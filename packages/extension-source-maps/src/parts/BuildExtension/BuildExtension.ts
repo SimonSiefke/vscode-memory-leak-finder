@@ -1,5 +1,5 @@
-import { exec } from '../Exec/Exec.ts'
 import { VError } from '@lvce-editor/verror'
+import { exec } from '../Exec/Exec.ts'
 
 export const buildExtension = async (repoPath: string, nodeVersion: string, platform?: string): Promise<void> => {
   if (platform === 'win32') {

@@ -12,8 +12,8 @@ test('exec - successfully executes command', async () => {
       if (method === 'exec.exec') {
         return {
           exitCode: 0,
-          stdout: 'test output',
           stderr: '',
+          stdout: 'test output',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -43,8 +43,8 @@ test('exec - handles command with non-zero exit code', async () => {
       if (method === 'exec.exec') {
         return {
           exitCode: 1,
-          stdout: '',
           stderr: 'error message',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -75,8 +75,8 @@ test('exec - passes cwd option', async () => {
         capturedOptions = options
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -106,8 +106,8 @@ test('exec - passes env option', async () => {
         capturedOptions = options
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -159,8 +159,8 @@ test('exec - handles empty args array', async () => {
       if (method === 'exec.exec') {
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -190,8 +190,8 @@ test('exec - handles multiple args', async () => {
         capturedArgs = args
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)

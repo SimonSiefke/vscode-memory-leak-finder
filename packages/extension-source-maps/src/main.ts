@@ -7,11 +7,11 @@ const main = async (): Promise<void> => {
   const outputDir = join(root, '.extension-source-maps')
 
   await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
-    extensionName: 'copilot-chat',
-    version: 'v0.36.2025121901',
-    repoUrl: 'git@github.com:microsoft/vscode-copilot-chat.git',
-    outputDir,
     cacheDir,
+    extensionName: 'copilot-chat',
+    outputDir,
+    repoUrl: 'git@github.com:microsoft/vscode-copilot-chat.git',
+    version: 'v0.36.2025121901',
   })
 }
 

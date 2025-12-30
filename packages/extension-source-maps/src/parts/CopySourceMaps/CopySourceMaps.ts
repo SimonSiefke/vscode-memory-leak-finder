@@ -1,6 +1,6 @@
+import { VError } from '@lvce-editor/verror'
 import { cp, mkdir, readdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
-import { VError } from '@lvce-editor/verror'
 
 export const copySourceMaps = async (repoPath: string, outputDir: string, extensionName: string, version: string): Promise<void> => {
   try {
@@ -21,7 +21,7 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
         for (const entry of entries) {
           const fullPath = join(dir, entry.name)
           if (entry.isFile() && entry.name.endsWith('.map')) {
-            sourceMapFiles.push({ file: fullPath, baseDir })
+            sourceMapFiles.push({ baseDir, file: fullPath })
           } else if (entry.isDirectory()) {
             await collectSourceMaps(fullPath, baseDir)
           }
@@ -48,7 +48,7 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
     const extensionId = `github.${extensionName}-${normalizedVersion}`
     const extensionOutputDir = join(outputDir, extensionId)
 
-    for (const { file: sourceMapFile, baseDir } of sourceMapFiles) {
+    for (const { baseDir, file: sourceMapFile } of sourceMapFiles) {
       const relativePath = relative(baseDir, sourceMapFile)
       const targetPath = join(extensionOutputDir, relativePath)
       const targetDir = dirname(targetPath)
@@ -58,7 +58,7 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
 
     // Also copy the corresponding .js files so we have the full context
     // This helps with source map resolution
-    for (const { file: sourceMapFile, baseDir } of sourceMapFiles) {
+    for (const { baseDir, file: sourceMapFile } of sourceMapFiles) {
       const jsFile = sourceMapFile.replace('.map', '')
       try {
         const relativePath = relative(baseDir, jsFile)

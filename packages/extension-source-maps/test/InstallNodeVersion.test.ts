@@ -19,28 +19,28 @@ test('installNodeVersion - successfully installs and uses node version', async (
         if (commandStr.includes('versions/node/v')) {
           return {
             exitCode: 0,
-            stdout: 'not_installed',
             stderr: '',
+            stdout: 'not_installed',
           }
         }
         if (commandStr.includes('nvm install')) {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         if (commandStr.includes('node --version')) {
           return {
             exitCode: 0,
-            stdout: installedVersion,
             stderr: '',
+            stdout: installedVersion,
           }
         }
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -75,29 +75,29 @@ test('installNodeVersion - skips install when version already installed', async 
         if (commandStr.includes('versions/node/v')) {
           return {
             exitCode: 0,
-            stdout: 'installed',
             stderr: '',
+            stdout: 'installed',
           }
         }
         if (commandStr.includes('nvm install')) {
           installCalled = true
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         if (commandStr.includes('node --version')) {
           return {
             exitCode: 0,
-            stdout: installedVersion,
             stderr: '',
+            stdout: installedVersion,
           }
         }
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -127,8 +127,8 @@ test('installNodeVersion - throws error when nvm is not available', async () => 
       if (method === 'exec.exec' && command === 'bash') {
         return {
           exitCode: 1,
-          stdout: '',
           stderr: 'nvm: command not found',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -156,21 +156,21 @@ test('installNodeVersion - throws error when install fails', async () => {
         if (commandStr.includes('versions/node/v')) {
           return {
             exitCode: 0,
-            stdout: 'not_installed',
             stderr: '',
+            stdout: 'not_installed',
           }
         }
         if (commandStr.includes('nvm install')) {
           return {
             exitCode: 1,
-            stdout: '',
             stderr: 'install failed',
+            stdout: '',
           }
         }
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -223,8 +223,8 @@ test('installNodeVersion - uses correct version in install command', async () =>
         if (commandStr.includes('versions/node/v')) {
           return {
             exitCode: 0,
-            stdout: 'not_installed',
             stderr: '',
+            stdout: 'not_installed',
           }
         }
         if (commandStr.includes('nvm install')) {
@@ -234,21 +234,21 @@ test('installNodeVersion - uses correct version in install command', async () =>
           }
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         if (commandStr.includes('node --version')) {
           return {
             exitCode: 0,
-            stdout: installedVersion,
             stderr: '',
+            stdout: installedVersion,
           }
         }
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)

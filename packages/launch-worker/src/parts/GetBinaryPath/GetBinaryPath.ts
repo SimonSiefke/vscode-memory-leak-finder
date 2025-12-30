@@ -55,10 +55,10 @@ export const getBinaryPath = async (
   }
   const path = await DownloadAndUnzipVscode.downloadAndUnzipVscode({
     arch,
-    platform,
-    vscodeVersion,
     insidersCommit: '',
+    platform,
     updateUrl: '',
+    vscodeVersion,
   })
   return path
 }

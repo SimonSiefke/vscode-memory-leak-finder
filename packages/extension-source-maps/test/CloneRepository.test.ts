@@ -1,8 +1,8 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
-import { join } from 'node:path'
-import { tmpdir } from 'node:os'
 import { MockRpc } from '@lvce-editor/rpc'
 import { rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 beforeEach(() => {
   jest.resetModules()
@@ -19,11 +19,11 @@ test('cloneRepository - executes git commands in sequence', async () => {
     commandMap: {},
     invoke: (method: string, command: string, args: string[], options: any) => {
       if (method === 'exec.exec') {
-        execCalls.push({ command, args, cwd: options?.cwd })
+        execCalls.push({ args, command, cwd: options?.cwd })
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -49,7 +49,7 @@ test('cloneRepository - executes git commands in sequence', async () => {
   expect(execCalls[3].command).toBe('git')
   expect(execCalls[3].args).toEqual(['-c', 'advice.detachedHead=false', 'checkout', 'FETCH_HEAD'])
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
 
 test('cloneRepository - creates directory if it does not exist', async () => {
@@ -63,8 +63,8 @@ test('cloneRepository - creates directory if it does not exist', async () => {
       if (method === 'exec.exec') {
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -83,7 +83,7 @@ test('cloneRepository - creates directory if it does not exist', async () => {
   const { access } = await import('node:fs/promises')
   await expect(access(tempDir)).resolves.not.toThrow()
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
 
 test('cloneRepository - throws VError when git init fails', async () => {
@@ -110,7 +110,7 @@ test('cloneRepository - throws VError when git init fails', async () => {
   const { cloneRepository } = await import('../src/parts/CloneRepository/CloneRepository.ts')
   await expect(cloneRepository(repoUrl, tempDir, commit)).rejects.toThrow(`Failed to clone repository from '${repoUrl}' to '${tempDir}'`)
 
-  await rm(tempDir, { recursive: true, force: true }).catch(() => {})
+  await rm(tempDir, { force: true, recursive: true }).catch(() => {})
 })
 
 test('cloneRepository - throws VError when git fetch fails', async () => {
@@ -129,8 +129,8 @@ test('cloneRepository - throws VError when git fetch fails', async () => {
         }
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -146,7 +146,7 @@ test('cloneRepository - throws VError when git fetch fails', async () => {
   const { cloneRepository } = await import('../src/parts/CloneRepository/CloneRepository.ts')
   await expect(cloneRepository(repoUrl, tempDir, commit)).rejects.toThrow(`Failed to clone repository from '${repoUrl}' to '${tempDir}'`)
 
-  await rm(tempDir, { recursive: true, force: true }).catch(() => {})
+  await rm(tempDir, { force: true, recursive: true }).catch(() => {})
 })
 
 test('cloneRepository - handles different repo URLs', async () => {
@@ -162,15 +162,15 @@ test('cloneRepository - handles different repo URLs', async () => {
         capturedRepoUrl = args[3]
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       if (method === 'exec.exec') {
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -188,7 +188,7 @@ test('cloneRepository - handles different repo URLs', async () => {
 
   expect(capturedRepoUrl).toBe(repoUrl)
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
 
 test('cloneRepository - handles different commit hashes', async () => {
@@ -204,15 +204,15 @@ test('cloneRepository - handles different commit hashes', async () => {
         capturedCommit = args[args.length - 1]
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       if (method === 'exec.exec') {
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -230,5 +230,5 @@ test('cloneRepository - handles different commit hashes', async () => {
 
   expect(capturedCommit).toBe(commit)
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
