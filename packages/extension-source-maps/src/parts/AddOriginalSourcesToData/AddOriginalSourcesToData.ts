@@ -1,55 +1,9 @@
-import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { dirname } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 import * as Root from '../Root/Root.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
-
-const parseSourceLocation = (sourceLocation: string): { url: string; line: number; column: number } | null => {
-  if (!sourceLocation) {
-    return null
-  }
-  // Format: ".vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277"
-  const match = sourceLocation.match(/^(.+):(\d+):(\d+)$/)
-  if (!match) {
-    return null
-  }
-  const path = match[1]
-  const line = Number.parseInt(match[2], 10)
-  const column = Number.parseInt(match[3], 10)
-  return { url: path, line, column }
-}
-
-const mapPathToSourceMapUrl = (path: string, root: string): string | null => {
-  if (!path) {
-    return null
-  }
-  try {
-    // Path might be: .vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js
-    // or absolute path
-    const absolutePath = path.startsWith('/') ? path : resolve(root, path)
-
-    // Check if this is a copilot extension file
-    const extensionMatch = absolutePath.match(/\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/)
-    if (!extensionMatch) {
-      return null
-    }
-    const extensionId = extensionMatch[1]
-    const relativePath = extensionMatch[2]
-
-    // Map to source maps directory
-    const sourceMapPath = join(root, '.extension-source-maps', extensionId, relativePath + '.map')
-    if (!existsSync(sourceMapPath)) {
-      console.log(`[addOriginalSourcesToData] Source map not found: ${sourceMapPath}`)
-      return null
-    }
-    const sourceMapUrl = pathToFileURL(sourceMapPath).toString()
-    return sourceMapUrl
-  } catch {
-    return null
-  }
-}
+import * as CollectSourceMapPositions from '../CollectSourceMapPositions/CollectSourceMapPositions.ts'
 
 export const addOriginalSourcesToData = async (dataFilePath: string, version: string, outputFilePath: string): Promise<void> => {
   try {
@@ -75,50 +29,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     }
 
     const enriched: any[] = [...items]
-    const sourceMapUrlToPositions: Record<string, number[]> = Object.create(null)
-    const positionPointers: { index: number; sourceMapUrl: string }[] = []
-
-    // First pass: collect positions for each source map URL
-    for (let i = 0; i < enriched.length; i++) {
-      const item = enriched[i] as any
-      let sourceMapUrl: string | null = null
-      let line: number | undefined
-      let column: number | undefined
-
-      // Try to get source map URL from item
-      if (item.sourceMapUrl) {
-        sourceMapUrl = item.sourceMapUrl
-        line = item.line
-        column = item.column
-      } else if (item.sourceLocation) {
-        // Parse sourceLocation format: ".vscode-extensions/.../file.js:917:1277"
-        const parsed = parseSourceLocation(item.sourceLocation)
-        if (parsed) {
-          line = parsed.line
-          column = parsed.column
-          sourceMapUrl = mapPathToSourceMapUrl(parsed.url, rootPath)
-          if (sourceMapUrl) {
-            item.sourceMapUrl = sourceMapUrl
-          }
-        }
-      } else if (item.url) {
-        // Map URL to source map URL
-        sourceMapUrl = mapPathToSourceMapUrl(item.url, rootPath)
-        if (sourceMapUrl) {
-          item.sourceMapUrl = sourceMapUrl
-        }
-        line = item.line
-        column = item.column
-      }
-
-      if (sourceMapUrl && line !== undefined && column !== undefined) {
-        if (!sourceMapUrlToPositions[sourceMapUrl]) {
-          sourceMapUrlToPositions[sourceMapUrl] = []
-        }
-        sourceMapUrlToPositions[sourceMapUrl].push(line, column)
-        positionPointers.push({ index: i, sourceMapUrl: sourceMapUrl })
-      }
-    }
+    const { sourceMapUrlToPositions, positionPointers } = CollectSourceMapPositions.collectSourceMapPositions(enriched, rootPath)
 
     const sourceMapUrls = Object.keys(sourceMapUrlToPositions)
     console.log(`[addOriginalSourcesToData] Found ${sourceMapUrls.length} source map URLs to resolve`)
