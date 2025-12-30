@@ -72,7 +72,7 @@ test('installNodeVersion - skips install when version already installed', async 
       if (method === 'exec.exec' && command === 'bash') {
         callCount++
         const commandStr = args[1]
-        if (commandStr.includes('nvm list')) {
+        if (commandStr.includes('versions/node/v')) {
           return {
             exitCode: 0,
             stdout: 'installed',
@@ -153,7 +153,7 @@ test('installNodeVersion - throws error when install fails', async () => {
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'bash') {
         const commandStr = args[1]
-        if (commandStr.includes('nvm list')) {
+        if (commandStr.includes('versions/node/v')) {
           return {
             exitCode: 0,
             stdout: 'not_installed',
@@ -220,7 +220,7 @@ test('installNodeVersion - uses correct version in install command', async () =>
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'bash') {
         const commandStr = args[1]
-        if (commandStr.includes('nvm list')) {
+        if (commandStr.includes('versions/node/v')) {
           return {
             exitCode: 0,
             stdout: 'not_installed',

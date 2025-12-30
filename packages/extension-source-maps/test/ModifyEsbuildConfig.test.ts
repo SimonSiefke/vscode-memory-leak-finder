@@ -29,6 +29,31 @@ esbuild.build({
   await rm(tempRepo, { recursive: true, force: true })
 })
 
+test('modifyEsbuildConfig - enables sourcemap in .esbuild.ts', async () => {
+  const tempRepo = join(tmpdir(), `test-modify-esbuild-${Date.now()}`)
+  await mkdir(tempRepo, { recursive: true })
+
+  const configContent = `import * as esbuild from 'esbuild'
+
+esbuild.build({
+  entryPoints: ['src/index.ts'],
+  bundle: true,
+  outfile: 'dist/index.js',
+  sourcemap: false,
+})
+`
+
+  await writeFile(join(tempRepo, '.esbuild.ts'), configContent)
+
+  await ModifyEsbuildConfig.modifyEsbuildConfig(tempRepo)
+
+  const modifiedContent = await readFile(join(tempRepo, '.esbuild.ts'), 'utf8')
+  expect(modifiedContent).toContain('sourcemap: true')
+  expect(modifiedContent).not.toContain('sourcemap: false')
+
+  await rm(tempRepo, { recursive: true, force: true })
+})
+
 test('modifyEsbuildConfig - enables sourcemap in esbuild.config.js', async () => {
   const tempRepo = join(tmpdir(), `test-modify-esbuild-${Date.now()}`)
   await mkdir(tempRepo, { recursive: true })
