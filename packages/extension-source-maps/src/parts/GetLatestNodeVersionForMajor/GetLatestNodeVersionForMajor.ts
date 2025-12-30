@@ -1,18 +1,8 @@
 import { VError } from '@lvce-editor/verror'
 import { launchNetworkWorker } from '../LaunchNetworkWorker/LaunchNetworkWorker.ts'
+import type { NodeVersionInfo, ParsedVersion } from './NodeVersionTypes.ts'
 
 const NODE_VERSION_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/
-
-interface NodeVersionInfo {
-  version: string
-}
-
-interface ParsedVersion {
-  major: number
-  minor: number
-  patch: number
-  version: string
-}
 
 export const getLatestNodeVersionForMajor = async (majorVersion: string): Promise<string> => {
   try {
