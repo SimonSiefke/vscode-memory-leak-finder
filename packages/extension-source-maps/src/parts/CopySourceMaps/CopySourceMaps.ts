@@ -49,8 +49,8 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
     const extensionId = `github.${extensionName}-${normalizedVersion}`
     const extensionOutputDir = join(outputDir, extensionId)
 
-    for (const { file: sourceMapFile, baseDir } of sourceMapFiles) {
-      const relativePath = relative(baseDir, sourceMapFile)
+    for (const { file: sourceMapFile } of sourceMapFiles) {
+      const relativePath = relative(repoPath, sourceMapFile)
       const targetPath = join(extensionOutputDir, relativePath)
       const targetDir = dirname(targetPath)
       await mkdir(targetDir, { recursive: true })
@@ -59,10 +59,10 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
 
     // Also copy the corresponding .js files so we have the full context
     // This helps with source map resolution
-    for (const { file: sourceMapFile, baseDir } of sourceMapFiles) {
+    for (const { file: sourceMapFile } of sourceMapFiles) {
       const jsFile = sourceMapFile.replace('.map', '')
       try {
-        const relativePath = relative(baseDir, jsFile)
+        const relativePath = relative(repoPath, jsFile)
         const targetPath = join(extensionOutputDir, relativePath)
         const targetDir = dirname(targetPath)
         await mkdir(targetDir, { recursive: true })
