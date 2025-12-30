@@ -10,14 +10,14 @@ export interface VariableName {
   readonly sourceType: string
 }
 export interface BigintObject {
-  detachedness: number
-  edgeCount: number
-  id: number
-  name: string
-  note: string
-  selfSize: number
-  value: string
-  variableNames: VariableName[]
+  readonly detachedness: number
+  readonly edgeCount: number
+  readonly id: number
+  readonly name: string
+  readonly note: string
+  readonly selfSize: number
+  readonly value: string
+  readonly variableNames: readonly VariableName[]
 }
 
 export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {

@@ -1,10 +1,11 @@
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 import * as ApplyOriginalPositions from '../ApplyOriginalPositions/ApplyOriginalPositions.ts'
+import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
 
 export const resolveOriginalPositions = async (
   enriched: any[],
   sourceMapUrlToPositions: Record<string, number[]>,
-  positionPointers: { index: number; sourceMapUrl: string }[],
+  positionPointers: PositionPointer[],
 ): Promise<void> => {
   // Resolve original positions using source-map-worker
   try {

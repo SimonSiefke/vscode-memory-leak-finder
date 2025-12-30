@@ -4,8 +4,8 @@ import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
 export interface BisectResult {
-  commit?: string
-  type: 'success' | 'failed-test' | 'not-found'
+  readonly commit?: string
+  readonly type: 'success' | 'failed-test' | 'not-found'
 }
 
 export const bisect = async (options: StartRunningOptions): Promise<BisectResult> => {

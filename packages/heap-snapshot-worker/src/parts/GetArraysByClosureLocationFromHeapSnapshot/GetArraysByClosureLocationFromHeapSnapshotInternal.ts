@@ -18,25 +18,25 @@ interface LocationInfo {
 }
 
 interface ArrayObj {
-  detachedness: number
-  edgeCount: number
-  id: number
-  length: number
-  locationInfo: LocationInfo | null
-  locationKey: string
-  name: string
-  nodeDataIndex: number
-  selfSize: number
-  type: 'array'
-  variableNames: VariableName[]
+  readonly detachedness: number
+  readonly edgeCount: number
+  readonly id: number
+  readonly length: number
+  readonly locationInfo: LocationInfo | null
+  readonly locationKey: string
+  readonly name: string
+  readonly nodeDataIndex: number
+  readonly selfSize: number
+  readonly type: 'array'
+  readonly variableNames: readonly VariableName[]
 }
 
 interface ClosureGroup {
-  arrays: ArrayObj[]
-  count: number
-  locationInfo: LocationInfo | null
-  locationKey: string
-  totalSize: number
+  readonly arrays: readonly ArrayObj[]
+  readonly count: number
+  readonly locationInfo: LocationInfo | null
+  readonly locationKey: string
+  readonly totalSize: number
 }
 
 interface ResultArrayItem {

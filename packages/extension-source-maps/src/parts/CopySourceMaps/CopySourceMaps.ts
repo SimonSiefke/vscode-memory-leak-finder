@@ -3,8 +3,8 @@ import { dirname, join, relative } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 
 interface SourceMapFile {
-  file: string
-  baseDir: string
+  readonly file: string
+  readonly baseDir: string
 }
 
 export const copySourceMaps = async (repoPath: string, outputDir: string, extensionName: string, version: string): Promise<void> => {

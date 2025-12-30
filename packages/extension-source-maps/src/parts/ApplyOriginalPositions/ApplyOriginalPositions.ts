@@ -1,18 +1,17 @@
-type OriginalPosition = {
+import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
+
+interface OriginalPosition {
   source?: string | null
   line?: number | null
   column?: number | null
   name?: string | null
 }
 
-type CleanPositionMap = Record<string, OriginalPosition[]>
-
-type PositionPointer = {
-  index: number
-  sourceMapUrl: string
+interface CleanPositionMap {
+  [key: string]: OriginalPosition[]
 }
 
-type EnrichedItem = {
+interface EnrichedItem {
   originalSource?: string | null
   originalUrl?: string | null
   originalLine?: number | null

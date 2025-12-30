@@ -1,15 +1,16 @@
 import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSourceMapUrl.ts'
 import * as ParseSourceLocation from '../ParseSourceLocation/ParseSourceLocation.ts'
+import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
 
 export const collectSourceMapPositions = (
   enriched: any[],
   rootPath: string,
 ): {
   sourceMapUrlToPositions: Record<string, number[]>
-  positionPointers: { index: number; sourceMapUrl: string }[]
+  positionPointers: PositionPointer[]
 } => {
   const sourceMapUrlToPositions: Record<string, number[]> = Object.create(null)
-  const positionPointers: { index: number; sourceMapUrl: string }[] = []
+  const positionPointers: PositionPointer[] = []
 
   // First pass: collect positions for each source map URL
   for (let i = 0; i < enriched.length; i++) {

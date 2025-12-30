@@ -11,17 +11,17 @@ interface VariableName {
   readonly sourceType: string
 }
 interface MapObject {
-  detachedness: number
-  edgeCount: number
-  id: number
-  keys: string[]
-  name: string
-  nodeDataIndex: number
-  note: string
-  selfSize: number
-  size?: string
-  type: 'map'
-  variableNames: VariableName[]
+  readonly detachedness: number
+  readonly edgeCount: number
+  readonly id: number
+  readonly keys: readonly string[]
+  readonly name: string
+  readonly nodeDataIndex: number
+  readonly note: string
+  readonly selfSize: number
+  readonly size?: string
+  readonly type: 'map'
+  readonly variableNames: readonly VariableName[]
 }
 
 export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {

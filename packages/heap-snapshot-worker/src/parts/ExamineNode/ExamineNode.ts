@@ -7,26 +7,26 @@ import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
 export interface NodeExaminationResult {
-  edges: Array<{
-    type: number
-    typeName: string
-    nameIndex: number
-    edgeName: string
-    toNode: number
-    targetNodeInfo?: {
-      name: string | null
-      type: string | null
+  readonly edges: readonly Array<{
+    readonly type: number
+    readonly typeName: string
+    readonly nameIndex: number
+    readonly edgeName: string
+    readonly toNode: number
+    readonly targetNodeInfo?: {
+      readonly name: string | null
+      readonly type: string | null
     }
   }>
-  node: any
-  nodeId: number
-  nodeIndex: number
-  nodeName: string | null
-  nodeType: string | null
-  properties: Array<{
-    name: string
-    value: string | null
-    targetType: string | null
+  readonly node: any
+  readonly nodeId: number
+  readonly nodeIndex: number
+  readonly nodeName: string | null
+  readonly nodeType: string | null
+  readonly properties: readonly Array<{
+    readonly name: string
+    readonly value: string | null
+    readonly targetType: string | null
   }>
 }
 

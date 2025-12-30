@@ -1,10 +1,10 @@
 import * as Assert from '../Assert/Assert.ts'
 
 export interface ParsedLocation {
-  columnIndex: number
-  lineIndex: number
-  objectIndex: number
-  scriptIdIndex: number
+  readonly columnIndex: number
+  readonly lineIndex: number
+  readonly objectIndex: number
+  readonly scriptIdIndex: number
 }
 
 export const parseHeapSnapshotLocations = (

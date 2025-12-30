@@ -5,20 +5,20 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
 interface GraphEdge {
-  index: number
-  name: string
+  readonly index: number
+  readonly name: string
 }
 interface Graph {
-  [nodeId: number]: GraphEdge[]
+  readonly [nodeId: number]: readonly GraphEdge[]
 }
 interface ParsedNode {
-  id: number
-  name: string
-  type: string
+  readonly id: number
+  readonly name: string
+  readonly type: string
 }
 interface ArrayWithCount {
-  count: number
-  id: number
+  readonly count: number
+  readonly id: number
 }
 
 const isArray = (node: ParsedNode): boolean => {
@@ -64,14 +64,14 @@ const filterByMinLength = (arrays: readonly ArrayWithCount[], minLength: number)
 }
 
 interface NameMapEntry {
-  edgeName: string | undefined
-  nodeName: string | undefined
+  readonly edgeName: string | undefined
+  readonly nodeName: string | undefined
 }
 interface NameMap {
-  [id: number]: NameMapEntry
+  readonly [id: number]: NameMapEntry
 }
 export interface ArrayWithCountAndName extends ArrayWithCount {
-  name: string | undefined
+  readonly name: string | undefined
 }
 
 const addNames = (items: readonly ArrayWithCount[], nameMap: NameMap): ArrayWithCountAndName[] => {
