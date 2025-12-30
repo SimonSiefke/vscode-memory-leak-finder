@@ -1,4 +1,4 @@
-import type { NodeVersionInfo, ParsedVersion } from '../GetLatestNodeVersionForMajor/NodeVersionTypes.ts'
+import type { NodeVersionInfo, ParsedVersion } from '../NodeVersionTypes/NodeVersionTypes.ts'
 
 const NODE_VERSION_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/
 

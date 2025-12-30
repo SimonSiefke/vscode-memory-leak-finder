@@ -1,7 +1,7 @@
 import { VError } from '@lvce-editor/verror'
 import { launchNetworkWorker } from '../LaunchNetworkWorker/LaunchNetworkWorker.ts'
 import { filterAndSortNodeVersions } from '../FilterAndSortNodeVersions/FilterAndSortNodeVersions.ts'
-import type { NodeVersionInfo } from './NodeVersionTypes.ts'
+import type { NodeVersionInfo } from '../NodeVersionTypes/NodeVersionTypes.ts'
 
 export const getLatestNodeVersionForMajor = async (majorVersion: string): Promise<string> => {
   try {
