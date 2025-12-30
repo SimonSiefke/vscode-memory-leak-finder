@@ -6,9 +6,9 @@ test('parseSourceLocation - parses valid source location', () => {
     '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277',
   )
   expect(result).toEqual({
-    url: '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js',
-    line: 917,
     column: 1277,
+    line: 917,
+    url: '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js',
   })
 })
 
@@ -30,17 +30,17 @@ test('parseSourceLocation - returns null for missing line number', () => {
 test('parseSourceLocation - handles absolute paths', () => {
   const result = ParseSourceLocation.parseSourceLocation('/absolute/path/to/file.js:10:20')
   expect(result).toEqual({
-    url: '/absolute/path/to/file.js',
-    line: 10,
     column: 20,
+    line: 10,
+    url: '/absolute/path/to/file.js',
   })
 })
 
 test('parseSourceLocation - handles paths with colons in filename', () => {
   const result = ParseSourceLocation.parseSourceLocation('file:name.js:5:10')
   expect(result).toEqual({
-    url: 'file:name.js',
-    line: 5,
     column: 10,
+    line: 5,
+    url: 'file:name.js',
   })
 })

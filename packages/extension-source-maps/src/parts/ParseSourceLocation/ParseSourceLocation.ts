@@ -12,5 +12,5 @@ export const parseSourceLocation = (sourceLocation: string): { url: string; line
   const path = match[1]
   const line = Number.parseInt(match[2], 10)
   const column = Number.parseInt(match[3], 10)
-  return { url: path, line, column }
+  return { column, line, url: path }
 }

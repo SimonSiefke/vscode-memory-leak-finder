@@ -52,15 +52,15 @@ test('installDependencies - successfully installs dependencies', async () => {
         if (command === 'bash' && args[0] === '-c' && args[1].includes('NVM_DIR')) {
           return {
             exitCode: 0,
-            stdout: npmPath,
             stderr: '',
+            stdout: npmPath,
           }
         }
         if (command === npmPath && args[0] === 'ci') {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
       }
@@ -98,8 +98,8 @@ test('installDependencies - throws error when npm path not found', async () => {
       if (method === 'exec.exec' && command === 'bash' && args[0] === '-c' && args[1].includes('NVM_DIR')) {
         return {
           exitCode: 1,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method} command ${command}`)
@@ -136,8 +136,8 @@ test('installDependencies - throws error when npm path is empty', async () => {
       if (method === 'exec.exec' && command === 'bash' && args[0] === '-c' && args[1].includes('NVM_DIR')) {
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method} command ${command}`)
@@ -176,15 +176,15 @@ test('installDependencies - throws error when npm ci fails', async () => {
         if (command === 'bash' && args[0] === '-c' && args[1].includes('NVM_DIR')) {
           return {
             exitCode: 0,
-            stdout: npmPath,
             stderr: '',
+            stdout: npmPath,
           }
         }
         if (command === npmPath && args[0] === 'ci') {
           return {
             exitCode: 1,
-            stdout: '',
             stderr: 'npm ci failed',
+            stdout: '',
           }
         }
       }
@@ -224,15 +224,15 @@ test('installDependencies - uses npm from .config/nvm when .nvm not found', asyn
         if (command === 'bash' && args[0] === '-c' && args[1].includes('NVM_DIR')) {
           return {
             exitCode: 0,
-            stdout: npmPath,
             stderr: '',
+            stdout: npmPath,
           }
         }
         if (command === npmPath && args[0] === 'ci') {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
       }

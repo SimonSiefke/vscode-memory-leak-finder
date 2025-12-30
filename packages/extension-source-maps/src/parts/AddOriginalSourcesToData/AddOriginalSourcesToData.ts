@@ -1,9 +1,9 @@
 import { VError } from '@lvce-editor/verror'
-import * as Root from '../Root/Root.ts'
 import * as CollectSourceMapPositions from '../CollectSourceMapPositions/CollectSourceMapPositions.ts'
 import * as ExtractItemsFromData from '../ExtractItemsFromData/ExtractItemsFromData.ts'
 import * as ReadJson from '../ReadJson/ReadJson.ts'
 import * as ResolveOriginalPositions from '../ResolveOriginalPositions/ResolveOriginalPositions.ts'
+import * as Root from '../Root/Root.ts'
 import * as WriteJson from '../WriteJson/WriteJson.ts'
 
 export const addOriginalSourcesToData = async (dataFilePath: string, version: string, outputFilePath: string): Promise<void> => {
@@ -18,7 +18,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     }
 
     const enriched: any[] = [...items]
-    const { sourceMapUrlToPositions, positionPointers } = CollectSourceMapPositions.collectSourceMapPositions(enriched, rootPath)
+    const { positionPointers, sourceMapUrlToPositions } = CollectSourceMapPositions.collectSourceMapPositions(enriched, rootPath)
 
     const sourceMapUrls = Object.keys(sourceMapUrlToPositions)
     console.log(`[addOriginalSourcesToData] Found ${sourceMapUrls.length} source map URLs to resolve`)

@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { mkdir, writeFile, rm } from 'node:fs/promises'
-import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import * as MapPathToSourceMapUrl from '../src/parts/MapPathToSourceMapUrl/MapPathToSourceMapUrl.ts'
 
 test('mapPathToSourceMapUrl - returns file URL when source map exists', async () => {
@@ -17,7 +17,7 @@ test('mapPathToSourceMapUrl - returns file URL when source map exists', async ()
   expect(result).toMatch(/^file:\/\//)
   expect(result).toContain('extension.js.map')
 
-  await rm(tempRoot, { recursive: true, force: true })
+  await rm(tempRoot, { force: true, recursive: true })
 })
 
 test('mapPathToSourceMapUrl - returns null when source map does not exist', () => {

@@ -19,8 +19,8 @@ beforeEach(() => {
 
 test('collectSourceMapPositions - collects positions from items with sourceMapUrl', () => {
   const enriched: any[] = [
-    { sourceMapUrl: 'file:///path/to/source.map', line: 10, column: 20 },
-    { sourceMapUrl: 'file:///path/to/source.map', line: 15, column: 25 },
+    { column: 20, line: 10, sourceMapUrl: 'file:///path/to/source.map' },
+    { column: 25, line: 15, sourceMapUrl: 'file:///path/to/source.map' },
   ]
   const rootPath = '/root'
 
@@ -35,7 +35,7 @@ test('collectSourceMapPositions - collects positions from items with sourceMapUr
 })
 
 test('collectSourceMapPositions - collects positions from items with sourceLocation', () => {
-  mockParseSourceLocation.mockReturnValue({ url: 'path/to/file.js', line: 5, column: 10 })
+  mockParseSourceLocation.mockReturnValue({ column: 10, line: 5, url: 'path/to/file.js' })
   mockMapPathToSourceMapUrl.mockReturnValue('file:///path/to/source.map')
 
   const enriched: any[] = [{ sourceLocation: 'path/to/file.js:5:10' }]
@@ -54,7 +54,7 @@ test('collectSourceMapPositions - collects positions from items with sourceLocat
 test('collectSourceMapPositions - collects positions from items with url', () => {
   mockMapPathToSourceMapUrl.mockReturnValue('file:///path/to/source.map')
 
-  const enriched: any[] = [{ url: 'path/to/file.js', line: 3, column: 7 }]
+  const enriched: any[] = [{ column: 7, line: 3, url: 'path/to/file.js' }]
   const rootPath = '/root'
 
   const result = collectSourceMapPositions(enriched, rootPath)
@@ -70,8 +70,8 @@ test('collectSourceMapPositions - skips items without valid source map URL', () 
   mockMapPathToSourceMapUrl.mockReturnValue(null)
 
   const enriched: any[] = [
-    { url: 'path/to/file.js', line: 3, column: 7 },
-    { line: 5, column: 10 }, // missing url and sourceLocation
+    { column: 7, line: 3, url: 'path/to/file.js' },
+    { column: 10, line: 5 }, // missing url and sourceLocation
   ]
   const rootPath = '/root'
 
@@ -83,8 +83,8 @@ test('collectSourceMapPositions - skips items without valid source map URL', () 
 
 test('collectSourceMapPositions - skips items without line or column', () => {
   const enriched: any[] = [
-    { sourceMapUrl: 'file:///path/to/source.map', line: 10 }, // missing column
-    { sourceMapUrl: 'file:///path/to/source.map', column: 20 }, // missing line
+    { line: 10, sourceMapUrl: 'file:///path/to/source.map' }, // missing column
+    { column: 20, sourceMapUrl: 'file:///path/to/source.map' }, // missing line
   ]
   const rootPath = '/root'
 

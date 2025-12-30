@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
-import { filterAndSortNodeVersions } from '../src/parts/FilterAndSortNodeVersions/FilterAndSortNodeVersions.ts'
 import type { NodeVersionInfo } from '../src/parts/NodeVersionTypes/NodeVersionTypes.ts'
+import { filterAndSortNodeVersions } from '../src/parts/FilterAndSortNodeVersions/FilterAndSortNodeVersions.ts'
 
 test('filterAndSortNodeVersions - filters by major version', () => {
   const versions: readonly NodeVersionInfo[] = [

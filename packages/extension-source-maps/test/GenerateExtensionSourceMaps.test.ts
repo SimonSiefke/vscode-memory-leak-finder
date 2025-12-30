@@ -1,9 +1,9 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
-import { mkdir, writeFile, rm } from 'node:fs/promises'
-import { join } from 'node:path'
-import { tmpdir } from 'node:os'
-import { existsSync } from 'node:fs'
 import { MockRpc } from '@lvce-editor/rpc'
+import { existsSync } from 'node:fs'
+import { mkdir, writeFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import * as GenerateExtensionSourceMaps from '../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
 
 beforeEach(() => {
@@ -20,17 +20,17 @@ test.skip('generateExtensionSourceMaps - skips when source maps already exist', 
   await mkdir(sourceMapsOutputPath, { recursive: true })
 
   await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
-    extensionName,
-    version,
-    repoUrl: 'git@github.com:test/repo.git',
-    outputDir: tempOutput,
     cacheDir: tempCache,
+    extensionName,
+    outputDir: tempOutput,
+    repoUrl: 'git@github.com:test/repo.git',
+    version,
   })
 
   expect(existsSync(sourceMapsOutputPath)).toBe(true)
 
-  await rm(tempOutput, { recursive: true, force: true })
-  await rm(tempCache, { recursive: true, force: true })
+  await rm(tempOutput, { force: true, recursive: true })
+  await rm(tempCache, { force: true, recursive: true })
 })
 
 test.skip('generateExtensionSourceMaps - clones repository when it does not exist', async () => {
@@ -49,8 +49,8 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
       if (method === 'exec.exec' && command === 'git') {
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -102,17 +102,17 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
-    extensionName,
-    version,
-    repoUrl,
-    outputDir: tempOutput,
     cacheDir: tempCache,
+    extensionName,
+    outputDir: tempOutput,
+    repoUrl,
+    version,
   })
 
   expect(cloneCalled).toBe(true)
 
-  await rm(tempOutput, { recursive: true, force: true })
-  await rm(tempCache, { recursive: true, force: true })
+  await rm(tempOutput, { force: true, recursive: true })
+  await rm(tempCache, { force: true, recursive: true })
 })
 
 test.skip('generateExtensionSourceMaps - finds commit and checks out', async () => {
@@ -139,8 +139,8 @@ test.skip('generateExtensionSourceMaps - finds commit and checks out', async () 
         }
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -193,18 +193,18 @@ test.skip('generateExtensionSourceMaps - finds commit and checks out', async () 
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
-    extensionName,
-    version,
-    repoUrl,
-    outputDir: tempOutput,
     cacheDir: tempCache,
+    extensionName,
+    outputDir: tempOutput,
+    repoUrl,
+    version,
   })
 
   expect(findCommitCalled).toBe(true)
   expect(checkoutCalled).toBe(true)
 
-  await rm(tempOutput, { recursive: true, force: true })
-  await rm(tempCache, { recursive: true, force: true })
+  await rm(tempOutput, { force: true, recursive: true })
+  await rm(tempCache, { force: true, recursive: true })
 })
 
 test.skip('generateExtensionSourceMaps - throws error when checkout fails', async () => {
@@ -223,8 +223,8 @@ test.skip('generateExtensionSourceMaps - throws error when checkout fails', asyn
       if (method === 'exec.exec' && command === 'git' && args[0] === 'checkout') {
         return {
           exitCode: 1,
-          stdout: '',
           stderr: 'checkout failed',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -249,16 +249,16 @@ test.skip('generateExtensionSourceMaps - throws error when checkout fails', asyn
 
   await expect(
     generateExtensionSourceMaps({
-      extensionName,
-      version,
-      repoUrl,
-      outputDir: tempOutput,
       cacheDir: tempCache,
+      extensionName,
+      outputDir: tempOutput,
+      repoUrl,
+      version,
     }),
   ).rejects.toThrow('Failed to checkout commit abc123: checkout failed')
 
-  await rm(tempOutput, { recursive: true, force: true })
-  await rm(tempCache, { recursive: true, force: true })
+  await rm(tempOutput, { force: true, recursive: true })
+  await rm(tempCache, { force: true, recursive: true })
 })
 
 test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
@@ -286,8 +286,8 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
       if (method === 'exec.exec' && command === 'git') {
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -354,11 +354,11 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
-    extensionName,
-    version,
-    repoUrl,
-    outputDir: tempOutput,
     cacheDir: tempCache,
+    extensionName,
+    outputDir: tempOutput,
+    repoUrl,
+    version,
   })
 
   expect(workflowCalls).toEqual([
@@ -371,8 +371,8 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
     'copySourceMaps',
   ])
 
-  await rm(tempOutput, { recursive: true, force: true })
-  await rm(tempCache, { recursive: true, force: true })
+  await rm(tempOutput, { force: true, recursive: true })
+  await rm(tempCache, { force: true, recursive: true })
 })
 
 test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
@@ -396,8 +396,8 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
       if (method === 'exec.exec' && command === 'git') {
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -445,11 +445,11 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
-    extensionName,
-    version,
-    repoUrl,
-    outputDir: tempOutput,
     cacheDir: tempCache,
+    extensionName,
+    outputDir: tempOutput,
+    repoUrl,
+    version,
   })
 
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Finding commit for version ${version}...`)
@@ -466,6 +466,6 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
 
   consoleSpy.mockRestore()
 
-  await rm(tempOutput, { recursive: true, force: true })
-  await rm(tempCache, { recursive: true, force: true })
+  await rm(tempOutput, { force: true, recursive: true })
+  await rm(tempCache, { force: true, recursive: true })
 })

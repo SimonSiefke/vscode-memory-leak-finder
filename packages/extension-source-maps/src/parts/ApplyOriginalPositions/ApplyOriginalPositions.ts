@@ -1,10 +1,10 @@
 import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
 
 interface OriginalPosition {
-  source?: string | null
-  line?: number | null
   column?: number | null
+  line?: number | null
   name?: string | null
+  source?: string | null
 }
 
 interface CleanPositionMap {
@@ -12,13 +12,13 @@ interface CleanPositionMap {
 }
 
 interface EnrichedItem {
+  [key: string]: any
+  originalColumn?: number | null
+  originalLine?: number | null
+  originalLocation?: string | null
+  originalName?: string | null
   originalSource?: string | null
   originalUrl?: string | null
-  originalLine?: number | null
-  originalColumn?: number | null
-  originalName?: string | null
-  originalLocation?: string | null
-  [key: string]: any
 }
 
 export const applyOriginalPositions = (
@@ -33,7 +33,7 @@ export const applyOriginalPositions = (
     const original = positions[offset]
     offsetMap[pointer.sourceMapUrl] = offset + 1
     if (original) {
-      const target = enriched[pointer.index] as EnrichedItem
+      const target = enriched[pointer.index]
       target.originalSource = original.source ?? null
       target.originalUrl = original.source ?? null
       target.originalLine = original.line ?? null

@@ -1,4 +1,4 @@
 export interface SourceMapFile {
-  readonly file: string
   readonly baseDir: string
+  readonly file: string
 }

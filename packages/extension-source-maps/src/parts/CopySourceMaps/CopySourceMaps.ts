@@ -1,6 +1,6 @@
+import { VError } from '@lvce-editor/verror'
 import { cp, mkdir, readdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
-import { VError } from '@lvce-editor/verror'
 import type { SourceMapFile } from '../SourceMapFile/SourceMapFile.js'
 
 export const copySourceMaps = async (repoPath: string, outputDir: string, extensionName: string, version: string): Promise<void> => {
@@ -22,7 +22,7 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
         for (const entry of entries) {
           const fullPath = join(dir, entry.name)
           if (entry.isFile() && entry.name.endsWith('.map')) {
-            sourceMapFiles.push({ file: fullPath, baseDir })
+            sourceMapFiles.push({ baseDir, file: fullPath })
           } else if (entry.isDirectory()) {
             await collectSourceMaps(fullPath, baseDir)
           }

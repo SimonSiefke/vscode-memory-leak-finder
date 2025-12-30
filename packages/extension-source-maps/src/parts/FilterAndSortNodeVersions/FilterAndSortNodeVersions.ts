@@ -8,7 +8,7 @@ const filterByMajorVersion = (majorVersion: number) => {
     if (!versionMatch) {
       return false
     }
-    const major = parseInt(versionMatch[1], 10)
+    const major = Number.parseInt(versionMatch[1], 10)
     return major === majorVersion
   }
 }
@@ -19,9 +19,9 @@ const parseVersion = (v: NodeVersionInfo): ParsedVersion | null => {
     return null
   }
   return {
-    major: parseInt(versionMatch[1], 10),
-    minor: parseInt(versionMatch[2], 10),
-    patch: parseInt(versionMatch[3], 10),
+    major: Number.parseInt(versionMatch[1], 10),
+    minor: Number.parseInt(versionMatch[2], 10),
+    patch: Number.parseInt(versionMatch[3], 10),
     version: v.version,
   }
 }

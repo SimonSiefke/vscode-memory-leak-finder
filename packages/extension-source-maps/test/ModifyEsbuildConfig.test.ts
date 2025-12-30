@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { mkdir, writeFile, readFile, rm } from 'node:fs/promises'
-import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import * as ModifyEsbuildConfig from '../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
 
 test('modifyEsbuildConfig - replaces isDev linked false with linked linked', async () => {
@@ -26,7 +26,7 @@ esbuild.build({
   expect(modifiedContent).toContain("sourcemap: isDev ? 'linked' : 'linked'")
   expect(modifiedContent).not.toContain("sourcemap: isDev ? 'linked' : false")
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - does not modify if pattern not found', async () => {
@@ -48,7 +48,7 @@ esbuild.build({
   const modifiedContent = await readFile(join(tempRepo, '.esbuild.ts'), 'utf8')
   expect(modifiedContent).toBe(configContent)
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - throws VError when file does not exist', async () => {
@@ -57,5 +57,5 @@ test('modifyEsbuildConfig - throws VError when file does not exist', async () =>
 
   await expect(ModifyEsbuildConfig.modifyEsbuildConfig(tempRepo)).rejects.toThrow(`Failed to modify esbuild config in '${tempRepo}'`)
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })

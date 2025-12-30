@@ -1,6 +1,6 @@
+import { VError } from '@lvce-editor/verror'
 import { join } from 'node:path'
 import { exec } from '../Exec/Exec.ts'
-import { VError } from '@lvce-editor/verror'
 import * as ReadJson from '../ReadJson/ReadJson.ts'
 
 export const findCommitForVersion = async (repoPath: string, version: string): Promise<string> => {

@@ -1,7 +1,7 @@
-import { exec } from '../Exec/Exec.ts'
 import { VError } from '@lvce-editor/verror'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { exec } from '../Exec/Exec.ts'
 
 export const installDependencies = async (repoPath: string, nodeVersion: string): Promise<void> => {
   try {

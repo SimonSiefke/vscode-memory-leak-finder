@@ -27,7 +27,7 @@ test('extractItemsFromData - extracts items from namedFunctionCount2', () => {
 test('extractItemsFromData - prefers namedFunctionCount3 over namedFunctionCount2', () => {
   const items3 = [{ name: 'test3' }]
   const items2 = [{ name: 'test2' }]
-  const data = { namedFunctionCount3: items3, namedFunctionCount2: items2 }
+  const data = { namedFunctionCount2: items2, namedFunctionCount3: items3 }
   const result = ExtractItemsFromData.extractItemsFromData(data)
   expect(result).toEqual(items3)
 })

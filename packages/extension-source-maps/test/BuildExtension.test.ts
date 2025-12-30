@@ -15,11 +15,11 @@ test.skip('buildExtension - runs npm ci and npm run compile successfully', async
     commandMap: {},
     invoke: (method: string, command: string, args: string[], options: any) => {
       if (method === 'exec.exec') {
-        execCalls.push({ command, args, cwd: options?.cwd })
+        execCalls.push({ args, command, cwd: options?.cwd })
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -61,21 +61,21 @@ test.skip('buildExtension - falls back to npm run build when compile fails', asy
         if (callCount === 1) {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         if (callCount === 2) {
           return {
             exitCode: 1,
-            stdout: '',
             stderr: 'compile failed',
+            stdout: '',
           }
         }
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -104,8 +104,8 @@ test.skip('buildExtension - throws error when npm ci fails', async () => {
       if (method === 'exec.exec') {
         return {
           exitCode: 1,
-          stdout: '',
           stderr: 'npm ci failed',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -135,14 +135,14 @@ test.skip('buildExtension - throws error when both compile and build fail', asyn
         if (callCount === 1) {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         return {
           exitCode: 1,
-          stdout: '',
           stderr: 'build failed',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -201,8 +201,8 @@ test.skip('buildExtension - uses correct node version in commands', async () => 
         }
         return {
           exitCode: 0,
-          stdout: '',
           stderr: '',
+          stdout: '',
         }
       }
       throw new Error(`unexpected method ${method}`)

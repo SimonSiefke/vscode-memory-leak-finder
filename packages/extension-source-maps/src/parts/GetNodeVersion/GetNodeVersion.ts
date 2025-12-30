@@ -1,5 +1,5 @@
-import { join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
+import { join } from 'node:path'
 import { getLatestNodeVersionForMajor } from '../GetLatestNodeVersionForMajor/GetLatestNodeVersionForMajor.ts'
 import * as ReadJson from '../ReadJson/ReadJson.ts'
 
@@ -9,7 +9,7 @@ export const getNodeVersion = async (repoPath: string): Promise<string> => {
   try {
     const packageJsonPath = join(repoPath, 'package.json')
     const packageJson = await ReadJson.readJson(packageJsonPath)
-    const engines = packageJson.engines
+    const {engines} = packageJson
     if (!engines || !engines.node) {
       throw new Error('No node version specified in package.json engines')
     }

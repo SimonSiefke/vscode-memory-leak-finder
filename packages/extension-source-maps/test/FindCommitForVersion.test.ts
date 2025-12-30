@@ -1,8 +1,8 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
-import { mkdir, writeFile, rm } from 'node:fs/promises'
-import { join } from 'node:path'
-import { tmpdir } from 'node:os'
 import { MockRpc } from '@lvce-editor/rpc'
+import { mkdir, writeFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 beforeEach(() => {
   jest.resetModules()
@@ -24,15 +24,15 @@ test('findCommitForVersion - finds commit from exact tag', async () => {
         if (args[0] === 'tag' && args[1] === '-l') {
           return {
             exitCode: 0,
-            stdout: version,
             stderr: '',
+            stdout: version,
           }
         }
         if (args[0] === 'rev-parse') {
           return {
             exitCode: 0,
-            stdout: expectedCommit,
             stderr: '',
+            stdout: expectedCommit,
           }
         }
       }
@@ -52,7 +52,7 @@ test('findCommitForVersion - finds commit from exact tag', async () => {
   expect(commit).toBe(expectedCommit)
   expect(invocationCount).toBe(2)
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
 
 test('findCommitForVersion - finds commit from tag that includes version', async () => {
@@ -72,15 +72,15 @@ test('findCommitForVersion - finds commit from tag that includes version', async
         if (args[0] === 'tag' && args[1] === '-l') {
           return {
             exitCode: 0,
-            stdout: `v0.9.0\n${matchingTag}\nv1.1.0`,
             stderr: '',
+            stdout: `v0.9.0\n${matchingTag}\nv1.1.0`,
           }
         }
         if (args[0] === 'rev-parse') {
           return {
             exitCode: 0,
-            stdout: expectedCommit,
             stderr: '',
+            stdout: expectedCommit,
           }
         }
       }
@@ -100,7 +100,7 @@ test('findCommitForVersion - finds commit from tag that includes version', async
   expect(commit).toBe(expectedCommit)
   expect(invocationCount).toBe(2)
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
 
 test('findCommitForVersion - finds commit from git log grep', async () => {
@@ -119,15 +119,15 @@ test('findCommitForVersion - finds commit from git log grep', async () => {
         if (args[0] === 'tag' && args[1] === '-l') {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         if (args[0] === 'log') {
           return {
             exitCode: 0,
-            stdout: `${expectedCommit} Update version to ${version}`,
             stderr: '',
+            stdout: `${expectedCommit} Update version to ${version}`,
           }
         }
       }
@@ -147,7 +147,7 @@ test('findCommitForVersion - finds commit from git log grep', async () => {
   expect(commit).toBe(expectedCommit)
   expect(invocationCount).toBe(2)
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
 
 test('findCommitForVersion - finds commit from package.json version', async () => {
@@ -171,22 +171,22 @@ test('findCommitForVersion - finds commit from package.json version', async () =
         if (args[0] === 'tag' && args[1] === '-l') {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         if (args[0] === 'log') {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         if (args[0] === 'rev-parse' && args[1] === 'HEAD') {
           return {
             exitCode: 0,
-            stdout: expectedCommit,
             stderr: '',
+            stdout: expectedCommit,
           }
         }
       }
@@ -206,7 +206,7 @@ test('findCommitForVersion - finds commit from package.json version', async () =
   expect(commit).toBe(expectedCommit)
   expect(invocationCount).toBe(3)
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
 
 test('findCommitForVersion - throws error when commit cannot be found', async () => {
@@ -222,15 +222,15 @@ test('findCommitForVersion - throws error when commit cannot be found', async ()
         if (args[0] === 'tag' && args[1] === '-l') {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         if (args[0] === 'log') {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
       }
@@ -247,7 +247,7 @@ test('findCommitForVersion - throws error when commit cannot be found', async ()
   const { findCommitForVersion } = await import('../src/parts/FindCommitForVersion/FindCommitForVersion.ts')
   await expect(findCommitForVersion(tempDir, version)).rejects.toThrow(`Could not find commit for version ${version}`)
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
 
 test('findCommitForVersion - throws VError when git command fails', async () => {
@@ -275,7 +275,7 @@ test('findCommitForVersion - throws VError when git command fails', async () => 
   const { findCommitForVersion } = await import('../src/parts/FindCommitForVersion/FindCommitForVersion.ts')
   await expect(findCommitForVersion(tempDir, version)).rejects.toThrow(`Failed to find commit for version '${version}'`)
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })
 
 test('findCommitForVersion - handles package.json with different version', async () => {
@@ -296,15 +296,15 @@ test('findCommitForVersion - handles package.json with different version', async
         if (args[0] === 'tag' && args[1] === '-l') {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
         if (args[0] === 'log') {
           return {
             exitCode: 0,
-            stdout: '',
             stderr: '',
+            stdout: '',
           }
         }
       }
@@ -321,5 +321,5 @@ test('findCommitForVersion - handles package.json with different version', async
   const { findCommitForVersion } = await import('../src/parts/FindCommitForVersion/FindCommitForVersion.ts')
   await expect(findCommitForVersion(tempDir, version)).rejects.toThrow(`Could not find commit for version ${version}`)
 
-  await rm(tempDir, { recursive: true, force: true })
+  await rm(tempDir, { force: true, recursive: true })
 })

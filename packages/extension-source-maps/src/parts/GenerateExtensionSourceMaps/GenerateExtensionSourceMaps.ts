@@ -1,23 +1,23 @@
 import { existsSync } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
-import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
-import * as FindCommitForVersion from '../FindCommitForVersion/FindCommitForVersion.ts'
-import * as GetNodeVersion from '../GetNodeVersion/GetNodeVersion.ts'
-import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
-import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
-import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
 import * as BuildExtension from '../BuildExtension/BuildExtension.ts'
+import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import * as CopySourceMaps from '../CopySourceMaps/CopySourceMaps.ts'
 import * as Exec from '../Exec/Exec.ts'
+import * as FindCommitForVersion from '../FindCommitForVersion/FindCommitForVersion.ts'
 import * as GetDisplayname from '../GetDisplayname/GetDisplayname.ts'
+import * as GetNodeVersion from '../GetNodeVersion/GetNodeVersion.ts'
+import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
+import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
+import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
 
 export const generateExtensionSourceMaps = async ({
-  extensionName,
-  version,
-  repoUrl,
-  outputDir,
   cacheDir,
+  extensionName,
+  outputDir,
+  repoUrl,
+  version,
 }: {
   extensionName: string
   version: string

@@ -1,6 +1,6 @@
-import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
-import * as ApplyOriginalPositions from '../ApplyOriginalPositions/ApplyOriginalPositions.ts'
 import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
+import * as ApplyOriginalPositions from '../ApplyOriginalPositions/ApplyOriginalPositions.ts'
+import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 
 export const resolveOriginalPositions = async (
   enriched: any[],

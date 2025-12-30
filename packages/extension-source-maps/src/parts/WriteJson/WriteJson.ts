@@ -1,6 +1,6 @@
+import { VError } from '@lvce-editor/verror'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
-import { VError } from '@lvce-editor/verror'
 
 export const writeJson = async (path: string, json: any): Promise<void> => {
   try {

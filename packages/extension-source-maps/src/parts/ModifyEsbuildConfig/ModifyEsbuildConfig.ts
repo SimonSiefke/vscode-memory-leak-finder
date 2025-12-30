@@ -1,6 +1,6 @@
+import { VError } from '@lvce-editor/verror'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { VError } from '@lvce-editor/verror'
 import { getNewEsbuildConfig } from '../GetNewEsbuildConfig/GetNewEsbuildConfig.ts'
 
 export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {

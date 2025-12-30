@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
-import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import * as MapPathToSourceMapPath from '../src/parts/MapPathToSourceMapPath/MapPathToSourceMapPath.ts'
 
 test('mapPathToSourceMapPath - maps relative copilot extension path', () => {

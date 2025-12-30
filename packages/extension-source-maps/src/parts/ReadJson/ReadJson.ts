@@ -1,5 +1,5 @@
-import { readFile } from 'node:fs/promises'
 import { VError } from '@lvce-editor/verror'
+import { readFile } from 'node:fs/promises'
 
 export const readJson = async (path: string): Promise<any> => {
   try {

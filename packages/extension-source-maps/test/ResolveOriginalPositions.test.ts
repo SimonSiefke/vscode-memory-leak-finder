@@ -25,8 +25,8 @@ test('resolveOriginalPositions - enriches items with original positions', async 
       if (method === 'SourceMap.getCleanPositionsMap') {
         return {
           'file:///path/to/source.map': [
-            { source: 'src/index.ts', line: 1, column: 5, name: 'testFunction1' },
-            { source: 'src/utils.ts', line: 2, column: 10, name: 'testFunction2' },
+            { column: 5, line: 1, name: 'testFunction1', source: 'src/index.ts' },
+            { column: 10, line: 2, name: 'testFunction2', source: 'src/utils.ts' },
           ],
         }
       }
@@ -43,22 +43,22 @@ test('resolveOriginalPositions - enriches items with original positions', async 
 
   expect(enriched[0]).toMatchObject({
     name: 'test1',
+    originalColumn: 5,
+    originalLine: 1,
+    originalLocation: 'src/index.ts:1:5',
+    originalName: 'testFunction1',
     originalSource: 'src/index.ts',
     originalUrl: 'src/index.ts',
-    originalLine: 1,
-    originalColumn: 5,
-    originalName: 'testFunction1',
-    originalLocation: 'src/index.ts:1:5',
   })
 
   expect(enriched[1]).toMatchObject({
     name: 'test2',
+    originalColumn: 10,
+    originalLine: 2,
+    originalLocation: 'src/utils.ts:2:10',
+    originalName: 'testFunction2',
     originalSource: 'src/utils.ts',
     originalUrl: 'src/utils.ts',
-    originalLine: 2,
-    originalColumn: 10,
-    originalName: 'testFunction2',
-    originalLocation: 'src/utils.ts:2:10',
   })
 })
 
@@ -122,7 +122,7 @@ test('resolveOriginalPositions - handles null original values', async () => {
     commandMap: {},
     invoke: () => {
       return {
-        'file:///path/to/source.map': [{ source: null, line: null, column: null, name: null }],
+        'file:///path/to/source.map': [{ column: null, line: null, name: null, source: null }],
       }
     },
   })
@@ -136,11 +136,11 @@ test('resolveOriginalPositions - handles null original values', async () => {
 
   expect(enriched[0]).toMatchObject({
     name: 'test1',
+    originalColumn: null,
+    originalLine: null,
+    originalName: null,
     originalSource: null,
     originalUrl: null,
-    originalLine: null,
-    originalColumn: null,
-    originalName: null,
   })
   expect((enriched[0] as any).originalLocation).toBeUndefined()
 })

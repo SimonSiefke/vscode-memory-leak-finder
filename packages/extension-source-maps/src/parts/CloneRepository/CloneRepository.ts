@@ -1,6 +1,6 @@
+import { VError } from '@lvce-editor/verror'
 import { mkdir } from 'node:fs/promises'
 import { exec } from '../Exec/Exec.ts'
-import { VError } from '@lvce-editor/verror'
 
 export const cloneRepository = async (repoUrl: string, repoPath: string, commit: string): Promise<void> => {
   try {
