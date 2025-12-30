@@ -138,6 +138,8 @@ test('getNodeVersion - handles version with only major and fetches latest', asyn
 })
 
 test('getNodeVersion - throws error when engines.node is missing', async () => {
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -148,6 +150,8 @@ test('getNodeVersion - throws error when engines.node is missing', async () => {
 })
 
 test('getNodeVersion - throws error when engines is missing', async () => {
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -160,6 +164,8 @@ test('getNodeVersion - throws error when engines is missing', async () => {
 })
 
 test('getNodeVersion - throws error when version cannot be parsed', async () => {
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -217,6 +223,34 @@ test('getNodeVersion - handles exact version and fetches latest', async () => {
 })
 
 test('getNodeVersion - handles version with tilde and fetches latest', async () => {
+  const mockVersions = [
+    { version: 'v18.20.0' },
+    { version: 'v18.19.0' },
+    { version: 'v20.15.0' },
+    { version: 'v19.5.0' },
+  ]
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Network.getJson') {
+        return mockVersions
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  jest.unstable_mockModule('../src/parts/LaunchNetworkWorker/LaunchNetworkWorker.ts', () => ({
+    launchNetworkWorker: async () => {
+      return {
+        invoke: mockRpc.invoke.bind(mockRpc),
+        async [Symbol.asyncDispose]() {},
+      }
+    },
+  }))
+
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -232,6 +266,8 @@ test('getNodeVersion - handles version with tilde and fetches latest', async () 
 })
 
 test('getNodeVersion - throws VError when package.json does not exist', async () => {
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -239,6 +275,8 @@ test('getNodeVersion - throws VError when package.json does not exist', async ()
 })
 
 test('getNodeVersion - throws VError when package.json is invalid JSON', async () => {
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
