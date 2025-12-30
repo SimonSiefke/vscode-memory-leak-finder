@@ -1,31 +1,45 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { dirname, join, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { VError } from '@lvce-editor/verror'
 import * as Root from '../Root/Root.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 
-const mapUrlToSourceMapUrl = (url: string, version: string, root: string): string | null => {
-  if (!url) {
+const parseSourceLocation = (sourceLocation: string): { url: string; line: number; column: number } | null => {
+  if (!sourceLocation) {
+    return null
+  }
+  // Format: ".vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277"
+  const match = sourceLocation.match(/^(.+):(\d+):(\d+)$/)
+  if (!match) {
+    return null
+  }
+  const path = match[1]
+  const line = Number.parseInt(match[2], 10)
+  const column = Number.parseInt(match[3], 10)
+  return { url: path, line, column }
+}
+
+const mapPathToSourceMapUrl = (path: string, root: string): string | null => {
+  if (!path) {
     return null
   }
   try {
-    const urlObj = new URL(url)
-    if (urlObj.protocol !== 'file:') {
-      return null
-    }
-    const path = fileURLToPath(url)
+    // Path might be: .vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js
+    // or absolute path
+    const absolutePath = path.startsWith('/') ? path : resolve(root, path)
+    
     // Check if this is a copilot extension file
-    // Path might be: /path/to/.vscode-extensions/github.copilot-chat-{version}/dist/extension.js
-    const extensionId = `github.copilot-chat-${version}`
-    const extensionIndex = path.indexOf(`.vscode-extensions/${extensionId}`)
-    if (extensionIndex === -1) {
+    const extensionMatch = absolutePath.match(/\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/)
+    if (!extensionMatch) {
       return null
     }
+    const extensionId = extensionMatch[1]
+    const relativePath = extensionMatch[2]
+    
     // Map to source maps directory
-    const relativePath = path.slice(extensionIndex + `.vscode-extensions/${extensionId}`.length)
     const sourceMapPath = join(root, '.extension-source-maps', extensionId, relativePath + '.map')
-    const sourceMapUrl = `file://${sourceMapPath}`
+    const sourceMapUrl = pathToFileURL(sourceMapPath).toString()
     return sourceMapUrl
   } catch {
     return null
@@ -38,10 +52,12 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     const dataContent = await readFile(dataFilePath, 'utf8')
     const data = JSON.parse(dataContent)
     
-    // Handle both array and object with array property
+    // Handle both array and object with array property (namedFunctionCount2 or namedFunctionCount3)
     let items: readonly any[]
     if (Array.isArray(data)) {
       items = data
+    } else if (data.namedFunctionCount3 && Array.isArray(data.namedFunctionCount3)) {
+      items = data.namedFunctionCount3
     } else if (data.namedFunctionCount2 && Array.isArray(data.namedFunctionCount2)) {
       items = data.namedFunctionCount2
     } else {
@@ -61,23 +77,40 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     for (let i = 0; i < enriched.length; i++) {
       const item = enriched[i] as any
       let sourceMapUrl: string | null = null
+      let line: number | undefined
+      let column: number | undefined
       
       // Try to get source map URL from item
       if (item.sourceMapUrl) {
         sourceMapUrl = item.sourceMapUrl
+        line = item.line
+        column = item.column
+      } else if (item.sourceLocation) {
+        // Parse sourceLocation format: ".vscode-extensions/.../file.js:917:1277"
+        const parsed = parseSourceLocation(item.sourceLocation)
+        if (parsed) {
+          line = parsed.line
+          column = parsed.column
+          sourceMapUrl = mapPathToSourceMapUrl(parsed.url, rootPath)
+          if (sourceMapUrl) {
+            item.sourceMapUrl = sourceMapUrl
+          }
+        }
       } else if (item.url) {
         // Map URL to source map URL
-        sourceMapUrl = mapUrlToSourceMapUrl(item.url, version, rootPath)
+        sourceMapUrl = mapPathToSourceMapUrl(item.url, rootPath)
         if (sourceMapUrl) {
           item.sourceMapUrl = sourceMapUrl
         }
+        line = item.line
+        column = item.column
       }
       
-      if (sourceMapUrl && item.line !== undefined && item.column !== undefined) {
+      if (sourceMapUrl && line !== undefined && column !== undefined) {
         if (!sourceMapUrlToPositions[sourceMapUrl]) {
           sourceMapUrlToPositions[sourceMapUrl] = []
         }
-        sourceMapUrlToPositions[sourceMapUrl].push(item.line, item.column)
+        sourceMapUrlToPositions[sourceMapUrl].push(line, column)
         positionPointers.push({ index: i, sourceMapUrl: sourceMapUrl })
       }
     }
@@ -121,6 +154,8 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     let outputData: any
     if (Array.isArray(data)) {
       outputData = enriched
+    } else if (data.namedFunctionCount3) {
+      outputData = { ...data, namedFunctionCount3: enriched }
     } else {
       outputData = { ...data, namedFunctionCount2: enriched }
     }
