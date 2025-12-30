@@ -42,17 +42,19 @@ test('addOriginalSourcesToData - enriches data with original sources', async () 
         const sourceMapUrlMap = params[0] as Record<string, number[]>
         const result: Record<string, any[]> = {}
         for (const [url, positions] of Object.entries(sourceMapUrlMap)) {
-          result[url] = positions.map((_, index) => {
-            if (index % 2 === 0) {
-              return {
-                source: 'src/index.ts',
-                line: 1,
-                column: 5,
-                name: 'testFunction',
+          result[url] = positions
+            .map((_, index) => {
+              if (index % 2 === 0) {
+                return {
+                  source: 'src/index.ts',
+                  line: 1,
+                  column: 5,
+                  name: 'testFunction',
+                }
               }
-            }
-            return null
-          }).filter(Boolean)
+              return null
+            })
+            .filter(Boolean)
         }
         return Promise.resolve(result)
       }
@@ -164,4 +166,3 @@ test('addOriginalSourcesToData - handles data without URLs', async () => {
 
   await rm(tempRoot, { recursive: true, force: true })
 })
-

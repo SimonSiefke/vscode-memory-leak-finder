@@ -11,4 +11,3 @@ const main2 = async (): Promise<void> => {
 }
 
 main2()
-

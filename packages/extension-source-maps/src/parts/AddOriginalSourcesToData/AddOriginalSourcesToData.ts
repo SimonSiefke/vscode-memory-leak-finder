@@ -29,7 +29,7 @@ const mapPathToSourceMapUrl = (path: string, root: string): string | null => {
     // Path might be: .vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js
     // or absolute path
     const absolutePath = path.startsWith('/') ? path : resolve(root, path)
-    
+
     // Check if this is a copilot extension file
     const extensionMatch = absolutePath.match(/\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/)
     if (!extensionMatch) {
@@ -37,7 +37,7 @@ const mapPathToSourceMapUrl = (path: string, root: string): string | null => {
     }
     const extensionId = extensionMatch[1]
     const relativePath = extensionMatch[2]
-    
+
     // Map to source maps directory
     const sourceMapPath = join(root, '.extension-source-maps', extensionId, relativePath + '.map')
     if (!existsSync(sourceMapPath)) {
@@ -56,7 +56,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     const rootPath = Root.root
     const dataContent = await readFile(dataFilePath, 'utf8')
     const data = JSON.parse(dataContent)
-    
+
     // Handle both array and object with array property (namedFunctionCount2 or namedFunctionCount3)
     let items: readonly any[]
     if (Array.isArray(data)) {
@@ -84,7 +84,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
       let sourceMapUrl: string | null = null
       let line: number | undefined
       let column: number | undefined
-      
+
       // Try to get source map URL from item
       if (item.sourceMapUrl) {
         sourceMapUrl = item.sourceMapUrl
@@ -110,7 +110,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
         line = item.line
         column = item.column
       }
-      
+
       if (sourceMapUrl && line !== undefined && column !== undefined) {
         if (!sourceMapUrlToPositions[sourceMapUrl]) {
           sourceMapUrlToPositions[sourceMapUrl] = []
@@ -166,7 +166,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     } else {
       outputData = { ...data, namedFunctionCount2: enriched }
     }
-    
+
     const outputDir = dirname(outputFilePath)
     await mkdir(outputDir, { recursive: true })
     await writeFile(outputFilePath, JSON.stringify(outputData, null, 2), 'utf8')
@@ -174,4 +174,3 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     throw new VError(error, `Failed to add original sources to data from '${dataFilePath}'`)
   }
 }
-

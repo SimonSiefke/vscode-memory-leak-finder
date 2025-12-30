@@ -174,17 +174,17 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
     // Look for objects with common esbuild properties
     const esbuildPropertyPatterns = ['entryPoints', 'bundle', 'outfile', 'outdir', 'format', 'platform', 'target']
     const hasEsbuildProperties = esbuildPropertyPatterns.some((prop) => content.includes(prop))
-    
+
     if (hasEsbuildProperties) {
       // Try to find object literals that look like esbuild configs
       // Match objects that are likely to be the main config (have multiple esbuild properties)
       const objectLiteralRegex = /(\{[\s\S]*?)(\n\s*\})/g
       let bestMatch: { match: RegExpMatchArray; score: number } | null = null
       let match: RegExpMatchArray | null
-      
+
       // Reset regex lastIndex to avoid issues with global regex
       objectLiteralRegex.lastIndex = 0
-      
+
       while ((match = objectLiteralRegex.exec(content)) !== null) {
         const objContent = match[1]
         // Check if this object has esbuild properties and doesn't have sourcemap

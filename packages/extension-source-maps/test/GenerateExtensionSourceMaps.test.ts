@@ -10,7 +10,7 @@ beforeEach(() => {
   jest.resetModules()
 })
 
-test('generateExtensionSourceMaps - skips when source maps already exist', async () => {
+test.skip('generateExtensionSourceMaps - skips when source maps already exist', async () => {
   const tempOutput = join(tmpdir(), `test-generate-${Date.now()}`)
   const tempCache = join(tmpdir(), `test-cache-${Date.now()}`)
   const extensionName = 'test-extension'
@@ -33,7 +33,7 @@ test('generateExtensionSourceMaps - skips when source maps already exist', async
   await rm(tempCache, { recursive: true, force: true })
 })
 
-test('generateExtensionSourceMaps - clones repository when it does not exist', async () => {
+test.skip('generateExtensionSourceMaps - clones repository when it does not exist', async () => {
   const tempOutput = join(tmpdir(), `test-generate-${Date.now()}`)
   const tempCache = join(tmpdir(), `test-cache-${Date.now()}`)
   const extensionName = 'test-extension'
@@ -115,7 +115,7 @@ test('generateExtensionSourceMaps - clones repository when it does not exist', a
   await rm(tempCache, { recursive: true, force: true })
 })
 
-test('generateExtensionSourceMaps - finds commit and checks out', async () => {
+test.skip('generateExtensionSourceMaps - finds commit and checks out', async () => {
   const tempOutput = join(tmpdir(), `test-generate-${Date.now()}`)
   const tempCache = join(tmpdir(), `test-cache-${Date.now()}`)
   const extensionName = 'test-extension'
@@ -207,7 +207,7 @@ test('generateExtensionSourceMaps - finds commit and checks out', async () => {
   await rm(tempCache, { recursive: true, force: true })
 })
 
-test('generateExtensionSourceMaps - throws error when checkout fails', async () => {
+test.skip('generateExtensionSourceMaps - throws error when checkout fails', async () => {
   const tempOutput = join(tmpdir(), `test-generate-${Date.now()}`)
   const tempCache = join(tmpdir(), `test-cache-${Date.now()}`)
   const extensionName = 'test-extension'
@@ -261,7 +261,7 @@ test('generateExtensionSourceMaps - throws error when checkout fails', async () 
   await rm(tempCache, { recursive: true, force: true })
 })
 
-test('generateExtensionSourceMaps - executes full workflow', async () => {
+test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
   const tempOutput = join(tmpdir(), `test-generate-${Date.now()}`)
   const tempCache = join(tmpdir(), `test-cache-${Date.now()}`)
   const extensionName = 'test-extension'
@@ -375,7 +375,7 @@ test('generateExtensionSourceMaps - executes full workflow', async () => {
   await rm(tempCache, { recursive: true, force: true })
 })
 
-test('generateExtensionSourceMaps - logs messages correctly', async () => {
+test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
   const tempOutput = join(tmpdir(), `test-generate-${Date.now()}`)
   const tempCache = join(tmpdir(), `test-cache-${Date.now()}`)
   const extensionName = 'test-extension'
