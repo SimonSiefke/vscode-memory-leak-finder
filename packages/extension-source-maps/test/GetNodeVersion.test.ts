@@ -1,10 +1,42 @@
-import { expect, test } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { getNodeVersion } from '../src/parts/GetNodeVersion/GetNodeVersion.ts'
+
+beforeEach(() => {
+  jest.resetModules()
+})
 
 test('getNodeVersion - extracts version from engines.node and fetches latest', async () => {
+  const mockVersions = [
+    { version: 'v18.20.0' },
+    { version: 'v18.19.0' },
+    { version: 'v20.15.0' },
+    { version: 'v19.5.0' },
+  ]
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Network.getJson') {
+        return mockVersions
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  jest.unstable_mockModule('../src/parts/LaunchNetworkWorker/LaunchNetworkWorker.ts', () => ({
+    launchNetworkWorker: async () => {
+      return {
+        invoke: mockRpc.invoke.bind(mockRpc),
+        async [Symbol.asyncDispose]() {},
+      }
+    },
+  }))
+
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -20,6 +52,34 @@ test('getNodeVersion - extracts version from engines.node and fetches latest', a
 })
 
 test('getNodeVersion - handles version without patch and fetches latest', async () => {
+  const mockVersions = [
+    { version: 'v20.15.0' },
+    { version: 'v20.10.0' },
+    { version: 'v18.20.0' },
+    { version: 'v19.5.0' },
+  ]
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Network.getJson') {
+        return mockVersions
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  jest.unstable_mockModule('../src/parts/LaunchNetworkWorker/LaunchNetworkWorker.ts', () => ({
+    launchNetworkWorker: async () => {
+      return {
+        invoke: mockRpc.invoke.bind(mockRpc),
+        async [Symbol.asyncDispose]() {},
+      }
+    },
+  }))
+
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -35,6 +95,34 @@ test('getNodeVersion - handles version without patch and fetches latest', async 
 })
 
 test('getNodeVersion - handles version with only major and fetches latest', async () => {
+  const mockVersions = [
+    { version: 'v18.20.0' },
+    { version: 'v18.19.0' },
+    { version: 'v20.15.0' },
+    { version: 'v19.5.0' },
+  ]
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Network.getJson') {
+        return mockVersions
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  jest.unstable_mockModule('../src/parts/LaunchNetworkWorker/LaunchNetworkWorker.ts', () => ({
+    launchNetworkWorker: async () => {
+      return {
+        invoke: mockRpc.invoke.bind(mockRpc),
+        async [Symbol.asyncDispose]() {},
+      }
+    },
+  }))
+
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -86,6 +174,34 @@ test('getNodeVersion - throws error when version cannot be parsed', async () => 
 })
 
 test('getNodeVersion - handles exact version and fetches latest', async () => {
+  const mockVersions = [
+    { version: 'v20.15.0' },
+    { version: 'v20.10.0' },
+    { version: 'v18.20.0' },
+    { version: 'v19.5.0' },
+  ]
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Network.getJson') {
+        return mockVersions
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  jest.unstable_mockModule('../src/parts/LaunchNetworkWorker/LaunchNetworkWorker.ts', () => ({
+    launchNetworkWorker: async () => {
+      return {
+        invoke: mockRpc.invoke.bind(mockRpc),
+        async [Symbol.asyncDispose]() {},
+      }
+    },
+  }))
+
+  const { getNodeVersion } = await import('../src/parts/GetNodeVersion/GetNodeVersion.ts')
+
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
