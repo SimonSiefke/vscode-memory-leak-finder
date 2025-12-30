@@ -26,8 +26,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
     if (!configPath) {
       // Try to find any .js file that might contain esbuild config
       const packageJsonPath = join(repoPath, 'package.json')
-      const packageJsonContent = await readFile(packageJsonPath, 'utf8')
-      const packageJson = JSON.parse(packageJsonContent)
+      const packageJson = await ReadJson.readJson(packageJsonPath)
       const scripts = packageJson.scripts || {}
 
       // Check if there's a build script that might reference a config

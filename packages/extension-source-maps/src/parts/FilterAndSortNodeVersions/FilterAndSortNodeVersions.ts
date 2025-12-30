@@ -37,4 +37,3 @@ export const filterAndSortNodeVersions = (versions: readonly NodeVersionInfo[], 
 
   return matchingVersions
 }
-
