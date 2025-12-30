@@ -10,6 +10,7 @@ import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig
 import * as BuildExtension from '../BuildExtension/BuildExtension.ts'
 import * as CopySourceMaps from '../CopySourceMaps/CopySourceMaps.ts'
 import * as Exec from '../Exec/Exec.ts'
+import * as GetDisplayname from '../GetDisplayname/GetDisplayname.ts'
 
 export const generateExtensionSourceMaps = async ({
   extensionName,
@@ -32,10 +33,7 @@ export const generateExtensionSourceMaps = async ({
   const extensionId = `github.${extensionName}-${normalizedVersion}`
   const sourceMapsOutputPath = join(outputDir, extensionId)
   if (existsSync(sourceMapsOutputPath)) {
-    const displayName = extensionName
-      .split('-')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
+    const displayName = GetDisplayname.getDisplayname(extensionName)
     console.log(`[extension-source-maps] Source maps for ${displayName} ${version} already exist, skipping...`)
     return
   }
@@ -44,6 +42,14 @@ export const generateExtensionSourceMaps = async ({
   if (!existsSync(repoPath)) {
     console.log(`[extension-source-maps] Cloning ${extensionName} repository...`)
     await CloneRepository.cloneRepository(repoUrl, repoPath, 'main')
+  }
+
+  // Fetch all tags so we can resolve versions to commits
+  console.log(`[extension-source-maps] Fetching all tags...`)
+  try {
+    await Exec.exec('git', ['fetch', 'origin', '--tags'], { cwd: repoPath })
+  } catch {
+    // If fetch fails, continue anyway - tags might already be available
   }
 
   // Find commit for version

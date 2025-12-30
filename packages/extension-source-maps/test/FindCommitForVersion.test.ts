@@ -48,6 +48,7 @@ test('findCommitForVersion - finds commit from exact tag', async () => {
   const commit = await findCommitForVersion(tempDir, version)
 
   expect(commit).toBe(expectedCommit)
+  expect(mockRpc.invocations.length).toBe(2)
 
   await rm(tempDir, { recursive: true, force: true })
 })
@@ -60,20 +61,11 @@ test('findCommitForVersion - finds commit from tag that includes version', async
   const matchingTag = 'v1.0.0'
   const expectedCommit = 'abc123def456'
 
-  let tagListCallCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'git') {
         if (args[0] === 'tag' && args[1] === '-l') {
-          tagListCallCount++
-          if (tagListCallCount === 1) {
-            return {
-              exitCode: 0,
-              stdout: '',
-              stderr: '',
-            }
-          }
           return {
             exitCode: 0,
             stdout: `v0.9.0\n${matchingTag}\nv1.1.0`,
@@ -102,6 +94,7 @@ test('findCommitForVersion - finds commit from tag that includes version', async
   const commit = await findCommitForVersion(tempDir, version)
 
   expect(commit).toBe(expectedCommit)
+  expect(mockRpc.invocations.length).toBe(2)
 
   await rm(tempDir, { recursive: true, force: true })
 })
@@ -113,20 +106,11 @@ test('findCommitForVersion - finds commit from git log grep', async () => {
   const version = '1.0.0'
   const expectedCommit = 'abc123'
 
-  let tagListCallCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'git') {
         if (args[0] === 'tag' && args[1] === '-l') {
-          tagListCallCount++
-          if (tagListCallCount === 1) {
-            return {
-              exitCode: 0,
-              stdout: '',
-              stderr: '',
-            }
-          }
           return {
             exitCode: 0,
             stdout: '',
@@ -155,6 +139,7 @@ test('findCommitForVersion - finds commit from git log grep', async () => {
   const commit = await findCommitForVersion(tempDir, version)
 
   expect(commit).toBe(expectedCommit)
+  expect(mockRpc.invocations.length).toBe(2)
 
   await rm(tempDir, { recursive: true, force: true })
 })

@@ -1,5 +1,4 @@
 export interface PositionPointer {
-  index: number
-  sourceMapUrl: string
+  readonly index: number
+  readonly sourceMapUrl: string
 }
-
