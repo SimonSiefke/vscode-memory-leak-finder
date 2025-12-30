@@ -105,11 +105,7 @@ test('getLatestNodeVersionForMajor - returns latest version when multiple versio
 })
 
 test('getLatestNodeVersionForMajor - throws error when no versions found for major version', async () => {
-  const mockVersions = [
-    { version: 'v20.15.0' },
-    { version: 'v19.5.0' },
-    { version: 'v18.20.0' },
-  ]
+  const mockVersions = [{ version: 'v20.15.0' }, { version: 'v19.5.0' }, { version: 'v18.20.0' }]
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -157,4 +153,3 @@ test('getLatestNodeVersionForMajor - handles network worker error', async () => 
   const { getLatestNodeVersionForMajor } = await import('../src/parts/GetLatestNodeVersionForMajor/GetLatestNodeVersionForMajor.ts')
   await expect(getLatestNodeVersionForMajor('22')).rejects.toThrow('Failed to fetch latest Node.js version for major version 22')
 })
-

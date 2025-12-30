@@ -8,4 +8,3 @@ export interface ParsedVersion {
   readonly patch: number
   readonly version: string
 }
-

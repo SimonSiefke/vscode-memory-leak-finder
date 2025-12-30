@@ -22,4 +22,3 @@ export const getLatestNodeVersionForMajor = async (majorVersion: string): Promis
     throw new VError(error, `Failed to fetch latest Node.js version for major version ${majorVersion}`)
   }
 }
-

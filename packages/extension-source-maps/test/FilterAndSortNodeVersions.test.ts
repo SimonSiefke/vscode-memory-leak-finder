@@ -69,11 +69,7 @@ test('filterAndSortNodeVersions - handles minor version sorting', () => {
 })
 
 test('filterAndSortNodeVersions - returns empty array when no matching versions', () => {
-  const versions: readonly NodeVersionInfo[] = [
-    { version: 'v20.15.0' },
-    { version: 'v19.5.0' },
-    { version: 'v18.20.0' },
-  ]
+  const versions: readonly NodeVersionInfo[] = [{ version: 'v20.15.0' }, { version: 'v19.5.0' }, { version: 'v18.20.0' }]
 
   const result = filterAndSortNodeVersions(versions, 22)
 
@@ -96,9 +92,7 @@ test('filterAndSortNodeVersions - filters out invalid version formats', () => {
 })
 
 test('filterAndSortNodeVersions - returns parsed version objects with correct properties', () => {
-  const versions: readonly NodeVersionInfo[] = [
-    { version: 'v22.21.5' },
-  ]
+  const versions: readonly NodeVersionInfo[] = [{ version: 'v22.21.5' }]
 
   const result = filterAndSortNodeVersions(versions, 22)
 
@@ -110,4 +104,3 @@ test('filterAndSortNodeVersions - returns parsed version objects with correct pr
     version: 'v22.21.5',
   })
 })
-
