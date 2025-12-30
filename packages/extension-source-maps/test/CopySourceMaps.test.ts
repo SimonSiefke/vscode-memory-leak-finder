@@ -149,17 +149,20 @@ test('copySourceMaps - creates correct extension ID format', async () => {
 
 test('copySourceMaps - throws VError when copy fails', async () => {
   const tempRepo = join(tmpdir(), `test-copy-source-maps-repo-${Date.now()}`)
-  const tempOutput = '/invalid/path/that/cannot/be/created'
+  // Create a file at the target location so directory creation will fail
+  const tempOutputFile = join(tmpdir(), `test-copy-source-maps-output-file-${Date.now()}`)
+  await writeFile(tempOutputFile, 'this is a file, not a directory')
 
   const distDir = join(tempRepo, 'dist')
   await mkdir(distDir, { recursive: true })
   await writeFile(join(distDir, 'extension.js.map'), '{"version":3}')
 
-  await expect(CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')).rejects.toThrow(
-    `Failed to copy source maps from '${tempRepo}' to '${tempOutput}'`,
+  await expect(CopySourceMaps.copySourceMaps(tempRepo, tempOutputFile, 'test-extension', '1.0.0')).rejects.toThrow(
+    `Failed to copy source maps from '${tempRepo}' to '${tempOutputFile}'`,
   )
 
   await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempOutputFile, { force: true }).catch(() => {})
 })
 
 test('copySourceMaps - checks multiple possible directories', async () => {

@@ -1,11 +1,19 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
+import { platform } from 'node:process'
 
 beforeEach(() => {
   jest.resetModules()
 })
 
+const isWindows = platform === 'win32'
+
 test('installDependencies - skips installation when node_modules exists', async () => {
+  if (isWindows) {
+    // This test uses bash/nvm which is Unix-specific
+    return
+  }
+
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
 
@@ -23,6 +31,10 @@ test('installDependencies - skips installation when node_modules exists', async 
 })
 
 test('installDependencies - successfully installs dependencies', async () => {
+  if (isWindows) {
+    // This test uses bash/nvm which is Unix-specific
+    return
+  }
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
   const npmPath = '/home/user/.nvm/versions/node/v18.0.0/bin/npm'
@@ -69,6 +81,10 @@ test('installDependencies - successfully installs dependencies', async () => {
 })
 
 test('installDependencies - throws error when npm path not found', async () => {
+  if (isWindows) {
+    // This test uses bash/nvm which is Unix-specific
+    return
+  }
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
 
@@ -103,6 +119,10 @@ test('installDependencies - throws error when npm path not found', async () => {
 })
 
 test('installDependencies - throws error when npm path is empty', async () => {
+  if (isWindows) {
+    // This test uses bash/nvm which is Unix-specific
+    return
+  }
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
 
@@ -137,6 +157,10 @@ test('installDependencies - throws error when npm path is empty', async () => {
 })
 
 test('installDependencies - throws error when npm ci fails', async () => {
+  if (isWindows) {
+    // This test uses bash/nvm which is Unix-specific
+    return
+  }
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
   const npmPath = '/home/user/.nvm/versions/node/v18.0.0/bin/npm'
@@ -179,6 +203,10 @@ test('installDependencies - throws error when npm ci fails', async () => {
 })
 
 test('installDependencies - uses npm from .config/nvm when .nvm not found', async () => {
+  if (isWindows) {
+    // This test uses bash/nvm which is Unix-specific
+    return
+  }
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
   const npmPath = '/home/user/.config/nvm/versions/node/v18.0.0/bin/npm'
@@ -225,6 +253,10 @@ test('installDependencies - uses npm from .config/nvm when .nvm not found', asyn
 })
 
 test('installDependencies - throws VError when exec throws', async () => {
+  if (isWindows) {
+    // This test uses bash/nvm which is Unix-specific
+    return
+  }
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
 
