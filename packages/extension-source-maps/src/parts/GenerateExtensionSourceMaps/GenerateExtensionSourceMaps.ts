@@ -60,8 +60,8 @@ export const generateExtensionSourceMaps = async ({
 
   // Install node version
   console.log(`[extension-source-maps] Installing node version ${nodeVersion}...`)
-  const installedVersion = await InstallNodeVersion.installNodeVersion(nodeVersion)
-  console.log(`[extension-source-maps] Node version ${installedVersion} installed successfully`)
+  await InstallNodeVersion.installNodeVersion(nodeVersion)
+  console.log(`[extension-source-maps] Node version ${nodeVersion} installed successfully`)
 
   // Install dependencies
   console.log(`[extension-source-maps] Installing dependencies...`)
