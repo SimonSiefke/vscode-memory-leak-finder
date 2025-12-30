@@ -9,7 +9,7 @@ export const getNodeVersion = async (repoPath: string): Promise<string> => {
   try {
     const packageJsonPath = join(repoPath, 'package.json')
     const packageJson = await ReadJson.readJson(packageJsonPath)
-    const {engines} = packageJson
+    const { engines } = packageJson
     if (!engines || !engines.node) {
       throw new Error('No node version specified in package.json engines')
     }
