@@ -1,0 +1,17 @@
+{
+  "name": "@vscode-memory-leak-finder/extension-source-maps",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "main": "src/main.ts",
+  "type": "module",
+  "scripts": {
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
+  "dependencies": {
+    "@lvce-editor/assert": "^1.5.1",
+    "@lvce-editor/rpc": "^4.20.0",
+    "@lvce-editor/verror": "^1.7.0"
+  },
+  "devDependencies": {}
+}
