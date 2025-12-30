@@ -9,7 +9,7 @@ export const filterAndSortNodeVersions = (versions: readonly NodeVersionInfo[], 
       if (!versionMatch) {
         return false
       }
-      const major = parseInt(versionMatch[1], 10)
+      const major = Number.parseInt(versionMatch[1], 10)
       return major === majorVersion
     })
     .map((v) => {
@@ -18,9 +18,9 @@ export const filterAndSortNodeVersions = (versions: readonly NodeVersionInfo[], 
         return null
       }
       return {
-        major: parseInt(versionMatch[1], 10),
-        minor: parseInt(versionMatch[2], 10),
-        patch: parseInt(versionMatch[3], 10),
+        major: Number.parseInt(versionMatch[1], 10),
+        minor: Number.parseInt(versionMatch[2], 10),
+        patch: Number.parseInt(versionMatch[3], 10),
         version: v.version,
       }
     })

@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { mkdir, writeFile, readFile, rm } from 'node:fs/promises'
-import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import * as ModifyEsbuildConfig from '../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
 
 test('modifyEsbuildConfig - enables sourcemap in esbuild.js', async () => {
@@ -26,7 +26,7 @@ esbuild.build({
   expect(modifiedContent).toContain('sourcemap: true')
   expect(modifiedContent).not.toContain('sourcemap: false')
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - enables sourcemap in .esbuild.ts', async () => {
@@ -51,7 +51,7 @@ esbuild.build({
   expect(modifiedContent).toContain('sourcemap: true')
   expect(modifiedContent).not.toContain('sourcemap: false')
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - enables sourcemap in esbuild.config.js', async () => {
@@ -73,7 +73,7 @@ test('modifyEsbuildConfig - enables sourcemap in esbuild.config.js', async () =>
   expect(modifiedContent).toContain('sourceMap: true')
   expect(modifiedContent).not.toContain('sourceMap: false')
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - adds sourcemap to build call', async () => {
@@ -95,7 +95,7 @@ esbuild.build({
   const modifiedContent = await readFile(join(tempRepo, 'esbuild.js'), 'utf8')
   expect(modifiedContent).toContain('sourcemap: true')
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - adds sourcemap to export default config', async () => {
@@ -115,7 +115,7 @@ test('modifyEsbuildConfig - adds sourcemap to export default config', async () =
   const modifiedContent = await readFile(join(tempRepo, 'esbuild.config.js'), 'utf8')
   expect(modifiedContent).toContain('sourcemap: true')
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - finds config from package.json script', async () => {
@@ -145,7 +145,7 @@ test('modifyEsbuildConfig - finds config from package.json script', async () => 
   const modifiedContent = await readFile(join(scriptsDir, 'build.js'), 'utf8')
   expect(modifiedContent).toContain('sourcemap: true')
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - handles sourcemap set to none', async () => {
@@ -168,7 +168,7 @@ esbuild.build({
   expect(modifiedContent).toContain("sourcemap: 'inline'")
   expect(modifiedContent).not.toContain("sourcemap: 'none'")
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - throws error when config file not found', async () => {
@@ -184,7 +184,7 @@ test('modifyEsbuildConfig - throws error when config file not found', async () =
 
   await expect(ModifyEsbuildConfig.modifyEsbuildConfig(tempRepo)).rejects.toThrow('Could not find esbuild config file')
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - throws VError when file operations fail', async () => {
@@ -212,7 +212,7 @@ esbuild.buildSync({
   const modifiedContent = await readFile(join(tempRepo, 'esbuild.js'), 'utf8')
   expect(modifiedContent).toContain('sourcemap: true')
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - handles module.exports config', async () => {
@@ -232,7 +232,7 @@ test('modifyEsbuildConfig - handles module.exports config', async () => {
   const modifiedContent = await readFile(join(tempRepo, 'esbuild.config.js'), 'utf8')
   expect(modifiedContent).toContain('sourcemap: true')
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - does not modify if sourcemap already true', async () => {
@@ -254,7 +254,7 @@ esbuild.build({
   const modifiedContent = await readFile(join(tempRepo, 'esbuild.js'), 'utf8')
   expect(modifiedContent).toBe(configContent)
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })
 
 test('modifyEsbuildConfig - replaces isDev linked false with linked linked', async () => {
@@ -279,5 +279,5 @@ esbuild.build({
   expect(modifiedContent).toContain("sourcemap: isDev ? 'linked' : 'linked'")
   expect(modifiedContent).not.toContain("sourcemap: isDev ? 'linked' : false")
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
 })

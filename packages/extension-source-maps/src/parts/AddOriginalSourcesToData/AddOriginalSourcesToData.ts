@@ -1,10 +1,10 @@
+import { VError } from '@lvce-editor/verror'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { VError } from '@lvce-editor/verror'
-import * as Root from '../Root/Root.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
+import * as Root from '../Root/Root.ts'
 
 const parseSourceLocation = (sourceLocation: string): { url: string; line: number; column: number } | null => {
   if (!sourceLocation) {
@@ -18,7 +18,7 @@ const parseSourceLocation = (sourceLocation: string): { url: string; line: numbe
   const path = match[1]
   const line = Number.parseInt(match[2], 10)
   const column = Number.parseInt(match[3], 10)
-  return { url: path, line, column }
+  return { column, line, url: path }
 }
 
 const mapPathToSourceMapUrl = (path: string, root: string): string | null => {
@@ -80,7 +80,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
 
     // First pass: collect positions for each source map URL
     for (let i = 0; i < enriched.length; i++) {
-      const item = enriched[i] as any
+      const item = enriched[i]
       let sourceMapUrl: string | null = null
       let line: number | undefined
       let column: number | undefined
@@ -141,7 +141,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
         const original = positions[offset]
         offsetMap[pointer.sourceMapUrl] = offset + 1
         if (original) {
-          const target = enriched[pointer.index] as any
+          const target = enriched[pointer.index]
           target.originalSource = original.source ?? null
           target.originalUrl = original.source ?? null
           target.originalLine = original.line ?? null

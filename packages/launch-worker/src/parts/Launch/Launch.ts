@@ -1,7 +1,7 @@
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
-import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
+import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
 
 export interface LaunchOptions {
   readonly arch: string

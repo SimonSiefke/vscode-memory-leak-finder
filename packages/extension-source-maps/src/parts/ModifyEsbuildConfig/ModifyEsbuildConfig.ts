@@ -1,6 +1,6 @@
+import { VError } from '@lvce-editor/verror'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { VError } from '@lvce-editor/verror'
 
 const CONFIG_FILE_REGEX = /--config\s+(\S+)/
 const SOURCE_MAP_FALSE_REGEX = /sourceMap:\s*false/g
@@ -71,13 +71,13 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
     if (content.includes('sourcemap:') || content.includes('sourceMap:')) {
       // Already has sourcemap config, modify it while preserving case
       // Match sourceMap (camelCase) first, then sourcemap (lowercase)
-      let modifiedContent = content
-        .replace(SOURCE_MAP_ISDEV_LINKED_FALSE_REGEX, "sourceMap: isDev ? 'linked' : 'linked'")
-        .replace(SOURCE_MAP_ISDEV_LINKED_FALSE_CASE_INSENSITIVE_REGEX, "sourcemap: isDev ? 'linked' : 'linked'")
-        .replace(SOURCE_MAP_FALSE_REGEX, 'sourceMap: true')
-        .replace(SOURCE_MAP_FALSE_CASE_INSENSITIVE_REGEX, 'sourcemap: true')
-        .replace(SOURCE_MAP_NONE_REGEX, "sourceMap: 'inline'")
-        .replace(SOURCE_MAP_NONE_CASE_INSENSITIVE_REGEX, "sourcemap: 'inline'")
+      const modifiedContent = content
+        .replaceAll(SOURCE_MAP_ISDEV_LINKED_FALSE_REGEX, "sourceMap: isDev ? 'linked' : 'linked'")
+        .replaceAll(SOURCE_MAP_ISDEV_LINKED_FALSE_CASE_INSENSITIVE_REGEX, "sourcemap: isDev ? 'linked' : 'linked'")
+        .replaceAll(SOURCE_MAP_FALSE_REGEX, 'sourceMap: true')
+        .replaceAll(SOURCE_MAP_FALSE_CASE_INSENSITIVE_REGEX, 'sourcemap: true')
+        .replaceAll(SOURCE_MAP_NONE_REGEX, "sourceMap: 'inline'")
+        .replaceAll(SOURCE_MAP_NONE_CASE_INSENSITIVE_REGEX, "sourcemap: 'inline'")
 
       if (modifiedContent !== content) {
         await writeFile(configPath, modifiedContent, 'utf8')

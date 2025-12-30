@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { mkdir, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { getNodeVersion } from '../src/parts/GetNodeVersion/GetNodeVersion.ts'
 
 test('getNodeVersion - extracts version from engines.node and fetches latest', async () => {

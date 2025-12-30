@@ -1,5 +1,6 @@
 import { VError } from '@lvce-editor/verror'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
+import * as Assert from '../Assert/Assert.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
 import * as DownloadAndUnzipInsiders from '../DownloadAndUnzipInsiders/DownloadAndUnzipInsiders.ts'
 import * as Env from '../Env/Env.ts'
@@ -9,7 +10,6 @@ import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as LoadSourceMaps from '../LoadSourceMaps/LoadSourceMaps.ts'
 import * as RemoveUnusedFiles from '../RemoveUnusedFiles/RemoveUnusedFiles.ts'
 import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.ts'
-import * as Assert from '../Assert/Assert.ts'
 
 const automaticallyDownloadSourceMaps = false
 
@@ -33,11 +33,11 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       return Env.env.VSCODE_PATH
     }
 
-    const vscodeVersion = options.vscodeVersion
-    const insidersCommit = options.insidersCommit
+    const { vscodeVersion } = options
+    const { insidersCommit } = options
     const platform = options.platform || process.platform
-    const arch = options.arch
-    const updateUrl = options.updateUrl
+    const { arch } = options
+    const { updateUrl } = options
 
     if (insidersCommit) {
       return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(platform, arch, insidersCommit, updateUrl)

@@ -1,8 +1,8 @@
 import { expect, test } from '@jest/globals'
-import { mkdir, writeFile, readFile, rm } from 'node:fs/promises'
-import { join } from 'node:path'
-import { tmpdir } from 'node:os'
 import { MockRpc } from '@lvce-editor/rpc'
+import { mkdir, writeFile, readFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import * as AddOriginalSourcesToData from '../src/parts/AddOriginalSourcesToData/AddOriginalSourcesToData.ts'
 import * as LaunchSourceMapWorker from '../src/parts/LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 
@@ -12,10 +12,10 @@ test.skip('addOriginalSourcesToData - enriches data with original sources', asyn
   await mkdir(extensionSourceMapsDir, { recursive: true })
 
   const sourceMapContent = JSON.stringify({
-    version: 3,
-    sources: ['src/index.ts'],
     mappings: 'AAAA',
     names: [],
+    sources: ['src/index.ts'],
+    version: 3,
   })
   await writeFile(join(extensionSourceMapsDir, 'extension.js.map'), sourceMapContent)
 
@@ -24,11 +24,11 @@ test.skip('addOriginalSourcesToData - enriches data with original sources', asyn
   const data = {
     namedFunctionCount2: [
       {
-        name: 'testFunction',
+        column: 10,
         count: 10,
         delta: 5,
         line: 1,
-        column: 10,
+        name: 'testFunction',
         url: `file://${tempRoot}/.vscode-extensions/github.copilot-chat-v1.0.0/dist/extension.js`,
       },
     ],
@@ -46,10 +46,10 @@ test.skip('addOriginalSourcesToData - enriches data with original sources', asyn
             .map((_, index) => {
               if (index % 2 === 0) {
                 return {
-                  source: 'src/index.ts',
-                  line: 1,
                   column: 5,
+                  line: 1,
                   name: 'testFunction',
+                  source: 'src/index.ts',
                 }
               }
               return null
@@ -76,19 +76,19 @@ test.skip('addOriginalSourcesToData - enriches data with original sources', asyn
 
     expect(result.namedFunctionCount2).toHaveLength(1)
     expect(result.namedFunctionCount2[0]).toMatchObject({
-      name: 'testFunction',
       count: 10,
       delta: 5,
+      name: 'testFunction',
+      originalColumn: 5,
+      originalLine: 1,
+      originalLocation: 'src/index.ts:1:5',
+      originalName: 'testFunction',
       originalSource: 'src/index.ts',
       originalUrl: 'src/index.ts',
-      originalLine: 1,
-      originalColumn: 5,
-      originalName: 'testFunction',
-      originalLocation: 'src/index.ts:1:5',
     })
   } finally {
     ;(LaunchSourceMapWorker as any).launchSourceMapWorker = originalLaunch
-    await rm(tempRoot, { recursive: true, force: true })
+    await rm(tempRoot, { force: true, recursive: true })
   }
 })
 
@@ -101,11 +101,11 @@ test.skip('addOriginalSourcesToData - handles array data', async () => {
   const outputFile = join(tempRoot, 'result.json')
   const data = [
     {
-      name: 'testFunction',
+      column: 10,
       count: 10,
       delta: 5,
       line: 1,
-      column: 10,
+      name: 'testFunction',
       url: `file://${tempRoot}/.vscode-extensions/github.copilot-chat-v1.0.0/dist/extension.js`,
     },
   ]
@@ -133,7 +133,7 @@ test.skip('addOriginalSourcesToData - handles array data', async () => {
     expect(result).toHaveLength(1)
   } finally {
     ;(LaunchSourceMapWorker as any).launchSourceMapWorker = originalLaunch
-    await rm(tempRoot, { recursive: true, force: true })
+    await rm(tempRoot, { force: true, recursive: true })
   }
 })
 
@@ -144,9 +144,9 @@ test.skip('addOriginalSourcesToData - handles data without URLs', async () => {
   const data = {
     namedFunctionCount2: [
       {
-        name: 'testFunction',
         count: 10,
         delta: 5,
+        name: 'testFunction',
       },
     ],
   }
@@ -159,10 +159,10 @@ test.skip('addOriginalSourcesToData - handles data without URLs', async () => {
 
   expect(result.namedFunctionCount2).toHaveLength(1)
   expect(result.namedFunctionCount2[0]).toMatchObject({
-    name: 'testFunction',
     count: 10,
     delta: 5,
+    name: 'testFunction',
   })
 
-  await rm(tempRoot, { recursive: true, force: true })
+  await rm(tempRoot, { force: true, recursive: true })
 })

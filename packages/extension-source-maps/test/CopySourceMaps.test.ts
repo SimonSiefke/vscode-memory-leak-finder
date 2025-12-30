@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { mkdir, writeFile, readFile, rm } from 'node:fs/promises'
-import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import * as CopySourceMaps from '../src/parts/CopySourceMaps/CopySourceMaps.ts'
 
 test('copySourceMaps - copies source maps from dist directory', async () => {
@@ -27,8 +27,8 @@ test('copySourceMaps - copies source maps from dist directory', async () => {
   expect(copiedMapContent).toBe(sourceMapContent)
   expect(copiedJsContent).toBe(jsContent)
 
-  await rm(tempRepo, { recursive: true, force: true })
-  await rm(tempOutput, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
+  await rm(tempOutput, { force: true, recursive: true })
 })
 
 test('copySourceMaps - copies source maps from out directory', async () => {
@@ -48,8 +48,8 @@ test('copySourceMaps - copies source maps from out directory', async () => {
   const copiedMapContent = await readFile(outputMapPath, 'utf8')
   expect(copiedMapContent).toBe(sourceMapContent)
 
-  await rm(tempRepo, { recursive: true, force: true })
-  await rm(tempOutput, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
+  await rm(tempOutput, { force: true, recursive: true })
 })
 
 test('copySourceMaps - copies source maps from nested extension directory', async () => {
@@ -69,8 +69,8 @@ test('copySourceMaps - copies source maps from nested extension directory', asyn
   const copiedMapContent = await readFile(outputMapPath, 'utf8')
   expect(copiedMapContent).toBe(sourceMapContent)
 
-  await rm(tempRepo, { recursive: true, force: true })
-  await rm(tempOutput, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
+  await rm(tempOutput, { force: true, recursive: true })
 })
 
 test('copySourceMaps - copies multiple source maps preserving structure', async () => {
@@ -92,8 +92,8 @@ test('copySourceMaps - copies multiple source maps preserving structure', async 
   await expect(readFile(mainMapPath, 'utf8')).resolves.toBe('{"version":3}')
   await expect(readFile(utilMapPath, 'utf8')).resolves.toBe('{"version":3}')
 
-  await rm(tempRepo, { recursive: true, force: true })
-  await rm(tempOutput, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
+  await rm(tempOutput, { force: true, recursive: true })
 })
 
 test('copySourceMaps - handles missing JS file gracefully', async () => {
@@ -111,8 +111,8 @@ test('copySourceMaps - handles missing JS file gracefully', async () => {
 
   await expect(readFile(outputMapPath, 'utf8')).resolves.toBe('{"version":3}')
 
-  await rm(tempRepo, { recursive: true, force: true })
-  await rm(tempOutput, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
+  await rm(tempOutput, { force: true, recursive: true })
 })
 
 test('copySourceMaps - throws error when no source maps found', async () => {
@@ -124,8 +124,8 @@ test('copySourceMaps - throws error when no source maps found', async () => {
     'No source map files found in the repository',
   )
 
-  await rm(tempRepo, { recursive: true, force: true })
-  await rm(tempOutput, { recursive: true, force: true }).catch(() => {})
+  await rm(tempRepo, { force: true, recursive: true })
+  await rm(tempOutput, { force: true, recursive: true }).catch(() => {})
 })
 
 test('copySourceMaps - creates correct extension ID format', async () => {
@@ -143,8 +143,8 @@ test('copySourceMaps - creates correct extension ID format', async () => {
 
   await expect(readFile(outputMapPath, 'utf8')).resolves.toBe('{"version":3}')
 
-  await rm(tempRepo, { recursive: true, force: true })
-  await rm(tempOutput, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
+  await rm(tempOutput, { force: true, recursive: true })
 })
 
 test('copySourceMaps - strips v prefix from version', async () => {
@@ -162,8 +162,8 @@ test('copySourceMaps - strips v prefix from version', async () => {
 
   await expect(readFile(outputMapPath, 'utf8')).resolves.toBe('{"version":3}')
 
-  await rm(tempRepo, { recursive: true, force: true })
-  await rm(tempOutput, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
+  await rm(tempOutput, { force: true, recursive: true })
 })
 
 test('copySourceMaps - throws VError when copy fails', async () => {
@@ -180,7 +180,7 @@ test('copySourceMaps - throws VError when copy fails', async () => {
     `Failed to copy source maps from '${tempRepo}' to '${tempOutputFile}'`,
   )
 
-  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
   await rm(tempOutputFile, { force: true }).catch(() => {})
 })
 
@@ -199,6 +199,6 @@ test('copySourceMaps - checks multiple possible directories', async () => {
 
   await expect(readFile(outputMapPath, 'utf8')).resolves.toBe('{"version":3}')
 
-  await rm(tempRepo, { recursive: true, force: true })
-  await rm(tempOutput, { recursive: true, force: true })
+  await rm(tempRepo, { force: true, recursive: true })
+  await rm(tempOutput, { force: true, recursive: true })
 })
