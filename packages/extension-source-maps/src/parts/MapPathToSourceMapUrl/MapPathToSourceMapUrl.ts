@@ -21,4 +21,3 @@ export const mapPathToSourceMapUrl = (path: string, root: string): string | null
     return null
   }
 }
-

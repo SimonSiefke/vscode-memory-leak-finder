@@ -17,4 +17,3 @@ export const resolveOriginalPositions = async (
     // ignore sourcemap resolution errors
   }
 }
-

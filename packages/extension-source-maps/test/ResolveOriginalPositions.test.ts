@@ -126,9 +126,7 @@ test('resolveOriginalPositions - handles null original values', async () => {
     commandMap: {},
     invoke: () => {
       return Promise.resolve({
-        'file:///path/to/source.map': [
-          { source: null, line: null, column: null, name: null },
-        ],
+        'file:///path/to/source.map': [{ source: null, line: null, column: null, name: null }],
       })
     },
   })
@@ -154,4 +152,3 @@ test('resolveOriginalPositions - handles null original values', async () => {
     ;(LaunchSourceMapWorker as any).launchSourceMapWorker = originalLaunch
   }
 })
-

@@ -1,15 +1,14 @@
-import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 import { getLatestNodeVersionForMajor } from '../GetLatestNodeVersionForMajor/GetLatestNodeVersionForMajor.ts'
+import * as ReadJson from '../ReadJson/ReadJson.ts'
 
 const NODE_VERSION_REGEX = /(\d+)\.?(\d+)?\.?(\d+)?/
 
 export const getNodeVersion = async (repoPath: string): Promise<string> => {
   try {
     const packageJsonPath = join(repoPath, 'package.json')
-    const packageJsonContent = await readFile(packageJsonPath, 'utf8')
-    const packageJson = JSON.parse(packageJsonContent)
+    const packageJson = await ReadJson.readJson(packageJsonPath)
     const engines = packageJson.engines
     if (!engines || !engines.node) {
       throw new Error('No node version specified in package.json engines')

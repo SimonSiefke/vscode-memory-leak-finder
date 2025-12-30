@@ -55,4 +55,3 @@ export const collectSourceMapPositions = (
 
   return { sourceMapUrlToPositions, positionPointers }
 }
-

@@ -92,4 +92,3 @@ test('collectSourceMapPositions - skips items without line or column', () => {
   expect(result.sourceMapUrlToPositions).toEqual({})
   expect(result.positionPointers).toHaveLength(0)
 })
-

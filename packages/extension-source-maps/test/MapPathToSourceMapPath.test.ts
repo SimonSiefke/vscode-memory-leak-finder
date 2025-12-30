@@ -46,4 +46,3 @@ test('mapPathToSourceMapPath - handles nested paths', () => {
   const expected = join(root, '.extension-source-maps', 'github.copilot-chat-1.0.0', 'src/utils/helper.js.map')
   expect(result).toBe(expected)
 })
-

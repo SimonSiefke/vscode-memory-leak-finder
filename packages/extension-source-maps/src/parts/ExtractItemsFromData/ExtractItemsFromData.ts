@@ -10,4 +10,3 @@ export const extractItemsFromData = (data: any): readonly any[] => {
     return []
   }
 }
-

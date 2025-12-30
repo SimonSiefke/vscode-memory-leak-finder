@@ -2,7 +2,9 @@ import { expect, test } from '@jest/globals'
 import * as ParseSourceLocation from '../src/parts/ParseSourceLocation/ParseSourceLocation.ts'
 
 test('parseSourceLocation - parses valid source location', () => {
-  const result = ParseSourceLocation.parseSourceLocation('.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
+  const result = ParseSourceLocation.parseSourceLocation(
+    '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277',
+  )
   expect(result).toEqual({
     url: '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js',
     line: 917,
@@ -42,4 +44,3 @@ test('parseSourceLocation - handles paths with colons in filename', () => {
     column: 10,
   })
 })
-

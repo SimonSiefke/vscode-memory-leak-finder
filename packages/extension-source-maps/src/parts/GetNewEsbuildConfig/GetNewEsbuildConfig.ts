@@ -39,7 +39,12 @@ export const getNewEsbuildConfig = (oldConfig: string): string => {
 
   // Add sourcemap config if it doesn't exist
   // Try to find the build function call or config object
-  if (oldConfig.includes('build(') || oldConfig.includes('buildSync(') || oldConfig.includes('.build(') || oldConfig.includes('.buildSync(')) {
+  if (
+    oldConfig.includes('build(') ||
+    oldConfig.includes('buildSync(') ||
+    oldConfig.includes('.build(') ||
+    oldConfig.includes('.buildSync(')
+  ) {
     // Try to add sourcemap to the first build options object
     // Match build({ ... }) and add sourcemap if not present
     // Use a more sophisticated regex that handles nested objects
@@ -157,4 +162,3 @@ export const getNewEsbuildConfig = (oldConfig: string): string => {
   // If we couldn't modify automatically, throw an error
   throw new Error(`Could not automatically modify esbuild config. Please add sourcemap: true manually.`)
 }
-

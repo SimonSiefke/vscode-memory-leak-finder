@@ -1,7 +1,7 @@
-import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { exec } from '../Exec/Exec.ts'
 import { VError } from '@lvce-editor/verror'
+import * as ReadJson from '../ReadJson/ReadJson.ts'
 
 export const findCommitForVersion = async (repoPath: string, version: string): Promise<string> => {
   try {
@@ -63,8 +63,7 @@ export const findCommitForVersion = async (repoPath: string, version: string): P
     // Last resort: try to find by package.json content
     const packageJsonPath = join(repoPath, 'package.json')
     try {
-      const packageJsonContent = await readFile(packageJsonPath, 'utf8')
-      const packageJson = JSON.parse(packageJsonContent)
+      const packageJson = await ReadJson.readJson(packageJsonPath)
       if (packageJson.version === version) {
         // Current commit matches
         const currentCommitResult = await exec('git', ['rev-parse', 'HEAD'], { cwd: repoPath })

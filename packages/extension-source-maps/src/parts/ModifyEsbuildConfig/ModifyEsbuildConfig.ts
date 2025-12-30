@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 import { getNewEsbuildConfig } from '../GetNewEsbuildConfig/GetNewEsbuildConfig.ts'
+import * as ReadJson from '../ReadJson/ReadJson.ts'
 
 const CONFIG_FILE_REGEX = /--config\s+(\S+)/
 
