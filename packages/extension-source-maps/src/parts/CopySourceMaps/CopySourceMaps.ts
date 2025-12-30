@@ -1,7 +1,7 @@
 import { cp, mkdir, readdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import { VError } from '@lvce-editor/verror'
-import { SourceMapFile } from '../SourceMapFile/SourceMapFile.js'
+import type { SourceMapFile } from '../SourceMapFile/SourceMapFile.js'
 
 export const copySourceMaps = async (repoPath: string, outputDir: string, extensionName: string, version: string): Promise<void> => {
   try {
