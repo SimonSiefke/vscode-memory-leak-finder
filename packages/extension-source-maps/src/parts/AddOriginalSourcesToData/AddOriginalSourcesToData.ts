@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -39,6 +40,10 @@ const mapPathToSourceMapUrl = (path: string, root: string): string | null => {
     
     // Map to source maps directory
     const sourceMapPath = join(root, '.extension-source-maps', extensionId, relativePath + '.map')
+    if (!existsSync(sourceMapPath)) {
+      console.log(`[addOriginalSourcesToData] Source map not found: ${sourceMapPath}`)
+      return null
+    }
     const sourceMapUrl = pathToFileURL(sourceMapPath).toString()
     return sourceMapUrl
   } catch {
@@ -116,8 +121,10 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     }
 
     const sourceMapUrls = Object.keys(sourceMapUrlToPositions)
+    console.log(`[addOriginalSourcesToData] Found ${sourceMapUrls.length} source map URLs to resolve`)
     if (sourceMapUrls.length === 0) {
       // No source maps to resolve, just write the data as-is
+      console.log(`[addOriginalSourcesToData] No source maps found, writing data as-is`)
       await writeFile(outputFilePath, JSON.stringify(data, null, 2), 'utf8')
       return
     }

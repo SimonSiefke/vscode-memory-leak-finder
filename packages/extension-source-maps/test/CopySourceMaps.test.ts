@@ -147,6 +147,25 @@ test('copySourceMaps - creates correct extension ID format', async () => {
   await rm(tempOutput, { recursive: true, force: true })
 })
 
+test('copySourceMaps - strips v prefix from version', async () => {
+  const tempRepo = join(tmpdir(), `test-copy-source-maps-repo-${Date.now()}`)
+  const tempOutput = join(tmpdir(), `test-copy-source-maps-output-${Date.now()}`)
+  const distDir = join(tempRepo, 'dist')
+  await mkdir(distDir, { recursive: true })
+
+  await writeFile(join(distDir, 'extension.js.map'), '{"version":3}')
+
+  await CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'copilot-chat', 'v0.36.2025121004')
+
+  const extensionId = 'github.copilot-chat-0.36.2025121004'
+  const outputMapPath = join(tempOutput, extensionId, 'extension.js.map')
+
+  await expect(readFile(outputMapPath, 'utf8')).resolves.toBe('{"version":3}')
+
+  await rm(tempRepo, { recursive: true, force: true })
+  await rm(tempOutput, { recursive: true, force: true })
+})
+
 test('copySourceMaps - throws VError when copy fails', async () => {
   const tempRepo = join(tmpdir(), `test-copy-source-maps-repo-${Date.now()}`)
   // Create a file at the target location so directory creation will fail
