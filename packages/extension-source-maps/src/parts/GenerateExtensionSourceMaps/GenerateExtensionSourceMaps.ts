@@ -27,7 +27,10 @@ export const generateExtensionSourceMaps = async ({
   const repoPath = join(cacheDir, `${extensionName}-${version}`)
 
   // Check if already built
-  const sourceMapsOutputPath = join(outputDir, `${extensionName}-${version}`)
+  // Use the same extension ID format as CopySourceMaps (github.extensionName-normalizedVersion)
+  const normalizedVersion = version.startsWith('v') ? version.slice(1) : version
+  const extensionId = `github.${extensionName}-${normalizedVersion}`
+  const sourceMapsOutputPath = join(outputDir, extensionId)
   if (existsSync(sourceMapsOutputPath)) {
     console.log(`[extension-source-maps] Source maps for ${extensionName} ${version} already exist, skipping...`)
     return
