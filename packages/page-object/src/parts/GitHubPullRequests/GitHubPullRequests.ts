@@ -4,7 +4,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const indexDelta = 5
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async checkoutIndex(index: number): Promise<void> {
       try {
@@ -40,7 +40,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async focusView() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusOnPullRequestsView)
         await page.waitForIdle()
         const viewlet = page.locator('#workbench\\.view\\.extension\\.github-pull-requests')

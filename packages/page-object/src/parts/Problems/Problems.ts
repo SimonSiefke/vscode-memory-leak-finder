@@ -2,7 +2,7 @@ import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async hide() {
       try {
@@ -33,7 +33,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ProblemsFocusOnProblemsView)
         await expect(markersPanel).toBeVisible()
       } catch (error) {

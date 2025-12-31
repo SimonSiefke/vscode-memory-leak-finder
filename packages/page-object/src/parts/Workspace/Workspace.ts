@@ -7,7 +7,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, page, VError }) => {
+export const create = ({ electronApp, expect, page, platform, VError }) => {
   return {
     async add(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')
@@ -24,7 +24,7 @@ export const create = ({ electronApp, expect, page, VError }) => {
           canceled: false,
           filePaths: [extensionsFolder],
         })
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.InstallExtensionFromLocation)
         await page.waitForIdle()
       } catch (error) {

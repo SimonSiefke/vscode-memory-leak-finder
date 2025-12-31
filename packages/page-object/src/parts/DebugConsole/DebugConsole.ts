@@ -2,7 +2,7 @@ import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async clear() {
       try {
@@ -15,7 +15,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async clearInput() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectAll)
         await quickPick.executeCommand(WellKnownCommands.DeleteAllLeft)
         await page.waitForIdle()
@@ -56,7 +56,7 @@ export const create = ({ expect, page, VError }) => {
         const completions = page.locator('.repl-input-wrapper .suggest-widget')
         const count = await completions.count()
         if (count === 0) {
-          const quickPick = QuickPick.create({ expect, page, VError })
+          const quickPick = QuickPick.create({ expect, page, platform, VError })
           await quickPick.executeCommand(WellKnownCommands.TriggerSuggest)
           await page.waitForIdle()
         }
@@ -91,7 +91,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const repl = page.locator('.repl')
         await expect(repl).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
         await expect(repl).toBeVisible()
       } catch (error) {
@@ -101,7 +101,7 @@ export const create = ({ expect, page, VError }) => {
     async type(value) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
         await page.waitForIdle()
         const replInputWrapper = page.locator('.repl-input-wrapper')

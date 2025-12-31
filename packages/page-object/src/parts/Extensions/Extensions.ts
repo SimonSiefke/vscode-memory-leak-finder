@@ -109,6 +109,7 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
         const quickPick = QuickPick.create({
           expect,
           page,
+          platform,
           VError,
         })
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
@@ -164,7 +165,7 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
     async restart() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
         await page.waitForIdle()
       } catch (error) {
@@ -286,6 +287,7 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
           const quickPick = QuickPick.create({
             expect,
             page,
+            platform,
             VError,
           })
           await quickPick.executeCommand(WellKnownCommands.ShowExtensions)

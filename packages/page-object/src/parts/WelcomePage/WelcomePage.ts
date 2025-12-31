@@ -2,7 +2,7 @@ import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }) => {
   return {
     async expandStep(name) {
       try {
@@ -29,7 +29,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       try {
         const gettingStartedContainer = page.locator('.gettingStartedContainer')
         await expect(gettingStartedContainer).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.HelpWelcome)
         await expect(gettingStartedContainer).toBeVisible()
       } catch (error) {

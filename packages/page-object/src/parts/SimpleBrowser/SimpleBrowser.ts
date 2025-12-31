@@ -25,7 +25,7 @@ const createMockServer = async ({ port }): Promise<MockServer> => {
   }
 }
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async addElementToChat({ selector }) {
       try {
@@ -78,7 +78,7 @@ export const create = ({ expect, page, VError }) => {
     async show({ port }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
           stayVisible: true,
