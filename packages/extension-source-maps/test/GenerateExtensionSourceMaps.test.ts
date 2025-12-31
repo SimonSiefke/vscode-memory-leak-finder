@@ -94,9 +94,6 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
     buildExtension: async () => {},
   }))
 
-  jest.unstable_mockModule('../src/parts/CopySourceMaps/CopySourceMaps.ts', () => ({
-    copySourceMaps: async () => {},
-  }))
 
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
@@ -185,9 +182,6 @@ test.skip('generateExtensionSourceMaps - finds commit and checks out', async () 
     buildExtension: async () => {},
   }))
 
-  jest.unstable_mockModule('../src/parts/CopySourceMaps/CopySourceMaps.ts', () => ({
-    copySourceMaps: async () => {},
-  }))
 
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
@@ -344,12 +338,6 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
     },
   }))
 
-  jest.unstable_mockModule('../src/parts/CopySourceMaps/CopySourceMaps.ts', () => ({
-    copySourceMaps: async () => {
-      workflowCalls.push('copySourceMaps')
-    },
-  }))
-
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
@@ -367,7 +355,6 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
     'installDependencies',
     'modifyEsbuildConfig',
     'buildExtension',
-    'copySourceMaps',
   ])
 
   await rm(tempOutput, { force: true, recursive: true })
@@ -437,9 +424,6 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
     buildExtension: async () => {},
   }))
 
-  jest.unstable_mockModule('../src/parts/CopySourceMaps/CopySourceMaps.ts', () => ({
-    copySourceMaps: async () => {},
-  }))
 
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 

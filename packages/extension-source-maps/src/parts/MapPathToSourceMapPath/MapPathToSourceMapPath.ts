@@ -26,7 +26,7 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
   // Remove 'github.' prefix
   let cacheDirName = extensionId.replace(GITHUB_PREFIX_REGEX, '')
 
-  // Strip 'v' prefix from version if present to match CopySourceMaps behavior
+  // Strip 'v' prefix from version if present
   // VS Code extension directories don't have 'v' prefix in version, so strip it if present
   // This ensures consistency: copilot-chat-v0.36.2025121004 -> copilot-chat-0.36.2025121004
   // Pattern: copilot-chat-v<version> -> copilot-chat-<version>
