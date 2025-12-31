@@ -7,7 +7,7 @@ import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
 export interface NodeExaminationResult {
-  readonly edges: readonly Array<{
+  readonly edges: Array<{
     readonly type: number
     readonly typeName: string
     readonly nameIndex: number
@@ -23,7 +23,7 @@ export interface NodeExaminationResult {
   readonly nodeIndex: number
   readonly nodeName: string | null
   readonly nodeType: string | null
-  readonly properties: readonly Array<{
+  readonly properties: Array<{
     readonly name: string
     readonly value: string | null
     readonly targetType: string | null
