@@ -3,3 +3,4 @@ export interface PositionPointer {
   readonly sourceMapUrl: string
 }
 
+

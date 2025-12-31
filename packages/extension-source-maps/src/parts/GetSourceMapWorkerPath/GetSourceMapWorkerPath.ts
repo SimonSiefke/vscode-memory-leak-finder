@@ -6,3 +6,4 @@ export const getSourceMapWorkerPath = (): string => {
   return sourceMapWorkerPath
 }
 
+
