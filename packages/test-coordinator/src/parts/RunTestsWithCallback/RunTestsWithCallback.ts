@@ -287,12 +287,12 @@ export const runTestsWithCallback = async ({
           if (checkLeaks) {
             if (measureAfter) {
               for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform)
               }
             }
             await MemoryLeakFinder.start(memoryRpc, connectionId)
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
@@ -328,7 +328,7 @@ export const runTestsWithCallback = async ({
             }
           } else {
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform)
             }
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)

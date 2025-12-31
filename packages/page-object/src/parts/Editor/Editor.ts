@@ -1485,7 +1485,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       // const placeholder = page.locator('.monaco-editor-pane-placeholder')
       // await expect(placeholder).toBeVisible()
       await page.waitForIdle()
-          const quickPick = QuickPick.create({ expect, page, platform, VError })
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
       await quickPick.executeCommand(WellKnownCommands.ReopenEditorWith, {
         pressKeyOnce: true,
         stayVisible: true,
