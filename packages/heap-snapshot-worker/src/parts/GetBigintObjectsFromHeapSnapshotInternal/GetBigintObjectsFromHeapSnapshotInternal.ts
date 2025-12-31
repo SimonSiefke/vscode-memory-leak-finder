@@ -17,7 +17,7 @@ export interface BigintObject {
   readonly note: string
   readonly selfSize: number
   readonly value: string
-  readonly variableNames: readonly VariableName[]
+  variableNames: VariableName[]
 }
 
 export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
