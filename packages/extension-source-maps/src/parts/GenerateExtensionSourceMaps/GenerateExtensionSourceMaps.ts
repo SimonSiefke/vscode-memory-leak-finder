@@ -15,14 +15,12 @@ import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig
 export const generateExtensionSourceMaps = async ({
   cacheDir,
   extensionName,
-  outputDir,
   repoUrl,
   version,
 }: {
   extensionName: string
   version: string
   repoUrl: string
-  outputDir: string
   cacheDir: string
 }): Promise<void> => {
   const repoPath = join(cacheDir, `${extensionName}-${version}`)
@@ -30,8 +28,8 @@ export const generateExtensionSourceMaps = async ({
   // Check if already built
   // Use the same extension ID format as CopySourceMaps (github.extensionName-normalizedVersion)
   const normalizedVersion = version.startsWith('v') ? version.slice(1) : version
-  const extensionId = `github.${extensionName}-${normalizedVersion}`
-  const sourceMapsOutputPath = join(outputDir, extensionId)
+  const extensionId = `${extensionName}-${normalizedVersion}`
+  const sourceMapsOutputPath = join(cacheDir, extensionId)
   if (existsSync(sourceMapsOutputPath)) {
     const displayName = GetDisplayname.getDisplayname(extensionName)
     console.log(`[extension-source-maps] Source maps for ${displayName} ${version} already exist, skipping...`)
@@ -87,8 +85,8 @@ export const generateExtensionSourceMaps = async ({
 
   // Copy source maps
   console.log(`[extension-source-maps] Copying source maps...`)
-  await mkdir(outputDir, { recursive: true })
-  await CopySourceMaps.copySourceMaps(repoPath, outputDir, extensionName, version)
+  await mkdir(cacheDir, { recursive: true })
+  await CopySourceMaps.copySourceMaps(repoPath, cacheDir, extensionName, version)
 
   console.log(`[extension-source-maps] Successfully generated source maps for ${extensionName} ${version}`)
 }

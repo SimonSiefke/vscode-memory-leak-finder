@@ -40,10 +40,9 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
       throw new Error('No source map files found in the repository')
     }
 
-    // Copy source maps to output directory, preserving the directory structure
-    // The output should match the extension installation path structure:
-    // .vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js.map
-    // So we'll create: .extension-source-maps/github.copilot-chat-0.36.2025121004/dist/extension.js.map
+    // Copy source maps to cache directory, preserving the directory structure
+    // The output should match the cache directory structure:
+    // .extension-source-maps-cache/copilot-chat-0.36.2025121004/dist/extension.js.map
     // Note: VS Code extension directories don't have 'v' prefix in version, so strip it if present
     const normalizedVersion = version.startsWith('v') ? version.slice(1) : version
     const extensionId = `${extensionName}-${normalizedVersion}`

@@ -16,13 +16,12 @@ test.skip('generateExtensionSourceMaps - skips when source maps already exist', 
   const extensionName = 'test-extension'
   const version = '1.0.0'
 
-  const sourceMapsOutputPath = join(tempOutput, `${extensionName}-${version}`)
+  const sourceMapsOutputPath = join(tempCache, `${extensionName}-${version}`)
   await mkdir(sourceMapsOutputPath, { recursive: true })
 
   await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl: 'git@github.com:test/repo.git',
     version,
   })
