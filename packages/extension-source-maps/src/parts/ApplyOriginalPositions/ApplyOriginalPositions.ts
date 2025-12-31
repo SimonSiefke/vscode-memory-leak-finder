@@ -35,14 +35,9 @@ export const applyOriginalPositions = (
     offsetMap[pointer.sourceMapUrl] = offset + 1
     if (original) {
       const target = enriched[pointer.index]
-<<<<<<< HEAD
       const normalizedSource = NormalizeSourcePath.normalizeSourcePath(original.source ?? null)
       target.originalSource = normalizedSource
       target.originalUrl = normalizedSource
-=======
-      target.originalSource = original.source ?? null
-      target.originalUrl = original.source ?? null
->>>>>>> origin/main
       target.originalLine = original.line ?? null
       target.originalColumn = original.column ?? null
       target.originalName = original.name ?? null
