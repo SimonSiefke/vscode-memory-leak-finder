@@ -10,13 +10,13 @@ export interface VariableName {
   readonly sourceType: string
 }
 export interface BigintObject {
-  detachedness: number
-  edgeCount: number
-  id: number
-  name: string
-  note: string
-  selfSize: number
-  value: string
+  readonly detachedness: number
+  readonly edgeCount: number
+  readonly id: number
+  readonly name: string
+  readonly note: string
+  readonly selfSize: number
+  readonly value: string
   variableNames: VariableName[]
 }
 

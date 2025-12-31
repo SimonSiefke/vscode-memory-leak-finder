@@ -15,77 +15,77 @@ export type AstNodeType =
   | 'unknown'
 
 export interface BaseAstNode {
-  id: number
-  name?: string | null
-  type: AstNodeType
+  readonly id: number
+  readonly name?: string | null
+  readonly type: AstNodeType
 }
 
 export interface NumberNode extends BaseAstNode {
-  type: 'number'
-  value: number | string
+  readonly type: 'number'
+  readonly value: number | string
 }
 
 export interface StringNode extends BaseAstNode {
-  type: 'string'
-  value: string
+  readonly type: 'string'
+  readonly value: string
 }
 
 export interface BigIntNode extends BaseAstNode {
-  type: 'bigint'
-  value: string
+  readonly type: 'bigint'
+  readonly value: string
 }
 
 export interface BooleanNode extends BaseAstNode {
-  type: 'boolean'
-  value: boolean
+  readonly type: 'boolean'
+  readonly value: boolean
 }
 
 export interface UndefinedNode extends BaseAstNode {
-  type: 'undefined'
+  readonly type: 'undefined'
 }
 
 export interface PropertyEntry {
-  id: number
-  name: string
-  value: AstNode
+  readonly id: number
+  readonly name: string
+  readonly value: AstNode
 }
 
 export interface ObjectNode extends BaseAstNode {
-  properties: PropertyEntry[]
-  type: 'object'
+  readonly properties: readonly PropertyEntry[]
+  readonly type: 'object'
 }
 
 export interface ArrayNode extends BaseAstNode {
-  elements: AstNode[]
-  type: 'array'
+  readonly elements: readonly AstNode[]
+  readonly type: 'array'
 }
 
 export interface MapEntry {
-  key: AstNode
-  value: AstNode
+  readonly key: AstNode
+  readonly value: AstNode
 }
 
 export interface MapNode extends BaseAstNode {
-  entries: MapEntry[]
-  type: 'map' | 'weakmap'
+  readonly entries: readonly MapEntry[]
+  readonly type: 'map' | 'weakmap'
 }
 
 export interface SetNode extends BaseAstNode {
-  elements: AstNode[]
-  type: 'set' | 'weakset'
+  readonly elements: readonly AstNode[]
+  readonly type: 'set' | 'weakset'
 }
 
 export interface CodeNode extends BaseAstNode {
-  column?: number
-  line?: number
-  scriptId?: number
-  type: 'code' | 'closure'
-  value?: string
+  readonly column?: number
+  readonly line?: number
+  readonly scriptId?: number
+  readonly type: 'code' | 'closure'
+  readonly value?: string
 }
 
 export interface UnknownNode extends BaseAstNode {
-  type: 'unknown'
-  value?: string
+  readonly type: 'unknown'
+  readonly value?: string
 }
 
 export type AstNode =
