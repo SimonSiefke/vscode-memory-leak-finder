@@ -99,7 +99,6 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
   await generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl,
     version,
   })
@@ -186,7 +185,6 @@ test.skip('generateExtensionSourceMaps - finds commit and checks out', async () 
   await generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl,
     version,
   })
@@ -242,7 +240,6 @@ test.skip('generateExtensionSourceMaps - throws error when checkout fails', asyn
     generateExtensionSourceMaps({
       cacheDir: tempCache,
       extensionName,
-      outputDir: tempOutput,
       repoUrl,
       version,
     }),
@@ -341,7 +338,6 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
   await generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl,
     version,
   })
@@ -427,7 +423,6 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
   await generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl,
     version,
   })

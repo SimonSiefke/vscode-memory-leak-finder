@@ -11,3 +11,4 @@ export const writeJson = async (path: string, json: any): Promise<void> => {
     throw new VError(error, `Failed to write json`)
   }
 }
+
