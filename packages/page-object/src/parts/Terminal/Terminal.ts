@@ -88,7 +88,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         if (waitForFile) {
-          const workspace = Workspace.create({ electronApp, expect, page, VError })
+          const workspace = Workspace.create({ electronApp, expect, page, platform, VError })
           const exists = await workspace.waitForFile(waitForFile)
           if (!exists) {
             throw new Error(`expected file to be created`)
@@ -130,7 +130,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async killAll() {
       try {
         await page.waitForIdle()
-        const panel = Panel.create({ expect, page, VError })
+        const panel = Panel.create({ expect, page, platform, VError })
         await panel.hide()
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })

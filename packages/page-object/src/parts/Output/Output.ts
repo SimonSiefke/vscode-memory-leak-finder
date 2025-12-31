@@ -59,7 +59,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       try {
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
-        const panel = Panel.create({ expect, page, VError })
+        const panel = Panel.create({ expect, page, platform, VError })
         await panel.hide()
         await expect(outputView).toBeHidden()
       } catch (error) {

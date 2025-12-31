@@ -8,7 +8,7 @@ export const create = ({ expect, page, platform, VError }) => {
       try {
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeVisible()
-        const panel = Panel.create({ expect, page, VError })
+        const panel = Panel.create({ expect, page, platform, VError })
         await panel.hide()
         await expect(markersPanel).toBeHidden()
       } catch (error) {

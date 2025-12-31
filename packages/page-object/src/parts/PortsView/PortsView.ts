@@ -22,7 +22,7 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
         const portsView = page.locator('#\\~remote\\.forwardedPortsContainer')
         await expect(portsView).toBeVisible()
-        const panel = Panel.create({ expect, page, VError })
+        const panel = Panel.create({ expect, page, platform, VError })
         await panel.hide()
         await page.waitForIdle()
       } catch (error) {
