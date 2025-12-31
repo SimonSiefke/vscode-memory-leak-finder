@@ -5,3 +5,4 @@ export const getDisplayname = (extensionName: string): string => {
     .join(' ')
 }
 
+

@@ -50,3 +50,4 @@ test('extractItemsFromData - returns empty array when namedFunctionCount3 is not
   expect(result).toEqual([])
 })
 
+
