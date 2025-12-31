@@ -16,11 +16,11 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
   const normalizedRoot = normalizePathSeparators(normalize(root))
   const normalizedPathInput = normalizePathSeparators(normalize(path))
   const looksAbsolute = isAbsolute(path) || normalizedPathInput.startsWith('/')
-  
+
   let normalizedPath = path
   if (looksAbsolute) {
     // Normalize both paths for comparison (handle Windows backslashes and cross-platform roots)
-    
+
     // If the absolute path is within the root, make it relative
     if (normalizedPathInput.startsWith(normalizedRoot)) {
       // Extract relative path by removing root prefix
