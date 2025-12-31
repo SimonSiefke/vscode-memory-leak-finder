@@ -121,7 +121,7 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
     },
     async install({ id, name }: { id: string; name: string }) {
       try {
-        const editor = Editor.create({ expect, ideVersion, page, VError })
+        const editor = Editor.create({ expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await this.show()
         await this.search(id)

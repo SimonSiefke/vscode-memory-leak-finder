@@ -18,7 +18,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       try {
         const gettingStartedContainer = page.locator('.gettingStartedContainer')
         await expect(gettingStartedContainer).toBeVisible()
-        const editor = Editor.create({ expect, ideVersion, page, VError })
+        const editor = Editor.create({ expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await expect(gettingStartedContainer).toBeHidden()
       } catch (error) {

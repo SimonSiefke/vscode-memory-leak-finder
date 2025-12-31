@@ -102,7 +102,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
         await page.waitForIdle()
-        const editor = Editor.create({ expect, ideVersion, page, VError })
+        const editor = Editor.create({ expect, ideVersion, page, platform, VError })
         await editor.focus()
         await editor.cursorRight()
         await page.waitForIdle()
