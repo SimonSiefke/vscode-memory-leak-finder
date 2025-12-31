@@ -94,7 +94,6 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
     buildExtension: async () => {},
   }))
 
-
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
@@ -181,7 +180,6 @@ test.skip('generateExtensionSourceMaps - finds commit and checks out', async () 
   jest.unstable_mockModule('../src/parts/BuildExtension/BuildExtension.ts', () => ({
     buildExtension: async () => {},
   }))
-
 
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
@@ -423,7 +421,6 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
   jest.unstable_mockModule('../src/parts/BuildExtension/BuildExtension.ts', () => ({
     buildExtension: async () => {},
   }))
-
 
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
