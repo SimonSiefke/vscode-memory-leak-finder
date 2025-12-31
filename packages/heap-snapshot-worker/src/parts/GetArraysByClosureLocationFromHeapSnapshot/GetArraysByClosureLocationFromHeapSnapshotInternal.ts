@@ -18,16 +18,16 @@ interface LocationInfo {
 }
 
 interface ArrayObj {
-  detachedness: number
-  edgeCount: number
-  id: number
+  readonly detachedness: number
+  readonly edgeCount: number
+  readonly id: number
   length: number
-  locationInfo: LocationInfo | null
-  locationKey: string
-  name: string
-  nodeDataIndex: number
-  selfSize: number
-  type: 'array'
+  readonly locationInfo: LocationInfo | null
+  readonly locationKey: string
+  readonly name: string
+  readonly nodeDataIndex: number
+  readonly selfSize: number
+  readonly type: 'array'
   variableNames: VariableName[]
 }
 
