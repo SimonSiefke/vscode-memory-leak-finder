@@ -50,10 +50,10 @@ export const runTestsWithCallback = async ({
   inspectExtensionsPort,
   inspectPtyHost,
   inspectPtyHostPort,
-    inspectSharedProcess,
-    inspectSharedProcessPort,
-    isGithubActions,
-    measure,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
+  isGithubActions,
+  measure,
   measureAfter,
   measureNode,
   platform,
@@ -257,7 +257,14 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerRpc, connectionId, absolutePath, forceRun, timeouts, isGithubActions)
+        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
+          testWorkerRpc,
+          connectionId,
+          absolutePath,
+          forceRun,
+          timeouts,
+          isGithubActions,
+        )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped
 
