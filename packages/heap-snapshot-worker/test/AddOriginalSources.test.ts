@@ -1,15 +1,12 @@
-import { test, expect } from '@jest/globals'
-import { mkdir, writeFile, rm } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { expect, test } from '@jest/globals'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { addOriginalSources } from '../src/parts/AddOriginalSources/AddOriginalSources.ts'
+import { root } from '../src/parts/Root/Root.ts'
 
 test('addOriginalSources attaches urls from script maps folder without sourcemap worker', async () => {
   // Arrange: write a temp script map file
-  const thisDir: string = dirname(fileURLToPath(import.meta.url))
-  const packageDir: string = resolve(thisDir, '..')
-  const repoRoot: string = resolve(packageDir, '../..')
-  const mapsDir: string = join(repoRoot, '.vscode-script-maps')
+  const mapsDir: string = join(root, '.vscode-script-maps')
   await mkdir(mapsDir, { recursive: true })
   const mapPath: string = join(mapsDir, 'tmp-test.json')
   const scriptMap = {
