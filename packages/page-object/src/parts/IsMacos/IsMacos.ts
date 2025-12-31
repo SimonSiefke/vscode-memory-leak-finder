@@ -1,6 +1,3 @@
-import * as PlatformState from '../PlatformState/PlatformState.ts'
-
-export const isMacos = (): boolean => {
-  const platform = PlatformState.getPlatform()
+export const isMacos = (platform: string): boolean => {
   return platform === 'darwin'
 }

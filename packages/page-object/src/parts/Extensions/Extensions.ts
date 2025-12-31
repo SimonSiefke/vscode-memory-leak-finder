@@ -9,14 +9,14 @@ import * as Root from '../Root/Root.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const getSelectAll = (): string => {
-  return IsMacos.isMacos() ? 'Meta+A' : 'Control+A'
+const getSelectAll = (platform: string): string => {
+  return IsMacos.isMacos(platform) ? 'Meta+A' : 'Control+A'
 }
 
 const space = ' '
 const nonBreakingSpace = String.fromCharCode(160)
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({ expect, ideVersion, page, VError, platform }) => {
   return {
     async add(path, expectedName) {
       try {
@@ -187,7 +187,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await extensionsInput.setValue('')
         }
         const lines = extensionsView.locator('.monaco-editor .view-lines')
-        await page.keyboard.press(getSelectAll())
+        await page.keyboard.press(getSelectAll(platform))
         await page.waitForIdle()
         await page.keyboard.press('Backspace')
         await page.waitForIdle()
