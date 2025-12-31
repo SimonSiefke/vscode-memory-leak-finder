@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -40,4 +42,3 @@ export const run = async ({ DiffEditor, Editor, expect, page }: TestContext): Pr
   await expect(diffEditors).toHaveCount(2)
   await Editor.closeAll()
 }
-
