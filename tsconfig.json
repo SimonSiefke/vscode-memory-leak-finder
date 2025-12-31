@@ -10,6 +10,7 @@
     { "path": "./packages/cryptography-worker" },
     { "path": "./packages/cursor-e2e" },
     { "path": "./packages/devtools-protocol" },
+    { "path": "./packages/extension-source-maps" },
     { "path": "./packages/download-worker" },
     { "path": "./packages/e2e" },
     { "path": "./packages/exec-worker" },

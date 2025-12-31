@@ -1,12 +1,12 @@
-import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
-import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { readdir, readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
+import { root } from '../Root/Root.ts'
 
 export interface ScriptInfo {
-  readonly url?: string
   readonly sourceMapUrl?: string
+  readonly url?: string
 }
 
 const isRelativeSourceMap = (sourceMapUrl) => {
@@ -32,15 +32,11 @@ const getSourceMapUrl = (script: ScriptInfo): string => {
   return script.sourceMapUrl || ''
 }
 
-const thisDir: string = dirname(fileURLToPath(import.meta.url))
-const packageDir: string = resolve(thisDir, '../../..')
-const repoRoot: string = resolve(packageDir, '../..')
-
 export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly any[]> => {
   let scriptMap: Record<number, ScriptInfo> | undefined
   // Always attempt to load script maps from disk
   try {
-    const scriptMapsDir: string = join(repoRoot, '.vscode-script-maps')
+    const scriptMapsDir: string = join(root, '.vscode-script-maps')
     const entries = await readdir(scriptMapsDir, { withFileTypes: true })
     const mergedMap: Record<number, ScriptInfo> = Object.create(null)
     for (const entry of entries) {
@@ -52,12 +48,12 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
           for (const [key, value] of Object.entries(parsed)) {
             const numericKey = Number(key)
             const existing = mergedMap[numericKey]
-            if (!existing) {
-              mergedMap[numericKey] = value
-            } else {
+            if (existing) {
               if (!existing.sourceMapUrl && value.sourceMapUrl) {
                 mergedMap[numericKey] = value
               }
+            } else {
+              mergedMap[numericKey] = value
             }
           }
         } catch {
@@ -70,7 +66,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
     // ignore if directory not found
   }
 
-  const enriched: CompareResult[] = items.slice()
+  const enriched: CompareResult[] = [...items]
   if (!scriptMap) {
     return enriched
   }

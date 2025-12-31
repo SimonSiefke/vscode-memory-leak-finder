@@ -13,7 +13,7 @@ const callback = async (method, ...params) => {
 export const performBisect = async (options: RunTestsOptions): Promise<BisectResult> => {
   let commits
   try {
-    commits = await FetchCommits.fetchCommits()
+    commits = await FetchCommits.fetchCommits(options.platform, options.arch, options.updateUrl)
   } catch {
     return {
       type: 'failed-test',

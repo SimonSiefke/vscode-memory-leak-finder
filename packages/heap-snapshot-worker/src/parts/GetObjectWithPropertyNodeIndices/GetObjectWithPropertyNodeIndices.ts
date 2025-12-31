@@ -1,7 +1,7 @@
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import * as Timing from '../Timing/Timing.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
  * Returns the node indices for all objects that have the given property name.
@@ -17,17 +17,17 @@ export const getObjectWithPropertyNodeIndices = (
   edgeCountFieldIndexParam?: number,
 ): number[] => {
   const tTotal = Timing.timeStart('GetObjectWithPropertyNodeIndices.scan')
-  const { nodes, edges, strings, meta } = snapshot
+  const { edges, meta, nodes, strings } = snapshot
 
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
   const edgeTypes = meta.edge_types[0] || []
 
-  if (!nodeFields.length || !edgeFields.length) {
+  if (nodeFields.length === 0 || edgeFields.length === 0) {
     return []
   }
 
-  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
+  const propertyNameIndex = strings.indexOf(propertyName)
   if (propertyNameIndex === -1) {
     return []
   }

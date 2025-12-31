@@ -4,9 +4,11 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export interface StdinDataState {
+  readonly arch: string
   readonly bisect: boolean
   readonly buffering: boolean
   readonly checkLeaks: boolean
+  readonly clearExtensions: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -29,6 +31,7 @@ export interface StdinDataState {
   readonly measureAfter: boolean
   readonly measureNode?: boolean
   readonly mode: number
+  readonly platform: string
   readonly previousFilters: string[]
   readonly recordVideo: boolean
   readonly restartBetween: boolean
@@ -43,13 +46,14 @@ export interface StdinDataState {
   readonly value: string
   readonly watch: boolean
   readonly workers: boolean
-  readonly clearExtensions: boolean
 }
 
 let state: StdinDataState = {
+  arch: '',
   bisect: false,
   buffering: false,
   checkLeaks: false,
+  clearExtensions: true,
   continueValue: '',
   cwd: Character.EmptyString,
   enableExtensions: false,
@@ -71,6 +75,7 @@ let state: StdinDataState = {
   measure: Character.EmptyString,
   measureAfter: false,
   mode: ModeType.Waiting,
+  platform: '',
   previousFilters: [],
   recordVideo: false,
   restartBetween: false,
@@ -85,12 +90,12 @@ let state: StdinDataState = {
   value: Character.EmptyString,
   watch: false,
   workers: false,
-  clearExtensions: true,
 }
 
 export const setState = (newState: StdinDataState): void => {
   state = {
     ...state,
+    arch: newState.arch,
     bisect: newState.bisect,
     checkLeaks: newState.checkLeaks,
     continueValue: newState.continueValue,
@@ -112,6 +117,7 @@ export const setState = (newState: StdinDataState): void => {
     measure: newState.measure,
     measureAfter: newState.measureAfter,
     mode: newState.mode,
+    platform: newState.platform,
     previousFilters: newState.previousFilters,
     recordVideo: newState.recordVideo,
     restartBetween: newState.restartBetween,

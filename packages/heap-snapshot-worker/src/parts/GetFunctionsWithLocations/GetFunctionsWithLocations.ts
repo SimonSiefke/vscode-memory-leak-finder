@@ -1,14 +1,14 @@
 import type { FunctionObject } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.ts'
 interface LocationLike {
+  readonly columnIndex: number
+  readonly lineIndex: number
   readonly objectIndex: number
   readonly scriptIdIndex: number
-  readonly lineIndex: number
-  readonly columnIndex: number
 }
 
 interface ScriptInfo {
-  readonly url?: string
   readonly sourceMapUrl?: string
+  readonly url?: string
 }
 
 export const getFunctionsWithLocations = (
@@ -23,11 +23,11 @@ export const getFunctionsWithLocations = (
     const sourceMapUrl = script?.sourceMapUrl || ''
     const node = parsedNodes[location.objectIndex] as Record<string, unknown>
     const item: FunctionObject = {
-      url,
-      lineIndex: location.lineIndex,
       columnIndex: location.columnIndex,
-      name: typeof node.name === 'string' ? (node.name as string) : '',
+      lineIndex: location.lineIndex,
+      name: typeof node.name === 'string' ? node.name : '',
       sourceMapUrl: sourceMapUrl || null,
+      url,
     }
     functionsWithLocations.push(item)
   }

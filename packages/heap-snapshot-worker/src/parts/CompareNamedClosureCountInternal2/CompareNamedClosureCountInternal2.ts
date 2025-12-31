@@ -1,8 +1,8 @@
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getNewItems } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 const createKeyMap = (keys) => {
   const map = Object.create(null)
@@ -13,10 +13,10 @@ const createKeyMap = (keys) => {
 }
 
 const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
-  const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset, objectIndexOffset } = getLocationFieldOffsets(
+  const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(
     snapshot.meta.location_fields,
   )
-  const { nodes, locations, strings } = snapshot
+  const { locations, nodes, strings } = snapshot
   const nodeNameOffset = snapshot.meta.node_fields.indexOf('name')
   const nodeIdOffset = snapshot.meta.node_fields.indexOf('id')
 
@@ -37,9 +37,9 @@ const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
       const nodeId = nodes[nodeIndex + nodeIdOffset]
       const nodeName = strings[nodeNameIndex] || 'anonymous'
       matchingNodeMap[key].push({
+        nodeId,
         nodeIndex,
         nodeName,
-        nodeId,
       })
     }
   }
@@ -74,8 +74,8 @@ const getLeaked = (oldNodeMap, newNodeMap) => {
 }
 
 export interface CompareClosuresOptions {
-  readonly minCount?: number
   readonly excludeOriginalPaths?: readonly string[]
+  readonly minCount?: number
 }
 
 export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (

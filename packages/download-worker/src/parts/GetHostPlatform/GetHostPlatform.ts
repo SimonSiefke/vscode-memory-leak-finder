@@ -5,8 +5,8 @@ import * as GetHostPlatformModule from '../GetHostPlatformModule/GetHostPlatform
 
 export const getHostPlatform = async (platform: string): Promise<string> => {
   try {
-    const module = await GetHostPlatformModule.getHostPlatformModule(platform)
-    const hostPlatform = await module.getHostPlatform()
+    const fn = GetHostPlatformModule.getHostPlatformModule(platform)
+    const hostPlatform = await fn()
     return hostPlatform
   } catch (error) {
     throw new VError(error, `Failed to determine host platform`)

@@ -14,7 +14,7 @@ export const generateInterfaceFromMethods = (methods: MethodInfo[], properties: 
     })
     .join('\n')
 
-  const propertySignatures = properties.map((prop) => `  ${prop.name}: ${prop.type}`).join('\n')
+  const propertySignatures = properties.map((prop) => `  readonly ${prop.name}: ${prop.type}`).join('\n')
 
   const allSignatures = methodSignatures + (propertySignatures ? '\n' + propertySignatures : '')
 

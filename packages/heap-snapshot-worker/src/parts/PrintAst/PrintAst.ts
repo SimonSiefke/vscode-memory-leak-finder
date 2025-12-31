@@ -65,33 +65,33 @@ const printObject = (node: ObjectNode): PrintedValue => {
 
 export const printAst = (node: AstNode): PrintedValue => {
   switch (node.type) {
-    case 'number':
-      return printNumber(node as NumberNode)
-    case 'string':
-      return printString(node as StringNode)
-    case 'boolean':
-      return printBoolean(node as BooleanNode)
-    case 'undefined':
-      return printUndefined(node as UndefinedNode)
-    case 'object':
-      return printObject(node as ObjectNode)
     case 'array':
-      return printArray(node as ArrayNode)
-    case 'map':
-    case 'weakmap':
-      return printMapLike(node as MapNode)
-    case 'set':
-    case 'weakset':
-      return printSetLike(node as SetNode)
-    case 'code':
-    case 'closure':
-      return printCodeLike(node as CodeNode)
+      return printArray(node)
     case 'bigint':
       // Keep as string representation to avoid BigInt JSON issues
       return (node as any).value as string
+    case 'boolean':
+      return printBoolean(node)
+    case 'closure':
+    case 'code':
+      return printCodeLike(node)
+    case 'map':
+    case 'weakmap':
+      return printMapLike(node)
+    case 'number':
+      return printNumber(node)
+    case 'object':
+      return printObject(node)
+    case 'set':
+    case 'weakset':
+      return printSetLike(node)
+    case 'string':
+      return printString(node)
+    case 'undefined':
+      return printUndefined(node)
     case 'unknown':
     default:
-      return printUnknown(node as UnknownNode)
+      return printUnknown(node)
   }
 }
 

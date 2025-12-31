@@ -1,60 +1,60 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
-import { isInternalArray } from '../IsInternalArray/IsInternalArray.ts'
-import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
+import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
+import { isInternalArray } from '../IsInternalArray/IsInternalArray.ts'
 
 interface VariableName {
   readonly name: string
-  readonly sourceType: string
   readonly sourceName: string
+  readonly sourceType: string
 }
 
 interface LocationInfo {
-  readonly scriptId: number
-  readonly line: number
   readonly column: number
-  readonly url: string
+  readonly line: number
+  readonly scriptId: number
   readonly sourceMapUrl: string
+  readonly url: string
 }
 
 interface ArrayObj {
-  id: number
-  name: string
-  type: 'array'
-  selfSize: number
-  edgeCount: number
-  detachedness: number
-  nodeDataIndex: number
-  locationKey: string
-  locationInfo: LocationInfo | null
-  variableNames: VariableName[]
+  readonly detachedness: number
+  readonly edgeCount: number
+  readonly id: number
   length: number
+  readonly locationInfo: LocationInfo | null
+  readonly locationKey: string
+  readonly name: string
+  readonly nodeDataIndex: number
+  readonly selfSize: number
+  readonly type: 'array'
+  variableNames: VariableName[]
 }
 
 interface ClosureGroup {
-  locationKey: string
-  locationInfo: LocationInfo | null
   arrays: ArrayObj[]
-  totalSize: number
   count: number
+  locationInfo: LocationInfo | null
+  locationKey: string
+  totalSize: number
 }
 
 interface ResultArrayItem {
   readonly id: number
-  readonly name: string | readonly string[]
   readonly length: number
+  readonly name: string | readonly string[]
   readonly selfSize: number
 }
 
 export interface ResultGroup {
-  readonly locationKey: string
-  readonly locationInfo: LocationInfo | null
-  readonly count: number
-  readonly totalSize: number
-  readonly avgSize: number
-  readonly totalLength: number
-  readonly avgLength: number
   readonly arrays: readonly ResultArrayItem[]
+  readonly avgLength: number
+  readonly avgSize: number
+  readonly count: number
+  readonly locationInfo: LocationInfo | null
+  readonly locationKey: string
+  readonly totalLength: number
+  readonly totalSize: number
 }
 
 export const getArraysByClosureLocationFromHeapSnapshotInternal = (
@@ -71,25 +71,25 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
   scriptMap,
 ) => {
   const {
-    objectTypeIndex,
-    ITEMS_PER_NODE,
-    ITEMS_PER_EDGE,
-    typeFieldIndex,
-    nameFieldIndex,
-    idFieldIndex,
-    selfSizeFieldIndex,
-    edgeCountFieldIndex,
     detachednessFieldIndex,
-    traceNodeIdFieldIndex,
-    edgeTypeFieldIndex,
+    edgeCountFieldIndex,
     edgeNameFieldIndex,
     edgeToNodeFieldIndex,
+    edgeTypeFieldIndex,
     edgeTypes,
+    idFieldIndex,
+    ITEMS_PER_EDGE,
+    ITEMS_PER_NODE,
+    nameFieldIndex,
     nodeTypes,
+    objectTypeIndex,
+    selfSizeFieldIndex,
+    traceNodeIdFieldIndex,
+    typeFieldIndex,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
   // Get location field offsets
-  const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
+  const { columnOffset, itemsPerLocation, lineOffset, scriptIdOffset } = getLocationFieldOffsets(locationFields)
 
   const arrayObjects: ArrayObj[] = []
   const arrayNodeMap = new Map<number, ArrayObj>() // nodeDataIndex -> array object
@@ -126,11 +126,11 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
 
               const script = scriptMap[scriptId]
               locationInfo = {
-                scriptId,
-                line,
                 column,
-                url: script?.url || '',
+                line,
+                scriptId,
                 sourceMapUrl: script?.sourceMapUrl || '',
+                url: script?.url || '',
               }
               break
             }
@@ -138,17 +138,17 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
         }
 
         const arrayObj: ArrayObj = {
-          id,
-          name,
-          type: 'array',
-          selfSize,
-          edgeCount,
           detachedness,
-          nodeDataIndex: i,
-          locationKey,
-          locationInfo,
-          variableNames: [],
+          edgeCount,
+          id,
           length: 0, // Will be calculated
+          locationInfo,
+          locationKey,
+          name,
+          nodeDataIndex: i,
+          selfSize,
+          type: 'array',
+          variableNames: [],
         }
 
         arrayObjects.push(arrayObj)
@@ -157,11 +157,11 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
         // Group by closure location
         if (!closureLocationMap.has(locationKey)) {
           closureLocationMap.set(locationKey, {
-            locationKey,
-            locationInfo,
             arrays: [],
-            totalSize: 0,
             count: 0,
+            locationInfo,
+            locationKey,
+            totalSize: 0,
           })
         }
 
@@ -214,8 +214,8 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
         ) {
           arrayObj.variableNames.push({
             name: edgeName,
-            sourceType: sourceTypeName,
             sourceName: sourceName,
+            sourceType: sourceTypeName,
           })
         }
       }
@@ -251,7 +251,7 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
   }
 
   // Convert closure location map to array and sort by potential memory leak indicators
-  const result: ResultGroup[] = Array.from(closureLocationMap.values())
+  const result: ResultGroup[] = [...closureLocationMap.values()]
     .map((closureGroup) => {
       // Calculate additional metrics for memory leak detection
       const avgSize = closureGroup.totalSize / closureGroup.count
@@ -268,19 +268,19 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
       })
 
       return {
-        locationKey: closureGroup.locationKey,
-        locationInfo: closureGroup.locationInfo,
-        count: nonInternalArrays.length,
-        totalSize: nonInternalArrays.reduce((sum, arr) => sum + arr.selfSize, 0),
-        avgSize,
-        totalLength,
-        avgLength,
         arrays: nonInternalArrays.map((arr) => ({
           id: arr.id,
-          name: arr.variableNames && arr.variableNames.length > 0 ? [...new Set(arr.variableNames.map((v) => v.name))].sort() : arr.name,
           length: arr.length,
+          name: arr.variableNames && arr.variableNames.length > 0 ? [...new Set(arr.variableNames.map((v) => v.name))].sort() : arr.name,
           selfSize: arr.selfSize,
         })),
+        avgLength,
+        avgSize,
+        count: nonInternalArrays.length,
+        locationInfo: closureGroup.locationInfo,
+        locationKey: closureGroup.locationKey,
+        totalLength,
+        totalSize: nonInternalArrays.reduce((sum, arr) => sum + arr.selfSize, 0),
       }
     })
     .filter((group) => group.count > 0) // Only include groups with non-internal arrays

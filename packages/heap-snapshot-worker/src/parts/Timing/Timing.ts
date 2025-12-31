@@ -19,13 +19,13 @@ export const timeEnd = (label: string, start: number): void => {
     current.totalMs += duration
     current.count += 1
   } else {
-    labelToStats.set(label, { totalMs: duration, count: 1 })
+    labelToStats.set(label, { count: 1, totalMs: duration })
   }
 }
 
 export const report = (header: string = 'Timing report'): void => {
   // Sort by total time desc
-  const rows = Array.from(labelToStats.entries()).sort((a, b) => b[1].totalMs - a[1].totalMs)
+  const rows = [...labelToStats.entries()].sort((a, b) => b[1].totalMs - a[1].totalMs)
   // eslint-disable-next-line no-console
   console.log(`\n=== ${header} ===`)
   for (const [label, stats] of rows) {

@@ -1,21 +1,21 @@
-import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
-import { getObjectWithPropertyNodeIndices } from '../GetObjectWithPropertyNodeIndices/GetObjectWithPropertyNodeIndices.ts'
-import { buildAstForNode } from '../GetNodePreviews/GetNodePreviewsAst.ts'
 import type { AstNode } from '../AstNode/AstNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
+import { buildAstForNode } from '../GetNodePreviews/GetNodePreviewsAst.ts'
+import { getObjectWithPropertyNodeIndices } from '../GetObjectWithPropertyNodeIndices/GetObjectWithPropertyNodeIndices.ts'
 
 export const getObjectsWithPropertiesInternalAst = (snapshot: Snapshot, propertyName: string, depth: number = 1): AstNode[] => {
-  const { nodes, meta } = snapshot
+  const { meta, nodes } = snapshot
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
-  if (!nodeFields.length || !edgeFields.length) {
+  if (nodeFields.length === 0 || edgeFields.length === 0) {
     return []
   }
 
   console.time('edgeMap')
   const edgeMap = createEdgeMap(nodes, nodeFields)
   console.timeEnd('edgeMap')
-  const strings = snapshot.strings
+  const { strings } = snapshot
   const nodeTypes = meta.node_types
   const edgeTypes = meta.edge_types[0] || []
   const ITEMS_PER_NODE = nodeFields.length

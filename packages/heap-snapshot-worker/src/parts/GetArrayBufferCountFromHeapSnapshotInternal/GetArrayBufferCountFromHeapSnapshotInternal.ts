@@ -1,5 +1,5 @@
-import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.ts'
 
 export const getArrayBufferCountFromHeapSnapshotInternal = (snapshot: Snapshot) => {
   const arrayBufferCount = getThingCountFromHeapSnapshot(snapshot, 'object', 'ArrayBuffer')

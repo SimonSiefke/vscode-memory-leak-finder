@@ -101,6 +101,8 @@ jobs:
         measure:
           - name: event-listeners
             args: --measure event-listeners --runs 17
+          - name: event-listener-count
+            args: --measure event-listener-count
           - name: dom-counters
             args: --measure dom-counters
           - name: detached-dom-node-count
@@ -255,6 +257,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-event-listeners
           path: ./vscode-memory-leak-finder-results-linux-event-listeners
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-event-listener-count
+          path: ./vscode-memory-leak-finder-results-linux-event-listener-count
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:

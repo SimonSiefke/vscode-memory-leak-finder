@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import * as DownloadWorker from '../DownloadWorker/DownloadWorker.ts'
 import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.ts'
 
-export const intialize = async () => {
+export const initialize = async () => {
   const ffmpegPath = GetFfmpegPath.getFfmpegPath()
   if (existsSync(ffmpegPath)) {
     return

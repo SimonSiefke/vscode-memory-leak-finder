@@ -1,9 +1,9 @@
 export interface ObjectWithProperty {
+  edgeCount: number
   id: number
   name: string | null
+  preview?: Readonly<Record<string, any>>
   propertyValue: string | boolean | number | null
-  type: string | null
   selfSize: number
-  edgeCount: number
-  preview?: Record<string, any>
+  type: string | null
 }
