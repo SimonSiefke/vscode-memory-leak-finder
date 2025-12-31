@@ -8,7 +8,7 @@ import { root } from '../Root/Root.ts'
 import * as Server from '../Server/Server.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }) => {
   const servers: Record<number, Server.ServerInfo> = Object.create(null)
   return {
     async addServer({ serverName }: { serverName: string }) {
@@ -19,7 +19,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.McpAddServer, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -176,7 +176,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await page.pressKeyExponential({
-          key: KeyBindings.getOpenQuickPickCommands(),
+          key: KeyBindings.getOpenQuickPickCommands(platform),
           waitFor: quickPick,
         })
         await expect(quickPick).toBeVisible({ timeout: 10_000 })
@@ -210,7 +210,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await page.pressKeyExponential({
-          key: KeyBindings.getOpenQuickPickCommands(),
+          key: KeyBindings.getOpenQuickPickCommands(platform),
           waitFor: quickPick,
         })
         await expect(quickPick).toBeVisible({ timeout: 10_000 })
@@ -258,7 +258,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await page.pressKeyExponential({
-          key: KeyBindings.getOpenQuickPickCommands(),
+          key: KeyBindings.getOpenQuickPickCommands(platform),
           waitFor: quickPick,
         })
         await expect(quickPick).toBeVisible({ timeout: 10_000 })

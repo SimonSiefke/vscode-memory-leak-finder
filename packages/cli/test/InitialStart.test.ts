@@ -54,7 +54,8 @@ test('initialStart - watch mode - show details', async () => {
     filter: '',
     isWindows: false,
     watch: true,
-  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
+    isGithubActions: false,
+  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean }
   // @ts-ignore
   WatchUsage.print.mockImplementation(async () => 'watch usage')
   await InitialStart.initialStart(options)
@@ -69,7 +70,8 @@ test('initialStart - watch mode - start running', async () => {
     filter: 'a',
     isWindows: false,
     watch: true,
-  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
+    isGithubActions: false,
+  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
   expect(Stdout.write).not.toHaveBeenCalled()
@@ -82,7 +84,8 @@ test('initialStart - start running', async () => {
     filter: 'a',
     isWindows: false,
     watch: false,
-  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
+    isGithubActions: false,
+  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()
   expect(Stdout.write).not.toHaveBeenCalled()

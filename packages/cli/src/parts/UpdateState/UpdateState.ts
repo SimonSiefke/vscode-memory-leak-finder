@@ -48,6 +48,7 @@ export const updateState = async (newState: any): Promise<void> => {
       inspectPtyHostPort: state.inspectPtyHostPort,
       inspectSharedProcess: state.inspectSharedProcess,
       inspectSharedProcessPort: state.inspectSharedProcessPort,
+      isGithubActions: state.isGithubActions,
       isWindows: state.isWindows,
       measure: state.measure,
       measureAfter: state.measureAfter,

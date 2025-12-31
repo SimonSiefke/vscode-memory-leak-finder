@@ -2,9 +2,9 @@ import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const getKeybindingButtonsText = (keyBinding) => {
+const getKeybindingButtonsText = (keyBinding, platform) => {
   if (keyBinding.startsWith('Control+')) {
-    if (IsMacos.isMacos()) {
+    if (IsMacos.isMacos(platform)) {
       return `⌃${keyBinding.slice('Control+'.length)}`
     }
     return `Ctrl+${keyBinding.slice('Control+'.length)}`
@@ -12,7 +12,7 @@ const getKeybindingButtonsText = (keyBinding) => {
   return keyBinding
 }
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async searchFor(searchValue) {
       try {
@@ -42,7 +42,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(defineKeyBindingInput).toHaveValue(keyBinding.replace('Control', 'ctrl').toLowerCase())
         await page.keyboard.press('Enter')
         await expect(defineKeyBindingWidget).toBeHidden({ timeout: 5000 })
-        const keyBindingsButtonText = getKeybindingButtonsText(keyBinding)
+        const keyBindingsButtonText = getKeybindingButtonsText(keyBinding, platform)
         const rowKeybinding = row.locator('.keybinding')
         await expect(rowKeybinding).toHaveText(keyBindingsButtonText, { timeout: 5000 })
       } catch (error) {
@@ -51,7 +51,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async show() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.OpenKeyboardShortcuts)
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible({
