@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { isAbsolute, join, relative } from 'node:path'
 
 const EXTENSION_PATH_REGEX = /^\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/
 const GITHUB_PREFIX_REGEX = /^github\./
@@ -7,8 +7,22 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
   if (!path) {
     return null
   }
+  // Normalize absolute paths to relative paths
+  let normalizedPath = path
+  if (isAbsolute(path)) {
+    // If the absolute path is within the root, make it relative
+    if (path.startsWith(root)) {
+      normalizedPath = relative(root, path)
+      // Ensure it starts with .vscode-extensions
+      if (!normalizedPath.startsWith('.vscode-extensions')) {
+        return null
+      }
+    } else {
+      return null
+    }
+  }
   // Check if this is a copilot extension file
-  const extensionMatch = path.match(EXTENSION_PATH_REGEX)
+  const extensionMatch = normalizedPath.match(EXTENSION_PATH_REGEX)
   if (!extensionMatch) {
     return null
   }

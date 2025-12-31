@@ -9,4 +9,3 @@ export const normalizeSourcePath = (path: string | null): string | null => {
   }
   return normalized
 }
-
