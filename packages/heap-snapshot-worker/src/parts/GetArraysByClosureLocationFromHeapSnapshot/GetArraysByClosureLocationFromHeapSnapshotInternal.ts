@@ -21,22 +21,22 @@ interface ArrayObj {
   readonly detachedness: number
   readonly edgeCount: number
   readonly id: number
-  readonly length: number
+  length: number
   readonly locationInfo: LocationInfo | null
   readonly locationKey: string
   readonly name: string
   readonly nodeDataIndex: number
   readonly selfSize: number
   readonly type: 'array'
-  readonly variableNames: readonly VariableName[]
+  variableNames: VariableName[]
 }
 
 interface ClosureGroup {
-  readonly arrays: readonly ArrayObj[]
-  readonly count: number
-  readonly locationInfo: LocationInfo | null
-  readonly locationKey: string
-  readonly totalSize: number
+  arrays: ArrayObj[]
+  count: number
+  locationInfo: LocationInfo | null
+  locationKey: string
+  totalSize: number
 }
 
 interface ResultArrayItem {
