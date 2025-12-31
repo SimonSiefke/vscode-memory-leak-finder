@@ -4,7 +4,7 @@ import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
-export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArgv>): Promise<void> => {
+export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArgv> & { isGithubActions: boolean }): Promise<void> => {
   if (options.watch) {
     await SpecialStdin.start()
   }
@@ -34,6 +34,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     inspectPtyHostPort: options.inspectPtyHostPort,
     inspectSharedProcess: options.inspectSharedProcess,
     inspectSharedProcessPort: options.inspectSharedProcessPort,
+    isGithubActions: options.isGithubActions,
     isWindows: options.isWindows,
     measure: options.measure,
     measureAfter: options.measureAfter,

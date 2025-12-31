@@ -20,6 +20,7 @@ export interface StartRunningOptions {
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
+  readonly isGithubActions: boolean
   readonly isWindows: boolean
   readonly measure: string
   readonly measureAfter: boolean

@@ -20,6 +20,7 @@ export interface RunTestsOptions {
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
+  readonly isGithubActions: boolean
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
