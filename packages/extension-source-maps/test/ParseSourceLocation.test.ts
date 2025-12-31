@@ -44,5 +44,3 @@ test('parseSourceLocation - handles paths with colons in filename', () => {
     url: 'file:name.js',
   })
 })
-
-
