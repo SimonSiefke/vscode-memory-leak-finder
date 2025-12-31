@@ -15,8 +15,6 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
   const extensionId = extensionMatch[1]
   const relativePath = extensionMatch[2]
 
-  console.log({ extensionId, extensionMatch })
-
   // Convert extension ID from github.copilot-chat-0.36.2025121004 to copilot-chat-0.36.2025121004
   // Remove 'github.' prefix
   let cacheDirName = extensionId.replace(GITHUB_PREFIX_REGEX, '')

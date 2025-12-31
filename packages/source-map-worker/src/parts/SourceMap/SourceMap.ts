@@ -67,8 +67,6 @@ export const getOriginalPositions = async (
     return intermediateItems
   })
 
-  console.log({ intermediateItems })
-
   const finalResults: readonly OriginalPosition[] = await AddOriginalPositions.addOriginalPositions(intermediateItems)
 
   return finalResults
