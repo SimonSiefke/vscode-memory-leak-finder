@@ -1,6 +1,5 @@
 import { existsSync } from 'node:fs'
-import { cp, mkdir, readdir } from 'node:fs/promises'
-import { dirname, join, relative } from 'node:path'
+import { join } from 'node:path'
 import * as BuildExtension from '../BuildExtension/BuildExtension.ts'
 import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import * as Exec from '../Exec/Exec.ts'
@@ -10,7 +9,6 @@ import * as GetNodeVersion from '../GetNodeVersion/GetNodeVersion.ts'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
 import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
-import type { SourceMapFile } from '../SourceMapFile/SourceMapFile.js'
 
 export const generateExtensionSourceMaps = async ({
   cacheDir,
@@ -23,11 +21,10 @@ export const generateExtensionSourceMaps = async ({
   repoUrl: string
   cacheDir: string
 }): Promise<void> => {
-  const repoPath = join(cacheDir, `${extensionName}-${version}`)
-
   // Check if already built
   // Normalize version by stripping 'v' prefix if present
   const normalizedVersion = version.startsWith('v') ? version.slice(1) : version
+  const repoPath = join(cacheDir, `${extensionName}-${normalizedVersion}`)
   const extensionId = `${extensionName}-${normalizedVersion}`
   const sourceMapsOutputPath = join(cacheDir, extensionId)
   if (existsSync(sourceMapsOutputPath)) {
