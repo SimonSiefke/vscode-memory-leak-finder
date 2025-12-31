@@ -1,11 +1,5 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import { join } from 'node:path'
-import { root } from '../Root/Root.ts'
-
-const getExecWorkerUrl = (): string => {
-  const url = join(root, 'packages/exec-worker/src/main.ts')
-  return url
-}
+import { getExecWorkerUrl } from '../GetExecWorkerUrl/GetExecWorkerUrl.ts'
 
 export const launchExecWorker = async () => {
   const url = getExecWorkerUrl()

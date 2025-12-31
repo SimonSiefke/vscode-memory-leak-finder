@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import type { NodeVersionInfo } from './NodeVersionTypes.ts'
+import type { NodeVersionInfo } from '../NodeVersionTypes/NodeVersionTypes.ts'
 import { filterAndSortNodeVersions } from '../FilterAndSortNodeVersions/FilterAndSortNodeVersions.ts'
 import { launchNetworkWorker } from '../LaunchNetworkWorker/LaunchNetworkWorker.ts'
 

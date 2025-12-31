@@ -14,10 +14,12 @@ test('findCommitForVersion - finds commit from exact tag', async () => {
 
   const version = '1.0.0'
   const expectedCommit = 'abc123def456'
+  let invocationCount = 0
 
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
+      invocationCount++
       if (method === 'exec.exec' && command === 'git') {
         if (args[0] === 'tag' && args[1] === '-l') {
           return {
@@ -48,6 +50,7 @@ test('findCommitForVersion - finds commit from exact tag', async () => {
   const commit = await findCommitForVersion(tempDir, version)
 
   expect(commit).toBe(expectedCommit)
+  expect(invocationCount).toBe(2)
 
   await rm(tempDir, { force: true, recursive: true })
 })
@@ -59,21 +62,14 @@ test('findCommitForVersion - finds commit from tag that includes version', async
   const version = '1.0.0'
   const matchingTag = 'v1.0.0'
   const expectedCommit = 'abc123def456'
+  let invocationCount = 0
 
-  let tagListCallCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
+      invocationCount++
       if (method === 'exec.exec' && command === 'git') {
         if (args[0] === 'tag' && args[1] === '-l') {
-          tagListCallCount++
-          if (tagListCallCount === 1) {
-            return {
-              exitCode: 0,
-              stderr: '',
-              stdout: '',
-            }
-          }
           return {
             exitCode: 0,
             stderr: '',
@@ -102,6 +98,7 @@ test('findCommitForVersion - finds commit from tag that includes version', async
   const commit = await findCommitForVersion(tempDir, version)
 
   expect(commit).toBe(expectedCommit)
+  expect(invocationCount).toBe(2)
 
   await rm(tempDir, { force: true, recursive: true })
 })
@@ -112,21 +109,14 @@ test('findCommitForVersion - finds commit from git log grep', async () => {
 
   const version = '1.0.0'
   const expectedCommit = 'abc123'
+  let invocationCount = 0
 
-  let tagListCallCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
+      invocationCount++
       if (method === 'exec.exec' && command === 'git') {
         if (args[0] === 'tag' && args[1] === '-l') {
-          tagListCallCount++
-          if (tagListCallCount === 1) {
-            return {
-              exitCode: 0,
-              stderr: '',
-              stdout: '',
-            }
-          }
           return {
             exitCode: 0,
             stderr: '',
@@ -155,6 +145,7 @@ test('findCommitForVersion - finds commit from git log grep', async () => {
   const commit = await findCommitForVersion(tempDir, version)
 
   expect(commit).toBe(expectedCommit)
+  expect(invocationCount).toBe(2)
 
   await rm(tempDir, { force: true, recursive: true })
 })
@@ -165,26 +156,19 @@ test('findCommitForVersion - finds commit from package.json version', async () =
 
   const version = '1.0.0'
   const expectedCommit = 'abc123'
+  let invocationCount = 0
 
   const packageJson = {
     version: version,
   }
   await writeFile(join(tempDir, 'package.json'), JSON.stringify(packageJson))
 
-  let tagListCallCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
+      invocationCount++
       if (method === 'exec.exec' && command === 'git') {
         if (args[0] === 'tag' && args[1] === '-l') {
-          tagListCallCount++
-          if (tagListCallCount === 1) {
-            return {
-              exitCode: 0,
-              stderr: '',
-              stdout: '',
-            }
-          }
           return {
             exitCode: 0,
             stderr: '',
@@ -220,6 +204,7 @@ test('findCommitForVersion - finds commit from package.json version', async () =
   const commit = await findCommitForVersion(tempDir, version)
 
   expect(commit).toBe(expectedCommit)
+  expect(invocationCount).toBe(3)
 
   await rm(tempDir, { force: true, recursive: true })
 })
@@ -230,20 +215,11 @@ test('findCommitForVersion - throws error when commit cannot be found', async ()
 
   const version = '999.999.999'
 
-  let tagListCallCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'git') {
         if (args[0] === 'tag' && args[1] === '-l') {
-          tagListCallCount++
-          if (tagListCallCount === 1) {
-            return {
-              exitCode: 0,
-              stderr: '',
-              stdout: '',
-            }
-          }
           return {
             exitCode: 0,
             stderr: '',
@@ -313,20 +289,11 @@ test('findCommitForVersion - handles package.json with different version', async
   }
   await writeFile(join(tempDir, 'package.json'), JSON.stringify(packageJson))
 
-  let tagListCallCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'git') {
         if (args[0] === 'tag' && args[1] === '-l') {
-          tagListCallCount++
-          if (tagListCallCount === 1) {
-            return {
-              exitCode: 0,
-              stderr: '',
-              stdout: '',
-            }
-          }
           return {
             exitCode: 0,
             stderr: '',

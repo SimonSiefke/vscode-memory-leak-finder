@@ -17,9 +17,9 @@ test('copySourceMaps - copies source maps from dist directory', async () => {
 
   await CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')
 
-  const extensionId = 'github.test-extension-1.0.0'
-  const outputMapPath = join(tempOutput, extensionId, 'extension.js.map')
-  const outputJsPath = join(tempOutput, extensionId, 'extension.js')
+  const extensionId = 'test-extension-1.0.0'
+  const outputMapPath = join(tempOutput, extensionId, 'dist', 'extension.js.map')
+  const outputJsPath = join(tempOutput, extensionId, 'dist', 'extension.js')
 
   const copiedMapContent = await readFile(outputMapPath, 'utf8')
   const copiedJsContent = await readFile(outputJsPath, 'utf8')
@@ -42,8 +42,8 @@ test('copySourceMaps - copies source maps from out directory', async () => {
 
   await CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')
 
-  const extensionId = 'github.test-extension-1.0.0'
-  const outputMapPath = join(tempOutput, extensionId, 'main.js.map')
+  const extensionId = 'test-extension-1.0.0'
+  const outputMapPath = join(tempOutput, extensionId, 'out', 'main.js.map')
 
   const copiedMapContent = await readFile(outputMapPath, 'utf8')
   expect(copiedMapContent).toBe(sourceMapContent)
@@ -63,8 +63,8 @@ test('copySourceMaps - copies source maps from nested extension directory', asyn
 
   await CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')
 
-  const extensionId = 'github.test-extension-1.0.0'
-  const outputMapPath = join(tempOutput, extensionId, 'extension.js.map')
+  const extensionId = 'test-extension-1.0.0'
+  const outputMapPath = join(tempOutput, extensionId, 'extension', 'dist', 'extension.js.map')
 
   const copiedMapContent = await readFile(outputMapPath, 'utf8')
   expect(copiedMapContent).toBe(sourceMapContent)
@@ -85,9 +85,9 @@ test('copySourceMaps - copies multiple source maps preserving structure', async 
 
   await CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')
 
-  const extensionId = 'github.test-extension-1.0.0'
-  const mainMapPath = join(tempOutput, extensionId, 'main.js.map')
-  const utilMapPath = join(tempOutput, extensionId, 'subdir', 'util.js.map')
+  const extensionId = 'test-extension-1.0.0'
+  const mainMapPath = join(tempOutput, extensionId, 'dist', 'main.js.map')
+  const utilMapPath = join(tempOutput, extensionId, 'dist', 'subdir', 'util.js.map')
 
   await expect(readFile(mainMapPath, 'utf8')).resolves.toBe('{"version":3}')
   await expect(readFile(utilMapPath, 'utf8')).resolves.toBe('{"version":3}')
@@ -106,8 +106,8 @@ test('copySourceMaps - handles missing JS file gracefully', async () => {
 
   await CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')
 
-  const extensionId = 'github.test-extension-1.0.0'
-  const outputMapPath = join(tempOutput, extensionId, 'extension.js.map')
+  const extensionId = 'test-extension-1.0.0'
+  const outputMapPath = join(tempOutput, extensionId, 'dist', 'extension.js.map')
 
   await expect(readFile(outputMapPath, 'utf8')).resolves.toBe('{"version":3}')
 
@@ -138,8 +138,8 @@ test('copySourceMaps - creates correct extension ID format', async () => {
 
   await CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'copilot-chat', '0.36.2025121004')
 
-  const extensionId = 'github.copilot-chat-0.36.2025121004'
-  const outputMapPath = join(tempOutput, extensionId, 'extension.js.map')
+  const extensionId = 'copilot-chat-0.36.2025121004'
+  const outputMapPath = join(tempOutput, extensionId, 'dist', 'extension.js.map')
 
   await expect(readFile(outputMapPath, 'utf8')).resolves.toBe('{"version":3}')
 
@@ -157,8 +157,8 @@ test('copySourceMaps - strips v prefix from version', async () => {
 
   await CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'copilot-chat', 'v0.36.2025121004')
 
-  const extensionId = 'github.copilot-chat-0.36.2025121004'
-  const outputMapPath = join(tempOutput, extensionId, 'extension.js.map')
+  const extensionId = 'copilot-chat-0.36.2025121004'
+  const outputMapPath = join(tempOutput, extensionId, 'dist', 'extension.js.map')
 
   await expect(readFile(outputMapPath, 'utf8')).resolves.toBe('{"version":3}')
 
@@ -194,8 +194,8 @@ test('copySourceMaps - checks multiple possible directories', async () => {
 
   await CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')
 
-  const extensionId = 'github.test-extension-1.0.0'
-  const outputMapPath = join(tempOutput, extensionId, 'extension.js.map')
+  const extensionId = 'test-extension-1.0.0'
+  const outputMapPath = join(tempOutput, extensionId, 'build', 'extension.js.map')
 
   await expect(readFile(outputMapPath, 'utf8')).resolves.toBe('{"version":3}')
 

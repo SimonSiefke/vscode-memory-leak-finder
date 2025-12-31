@@ -10,8 +10,9 @@ const main = async (): Promise<void> => {
     cacheDir,
     extensionName: 'copilot-chat',
     outputDir,
+    // version: 'v0.36.2025121901',
     repoUrl: 'git@github.com:microsoft/vscode-copilot-chat.git',
-    version: 'v0.36.2025121901',
+    version: 'v0.36.2025121004',
   })
 }
 

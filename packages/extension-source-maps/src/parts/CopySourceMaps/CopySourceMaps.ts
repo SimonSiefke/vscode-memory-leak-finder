@@ -1,6 +1,7 @@
 import { VError } from '@lvce-editor/verror'
 import { cp, mkdir, readdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
+import type { SourceMapFile } from '../SourceMapFile/SourceMapFile.js'
 
 export const copySourceMaps = async (repoPath: string, outputDir: string, extensionName: string, version: string): Promise<void> => {
   try {
@@ -13,7 +14,7 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
       join(repoPath, 'extension', 'out'),
     ]
 
-    const sourceMapFiles: Array<{ file: string; baseDir: string }> = []
+    const sourceMapFiles: Array<SourceMapFile> = []
 
     const collectSourceMaps = async (dir: string, baseDir: string): Promise<void> => {
       try {
@@ -45,11 +46,11 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
     // So we'll create: .extension-source-maps/github.copilot-chat-0.36.2025121004/dist/extension.js.map
     // Note: VS Code extension directories don't have 'v' prefix in version, so strip it if present
     const normalizedVersion = version.startsWith('v') ? version.slice(1) : version
-    const extensionId = `github.${extensionName}-${normalizedVersion}`
+    const extensionId = `${extensionName}-${normalizedVersion}`
     const extensionOutputDir = join(outputDir, extensionId)
 
-    for (const { baseDir, file: sourceMapFile } of sourceMapFiles) {
-      const relativePath = relative(baseDir, sourceMapFile)
+    for (const { file: sourceMapFile } of sourceMapFiles) {
+      const relativePath = relative(repoPath, sourceMapFile)
       const targetPath = join(extensionOutputDir, relativePath)
       const targetDir = dirname(targetPath)
       await mkdir(targetDir, { recursive: true })
@@ -58,10 +59,10 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
 
     // Also copy the corresponding .js files so we have the full context
     // This helps with source map resolution
-    for (const { baseDir, file: sourceMapFile } of sourceMapFiles) {
+    for (const { file: sourceMapFile } of sourceMapFiles) {
       const jsFile = sourceMapFile.replace('.map', '')
       try {
-        const relativePath = relative(baseDir, jsFile)
+        const relativePath = relative(repoPath, jsFile)
         const targetPath = join(extensionOutputDir, relativePath)
         const targetDir = dirname(targetPath)
         await mkdir(targetDir, { recursive: true })

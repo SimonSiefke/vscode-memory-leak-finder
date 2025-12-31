@@ -454,8 +454,7 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
 
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Finding commit for version ${version}...`)
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Found commit: ${expectedCommit}`)
-  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Getting node version from package.json...`)
-  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Node version: ${nodeVersion}`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Getting node version from package.json: ${nodeVersion}`)
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Installing node version ${nodeVersion}...`)
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Node version ${installedVersion} installed successfully`)
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Installing dependencies...`)

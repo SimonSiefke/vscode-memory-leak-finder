@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import type { NodeVersionInfo } from '../src/parts/GetLatestNodeVersionForMajor/NodeVersionTypes.ts'
+import type { NodeVersionInfo } from '../src/parts/NodeVersionTypes/NodeVersionTypes.ts'
 import { filterAndSortNodeVersions } from '../src/parts/FilterAndSortNodeVersions/FilterAndSortNodeVersions.ts'
 
 test('filterAndSortNodeVersions - filters by major version', () => {

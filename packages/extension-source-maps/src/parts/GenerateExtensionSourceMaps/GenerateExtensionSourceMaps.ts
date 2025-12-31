@@ -6,6 +6,7 @@ import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import * as CopySourceMaps from '../CopySourceMaps/CopySourceMaps.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as FindCommitForVersion from '../FindCommitForVersion/FindCommitForVersion.ts'
+import * as GetDisplayname from '../GetDisplayname/GetDisplayname.ts'
 import * as GetNodeVersion from '../GetNodeVersion/GetNodeVersion.ts'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
@@ -32,7 +33,8 @@ export const generateExtensionSourceMaps = async ({
   const extensionId = `github.${extensionName}-${normalizedVersion}`
   const sourceMapsOutputPath = join(outputDir, extensionId)
   if (existsSync(sourceMapsOutputPath)) {
-    console.log(`[extension-source-maps] Source maps for ${extensionName} ${version} already exist, skipping...`)
+    const displayName = GetDisplayname.getDisplayname(extensionName)
+    console.log(`[extension-source-maps] Source maps for ${displayName} ${version} already exist, skipping...`)
     return
   }
 
@@ -40,6 +42,14 @@ export const generateExtensionSourceMaps = async ({
   if (!existsSync(repoPath)) {
     console.log(`[extension-source-maps] Cloning ${extensionName} repository...`)
     await CloneRepository.cloneRepository(repoUrl, repoPath, 'main')
+  }
+
+  // Fetch all tags so we can resolve versions to commits
+  console.log(`[extension-source-maps] Fetching all tags...`)
+  try {
+    await Exec.exec('git', ['fetch', 'origin', '--tags'], { cwd: repoPath })
+  } catch {
+    // If fetch fails, continue anyway - tags might already be available
   }
 
   // Find commit for version
@@ -54,14 +64,13 @@ export const generateExtensionSourceMaps = async ({
   }
 
   // Get node version
-  console.log(`[extension-source-maps] Getting node version from package.json...`)
   const nodeVersion = await GetNodeVersion.getNodeVersion(repoPath)
-  console.log(`[extension-source-maps] Node version: ${nodeVersion}`)
+  console.log(`[extension-source-maps] Getting node version from package.json: ${nodeVersion}`)
 
   // Install node version
   console.log(`[extension-source-maps] Installing node version ${nodeVersion}...`)
-  const installedVersion = await InstallNodeVersion.installNodeVersion(nodeVersion)
-  console.log(`[extension-source-maps] Node version ${installedVersion} installed successfully`)
+  await InstallNodeVersion.installNodeVersion(nodeVersion)
+  console.log(`[extension-source-maps] Node version ${nodeVersion} installed successfully`)
 
   // Install dependencies
   console.log(`[extension-source-maps] Installing dependencies...`)
