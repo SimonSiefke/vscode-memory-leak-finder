@@ -2,7 +2,7 @@ import { expect, test } from '@jest/globals'
 import * as GetExecutablePath from '../src/parts/GetExecutablePath/GetExecutablePath.ts'
 
 test('getExecutablePath returns path for ffmpeg', () => {
-  const platform = process.platform
+  const platform = 'linux'
   const result = GetExecutablePath.getExecutablePath(platform, 'ffmpeg')
   expect(Array.isArray(result)).toBe(true)
   expect(result.length).toBeGreaterThan(0)
