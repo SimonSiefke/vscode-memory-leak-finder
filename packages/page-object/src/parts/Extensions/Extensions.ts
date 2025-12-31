@@ -9,7 +9,9 @@ import * as Root from '../Root/Root.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
+const getSelectAll = (): string => {
+  return IsMacos.isMacos() ? 'Meta+A' : 'Control+A'
+}
 
 const space = ' '
 const nonBreakingSpace = String.fromCharCode(160)

@@ -8,10 +8,12 @@ import * as Expect from '../Expect/Expect.ts'
 import * as ImportScript from '../ImportScript/ImportScript.ts'
 import * as Page from '../Page/Page.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
+import * as PlatformState from '../PlatformState/PlatformState.ts'
 import { VError } from '../VError/VError.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export const connectDevtools = async (
+  platform: string,
   connectionId: number,
   devtoolsWebSocketUrl: string,
   electronObjectId: string,
@@ -27,6 +29,7 @@ export const connectDevtools = async (
   inspectPtyHost: boolean,
   enableExtensions: boolean,
 ) => {
+  PlatformState.setPlatform(platform)
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   // TODO must create separate electron object id since it is a separate connection
@@ -80,6 +83,7 @@ export const connectDevtools = async (
     expect: Expect.expect,
     ideVersion: parsedIdeVersion,
     page: firstWindow,
+    platform,
     sessionRpc,
     utilityContext: {
       callFunctionOn(options) {

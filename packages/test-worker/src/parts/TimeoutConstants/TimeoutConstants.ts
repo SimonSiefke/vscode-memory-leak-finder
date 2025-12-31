@@ -1,9 +1,19 @@
 import * as IsWindows from '../IsWindows/IsWindows.ts'
+import * as PlatformState from '../PlatformState/PlatformState.ts'
 
-const AttachToPage = IsWindows.IsWindows ? 5000 : 1000
+export const getAttachToPage = (): number => {
+  const platform = PlatformState.getPlatform()
+  return IsWindows.isWindows(platform) ? 5000 : 1000
+}
+
 const DefaultExecutionContext = 500
 export const PageEvent = 2000
 const SessionState = 500
 const Target = 8000
-const UtilityExecutionContext = IsWindows.IsWindows ? 16_000 : 8500
+
+export const getUtilityExecutionContext = (): number => {
+  const platform = PlatformState.getPlatform()
+  return IsWindows.isWindows(platform) ? 16_000 : 8500
+}
+
 const InteractiveTime = 120_000

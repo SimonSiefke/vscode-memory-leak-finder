@@ -26,6 +26,7 @@ export const connectDevtools = (
   Assert.string(devtoolsWebSocketUrl)
   return rpc.invoke(
     TestWorkerCommandType.ConnectDevtools,
+    platform,
     connectionId,
     devtoolsWebSocketUrl,
     electronObjectId,

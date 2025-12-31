@@ -4,7 +4,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const getKeybindingButtonsText = (keyBinding) => {
   if (keyBinding.startsWith('Control+')) {
-    if (IsMacos.isMacos) {
+    if (IsMacos.isMacos()) {
       return `⌃${keyBinding.slice('Control+'.length)}`
     }
     return `Ctrl+${keyBinding.slice('Control+'.length)}`

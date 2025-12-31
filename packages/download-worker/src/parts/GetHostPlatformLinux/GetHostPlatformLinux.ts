@@ -3,10 +3,9 @@
 import * as os from 'node:os'
 import * as GetLinuxDistributionInfo from '../GetLinuxDistributionInfo/GetLinuxDistributionInfo.ts'
 
-export const getHostPlatform = async (): Promise<string> => {
-  const osArch = os.arch()
-  const archSuffix = osArch === 'arm64' ? '-arm64' : '-x64'
-  const distroInfo = await GetLinuxDistributionInfo.getLinuxDistributionInfo()
+export const getHostPlatform = async (platform: string, arch: string): Promise<string> => {
+  const archSuffix = arch === 'arm64' ? '-arm64' : '-x64'
+  const distroInfo = await GetLinuxDistributionInfo.getLinuxDistributionInfo(platform)
   const major = Number.parseInt(distroInfo?.version || '0', 10)
   // Pop!_OS is ubuntu-based and has the same versions.
   // KDE Neon is ubuntu-based and has the same versions.

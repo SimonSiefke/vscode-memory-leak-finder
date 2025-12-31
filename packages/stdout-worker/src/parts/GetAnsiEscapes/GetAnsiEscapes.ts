@@ -1,7 +1,5 @@
 import ansiEscapes from 'ansi-escapes'
 
-const isWindows: boolean = process.platform === 'win32'
-
 export const getCursorUp = (): string => ansiEscapes.cursorUp()
 
 export const getEraseLine = (): string => ansiEscapes.eraseLine
@@ -18,6 +16,6 @@ export const getCursorBackward = (length: number): string => ansiEscapes.cursorB
 
 export const getEraseEndLine = (): string => ansiEscapes.eraseEndLine
 
-export const getClear = (): string => {
+export const getClear = (isWindows: boolean): string => {
   return isWindows ? '\u001B[2J\u001B[0f' : '\u001B[2J\u001B[3J\u001B[H'
 }

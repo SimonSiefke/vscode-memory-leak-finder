@@ -3,7 +3,7 @@ import * as GetHostPlatformLinux from '../GetHostPlatformLinux/GetHostPlatformLi
 import * as GetHostPlatformWindows from '../GetHostPlatformWindows/GetHostPlatformWindows.ts'
 
 interface HostPlatformFn {
-  (): string | Promise<string>
+  (arch: string): string | Promise<string>
 }
 
 export const getHostPlatformModule = (platform: string): HostPlatformFn => {
