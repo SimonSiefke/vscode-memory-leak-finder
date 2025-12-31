@@ -2,7 +2,7 @@ import * as RunTestWithCallbackImport from '../RunTestWithCallbackImport/RunTest
 import * as RunTestWithCallbackVm from '../RunTestWithCallbackVm/RunTestWithCallbackVm.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
-const getModule = (runMode) => {
+const getModule = (runMode: number) => {
   switch (runMode) {
     case TestRunMode.Vm:
       return RunTestWithCallbackVm.runTest
