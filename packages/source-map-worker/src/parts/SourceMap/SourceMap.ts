@@ -1,5 +1,5 @@
 import type { RawSourceMap } from 'source-map'
-import { join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { SourceMapConsumer } from 'source-map'
 import type { IntermediateItem } from '../IntermediateItem/IntermediateItem.ts'
@@ -16,7 +16,6 @@ const getExtensionSourceMapDir = (sourceMapUrl: string): string | null => {
     const sourceMapPath = fileURLToPath(sourceMapUrl)
     // Get the directory containing the source map file
     // This allows relative paths in the source map to resolve correctly
-    const { dirname } = await import('node:path')
     return dirname(sourceMapPath)
   } catch {
     return null
