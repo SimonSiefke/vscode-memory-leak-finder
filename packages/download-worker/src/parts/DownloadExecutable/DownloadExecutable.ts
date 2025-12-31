@@ -5,7 +5,13 @@ import * as GetDownloadUrls from '../GetDownloadUrls/GetDownloadUrls.ts'
 import * as MakeExecutable from '../MakeExecutable/MakeExecutable.ts'
 import * as Root from '../Root/Root.ts'
 
-export const downloadExecutable = async (platform: string, name: string, revision: string, hostPlatform: string, executablePath: string[]): Promise<void> => {
+export const downloadExecutable = async (
+  platform: string,
+  name: string,
+  revision: string,
+  hostPlatform: string,
+  executablePath: string[],
+): Promise<void> => {
   Assert.string(name)
   Assert.string(revision)
   Assert.string(hostPlatform)

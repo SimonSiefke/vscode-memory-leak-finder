@@ -54,7 +54,7 @@ export const downloadAndUnzipInsiders = async (platform: string, arch: string, c
   const productJson = await JsonFile.readJson(productPath)
   const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
   await JsonFile.writeJson(productPath, newProductJson)
-    await RemoveUnusedFiles.removeUnusedFiles(platform, path)
+  await RemoveUnusedFiles.removeUnusedFiles(platform, path)
   if (automaticallyDownloadSourceMaps) {
     const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
     await LoadSourceMaps.loadSourceMaps(sourceMapUrls)

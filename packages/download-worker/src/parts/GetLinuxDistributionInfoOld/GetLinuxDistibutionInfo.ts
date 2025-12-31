@@ -3,7 +3,9 @@
 import * as fs from 'node:fs/promises'
 import * as ParseOsReleaseText from '../ParseOsReleaseText/ParseOsReleaseText.ts'
 
-export const getLinuxDistributionInfo = async (platform: string): Promise<
+export const getLinuxDistributionInfo = async (
+  platform: string,
+): Promise<
   | {
       id: string
       version: string

@@ -10,4 +10,3 @@ export const getPlatform = (): string => {
   }
   return platform
 }
-

@@ -49,3 +49,4 @@ test('extractItemsFromData - returns empty array when namedFunctionCount3 is not
   const result = ExtractItemsFromData.extractItemsFromData(data)
   expect(result).toEqual([])
 })
+
