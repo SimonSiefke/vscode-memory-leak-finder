@@ -176,7 +176,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await page.pressKeyExponential({
-          key: KeyBindings.OpenQuickPickCommands,
+          key: KeyBindings.getOpenQuickPickCommands(),
           waitFor: quickPick,
         })
         await expect(quickPick).toBeVisible({ timeout: 10_000 })
@@ -210,7 +210,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await page.pressKeyExponential({
-          key: KeyBindings.OpenQuickPickCommands,
+          key: KeyBindings.getOpenQuickPickCommands(),
           waitFor: quickPick,
         })
         await expect(quickPick).toBeVisible({ timeout: 10_000 })
@@ -258,7 +258,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await page.pressKeyExponential({
-          key: KeyBindings.OpenQuickPickCommands,
+          key: KeyBindings.getOpenQuickPickCommands(),
           waitFor: quickPick,
         })
         await expect(quickPick).toBeVisible({ timeout: 10_000 })

@@ -85,7 +85,7 @@ export const create = ({ expect, page, VError }) => {
     async openFile(fileName) {
       try {
         await page.waitForIdle()
-        await this.show({ key: KeyBindings.OpenQuickPickFiles })
+        await this.show({ key: KeyBindings.getOpenQuickPickFiles() })
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
@@ -132,7 +132,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to select "${text}"`)
       }
     },
-    async show({ key = KeyBindings.OpenQuickPickFiles, pressKeyOnce = false } = {}) {
+    async show({ key = KeyBindings.getOpenQuickPickFiles(), pressKeyOnce = false } = {}) {
       try {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
@@ -169,7 +169,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async showCommands({ pressKeyOnce = false } = {}) {
       try {
-        return this.show({ key: KeyBindings.OpenQuickPickCommands, pressKeyOnce })
+        return this.show({ key: KeyBindings.getOpenQuickPickCommands(), pressKeyOnce })
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }

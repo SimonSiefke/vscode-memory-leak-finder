@@ -11,7 +11,7 @@ export const getHostPlatformModule = (platform: string): HostPlatformFn => {
     case 'darwin':
       return GetHostPlatformDarwin.getHostPlatform
     case 'linux':
-      return GetHostPlatformLinux.getHostPlatform
+      return (arch: string) => GetHostPlatformLinux.getHostPlatform(platform, arch)
     case 'win32':
       return GetHostPlatformWindows.getHostPlatform
     default:

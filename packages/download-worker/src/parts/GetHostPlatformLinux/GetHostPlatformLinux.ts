@@ -1,6 +1,5 @@
 // based on microsoft/playwright/packages/playwright-core/src/utils/hostPlatform.ts (License Apache 2.0)
 
-import * as os from 'node:os'
 import * as GetLinuxDistributionInfo from '../GetLinuxDistributionInfo/GetLinuxDistributionInfo.ts'
 
 export const getHostPlatform = async (platform: string, arch: string): Promise<string> => {
