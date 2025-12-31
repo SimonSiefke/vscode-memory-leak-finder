@@ -136,6 +136,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         const quickPick = QuickPick.create({
           expect,
           page,
+          platform,
           VError,
         })
         await quickPick.executeCommand(WellKnownCommands.FocusExplorer)

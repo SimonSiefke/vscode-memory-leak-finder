@@ -129,7 +129,7 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
         await this.first.click()
         const extensionDetailView = ExtensionDetailView.create({ expect, page, VError })
         await extensionDetailView.installExtension()
-        const sideBar = SideBar.create({ expect, page, VError })
+        const sideBar = SideBar.create({ expect, page, platform, VError })
         await sideBar.hide()
         await editor.closeAll()
         await page.waitForIdle()

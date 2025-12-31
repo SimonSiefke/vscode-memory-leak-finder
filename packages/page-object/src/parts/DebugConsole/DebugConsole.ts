@@ -43,7 +43,7 @@ export const create = ({ expect, page, platform, VError }) => {
       try {
         const repl = page.locator('.repl')
         await expect(repl).toBeVisible()
-        const panel = Panel.create({ expect, page, VError })
+        const panel = Panel.create({ expect, page, platform, VError })
         await panel.hide()
         await expect(repl).toBeHidden()
         await page.waitForIdle()
