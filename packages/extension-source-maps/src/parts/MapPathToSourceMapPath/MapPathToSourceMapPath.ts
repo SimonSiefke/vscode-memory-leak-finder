@@ -1,4 +1,4 @@
-import { join, resolve } from 'node:path'
+import { join, resolve, isAbsolute } from 'node:path'
 
 const EXTENSION_PATH_REGEX = /\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/
 const GITHUB_PREFIX_REGEX = /^github\./
@@ -9,10 +9,13 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
   }
   // Path might be: .vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js
   // or absolute path
-  const absolutePath = path.startsWith('/') ? path : resolve(root, path)
+  const absolutePath = isAbsolute(path) ? path : resolve(root, path)
+
+  // Normalize path separators to forward slashes for regex matching (works on both Unix and Windows)
+  const normalizedPath = absolutePath.replace(/\\/g, '/')
 
   // Check if this is a copilot extension file
-  const extensionMatch = absolutePath.match(EXTENSION_PATH_REGEX)
+  const extensionMatch = normalizedPath.match(EXTENSION_PATH_REGEX)
   if (!extensionMatch) {
     return null
   }
