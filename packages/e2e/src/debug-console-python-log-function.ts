@@ -39,27 +39,19 @@ if __name__ == '__main__':
 }
 
 export const run = async ({ RunAndDebug, DebugConsole }: TestContext): Promise<void> => {
+  // await DebugConsole.evaluate({
+  //   expression: 'a',
+  //   expectedResult: {
+  //     message: '1',
+  //     type: 'number',
+  //   },
+  // })
   await DebugConsole.evaluate({
-    expression: 'a',
+    expression: 'add',
     expectedResult: {
-      message: '1',
-      type: 'number',
+      message: /^function add/,
+      type: '',
     },
-  })
-  await new Promise((r) => {})
-  // @ts-ignore
-  await RunAndDebug.setValue({
-    variableName: `a`,
-    variableValue: '1',
-    newVariableValue: '11',
-    scopeName: 'Scope Locals',
-  })
-  // @ts-ignore
-  await RunAndDebug.setValue({
-    variableName: `a`,
-    variableValue: '11',
-    newVariableValue: '1',
-    scopeName: 'Scope Locals',
   })
 }
 
