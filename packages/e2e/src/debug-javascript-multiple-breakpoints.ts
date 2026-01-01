@@ -6,22 +6,18 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Workspace }: TestCo
   await Workspace.setFiles([
     {
       content: `export function add(a,b){
-a++
-a--
-if(a === 0){
-  return b
-}
-if(a > 0){
-  return add(a-1, b) + 1
-}
-return add(a+1, b) - 1
+  a++
+  a--
+  return a + b
 }`,
       name: 'add.js',
     },
     {
       content: `import { add } from './add.js'
 
-add(1000, 1)
+for(let i=0;i<1000;i++){
+  add(1000, 1)
+}
 `,
       name: 'main.js',
     },
@@ -40,7 +36,7 @@ add(1000, 1)
     hasCallStack: false,
   })
   await Editor.open('add.js')
-  await Editor.setBreakpoint(3)
+  await Editor.setBreakpoint(2)
 }
 
 export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
@@ -52,19 +48,12 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
     hasCallStack: false,
   })
   // @ts-ignore
-  await Editor.removeBreakPoint(3)
-  await Editor.setBreakpoint(4)
-  // @ts-ignore
-  await RunAndDebug.step('add.js', 4, 0, false)
-  // @ts-ignore
-  await Editor.removeBreakPoint(4)
-  // @ts-ignore
+  await Editor.removeBreakPoint(2)
   await Editor.setBreakpoint(3)
-
-  await new Promise((r) => {})
   // @ts-ignore
-  // await RunAndDebug.step('index.js', 5)
-  // await RunAndDebug.stop()
-  // await RunAndDebug.removeAllBreakpoints()
-  // await Editor.closeAll()
+  await RunAndDebug.step('add.js', 3, 0, false)
+  // @ts-ignore
+  await Editor.removeBreakPoint(3)
+  // @ts-ignore
+  await Editor.setBreakpoint(2)
 }

@@ -912,13 +912,16 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed set breakpoint`)
       }
     },
-    async removeBreakpoint(lineNumber: number) {
+    async removeBreakPoint(lineNumber: number) {
       try {
+        await page.waitForIdle()
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
         await expect(lineNumberElement).toBeVisible()
+        await page.waitForIdle()
         const contextMenu = ContextMenu.create({ expect, page, VError })
         await contextMenu.open(lineNumberElement)
+        await page.waitForIdle()
         await contextMenu.select('Remove Breakpoint')
         await page.waitForIdle()
       } catch (error) {
