@@ -8,7 +8,7 @@ import * as LaunchSourceMapWorker from '../src/parts/LaunchSourceMapWorker/Launc
 
 test.skip('addOriginalSourcesToData - enriches data with original sources', async () => {
   const tempRoot = join(tmpdir(), `test-add-original-sources-${Date.now()}`)
-  const extensionSourceMapsDir = join(tempRoot, '.extension-source-maps', 'github.copilot-chat-v1.0.0', 'dist')
+  const extensionSourceMapsDir = join(tempRoot, '.extension-source-maps-cache', 'copilot-chat-1.0.0', 'dist')
   await mkdir(extensionSourceMapsDir, { recursive: true })
 
   const sourceMapContent = JSON.stringify({
@@ -94,7 +94,7 @@ test.skip('addOriginalSourcesToData - enriches data with original sources', asyn
 
 test.skip('addOriginalSourcesToData - handles array data', async () => {
   const tempRoot = join(tmpdir(), `test-add-original-sources-array-${Date.now()}`)
-  const extensionSourceMapsDir = join(tempRoot, '.extension-source-maps', 'github.copilot-chat-v1.0.0', 'dist')
+  const extensionSourceMapsDir = join(tempRoot, '.extension-source-maps-cache', 'copilot-chat-1.0.0', 'dist')
   await mkdir(extensionSourceMapsDir, { recursive: true })
 
   const dataFile = join(tempRoot, 'input.json')
