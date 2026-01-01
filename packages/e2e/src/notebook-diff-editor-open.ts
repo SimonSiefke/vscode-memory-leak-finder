@@ -204,7 +204,11 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
 }
 
 export const run = async ({ DiffEditor, Editor }: TestContext): Promise<void> => {
-  await DiffEditor.open('notebook-1.ipynb', 'notebook-2.ipynb')
+  // @ts-ignore
+  await DiffEditor.open({
+    file1: 'notebook-1.ipynb',
+    file2: 'notebook-2.ipynb',
+  })
   await DiffEditor.shouldHaveOriginalEditor('a')
   await DiffEditor.shouldHaveModifiedEditor('aa')
   await Editor.closeAll()
