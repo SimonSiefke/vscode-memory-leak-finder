@@ -18,7 +18,6 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
       name: 'package.json',
     },
   ])
-  // @ts-ignore
   await Extensions.install({
     id: 'version lens',
     name: 'Version Lens',

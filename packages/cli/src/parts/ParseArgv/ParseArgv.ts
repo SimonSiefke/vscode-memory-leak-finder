@@ -253,7 +253,15 @@ const parseUpdateUrl = (argv: readonly string[]): string => {
   return 'https://update.code.visualstudio.com'
 }
 
-export const parseArgv = (platform: string, arch: string, argv: readonly string[]) => {
+const parsePlatform = (platform: string, argv: readonly string[]): string => {
+  if (argv.includes('--platform')) {
+    return parseArgvString(argv, '--platform')
+  }
+  return platform
+}
+
+export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
+  const platform = parsePlatform(processPlatform, argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const bisect = parseBisect(argv)
   const checkLeaks = parseCheckLeaks(argv)
@@ -293,7 +301,7 @@ export const parseArgv = (platform: string, arch: string, argv: readonly string[
   const { vscodeVersion } = parsedVersion
   const watch = parseWatch(argv)
   const workers = parseWorkers(argv)
-  const isWindows = IsWindows.isWindows(platform)
+  const isWindows = IsWindows.isWindows(processPlatform)
   return {
     arch,
     bisect,
