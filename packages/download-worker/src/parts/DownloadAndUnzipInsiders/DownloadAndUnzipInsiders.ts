@@ -50,7 +50,7 @@ export const downloadAndUnzipInsiders = async (platform: string, arch: string, c
   await DownloadAndExtract.downloadAndExtract(platform, 'vscode-insiders', [metadata.url], extractDir)
   console.log(`[download-worker] Download complete.`)
   const path = getBinaryPathFromExtractDir(platform, arch, extractDir)
-  const productPath = GetProductJsonPath.getProductJsonPath(platform, path)
+  const productPath = GetProductJsonPath.getProductJsonPath(platform, path, commit)
   const productJson = await JsonFile.readJson(productPath)
   const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
   await JsonFile.writeJson(productPath, newProductJson)

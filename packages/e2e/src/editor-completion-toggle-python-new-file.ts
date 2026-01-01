@@ -12,7 +12,6 @@ export const setup = async ({ Extensions, Workspace }: TestContext): Promise<voi
       name: 'index.py',
     },
   ])
-  // @ts-ignore
   await Extensions.install({
     id: 'ms-python.python',
     name: 'Python',
