@@ -1,21 +1,21 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+import { parseNode } from '../ParseNode/ParseNode.ts'
 
 export interface ClosureReference {
-  readonly sourceNodeIndex: number
+  readonly edgeName: string
+  readonly edgeType: string
+  readonly path: string
   readonly sourceNodeId: number
+  readonly sourceNodeIndex: number
   readonly sourceNodeName: string | null
   readonly sourceNodeType: string | null
-  readonly edgeType: string
-  readonly edgeName: string
-  readonly path: string
 }
 
 export const getClosureReferences = (targetNodeIndex: number, snapshot: Snapshot): readonly ClosureReference[] => {
-  const { nodes, edges, strings, meta } = snapshot
-  const { node_fields, edge_fields, node_types, edge_types } = meta
+  const { edges, meta, nodes, strings } = snapshot
+  const { edge_fields, edge_types, node_fields, node_types } = meta
 
   const ITEMS_PER_NODE = node_fields.length
   const ITEMS_PER_EDGE = edge_fields.length
@@ -61,51 +61,65 @@ export const getClosureReferences = (targetNodeIndex: number, snapshot: Snapshot
         let edgeName = ''
         let path = ''
 
-        if (edgeTypeName === 'property') {
-          edgeName = strings[edgeNameOrIndex] || `<string_${edgeNameOrIndex}>`
-          if (sourceNodeName) {
-            path = `${sourceNodeName}.${edgeName}`
-          } else {
-            path = `[Object ${sourceNodeId}].${edgeName}`
+        switch (edgeTypeName) {
+          case 'context': {
+            edgeName = 'context'
+            if (sourceNodeName) {
+              path = `${sourceNodeName}.context`
+            } else {
+              path = `[Closure ${sourceNodeId}].context`
+            }
+
+            break
           }
-        } else if (edgeTypeName === 'element') {
-          edgeName = `[${edgeNameOrIndex}]`
-          if (sourceNodeName) {
-            path = `${sourceNodeName}${edgeName}`
-          } else {
-            path = `[Array ${sourceNodeId}]${edgeName}`
+          case 'element': {
+            edgeName = `[${edgeNameOrIndex}]`
+            if (sourceNodeName) {
+              path = `${sourceNodeName}${edgeName}`
+            } else {
+              path = `[Array ${sourceNodeId}]${edgeName}`
+            }
+
+            break
           }
-        } else if (edgeTypeName === 'context') {
-          edgeName = 'context'
-          if (sourceNodeName) {
-            path = `${sourceNodeName}.context`
-          } else {
-            path = `[Closure ${sourceNodeId}].context`
+          case 'internal': {
+            edgeName = 'internal'
+            if (sourceNodeName) {
+              path = `${sourceNodeName}.internal`
+            } else {
+              path = `[${sourceNodeType} ${sourceNodeId}].internal`
+            }
+
+            break
           }
-        } else if (edgeTypeName === 'internal') {
-          edgeName = 'internal'
-          if (sourceNodeName) {
-            path = `${sourceNodeName}.internal`
-          } else {
-            path = `[${sourceNodeType} ${sourceNodeId}].internal`
+          case 'property': {
+            edgeName = strings[edgeNameOrIndex] || `<string_${edgeNameOrIndex}>`
+            if (sourceNodeName) {
+              path = `${sourceNodeName}.${edgeName}`
+            } else {
+              path = `[Object ${sourceNodeId}].${edgeName}`
+            }
+
+            break
           }
-        } else {
-          edgeName = edgeTypeName
-          if (sourceNodeName) {
-            path = `${sourceNodeName}.${edgeTypeName}`
-          } else {
-            path = `[${sourceNodeType} ${sourceNodeId}].${edgeTypeName}`
+          default: {
+            edgeName = edgeTypeName
+            if (sourceNodeName) {
+              path = `${sourceNodeName}.${edgeTypeName}`
+            } else {
+              path = `[${sourceNodeType} ${sourceNodeId}].${edgeTypeName}`
+            }
           }
         }
 
         references.push({
-          sourceNodeIndex: sourceNodeIndex / ITEMS_PER_NODE,
+          edgeName,
+          edgeType: edgeTypeName,
+          path,
           sourceNodeId,
+          sourceNodeIndex: sourceNodeIndex / ITEMS_PER_NODE,
           sourceNodeName,
           sourceNodeType,
-          edgeType: edgeTypeName,
-          edgeName,
-          path,
         })
       }
     }

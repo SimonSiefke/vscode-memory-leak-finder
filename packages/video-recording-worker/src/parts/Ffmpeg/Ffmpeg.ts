@@ -17,10 +17,10 @@ const handleExit = () => {
   console.log('[video-recording-worker] ffmpeg exit')
 }
 
-export const start = async (outFile: string): Promise<void> => {
+export const start = async (platform: string, outFile: string): Promise<void> => {
   Assert.string(outFile)
   // TODO make ffmpegPath an argument
-  const ffmpegPath = GetFfmpegPath.getFfmpegPath()
+  const ffmpegPath = GetFfmpegPath.getFfmpegPath(platform)
   if (!existsSync(ffmpegPath)) {
     throw new Error(`ffmpeg binary not found at ${ffmpegPath}`)
   }

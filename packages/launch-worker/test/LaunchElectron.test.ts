@@ -13,12 +13,6 @@ jest.unstable_mockModule('../src/parts/Spawn/Spawn.ts', () => {
   }
 })
 
-jest.unstable_mockModule('../src/parts/NodeVersion/NodeVersion.ts', () => {
-  return {
-    nodeVersion: 'test-node-version',
-  }
-})
-
 const LaunchElectron = await import('../src/parts/LaunchElectron/LaunchElectron.ts')
 const Spawn = await import('../src/parts/Spawn/Spawn.ts')
 

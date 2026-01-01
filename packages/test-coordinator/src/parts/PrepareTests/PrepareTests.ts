@@ -3,6 +3,7 @@ import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExist
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 
 export interface PrepareTestsOptions {
+  readonly arch: string
   readonly attachedToPageTimeout: number
   readonly clearExtensions: boolean
   readonly commit: string
@@ -23,9 +24,11 @@ export interface PrepareTestsOptions {
   readonly inspectSharedProcessPort: number
   readonly measureId: string
   readonly pageObjectPath: string
+  readonly platform: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly timeouts: any
+  readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
@@ -33,6 +36,7 @@ export interface PrepareTestsOptions {
 
 export const prepareTests = async (options: PrepareTestsOptions) => {
   const {
+    arch,
     attachedToPageTimeout,
     clearExtensions,
     commit,
@@ -49,6 +53,8 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    platform,
+    updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
@@ -58,6 +64,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
   const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, utilityContext, webSocketUrl } =
     await prepareBoth({
+      arch,
       attachedToPageTimeout,
       canUseIdleCallback,
       clearExtensions,
@@ -76,6 +83,8 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       inspectSharedProcess,
       inspectSharedProcessPort,
       isFirstConnection,
+      platform,
+      updateUrl,
       useProxyMock,
       vscodePath,
       vscodeVersion,

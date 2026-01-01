@@ -2,7 +2,7 @@ import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }) => {
   return {
     async clearFilter() {
       try {
@@ -59,7 +59,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       try {
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
-        const panel = Panel.create({ expect, page, VError })
+        const panel = Panel.create({ expect, page, platform, VError })
         await panel.hide()
         await expect(outputView).toBeHidden()
       } catch (error) {
@@ -107,7 +107,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.OutputFocusOnOutputView)
         await page.waitForIdle()
         await expect(outputView).toBeVisible()

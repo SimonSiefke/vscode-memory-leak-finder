@@ -129,8 +129,7 @@ const convertRequestsToMocks = async (): Promise<void> => {
 
         // Parse URL to get hostname and pathname
         const parsedUrl = new URL(request.url)
-        const { hostname } = parsedUrl
-        const { pathname } = parsedUrl
+        const { hostname, pathname } = parsedUrl
 
         // Generate mock filename using the same logic as GetMockFileName
         const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)

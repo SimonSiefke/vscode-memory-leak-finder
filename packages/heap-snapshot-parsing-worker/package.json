@@ -60,7 +60,5 @@
       "distmin"
     ]
   },
-  "devDependencies": {
-    "@types/node": "^25.0.3"
-  }
+  "devDependencies": {}
 }

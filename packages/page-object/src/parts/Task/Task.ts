@@ -3,7 +3,7 @@ import * as IconSelect from '../IconSelect/IconSelect.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async changeIcon(fromIcon, toIcon) {
       try {
@@ -36,7 +36,7 @@ export const create = ({ expect, page, VError }) => {
     async clear() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
         await page.waitForIdle()
       } catch (error) {
@@ -46,7 +46,7 @@ export const create = ({ expect, page, VError }) => {
     async hideQuickPick() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.close()
       } catch (error) {
         throw new VError(error, `Failed to close task quickpick`)
@@ -55,7 +55,7 @@ export const create = ({ expect, page, VError }) => {
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ConfigureTask, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -79,7 +79,7 @@ export const create = ({ expect, page, VError }) => {
     async openQuickPick({ item }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RunTask, {
           stayVisible: true,
         })
@@ -91,7 +91,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async openRun() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
         // await quickPick.select('Create tasks.json file from template', true)
@@ -129,7 +129,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async run(taskName: string) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
         await quickPick.select(taskName)
@@ -161,7 +161,7 @@ export const create = ({ expect, page, VError }) => {
     async selectQuickPickItem({ item }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RunTask, {
           stayVisible: true,
         })

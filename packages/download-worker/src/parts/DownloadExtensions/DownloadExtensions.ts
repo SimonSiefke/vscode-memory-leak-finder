@@ -1,4 +1,5 @@
 import { cp } from 'node:fs/promises'
+import { platform } from 'node:os'
 import { join } from 'node:path'
 import { downloadAndExtract } from '../DownloadAndExtract/DownloadAndExtract.ts'
 import { root } from '../Root/Root.ts'
@@ -12,7 +13,7 @@ const downloadExtension = async (extension: { id: string; version: string }) => 
   const url = urlPlaceHolder.replace('$PUBLISHER', publisher).replace('$NAME', name).replace('$VERSION', version)
   console.info(`[download worker] Downloading extension ${id}`)
   const outDir = join(root, '.vscode-tool-downloads', `${name}-extracted`)
-  await downloadAndExtract(name, [url], outDir)
+  await downloadAndExtract(platform(), name, [url], outDir)
   await cp(join(outDir, 'extension'), join(root, '.vscode-extensions', `${publisherLower}.${name}-${version}`), {
     recursive: true,
   })

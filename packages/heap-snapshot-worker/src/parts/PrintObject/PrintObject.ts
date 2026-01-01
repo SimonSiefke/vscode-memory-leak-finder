@@ -1,6 +1,6 @@
 import type { ObjectNode } from '../AstNode/AstNode.ts'
-import { printAst } from '../PrintAst/PrintAst.ts'
 import type { PrintedValue } from '../PrintedValue/PrintedValue.ts'
+import { printAst } from '../PrintAst/PrintAst.ts'
 
 export const printObject = (node: ObjectNode): PrintedValue => {
   const out: Record<string, PrintedValue> = {}

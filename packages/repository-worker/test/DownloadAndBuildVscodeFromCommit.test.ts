@@ -164,7 +164,7 @@ test.skip('downloadVscodeCommit - tests git clone operations with mocked execa',
 
   mockMkdir.mockReturnValue(undefined)
 
-  await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testReposDir, '/test/cache', false)
+  await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, testRepoUrl, testReposDir, '/test/cache', false)
 
   // Verify that makeDirectory was called to create the repos directory
   expect(mockMkdir).toHaveBeenCalledWith(reposDir)
@@ -211,7 +211,7 @@ test.skip('downloadAndBuildVscodeFromCommit - handles interrupted workflow with 
 
   mockMkdir.mockReturnValue(undefined)
 
-  await downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
+  await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
 
   // Verify that installDependencies was called since cache doesn't exist
   expect(mockInstallDependencies).toHaveBeenCalled()
@@ -254,7 +254,7 @@ test.skip('downloadAndBuildVscodeFromCommit - handles interrupted workflow with 
 
   mockMkdir.mockReturnValue(undefined)
 
-  await downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
+  await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
 
   // Since main.js doesn't exist but node_modules does, it should still call installDependencies
   // because needsInstall = !existsMainJsPath && !existsNodeModulesPath = true && false = false
@@ -301,7 +301,7 @@ test.skip('downloadAndBuildVscodeFromCommit - handles interrupted workflow with 
 
   mockMkdir.mockReturnValue(undefined)
 
-  await downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
+  await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
 
   // Since main.js doesn't exist but out folder does, it should still call runCompile
   // because needsCompile = !existsMainJsPath && !existsOutPath = true && false = false

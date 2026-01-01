@@ -14,14 +14,25 @@ export const createHeapSnapshotNode = (
   for (let j = 0; j < nodeFieldCount; j++) {
     const key = nodeFields[j]
     const value = array[startIndex + j]
-    if (key === typeKey) {
-      node[key] = valueTypes[value]
-    } else if (key === nameKey) {
-      node[key] = strings[value]
-    } else if (key === indexMultiplierKey) {
-      node[key] = value / indexMultiplier
-    } else {
-      node[key] = value
+    switch (key) {
+      case indexMultiplierKey: {
+        node[key] = value / indexMultiplier
+
+        break
+      }
+      case nameKey: {
+        node[key] = strings[value]
+
+        break
+      }
+      case typeKey: {
+        node[key] = valueTypes[value]
+
+        break
+      }
+      default: {
+        node[key] = value
+      }
     }
   }
   return node

@@ -31,7 +31,7 @@ const getListId = (classNameString) => {
   throw new Error(`Failed to extract list id from explorer`)
 }
 
-export const create = ({ electronApp, expect, page, VError }) => {
+export const create = ({ electronApp, expect, page, platform, VError }) => {
   return {
     async cancel() {
       try {
@@ -70,7 +70,7 @@ export const create = ({ electronApp, expect, page, VError }) => {
     },
     async collapseAll() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.CollapseFoldersInExplorer)
       } catch (error) {
         throw new VError(error, `Failed to collapse all`)
@@ -136,6 +136,7 @@ export const create = ({ electronApp, expect, page, VError }) => {
         const quickPick = QuickPick.create({
           expect,
           page,
+          platform,
           VError,
         })
         await quickPick.executeCommand(WellKnownCommands.FocusExplorer)
@@ -223,7 +224,7 @@ export const create = ({ electronApp, expect, page, VError }) => {
         const contextMenu = ContextMenu.create({ expect, page, VError })
         await contextMenu.select('Open to the Side')
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.CloseOtherGroups)
         await page.waitForIdle()
         // TODO open context menu, the open to the side

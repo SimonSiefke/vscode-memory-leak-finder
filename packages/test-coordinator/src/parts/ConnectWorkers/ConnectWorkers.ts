@@ -3,6 +3,8 @@ import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 
 export const connectWorkers = async (
+  platform: string,
+  arch: string,
   recordVideo: boolean,
   screencastQuality: number,
   connectionId: number,
@@ -28,12 +30,13 @@ export const connectWorkers = async (
 ) => {
   const promises: Promise<any>[] = []
   if (recordVideo) {
-    promises.push(VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout, screencastQuality))
+    promises.push(VideoRecording.start(platform, arch, devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout, screencastQuality))
   } else {
     promises.push(Promise.resolve(undefined))
   }
   promises.push(
     LaunchTestWorker.launchTestWorker(
+      platform,
       runMode,
       connectionId,
       devtoolsWebSocketUrl,

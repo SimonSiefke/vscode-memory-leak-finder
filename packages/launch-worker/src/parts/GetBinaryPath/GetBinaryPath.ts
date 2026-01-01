@@ -4,31 +4,61 @@ import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUn
 import * as Env from '../Env/Env.ts'
 import * as Root from '../Root/Root.ts'
 
-export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, commit: string, insidersCommit: string): Promise<string> => {
+export const getBinaryPath = async (
+  platform: string,
+  arch: string,
+  vscodeVersion: string,
+  vscodePath: string,
+  commit: string,
+  insidersCommit: string,
+  updateUrl: string,
+): Promise<string> => {
   if (vscodePath) {
     return vscodePath
   }
   if (insidersCommit && typeof insidersCommit === 'string' && insidersCommit !== '') {
     return await DownloadAndUnzipVscode.downloadAndUnzipVscode({
+      arch,
       insidersCommit,
+      platform,
+      updateUrl,
+      vscodeVersion: '',
     })
   }
   if (commit && typeof commit === 'string' && commit !== '') {
     const repoUrl = 'https://github.com/microsoft/vscode.git'
     const reposDir = join(Root.root, '.vscode-repos')
     const nodeModulesCacheDir = join(Root.root, '.vscode-node-modules-cache')
-    const useNice = process.platform === 'linux'
-    return await DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(commit, repoUrl, reposDir, nodeModulesCacheDir, useNice)
+    const useNice = platform === 'linux'
+    return await DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(
+      platform,
+      arch,
+      commit,
+      repoUrl,
+      reposDir,
+      nodeModulesCacheDir,
+      useNice,
+    )
   }
   if (insidersCommit) {
     return await DownloadAndUnzipVscode.downloadAndUnzipVscode({
+      arch,
       insidersCommit,
+      platform,
+      updateUrl,
+      vscodeVersion: '',
     })
   }
   if (Env.env.VSCODE_PATH) {
     console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')
     return Env.env.VSCODE_PATH
   }
-  const path = await DownloadAndUnzipVscode.downloadAndUnzipVscode(vscodeVersion)
+  const path = await DownloadAndUnzipVscode.downloadAndUnzipVscode({
+    arch,
+    insidersCommit: '',
+    platform,
+    updateUrl: '',
+    vscodeVersion,
+  })
   return path
 }

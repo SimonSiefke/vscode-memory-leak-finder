@@ -1,5 +1,5 @@
-import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import type { UniqueLocationMap } from '../UniqueLocationMap/UniqueLocationMap.ts'
+import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 
 export const getUniqueLocationMap = (
   locations: Uint32Array,

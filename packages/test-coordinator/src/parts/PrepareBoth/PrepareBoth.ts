@@ -12,6 +12,7 @@ export interface PrepareBothResult {
 }
 
 export interface PrepareBothOptions {
+  readonly arch: string
   readonly attachedToPageTimeout: number
   readonly canUseIdleCallback: boolean
   readonly clearExtensions: boolean
@@ -30,6 +31,8 @@ export interface PrepareBothOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
+  readonly platform: string
+  readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
@@ -37,6 +40,7 @@ export interface PrepareBothOptions {
 
 export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareBothResult> => {
   const {
+    arch,
     attachedToPageTimeout,
     canUseIdleCallback,
     clearExtensions,
@@ -55,6 +59,8 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     inspectSharedProcess,
     inspectSharedProcessPort,
     isFirstConnection,
+    platform,
+    updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
@@ -62,6 +68,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
   const initializationWorkerRpc = await launchInitializationWorker()
   const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, sessionId, targetId, utilityContext, webSocketUrl } =
     await initializationWorkerRpc.invoke('Launch.launch', {
+      arch,
       attachedToPageTimeout,
       canUseIdleCallback,
       clearExtensions,
@@ -80,6 +87,8 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
       inspectSharedProcess,
       inspectSharedProcessPort,
       isFirstConnection,
+      platform,
+      updateUrl,
       useProxyMock,
       vscodePath,
       vscodeVersion,

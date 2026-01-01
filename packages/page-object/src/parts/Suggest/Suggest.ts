@@ -1,7 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async close() {
       try {
@@ -15,13 +15,13 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to close suggest widget`)
       }
     },
-    async open(expectedItem: string) {
+    async open(expectedItem?: string) {
       try {
         await page.waitForIdle()
         const suggestWidget = page.locator('.suggest-widget')
         await expect(suggestWidget).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TriggerSuggest, {
           pressKeyOnce: true,
         })

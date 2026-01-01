@@ -1,32 +1,32 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import { parseNode } from '../ParseNode/ParseNode.ts'
-import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
+import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
+import { parseNode } from '../ParseNode/ParseNode.ts'
 
 export interface NodeExaminationResult {
-  nodeIndex: number
-  nodeId: number
-  node: any
-  nodeName: string | null
-  nodeType: string | null
-  edges: Array<{
-    type: number
-    typeName: string
-    nameIndex: number
-    edgeName: string
-    toNode: number
-    targetNodeInfo?: {
-      name: string | null
-      type: string | null
+  readonly edges: Array<{
+    readonly type: number
+    readonly typeName: string
+    readonly nameIndex: number
+    readonly edgeName: string
+    readonly toNode: number
+    readonly targetNodeInfo?: {
+      readonly name: string | null
+      readonly type: string | null
     }
   }>
-  properties: Array<{
-    name: string
-    value: string | null
-    targetType: string | null
+  readonly node: any
+  readonly nodeId: number
+  readonly nodeIndex: number
+  readonly nodeName: string | null
+  readonly nodeType: string | null
+  readonly properties: Array<{
+    readonly name: string
+    readonly value: string | null
+    readonly targetType: string | null
   }>
 }
 
@@ -64,8 +64,8 @@ export const examineNodeById = (nodeId: number, snapshot: Snapshot): NodeExamina
  * @returns Detailed examination result of the node
  */
 export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeExaminationResult | null => {
-  const { nodes, edges, strings, meta } = snapshot
-  const { node_fields, edge_fields, node_types, edge_types } = meta
+  const { edges, meta, nodes, strings } = snapshot
+  const { edge_fields, edge_types, node_fields, node_types } = meta
 
   // Parse the target node
   const node = parseNode(nodeIndex, nodes, node_fields)
@@ -119,7 +119,7 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
           type: getNodeTypeName(targetNode, node_types),
         }
       : undefined
-    processedEdges.push({ type, typeName, nameIndex, edgeName, toNode, targetNodeInfo })
+    processedEdges.push({ edgeName, nameIndex, targetNodeInfo, toNode, type, typeName })
   }
 
   // Extract properties (property-type edges) with improved value detection
@@ -171,7 +171,7 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
             if (detectedValue !== null && (detectedValue !== edge.targetNodeInfo.name || detectedValue === '')) {
               actualValue = detectedValue
             }
-          } catch (error) {
+          } catch {
             // Fall back to basic name if detection fails
           }
         }
@@ -186,7 +186,7 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
         const parsed = Number(actualValue)
         if (Number.isFinite(parsed)) {
           // keep as number for display in examination output
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
           // @ts-ignore
           displayValue = parsed
         }
@@ -194,18 +194,18 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
 
       return {
         name: edge.edgeName,
-        value: displayValue,
         targetType: edge.targetNodeInfo?.type || null,
+        value: displayValue,
       }
     })
 
   return {
-    nodeIndex,
-    nodeId: node.id,
+    edges: processedEdges,
     node,
+    nodeId: node.id,
+    nodeIndex,
     nodeName,
     nodeType,
-    edges: processedEdges,
     properties,
   }
 }
@@ -223,7 +223,7 @@ export const analyzeNodeFromFile = async (filePath: string, nodeId: number): Pro
     // @ts-ignore minimal typing for migration
     const snapshot: any = await prepareHeapSnapshot(filePath, { parseStrings: true })
     // @ts-ignore minimal typing for migration
-    return examineNodeById(nodeId, snapshot as any)
+    return examineNodeById(nodeId, snapshot)
   } catch (error) {
     console.error(`Error loading heap snapshot from ${filePath}:`, error)
     return null

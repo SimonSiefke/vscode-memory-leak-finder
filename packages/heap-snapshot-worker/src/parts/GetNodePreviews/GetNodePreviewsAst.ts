@@ -1,16 +1,16 @@
 import type { ArrayNode, AstNode, ObjectNode, PropertyEntry } from '../AstNode/AstNode.ts'
-import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 
 const createUnknown = (id: number, name: string | null, value?: string): AstNode => ({
-  type: 'unknown',
   id,
   name,
+  type: 'unknown',
   value,
 })
 
@@ -33,12 +33,12 @@ export const buildAstForNode = (
   depth: number,
   visited: Set<number>,
 ): AstNode | null => {
-  const { nodes, edges } = snapshot
+  const { edges, nodes } = snapshot
   const node = parseNode(nodeIndex, nodes, nodeFields)
   if (!node) return null
   const nodeTypeName = getNodeTypeName(node, nodeTypes) || 'unknown'
   const name = getNodeName(node, strings)
-  const id = node.id
+  const { id } = node
 
   if (visited.has(id)) {
     return createUnknown(id, name, `[Circular ${id}]`)
@@ -46,25 +46,25 @@ export const buildAstForNode = (
   visited.add(id)
 
   if (nodeTypeName === 'string') {
-    return { type: 'string', id, name, value: name ?? '' }
+    return { id, name, type: 'string', value: name ?? '' }
   }
   if (nodeTypeName === 'number') {
     const n = typeof node.name === 'number' ? strings[node.name] : undefined
-    const parsed = n !== undefined ? Number(n) : NaN
-    return { type: 'number', id, name, value: Number.isFinite(parsed) ? parsed : (n ?? '') }
+    const parsed = n === undefined ? Number.NaN : Number(n)
+    return { id, name, type: 'number', value: Number.isFinite(parsed) ? parsed : (n ?? '') }
   }
   if (nodeTypeName === 'bigint') {
     const v = name ?? ''
-    return { type: 'bigint', id, name, value: v }
+    return { id, name, type: 'bigint', value: v }
   }
   if (nodeTypeName === 'hidden') {
     // Try boolean detection; otherwise unknown/hidden
     const value = getBooleanValue(node, snapshot, edgeMap)
     if (value === 'true') {
-      return { type: 'boolean', id, name, value: true } as any
+      return { id, name, type: 'boolean', value: true } as any
     }
     if (value === 'false') {
-      return { type: 'boolean', id, name, value: false } as any
+      return { id, name, type: 'boolean', value: false } as any
     }
     return createUnknown(id, name, `[hidden ${id}]`)
   }
@@ -73,7 +73,7 @@ export const buildAstForNode = (
     if (nodeTypeName === 'array') {
       const elements: AstNode[] = []
       if (depth <= 0) {
-        const arr: ArrayNode = { type: 'array', id, name, elements }
+        const arr: ArrayNode = { elements, id, name, type: 'array' }
         return arr
       }
       for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
@@ -100,14 +100,14 @@ export const buildAstForNode = (
         )
         if (childAst) elements.push(childAst)
       }
-      const arr: ArrayNode = { type: 'array', id, name, elements }
+      const arr: ArrayNode = { elements, id, name, type: 'array' }
       return arr
     }
 
     // object
     const properties: PropertyEntry[] = []
     if (depth <= 0) {
-      const obj: ObjectNode = { type: 'object', id, name, properties }
+      const obj: ObjectNode = { id, name, properties, type: 'object' }
       return obj
     }
     for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
@@ -141,7 +141,7 @@ export const buildAstForNode = (
       if (!valueAst) continue
       properties.push({ id, name: propName, value: valueAst })
     }
-    const obj: ObjectNode = { type: 'object', id, name, properties }
+    const obj: ObjectNode = { id, name, properties, type: 'object' }
     return obj
   }
 
@@ -151,9 +151,9 @@ export const buildAstForNode = (
     let lineValue: number | undefined
     let columnValue: number | undefined
     const locationFields = snapshot.meta.location_fields
-    const locations = snapshot.locations
+    const { locations } = snapshot
     if (locationFields && locationFields.length > 0 && locations && locations.length > 0) {
-      const { itemsPerLocation, objectIndexOffset, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
+      const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(locationFields)
       const objectIndexViaTrace = typeof node.trace_node_id === 'number' && node.trace_node_id !== 0 ? node.trace_node_id : -1
       const objectIndexViaNode = nodeIndex
       for (let locIndex = 0; locIndex < locations.length; locIndex += itemsPerLocation) {
@@ -166,7 +166,7 @@ export const buildAstForNode = (
         }
       }
     }
-    return { type: nodeTypeName as any, id, name, scriptId: scriptIdValue, line: lineValue, column: columnValue }
+    return { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: nodeTypeName as any }
   }
 
   return createUnknown(id, name, `[${nodeTypeName} ${id}]`)

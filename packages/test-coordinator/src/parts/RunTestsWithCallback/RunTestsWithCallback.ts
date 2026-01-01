@@ -31,6 +31,7 @@ const disposeWorkers = async (workers) => {
 }
 
 export const runTestsWithCallback = async ({
+  arch,
   callback,
   checkLeaks,
   clearExtensions,
@@ -51,9 +52,11 @@ export const runTestsWithCallback = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  isGithubActions,
   measure,
   measureAfter,
   measureNode,
+  platform,
   recordVideo,
   restartBetween,
   root,
@@ -64,6 +67,7 @@ export const runTestsWithCallback = async ({
   setupOnly,
   timeoutBetween,
   timeouts,
+  updateUrl,
   useProxyMock,
   vscodePath,
   vscodeVersion,
@@ -100,6 +104,7 @@ export const runTestsWithCallback = async ({
 
     if (setupOnly && commit) {
       const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+        arch,
         attachedToPageTimeout,
         clearExtensions,
         commit,
@@ -121,10 +126,12 @@ export const runTestsWithCallback = async ({
         measureId: measure,
         measureNode,
         pageObjectPath,
+        platform,
         recordVideo,
         runMode,
         screencastQuality,
         timeouts,
+        updateUrl,
         useProxyMock,
         vscodePath,
         vscodeVersion,
@@ -200,6 +207,7 @@ export const runTestsWithCallback = async ({
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
         const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+          arch,
           attachedToPageTimeout,
           clearExtensions,
           commit,
@@ -221,10 +229,12 @@ export const runTestsWithCallback = async ({
           measureId: measure,
           measureNode,
           pageObjectPath,
+          platform,
           recordVideo,
           runMode,
           screencastQuality,
           timeouts,
+          updateUrl,
           useProxyMock,
           vscodePath,
           vscodeVersion,
@@ -247,7 +257,14 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerRpc, connectionId, absolutePath, forceRun, timeouts)
+        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
+          testWorkerRpc,
+          connectionId,
+          absolutePath,
+          forceRun,
+          timeouts,
+          isGithubActions,
+        )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped
 
@@ -270,12 +287,12 @@ export const runTestsWithCallback = async ({
           if (checkLeaks) {
             if (measureAfter) {
               for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform)
               }
             }
             await MemoryLeakFinder.start(memoryRpc, connectionId)
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
@@ -311,7 +328,7 @@ export const runTestsWithCallback = async ({
             }
           } else {
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform)
             }
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)

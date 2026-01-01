@@ -23,6 +23,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     return
   }
   const {
+    arch,
     bisect,
     checkLeaks,
     clearExtensions,
@@ -43,10 +44,12 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    isGithubActions,
     isWindows,
     measure,
     measureAfter,
     measureNode,
+    platform,
     recordVideo,
     restartBetween,
     runMode,
@@ -56,6 +59,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     setupOnly,
     timeoutBetween,
     timeouts,
+    updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
@@ -65,6 +69,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   await Stdout.write(clear)
   const rpc = await RunTest.prepare()
   const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
+    arch,
     bisect,
     checkLeaks,
     clearExtensions,
@@ -85,9 +90,11 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    isGithubActions,
     measure,
     measureAfter,
     measureNode,
+    platform,
     recordVideo,
     restartBetween,
     root: cwd,
@@ -98,6 +105,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     setupOnly,
     timeoutBetween,
     timeouts,
+    updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,

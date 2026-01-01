@@ -1,7 +1,5 @@
 import * as TestFrameWork from './TestFrameWork.ts'
 
-export const name = 'TestFrameWork'
-
 export const Commands = {
   boundingBox: TestFrameWork.boundingBox,
   checkHidden: TestFrameWork.checkHidden,

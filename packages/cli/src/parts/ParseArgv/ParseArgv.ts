@@ -35,20 +35,20 @@ const parseVscodeVersion = (defaultVersionValue: string, argv: readonly string[]
     if (vscodeVersionValue.startsWith('insiders:')) {
       const commitHash = vscodeVersionValue.slice('insiders:'.length)
       return {
-        vscodeVersion: '',
         insidersCommit: commitHash,
+        vscodeVersion: '',
       }
     }
     return {
-      vscodeVersion: vscodeVersionValue,
       insidersCommit: '',
+      vscodeVersion: vscodeVersionValue,
     }
   }
   if (defaultVersionValue.startsWith('insiders:')) {
     const commitHash = defaultVersionValue.slice('insiders:'.length)
     return {
-      vscodeVersion: '',
       insidersCommit: commitHash,
+      vscodeVersion: '',
     }
   }
   return {
@@ -84,11 +84,11 @@ const parseRuns = (argv: readonly string[]): number => {
   return 1
 }
 
-const parseCwd = (argv: readonly string[]): string => {
+const parseCwd = (cwd: string, argv: readonly string[]): string => {
   if (argv.includes('--cwd')) {
     return parseArgvString(argv, '--cwd')
   }
-  return process.cwd()
+  return cwd
 }
 
 const parseMeasure = (argv: readonly string[]): string => {
@@ -100,7 +100,9 @@ const parseMeasure = (argv: readonly string[]): string => {
 
 const parseFilter = (argv: readonly string[]): string => {
   if (argv.includes('--only')) {
-    return parseArgvString(argv, '--only')
+    const filterValue = parseArgvString(argv, '--only')
+    // Replace dots with dashes for backwards compatibility
+    return filterValue.replaceAll('.', '-')
   }
   return ''
 }
@@ -244,7 +246,14 @@ const parseClearExtensions = (argv: readonly string[]): boolean => {
   return argv.includes('--clear-extensions')
 }
 
-export const parseArgv = (argv: readonly string[]) => {
+const parseUpdateUrl = (argv: readonly string[]): string => {
+  if (argv.includes('--update-url')) {
+    return parseArgvString(argv, '--update-url')
+  }
+  return 'https://update.code.visualstudio.com'
+}
+
+export const parseArgv = (platform: string, arch: string, argv: readonly string[]) => {
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const bisect = parseBisect(argv)
   const checkLeaks = parseCheckLeaks(argv)
@@ -252,7 +261,7 @@ export const parseArgv = (argv: readonly string[]) => {
   const color = true
   const commit = parseCommit(argv)
   const continueValue = parseContinueValue(argv)
-  const cwd = parseCwd(argv)
+  const cwd = parseCwd(process.cwd(), argv)
   const enableExtensions = parseEnableExtensions(argv)
   const enableProxy = parseEnableProxy(argv)
   const filter = parseFilter(argv)
@@ -279,12 +288,14 @@ export const parseArgv = (argv: readonly string[]) => {
   const timeoutBetween = parseTimeoutBetween(argv)
   const timeouts = parseTimeouts(argv)
   const useProxyMock = parseUseProxyMock(argv)
+  const updateUrl = parseUpdateUrl(argv)
   const vscodePath = parseVscodePath(argv)
-  const vscodeVersion = parsedVersion.vscodeVersion
+  const { vscodeVersion } = parsedVersion
   const watch = parseWatch(argv)
   const workers = parseWorkers(argv)
-  const isWindows = IsWindows.isWindows(process.platform)
+  const isWindows = IsWindows.isWindows(platform)
   return {
+    arch,
     bisect,
     checkLeaks,
     clearExtensions,
@@ -305,9 +316,11 @@ export const parseArgv = (argv: readonly string[]) => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    isWindows,
     measure,
     measureAfter,
     measureNode,
+    platform,
     recordVideo,
     restartBetween,
     runMode,
@@ -317,11 +330,11 @@ export const parseArgv = (argv: readonly string[]) => {
     setupOnly,
     timeoutBetween,
     timeouts,
+    updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
     watch,
     workers,
-    isWindows,
   }
 }
