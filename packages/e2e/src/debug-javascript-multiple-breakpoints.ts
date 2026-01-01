@@ -6,6 +6,8 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Workspace }: TestCo
   await Workspace.setFiles([
     {
       content: `export function add(a,b){
+a++
+a--
 if(a === 0){
   return b
 }
@@ -28,17 +30,20 @@ add(1000, 1)
   await Explorer.focus()
   await Explorer.shouldHaveItem('main.js')
   await RunAndDebug.removeAllBreakpoints()
-}
-
-export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await Editor.open('main.js')
   await Editor.setBreakpoint(3)
+  await Editor.closeAll()
   await RunAndDebug.runAndWaitForPaused({
     callStackSize: 11,
     file: 'main.js',
     line: 4,
     hasCallStack: false,
   })
+  await Editor.open('add.js')
+  await Editor.setBreakpoint(3)
+}
+
+export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await new Promise((r) => {})
   // @ts-ignore
   // await RunAndDebug.step('index.js', 5)
