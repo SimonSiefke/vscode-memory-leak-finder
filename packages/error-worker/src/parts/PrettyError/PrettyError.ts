@@ -121,6 +121,7 @@ interface PrepareResult {
 
 export const prepare = async (error: Error, { color = true, root = '' }: PrepareOptions = {}): Promise<PrepareResult> => {
   if (error && (error as any).code === ErrorCodes.ERR_MODULE_NOT_FOUND) {
+    // @ts-ignore
     return prepareModuleNotFoundError(error)
   }
   if (error && error.message && error.stack && (error as any).codeFrame) {
