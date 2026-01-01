@@ -36,7 +36,6 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         const tab = page.locator('.tab', { hasText: `${file1} ${arrow} ${file2}` })
         await expect(tab).toBeVisible()
         const original = page.locator(`.monaco-diff-editor .monaco-editor.original[data-uri$="${file1}"]`)
-        await new Promise((r) => {})
         await expect(original).toBeVisible()
         const modified = page.locator(`.monaco-diff-editor .monaco-editor.modified[data-uri$="${file2}"]`)
         await expect(modified).toBeVisible()
