@@ -18,7 +18,6 @@ if __name__ == '__main__':
       name: 'main.py',
     },
   ])
-  // @ts-ignore
   await Extensions.install({
     id: 'ms-python.python',
     name: 'Python',

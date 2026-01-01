@@ -8,7 +8,6 @@ export const setup = async ({ Editor, Extensions, Git, GitHubPullRequests, Works
   await Editor.closeAll()
   await Workspace.setFiles([])
   await Git.cloneRepository('https://github.com/octocat/Hello-World.git')
-  // @ts-ignore
   await Extensions.install({
     id: 'github pull requests',
     name: 'GitHub Pull Requests',
