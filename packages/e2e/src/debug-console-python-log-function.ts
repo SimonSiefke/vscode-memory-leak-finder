@@ -54,6 +54,7 @@ export const run = async ({ DebugConsole }: TestContext): Promise<void> => {
       message: /^<function add/,
       type: '',
     },
+    hasSuggest: true,
   })
   // @ts-ignore
   await DebugConsole.expand({

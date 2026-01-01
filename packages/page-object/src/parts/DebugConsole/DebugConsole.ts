@@ -23,8 +23,10 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to clear debug console input`)
       }
     },
-    async evaluate({ expectedResult, expression }) {
+    async evaluate({ expectedResult, expression, hasSuggest }) {
       try {
+        const repl = page.locator('.repl')
+        await expect(repl).toBeVisible()
         await page.waitForIdle()
         const replInputWrapper = page.locator('.repl-input-wrapper')
         await expect(replInputWrapper).toBeVisible()
@@ -41,10 +43,13 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
         await replInput.type(expression)
         await page.waitForIdle()
-        await expect(lines).toHaveText(expression)
-        for (let i = 0; i < 10; i++) {
-          await page.waitForIdle()
+        if (hasSuggest) {
+          const suggest = repl.locator('[widgetid="editor.widget.suggestWidget"]')
+          await expect(suggest).toBeVisible()
         }
+        await page.waitForIdle()
+        await expect(lines).toHaveText(expression)
+        await page.waitForIdle()
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
