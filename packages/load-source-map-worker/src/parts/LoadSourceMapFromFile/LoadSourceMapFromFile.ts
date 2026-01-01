@@ -9,6 +9,7 @@ export const loadSourceMap = async (url: string): Promise<any> => {
     const data = JSON.parse(content)
     return data
   } catch {
+    // TODO log error? what to do here?
     return emptySourceMap
   }
 }
