@@ -678,7 +678,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to pin editor`)
       }
     },
-    async press(key) {
+    async press(key: string) {
       try {
         await page.waitForIdle()
         await page.keyboard.press(key)
@@ -926,8 +926,19 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           await quickPick.select(`Go to line ${line} and character ${column}.`)
         }
         await page.waitForIdle()
+        // TODO verify that cursor is actually at that position
       } catch (error) {
         throw new VError(error, `Failed to set cursor`)
+      }
+    },
+    async goToEndOfLine() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('End')
+        await page.waitForIdle()
+        // TODO verify that cursor is actually at that position
+      } catch (error) {
+        throw new VError(error, `Failed to set cursor to end of line`)
       }
     },
     async setLanguageMode(languageId) {
@@ -1422,9 +1433,11 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to toggle screen reader accessibility mode`)
       }
     },
-    async type(text) {
+    async type(text: string) {
       try {
+        await page.waitForIdle()
         await page.keyboard.type(text)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to type ${text}`)
       }
