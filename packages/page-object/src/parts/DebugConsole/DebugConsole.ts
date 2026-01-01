@@ -32,6 +32,8 @@ export const create = ({ expect, page, platform, VError }) => {
         const replInput = replInputWrapper.locator('.native-edit-context')
         await replInput.focus()
         await page.waitForIdle()
+        await expect(replInput).toBeFocused()
+        await page.waitForIdle()
         const lines = replInputWrapper.locator('.view-lines')
         await expect(lines).toBeVisible()
         await page.waitForIdle()
