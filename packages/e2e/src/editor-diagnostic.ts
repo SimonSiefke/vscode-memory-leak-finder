@@ -41,5 +41,6 @@ abc
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.saveAll()
   await Editor.closeAll()
 }
