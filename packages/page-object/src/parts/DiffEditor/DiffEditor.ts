@@ -32,6 +32,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         await explorer.openContextMenu(file2)
         await contextMenu.select('Compare with Selected')
         await sideBar.hide()
+        await new Promise((r) => {})
         // TODO verify that diff editor is open
         // TODO verify that file1 has content1 and file2 has content2
       } catch (error) {
