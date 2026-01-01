@@ -11,8 +11,12 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('index.html')
   await Editor.open('index.html')
+  await Editor.setCursor(1, 1)
+  await Editor.shouldHaveBreadCrumb('index.html')
+  await Editor.shouldHaveBreadCrumb('h1')
 }
 
 export const run = async ({ Editor, Hover }: TestContext): Promise<void> => {
