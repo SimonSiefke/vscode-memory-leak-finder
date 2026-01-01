@@ -217,7 +217,9 @@ export const create = ({ expect, page, platform, VError }) => {
           platform,
           VError,
         })
-        await quickPick.executeCommand(WellKnownCommands.DebugStepInto)
+        await quickPick.executeCommand(WellKnownCommands.DebugStepInto, {
+          pressKeyOnce: true,
+        })
         await page.waitForIdle()
         await this.waitForPaused({
           callStackSize: expectedCallStackSize,
@@ -247,7 +249,9 @@ export const create = ({ expect, page, platform, VError }) => {
           platform,
           VError,
         })
-        await quickPick.executeCommand(WellKnownCommands.DebugStepOut)
+        await quickPick.executeCommand(WellKnownCommands.DebugStepOut, {
+          pressKeyOnce: true,
+        })
         await page.waitForIdle()
         await this.waitForPaused({
           callStackSize: expectedCallStackSize,
