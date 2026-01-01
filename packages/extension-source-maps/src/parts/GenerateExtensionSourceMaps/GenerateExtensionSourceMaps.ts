@@ -1,9 +1,7 @@
 import { existsSync } from 'node:fs'
-import { mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as BuildExtension from '../BuildExtension/BuildExtension.ts'
 import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
-import * as CopySourceMaps from '../CopySourceMaps/CopySourceMaps.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as FindCommitForVersion from '../FindCommitForVersion/FindCommitForVersion.ts'
 import * as GetDisplayname from '../GetDisplayname/GetDisplayname.ts'
@@ -15,23 +13,20 @@ import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig
 export const generateExtensionSourceMaps = async ({
   cacheDir,
   extensionName,
-  outputDir,
   repoUrl,
   version,
 }: {
   extensionName: string
   version: string
   repoUrl: string
-  outputDir: string
   cacheDir: string
 }): Promise<void> => {
-  const repoPath = join(cacheDir, `${extensionName}-${version}`)
-
   // Check if already built
-  // Use the same extension ID format as CopySourceMaps (github.extensionName-normalizedVersion)
+  // Normalize version by stripping 'v' prefix if present
   const normalizedVersion = version.startsWith('v') ? version.slice(1) : version
-  const extensionId = `github.${extensionName}-${normalizedVersion}`
-  const sourceMapsOutputPath = join(outputDir, extensionId)
+  const repoPath = join(cacheDir, `${extensionName}-${normalizedVersion}`)
+  const extensionId = `${extensionName}-${normalizedVersion}`
+  const sourceMapsOutputPath = join(cacheDir, extensionId)
   if (existsSync(sourceMapsOutputPath)) {
     const displayName = GetDisplayname.getDisplayname(extensionName)
     console.log(`[extension-source-maps] Source maps for ${displayName} ${version} already exist, skipping...`)
@@ -84,11 +79,6 @@ export const generateExtensionSourceMaps = async ({
   // Build extension
   console.log(`[extension-source-maps] Building extension...`)
   await BuildExtension.buildExtension(repoPath, nodeVersion)
-
-  // Copy source maps
-  console.log(`[extension-source-maps] Copying source maps...`)
-  await mkdir(outputDir, { recursive: true })
-  await CopySourceMaps.copySourceMaps(repoPath, outputDir, extensionName, version)
 
   console.log(`[extension-source-maps] Successfully generated source maps for ${extensionName} ${version}`)
 }
