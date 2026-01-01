@@ -19,7 +19,6 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   await Editor.open('index.py')
   await Editor.shouldHaveBreadCrumb('index.py')
   await Editor.shouldHaveBreadCrumb('add')
-  // @ts-ignore
   await Editor.setCursor(2, 15)
   await Editor.shouldHaveSquigglyError()
   // @ts-ignore

@@ -40,7 +40,6 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
 export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Editor.shouldHaveText(originalContent)
 
-  // @ts-ignore
   await Editor.setCursor(2, 3)
   await Editor.selectAll()
   // @ts-ignore

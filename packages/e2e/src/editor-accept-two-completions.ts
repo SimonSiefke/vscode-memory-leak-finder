@@ -17,7 +17,6 @@ export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promis
   visibil
 }`)
   await Editor.shouldHaveBreadCrumb('h1')
-  // @ts-ignore
   await Editor.setCursor(2, 8)
 }
 

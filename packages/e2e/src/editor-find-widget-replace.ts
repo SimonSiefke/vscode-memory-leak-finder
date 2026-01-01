@@ -16,7 +16,6 @@ export const setup = async ({ Editor, EditorFind, Explorer, Workspace }: TestCon
   await Editor.open('index.html')
   await Editor.shouldHaveText('<h1>abc</h1>')
   await Editor.shouldHaveBreadCrumb('index.html')
-  // @ts-ignore
   await Editor.setCursor(1, 1)
   await Editor.shouldHaveBreadCrumb('h1')
   await Editor.closeFind()
