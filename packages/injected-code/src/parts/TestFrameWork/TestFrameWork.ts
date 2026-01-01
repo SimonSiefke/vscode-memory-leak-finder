@@ -258,6 +258,7 @@ export const pressKey = async (key) => {
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
   KeyBoardActions.press(keyboardEventOptions)
   if (
+    key === 'Enter' &&
     document.activeElement &&
     (document.activeElement instanceof HTMLAnchorElement || document.activeElement instanceof HTMLButtonElement)
   ) {
