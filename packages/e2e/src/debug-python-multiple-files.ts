@@ -54,6 +54,7 @@ export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
     expectedFile: 'test.py',
     expectedPauseLine: 3,
     expectedCallStackSize: 2,
+    hasCallStack: false,
   })
   await new Promise((r) => {})
 }
