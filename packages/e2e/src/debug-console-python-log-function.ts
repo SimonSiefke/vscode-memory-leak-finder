@@ -50,6 +50,9 @@ export const run = async ({ RunAndDebug, DebugConsole }: TestContext): Promise<v
     label: '<function add',
   })
   await new Promise((r) => {})
+  await DebugConsole.expand({
+    label: 'special variables',
+  })
 }
 
 export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
