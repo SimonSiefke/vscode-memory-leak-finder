@@ -24,6 +24,7 @@ for(let i=0;i<1000;i++){
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('main.js')
   await RunAndDebug.removeAllBreakpoints()
   await Editor.open('main.js')
