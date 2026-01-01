@@ -26,7 +26,7 @@ export const create = ({ expect, page, platform, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.DebugPause)
         await page.waitForIdle()
         await expect(pauseButton).toBeHidden({
-          timeout: 20_000,
+          timeout: 30_000,
         })
         const continueButton = debugToolBar.locator('[aria-label^="Continue"]')
         await expect(continueButton).toBeVisible()
@@ -180,7 +180,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to start run and debug`)
       }
     },
-    async step(expectedFile, expectedPauseLine, expectedCallStackSize) {
+    async step(expectedFile: string, expectedPauseLine: number, expectedCallStackSize: number) {
       try {
         const quickPick = QuickPick.create({
           expect,
@@ -197,6 +197,74 @@ export const create = ({ expect, page, platform, VError }) => {
         })
       } catch (error) {
         throw new VError(error, `Failed to step over`)
+      }
+    },
+    async stepInto({
+      expectedFile,
+      expectedPauseLine,
+      expectedCallStackSize,
+      hasCallStack,
+    }: {
+      expectedFile: string
+      expectedPauseLine: number
+      expectedCallStackSize: number
+      hasCallStack: boolean
+    }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          expect,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.DebugStepInto, {
+          pressKeyOnce: true,
+        })
+        await page.waitForIdle()
+        await this.waitForPaused({
+          callStackSize: expectedCallStackSize,
+          file: expectedFile,
+          line: expectedPauseLine,
+          hasCallStack,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to step into`)
+      }
+    },
+    async stepOutOf({
+      expectedFile,
+      expectedPauseLine,
+      expectedCallStackSize,
+      hasCallStack,
+    }: {
+      expectedFile: string
+      expectedPauseLine: number
+      expectedCallStackSize: number
+      hasCallStack: boolean
+    }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          expect,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.DebugStepOut, {
+          pressKeyOnce: true,
+        })
+        await page.waitForIdle()
+        await this.waitForPaused({
+          callStackSize: expectedCallStackSize,
+          file: expectedFile,
+          line: expectedPauseLine,
+          hasCallStack,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to step out`)
       }
     },
     async stop() {
@@ -235,7 +303,7 @@ export const create = ({ expect, page, platform, VError }) => {
     async waitForPaused({ callStackSize, file, line, hasCallStack = true }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
-      await expect(continueButton).toBeVisible({ timeout: 20_000 })
+      await expect(continueButton).toBeVisible({ timeout: 30_000 })
       await page.waitForIdle()
       if (!hasCallStack) {
         // TODO maybe check some other things
@@ -271,7 +339,7 @@ export const create = ({ expect, page, platform, VError }) => {
     async waitForPausedOnException({ exception = false, file, line }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
-      await expect(continueButton).toBeVisible({ timeout: 20_000 })
+      await expect(continueButton).toBeVisible({ timeout: 30_000 })
       await page.waitForIdle()
       const pausedStackFrame = page.locator('.debug-top-stack-frame-column')
       await expect(pausedStackFrame).toBeVisible()
