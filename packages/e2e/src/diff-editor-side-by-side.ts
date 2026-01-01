@@ -23,6 +23,7 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('a.txt')
   await Explorer.shouldHaveItem('b.txt')
   await Explorer.shouldHaveItem('c.txt')
@@ -37,7 +38,7 @@ export const run = async ({ DiffEditor, Editor }: TestContext): Promise<void> =>
     file1Content: 'a',
     file2Content: 'b',
   })
-  await Editor.splitRight()
+  await Editor.splitDown()
   // @ts-ignore
   await DiffEditor.open({
     file1: 'c.txt',
