@@ -201,6 +201,7 @@ export const setup = async ({ DiffEditor, Editor, Explorer, Workspace }: TestCon
   await Explorer.shouldHaveItem('notebook-1.ipynb')
   await Explorer.shouldHaveItem('notebook-2.ipynb')
   await Editor.open('notebook-1.ipynb')
+  // @ts-ignore
   await DiffEditor.open({ file1: 'notebook-1.ipynb', file2: 'notebook-2.ipynb' })
   await DiffEditor.shouldHaveOriginalEditor('a')
   await DiffEditor.shouldHaveModifiedEditor('aa')

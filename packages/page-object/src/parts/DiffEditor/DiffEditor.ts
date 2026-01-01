@@ -32,9 +32,21 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         await explorer.openContextMenu(file2)
         await contextMenu.select('Compare with Selected')
         await sideBar.hide()
-        await new Promise((r) => {})
-        // TODO verify that diff editor is open
-        // TODO verify that file1 has content1 and file2 has content2
+        const arrow = '↔'
+        const tab = page.locator('.tab', { hasText: `${file1} ${arrow} ${file2}` })
+        await expect(tab).toBeVisible()
+        const original = page.locator(`.monaco-diff-editor .editor.original[data-uri$="${file1}"]`)
+        await expect(original).toBeVisible()
+        const modified = page.locator(`.monaco-diff-editor .editor.modified[data-uri$="${file2}"]`)
+        await expect(modified).toBeVisible()
+        if (file1Content) {
+          const lines = original.locator('.view-lines')
+          await expect(lines).toHaveText(file1Content)
+        }
+        if (file2Content) {
+          const lines = modified.locator('.view-lines')
+          await expect(lines).toHaveText(file2Content)
+        }
       } catch (error) {
         throw new VError(error, `Failed to open diff editor`)
       }
