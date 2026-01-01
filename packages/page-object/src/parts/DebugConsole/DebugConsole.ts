@@ -115,7 +115,28 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to show debug console`)
       }
     },
-    async type(value) {
+    async expand({ label }: { label: string }) {
+      try {
+        const repl = page.locator('.repl')
+        await expect(repl).toBeVisible()
+        await page.waitForIdle()
+        const row = repl.locator(`.monaco-list-row[aria-label^="${label}"]`)
+        await expect(row).toBeVisible()
+        await page.waitForIdle()
+        await expect(row).toHaveAttribute('aria-expanded', 'false')
+        await page.waitForIdle()
+        const collapsedTwistie = row.locator('.codicon-tree-item-expanded.collapsed')
+        await expect(collapsedTwistie).toBeVisible()
+        await collapsedTwistie.click()
+        await page.waitForIdle()
+        const expandedTwistie = row.locator('.codicon-tree-item-expanded')
+        await expect(expandedTwistie).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show debug console`)
+      }
+    },
+    async type(value: string) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
