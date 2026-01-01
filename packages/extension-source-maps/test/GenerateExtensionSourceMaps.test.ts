@@ -16,13 +16,12 @@ test.skip('generateExtensionSourceMaps - skips when source maps already exist', 
   const extensionName = 'test-extension'
   const version = '1.0.0'
 
-  const sourceMapsOutputPath = join(tempOutput, `${extensionName}-${version}`)
+  const sourceMapsOutputPath = join(tempCache, `${extensionName}-${version}`)
   await mkdir(sourceMapsOutputPath, { recursive: true })
 
   await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl: 'git@github.com:test/repo.git',
     version,
   })
@@ -95,16 +94,11 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
     buildExtension: async () => {},
   }))
 
-  jest.unstable_mockModule('../src/parts/CopySourceMaps/CopySourceMaps.ts', () => ({
-    copySourceMaps: async () => {},
-  }))
-
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl,
     version,
   })
@@ -186,16 +180,11 @@ test.skip('generateExtensionSourceMaps - finds commit and checks out', async () 
     buildExtension: async () => {},
   }))
 
-  jest.unstable_mockModule('../src/parts/CopySourceMaps/CopySourceMaps.ts', () => ({
-    copySourceMaps: async () => {},
-  }))
-
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl,
     version,
   })
@@ -251,7 +240,6 @@ test.skip('generateExtensionSourceMaps - throws error when checkout fails', asyn
     generateExtensionSourceMaps({
       cacheDir: tempCache,
       extensionName,
-      outputDir: tempOutput,
       repoUrl,
       version,
     }),
@@ -345,18 +333,11 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
     },
   }))
 
-  jest.unstable_mockModule('../src/parts/CopySourceMaps/CopySourceMaps.ts', () => ({
-    copySourceMaps: async () => {
-      workflowCalls.push('copySourceMaps')
-    },
-  }))
-
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl,
     version,
   })
@@ -368,7 +349,6 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
     'installDependencies',
     'modifyEsbuildConfig',
     'buildExtension',
-    'copySourceMaps',
   ])
 
   await rm(tempOutput, { force: true, recursive: true })
@@ -438,16 +418,11 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
     buildExtension: async () => {},
   }))
 
-  jest.unstable_mockModule('../src/parts/CopySourceMaps/CopySourceMaps.ts', () => ({
-    copySourceMaps: async () => {},
-  }))
-
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
     cacheDir: tempCache,
     extensionName,
-    outputDir: tempOutput,
     repoUrl,
     version,
   })

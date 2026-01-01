@@ -15,7 +15,5 @@
     "execa": "^9.6.1",
     "http-proxy-agent": "^7.0.2"
   },
-  "devDependencies": {
-    "@types/node": "^25.0.3"
-  }
+  "devDependencies": {}
 }

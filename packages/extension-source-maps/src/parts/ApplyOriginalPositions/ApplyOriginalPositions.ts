@@ -1,4 +1,5 @@
 import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
+import * as NormalizeSourcePath from '../NormalizeSourcePath/NormalizeSourcePath.ts'
 
 interface OriginalPosition {
   column?: number | null
@@ -34,8 +35,9 @@ export const applyOriginalPositions = (
     offsetMap[pointer.sourceMapUrl] = offset + 1
     if (original) {
       const target = enriched[pointer.index]
-      target.originalSource = original.source ?? null
-      target.originalUrl = original.source ?? null
+      const normalizedSource = NormalizeSourcePath.normalizeSourcePath(original.source ?? null)
+      target.originalSource = normalizedSource
+      target.originalUrl = normalizedSource
       target.originalLine = original.line ?? null
       target.originalColumn = original.column ?? null
       target.originalName = original.name ?? null

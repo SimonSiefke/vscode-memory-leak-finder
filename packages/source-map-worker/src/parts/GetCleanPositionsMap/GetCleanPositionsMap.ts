@@ -24,7 +24,7 @@ export const getCleanPositionsMap = async (
     }
     const hash = Hash.hash(key)
     const sourceMap = await LoadSourceMap.loadSourceMap(key, hash)
-    const originalPositions = await SourceMap.getOriginalPositions(sourceMap, value, classNames, hash)
+    const originalPositions = await SourceMap.getOriginalPositions(sourceMap, value, classNames, hash, key)
     const cleanPositions = originalPositions.map(GetCleanPosition.getCleanPosition)
     cleanPositionMap[key] = cleanPositions
   }

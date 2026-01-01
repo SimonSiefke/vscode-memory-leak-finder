@@ -13,7 +13,5 @@
     "@lvce-editor/rpc": "^4.20.0",
     "@lvce-editor/verror": "^1.7.0"
   },
-  "devDependencies": {
-    "@types/node": "^25.0.3"
-  }
+  "devDependencies": {}
 }
