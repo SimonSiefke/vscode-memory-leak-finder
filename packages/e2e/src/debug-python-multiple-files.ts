@@ -56,7 +56,13 @@ export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
     expectedCallStackSize: 2,
     hasCallStack: false,
   })
-  await new Promise((r) => {})
+  // @ts-ignore
+  await RunAndDebug.stepOutOf({
+    expectedFile: 'main.py',
+    expectedPauseLine: 4,
+    expectedCallStackSize: 2,
+    hasCallStack: false,
+  })
 }
 
 export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {

@@ -229,6 +229,36 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to step into`)
       }
     },
+    async stepOutOf({
+      expectedFile,
+      expectedPauseLine,
+      expectedCallStackSize,
+      hasCallStack,
+    }: {
+      expectedFile: string
+      expectedPauseLine: number
+      expectedCallStackSize: number
+      hasCallStack: boolean
+    }) {
+      try {
+        const quickPick = QuickPick.create({
+          expect,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.DebugStepOut)
+        await page.waitForIdle()
+        await this.waitForPaused({
+          callStackSize: expectedCallStackSize,
+          file: expectedFile,
+          line: expectedPauseLine,
+          hasCallStack,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to step out`)
+      }
+    },
     async stop() {
       try {
         await page.waitForIdle()
