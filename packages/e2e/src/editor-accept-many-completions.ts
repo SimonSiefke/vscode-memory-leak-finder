@@ -13,6 +13,9 @@ export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promis
     },
   ])
   await Editor.open('index.css')
+  await Editor.shouldHaveText(`h1 {
+  visibil
+}`)
   await Editor.shouldHaveBreadCrumb('h1')
   // @ts-ignore
   await Editor.setCursor(2, 8)
@@ -23,8 +26,20 @@ export const run = async ({ Editor, Suggest }: TestContext): Promise<void> => {
   await Suggest.open('visibility, Property')
   // @ts-ignore
   await Suggest.accept('visibility, Property')
-  await new Promise((r) => {})
-  // await Editor.shouldHaveText('')
+  const space = ' '
+  await Editor.shouldHaveText(`h1 {
+  visibility:${space}
+}`)
+  // @ts-ignore
+  await Suggest.accept(`hidden, Value`)
+  await Editor.shouldHaveText(`h1 {
+  visibility: hidden
+}`)
+  await Editor.undo()
+  await Editor.undo()
+  await Editor.shouldHaveText(`h1 {
+  visibil
+}`)
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
