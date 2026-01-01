@@ -8,7 +8,6 @@ export const setup = async ({ ChatEditor, Electron, Extensions }: TestContext): 
   await Electron.mockDialog({
     response: 1,
   })
-  // @ts-ignore
   await Extensions.install({
     id: 'github copilot chat',
     name: 'GitHub Copilot Chat',
