@@ -180,7 +180,11 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to start run and debug`)
       }
     },
+<<<<<<< HEAD
     async step(expectedFile: string, expectedPauseLine: number, expectedCallStackSize: number, hasCallStack?: boolean) {
+=======
+    async step(expectedFile: string, expectedPauseLine: number, expectedCallStackSize: number) {
+>>>>>>> origin/main
       try {
         const quickPick = QuickPick.create({
           expect,
