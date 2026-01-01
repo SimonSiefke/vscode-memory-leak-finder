@@ -36,10 +36,17 @@ if __name__ == '__main__':
     hasCallStack: false,
   })
   await DebugConsole.show()
-  await new Promise((r) => {})
 }
 
-export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
+export const run = async ({ RunAndDebug, DebugConsole }: TestContext): Promise<void> => {
+  await DebugConsole.evaluate({
+    expression: 'a',
+    expectedResult: {
+      message: '1',
+      type: 'number',
+    },
+  })
+  await new Promise((r) => {})
   // @ts-ignore
   await RunAndDebug.setValue({
     variableName: `a`,

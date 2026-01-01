@@ -25,14 +25,20 @@ export const create = ({ expect, page, platform, VError }) => {
     },
     async evaluate({ expectedResult, expression }) {
       try {
+        await page.waitForIdle()
         const replInputWrapper = page.locator('.repl-input-wrapper')
         await expect(replInputWrapper).toBeVisible()
+        await page.waitForIdle()
         const replInput = replInputWrapper.locator('.native-edit-context')
         await replInput.focus()
+        await page.waitForIdle()
         await replInput.type(expression)
+        await page.waitForIdle()
         await page.keyboard.press('Enter')
+        await page.waitForIdle()
         const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
         await expect(firstResult).toBeVisible()
+        await page.waitForIdle()
         await expect(firstResult).toHaveText(expectedResult.message)
         await page.waitForIdle()
       } catch (error) {
