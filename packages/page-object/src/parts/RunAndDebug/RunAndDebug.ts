@@ -228,6 +228,7 @@ export const create = ({ expect, page, platform, VError }) => {
           line: expectedPauseLine,
           hasCallStack,
         })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to step into`)
       }
@@ -261,6 +262,7 @@ export const create = ({ expect, page, platform, VError }) => {
           line: expectedPauseLine,
           hasCallStack,
         })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to step out`)
       }

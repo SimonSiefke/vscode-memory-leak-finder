@@ -55,8 +55,7 @@ export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
     expectedCallStackSize: 2,
     hasCallStack: false,
   })
-  await RunAndDebug.continue()
-  await new Promise((r) => {})
+  await RunAndDebug.stop()
 }
 
 export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
