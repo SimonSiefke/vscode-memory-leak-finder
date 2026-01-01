@@ -44,6 +44,23 @@ add(1000, 1)
 }
 
 export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
+  await RunAndDebug.continue()
+  await RunAndDebug.waitForPaused({
+    callStackSize: 11,
+    file: 'add.js',
+    line: 3,
+    hasCallStack: false,
+  })
+  // @ts-ignore
+  await Editor.removeBreakPoint(3)
+  await Editor.setBreakpoint(4)
+  // @ts-ignore
+  await RunAndDebug.step('add.js', 4, 0, false)
+  // @ts-ignore
+  await Editor.removeBreakPoint(4)
+  // @ts-ignore
+  await Editor.setBreakpoint(3)
+
   await new Promise((r) => {})
   // @ts-ignore
   // await RunAndDebug.step('index.js', 5)

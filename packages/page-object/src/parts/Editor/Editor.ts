@@ -900,7 +900,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to select source action "${actionText}"`)
       }
     },
-    async setBreakpoint(lineNumber) {
+    async setBreakpoint(lineNumber: number) {
       try {
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
@@ -910,6 +910,19 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await contextMenu.select('Add Breakpoint')
       } catch (error) {
         throw new VError(error, `Failed set breakpoint`)
+      }
+    },
+    async removeBreakpoint(lineNumber: number) {
+      try {
+        const editor = page.locator('.part.editor .editor-instance')
+        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
+        await expect(lineNumberElement).toBeVisible()
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        await contextMenu.open(lineNumberElement)
+        await contextMenu.select('Remove Breakpoint')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed remove breakpoint`)
       }
     },
     async setCursor(line: number, column: number) {
