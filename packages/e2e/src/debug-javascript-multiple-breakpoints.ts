@@ -37,7 +37,9 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
     callStackSize: 11,
     file: 'main.js',
     line: 4,
+    hasCallStack: false,
   })
+  await new Promise((r) => {})
   // @ts-ignore
   // await RunAndDebug.step('index.js', 5)
   // await RunAndDebug.stop()
