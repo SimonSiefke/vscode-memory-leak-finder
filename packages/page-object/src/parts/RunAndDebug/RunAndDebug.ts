@@ -211,6 +211,7 @@ export const create = ({ expect, page, platform, VError }) => {
       hasCallStack: boolean
     }) {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({
           expect,
           page,
@@ -243,6 +244,7 @@ export const create = ({ expect, page, platform, VError }) => {
       hasCallStack: boolean
     }) {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({
           expect,
           page,
