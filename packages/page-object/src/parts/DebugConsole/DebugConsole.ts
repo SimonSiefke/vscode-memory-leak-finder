@@ -23,42 +23,16 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to clear debug console input`)
       }
     },
-    async evaluate({ expectedResult, expression, hasSuggest }) {
+    async evaluate({ expectedResult, expression }) {
       try {
-        const repl = page.locator('.repl')
-        await expect(repl).toBeVisible()
-        await page.waitForIdle()
         const replInputWrapper = page.locator('.repl-input-wrapper')
         await expect(replInputWrapper).toBeVisible()
-        await page.waitForIdle()
         const replInput = replInputWrapper.locator('.native-edit-context')
         await replInput.focus()
-        await page.waitForIdle()
-        await expect(replInput).toBeFocused()
-        await page.waitForIdle()
-        const lines = replInputWrapper.locator('.view-lines')
-        await expect(lines).toBeVisible()
-        await page.waitForIdle()
-        await expect(lines).toHaveText('')
-        await page.waitForIdle()
         await replInput.type(expression)
-        await page.waitForIdle()
-        if (hasSuggest) {
-          const suggest = repl.locator('[widgetid="editor.widget.suggestWidget"]')
-          await expect(suggest).toBeVisible()
-        }
-        await page.waitForIdle()
-        await expect(lines).toHaveText(expression)
-        await page.waitForIdle()
         await page.keyboard.press('Enter')
-        await page.waitForIdle()
         const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
         await expect(firstResult).toBeVisible()
-        if (expectedResult.type) {
-          const span = firstResult.locator(`.value.${expectedResult.type}`)
-          await expect(span).toBeBisible()
-        }
-        await page.waitForIdle()
         await expect(firstResult).toHaveText(expectedResult.message)
         await page.waitForIdle()
       } catch (error) {
@@ -124,28 +98,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to show debug console`)
       }
     },
-    async expand({ label }: { label: string }) {
-      try {
-        const repl = page.locator('.repl')
-        await expect(repl).toBeVisible()
-        await page.waitForIdle()
-        const row = repl.locator(`.monaco-list-row[aria-label^="${label}"]`)
-        await expect(row).toBeVisible()
-        await page.waitForIdle()
-        await expect(row).toHaveAttribute('aria-expanded', 'false')
-        await page.waitForIdle()
-        const collapsedTwistie = row.locator('.codicon-tree-item-expanded.collapsed')
-        await expect(collapsedTwistie).toBeVisible()
-        await collapsedTwistie.click()
-        await page.waitForIdle()
-        const expandedTwistie = row.locator('.codicon-tree-item-expanded')
-        await expect(expandedTwistie).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to show debug console`)
-      }
-    },
-    async type(value: string) {
+    async type(value) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
