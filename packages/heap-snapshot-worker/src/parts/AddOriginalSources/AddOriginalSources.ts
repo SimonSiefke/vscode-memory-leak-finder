@@ -1,6 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
+import * as FindMatchingSourceMap from '../FindMatchingSourceMap/FindMatchingSourceMap.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 import { root } from '../Root/Root.ts'
 
@@ -29,7 +30,15 @@ const getSourceMapUrl = (script: ScriptInfo): string => {
   if (script.url && script.sourceMapUrl && isRelativeSourceMap(script.sourceMapUrl)) {
     return new URL(script.sourceMapUrl, script.url).toString()
   }
-  return script.sourceMapUrl || ''
+  let sourceMapUrl = script.sourceMapUrl || ''
+  // If no source map URL was found, try to find a matching .js.map file
+  if (!sourceMapUrl && script.url) {
+    const matchingSourceMap = FindMatchingSourceMap.findMatchingSourceMap(script.url)
+    if (matchingSourceMap) {
+      sourceMapUrl = matchingSourceMap
+    }
+  }
+  return sourceMapUrl
 }
 
 export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly any[]> => {
