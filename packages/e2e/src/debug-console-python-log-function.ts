@@ -38,7 +38,7 @@ if __name__ == '__main__':
   await DebugConsole.show()
 }
 
-export const run = async ({ RunAndDebug, DebugConsole }: TestContext): Promise<void> => {
+export const run = async ({ DebugConsole }: TestContext): Promise<void> => {
   await DebugConsole.evaluate({
     expression: 'add',
     expectedResult: {
@@ -46,13 +46,15 @@ export const run = async ({ RunAndDebug, DebugConsole }: TestContext): Promise<v
       type: '',
     },
   })
+  // @ts-ignore
   await DebugConsole.expand({
     label: '<function add',
   })
+  // @ts-ignore
   await DebugConsole.expand({
     label: 'Variable special variables',
   })
-  await new Promise((r) => {})
+  await DebugConsole.clear()
 }
 
 export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
