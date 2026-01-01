@@ -4,15 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-export const setup = async ({
-  SideBar,
-  Editor,
-  Extensions,
-  RunAndDebug,
-  Workspace,
-  ActivityBar,
-  DebugConsole,
-}: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Extensions, RunAndDebug, Workspace, ActivityBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: `myvar = 42
