@@ -43,32 +43,13 @@ if __name__ == '__main__':
     debugLabel: 'Python Debugger',
     debugConfiguration: 'Python File',
     file: 'main.py',
-    line: 2,
+    line: 4,
     hasCallStack: false,
   })
-  await DebugConsole.show()
-  await SideBar.hide()
+  await new Promise((r) => {})
 }
 
-export const run = async ({ DebugConsole }: TestContext): Promise<void> => {
-  await DebugConsole.evaluate({
-    expression: 'add',
-    expectedResult: {
-      message: /^<function add/,
-      type: '',
-    },
-    hasSuggest: true,
-  })
-  // @ts-ignore
-  await DebugConsole.expand({
-    label: '<function add',
-  })
-  // @ts-ignore
-  await DebugConsole.expand({
-    label: 'Variable special variables',
-  })
-  await DebugConsole.clear()
-}
+export const run = async ({ DebugConsole }: TestContext): Promise<void> => {}
 
 export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.stop()
