@@ -31,6 +31,9 @@ if __name__ == '__main__':
   await Editor.open('main.py')
   await ActivityBar.showRunAndDebug()
   await Editor.setBreakpoint(4)
+}
+
+export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.runAndWaitForPaused({
     debugLabel: 'Python Debugger',
     debugConfiguration: 'Python File',
@@ -38,9 +41,6 @@ if __name__ == '__main__':
     line: 4,
     hasCallStack: false,
   })
-}
-
-export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
   // @ts-ignore
   await RunAndDebug.stepInto({
     expectedFile: 'test.py',
@@ -55,6 +55,8 @@ export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
     expectedCallStackSize: 2,
     hasCallStack: false,
   })
+  await RunAndDebug.continue()
+  await new Promise((r) => {})
 }
 
 export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
