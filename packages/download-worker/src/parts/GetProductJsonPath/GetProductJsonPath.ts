@@ -6,7 +6,7 @@ export const getProductJsonPath = (platform: string, path: string, commit?: stri
   }
   if (platform === 'win32' && commit) {
     const commitPrefix = commit.substring(0, 10)
-    return resolve(path, '..', 'resources', commitPrefix, 'app', 'product.json')
+    return resolve(path, '..', commitPrefix, 'resources', 'app', 'product.json')
   }
   return resolve(path, '..', 'resources', 'app', 'product.json')
 }
