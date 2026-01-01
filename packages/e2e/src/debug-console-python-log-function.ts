@@ -39,19 +39,16 @@ if __name__ == '__main__':
 }
 
 export const run = async ({ RunAndDebug, DebugConsole }: TestContext): Promise<void> => {
-  // await DebugConsole.evaluate({
-  //   expression: 'a',
-  //   expectedResult: {
-  //     message: '1',
-  //     type: 'number',
-  //   },
-  // })
   await DebugConsole.evaluate({
     expression: 'add',
     expectedResult: {
-      message: /^function add/,
+      message: /^<function add/,
       type: '',
     },
+  })
+  await new Promise((r) => {})
+  await DebugConsole.expand({
+    label: /^function add/,
   })
 }
 
