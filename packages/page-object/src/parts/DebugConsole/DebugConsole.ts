@@ -41,6 +41,8 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
         await expect(lines).toHaveText(expression)
         await page.waitForIdle()
+        await page.waitForIdle()
+        await page.waitForIdle()
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
