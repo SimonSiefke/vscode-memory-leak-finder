@@ -3,13 +3,14 @@ import * as ImportTest from '../ImportTest/ImportTest.ts'
 import * as TestStage from '../TestStage/TestStage.ts'
 
 // @ts-ignore
-export const setupTestWithCallback = async (pageObject, file, forceRun) => {
+export const setupTestWithCallback = async (pageObject, file, forceRun, isGithubActions) => {
   Assert.object(pageObject)
   Assert.string(file)
   Assert.boolean(forceRun)
+  Assert.boolean(isGithubActions)
   const module = await ImportTest.importTest(file)
   const wasOriginallySkipped = Boolean(module.skip)
-  const isCi = process.env.GITHUB_ACTIONS
+  const isCi = isGithubActions
   if (module.requiresNetwork && isCi) {
     return { error: null, skipped: true, wasOriginallySkipped }
   }

@@ -33,11 +33,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       return Env.env.VSCODE_PATH
     }
 
-    const { vscodeVersion } = options
-    const { insidersCommit } = options
-    const platform = options.platform || process.platform
-    const { arch } = options
-    const { updateUrl } = options
+    const { vscodeVersion, insidersCommit, platform, arch, updateUrl } = options
 
     if (insidersCommit) {
       return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(platform, arch, insidersCommit, updateUrl)
@@ -60,7 +56,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     const productJson = await JsonFile.readJson(productPath)
     const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
     await JsonFile.writeJson(productPath, newProductJson)
-    await RemoveUnusedFiles.removeUnusedFiles(path)
+    await RemoveUnusedFiles.removeUnusedFiles(platform, path)
     if (automaticallyDownloadSourceMaps) {
       const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
       await LoadSourceMaps.loadSourceMaps(sourceMapUrls)

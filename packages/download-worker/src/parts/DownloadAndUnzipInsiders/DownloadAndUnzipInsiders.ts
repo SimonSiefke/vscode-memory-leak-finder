@@ -47,14 +47,14 @@ export const downloadAndUnzipInsiders = async (platform: string, arch: string, c
     return path
   }
 
-  await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
+  await DownloadAndExtract.downloadAndExtract(platform, 'vscode-insiders', [metadata.url], extractDir)
   console.log(`[download-worker] Download complete.`)
   const path = getBinaryPathFromExtractDir(platform, arch, extractDir)
   const productPath = GetProductJsonPath.getProductJsonPath(platform, path)
   const productJson = await JsonFile.readJson(productPath)
   const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
   await JsonFile.writeJson(productPath, newProductJson)
-  await RemoveUnusedFiles.removeUnusedFiles(path)
+  await RemoveUnusedFiles.removeUnusedFiles(platform, path)
   if (automaticallyDownloadSourceMaps) {
     const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
     await LoadSourceMaps.loadSourceMaps(sourceMapUrls)

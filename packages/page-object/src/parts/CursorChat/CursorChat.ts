@@ -1,6 +1,6 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async resetFocus() {
       try {
@@ -47,7 +47,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async show() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand('Cursor: New Chat')
         const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()

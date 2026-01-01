@@ -12,6 +12,7 @@ import { VError } from '../VError/VError.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export const connectDevtools = async (
+  platform: string,
   connectionId: number,
   devtoolsWebSocketUrl: string,
   electronObjectId: string,
@@ -80,6 +81,7 @@ export const connectDevtools = async (
     expect: Expect.expect,
     ideVersion: parsedIdeVersion,
     page: firstWindow,
+    platform,
     sessionRpc,
     utilityContext: {
       callFunctionOn(options) {

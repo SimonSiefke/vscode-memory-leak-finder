@@ -50,11 +50,50 @@ const StartRunning = await import('../src/parts/StartRunning/StartRunning.ts')
 const WatchUsage = await import('../src/parts/WatchUsage/WatchUsage.ts')
 
 test('initialStart - watch mode - show details', async () => {
-  const options = {
+  const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
+    arch: '',
+    bisect: false,
+    checkLeaks: false,
+    clearExtensions: true,
+    color: true,
+    commit: '',
+    continueValue: '',
+    cwd: '',
+    enableExtensions: false,
+    enableProxy: false,
     filter: '',
+    headless: false,
+    ide: '',
+    ideVersion: '',
+    insidersCommit: '',
+    inspectExtensions: false,
+    inspectExtensionsPort: 0,
+    inspectPtyHost: false,
+    inspectPtyHostPort: 0,
+    inspectSharedProcess: false,
+    inspectSharedProcessPort: 0,
     isWindows: false,
+    measure: '',
+    measureAfter: false,
+    measureNode: false,
+    platform: '',
+    recordVideo: false,
+    restartBetween: false,
+    runMode: 0,
+    runs: 1,
+    runSkippedTestsAnyway: false,
+    screencastQuality: 90,
+    setupOnly: false,
+    timeoutBetween: 0,
+    timeouts: true,
+    updateUrl: '',
+    useProxyMock: false,
+    vscodePath: '',
+    vscodeVersion: '',
     watch: true,
-  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
+    workers: false,
+    isGithubActions: false,
+  }
   // @ts-ignore
   WatchUsage.print.mockImplementation(async () => 'watch usage')
   await InitialStart.initialStart(options)
@@ -65,11 +104,50 @@ test('initialStart - watch mode - show details', async () => {
 })
 
 test('initialStart - watch mode - start running', async () => {
-  const options = {
+  const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
+    arch: '',
+    bisect: false,
+    checkLeaks: false,
+    clearExtensions: true,
+    color: true,
+    commit: '',
+    continueValue: '',
+    cwd: '',
+    enableExtensions: false,
+    enableProxy: false,
     filter: 'a',
+    headless: false,
+    ide: '',
+    ideVersion: '',
+    insidersCommit: '',
+    inspectExtensions: false,
+    inspectExtensionsPort: 0,
+    inspectPtyHost: false,
+    inspectPtyHostPort: 0,
+    inspectSharedProcess: false,
+    inspectSharedProcessPort: 0,
     isWindows: false,
+    measure: '',
+    measureAfter: false,
+    measureNode: false,
+    platform: '',
+    recordVideo: false,
+    restartBetween: false,
+    runMode: 0,
+    runs: 1,
+    runSkippedTestsAnyway: false,
+    screencastQuality: 90,
+    setupOnly: false,
+    timeoutBetween: 0,
+    timeouts: true,
+    updateUrl: '',
+    useProxyMock: false,
+    vscodePath: '',
+    vscodeVersion: '',
     watch: true,
-  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
+    workers: false,
+    isGithubActions: false,
+  }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
   expect(Stdout.write).not.toHaveBeenCalled()
@@ -78,11 +156,50 @@ test('initialStart - watch mode - start running', async () => {
 })
 
 test('initialStart - start running', async () => {
-  const options = {
+  const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
+    arch: '',
+    bisect: false,
+    checkLeaks: false,
+    clearExtensions: true,
+    color: true,
+    commit: '',
+    continueValue: '',
+    cwd: '',
+    enableExtensions: false,
+    enableProxy: false,
     filter: 'a',
+    headless: false,
+    ide: '',
+    ideVersion: '',
+    insidersCommit: '',
+    inspectExtensions: false,
+    inspectExtensionsPort: 0,
+    inspectPtyHost: false,
+    inspectPtyHostPort: 0,
+    inspectSharedProcess: false,
+    inspectSharedProcessPort: 0,
     isWindows: false,
+    measure: '',
+    measureAfter: false,
+    measureNode: false,
+    platform: '',
+    recordVideo: false,
+    restartBetween: false,
+    runMode: 0,
+    runs: 1,
+    runSkippedTestsAnyway: false,
+    screencastQuality: 90,
+    setupOnly: false,
+    timeoutBetween: 0,
+    timeouts: true,
+    updateUrl: '',
+    useProxyMock: false,
+    vscodePath: '',
+    vscodeVersion: '',
     watch: false,
-  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
+    workers: false,
+    isGithubActions: false,
+  }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()
   expect(Stdout.write).not.toHaveBeenCalled()

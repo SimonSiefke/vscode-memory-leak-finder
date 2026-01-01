@@ -2,12 +2,12 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async create(info) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ProfilesNewProfile, {
           stayVisible: true,
         })
@@ -46,7 +46,7 @@ export const create = ({ expect, page, VError }) => {
     async export({ name }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ProfilesExport)
         const profileViewContainer = page.locator('.profile-view-tree-container')
         await expect(profileViewContainer).toBeVisible()
@@ -78,7 +78,7 @@ export const create = ({ expect, page, VError }) => {
     async remove(info) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ProfilesDeleteProfile, {
           stayVisible: true,
         })

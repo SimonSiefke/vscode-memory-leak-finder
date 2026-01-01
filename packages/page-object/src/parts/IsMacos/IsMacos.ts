@@ -1,1 +1,3 @@
-export const isMacos = process.platform === 'darwin'
+export const isMacos = (platform: string): boolean => {
+  return platform === 'darwin'
+}

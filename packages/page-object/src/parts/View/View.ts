@@ -1,13 +1,13 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, platform }) => {
   return {
     async enterZenMode() {
       try {
         const indicator = page.locator(`.nostatusbar.fullscreen`)
         await expect(indicator).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, VError, platform })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleZenMode)
         await expect(indicator).toBeVisible()
       } catch (error) {
@@ -18,7 +18,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const indicator = page.locator(`.nostatusbar.fullscreen`)
         await expect(indicator).toBeVisible()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, VError, platform })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleZenMode)
         await expect(indicator).toBeHidden()
       } catch (error) {

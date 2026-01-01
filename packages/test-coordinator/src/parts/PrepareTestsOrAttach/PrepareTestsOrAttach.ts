@@ -116,6 +116,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, utilityContext, webSocketUrl } = await result
 
   const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
+    platform,
+    arch,
     recordVideo,
     screencastQuality,
     connectionId,
