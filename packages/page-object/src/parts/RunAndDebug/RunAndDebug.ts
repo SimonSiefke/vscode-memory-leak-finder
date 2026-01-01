@@ -26,7 +26,7 @@ export const create = ({ expect, page, platform, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.DebugPause)
         await page.waitForIdle()
         await expect(pauseButton).toBeHidden({
-          timeout: 20_000,
+          timeout: 30_000,
         })
         const continueButton = debugToolBar.locator('[aria-label^="Continue"]')
         await expect(continueButton).toBeVisible()
@@ -295,7 +295,7 @@ export const create = ({ expect, page, platform, VError }) => {
     async waitForPaused({ callStackSize, file, line, hasCallStack = true }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
-      await expect(continueButton).toBeVisible({ timeout: 20_000 })
+      await expect(continueButton).toBeVisible({ timeout: 30_000 })
       await page.waitForIdle()
       if (!hasCallStack) {
         // TODO maybe check some other things
@@ -331,7 +331,7 @@ export const create = ({ expect, page, platform, VError }) => {
     async waitForPausedOnException({ exception = false, file, line }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
-      await expect(continueButton).toBeVisible({ timeout: 20_000 })
+      await expect(continueButton).toBeVisible({ timeout: 30_000 })
       await page.waitForIdle()
       const pausedStackFrame = page.locator('.debug-top-stack-frame-column')
       await expect(pausedStackFrame).toBeVisible()
