@@ -40,9 +40,9 @@ export const create = ({ expect, page, platform, VError }) => {
         await replInput.type(expression)
         await page.waitForIdle()
         await expect(lines).toHaveText(expression)
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
+        for (let i = 0; i < 10; i++) {
+          await page.waitForIdle()
+        }
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
