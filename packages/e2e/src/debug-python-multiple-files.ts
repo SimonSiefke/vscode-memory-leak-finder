@@ -46,10 +46,17 @@ if __name__ == '__main__':
     line: 4,
     hasCallStack: false,
   })
-  await new Promise((r) => {})
 }
 
-export const run = async ({ DebugConsole }: TestContext): Promise<void> => {}
+export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
+  // @ts-ignore
+  await RunAndDebug.stepInto({
+    expectedFile: 'test.py',
+    expectedPauseLine: 3,
+    expectedCallStackSize: 2,
+  })
+  await new Promise((r) => {})
+}
 
 export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.stop()
