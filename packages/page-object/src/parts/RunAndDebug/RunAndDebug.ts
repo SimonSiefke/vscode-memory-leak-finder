@@ -101,19 +101,27 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to set pause on exceptions`)
       }
     },
-    async setValue(variableName, variableValue, newVariableValue) {
+    async setValue({
+      variableName,
+      variableValue,
+      newVariableValue,
+      scopeName = 'Scope Module',
+    }: {
+      variableName: string
+      variableValue: string
+      newVariableValue: string
+      scopeName: string
+    }) {
       try {
         const debugVariables = page.locator('.debug-variables')
-        const scopeLocal = debugVariables.locator('[aria-label="Scope Local"]')
-        await expect(scopeLocal).toBeVisible()
-        const scopeModule = debugVariables.locator('[aria-label="Scope Module"]')
-        await expect(scopeModule).toBeVisible()
-        const isExpanded = await scopeModule.getAttribute('aria-expanded')
+        const scope = debugVariables.locator(`[aria-label="${scopeName}"]`)
+        await expect(scope).toBeVisible()
+        const isExpanded = await scope.getAttribute('aria-expanded')
         if (isExpanded === 'false') {
-          const scopeModuleText = scopeModule.locator('.monaco-highlighted-label')
+          const scopeModuleText = scope.locator('.monaco-highlighted-label')
           await scopeModuleText.click()
         }
-        await expect(scopeModule).toHaveAttribute('aria-expanded', 'true')
+        await expect(scope).toHaveAttribute('aria-expanded', 'true')
         const variableRow = debugVariables.locator(`[aria-label="${variableName}, value ${variableValue}"]`)
         await variableRow.dblclick()
         const input = page.locator('input[aria-label="Type new variable value"]')
