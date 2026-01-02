@@ -6,8 +6,16 @@ export function activate(context) {
       const line = document.lineAt(position.line)
       const textBeforeCursor = line.text.substring(0, position.character)
 
-      if (textBeforeCursor.endsWith('a')) {
-        return [new vscode.InlineCompletionItem('bcdef', new vscode.Range(position, position))]
+      if (textBeforeCursor.endsWith('func')) {
+        return [
+          new vscode.InlineCompletionItem(
+            `function add(a:number, b:number): number {
+  return a+b
+}
+  `,
+            new vscode.Range(position, position),
+          ),
+        ]
       }
 
       return []
