@@ -67,7 +67,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to hide output`)
       }
     },
-    async select(channelName: string) {
+    async select(channelName: string, options: { shouldHaveContent?: boolean } = {}) {
       try {
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
@@ -84,6 +84,20 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           stayVisible: true,
         })
         await quickPick.select(channelName)
+        await expect(select).toHaveValue(channelName)
+
+        const nameLower = channelName.toLowerCase()
+        const editor = page.locator(`.monaco-editor[data-uri^="output:${nameLower}"]`)
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+
+        if (options.shouldHaveContent) {
+          const lines = editor.locator('.view-line')
+          const count = await lines.count()
+          if (count === 0) {
+            throw new Error(`channel has no content`)
+          }
+        }
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select output channel ${channelName}`)
