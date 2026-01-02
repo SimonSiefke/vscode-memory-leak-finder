@@ -14,5 +14,8 @@
   "license": "MIT",
   "engines": {
     "vscode": "^1.107.0"
-  }
+  },
+  "activationEvents": [
+    "onLanguage:plaintext"
+  ]
 }
