@@ -1238,7 +1238,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         if (fileName) {
           const baseName = basename(fileName)
           if (groupId) {
-            editor = page.locator(`.editor-instance[aria-label="${baseName}, Group ${groupId}"]`)
+            editor = page.locator(`.editor-instance[aria-label="${baseName}, Editor Group ${groupId}"]`)
           } else {
             editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
           }
