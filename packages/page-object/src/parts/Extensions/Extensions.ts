@@ -16,7 +16,7 @@ const getSelectAll = (platform: string): string => {
 const space = ' '
 const nonBreakingSpace = String.fromCharCode(160)
 
-export const create = ({ expect, ideVersion, page, VError, platform }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }) => {
   return {
     async add({ path, expectedName }: { path: string; expectedName: string }) {
       try {

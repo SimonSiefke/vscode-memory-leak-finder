@@ -1,15 +1,13 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { UniqueLocation, UniqueLocationMap } from '../UniqueLocationMap/UniqueLocationMap.ts'
+import type { CompareResult } from './CompareResult.ts'
 import { addOriginalSources } from '../AddOriginalSources/AddOriginalSources.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
-import type { CompareResult } from './CompareResult.ts'
 
 const emptyItem = {
   count: 0,
 }
-
-export type { CompareResult }
 
 interface UniqueLocationWithDelta extends UniqueLocation {
   readonly delta: number
@@ -134,3 +132,5 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   const cleanItems = sorted.map(cleanItem)
   return cleanItems
 }
+
+export { type CompareResult } from './CompareResult.ts'

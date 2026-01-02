@@ -33,7 +33,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       return Env.env.VSCODE_PATH
     }
 
-    const { vscodeVersion, insidersCommit, platform, arch, updateUrl } = options
+    const { arch, insidersCommit, platform, updateUrl, vscodeVersion } = options
 
     if (insidersCommit) {
       return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(platform, arch, insidersCommit, updateUrl)
