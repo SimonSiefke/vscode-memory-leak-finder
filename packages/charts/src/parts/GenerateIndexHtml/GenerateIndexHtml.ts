@@ -27,7 +27,6 @@ const baseStructure = `
 </html>
 `
 
-
 const getMiddleHtml = (dirents: string[]) => {
   let html = '<ul class="Charts">\n'
   for (const dirent of dirents) {
@@ -98,13 +97,13 @@ const generateIndexHtmlRecursively = async (basePath: string): Promise<void> => 
     withFileTypes: true,
   })
 
-  // Group by directory path
+  // Group by directory path - collect all directories that contain SVG files
   const foldersWithSvg = new Set<string>()
   for (const dirent of dirents) {
     if (dirent.isFile() && dirent.name.endsWith('.svg')) {
-      // @ts-ignore - path property exists on Dirent when using recursive
-      const relativePath = dirent.path || ''
-      const folderPath = relativePath ? join(basePath, relativePath) : basePath
+      // @ts-ignore - path property exists on Dirent when using recursive: true
+      const relativeDirPath = dirent.path || ''
+      const folderPath = relativeDirPath ? join(basePath, relativeDirPath) : basePath
       foldersWithSvg.add(folderPath)
     }
   }
@@ -115,7 +114,6 @@ const generateIndexHtmlRecursively = async (basePath: string): Promise<void> => 
     await generateIndexHtmlForFolder(folderPath, folderName)
   }
 }
-
 
 export const generateIndexHtml = async (): Promise<void> => {
   const outPath = join(Root.root, '.vscode-charts', `index.html`)
