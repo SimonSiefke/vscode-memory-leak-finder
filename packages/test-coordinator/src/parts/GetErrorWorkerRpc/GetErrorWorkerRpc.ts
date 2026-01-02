@@ -11,4 +11,3 @@ export const getErrorWorkerRpc = async () => {
     },
   }
 }
-
