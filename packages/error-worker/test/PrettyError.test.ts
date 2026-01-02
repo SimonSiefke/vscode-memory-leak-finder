@@ -127,4 +127,3 @@ test('prepare - error type is preserved', async () => {
   const prettyError = await PrettyError.prepare(error, { color: false })
   expect(prettyError.type).toBe('ExpectError')
 })
-
