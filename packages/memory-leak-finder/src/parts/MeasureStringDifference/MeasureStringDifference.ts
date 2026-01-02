@@ -1,5 +1,6 @@
 import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import { compareStrings2 } from '../HeapSnapshotFunctions/HeapSnapshotFunctions.ts'
+import { launchHeapSnapshotWorker } from '../LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import type { Session } from '../Session/Session.ts'
@@ -24,7 +25,11 @@ export const stop = (session: Session, objectGroup: string) => {
   return getHeapSnapshot(session, id)
 }
 
-export const compare = compareStrings2
+export const compare = async (beforePath: string, afterPath: string, context: any) => {
+  await using rpc = await launchHeapSnapshotWorker()
+  const result = await compareStrings2(rpc, beforePath, afterPath, context.runs)
+  return result
+}
 
 export const isLeak = (newStrings: readonly string[]) => {
   return newStrings.length > 0
