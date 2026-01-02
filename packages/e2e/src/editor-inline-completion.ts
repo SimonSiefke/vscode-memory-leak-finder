@@ -26,10 +26,7 @@ export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestCont
     file: 'test.txt',
     line: 1,
   })
-  console.log('done')
-  await new Promise((r) => {
-    setTimeout(r, 1000021)
-  })
+  await Editor.deleteAll()
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
