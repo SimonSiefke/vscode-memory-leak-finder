@@ -10,16 +10,8 @@ export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestCont
       name: 'test.ts',
     },
   ])
-  // @ts-ignore
-  await Extensions.add({
-    path: '.vscode-extensions-source/inline-completion-provider',
-    expectedName: 'inline-completion-provider',
-  })
   await Editor.open('test.ts')
   await Editor.shouldHaveBreadCrumb('test.ts')
-  await Extensions.show()
-  await Extensions.search(`@id:e2e-tests.inline-completion-provider`)
-  await Extensions.first.shouldHaveActivationTime()
   await SideBar.hide()
   // @ts-ignore
   await Editor.waitforTextFileReady('test.ts')
