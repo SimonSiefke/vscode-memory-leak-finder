@@ -1640,5 +1640,14 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify inline completion with text "${expectedText}"`)
       }
     },
+    async acceptInlineCompletion() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Tab')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to accept inline completion`)
+      }
+    },
   }
 }
