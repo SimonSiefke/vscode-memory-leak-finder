@@ -1403,16 +1403,22 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to show empty source action`)
       }
     },
-    async split(command) {
+    async split(command: string, { groupCount = undefined } = {}) {
       try {
+        // TODO count editor groups
         const editors = page.locator('.editor-instance')
         const currentCount = await editors.count()
-        if (currentCount === 0) {
+        if (currentCount === 0 && groupCount !== 0) {
           throw new Error('no open editor found')
         }
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(command)
-        await expect(editors).toHaveCount(currentCount + 1)
+        if (groupCount === 0) {
+          // TODO maybe check that new group was created
+          // ignore
+        } else {
+          await expect(editors).toHaveCount(currentCount + 1)
+        }
       } catch (error) {
         throw new VError(error, `Failed to split editor`)
       }
@@ -1423,8 +1429,8 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     async splitLeft() {
       return this.split(WellKnownCommands.ViewSplitEditorLeft)
     },
-    async splitRight() {
-      return this.split(WellKnownCommands.ViewSplitEditorRight)
+    async splitRight({ groupCount = undefined } = {}) {
+      return this.split(WellKnownCommands.ViewSplitEditorRight, { groupCount })
     },
     async splitUp() {
       return this.split(WellKnownCommands.ViewSplitEditorUp)
