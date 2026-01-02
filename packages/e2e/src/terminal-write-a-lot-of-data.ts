@@ -20,7 +20,6 @@ export const setup = async ({ SideBar, Terminal, Workspace }: TestContext): Prom
 }
 
 export const run = async ({ Terminal, Workspace }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Terminal.execute('node file.js && touch test.txt', {
     waitForFile: 'test.txt',
   })
