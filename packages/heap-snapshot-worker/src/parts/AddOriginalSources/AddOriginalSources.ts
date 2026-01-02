@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
+import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareResult.ts'
 import * as FindMatchingSourceMap from '../FindMatchingSourceMap/FindMatchingSourceMap.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 import { root } from '../Root/Root.ts'

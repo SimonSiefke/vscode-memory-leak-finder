@@ -1,4 +1,4 @@
-import type { LeakedClosureWithReferences } from '../EnrichLeakedClosuresWithReferences/EnrichLeakedClosuresWithReferences.ts'
+import type { LeakedClosureWithReferences } from '../EnrichLeakedClosuresWithReferences/LeakedClosureWithReferences.ts'
 import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
 
 export const enrichClosuresWithReferences = (

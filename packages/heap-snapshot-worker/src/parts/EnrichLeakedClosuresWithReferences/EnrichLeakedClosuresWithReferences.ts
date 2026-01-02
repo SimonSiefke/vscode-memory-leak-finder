@@ -1,14 +1,11 @@
-import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { collectLeakedNodeByteOffsets } from '../CollectLeakedNodeByteOffsets/CollectLeakedNodeByteOffsets.ts'
 import { collectReferencesToLeakedNodes } from '../CollectReferencesToLeakedNodes/CollectReferencesToLeakedNodes.ts'
 import { enrichClosuresWithReferences } from '../EnrichClosuresWithReferences/EnrichClosuresWithReferences.ts'
 import { initializeReferencesMap } from '../InitializeReferencesMap/InitializeReferencesMap.ts'
+import type { LeakedClosureWithReferences } from './LeakedClosureWithReferences.ts'
 
-export interface LeakedClosureWithReferences {
-  readonly nodeName: string
-  readonly references: readonly ReferencePath[]
-}
+export type { LeakedClosureWithReferences }
 
 export const enrichLeakedClosuresWithReferences = (
   leakedClosures: Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>,
