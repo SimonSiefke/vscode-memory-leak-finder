@@ -26,7 +26,10 @@
     }
   },
   "dependencies": {
+<<<<<<< HEAD
     "@babel/code-frame": "^7.27.1",
+=======
+>>>>>>> origin/main
     "@lvce-editor/rpc": "^4.20.0",
     "escape-html": "^1.0.3"
   },

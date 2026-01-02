@@ -20,7 +20,7 @@ test('win32 platform with commit', () => {
   const path = '/path/to/Code.exe'
   const commit = 'd0bba70758d220b36efa0edb7c9088b4b34c9370'
   const result = GetProductJsonPath.getProductJsonPath('win32', path, commit)
-  const expected = resolve(path, '..', 'resources', 'd0bba70758', 'app', 'product.json')
+  const expected = resolve(path, '..', 'd0bba70758', 'resources', 'app', 'product.json')
   expect(result).toBe(expected)
 })
 
