@@ -1,8 +1,8 @@
-import type { Session } from '../Session/Session.ts'
-import * as CompareStrings from '../CompareStrings/CompareStrings.ts'
-import * as GetStrings from '../GetStrings/GetStrings.ts'
+import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
+import { compareStrings2 } from '../HeapSnapshotFunctions/HeapSnapshotFunctions.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.StringDifference
@@ -16,16 +16,16 @@ export const create = (session: Session) => {
 
 export const start = (session: Session, objectGroup: string) => {
   const id = 0
-  return GetStrings.getStrings(session, objectGroup, id)
+  return getHeapSnapshot(session, id)
 }
 
 export const stop = (session: Session, objectGroup: string) => {
   const id = 1
-  return GetStrings.getStrings(session, objectGroup, id)
+  return getHeapSnapshot(session, id)
 }
 
-export const compare = CompareStrings.compareStrings
+export const compare = compareStrings2
 
-export const isLeak = (newStrings) => {
+export const isLeak = (newStrings: readonly string[]) => {
   return newStrings.length > 0
 }

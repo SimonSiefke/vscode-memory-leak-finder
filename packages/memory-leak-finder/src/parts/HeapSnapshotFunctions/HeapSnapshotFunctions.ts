@@ -11,6 +11,10 @@ export const parseHeapSnapshotStrings = async (rpc: any, id) => {
   return rpc.invoke('HeapSnapshot.parseStrings', id)
 }
 
+export const compareStrings2 = async (rpc: any, pathA, pathB) => {
+  return rpc.invoke('HeapSnapshot.compareStrings2', pathA, pathB)
+}
+
 export const getStringCount = async (rpc: any, id) => {
   return rpc.invoke('HeapSnapshot.parseStringCount', id)
 }

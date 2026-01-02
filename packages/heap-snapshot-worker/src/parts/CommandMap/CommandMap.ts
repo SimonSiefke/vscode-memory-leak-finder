@@ -24,12 +24,14 @@ import * as ParseHeapSnapshotNumbers from '../ParseHeapSnapshotNumbers/ParseHeap
 import * as ParseHeapSnapshotStrings from '../ParseHeapSnapshotStrings/ParseHeapSnapshotStrings.ts'
 import * as ParseHeapSnapshotStringsCount from '../ParseHeapSnapshotStringsCount/ParseHeapSnapshotStringsCount.ts'
 import * as ParseUserStrings from '../ParseUserStrings/ParseUserStrings.ts'
+import { compareStrings2 } from '../CompareStrings2/CompareStrings2.ts'
 
 export const commandMap = {
   'HeapSnapshot.compareArrays2': CompareHeapsnapshotArrays2.compareHeapsnapshotArrays2,
   'HeapSnapshot.compareDomTimerCount': compareDomTimerCount,
   'HeapSnapshot.compareFunctions': CompareHeapSnapshotsFunctions.compareHeapSnapshotFunctions,
   'HeapSnapshot.compareFunctions2': CompareHeapSnapshotsFunctions2.compareHeapSnapshotFunctions2,
+  'HeapSnapshot.compareStrings2': compareStrings2,
   'HeapSnapshot.compareGrowingArrays': CompareGrowingArrays.compareGrowingArrays,
   'HeapSnapshot.compareNamedClosureCount': CompareNamedClosureCount.compareNamedClosureCountFromHeapSnapshot,
   'HeapSnapshot.compareNamedClosureCountWithReferences2':
