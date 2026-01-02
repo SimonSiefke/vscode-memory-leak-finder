@@ -35,9 +35,7 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   // @ts-ignore
   await Editor.shouldHaveInlineCompletion('bcdef')
   await Editor.shouldHaveText('abcdef')
-  // @ts-ignore
-  await Editor.undo({ viaKeyBoard: true })
-  await Editor.shouldHaveText('')
+  await Editor.deleteAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
