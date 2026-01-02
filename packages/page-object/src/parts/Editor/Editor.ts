@@ -1244,6 +1244,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           editor = page.locator(`.editor-instance`)
         }
         await expect(editor).toBeVisible()
+        await page.waitForIdle()
         const editorLines = editor.locator('.view-lines')
         await expect(editorLines).toBeVisible()
         await page.waitForIdle()
