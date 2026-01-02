@@ -19,5 +19,8 @@ export const isChromeInternalString = (str: string): boolean => {
   if (str.includes('(code for ')) {
     return true
   }
+  if (str.includes('/ DevTools console')) {
+    return true
+  }
   return false
 }
