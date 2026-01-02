@@ -26,6 +26,10 @@
     }
   },
   "dependencies": {
-    "@lvce-editor/rpc": "^4.20.0"
+    "@lvce-editor/rpc": "^4.20.0",
+    "escape-html": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/escape-html": "^1.0.4"
   }
 }
