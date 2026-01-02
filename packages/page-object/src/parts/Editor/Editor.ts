@@ -534,9 +534,11 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await expect(startTag).toBeVisible()
         await page.waitForIdle()
         await startTag.click()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         const tooltip = editor.locator('.monaco-hover')
         await expect(tooltip).toBeHidden()
+        await page.waitForIdle()
         await quickPick.executeCommand(WellKnownCommands.ShowOrFocusHover, {
           pressKeyOnce: true,
         })
