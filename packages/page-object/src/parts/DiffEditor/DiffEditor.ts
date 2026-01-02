@@ -3,7 +3,21 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
+<<<<<<< HEAD
+export const create = ({
+  electronApp,
+  expect,
+  page,
+  VError,
+}: {
+  electronApp: any
+  expect: any
+  page: any
+  VError: any
+}) => {
+=======
 export const create = ({ electronApp, expect, page, platform, VError }) => {
+>>>>>>> origin/main
   return {
     async expectModified(text: string) {
       try {
@@ -21,7 +35,11 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to verify original text ${text}`)
       }
     },
+<<<<<<< HEAD
+    async open(a: string, b: string) {
+=======
     async open({ file1, file2, file1Content, file2Content }: { file1: string; file2: string; file1Content: string; file2Content: string }) {
+>>>>>>> origin/main
       try {
         const explorer = Explorer.create({ electronApp, expect, page, platform, VError })
         const contextMenu = ContextMenu.create({ expect, page, VError })
@@ -73,7 +91,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to scroll up in diff editor`)
       }
     },
-    async shouldHaveModifiedEditor(text) {
+    async shouldHaveModifiedEditor(text: string) {
       try {
         const editor = page.locator('.editor.modified')
         const editorLines = editor.locator('.view-lines')
@@ -85,7 +103,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to assert modified editor contents`)
       }
     },
-    async shouldHaveOriginalEditor(text) {
+    async shouldHaveOriginalEditor(text: string) {
       try {
         const editor = page.locator('.editor.original')
         const editorLines = editor.locator('.view-lines')
