@@ -119,10 +119,9 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await contextMenu.shouldHaveItem('Open Output in Editor')
         await contextMenu.select('Open Output in Editor')
         await page.waitForIdle()
-        // TODO vrify that tab is visible
-        // const tab = page.locator('.tab')
-        // await expect(tab).toBeVisible()
-        // await page.waitForIdle()
+        const editor = page.locator('.part.editor .editor-instance[data-mode-id="log"]')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open output in editor`)
       }
