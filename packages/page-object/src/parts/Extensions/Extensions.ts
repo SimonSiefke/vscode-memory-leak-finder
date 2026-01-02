@@ -30,7 +30,7 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
         await page.waitForIdle()
         await this.show()
         await page.waitForIdle()
-        await this.search('@installed')
+        await this.search(`@installed ${expectedName}`)
         await page.waitForIdle()
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible()
