@@ -9,7 +9,7 @@ export function activate(context) {
       if (textBeforeCursor.endsWith('func')) {
         return [
           new vscode.InlineCompletionItem(
-            `function add(a:number, b:number): number {
+            `tion add(a:number, b:number): number {
   return a+b
 }
   `,

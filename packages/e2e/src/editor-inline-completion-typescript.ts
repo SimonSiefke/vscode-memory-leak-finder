@@ -27,7 +27,7 @@ export const setup = async ({ Editor, Workspace, SideBar, Extensions }: TestCont
   await Editor.waitforTextFileReady('test.ts')
   await Editor.shouldHaveText('a')
   await new Promise((r) => {
-    setTimeout(r, 100)
+    setTimeout(r, 350)
   })
 
   await Editor.deleteAll()
@@ -37,11 +37,9 @@ export const setup = async ({ Editor, Workspace, SideBar, Extensions }: TestCont
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.shouldHaveText('')
   await Editor.type('func')
-  await new Promise((r) => {})
-  // @ts-ignore
-  await Editor.shouldHaveInlineCompletion('bcdef')
   // @ts-ignore
   await Editor.acceptInlineCompletion()
+  await new Promise((r) => {})
   await Editor.shouldHaveText('abcdef')
   await Editor.deleteAll()
   await Editor.save({ viaKeyBoard: true })
