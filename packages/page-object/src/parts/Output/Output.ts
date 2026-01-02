@@ -101,6 +101,22 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to select output channel ${channelName}`)
       }
     },
+    async openEditor() {
+      try {
+        await page.waitForIdle()
+        const link = page.locator('a', {
+          hasText: 'Open in editor',
+        })
+        await expect(link).toBeVisible()
+        await link.click()
+        await page.waitForIdle()
+        const tab = page.locator('.tab')
+        await expect(tab).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open output in editor`)
+      }
+    },
     async show() {
       try {
         await page.waitForIdle()
