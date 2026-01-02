@@ -14,7 +14,7 @@ export const setup = async ({ Editor, Extensions, SideBar, Workspace }: TestCont
   await Extensions.first.shouldBe('C/C++ Language Basics')
 }
 
-export const run = async ({ Editor, ExtensionDetailView, Extensions, SideBar }: TestContext): Promise<void> => {
+export const run = async ({ Editor, ExtensionDetailView, Extensions }: TestContext): Promise<void> => {
   await Extensions.first.click()
   await ExtensionDetailView.shouldHaveHeading('C/C++ Language Basics')
   await Editor.focusRightEditorGroup()
@@ -24,7 +24,7 @@ export const run = async ({ Editor, ExtensionDetailView, Extensions, SideBar }: 
   // await Extensions.show()
   // await Extensions.search('@builtin typescript')
   // await Extensions.first.shouldBe('TypeScript Language Basics')
-  await new Promise((r) => {})
+  await new Promise(() => {})
   // TODO second editor
   await ExtensionDetailView.shouldHaveHeading('TypeScript Language Basics')
   await Editor.closeAll()
