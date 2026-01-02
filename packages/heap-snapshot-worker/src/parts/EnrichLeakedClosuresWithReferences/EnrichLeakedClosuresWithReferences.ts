@@ -5,8 +5,6 @@ import { collectReferencesToLeakedNodes } from '../CollectReferencesToLeakedNode
 import { enrichClosuresWithReferences } from '../EnrichClosuresWithReferences/EnrichClosuresWithReferences.ts'
 import { initializeReferencesMap } from '../InitializeReferencesMap/InitializeReferencesMap.ts'
 
-
-
 export const enrichLeakedClosuresWithReferences = (
   leakedClosures: Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>,
   snapshot: Snapshot,
@@ -17,4 +15,4 @@ export const enrichLeakedClosuresWithReferences = (
   return enrichClosuresWithReferences(leakedClosures, referencesMap)
 }
 
-export {type LeakedClosureWithReferences} from './LeakedClosureWithReferences.ts'
+export { type LeakedClosureWithReferences } from './LeakedClosureWithReferences.ts'

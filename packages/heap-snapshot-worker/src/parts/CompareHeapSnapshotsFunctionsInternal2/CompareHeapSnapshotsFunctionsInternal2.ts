@@ -9,8 +9,6 @@ const emptyItem = {
   count: 0,
 }
 
-
-
 interface UniqueLocationWithDelta extends UniqueLocation {
   readonly delta: number
   readonly key: string
@@ -135,4 +133,4 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   return cleanItems
 }
 
-export {type CompareResult} from './CompareResult.ts'
+export { type CompareResult } from './CompareResult.ts'
