@@ -173,12 +173,14 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async deleteAll() {
       try {
+        await page.waitForIdle()
         await this.selectAll()
         await page.waitForIdle()
         await page.keyboard.press('Delete')
         await page.waitForIdle()
         await page.waitForIdle()
         await this.shouldHaveText('')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to delete all`)
       }

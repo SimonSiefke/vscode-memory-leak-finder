@@ -26,6 +26,7 @@ export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestCont
     file: 'test.txt',
     line: 1,
   })
+  await Editor.shouldHaveText('a')
   await Editor.deleteAll()
 }
 
