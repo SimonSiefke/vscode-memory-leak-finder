@@ -1643,7 +1643,13 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     async acceptInlineCompletion() {
       try {
         await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
+        await expect(inlineCompletion).toBeVisible()
+        await page.waitForIdle()
         await page.keyboard.press('Tab')
+        await page.waitForIdle()
+        await expect(inlineCompletion).toBeHidden()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to accept inline completion`)

@@ -29,6 +29,7 @@ export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestCont
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.shouldHaveText('')
   await Editor.type('a')
   // @ts-ignore
   await Editor.shouldHaveInlineCompletion('bcdef')
