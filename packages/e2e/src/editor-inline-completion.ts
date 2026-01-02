@@ -19,11 +19,14 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   await Editor.shouldHaveBreadCrumb('test.txt')
   await Editor.shouldHaveText('a')
   await Editor.setCursor(1, 2)
-  await Editor.deleteCharactersLeft(1)
-  await Editor.shouldHaveText('')
+  await Editor.deleteAll()
+  await Editor.save({ viaKeyBoard: true })
+  await Editor.closeAll()
+  await Extensions.show()
+  await Extensions.search(`@id:inline-completion-provider`)
   // TODO need to ensure that xtnion is running somow
   await new Promise((r) => {
-    setTimeout(r, 1000)
+    setTimeout(r, 1000021)
   })
 }
 
