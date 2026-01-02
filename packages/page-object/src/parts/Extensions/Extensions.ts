@@ -102,6 +102,21 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
         await page.waitForIdle()
       },
     },
+    second: {
+      async click() {
+        const secondExtension = page.locator('.extension-list-item').nth(1)
+        await expect(secondExtension).toBeVisible()
+        const nameLocator = secondExtension.locator('.name')
+        const name = await nameLocator.textContent()
+        await expect(nameLocator).toHaveText(name)
+        await secondExtension.click()
+        const extensionEditor = page.locator('.extension-editor')
+        await expect(extensionEditor).toBeVisible()
+        const heading = extensionEditor.locator('.name').first()
+        await expect(heading).toHaveText(name)
+        await page.waitForIdle()
+      },
+    },
     async hide() {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`)
