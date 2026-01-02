@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { mkdir, readdir, stat, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
@@ -92,31 +92,27 @@ const getSingleColumnHtml = (dirents: string[]): string => {
   return html
 }
 
-const generateIndexHtmlRecursively = async (basePath: string, dirents: string[]): Promise<void> => {
+const generateIndexHtmlRecursively = async (basePath: string): Promise<void> => {
+  const dirents = await readdir(basePath, {
+    recursive: true,
+    withFileTypes: true,
+  })
+
+  // Group by directory path
+  const foldersWithSvg = new Set<string>()
   for (const dirent of dirents) {
-    const fullPath = join(basePath, dirent)
-    const stats = await stat(fullPath)
-    if (stats.isDirectory()) {
-      const subDirContents = await readdir(fullPath)
-      const hasSvgFiles = subDirContents.some((file) => file.endsWith('.svg'))
-      if (hasSvgFiles) {
-        await generateIndexHtmlForFolder(fullPath, dirent)
-      }
-
-      // Recursively process subdirectories
-      const subDirs: string[] = []
-      for (const item of subDirContents) {
-        const itemPath = join(fullPath, item)
-        const itemStats = await stat(itemPath)
-        if (itemStats.isDirectory()) {
-          subDirs.push(item)
-        }
-      }
-
-      if (subDirs.length > 0) {
-        await generateIndexHtmlRecursively(fullPath, subDirs)
-      }
+    if (dirent.isFile() && dirent.name.endsWith('.svg')) {
+      // @ts-ignore - path property exists on Dirent when using recursive
+      const relativePath = dirent.path || ''
+      const folderPath = relativePath ? join(basePath, relativePath) : basePath
+      foldersWithSvg.add(folderPath)
     }
+  }
+
+  // Generate index.html for each folder that has SVG files
+  for (const folderPath of foldersWithSvg) {
+    const folderName = folderPath.split('/').pop() || folderPath.split('\\').pop() || ''
+    await generateIndexHtmlForFolder(folderPath, folderName)
   }
 }
 
@@ -140,7 +136,7 @@ export const generateIndexHtml = async (): Promise<void> => {
   await writeFile(outPath, html)
 
   // Generate index.html for subfolders that contain multiple SVG files
-  await generateIndexHtmlRecursively(svgPath, dirents)
+  await generateIndexHtmlRecursively(svgPath)
 
   // Generate HTML for promise stack traces
   await GeneratePromiseStackTraceHtml.generatePromiseStackTraceHtml()
