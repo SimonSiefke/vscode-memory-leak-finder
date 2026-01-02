@@ -16,5 +16,8 @@ export const isChromeInternalString = (str: string): boolean => {
   if (str.includes('(instruction stream for')) {
     return true
   }
+  if (str.includes('(code for ')) {
+    return true
+  }
   return false
 }
