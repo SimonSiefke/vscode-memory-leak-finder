@@ -1,7 +1,7 @@
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 
 export const create = ({ expect, ideVersion, page, platform, VError }) => {
   return {
@@ -107,10 +107,18 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       try {
         await page.waitForIdle()
         const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
+        await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
         const contextMenu = ContextMenu.create({ page, expect, VError })
         await contextMenu.open(moreActions)
+        await new Promise((r) => {
+          setTimeout(r, 200000)
+        })
+        await contextMenu.shouldHaveItem('Open Output in Editor')
         await contextMenu.select('Open Output in Editor')
-        await new Promise((r) => {})
+        await new Promise((r) => {
+          setTimeout(r, 2000)
+        })
         // TODO vrify that tab is visible
         // const tab = page.locator('.tab')
         // await expect(tab).toBeVisible()

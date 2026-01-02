@@ -13,7 +13,7 @@ export const setup = async ({ Editor, Output, Panel, SideBar }: TestContext): Pr
 
 export const run = async ({ Editor, Output }: TestContext): Promise<void> => {
   await Output.openEditor()
-  await Editor.close()
+  await Editor.closeAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
