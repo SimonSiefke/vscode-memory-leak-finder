@@ -22,12 +22,3 @@ export const compareStrings2 = async (
   const leaked = compareStrings2Internal(snapshotBefore.strings, snapshotAfter.strings, minCount, includeChromeInternalStrings)
   return leaked
 }
-
-const r = await compareStrings2(
-  `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/0.json`,
-  `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/1.json`,
-  1,
-  false,
-)
-
-console.log({ r })
