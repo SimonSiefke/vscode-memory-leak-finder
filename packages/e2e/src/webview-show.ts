@@ -4,7 +4,7 @@ export const skip = 1
 
 export const setup = async ({ Extensions }: TestContext) => {
   // @ts-ignore
-  await Extensions.add(`packages/e2e/fixtures/sample.webview-provider`, 'webview-sample')
+  await Extensions.add({ path: `packages/e2e/fixtures/sample.webview-provider`, expectedName: 'webview-sample' })
 }
 
 export const run = async ({ Editor, QuickPick, WebView }: TestContext): Promise<void> => {

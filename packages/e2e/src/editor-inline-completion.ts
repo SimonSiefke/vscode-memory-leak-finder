@@ -8,7 +8,10 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
       name: 'test.txt',
     },
   ])
-  await Extensions.add('.vscode-extensions-source/inline-completion-provider', 'inline-completion-provider')
+  await Extensions.add({
+    path: '.vscode-extensions-source/inline-completion-provider',
+    expectedName: 'inline-completion-provider',
+  })
   await Editor.open('test.txt')
 }
 
