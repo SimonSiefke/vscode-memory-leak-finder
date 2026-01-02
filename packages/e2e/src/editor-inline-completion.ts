@@ -5,7 +5,7 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   await Editor.closeAll()
   await Workspace.setFiles([
     {
-      content: 'test ',
+      content: '',
       name: 'test.txt',
     },
   ])
@@ -16,18 +16,16 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   })
   await Editor.open('test.txt')
   await Editor.shouldHaveBreadCrumb('test.txt')
+  await Editor.shouldHaveText('')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.shouldHaveText('test ')
-  await Editor.setCursor(1, 5)
-  await Editor.deleteAll()
   await Editor.type('a')
-  await new Promise((r) => {})
   // @ts-ignore
   await Editor.shouldHaveInlineCompletion('bcdef')
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.save({ viaKeyBoard: true })
   await Editor.closeAll()
 }
