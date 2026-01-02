@@ -6,7 +6,7 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   await Editor.closeAll()
   await Workspace.setFiles([
     {
-      content: '',
+      content: 'a',
       name: 'test.txt',
     },
   ])
@@ -17,10 +17,9 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   })
   await Editor.open('test.txt')
   await Editor.shouldHaveBreadCrumb('test.txt')
-  await Editor.shouldHaveText('')
-  await Editor.setCursor(1, 1)
-  await Editor.type('a')
-  await Editor.undo()
+  await Editor.shouldHaveText('a')
+  await Editor.setCursor(1, 2)
+  await Editor.deleteCharactersLeft(1)
   await Editor.shouldHaveText('')
 }
 
