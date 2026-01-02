@@ -11,5 +11,8 @@
     "mock",
     "test"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.107.0"
+  }
 }
