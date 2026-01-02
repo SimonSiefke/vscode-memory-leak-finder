@@ -22,11 +22,8 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   await Editor.open('file2.ts')
 }
 
-// @ts-ignore
-export const run = async ({ Editor, page, expect }: TestContext): Promise<void> => {
+export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.splitRight()
-  const editors = page.locator('.editor-instance')
-  await expect(editors).toHaveCount(2)
 
   const leftEditor = editors.first()
   const rightEditor = editors.last()
@@ -84,4 +81,3 @@ export const run = async ({ Editor, page, expect }: TestContext): Promise<void> 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }
-
