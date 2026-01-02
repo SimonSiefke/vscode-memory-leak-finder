@@ -14,10 +14,10 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.type('a')
+  // @ts-ignore
   await Editor.shouldHaveInlineCompletion('bcdef')
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }
-
