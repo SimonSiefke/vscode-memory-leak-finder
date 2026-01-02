@@ -20,3 +20,4 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }
+
