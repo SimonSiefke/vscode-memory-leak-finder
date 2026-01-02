@@ -11,7 +11,6 @@ export const run = async ({ Editor, QuickPick, WebView }: TestContext): Promise<
   await QuickPick.showCommands()
   await QuickPick.type('Test: Show WebView')
   await QuickPick.select('Test: Show WebView')
-  // @ts-ignore
   await WebView.shouldBeVisible2({
     extensionId: 'undefined_publisher.webview-sample',
   })
