@@ -1,9 +1,9 @@
-import { basename, join } from 'node:path'
 import { existsSync } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
-import * as Root from '../Root/Root.ts'
+import { basename, join } from 'node:path'
 import * as FindPromiseStackTraceFolders from '../FindPromiseStackTraceFolders/FindPromiseStackTraceFolders.ts'
 import * as GeneratePromiseStackTraceHtmlForFolder from '../GeneratePromiseStackTraceHtmlForFolder/GeneratePromiseStackTraceHtmlForFolder.ts'
+import * as Root from '../Root/Root.ts'
 
 export const generatePromiseStackTraceHtml = async (): Promise<void> => {
   const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results')

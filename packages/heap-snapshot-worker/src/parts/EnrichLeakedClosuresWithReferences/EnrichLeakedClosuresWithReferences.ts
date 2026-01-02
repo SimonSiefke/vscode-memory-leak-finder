@@ -1,11 +1,11 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import type { LeakedClosureWithReferences } from './LeakedClosureWithReferences.ts'
 import { collectLeakedNodeByteOffsets } from '../CollectLeakedNodeByteOffsets/CollectLeakedNodeByteOffsets.ts'
 import { collectReferencesToLeakedNodes } from '../CollectReferencesToLeakedNodes/CollectReferencesToLeakedNodes.ts'
 import { enrichClosuresWithReferences } from '../EnrichClosuresWithReferences/EnrichClosuresWithReferences.ts'
 import { initializeReferencesMap } from '../InitializeReferencesMap/InitializeReferencesMap.ts'
-import type { LeakedClosureWithReferences } from './LeakedClosureWithReferences.ts'
 
-export type { LeakedClosureWithReferences }
+
 
 export const enrichLeakedClosuresWithReferences = (
   leakedClosures: Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>,
@@ -16,3 +16,5 @@ export const enrichLeakedClosuresWithReferences = (
   collectReferencesToLeakedNodes(snapshot, leakedNodeByteOffsets, referencesMap)
   return enrichClosuresWithReferences(leakedClosures, referencesMap)
 }
+
+export {type LeakedClosureWithReferences} from './LeakedClosureWithReferences.ts'

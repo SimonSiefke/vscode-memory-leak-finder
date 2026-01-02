@@ -31,11 +31,11 @@ export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Pr
   await ActivityBar.showRunAndDebug()
   await Editor.setBreakpoint(2)
   await RunAndDebug.runAndWaitForPaused({
-    debugLabel: 'Python Debugger',
     debugConfiguration: 'Python File',
+    debugLabel: 'Python Debugger',
     file: 'main.py',
-    line: 2,
     hasCallStack: false,
+    line: 2,
   })
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()

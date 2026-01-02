@@ -1,13 +1,13 @@
 import { codeFrameColumns } from '@babel/code-frame'
 import { existsSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { readdir } from 'node:fs/promises'
+import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
 interface ParseStackLineResult {
+  column: number
   filePath: string
   line: number
-  column: number
 }
 
 const parseStackLine = (line: string): ParseStackLineResult | null => {
@@ -18,9 +18,9 @@ const parseStackLine = (line: string): ParseStackLineResult | null => {
   }
   const [, filePath, lineStr, columnStr] = match
   return {
+    column: Number.parseInt(columnStr, 10),
     filePath,
-    line: parseInt(lineStr, 10),
-    column: parseInt(columnStr, 10),
+    line: Number.parseInt(lineStr, 10),
   }
 }
 
@@ -53,7 +53,7 @@ export const getCodeFrame = async (stackLine: string): Promise<string | null> =>
     return null
   }
 
-  const { filePath, line, column } = parsed
+  const { column, filePath, line } = parsed
   const sourceFilePath = await findSourceFile(filePath)
   if (!sourceFilePath) {
     return null

@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-export const setup = async ({ Editor, Extensions, RunAndDebug, Workspace, ActivityBar }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Editor, Extensions, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: `myvar = 42
@@ -35,24 +35,24 @@ if __name__ == '__main__':
 
 export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.runAndWaitForPaused({
-    debugLabel: 'Python Debugger',
     debugConfiguration: 'Python File',
+    debugLabel: 'Python Debugger',
     file: 'main.py',
-    line: 4,
     hasCallStack: false,
+    line: 4,
   })
   // @ts-ignore
   await RunAndDebug.stepInto({
+    expectedCallStackSize: 2,
     expectedFile: 'test.py',
     expectedPauseLine: 3,
-    expectedCallStackSize: 2,
     hasCallStack: false,
   })
   // @ts-ignore
   await RunAndDebug.stepOutOf({
+    expectedCallStackSize: 2,
     expectedFile: 'main.py',
     expectedPauseLine: 4,
-    expectedCallStackSize: 2,
     hasCallStack: false,
   })
   await RunAndDebug.stop()
