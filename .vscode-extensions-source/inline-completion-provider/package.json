@@ -2,6 +2,7 @@
   "name": "inline-completion-provider",
   "version": "0.0.1",
   "description": "Inline completion provider extension for e2e testing",
+  "type": "module",
   "main": "extension.js",
   "keywords": [
     "vscode",

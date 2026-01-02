@@ -1,6 +1,6 @@
-const vscode = require('vscode')
+import * as vscode from 'vscode'
 
-function activate(context) {
+export function activate(context) {
   const provider = {
     provideInlineCompletionItems(document, position, inlineCompletionContext, token) {
       const line = document.lineAt(position.line)
@@ -21,10 +21,5 @@ function activate(context) {
   )
 }
 
-function deactivate() {}
-
-module.exports = {
-  activate,
-  deactivate,
-}
+export function deactivate() {}
 
