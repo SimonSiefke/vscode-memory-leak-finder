@@ -17,6 +17,7 @@ export const findPromiseStackTraceFolders = async (basePath: string): Promise<st
     if (dirent.isDirectory()) {
       const lowerName = dirent.name.toLowerCase()
       if (
+        lowerName.includes('promises-with-stack-trace') ||
         lowerName.includes('promises-with-stack-traces') ||
         lowerName.includes('promiseswithstacktrace') ||
         lowerName === 'promiseswithstacktrace'
