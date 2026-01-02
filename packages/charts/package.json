@@ -31,6 +31,7 @@
     "escape-html": "^1.0.3"
   },
   "devDependencies": {
-    "@types/escape-html": "^1.0.4"
+    "@types/escape-html": "^1.0.4",
+    "@types/babel__code-frame": "^7.0.6"
   }
 }
