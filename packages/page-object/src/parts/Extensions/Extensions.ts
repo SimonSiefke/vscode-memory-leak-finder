@@ -18,8 +18,9 @@ const nonBreakingSpace = String.fromCharCode(160)
 
 export const create = ({ expect, ideVersion, page, VError, platform }) => {
   return {
-    async add(path, expectedName) {
+    async add({ path, expectedName }: { path: string; expectedName: string }) {
       try {
+        // TODO maybe use the install extension from path command
         await page.waitForIdle()
         // TODO could create symlink also
         const absolutePath = join(Root.root, path)
