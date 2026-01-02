@@ -17,4 +17,3 @@ export const run = async ({ Editor, ExtensionDetailView, Extensions }: TestConte
   await ExtensionDetailView.shouldHaveHeading('TypeScript Language Basics')
   await Editor.closeAll()
 }
-
