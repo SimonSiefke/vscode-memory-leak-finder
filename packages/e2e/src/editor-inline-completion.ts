@@ -17,14 +17,11 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   })
   await Editor.open('test.txt')
   await Editor.shouldHaveBreadCrumb('test.txt')
-  await Editor.shouldHaveText('a')
-  await Editor.setCursor(1, 2)
-  await Editor.deleteAll()
-  await Editor.save({ viaKeyBoard: true })
-  await Editor.closeAll()
   await Extensions.show()
-  await Extensions.search(`@id:inline-completion-provider`)
-  // TODO need to ensure that extension is running
+  await Extensions.search(`@id:undefined_publisher.inline-completion-provider`)
+  await Extensions.first.click()
+  await Extensions.first.shouldHaveActivationTime()
+  console.log('done')
   await new Promise((r) => {
     setTimeout(r, 1000021)
   })
