@@ -125,8 +125,6 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       const delta = item.delta || 0
       const properties = item.properties || {}
 
-      const formattedStackTrace = FormatStackTrace.formatStackTrace(stackTrace)
-      const escapedStackTrace = formattedStackTrace ? EscapeHtml.escapeHtml(formattedStackTrace) : '(no stack trace)'
       const promiseTitle = getPromiseTitle(stackTrace)
 
       content += '<div class="PromiseItem">\n'
@@ -147,7 +145,6 @@ export const generatePromiseStackTraceHtmlForFolder = async (
         const codeFrame = await GetCodeFrame.getCodeFrame(firstStackLine)
         if (codeFrame) {
           content += '  <div class="CodeFrame">\n'
-          content += `    <div class="CodeFrameHeader">${EscapeHtml.escapeHtml(firstStackLine)}</div>\n`
           content += '    <pre class="line-numbers"><code class="language-typescript">'
           content += EscapeHtml.escapeHtml(codeFrame)
           content += '</code></pre>\n'
@@ -155,9 +152,21 @@ export const generatePromiseStackTraceHtmlForFolder = async (
         }
       }
 
+      // Format stack trace without the first line
+      let stackTraceWithoutFirstLine: string | string[] = stackTrace
+      if (Array.isArray(stackTrace)) {
+        stackTraceWithoutFirstLine = stackTrace.slice(1)
+      } else if (typeof stackTrace === 'string') {
+        const lines = stackTrace.split('\n')
+        stackTraceWithoutFirstLine = lines.slice(1).join('\n')
+      }
+
+      const formattedStackTraceWithoutFirstLine = FormatStackTrace.formatStackTrace(stackTraceWithoutFirstLine)
+      const escapedStackTraceWithoutFirstLine = formattedStackTraceWithoutFirstLine ? EscapeHtml.escapeHtml(formattedStackTraceWithoutFirstLine) : '(no stack trace)'
+
       content += '  <div class="CodeBlock">\n'
       content += '    <pre><code class="language-javascript">'
-      content += escapedStackTrace
+      content += escapedStackTraceWithoutFirstLine
       content += '</code></pre>\n'
       content += '  </div>\n'
 
