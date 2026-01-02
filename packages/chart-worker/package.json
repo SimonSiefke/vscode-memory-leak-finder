@@ -12,7 +12,7 @@
   "dependencies": {
     "@lvce-editor/rpc": "^4.20.0",
     "@observablehq/plot": "^0.6.17",
-    "jsdom": "^26.1.0"
-  },
-  "devDependencies": {}
+    "jsdom": "^26.1.0",
+    "svgo": "^4.0.0"
+  }
 }

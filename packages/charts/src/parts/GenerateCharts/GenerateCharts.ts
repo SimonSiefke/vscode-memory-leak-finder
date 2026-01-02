@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import * as Charts from '../Charts/Charts.ts'
+import * as GetChartConfig from '../GetChartConfig/GetChartConfig.ts'
 import { launchChartWorker } from '../LaunchChartWorker/LaunchChartWorker.ts'
 import * as Root from '../Root/Root.ts'
 
@@ -18,6 +19,7 @@ const visitors = Object.values(Charts).map((value) => {
 
 export const generateCharts = async () => {
   await using rpc = await launchChartWorker()
+  const config = GetChartConfig.getChartConfig()
 
   // Generate charts for all process types
   const basePaths = [
@@ -49,7 +51,7 @@ export const generateCharts = async () => {
           const filename = item.filename || i.toString()
 
           if (chartData.length > 0) {
-            const svg = await rpc.invoke('Chart.create', chartData, chartMetaData)
+            const svg = await rpc.invoke('Chart.create', chartData, { ...chartMetaData, compress: config.compress })
             let outPath
             if (basePathInfo.isNode) {
               if (visitor.name === 'named-function-count-3') {
@@ -67,7 +69,7 @@ export const generateCharts = async () => {
           }
         }
       } else {
-        const svg = await rpc.invoke('Chart.create', data, chartMetaData)
+        const svg = await rpc.invoke('Chart.create', data, { ...chartMetaData, compress: config.compress })
         let outPath
         if (basePathInfo.isNode) {
           outPath = join(Root.root, '.vscode-charts', 'node', `${visitor.name}.svg`)
