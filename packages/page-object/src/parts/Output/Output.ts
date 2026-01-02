@@ -69,34 +69,21 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async select(channelName: string) {
       try {
-        await page.waitForIdle()
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
-        const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
+        const select = page.locator('.panel [aria-label="Output actions"] .monaco-select-box')
         await expect(select).toBeVisible()
         await page.waitForIdle()
-        await expect(select).toHaveAttribute('custom-hover', 'true')
-        await page.waitForIdle()
-        await select.focus()
-        await page.waitForIdle()
-        await expect(select).toBeFocused()
-        await page.waitForIdle()
-        await select.click()
-        await page.waitForIdle()
-        const monacoList = page.locator('.select-box-dropdown-list-container .monaco-list')
-        await expect(monacoList).toBeVisible()
-        await page.waitForIdle()
-        await expect(monacoList).toBeFocused()
-        await page.waitForIdle()
-        const option = monacoList.locator(`[role="option"][aria-label="${channelName}"]`)
-        await expect(option).toBeVisible()
-        await option.click()
-        await page.waitForIdle()
-        await expect(monacoList).toBeHidden()
-        await page.waitForIdle()
-        await expect(select).toBeFocused()
-        await page.waitForIdle()
-        await expect(select).toHaveValue(channelName)
+        const current = await select.getValue()
+        if (current === channelName) {
+          return
+        }
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.SelectOutputChannel, {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
+        await quickPick.select(channelName)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select output channel ${channelName}`)
@@ -147,13 +134,16 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const viewLines = outputView.locator('.view-lines')
         await expect(viewLines).toBeVisible()
         await page.waitForIdle()
-        const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
+        const select = page.locator('.panel [aria-label="Output actions"] .monaco-select-box')
         await expect(select).toBeVisible()
         await page.waitForIdle()
         const cursor = outputView.locator('.cursor.monaco-mouse-cursor-text')
         await expect(cursor).toBeVisible()
         await page.waitForIdle()
         await expect(cursor).toHaveCount(1)
+        await page.waitForIdle()
+        const clearAction = page.locator('.panel [aria-label="Clear Output"]')
+        await expect(clearAction).toBeVisible()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show output`)
