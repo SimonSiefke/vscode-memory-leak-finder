@@ -4,6 +4,7 @@
   "description": "Inline completion provider extension for e2e testing",
   "type": "module",
   "main": "extension.js",
+  "publisher": "e2e-tests",
   "keywords": [
     "vscode",
     "extension",
