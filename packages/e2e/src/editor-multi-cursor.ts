@@ -20,9 +20,9 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   // @ts-ignore
   await Editor.addCursorBelow()
   await Editor.type('1')
-  await Editor.shouldHaveText(`a1
-b1
-c1`)
+  await Editor.shouldHaveText(`1a
+1b
+1c`)
   await Editor.undo()
   await Editor.shouldHaveText(`a
 b
