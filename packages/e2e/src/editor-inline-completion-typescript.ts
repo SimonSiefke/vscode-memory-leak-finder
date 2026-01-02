@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
-export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, SideBar, Extensions }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([
     {
@@ -10,8 +10,18 @@ export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promis
       name: 'test.ts',
     },
   ])
+  // @ts-ignore
+  await Extensions.add({
+    path: '.vscode-extensions-source/inline-completion-provider-typescript',
+    expectedName: 'inline-completion-provider-typescript',
+  })
   await Editor.open('test.ts')
   await Editor.shouldHaveBreadCrumb('test.ts')
+  await Editor.open('test.ts')
+  await Editor.shouldHaveBreadCrumb('test.ts')
+  await Extensions.show()
+  await Extensions.search(`@id:e2e-tests.inline-completion-provider-typescript`)
+  await Extensions.first.shouldHaveActivationTime()
   await SideBar.hide()
   // @ts-ignore
   await Editor.waitforTextFileReady('test.ts')

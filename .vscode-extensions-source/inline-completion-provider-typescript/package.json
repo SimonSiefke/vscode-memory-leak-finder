@@ -1,5 +1,5 @@
 {
-  "name": "inline-completion-provider",
+  "name": "inline-completion-provider-typescript",
   "version": "0.0.1",
   "description": "Inline completion provider extension for e2e testing",
   "type": "module",
@@ -17,6 +17,6 @@
     "vscode": "^1.107.0"
   },
   "activationEvents": [
-    "onLanguage:plaintext"
+    "onLanguage:typescript"
   ]
 }
