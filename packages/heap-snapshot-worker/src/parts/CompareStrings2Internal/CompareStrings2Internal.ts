@@ -34,7 +34,7 @@ const getLeakedStrings = (before: readonly string[], after: readonly string[], m
 
 export const compareStrings2Internal = (before: readonly string[], after: readonly string[], minCount: number): readonly LeakedString[] => {
   Assert.array(before)
-  Assert.string(after)
+  Assert.array(after)
   Assert.number(minCount)
   const leaked = getLeakedStrings(before, after, minCount)
   return leaked
