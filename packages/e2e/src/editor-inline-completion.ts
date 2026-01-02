@@ -21,6 +21,10 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   await Editor.setCursor(1, 2)
   await Editor.deleteCharactersLeft(1)
   await Editor.shouldHaveText('')
+  // TODO need to ensure that xtnion is running somow
+  await new Promise((r) => {
+    setTimeout(r, 1000)
+  })
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
