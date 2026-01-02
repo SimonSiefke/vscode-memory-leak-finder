@@ -1,14 +1,11 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'url'
+import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 import * as EscapeHtml from '../EscapeHtml/EscapeHtml.ts'
 import * as FormatStackTrace from '../FormatStackTrace/FormatStackTrace.ts'
-import * as ReadJson from '../ReadJson/ReadJson.ts'
-import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
-<<<<<<< HEAD
 import * as GetCodeFrame from '../GetCodeFrame/GetCodeFrame.ts'
-=======
->>>>>>> origin/main
+import * as ReadJson from '../ReadJson/ReadJson.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -123,7 +120,6 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       content += escapedStackTrace
       content += '</code></pre>\n'
       content += '  </div>\n'
-<<<<<<< HEAD
 
       // Add code frames for original stack trace lines
       if (item.originalStack && Array.isArray(item.originalStack)) {
@@ -140,8 +136,6 @@ export const generatePromiseStackTraceHtmlForFolder = async (
         }
       }
 
-=======
->>>>>>> origin/main
       content += '</div>\n'
     }
   }
