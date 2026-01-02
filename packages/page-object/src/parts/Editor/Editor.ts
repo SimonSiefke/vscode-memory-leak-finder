@@ -534,9 +534,11 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await expect(startTag).toBeVisible()
         await page.waitForIdle()
         await startTag.click()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         const tooltip = editor.locator('.monaco-hover')
         await expect(tooltip).toBeHidden()
+        await page.waitForIdle()
         await quickPick.executeCommand(WellKnownCommands.ShowOrFocusHover, {
           pressKeyOnce: true,
         })
@@ -619,6 +621,8 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           await this.waitForNoteBookReady()
         } else if (isImage(fileName)) {
           await this.waitForImageReady()
+        } else if (options?.hasWarning) {
+          await this.waitForWarning()
         } else if (options?.hasError) {
           // TODO
           await new Promise((r) => {})
@@ -900,7 +904,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to select source action "${actionText}"`)
       }
     },
-    async setBreakpoint(lineNumber) {
+    async setBreakpoint(lineNumber: number) {
       try {
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
@@ -912,11 +916,29 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed set breakpoint`)
       }
     },
+    async removeBreakPoint(lineNumber: number) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.part.editor .editor-instance')
+        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
+        await expect(lineNumberElement).toBeVisible()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        await contextMenu.open(lineNumberElement)
+        await page.waitForIdle()
+        await contextMenu.select('Remove Breakpoint')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed remove breakpoint`)
+      }
+    },
     async setCursor(line: number, column: number) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
-        await quickPick.show()
+        await quickPick.show({
+          pressKeyOnce: true,
+        })
         await page.waitForIdle()
         await quickPick.type(`:${line}:${column}`)
         await page.waitForIdle()
@@ -1275,7 +1297,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await expect(colorPicker).toBeHidden()
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker)
+        await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker, { pressKeyOnce: true })
         await page.waitForIdle()
         await expect(colorPicker).toBeVisible()
         await page.waitForIdle()
@@ -1524,6 +1546,12 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       const img = subFrame.locator('img')
       await expect(img).toBeVisible()
       await subFrame.waitForIdle()
+    },
+    async waitForWarning() {
+      const pane = page.locator('.monaco-editor-pane-placeholder')
+      await expect(pane).toBeVisible()
+      const warningIcon = pane.locator('.codicon.codicon-warning')
+      await expect(warningIcon).toBeVisible()
     },
     async waitForNoteBookReady() {
       const notebookEditor = page.locator('.notebook-editor')

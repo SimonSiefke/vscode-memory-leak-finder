@@ -5,7 +5,7 @@ import * as SideBar from '../SideBar/SideBar.ts'
 
 export const create = ({ electronApp, expect, page, platform, VError }) => {
   return {
-    async expectModified(text) {
+    async expectModified(text: string) {
       try {
         const modified = page.locator('.editor.modified .view-lines')
         await expect(modified).toHaveText(text)
@@ -13,7 +13,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to verify modified text ${text}`)
       }
     },
-    async expectOriginal(text) {
+    async expectOriginal(text: string) {
       try {
         const original = page.locator('.editor.original .view-lines')
         await expect(original).toHaveText(text)
@@ -21,17 +21,33 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to verify original text ${text}`)
       }
     },
-    async open(a, b) {
+    async open({ file1, file2, file1Content, file2Content }: { file1: string; file2: string; file1Content: string; file2Content: string }) {
       try {
         const explorer = Explorer.create({ electronApp, expect, page, platform, VError })
         const contextMenu = ContextMenu.create({ expect, page, VError })
         const sideBar = SideBar.create({ expect, page, platform, VError })
         await explorer.focus()
-        await explorer.openContextMenu(a)
+        await explorer.openContextMenu(file1)
         await contextMenu.select('Select for Compare')
-        await explorer.openContextMenu(b)
+        await explorer.openContextMenu(file2)
         await contextMenu.select('Compare with Selected')
         await sideBar.hide()
+        const arrow = '↔'
+        const tab = page.locator('.tab', { hasText: `${file1} ${arrow} ${file2}` })
+        await expect(tab).toBeVisible()
+        await page.waitForIdle()
+        const original = page.locator(`.monaco-diff-editor .monaco-editor[data-uri$="${file1}"]`)
+        await expect(original).toBeVisible()
+        const modified = page.locator(`.monaco-diff-editor .monaco-editor[data-uri$="${file2}"]`)
+        await expect(modified).toBeVisible()
+        if (file1Content) {
+          const lines = original.locator('.view-lines')
+          await expect(lines).toHaveText(file1Content)
+        }
+        if (file2Content) {
+          const lines = modified.locator('.view-lines')
+          await expect(lines).toHaveText(file2Content)
+        }
       } catch (error) {
         throw new VError(error, `Failed to open diff editor`)
       }

@@ -46,7 +46,6 @@ export const unused = () => {
   await Explorer.expand('src')
   await Explorer.shouldHaveItem('main.ts')
   await Editor.open('main.ts')
-  // @ts-ignore
   await Editor.setCursor(5, 1)
   await Editor.shouldHaveBreadCrumb('main.ts')
   await Editor.shouldHaveBreadCrumb('main')

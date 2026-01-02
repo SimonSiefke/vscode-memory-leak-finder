@@ -216,6 +216,33 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async setMode(modeLabel: string) {
       try {
+        if (ideVersion.minor < 107) {
+          await this.setModeLegacy(modeLabel)
+          return
+        }
+        const chatView = page.locator('.interactive-session')
+        const setModeButton = chatView.locator('.chat-modelPicker-item .action-label')
+        await expect(setModeButton).toBeVisible()
+        await setModeButton.click()
+        await page.waitForIdle()
+        const actionWidget = page.locator('.monaco-list[aria-label="Action Widget"]')
+        await expect(actionWidget).toBeVisible()
+        await page.waitForIdle()
+        await expect(actionWidget).toBeFocused()
+        await page.waitForIdle()
+        const option = actionWidget.locator(`.monaco-list-row.action[aria-label="${modeLabel}"]`)
+        await expect(option).toBeVisible()
+        await option.click()
+        await page.waitForIdle()
+        await expect(actionWidget).toBeHidden()
+        const modeLabelElement = chatView.locator('.chat-model-label')
+        await expect(modeLabelElement).toHaveText(modeLabel)
+      } catch (error) {
+        throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
+      }
+    },
+    async setModeLegacy(modeLabel: string) {
+      try {
         const chatView = page.locator('.interactive-session')
         const setModeButton = chatView.locator('[aria-label^="Set Mode"]')
         await expect(setModeButton).toBeVisible()
