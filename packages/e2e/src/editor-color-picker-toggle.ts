@@ -11,11 +11,11 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('index.txt')
   await Editor.open('index.txt')
   await Editor.shouldHaveBreadCrumb('index.txt')
   await Editor.shouldHaveText('hello world')
-  // @ts-ignore
   await Editor.setCursor(1, 1)
 }
 

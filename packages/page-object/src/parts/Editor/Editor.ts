@@ -934,7 +934,9 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
-        await quickPick.show()
+        await quickPick.show({
+          pressKeyOnce: true,
+        })
         await page.waitForIdle()
         await quickPick.type(`:${line}:${column}`)
         await page.waitForIdle()
@@ -1293,7 +1295,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await expect(colorPicker).toBeHidden()
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker)
+        await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker, { pressKeyOnce: true })
         await page.waitForIdle()
         await expect(colorPicker).toBeVisible()
         await page.waitForIdle()
