@@ -198,6 +198,10 @@ const parseInspectPtyHost = (argv: readonly string[]): boolean => {
   return argv.includes('--inspect-ptyhost')
 }
 
+const parseInspectMainProcess = (argv: readonly string[]): boolean => {
+  return argv.includes('--inspect-main-process')
+}
+
 const parseEnableExtensions = (argv: readonly string[]): boolean => {
   return argv.includes('--enable-extensions')
 }
@@ -281,6 +285,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const inspectExtensionsPort = parseInspectExtensionsPort(argv)
   const inspectPtyHost = parseInspectPtyHost(argv)
   const inspectPtyHostPort = parseInspectPtyHostPort(argv)
+  const inspectMainProcess = parseInspectMainProcess(argv)
   const inspectSharedProcess = parseInspectSharedProcess(argv)
   const inspectSharedProcessPort = parseInspectSharedProcessPort(argv)
   const measure = parseMeasure(argv)
@@ -322,6 +327,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     inspectExtensionsPort,
     inspectPtyHost,
     inspectPtyHostPort,
+    inspectMainProcess,
     inspectSharedProcess,
     inspectSharedProcessPort,
     isWindows,

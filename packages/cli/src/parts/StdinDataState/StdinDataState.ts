@@ -23,6 +23,7 @@ export interface StdinDataState {
   readonly inspectExtensionsPort: number
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
+  readonly inspectMainProcess: boolean
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isGithubActions: boolean
@@ -68,6 +69,7 @@ let state: StdinDataState = {
   inspectExtensionsPort: 5870,
   inspectPtyHost: false,
   inspectPtyHostPort: 5877,
+  inspectMainProcess: false,
   inspectSharedProcess: false,
   inspectSharedProcessPort: 5879,
   isGithubActions: false,
@@ -110,6 +112,7 @@ export const setState = (newState: StdinDataState): void => {
     inspectExtensionsPort: newState.inspectExtensionsPort,
     inspectPtyHost: newState.inspectPtyHost,
     inspectPtyHostPort: newState.inspectPtyHostPort,
+    inspectMainProcess: newState.inspectMainProcess,
     inspectSharedProcess: newState.inspectSharedProcess,
     inspectSharedProcessPort: newState.inspectSharedProcessPort,
     isGithubActions: newState.isGithubActions,

@@ -18,6 +18,7 @@ export interface StartRunningOptions {
   readonly inspectExtensionsPort: number
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
+  readonly inspectMainProcess: boolean
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isGithubActions: boolean

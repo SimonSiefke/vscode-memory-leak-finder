@@ -23,6 +23,7 @@ export const createDefaultState = (): StdinDataState => ({
   inspectExtensionsPort: 5870,
   inspectPtyHost: false,
   inspectPtyHostPort: 5877,
+  inspectMainProcess: false,
   inspectSharedProcess: false,
   inspectSharedProcessPort: 5879,
   isGithubActions: false,

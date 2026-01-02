@@ -33,6 +33,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     inspectExtensionsPort: options.inspectExtensionsPort,
     inspectPtyHost: options.inspectPtyHost,
     inspectPtyHostPort: options.inspectPtyHostPort,
+    inspectMainProcess: options.inspectMainProcess,
     inspectSharedProcess: options.inspectSharedProcess,
     inspectSharedProcessPort: options.inspectSharedProcessPort,
     isGithubActions,
