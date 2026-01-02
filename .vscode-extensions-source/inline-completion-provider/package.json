@@ -14,14 +14,9 @@
     "mock",
     "test"
   ],
-  "author": "SimonSiefke",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "@types/vscode": "^1.105.0",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "^24.7.2"
+    "@types/vscode": "^1.105.0"
   },
   "dependencies": {}
 }
-
