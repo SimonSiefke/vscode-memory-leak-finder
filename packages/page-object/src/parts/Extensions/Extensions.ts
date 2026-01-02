@@ -124,7 +124,7 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
         const editor = Editor.create({ expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await this.show()
-        await this.search(id)
+        await this.search(`@id:"${id}"`)
         await this.first.shouldBe(name)
         await this.first.click()
         const extensionDetailView = ExtensionDetailView.create({ expect, page, VError })

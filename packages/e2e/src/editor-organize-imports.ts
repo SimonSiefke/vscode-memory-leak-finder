@@ -50,11 +50,15 @@ export const unused = () => {
   await Editor.shouldHaveBreadCrumb('main.ts')
   await Editor.shouldHaveBreadCrumb('main')
   await Editor.shouldHaveSquigglyError()
+  await Editor.setCursor(1, 1)
+  // @ts-ignore
+  await Editor.shouldHaveLightBulb()
 }
 
 export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   // Wait a bit for TypeScript language server to initialize
 
+  // TODO set cursor and wait for spark
   await new Promise((resolve) => setTimeout(resolve, 2000))
 
   await Editor.showSourceAction()
