@@ -18,10 +18,13 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   await Editor.open('test.txt')
   await Editor.shouldHaveBreadCrumb('test.txt')
   await Editor.shouldHaveText('')
+  await Editor.setCursor(1, 1)
+  await Editor.type('a')
+  await Editor.undo()
+  await Editor.shouldHaveText('')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.setCursor(1, 1)
   await Editor.type('a')
   // @ts-ignore
   await Editor.shouldHaveInlineCompletion('bcdef')
