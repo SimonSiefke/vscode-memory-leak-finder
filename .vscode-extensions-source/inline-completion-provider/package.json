@@ -1,0 +1,22 @@
+{
+  "name": "inline-completion-provider",
+  "version": "0.0.1",
+  "description": "Inline completion provider extension for e2e testing",
+  "type": "module",
+  "main": "extension.js",
+  "publisher": "e2e-tests",
+  "keywords": [
+    "vscode",
+    "extension",
+    "inline-completion",
+    "mock",
+    "test"
+  ],
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.107.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ]
+}

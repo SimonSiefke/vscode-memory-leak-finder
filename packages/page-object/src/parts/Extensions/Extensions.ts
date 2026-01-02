@@ -18,8 +18,9 @@ const nonBreakingSpace = String.fromCharCode(160)
 
 export const create = ({ expect, ideVersion, page, VError, platform }) => {
   return {
-    async add(path, expectedName) {
+    async add({ path, expectedName }: { path: string; expectedName: string }) {
       try {
+        // TODO maybe use the install extension from path command
         await page.waitForIdle()
         // TODO could create symlink also
         const absolutePath = join(Root.root, path)
@@ -29,13 +30,16 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
         await page.waitForIdle()
         await this.show()
         await page.waitForIdle()
-        await this.search('@installed')
+        await this.search(`@installed ${expectedName}`)
         await page.waitForIdle()
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible()
         const nameLocator = firstExtension.locator('.name')
         await expect(nameLocator).toBeVisible()
         await expect(nameLocator).toHaveText(expectedName)
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
+        await page.waitForIdle()
         await page.waitForIdle()
         await this.hide()
         await page.waitForIdle()
@@ -76,6 +80,22 @@ export const create = ({ expect, ideVersion, page, VError, platform }) => {
         await expect(extensionEditor).toBeVisible()
         const heading = extensionEditor.locator('.name').first()
         await expect(heading).toHaveText(name)
+        await page.waitForIdle()
+      },
+      async shouldHaveActivationTime() {
+        await page.waitForIdle()
+        const firstExtension = page.locator('.extension-list-item').first()
+        await expect(firstExtension).toBeVisible()
+        await page.waitForIdle()
+        const nameLocator = firstExtension.locator('.name')
+        const name = await nameLocator.textContent()
+        await expect(nameLocator).toHaveText(name)
+        await page.waitForIdle()
+        const status = firstExtension.locator('.activation-status')
+        await expect(status).toBeVisible()
+        await page.waitForIdle()
+        const time = firstExtension.locator('.activationTime')
+        await expect(time).toBeVisible()
         await page.waitForIdle()
       },
       async openContextMenu() {

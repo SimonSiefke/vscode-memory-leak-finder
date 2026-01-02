@@ -173,12 +173,14 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async deleteAll() {
       try {
-        await this.selectAll()
+        await page.waitForIdle()
+        await this.selectAll({ viaKeyBoard: true })
         await page.waitForIdle()
         await page.keyboard.press('Delete')
         await page.waitForIdle()
         await page.waitForIdle()
         await this.shouldHaveText('')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to delete all`)
       }
@@ -858,8 +860,14 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to select ${text}`)
       }
     },
-    async selectAll() {
+    async selectAll({ viaKeyBoard = false } = {}) {
       try {
+        if (viaKeyBoard) {
+          await page.waitForIdle()
+          await page.keyboard.press('Control+A')
+          await page.waitForIdle()
+          return
+        }
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectAll)
@@ -1242,6 +1250,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           editor = page.locator(`.editor-instance`)
         }
         await expect(editor).toBeVisible()
+        await page.waitForIdle()
         const editorLines = editor.locator('.view-lines')
         await expect(editorLines).toBeVisible()
         await page.waitForIdle()
@@ -1477,8 +1486,14 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to type ${text}`)
       }
     },
-    async undo() {
+    async undo({ viaKeyBoard = false } = {}) {
       try {
+        if (viaKeyBoard) {
+          await page.waitForIdle()
+          await page.keyboard.press('Ctrl+Z')
+          await page.waitForIdle()
+          return
+        }
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.Undo)
       } catch (error) {
@@ -1573,17 +1588,22 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       await expect(list).toBeFocused()
     },
     async waitforTextFileReady(fileName: string) {
+      await page.waitForIdle()
       const baseName = basename(fileName)
       const editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
       await expect(editor).toBeVisible()
+      await page.waitForIdle()
 
       if (ideVersion && ideVersion.minor <= 100) {
         const editorInput = editor.locator('.inputarea')
         await expect(editorInput).toBeFocused()
+        await page.waitForIdle()
       } else {
         const editContext = editor.locator('.native-edit-context')
         await expect(editContext).toBeFocused()
+        await page.waitForIdle()
       }
+      await page.waitForIdle()
     },
     async waitForVideoReady(hasError) {
       const webView = WebView.create({ expect, page, VError })
@@ -1600,6 +1620,40 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await expect(video).toBeVisible()
       }
       await subFrame.waitForIdle()
+    },
+    async shouldHaveInlineCompletion(expectedText: string) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
+        await expect(inlineCompletion).toBeVisible({
+          timeout: 10_000,
+        })
+        await page.waitForIdle()
+        await expect(inlineCompletion).toHaveText(expectedText, {
+          timeout: 1000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify inline completion with text "${expectedText}"`)
+      }
+    },
+    async acceptInlineCompletion() {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
+        await expect(inlineCompletion).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Tab')
+        await page.waitForIdle()
+        await expect(inlineCompletion).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to accept inline completion`)
+      }
     },
   }
 }
