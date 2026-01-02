@@ -1606,17 +1606,12 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const inlineCompletion = editor.locator(
-          '.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]',
-        )
+        await page.waitForIdle()
+        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
         await expect(inlineCompletion).toBeVisible({
           timeout: 10_000,
         })
         await page.waitForIdle()
-        const completionText = await inlineCompletion.textContent()
-        if (completionText && completionText.includes(expectedText)) {
-          return
-        }
         await expect(inlineCompletion).toHaveText(expectedText, {
           timeout: 1000,
         })

@@ -23,9 +23,9 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.setCursor(1, 1)
   await Editor.type('a')
-  await Editor.shouldHaveText('abcdef')
   // @ts-ignore
   await Editor.shouldHaveInlineCompletion('bcdef')
+  await Editor.shouldHaveText('abcdef')
   await Editor.undo()
   await Editor.shouldHaveText('')
 }
