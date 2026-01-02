@@ -13,7 +13,6 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   ])
   await Editor.open('index.css')
   await Editor.shouldHaveBreadCrumb('h1')
-  // @ts-ignore
   await Editor.setCursor(1, 13)
 }
 

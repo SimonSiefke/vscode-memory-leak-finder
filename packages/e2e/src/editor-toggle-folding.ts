@@ -28,7 +28,6 @@ ${classes.join('\n\n')}
 
   await Editor.open('large-file.ts')
   await Editor.shouldHaveBreadCrumb('large-file.ts')
-  // @ts-ignore
   await Editor.setCursor(3, 5)
   await Editor.shouldHaveSquigglyError()
   await Editor.shouldHaveBreadCrumb('constructor')
