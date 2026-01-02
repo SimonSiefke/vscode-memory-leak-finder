@@ -5,6 +5,7 @@ import * as EscapeHtml from '../EscapeHtml/EscapeHtml.ts'
 import * as FormatStackTrace from '../FormatStackTrace/FormatStackTrace.ts'
 import * as ReadJson from '../ReadJson/ReadJson.ts'
 import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
+import * as GetCodeFrame from '../GetCodeFrame/GetCodeFrame.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -119,6 +120,22 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       content += escapedStackTrace
       content += '</code></pre>\n'
       content += '  </div>\n'
+
+      // Add code frames for original stack trace lines
+      if (item.originalStack && Array.isArray(item.originalStack)) {
+        for (const stackLine of item.originalStack) {
+          const codeFrame = await GetCodeFrame.getCodeFrame(stackLine)
+          if (codeFrame) {
+            content += '  <div class="CodeFrame">\n'
+            content += `    <div class="CodeFrameHeader">${EscapeHtml.escapeHtml(stackLine)}</div>\n`
+            content += '    <pre class="line-numbers"><code class="language-typescript">'
+            content += EscapeHtml.escapeHtml(codeFrame)
+            content += '</code></pre>\n'
+            content += '  </div>\n'
+          }
+        }
+      }
+
       content += '</div>\n'
     }
   }
