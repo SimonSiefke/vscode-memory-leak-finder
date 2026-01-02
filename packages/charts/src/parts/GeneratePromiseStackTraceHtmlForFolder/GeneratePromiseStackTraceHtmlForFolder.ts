@@ -43,7 +43,11 @@ const copyPromiseStackTraceCss = async (folderPath: string): Promise<void> => {
   await writeFile(join(folderPath, 'promise-stack-traces.css'), cssContent)
 }
 
-export const generatePromiseStackTraceHtmlForFolder = async (sourceFolderPath: string, targetFolderPath: string, folderName: string): Promise<void> => {
+export const generatePromiseStackTraceHtmlForFolder = async (
+  sourceFolderPath: string,
+  targetFolderPath: string,
+  folderName: string,
+): Promise<void> => {
   const dirents = await readdir(sourceFolderPath)
   const jsonFiles = dirents.filter((file) => file.endsWith('.json'))
 
@@ -127,4 +131,3 @@ export const generatePromiseStackTraceHtmlForFolder = async (sourceFolderPath: s
     await writeFile(outPath, html)
   }
 }
-

@@ -14,4 +14,3 @@ export const copyAssetsToFolder = async (folderPath: string): Promise<void> => {
   await writeFile(join(folderPath, 'styles.css'), cssContent)
   await writeFile(join(folderPath, 'script.js'), jsContent)
 }
-

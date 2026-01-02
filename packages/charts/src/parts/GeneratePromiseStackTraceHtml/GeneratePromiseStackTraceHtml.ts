@@ -8,7 +8,7 @@ import * as GeneratePromiseStackTraceHtmlForFolder from '../GeneratePromiseStack
 export const generatePromiseStackTraceHtml = async (): Promise<void> => {
   const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results')
   const chartsPath = join(Root.root, '.vscode-charts')
-  
+
   if (!existsSync(resultsPath)) {
     return
   }
@@ -26,4 +26,3 @@ export const generatePromiseStackTraceHtml = async (): Promise<void> => {
     await GeneratePromiseStackTraceHtmlForFolder.generatePromiseStackTraceHtmlForFolder(folderPath, targetFolderPath, folderName)
   }
 }
-

@@ -4,4 +4,3 @@ export const formatStackTrace = (stackTrace: string | string[]): string => {
   }
   return stackTrace
 }
-

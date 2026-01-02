@@ -32,4 +32,3 @@ export const findPromiseStackTraceFolders = async (basePath: string): Promise<st
 
   return folders
 }
-
