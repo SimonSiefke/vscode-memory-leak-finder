@@ -1,10 +1,11 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'url'
+import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 import * as EscapeHtml from '../EscapeHtml/EscapeHtml.ts'
 import * as FormatStackTrace from '../FormatStackTrace/FormatStackTrace.ts'
+import * as GetCodeFrame from '../GetCodeFrame/GetCodeFrame.ts'
 import * as ReadJson from '../ReadJson/ReadJson.ts'
-import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -41,6 +42,30 @@ const copyPromiseStackTraceCss = async (folderPath: string): Promise<void> => {
   const cssPath = join(__dirname, 'promise-stack-traces.css')
   const cssContent = await readFile(cssPath, 'utf-8')
   await writeFile(join(folderPath, 'promise-stack-traces.css'), cssContent)
+}
+
+const getPromiseTitle = (stackTrace: string | string[]): string => {
+  let firstLine: string | undefined
+  if (Array.isArray(stackTrace)) {
+    firstLine = stackTrace[0]
+  } else if (typeof stackTrace === 'string') {
+    const lines = stackTrace.split('\n')
+    firstLine = lines[0]
+  }
+
+  if (!firstLine) {
+    return 'Promise'
+  }
+
+  // Format: "src/vs/editor/contrib/find/browser/findWidget.ts:381:69"
+  const match = firstLine.match(/^(.+):(\d+):(\d+)$/)
+  if (match) {
+    const [, filePath, line, column] = match
+    const fileName = basename(filePath)
+    return `${fileName}:${line}:${column}`
+  }
+
+  return 'Promise'
 }
 
 export const generatePromiseStackTraceHtmlForFolder = async (
@@ -100,12 +125,11 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       const delta = item.delta || 0
       const properties = item.properties || {}
 
-      const formattedStackTrace = FormatStackTrace.formatStackTrace(stackTrace)
-      const escapedStackTrace = formattedStackTrace ? EscapeHtml.escapeHtml(formattedStackTrace) : '(no stack trace)'
+      const promiseTitle = getPromiseTitle(stackTrace)
 
       content += '<div class="PromiseItem">\n'
       content += '  <div class="PromiseItemHeader">\n'
-      content += `    <h3>Promise ${i + 1}</h3>\n`
+      content += `    <h3>${EscapeHtml.escapeHtml(promiseTitle)}</h3>\n`
       content += '    <div class="PromiseItemMeta">\n'
       content += `      <span>Count: ${count}</span>\n`
       content += `      <span>Delta: ${delta}</span>\n`
@@ -114,11 +138,40 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       }
       content += '    </div>\n'
       content += '  </div>\n'
+
+      // Add code frame for first stack trace line only
+      if (item.originalStack && Array.isArray(item.originalStack) && item.originalStack.length > 0) {
+        const firstStackLine = item.originalStack[0]
+        const codeFrame = await GetCodeFrame.getCodeFrame(firstStackLine)
+        if (codeFrame) {
+          content += '  <div class="CodeFrame">\n'
+          content += '    <pre class="line-numbers"><code class="language-typescript">'
+          content += EscapeHtml.escapeHtml(codeFrame)
+          content += '</code></pre>\n'
+          content += '  </div>\n'
+        }
+      }
+
+      // Format stack trace without the first line
+      let stackTraceWithoutFirstLine: string | string[] = stackTrace
+      if (Array.isArray(stackTrace)) {
+        stackTraceWithoutFirstLine = stackTrace.slice(1)
+      } else if (typeof stackTrace === 'string') {
+        const lines = stackTrace.split('\n')
+        stackTraceWithoutFirstLine = lines.slice(1).join('\n')
+      }
+
+      const formattedStackTraceWithoutFirstLine = FormatStackTrace.formatStackTrace(stackTraceWithoutFirstLine)
+      const escapedStackTraceWithoutFirstLine = formattedStackTraceWithoutFirstLine
+        ? EscapeHtml.escapeHtml(formattedStackTraceWithoutFirstLine)
+        : '(no stack trace)'
+
       content += '  <div class="CodeBlock">\n'
       content += '    <pre><code class="language-javascript">'
-      content += escapedStackTrace
+      content += escapedStackTraceWithoutFirstLine
       content += '</code></pre>\n'
       content += '  </div>\n'
+
       content += '</div>\n'
     }
   }
