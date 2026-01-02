@@ -18,16 +18,14 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.focusLeftEditorGroup()
   await Editor.type('left ')
 
-  // await Editor.shouldHaveText()
-  // const leftEditorLines = leftEditor.locator('.view-lines')
-  // const rightEditorLines = rightEditor.locator('.view-lines')
-  // const nonBreakingSpace = String.fromCharCode(160)
-  // const leftText = 'left initial text'.replaceAll(' ', nonBreakingSpace)
-  // await expect(leftEditorLines).toHaveText(leftText)
-  // await expect(rightEditorLines).toHaveText(leftText)
+  // @ts-ignore
+  await Editor.shouldHaveText('left initial text', 'file.txt', 1)
+  // @ts-ignore
+  await Editor.shouldHaveText('left initial text', 'file.txt', 2)
 
-  // await Editor.focusRightEditorGroup()
-  // await Editor.type('right ')
+  await Editor.focusRightEditorGroup()
+  await Editor.type('right ')
+  await new Promise((r) => {})
   // await page.waitForIdle()
 
   // const rightText = 'left right initial text'.replaceAll(' ', nonBreakingSpace)

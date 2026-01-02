@@ -1231,13 +1231,17 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify squiggly error`)
       }
     },
-    async shouldHaveText(text: string, fileName?: string) {
+    async shouldHaveText(text: string, fileName?: string, groupId?: number) {
       try {
         await page.waitForIdle()
         let editor
         if (fileName) {
           const baseName = basename(fileName)
-          editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
+          if (groupId) {
+            editor = page.locator(`.editor-instance[aria-label="${baseName}, Group ${groupId}"]`)
+          } else {
+            editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
+          }
         } else {
           editor = page.locator(`.editor-instance`)
         }
