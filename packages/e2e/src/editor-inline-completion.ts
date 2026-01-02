@@ -21,13 +21,11 @@ export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestCont
   await Extensions.search(`@id:e2e-tests.inline-completion-provider`)
   await Extensions.first.shouldHaveActivationTime()
   await SideBar.hide()
-  await Editor.goToFile({
-    column: 1,
-    file: 'test.txt',
-    line: 1,
-  })
+  // @ts-ignore
+  await Editor.waitforTextFileReady('test.txt')
   await Editor.shouldHaveText('a')
   await Editor.deleteAll()
+  await Editor.save({ viaKeyBoard: true })
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {

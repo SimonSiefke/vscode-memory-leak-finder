@@ -1581,17 +1581,22 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       await expect(list).toBeFocused()
     },
     async waitforTextFileReady(fileName: string) {
+      await page.waitForIdle()
       const baseName = basename(fileName)
       const editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
       await expect(editor).toBeVisible()
+      await page.waitForIdle()
 
       if (ideVersion && ideVersion.minor <= 100) {
         const editorInput = editor.locator('.inputarea')
         await expect(editorInput).toBeFocused()
+        await page.waitForIdle()
       } else {
         const editContext = editor.locator('.native-edit-context')
         await expect(editContext).toBeFocused()
+        await page.waitForIdle()
       }
+      await page.waitForIdle()
     },
     async waitForVideoReady(hasError) {
       const webView = WebView.create({ expect, page, VError })
