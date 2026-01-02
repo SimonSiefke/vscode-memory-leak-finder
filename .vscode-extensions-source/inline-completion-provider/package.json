@@ -17,6 +17,10 @@
     "vscode": "^1.107.0"
   },
   "activationEvents": [
+<<<<<<< HEAD
     "onLanguage:plaintext"
+=======
+    "onStartupFinished"
+>>>>>>> origin/main
   ]
 }
