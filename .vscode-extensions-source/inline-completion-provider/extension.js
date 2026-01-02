@@ -2,7 +2,7 @@ const vscode = require('vscode')
 
 function activate(context) {
   const provider = {
-    provideInlineCompletionItems(document, position, context, token) {
+    provideInlineCompletionItems(document, position, inlineCompletionContext, token) {
       const line = document.lineAt(position.line)
       const textBeforeCursor = line.text.substring(0, position.character)
 
