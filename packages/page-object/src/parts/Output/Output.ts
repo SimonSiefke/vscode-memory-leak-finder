@@ -109,16 +109,16 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
         await expect(moreActions).toBeVisible()
         await page.waitForIdle()
+        await moreActions.focus()
+        await page.waitForIdle()
+        await expect(moreActions).toBeFocused()
+        await page.waitForIdle()
+        await moreActions.click()
+        await page.waitForIdle()
         const contextMenu = ContextMenu.create({ page, expect, VError })
-        await contextMenu.open(moreActions)
-        await new Promise((r) => {
-          setTimeout(r, 200000)
-        })
         await contextMenu.shouldHaveItem('Open Output in Editor')
         await contextMenu.select('Open Output in Editor')
-        await new Promise((r) => {
-          setTimeout(r, 2000)
-        })
+        await page.waitForIdle()
         // TODO vrify that tab is visible
         // const tab = page.locator('.tab')
         // await expect(tab).toBeVisible()
