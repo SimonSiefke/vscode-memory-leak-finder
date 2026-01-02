@@ -619,6 +619,8 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           await this.waitForNoteBookReady()
         } else if (isImage(fileName)) {
           await this.waitForImageReady()
+        } else if (options?.hasWarning) {
+          await this.waitForWarning()
         } else if (options?.hasError) {
           // TODO
           await new Promise((r) => {})
@@ -1540,6 +1542,12 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       const img = subFrame.locator('img')
       await expect(img).toBeVisible()
       await subFrame.waitForIdle()
+    },
+    async waitForWarning() {
+      const pane = page.locator('.monaco-editor-pane-placeholder')
+      await expect(pane).toBeVisible()
+      const warningIcon = pane.locator('.codicon.codicon-warning')
+      await expect(warningIcon).toBeVisible()
     },
     async waitForNoteBookReady() {
       const notebookEditor = page.locator('.notebook-editor')
