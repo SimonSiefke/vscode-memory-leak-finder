@@ -1,7 +1,16 @@
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import * as Assert from '../Assert/Assert.ts'
 
-const getLeakedStrings = (before: readonly string[], after: readonly string[], minCount: number): readonly string[] => {
+interface LeakedString {
+  readonly string: string
+  readonly delta: number
+}
+
+const compareCount = (a: LeakedString, b: LeakedString): number => {
+  return b.delta - a.delta
+}
+
+const getLeakedStrings = (before: readonly string[], after: readonly string[], minCount: number): readonly LeakedString[] => {
   const countMap: Record<string, number> = Object.create(null)
   for (const item of before) {
     countMap[item] ||= 0
@@ -11,16 +20,20 @@ const getLeakedStrings = (before: readonly string[], after: readonly string[], m
     countMap[item] ||= 0
     countMap[item]--
   }
-  const leaked: string[] = []
+  const leaked: LeakedString[] = []
   for (const [key, value] of Object.entries(countMap)) {
-    if (value < 0) {
-      leaked.push(key)
+    if (value < 0 && -value >= minCount) {
+      leaked.push({
+        string: key,
+        delta: -value,
+      })
     }
   }
-  return leaked
+  const sorted = leaked.toSorted(compareCount)
+  return sorted
 }
 
-export const compareStrings2 = async (beforePath: string, afterPath: string, minCount: number): Promise<readonly string[]> => {
+export const compareStrings2 = async (beforePath: string, afterPath: string, minCount: number): Promise<readonly LeakedString[]> => {
   Assert.string(beforePath)
   Assert.string(afterPath)
   Assert.number(minCount)
