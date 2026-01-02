@@ -1206,6 +1206,19 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify spark`)
       }
     },
+    async shouldHaveLightBulb() {
+      try {
+        await new Promise((r) => {})
+        await page.waitForIdle()
+        const spark = page.locator('.codicon.codicon-gutter-lightbulb-sparkle-filled')
+        await expect(spark).toBeVisible({
+          timeout: 20_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify lightbulb`)
+      }
+    },
     async shouldHaveSquigglyError() {
       try {
         await page.waitForIdle()
