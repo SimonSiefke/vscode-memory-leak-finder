@@ -1,5 +1,5 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'url'
 import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 import * as EscapeHtml from '../EscapeHtml/EscapeHtml.ts'
@@ -42,6 +42,30 @@ const copyPromiseStackTraceCss = async (folderPath: string): Promise<void> => {
   const cssPath = join(__dirname, 'promise-stack-traces.css')
   const cssContent = await readFile(cssPath, 'utf-8')
   await writeFile(join(folderPath, 'promise-stack-traces.css'), cssContent)
+}
+
+const getPromiseTitle = (stackTrace: string | string[]): string => {
+  let firstLine: string | undefined
+  if (Array.isArray(stackTrace)) {
+    firstLine = stackTrace[0]
+  } else if (typeof stackTrace === 'string') {
+    const lines = stackTrace.split('\n')
+    firstLine = lines[0]
+  }
+
+  if (!firstLine) {
+    return 'Promise'
+  }
+
+  // Format: "src/vs/editor/contrib/find/browser/findWidget.ts:381:69"
+  const match = firstLine.match(/^(.+):(\d+):(\d+)$/)
+  if (match) {
+    const [, filePath, line, column] = match
+    const fileName = basename(filePath)
+    return `${fileName}:${line}:${column}`
+  }
+
+  return 'Promise'
 }
 
 export const generatePromiseStackTraceHtmlForFolder = async (
@@ -103,10 +127,11 @@ export const generatePromiseStackTraceHtmlForFolder = async (
 
       const formattedStackTrace = FormatStackTrace.formatStackTrace(stackTrace)
       const escapedStackTrace = formattedStackTrace ? EscapeHtml.escapeHtml(formattedStackTrace) : '(no stack trace)'
+      const promiseTitle = getPromiseTitle(stackTrace)
 
       content += '<div class="PromiseItem">\n'
       content += '  <div class="PromiseItemHeader">\n'
-      content += `    <h3>Promise ${i + 1}</h3>\n`
+      content += `    <h3>${EscapeHtml.escapeHtml(promiseTitle)}</h3>\n`
       content += '    <div class="PromiseItemMeta">\n'
       content += `      <span>Count: ${count}</span>\n`
       content += `      <span>Delta: ${delta}</span>\n`
