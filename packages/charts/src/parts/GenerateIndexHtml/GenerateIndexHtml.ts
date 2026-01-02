@@ -1,13 +1,9 @@
-import { readFile } from 'fs/promises'
 import { existsSync } from 'node:fs'
 import { mkdir, readdir, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
 import * as Root from '../Root/Root.ts'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
+import * as GeneratePromiseStackTraceHtml from '../GeneratePromiseStackTraceHtml/GeneratePromiseStackTraceHtml.ts'
 
 const baseStructure = `
 <!DOCTYPE html>
@@ -31,6 +27,7 @@ const baseStructure = `
 </html>
 `
 
+
 const getMiddleHtml = (dirents: string[]) => {
   let html = '<ul class="Charts">\n'
   for (const dirent of dirents) {
@@ -43,21 +40,12 @@ const getMiddleHtml = (dirents: string[]) => {
   return html
 }
 
-const copyAssetsToFolder = async (folderPath: string): Promise<void> => {
-  const cssPath = join(__dirname, 'styles.css')
-  const jsPath = join(__dirname, 'script.js')
-  const cssContent = await readFile(cssPath, 'utf-8')
-  const jsContent = await readFile(jsPath, 'utf-8')
-  await writeFile(join(folderPath, 'styles.css'), cssContent)
-  await writeFile(join(folderPath, 'script.js'), jsContent)
-}
-
 const generateIndexHtmlForFolder = async (folderPath: string, folderName: string): Promise<void> => {
   const outPath = join(folderPath, 'index.html')
   const dirents = await readdir(folderPath)
 
   // Copy CSS and JS files to this folder
-  await copyAssetsToFolder(folderPath)
+  await CopyAssetsToFolder.copyAssetsToFolder(folderPath)
 
   // Use single column layout for named-function-count-3
   if (folderName === 'named-function-count-3') {
@@ -132,6 +120,7 @@ const generateIndexHtmlRecursively = async (basePath: string, dirents: string[])
   }
 }
 
+
 export const generateIndexHtml = async (): Promise<void> => {
   const outPath = join(Root.root, '.vscode-charts', `index.html`)
   const svgPath = join(Root.root, '.vscode-charts')
@@ -143,7 +132,7 @@ export const generateIndexHtml = async (): Promise<void> => {
   }
 
   // Copy CSS and JS files to root .vscode-charts directory
-  await copyAssetsToFolder(svgPath)
+  await CopyAssetsToFolder.copyAssetsToFolder(svgPath)
 
   const dirents = await readdir(svgPath)
   const middleHtml = getMiddleHtml(dirents)
@@ -152,4 +141,7 @@ export const generateIndexHtml = async (): Promise<void> => {
 
   // Generate index.html for subfolders that contain multiple SVG files
   await generateIndexHtmlRecursively(svgPath, dirents)
+
+  // Generate HTML for promise stack traces
+  await GeneratePromiseStackTraceHtml.generatePromiseStackTraceHtml()
 }
