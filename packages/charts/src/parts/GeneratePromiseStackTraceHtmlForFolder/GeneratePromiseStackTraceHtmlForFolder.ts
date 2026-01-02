@@ -90,7 +90,8 @@ export const generatePromiseStackTraceHtmlForFolder = async (sourceFolderPath: s
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i]
-      const stackTrace = item.stackTrace || item.originalStack || ''
+      // Prefer originalStack (original locations) over stackTrace (minified locations)
+      const stackTrace = item.originalStack || item.stackTrace || ''
       const count = item.count || 0
       const delta = item.delta || 0
       const properties = item.properties || {}
