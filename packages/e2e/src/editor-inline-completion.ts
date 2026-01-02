@@ -16,13 +16,15 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   })
   await Editor.open('test.txt')
   await Editor.shouldHaveBreadCrumb('test.txt')
-  await Editor.shouldHaveText('')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.type('a')
+  await Editor.shouldHaveText('a')
   // @ts-ignore
   await Editor.shouldHaveInlineCompletion('bcdef')
+  await Editor.undo()
+  await Editor.shouldHaveText('')
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
