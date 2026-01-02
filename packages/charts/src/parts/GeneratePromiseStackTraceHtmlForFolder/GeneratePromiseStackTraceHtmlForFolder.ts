@@ -43,8 +43,8 @@ const copyPromiseStackTraceCss = async (folderPath: string): Promise<void> => {
   await writeFile(join(folderPath, 'promise-stack-traces.css'), cssContent)
 }
 
-export const generatePromiseStackTraceHtmlForFolder = async (folderPath: string, folderName: string): Promise<void> => {
-  const dirents = await readdir(folderPath)
+export const generatePromiseStackTraceHtmlForFolder = async (sourceFolderPath: string, targetFolderPath: string, folderName: string): Promise<void> => {
+  const dirents = await readdir(sourceFolderPath)
   const jsonFiles = dirents.filter((file) => file.endsWith('.json'))
 
   if (jsonFiles.length === 0) {
@@ -54,7 +54,7 @@ export const generatePromiseStackTraceHtmlForFolder = async (folderPath: string,
   let content = ''
 
   for (const jsonFile of jsonFiles) {
-    const filePath = join(folderPath, jsonFile)
+    const filePath = join(sourceFolderPath, jsonFile)
     const data = await ReadJson.readJson(filePath)
 
     // Handle different data structures
@@ -119,10 +119,10 @@ export const generatePromiseStackTraceHtmlForFolder = async (folderPath: string,
   }
 
   if (content) {
-    const outPath = join(folderPath, 'index.html')
+    const outPath = join(targetFolderPath, 'index.html')
     const html = promiseStackTraceStructure.replace('CONTENT', content)
-    await CopyAssetsToFolder.copyAssetsToFolder(folderPath)
-    await copyPromiseStackTraceCss(folderPath)
+    await CopyAssetsToFolder.copyAssetsToFolder(targetFolderPath)
+    await copyPromiseStackTraceCss(targetFolderPath)
     await writeFile(outPath, html)
   }
 }
