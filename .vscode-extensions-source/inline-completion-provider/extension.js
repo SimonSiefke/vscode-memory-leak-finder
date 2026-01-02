@@ -7,19 +7,14 @@ export function activate(context) {
       const textBeforeCursor = line.text.substring(0, position.character)
 
       if (textBeforeCursor.endsWith('a')) {
-        return [
-          new vscode.InlineCompletionItem('bcdef', new vscode.Range(position, position)),
-        ]
+        return [new vscode.InlineCompletionItem('bcdef', new vscode.Range(position, position))]
       }
 
       return []
     },
   }
 
-  context.subscriptions.push(
-    vscode.languages.registerInlineCompletionItemProvider({ scheme: 'file' }, provider),
-  )
+  context.subscriptions.push(vscode.languages.registerInlineCompletionItemProvider({ scheme: 'file' }, provider))
 }
 
 export function deactivate() {}
-
