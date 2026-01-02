@@ -17,6 +17,7 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   })
   await Editor.open('test.txt')
   await Editor.shouldHaveBreadCrumb('test.txt')
+  await Editor.shouldHaveText('')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
