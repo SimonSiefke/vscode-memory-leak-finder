@@ -25,11 +25,7 @@ export const setup = async ({ Editor, Workspace, SideBar, Extensions }: TestCont
   await SideBar.hide()
   // @ts-ignore
   await Editor.waitforTextFileReady('test.ts')
-  await Editor.shouldHaveText('a')
-  await new Promise((r) => {
-    setTimeout(r, 350)
-  })
-
+  await Editor.deleteCharactersLeft({ count: 1 })
   await Editor.deleteAll()
   await Editor.save({ viaKeyBoard: true })
 }
@@ -39,8 +35,10 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.type('func')
   // @ts-ignore
   await Editor.acceptInlineCompletion()
-  await new Promise((r) => {})
-  await Editor.shouldHaveText('abcdef')
+  await Editor.shouldHaveText(`function add(a:number, b:number): number {
+  return a+b
+}
+  `)
   await Editor.deleteAll()
   await Editor.save({ viaKeyBoard: true })
 }

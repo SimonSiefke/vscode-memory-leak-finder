@@ -188,7 +188,9 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     async deleteCharactersLeft({ count }) {
       try {
         for (let i = 0; i < count; i++) {
+          await page.waitForIdle()
           await page.keyboard.press('Backspace')
+          await page.waitForIdle()
         }
       } catch (error) {
         throw new VError(error, `Failed to delete character left`)
