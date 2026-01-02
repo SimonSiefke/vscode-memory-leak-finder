@@ -3,28 +3,13 @@ import type { UniqueLocation, UniqueLocationMap } from '../UniqueLocationMap/Uni
 import { addOriginalSources } from '../AddOriginalSources/AddOriginalSources.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
+import type { CompareResult } from './CompareResult.ts'
 
 const emptyItem = {
   count: 0,
 }
 
-export interface CompareResult {
-  readonly column: number
-  readonly count: number
-  readonly delta: number
-  readonly line: number
-  readonly name: string
-  readonly originalColumn?: number | null
-  readonly originalLine?: number | null
-  readonly originalLocation?: string
-  readonly originalName?: string | null
-  readonly originalSource?: string | null
-  readonly originalUrl?: string | null
-  readonly scriptId: number
-  readonly sourceLocation?: string
-  readonly sourceMapUrl?: string
-  readonly url?: string
-}
+export type { CompareResult }
 
 interface UniqueLocationWithDelta extends UniqueLocation {
   readonly delta: number

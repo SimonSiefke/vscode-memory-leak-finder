@@ -18,7 +18,7 @@ const getBinaryPathFromExtractDir = (platform: string, arch: string, extractDir:
     return join(extractDir, 'Visual Studio Code - Insiders.app', 'Contents', 'MacOS', 'Electron')
   }
   if (platform === 'win32') {
-    return join(extractDir, 'Code - Insiders', 'Code - Insiders.exe')
+    return join(extractDir, 'Code - Insiders.exe')
   }
   const archSuffix = arch === 'arm64' ? 'arm64' : 'x64'
   return join(extractDir, `VSCode-linux-${archSuffix}`, 'code-insiders')
