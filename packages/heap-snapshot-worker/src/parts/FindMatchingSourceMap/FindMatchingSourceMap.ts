@@ -29,4 +29,3 @@ export const findMatchingSourceMap = (url: string): string | null => {
     return null
   }
 }
-

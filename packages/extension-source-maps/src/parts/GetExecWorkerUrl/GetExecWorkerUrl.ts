@@ -5,4 +5,3 @@ export const getExecWorkerUrl = (): string => {
   const url = join(root, 'packages/exec-worker/src/main.ts')
   return url
 }
-

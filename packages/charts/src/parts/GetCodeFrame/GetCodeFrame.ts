@@ -77,4 +77,3 @@ export const getCodeFrame = async (stackLine: string): Promise<string | null> =>
     return null
   }
 }
-

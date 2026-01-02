@@ -162,7 +162,9 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       }
 
       const formattedStackTraceWithoutFirstLine = FormatStackTrace.formatStackTrace(stackTraceWithoutFirstLine)
-      const escapedStackTraceWithoutFirstLine = formattedStackTraceWithoutFirstLine ? EscapeHtml.escapeHtml(formattedStackTraceWithoutFirstLine) : '(no stack trace)'
+      const escapedStackTraceWithoutFirstLine = formattedStackTraceWithoutFirstLine
+        ? EscapeHtml.escapeHtml(formattedStackTraceWithoutFirstLine)
+        : '(no stack trace)'
 
       content += '  <div class="CodeBlock">\n'
       content += '    <pre><code class="language-javascript">'
