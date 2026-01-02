@@ -24,7 +24,7 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   await Editor.closeAll()
   await Extensions.show()
   await Extensions.search(`@id:inline-completion-provider`)
-  // TODO need to ensure that xtnion is running somow
+  // TODO need to ensure that extension is running
   await new Promise((r) => {
     setTimeout(r, 1000021)
   })
