@@ -11,6 +11,7 @@ export const getMeasureRpc = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  inspectMainProcess: boolean,
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
@@ -33,6 +34,11 @@ export const getMeasureRpc = async (
     await sessionRpc.dispose()
     const ptyhostRpc = await connectToDevtoolsWithJsonUrl(inspectPtyHostPort)
     return ptyhostRpc
+  }
+  if (inspectMainProcess) {
+    await sessionRpc.dispose()
+    const electronRpc = await DebuggerCreateIpcConnection.createConnection(electronWebSocketUrl)
+    return electronRpc
   }
   if (measureNode) {
     await sessionRpc.dispose()

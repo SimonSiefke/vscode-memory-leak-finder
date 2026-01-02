@@ -51,6 +51,7 @@ export const runTestsWithCallback = async ({
   inspectExtensionsPort,
   inspectPtyHost,
   inspectPtyHostPort,
+  inspectMainProcess,
   inspectSharedProcess,
   inspectSharedProcessPort,
   isGithubActions,
@@ -122,6 +123,7 @@ export const runTestsWithCallback = async ({
         inspectExtensionsPort,
         inspectPtyHost,
         inspectPtyHostPort,
+        inspectMainProcess,
         inspectSharedProcess,
         inspectSharedProcessPort,
         measureId: measure,
@@ -307,7 +309,9 @@ export const runTestsWithCallback = async ({
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const testName = fileName.replace('.json', '')
             let resultPath
-            if (measureNode) {
+            if (inspectMainProcess) {
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'main-process', measure, fileName)
+            } else if (measureNode) {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, testName + '.json')
             } else if (inspectSharedProcess) {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'shared-process', measure, fileName)

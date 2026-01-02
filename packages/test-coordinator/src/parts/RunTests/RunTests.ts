@@ -131,6 +131,7 @@ export const runTests = async ({
     inspectExtensionsPort,
     inspectPtyHost,
     inspectPtyHostPort,
+    inspectMainProcess,
     inspectSharedProcess,
     inspectSharedProcessPort,
     isGithubActions,
