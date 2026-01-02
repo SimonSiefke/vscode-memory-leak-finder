@@ -9,12 +9,14 @@ import * as Root from '../Root/Root.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
+const getSelectAll = (platform: string): string => {
+  return IsMacos.isMacos(platform) ? 'Meta+A' : 'Control+A'
+}
 
 const space = ' '
 const nonBreakingSpace = String.fromCharCode(160)
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({ expect, ideVersion, page, VError, platform }) => {
   return {
     async add(path, expectedName) {
       try {
@@ -107,6 +109,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const quickPick = QuickPick.create({
           expect,
           page,
+          platform,
           VError,
         })
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
@@ -118,15 +121,15 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async install({ id, name }: { id: string; name: string }) {
       try {
-        const editor = Editor.create({ expect, ideVersion, page, VError })
+        const editor = Editor.create({ expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await this.show()
-        await this.search(id)
+        await this.search(`@id:"${id}"`)
         await this.first.shouldBe(name)
         await this.first.click()
         const extensionDetailView = ExtensionDetailView.create({ expect, page, VError })
         await extensionDetailView.installExtension()
-        const sideBar = SideBar.create({ expect, page, VError })
+        const sideBar = SideBar.create({ expect, page, platform, VError })
         await sideBar.hide()
         await editor.closeAll()
         await page.waitForIdle()
@@ -162,7 +165,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async restart() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
         await page.waitForIdle()
       } catch (error) {
@@ -185,7 +188,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await extensionsInput.setValue('')
         }
         const lines = extensionsView.locator('.monaco-editor .view-lines')
-        await page.keyboard.press(selectAll)
+        await page.keyboard.press(getSelectAll(platform))
         await page.waitForIdle()
         await page.keyboard.press('Backspace')
         await page.waitForIdle()
@@ -284,6 +287,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           const quickPick = QuickPick.create({
             expect,
             page,
+            platform,
             VError,
           })
           await quickPick.executeCommand(WellKnownCommands.ShowExtensions)

@@ -3,14 +3,16 @@
 import * as fs from 'node:fs/promises'
 import * as ParseOsReleaseText from '../ParseOsReleaseText/ParseOsReleaseText.ts'
 
-export const getLinuxDistributionInfo = async (): Promise<
+export const getLinuxDistributionInfo = async (
+  platform: string,
+): Promise<
   | {
       id: string
       version: string
     }
   | undefined
 > => {
-  if (process.platform !== 'linux') {
+  if (platform !== 'linux') {
     return undefined
   }
   try {

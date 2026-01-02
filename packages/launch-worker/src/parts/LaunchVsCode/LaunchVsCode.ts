@@ -35,8 +35,8 @@ export const launchVsCode = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
-  useProxyMock,
   updateUrl,
+  useProxyMock,
   vscodePath,
   vscodeVersion,
 }: {

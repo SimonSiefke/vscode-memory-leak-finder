@@ -55,5 +55,5 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     watch: options.watch,
     workers: options.workers,
   })
-  return InitialStart.initialStart(options)
+  return InitialStart.initialStart({ ...options, isGithubActions } as ReturnType<typeof ParseArgv.parseArgv> & { isGithubActions: boolean })
 }

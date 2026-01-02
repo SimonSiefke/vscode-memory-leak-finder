@@ -37,8 +37,8 @@ export interface PrepareTestsAndAttachOptions {
   readonly runMode: number
   readonly screencastQuality: number
   readonly timeouts: any
-  readonly useProxyMock: boolean
   readonly updateUrl: string
+  readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
 }
@@ -72,8 +72,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     runMode,
     screencastQuality,
     timeouts,
-    useProxyMock,
     updateUrl,
+    useProxyMock,
     vscodePath,
     vscodeVersion,
   } = options
@@ -105,8 +105,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       recordVideo,
       runMode,
       timeouts,
-      useProxyMock,
       updateUrl,
+      useProxyMock,
       vscodePath,
       vscodeVersion,
     })
@@ -116,6 +116,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, utilityContext, webSocketUrl } = await result
 
   const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
+    platform,
+    arch,
     recordVideo,
     screencastQuality,
     connectionId,

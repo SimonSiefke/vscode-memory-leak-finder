@@ -12,7 +12,6 @@ export const setup = async ({ Extensions, Workspace }: TestContext): Promise<voi
       name: 'index.py',
     },
   ])
-  // @ts-ignore
   await Extensions.install({
     id: 'ms-python.python',
     name: 'Python',
@@ -23,7 +22,6 @@ export const run = async ({ Editor, Suggest, Workspace }: TestContext): Promise<
   await Editor.open('index.py')
   await Editor.shouldHaveBreadCrumb('index.py')
   await Editor.shouldHaveBreadCrumb('add')
-  // @ts-ignore
   await Editor.setCursor(2, 15)
   await Editor.shouldHaveSquigglyError()
   await Editor.shouldHaveText(`def add(a,b,c):

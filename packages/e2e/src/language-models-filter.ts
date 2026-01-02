@@ -4,12 +4,10 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-// @ts-ignore
 export const setup = async ({ Editor, Electron, Extensions, LanguageModelEditor }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
   })
-  // @ts-ignore
   await Extensions.install({
     id: 'github copilot chat',
     name: 'GitHub Copilot Chat',
@@ -19,7 +17,7 @@ export const setup = async ({ Editor, Electron, Extensions, LanguageModelEditor 
 }
 
 // @ts-ignore
-export const run = async ({ LanguageModelEditor, Editor }: TestContext): Promise<void> => {
+export const run = async ({ Editor, LanguageModelEditor }: TestContext): Promise<void> => {
   await LanguageModelEditor.filter({
     searchValue: 'gpt',
   })

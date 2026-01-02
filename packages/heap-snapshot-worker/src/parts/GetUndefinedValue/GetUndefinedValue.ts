@@ -1,7 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
 // Cache for undefined nodes analysis to avoid re-scanning the entire snapshot
@@ -12,7 +12,7 @@ let undefinedNodesCache: Map<string, { undefinedNodeId: number | null }> | null 
  * This is done by looking for hidden nodes with name "undefined"
  */
 const analyzeUndefinedNodes = (snapshot: Snapshot): { undefinedNodeId: number | null } => {
-  const { nodes, strings, meta } = snapshot
+  const { meta, nodes, strings } = snapshot
   const nodeFields = meta.node_fields
 
   // Create a snapshot hash for caching
@@ -27,7 +27,7 @@ const analyzeUndefinedNodes = (snapshot: Snapshot): { undefinedNodeId: number | 
   const idFieldIndex = nodeFields.indexOf('id')
 
   // Find the string index for "undefined"
-  const undefinedStringIndex = strings.findIndex((str) => str === 'undefined')
+  const undefinedStringIndex = strings.indexOf('undefined')
 
   let undefinedNodeId: number | null = null
 
@@ -108,7 +108,7 @@ export const getUndefinedStructure = (
 ): { value: string; hasTypeReference: boolean } | null => {
   if (!sourceNode) return null
 
-  const { nodes, edges, strings, meta } = snapshot
+  const { edges, meta, nodes, strings } = snapshot
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
   const ITEMS_PER_NODE = nodeFields.length
@@ -131,7 +131,7 @@ export const getUndefinedStructure = (
   const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
   // Find property name index
-  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
+  const propertyNameIndex = strings.indexOf(propertyName)
   if (propertyNameIndex === -1) return null
 
   // Get edge type indices
@@ -173,8 +173,8 @@ export const getUndefinedStructure = (
 
   if (undefinedValue) {
     return {
-      value: undefinedValue,
       hasTypeReference: hasTypeReference,
+      value: undefinedValue,
     }
   }
 

@@ -1,10 +1,10 @@
+import type * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as Character from '../Character/Character.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
-import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 
 <<<<<<< HEAD
 export const handleStdinDataWaitingMode = async (state: StdinDataState.StdinDataState, key: string): Promise<StdinDataState.StdinDataState> => {

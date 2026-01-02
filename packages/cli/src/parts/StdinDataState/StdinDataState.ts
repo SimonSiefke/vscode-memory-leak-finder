@@ -8,6 +8,7 @@ export interface StdinDataState {
   readonly bisect: boolean
   readonly buffering: boolean
   readonly checkLeaks: boolean
+  readonly clearExtensions: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -45,7 +46,6 @@ export interface StdinDataState {
   readonly value: string
   readonly watch: boolean
   readonly workers: boolean
-  readonly clearExtensions: boolean
 }
 
 let state: StdinDataState = {
@@ -53,6 +53,7 @@ let state: StdinDataState = {
   bisect: false,
   buffering: false,
   checkLeaks: false,
+  clearExtensions: true,
   continueValue: '',
   cwd: Character.EmptyString,
   enableExtensions: false,
@@ -89,7 +90,6 @@ let state: StdinDataState = {
   value: Character.EmptyString,
   watch: false,
   workers: false,
-  clearExtensions: true,
 }
 
 <<<<<<< HEAD

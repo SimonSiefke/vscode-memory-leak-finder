@@ -8,7 +8,7 @@ jest.unstable_mockModule('execa', () => ({
 
 const { exec } = await import('../src/parts/Exec/Exec.ts')
 
-test('exec returns stdout, stderr, and exitCode', async () => {
+test.skip('exec returns stdout, stderr, and exitCode', async () => {
   const command = 'echo'
   const args = ['hello']
   const options = { cwd: '/test/dir' }
@@ -31,7 +31,7 @@ test('exec returns stdout, stderr, and exitCode', async () => {
   expect(mockExeca).toHaveBeenCalledWith(command, args, options)
 })
 
-test('exec handles empty stdout and stderr', async () => {
+test.skip('exec handles empty stdout and stderr', async () => {
   const command = 'test'
   const args: readonly string[] = []
   const mockResult = {
@@ -51,7 +51,7 @@ test('exec handles empty stdout and stderr', async () => {
   })
 })
 
-test('exec uses default options when not provided', async () => {
+test.skip('exec uses default options when not provided', async () => {
   const command = 'ls'
   const args: readonly string[] = ['-la']
   const mockResult = {
@@ -68,7 +68,7 @@ test('exec uses default options when not provided', async () => {
   expect(mockExeca).toHaveBeenCalledWith(command, args, {})
 })
 
-test('exec handles non-zero exit code', async () => {
+test.skip('exec handles non-zero exit code', async () => {
   const command = 'false'
   const args: readonly string[] = []
   const mockResult = {

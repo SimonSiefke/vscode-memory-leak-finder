@@ -1,7 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async close() {
       try {
@@ -21,7 +21,7 @@ export const create = ({ expect, page, VError }) => {
         const suggestWidget = page.locator('.suggest-widget')
         await expect(suggestWidget).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TriggerSuggest, {
           pressKeyOnce: true,
         })
@@ -34,6 +34,28 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open suggest widget`)
+      }
+    },
+    async accept(item: string) {
+      try {
+        await page.waitForIdle()
+        const suggestWidget = page.locator('.suggest-widget')
+        await expect(suggestWidget).toBeVisible()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.TriggerSuggest, {
+          pressKeyOnce: true,
+        })
+        await expect(suggestWidget).toBeVisible()
+        await page.waitForIdle()
+        const element = suggestWidget.locator(`.monaco-list-row[aria-label="${item}"]`)
+        await expect(element).toBeVisible()
+        await page.waitForIdle()
+        await element.click()
+        await page.waitForIdle()
+        // await expect(suggestWidget).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to select completion`)
       }
     },
   }

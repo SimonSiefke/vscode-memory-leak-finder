@@ -14,7 +14,6 @@ abc
   await Editor.open('index.css')
   await Editor.shouldHaveBreadCrumb('index.css')
   await Editor.shouldHaveSquigglyError()
-  // @ts-ignore
   await Editor.setCursor(1, 1)
 }
 
@@ -26,7 +25,6 @@ abc
   // @ts-ignore
   await Editor.hover('}', /colon expected/)
   await Hover.hide()
-  // @ts-ignore
   await Editor.setCursor(2, 1)
   await Editor.deleteCharactersRight({ count: 3 })
   await Editor.shouldHaveText(`h1{
@@ -41,5 +39,6 @@ abc
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.saveAll()
   await Editor.closeAll()
 }

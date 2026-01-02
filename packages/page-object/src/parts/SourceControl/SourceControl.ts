@@ -50,12 +50,12 @@ const getDecorationContent = (text: string, className: string): string => {
   return content
 }
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }) => {
   return {
     async checkoutBranch(branchName: string) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitCheckoutTo, {
           stayVisible: true,
         })
@@ -71,7 +71,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const decoration = page.locator('[class^="ced-1-TextEditorDecorationType"]').nth(1)
         await expect(decoration).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
         await page.waitForIdle()
         await expect(decoration).toBeHidden()
@@ -99,10 +99,10 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async enableInlineBlame({ expectedDecoration }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
         await page.waitForIdle()
-        const editor = Editor.create({ expect, ideVersion, page, VError })
+        const editor = Editor.create({ expect, ideVersion, page, platform, VError })
         await editor.focus()
         await editor.cursorRight()
         await page.waitForIdle()
@@ -178,51 +178,9 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to hide graph`)
       }
     },
-    async showGraph() {
-      try {
-        await page.waitForIdle()
-        const input = page.locator('.scm-input')
-        await expect(input).toBeVisible()
-        await page.waitForIdle()
-        const editContext = input.locator('.native-edit-context')
-        await expect(editContext).toBeVisible()
-        await page.waitForIdle()
-        const management = page.locator('[aria-label="Source Control Management"]')
-        await expect(management).toBeVisible()
-        await page.waitForIdle()
-        const graph = page.locator('[aria-label="Graph Section"]')
-        const count = await graph.count()
-        if (count > 0) {
-          return
-        }
-        const actions = page.locator(`[aria-label="Source Control actions"]`)
-        await expect(actions).toBeVisible()
-        await page.waitForIdle()
-        const moreActions = actions.locator(`[aria-label^="Views and More Actions"]`)
-        await expect(moreActions).toBeVisible()
-        await page.waitForIdle()
-        await moreActions.click()
-        await page.waitForIdle()
-        const contextMenu = ContextMenu.create({
-          expect,
-          page,
-          VError,
-        })
-        await contextMenu.shouldHaveItem(`Graph`)
-        // @ts-ignore
-        await contextMenu.check('Graph')
-        await page.waitForIdle()
-        await contextMenu.close()
-        await page.waitForIdle()
-        await expect(graph).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to show graph`)
-      }
-    },
     async refresh() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitRefresh)
       } catch (error) {
         throw new VError(error, `Failed to git refresh`)
@@ -290,9 +248,51 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to show branch picker`)
       }
     },
+    async showGraph() {
+      try {
+        await page.waitForIdle()
+        const input = page.locator('.scm-input')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        const editContext = input.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        const management = page.locator('[aria-label="Source Control Management"]')
+        await expect(management).toBeVisible()
+        await page.waitForIdle()
+        const graph = page.locator('[aria-label="Graph Section"]')
+        const count = await graph.count()
+        if (count > 0) {
+          return
+        }
+        const actions = page.locator(`[aria-label="Source Control actions"]`)
+        await expect(actions).toBeVisible()
+        await page.waitForIdle()
+        const moreActions = actions.locator(`[aria-label^="Views and More Actions"]`)
+        await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
+        await moreActions.click()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({
+          expect,
+          page,
+          VError,
+        })
+        await contextMenu.shouldHaveItem(`Graph`)
+        // @ts-ignore
+        await contextMenu.check('Graph')
+        await page.waitForIdle()
+        await contextMenu.close()
+        await page.waitForIdle()
+        await expect(graph).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show graph`)
+      }
+    },
     async stageFile(name: string, parentFolder?: string) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitStageAllChanges)
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
         if (parentFolder) {
@@ -306,7 +306,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async undoLastCommit() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.UndoLastCommit)
       } catch (error) {
         throw new VError(error, `Failed to undo last commit`)
@@ -314,7 +314,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async unstageFile(name) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitUnstageAllChanges)
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
         await expect(file).toHaveAttribute('aria-label', `${name}, Untracked`)

@@ -5,9 +5,9 @@ export const launchSourceMapWorker = async () => {
   const sourceMapWorkerPath: string = getSourceMapWorkerPath()
 
   const rpc = await NodeWorkerRpcParent.create({
-    stdio: 'inherit',
-    path: sourceMapWorkerPath,
     commandMap: {},
+    path: sourceMapWorkerPath,
+    stdio: 'inherit',
   })
   return {
     invoke(method: string, ...params: readonly any[]) {

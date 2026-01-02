@@ -2,7 +2,11 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+<<<<<<< HEAD
 export const create = ({ expect, page, VError }: { expect: any; page: any; VError: any }) => {
+=======
+export const create = ({ expect, page, platform, VError }) => {
+>>>>>>> origin/main
   return {
     async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {
@@ -142,7 +146,7 @@ export const create = ({ expect, page, VError }: { expect: any; page: any; VErro
       // TODO maybe find a better way
       // create random quickpick to avoid race condition
       await page.waitForIdle()
-      const quickPick = QuickPick.create({ expect, page, VError })
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
       await quickPick.show()
       await quickPick.hide()
       await page.waitForIdle()
@@ -227,7 +231,7 @@ export const create = ({ expect, page, VError }: { expect: any; page: any; VErro
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
         await page.waitForIdle()
         const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')

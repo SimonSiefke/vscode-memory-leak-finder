@@ -44,7 +44,6 @@ int main() {
     return 0;
 }
 `)
-  // @ts-ignore
   await Editor.setCursor(4, 2)
   await Editor.inspectTokens()
   await Editor.shouldHaveInspectedToken('int3 chars')

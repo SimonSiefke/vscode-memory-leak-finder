@@ -1,14 +1,14 @@
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { collectArrayElements } from '../CollectArrayElements/CollectArrayElements.ts'
 import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
-import { tryResolveNestedNumeric } from '../TryResolveNestedNumeric/TryResolveNestedNumeric.ts'
 import * as Timing from '../Timing/Timing.ts'
-import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
+import { tryResolveNestedNumeric } from '../TryResolveNestedNumeric/TryResolveNestedNumeric.ts'
 
 /**
  * Collects properties of an object with optional depth control
@@ -49,7 +49,7 @@ export const collectObjectProperties = (
     return {}
   }
 
-  const { nodes, edges } = snapshot
+  const { edges, nodes } = snapshot
   const node = parseNode(nodeIndex, nodes, nodeFields)
 
   if (!node || visited.has(node.id)) {
@@ -147,139 +147,159 @@ export const collectObjectProperties = (
           // At depth 1, just show reference
           value = `[Array ${targetNode.id}]`
         }
-      } else if (targetType === 'array') {
-        if (depth > 1) {
-          // For arrays at depth > 1, we could collect indexed elements
-          // For now, show reference but could be enhanced later
-          value = `[Array ${targetNode.id}]`
-        } else {
-          // At depth 1, just show reference
-          value = `[Array ${targetNode.id}]`
-        }
-      } else if (targetType === 'string' || targetType === 'number') {
-        // For primitives, get the actual value (use fresh visited to avoid sibling cross-contamination)
-        const actual = getActualValueFast(
-          targetNode,
-          snapshot,
-          edgeMap,
-          new Set(),
-          targetNodeIndex,
-          nodeFields,
-          nodeTypes,
-          edgeFields,
-          strings,
-          ITEMS_PER_NODE,
-          ITEMS_PER_EDGE,
-          idFieldIndex,
-          edgeCountFieldIndex,
-          edgeTypeFieldIndex,
-          edgeNameFieldIndex,
-          edgeToNodeFieldIndex,
-          EDGE_TYPE_INTERNAL,
-          NODE_TYPE_STRING,
-          NODE_TYPE_NUMBER,
-          NODE_TYPE_OBJECT,
-          NODE_TYPE_ARRAY,
-        )
-        if (targetType === 'number') {
-          const parsed = Number(actual)
-          if (Number.isFinite(parsed)) {
-            value = parsed
-          } else {
-            value = actual
-          }
-        } else {
-          value = actual
-        }
-      } else if (targetType === 'hidden') {
-        // For hidden nodes, check if it's a boolean or other special value
-        const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
-        if (booleanValue) {
-          // Convert boolean strings to actual boolean values for preview
-          if (booleanValue === 'true') {
-            value = true
-          } else if (booleanValue === 'false') {
-            value = false
-          } else {
-            value = booleanValue
-          }
-        } else {
-          value = getActualValueFast(
-            targetNode,
-            snapshot,
-            edgeMap,
-            new Set(),
-            targetNodeIndex,
-            nodeFields,
-            nodeTypes,
-            edgeFields,
-            strings,
-            ITEMS_PER_NODE,
-            ITEMS_PER_EDGE,
-            idFieldIndex,
-            edgeCountFieldIndex,
-            edgeTypeFieldIndex,
-            edgeNameFieldIndex,
-            edgeToNodeFieldIndex,
-            EDGE_TYPE_INTERNAL,
-            NODE_TYPE_STRING,
-            NODE_TYPE_NUMBER,
-            NODE_TYPE_OBJECT,
-            NODE_TYPE_ARRAY,
-          )
-        }
-      } else if (targetType === 'code') {
-        // For code objects, try to get the actual value they represent
-        value = getActualValueFast(
-          targetNode,
-          snapshot,
-          edgeMap,
-          new Set(),
-          -1,
-          nodeFields,
-          nodeTypes,
-          edgeFields,
-          strings,
-          ITEMS_PER_NODE,
-          ITEMS_PER_EDGE,
-          idFieldIndex,
-          edgeCountFieldIndex,
-          edgeTypeFieldIndex,
-          edgeNameFieldIndex,
-          edgeToNodeFieldIndex,
-          EDGE_TYPE_INTERNAL,
-          NODE_TYPE_STRING,
-          NODE_TYPE_NUMBER,
-          NODE_TYPE_OBJECT,
-          NODE_TYPE_ARRAY,
-        )
-      } else if (targetType === 'closure') {
-        // Prefer showing function location if available
-        const locationFields = snapshot.meta.location_fields
-        const locations = snapshot.locations
-        if (locationFields && locationFields.length > 0 && locations && locations.length > 0) {
-          const { itemsPerLocation, objectIndexOffset, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
-          const traceNodeId = (targetNode as any)['trace_node_id']
-          for (let locIndex = 0; locIndex < locations.length; locIndex += itemsPerLocation) {
-            const objectIndex = locations[locIndex + objectIndexOffset] / ITEMS_PER_NODE
-            const isMatchByTrace = typeof traceNodeId === 'number' && traceNodeId !== 0 && objectIndex === traceNodeId
-            const isMatchByNodeIndex = objectIndex === targetNodeIndex
-            if (isMatchByTrace || isMatchByNodeIndex) {
-              const scriptId = locations[locIndex + scriptIdOffset]
-              const line = locations[locIndex + lineOffset]
-              const column = locations[locIndex + columnOffset]
-              value = `[function: ${scriptId}:${line}:${column}]`
-              break
+      } else
+        switch (targetType) {
+          case 'array': {
+            if (depth > 1) {
+              // For arrays at depth > 1, we could collect indexed elements
+              // For now, show reference but could be enhanced later
+              value = `[Array ${targetNode.id}]`
+            } else {
+              // At depth 1, just show reference
+              value = `[Array ${targetNode.id}]`
             }
+
+            break
+          }
+          case 'closure': {
+            // Prefer showing function location if available
+            const locationFields = snapshot.meta.location_fields
+            const { locations } = snapshot
+            if (locationFields && locationFields.length > 0 && locations && locations.length > 0) {
+              const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } =
+                getLocationFieldOffsets(locationFields)
+              const traceNodeId = targetNode['trace_node_id']
+              for (let locIndex = 0; locIndex < locations.length; locIndex += itemsPerLocation) {
+                const objectIndex = locations[locIndex + objectIndexOffset] / ITEMS_PER_NODE
+                const isMatchByTrace = typeof traceNodeId === 'number' && traceNodeId !== 0 && objectIndex === traceNodeId
+                const isMatchByNodeIndex = objectIndex === targetNodeIndex
+                if (isMatchByTrace || isMatchByNodeIndex) {
+                  const scriptId = locations[locIndex + scriptIdOffset]
+                  const line = locations[locIndex + lineOffset]
+                  const column = locations[locIndex + columnOffset]
+                  value = `[function: ${scriptId}:${line}:${column}]`
+                  break
+                }
+              }
+            }
+            if (value === undefined) {
+              value = `[${targetType} ${targetNode.id}]`
+            }
+
+            break
+          }
+          case 'code': {
+            // For code objects, try to get the actual value they represent
+            value = getActualValueFast(
+              targetNode,
+              snapshot,
+              edgeMap,
+              new Set(),
+              -1,
+              nodeFields,
+              nodeTypes,
+              edgeFields,
+              strings,
+              ITEMS_PER_NODE,
+              ITEMS_PER_EDGE,
+              idFieldIndex,
+              edgeCountFieldIndex,
+              edgeTypeFieldIndex,
+              edgeNameFieldIndex,
+              edgeToNodeFieldIndex,
+              EDGE_TYPE_INTERNAL,
+              NODE_TYPE_STRING,
+              NODE_TYPE_NUMBER,
+              NODE_TYPE_OBJECT,
+              NODE_TYPE_ARRAY,
+            )
+
+            break
+          }
+          case 'hidden': {
+            // For hidden nodes, check if it's a boolean or other special value
+            const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
+            if (booleanValue) {
+              // Convert boolean strings to actual boolean values for preview
+              if (booleanValue === 'true') {
+                value = true
+              } else if (booleanValue === 'false') {
+                value = false
+              } else {
+                value = booleanValue
+              }
+            } else {
+              value = getActualValueFast(
+                targetNode,
+                snapshot,
+                edgeMap,
+                new Set(),
+                targetNodeIndex,
+                nodeFields,
+                nodeTypes,
+                edgeFields,
+                strings,
+                ITEMS_PER_NODE,
+                ITEMS_PER_EDGE,
+                idFieldIndex,
+                edgeCountFieldIndex,
+                edgeTypeFieldIndex,
+                edgeNameFieldIndex,
+                edgeToNodeFieldIndex,
+                EDGE_TYPE_INTERNAL,
+                NODE_TYPE_STRING,
+                NODE_TYPE_NUMBER,
+                NODE_TYPE_OBJECT,
+                NODE_TYPE_ARRAY,
+              )
+            }
+
+            break
+          }
+          case 'number':
+          case 'string': {
+            // For primitives, get the actual value (use fresh visited to avoid sibling cross-contamination)
+            const actual = getActualValueFast(
+              targetNode,
+              snapshot,
+              edgeMap,
+              new Set(),
+              targetNodeIndex,
+              nodeFields,
+              nodeTypes,
+              edgeFields,
+              strings,
+              ITEMS_PER_NODE,
+              ITEMS_PER_EDGE,
+              idFieldIndex,
+              edgeCountFieldIndex,
+              edgeTypeFieldIndex,
+              edgeNameFieldIndex,
+              edgeToNodeFieldIndex,
+              EDGE_TYPE_INTERNAL,
+              NODE_TYPE_STRING,
+              NODE_TYPE_NUMBER,
+              NODE_TYPE_OBJECT,
+              NODE_TYPE_ARRAY,
+            )
+            if (targetType === 'number') {
+              const parsed = Number(actual)
+              if (Number.isFinite(parsed)) {
+                value = parsed
+              } else {
+                value = actual
+              }
+            } else {
+              value = actual
+            }
+
+            break
+          }
+          default: {
+            // For other types
+            value = `[${targetType} ${targetNode.id}]`
           }
         }
-        if (value === undefined) {
-          value = `[${targetType} ${targetNode.id}]`
-        }
-      } else {
-        // For other types
-        value = `[${targetType} ${targetNode.id}]`
-      }
 
       // Heuristic: For coordinate and size properties ('x','y','width','height'),
       // if value still looks like a reference, try to resolve nested numeric value

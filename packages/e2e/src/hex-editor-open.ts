@@ -4,8 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-export const setup = async ({ Editor, Explorer, Workspace, Extensions }: TestContext): Promise<void> => {
-  // @ts-ignore
+export const setup = async ({ Editor, Explorer, Extensions, Workspace }: TestContext): Promise<void> => {
   await Extensions.install({
     id: 'ms-vscode.hexeditor',
     name: 'Hex Editor',

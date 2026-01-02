@@ -29,7 +29,7 @@ const waitForTerminalReady = async ({ page, row1 }) => {
   return false
 }
 
-export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }) => {
   return {
     async add() {
       try {
@@ -88,7 +88,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         if (waitForFile) {
-          const workspace = Workspace.create({ electronApp, expect, page, VError })
+          const workspace = Workspace.create({ electronApp, expect, page, platform, VError })
           const exists = await workspace.waitForFile(waitForFile)
           if (!exists) {
             throw new Error(`expected file to be created`)
@@ -101,7 +101,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
     async focusHover() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TerminalFocusHover)
         await page.waitForIdle()
         const hover = page.locator('.monaco-hover.workbench-hover')
@@ -130,10 +130,10 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
     async killAll() {
       try {
         await page.waitForIdle()
-        const panel = Panel.create({ expect, page, VError })
+        const panel = Panel.create({ expect, page, platform, VError })
         await panel.hide()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.KillAllTerminals)
         await page.waitForIdle()
       } catch (error) {
@@ -164,7 +164,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
         const deleteAction = secondEntry.locator('[aria-label^="Kill"]')
         await deleteAction.click()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await page.waitForIdle()
         if (ideVersion && ideVersion.minor <= 106) {
           // do nothing
@@ -194,7 +194,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
         // const body = page.locator('body')
         // await body.focus()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.MoveTerminalToEditorArea, {
           pressKeyOnce: true,
         })
@@ -207,7 +207,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
     async moveToPanelArea() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.MoveTerminalToPanelArea)
         await page.waitForIdle()
         // TODO verify terminal tab is hidden
@@ -239,7 +239,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
     async restartPtyHost() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RestartPtyHost)
         await page.waitForIdle()
       } catch (error) {
@@ -249,7 +249,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
     async scrollToBottom() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TerminalScrollToBottom)
         await page.waitForIdle()
       } catch (error) {
@@ -259,7 +259,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
     async scrollToTop() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TerminalScrollToTop)
         await page.waitForIdle()
       } catch (error) {
@@ -296,7 +296,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
       try {
         await page.waitForIdle()
         await page.focus()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
         const terminalSplitPane = page.locator('.terminal-split-pane')
         await expect(terminalSplitPane).toBeVisible()

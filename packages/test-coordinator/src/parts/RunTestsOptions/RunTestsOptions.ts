@@ -20,6 +20,7 @@ export interface RunTestsOptions {
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
+  readonly isGithubActions: boolean
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
@@ -34,8 +35,8 @@ export interface RunTestsOptions {
   readonly setupOnly: boolean
   readonly timeoutBetween: number
   readonly timeouts: any
-  readonly useProxyMock: boolean
   readonly updateUrl: string
+  readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
 }

@@ -18,7 +18,6 @@ if __name__ == '__main__':
       name: 'main.py',
     },
   ])
-  // @ts-ignore
   await Extensions.install({
     id: 'ms-python.python',
     name: 'Python',
@@ -32,8 +31,11 @@ export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Pr
   await ActivityBar.showRunAndDebug()
   await Editor.setBreakpoint(2)
   await RunAndDebug.runAndWaitForPaused({
+    debugLabel: 'Python Debugger',
+    debugConfiguration: 'Python File',
     file: 'main.py',
     line: 2,
+    hasCallStack: false,
   })
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()

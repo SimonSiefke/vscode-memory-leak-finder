@@ -86,13 +86,13 @@ export const generateApiTypes = async (): Promise<void> => {
 
     // Generate context interface
     const contextInterface = `export interface PageObjectContext {
-  page: any
-  expect: any
-  VError: any
-  ideVersion?: {
-    minor: number
+  readonly page: any
+  readonly expect: any
+  readonly VError: any
+  readonly ideVersion?: {
+    readonly minor: number
   }
-  electronApp?: any
+  readonly electronApp?: any
 }`
 
     // Combine all interfaces

@@ -18,7 +18,7 @@ const getBinaryPathFromExtractDir = (platform: string, arch: string, extractDir:
     return join(extractDir, 'Visual Studio Code - Insiders.app', 'Contents', 'MacOS', 'Electron')
   }
   if (platform === 'win32') {
-    return join(extractDir, 'Code - Insiders', 'Code - Insiders.exe')
+    return join(extractDir, 'Code - Insiders.exe')
   }
   const archSuffix = arch === 'arm64' ? 'arm64' : 'x64'
   return join(extractDir, `VSCode-linux-${archSuffix}`, 'code-insiders')
@@ -77,15 +77,19 @@ export const downloadAndUnzipInsiders = async (platform: string, arch: string, c
     return path
   }
 
+<<<<<<< HEAD
 >>>>>>> origin/main
   await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
+=======
+  await DownloadAndExtract.downloadAndExtract(platform, 'vscode-insiders', [metadata.url], extractDir)
+>>>>>>> origin/main
   console.log(`[download-worker] Download complete.`)
   const path = getBinaryPathFromExtractDir(platform, arch, extractDir)
-  const productPath = GetProductJsonPath.getProductJsonPath(platform, path)
+  const productPath = GetProductJsonPath.getProductJsonPath(platform, path, commit)
   const productJson = await JsonFile.readJson(productPath)
   const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
   await JsonFile.writeJson(productPath, newProductJson)
-  await RemoveUnusedFiles.removeUnusedFiles(path)
+  await RemoveUnusedFiles.removeUnusedFiles(platform, path)
   if (automaticallyDownloadSourceMaps) {
     const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
     await LoadSourceMaps.loadSourceMaps(sourceMapUrls)

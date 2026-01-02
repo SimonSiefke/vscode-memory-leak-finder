@@ -35,20 +35,20 @@ const parseVscodeVersion = (defaultVersionValue: string, argv: readonly string[]
     if (vscodeVersionValue.startsWith('insiders:')) {
       const commitHash = vscodeVersionValue.slice('insiders:'.length)
       return {
-        vscodeVersion: '',
         insidersCommit: commitHash,
+        vscodeVersion: '',
       }
     }
     return {
-      vscodeVersion: vscodeVersionValue,
       insidersCommit: '',
+      vscodeVersion: vscodeVersionValue,
     }
   }
   if (defaultVersionValue.startsWith('insiders:')) {
     const commitHash = defaultVersionValue.slice('insiders:'.length)
     return {
-      vscodeVersion: '',
       insidersCommit: commitHash,
+      vscodeVersion: '',
     }
   }
   return {
@@ -102,7 +102,7 @@ const parseFilter = (argv: readonly string[]): string => {
   if (argv.includes('--only')) {
     const filterValue = parseArgvString(argv, '--only')
     // Replace dots with dashes for backwards compatibility
-    return filterValue.replace(/\./g, '-')
+    return filterValue.replaceAll('.', '-')
   }
   return ''
 }
@@ -253,7 +253,15 @@ const parseUpdateUrl = (argv: readonly string[]): string => {
   return 'https://update.code.visualstudio.com'
 }
 
-export const parseArgv = (platform: string, arch: string, argv: readonly string[]) => {
+const parsePlatform = (platform: string, argv: readonly string[]): string => {
+  if (argv.includes('--platform')) {
+    return parseArgvString(argv, '--platform')
+  }
+  return platform
+}
+
+export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
+  const platform = parsePlatform(processPlatform, argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const bisect = parseBisect(argv)
   const checkLeaks = parseCheckLeaks(argv)
@@ -290,10 +298,10 @@ export const parseArgv = (platform: string, arch: string, argv: readonly string[
   const useProxyMock = parseUseProxyMock(argv)
   const updateUrl = parseUpdateUrl(argv)
   const vscodePath = parseVscodePath(argv)
-  const vscodeVersion = parsedVersion.vscodeVersion
+  const { vscodeVersion } = parsedVersion
   const watch = parseWatch(argv)
   const workers = parseWorkers(argv)
-  const isWindows = IsWindows.isWindows(platform)
+  const isWindows = IsWindows.isWindows(processPlatform)
   return {
     arch,
     bisect,
@@ -316,6 +324,7 @@ export const parseArgv = (platform: string, arch: string, argv: readonly string[
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    isWindows,
     measure,
     measureAfter,
     measureNode,
@@ -329,12 +338,11 @@ export const parseArgv = (platform: string, arch: string, argv: readonly string[
     setupOnly,
     timeoutBetween,
     timeouts,
-    useProxyMock,
     updateUrl,
+    useProxyMock,
     vscodePath,
     vscodeVersion,
     watch,
     workers,
-    isWindows,
   }
 }

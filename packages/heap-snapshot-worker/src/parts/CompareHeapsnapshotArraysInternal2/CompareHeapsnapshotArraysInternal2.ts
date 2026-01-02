@@ -1,14 +1,14 @@
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as Assert from '../Assert/Assert.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { isChromeInternalArrayName } from '../IsChromeInternalArrayName/IsChromeInternalArrayName.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 
 const getSortedCounts = (heapsnapshot: Snapshot) => {
-  const { nodes, edges, strings } = heapsnapshot
-  const meta = heapsnapshot.meta
-  const { node_fields, edge_fields, edge_types } = meta
+  const { edges, nodes, strings } = heapsnapshot
+  const { meta } = heapsnapshot
+  const { edge_fields, edge_types, node_fields } = meta
 
   const nodeFieldCount = node_fields.length
   const edgeFieldCount = edge_fields.length
@@ -123,12 +123,12 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
     const edgeNames = arrayNamesMap[arrayOffset]
     if (edgeNames.size > 0) {
       // Sort names for consistent ordering, then join with "/"
-      const sortedNames = Array.from(edgeNames).sort()
+      const sortedNames = [...edgeNames].sort()
       const joinedName = sortedNames.join('/')
 
       // Try to get location info for this array (for potential original name resolution)
       let locationKey: string | null = null
-      if (hasLocations && locationOffsets && locations && traceNodeIdFieldIndex >= 0) {
+      if (hasLocations && locationOffsets && locations && traceNodeIdFieldIndex !== -1) {
         const traceNodeId = nodes[arrayOffset + traceNodeIdFieldIndex]
         if (traceNodeId !== undefined && traceNodeId !== 0) {
           // Find the location in the locations array
@@ -162,9 +162,9 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
     .filter(([name]) => !isChromeInternalArrayName(name))
     .map(([key, value]) => {
       return {
-        name: key,
         // @ts-ignore
         count: value.count,
+        name: key,
       }
     })
   const sorted = SortCountMap.sortCountMap(arrayNamesWithCount)

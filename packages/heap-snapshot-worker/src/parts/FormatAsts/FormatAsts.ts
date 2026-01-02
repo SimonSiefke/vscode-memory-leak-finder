@@ -25,7 +25,7 @@ const collapseAstsMaybe = (asts: readonly ObjectNode[], collapse: boolean): read
   const map = Object.create(null)
   for (const item of asts) {
     const hash = signatureFor(item, depth)
-    console.log({ item, hash })
+    console.log({ hash, item })
     map[hash] ||= 0
     map[hash]++
   }
