@@ -174,7 +174,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     async deleteAll() {
       try {
         await page.waitForIdle()
-        await this.selectAll()
+        await this.selectAll({ viaKeyBoard: true })
         await page.waitForIdle()
         await page.keyboard.press('Delete')
         await page.waitForIdle()
@@ -860,8 +860,14 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to select ${text}`)
       }
     },
-    async selectAll() {
+    async selectAll({ viaKeyBoard = false } = {}) {
       try {
+        if (viaKeyBoard) {
+          await page.waitForIdle()
+          await page.keyboard.press('Control+A')
+          await page.waitForIdle()
+          return
+        }
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectAll)
