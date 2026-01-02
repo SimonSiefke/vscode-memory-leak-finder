@@ -13,6 +13,8 @@ export const isChromeInternalString = (str: string): boolean => {
   if (str.includes('node:internal/')) {
     return true
   }
+  if (str.includes('(instruction stream for')) {
+    return true
+  }
   return false
 }
-

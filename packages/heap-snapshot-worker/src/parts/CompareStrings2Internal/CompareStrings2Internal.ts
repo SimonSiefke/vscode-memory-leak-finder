@@ -7,7 +7,7 @@ export interface LeakedString {
 }
 
 const compareCount = (a: LeakedString, b: LeakedString): number => {
-  return b.delta - a.delta
+  return b.delta - a.delta || b.string.length - a.string.length
 }
 
 const getLeakedStrings = (
