@@ -121,19 +121,7 @@ export const generatePromiseStackTraceHtmlForFolder = async (sourceFolderPath: s
 
   if (content) {
     const outPath = join(targetFolderPath, 'index.html')
-    // Build HTML with proper indentation - content should be indented to match CONTENT position (8 spaces)
-    const indentedContent = content
-      .split('\n')
-      .filter((line) => line.trim() || line === '') // Keep empty lines
-      .map((line) => {
-        if (!line.trim()) {
-          return line // Preserve empty lines
-        }
-        // Add 8 spaces to match the CONTENT placeholder position
-        return '        ' + line.trimStart()
-      })
-      .join('\n')
-    const html = promiseStackTraceStructure.replace('CONTENT', indentedContent)
+    const html = promiseStackTraceStructure.replace('CONTENT', content)
     await CopyAssetsToFolder.copyAssetsToFolder(targetFolderPath)
     await copyPromiseStackTraceCss(targetFolderPath)
     await writeFile(outPath, html)
