@@ -1601,5 +1601,27 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       }
       await subFrame.waitForIdle()
     },
+    async shouldHaveInlineCompletion(expectedText: string) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
+        await expect(inlineCompletion).toBeVisible({
+          timeout: 10_000,
+        })
+        await page.waitForIdle()
+        const completionText = await inlineCompletion.textContent()
+        if (completionText && completionText.includes(expectedText)) {
+          return
+        }
+        await expect(inlineCompletion).toHaveText(expectedText, {
+          timeout: 1000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify inline completion with text "${expectedText}"`)
+      }
+    },
   }
 }
