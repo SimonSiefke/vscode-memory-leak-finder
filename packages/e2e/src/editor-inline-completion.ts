@@ -34,7 +34,8 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   // @ts-ignore
   await Editor.shouldHaveInlineCompletion('bcdef')
   await Editor.shouldHaveText('abcdef')
-  await Editor.undo()
+  // @ts-ignore
+  await Editor.undo({ viaKeyBoard: true })
   await Editor.shouldHaveText('')
 }
 

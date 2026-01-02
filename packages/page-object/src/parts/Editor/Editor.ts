@@ -1477,8 +1477,14 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to type ${text}`)
       }
     },
-    async undo() {
+    async undo({ viaKeyBoard = false } = {}) {
       try {
+        if (viaKeyBoard) {
+          await page.waitForIdle()
+          await page.keyboard.press('Ctrl+Z')
+          await page.waitForIdle()
+          return
+        }
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.Undo)
       } catch (error) {
