@@ -140,26 +140,26 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       }
       content += '    </div>\n'
       content += '  </div>\n'
+
+      // Add code frame for first stack trace line only
+      if (item.originalStack && Array.isArray(item.originalStack) && item.originalStack.length > 0) {
+        const firstStackLine = item.originalStack[0]
+        const codeFrame = await GetCodeFrame.getCodeFrame(firstStackLine)
+        if (codeFrame) {
+          content += '  <div class="CodeFrame">\n'
+          content += `    <div class="CodeFrameHeader">${EscapeHtml.escapeHtml(firstStackLine)}</div>\n`
+          content += '    <pre class="line-numbers"><code class="language-typescript">'
+          content += EscapeHtml.escapeHtml(codeFrame)
+          content += '</code></pre>\n'
+          content += '  </div>\n'
+        }
+      }
+
       content += '  <div class="CodeBlock">\n'
       content += '    <pre><code class="language-javascript">'
       content += escapedStackTrace
       content += '</code></pre>\n'
       content += '  </div>\n'
-
-      // Add code frames for original stack trace lines
-      if (item.originalStack && Array.isArray(item.originalStack)) {
-        for (const stackLine of item.originalStack) {
-          const codeFrame = await GetCodeFrame.getCodeFrame(stackLine)
-          if (codeFrame) {
-            content += '  <div class="CodeFrame">\n'
-            content += `    <div class="CodeFrameHeader">${EscapeHtml.escapeHtml(stackLine)}</div>\n`
-            content += '    <pre class="line-numbers"><code class="language-typescript">'
-            content += EscapeHtml.escapeHtml(codeFrame)
-            content += '</code></pre>\n'
-            content += '  </div>\n'
-          }
-        }
-      }
 
       content += '</div>\n'
     }
