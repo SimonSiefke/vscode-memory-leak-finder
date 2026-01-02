@@ -81,7 +81,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to close terminal find`)
       }
     },
-    async execute(command, { waitForFile = '' } = {}) {
+    async execute(command: string, { waitForFile = '' } = {}) {
       try {
         await page.waitForIdle()
         await this.type(command)
@@ -342,6 +342,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const letters = command.split('')
         for (const letter of letters) {
+          await page.waitForIdle()
           await page.keyboard.press(letter)
           await page.waitForIdle()
         }
