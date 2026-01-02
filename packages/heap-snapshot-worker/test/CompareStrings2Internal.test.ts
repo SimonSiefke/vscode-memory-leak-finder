@@ -339,3 +339,83 @@ test('should handle strings with control characters', () => {
     { string: '\x02', delta: 1 },
   ])
 })
+
+test('should filter out Chrome internal strings when includeChromeInternalStrings is false', () => {
+  const before: readonly string[] = ['normal']
+  const after: readonly string[] = [
+    'normal',
+    '167 / part of key (system / ScopeInfo @67611) -> value (system / Tuple2 @200575) pair in WeakMap (table @2317)',
+    '1 / part of key (node:internal/readline/utils @71901) -> value (system / ArrayList @273823) pair in WeakMap (table @109977)',
+    'leaked',
+  ]
+  const minCount = 1
+
+  const result = compareStrings2Internal(before, after, minCount, false)
+
+  expect(result).toEqual([{ string: 'leaked', delta: 1 }])
+})
+
+test('should include Chrome internal strings when includeChromeInternalStrings is true', () => {
+  const before: readonly string[] = ['normal']
+  const after: readonly string[] = [
+    'normal',
+    '167 / part of key (system / ScopeInfo @67611) -> value (system / Tuple2 @200575) pair in WeakMap (table @2317)',
+    'leaked',
+  ]
+  const minCount = 1
+
+  const result = compareStrings2Internal(before, after, minCount, true)
+
+  expect(result).toEqual([
+    { string: '167 / part of key (system / ScopeInfo @67611) -> value (system / Tuple2 @200575) pair in WeakMap (table @2317)', delta: 1 },
+    { string: 'leaked', delta: 1 },
+  ])
+})
+
+test('should include Chrome internal strings by default', () => {
+  const before: readonly string[] = ['normal']
+  const after: readonly string[] = [
+    'normal',
+    '1 / part of key (ForkUtilityProcess @111149) -> value (UtilityProcessWrapper @7297) pair in WeakMap (table @195443)',
+    'leaked',
+  ]
+  const minCount = 1
+
+  const result = compareStrings2Internal(before, after, minCount)
+
+  expect(result).toEqual([
+    {
+      string: '1 / part of key (ForkUtilityProcess @111149) -> value (UtilityProcessWrapper @7297) pair in WeakMap (table @195443)',
+      delta: 1,
+    },
+    { string: 'leaked', delta: 1 },
+  ])
+})
+
+test('should filter out strings with system / pattern when includeChromeInternalStrings is false', () => {
+  const before: readonly string[] = ['normal']
+  const after: readonly string[] = [
+    'normal',
+    '1 / part of key (system / ObjectTemplateInfo @154791) -> value (FSEvent @205297) pair in WeakMap (table @109929)',
+    'leaked',
+  ]
+  const minCount = 1
+
+  const result = compareStrings2Internal(before, after, minCount, false)
+
+  expect(result).toEqual([{ string: 'leaked', delta: 1 }])
+})
+
+test('should filter out strings with node:internal/ pattern when includeChromeInternalStrings is false', () => {
+  const before: readonly string[] = ['normal']
+  const after: readonly string[] = [
+    'normal',
+    '1 / part of key (node:internal/readline/utils @71901) -> value (system / ArrayList @273823) pair in WeakMap (table @109977)',
+    'leaked',
+  ]
+  const minCount = 1
+
+  const result = compareStrings2Internal(before, after, minCount, false)
+
+  expect(result).toEqual([{ string: 'leaked', delta: 1 }])
+})

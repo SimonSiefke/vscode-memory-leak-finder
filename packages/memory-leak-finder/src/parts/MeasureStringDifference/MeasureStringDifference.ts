@@ -27,7 +27,9 @@ export const stop = (session: Session, objectGroup: string) => {
 
 export const compare = async (beforePath: string, afterPath: string, context: any) => {
   await using rpc = await launchHeapSnapshotWorker()
-  const result = await compareStrings2(rpc, beforePath, afterPath, context.runs)
+  const minCount = 1
+  const includeChromeInternalStrings = false
+  const result = await compareStrings2(rpc, beforePath, afterPath, minCount, includeChromeInternalStrings)
   return result
 }
 

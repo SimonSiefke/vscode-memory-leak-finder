@@ -1,8 +1,13 @@
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import * as Assert from '../Assert/Assert.ts'
-import { compareStrings2Internal, type LeakedString } from '../CompareStrings2Internal/CompareStrings2Internal.ts'
+import { type LeakedString, compareStrings2Internal } from '../CompareStrings2Internal/CompareStrings2Internal.ts'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
-export const compareStrings2 = async (beforePath: string, afterPath: string, minCount: number): Promise<readonly LeakedString[]> => {
+export const compareStrings2 = async (
+  beforePath: string,
+  afterPath: string,
+  minCount: number,
+  includeChromeInternalStrings: boolean,
+): Promise<readonly LeakedString[]> => {
   Assert.string(beforePath)
   Assert.string(afterPath)
   Assert.number(minCount)
@@ -14,6 +19,15 @@ export const compareStrings2 = async (beforePath: string, afterPath: string, min
       parseStrings: true,
     }),
   ])
-  const leaked = compareStrings2Internal(snapshotBefore.strings, snapshotAfter.strings, minCount)
+  const leaked = compareStrings2Internal(snapshotBefore.strings, snapshotAfter.strings, minCount, includeChromeInternalStrings)
   return leaked
 }
+
+const r = await compareStrings2(
+  `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/0.json`,
+  `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/1.json`,
+  1,
+  false,
+)
+
+console.log({ r })
