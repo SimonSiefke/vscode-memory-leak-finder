@@ -20,6 +20,7 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.shouldHaveText('test ')
   await Editor.setCursor(1, 5)
+  await Editor.deleteAll()
   await Editor.type('a')
   await new Promise((r) => {})
   // @ts-ignore
