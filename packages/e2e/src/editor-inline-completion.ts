@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([
     {
@@ -20,6 +20,12 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
   await Extensions.show()
   await Extensions.search(`@id:e2e-tests.inline-completion-provider`)
   await Extensions.first.shouldHaveActivationTime()
+  await SideBar.hide()
+  await Editor.goToFile({
+    column: 1,
+    file: 'test.txt',
+    line: 1,
+  })
   console.log('done')
   await new Promise((r) => {
     setTimeout(r, 1000021)
