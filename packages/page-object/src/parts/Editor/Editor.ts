@@ -629,7 +629,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           await this.waitForWarning()
         } else if (options?.hasError) {
           // TODO
-          await new Promise((r) => {})
+          throw new Error(`not implemented`)
         } else if (isVideo(fileName)) {
           await this.waitForVideoReady(options?.hasError)
         } else if (isBinary(fileName)) {
@@ -1218,9 +1218,8 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async shouldHaveLightBulb() {
       try {
-        await new Promise((r) => {})
         await page.waitForIdle()
-        const spark = page.locator('.codicon.codicon-gutter-lightbulb-sparkle-filled')
+        const spark = page.locator('.codicon.codicon-gutter-lightbulb-aifix-auto-fix')
         await expect(spark).toBeVisible({
           timeout: 20_000,
         })
@@ -1379,7 +1378,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     async showSourceAction() {
       try {
         await page.waitForIdle()
-        const sourceAction = page.locator('[aria-label="Action Widget"]')
+        const sourceAction = page.locator('.context-view [aria-label="Action Widget"]')
         await expect(sourceAction).toBeHidden()
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })

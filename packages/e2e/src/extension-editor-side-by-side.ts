@@ -24,7 +24,6 @@ export const run = async ({ Editor, ExtensionDetailView, Extensions }: TestConte
   // await Extensions.show()
   // await Extensions.search('@builtin typescript')
   // await Extensions.first.shouldBe('TypeScript Language Basics')
-  await new Promise(() => {})
   // TODO second editor
   await ExtensionDetailView.shouldHaveHeading('TypeScript Language Basics')
   await Editor.closeAll()
