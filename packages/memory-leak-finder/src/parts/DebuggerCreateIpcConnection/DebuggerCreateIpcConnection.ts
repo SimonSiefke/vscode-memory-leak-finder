@@ -6,14 +6,24 @@ import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWe
 export const createConnection = async (wsUrl: string): Promise<any> => {
   try {
     const webSocket = new WebSocket(wsUrl)
+    let connectionClosed = false
 
-    // TODO remove error listener and message listener when ipc is disposed
-    webSocket.addEventListener('error', (error: any) => {
-      throw new Error(`memory leak worker websocket error`)
-    })
+    const errorHandler = (error: any) => {
+      connectionClosed = true
+    }
+    const closeHandler = () => {
+      connectionClosed = true
+    }
+
+    webSocket.addEventListener('error', errorHandler)
+    webSocket.addEventListener('close', closeHandler)
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)
+
     const ipc = {
       dispose() {
+        webSocket.removeEventListener('error', errorHandler)
+        webSocket.removeEventListener('close', closeHandler)
+        webSocket.onmessage = null
         webSocket.close()
       },
       get onmessage() {
@@ -28,11 +38,21 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
         webSocket.onmessage = handleMessage
       },
       send(message: any): void {
+        if (connectionClosed) {
+          return
+        }
         webSocket.send(Json.stringify(message))
+      },
+      get connectionClosed() {
+        return connectionClosed
       },
     }
     const rpc = createRpc(ipc)
-    return rpc
+    // Wrap rpc to include connectionClosed flag
+    return {
+      ...rpc,
+      connectionClosed: () => connectionClosed,
+    }
   } catch (error) {
     throw new VError(error, `Failed to create websocket connection`)
   }
