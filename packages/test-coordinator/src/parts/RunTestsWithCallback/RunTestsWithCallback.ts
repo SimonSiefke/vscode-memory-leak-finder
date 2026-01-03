@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
-import * as GetErrorWorkerRpc from '../GetErrorWorkerRpc/GetErrorWorkerRpc.ts'
+import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
@@ -346,8 +346,7 @@ export const runTestsWithCallback = async ({
         } else {
           failed++
         }
-        await using errorWorkerRpc = await GetErrorWorkerRpc.getErrorWorkerRpc()
-        const prettyError = await errorWorkerRpc.invoke('PrettyError.prepare', error, { color, root })
+        const prettyError = await GetPrettyError.getPrettyError(error, color, root)
         await callback(
           TestWorkerEventType.TestFailed,
           absolutePath,
@@ -384,8 +383,7 @@ export const runTestsWithCallback = async ({
       type: 'success',
     }
   } catch (error) {
-    await using errorWorkerRpc = await GetErrorWorkerRpc.getErrorWorkerRpc()
-    const prettyError = await errorWorkerRpc.invoke('PrettyError.prepare', error, { color, root })
+    const prettyError = await GetPrettyError.getPrettyError(error, color, root)
     return {
       prettyError,
       type: 'error',
