@@ -35,7 +35,7 @@ export const setup = async ({
   await Workbench.focusLeftEditorGroup()
 }
 
-export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands, Workbench }: TestContext): Promise<void> => {
+export const run = async ({ Editor, MarkdownPreview }: TestContext): Promise<void> => {
   await Editor.open('other.md')
   const subFrame2 = await MarkdownPreview.shouldBeVisible()
 
