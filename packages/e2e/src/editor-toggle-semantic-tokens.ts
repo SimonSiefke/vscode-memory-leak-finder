@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Editor, SettingsEditor, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SettingsEditor, Workspace, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: `class MyClass {
@@ -17,6 +17,7 @@ export const setup = async ({ Editor, SettingsEditor, Workspace }: TestContext):
       name: 'file.ts',
     },
   ])
+  await SideBar.hide()
   await Editor.closeAll()
   await Editor.open('file.ts')
   await Editor.splitRight()
