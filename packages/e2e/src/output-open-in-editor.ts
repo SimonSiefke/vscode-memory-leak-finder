@@ -7,7 +7,6 @@ export const setup = async ({ Editor, Output, Panel, SideBar }: TestContext): Pr
   await SideBar.hide()
   await Panel.hide()
   await Output.show()
-
   // @ts-ignore
   await Output.select('Main', {
     shouldHaveContent: true,
