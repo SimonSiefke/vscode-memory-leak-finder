@@ -51,7 +51,6 @@ export const unused = () => {
   await Editor.shouldHaveBreadCrumb('main')
   await Editor.shouldHaveSquigglyError()
   await Editor.setCursor(1, 1)
-
   // @ts-ignore
   await Editor.shouldHaveLightBulb()
 }
