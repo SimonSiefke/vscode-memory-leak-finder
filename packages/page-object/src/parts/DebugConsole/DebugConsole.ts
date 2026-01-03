@@ -56,7 +56,7 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(firstResult).toBeVisible()
         if (expectedResult.type) {
           const span = firstResult.locator(`.value.${expectedResult.type}`)
-          await expect(span).toBeBisible()
+          await expect(span).toBeVisible()
         }
         await page.waitForIdle()
         await expect(firstResult).toHaveText(expectedResult.message)
