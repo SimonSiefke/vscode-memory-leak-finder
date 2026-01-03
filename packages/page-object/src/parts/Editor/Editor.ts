@@ -1171,11 +1171,12 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify editor selection`)
       }
     },
-    async shouldHaveSemanticToken(type) {
+    async shouldHaveSemanticToken(type: string) {
       try {
         await page.waitForIdle()
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
+        await page.waitForIdle()
         const semanticSection = inspectWidget.locator('.tiw-semantic-token-info, [class*="semantic-token"], [class*="semantic"]')
         const count = await semanticSection.count()
         if (count > 0) {
@@ -1276,11 +1277,12 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       await expect(token).toHaveCss('color', color)
       await page.waitForIdle()
     },
-    async shouldNotHaveSemanticToken(type) {
+    async shouldNotHaveSemanticToken(type: string) {
       try {
         await page.waitForIdle()
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
+        await page.waitForIdle()
         const widgetText = await inspectWidget.textContent()
         if (widgetText) {
           const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
