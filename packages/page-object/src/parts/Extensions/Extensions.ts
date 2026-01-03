@@ -99,14 +99,22 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
       },
       async openContextMenu() {
-        const firstExtension = page.locator('.extension-list-item').first()
-        await expect(firstExtension).toBeVisible()
-        const nameLocator = firstExtension.locator('.name')
-        const name = await nameLocator.textContent()
-        await expect(nameLocator).toHaveText(name)
-        const contextMenu = ContextMenu.create({ expect, page, VError })
-        await contextMenu.open(firstExtension)
-        await contextMenu.close()
+        try {
+          await page.waitForIdle()
+          const firstExtension = page.locator('.extension-list-item').first()
+          await expect(firstExtension).toBeVisible()
+          await page.waitForIdle()
+          const nameLocator = firstExtension.locator('.name')
+          const name = await nameLocator.textContent()
+          await page.waitForIdle()
+          await expect(nameLocator).toHaveText(name)
+          await page.waitForIdle()
+          const contextMenu = ContextMenu.create({ expect, page, VError })
+          await contextMenu.open(firstExtension)
+          await contextMenu.close()
+        } catch (error) {
+          throw new VError(error, `Failed to open context menu`)
+        }
       },
       async shouldBe(name: string) {
         await page.waitForIdle()
