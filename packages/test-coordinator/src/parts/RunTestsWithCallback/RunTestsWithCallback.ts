@@ -325,6 +325,7 @@ export const runTestsWithCallback = async ({
               leaking++
             }
             if (result.summary) {
+              // TODO log it in cli or stdout worker
               console.log(result.summary)
             }
           } else {
