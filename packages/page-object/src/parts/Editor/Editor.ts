@@ -1375,6 +1375,27 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to show refactor action`)
       }
     },
+    async selectLine() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Control+L')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select line`)
+      }
+    },
+    async shouldHaveSelectedCharacters(count: number) {
+      try {
+        await page.waitForIdle()
+        const statusBarItem = page.locator('#status\\.editor\\.selection')
+        await expect(statusBarItem).toBeVisible()
+        await page.waitForIdle()
+        await expect(statusBarItem).toHaveText(new RegExp(`\\(${count} selected\\)`))
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify selected character count`)
+      }
+    },
     async showSourceAction() {
       try {
         await page.waitForIdle()
