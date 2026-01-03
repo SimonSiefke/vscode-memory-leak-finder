@@ -22,6 +22,7 @@ export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void>
     },
   ])
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('level1')
   await Explorer.shouldHaveItem('another-branch')
 }
@@ -69,7 +70,6 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
   await Workspace.remove('temp/nested/folders')
   await Workspace.remove('temp/nested')
   await Workspace.remove('temp')
-
   await Explorer.refresh()
 
   // Verify deletion
@@ -105,7 +105,6 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
 
   // Clean up: Restore original state to make test idempotent
   await Workspace.remove('complex/nested/structure/deep-file.txt')
-
   await Workspace.remove('level1/renamed-level2/level3/deep-file.txt')
   await Workspace.remove('level1/renamed-level2/mid-file.txt')
   await Workspace.add({
