@@ -1,25 +1,20 @@
-<<<<<<< HEAD
-import * as ConvertRequestsToMocks from './ConvertRequestsToMocks/ConvertRequestsToMocks.ts'
 import { existsSync } from 'fs'
 import { readdir, readFile, writeFile, mkdir } from 'fs/promises'
 import { join, dirname } from 'path'
 import { URL } from 'url'
 import { fileURLToPath } from 'url'
-=======
-import { existsSync } from 'node:fs'
-import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
-import { join } from 'node:path'
-import { URL } from 'node:url'
->>>>>>> origin/main
-import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
-import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
-import * as Root from '../Root/Root.ts'
+import * as Root from '../../Root/Root.ts'
+import type { MockConfigEntry } from '../../MockConfigEntry/MockConfigEntry.ts'
+import * as GetMockFileName from '../../GetMockFileName/GetMockFileName.ts'
+import * as LoadMockConfig from '../LoadMockConfig/LoadMockConfig.ts'
+import * as HasConfigEntry from '../HasConfigEntry/HasConfigEntry.ts'
+import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
 
-const __dirname = import.meta.dirname
-const MOCK_CONFIG_PATH = join(__dirname, '..', 'GetMockFileName', 'mock-config.json')
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const MOCK_CONFIG_PATH = join(__dirname, '..', '..', 'GetMockFileName', 'mock-config.json')
 
 interface RecordedRequest {
   headers: Record<string, string | string[]>
@@ -35,46 +30,7 @@ interface RecordedRequest {
   url: string
 }
 
-const loadMockConfig = async (): Promise<MockConfigEntry[]> => {
-  try {
-    if (!existsSync(MOCK_CONFIG_PATH)) {
-      return []
-    }
-    const configContent = await readFile(MOCK_CONFIG_PATH, 'utf8')
-    return JSON.parse(configContent) as MockConfigEntry[]
-  } catch (error) {
-    console.error(`Error loading mock config from ${MOCK_CONFIG_PATH}:`, error)
-    return []
-  }
-}
-
-const matchesPattern = (value: string, pattern: string): boolean => {
-  if (pattern === '*') {
-    return true
-  }
-  if (pattern.includes('*')) {
-    // Simple wildcard matching: convert pattern to regex
-    const regexPattern = pattern.replaceAll('*', '.*').replaceAll('?', '.')
-    const regex = new RegExp(`^${regexPattern}$`)
-    return regex.test(value)
-  }
-  return value === pattern
-}
-
-const hasConfigEntry = (config: MockConfigEntry[], hostname: string, pathname: string, method: string): boolean => {
-  const methodLower = method.toLowerCase()
-  for (const entry of config) {
-    const hostnameMatch = matchesPattern(hostname, entry.hostname) || hostname.includes(entry.hostname)
-    const pathnameMatch = matchesPattern(pathname, entry.pathname)
-    const methodMatch = matchesPattern(methodLower, entry.method.toLowerCase())
-    if (hostnameMatch && pathnameMatch && methodMatch) {
-      return true
-    }
-  }
-  return false
-}
-
-const convertRequestsToMocks = async (): Promise<void> => {
+export const convertRequestsToMocks = async (): Promise<void> => {
   try {
     // Check if requests directory exists
     if (!existsSync(REQUESTS_DIR)) {
@@ -120,7 +76,7 @@ const convertRequestsToMocks = async (): Promise<void> => {
     console.log(`Found ${latestRequests.size} unique request/response pairs`)
 
     // Load existing mock config
-    const mockConfig = await loadMockConfig()
+    const mockConfig = await LoadMockConfig.loadMockConfig()
 
     // Convert each request to mock format and save
     let savedCount = 0
@@ -138,17 +94,23 @@ const convertRequestsToMocks = async (): Promise<void> => {
 
         // Parse URL to get hostname and pathname
         const parsedUrl = new URL(request.url)
-        const { hostname, pathname } = parsedUrl
+        const { hostname } = parsedUrl
+        const { pathname } = parsedUrl
 
         // Generate mock filename using the same logic as GetMockFileName
         const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
         const mockFilePath = join(MOCK_REQUESTS_DIR, mockFileName)
 
+        // Replace JWT tokens in request headers, response headers, and response body
+        const sanitizedRequestHeaders = ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.headers || {})
+        const sanitizedResponseHeaders = ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.headers || {})
+        const sanitizedResponseBody = ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)
+
         // Create mock data structure matching what GetMockResponse expects
         const mockData = {
           response: {
-            body: request.response.body,
-            headers: request.response.headers || {},
+            body: sanitizedResponseBody,
+            headers: sanitizedResponseHeaders,
             statusCode: request.response.statusCode,
             statusMessage: request.response.statusMessage,
             wasCompressed: request.response.wasCompressed,
@@ -160,7 +122,7 @@ const convertRequestsToMocks = async (): Promise<void> => {
         savedCount++
 
         // Check if we need to add this to mock-config.json
-        if (!hasConfigEntry(mockConfig, hostname, pathname, request.method)) {
+        if (!HasConfigEntry.hasConfigEntry(mockConfig, hostname, pathname, request.method)) {
           const newEntry: MockConfigEntry = {
             filename: mockFileName,
             hostname,
@@ -200,8 +162,4 @@ const convertRequestsToMocks = async (): Promise<void> => {
     console.error('Error converting requests to mocks:', error)
     throw error
   }
-}
-
-export const convertRequestsToMocksMain = async (): Promise<void> => {
-  await ConvertRequestsToMocks.convertRequestsToMocks()
 }
