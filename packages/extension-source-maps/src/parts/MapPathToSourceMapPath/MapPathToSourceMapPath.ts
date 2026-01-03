@@ -4,7 +4,7 @@ const EXTENSION_PATH_REGEX = /\.vscode-extensions\/(github\.copilot-chat-[^/]+)\
 const GITHUB_PREFIX_REGEX = /^github\./
 
 const normalizePathSeparators = (path: string): string => {
-  return path.replace(/\\/g, '/')
+  return path.replaceAll('\\', '/')
 }
 
 export const mapPathToSourceMapPath = (path: string, root: string): string | null => {

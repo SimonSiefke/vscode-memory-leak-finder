@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { createChart } from '../src/parts/CreateChart/CreateChart.ts'
 
-test('main', () => {
+test('main', async () => {
   const data: any[] = []
   const options = {
     x: 0,
@@ -9,7 +9,7 @@ test('main', () => {
     y: 0,
     yLabel: 'Y',
   }
-  expect(createChart(data, options))
+  expect(await createChart(data, options))
     .toBe(`<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" class=\"plot-d6a7b5\" fill=\"currentColor\" font-family=\"system-ui, sans-serif\" font-size=\"10\" text-anchor=\"middle\" width=\"640\" height=\"400\" viewBox=\"0 0 640 400\" style=\"overflow: visible; background: white;\"><style>:where(.plot-d6a7b5) {
   --plot-background: white;
   display: block;

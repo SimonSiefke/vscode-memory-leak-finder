@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
-import * as IsIgnoredProcessKillError from '../src/parts/IsIgnoredProcessKillError/IsIgnoredProcessKillError.ts'
 import * as ErrorCodes from '../src/parts/ErrorCodes/ErrorCodes.ts'
+import * as IsIgnoredProcessKillError from '../src/parts/IsIgnoredProcessKillError/IsIgnoredProcessKillError.ts'
 
 test('isIgnoredProcessKillError - ENOENT', () => {
   const error: { code: string } = { code: ErrorCodes.ENOENT }

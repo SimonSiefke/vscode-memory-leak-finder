@@ -317,6 +317,7 @@ export interface Output {
   clearFilter(): Promise<void>
   filter(filterValue: any): Promise<void>
   hide(): Promise<void>
+  openEditor(): Promise<void>
   select(channelName: any): Promise<void>
   show(): Promise<void>
 }

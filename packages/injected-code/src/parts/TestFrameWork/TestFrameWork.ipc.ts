@@ -11,6 +11,7 @@ export const Commands = {
   count: TestFrameWork.count,
   getAttribute: TestFrameWork.getAttribute,
   getTextContent: TestFrameWork.getTextContent,
+  getValue: TestFrameWork.getValue,
   isVisible: TestFrameWork.isVisible,
   mouseDown: TestFrameWork.mouseDown,
   mouseMove: TestFrameWork.mouseMove,
