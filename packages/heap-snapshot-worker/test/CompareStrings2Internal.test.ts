@@ -6,7 +6,7 @@ test('should return empty array when both arrays are empty', () => {
   const after: readonly string[] = []
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([])
 })
@@ -16,7 +16,7 @@ test('should return empty array when before is empty and after has strings', () 
   const after: readonly string[] = ['leaked1', 'leaked2']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     { string: 'leaked1', delta: 1 },
@@ -29,7 +29,7 @@ test('should return empty array when after is empty and before has strings', () 
   const after: readonly string[] = []
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([])
 })
@@ -39,7 +39,7 @@ test('should return empty array when strings are identical', () => {
   const after: readonly string[] = ['string1', 'string2', 'string3']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([])
 })
@@ -49,7 +49,7 @@ test('should detect single leaked string', () => {
   const after: readonly string[] = ['string1', 'string2', 'leaked']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: 'leaked', delta: 1 }])
 })
@@ -59,7 +59,7 @@ test('should detect multiple leaked strings', () => {
   const after: readonly string[] = ['string1', 'string2', 'leaked1', 'leaked2']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     { string: 'leaked1', delta: 1 },
@@ -72,7 +72,7 @@ test('should count multiple occurrences of leaked strings', () => {
   const after: readonly string[] = ['string1', 'string2', 'leaked', 'leaked', 'leaked']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: 'leaked', delta: 3 }])
 })
@@ -82,7 +82,7 @@ test('should filter by minCount', () => {
   const after: readonly string[] = ['string1', 'string2', 'leaked1', 'leaked1', 'leaked2']
   const minCount = 2
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: 'leaked1', delta: 2 }])
 })
@@ -92,7 +92,7 @@ test('should return empty array when all leaks are below minCount', () => {
   const after: readonly string[] = ['string1', 'string2', 'leaked']
   const minCount = 2
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([])
 })
@@ -102,7 +102,7 @@ test('should sort results by delta descending', () => {
   const after: readonly string[] = ['string1', 'leaked1', 'leaked2', 'leaked2', 'leaked2', 'leaked3', 'leaked3']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     { string: 'leaked2', delta: 3 },
@@ -116,7 +116,7 @@ test('should handle strings that appear in both arrays', () => {
   const after: readonly string[] = ['common1', 'common2', 'common2', 'common2', 'leaked']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     { string: 'common2', delta: 2 },
@@ -129,7 +129,7 @@ test('should handle empty strings', () => {
   const after: readonly string[] = ['string1', '', '', '']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: '', delta: 2 }])
 })
@@ -139,7 +139,7 @@ test('should handle strings with special characters', () => {
   const after: readonly string[] = ['normal', 'with\nnewline', 'with\ttab', 'with"quote']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     { string: 'with\nnewline', delta: 1 },
@@ -153,7 +153,7 @@ test('should handle unicode strings', () => {
   const after: readonly string[] = ['normal', '🚀', '你好', 'مرحبا']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     { string: '🚀', delta: 1 },
@@ -168,7 +168,7 @@ test('should handle very long strings', () => {
   const after: readonly string[] = ['normal', longString]
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: longString, delta: 1 }])
 })
@@ -178,7 +178,7 @@ test('should handle strings that decrease in count', () => {
   const after: readonly string[] = ['string1', 'string2']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([])
 })
@@ -188,7 +188,7 @@ test('should handle complex scenario with multiple counts', () => {
   const after: readonly string[] = ['a', 'b', 'b', 'd', 'd', 'd', 'd', 'e', 'e']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     { string: 'd', delta: 4 },
@@ -201,7 +201,7 @@ test('should handle minCount of zero', () => {
   const after: readonly string[] = ['string1', 'leaked']
   const minCount = 0
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: 'leaked', delta: 1 }])
 })
@@ -211,7 +211,7 @@ test('should handle minCount greater than one', () => {
   const after: readonly string[] = ['string1', 'leaked1', 'leaked1', 'leaked1', 'leaked2', 'leaked2']
   const minCount = 3
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: 'leaked1', delta: 3 }])
 })
@@ -221,7 +221,7 @@ test('should handle duplicate strings in before array', () => {
   const after: readonly string[] = ['a', 'a', 'b', 'b', 'c']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     { string: 'b', delta: 1 },
@@ -234,7 +234,7 @@ test('should handle duplicate strings in after array', () => {
   const after: readonly string[] = ['a', 'b', 'c', 'c', 'c', 'c', 'c']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: 'c', delta: 5 }])
 })
@@ -244,7 +244,7 @@ test('should handle strings with same delta value', () => {
   const after: readonly string[] = ['string1', 'a', 'a', 'b', 'b', 'c', 'c']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   // All have delta 2, order may vary but all should be present
   expect(result).toHaveLength(3)
@@ -258,7 +258,7 @@ test('should handle large arrays', () => {
   const after: readonly string[] = [...Array.from({ length: 100 }, (_, i) => `string${i}`), ...Array.from({ length: 50 }, () => 'leaked')]
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: 'leaked', delta: 50 }])
 })
@@ -268,7 +268,7 @@ test('should handle strings that appear more in before than after', () => {
   const after: readonly string[] = ['a', 'b']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([])
 })
@@ -278,7 +278,7 @@ test('should handle mixed case strings', () => {
   const after: readonly string[] = ['String1', 'string1', 'STRING1']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   // Both have delta 1, order may vary but both should be present
   expect(result).toHaveLength(2)
@@ -291,7 +291,7 @@ test('should handle numeric strings', () => {
   const after: readonly string[] = ['1', '2', '3', '3', '3']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: '3', delta: 3 }])
 })
@@ -301,7 +301,7 @@ test('should handle boolean-like strings', () => {
   const after: readonly string[] = ['true', 'false', 'false']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: 'false', delta: 2 }])
 })
@@ -311,7 +311,7 @@ test('should handle JSON-like strings', () => {
   const after: readonly string[] = ['{"key":"value"}', '{"key":"value2"}', '{"key":"value2"}']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: '{"key":"value2"}', delta: 2 }])
 })
@@ -321,7 +321,7 @@ test('should handle strings with whitespace', () => {
   const after: readonly string[] = ['normal', '  spaced  ', '  spaced  ', '  spaced  ']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([{ string: '  spaced  ', delta: 3 }])
 })
@@ -331,7 +331,7 @@ test('should handle strings with control characters', () => {
   const after: readonly string[] = ['normal', '\x00', '\x01', '\x02']
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     { string: '\x00', delta: 1 },
@@ -381,7 +381,7 @@ test('should include Chrome internal strings by default', () => {
   ]
   const minCount = 1
 
-  const result = compareStrings2Internal(before, after, minCount)
+  const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
     {
