@@ -16,8 +16,7 @@ export const setup = async ({ Editor, Electron, Extensions, LanguageModelEditor 
   await LanguageModelEditor.open()
 }
 
-// @ts-ignore
-export const run = async ({ Editor, LanguageModelEditor }: TestContext): Promise<void> => {
+export const run = async ({ LanguageModelEditor }: TestContext): Promise<void> => {
   await LanguageModelEditor.filter({
     searchValue: 'gpt',
   })

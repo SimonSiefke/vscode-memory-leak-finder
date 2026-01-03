@@ -20,7 +20,6 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.reloadWebViews({
     expectViews: ['a.svg'],
   })

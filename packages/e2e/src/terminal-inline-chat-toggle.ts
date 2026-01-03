@@ -35,13 +35,12 @@ export const setup = async ({
   await Editor.closeAll()
   await Workspace.setFiles([])
   await Panel.hide()
-  // @ts-ignore
+
   await Terminal.show({
     waitForReady: true,
   })
 }
 
-// @ts-ignore
 export const run = async ({ TerminalInlineChat }: TestContext): Promise<void> => {
   await TerminalInlineChat.show()
   await TerminalInlineChat.hide()

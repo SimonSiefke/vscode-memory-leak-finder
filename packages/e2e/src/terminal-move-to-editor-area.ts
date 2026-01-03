@@ -7,15 +7,14 @@ export const setup = async ({ Editor, SideBar, Terminal, Workspace }: TestContex
   await Terminal.killAll()
   await Workspace.setFiles([])
   await SideBar.hide()
-  // @ts-ignore
+
   await Terminal.show({
     waitForReady: true,
   })
 }
 
 export const run = async ({ Terminal }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Terminal.moveToEditorArea()
-  // @ts-ignore
+
   await Terminal.moveToPanelArea()
 }

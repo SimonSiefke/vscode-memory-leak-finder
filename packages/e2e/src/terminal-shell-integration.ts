@@ -17,18 +17,17 @@ export const setup = async ({ Editor, Panel, SettingsEditor, SideBar, Terminal, 
   await Editor.closeAll()
   await Workspace.setFiles([])
   await Panel.hide()
-  // @ts-ignore
+
   await Terminal.show({
     waitForReady: true,
   })
 }
 
 export const run = async ({ Terminal, Workspace }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Terminal.execute('echo hello > test.txt', {
     waitForFile: 'test.txt',
   })
-  // @ts-ignore
+
   await Terminal.shouldHaveSuccessDecoration()
   await Terminal.clear()
   await Workspace.remove('test.txt')

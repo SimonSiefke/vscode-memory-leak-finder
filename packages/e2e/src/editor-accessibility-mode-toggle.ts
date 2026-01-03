@@ -16,9 +16,8 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.toggleScreenReaderAccessibilityMode()
-  // @ts-ignore
+
   await Editor.toggleScreenReaderAccessibilityMode()
 }
 

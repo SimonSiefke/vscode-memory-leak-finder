@@ -6,7 +6,7 @@ export const setup = async ({ SideBar, Terminal, Workspace }: TestContext): Prom
   await Terminal.killAll()
   await Workspace.setFiles([])
   await SideBar.hide()
-  // @ts-ignore
+
   await Terminal.show({
     waitForReady: true,
   })
@@ -15,7 +15,7 @@ export const setup = async ({ SideBar, Terminal, Workspace }: TestContext): Prom
 export const run = async ({ Terminal, Workspace }: TestContext): Promise<void> => {
   for (let i = 0; i < 50; i++) {
     const fileName = `test-${i}.txt`
-    // @ts-ignore
+
     await Terminal.execute(`echo test > ${fileName}`, {
       waitForFile: fileName,
     })

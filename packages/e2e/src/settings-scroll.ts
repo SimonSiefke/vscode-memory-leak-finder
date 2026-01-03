@@ -13,8 +13,7 @@ export const setup = async ({ Editor, SettingsEditor, SideBar }: TestContext): P
 }
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await SettingsEditor.moveScrollBar(200, 200)
-  // @ts-ignore
+
   await SettingsEditor.moveScrollBar(-200, 0)
 }

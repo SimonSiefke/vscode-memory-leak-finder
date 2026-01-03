@@ -22,7 +22,7 @@ export const run = async ({ Editor, Hover }: TestContext): Promise<void> => {
 abc
 }`)
   await Editor.shouldHaveSquigglyError()
-  // @ts-ignore
+
   await Editor.hover('}', /colon expected/)
   await Hover.hide()
   await Editor.setCursor(2, 1)

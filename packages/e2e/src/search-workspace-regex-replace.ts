@@ -20,9 +20,9 @@ export const setup = async ({ ActivityBar, Electron, Search, Workspace }: TestCo
   await ActivityBar.showSearch()
   await Electron.mockDialog({ response: 1 })
   await Search.expandFiles()
-  // @ts-ignore
+
   await Search.setFilesToInclude('test*.ts')
-  // @ts-ignore
+
   await Search.enableRegex()
 }
 

@@ -17,11 +17,8 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 }
 
 export const run = async ({ Editor, Extensions, Suggest }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Extensions.restart()
-  // @ts-ignore
   await Editor.shouldHaveBreadCrumb('h1')
-  // @ts-ignore
   await Suggest.open('visibility, Property')
   await Suggest.close()
 }

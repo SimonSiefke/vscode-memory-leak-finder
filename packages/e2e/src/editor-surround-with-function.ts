@@ -42,11 +42,11 @@ export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => 
 
   await Editor.setCursor(2, 3)
   await Editor.selectAll()
-  // @ts-ignore
+
   await Editor.showRefactor()
-  // @ts-ignore
+
   await Editor.selectRefactor('Extract to function in global scope')
-  // @ts-ignore
+
   await Editor.acceptRename()
   await Editor.shouldHaveText(`
 newFunction()

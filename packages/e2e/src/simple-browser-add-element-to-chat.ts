@@ -12,6 +12,7 @@ export const setup = async ({ Editor, Electron, SimpleBrowser, Workspace }: Test
   await SimpleBrowser.show({
     port: 3001,
   })
+
   // @ts-ignore
   await Electron.mockWebViewDebugger({
     // @ts-ignore

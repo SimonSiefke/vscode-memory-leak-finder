@@ -48,6 +48,7 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
     hasCallStack: false,
     line: 3,
   })
+
   // @ts-ignore
   await Editor.removeBreakPoint(2)
   await Editor.setBreakpoint(3)
@@ -55,6 +56,6 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
   await RunAndDebug.step('add.js', 3, 0, false)
   // @ts-ignore
   await Editor.removeBreakPoint(3)
-  // @ts-ignore
+
   await Editor.setBreakpoint(2)
 }
