@@ -12,7 +12,8 @@ export const setup = async ({ Editor, ExtensionDetailView, Extensions }: TestCon
   await ExtensionDetailView.shouldHaveTab('Details')
 }
 
-export const run = async ({ ExtensionDetailView, Extensions }: TestContext): Promise<void> => {
+export const run = async ({ ExtensionDetailView, Extensions, SideBar }: TestContext): Promise<void> => {
+  await SideBar.hide()
   await ExtensionDetailView.selectCategory('Programming Languages')
   await Extensions.shouldHaveValue('@category:"Programming Languages"')
   // @ts-ignore
