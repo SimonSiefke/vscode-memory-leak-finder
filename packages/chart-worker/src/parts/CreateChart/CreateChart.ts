@@ -1,14 +1,25 @@
 import { createBarChart } from '../CreateBarChart/CreateBarChart.ts'
 import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
 import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
+import * as CompressSvg from '../CompressSvg/CompressSvg.ts'
 
-export const createChart = (data: any, options: any) => {
+export const createChart = async (data: any, options: any): Promise<string> => {
+  let svg: string
   switch (options.type) {
     case 'bar-chart':
-      return createBarChart(data, options)
+      svg = createBarChart(data, options)
+      break
     case 'dual-bar-chart':
-      return createDualBarChart(data, options)
+      svg = createDualBarChart(data, options)
+      break
     default:
-      return createDefaultChart(data, options)
+      svg = createDefaultChart(data, options)
+      break
   }
+
+  if (options.compress) {
+    return await CompressSvg.compressSvg(svg)
+  }
+
+  return svg
 }

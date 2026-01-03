@@ -15,6 +15,7 @@ import * as LocatorScrollUp from '../LocatorScrollUp/LocatorScrollUp.ts'
 import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.ts'
 import * as LocatorSetChecked from '../LocatorSetChecked/LocatorSetChecked.ts'
 import * as LocatorSetValue from '../LocatorSetValue/LocatorSetValue.ts'
+import * as LocatorGetValue from '../LocatorGetValue/LocatorGetValue.ts'
 import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.ts'
 import * as LocatorType from '../LocatorType/LocatorType.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
@@ -125,6 +126,9 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     },
     setValue(value) {
       return LocatorSetValue.setValue(this, value)
+    },
+    getValue() {
+      return LocatorGetValue.getValue(this)
     },
     textContent({ allowHidden = false } = {}) {
       return LocatorTextContent.getTextContent(this, { allowHidden })

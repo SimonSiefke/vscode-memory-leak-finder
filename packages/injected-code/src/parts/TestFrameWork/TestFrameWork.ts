@@ -272,6 +272,14 @@ export const type = (text) => {
   fn(document.activeElement, { text })
 }
 
+export const getValue = (locator) => {
+  const element = QuerySelector.querySelector(locator.selector)
+  if (!element) {
+    throw new Error(`element not found`)
+  }
+  return element.value
+}
+
 export const contentEditableInsert = ({ value }) => {
   // TODO find non-deprecated alternative
   document.execCommand('insertText', false, value)
