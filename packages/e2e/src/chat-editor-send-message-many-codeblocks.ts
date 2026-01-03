@@ -70,7 +70,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     verify: true,
     viewLinesText: /Okay/,
   })
-  // @ts-ignore
+
   await ChatEditor.clearAll()
 }
 

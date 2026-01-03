@@ -13,7 +13,7 @@ export const setup = async ({ SideBar, Terminal, Workspace }: TestContext): Prom
     },
   ])
   await SideBar.hide()
-  // @ts-ignore
+
   await Terminal.show({
     waitForReady: true,
   })

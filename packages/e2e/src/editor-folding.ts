@@ -21,9 +21,8 @@ h2 {
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.fold()
-  // @ts-ignore
+
   await Editor.unfold()
 }
 

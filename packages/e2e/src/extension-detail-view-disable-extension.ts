@@ -15,6 +15,7 @@ export const setup = async ({ Editor, ExtensionDetailView, Extensions }: TestCon
 
 export const run = async ({ ExtensionDetailView }: TestContext): Promise<void> => {
   await ExtensionDetailView.disableExtension()
+
   // @ts-ignore
   await ExtensionDetailView.enableExtension()
 }

@@ -20,12 +20,12 @@ export const setup = async ({ ChatEditor, Editor, Electron, Extensions }: TestCo
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.addContext('Problems...', 'All Problems', 'All Problems')
-  // @ts-ignore
+
   await ChatEditor.sendMessage({
     message: `Fix the problems please`,
     verify: true,
   })
-  // @ts-ignore
+
   await ChatEditor.clearAll()
 }
 

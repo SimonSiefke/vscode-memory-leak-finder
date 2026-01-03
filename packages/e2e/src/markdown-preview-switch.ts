@@ -7,7 +7,7 @@ export const setup = async ({
   Explorer,
   MarkdownPreview,
   QuickPick,
-  // @ts-ignore
+
   WellKnownCommands,
   Workbench,
   Workspace,
@@ -29,21 +29,20 @@ export const setup = async ({
   await Editor.open('index.md')
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   const subFrame = await MarkdownPreview.shouldBeVisible()
-  // @ts-ignore
+
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
-  // @ts-ignore
+
   await Workbench.focusLeftEditorGroup()
 }
 
-// @ts-ignore
 export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands, Workbench }: TestContext): Promise<void> => {
   await Editor.open('other.md')
   const subFrame2 = await MarkdownPreview.shouldBeVisible()
-  // @ts-ignore
+
   await MarkdownPreview.shouldHaveHeading(subFrame2, 'abc')
   await Editor.open('index.md')
   const subFrame = await MarkdownPreview.shouldBeVisible()
-  // @ts-ignore
+
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
 }
 

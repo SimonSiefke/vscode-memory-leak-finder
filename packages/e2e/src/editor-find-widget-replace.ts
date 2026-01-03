@@ -2,7 +2,6 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
-// @ts-ignore
 export const setup = async ({ Editor, EditorFind, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -23,7 +22,6 @@ export const setup = async ({ Editor, EditorFind, Explorer, Workspace }: TestCon
   await EditorFind.openReplace()
 }
 
-// @ts-ignore
 export const run = async ({ Editor, EditorFind }: TestContext): Promise<void> => {
   await EditorFind.setSearchValue('abc')
   await EditorFind.setReplaceValue('def')

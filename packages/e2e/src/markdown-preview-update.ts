@@ -7,7 +7,7 @@ export const setup = async ({
   Explorer,
   MarkdownPreview,
   QuickPick,
-  // @ts-ignore
+
   WellKnownCommands,
   Workbench,
   Workspace,
@@ -25,16 +25,15 @@ export const setup = async ({
   await Editor.open('index.md')
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   const subFrame = await MarkdownPreview.shouldBeVisible()
-  // @ts-ignore
+
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
-  // @ts-ignore
+
   await Workbench.focusLeftEditorGroup()
 }
 
-// @ts-ignore
 export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands, Workbench }: TestContext): Promise<void> => {
   const subFrame = await MarkdownPreview.shouldBeVisible()
-  // @ts-ignore
+
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
   await Editor.deleteAll()
   await Editor.type('a')
@@ -42,7 +41,7 @@ export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommand
   await Editor.type('c')
   await Editor.type(' ')
   await Editor.type('#')
-  // @ts-ignore
+
   await MarkdownPreview.shouldHaveHeading(subFrame, 'cba') // TODO why is it reverse?
   await Editor.deleteAll()
   await Editor.type('d')
@@ -58,7 +57,7 @@ export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommand
   await Editor.type('h')
   await Editor.type(' ')
   await Editor.type('#')
-  // @ts-ignore
+
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
   await Editor.save({ viaKeyBoard: true })
 }

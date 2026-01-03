@@ -12,18 +12,17 @@ export const setup = async ({ ChatEditor, Electron, Extensions }: TestContext): 
     id: 'github copilot chat',
     name: 'GitHub Copilot Chat',
   })
-  // @ts-ignore
+
   await ChatEditor.clearAll()
   await ChatEditor.open()
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await ChatEditor.sendMessage({
     message: `What is displayed on https://example.com`,
     verify: true,
   })
-  // @ts-ignore
+
   await ChatEditor.clearAll()
 }
 

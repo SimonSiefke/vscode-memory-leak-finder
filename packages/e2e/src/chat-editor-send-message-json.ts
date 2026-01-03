@@ -28,7 +28,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     },
     verify: true,
   })
-  // @ts-ignore
+
   await ChatEditor.clearAll()
 }
 

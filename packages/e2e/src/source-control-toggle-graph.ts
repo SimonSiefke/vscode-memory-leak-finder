@@ -25,7 +25,6 @@ export const run = async ({ SourceControl }: TestContext): Promise<void> => {
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.saveAll()
   await Editor.closeAll()
   await Workspace.setFiles([])

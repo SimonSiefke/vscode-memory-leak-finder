@@ -21,14 +21,15 @@ export const setup = async ({ Editor, SideBar, Workspace }: TestContext): Promis
 }
 
 export const run = async ({ Editor, Suggest }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Suggest.open('visibility, Property')
+
   // @ts-ignore
   await Suggest.accept('visibility, Property')
   const space = ' '
   await Editor.shouldHaveText(`h1 {
   visibility:${space}
 }`)
+
   // @ts-ignore
   await Suggest.accept(`hidden, Value`)
   await Editor.shouldHaveText(`h1 {

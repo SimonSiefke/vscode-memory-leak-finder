@@ -16,7 +16,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 
 export const run = async ({ Editor, Explorer }: TestContext): Promise<void> => {
   await Explorer.focus()
-  // @ts-ignore
+
   await Explorer.openAllFiles()
   await Editor.closeAll()
 }

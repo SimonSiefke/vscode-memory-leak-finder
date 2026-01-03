@@ -9,8 +9,8 @@ export const setup = async ({ Editor, Panel }: TestContext): Promise<void> => {
 
 export const run = async ({ StatusBar }: TestContext): Promise<void> => {
   const id = 'status.problems'
-  // @ts-ignore
+
   await StatusBar.hideItem(id)
-  // @ts-ignore
+
   await StatusBar.showItem(id)
 }

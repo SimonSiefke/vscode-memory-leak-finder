@@ -12,7 +12,6 @@ export const run = async ({ Notification, QuickPick }: TestContext): Promise<voi
   await QuickPick.type('Hello world')
   await QuickPick.select('Hello World')
 
-  // @ts-ignore
   await Notification.shouldHaveItem('Hello World!')
   await Notification.closeAll()
 }

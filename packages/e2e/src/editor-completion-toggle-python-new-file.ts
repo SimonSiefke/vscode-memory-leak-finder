@@ -26,7 +26,7 @@ export const run = async ({ Editor, Suggest, Workspace }: TestContext): Promise<
   await Editor.shouldHaveSquigglyError()
   await Editor.shouldHaveText(`def add(a,b,c):
   return a + b + `)
-  // @ts-ignore
+
   await Suggest.open('bool, Class')
   await Suggest.close()
   await Editor.closeAll()

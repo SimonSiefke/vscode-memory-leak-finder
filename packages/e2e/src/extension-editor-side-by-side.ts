@@ -6,6 +6,7 @@ export const setup = async ({ Editor, Extensions, SideBar, Workspace }: TestCont
   await Editor.closeAll()
   await Workspace.setFiles([])
   await SideBar.hide()
+
   // @ts-ignore
   await Editor.splitRight({ groupCount: 0 })
   await Editor.focusLeftEditorGroup()
@@ -18,6 +19,7 @@ export const run = async ({ Editor, ExtensionDetailView, Extensions }: TestConte
   await Extensions.first.click()
   await ExtensionDetailView.shouldHaveHeading('C/C++ Language Basics')
   await Editor.focusRightEditorGroup()
+
   // @ts-ignore
   await Extensions.second.click()
   // await SideBar.hide()
