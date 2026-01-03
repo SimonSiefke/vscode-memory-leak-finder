@@ -4,7 +4,6 @@ export const skip = true
 
 export const setup = async ({ Editor, Electron, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
-
   // @ts-ignore
   const filePath = Workspace.getWorkspaceFilePath('exported-profile.code-profile')
   await Electron.mockSaveDialog({
