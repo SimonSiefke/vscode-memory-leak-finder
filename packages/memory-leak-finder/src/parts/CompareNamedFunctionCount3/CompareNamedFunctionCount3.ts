@@ -12,8 +12,10 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
     excludeOriginalPaths: [
       'async.ts',
       'debugName.ts',
+      'diffEditorInput.ts',
       'editStack.ts',
       'event.ts',
+      'fileEditorInput.ts',
       'files.ts',
       'functional.ts',
       'historyService.ts.ts',
@@ -23,6 +25,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'numbers.ts',
       'position.ts',
       'ternarySearchTree.ts',
+      'textResourceEditorInput.ts',
       'undoRedoService.ts',
       'uri.ts',
       'uriIdentityService.ts',
