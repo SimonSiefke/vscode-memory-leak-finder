@@ -120,10 +120,20 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
-        const option = quickPick.locator('.label-name', {
-          hasExactText: text,
-        })
-        await option.click()
+        if (typeof text === 'string') {
+          const option = quickPick.locator('.label-name', {
+            hasExactText: text,
+          })
+          await option.click()
+        } else {
+          const normal = `${text}`.slice(1, -1)
+          const item = quickPick.locator(`.monaco-list-row[aria-label*="${normal}"]`)
+          await expect(item).toBeVisible()
+          await page.waitForIdle()
+          const label = item.locator('.label-name')
+          await label.click()
+          await page.waitForIdle()
+        }
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()
         }

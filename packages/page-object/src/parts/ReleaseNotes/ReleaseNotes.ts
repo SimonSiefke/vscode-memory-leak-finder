@@ -9,9 +9,14 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(webView).toBeHidden()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await page.waitForIdle()
-        await quickPick.executeCommand(WellKnownCommands.ShowReleaseNotes)
+        await quickPick.show({
+          pressKeyOnce: true,
+        })
+        await quickPick.type('>' + WellKnownCommands.ShowReleaseNotes)
+        await quickPick.select(/Show Release Notes/)
         await page.waitForIdle()
         await expect(webView).toBeVisible()
+        // TODO verify webview contents
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show release notes`)
