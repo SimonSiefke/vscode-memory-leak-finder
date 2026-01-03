@@ -10,7 +10,7 @@ import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
-import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
+import * as TestWorkerRunTests from '../TestWorkerRunTests/TestWorkerRunTests.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
 import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as Time from '../Time/Time.ts'
@@ -287,14 +287,10 @@ export const runTestsWithCallback = async ({
           let isLeak = false
           if (checkLeaks) {
             if (measureAfter) {
-              for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform)
-              }
+              await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
             }
             await MemoryLeakFinder.start(memoryRpc, connectionId)
-            for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform)
-            }
+            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
@@ -328,9 +324,7 @@ export const runTestsWithCallback = async ({
               console.log(result.summary)
             }
           } else {
-            for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform)
-            }
+            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
           const end = Time.now()
