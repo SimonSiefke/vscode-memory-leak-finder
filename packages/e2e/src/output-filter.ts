@@ -7,16 +7,16 @@ export const setup = async ({ Editor, Output, Panel, SideBar }: TestContext): Pr
   await SideBar.hide()
   await Panel.hide()
   await Output.show()
-  await Output.select('Main')
-
+  // @ts-ignore
+  await Output.select('Main', {
+    shouldHaveContent: true,
+  })
   await Output.filter('update#setState')
 }
 
 export const run = async ({ Output }: TestContext): Promise<void> => {
   await Output.filter('update#setState')
-
   await Output.filter('update')
-
   await Output.filter('update#setState')
 }
 
