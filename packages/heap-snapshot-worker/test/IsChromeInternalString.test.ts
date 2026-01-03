@@ -18,14 +18,10 @@ test('should return true for strings with part of key and WeakMap', () => {
     ),
   ).toBe(true)
   expect(
-    isChromeInternalString(
-      '2 / part of key (ForkUtilityProcess @111149) -> value (PassThrough @111023) pair in WeakMap (table @195445)',
-    ),
+    isChromeInternalString('2 / part of key (ForkUtilityProcess @111149) -> value (PassThrough @111023) pair in WeakMap (table @195445)'),
   ).toBe(true)
   expect(
-    isChromeInternalString(
-      '3 / part of key (ForkUtilityProcess @112983) -> value (PassThrough @115787) pair in WeakMap (table @195447)',
-    ),
+    isChromeInternalString('3 / part of key (ForkUtilityProcess @112983) -> value (PassThrough @115787) pair in WeakMap (table @195447)'),
   ).toBe(true)
 })
 
@@ -154,8 +150,7 @@ test('should handle strings with whitespace variations', () => {
 
 test('should handle very long strings', () => {
   const longString =
-    '167 / part of key (system / ScopeInfo @67611) -> value (system / Tuple2 @200575) pair in WeakMap (table @2317) ' +
-    'a'.repeat(1000)
+    '167 / part of key (system / ScopeInfo @67611) -> value (system / Tuple2 @200575) pair in WeakMap (table @2317) ' + 'a'.repeat(1000)
   expect(isChromeInternalString(longString)).toBe(true)
   const longNonInternal = 'a'.repeat(1000) + 'normal string'
   expect(isChromeInternalString(longNonInternal)).toBe(false)
@@ -169,9 +164,7 @@ test('should handle unicode strings', () => {
 })
 
 test('should handle JSON-like strings', () => {
-  expect(isChromeInternalString('{"key": "part of key (Object @123) -> value (Array @456) pair in WeakMap"}')).toBe(
-    true,
-  )
+  expect(isChromeInternalString('{"key": "part of key (Object @123) -> value (Array @456) pair in WeakMap"}')).toBe(true)
   expect(isChromeInternalString('{"key": "system / WeakFixedArray"}')).toBe(true)
   expect(isChromeInternalString('{"key": "node:internal/readline/utils"}')).toBe(true)
   expect(isChromeInternalString('{"key": "normal string"}')).toBe(false)
@@ -226,4 +219,3 @@ test('should handle strings with escaped characters', () => {
   expect(isChromeInternalString('system \\/ WeakFixedArray')).toBe(false)
   expect(isChromeInternalString('node:internal\\/readline/utils')).toBe(false)
 })
-
