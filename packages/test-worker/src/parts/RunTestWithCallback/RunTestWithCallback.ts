@@ -11,11 +11,23 @@ const getModule = (runMode: number) => {
   }
 }
 
-export const runTestWithCallback = async (pageObject: any, file: string, forceRun: boolean, runMode: any, platform: string) => {
+export const runTestWithCallback = async ({
+  absolutePath,
+  forceRun,
+  pageObject,
+  platform,
+  runMode,
+}: {
+  absolutePath: string
+  forceRun: boolean
+  pageObject: any
+  platform: string
+  runMode: any
+}) => {
   const fn = getModule(runMode)
   if (runMode === TestRunMode.Vm) {
-    await fn(pageObject, file, forceRun, platform)
+    await fn({ absolutePath, forceRun, pageObject, platform })
   } else {
-    await fn(pageObject, file, forceRun, platform)
+    await fn({ absolutePath, forceRun, pageObject, platform })
   }
 }
