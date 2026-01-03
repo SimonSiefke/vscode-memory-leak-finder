@@ -7,7 +7,6 @@ export const setup = async ({
   Explorer,
   MarkdownPreview,
   QuickPick,
-
   WellKnownCommands,
   Workbench,
   Workspace,
@@ -31,7 +30,7 @@ export const setup = async ({
   await Workbench.focusLeftEditorGroup()
 }
 
-export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands, Workbench }: TestContext): Promise<void> => {
+export const run = async ({ Editor, MarkdownPreview }: TestContext): Promise<void> => {
   const subFrame = await MarkdownPreview.shouldBeVisible()
 
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
