@@ -1,3 +1,4 @@
+export const AddCursorBelow = 'Add Cursor Below'
 export const AutoFix = 'Auto Fix...'
 export const ChangeLanguageMode = 'Change Language Mode'
 export const ClearAllWorkspaceChats = 'Chat: Clear All Workspace Chats'

@@ -1498,6 +1498,16 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to type ${text}`)
       }
     },
+    async addCursorBelow() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.AddCursorBelow)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add cursor below`)
+      }
+    },
     async undo({ viaKeyBoard = false } = {}) {
       try {
         if (viaKeyBoard) {
