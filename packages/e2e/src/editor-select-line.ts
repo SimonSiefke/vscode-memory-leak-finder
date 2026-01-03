@@ -18,9 +18,7 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   // @ts-ignore
   await Editor.selectLine()
   // @ts-ignore
-  await Editor.shouldHaveSelectedCharacters(13)
-  // TODO verify status bar item with selected characters count
-  // await Editor.shouldHaveSelection('8px', /(15px|17px)/)
+  await Editor.shouldHaveSelectedCharacters(20)
   await Editor.cursorRight()
   await Editor.shouldHaveEmptySelection()
 }
