@@ -143,8 +143,8 @@ test('should handle strings with special characters', () => {
 
   expect(result).toEqual([
     { string: 'with\nnewline', delta: 1 },
-    { string: 'with\ttab', delta: 1 },
     { string: 'with"quote', delta: 1 },
+    { string: 'with\ttab', delta: 1 },
   ])
 })
 
@@ -156,9 +156,9 @@ test('should handle unicode strings', () => {
   const result = compareStrings2Internal(before, after, minCount, true)
 
   expect(result).toEqual([
+    { string: 'مرحبا', delta: 1 },
     { string: '🚀', delta: 1 },
     { string: '你好', delta: 1 },
-    { string: 'مرحبا', delta: 1 },
   ])
 })
 
