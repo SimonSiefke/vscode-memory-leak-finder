@@ -10,6 +10,8 @@ export const main = () => {
 
 export const skip = 1
 
+export const requiresNetwork = 1
+
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
