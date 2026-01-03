@@ -12,7 +12,6 @@ export const setup = async ({ Editor, Workspace, SideBar, Extensions }: TestCont
       name: 'test.ts',
     },
   ])
-
   // @ts-ignore
   await Extensions.add({
     path: '.vscode-extensions-source/inline-completion-provider-typescript',
@@ -25,7 +24,6 @@ export const setup = async ({ Editor, Workspace, SideBar, Extensions }: TestCont
   await Extensions.search(`@id:e2e-tests.inline-completion-provider-typescript`)
   await Extensions.first.shouldHaveActivationTime()
   await SideBar.hide()
-
   // @ts-ignore
   await Editor.waitforTextFileReady('test.ts')
   await Editor.deleteCharactersLeft({ count: 1 })
@@ -36,7 +34,6 @@ export const setup = async ({ Editor, Workspace, SideBar, Extensions }: TestCont
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.shouldHaveText('')
   await Editor.type('func')
-
   // @ts-ignore
   await Editor.acceptInlineCompletion()
   await Editor.shouldHaveText(`function add(a:number, b:number): number {
