@@ -136,7 +136,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to set variable value for ${variableName}`)
       }
     },
-    async startRunAndDebug({ debugConfiguration = '', debugLabel = 'Node.js' }) {
+    async startRunAndDebug({ debugConfiguration = '', debugLabel = 'Node.js' } = {}) {
       try {
         await page.waitForIdle()
         const button = page.locator('.monaco-button:has-text("Run and Debug")')
