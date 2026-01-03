@@ -26,6 +26,7 @@ export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void>
     },
   ])
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('file-to-copy.txt')
   await Explorer.shouldHaveItem('source-folder')
   await Explorer.shouldHaveItem('destination-folder')
@@ -42,6 +43,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
   // Verify original file still exists and copy appears in destination
   await Explorer.shouldHaveItem('file-to-copy.txt')
   await Explorer.expand('destination-folder')
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('copied-file.txt')
 
   // Copy a file from one folder to another via file system operation
