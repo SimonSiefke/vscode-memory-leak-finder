@@ -1376,6 +1376,23 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to show refactor action`)
       }
     },
+    async selectLine() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Control+L')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select line`)
+      }
+    },
+    async shouldHaveSelectedCharacters(count: number) {
+      try {
+        await page.waitForIdle()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select line`)
+      }
+    },
     async showSourceAction() {
       try {
         await page.waitForIdle()
