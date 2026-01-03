@@ -12,7 +12,6 @@ export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestCont
       name: 'test.txt',
     },
   ])
-
   // @ts-ignore
   await Extensions.add({
     path: '.vscode-extensions-source/inline-completion-provider',
@@ -24,7 +23,6 @@ export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestCont
   await Extensions.search(`@id:e2e-tests.inline-completion-provider`)
   await Extensions.first.shouldHaveActivationTime()
   await SideBar.hide()
-
   // @ts-ignore
   await Editor.waitforTextFileReady('test.txt')
   await Editor.shouldHaveText('a')
@@ -35,7 +33,6 @@ export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestCont
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.shouldHaveText('')
   await Editor.type('a')
-
   // @ts-ignore
   await Editor.shouldHaveInlineCompletion('bcdef')
   // @ts-ignore
