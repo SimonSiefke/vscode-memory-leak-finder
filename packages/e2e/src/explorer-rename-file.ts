@@ -26,5 +26,7 @@ export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void>
 
 export const run = async ({ Explorer }: TestContext): Promise<void> => {
   await Explorer.rename('file-2.txt', 'renamed.txt')
+  await Explorer.refresh()
   await Explorer.rename('renamed.txt', 'file-2.txt')
+  await Explorer.refresh()
 }
