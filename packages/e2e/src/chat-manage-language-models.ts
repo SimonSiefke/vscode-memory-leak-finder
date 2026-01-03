@@ -18,7 +18,6 @@ export const setup = async ({ Editor, Electron, Extensions }: TestContext): Prom
 export const run = async ({ Editor, LanguageModelEditor }: TestContext): Promise<void> => {
   await LanguageModelEditor.open()
   await Editor.closeAll()
-  // TODO open and close language model editor
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
