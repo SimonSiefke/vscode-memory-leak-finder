@@ -1498,7 +1498,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to type ${text}`)
       }
     },
-<<<<<<< HEAD
     async addCursorBelow() {
       try {
         await page.waitForIdle()
@@ -1509,10 +1508,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to add cursor below`)
       }
     },
-    async undo() {
-=======
     async undo({ viaKeyBoard = false } = {}) {
->>>>>>> origin/main
       try {
         if (viaKeyBoard) {
           await page.waitForIdle()
