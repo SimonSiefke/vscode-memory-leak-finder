@@ -1,6 +1,7 @@
 export const createSessionRpcConnection = (rpc: any, sessionId: string): any => {
   return {
     callbacks: rpc.callbacks,
+    connectionClosed: rpc.connectionClosed,
     dispose() {
       rpc.dispose()
     },
