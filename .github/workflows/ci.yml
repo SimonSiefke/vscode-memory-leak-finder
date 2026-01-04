@@ -34,6 +34,7 @@ jobs:
           path: |
             **/node_modules
             **/.vscode-test
+            **/.vscode-insiders-versions
             **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
@@ -89,6 +90,7 @@ jobs:
 
   ci-linux-measures:
     runs-on: ubuntu-24.04
+    needs: ci
     strategy:
       fail-fast: false
       matrix:
@@ -185,6 +187,7 @@ jobs:
           path: |
             **/node_modules
             **/.vscode-test
+            **/.vscode-insiders-versions
             **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
@@ -237,6 +240,7 @@ jobs:
           path: |
             **/node_modules
             **/.vscode-test
+            **/.vscode-insiders-versions
             **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
