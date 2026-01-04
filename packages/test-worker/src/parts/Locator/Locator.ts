@@ -67,9 +67,10 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     dblclick() {
       return LocatorClick.dblclick(this)
     },
-    fill(text) {
+    fill(text: string) {
       return LocatorFill.fill(
         {
+          ...this,
           selector: this.selector,
         },
         text,
