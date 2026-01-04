@@ -1,3 +1,4 @@
+import { getJson } from '../GetJson/GetJson.ts'
 import * as GetVscodePlatformName from '../GetVscodePlatformName/GetVscodePlatformName.ts'
 import * as VError from '../VError/VError.ts'
 
@@ -17,20 +18,8 @@ export const fetchVscodeInsidersMetadata = async (
   const platformName = GetVscodePlatformName.getVscodePlatformName(platform, arch)
   const quality = 'insider'
   const url = `${updateUrl}/api/versions/commit:${commit}/${platformName}/${quality}`
-
   try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'vscode-memory-leak-finder/1.0.0',
-      },
-      signal: AbortSignal.timeout(30_000),
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    }
-
-    const metadata = (await response.json()) as IBuildMetadata
+    const metadata = await getJson(url)
     return metadata
   } catch (error) {
     if (error instanceof Error && error.name === 'TimeoutError') {
