@@ -83,7 +83,6 @@ export const create = ({ expect, page, platform, VError }) => {
     async setPortInput(portId) {
       try {
         await page.waitForIdle()
-        await new Promise((r) => {})
         const forwardPortButton = page.locator('[role="button"]', { hasText: 'Forward a Port' })
         await expect(forwardPortButton).toBeVisible()
         await page.waitForIdle()

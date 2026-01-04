@@ -36,7 +36,6 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(button).toBeVisible()
         await button.click()
         await page.waitForIdle()
-        await new Promise((r) => {})
       } catch (error) {
         throw new VError(error, `Failed to add element to chat`)
       }
@@ -69,7 +68,6 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(button).toBeVisible()
         await button.click()
         await page.waitForIdle()
-        await new Promise((r) => {})
       } catch (error) {
         throw new VError(error, `Failed to add element to chat`)
       }
