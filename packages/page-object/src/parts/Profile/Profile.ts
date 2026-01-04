@@ -2,19 +2,27 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+interface ProfileCreateInfo {
+  readonly name: string
+  readonly removeOthers?: boolean
+}
+
 export const create = ({ expect, page, platform, VError }) => {
   return {
-    async create(info) {
+    async create(info: ProfileCreateInfo) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ProfilesNewProfile, {
           stayVisible: true,
+          pressKeyOnce: true,
         })
         const profilesEditor = page.locator('.profiles-editor')
         await expect(profilesEditor).toBeVisible()
+        await page.waitForIdle()
         const profilesList = page.locator('.profiles-list')
         await expect(profilesList).toBeVisible()
+        await page.waitForIdle()
         if (info.removeOthers) {
           await this.removeOtherProfiles()
         }
