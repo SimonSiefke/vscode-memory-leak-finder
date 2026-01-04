@@ -64,6 +64,6 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     await GetVscodeRuntimePath.setVscodeRuntimePath(vscodeVersion, path)
     return path
   } catch (error) {
-    throw new VError(error, `Failed to download vscode`)
+    throw new VError(error, `Failed to download VSCode`)
   }
 }
