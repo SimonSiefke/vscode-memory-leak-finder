@@ -1,3 +1,5 @@
+import * as ComputeVscodeInsidersMetadataCacheKey from '../ComputeVscodeInsidersMetadataCacheKey/ComputeVscodeInsidersMetadataCacheKey.ts'
+import * as GetJsonCached from '../GetJsonCached/GetJsonCached.ts'
 import * as GetVscodePlatformName from '../GetVscodePlatformName/GetVscodePlatformName.ts'
 import * as VError from '../VError/VError.ts'
 
@@ -14,28 +16,14 @@ export const fetchVscodeInsidersMetadata = async (
   commit: string,
   updateUrl: string,
 ): Promise<IBuildMetadata> => {
+  const cacheKey = ComputeVscodeInsidersMetadataCacheKey.computeVscodeInsidersMetadataCacheKey(platform, arch, commit)
   const platformName = GetVscodePlatformName.getVscodePlatformName(platform, arch)
   const quality = 'insider'
   const url = `${updateUrl}/api/versions/commit:${commit}/${platformName}/${quality}`
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'vscode-memory-leak-finder/1.0.0',
-      },
-      signal: AbortSignal.timeout(30_000),
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    }
-
-    const metadata = (await response.json()) as IBuildMetadata
-    return metadata
+    return await GetJsonCached.getJsonCached<IBuildMetadata>(url, cacheKey, '.vscode-insiders-metadata')
   } catch (error) {
-    if (error instanceof Error && error.name === 'TimeoutError') {
-      throw new Error(`Request timeout for URL: ${url}`)
-    }
     throw new VError.VError(error, `Failed to fetch VS Code Insiders metadata for commit ${commit} from URL: ${url}`)
   }
 }
