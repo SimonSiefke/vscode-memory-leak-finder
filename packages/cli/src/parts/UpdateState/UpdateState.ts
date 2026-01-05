@@ -55,6 +55,7 @@ export const updateState = async (newState: any): Promise<void> => {
       measureNode: false,
       platform: state.platform,
       recordVideo: state.recordVideo,
+      compressVideo: state.compressVideo,
       restartBetween: state.restartBetween,
       runMode: state.runMode,
       runs: state.runs,
