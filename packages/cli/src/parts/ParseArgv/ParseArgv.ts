@@ -242,7 +242,7 @@ const parseScreencastQuality = (argv: readonly string[]): number => {
   if (argv.includes('--screencast-quality')) {
     return parseArgvNumber(argv, '--screencast-quality')
   }
-  return 90
+  return 95
 }
 
 const parseClearExtensions = (argv: readonly string[]): boolean => {
