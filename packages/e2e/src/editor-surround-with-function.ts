@@ -31,6 +31,7 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.expand('src')
   await Explorer.shouldHaveItem('main.ts')
   await Editor.open('main.ts')
@@ -42,6 +43,8 @@ export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => 
 
   await Editor.setCursor(2, 3)
   await Editor.selectAll()
+  // @ts-ignore
+  await Editor.shouldHaveSelectedCharacters(47)
 
   await Editor.showRefactor()
 
