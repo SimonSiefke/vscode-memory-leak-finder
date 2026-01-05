@@ -2,6 +2,8 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
+export const requiresNetwork = 1
+
 export const setup = async ({ Editor, Electron }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Electron.mockDialog({
