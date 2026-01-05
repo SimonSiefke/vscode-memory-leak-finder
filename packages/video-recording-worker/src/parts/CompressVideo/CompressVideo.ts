@@ -3,10 +3,7 @@ import { basename, dirname, join } from 'node:path'
 import { rename } from 'node:fs/promises'
 import * as Exec from '../Exec/Exec.ts'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
-
-const supportsNativeFfmpeg = (): boolean => {
-  return existsSync('/usr/bin/ffmpeg')
-}
+import * as SupportsNativeFfmpeg from '../SupportsNativeFfmpeg/SupportsNativeFfmpeg.ts'
 
 const getCompressOptions = (inputFile: string, outputFile: string): readonly string[] => {
   return [
@@ -30,7 +27,7 @@ const getCompressOptions = (inputFile: string, outputFile: string): readonly str
 }
 
 export const compressVideo = async (): Promise<void> => {
-  if (!supportsNativeFfmpeg()) {
+  if (!SupportsNativeFfmpeg.supportsNativeFfmpeg()) {
     return
   }
   const outFile = FfmpegProcessState.getOutFile()
@@ -49,4 +46,3 @@ export const compressVideo = async (): Promise<void> => {
   const finalFile = existsSync(possibleFinalFile) ? possibleFinalFile : outFile
   await rename(compressedFilePath, finalFile)
 }
-
