@@ -242,6 +242,7 @@ test('comparePromisesWithStackTrace - with result and scriptMap', async () => {
       originalStack: [],
       properties: [{ name: 'status', value: 'pending' }],
       stackTrace: ['at test.js:1:1'],
+      sourcesHash: null,
     },
   ])
 })
