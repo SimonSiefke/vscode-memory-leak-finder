@@ -59,6 +59,6 @@ export const downloadAndUnzipInsiders = async (platform: string, arch: string, c
     const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
     await LoadSourceMaps.loadSourceMaps(sourceMapUrls)
   }
-  await GetVscodeRuntimePath.setVscodeRuntimePath(commit, path, platform)
+  await GetVscodeRuntimePath.setVscodeRuntimePath(commit, path, platform, arch)
   return path
 }
