@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@lvce-editor/rpc": "^4.20.0",
-    "@lvce-editor/verror": "^1.7.0"
-  },
-  "devDependencies": {}
+    "@lvce-editor/verror": "^1.7.0",
+    "got": "^14.6.6"
+  }
 }
