@@ -1,12 +1,6 @@
 import * as DownloadWorker from '../DownloadWorker/DownloadWorker.ts'
 
-export const isVscodeDownloaded = async (
-  vscodeVersion: string,
-  vscodePath: string,
-  commit: string,
-  platform: string,
-  arch: string,
-): Promise<boolean> => {
+export const isVscodeDownloaded = async (vscodeVersion: string, vscodePath: string, commit: string, platform: string, arch: string): Promise<boolean> => {
   const rpc = await DownloadWorker.launch()
   const result = await rpc.invoke('Download.isVscodeDownloaded', vscodeVersion, vscodePath, commit, platform, arch)
   await rpc.dispose()

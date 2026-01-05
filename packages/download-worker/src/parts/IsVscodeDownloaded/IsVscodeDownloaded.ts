@@ -1,13 +1,7 @@
 import * as Env from '../Env/Env.ts'
 import * as GetVscodeRuntimePath from '../GetVscodeRuntimePath/GetVscodeRuntimePath.ts'
 
-export const isVscodeDownloaded = async (
-  vscodeVersion: string,
-  vscodePath: string,
-  commit: string,
-  platform: string,
-  arch: string,
-): Promise<boolean> => {
+export const isVscodeDownloaded = async (vscodeVersion: string, vscodePath: string, commit: string, platform: string, arch: string): Promise<boolean> => {
   if (vscodePath) {
     return true
   }
