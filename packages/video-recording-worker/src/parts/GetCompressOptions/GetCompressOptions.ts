@@ -18,4 +18,3 @@ export const getCompressOptions = (inputFile: string, outputFile: string): reado
     outputFile,
   ]
 }
-
