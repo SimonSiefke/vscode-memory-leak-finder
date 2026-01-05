@@ -113,6 +113,25 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.open('a3.txt')
   await Editor.shouldHaveText('a3', 'a3.txt')
 
+  await Editor.focusTopEditorGroup()
+  await Editor.focusRightEditorGroup()
+  await Editor.focusRightEditorGroup()
+  // @ts-ignore
+  await Editor.newEditorGroupRight()
+  await Editor.open('b2.txt')
+  await Editor.shouldHaveText('b2', 'b2.txt')
+
+  // @ts-ignore
+  await Editor.newEditorGroupBottom()
+  await Editor.open('b4.txt')
+  await Editor.shouldHaveText('b4', 'b4.txt')
+
+  await Editor.focusLeftEditorGroup()
+  // @ts-ignore
+  await Editor.newEditorGroupBottom()
+  await Editor.open('b3.txt')
+  await Editor.shouldHaveText('b3', 'b3.txt')
+
   await new Promise((r) => {})
   await Editor.closeAllEditorGroups()
 }
