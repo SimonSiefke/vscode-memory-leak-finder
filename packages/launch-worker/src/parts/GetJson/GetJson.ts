@@ -2,6 +2,6 @@ import { launchNetworkWorker } from '../LaunchNetworkWorker/LaunchNetworkWorker.
 
 export const getJson = async (url: string): Promise<any> => {
   await using rpc = await launchNetworkWorker()
-  const result = rpc.invoke('Network.getJson', url)
+  const result = await rpc.invoke('Network.getJson', url)
   return result
 }
