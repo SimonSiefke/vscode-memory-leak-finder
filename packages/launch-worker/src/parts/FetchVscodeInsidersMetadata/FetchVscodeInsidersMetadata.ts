@@ -20,6 +20,7 @@ export const fetchVscodeInsidersMetadata = async (
   const platformName = GetVscodePlatformName.getVscodePlatformName(platform, arch)
   const quality = 'insider'
   const url = `${updateUrl}/api/versions/commit:${commit}/${platformName}/${quality}`
+
   try {
     return await GetJsonCached.getJsonCached<IBuildMetadata>(url, cacheKey, '.vscode-insiders-metadata')
   } catch (error) {
