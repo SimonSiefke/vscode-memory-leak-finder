@@ -1,5 +1,7 @@
+import { join } from 'node:path'
 import { expect, test } from '@jest/globals'
 import * as ParseArgv from '../src/parts/ParseArgv/ParseArgv.ts'
+import { root } from '../src/parts/Root/Root.ts'
 
 test('parseArgv - empty', () => {
   const argv: readonly string[] = []
@@ -53,6 +55,12 @@ test('parseArgv - cwd', () => {
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     cwd: '/test',
   })
+})
+
+test('parseArgv - cwd defaults to packages/e2e', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.cwd).toBe(join(root, 'packages/e2e'))
 })
 
 test('parseArgv - vscode-path flag', () => {
@@ -295,4 +303,34 @@ test('parseArgv - only flag with value that already has dashes', () => {
   const argv = ['--only', 'editor-open-many-tabs']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.filter).toBe('editor-open-many-tabs')
+})
+
+test('parseArgv - check-leaks flag', () => {
+  const argv = ['--check-leaks']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.checkLeaks).toBe(true)
+})
+
+test('parseArgv - check-leaks flag not present', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.checkLeaks).toBe(false)
+})
+
+test('parseArgv - check-leaks automatically true when --measure is specified', () => {
+  const argv = ['--measure', 'event-listener-count']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.checkLeaks).toBe(true)
+})
+
+test('parseArgv - check-leaks automatically true when --measure is specified with any value', () => {
+  const argv = ['--measure', 'heap-usage']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.checkLeaks).toBe(true)
+})
+
+test('parseArgv - explicit --check-leaks takes precedence', () => {
+  const argv = ['--check-leaks', '--measure', 'event-listener-count']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.checkLeaks).toBe(true)
 })

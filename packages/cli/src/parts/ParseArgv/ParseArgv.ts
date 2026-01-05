@@ -1,7 +1,9 @@
+import { join } from 'node:path'
 import * as Ide from '../Ide/Ide.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
+import { root } from '../Root/Root.ts'
 
 const parseArgvNumber = (argv: readonly string[], name: string): number => {
   const index = argv.indexOf(name)
@@ -66,7 +68,13 @@ const parseHeadless = (argv: readonly string[]): boolean => {
 }
 
 const parseCheckLeaks = (argv: readonly string[]): boolean => {
-  return argv.includes('--check-leaks')
+  if (argv.includes('--check-leaks')) {
+    return true
+  }
+  if (argv.includes('--measure')) {
+    return true
+  }
+  return false
 }
 
 const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
@@ -92,7 +100,7 @@ const parseCwd = (cwd: string, argv: readonly string[]): string => {
   if (argv.includes('--cwd')) {
     return parseArgvString(argv, '--cwd')
   }
-  return cwd
+  return join(root, 'packages/e2e')
 }
 
 const parseMeasure = (argv: readonly string[]): string => {
@@ -246,7 +254,7 @@ const parseScreencastQuality = (argv: readonly string[]): number => {
   if (argv.includes('--screencast-quality')) {
     return parseArgvNumber(argv, '--screencast-quality')
   }
-  return 90
+  return 95
 }
 
 const parseClearExtensions = (argv: readonly string[]): boolean => {

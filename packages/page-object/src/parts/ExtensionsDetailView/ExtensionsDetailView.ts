@@ -14,12 +14,19 @@ export const create = ({ expect, page, VError }) => {
     async enableExtension(options?: any) {
       try {
         const extensionEditor = page.locator('.extension-editor')
+        await expect(extensionEditor).toBeVisible()
         const disabledStatusLabel = extensionEditor.locator('.extension-status-label[aria-label="Disabled"]')
         if (!options?.force) {
           await expect(disabledStatusLabel).toBeVisible()
         }
-        const action = extensionEditor.locator('.action-label[aria-label^="Enable"]')
-        await action.click()
+        const enableAction = extensionEditor.locator('.action-label[aria-label^="Enable"]')
+        const disableAction = extensionEditor.locator('.action-label[aria-label^="Disable"]')
+        const disableCount = await disableAction.count()
+        if (disableCount > 0) {
+          return
+        }
+        await enableAction.click()
+        await page.waitForIdle()
         await expect(disabledStatusLabel).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to enable extension`)

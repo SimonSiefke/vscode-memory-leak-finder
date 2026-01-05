@@ -60,6 +60,18 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to clear`)
       }
     },
+    async open({ id, name }) {
+      try {
+        await this.show()
+        await this.search(`@id:${id}`)
+        await this.first.shouldBe(name)
+        await this.first.click()
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
+      } catch (error) {
+        throw new VError(error, `Failed to clear`)
+      }
+    },
     async closeSuggest() {
       try {
         // TODO scope selector to extensions view
@@ -115,7 +127,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           await page.waitForIdle()
           const contextMenu = ContextMenu.create({ expect, page, VError })
           await contextMenu.open(firstExtension)
-          await contextMenu.close()
         } catch (error) {
           throw new VError(error, `Failed to open context menu`)
         }
