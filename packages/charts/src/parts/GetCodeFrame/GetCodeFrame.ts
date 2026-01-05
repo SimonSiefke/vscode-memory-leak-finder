@@ -24,9 +24,17 @@ const parseStackLine = (line: string): ParseStackLineResult | null => {
   }
 }
 
-const findSourceFile = async (relativePath: string): Promise<string | null> => {
+const findSourceFile = async (relativePath: string, sourcesHash: string | null | undefined): Promise<string | null> => {
   const sourcesDir = join(Root.root, '.vscode-sources')
   if (!existsSync(sourcesDir)) {
+    return null
+  }
+
+  if (sourcesHash) {
+    const sourceFilePath = join(sourcesDir, sourcesHash, relativePath)
+    if (existsSync(sourceFilePath)) {
+      return sourceFilePath
+    }
     return null
   }
 
@@ -47,14 +55,14 @@ const findSourceFile = async (relativePath: string): Promise<string | null> => {
   return null
 }
 
-export const getCodeFrame = async (stackLine: string): Promise<string | null> => {
+export const getCodeFrame = async (stackLine: string, sourcesHash?: string | null): Promise<string | null> => {
   const parsed = parseStackLine(stackLine)
   if (!parsed) {
     return null
   }
 
   const { column, filePath, line } = parsed
-  const sourceFilePath = await findSourceFile(filePath)
+  const sourceFilePath = await findSourceFile(filePath, sourcesHash)
   if (!sourceFilePath) {
     return null
   }
