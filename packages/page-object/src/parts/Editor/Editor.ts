@@ -1384,6 +1384,17 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to select line`)
       }
     },
+    async expandSelection() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.ExpandSelection)
+        await page.waitForIdle()
+        await page.keyboard.press('Control+L')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select line`)
+      }
+    },
     async shouldHaveSelectedCharacters(count: number) {
       try {
         await page.waitForIdle()
