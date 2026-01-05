@@ -101,6 +101,9 @@ const parseMeasure = (argv: readonly string[]): string => {
 const parseFilter = (argv: readonly string[]): string => {
   if (argv.includes('--only')) {
     const filterValue = parseArgvString(argv, '--only')
+    if (filterValue.endsWith('.ts')) {
+      return filterValue
+    }
     // Replace dots with dashes for backwards compatibility
     return filterValue.replaceAll('.', '-')
   }
