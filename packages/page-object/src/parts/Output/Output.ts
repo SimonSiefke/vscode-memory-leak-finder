@@ -70,6 +70,29 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to hide output`)
       }
     },
+    async openEditor() {
+      try {
+        await page.waitForIdle()
+        const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
+        await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
+        await moreActions.focus()
+        await page.waitForIdle()
+        await expect(moreActions).toBeFocused()
+        await page.waitForIdle()
+        await moreActions.click()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        await contextMenu.shouldHaveItem('Open Output in Editor')
+        await contextMenu.select('Open Output in Editor')
+        await page.waitForIdle()
+        const editor = page.locator('.part.editor .editor-instance[data-mode-id="log"]')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open output in editor`)
+      }
+    },
     async select(channelName: string, options: { shouldHaveContent?: boolean } = {}) {
       try {
         const outputView = page.locator('.pane-body.output-view')
@@ -81,7 +104,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         if (current === channelName) {
           return
         }
-        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectOutputChannel, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -104,29 +127,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select output channel ${channelName}`)
-      }
-    },
-    async openEditor() {
-      try {
-        await page.waitForIdle()
-        const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
-        await expect(moreActions).toBeVisible()
-        await page.waitForIdle()
-        await moreActions.focus()
-        await page.waitForIdle()
-        await expect(moreActions).toBeFocused()
-        await page.waitForIdle()
-        await moreActions.click()
-        await page.waitForIdle()
-        const contextMenu = ContextMenu.create({ page, expect, VError })
-        await contextMenu.shouldHaveItem('Open Output in Editor')
-        await contextMenu.select('Open Output in Editor')
-        await page.waitForIdle()
-        const editor = page.locator('.part.editor .editor-instance[data-mode-id="log"]')
-        await expect(editor).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to open output in editor`)
       }
     },
     async show() {

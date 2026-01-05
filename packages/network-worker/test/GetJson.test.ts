@@ -27,10 +27,10 @@ test('getJson fetches and returns JSON data', async () => {
   const result = await getJson('https://example.com/api/data')
 
   expect(mockFetch).toHaveBeenCalledWith('https://example.com/api/data', {
-    signal: expect.any(AbortSignal),
     headers: {
       'User-Agent': 'vscode-memory-leak-finder/1.0.0',
     },
+    signal: expect.any(AbortSignal),
   })
   expect(result).toEqual(mockData)
 })

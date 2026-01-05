@@ -18,7 +18,7 @@ const nonBreakingSpace = String.fromCharCode(160)
 
 export const create = ({ expect, ideVersion, page, platform, VError }) => {
   return {
-    async add({ path, expectedName }: { path: string; expectedName: string }) {
+    async add({ expectedName, path }: { path: string; expectedName: string }) {
       try {
         // TODO maybe use the install extension from path command
         await page.waitForIdle()
@@ -37,7 +37,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const nameLocator = firstExtension.locator('.name')
         await expect(nameLocator).toBeVisible()
         await expect(nameLocator).toHaveText(expectedName)
-        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
         await page.waitForIdle()
         await page.waitForIdle()
@@ -56,18 +56,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await clearButton.click()
         await page.waitForIdle()
         await this.shouldHaveValue('')
-      } catch (error) {
-        throw new VError(error, `Failed to clear`)
-      }
-    },
-    async open({ id, name }) {
-      try {
-        await this.show()
-        await this.search(`@id:${id}`)
-        await this.first.shouldBe(name)
-        await this.first.click()
-        const quickPick = QuickPick.create({ page, expect, VError, platform })
-        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
       } catch (error) {
         throw new VError(error, `Failed to clear`)
       }
@@ -96,22 +84,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await expect(extensionEditor).toBeVisible()
         const heading = extensionEditor.locator('.name').first()
         await expect(heading).toHaveText(name)
-        await page.waitForIdle()
-      },
-      async shouldHaveActivationTime() {
-        await page.waitForIdle()
-        const firstExtension = page.locator('.extension-list-item').first()
-        await expect(firstExtension).toBeVisible()
-        await page.waitForIdle()
-        const nameLocator = firstExtension.locator('.name')
-        const name = await nameLocator.textContent()
-        await expect(nameLocator).toHaveText(name)
-        await page.waitForIdle()
-        const status = firstExtension.locator('.activation-status')
-        await expect(status).toBeVisible()
-        await page.waitForIdle()
-        const time = firstExtension.locator('.activationTime')
-        await expect(time).toBeVisible()
         await page.waitForIdle()
       },
       async openContextMenu() {
@@ -144,19 +116,20 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await expect(nameLocator).toHaveText(name)
         await page.waitForIdle()
       },
-    },
-    second: {
-      async click() {
-        const secondExtension = page.locator('.extension-list-item').nth(1)
-        await expect(secondExtension).toBeVisible()
-        const nameLocator = secondExtension.locator('.name')
+      async shouldHaveActivationTime() {
+        await page.waitForIdle()
+        const firstExtension = page.locator('.extension-list-item').first()
+        await expect(firstExtension).toBeVisible()
+        await page.waitForIdle()
+        const nameLocator = firstExtension.locator('.name')
         const name = await nameLocator.textContent()
         await expect(nameLocator).toHaveText(name)
-        await secondExtension.click()
-        const extensionEditor = page.locator('.extension-editor')
-        await expect(extensionEditor).toBeVisible()
-        const heading = extensionEditor.locator('.name').first()
-        await expect(heading).toHaveText(name)
+        await page.waitForIdle()
+        const status = firstExtension.locator('.activation-status')
+        await expect(status).toBeVisible()
+        await page.waitForIdle()
+        const time = firstExtension.locator('.activationTime')
+        await expect(time).toBeVisible()
         await page.waitForIdle()
       },
     },
@@ -196,6 +169,18 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to install ${id}`)
+      }
+    },
+    async open({ id, name }) {
+      try {
+        await this.show()
+        await this.search(`@id:${id}`)
+        await this.first.shouldBe(name)
+        await this.first.click()
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
+      } catch (error) {
+        throw new VError(error, `Failed to clear`)
       }
     },
     async openSuggest() {
@@ -272,6 +257,21 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
       }
+    },
+    second: {
+      async click() {
+        const secondExtension = page.locator('.extension-list-item').nth(1)
+        await expect(secondExtension).toBeVisible()
+        const nameLocator = secondExtension.locator('.name')
+        const name = await nameLocator.textContent()
+        await expect(nameLocator).toHaveText(name)
+        await secondExtension.click()
+        const extensionEditor = page.locator('.extension-editor')
+        await expect(extensionEditor).toBeVisible()
+        const heading = extensionEditor.locator('.name').first()
+        await expect(heading).toHaveText(name)
+        await page.waitForIdle()
+      },
     },
     async selectMcpItem({ name }) {
       try {

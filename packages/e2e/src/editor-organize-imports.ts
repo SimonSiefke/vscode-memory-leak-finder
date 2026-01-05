@@ -12,7 +12,7 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-export const setup = async ({ Editor, Explorer, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, SideBar, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: originalContent,

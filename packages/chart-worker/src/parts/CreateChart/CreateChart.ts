@@ -1,7 +1,7 @@
+import * as CompressSvg from '../CompressSvg/CompressSvg.ts'
 import { createBarChart } from '../CreateBarChart/CreateBarChart.ts'
 import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
 import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
-import * as CompressSvg from '../CompressSvg/CompressSvg.ts'
 
 export const createChart = async (data: any, options: any): Promise<string> => {
   let svg: string

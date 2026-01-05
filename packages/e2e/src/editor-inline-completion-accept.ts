@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Extensions, SideBar, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([
     {
@@ -14,8 +14,8 @@ export const setup = async ({ Editor, Extensions, Workspace, SideBar }: TestCont
   ])
   // @ts-ignore
   await Extensions.add({
-    path: '.vscode-extensions-source/inline-completion-provider',
     expectedName: 'inline-completion-provider',
+    path: '.vscode-extensions-source/inline-completion-provider',
   })
   await Editor.open('test.txt')
   await Editor.shouldHaveBreadCrumb('test.txt')

@@ -16,6 +16,23 @@ export const create = ({ expect, page, VError }) => {
       await expect(contextMenu).toBeHidden()
       await page.waitForIdle()
     },
+    async checkSubItem(option: string) {
+      try {
+        const subMenu = page.locator('.monaco-submenu')
+        await expect(subMenu).toBeVisible()
+        const contextMenuItem = subMenu.locator('.action-item', {
+          hasText: option,
+        })
+        await expect(contextMenuItem).toBeVisible()
+        await page.waitForIdle()
+        await contextMenuItem.click()
+        const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
+        await expect(contextMenu).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to check sub menu item ${option}`)
+      }
+    },
     async close() {
       try {
         const contextMenu = page.locator('.context-view.monaco-menu-container')
@@ -53,19 +70,6 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open context menu`)
       }
     },
-    async select(option) {
-      await page.waitForIdle()
-      const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
-      await expect(contextMenu).toBeVisible()
-      await expect(contextMenu).toBeFocused()
-      const contextMenuItem = contextMenu.locator('.action-item', {
-        hasText: option,
-      })
-      await page.waitForIdle()
-      await contextMenuItem.clickExponential({
-        waitForHidden: contextMenu,
-      })
-    },
     async openSubMenu(option: string) {
       await page.waitForIdle()
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
@@ -85,22 +89,18 @@ export const create = ({ expect, page, VError }) => {
       const subMenu = page.locator('.monaco-submenu')
       await expect(subMenu).toBeVisible()
     },
-    async checkSubItem(option: string) {
-      try {
-        const subMenu = page.locator('.monaco-submenu')
-        await expect(subMenu).toBeVisible()
-        const contextMenuItem = subMenu.locator('.action-item', {
-          hasText: option,
-        })
-        await expect(contextMenuItem).toBeVisible()
-        await page.waitForIdle()
-        await contextMenuItem.click()
-        const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
-        await expect(contextMenu).toBeHidden()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to check sub menu item ${option}`)
-      }
+    async select(option) {
+      await page.waitForIdle()
+      const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
+      await expect(contextMenu).toBeVisible()
+      await expect(contextMenu).toBeFocused()
+      const contextMenuItem = contextMenu.locator('.action-item', {
+        hasText: option,
+      })
+      await page.waitForIdle()
+      await contextMenuItem.clickExponential({
+        waitForHidden: contextMenu,
+      })
     },
     async shouldHaveItem(option) {
       await page.waitForIdle()

@@ -13,7 +13,7 @@ export const isInputElement = (element) => {
 }
 
 export const type = (element, options) => {
-  const { selectionStart, selectionEnd } = element
+  const { selectionEnd, selectionStart } = element
   const oldValue = element.value || ''
   const newValue = getNewValue(oldValue, selectionStart, selectionEnd, options.text)
   if (isInputElement(element)) {

@@ -26,7 +26,7 @@ export const create = ({ expect, page, platform, VError }) => {
           return
         }
         await expect(secondarySideBar).toBeVisible()
-        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.HideSecondarySideBar)
         await expect(secondarySideBar).toBeHidden()
         await page.waitForIdle()

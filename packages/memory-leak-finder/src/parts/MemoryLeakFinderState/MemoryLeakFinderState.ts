@@ -7,18 +7,18 @@ export interface RpcConnection {
 }
 
 export interface Measure {
+  compare(before: any, after: any, context: any): Promise<any>
   readonly id: string
+  releaseResources(): Promise<void>
   start(): Promise<any>
   stop(): Promise<any>
-  compare(before: any, after: any, context: any): Promise<any>
-  releaseResources(): Promise<void>
 }
 
 export interface MemoryLeakFinderState {
+  after?: any
+  before?: any
   readonly measure: Measure
   readonly rpc: RpcConnection
-  before?: any
-  after?: any
 }
 
 export const state: {
