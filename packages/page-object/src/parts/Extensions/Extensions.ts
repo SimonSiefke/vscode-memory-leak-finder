@@ -60,6 +60,18 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to clear`)
       }
     },
+    async open({ id, name }) {
+      try {
+        await this.show()
+        await this.search(`@id:${id}`)
+        await this.first.shouldBe(name)
+        await this.first.click()
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
+      } catch (error) {
+        throw new VError(error, `Failed to clear`)
+      }
+    },
     async closeSuggest() {
       try {
         // TODO scope selector to extensions view
