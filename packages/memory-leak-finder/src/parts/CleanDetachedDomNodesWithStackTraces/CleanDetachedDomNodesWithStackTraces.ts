@@ -11,16 +11,21 @@ const mergeOriginal = (nodes, cleanInstances) => {
   for (const node of nodes) {
     originalIndex++
     const originalStack: any[] = []
+    let sourcesHash: string | null | undefined = null
     for (let i = 0; i < node.stackTrace.length; i++) {
       originalIndex++
       const instance = reverseMap[originalIndex]
       if (instance && instance.originalStack) {
         originalStack.push(instance.originalStack[0])
+        if (i === 0 && instance.sourcesHash) {
+          sourcesHash = instance.sourcesHash
+        }
       }
     }
     merged.push({
       ...node,
       originalStack,
+      sourcesHash,
     })
   }
   return merged

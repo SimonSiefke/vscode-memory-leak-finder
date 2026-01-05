@@ -14,7 +14,7 @@ interface CleanPositionMap {
 export const getCleanPositionsMap = async (
   sourceMapUrlMap: SourceMapUrlMap,
   classNames: boolean,
-  hash: string,
+  hash?: string,
 ): Promise<CleanPositionMap> => {
   const cleanPositionMap: CleanPositionMap = Object.create(null)
   for (const [key, value] of Object.entries(sourceMapUrlMap)) {

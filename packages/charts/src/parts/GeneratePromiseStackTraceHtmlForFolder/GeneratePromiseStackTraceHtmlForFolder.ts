@@ -142,7 +142,8 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       // Add code frame for first stack trace line only
       if (item.originalStack && Array.isArray(item.originalStack) && item.originalStack.length > 0) {
         const firstStackLine = item.originalStack[0]
-        const codeFrame = await GetCodeFrame.getCodeFrame(firstStackLine)
+        const sourcesHash = item.sourcesHash || null
+        const codeFrame = await GetCodeFrame.getCodeFrame(firstStackLine, sourcesHash)
         if (codeFrame) {
           content += '  <div class="CodeFrame">\n'
           content += '    <pre class="line-numbers"><code class="language-typescript">'

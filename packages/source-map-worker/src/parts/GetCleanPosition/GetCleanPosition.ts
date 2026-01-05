@@ -5,15 +5,17 @@ interface Position {
   line?: number | null
   name?: string | null
   source?: string | null
+  sourcesHash?: string | null
 }
 
 export const getCleanPosition = (position: Position | null | undefined): Position | undefined => {
   if (!position) {
     return undefined
   }
-  const { source } = position
+  const { source, sourcesHash } = position
   return {
     ...position,
     source: CleanSource.cleanSource(source),
+    sourcesHash,
   }
 }
