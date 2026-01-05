@@ -115,7 +115,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           await page.waitForIdle()
           const contextMenu = ContextMenu.create({ expect, page, VError })
           await contextMenu.open(firstExtension)
-          await contextMenu.close()
         } catch (error) {
           throw new VError(error, `Failed to open context menu`)
         }
