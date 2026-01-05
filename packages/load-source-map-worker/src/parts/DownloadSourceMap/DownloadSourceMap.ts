@@ -1,14 +1,12 @@
 import { VError } from '@lvce-editor/verror'
-import got from 'got'
-import { createWriteStream } from 'node:fs'
-import { mkdir } from 'node:fs/promises'
-import { dirname } from 'node:path'
-import { pipeline } from 'node:stream/promises'
+import { basename } from 'node:path'
+import { launchNetworkWorker } from '../LaunchNetworkWorker/LaunchNetworkWorker.ts'
 
 export const downloadSourceMap = async (url: string, outFilePath: string): Promise<void> => {
   try {
-    await mkdir(dirname(outFilePath), { recursive: true })
-    await pipeline(got.stream(url), createWriteStream(outFilePath))
+    await using rpc = await launchNetworkWorker()
+    const name = basename(outFilePath)
+    await rpc.invoke('Network.download', name, url, outFilePath)
   } catch (error) {
     throw new VError(error, `Failed to download source map from ${url}`)
   }

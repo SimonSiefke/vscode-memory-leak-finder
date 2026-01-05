@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { mkdir, readdir, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 import * as GeneratePromiseStackTraceHtml from '../GeneratePromiseStackTraceHtml/GeneratePromiseStackTraceHtml.ts'
 import * as Root from '../Root/Root.ts'
@@ -102,8 +102,9 @@ const generateIndexHtmlRecursively = async (basePath: string): Promise<void> => 
   for (const dirent of dirents) {
     if (dirent.isFile() && dirent.name.endsWith('.svg')) {
       // @ts-ignore - path property exists on Dirent when using recursive: true
-      const relativeDirPath = dirent.path || ''
-      const folderPath = relativeDirPath ? join(basePath, relativeDirPath) : basePath
+      const filePath = dirent.path || ''
+      // Get the directory path containing the SVG file
+      const folderPath = dirname(filePath)
       foldersWithSvg.add(folderPath)
     }
   }

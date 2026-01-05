@@ -311,10 +311,14 @@ export const create = ({ expect, page, platform, VError }) => {
         await searchInput.type(value)
         await page.waitForIdle()
         const searchCount = page.locator('.settings-count-widget')
-        const word = resultCount === 1 ? 'Setting' : 'Settings'
         await expect(searchCount).toBeVisible()
         await page.waitForIdle()
-        await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)
+        if (resultCount === 'many') {
+          await expect(searchCount).toHaveText(new RegExp(`\\d+ Settings Found`))
+        } else {
+          const word = resultCount === 1 ? 'Setting' : 'Settings'
+          await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)
+        }
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)

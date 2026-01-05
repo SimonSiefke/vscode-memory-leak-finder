@@ -462,15 +462,10 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const colorPicker = page.locator('.standalone-colorpicker-body')
         await expect(colorPicker).toBeVisible()
         await page.waitForIdle()
-        await colorPicker.focus()
+        const closeButton = colorPicker.locator('.button.close-icon')
+        await expect(closeButton).toBeVisible()
         await page.waitForIdle()
-        await expect(colorPicker).toBeFocused()
-        await page.waitForIdle()
-        await page.keyboard.press('Escape')
-        await page.waitForIdle()
-        await page.keyboard.press('Escape')
-        await page.waitForIdle()
-        await page.keyboard.press('Escape')
+        await closeButton.click()
         await expect(colorPicker).toBeHidden()
         await page.waitForIdle()
       } catch (error) {
@@ -883,6 +878,11 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
         const widget = page.locator('.action-widget')
         await expect(widget).toBeVisible()
+        await page.waitForIdle()
+        const list = widget.locator('.monaco-list')
+        await expect(list).toBeVisible()
+        await page.waitForIdle()
+        await expect(list).toBeFocused()
         await page.waitForIdle()
         const actionItem = widget.locator(`.monaco-list-row[aria-label="${actionText}"]`)
         await expect(actionItem).toBeVisible({ timeout: 10_000 })
@@ -1330,6 +1330,9 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
         await expect(colorPicker).toBeVisible()
         await page.waitForIdle()
+        const insertButton = colorPicker.locator('.insert-button')
+        await expect(insertButton).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show color picker`)
       }
@@ -1379,6 +1382,17 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async selectLine() {
       try {
+        await page.waitForIdle()
+        await page.keyboard.press('Control+L')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select line`)
+      }
+    },
+    async expandSelection() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.ExpandSelection)
         await page.waitForIdle()
         await page.keyboard.press('Control+L')
         await page.waitForIdle()

@@ -1,5 +1,5 @@
 export const getChartConfig = () => {
   return {
-    compress: false,
+    compress: true,
   }
 }

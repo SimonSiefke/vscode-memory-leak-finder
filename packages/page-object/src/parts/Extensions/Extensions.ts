@@ -49,8 +49,12 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async clear() {
       try {
+        await page.waitForIdle()
         const clearButton = page.locator('[aria-label="Clear Extensions Search Results"]')
+        await expect(clearButton).toBeVisible()
+        await page.waitForIdle()
         await clearButton.click()
+        await page.waitForIdle()
         await this.shouldHaveValue('')
       } catch (error) {
         throw new VError(error, `Failed to clear`)
@@ -164,10 +168,13 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async install({ id, name }: { id: string; name: string }) {
       try {
+        if (id.includes(' ')) {
+          throw new Error(`id cannot contain spaces`)
+        }
         const editor = Editor.create({ expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await this.show()
-        await this.search(`@id:"${id}"`)
+        await this.search(`@id:${id}`)
         await this.first.shouldBe(name)
         await this.first.click()
         const extensionDetailView = ExtensionDetailView.create({ expect, page, VError })
@@ -224,11 +231,15 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         if (ideVersion && ideVersion.minor <= 100) {
           const extensionsInput = extensionsView.locator('.inputarea')
           await expect(extensionsInput).toBeFocused()
+          await page.waitForIdle()
           await extensionsInput.setValue('')
+          await page.waitForIdle()
         } else {
           const extensionsInput = extensionsView.locator('.native-edit-context')
           await expect(extensionsInput).toBeFocused()
+          await page.waitForIdle()
           await extensionsInput.setValue('')
+          await page.waitForIdle()
         }
         const lines = extensionsView.locator('.monaco-editor .view-lines')
         await page.keyboard.press(getSelectAll(platform))

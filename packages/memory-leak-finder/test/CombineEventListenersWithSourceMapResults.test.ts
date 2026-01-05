@@ -26,6 +26,7 @@ test('combineEventListenersWithSourceMapResults', () => {
     {
       originalStack: [`index.ts:2:2`],
       stack: ['index.js:1:1'],
+      sourcesHash: null,
     },
   ])
 })
@@ -58,10 +59,12 @@ test('combineEventListenersWithSourceMapResults - multiple inputs', () => {
     {
       originalStack: [`index.ts:2:2`],
       stack: ['index.js:1:1'],
+      sourcesHash: null,
     },
     {
       originalStack: [`index.ts:2:2`],
       stack: ['index.js:1:1'],
+      sourcesHash: null,
     },
   ])
 })
