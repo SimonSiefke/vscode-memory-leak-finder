@@ -16,8 +16,8 @@ export const getVscodeRuntimePath = async (vscodeVersion: string, platform: stri
   }
   try {
     const cache = await JsonFile.readJson(cacheFilePath)
-    // Support both new format (pathUri) and old format (path) for backward compatibility
-    const pathUri = cache.pathUri || cache.path
+    // Support both new format (uri) and old format (path) for backward compatibility
+    const pathUri = cache.uri || cache.path
     if (typeof pathUri !== 'string') {
       return ''
     }
@@ -41,5 +41,5 @@ export const setVscodeRuntimePath = async (vscodeVersion: string, path: string, 
   const cacheFilePath = getCacheFilePath(vscodeVersion, platform, arch)
   // Convert path to URI before saving
   const pathUri = pathToFileURL(path).toString()
-  await JsonFile.writeJson(cacheFilePath, { pathUri })
+  await JsonFile.writeJson(cacheFilePath, { uri: pathUri })
 }
