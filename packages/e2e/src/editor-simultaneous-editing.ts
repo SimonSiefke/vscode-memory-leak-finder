@@ -34,6 +34,11 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.shouldHaveText('right left initial text', 'file.txt', 2)
   await Editor.undo()
   await Editor.undo()
+  await Editor.undo()
+  // @ts-ignore
+  await Editor.shouldHaveText('initial text', 'file.txt', 1)
+  // @ts-ignore
+  await Editor.shouldHaveText('initial text', 'file.txt', 2)
   await Editor.saveAll()
 }
 
