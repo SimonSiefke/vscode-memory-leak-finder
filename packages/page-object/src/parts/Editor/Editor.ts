@@ -1645,6 +1645,22 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       await page.waitForIdle()
       await expect(list).toBeFocused()
     },
+    async newEditorGroupRight() {
+      const quickPick = QuickPick.create({ page, expect, VError, platform })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupRight)
+    },
+    async newEditorGroupLeft() {
+      const quickPick = QuickPick.create({ page, expect, VError, platform })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupLeft)
+    },
+    async newEditorGroupTop() {
+      const quickPick = QuickPick.create({ page, expect, VError, platform })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupTop)
+    },
+    async newEditorGroupBottom() {
+      const quickPick = QuickPick.create({ page, expect, VError, platform })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupBottom)
+    },
     async waitforTextFileReady(fileName: string) {
       await page.waitForIdle()
       const baseName = basename(fileName)

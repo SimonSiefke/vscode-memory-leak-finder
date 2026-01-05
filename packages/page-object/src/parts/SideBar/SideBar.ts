@@ -20,7 +20,7 @@ export const create = ({ expect, page, platform, VError }) => {
     },
     async hideSecondary() {
       try {
-        const secondarySideBar = page.locator('.part.secondary-sidebar')
+        const secondarySideBar = page.locator('.auxiliarybar')
         const isVisible = await secondarySideBar.isVisible()
         if (!isVisible) {
           return
