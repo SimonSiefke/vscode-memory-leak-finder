@@ -10,12 +10,13 @@ export const start = async (
   attachedToPageTimeout: number,
   idleTimeout: number,
   screencastQuality: number,
+  compressVideo: boolean,
 ) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await VideoRecordingWorker.start(platform, arch)
   await rpc.invoke('ConnectDevtools.connectDevtools', devtoolsWebsocketUrl, attachedToPageTimeout, idleTimeout, screencastQuality)
   const outFile = join(Root.root, '.vscode-videos', 'video.webm')
-  await rpc.invoke('VideoRecording.start', platform, outFile)
+  await rpc.invoke('VideoRecording.start', platform, outFile, compressVideo)
   return rpc
 }
 

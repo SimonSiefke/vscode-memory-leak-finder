@@ -34,6 +34,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
+  readonly compressVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
   readonly timeouts: any
@@ -69,6 +70,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     pageObjectPath,
     platform,
     recordVideo,
+    compressVideo,
     runMode,
     screencastQuality,
     timeouts,
@@ -119,6 +121,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     platform,
     arch,
     recordVideo,
+    compressVideo,
     screencastQuality,
     connectionId,
     devtoolsWebSocketUrl,
