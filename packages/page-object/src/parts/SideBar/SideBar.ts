@@ -18,6 +18,22 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to hide side bar`)
       }
     },
+    async hideSecondary() {
+      try {
+        const secondarySideBar = page.locator('.part.secondary-sidebar')
+        const isVisible = await secondarySideBar.isVisible()
+        if (!isVisible) {
+          return
+        }
+        await expect(secondarySideBar).toBeVisible()
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.HideSecondarySideBar)
+        await expect(secondarySideBar).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide secondary bar`)
+      }
+    },
     async moveLeft() {
       try {
         const sideBar = page.locator('.part.sidebar')

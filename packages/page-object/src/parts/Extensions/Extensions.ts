@@ -164,10 +164,13 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async install({ id, name }: { id: string; name: string }) {
       try {
+        if (id.includes(' ')) {
+          throw new Error(`id cannot contain spaces`)
+        }
         const editor = Editor.create({ expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await this.show()
-        await this.search(`@id:"${id}"`)
+        await this.search(`@id:${id}`)
         await this.first.shouldBe(name)
         await this.first.click()
         const extensionDetailView = ExtensionDetailView.create({ expect, page, VError })
