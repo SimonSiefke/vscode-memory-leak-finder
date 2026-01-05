@@ -20,6 +20,8 @@ const getCompressOptions = (inputFile: string, outputFile: string): readonly str
     '0',
     '-lossless',
     '1',
+    '-map_metadata',
+    '0',
     '-threads',
     '0',
     '-y',
