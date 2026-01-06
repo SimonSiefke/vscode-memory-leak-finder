@@ -158,7 +158,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to run task`)
       }
     },
-    async runError(taskName: string) {
+    async runError({ taskName }: { taskName: string }) {
       try {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
