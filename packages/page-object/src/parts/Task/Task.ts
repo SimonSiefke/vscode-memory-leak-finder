@@ -158,6 +158,38 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to run task`)
       }
     },
+    async runError(taskName: string) {
+      try {
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
+        await page.waitForIdle()
+        await quickPick.select(taskName)
+        await page.waitForIdle()
+        const panel = page.locator('.part.panel')
+        await expect(panel).toBeVisible()
+        const terminal = page.locator('.terminal')
+        await expect(terminal).toHaveCount(1)
+        await page.waitForIdle()
+        await expect(terminal).toBeVisible()
+        await page.waitForIdle()
+        await expect(terminal).toHaveClass('xterm')
+        await page.waitForIdle()
+        const terminalActions = page.locator('[aria-label="Terminal actions"]')
+        await expect(terminalActions).toBeVisible()
+        await page.waitForIdle()
+        const actionLabel = terminalActions.locator('.action-label')
+        await expect(actionLabel).toBeVisible()
+        await page.waitForIdle()
+        const taskNameWithSpaces = ` ${taskName}  -  Task `
+        await expect(actionLabel).toHaveText(taskNameWithSpaces)
+        await page.waitForIdle()
+        const errorIcon = actionLabel.locator('.codicon-error')
+        await expect(errorIcon).toBeVisible({ timeout: 15_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to run task with error`)
+      }
+    },
     async selectQuickPickItem({ item }) {
       try {
         await page.waitForIdle()
