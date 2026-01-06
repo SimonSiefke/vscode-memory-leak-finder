@@ -171,7 +171,7 @@ jobs:
             args: --measure disposable-count
           - name: worker-count
             args: --measure worker-count
-    timeout-minutes: 180
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
