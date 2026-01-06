@@ -26,5 +26,5 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace, SideBar 
 }
 
 export const run = async ({ Task }: TestContext): Promise<void> => {
-  await Task.runError('error-task')
+  await Task.runError({ taskName: 'error-task' })
 }
