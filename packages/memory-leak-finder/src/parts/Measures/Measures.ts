@@ -44,7 +44,6 @@ export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersW
 export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEventTargetCount.ts'
 export * as MeasureEventTargetDifference from '../MeasureEventTargetDifference/MeasureEventTargetDifference.ts'
 export * as MeasureEventTargets from '../MeasureEventTargets/MeasureEventTargets.ts'
-export * as MeasureFileWatcherCount from '../MeasureFileWatcherCount/MeasureFileWatcherCount.ts'
 export * as MeasureFunctionCount from '../MeasureFunctionCount/MeasureFunctionCount.ts'
 export * as MeasureGlobalLexicalScopeNames from '../MeasureGlobalLexicalScopeNames/MeasureGlobalLexicalScopeNames.ts'
 export * as MeasureGpuCanvasContextCount from '../MeasureGpuCanvasContextCount/MeasureGpuCanvasContextCount.ts'
