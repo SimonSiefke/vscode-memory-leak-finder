@@ -30,6 +30,7 @@ export const setup = async ({ Panel, ActivityBar, Editor, Explorer, Workspace, S
   await SideBar.hide()
 }
 
-export const run = async ({ Task }: TestContext): Promise<void> => {
+export const run = async ({ Task, Terminal }: TestContext): Promise<void> => {
   await Task.runError({ taskName: 'error-task', scanType: 'Continue without scanning the task output' })
+  await Terminal.killAll()
 }
