@@ -1,9 +1,9 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { getJson } from '../GetJson/GetJson.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as Root from '../Root/Root.ts'
 import * as VError from '../VError/VError.ts'
-import { getJson } from '../GetJson/GetJson.ts'
 
 export const getJsonCached = async <T>(url: string, cacheKey: string, cacheDirName: string): Promise<T> => {
   const cacheFilePath = join(Root.root, cacheDirName, `${cacheKey}.json`)

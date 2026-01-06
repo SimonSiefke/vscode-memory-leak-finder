@@ -25,6 +25,21 @@ const isBinary = (file) => {
 
 export const create = ({ expect, ideVersion, page, platform, VError }) => {
   return {
+    async acceptInlineCompletion() {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
+        await expect(inlineCompletion).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Tab')
+        await page.waitForIdle()
+        await expect(inlineCompletion).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to accept inline completion`)
+      }
+    },
     async acceptRename() {
       try {
         await page.waitForIdle()
@@ -39,6 +54,16 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to accept rename`)
+      }
+    },
+    async addCursorBelow() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.AddCursorBelow)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add cursor below`)
       }
     },
     async autoFix({ hasFixes }) {
@@ -309,6 +334,17 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to enable version lens`)
       }
     },
+    async expandSelection() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ExpandSelection)
+        await page.waitForIdle()
+        await page.keyboard.press('Control+L')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select line`)
+      }
+    },
     async findAllReferences() {
       try {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
@@ -410,6 +446,16 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.GoToDefintiion)
       } catch (error) {
         throw new VError(error, `Failed to go to definition`)
+      }
+    },
+    async goToEndOfLine() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('End')
+        await page.waitForIdle()
+        // TODO verify that cursor is actually at that position
+      } catch (error) {
+        throw new VError(error, `Failed to set cursor to end of line`)
       }
     },
     async goToFile({ column, file, line }) {
@@ -598,6 +644,22 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to scroll in editor`)
       }
     },
+    async newEditorGroupBottom() {
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupBottom)
+    },
+    async newEditorGroupLeft() {
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupLeft)
+    },
+    async newEditorGroupRight() {
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupRight)
+    },
+    async newEditorGroupTop() {
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupTop)
+    },
     async newTextFile() {
       try {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
@@ -730,6 +792,22 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to remove all breakpoints`)
+      }
+    },
+    async removeBreakPoint(lineNumber: number) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.part.editor .editor-instance')
+        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
+        await expect(lineNumberElement).toBeVisible()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        await contextMenu.open(lineNumberElement)
+        await page.waitForIdle()
+        await contextMenu.select('Remove Breakpoint')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed remove breakpoint`)
       }
     },
     async rename(newText: string) {
@@ -873,6 +951,15 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to select all`)
       }
     },
+    async selectLine() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Control+L')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select line`)
+      }
+    },
     async selectRefactor(actionText: string) {
       try {
         await page.waitForIdle()
@@ -926,22 +1013,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed set breakpoint`)
       }
     },
-    async removeBreakPoint(lineNumber: number) {
-      try {
-        await page.waitForIdle()
-        const editor = page.locator('.part.editor .editor-instance')
-        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
-        await expect(lineNumberElement).toBeVisible()
-        await page.waitForIdle()
-        const contextMenu = ContextMenu.create({ expect, page, VError })
-        await contextMenu.open(lineNumberElement)
-        await page.waitForIdle()
-        await contextMenu.select('Remove Breakpoint')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed remove breakpoint`)
-      }
-    },
     async setCursor(line: number, column: number) {
       try {
         await page.waitForIdle()
@@ -961,16 +1032,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         // TODO verify that cursor is actually at that position
       } catch (error) {
         throw new VError(error, `Failed to set cursor`)
-      }
-    },
-    async goToEndOfLine() {
-      try {
-        await page.waitForIdle()
-        await page.keyboard.press('End')
-        await page.waitForIdle()
-        // TODO verify that cursor is actually at that position
-      } catch (error) {
-        throw new VError(error, `Failed to set cursor to end of line`)
       }
     },
     async setLanguageMode(languageId) {
@@ -1144,12 +1205,43 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify font family`)
       }
     },
+    async shouldHaveInlineCompletion(expectedText: string) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
+        await expect(inlineCompletion).toBeVisible({
+          timeout: 10_000,
+        })
+        await page.waitForIdle()
+        await expect(inlineCompletion).toHaveText(expectedText, {
+          timeout: 1000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify inline completion with text "${expectedText}"`)
+      }
+    },
     async shouldHaveInspectedToken(name) {
       try {
         const inspectedToken = page.locator('h2.tiw-token')
         await expect(inspectedToken).toHaveText(name)
       } catch (error) {
         throw new VError(error, `Failed verify inspected token`)
+      }
+    },
+    async shouldHaveLightBulb() {
+      try {
+        await page.waitForIdle()
+        const spark = page.locator('.codicon.codicon-gutter-lightbulb-aifix-auto-fix')
+        await expect(spark).toBeVisible({
+          timeout: 20_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify lightbulb`)
       }
     },
     async shouldHaveOverlayMessage(message) {
@@ -1159,6 +1251,18 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await expect(messageElement).toHaveText(message)
       } catch (error) {
         throw new VError(error, `Failed to check overlay message with text "${message}"`)
+      }
+    },
+    async shouldHaveSelectedCharacters(count: number) {
+      try {
+        await page.waitForIdle()
+        const statusBarItem = page.locator('#status\\.editor\\.selection')
+        await expect(statusBarItem).toBeVisible()
+        await page.waitForIdle()
+        await expect(statusBarItem).toHaveText(new RegExp(`\\(${count} selected\\)`))
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify selected character count`)
       }
     },
     async shouldHaveSelection(left, width) {
@@ -1215,18 +1319,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify spark`)
-      }
-    },
-    async shouldHaveLightBulb() {
-      try {
-        await page.waitForIdle()
-        const spark = page.locator('.codicon.codicon-gutter-lightbulb-aifix-auto-fix')
-        await expect(spark).toBeVisible({
-          timeout: 20_000,
-        })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to verify lightbulb`)
       }
     },
     async shouldHaveSquigglyError() {
@@ -1380,38 +1472,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to show refactor action`)
       }
     },
-    async selectLine() {
-      try {
-        await page.waitForIdle()
-        await page.keyboard.press('Control+L')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to select line`)
-      }
-    },
-    async expandSelection() {
-      try {
-        const quickPick = QuickPick.create({ page, expect, VError, platform })
-        await quickPick.executeCommand(WellKnownCommands.ExpandSelection)
-        await page.waitForIdle()
-        await page.keyboard.press('Control+L')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to select line`)
-      }
-    },
-    async shouldHaveSelectedCharacters(count: number) {
-      try {
-        await page.waitForIdle()
-        const statusBarItem = page.locator('#status\\.editor\\.selection')
-        await expect(statusBarItem).toBeVisible()
-        await page.waitForIdle()
-        await expect(statusBarItem).toHaveText(new RegExp(`\\(${count} selected\\)`))
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to verify selected character count`)
-      }
-    },
     async showSourceAction() {
       try {
         await page.waitForIdle()
@@ -1534,16 +1594,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to type ${text}`)
       }
     },
-    async addCursorBelow() {
-      try {
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError, platform })
-        await quickPick.executeCommand(WellKnownCommands.AddCursorBelow)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to add cursor below`)
-      }
-    },
     async undo({ viaKeyBoard = false } = {}) {
       try {
         if (viaKeyBoard) {
@@ -1633,33 +1683,11 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       await expect(img).toBeVisible()
       await subFrame.waitForIdle()
     },
-    async waitForWarning() {
-      const pane = page.locator('.monaco-editor-pane-placeholder')
-      await expect(pane).toBeVisible()
-      const warningIcon = pane.locator('.codicon.codicon-warning')
-      await expect(warningIcon).toBeVisible()
-    },
     async waitForNoteBookReady() {
       const notebookEditor = page.locator('.notebook-editor')
       const list = notebookEditor.locator('.monaco-list')
       await page.waitForIdle()
       await expect(list).toBeFocused()
-    },
-    async newEditorGroupRight() {
-      const quickPick = QuickPick.create({ page, expect, VError, platform })
-      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupRight)
-    },
-    async newEditorGroupLeft() {
-      const quickPick = QuickPick.create({ page, expect, VError, platform })
-      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupLeft)
-    },
-    async newEditorGroupTop() {
-      const quickPick = QuickPick.create({ page, expect, VError, platform })
-      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupTop)
-    },
-    async newEditorGroupBottom() {
-      const quickPick = QuickPick.create({ page, expect, VError, platform })
-      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupBottom)
     },
     async waitforTextFileReady(fileName: string) {
       await page.waitForIdle()
@@ -1695,39 +1723,11 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       }
       await subFrame.waitForIdle()
     },
-    async shouldHaveInlineCompletion(expectedText: string) {
-      try {
-        await page.waitForIdle()
-        const editor = page.locator('.editor-instance')
-        await expect(editor).toBeVisible()
-        await page.waitForIdle()
-        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
-        await expect(inlineCompletion).toBeVisible({
-          timeout: 10_000,
-        })
-        await page.waitForIdle()
-        await expect(inlineCompletion).toHaveText(expectedText, {
-          timeout: 1000,
-        })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to verify inline completion with text "${expectedText}"`)
-      }
-    },
-    async acceptInlineCompletion() {
-      try {
-        await page.waitForIdle()
-        const editor = page.locator('.editor-instance')
-        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
-        await expect(inlineCompletion).toBeVisible()
-        await page.waitForIdle()
-        await page.keyboard.press('Tab')
-        await page.waitForIdle()
-        await expect(inlineCompletion).toBeHidden()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to accept inline completion`)
-      }
+    async waitForWarning() {
+      const pane = page.locator('.monaco-editor-pane-placeholder')
+      await expect(pane).toBeVisible()
+      const warningIcon = pane.locator('.codicon.codicon-warning')
+      await expect(warningIcon).toBeVisible()
     },
   }
 }

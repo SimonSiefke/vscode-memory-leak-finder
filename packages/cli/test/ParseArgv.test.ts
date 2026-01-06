@@ -1,5 +1,5 @@
-import { join } from 'node:path'
 import { expect, test } from '@jest/globals'
+import { join } from 'node:path'
 import * as ParseArgv from '../src/parts/ParseArgv/ParseArgv.ts'
 import { root } from '../src/parts/Root/Root.ts'
 

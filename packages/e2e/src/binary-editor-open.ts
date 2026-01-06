@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-export const setup = async ({ Extensions, SideBar, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Extensions, SideBar, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SideBar.hide()
   // @ts-ignore

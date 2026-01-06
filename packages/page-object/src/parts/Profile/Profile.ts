@@ -14,8 +14,8 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ProfilesNewProfile, {
-          stayVisible: true,
           pressKeyOnce: true,
+          stayVisible: true,
         })
         const profilesEditor = page.locator('.profiles-editor')
         await expect(profilesEditor).toBeVisible()

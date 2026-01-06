@@ -26,12 +26,12 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
       }
     },
     async open({
+      cell1Content,
+      cell2Content,
       file1,
       file1Content,
       file2,
       file2Content,
-      cell1Content,
-      cell2Content,
     }: {
       file1: string
       file2: string

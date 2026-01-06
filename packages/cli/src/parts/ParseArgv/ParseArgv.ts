@@ -1,9 +1,9 @@
 import { join } from 'node:path'
 import * as Ide from '../Ide/Ide.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
+import { root } from '../Root/Root.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
-import { root } from '../Root/Root.ts'
 
 const parseArgvNumber = (argv: readonly string[], name: string): number => {
   const index = argv.indexOf(name)
