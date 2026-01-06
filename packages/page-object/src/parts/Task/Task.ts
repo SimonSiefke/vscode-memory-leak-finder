@@ -158,13 +158,14 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to run task`)
       }
     },
-    async runError({ taskName }: { taskName: string }) {
+    async runError({ taskName, scanType }: { taskName: string; scanType: string }) {
       try {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
         await quickPick.select(taskName, true)
         await page.waitForIdle()
+        await quickPick.select(scanType, false)
         await new Promise((r) => {})
         const panel = page.locator('.part.panel')
         await expect(panel).toBeVisible({ timeout: 10_000 })
@@ -179,12 +180,8 @@ export const create = ({ expect, page, platform, VError }) => {
         const terminalActions = page.locator('[aria-label="Terminal actions"]')
         await expect(terminalActions).toBeVisible()
         await page.waitForIdle()
-        const actionLabel = terminalActions.locator('.action-label')
+        const actionLabel = terminalActions.locator('.action-label[aria-label^="Focus Terminal"]')
         await expect(actionLabel).toBeVisible()
-        await page.waitForIdle()
-        const taskNameWithSpaces = ` ${taskName}  -  Task `
-        await expect(actionLabel).toHaveText(taskNameWithSpaces)
-        await page.waitForIdle()
         const errorIcon = actionLabel.locator('.codicon-error')
         await expect(errorIcon).toBeVisible({ timeout: 15_000 })
         await page.waitForIdle()

@@ -1,8 +1,10 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ ActivityBar, Editor, Explorer, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ Panel, ActivityBar, Editor, Explorer, Workspace, SideBar, Terminal }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SideBar.hide()
+  await Terminal.killAll()
+  await Panel.hide()
   // @ts-ignore
   await SideBar.hideSecondary()
   await Workspace.setFiles([
@@ -25,8 +27,9 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace, SideBar 
   await ActivityBar.showExplorer()
   await Explorer.refresh()
   await Explorer.shouldHaveItem('.vscode')
+  await SideBar.hide()
 }
 
 export const run = async ({ Task }: TestContext): Promise<void> => {
-  await Task.runError({ taskName: 'error-task' })
+  await Task.runError({ taskName: 'error-task', scanType: 'Continue without scanning the task output' })
 }
