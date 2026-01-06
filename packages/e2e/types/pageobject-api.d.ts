@@ -496,6 +496,7 @@ export interface Task {
   openRun(): Promise<void>
   pin(name: any): Promise<void>
   run(taskName: any): Promise<void>
+  runError(taskName: any): Promise<void>
   selectQuickPickItem(options: any): Promise<void>
   unpin(name: any): Promise<void>
 }
