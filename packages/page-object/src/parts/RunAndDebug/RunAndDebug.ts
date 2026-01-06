@@ -180,7 +180,17 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to start run and debug`)
       }
     },
-    async step(expectedFile: string, expectedPauseLine: number, expectedCallStackSize: number, hasCallStack?: boolean) {
+    async step({
+      file: file,
+      line: line,
+      callStackSize: callStackSize,
+      hasCallStack = true,
+    }: {
+      file: string
+      line: number
+      callStackSize: number
+      hasCallStack?: boolean
+    }) {
       try {
         const quickPick = QuickPick.create({
           expect,
@@ -191,10 +201,10 @@ export const create = ({ expect, page, platform, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.DebugStepOver)
         await page.waitForIdle()
         await this.waitForPaused({
-          callStackSize: expectedCallStackSize,
-          file: expectedFile,
+          callStackSize: callStackSize,
+          file: file,
           hasCallStack,
-          line: expectedPauseLine,
+          line: line,
         })
       } catch (error) {
         throw new VError(error, `Failed to step over`)
