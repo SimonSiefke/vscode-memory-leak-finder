@@ -160,8 +160,9 @@ export const create = ({ expect, page, platform, VError }) => {
           .catch(() => 0)
         const value = await Promise.race([quickPickPromise, debugToolBarPromise])
         if (value === 1) {
-          const option = page.locator(`[role="option"][aria-label="${debugLabel}"]`)
+          const option = page.locator(`[role="option"][aria-label^="${debugLabel}"]`)
           await expect(quickPickWidget).toBeVisible()
+
           await page.waitForIdle()
           await option.click()
           await page.waitForIdle()
@@ -175,6 +176,7 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(debugToolBar).toBeVisible({
           timeout: 30_000,
         })
+
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to start run and debug`)
