@@ -3,6 +3,8 @@ import type { TestContext } from '../types.ts'
 export const setup = async ({ ActivityBar, Editor, Explorer, Workspace, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SideBar.hide()
+  // @ts-ignore
+  await SideBar.hideSecondary()
   await Workspace.setFiles([
     {
       content: `{

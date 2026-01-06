@@ -165,6 +165,7 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
         await quickPick.select(taskName, true)
         await page.waitForIdle()
+        await new Promise((r) => {})
         const panel = page.locator('.part.panel')
         await expect(panel).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
