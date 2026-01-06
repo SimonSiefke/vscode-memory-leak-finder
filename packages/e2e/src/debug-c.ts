@@ -31,7 +31,7 @@ export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Pr
   await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused({
     debugConfiguration: 'C File',
-    debugLabel: 'C/C++ gcc build and debug active file',
+    debugLabel: 'C/C++: gcc build and debug active file',
     file: 'main.c',
     hasCallStack: false,
     line: 2,
