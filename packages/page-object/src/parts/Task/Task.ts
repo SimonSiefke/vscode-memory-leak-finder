@@ -163,9 +163,12 @@ export const create = ({ expect, page, platform, VError }) => {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
-        await quickPick.select(taskName, true)
+        const hasScanType = Boolean(scanType)
+        await quickPick.select(taskName, hasScanType)
         await page.waitForIdle()
-        await quickPick.select(scanType, false)
+        if (hasScanType) {
+          await quickPick.select(scanType, false)
+        }
         const panel = page.locator('.part.panel')
         await expect(panel).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
@@ -230,6 +233,28 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(pinAction).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to pin ${name}`)
+      }
+    },
+    async reRunLast({ hasError }: { hasError: boolean }) {
+      try {
+        const errorDecorations = page.locator('.terminal-command-decoration.codicon-terminal-decoration-error')
+        await expect(errorDecorations).toHaveCount(0)
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.ReRunLastTask)
+        if (hasError) {
+          await expect(errorDecorations).toHaveCount(1)
+          await page.waitForIdle()
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to rerun last task`)
+      }
+    },
+    async clearTerminal() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
+      } catch (error) {
+        throw new VError(error, `Failed to clear terminal`)
       }
     },
   }

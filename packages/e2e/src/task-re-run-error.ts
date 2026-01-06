@@ -36,7 +36,6 @@ export const setup = async ({ Task, Panel, ActivityBar, Editor, Explorer, Worksp
 }
 
 export const run = async ({ Task }: TestContext): Promise<void> => {
-  // TODO maybe kill all terminals here
   // @ts-ignore
   await Task.reRunLast({ hasError: true })
   // @ts-ignore
