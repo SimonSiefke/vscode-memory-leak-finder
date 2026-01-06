@@ -176,7 +176,7 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
         await expect(terminal).toHaveClass('xterm')
         await page.waitForIdle()
-        const terminalActions = page.locator('[aria-label="Terminal Actions"]')
+        const terminalActions = page.locator('[aria-label="Terminal actions"]')
         await expect(terminalActions).toBeVisible()
         await page.waitForIdle()
         const actionLabel = terminalActions.locator('.action-label[aria-label^="Focus Terminal"]')
