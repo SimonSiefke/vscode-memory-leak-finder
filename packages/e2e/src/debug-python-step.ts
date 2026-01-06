@@ -45,7 +45,6 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
     line: 3,
     hasCallStack: false,
   })
-
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()
