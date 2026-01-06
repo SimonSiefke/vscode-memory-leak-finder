@@ -159,6 +159,7 @@ export const create = ({ expect, page, platform, VError }) => {
           .then(() => 2)
           .catch(() => 0)
         const value = await Promise.race([quickPickPromise, debugToolBarPromise])
+        await new Promise((r) => {})
         if (value === 1) {
           const option = page.locator(`[role="option"][aria-label="${debugLabel}"]`)
           await expect(quickPickWidget).toBeVisible()

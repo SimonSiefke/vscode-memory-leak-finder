@@ -10,7 +10,7 @@ export const setup = async ({ Editor, Extensions, RunAndDebug, Workspace }: Test
       content: `#include<stdio.h>
 
 int main() {
-	printf("Hello World\n");
+	printf("Hello World\\n");
 	return 0;
 }
 `,
@@ -21,19 +21,18 @@ int main() {
     id: 'ms-vscode.cpptools',
     name: 'C/C++',
   })
-  await new Promise((r) => {})
   await Editor.closeAll()
   await RunAndDebug.removeAllBreakpoints()
 }
 
 export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Promise<void> => {
-  await Editor.open('main.py')
+  await Editor.open('main.c')
   await ActivityBar.showRunAndDebug()
-  await Editor.setBreakpoint(2)
+  await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused({
-    debugConfiguration: 'Python File',
-    debugLabel: 'Python Debugger',
-    file: 'main.py',
+    debugConfiguration: 'C File',
+    debugLabel: 'C/C++ gcc build and debug active file',
+    file: 'main.c',
     hasCallStack: false,
     line: 2,
   })
