@@ -41,6 +41,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     measureNode: options.measureNode,
     platform: options.platform,
     recordVideo: options.recordVideo,
+    compressVideo: options.compressVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
     runs: options.runs,

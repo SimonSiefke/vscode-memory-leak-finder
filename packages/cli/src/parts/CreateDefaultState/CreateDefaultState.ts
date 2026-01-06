@@ -34,6 +34,7 @@ export const createDefaultState = (): StdinDataState => ({
   platform: '',
   previousFilters: [],
   recordVideo: false,
+  compressVideo: false,
   restartBetween: false,
   runMode: TestRunMode.Auto,
   runs: 1,

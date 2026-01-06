@@ -26,6 +26,7 @@ export interface RunTestsOptions {
   readonly measureNode: boolean
   readonly platform: string
   readonly recordVideo: boolean
+  readonly compressVideo: boolean
   readonly restartBetween: boolean
   readonly root: string
   readonly runMode: number

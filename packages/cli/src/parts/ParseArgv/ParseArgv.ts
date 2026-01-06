@@ -85,6 +85,10 @@ const parseRecordVideo = (argv: readonly string[]): boolean => {
   return argv.includes('--record-video')
 }
 
+const parseCompressVideo = (argv: readonly string[]): boolean => {
+  return argv.includes('--compress-video')
+}
+
 const parseRuns = (argv: readonly string[]): number => {
   if (argv.includes('--runs')) {
     return parseArgvNumber(argv, '--runs')
@@ -298,6 +302,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
   const recordVideo = parseRecordVideo(argv)
+  const compressVideo = parseCompressVideo(argv)
   const restartBetween = parseRestartBetween(argv)
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
@@ -341,6 +346,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     measureNode,
     platform,
     recordVideo,
+    compressVideo,
     restartBetween,
     runMode,
     runs,
