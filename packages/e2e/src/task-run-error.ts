@@ -1,7 +1,8 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Editor, Explorer, Workspace, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
+  await SideBar.hide()
   await Workspace.setFiles([
     {
       content: `{
@@ -27,4 +28,3 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestCo
 export const run = async ({ Task }: TestContext): Promise<void> => {
   await Task.runError('error-task')
 }
-
