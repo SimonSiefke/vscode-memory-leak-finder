@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { mkdir, readdir, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 import * as GeneratePromiseStackTraceHtml from '../GeneratePromiseStackTraceHtml/GeneratePromiseStackTraceHtml.ts'
 import * as Root from '../Root/Root.ts'
@@ -92,22 +92,24 @@ const getSingleColumnHtml = (dirents: string[]): string => {
 }
 
 const generateIndexHtmlRecursively = async (basePath: string): Promise<void> => {
-  const dirents = await readdir(basePath, {
-    recursive: true,
-    withFileTypes: true,
-  })
-
-  // Group by directory path - collect all directories that contain SVG files
   const foldersWithSvg = new Set<string>()
-  for (const dirent of dirents) {
-    if (dirent.isFile() && dirent.name.endsWith('.svg')) {
-      // @ts-ignore - path property exists on Dirent when using recursive: true
-      const filePath = dirent.path || ''
-      // Get the directory path containing the SVG file
-      const folderPath = dirname(filePath)
-      foldersWithSvg.add(folderPath)
+
+  const processDirectory = async (dirPath: string, relativePath: string = ''): Promise<void> => {
+    const dirents = await readdir(dirPath, { withFileTypes: true })
+
+    for (const dirent of dirents) {
+      if (dirent.isFile() && dirent.name.endsWith('.svg')) {
+        // This file is in the current directory
+        foldersWithSvg.add(dirPath)
+      } else if (dirent.isDirectory()) {
+        // Recursively process subdirectories
+        const subDirPath = join(dirPath, dirent.name)
+        await processDirectory(subDirPath)
+      }
     }
   }
+
+  await processDirectory(basePath)
 
   // Generate index.html for each folder that has SVG files
   for (const folderPath of foldersWithSvg) {
