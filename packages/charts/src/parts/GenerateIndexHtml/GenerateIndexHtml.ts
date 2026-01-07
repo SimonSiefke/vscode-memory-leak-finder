@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { mkdir, readdir, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 import * as GeneratePromiseStackTraceHtml from '../GeneratePromiseStackTraceHtml/GeneratePromiseStackTraceHtml.ts'
 import * as Root from '../Root/Root.ts'
