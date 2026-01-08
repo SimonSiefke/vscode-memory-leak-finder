@@ -3,7 +3,6 @@ import * as CommandMap from '../CommandMap/CommandMap.ts'
 import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 
 export const main = async (): Promise<void> => {
-<<<<<<< HEAD
   const args = process.argv.slice(2)
 
   if (args.includes('--run-server')) {
@@ -37,8 +36,6 @@ export const main = async (): Promise<void> => {
   }
 
   // Default: start as RPC worker
-=======
->>>>>>> origin/main
   await NodeWorkerRpcClient.create({
     commandMap: CommandMap.commandMap,
   })
