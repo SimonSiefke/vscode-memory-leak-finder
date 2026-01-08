@@ -1,4 +1,4 @@
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage, ServerResponse } from 'http'
 import { mkdir } from 'fs/promises'
 import { createServer } from 'http'
 import { request as httpRequest } from 'http'
@@ -157,11 +157,15 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
         const lowerKey = k.toLowerCase()
         // Skip transfer-encoding, connection, and content-length headers
         // We'll set Content-Length ourselves based on the buffered data
-        if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection' && lowerKey !== 'content-length' && // Avoid duplicate headers by checking case-insensitively
-          !lowerCaseHeaders.has(lowerKey)) {
-            responseHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
-            lowerCaseHeaders.add(lowerKey)
-          }
+        if (
+          lowerKey !== 'transfer-encoding' &&
+          lowerKey !== 'connection' &&
+          lowerKey !== 'content-length' && // Avoid duplicate headers by checking case-insensitively
+          !lowerCaseHeaders.has(lowerKey)
+        ) {
+          responseHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+          lowerCaseHeaders.add(lowerKey)
+        }
       }
 
       // Add CORS headers for marketplace API responses
@@ -271,7 +275,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
           JSON.stringify({
             error: errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Network Error',
             message:
-              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : (errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error'),
+              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error',
             target: targetUrl,
           }),
         )
@@ -349,7 +353,7 @@ export const createHttpProxyServer = async (
 ): Promise<{
   port: number
   url: string
-  dispose: () => Promise<void>
+  [Symbol.asyncDispose]: () => Promise<void>
 }> => {
   const { port = 0, useProxyMock = false } = options
   console.log({ useProxyMock })
@@ -437,7 +441,7 @@ export const createHttpProxyServer = async (
   console.log(`[Proxy] Proxy URL: ${url}`)
 
   return {
-    async dispose() {
+    async [Symbol.asyncDispose]() {
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())
       await promise
