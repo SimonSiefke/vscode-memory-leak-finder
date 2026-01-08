@@ -1,8 +1,8 @@
 import { createBrotliDecompress } from 'node:zlib'
 
-export const decompressBrotli = async (body: Buffer): Promise<{ body: Buffer; wasCompressed: boolean }> => {
+export const decompressBrotli = async (body: Buffer): Promise<{ body: Uint8Array; wasCompressed: boolean }> => {
   const { promise, reject, resolve } = Promise.withResolvers<{
-    body: Buffer
+    body: Uint8Array
     wasCompressed: boolean
   }>()
   const brotli = createBrotliDecompress()
@@ -10,7 +10,7 @@ export const decompressBrotli = async (body: Buffer): Promise<{ body: Buffer; wa
   brotli.on('data', (chunk: Buffer) => chunks.push(chunk))
   brotli.on('end', () => {
     const decompressed = Buffer.concat(chunks)
-    resolve({ body: decompressed, wasCompressed: true })
+    resolve({ body: new Uint8Array(decompressed), wasCompressed: true })
   })
   brotli.on('error', reject)
   brotli.write(body)
