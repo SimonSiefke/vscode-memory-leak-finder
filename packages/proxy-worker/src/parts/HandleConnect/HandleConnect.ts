@@ -12,6 +12,7 @@ import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
+import { parseJsonIfApplicable } from '../ParseJson/ParseJson.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
@@ -49,7 +50,6 @@ const saveInterceptedRequest = async (
       const result = await compressionWorker.invoke('Compression.decompressBody', responseBody, contentEncoding)
       const decompressedBody = result.body
       wasCompressed = result.wasCompressed
-      // @ts-ignore
       parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
     }
 
@@ -275,7 +275,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             // Always set Content-Length to match actual body length
             cleanedHeaders['Content-Length'] = String(bodyBuffer.length)
 
-            const statusLine = `${httpVersion} ${mockResponse.statusCode} ${mockResponse.statusCode === 200 ? 'OK' : (mockResponse.statusCode === 204 ? 'No Content' : '')}\r\n`
+            const statusLine = `${httpVersion} ${mockResponse.statusCode} ${mockResponse.statusCode === 200 ? 'OK' : mockResponse.statusCode === 204 ? 'No Content' : ''}\r\n`
             const headerLines = Object.entries(cleanedHeaders)
               .map(([k, v]) => `${k}: ${v}\r\n`)
               .join('')
