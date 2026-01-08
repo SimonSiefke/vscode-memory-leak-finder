@@ -275,7 +275,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             // Always set Content-Length to match actual body length
             cleanedHeaders['Content-Length'] = String(bodyBuffer.length)
 
-            const statusLine = `${httpVersion} ${mockResponse.statusCode} ${mockResponse.statusCode === 200 ? 'OK' : mockResponse.statusCode === 204 ? 'No Content' : ''}\r\n`
+            const statusLine = `${httpVersion} ${mockResponse.statusCode} ${mockResponse.statusCode === 200 ? 'OK' : (mockResponse.statusCode === 204 ? 'No Content' : '')}\r\n`
             const headerLines = Object.entries(cleanedHeaders)
               .map(([k, v]) => `${k}: ${v}\r\n`)
               .join('')

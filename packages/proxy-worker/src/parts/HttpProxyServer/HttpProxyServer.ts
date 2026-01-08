@@ -1,15 +1,16 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http'
+import type { IncomingMessage, ServerResponse } from 'http';
+import { mkdir } from 'fs/promises'
+import { createServer } from 'http'
 import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
-import { URL } from 'url'
-import { mkdir } from 'fs/promises'
 import { join } from 'path'
-import * as Root from '../Root/Root.ts'
+import { URL } from 'url'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
-import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
-import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
 import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
 import * as HandleConnect from '../HandleConnect/HandleConnect.ts'
+import * as Root from '../Root/Root.ts'
+import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
+import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -25,7 +26,7 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
   if (normalizedContentType.includes('application/json') || normalizedContentType.includes('text/json')) {
     try {
       return JSON.parse(body)
-    } catch (error) {
+    } catch {
       // If parsing fails, return as string
       return body
     }
@@ -94,10 +95,10 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       : 'authorization, content-type, accept, x-requested-with, x-market-client-id'
 
     res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': requestedMethod || 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': allowHeaders,
       'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Allow-Headers': allowHeaders,
+      'Access-Control-Allow-Methods': requestedMethod || 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Origin': '*',
       'Access-Control-Max-Age': '86400',
     })
     res.end()
@@ -108,14 +109,14 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   const requestModule = isHttps ? httpsRequest : httpRequest
 
   const options = {
-    hostname: parsedUrl.hostname,
-    port: parsedUrl.port || (isHttps ? 443 : 80),
-    path: parsedUrl.pathname + parsedUrl.search,
-    method: req.method,
     headers: {
       ...req.headers,
       host: parsedUrl.host,
     },
+    hostname: parsedUrl.hostname,
+    method: req.method,
+    path: parsedUrl.pathname + parsedUrl.search,
+    port: parsedUrl.port || (isHttps ? 443 : 80),
   }
 
   // Remove proxy-specific headers
@@ -142,28 +143,26 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
 
       // Convert headers to Record<string, string | string[]> format for saving
       const responseHeadersForSave: Record<string, string | string[]> = {}
-      Object.entries(proxyRes.headers).forEach(([k, v]) => {
+      for (const [k, v] of Object.entries(proxyRes.headers)) {
         if (v !== undefined) {
           responseHeadersForSave[k] = v
         }
-      })
+      }
 
       // Clean headers - remove Transfer-Encoding, Connection, and Content-Length headers
       // We'll set Content-Length ourselves based on buffered data to avoid chunked encoding issues
       const responseHeaders: Record<string, string> = {}
       const lowerCaseHeaders: Set<string> = new Set()
-      Object.entries(proxyRes.headers).forEach(([k, v]) => {
+      for (const [k, v] of Object.entries(proxyRes.headers)) {
         const lowerKey = k.toLowerCase()
         // Skip transfer-encoding, connection, and content-length headers
         // We'll set Content-Length ourselves based on the buffered data
-        if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection' && lowerKey !== 'content-length') {
-          // Avoid duplicate headers by checking case-insensitively
-          if (!lowerCaseHeaders.has(lowerKey)) {
+        if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection' && lowerKey !== 'content-length' && // Avoid duplicate headers by checking case-insensitively
+          !lowerCaseHeaders.has(lowerKey)) {
             responseHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
             lowerCaseHeaders.add(lowerKey)
           }
-        }
-      })
+      }
 
       // Add CORS headers for marketplace API responses
       if (isMarketplaceApi) {
@@ -180,38 +179,38 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
 
       // Explicitly remove Transfer-Encoding header if it somehow got through
       // (case-insensitive check)
-      Object.keys(responseHeaders).forEach((key) => {
+      for (const key of Object.keys(responseHeaders)) {
         if (key.toLowerCase() === 'transfer-encoding') {
           delete responseHeaders[key]
         }
-      })
+      }
 
       // Set Content-Length to avoid chunked encoding
       responseHeaders['Content-Length'] = String(responseData.length)
 
       // Write response headers and data
       // Check if headers were already sent (shouldn't happen, but safety check)
-      if (!res.headersSent) {
+      if (res.headersSent) {
+        console.error(`[Proxy] Headers already sent for ${targetUrl}, cannot send response`)
+      } else {
         res.writeHead(proxyRes.statusCode || 200, responseHeaders)
         res.end(responseData)
-      } else {
-        console.error(`[Proxy] Headers already sent for ${targetUrl}, cannot send response`)
       }
 
       // Save POST body if applicable (with response data)
       if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
         const requestBody = Buffer.concat(requestBodyChunks)
         await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody, {
+          responseData,
+          responseHeaders: responseHeadersForSave,
           statusCode: proxyRes.statusCode || 200,
           statusMessage: proxyRes.statusMessage,
-          responseHeaders: responseHeadersForSave,
-          responseData,
         })
       }
 
       SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeadersForSave, responseData).catch(
-        (err) => {
-          console.error('[Proxy] Error saving request:', err)
+        (error) => {
+          console.error('[Proxy] Error saving request:', error)
         },
       )
     }
@@ -272,7 +271,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
           JSON.stringify({
             error: errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Network Error',
             message:
-              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error',
+              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : (errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error'),
             target: targetUrl,
           }),
         )
@@ -295,7 +294,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   })
 
   // Handle request timeout
-  proxyReq.setTimeout(30000, () => {
+  proxyReq.setTimeout(30_000, () => {
     const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
 
     // Azure metadata endpoint timeouts are expected when not on Azure
@@ -372,8 +371,8 @@ export const createHttpProxyServer = async (
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(
         JSON.stringify({
-          status: 'running',
           port,
+          status: 'running',
           timestamp: Date.now(),
         }),
       )
@@ -438,12 +437,12 @@ export const createHttpProxyServer = async (
   console.log(`[Proxy] Proxy URL: ${url}`)
 
   return {
-    port: actualPort,
-    url,
     async dispose() {
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())
       await promise
     },
+    port: actualPort,
+    url,
   }
 }

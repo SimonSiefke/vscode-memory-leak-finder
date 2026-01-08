@@ -3,11 +3,11 @@ import { readdir, readFile, writeFile, mkdir } from 'fs/promises'
 import { join, dirname } from 'path'
 import { URL } from 'url'
 import { fileURLToPath } from 'url'
-import * as Root from '../../Root/Root.ts'
 import type { MockConfigEntry } from '../../MockConfigEntry/MockConfigEntry.ts'
 import * as GetMockFileName from '../../GetMockFileName/GetMockFileName.ts'
-import * as LoadMockConfig from '../LoadMockConfig/LoadMockConfig.ts'
+import * as Root from '../../Root/Root.ts'
 import * as HasConfigEntry from '../HasConfigEntry/HasConfigEntry.ts'
+import * as LoadMockConfig from '../LoadMockConfig/LoadMockConfig.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
