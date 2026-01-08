@@ -90,6 +90,12 @@
     "filename": "api_individual_githubcopilot_com_responses_post.json"
   },
   {
+    "filename": "api_mcp_github_com_v0_1_servers_get.json",
+    "hostname": "api.mcp.github.com",
+    "method": "GET",
+    "pathname": "/v0.1/servers"
+  },
+  {
     "hostname": "applicationinsights.azure.com",
     "pathname": "*",
     "method": "*",
@@ -108,10 +114,28 @@
     "filename": "avatars_githubusercontent_com_u_12345678_get.json"
   },
   {
+    "filename": "avatars_githubusercontent_com_u_6154722_get.json",
+    "hostname": "avatars.githubusercontent.com",
+    "method": "GET",
+    "pathname": "/u/6154722"
+  },
+  {
     "hostname": "avatars.githubusercontent.com",
     "pathname": "/u/72156503",
     "method": "GET",
     "filename": "avatars_githubusercontent_com_u_72156503_get.json"
+  },
+  {
+    "filename": "avatars_githubusercontent_com_u_74989412_get.json",
+    "hostname": "avatars.githubusercontent.com",
+    "method": "GET",
+    "pathname": "/u/74989412"
+  },
+  {
+    "filename": "avatars_githubusercontent_com_u_9919_get.json",
+    "hostname": "avatars.githubusercontent.com",
+    "method": "GET",
+    "pathname": "/u/9919"
   },
   {
     "hostname": "baiducomate.gallerycdn.vsassets.io",
@@ -492,6 +516,12 @@
     "filename": "marketplace_visualstudio_com_apis_public_gallery_extensionquery_post.json"
   },
   {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_dbaeumer_vscode_eslint_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/dbaeumer/vscode-eslint/latest"
+  },
+  {
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_e2e_tests_inline_completion_provider_typescript_latest_get.json",
     "hostname": "marketplace.visualstudio.com",
     "method": "GET",
@@ -508,6 +538,12 @@
     "pathname": "/_apis/public/gallery/vscode/eamodio/gitlens/latest",
     "method": "GET",
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_eamodio_gitlens_latest_get.json"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_firefox_devtools_vscode_firefox_debug_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/firefox-devtools/vscode-firefox-debug/latest"
   },
   {
     "hostname": "marketplace.visualstudio.com",
@@ -546,6 +582,12 @@
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_azuretools_vscode_containers_latest_get.json"
   },
   {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_edgedevtools_vscode_edge_devtools_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-edgedevtools/vscode-edge-devtools/latest"
+  },
+  {
     "hostname": "marketplace.visualstudio.com",
     "pathname": "/_apis/public/gallery/vscode/ms-kubernetes-tools/vscode-kubernetes-tools/latest",
     "method": "GET",
@@ -576,10 +618,22 @@
     "pathname": "/_apis/public/gallery/vscode/ms-python/vscode-python-envs/latest"
   },
   {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_toolsai_jupyter_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-toolsai/jupyter/latest"
+  },
+  {
     "hostname": "marketplace.visualstudio.com",
     "pathname": "/_apis/public/gallery/vscode/ms-vscode-remote/remote-containers/latest",
     "method": "GET",
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_remote_remote_containers_latest_get.json"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_cpptools_extension_pack_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode/cpptools-extension-pack/latest"
   },
   {
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_cpptools_latest_get.json",
