@@ -102,7 +102,7 @@ export const convertRequestsToMocks = async (): Promise<void> => {
         const mockFilePath = join(MOCK_REQUESTS_DIR, mockFileName)
 
         // Replace JWT tokens in request headers, response headers, and response body
-        const sanitizedRequestHeaders = ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.headers || {})
+        // const sanitizedRequestHeaders = ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.headers || {})
         const sanitizedResponseHeaders = ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.headers || {})
         const sanitizedResponseBody = ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)
 
