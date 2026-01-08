@@ -384,59 +384,6 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
   })
 }
 
-<<<<<<< HEAD
-=======
-const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): Promise<void> => {
-  // Handle HTTPS CONNECT requests for tunneling
-  const target = req.url || ''
-  const parts = target.split(':')
-  const hostname = parts[0]
-  const targetPort = parts[1] ? Number.parseInt(parts[1], 10) : 443
-
-  const { createConnection } = await import('node:net')
-  console.log(`[Proxy] Establishing CONNECT tunnel to ${hostname}:${targetPort}`)
-  const proxySocket = createConnection(targetPort, hostname, () => {
-    socket.write('HTTP/1.1 200 Connection Established\r\n\r\n')
-    if (head.length > 0) {
-      proxySocket.write(head)
-    }
-    proxySocket.pipe(socket)
-    socket.pipe(proxySocket)
-    console.log(`[Proxy] CONNECT tunnel established to ${hostname}:${targetPort}`)
-    // Save tunnel metadata (we can't capture encrypted HTTPS traffic)
-    saveConnectTunnel(hostname, targetPort).catch((error) => {
-      console.error('[Proxy] Error saving CONNECT tunnel:', error)
-    })
-  })
-
-  proxySocket.on('error', (error) => {
-    // EPIPE, ECONNRESET, ETIMEDOUT, and ENETUNREACH are common network errors
-    const errorCode = (error as NodeJS.ErrnoException).code
-    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
-      // Silently handle expected connection closures and network errors
-      socket.end()
-      return
-    }
-    console.error(`[Proxy] CONNECT tunnel error to ${hostname}:${targetPort}:`, error)
-    socket.end()
-  })
-
-  socket.on('error', (error: Error) => {
-    // EPIPE, ECONNRESET, ETIMEDOUT, and ENETUNREACH are common network errors
-    const errorCode = (error as NodeJS.ErrnoException).code
-    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
-      // Silently handle expected connection closures and network errors
-      proxySocket.end()
-      return
-    }
-    console.error(`[Proxy] Socket error for ${hostname}:${targetPort}:`, error)
-    proxySocket.end()
-  })
-
-  // Note: We can't easily capture HTTPS traffic through CONNECT,
-  // but HTTP requests will be captured
-}
->>>>>>> origin/main
 
 export const createHttpProxyServer = async (
   options: {
