@@ -7,7 +7,6 @@ import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import { CERT_DIR } from '../Constants/Constants.ts'
 import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertificateForDomain.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
-import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
 import * as Root from '../Root/Root.ts'
 import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
@@ -50,6 +49,7 @@ const saveInterceptedRequest = async (
       const result = await compressionWorker.invoke('Compression.decompressBody', responseBody, contentEncoding)
       const decompressedBody = result.body
       wasCompressed = result.wasCompressed
+      // @ts-ignore
       parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
     }
 
