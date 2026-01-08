@@ -1,15 +1,15 @@
 import { createGunzip } from 'node:zlib'
 
-export const decompressGzip = async (body: Buffer): Promise<{ body: string; wasCompressed: boolean }> => {
+export const decompressGzip = async (body: Buffer): Promise<{ body: Buffer; wasCompressed: boolean }> => {
   const { promise, reject, resolve } = Promise.withResolvers<{
-    body: string
+    body: Buffer
     wasCompressed: boolean
   }>()
   const gunzip = createGunzip()
   const chunks: Buffer[] = []
   gunzip.on('data', (chunk: Buffer) => chunks.push(chunk))
   gunzip.on('end', () => {
-    const decompressed = Buffer.concat(chunks).toString('utf8')
+    const decompressed = Buffer.concat(chunks)
     resolve({ body: decompressed, wasCompressed: true })
   })
   gunzip.on('error', reject)

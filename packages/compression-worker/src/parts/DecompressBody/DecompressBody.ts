@@ -6,9 +6,9 @@ import { decompressZstd } from '../DecompressZstd/DecompressZstd.ts'
 export const decompressBody = async (
   body: Buffer,
   encoding: string | string[] | undefined,
-): Promise<{ body: string; wasCompressed: boolean }> => {
+): Promise<{ body: Buffer; wasCompressed: boolean }> => {
   if (!encoding) {
-    return { body: body.toString('utf8'), wasCompressed: false }
+    return { body: body, wasCompressed: false }
   }
 
   const encodingStr = Array.isArray(encoding) ? encoding[0] : encoding
@@ -30,5 +30,5 @@ export const decompressBody = async (
     return decompressZstd(body)
   }
 
-  return { body: body.toString('utf8'), wasCompressed: false }
+  return { body: body, wasCompressed: false }
 }
