@@ -1,29 +1,17 @@
-import type { IncomingMessage, ServerResponse } from 'http';
-import { mkdir } from 'fs/promises'
-import type { IncomingMessage, ServerResponse } from 'http'
-import { mkdir, writeFile } from 'fs/promises'
-import { createServer } from 'http'
+import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
-import { join } from 'path'
 import { URL } from 'url'
-import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
-import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
-import * as HandleConnect from '../HandleConnect/HandleConnect.ts'
-import type { IncomingMessage, ServerResponse } from 'node:http'
-import { mkdir, writeFile } from 'node:fs/promises'
-import { createServer } from 'node:http'
-import { request as httpRequest } from 'node:http'
-import { request as httpsRequest } from 'node:https'
-import { join } from 'node:path'
-import { URL } from 'node:url'
+import { mkdir } from 'fs/promises'
+import { join } from 'path'
 import * as Root from '../Root/Root.ts'
+import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
+import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
+import * as HandleConnect from '../HandleConnect/HandleConnect.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
-
-
 
 export const parseJsonIfApplicable = (body: string, contentType: string | string[] | undefined): string | object => {
   if (!contentType) {
@@ -37,7 +25,7 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
   if (normalizedContentType.includes('application/json') || normalizedContentType.includes('text/json')) {
     try {
       return JSON.parse(body)
-    } catch {
+    } catch (error) {
       // If parsing fails, return as string
       return body
     }
@@ -46,10 +34,7 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
   return body
 }
 
-
-
-
-  const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string, useProxyMock: boolean): Promise<void> => {
+const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string, useProxyMock: boolean): Promise<void> => {
   // Check for mock response first (only if useProxyMock is enabled)
   if (useProxyMock) {
     const mockResponse = await GetMockResponse.getMockResponse(req.method || 'GET', targetUrl)
@@ -58,6 +43,8 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
       GetMockResponse.sendMockResponse(res, mockResponse)
       return // Don't record mock requests
     }
+  }
+
   let parsedUrl: URL
   try {
     // In HTTP proxy protocol, the request line contains the full URL
@@ -107,10 +94,10 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
       : 'authorization, content-type, accept, x-requested-with, x-market-client-id'
 
     res.writeHead(204, {
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Headers': allowHeaders,
-      'Access-Control-Allow-Methods': requestedMethod || 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': requestedMethod || 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': allowHeaders,
+      'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Max-Age': '86400',
     })
     res.end()
@@ -121,15 +108,14 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
   const requestModule = isHttps ? httpsRequest : httpRequest
 
   const options = {
+    hostname: parsedUrl.hostname,
+    port: parsedUrl.port || (isHttps ? 443 : 80),
+    path: parsedUrl.pathname + parsedUrl.search,
+    method: req.method,
     headers: {
       ...req.headers,
       host: parsedUrl.host,
     },
-    } as Record<string, string | string[] | undefined>,
-    hostname: parsedUrl.hostname,
-    method: req.method,
-    path: parsedUrl.pathname + parsedUrl.search,
-    port: parsedUrl.port || (isHttps ? 443 : 80),
   }
 
   // Remove proxy-specific headers
@@ -156,26 +142,28 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
 
       // Convert headers to Record<string, string | string[]> format for saving
       const responseHeadersForSave: Record<string, string | string[]> = {}
-      for (const [k, v] of Object.entries(proxyRes.headers)) {
+      Object.entries(proxyRes.headers).forEach(([k, v]) => {
         if (v !== undefined) {
           responseHeadersForSave[k] = v
         }
-      }
+      })
 
       // Clean headers - remove Transfer-Encoding, Connection, and Content-Length headers
       // We'll set Content-Length ourselves based on buffered data to avoid chunked encoding issues
       const responseHeaders: Record<string, string> = {}
       const lowerCaseHeaders: Set<string> = new Set()
-      for (const [k, v] of Object.entries(proxyRes.headers)) {
+      Object.entries(proxyRes.headers).forEach(([k, v]) => {
         const lowerKey = k.toLowerCase()
         // Skip transfer-encoding, connection, and content-length headers
         // We'll set Content-Length ourselves based on the buffered data
-        if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection' && lowerKey !== 'content-length' && // Avoid duplicate headers by checking case-insensitively
-          !lowerCaseHeaders.has(lowerKey)) {
+        if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection' && lowerKey !== 'content-length') {
+          // Avoid duplicate headers by checking case-insensitively
+          if (!lowerCaseHeaders.has(lowerKey)) {
             responseHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
             lowerCaseHeaders.add(lowerKey)
           }
-      }
+        }
+      })
 
       // Add CORS headers for marketplace API responses
       if (isMarketplaceApi) {
@@ -192,38 +180,40 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
 
       // Explicitly remove Transfer-Encoding header if it somehow got through
       // (case-insensitive check)
-      for (const key of Object.keys(responseHeaders)) {
+      Object.keys(responseHeaders).forEach((key) => {
         if (key.toLowerCase() === 'transfer-encoding') {
           delete responseHeaders[key]
         }
-      }
+      })
 
       // Set Content-Length to avoid chunked encoding
       responseHeaders['Content-Length'] = String(responseData.length)
 
       // Write response headers and data
       // Check if headers were already sent (shouldn't happen, but safety check)
-      if (res.headersSent) {
-        console.error(`[Proxy] Headers already sent for ${targetUrl}, cannot send response`)
-      } else {
+      if (!res.headersSent) {
         res.writeHead(proxyRes.statusCode || 200, responseHeaders)
         res.end(responseData)
+      } else {
+        console.error(`[Proxy] Headers already sent for ${targetUrl}, cannot send response`)
       }
 
       // Save POST body if applicable (with response data)
       if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
         const requestBody = Buffer.concat(requestBodyChunks)
         await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody, {
-          responseData,
-          responseHeaders: responseHeadersForSave,
           statusCode: proxyRes.statusCode || 200,
           statusMessage: proxyRes.statusMessage,
+          responseHeaders: responseHeadersForSave,
+          responseData,
         })
       }
 
-      SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeadersForSave, responseData).catch((error) => {
-        console.error('[Proxy] Error saving request:', error)
-      })
+      SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeadersForSave, responseData).catch(
+        (err) => {
+          console.error('[Proxy] Error saving request:', err)
+        },
+      )
     }
 
     // Handle errors on the response stream
@@ -250,12 +240,6 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
       if (!saved) {
         await saveAndWriteResponse()
       }
-    proxyRes.on('end', () => {
-      res.end()
-      const responseData = Buffer.concat(chunks)
-      saveRequest(req, res, responseData).catch((error) => {
-        console.error('[Proxy] Error saving request:', error)
-      })
     })
   })
 
@@ -288,7 +272,7 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
           JSON.stringify({
             error: errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Network Error',
             message:
-              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : (errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error'),
+              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error',
             target: targetUrl,
           }),
         )
@@ -311,7 +295,7 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
   })
 
   // Handle request timeout
-  proxyReq.setTimeout(30_000, () => {
+  proxyReq.setTimeout(30000, () => {
     const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
 
     // Azure metadata endpoint timeouts are expected when not on Azure
@@ -358,7 +342,6 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
   })
 }
 
-
 export const createHttpProxyServer = async (
   options: {
     port?: number
@@ -389,8 +372,8 @@ export const createHttpProxyServer = async (
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(
         JSON.stringify({
-          port,
           status: 'running',
+          port,
           timestamp: Date.now(),
         }),
       )
@@ -456,11 +439,11 @@ export const createHttpProxyServer = async (
 
   return {
     port: actualPort,
-    async [Symbol.asyncDispose](): Promise<void> {
+    url,
+    async dispose() {
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())
       await promise
     },
-    url,
   }
 }
