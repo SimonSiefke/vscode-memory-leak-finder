@@ -198,6 +198,12 @@
     "filename": "eamodio_gallerycdn_vsassets_io_extensions_eamodio_gitlens_17_7_1_1763061694224_Microsoft_VisualStudio_Services_Icons_Default_get.json"
   },
   {
+    "filename": "eamodio_gallerycdn_vsassets_io_extensions_eamodio_gitlens_2026_1_804_1767863573040_Microsoft_VisualStudio_Services_Icons_Default_get.json",
+    "hostname": "eamodio.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/eamodio/gitlens/2026.1.804/1767863573040/Microsoft.VisualStudio.Services.Icons.Default"
+  },
+  {
     "hostname": "embeddings.vscode-cdn.net",
     "pathname": "/text-3-small/v1.106/commands/GitHub.copilot-chat.json",
     "method": "GET",
@@ -372,6 +378,12 @@
     "filename": "github_gallery_vsassets_io_apis_public_gallery_publisher_GitHub_extension_copilot_chat_0_33_5_assetbyname_Microsoft_VisualStudio_Services_VSIXPackage_get.json"
   },
   {
+    "filename": "github_gallery_vsassets_io_apis_public_gallery_publisher_GitHub_extension_copilot_chat_0_35_3_assetbyname_Microsoft_VisualStudio_Services_VSIXPackage_get.json",
+    "hostname": "github.gallery.vsassets.io",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/publisher/GitHub/extension/copilot-chat/0.35.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+  },
+  {
     "hostname": "github.gallery.vsassets.io",
     "pathname": "/_apis/public/gallery/publisher/GitHub/extension/copilot-chat/0.36.2025121004/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage",
     "method": "GET",
@@ -412,6 +424,24 @@
     "pathname": "/extensions/github/copilot-chat/0.33.5/1765210039863/Microsoft.VisualStudio.Services.VSIXPackage",
     "method": "GET",
     "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_33_5_1765210039863_Microsoft_VisualStudio_Services_VSIXPackage_get.json"
+  },
+  {
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_35_3_1767730520274_Microsoft_VisualStudio_Code_Manifest_get.json",
+    "hostname": "github.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/github/copilot-chat/0.35.3/1767730520274/Microsoft.VisualStudio.Code.Manifest"
+  },
+  {
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_35_3_1767730520274_Microsoft_VisualStudio_Services_Content_Details_get.json",
+    "hostname": "github.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/github/copilot-chat/0.35.3/1767730520274/Microsoft.VisualStudio.Services.Content.Details"
+  },
+  {
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_35_3_1767730520274_Microsoft_VisualStudio_Services_VSIXPackage_get.json",
+    "hostname": "github.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/github/copilot-chat/0.35.3/1767730520274/Microsoft.VisualStudio.Services.VSIXPackage"
   },
   {
     "hostname": "github.gallerycdn.vsassets.io",
@@ -478,6 +508,36 @@
     "pathname": "/extensions/marketplace.json",
     "method": "GET",
     "filename": "main_vscode_cdn_net_extensions_marketplace_json_get.json"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_code_electron_browser_workbench_workbench_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/code/electron-browser/workbench/workbench.js.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_editor_common_services_editorWebWorkerMain_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/editor/common/services/editorWebWorkerMain.js.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_workbench_services_textMate_browser_backgroundTokenization_worker_textMateTokenizationWorker_workerMain_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.workerMain.js.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_workbench_workbench_desktop_main_css_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/workbench/workbench.desktop.main.css.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_workbench_workbench_desktop_main_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/workbench/workbench.desktop.main.js.map"
   },
   {
     "hostname": "main.vscode-cdn.net",
