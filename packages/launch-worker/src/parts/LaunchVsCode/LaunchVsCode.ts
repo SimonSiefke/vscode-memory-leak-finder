@@ -137,7 +137,6 @@ export const launchVsCode = async ({
       extraLaunchArgs: [testWorkspacePath],
       inspectExtensions,
       inspectExtensionsPort,
-      enableProxy: shouldEnableProxy,
       inspectPtyHost,
       inspectPtyHostPort,
       inspectSharedProcess,
