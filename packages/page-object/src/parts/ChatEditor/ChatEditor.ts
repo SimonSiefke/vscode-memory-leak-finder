@@ -1,7 +1,8 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as Electron from '../Electron/Electron.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError, electronApp }) => {
   return {
     async addContext(initialPrompt, secondPrompt, confirmText) {
       try {
@@ -25,9 +26,15 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async clearAll() {
       try {
+        const electron = Electron.create({ electronApp, VError })
+        await using _mockDialog = await electron.mockDialog({
+          response: 1,
+        })
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         if (ideVersion && ideVersion.minor >= 108) {
-          await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+          // TODO
+          // await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
         } else {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
         }
@@ -190,8 +197,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         if (expectedResponse) {
           const requestMessage = last
           await expect(requestMessage).toBeVisible()
-          await page.waitForIdle()
-          await sendButton.click()
           await page.waitForIdle()
           await expect(lines).toHaveText('')
           const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
