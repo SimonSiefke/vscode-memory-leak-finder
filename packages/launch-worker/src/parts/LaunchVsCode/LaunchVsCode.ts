@@ -132,7 +132,7 @@ export const launchVsCode = async ({
     }
     const args = GetVsCodeArgs.getVscodeArgs({
       enableExtensions,
-      enableProxy: enableProxy,
+      enableProxy,
       extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
       inspectExtensions,
