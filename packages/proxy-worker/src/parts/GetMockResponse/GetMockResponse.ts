@@ -43,10 +43,11 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
       }
     }
 
-    // Handle file references (for zip files, SSE files, etc.)
+    // Handle file references (for zip files, SSE files, images, etc.)
     let body: any = response.body
     let isZipFile = false
     let isSseFile = false
+    let isImageFile = false
 
     if (typeof body === 'string' && body.startsWith('file-reference:')) {
       const fileData = await LoadZipData.loadZipData(body)
@@ -57,6 +58,13 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
           isZipFile = true
         } else if (responseType === 'sse') {
           isSseFile = true
+        } else if (responseType === 'binary') {
+          // Check if it's an image based on content type
+          const contentType = response.headers['content-type'] || response.headers['Content-Type']
+          const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+          if (contentTypeStr.startsWith('image/')) {
+            isImageFile = true
+          }
         } else {
           // Fallback to content type check
           const contentType = response.headers['content-type'] || response.headers['Content-Type']
@@ -65,6 +73,8 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
             isZipFile = true
           } else if (contentTypeStr.includes('text/event-stream')) {
             isSseFile = true
+          } else if (contentTypeStr.startsWith('image/')) {
+            isImageFile = true
           }
         }
       }
@@ -75,6 +85,13 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
       isZipFile = true
     } else if (responseType === 'sse') {
       isSseFile = true
+    } else if (responseType === 'binary') {
+      // Check if it's an image based on content type
+      const contentType = response.headers['content-type'] || response.headers['Content-Type']
+      const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+      if (contentTypeStr.startsWith('image/')) {
+        isImageFile = true
+      }
     } else {
       // Fallback: check content type
       const contentType = response.headers['content-type'] || response.headers['Content-Type']
@@ -83,13 +100,15 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
         isZipFile = true
       } else if (contentTypeStr.includes('text/event-stream')) {
         isSseFile = true
+      } else if (contentTypeStr.startsWith('image/')) {
+        isImageFile = true
       }
     }
 
-    // Remove Content-Encoding and Transfer-Encoding headers for zip files and SSE files
+    // Remove Content-Encoding and Transfer-Encoding headers for zip files, SSE files, and images
     // since the binary/text data is not encoded
     const cleanedHeaders = { ...response.headers }
-    if (isZipFile || isSseFile) {
+    if (isZipFile || isSseFile || isImageFile) {
       const lowerCaseHeaders: Set<string> = new Set()
       for (const k of Object.keys(cleanedHeaders)) {
         lowerCaseHeaders.add(k.toLowerCase())
@@ -185,6 +204,7 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   const hasZipMagicBytes = Buffer.isBuffer(bodyBuffer) && bodyBuffer.length >= 2 && bodyBuffer[0] === 0x50 && bodyBuffer[1] === 0x4b
   const isZipFile = contentTypeStr.includes('application/zip') || hasZipMagicBytes
   const isSseFile = contentTypeStr.includes('text/event-stream')
+  const isImageFile = contentTypeStr.startsWith('image/')
 
   if (isZipFile) {
     console.log(
@@ -193,6 +213,9 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   }
   if (isSseFile) {
     console.log(`[Proxy] Detected SSE file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}`)
+  }
+  if (isImageFile) {
+    console.log(`[Proxy] Detected image file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}`)
   }
 
   // Convert headers to the format expected by writeHead and check for existing CORS headers
@@ -204,20 +227,20 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
     // Skip Content-Length headers (case-insensitive) - we'll set it below
     // Skip Transfer-Encoding headers - we'll set Content-Length instead
     // Skip Content-Encoding headers - mock body is already decompressed, so we can't send gzip encoding
-    // Skip Content-Encoding and Transfer-Encoding headers for zip files and SSE files - data is not encoded
+    // Skip Content-Encoding and Transfer-Encoding headers for zip files, SSE files, and images - data is not encoded
     if (
       lowerKey !== 'content-length' &&
       lowerKey !== 'transfer-encoding' &&
       lowerKey !== 'content-encoding' &&
-      !((isZipFile || isSseFile) && lowerKey === 'content-encoding')
+      !((isZipFile || isSseFile || isImageFile) && lowerKey === 'content-encoding')
     ) {
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
       lowerCaseHeaders.add(lowerKey)
     }
   }
 
-  // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files and SSE files
-  if (isZipFile || isSseFile) {
+  // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files, SSE files, and images
+  if (isZipFile || isSseFile || isImageFile) {
     const keysToRemove: string[] = []
     for (const k of Object.keys(headers)) {
       const lowerKey = k.toLowerCase()
@@ -229,7 +252,7 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
       delete headers[k]
       lowerCaseHeaders.delete(k.toLowerCase())
     }
-    const fileType = isZipFile ? 'zip file' : 'SSE file'
+    const fileType = isZipFile ? 'zip file' : isSseFile ? 'SSE file' : 'image file'
     console.log(`[Proxy] sendMockResponse - Final headers for ${fileType} (after cleanup):`, Object.keys(headers))
   }
 

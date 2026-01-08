@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
@@ -39,6 +40,37 @@ export const saveRequest = async (
       responseType = 'sse'
       const sseFilePath = await SaveSseData.saveSseData(responseData, url, timestamp)
       responseBodyData = `file-reference:${sseFilePath}`
+    } else if (contentTypeLower.startsWith('image/')) {
+      responseType = 'binary'
+      // Decompress if needed before saving
+      const compressionWorker = await CompressionWorker.getCompressionWorker()
+      const result = await compressionWorker.invoke('Compression.decompressBody', responseData, contentEncoding)
+      const decompressedBody = result.body
+
+      // Convert decompressed body to Buffer
+      let imageBuffer: Buffer
+      if (decompressedBody instanceof Uint8Array) {
+        imageBuffer = Buffer.from(decompressedBody)
+      } else if (Array.isArray(decompressedBody)) {
+        imageBuffer = Buffer.from(new Uint8Array(decompressedBody))
+      } else if (typeof decompressedBody === 'object' && decompressedBody !== null) {
+        // Handle case where Buffer was serialized as an object with numeric keys through IPC
+        const keys = Object.keys(decompressedBody)
+          .map((k) => Number.parseInt(k, 10))
+          .filter((k) => !isNaN(k))
+          .sort((a, b) => a - b)
+        if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+          const numbers = keys.map((k) => (decompressedBody as any)[k] as number)
+          imageBuffer = Buffer.from(new Uint8Array(numbers))
+        } else {
+          imageBuffer = Buffer.from(String(decompressedBody))
+        }
+      } else {
+        imageBuffer = Buffer.from(String(decompressedBody))
+      }
+
+      const imageFilePath = await SaveImageData.saveImageData(imageBuffer, url, timestamp, contentTypeLower)
+      responseBodyData = `file-reference:${imageFilePath}`
     } else {
       const compressionWorker = await CompressionWorker.getCompressionWorker()
       const result = await compressionWorker.invoke('Compression.decompressBody', responseData, contentEncoding)
