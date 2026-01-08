@@ -1,8 +1,12 @@
-<<<<<<< HEAD
-export const getVsCodeEnv = ({ runtimeDir, processEnv, proxyEnvVars }) => {
-=======
-export const getVsCodeEnv = ({ processEnv, runtimeDir }: { processEnv: NodeJS.ProcessEnv; runtimeDir?: string }): NodeJS.ProcessEnv => {
->>>>>>> origin/main
+export const getVsCodeEnv = ({
+  processEnv,
+  runtimeDir,
+  proxyEnvVars,
+}: {
+  processEnv: NodeJS.ProcessEnv
+  runtimeDir?: string
+  proxyEnvVars?: any
+}): NodeJS.ProcessEnv => {
   const env = {
     ...processEnv,
   }
