@@ -1,6 +1,5 @@
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
-import { decompressBody } from '../DecompressBody/DecompressBody.ts'
 import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
