@@ -343,6 +343,15 @@ export const createHttpProxyServer = async (
   await GetOrCreateCA.getOrCreateCA()
 
   const server = createServer()
+  const activeConnections = new Set<any>()
+
+  // Track all connections
+  server.on('connection', (socket) => {
+    activeConnections.add(socket)
+    socket.on('close', () => {
+      activeConnections.delete(socket)
+    })
+  })
 
   server.on('request', (req: IncomingMessage, res: ServerResponse) => {
     const targetUrl = req.url || ''
@@ -398,6 +407,11 @@ export const createHttpProxyServer = async (
   })
 
   server.on('connect', (req: IncomingMessage, socket: any, head: Buffer) => {
+    // Track the socket
+    activeConnections.add(socket)
+    socket.on('close', () => {
+      activeConnections.delete(socket)
+    })
     // Handle CONNECT method for HTTPS tunneling
     HandleConnect.handleConnect(req, socket, head, useProxyMock).catch(() => {
       socket.end()
@@ -421,6 +435,17 @@ export const createHttpProxyServer = async (
 
   return {
     async [Symbol.asyncDispose]() {
+      // Close all active connections first
+      for (const socket of activeConnections) {
+        try {
+          socket.destroy()
+        } catch (error) {
+          // Ignore errors when destroying sockets
+        }
+      }
+      activeConnections.clear()
+
+      // Then close the server
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())
       await promise
