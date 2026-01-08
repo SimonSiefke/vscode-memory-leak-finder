@@ -17,7 +17,7 @@ export const createHttpProxyServer = async (
   })
   proxyServerInstance = {
     port: server.port,
-    [Symbol.asyncDispose]: server.dispose,
+    [Symbol.asyncDispose]: server[Symbol.asyncDispose],
     url: server.url,
   }
   return {
