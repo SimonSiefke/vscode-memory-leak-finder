@@ -35,35 +35,62 @@ const saveInterceptedRequest = async (
     const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
     const contentTypeLower = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
 
-    // Handle zip files separately - don't decompress them
-    // Handle SSE (Server-Sent Events) separately - save as text file
-    let parsedBody: any
-    let wasCompressed = false
+    // Determine response type and process body accordingly
+    let responseType: 'json' | 'zip' | 'binary' | 'text' | 'sse'
+    let responseBodyData: string | object
+
     if (contentTypeLower.includes('application/zip')) {
+      responseType = 'zip'
       const zipFilePath = await SaveZipData.saveZipData(responseBody, url, timestamp)
-      parsedBody = `file-reference:${zipFilePath}`
+      responseBodyData = `file-reference:${zipFilePath}`
     } else if (contentTypeLower.includes('text/event-stream')) {
+      responseType = 'sse'
       const sseFilePath = await SaveSseData.saveSseData(responseBody, url, timestamp)
-      parsedBody = `file-reference:${sseFilePath}`
+      responseBodyData = `file-reference:${sseFilePath}`
     } else {
       const compressionWorker = await CompressionWorker.getCompressionWorker()
       const result = await compressionWorker.invoke('Compression.decompressBody', responseBody, contentEncoding)
       const decompressedBody = result.body
-      wasCompressed = result.wasCompressed
-      parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
+
+      // Handle case where decompressedBody is an array of numbers (from RPC serialization)
+      let bodyString: string
+      if (Array.isArray(decompressedBody)) {
+        bodyString = new TextDecoder().decode(new Uint8Array(decompressedBody))
+      } else {
+        bodyString = decompressedBody
+      }
+
+      // Check if it's JSON
+      if (contentTypeLower.includes('application/json') || contentTypeLower.includes('text/json')) {
+        try {
+          responseType = 'json'
+          responseBodyData = JSON.parse(bodyString)
+        } catch {
+          // If parsing fails, treat as text
+          responseType = 'text'
+          responseBodyData = bodyString
+        }
+      } else {
+        responseType = 'text'
+        responseBodyData = bodyString
+      }
     }
 
     const requestData = {
-      headers: requestHeaders,
-      method,
+      metadata: {
+        responseType,
+        timestamp,
+      },
+      request: {
+        headers: requestHeaders,
+        method,
+        url,
+      },
       response: {
-        body: parsedBody,
+        body: responseBodyData,
         headers: responseHeaders,
         statusCode,
-        wasCompressed,
       },
-      timestamp,
-      url,
     }
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
