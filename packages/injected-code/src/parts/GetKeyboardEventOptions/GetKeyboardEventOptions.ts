@@ -1,6 +1,6 @@
 import * as GetKeyCode from '../GetKeyCode/GetKeyCode.ts'
 
-export const getKeyboardEventOptions = (rawKey) => {
+export const getKeyboardEventOptions = (rawKey: string) => {
   let ctrlKey = false
   let metaKey = false
   let shiftKey = false

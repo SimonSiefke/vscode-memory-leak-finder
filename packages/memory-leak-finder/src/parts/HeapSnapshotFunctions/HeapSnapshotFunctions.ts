@@ -11,6 +11,10 @@ export const parseHeapSnapshotStrings = async (rpc: any, id) => {
   return rpc.invoke('HeapSnapshot.parseStrings', id)
 }
 
+export const compareStrings2 = async (rpc: any, pathA: string, pathB: string, minCount: number, includeChromeInternalStrings: boolean) => {
+  return rpc.invoke('HeapSnapshot.compareStrings2', pathA, pathB, minCount, includeChromeInternalStrings)
+}
+
 export const getStringCount = async (rpc: any, id) => {
   return rpc.invoke('HeapSnapshot.parseStringCount', id)
 }
@@ -57,4 +61,8 @@ export const getLargestArraysFromHeapSnapshot = async (rpc: any, value) => {
 
 export const compareHeapSnapshotFunctions = async (rpc: any, pathA, pathB, useParallel = true) => {
   return rpc.invoke('HeapSnapshot.compareFunctions', pathA, pathB, useParallel)
+}
+
+export const compareStringCounts = async (rpc: any, pathA: string, pathB: string) => {
+  return rpc.invoke('HeapSnapshot.compareStringCount', pathA, pathB)
 }

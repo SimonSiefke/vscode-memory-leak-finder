@@ -3,10 +3,10 @@
 import { VError } from '@lvce-editor/verror'
 import * as GetHostPlatformModule from '../GetHostPlatformModule/GetHostPlatformModule.ts'
 
-export const getHostPlatform = async (platform: string): Promise<string> => {
+export const getHostPlatform = async (platform: string, arch: string): Promise<string> => {
   try {
-    const module = await GetHostPlatformModule.getHostPlatformModule(platform)
-    const hostPlatform = await module.getHostPlatform()
+    const fn = GetHostPlatformModule.getHostPlatformModule(platform)
+    const hostPlatform = await fn(arch)
     return hostPlatform
   } catch (error) {
     throw new VError(error, `Failed to determine host platform`)

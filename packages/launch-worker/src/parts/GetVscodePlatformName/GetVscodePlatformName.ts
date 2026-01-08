@@ -15,12 +15,9 @@ export const getVscodePlatformName = (platform: string, arch: string): string =>
 
   if (platform === 'win32') {
     if (arch === 'arm64' || arch === 'aarch64') {
-      return 'win32-arm64'
+      return 'win32-arm64-archive'
     }
-    if (arch === 'ia32' || arch === 'x32') {
-      return 'win32-ia32'
-    }
-    return 'win32-x64'
+    return 'win32-x64-archive'
   }
 
   throw new Error(`Unsupported platform: ${platform}`)

@@ -13,6 +13,8 @@ import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.ts'
 import * as RunCompile from '../RunCompile/RunCompile.ts'
 
 export const downloadAndBuildVscodeFromCommit = async (
+  platform: string,
+  arch: string,
   commitRef: string,
   _repoUrl: string,
   reposDir: string,
@@ -75,7 +77,7 @@ export const downloadAndBuildVscodeFromCommit = async (
   if (needsInstall) {
     Logger.log(`[repository] Pre-caching ripgrep binary before installing dependencies...`)
     try {
-      await preCacheRipgrep()
+      await preCacheRipgrep(platform, arch)
     } catch (error) {
       Logger.log(`[repository] Warning: Failed to pre-cache ripgrep: ${error}`)
       Logger.log(`[repository] Continuing with npm ci - may encounter GitHub API issues`)

@@ -35,6 +35,7 @@ export const combineEventListenersWithSourceMapResults = (eventListeners, map, c
         ...rest,
         originalName: cleanPosition.name,
         originalStack: [`${cleanPosition.source}:${cleanPosition.line}:${cleanPosition.column}`],
+        sourcesHash: cleanPosition.sourcesHash || null,
       })
     } else {
       newEventListeners.push(eventListener)

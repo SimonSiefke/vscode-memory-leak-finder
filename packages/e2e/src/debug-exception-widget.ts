@@ -18,11 +18,15 @@ setInterval(() => {
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('index.js')
   await RunAndDebug.removeAllBreakpoints()
   await Editor.open('index.js')
   await ActivityBar.showRunAndDebug()
-  await RunAndDebug.startRunAndDebug()
+  // @ts-ignore
+  await RunAndDebug.startRunAndDebug({
+    debugLabel: 'Node.js',
+  })
   await RunAndDebug.setPauseOnExceptions({
     pauseOnCaughtExceptions: true,
     pauseOnExceptions: true,

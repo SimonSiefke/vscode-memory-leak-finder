@@ -94,8 +94,7 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
 export const getMockResponse = async (method: string, url: string): Promise<MockResponse | null> => {
   try {
     const parsedUrl = new URL(url)
-    const { hostname } = parsedUrl
-    const { pathname } = parsedUrl
+    const { hostname, pathname } = parsedUrl
 
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {

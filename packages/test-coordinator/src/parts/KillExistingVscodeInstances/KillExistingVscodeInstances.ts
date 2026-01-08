@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
+import * as IsIgnoredProcessKillError from '../IsIgnoredProcessKillError/IsIgnoredProcessKillError.ts'
 import * as KillProcess from '../KillProcess/KillProcess.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
@@ -20,8 +20,7 @@ export const killExistingVsCodeInstances = async () => {
     }
     KillProcess.killProcess(pid)
   } catch (error) {
-    // @ts-ignore
-    if (error && (error.code === ErrorCodes.ENOENT || error.code === ErrorCodes.ESRCH || error.code === ErrorCodes.EPERM)) {
+    if (IsIgnoredProcessKillError.isIgnoredProcessKillError(error)) {
       return
     }
     throw new VError(error, `Failed to kill existing vscode processes`)

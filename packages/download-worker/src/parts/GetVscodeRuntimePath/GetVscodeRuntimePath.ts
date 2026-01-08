@@ -1,22 +1,32 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as Root from '../Root/Root.ts'
 
-const getCacheFilePath = (vscodeVersion: string): string => {
-  return join(Root.root, '.vscode-runtime-paths', `${vscodeVersion}.json`)
+const getCacheFilePath = (vscodeVersion: string, platform: string, arch: string): string => {
+  const cacheKey = `${vscodeVersion}-${platform}-${arch}`
+  return join(Root.root, '.vscode-runtime-paths', `${cacheKey}.json`)
 }
 
-export const getVscodeRuntimePath = async (vscodeVersion: string): Promise<string> => {
-  const cacheFilePath = getCacheFilePath(vscodeVersion)
+export const getVscodeRuntimePath = async (vscodeVersion: string, platform: string, arch: string): Promise<string> => {
+  const cacheFilePath = getCacheFilePath(vscodeVersion, platform, arch)
   if (!existsSync(cacheFilePath)) {
     return ''
   }
   try {
     const cache = await JsonFile.readJson(cacheFilePath)
-    const { path } = cache
-    if (typeof path !== 'string') {
+    // Support both new format (uri) and old format (path) for backward compatibility
+    const pathUri = cache.uri || cache.path
+    if (typeof pathUri !== 'string') {
       return ''
+    }
+    // If it's already a URI, convert it to path; otherwise use it as-is (old format)
+    let path: string
+    if (pathUri.startsWith('file://')) {
+      path = fileURLToPath(pathUri)
+    } else {
+      path = pathUri
     }
     if (!existsSync(path)) {
       return ''
@@ -27,7 +37,9 @@ export const getVscodeRuntimePath = async (vscodeVersion: string): Promise<strin
   }
 }
 
-export const setVscodeRuntimePath = async (vscodeVersion: string, path: string): Promise<void> => {
-  const cacheFilePath = getCacheFilePath(vscodeVersion)
-  await JsonFile.writeJson(cacheFilePath, { path })
+export const setVscodeRuntimePath = async (vscodeVersion: string, path: string, platform: string, arch: string): Promise<void> => {
+  const cacheFilePath = getCacheFilePath(vscodeVersion, platform, arch)
+  // Convert path to URI before saving
+  const pathUri = pathToFileURL(path).toString()
+  await JsonFile.writeJson(cacheFilePath, { uri: pathUri })
 }

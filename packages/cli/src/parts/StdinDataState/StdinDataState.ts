@@ -4,9 +4,11 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export interface StdinDataState {
+  readonly arch: string
   readonly bisect: boolean
   readonly buffering: boolean
   readonly checkLeaks: boolean
+  readonly clearExtensions: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -29,8 +31,10 @@ export interface StdinDataState {
   readonly measureAfter: boolean
   readonly measureNode?: boolean
   readonly mode: number
+  readonly platform: string
   readonly previousFilters: string[]
   readonly recordVideo: boolean
+  readonly compressVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
   readonly runs: number
@@ -46,9 +50,11 @@ export interface StdinDataState {
 }
 
 let state: StdinDataState = {
+  arch: '',
   bisect: false,
   buffering: false,
   checkLeaks: false,
+  clearExtensions: true,
   continueValue: '',
   cwd: Character.EmptyString,
   enableExtensions: false,
@@ -70,8 +76,10 @@ let state: StdinDataState = {
   measure: Character.EmptyString,
   measureAfter: false,
   mode: ModeType.Waiting,
+  platform: '',
   previousFilters: [],
   recordVideo: false,
+  compressVideo: false,
   restartBetween: false,
   runMode: TestRunMode.Auto,
   runs: 1,
@@ -89,6 +97,7 @@ let state: StdinDataState = {
 export const setState = (newState: StdinDataState): void => {
   state = {
     ...state,
+    arch: newState.arch,
     bisect: newState.bisect,
     checkLeaks: newState.checkLeaks,
     continueValue: newState.continueValue,
@@ -110,8 +119,10 @@ export const setState = (newState: StdinDataState): void => {
     measure: newState.measure,
     measureAfter: newState.measureAfter,
     mode: newState.mode,
+    platform: newState.platform,
     previousFilters: newState.previousFilters,
     recordVideo: newState.recordVideo,
+    compressVideo: newState.compressVideo,
     restartBetween: newState.restartBetween,
     runMode: newState.runMode,
     runs: newState.runs,

@@ -1,7 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async hide() {
       try {
@@ -16,6 +16,22 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide side bar`)
+      }
+    },
+    async hideSecondary() {
+      try {
+        const secondarySideBar = page.locator('.auxiliarybar')
+        const isVisible = await secondarySideBar.isVisible()
+        if (!isVisible) {
+          return
+        }
+        await expect(secondarySideBar).toBeVisible()
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.HideSecondarySideBar)
+        await expect(secondarySideBar).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide secondary bar`)
       }
     },
     async moveLeft() {
@@ -51,14 +67,14 @@ export const create = ({ expect, page, VError }) => {
     },
     async toggle() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
       } catch (error) {
         throw new VError(error, `Failed to toggle side bar`)
       }
     },
     async togglePosition() {
-      const quickPick = QuickPick.create({ expect, page, VError })
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
       await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarPosition)
     },
   }

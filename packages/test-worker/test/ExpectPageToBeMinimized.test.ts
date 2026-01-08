@@ -1,5 +1,4 @@
 import { expect, jest, test } from '@jest/globals'
-import * as DevtoolsCommandType from '../src/parts/DevtoolsCommandType/DevtoolsCommandType.ts'
 import * as ExpectPageToBeMinimized from '../src/parts/ExpectPageToBeMinimized/ExpectPageToBeMinimized.ts'
 
 test('execute', async () => {
@@ -22,7 +21,7 @@ test('execute', async () => {
   await ExpectPageToBeMinimized.toBeMinimized(page)
   expect(page.electronRpc.invoke).toHaveBeenCalledTimes(1)
   // @ts-ignore
-  expect(page.electronRpc.invoke).toHaveBeenCalledWith(DevtoolsCommandType.RuntimeCallFunctionOn, {
+  expect(page.electronRpc.invoke).toHaveBeenCalledWith('Runtime.callFunctionOn', {
     arguments: [
       {
         value: 'test-targetId',

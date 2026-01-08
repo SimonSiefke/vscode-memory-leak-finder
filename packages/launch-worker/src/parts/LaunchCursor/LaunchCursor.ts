@@ -1,5 +1,6 @@
 import { copyFile, mkdir, rm } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
 import * as DownloadAndUnzipCursor from '../DownloadAndUnzipCursor/DownloadAndUnzipCursor.ts'
@@ -16,6 +17,7 @@ import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 
 export const launchCursor = async ({
   addDisposable,
+  clearExtensions,
   cursorVersion,
   cwd,
   enableExtensions,
@@ -31,6 +33,7 @@ export const launchCursor = async ({
   vscodePath,
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
+  clearExtensions: boolean
   cursorVersion: string
   cwd: string
   enableExtensions: boolean
@@ -60,8 +63,12 @@ export const launchCursor = async ({
     const binaryPath = vscodePath || (await DownloadAndUnzipCursor.downloadAndUnzipCursor(cursorVersion))
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
-    await rm(extensionsDir, { force: true, recursive: true })
-    await mkdir(extensionsDir)
+    if (clearExtensions) {
+      await rm(extensionsDir, { force: true, recursive: true })
+      await mkdir(extensionsDir)
+    } else {
+      await ClearExtensionsDirIfEmpty.clearExtensionsDirIfEmpty(extensionsDir)
+    }
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })

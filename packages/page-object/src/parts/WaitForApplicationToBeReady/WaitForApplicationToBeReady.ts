@@ -7,7 +7,7 @@ const isDevtoolsCannotFindContextError = (error) => {
   )
 }
 
-export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }) => {
   return {
     async waitForApplicationToBeReady({
       enableExtensions,
@@ -45,6 +45,7 @@ export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
           expect,
           ideVersion,
           page,
+          platform,
           VError,
         })
         await terminal.show()

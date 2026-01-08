@@ -1,5 +1,38 @@
 export const create = ({ expect, page, VError }) => {
   return {
+    async check(name: string) {
+      await page.waitForIdle()
+      const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
+      await expect(contextMenu).toBeVisible()
+      await page.waitForIdle()
+      await expect(contextMenu).toBeFocused()
+      await page.waitForIdle()
+      const contextMenuItem = contextMenu.locator('.action-item', {
+        hasText: name,
+      })
+      await page.waitForIdle()
+      await contextMenuItem.click()
+      await page.waitForIdle()
+      await expect(contextMenu).toBeHidden()
+      await page.waitForIdle()
+    },
+    async checkSubItem(option: string) {
+      try {
+        const subMenu = page.locator('.monaco-submenu')
+        await expect(subMenu).toBeVisible()
+        const contextMenuItem = subMenu.locator('.action-item', {
+          hasText: option,
+        })
+        await expect(contextMenuItem).toBeVisible()
+        await page.waitForIdle()
+        await contextMenuItem.click()
+        const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
+        await expect(contextMenu).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to check sub menu item ${option}`)
+      }
+    },
     async close() {
       try {
         const contextMenu = page.locator('.context-view.monaco-menu-container')
@@ -10,7 +43,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to close context menu`)
       }
     },
-    async open(locator) {
+    async open(locator: any) {
       try {
         await page.waitForIdle()
         const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
@@ -37,6 +70,25 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open context menu`)
       }
     },
+    async openSubMenu(option: string) {
+      await page.waitForIdle()
+      const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
+      await expect(contextMenu).toBeVisible()
+      await page.waitForIdle()
+      await expect(contextMenu).toBeFocused()
+      await page.waitForIdle()
+      const contextMenuItem = contextMenu.locator('.action-item', {
+        hasText: option,
+      })
+      await expect(contextMenuItem).toBeVisible()
+      await page.waitForIdle()
+      await contextMenuItem.click()
+      await page.waitForIdle()
+      await expect(contextMenuItem).toHaveAttribute('aria-expanded', 'true')
+
+      const subMenu = page.locator('.monaco-submenu')
+      await expect(subMenu).toBeVisible()
+    },
     async select(option) {
       await page.waitForIdle()
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
@@ -61,22 +113,6 @@ export const create = ({ expect, page, VError }) => {
       })
       await page.waitForIdle()
       await expect(contextMenuItem).toBeVisible()
-    },
-    async check(name: string) {
-      await page.waitForIdle()
-      const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
-      await expect(contextMenu).toBeVisible()
-      await page.waitForIdle()
-      await expect(contextMenu).toBeFocused()
-      await page.waitForIdle()
-      const contextMenuItem = contextMenu.locator('.action-item', {
-        hasText: name,
-      })
-      await page.waitForIdle()
-      await contextMenuItem.click()
-      await page.waitForIdle()
-      await expect(contextMenu).toBeHidden()
-      await page.waitForIdle()
     },
     async uncheck(name: string) {
       await page.waitForIdle()

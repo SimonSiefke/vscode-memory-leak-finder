@@ -2,7 +2,7 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async addItem({ key, name, value }) {
       try {
@@ -142,7 +142,7 @@ export const create = ({ expect, page, VError }) => {
       // TODO maybe find a better way
       // create random quickpick to avoid race condition
       await page.waitForIdle()
-      const quickPick = QuickPick.create({ expect, page, VError })
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
       await quickPick.show()
       await quickPick.hide()
       await page.waitForIdle()
@@ -227,7 +227,7 @@ export const create = ({ expect, page, VError }) => {
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
         await page.waitForIdle()
         const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
@@ -311,10 +311,14 @@ export const create = ({ expect, page, VError }) => {
         await searchInput.type(value)
         await page.waitForIdle()
         const searchCount = page.locator('.settings-count-widget')
-        const word = resultCount === 1 ? 'Setting' : 'Settings'
         await expect(searchCount).toBeVisible()
         await page.waitForIdle()
-        await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)
+        if (resultCount === 'many') {
+          await expect(searchCount).toHaveText(new RegExp(`\\d+ Settings Found`))
+        } else {
+          const word = resultCount === 1 ? 'Setting' : 'Settings'
+          await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)
+        }
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)

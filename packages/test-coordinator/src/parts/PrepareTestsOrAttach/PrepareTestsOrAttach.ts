@@ -10,7 +10,9 @@ export const state: State = {
 }
 
 export interface PrepareTestsAndAttachOptions {
+  readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
@@ -30,10 +32,13 @@ export interface PrepareTestsAndAttachOptions {
   readonly measureId: string
   readonly measureNode: boolean
   readonly pageObjectPath: string
+  readonly platform: string
   readonly recordVideo: boolean
+  readonly compressVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
   readonly timeouts: any
+  readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
@@ -41,7 +46,9 @@ export interface PrepareTestsAndAttachOptions {
 
 export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOptions) => {
   const {
+    arch,
     attachedToPageTimeout,
+    clearExtensions,
     commit,
     connectionId,
     cwd,
@@ -61,10 +68,13 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     measureId,
     measureNode,
     pageObjectPath,
+    platform,
     recordVideo,
+    compressVideo,
     runMode,
     screencastQuality,
     timeouts,
+    updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
@@ -72,7 +82,9 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   const isFirst = state.promise === undefined
   if (isFirst) {
     state.promise = PrepareTests.prepareTests({
+      arch,
       attachedToPageTimeout,
+      clearExtensions,
       commit,
       connectionId,
       cwd,
@@ -91,9 +103,11 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       inspectSharedProcessPort,
       measureId,
       pageObjectPath,
+      platform,
       recordVideo,
       runMode,
       timeouts,
+      updateUrl,
       useProxyMock,
       vscodePath,
       vscodeVersion,
@@ -104,7 +118,10 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, utilityContext, webSocketUrl } = await result
 
   const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
+    platform,
+    arch,
     recordVideo,
+    compressVideo,
     screencastQuality,
     connectionId,
     devtoolsWebSocketUrl,

@@ -258,6 +258,7 @@ export const pressKey = async (key) => {
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
   KeyBoardActions.press(keyboardEventOptions)
   if (
+    key === 'Enter' &&
     document.activeElement &&
     (document.activeElement instanceof HTMLAnchorElement || document.activeElement instanceof HTMLButtonElement)
   ) {
@@ -269,6 +270,14 @@ export const type = (text) => {
   Assert.string(text)
   const fn = ElementAction.type
   fn(document.activeElement, { text })
+}
+
+export const getValue = (locator) => {
+  const element = QuerySelector.querySelector(locator.selector)
+  if (!element) {
+    throw new Error(`element not found`)
+  }
+  return element.value
 }
 
 export const contentEditableInsert = ({ value }) => {

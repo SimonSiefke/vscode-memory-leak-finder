@@ -5,20 +5,20 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
 interface GraphEdge {
-  name: string
-  index: number
+  readonly index: number
+  readonly name: string
 }
 interface Graph {
-  [nodeId: number]: GraphEdge[]
+  readonly [nodeId: number]: readonly GraphEdge[]
 }
 interface ParsedNode {
-  id: number
-  type: string
-  name: string
+  readonly id: number
+  readonly name: string
+  readonly type: string
 }
 interface ArrayWithCount {
-  id: number
-  count: number
+  readonly count: number
+  readonly id: number
 }
 
 const isArray = (node: ParsedNode): boolean => {
@@ -44,8 +44,8 @@ const getArraysWithCount = (parsedNodes: readonly ParsedNode[], graph: Graph, ar
   for (const arrayNode of arrayNodes) {
     const count = getElementCount(parsedNodes, graph, arrayNode.id)
     withCount.push({
-      id: arrayNode.id,
       count,
+      id: arrayNode.id,
     })
   }
   return withCount
@@ -64,14 +64,14 @@ const filterByMinLength = (arrays: readonly ArrayWithCount[], minLength: number)
 }
 
 interface NameMapEntry {
-  edgeName: string | undefined
-  nodeName: string | undefined
+  readonly edgeName: string | undefined
+  readonly nodeName: string | undefined
 }
 interface NameMap {
-  [id: number]: NameMapEntry
+  readonly [id: number]: NameMapEntry
 }
 export interface ArrayWithCountAndName extends ArrayWithCount {
-  name: string | undefined
+  readonly name: string | undefined
 }
 
 const addNames = (items: readonly ArrayWithCount[], nameMap: NameMap): ArrayWithCountAndName[] => {
@@ -90,7 +90,7 @@ export const getLargestArraysFromHeapSnapshot = async (id: number): Promise<Arra
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const minLength = 1
-  const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const arrayNodes = parsedNodes.filter(isArray)
   const arraysWithLength = getArraysWithCount(parsedNodes, graph, arrayNodes)
   const filtered = filterByMinLength(arraysWithLength, minLength)

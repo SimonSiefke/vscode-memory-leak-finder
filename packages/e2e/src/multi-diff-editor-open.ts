@@ -1,0 +1,36 @@
+import type { TestContext } from '../types.ts'
+
+export const skip = 1
+
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+  await Workspace.setFiles([
+    {
+      content: 'a',
+      name: 'a.txt',
+    },
+    {
+      content: 'b',
+      name: 'b.txt',
+    },
+    {
+      content: 'c',
+      name: 'c.txt',
+    },
+  ])
+  await Editor.closeAll()
+  await Explorer.focus()
+  await Explorer.shouldHaveItem('a.txt')
+  await Explorer.shouldHaveItem('b.txt')
+  await Explorer.shouldHaveItem('c.txt')
+}
+
+export const run = async ({ DiffEditor, Editor }: TestContext): Promise<void> => {
+  // @ts-ignore
+  await DiffEditor.open({
+    file1: 'a.txt',
+    file1Content: 'a',
+    file2: 'b.txt',
+    file2Content: 'b',
+  })
+  await Editor.closeAll()
+}

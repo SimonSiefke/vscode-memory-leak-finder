@@ -1,5 +1,6 @@
 import { copyFile, mkdir, rm } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.ts'
@@ -20,6 +21,8 @@ import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 
 export const launchVsCode = async ({
   addDisposable,
+  arch,
+  clearExtensions,
   commit,
   cwd,
   enableExtensions,
@@ -32,11 +35,15 @@ export const launchVsCode = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  platform,
+  updateUrl,
   useProxyMock,
   vscodePath,
   vscodeVersion,
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
+  arch: string
+  clearExtensions: boolean
   commit: string
   cwd: string
   enableExtensions: boolean
@@ -49,7 +56,9 @@ export const launchVsCode = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  platform: string
   useProxyMock: boolean
+  updateUrl: string
   vscodePath: string
   vscodeVersion: string
 }) => {
@@ -73,11 +82,15 @@ export const launchVsCode = async ({
     await mkdir(sourceMapCacheDir, { recursive: true })
     const sourcesDir = join(Root.root, '.vscode-sources')
     await mkdir(sourcesDir, { recursive: true })
-    const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit, insidersCommit)
+    const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
-    await rm(extensionsDir, { force: true, recursive: true })
-    await mkdir(extensionsDir)
+    if (clearExtensions) {
+      await rm(extensionsDir, { force: true, recursive: true })
+      await mkdir(extensionsDir)
+    } else {
+      await ClearExtensionsDirIfEmpty.clearExtensionsDirIfEmpty(extensionsDir)
+    }
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })

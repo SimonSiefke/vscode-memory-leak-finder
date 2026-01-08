@@ -1,7 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }) => {
   return {
     async addContext(initialPrompt, secondPrompt, confirmText) {
       try {
@@ -9,7 +9,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await addContextButton.click()
         await page.waitForIdle()
 
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.select(initialPrompt, true)
         await quickPick.select(secondPrompt)
         await page.waitForIdle()
@@ -25,7 +25,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async clearAll() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         if (ideVersion && ideVersion.minor >= 108) {
           await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
         } else {
@@ -68,7 +68,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     isFirst: false,
     async open() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.NewChartEditor)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -219,6 +219,33 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       }
     },
     async setMode(modeLabel: string) {
+      try {
+        if (ideVersion.minor < 107) {
+          await this.setModeLegacy(modeLabel)
+          return
+        }
+        const chatView = page.locator('.interactive-session')
+        const setModeButton = chatView.locator('.chat-modelPicker-item .action-label')
+        await expect(setModeButton).toBeVisible()
+        await setModeButton.click()
+        await page.waitForIdle()
+        const actionWidget = page.locator('.monaco-list[aria-label="Action Widget"]')
+        await expect(actionWidget).toBeVisible()
+        await page.waitForIdle()
+        await expect(actionWidget).toBeFocused()
+        await page.waitForIdle()
+        const option = actionWidget.locator(`.monaco-list-row.action[aria-label="${modeLabel}"]`)
+        await expect(option).toBeVisible()
+        await option.click()
+        await page.waitForIdle()
+        await expect(actionWidget).toBeHidden()
+        const modeLabelElement = chatView.locator('.chat-model-label')
+        await expect(modeLabelElement).toHaveText(modeLabel)
+      } catch (error) {
+        throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
+      }
+    },
+    async setModeLegacy(modeLabel: string) {
       try {
         const chatView = page.locator('.interactive-session')
         const setModeButton = chatView.locator('[aria-label^="Set Mode"]')

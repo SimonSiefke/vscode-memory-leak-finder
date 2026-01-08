@@ -3,6 +3,7 @@ import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerComma
 
 export const connectDevtools = (
   rpc: any,
+  platform: string,
   connectionId: number,
   devtoolsWebSocketUrl: string,
   electronObjectId: string,
@@ -22,10 +23,12 @@ export const connectDevtools = (
   inspectExtensionsPort: number,
 ) => {
   Assert.object(rpc)
+  Assert.string(platform)
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   return rpc.invoke(
     TestWorkerCommandType.ConnectDevtools,
+    platform,
     connectionId,
     devtoolsWebSocketUrl,
     electronObjectId,

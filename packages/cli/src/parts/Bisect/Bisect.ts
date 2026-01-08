@@ -4,8 +4,8 @@ import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
 export interface BisectResult {
-  commit?: string
-  type: 'success' | 'failed-test' | 'not-found'
+  readonly commit?: string
+  readonly type: 'success' | 'failed-test' | 'not-found'
 }
 
 export const bisect = async (options: StartRunningOptions): Promise<BisectResult> => {
@@ -43,6 +43,7 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       measureAfter: options.measureAfter,
       measureNode: options.measureNode,
       recordVideo: options.recordVideo,
+      compressVideo: options.compressVideo,
       restartBetween: options.restartBetween,
       root: options.cwd,
       runMode: options.runMode,
@@ -51,6 +52,7 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       setupOnly: options.setupOnly,
       timeoutBetween: options.timeoutBetween,
       timeouts: options.timeouts,
+      updateUrl: options.updateUrl,
       useProxyMock: options.useProxyMock,
       vscodePath: options.vscodePath,
       vscodeVersion: options.vscodeVersion,

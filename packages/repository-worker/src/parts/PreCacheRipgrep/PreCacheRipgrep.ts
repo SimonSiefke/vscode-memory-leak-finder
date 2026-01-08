@@ -12,16 +12,15 @@ const VSCODE_RIPGREP_VERSION = '1.15.14' // Current @vscode/ripgrep version
 /**
  * Determines the target platform for ripgrep binary using Node.js APIs
  */
-const getTarget = (): string => {
-  const arch = process.env.npm_config_arch || os.arch()
-  const platform = os.platform()
+const getTarget = (platform: string, arch: string): string => {
+  const effectiveArch = process.env.npm_config_arch || arch
 
   switch (platform) {
     case 'darwin':
-      return arch === 'arm64' || arch === 'aarch64' ? 'aarch64-apple-darwin' : 'x86_64-apple-darwin'
+      return effectiveArch === 'arm64' || effectiveArch === 'aarch64' ? 'aarch64-apple-darwin' : 'x86_64-apple-darwin'
 
     case 'linux':
-      switch (arch) {
+      switch (effectiveArch) {
         case 'aarch64':
         case 'arm64':
           return 'aarch64-unknown-linux-musl'
@@ -44,7 +43,7 @@ const getTarget = (): string => {
       }
 
     case 'win32':
-      switch (arch) {
+      switch (effectiveArch) {
         case 'arm64':
           return 'aarch64-pc-windows-msvc'
         case 'x64':
@@ -157,12 +156,12 @@ const downloadWithRetry = async (url: string, outputPath: string, maxRetries = 3
 /**
  * Pre-caches ripgrep binary to avoid GitHub API 403 errors
  */
-export const preCacheRipgrep = async (): Promise<void> => {
+export const preCacheRipgrep = async (platform: string, arch: string): Promise<void> => {
   try {
     Logger.log('[ripgrep] Pre-caching ripgrep binary to avoid GitHub API issues')
 
     // Determine target platform
-    const target = getTarget()
+    const target = getTarget(platform, arch)
     Logger.log(`[ripgrep] Detected target: ${target}`)
 
     // Get appropriate version
@@ -170,7 +169,7 @@ export const preCacheRipgrep = async (): Promise<void> => {
     Logger.log(`[ripgrep] Using version: ${version}`)
 
     // Construct asset name
-    const extension = os.platform() === 'win32' ? '.zip' : '.tar.gz'
+    const extension = platform === 'win32' ? '.zip' : '.tar.gz'
     const assetName = `ripgrep-${version}-${target}${extension}`
     Logger.log(`[ripgrep] Asset name: ${assetName}`)
 

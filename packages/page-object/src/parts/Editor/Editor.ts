@@ -1,3 +1,4 @@
+import { basename } from 'node:path'
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
@@ -22,8 +23,23 @@ const isBinary = (file) => {
   return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }) => {
   return {
+    async acceptInlineCompletion() {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
+        await expect(inlineCompletion).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Tab')
+        await page.waitForIdle()
+        await expect(inlineCompletion).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to accept inline completion`)
+      }
+    },
     async acceptRename() {
       try {
         await page.waitForIdle()
@@ -40,11 +56,22 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to accept rename`)
       }
     },
+    async addCursorBelow() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.AddCursorBelow)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add cursor below`)
+      }
+    },
     async autoFix({ hasFixes }) {
       try {
         const quickPick = QuickPick.create({
           expect,
           page,
+          platform,
           VError,
         })
         await quickPick.executeCommand(WellKnownCommands.AutoFix)
@@ -99,7 +126,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await page.waitForIdle()
           return
         }
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors)
         await expect(tabs).toHaveCount(0, {
           timeout: 4000,
@@ -112,7 +139,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async closeAllEditorGroups() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.CloseAllEditorGroups)
         await page.waitForIdle()
       } catch (error) {
@@ -122,7 +149,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async closeAutoFix() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.show()
         await quickPick.hide()
         const overlayMessage = page.locator('.monaco-editor-overlaymessage')
@@ -171,12 +198,14 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async deleteAll() {
       try {
-        await this.selectAll()
+        await page.waitForIdle()
+        await this.selectAll({ viaKeyBoard: true })
         await page.waitForIdle()
         await page.keyboard.press('Delete')
         await page.waitForIdle()
         await page.waitForIdle()
         await this.shouldHaveText('')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to delete all`)
       }
@@ -184,7 +213,9 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async deleteCharactersLeft({ count }) {
       try {
         for (let i = 0; i < count; i++) {
+          await page.waitForIdle()
           await page.keyboard.press('Backspace')
+          await page.waitForIdle()
         }
       } catch (error) {
         throw new VError(error, `Failed to delete character left`)
@@ -205,7 +236,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async disableReadonly() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DisableReadonly)
         await page.waitForIdle()
       } catch (error) {
@@ -220,7 +251,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         if (count === 0) {
           return
         }
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
         await expect(stickyWidget).toBeHidden()
         await page.waitForIdle()
@@ -244,7 +275,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async duplicateSelection() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DuplicateSelection)
       } catch (error) {
         throw new VError(error, `Failed to duplicate selection`)
@@ -253,7 +284,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async enable2x2GridView() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.EditorGridLayout)
         await page.waitForIdle()
       } catch (error) {
@@ -263,7 +294,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async enableReadonly() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.EnableReadonly)
         await page.waitForIdle()
       } catch (error) {
@@ -279,7 +310,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           return
         }
         await expect(stickyWidget).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
         await expect(stickyWidget).toHaveCount(count + 1)
         await page.waitForIdle()
@@ -303,9 +334,20 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to enable version lens`)
       }
     },
+    async expandSelection() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ExpandSelection)
+        await page.waitForIdle()
+        await page.keyboard.press('Control+L')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select line`)
+      }
+    },
     async findAllReferences() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.FindAllReferences)
       } catch (error) {
         throw new VError(error, `Failed to find all references`)
@@ -322,6 +364,38 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const editContext = editor.locator('.native-edit-context')
         await editContext.focus()
         await expect(editContext).toBeFocused()
+      }
+    },
+    async focusBottomEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, platform, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusBelowEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus bottom editor group`)
+      }
+    },
+    async focusLeftEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, platform, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusLeftEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus left editor group`)
+      }
+    },
+    async focusRightEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, platform, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusRightEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus right editor group`)
+      }
+    },
+    async focusTopEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, platform, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusAboveEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus top editor group`)
       }
     },
     async fold() {
@@ -350,7 +424,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async foldAll() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand('Fold All')
         await page.waitForIdle()
       } catch (error) {
@@ -359,7 +433,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async format() {
       try {
-        const quickpick = QuickPick.create({ expect, page, VError })
+        const quickpick = QuickPick.create({ expect, page, platform, VError })
         await quickpick.executeCommand(WellKnownCommands.FormatDocument)
       } catch (error) {
         throw new VError(error, `Failed to format file`)
@@ -368,15 +442,25 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async goToDefinition() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GoToDefintiion)
       } catch (error) {
         throw new VError(error, `Failed to go to definition`)
       }
     },
+    async goToEndOfLine() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('End')
+        await page.waitForIdle()
+        // TODO verify that cursor is actually at that position
+      } catch (error) {
+        throw new VError(error, `Failed to set cursor to end of line`)
+      }
+    },
     async goToFile({ column, file, line }) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GoToFile, {
           stayVisible: true,
         })
@@ -389,7 +473,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async goToSourceDefinition({ hasDefinition }) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TypeScriptGoToSourceDefinition)
         if (hasDefinition) {
           // TODO
@@ -410,7 +494,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           return
         }
         await expect(breadcrumbs).toBeVisible()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleBreadCrumbs)
         await expect(breadcrumbs).toBeHidden()
         await page.waitForIdle()
@@ -424,15 +508,10 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const colorPicker = page.locator('.standalone-colorpicker-body')
         await expect(colorPicker).toBeVisible()
         await page.waitForIdle()
-        await colorPicker.focus()
+        const closeButton = colorPicker.locator('.button.close-icon')
+        await expect(closeButton).toBeVisible()
         await page.waitForIdle()
-        await expect(colorPicker).toBeFocused()
-        await page.waitForIdle()
-        await page.keyboard.press('Escape')
-        await page.waitForIdle()
-        await page.keyboard.press('Escape')
-        await page.waitForIdle()
-        await page.keyboard.press('Escape')
+        await closeButton.click()
         await expect(colorPicker).toBeHidden()
         await page.waitForIdle()
       } catch (error) {
@@ -454,7 +533,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       try {
         const minimap = page.locator('.minimap')
         await expect(minimap).toBeVisible()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleMinimap)
         await expect(minimap).toBeHidden()
       } catch (error) {
@@ -500,9 +579,11 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await expect(startTag).toBeVisible()
         await page.waitForIdle()
         await startTag.click()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         const tooltip = editor.locator('.monaco-hover')
         await expect(tooltip).toBeHidden()
+        await page.waitForIdle()
         await quickPick.executeCommand(WellKnownCommands.ShowOrFocusHover, {
           pressKeyOnce: true,
         })
@@ -517,7 +598,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async inspectTokens() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DeveloperInspectTokensAndScopes)
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
@@ -563,9 +644,25 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to scroll in editor`)
       }
     },
+    async newEditorGroupBottom() {
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupBottom)
+    },
+    async newEditorGroupLeft() {
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupLeft)
+    },
+    async newEditorGroupRight() {
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupRight)
+    },
+    async newEditorGroupTop() {
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.NewEditorGroupTop)
+    },
     async newTextFile() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.NewUntitledTextFile)
         const tab = page.locator('[role="tab"][data-resource-name="Untitled-1"]')
         await expect(tab).toBeVisible()
@@ -576,73 +673,26 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async open(fileName: string, options?: any) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.openFile(fileName)
         const tab = page.locator('.tab', { hasText: fileName })
         await expect(tab).toBeVisible()
         await page.waitForIdle()
         if (isNotebook(fileName)) {
-          const notebookEditor = page.locator('.notebook-editor')
-          const list = notebookEditor.locator('.monaco-list')
-          await page.waitForIdle()
-          await expect(list).toBeFocused()
+          await this.waitForNoteBookReady()
         } else if (isImage(fileName)) {
-          const webView = WebView.create({ expect, page, VError })
-          const subFrame = await webView.shouldBeVisible2({
-            extensionId: `vscode.media-preview`,
-            hasLineOfCodeCounter: false,
-          })
-          await subFrame.waitForIdle()
-          const img = subFrame.locator('img')
-          await expect(img).toBeVisible()
-          await subFrame.waitForIdle()
+          await this.waitForImageReady()
+        } else if (options?.hasWarning) {
+          await this.waitForWarning()
         } else if (options?.hasError) {
           // TODO
-          await new Promise((r) => {})
+          throw new Error(`not implemented`)
         } else if (isVideo(fileName)) {
-          const webView = WebView.create({ expect, page, VError })
-          const subFrame = await webView.shouldBeVisible2({
-            extensionId: `vscode.media-preview`,
-            hasLineOfCodeCounter: false,
-          })
-          await subFrame.waitForIdle()
-          if (options?.hasError) {
-            const error = subFrame.locator('.loading-error')
-            await expect(error).toBeVisible()
-          } else {
-            const video = subFrame.locator('video')
-            await expect(video).toBeVisible()
-          }
-          await subFrame.waitForIdle()
+          await this.waitForVideoReady(options?.hasError)
         } else if (isBinary(fileName)) {
-          const placeholder = page.locator('.monaco-editor-pane-placeholder')
-          await expect(placeholder).toBeVisible()
-          await page.waitForIdle()
-          const quickPick = QuickPick.create({ expect, page, VError })
-          await quickPick.executeCommand(WellKnownCommands.ReopenEditorWith, {
-            pressKeyOnce: true,
-            stayVisible: true,
-          })
-          await page.waitForIdle()
-          await quickPick.type('hex')
-          await page.waitForIdle()
-          await quickPick.select(/hex.*editor/i)
-          await page.waitForIdle()
-          const webView = WebView.create({ expect, page, VError })
-          await webView.shouldBeVisible2({
-            extensionId: `vscode.hexeditor`,
-            hasLineOfCodeCounter: false,
-          })
+          await this.waitForBinaryReady()
         } else {
-          const editor = page.locator('.editor-instance')
-          await expect(editor).toBeVisible()
-          if (ideVersion && ideVersion.minor <= 100) {
-            const editorInput = editor.locator('.inputarea')
-            await expect(editorInput).toBeFocused()
-          } else {
-            const editContext = editor.locator('.native-edit-context')
-            await expect(editContext).toBeFocused()
-          }
+          await this.waitforTextFileReady(fileName)
         }
         await page.waitForIdle()
       } catch (error) {
@@ -658,7 +708,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await expect(findWidget).toHaveAttribute('aria-hidden', 'true')
         }
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.Find)
         await page.waitForIdle()
         await expect(findWidget).toBeVisible()
@@ -670,7 +720,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async openSettingsJson() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand('Preferences: Open User Settings (JSON)')
         await this.switchToTab('settings.json')
       } catch (error) {
@@ -685,7 +735,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await expect(tabsContainer).toBeVisible()
         const activeTab = tabsContainer.locator('.tab.active')
         await expect(activeTab).notToHaveClass('sticky-normal')
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.PinEditor)
         await page.waitForIdle()
         await expect(activeTab).toHaveClass('sticky-normal')
@@ -693,7 +743,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to pin editor`)
       }
     },
-    async press(key) {
+    async press(key: string) {
       try {
         await page.waitForIdle()
         await page.keyboard.press(key)
@@ -705,7 +755,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async reloadWebViews({ expectViews }: { expectViews: readonly string[] }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ReloadWebViews)
         await page.waitForIdle()
         // TODO need to wait for subframe to be
@@ -737,16 +787,32 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async removeAllBreakpoints() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RemoveAllBreakpoints)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to remove all breakpoints`)
       }
     },
+    async removeBreakPoint(lineNumber: number) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.part.editor .editor-instance')
+        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
+        await expect(lineNumberElement).toBeVisible()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        await contextMenu.open(lineNumberElement)
+        await page.waitForIdle()
+        await contextMenu.select('Remove Breakpoint')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed remove breakpoint`)
+      }
+    },
     async rename(newText: string) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
         await expect(renameInput).toBeVisible()
@@ -760,7 +826,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async renameCancel(newText) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
         await expect(renameInput).toBeVisible()
@@ -774,7 +840,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async renameWithPreview(newText: string) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
         await page.waitForIdle()
@@ -798,7 +864,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to rename with preview ${newText}`)
       }
     },
-    async save(options) {
+    async save(options?: { viaKeyBoard: boolean }) {
       try {
         if (options?.viaKeyBoard) {
           await page.waitForIdle()
@@ -808,7 +874,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await expect(dirtyTabs).toHaveCount(0)
           await page.waitForIdle()
         } else {
-          const quickPick = QuickPick.create({ expect, page, VError })
+          const quickPick = QuickPick.create({ expect, page, platform, VError })
           await quickPick.executeCommand(WellKnownCommands.FileSave)
           await page.waitForIdle()
         }
@@ -819,7 +885,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async saveAll() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.FileSaveAll)
         await page.waitForIdle()
         const dirtyTabs = page.locator('.tab.dirty')
@@ -869,14 +935,29 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to select ${text}`)
       }
     },
-    async selectAll() {
+    async selectAll({ viaKeyBoard = false } = {}) {
       try {
+        if (viaKeyBoard) {
+          await page.waitForIdle()
+          await page.keyboard.press('Control+A')
+          await page.waitForIdle()
+          return
+        }
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectAll)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select all`)
+      }
+    },
+    async selectLine() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Control+L')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select line`)
       }
     },
     async selectRefactor(actionText: string) {
@@ -884,6 +965,11 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         const widget = page.locator('.action-widget')
         await expect(widget).toBeVisible()
+        await page.waitForIdle()
+        const list = widget.locator('.monaco-list')
+        await expect(list).toBeVisible()
+        await page.waitForIdle()
+        await expect(list).toBeFocused()
         await page.waitForIdle()
         const actionItem = widget.locator(`.monaco-list-row[aria-label="${actionText}"]`)
         await expect(actionItem).toBeVisible({ timeout: 10_000 })
@@ -915,7 +1001,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to select source action "${actionText}"`)
       }
     },
-    async setBreakpoint(lineNumber) {
+    async setBreakpoint(lineNumber: number) {
       try {
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
@@ -930,8 +1016,10 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async setCursor(line: number, column: number) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.show()
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.show({
+          pressKeyOnce: true,
+        })
         await page.waitForIdle()
         await quickPick.type(`:${line}:${column}`)
         await page.waitForIdle()
@@ -941,6 +1029,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await quickPick.select(`Go to line ${line} and character ${column}.`)
         }
         await page.waitForIdle()
+        // TODO verify that cursor is actually at that position
       } catch (error) {
         throw new VError(error, `Failed to set cursor`)
       }
@@ -948,7 +1037,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async setLanguageMode(languageId) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ChangeLanguageMode, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -1116,12 +1205,43 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to verify font family`)
       }
     },
+    async shouldHaveInlineCompletion(expectedText: string) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const inlineCompletion = editor.locator('.ghost-text, .inline-suggestion-text, [class*="ghost-text"], [class*="inline-suggestion"]')
+        await expect(inlineCompletion).toBeVisible({
+          timeout: 10_000,
+        })
+        await page.waitForIdle()
+        await expect(inlineCompletion).toHaveText(expectedText, {
+          timeout: 1000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify inline completion with text "${expectedText}"`)
+      }
+    },
     async shouldHaveInspectedToken(name) {
       try {
         const inspectedToken = page.locator('h2.tiw-token')
         await expect(inspectedToken).toHaveText(name)
       } catch (error) {
         throw new VError(error, `Failed verify inspected token`)
+      }
+    },
+    async shouldHaveLightBulb() {
+      try {
+        await page.waitForIdle()
+        const spark = page.locator('.codicon.codicon-gutter-lightbulb-aifix-auto-fix')
+        await expect(spark).toBeVisible({
+          timeout: 20_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify lightbulb`)
       }
     },
     async shouldHaveOverlayMessage(message) {
@@ -1131,6 +1251,18 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await expect(messageElement).toHaveText(message)
       } catch (error) {
         throw new VError(error, `Failed to check overlay message with text "${message}"`)
+      }
+    },
+    async shouldHaveSelectedCharacters(count: number) {
+      try {
+        await page.waitForIdle()
+        const statusBarItem = page.locator('#status\\.editor\\.selection')
+        await expect(statusBarItem).toBeVisible()
+        await page.waitForIdle()
+        await expect(statusBarItem).toHaveText(new RegExp(`\\(${count} selected\\)`))
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify selected character count`)
       }
     },
     async shouldHaveSelection(left, width) {
@@ -1143,11 +1275,12 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to verify editor selection`)
       }
     },
-    async shouldHaveSemanticToken(type) {
+    async shouldHaveSemanticToken(type: string) {
       try {
         await page.waitForIdle()
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
+        await page.waitForIdle()
         const semanticSection = inspectWidget.locator('.tiw-semantic-token-info, [class*="semantic-token"], [class*="semantic"]')
         const count = await semanticSection.count()
         if (count > 0) {
@@ -1200,14 +1333,30 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to verify squiggly error`)
       }
     },
-    async shouldHaveText(text) {
+    async shouldHaveText(text: string, fileName?: string, groupId?: number) {
       try {
-        const editor = page.locator('.editor-instance')
+        await page.waitForIdle()
+        let editor
+        if (fileName) {
+          const baseName = basename(fileName)
+          if (groupId) {
+            editor = page.locator(`.editor-instance[aria-label="${baseName}, Editor Group ${groupId}"]`)
+          } else {
+            editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
+          }
+        } else {
+          editor = page.locator(`.editor-instance`)
+        }
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
         const editorLines = editor.locator('.view-lines')
+        await expect(editorLines).toBeVisible()
+        await page.waitForIdle()
         const actualText = text.replaceAll(Character.NewLine, Character.EmptyString).replaceAll(Character.Space, Character.NonBreakingSpace)
         await expect(editorLines).toHaveText(actualText, {
           timeout: 3000,
         })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
@@ -1220,11 +1369,12 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       await expect(token).toHaveCss('color', color)
       await page.waitForIdle()
     },
-    async shouldNotHaveSemanticToken(type) {
+    async shouldNotHaveSemanticToken(type: string) {
       try {
         await page.waitForIdle()
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
+        await page.waitForIdle()
         const widgetText = await inspectWidget.textContent()
         if (widgetText) {
           const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
@@ -1253,7 +1403,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           return
         }
         await expect(breadcrumbs).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleBreadCrumbs)
         await expect(breadcrumbs).toBeVisible()
         await page.waitForIdle()
@@ -1267,10 +1417,13 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const colorPicker = page.locator('.standalone-colorpicker-body')
         await expect(colorPicker).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker)
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker, { pressKeyOnce: true })
         await page.waitForIdle()
         await expect(colorPicker).toBeVisible()
+        await page.waitForIdle()
+        const insertButton = colorPicker.locator('.insert-button')
+        await expect(insertButton).toBeVisible()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show color picker`)
@@ -1279,7 +1432,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async showDebugHover({ expectedTitle }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DebugShowHover)
         const debugHover = page.locator('.debug-hover-widget')
         await expect(debugHover).toBeVisible()
@@ -1293,7 +1446,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       try {
         const minimap = page.locator('.minimap')
         await expect(minimap).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleMinimap)
         await expect(minimap).toBeVisible()
       } catch (error) {
@@ -1306,7 +1459,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const refactorWidget = page.locator('[aria-label="Action Widget"]')
         await expect(refactorWidget).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.Refactor)
         await page.waitForIdle()
         await expect(refactorWidget).toBeVisible({
@@ -1322,10 +1475,10 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async showSourceAction() {
       try {
         await page.waitForIdle()
-        const sourceAction = page.locator('[aria-label="Action Widget"]')
+        const sourceAction = page.locator('.context-view [aria-label="Action Widget"]')
         await expect(sourceAction).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SourceAction)
         await page.waitForIdle()
         await expect(sourceAction).toBeVisible()
@@ -1342,7 +1495,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const overlayMessage = page.locator('.monaco-editor-overlaymessage')
         await expect(overlayMessage).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SourceAction)
         await page.waitForIdle()
         await expect(overlayMessage).toBeVisible()
@@ -1352,16 +1505,22 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to show empty source action`)
       }
     },
-    async split(command) {
+    async split(command: string, { groupCount = undefined } = {}) {
       try {
+        // TODO count editor groups
         const editors = page.locator('.editor-instance')
         const currentCount = await editors.count()
-        if (currentCount === 0) {
+        if (currentCount === 0 && groupCount !== 0) {
           throw new Error('no open editor found')
         }
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(command)
-        await expect(editors).toHaveCount(currentCount + 1)
+        if (groupCount === 0) {
+          // TODO maybe check that new group was created
+          // ignore
+        } else {
+          await expect(editors).toHaveCount(currentCount + 1)
+        }
       } catch (error) {
         throw new VError(error, `Failed to split editor`)
       }
@@ -1372,8 +1531,8 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async splitLeft() {
       return this.split(WellKnownCommands.ViewSplitEditorLeft)
     },
-    async splitRight() {
-      return this.split(WellKnownCommands.ViewSplitEditorRight)
+    async splitRight({ groupCount = undefined } = {}) {
+      return this.split(WellKnownCommands.ViewSplitEditorRight, { groupCount })
     },
     async splitUp() {
       return this.split(WellKnownCommands.ViewSplitEditorUp)
@@ -1390,7 +1549,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async threeColumnsLayout() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ThreeColumnLayout)
         await page.waitForIdle()
         const main = page.locator('[role="main"]')
@@ -1408,7 +1567,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const breakpoints = glyphMarginWidgets.locator('.codicon-debug-breakpoint')
         const breakpointCount = await breakpoints.count()
         const newBreakpointCount = breakpointCount === 0 ? 1 : 0
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleBreakpoint)
         await page.waitForIdle()
         await expect(breakpoints).toHaveCount(newBreakpointCount)
@@ -1419,23 +1578,31 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async toggleScreenReaderAccessibilityMode() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleScreenReaderAccessibilityMode)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to toggle screen reader accessibility mode`)
       }
     },
-    async type(text) {
+    async type(text: string) {
       try {
+        await page.waitForIdle()
         await page.keyboard.type(text)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to type ${text}`)
       }
     },
-    async undo() {
+    async undo({ viaKeyBoard = false } = {}) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        if (viaKeyBoard) {
+          await page.waitForIdle()
+          await page.keyboard.press('Ctrl+Z')
+          await page.waitForIdle()
+          return
+        }
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.Undo)
       } catch (error) {
         throw new VError(error, `Failed to undo`)
@@ -1464,7 +1631,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async unfoldAll() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand('Unfold All')
         await page.waitForIdle()
       } catch (error) {
@@ -1477,13 +1644,90 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await expect(tabsContainer).toBeVisible()
         const activeTab = tabsContainer.locator('.tab.active')
         await expect(activeTab).toHaveClass('sticky-normal')
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.UnPinEditor)
         await page.waitForIdle()
         await expect(activeTab).notToHaveClass('sticky-normal')
       } catch (error) {
         throw new VError(error, `Failed to unpin editor`)
       }
+    },
+    async waitForBinaryReady() {
+      // const placeholder = page.locator('.monaco-editor-pane-placeholder')
+      // await expect(placeholder).toBeVisible()
+      await page.waitForIdle()
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.ReopenEditorWith, {
+        pressKeyOnce: true,
+        stayVisible: true,
+      })
+      await page.waitForIdle()
+      await quickPick.type('hex')
+      await page.waitForIdle()
+      await quickPick.select('Hex Editor') // TODO make this configurable
+      await page.waitForIdle()
+      const webView = WebView.create({ expect, page, VError })
+      await webView.shouldBeVisible2({
+        extensionId: `ms-vscode.hexeditor`,
+        hasLineOfCodeCounter: false,
+      })
+    },
+    async waitForImageReady() {
+      const webView = WebView.create({ expect, page, VError })
+      const subFrame = await webView.shouldBeVisible2({
+        extensionId: `vscode.media-preview`,
+        hasLineOfCodeCounter: false,
+      })
+      await subFrame.waitForIdle()
+      const img = subFrame.locator('img')
+      await expect(img).toBeVisible()
+      await subFrame.waitForIdle()
+    },
+    async waitForNoteBookReady() {
+      const notebookEditor = page.locator('.notebook-editor')
+      const list = notebookEditor.locator('.monaco-list')
+      await page.waitForIdle()
+      await expect(list).toBeFocused()
+    },
+    async waitforTextFileReady(fileName: string) {
+      await page.waitForIdle()
+      const baseName = basename(fileName)
+      const editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
+      await expect(editor).toBeVisible()
+      await page.waitForIdle()
+
+      if (ideVersion && ideVersion.minor <= 100) {
+        const editorInput = editor.locator('.inputarea')
+        await expect(editorInput).toBeFocused()
+        await page.waitForIdle()
+      } else {
+        const editContext = editor.locator('.native-edit-context')
+        await expect(editContext).toBeFocused()
+        await page.waitForIdle()
+      }
+      await page.waitForIdle()
+    },
+    async waitForVideoReady(hasError) {
+      const webView = WebView.create({ expect, page, VError })
+      const subFrame = await webView.shouldBeVisible2({
+        extensionId: `vscode.media-preview`,
+        hasLineOfCodeCounter: false,
+      })
+      await subFrame.waitForIdle()
+      if (hasError) {
+        const error = subFrame.locator('.loading-error')
+        await expect(error).toBeVisible()
+      } else {
+        const video = subFrame.locator('video')
+        await expect(video).toBeVisible()
+      }
+      await subFrame.waitForIdle()
+    },
+    async waitForWarning() {
+      const pane = page.locator('.monaco-editor-pane-placeholder')
+      await expect(pane).toBeVisible()
+      const warningIcon = pane.locator('.codicon.codicon-warning')
+      await expect(warningIcon).toBeVisible()
     },
   }
 }

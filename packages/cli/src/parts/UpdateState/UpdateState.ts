@@ -27,8 +27,10 @@ export const updateState = async (newState: any): Promise<void> => {
   StdinDataState.setState({ ...newState, previousFilters: [], stdout: [] })
   if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {
     await StartRunning.startRunning({
+      arch: state.arch,
       bisect: state.bisect,
       checkLeaks: state.checkLeaks,
+      clearExtensions: state.clearExtensions,
       color: true,
       commit: '',
       continueValue: state.continueValue,
@@ -46,11 +48,14 @@ export const updateState = async (newState: any): Promise<void> => {
       inspectPtyHostPort: state.inspectPtyHostPort,
       inspectSharedProcess: state.inspectSharedProcess,
       inspectSharedProcessPort: state.inspectSharedProcessPort,
+      isGithubActions: state.isGithubActions,
       isWindows: state.isWindows,
       measure: state.measure,
       measureAfter: state.measureAfter,
       measureNode: false,
+      platform: state.platform,
       recordVideo: state.recordVideo,
+      compressVideo: state.compressVideo,
       restartBetween: state.restartBetween,
       runMode: state.runMode,
       runs: state.runs,
@@ -59,6 +64,7 @@ export const updateState = async (newState: any): Promise<void> => {
       setupOnly: false,
       timeoutBetween: state.timeoutBetween,
       timeouts: state.timeouts,
+      updateUrl: 'https://update.code.visualstudio.com',
       useProxyMock: state.useProxyMock,
       vscodePath: '',
       vscodeVersion: VsCodeVersion.vscodeVersion,

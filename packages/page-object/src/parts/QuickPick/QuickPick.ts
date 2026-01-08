@@ -1,7 +1,7 @@
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async close() {
       try {
@@ -85,7 +85,7 @@ export const create = ({ expect, page, VError }) => {
     async openFile(fileName) {
       try {
         await page.waitForIdle()
-        await this.show({ key: KeyBindings.OpenQuickPickFiles })
+        await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform) })
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
@@ -120,10 +120,20 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
-        const option = quickPick.locator('.label-name', {
-          hasExactText: text,
-        })
-        await option.click()
+        if (typeof text === 'string') {
+          const option = quickPick.locator('.label-name', {
+            hasExactText: text,
+          })
+          await option.click()
+        } else {
+          const normal = `${text}`.slice(1, -1)
+          const item = quickPick.locator(`.monaco-list-row[aria-label*="${normal}"]`)
+          await expect(item).toBeVisible()
+          await page.waitForIdle()
+          const label = item.locator('.label-name')
+          await label.click()
+          await page.waitForIdle()
+        }
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()
         }
@@ -132,7 +142,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to select "${text}"`)
       }
     },
-    async show({ key = KeyBindings.OpenQuickPickFiles, pressKeyOnce = false } = {}) {
+    async show({ key = KeyBindings.getOpenQuickPickFiles(platform), pressKeyOnce = false } = {}) {
       try {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
@@ -169,7 +179,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async showCommands({ pressKeyOnce = false } = {}) {
       try {
-        return this.show({ key: KeyBindings.OpenQuickPickCommands, pressKeyOnce })
+        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform), pressKeyOnce })
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }

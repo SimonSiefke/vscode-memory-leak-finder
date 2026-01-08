@@ -1,6 +1,8 @@
 export interface RunTestsOptions {
+  readonly arch: string
   readonly bisect?: boolean
   readonly checkLeaks: boolean
+  readonly clearExtensions: boolean
   readonly color: boolean
   readonly commit: string
   readonly continueValue: string
@@ -18,10 +20,13 @@ export interface RunTestsOptions {
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
+  readonly isGithubActions: boolean
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly platform: string
   readonly recordVideo: boolean
+  readonly compressVideo: boolean
   readonly restartBetween: boolean
   readonly root: string
   readonly runMode: number
@@ -31,6 +36,7 @@ export interface RunTestsOptions {
   readonly setupOnly: boolean
   readonly timeoutBetween: number
   readonly timeouts: any
+  readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string

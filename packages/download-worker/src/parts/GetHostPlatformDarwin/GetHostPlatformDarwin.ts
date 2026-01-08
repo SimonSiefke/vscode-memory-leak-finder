@@ -2,7 +2,7 @@
 
 import * as os from 'node:os'
 
-export const getHostPlatform = (): string => {
+export const getHostPlatform = (arch: string): string => {
   const ver = os
     .release()
     .split('.')
@@ -21,7 +21,7 @@ export const getHostPlatform = (): string => {
     // Best-effort support for MacOS beta versions.
     macVersion = 'mac' + Math.min(ver[0] - 9, LAST_STABLE_MAC_MAJOR_VERSION)
     // BigSur is the first version that might run on Apple Silicon.
-    if (os.cpus().some((cpu) => cpu.model.includes('Apple'))) macVersion += '-arm64'
+    if (arch === 'arm64') macVersion += '-arm64'
   }
   return macVersion
 }

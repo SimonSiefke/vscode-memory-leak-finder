@@ -3,13 +3,14 @@ import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOpt
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
+import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
-import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
+import * as TestWorkerRunTests from '../TestWorkerRunTests/TestWorkerRunTests.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
 import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as Time from '../Time/Time.ts'
@@ -31,8 +32,10 @@ const disposeWorkers = async (workers) => {
 }
 
 export const runTestsWithCallback = async ({
+  arch,
   callback,
   checkLeaks,
+  clearExtensions,
   color,
   commit,
   continueValue,
@@ -50,10 +53,13 @@ export const runTestsWithCallback = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  isGithubActions,
   measure,
   measureAfter,
   measureNode,
+  platform,
   recordVideo,
+  compressVideo,
   restartBetween,
   root,
   runMode,
@@ -63,6 +69,7 @@ export const runTestsWithCallback = async ({
   setupOnly,
   timeoutBetween,
   timeouts,
+  updateUrl,
   useProxyMock,
   vscodePath,
   vscodeVersion,
@@ -99,7 +106,9 @@ export const runTestsWithCallback = async ({
 
     if (setupOnly && commit) {
       const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+        arch,
         attachedToPageTimeout,
+        clearExtensions,
         commit,
         connectionId,
         cwd,
@@ -119,10 +128,13 @@ export const runTestsWithCallback = async ({
         measureId: measure,
         measureNode,
         pageObjectPath,
+        platform,
         recordVideo,
+        compressVideo,
         runMode,
         screencastQuality,
         timeouts,
+        updateUrl,
         useProxyMock,
         vscodePath,
         vscodeVersion,
@@ -198,7 +210,9 @@ export const runTestsWithCallback = async ({
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
         const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+          arch,
           attachedToPageTimeout,
+          clearExtensions,
           commit,
           connectionId,
           cwd,
@@ -218,10 +232,13 @@ export const runTestsWithCallback = async ({
           measureId: measure,
           measureNode,
           pageObjectPath,
+          platform,
           recordVideo,
+          compressVideo,
           runMode,
           screencastQuality,
           timeouts,
+          updateUrl,
           useProxyMock,
           vscodePath,
           vscodeVersion,
@@ -244,7 +261,14 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerRpc, connectionId, absolutePath, forceRun, timeouts)
+        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
+          testWorkerRpc,
+          connectionId,
+          absolutePath,
+          forceRun,
+          timeouts,
+          isGithubActions,
+        )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped
 
@@ -266,14 +290,10 @@ export const runTestsWithCallback = async ({
           let isLeak = false
           if (checkLeaks) {
             if (measureAfter) {
-              for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
-              }
+              await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
             }
             await MemoryLeakFinder.start(memoryRpc, connectionId)
-            for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
-            }
+            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
@@ -304,12 +324,11 @@ export const runTestsWithCallback = async ({
               leaking++
             }
             if (result.summary) {
+              // TODO log it in cli or stdout worker
               console.log(result.summary)
             }
           } else {
-            for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
-            }
+            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
           const end = Time.now()
@@ -325,8 +344,7 @@ export const runTestsWithCallback = async ({
         } else {
           failed++
         }
-        const PrettyError = await import('../PrettyError/PrettyError.ts')
-        const prettyError = await PrettyError.prepare(error, { color, root })
+        const prettyError = await GetPrettyError.getPrettyError(error, color, root)
         await callback(
           TestWorkerEventType.TestFailed,
           absolutePath,
@@ -363,8 +381,7 @@ export const runTestsWithCallback = async ({
       type: 'success',
     }
   } catch (error) {
-    const PrettyError = await import('../PrettyError/PrettyError.ts')
-    const prettyError = await PrettyError.prepare(error, { color, root })
+    const prettyError = await GetPrettyError.getPrettyError(error, color, root)
     return {
       prettyError,
       type: 'error',

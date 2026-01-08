@@ -11,8 +11,10 @@ const callback = async (method, ...params) => {
 }
 
 export const runTests = async ({
+  arch,
   bisect,
   checkLeaks,
+  clearExtensions,
   color,
   commit,
   continueValue,
@@ -30,10 +32,13 @@ export const runTests = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  isGithubActions,
   measure,
   measureAfter,
   measureNode,
+  platform,
   recordVideo,
+  compressVideo,
   restartBetween,
   root,
   runMode,
@@ -43,13 +48,14 @@ export const runTests = async ({
   setupOnly,
   timeoutBetween,
   timeouts,
+  updateUrl,
   useProxyMock,
   vscodePath,
   vscodeVersion,
 }: RunTestsOptions): Promise<RunTestsResult> => {
   let insidersCommit = insidersCommitInput
   if (insidersCommit === 'today') {
-    const versions = await FetchAllInsidersVersions.fetchAllInsidersVersions()
+    const versions = await FetchAllInsidersVersions.fetchAllInsidersVersions(platform, arch, updateUrl)
     if (versions.length === 0) {
       throw new Error('No insiders versions found')
     }
@@ -60,8 +66,10 @@ export const runTests = async ({
       throw new Error('--bisect requires --check-leaks to be enabled')
     }
     const options: RunTestsOptions = {
+      arch,
       bisect,
       checkLeaks,
+      clearExtensions,
       color,
       commit,
       continueValue,
@@ -79,10 +87,13 @@ export const runTests = async ({
       inspectPtyHostPort,
       inspectSharedProcess,
       inspectSharedProcessPort,
+      isGithubActions,
       measure,
       measureAfter,
       measureNode,
+      platform,
       recordVideo,
+      compressVideo,
       restartBetween,
       root,
       runMode,
@@ -92,6 +103,7 @@ export const runTests = async ({
       setupOnly,
       timeoutBetween,
       timeouts,
+      updateUrl,
       useProxyMock,
       vscodePath,
       vscodeVersion,
@@ -101,9 +113,11 @@ export const runTests = async ({
 
   return RunTestsWithCallback.runTestsWithCallback({
     addDisposable: Disposables.add,
+    arch,
     callback,
     checkLeaks,
     clearDisposables: Disposables.disposeAll,
+    clearExtensions,
     color,
     commit,
     continueValue,
@@ -121,10 +135,13 @@ export const runTests = async ({
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    isGithubActions,
     measure,
     measureAfter,
     measureNode,
+    platform,
     recordVideo,
+    compressVideo,
     restartBetween,
     root,
     runMode,
@@ -134,6 +151,7 @@ export const runTests = async ({
     setupOnly,
     timeoutBetween,
     timeouts,
+    updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,

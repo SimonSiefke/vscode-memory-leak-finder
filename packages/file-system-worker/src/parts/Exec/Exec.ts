@@ -1,4 +1,4 @@
-import { execa } from 'execa'
+import * as ExecWorker from '../ExecWorker/ExecWorker.ts'
 
 interface ExecOptions {
   readonly cwd?: string
@@ -12,10 +12,7 @@ interface ExecResult {
 }
 
 export const exec = async (command: string, args: readonly string[], options: ExecOptions = {}): Promise<ExecResult> => {
-  const result = await execa(command, args, { ...options, reject: options.reject })
-  return {
-    exitCode: result.exitCode || 0,
-    stderr: result.stderr || '',
-    stdout: result.stdout || '',
-  }
+  await using execWorker = await ExecWorker.launchExecWorker()
+  const result = await execWorker.exec(command, args, options)
+  return result
 }

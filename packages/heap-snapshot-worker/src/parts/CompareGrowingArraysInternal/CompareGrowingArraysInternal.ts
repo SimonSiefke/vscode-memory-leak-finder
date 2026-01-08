@@ -1,8 +1,8 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
-export const countArrays = (snapshot: Snapshot): number => {
+const countArrays = (snapshot: Snapshot): number => {
   const { nodes, strings } = snapshot
-  const meta = snapshot.meta
+  const { meta } = snapshot
   const { node_fields, node_types } = meta
 
   const nodeFieldCount = node_fields.length

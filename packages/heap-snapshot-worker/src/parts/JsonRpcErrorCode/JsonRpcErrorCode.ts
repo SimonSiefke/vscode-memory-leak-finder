@@ -1,1 +1,1 @@
-export const MethodNotFound = -32601
+export const MethodNotFound = -32_601
