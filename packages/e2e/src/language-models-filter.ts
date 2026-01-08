@@ -9,7 +9,7 @@ export const setup = async ({ Editor, Electron, Extensions, LanguageModelEditor 
     response: 1,
   })
   await Extensions.install({
-    id: 'github copilot chat',
+    id: 'GitHub.copilot-chat',
     name: 'GitHub Copilot Chat',
   })
   await Editor.closeAll()
