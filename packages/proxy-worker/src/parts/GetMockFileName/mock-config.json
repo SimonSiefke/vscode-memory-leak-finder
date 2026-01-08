@@ -210,16 +210,94 @@
     "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_ms_vscode_vscode_js_profile_table_json_get.json"
   },
   {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_abc_abc_test_provider_sample_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/abc.abc-test-provider-sample.json"
+  },
+  {
     "hostname": "embeddings.vscode-cdn.net",
     "pathname": "/text-3-small/v1.108/commands/core.json",
     "method": "GET",
     "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_core_json_get.json"
   },
   {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_e2e_tests_inline_completion_provider_typescript_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/e2e-tests.inline-completion-provider-typescript.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_e2e_tests_inline_completion_provider_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/e2e-tests.inline-completion-provider.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_GitHub_copilot_chat_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/GitHub.copilot-chat.json"
+  },
+  {
     "hostname": "embeddings.vscode-cdn.net",
     "pathname": "/text-3-small/v1.108/commands/latest.txt",
     "method": "GET",
     "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_latest_txt_get.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_python_debugpy_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-python.debugpy.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_python_python_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-python.python.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_python_vscode_pylance_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-python.vscode-pylance.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_python_vscode_python_envs_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-python.vscode-python-envs.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_cpptools_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.cpptools.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_hexeditor_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.hexeditor.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_js_debug_companion_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.js-debug-companion.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_js_debug_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.js-debug.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_vscode_js_profile_table_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.vscode-js-profile-table.json"
   },
   {
     "hostname": "feiskyer.gallerycdn.vsassets.io",
@@ -354,6 +432,12 @@
     "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_1_388_0_1761326434179_Microsoft_VisualStudio_Services_VSIXPackage_get.json"
   },
   {
+    "filename": "main_vscode_cdn_net_core_insiders_json_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/core/insiders.json"
+  },
+  {
     "hostname": "main.vscode-cdn.net",
     "pathname": "/extensions/chat.json",
     "method": "*",
@@ -408,6 +492,18 @@
     "filename": "marketplace_visualstudio_com_apis_public_gallery_extensionquery_post.json"
   },
   {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_e2e_tests_inline_completion_provider_typescript_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/e2e-tests/inline-completion-provider-typescript/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_e2e_tests_inline_completion_provider_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/e2e-tests/inline-completion-provider/latest"
+  },
+  {
     "hostname": "marketplace.visualstudio.com",
     "pathname": "/_apis/public/gallery/vscode/eamodio/gitlens/latest",
     "method": "GET",
@@ -432,6 +528,12 @@
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_GitHub_copilot_chat_latest_options.json"
   },
   {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_github_copilot_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/github/copilot/latest"
+  },
+  {
     "hostname": "marketplace.visualstudio.com",
     "pathname": "/_apis/public/gallery/vscode/GitHub/copilot/latest",
     "method": "GET",
@@ -450,10 +552,46 @@
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_kubernetes_tools_vscode_kubernetes_tools_latest_get.json"
   },
   {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_python_debugpy_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-python/debugpy/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_python_python_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-python/python/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_python_vscode_pylance_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-python/vscode-pylance/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_python_vscode_python_envs_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-python/vscode-python-envs/latest"
+  },
+  {
     "hostname": "marketplace.visualstudio.com",
     "pathname": "/_apis/public/gallery/vscode/ms-vscode-remote/remote-containers/latest",
     "method": "GET",
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_remote_remote_containers_latest_get.json"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_cpptools_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode/cpptools/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_hexeditor_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode/hexeditor/latest"
   },
   {
     "hostname": "marketplace.visualstudio.com",
