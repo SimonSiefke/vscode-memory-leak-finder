@@ -19,13 +19,13 @@ export const main = async (): Promise<void> => {
     // Keep the process alive
     process.on('SIGINT', async () => {
       console.log('\nShutting down proxy server...')
-      await server.dispose()
+      await server[Symbol.asyncDispose]()
       process.exit(0)
     })
 
     process.on('SIGTERM', async () => {
       console.log('\nShutting down proxy server...')
-      await server.dispose()
+      await server[Symbol.asyncDispose]()
       process.exit(0)
     })
 
