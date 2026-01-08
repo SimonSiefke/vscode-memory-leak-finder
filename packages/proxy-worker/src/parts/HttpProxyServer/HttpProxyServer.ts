@@ -24,18 +24,6 @@ import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
 
-    const requestData = {
-      headers: req.headers,
-      method: req.method,
-      response: {
-        body: responseData.toString('utf8'),
-        headers: response.getHeaders(),
-        statusCode: response.statusCode,
-        statusMessage: response.statusMessage,
-      },
-      timestamp,
-      url: req.url,
-    }
 
 export const parseJsonIfApplicable = (body: string, contentType: string | string[] | undefined): string | object => {
   if (!contentType) {
@@ -58,7 +46,10 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
   return body
 }
 
-const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string, useProxyMock: boolean): Promise<void> => {
+
+
+
+  const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string, useProxyMock: boolean): Promise<void> => {
   // Check for mock response first (only if useProxyMock is enabled)
   if (useProxyMock) {
     const mockResponse = await GetMockResponse.getMockResponse(req.method || 'GET', targetUrl)
@@ -66,24 +57,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       console.log(`[Proxy] Returning mock response for ${req.method} ${targetUrl}`)
       GetMockResponse.sendMockResponse(res, mockResponse)
       return // Don't record mock requests
-const saveConnectTunnel = async (hostname: string, port: number): Promise<void> => {
-  try {
-    await mkdir(REQUESTS_DIR, { recursive: true })
-    const timestamp = Date.now()
-    const target = `${hostname}:${port}`
-    const filename = `${timestamp}_CONNECT_${SanitizeFilename.sanitizeFilename(target)}.json`
-    const filepath = join(REQUESTS_DIR, filename)
-
-    const tunnelData = {
-      hostname,
-      method: 'CONNECT',
-      note: 'HTTPS tunnel - actual request/response data is encrypted and cannot be captured',
-      port,
-      target,
-      timestamp,
     }
-  }
-
   let parsedUrl: URL
   try {
     // In HTTP proxy protocol, the request line contains the full URL
@@ -481,24 +455,12 @@ export const createHttpProxyServer = async (
   console.log(`[Proxy] Proxy URL: ${url}`)
 
   return {
-<<<<<<< HEAD
-    async dispose() {
-=======
     port: actualPort,
-<<<<<<< HEAD
-    async [Symbol.asyncDispose]() {
->>>>>>> origin/main
-=======
     async [Symbol.asyncDispose](): Promise<void> {
->>>>>>> origin/main
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())
       await promise
     },
-<<<<<<< HEAD
-    port: actualPort,
-=======
->>>>>>> origin/main
     url,
   }
 }
