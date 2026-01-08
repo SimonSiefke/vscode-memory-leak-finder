@@ -1,19 +1,11 @@
-<<<<<<< HEAD
-import * as ConvertRequestsToMocks from './ConvertRequestsToMocks/ConvertRequestsToMocks.ts'
 import { existsSync } from 'fs'
-import { readdir, readFile, writeFile, mkdir } from 'fs/promises'
-import { join, dirname } from 'path'
+import { mkdir, readdir, readFile, writeFile } from 'fs/promises'
+import { join } from 'path'
 import { URL } from 'url'
-import { fileURLToPath } from 'url'
-=======
-import { existsSync } from 'node:fs'
-import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
-import { join } from 'node:path'
-import { URL } from 'node:url'
->>>>>>> origin/main
-import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as Root from '../Root/Root.ts'
+import * as ConvertRequestsToMocks from './ConvertRequestsToMocks/ConvertRequestsToMocks.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
