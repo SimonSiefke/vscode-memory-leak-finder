@@ -4,8 +4,9 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-export const setup = async ({ ChatEditor, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
+  await SideBar.hide()
   await ChatEditor.open()
 }
 
