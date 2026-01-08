@@ -1,7 +1,7 @@
 import { VError } from '@lvce-editor/verror'
+import type { NodeVersionInfo } from '../NodeVersionTypes/NodeVersionTypes.ts'
 import { filterAndSortNodeVersions } from '../FilterAndSortNodeVersions/FilterAndSortNodeVersions.ts'
 import { getJson } from '../GetJson/GetJson.ts'
-import type { NodeVersionInfo } from '../NodeVersionTypes/NodeVersionTypes.ts'
 
 export const getLatestNodeVersionForMajor = async (majorVersion: string): Promise<string> => {
   try {

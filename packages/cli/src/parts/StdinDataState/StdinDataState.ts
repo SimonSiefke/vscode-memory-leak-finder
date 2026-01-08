@@ -9,6 +9,7 @@ export interface StdinDataState {
   readonly buffering: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
+  readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -34,7 +35,6 @@ export interface StdinDataState {
   readonly platform: string
   readonly previousFilters: string[]
   readonly recordVideo: boolean
-  readonly compressVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
   readonly runs: number
@@ -55,6 +55,7 @@ let state: StdinDataState = {
   buffering: false,
   checkLeaks: false,
   clearExtensions: true,
+  compressVideo: false,
   continueValue: '',
   cwd: Character.EmptyString,
   enableExtensions: false,
@@ -79,7 +80,6 @@ let state: StdinDataState = {
   platform: '',
   previousFilters: [],
   recordVideo: false,
-  compressVideo: false,
   restartBetween: false,
   runMode: TestRunMode.Auto,
   runs: 1,
@@ -100,6 +100,7 @@ export const setState = (newState: StdinDataState): void => {
     arch: newState.arch,
     bisect: newState.bisect,
     checkLeaks: newState.checkLeaks,
+    compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,
     cwd: newState.cwd,
     enableExtensions: newState.enableExtensions,
@@ -122,7 +123,6 @@ export const setState = (newState: StdinDataState): void => {
     platform: newState.platform,
     previousFilters: newState.previousFilters,
     recordVideo: newState.recordVideo,
-    compressVideo: newState.compressVideo,
     restartBetween: newState.restartBetween,
     runMode: newState.runMode,
     runs: newState.runs,
