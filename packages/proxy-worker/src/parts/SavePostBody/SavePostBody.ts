@@ -1,4 +1,3 @@
-import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
@@ -72,7 +71,7 @@ export const savePostBody = async (
       // For multipart, we'll save the raw body as it's complex to parse
     }
 
-    const postData: any = {
+    const postData = {
       body: parsedBody,
       bodyFormat,
       contentType,
@@ -110,6 +109,7 @@ export const savePostBody = async (
         const result = await compressionWorker.invoke('Compression.decompressBody', responseData.responseData, responseContentEncoding)
         const decompressedBody = result.body
         responseWasCompressed = result.wasCompressed
+        // @ts-ignore
         parsedResponseBody = parseJsonIfApplicable(decompressedBody, responseContentType)
         if (responseContentTypeLower.includes('application/json')) {
           responseBodyFormat = 'json'
