@@ -1,16 +1,10 @@
-<<<<<<< HEAD
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { decompressBody } from '../DecompressBody/DecompressBody.ts'
-<<<<<<< HEAD
 import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
-=======
->>>>>>> origin/main
-=======
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
->>>>>>> origin/main
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
@@ -95,15 +89,8 @@ export const savePostBody = async (
 
     // Add response data if available
     if (responseData) {
-<<<<<<< HEAD
-      const responseContentEncoding =
-        responseData.responseHeaders['content-encoding'] || responseData.responseHeaders['Content-Encoding']
-      const responseContentType =
-        responseData.responseHeaders['content-type'] || responseData.responseHeaders['Content-Type']
-=======
       const responseContentEncoding = responseData.responseHeaders['content-encoding'] || responseData.responseHeaders['Content-Encoding']
       const responseContentType = responseData.responseHeaders['content-type'] || responseData.responseHeaders['Content-Type']
->>>>>>> origin/main
       const responseContentTypeLower = responseContentType
         ? (Array.isArray(responseContentType) ? responseContentType[0] : responseContentType).toLowerCase()
         : ''
@@ -123,34 +110,17 @@ export const savePostBody = async (
         parsedResponseBody = `file-reference:${sseFilePath}`
         responseBodyFormat = 'sse'
       } else {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        const { body: decompressedBody, wasCompressed } = await decompressBody(
-          responseData.responseData,
-          responseContentEncoding,
-        )
-        responseWasCompressed = wasCompressed
-=======
-        const { body: decompressedBody, wasCompressed } = await decompressBody(responseData.responseData, responseContentEncoding)
-        responseWasCompressed = wasCompressed
-=======
         const compressionWorker = await CompressionWorker.getCompressionWorker()
         const result = await compressionWorker.invoke('Compression.decompressBody', responseData.responseData, responseContentEncoding)
         const decompressedBody = result.body
         responseWasCompressed = result.wasCompressed
->>>>>>> origin/main
-        // @ts-ignore
->>>>>>> origin/main
         parsedResponseBody = parseJsonIfApplicable(decompressedBody, responseContentType)
         if (responseContentTypeLower.includes('application/json')) {
           responseBodyFormat = 'json'
         }
       }
 
-<<<<<<< HEAD
-=======
       // @ts-ignore
->>>>>>> origin/main
       postData.response = {
         body: parsedResponseBody,
         bodyFormat: responseBodyFormat,
