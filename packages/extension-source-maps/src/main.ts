@@ -8,9 +8,8 @@ const main = async (): Promise<void> => {
   await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
     cacheDir,
     extensionName: 'copilot-chat',
-    // version: 'v0.36.2025121901',
     repoUrl: 'git@github.com:microsoft/vscode-copilot-chat.git',
-    version: 'v0.36.2025121004',
+    version: 'v0.35.3',
   })
 }
 
