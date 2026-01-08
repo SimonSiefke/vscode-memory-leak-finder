@@ -1,7 +1,7 @@
 import * as Cli from '../Cli/Cli.ts'
 
 export const main = async (): Promise<void> => {
-  const { arch, env, platform, versions, argv } = process
+  const { arch, argv, env, platform, versions } = process
 
   const nodeVersion = versions.node
   if (nodeVersion) {

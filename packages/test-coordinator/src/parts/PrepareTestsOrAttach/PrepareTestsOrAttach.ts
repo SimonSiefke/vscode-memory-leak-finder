@@ -14,6 +14,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly attachedToPageTimeout: number
   readonly clearExtensions: boolean
   readonly commit: string
+  readonly compressVideo: boolean
   readonly connectionId: number
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -34,7 +35,6 @@ export interface PrepareTestsAndAttachOptions {
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
-  readonly compressVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
   readonly timeouts: any
@@ -50,6 +50,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     attachedToPageTimeout,
     clearExtensions,
     commit,
+    compressVideo,
     connectionId,
     cwd,
     enableExtensions,
@@ -70,7 +71,6 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     pageObjectPath,
     platform,
     recordVideo,
-    compressVideo,
     runMode,
     screencastQuality,
     timeouts,
