@@ -185,10 +185,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
-          const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
-          await expect(responseMessage).toBeVisible()
-          await page.waitForIdle()
-          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
         }
 
         if (expectedResponse) {
