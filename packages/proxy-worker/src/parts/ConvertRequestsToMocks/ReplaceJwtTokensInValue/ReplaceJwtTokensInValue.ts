@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-import * as IsJwtToken from '../IsJwtToken/IsJwtToken.ts'
-import * as ReplaceJwtToken from '../ReplaceJwtToken/ReplaceJwtToken.ts'
-import * as IsExpirationProperty from '../IsExpirationProperty/IsExpirationProperty.ts'
-import * as IsUnixTimestamp from '../IsUnixTimestamp/IsUnixTimestamp.ts'
-=======
 import * as IsExpirationProperty from '../IsExpirationProperty/IsExpirationProperty.ts'
 import * as IsJwtToken from '../IsJwtToken/IsJwtToken.ts'
 import * as IsUnixTimestamp from '../IsUnixTimestamp/IsUnixTimestamp.ts'
 import * as ReplaceJwtToken from '../ReplaceJwtToken/ReplaceJwtToken.ts'
->>>>>>> origin/main
 
 export const replaceJwtTokensInValue = async (value: any, parentKey?: string): Promise<any> => {
   if (typeof value === 'string') {
