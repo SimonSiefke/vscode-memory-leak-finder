@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import type { IncomingMessage, ServerResponse } from 'http';
 import { mkdir } from 'fs/promises'
 import type { IncomingMessage, ServerResponse } from 'http'
@@ -11,7 +10,6 @@ import { URL } from 'url'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
 import * as HandleConnect from '../HandleConnect/HandleConnect.ts'
-=======
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
@@ -19,7 +17,6 @@ import { request as httpRequest } from 'node:http'
 import { request as httpsRequest } from 'node:https'
 import { join } from 'node:path'
 import { URL } from 'node:url'
->>>>>>> origin/main
 import * as Root from '../Root/Root.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
@@ -153,11 +150,8 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
     headers: {
       ...req.headers,
       host: parsedUrl.host,
-<<<<<<< HEAD
     },
-=======
     } as Record<string, string | string[] | undefined>,
->>>>>>> origin/main
     hostname: parsedUrl.hostname,
     method: req.method,
     path: parsedUrl.pathname + parsedUrl.search,
@@ -267,7 +261,6 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
       }
     })
 
-<<<<<<< HEAD
     // Buffer the entire response first
     proxyRes.on('data', (chunk: Buffer) => {
       responseChunks.push(chunk)
@@ -283,14 +276,12 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
       if (!saved) {
         await saveAndWriteResponse()
       }
-=======
     proxyRes.on('end', () => {
       res.end()
       const responseData = Buffer.concat(chunks)
       saveRequest(req, res, responseData).catch((error) => {
         console.error('[Proxy] Error saving request:', error)
       })
->>>>>>> origin/main
     })
   })
 
