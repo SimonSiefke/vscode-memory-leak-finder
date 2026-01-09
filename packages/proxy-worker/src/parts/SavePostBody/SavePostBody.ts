@@ -30,7 +30,7 @@ export const savePostBody = async (
     const testSpecificDir = currentTestName ? join(REQUESTS_DIR, SanitizeFilename.sanitizeFilename(currentTestName)) : REQUESTS_DIR
     await mkdir(testSpecificDir, { recursive: true })
     const timestamp = Date.now()
-    const filename = `${timestamp}_POST_${SanitizeFilename.sanitizeFilename(url)}.json`
+    const filename = `${timestamp}_${method}_${SanitizeFilename.sanitizeFilename(url)}.json`
     const filepath = join(testSpecificDir, filename)
 
     const contentType = headers['content-type'] || headers['Content-Type'] || ''

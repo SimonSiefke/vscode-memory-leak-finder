@@ -46,7 +46,8 @@ export const saveRequest = async (
     }
 
     const hashSuffix = bodyHash ? `_${bodyHash}` : ''
-    const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}${hashSuffix}.json`
+    const method = req.method || 'UNKNOWN'
+    const filename = `${timestamp}_${method}_${SanitizeFilename.sanitizeFilename(url)}${hashSuffix}.json`
     const filepath = join(testSpecificDir, filename)
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']

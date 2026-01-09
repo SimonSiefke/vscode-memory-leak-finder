@@ -48,7 +48,7 @@ const saveInterceptedRequest = async (
     }
 
     const hashSuffix = bodyHash ? `_${bodyHash}` : ''
-    const filename = `${timestamp}_${sanitizeFilename(url)}${hashSuffix}.json`
+    const filename = `${timestamp}_${method}_${sanitizeFilename(url)}${hashSuffix}.json`
     const filepath = join(testSpecificDir, filename)
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
