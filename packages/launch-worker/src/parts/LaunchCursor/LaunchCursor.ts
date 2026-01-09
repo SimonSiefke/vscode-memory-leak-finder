@@ -13,7 +13,6 @@ import * as LaunchElectron from '../LaunchElectron/LaunchElectron.ts'
 import { join } from '../Path/Path.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
-import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 
 export const launchCursor = async ({
   addDisposable,
@@ -48,8 +47,6 @@ export const launchCursor = async ({
   useProxyMock: boolean
   vscodePath?: string
 }) => {
-  console.log(`[LaunchCursor] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
-  console.log(`[LaunchCursor] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
@@ -74,34 +71,6 @@ export const launchCursor = async ({
     await mkdir(dirname(settingsPath), { recursive: true })
     await copyFile(defaultSettingsSourcePath, settingsPath)
 
-    // Start proxy server if enabled
-    let proxyEnvVars: Record<string, string> = {}
-    let proxyServer: { port: number; url: string } | null = null
-    let proxyWorkerRpc: Awaited<ReturnType<typeof ProxyWorker.launch>> | null = null
-    if (enableProxy) {
-      try {
-        console.log('[LaunchCursor] Starting proxy worker...')
-        proxyWorkerRpc = await ProxyWorker.launch()
-        proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, settingsPath)
-
-        // Get proxy environment variables
-        if (proxyServer) {
-          proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyServer.url)
-        }
-
-        // Keep proxy server alive
-        if (addDisposable && proxyWorkerRpc) {
-          addDisposable(async () => {
-            console.log('[LaunchCursor] Disposing proxy server...')
-            await proxyWorkerRpc!.invoke('Proxy.disposeProxyServer')
-            await proxyWorkerRpc!.dispose()
-          })
-        }
-      } catch (error) {
-        console.error('[LaunchCursor] Error setting up proxy:', error)
-        // Continue even if proxy setup fails
-      }
-    }
     const args = GetVsCodeArgs.getVscodeArgs({
       enableExtensions,
       enableProxy,
@@ -117,7 +86,6 @@ export const launchCursor = async ({
     })
     const env = GetVsCodeEnv.getVsCodeEnv({
       processEnv: process.env,
-      proxyEnvVars,
       runtimeDir,
     })
     const { child } = await LaunchElectron.launchElectron({
