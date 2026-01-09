@@ -218,9 +218,8 @@ export const runTestsWithCallback = async ({
     const intializeEnd = performance.now()
     const intializeTime = intializeEnd - initialStart
 
-    await callback(TestWorkerEventType.HandleInitialized, intializeTime)
 
-    // Launch proxy worker first if proxy is enabled
+     // Launch proxy worker first if proxy is enabled
     if (enableProxy) {
       try {
         console.log('[TestCoordinator] Launching proxy worker...')
@@ -238,6 +237,10 @@ export const runTestsWithCallback = async ({
         // Continue without proxy
       }
     }
+
+    await callback(TestWorkerEventType.HandleInitialized, intializeTime)
+
+
 
     const testStart = performance.now()
     await callback(TestWorkerEventType.TestsStarting, total)
