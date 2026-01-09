@@ -9,7 +9,6 @@ import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
 import * as HandleConnect from '../HandleConnect/HandleConnect.ts'
 import * as Root from '../Root/Root.ts'
-import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
@@ -189,19 +188,6 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     } else {
       res.writeHead(proxyRes.statusCode || 200, responseHeaders)
       res.end(responseData)
-    }
-
-    // Save POST body if applicable (with response data)
-    if (isPostPutPatch) {
-      const requestBody = requestBodyChunks.length > 0 ? Buffer.concat(requestBodyChunks) : Buffer.alloc(0)
-      if (requestBody.length > 0) {
-        await SavePostBody.savePostBody(req.method!, targetUrl, req.headers as Record<string, string>, requestBody, {
-          responseData,
-          responseHeaders: responseHeadersForSave,
-          statusCode: proxyRes.statusCode || 200,
-          statusMessage: proxyRes.statusMessage,
-        })
-      }
     }
 
     // For POST/PUT/PATCH, ensure we have body chunks before creating the buffer
