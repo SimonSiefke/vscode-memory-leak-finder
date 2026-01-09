@@ -98,116 +98,47 @@ const convertRequestsToMocks = async (): Promise<void> => {
     // Ensure mock directory exists
     await mkdir(MOCK_REQUESTS_DIR, { recursive: true })
 
-    // Read all files from requests directory
-    const files = await readdir(REQUESTS_DIR)
-    const jsonFiles = files.filter((file) => file.endsWith('.json'))
-
-    console.log(`Found ${jsonFiles.length} request files to process`)
-
-    // Map to store latest request for each URL+method combination
-    const latestRequests = new Map<string, RecordedRequest>()
-
-    // Process each file
-    for (const file of jsonFiles) {
-      try {
-        const filePath = join(REQUESTS_DIR, file)
-        const content = await readFile(filePath, 'utf8')
-        const fileData: RecordedRequestFile = JSON.parse(content)
-
-        // Transform nested structure to flat structure
-        const request: RecordedRequest = {
-          headers: fileData.request.headers,
-          method: fileData.request.method,
-          url: fileData.request.url,
-          response: fileData.response,
-          timestamp: fileData.metadata.timestamp,
-        }
-
-        // Create a key from URL and method
-        const key = `${request.method}:${request.url}`
-
-        // Check if we already have a request for this key
-        const existing = latestRequests.get(key)
-        if (!existing || request.timestamp > existing.timestamp) {
-          // Keep the latest one
-          latestRequests.set(key, request)
-        }
-      } catch (error) {
-        console.error(`Error processing file ${file}:`, error)
-        // Continue with other files
-      }
-    }
-
-    console.log(`Found ${latestRequests.size} unique request/response pairs`)
-
-    // Load existing mock config
+    // Load existing mock config (shared across all directories)
     const mockConfig = await loadMockConfig()
 
-    // Convert each request to mock format and save
-    let savedCount = 0
-    let skippedCount = 0
-    let configAddedCount = 0
+    // Read all entries from requests directory
+    const entries = await readdir(REQUESTS_DIR, { withFileTypes: true })
 
-    for (const request of latestRequests.values()) {
-      try {
-        // Skip requests without a response or without required fields
-        if (!request.response || request.response.statusCode === undefined) {
-          console.log(`Skipping request ${request.method} ${request.url} - no response data or missing statusCode`)
-          skippedCount++
-          continue
-        }
+    // Separate directories and files
+    const testDirs = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name)
+    const rootFiles = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.json')).map((entry) => entry.name)
 
-        // Parse URL to get hostname and pathname
-        let parsedUrl
-        try {
-          parsedUrl = new URL(request.url)
-        } catch (error) {
-          console.log({ request })
-          throw new VError(error, `Failed to parse ${request.url}`)
-        }
-        const { hostname, pathname } = parsedUrl
+    let totalSavedCount = 0
+    let totalSkippedCount = 0
+    let totalConfigAddedCount = 0
 
-        // Generate mock filename using the same logic as GetMockFileName
-        const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
-        const mockFilePath = join(MOCK_REQUESTS_DIR, mockFileName)
+    // Process root directory files (backward compatibility)
+    if (rootFiles.length > 0) {
+      const result = await processRequestsDirectory(REQUESTS_DIR, rootFiles, MOCK_REQUESTS_DIR, mockConfig)
+      totalSavedCount += result.savedCount
+      totalSkippedCount += result.skippedCount
+      totalConfigAddedCount += result.configAddedCount
+    }
 
-        // Replace JWT tokens in response body with new tokens that expire in 1 year
-        const processedBody = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)
+    // Process each test-specific directory
+    for (const testDir of testDirs) {
+      const testRequestsDir = join(REQUESTS_DIR, testDir)
+      const testMockDir = join(MOCK_REQUESTS_DIR, testDir)
+      await mkdir(testMockDir, { recursive: true })
 
-        // Create mock data structure matching what GetMockResponse expects
-        const mockData = {
-          response: {
-            body: processedBody,
-            headers: request.response.headers || {},
-            statusCode: request.response.statusCode,
-            statusMessage: request.response.statusMessage,
-            wasCompressed: request.response.wasCompressed,
-          },
-        }
+      const testFiles = await readdir(testRequestsDir)
+      const testJsonFiles = testFiles.filter((file) => file.endsWith('.json'))
 
-        // Save mock file
-        await writeFile(mockFilePath, JSON.stringify(mockData, null, 2), 'utf8')
-        savedCount++
-
-        // Check if we need to add this to mock-config.json
-        if (!hasConfigEntry(mockConfig, hostname, pathname, request.method)) {
-          const newEntry: MockConfigEntry = {
-            filename: mockFileName,
-            hostname,
-            method: request.method,
-            pathname,
-          }
-          mockConfig.push(newEntry)
-          configAddedCount++
-        }
-      } catch (error) {
-        console.error(`Error converting request ${request.method} ${request.url}:`, error)
-        skippedCount++
+      if (testJsonFiles.length > 0) {
+        const result = await processRequestsDirectory(testRequestsDir, testJsonFiles, testMockDir, mockConfig)
+        totalSavedCount += result.savedCount
+        totalSkippedCount += result.skippedCount
+        totalConfigAddedCount += result.configAddedCount
       }
     }
 
-    // Save updated mock config
-    if (configAddedCount > 0) {
+    // Save updated mock config (only once, after processing all directories)
+    if (totalConfigAddedCount > 0) {
       // Sort config entries for consistency
       mockConfig.sort((a, b) => {
         if (a.hostname !== b.hostname) {
@@ -219,17 +150,132 @@ const convertRequestsToMocks = async (): Promise<void> => {
         return a.method.localeCompare(b.method)
       })
       await writeFile(MOCK_CONFIG_PATH, JSON.stringify(mockConfig, null, 2), 'utf8')
-      console.log(`Added ${configAddedCount} entries to mock-config.json`)
+      console.log(`Added ${totalConfigAddedCount} entries to mock-config.json`)
     }
 
-    console.log(`Successfully converted ${savedCount} requests to mocks`)
-    if (skippedCount > 0) {
-      console.log(`Skipped ${skippedCount} requests due to errors`)
+    console.log(`Total: Successfully converted ${totalSavedCount} requests to mocks`)
+    if (totalSkippedCount > 0) {
+      console.log(`Total: Skipped ${totalSkippedCount} requests due to errors`)
     }
   } catch (error) {
     console.error('Error converting requests to mocks:', error)
     throw error
   }
+}
+
+const processRequestsDirectory = async (
+  requestsDir: string,
+  jsonFiles: string[],
+  mockDir: string,
+  mockConfig: MockConfigEntry[],
+): Promise<{ savedCount: number; skippedCount: number; configAddedCount: number }> => {
+  console.log(`Found ${jsonFiles.length} request files to process in ${requestsDir}`)
+
+  // Map to store latest request for each URL+method combination
+  const latestRequests = new Map<string, RecordedRequest>()
+
+  // Process each file
+  for (const file of jsonFiles) {
+    try {
+      const filePath = join(requestsDir, file)
+      const content = await readFile(filePath, 'utf8')
+      const fileData: RecordedRequestFile = JSON.parse(content)
+
+      // Transform nested structure to flat structure
+      const request: RecordedRequest = {
+        headers: fileData.request.headers,
+        method: fileData.request.method,
+        url: fileData.request.url,
+        response: fileData.response,
+        timestamp: fileData.metadata.timestamp,
+      }
+
+      // Create a key from URL and method
+      const key = `${request.method}:${request.url}`
+
+      // Check if we already have a request for this key
+      const existing = latestRequests.get(key)
+      if (!existing || request.timestamp > existing.timestamp) {
+        // Keep the latest one
+        latestRequests.set(key, request)
+      }
+    } catch (error) {
+      console.error(`Error processing file ${file}:`, error)
+      // Continue with other files
+    }
+  }
+
+  console.log(`Found ${latestRequests.size} unique request/response pairs in ${requestsDir}`)
+
+  // Convert each request to mock format and save
+  let savedCount = 0
+  let skippedCount = 0
+  let configAddedCount = 0
+
+  for (const request of latestRequests.values()) {
+    try {
+      // Skip requests without a response or without required fields
+      if (!request.response || request.response.statusCode === undefined) {
+        console.log(`Skipping request ${request.method} ${request.url} - no response data or missing statusCode`)
+        skippedCount++
+        continue
+      }
+
+      // Parse URL to get hostname and pathname
+      let parsedUrl
+      try {
+        parsedUrl = new URL(request.url)
+      } catch (error) {
+        console.log({ request })
+        throw new VError(error, `Failed to parse ${request.url}`)
+      }
+      const { hostname, pathname } = parsedUrl
+
+      // Generate mock filename using the same logic as GetMockFileName
+      const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
+      const mockFilePath = join(mockDir, mockFileName)
+
+      // Replace JWT tokens in response body with new tokens that expire in 1 year
+      const processedBody = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)
+
+      // Create mock data structure matching what GetMockResponse expects
+      const mockData = {
+        response: {
+          body: processedBody,
+          headers: request.response.headers || {},
+          statusCode: request.response.statusCode,
+          statusMessage: request.response.statusMessage,
+          wasCompressed: request.response.wasCompressed,
+        },
+      }
+
+      // Save mock file
+      await writeFile(mockFilePath, JSON.stringify(mockData, null, 2), 'utf8')
+      savedCount++
+
+      // Check if we need to add this to mock-config.json
+      if (!hasConfigEntry(mockConfig, hostname, pathname, request.method)) {
+        const newEntry: MockConfigEntry = {
+          filename: mockFileName,
+          hostname,
+          method: request.method,
+          pathname,
+        }
+        mockConfig.push(newEntry)
+        configAddedCount++
+      }
+    } catch (error) {
+      console.error(`Error converting request ${request.method} ${request.url}:`, error)
+      skippedCount++
+    }
+  }
+
+  console.log(`Successfully converted ${savedCount} requests to mocks in ${requestsDir}`)
+  if (skippedCount > 0) {
+    console.log(`Skipped ${skippedCount} requests due to errors in ${requestsDir}`)
+  }
+
+  return { savedCount, skippedCount, configAddedCount }
 }
 
 export const convertRequestsToMocksMain = async (): Promise<void> => {

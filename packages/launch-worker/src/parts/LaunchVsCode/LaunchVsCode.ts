@@ -18,6 +18,7 @@ import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/R
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
 import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
+import * as ProxyWorkerState from '../ProxyWorkerState/ProxyWorkerState.ts'
 
 export const launchVsCode = async ({
   addDisposable,
@@ -112,6 +113,8 @@ export const launchVsCode = async ({
       try {
         console.log('[LaunchVsCode] Starting proxy worker...')
         proxyWorkerRpc = await ProxyWorker.launch()
+        // Store proxy worker RPC for later use
+        ProxyWorkerState.setProxyWorkerRpc(proxyWorkerRpc)
         proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, settingsPath)
 
         // Get proxy environment variables
@@ -123,6 +126,7 @@ export const launchVsCode = async ({
         if (addDisposable && proxyWorkerRpc) {
           addDisposable(async () => {
             console.log('[LaunchVsCode] Disposing proxy server...')
+            ProxyWorkerState.setProxyWorkerRpc(null)
             await proxyWorkerRpc!.invoke('Proxy.disposeProxyServer')
             await proxyWorkerRpc!.dispose()
           })

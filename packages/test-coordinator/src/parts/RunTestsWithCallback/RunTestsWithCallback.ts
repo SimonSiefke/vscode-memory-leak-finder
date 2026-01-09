@@ -261,6 +261,16 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
+
+        // Set current test name in proxy worker
+        const testName = dirent.replace('.js', '').replace('.ts', '')
+        try {
+          await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', testName)
+        } catch (error) {
+          // Ignore errors if proxy is not enabled
+          console.log(`[TestCoordinator] Could not set test name in proxy: ${error}`)
+        }
+
         const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
           testWorkerRpc,
           connectionId,
@@ -331,6 +341,14 @@ export const runTestsWithCallback = async ({
             await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
+
+          // Clear test name in proxy worker
+          try {
+            await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', null)
+          } catch (error) {
+            // Ignore errors if proxy is not enabled
+          }
+
           const end = Time.now()
           const duration = end - start
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak, wasOriginallySkipped)
@@ -339,6 +357,13 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
+        // Clear test name in proxy worker on error
+        try {
+          await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', null)
+        } catch {
+          // Ignore errors if proxy is not enabled
+        }
+
         if (wasOriginallySkipped) {
           skippedFailed++
         } else {

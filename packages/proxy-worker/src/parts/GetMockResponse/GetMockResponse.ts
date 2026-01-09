@@ -7,6 +7,8 @@ import type { MockResponse } from '../MockResponse/MockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
 import * as Root from '../Root/Root.ts'
+import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SetCurrentTestName from '../SetCurrentTestName/SetCurrentTestName.ts'
 
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
 
@@ -145,9 +147,24 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
     const parsedUrl = new URL(url)
     const { hostname, pathname } = parsedUrl
 
+    // Get test-specific directory if test name is set
+    const currentTestName = SetCurrentTestName.getCurrentTestName()
+    const testSpecificDir = currentTestName ? join(MOCK_REQUESTS_DIR, SanitizeFilename.sanitizeFilename(currentTestName)) : null
+
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {
       const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
+
+      // Try test-specific directory first
+      if (testSpecificDir) {
+        const testSpecificMockFile = join(testSpecificDir, mockFileName)
+        const testSpecificMockResponse = await loadMockResponse(testSpecificMockFile)
+        if (testSpecificMockResponse) {
+          return testSpecificMockResponse
+        }
+      }
+
+      // Fall back to root directory
       const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
       const mockResponse = await loadMockResponse(mockFile)
 
@@ -171,6 +188,17 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
 
     // Try to load mock from file
     const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
+
+    // Try test-specific directory first
+    if (testSpecificDir) {
+      const testSpecificMockFile = join(testSpecificDir, mockFileName)
+      const testSpecificMockResponse = await loadMockResponse(testSpecificMockFile)
+      if (testSpecificMockResponse) {
+        return testSpecificMockResponse
+      }
+    }
+
+    // Fall back to root directory
     const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
     const mockResponse = await loadMockResponse(mockFile)
 

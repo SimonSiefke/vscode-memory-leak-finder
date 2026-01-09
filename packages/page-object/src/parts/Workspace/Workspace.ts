@@ -65,7 +65,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
       }
       await page.waitForIdle()
     },
-    async waitForFile(fileName) {
+    async waitForFile(fileName:string) {
       const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, fileName)
       if (existsSync(absolutePath)) {

@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { getCACertPath as getCACertPathImpl } from '../GetCACertPath/GetCACertPath.ts'
 import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
+import * as SetCurrentTestName from '../SetCurrentTestName/SetCurrentTestName.ts'
 
 let proxyServerInstance: { port: number; url: string; [Symbol.asyncDispose]: () => Promise<void> } | null = null
 
@@ -62,6 +63,10 @@ export const setupProxy = async (
   }
 
   return proxyServer
+}
+
+export const setCurrentTestName = (testName: string | null): void => {
+  SetCurrentTestName.setCurrentTestName(testName)
 }
 
 export { getProxyEnvVars } from '../GetProxyEnvVars/GetProxyEnvVars.ts'
