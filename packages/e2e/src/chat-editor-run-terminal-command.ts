@@ -38,6 +38,7 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
   })
   await Workspace.waitForFile('result.txt')
   await ChatEditor.clearAll()
+  await Workspace.remove('result.txt')
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
