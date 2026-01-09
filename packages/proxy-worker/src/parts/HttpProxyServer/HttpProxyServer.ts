@@ -104,106 +104,121 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
 
   // Capture request body for POST/PUT/PATCH requests
   const requestBodyChunks: Buffer[] = []
+  const responseChunks: Buffer[] = []
+  let requestBodyComplete = false
+  let responseComplete = false
+  let saved = false
+  let proxyRes: any = null
 
-  const proxyReq = requestModule(options, (proxyRes) => {
-    console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
+  const saveAndWriteResponse = async (): Promise<void> => {
+    if (saved) {
+      return
+    }
 
-    // Buffer the entire response first to handle chunked encoding properly
-    const responseChunks: Buffer[] = []
-    let saved = false
+    // For POST/PUT/PATCH requests, wait for request body to complete before saving
+    const isPostPutPatch = req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH'
+    if (isPostPutPatch && !requestBodyComplete) {
+      // Response arrived before request body finished - wait for it
+      return
+    }
 
-    const saveAndWriteResponse = async (): Promise<void> => {
-      if (saved) {
-        return
+    if (!proxyRes) {
+      // Response not ready yet
+      return
+    }
+
+    saved = true
+
+    const responseData = Buffer.concat(responseChunks)
+
+    // Convert headers to Record<string, string | string[]> format for saving
+    const responseHeadersForSave: Record<string, string | string[]> = {}
+    for (const [k, v] of Object.entries(proxyRes.headers)) {
+      if (v !== undefined) {
+        responseHeadersForSave[k] = v
       }
-      saved = true
+    }
 
-      const responseData = Buffer.concat(responseChunks)
-
-      // Convert headers to Record<string, string | string[]> format for saving
-      const responseHeadersForSave: Record<string, string | string[]> = {}
-      for (const [k, v] of Object.entries(proxyRes.headers)) {
-        if (v !== undefined) {
-          responseHeadersForSave[k] = v
-        }
+    // Clean headers - remove Transfer-Encoding, Connection, and Content-Length headers
+    // We'll set Content-Length ourselves based on buffered data to avoid chunked encoding issues
+    const responseHeaders: Record<string, string> = {}
+    const lowerCaseHeaders: Set<string> = new Set()
+    for (const [k, v] of Object.entries(proxyRes.headers)) {
+      const lowerKey = k.toLowerCase()
+      // Skip transfer-encoding, connection, and content-length headers
+      // We'll set Content-Length ourselves based on the buffered data
+      if (
+        lowerKey !== 'transfer-encoding' &&
+        lowerKey !== 'connection' &&
+        lowerKey !== 'content-length' && // Avoid duplicate headers by checking case-insensitively
+        !lowerCaseHeaders.has(lowerKey)
+      ) {
+        responseHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+        lowerCaseHeaders.add(lowerKey)
       }
+    }
 
-      // Clean headers - remove Transfer-Encoding, Connection, and Content-Length headers
-      // We'll set Content-Length ourselves based on buffered data to avoid chunked encoding issues
-      const responseHeaders: Record<string, string> = {}
-      const lowerCaseHeaders: Set<string> = new Set()
-      for (const [k, v] of Object.entries(proxyRes.headers)) {
-        const lowerKey = k.toLowerCase()
-        // Skip transfer-encoding, connection, and content-length headers
-        // We'll set Content-Length ourselves based on the buffered data
-        if (
-          lowerKey !== 'transfer-encoding' &&
-          lowerKey !== 'connection' &&
-          lowerKey !== 'content-length' && // Avoid duplicate headers by checking case-insensitively
-          !lowerCaseHeaders.has(lowerKey)
-        ) {
-          responseHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
-          lowerCaseHeaders.add(lowerKey)
-        }
+    // Add CORS headers for marketplace API responses
+    if (isMarketplaceApi) {
+      if (!lowerCaseHeaders.has('access-control-allow-origin')) {
+        responseHeaders['Access-Control-Allow-Origin'] = '*'
       }
-
-      // Add CORS headers for marketplace API responses
-      if (isMarketplaceApi) {
-        if (!lowerCaseHeaders.has('access-control-allow-origin')) {
-          responseHeaders['Access-Control-Allow-Origin'] = '*'
-        }
-        if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
-          responseHeaders['Access-Control-Allow-Credentials'] = 'true'
-        }
-        if (!lowerCaseHeaders.has('access-control-allow-headers')) {
-          responseHeaders['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with, x-market-client-id'
-        }
+      if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
+        responseHeaders['Access-Control-Allow-Credentials'] = 'true'
       }
-
-      // Explicitly remove Transfer-Encoding header if it somehow got through
-      // (case-insensitive check)
-      for (const key of Object.keys(responseHeaders)) {
-        if (key.toLowerCase() === 'transfer-encoding') {
-          delete responseHeaders[key]
-        }
+      if (!lowerCaseHeaders.has('access-control-allow-headers')) {
+        responseHeaders['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with, x-market-client-id'
       }
+    }
 
-      // Set Content-Length to avoid chunked encoding
-      responseHeaders['Content-Length'] = String(responseData.length)
-
-      // Write response headers and data
-      // Check if headers were already sent (shouldn't happen, but safety check)
-      if (res.headersSent) {
-        console.error(`[Proxy] Headers already sent for ${targetUrl}, cannot send response`)
-      } else {
-        res.writeHead(proxyRes.statusCode || 200, responseHeaders)
-        res.end(responseData)
+    // Explicitly remove Transfer-Encoding header if it somehow got through
+    // (case-insensitive check)
+    for (const key of Object.keys(responseHeaders)) {
+      if (key.toLowerCase() === 'transfer-encoding') {
+        delete responseHeaders[key]
       }
+    }
 
-      // Save POST body if applicable (with response data)
-      if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
-        const requestBody = Buffer.concat(requestBodyChunks)
-        await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody, {
-          responseData,
-          responseHeaders: responseHeadersForSave,
-          statusCode: proxyRes.statusCode || 200,
-          statusMessage: proxyRes.statusMessage,
-        })
-      }
+    // Set Content-Length to avoid chunked encoding
+    responseHeaders['Content-Length'] = String(responseData.length)
 
-      const requestBody =
-        req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH' ? Buffer.concat(requestBodyChunks) : undefined
-      SaveRequest.saveRequest(
-        req,
-        proxyRes.statusCode || 200,
-        proxyRes.statusMessage,
-        responseHeadersForSave,
+    // Write response headers and data
+    // Check if headers were already sent (shouldn't happen, but safety check)
+    if (res.headersSent) {
+      console.error(`[Proxy] Headers already sent for ${targetUrl}, cannot send response`)
+    } else {
+      res.writeHead(proxyRes.statusCode || 200, responseHeaders)
+      res.end(responseData)
+    }
+
+    // Save POST body if applicable (with response data)
+    if (isPostPutPatch) {
+      const requestBody = Buffer.concat(requestBodyChunks)
+      await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody, {
         responseData,
-        requestBody,
-      ).catch((error) => {
-        console.error('[Proxy] Error saving request:', error)
+        responseHeaders: responseHeadersForSave,
+        statusCode: proxyRes.statusCode || 200,
+        statusMessage: proxyRes.statusMessage,
       })
     }
+
+    const requestBody =
+      req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH' ? Buffer.concat(requestBodyChunks) : undefined
+    SaveRequest.saveRequest(
+      req,
+      proxyRes.statusCode || 200,
+      proxyRes.statusMessage,
+      responseHeadersForSave,
+      responseData,
+      requestBody,
+    ).catch((error) => {
+      console.error('[Proxy] Error saving request:', error)
+    })
+  }
+
+  const proxyReq = requestModule(options, (res) => {
+    proxyRes = res
+    console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
 
     // Handle errors on the response stream
     proxyRes.on('error', (err) => {
@@ -220,12 +235,14 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     })
 
     proxyRes.on('end', async () => {
+      responseComplete = true
       await saveAndWriteResponse()
     })
 
     // Also handle 'close' event in case connection closes without 'end'
     // This is important for SSE streams that may never fire 'end'
     proxyRes.on('close', async () => {
+      responseComplete = true
       if (!saved) {
         await saveAndWriteResponse()
       }
@@ -326,8 +343,13 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     proxyReq.write(chunk)
   })
 
-  req.on('end', () => {
+  req.on('end', async () => {
+    requestBodyComplete = true
     proxyReq.end()
+    // If response already completed, try saving now
+    if (responseComplete && !saved && proxyRes) {
+      await saveAndWriteResponse()
+    }
   })
 }
 
