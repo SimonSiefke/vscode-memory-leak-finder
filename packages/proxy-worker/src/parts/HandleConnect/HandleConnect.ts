@@ -13,6 +13,8 @@ import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
+import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SetCurrentTestName from '../SetCurrentTestName/SetCurrentTestName.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
@@ -26,10 +28,12 @@ const saveInterceptedRequest = async (
   responseBody: Buffer,
 ): Promise<void> => {
   try {
-    await mkdir(REQUESTS_DIR, { recursive: true })
+    const currentTestName = SetCurrentTestName.getCurrentTestName()
+    const testSpecificDir = currentTestName ? join(REQUESTS_DIR, SanitizeFilename.sanitizeFilename(currentTestName)) : REQUESTS_DIR
+    await mkdir(testSpecificDir, { recursive: true })
     const timestamp = Date.now()
     const filename = `${timestamp}_${sanitizeFilename(url)}.json`
-    const filepath = join(REQUESTS_DIR, filename)
+    const filepath = join(testSpecificDir, filename)
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
     const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
