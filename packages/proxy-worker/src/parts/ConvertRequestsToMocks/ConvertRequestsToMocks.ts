@@ -260,11 +260,17 @@ const processRequestsDirectory = async (
 
   for (const request of latestRequests.values()) {
     try {
-      // Skip requests without a response or without required fields
-      if (!request.response || request.response.statusCode === undefined) {
-        console.log(`Skipping request ${request.method} ${request.url} - no response data or missing statusCode`)
+      // Skip requests without a response object at all
+      if (!request.response) {
+        console.log(`Skipping request ${request.method} ${request.url} - no response object`)
         skippedCount++
         continue
+      }
+
+      // Default statusCode to 200 if missing (valid HTTP response even with empty body)
+      const statusCode = request.response.statusCode !== undefined ? request.response.statusCode : 200
+      if (request.response.statusCode === undefined) {
+        console.log(`Warning: Request ${request.method} ${request.url} has no statusCode, defaulting to 200`)
       }
 
       // Parse URL to get hostname and pathname
@@ -282,7 +288,9 @@ const processRequestsDirectory = async (
       const mockFilePath = join(mockDir, mockFileName)
 
       // Replace JWT tokens in response body with new tokens that expire in 1 year
-      const processedBody = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)
+      // Handle empty body (undefined or null) - still a valid response
+      const responseBody = request.response.body !== undefined ? request.response.body : ''
+      const processedBody = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(responseBody)
 
       // Create mock data structure matching what GetMockResponse expects
       const mockData = {
@@ -293,7 +301,7 @@ const processRequestsDirectory = async (
         response: {
           body: processedBody,
           headers: request.response.headers || {},
-          statusCode: request.response.statusCode,
+          statusCode,
           statusMessage: request.response.statusMessage,
           wasCompressed: request.response.wasCompressed,
         },
