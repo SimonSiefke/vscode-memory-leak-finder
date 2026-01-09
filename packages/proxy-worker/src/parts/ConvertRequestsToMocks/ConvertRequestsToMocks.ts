@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { URL } from 'node:url'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as HashRequestBody from '../HashRequestBody/HashRequestBody.ts'
 import * as Root from '../Root/Root.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
 import { VError } from '@lvce-editor/verror'
@@ -283,8 +284,17 @@ const processRequestsDirectory = async (
       }
       const { hostname, pathname } = parsedUrl
 
+      // Calculate bodyHash if missing for POST/PUT/PATCH requests with a body
+      let bodyHash = request.bodyHash
+      if (!bodyHash && request.body && (request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH')) {
+        // Convert body to Buffer to calculate hash
+        const bodyBuffer = Buffer.from(JSON.stringify(request.body), 'utf8')
+        bodyHash = HashRequestBody.hashRequestBody(bodyBuffer)
+        console.log(`Calculated missing bodyHash for ${request.method} ${request.url}: ${bodyHash}`)
+      }
+
       // Generate mock filename using the same logic as GetMockFileName
-      const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method, request.bodyHash)
+      const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method, bodyHash)
       const mockFilePath = join(mockDir, mockFileName)
 
       // Replace JWT tokens in response body with new tokens that expire in 1 year
