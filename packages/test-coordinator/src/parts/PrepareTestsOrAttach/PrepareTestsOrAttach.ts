@@ -34,6 +34,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly measureNode: boolean
   readonly pageObjectPath: string
   readonly platform: string
+  readonly proxyEnvVars?: Record<string, string>
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
@@ -104,6 +105,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       measureId,
       pageObjectPath,
       platform,
+      proxyEnvVars: options.proxyEnvVars,
       recordVideo,
       runMode,
       timeouts,

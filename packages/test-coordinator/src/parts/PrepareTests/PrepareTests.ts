@@ -25,6 +25,7 @@ export interface PrepareTestsOptions {
   readonly measureId: string
   readonly pageObjectPath: string
   readonly platform: string
+  readonly proxyEnvVars?: Record<string, string>
   readonly recordVideo: boolean
   readonly runMode: number
   readonly timeouts: any
@@ -84,6 +85,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       inspectSharedProcessPort,
       isFirstConnection,
       platform,
+      proxyEnvVars: options.proxyEnvVars,
       updateUrl,
       useProxyMock,
       vscodePath,

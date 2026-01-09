@@ -32,6 +32,7 @@ export interface PrepareBothOptions {
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
   readonly platform: string
+  readonly proxyEnvVars?: Record<string, string>
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -88,6 +89,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
       inspectSharedProcessPort,
       isFirstConnection,
       platform,
+      proxyEnvVars: options.proxyEnvVars,
       updateUrl,
       useProxyMock,
       vscodePath,

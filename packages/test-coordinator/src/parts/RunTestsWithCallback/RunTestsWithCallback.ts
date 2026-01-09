@@ -1,4 +1,3 @@
-import { writeFileSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
@@ -7,6 +6,7 @@ import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
+import * as LaunchProxyWorker from '../LaunchProxyWorker/LaunchProxyWorker.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
@@ -105,6 +105,27 @@ export const runTestsWithCallback = async ({
     // when a new connection id comes in, dispose them (even while running)
     // Then recreate the workers, ensuring a clean state
 
+    // Launch proxy worker first if proxy is enabled
+    let proxyWorkerRpc: Awaited<ReturnType<typeof LaunchProxyWorker.launchProxyWorker>> | null = null
+    let proxyEnvVars: Record<string, string> | undefined = undefined
+    if (enableProxy) {
+      try {
+        console.log('[TestCoordinator] Launching proxy worker...')
+        proxyWorkerRpc = await LaunchProxyWorker.launchProxyWorker()
+        const proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, null)
+        if (proxyServer) {
+          proxyEnvVars = (await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', (proxyServer as { url: string }).url)) as Record<
+            string,
+            string
+          >
+          console.log('[TestCoordinator] Proxy worker launched, env vars obtained')
+        }
+      } catch (error) {
+        console.error('[TestCoordinator] Error launching proxy worker:', error)
+        // Continue without proxy
+      }
+    }
+
     if (setupOnly && commit) {
       const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
         arch,
@@ -131,6 +152,7 @@ export const runTestsWithCallback = async ({
         measureNode,
         pageObjectPath,
         platform,
+        proxyEnvVars,
         recordVideo,
         runMode,
         screencastQuality,
@@ -143,6 +165,15 @@ export const runTestsWithCallback = async ({
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
       await videoRpc?.dispose()
+      // Dispose proxy worker
+      if (proxyWorkerRpc) {
+        try {
+          await proxyWorkerRpc.invoke('Proxy.disposeProxyServer')
+          await proxyWorkerRpc.dispose()
+        } catch (error) {
+          // Ignore errors
+        }
+      }
       return {
         duration: 0,
         failed: 0,
@@ -189,6 +220,25 @@ export const runTestsWithCallback = async ({
 
     await callback(TestWorkerEventType.HandleInitialized, intializeTime)
 
+    // Launch proxy worker first if proxy is enabled
+    if (enableProxy) {
+      try {
+        console.log('[TestCoordinator] Launching proxy worker...')
+        proxyWorkerRpc = await LaunchProxyWorker.launchProxyWorker()
+        const proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, null)
+        if (proxyServer) {
+          proxyEnvVars = (await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', (proxyServer as { url: string }).url)) as Record<
+            string,
+            string
+          >
+          console.log('[TestCoordinator] Proxy worker launched, env vars obtained')
+        }
+      } catch (error) {
+        console.error('[TestCoordinator] Error launching proxy worker:', error)
+        // Continue without proxy
+      }
+    }
+
     const testStart = performance.now()
     await callback(TestWorkerEventType.TestsStarting, total)
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
@@ -211,14 +261,15 @@ export const runTestsWithCallback = async ({
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
 
-        // Set test name BEFORE creating workers so proxy server knows which test is running
+        // Set test name in proxy worker BEFORE creating workers
         const testName = dirent.replace('.js', '').replace('.ts', '')
-        // Write test name to file so LaunchVsCode can read it when creating proxy server
-        try {
-          const testNameFile = join(root, '.vscode-test-name.txt')
-          writeFileSync(testNameFile, testName, 'utf8')
-        } catch (error) {
-          // Ignore errors
+        if (proxyWorkerRpc) {
+          try {
+            await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', testName)
+            console.log(`[TestCoordinator] Set test name in proxy: ${testName}`)
+          } catch (error) {
+            console.log(`[TestCoordinator] Could not set test name in proxy: ${error}`)
+          }
         }
 
         const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
@@ -246,6 +297,7 @@ export const runTestsWithCallback = async ({
           measureNode,
           pageObjectPath,
           platform,
+          proxyEnvVars,
           recordVideo,
           runMode,
           screencastQuality,
@@ -263,26 +315,17 @@ export const runTestsWithCallback = async ({
           videoRpc: videoRpc || emptyRpc,
         }
 
-        // Set test name in global state and proxy worker immediately after workers are created
-        // The test name should have been set in LaunchVsCode when proxy was created,
-        // but set it again to ensure it's correct
-        try {
-          await workers.initializationWorkerRpc.invoke('Launch.setTestName', testName)
-          await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', testName)
-        } catch (error) {
-          // Ignore errors if proxy is not enabled
-          console.log(`[TestCoordinator] Could not set test name: ${error}`)
-        }
+        // Test name was already set in proxy worker before prepareTestsAndAttach
       } else {
-        // For subsequent tests, set test name before any operations
+        // For subsequent tests, set test name in proxy worker before any operations
         const testName = dirent.replace('.js', '').replace('.ts', '')
-        try {
-          // Update test name in global state and proxy
-          await workers.initializationWorkerRpc.invoke('Launch.setTestName', testName)
-          await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', testName)
-        } catch (error) {
-          // Ignore errors if proxy is not enabled
-          console.log(`[TestCoordinator] Could not set test name: ${error}`)
+        if (proxyWorkerRpc) {
+          try {
+            await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', testName)
+            console.log(`[TestCoordinator] Set test name in proxy: ${testName}`)
+          } catch (error) {
+            console.log(`[TestCoordinator] Could not set test name in proxy: ${error}`)
+          }
         }
       }
 
@@ -367,17 +410,13 @@ export const runTestsWithCallback = async ({
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
 
-          // Clear test name in proxy worker and file
-          try {
-            await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', null)
-            const testNameFile = join(root, '.vscode-test-name.txt')
+          // Clear test name in proxy worker
+          if (proxyWorkerRpc) {
             try {
-              unlinkSync(testNameFile)
-            } catch {
-              // Ignore if file doesn't exist
+              await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', null)
+            } catch (error) {
+              // Ignore errors
             }
-          } catch (error) {
-            // Ignore errors if proxy is not enabled
           }
 
           const end = Time.now()
@@ -388,17 +427,13 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
-        // Clear test name in proxy worker and file on error
-        try {
-          await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', null)
-          const testNameFile = join(root, '.vscode-test-name.txt')
+        // Clear test name in proxy worker on error
+        if (proxyWorkerRpc) {
           try {
-            unlinkSync(testNameFile)
+            await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', null)
           } catch {
-            // Ignore if file doesn't exist
+            // Ignore errors
           }
-        } catch {
-          // Ignore errors if proxy is not enabled
         }
 
         if (wasOriginallySkipped) {
@@ -430,6 +465,15 @@ export const runTestsWithCallback = async ({
       memoryRpc: emptyRpc,
       testWorkerRpc: emptyRpc,
       videoRpc: emptyRpc,
+    }
+    // Dispose proxy worker
+    if (proxyWorkerRpc) {
+      try {
+        await proxyWorkerRpc.invoke('Proxy.disposeProxyServer')
+        await proxyWorkerRpc.dispose()
+      } catch (error) {
+        // Ignore errors
+      }
     }
     return {
       duration,

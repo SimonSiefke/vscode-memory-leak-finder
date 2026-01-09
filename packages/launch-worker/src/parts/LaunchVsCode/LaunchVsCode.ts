@@ -17,10 +17,6 @@ import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveV
 import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/RemoveVscodeWorkspaceStorage.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
-import * as GetTestNameFromFile from '../GetTestNameFromFile/GetTestNameFromFile.ts'
-import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
-import * as ProxyWorkerState from '../ProxyWorkerState/ProxyWorkerState.ts'
-import * as TestNameState from '../TestNameState/TestNameState.ts'
 
 export const launchVsCode = async ({
   addDisposable,
@@ -39,6 +35,7 @@ export const launchVsCode = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
+  proxyEnvVars,
   updateUrl,
   useProxyMock,
   vscodePath,
@@ -60,8 +57,9 @@ export const launchVsCode = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform: string
-  useProxyMock: boolean
+  proxyEnvVars?: Record<string, string>
   updateUrl: string
+  useProxyMock: boolean
   vscodePath: string
   vscodeVersion: string
 }) => {
@@ -103,57 +101,11 @@ export const launchVsCode = async ({
 
     // Start proxy server if enabled
     // Note: enableProxy might be undefined if RPC call doesn't pass it correctly
-    // Default to false if undefined
-    const shouldEnableProxy = enableProxy === true
+    // Use provided proxyEnvVars if available (proxy worker was launched by test-coordinator)
+    // Otherwise, proxy is not enabled
+    const shouldEnableProxy = enableProxy === true && proxyEnvVars !== undefined
     if (shouldEnableProxy) {
-      console.log(`[LaunchVsCode] shouldEnableProxy: ${shouldEnableProxy} (enableProxy was: ${enableProxy})`)
-    }
-    let proxyEnvVars: Record<string, string> = {}
-    let proxyServer: { port: number; url: string } | null = null
-    let proxyWorkerRpc: Awaited<ReturnType<typeof ProxyWorker.launch>> | null = null
-    if (shouldEnableProxy) {
-      try {
-        console.log('[LaunchVsCode] Starting proxy worker...')
-        proxyWorkerRpc = await ProxyWorker.launch()
-        // Store proxy worker RPC for later use
-        ProxyWorkerState.setProxyWorkerRpc(proxyWorkerRpc)
-        proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, settingsPath)
-
-        // Get proxy environment variables
-        if (proxyServer) {
-          proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyServer.url)
-        }
-
-        // Set test name immediately after proxy server is created (if available)
-        // This ensures requests are saved to the correct test-specific directory
-        // Try to get test name from file first (set before prepareTestsAndAttach)
-        let testName = GetTestNameFromFile.getTestNameFromFile()
-        if (!testName) {
-          // Fall back to TestNameState (set via RPC)
-          testName = TestNameState.getTestName()
-        }
-        if (testName) {
-          try {
-            await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', testName)
-            console.log(`[LaunchVsCode] Set test name in proxy: ${testName}`)
-          } catch (error) {
-            console.log(`[LaunchVsCode] Could not set test name in proxy: ${error}`)
-          }
-        }
-
-        // Keep proxy server alive
-        if (addDisposable && proxyWorkerRpc) {
-          addDisposable(async () => {
-            console.log('[LaunchVsCode] Disposing proxy server...')
-            ProxyWorkerState.setProxyWorkerRpc(null)
-            await proxyWorkerRpc!.invoke('Proxy.disposeProxyServer')
-            await proxyWorkerRpc!.dispose()
-          })
-        }
-      } catch (error) {
-        console.error('[LaunchVsCode] Error setting up proxy:', error)
-        // Continue even if proxy setup fails
-      }
+      console.log(`[LaunchVsCode] Using proxy env vars provided by test-coordinator`)
     }
     const args = GetVsCodeArgs.getVscodeArgs({
       enableExtensions,
