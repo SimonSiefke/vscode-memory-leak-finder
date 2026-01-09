@@ -364,3 +364,77 @@ test('hashRequestBody produces different hashes for different function names', (
   // Should produce different hashes due to different function names
   expect(hash1).not.toBe(hash2)
 })
+
+test('normalizeRequestBody only includes messages property when present', () => {
+  const body = Buffer.from(
+    JSON.stringify({
+      messages: [{ role: 'user', content: 'test' }],
+      n: 1,
+      stream: true,
+      thinking_budget: 4000,
+    }),
+    'utf8',
+  )
+
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
+  const parsed = JSON.parse(normalized.toString('utf8'))
+
+  expect(parsed.messages).toEqual([{ role: 'user', content: 'test' }])
+  expect(parsed.n).toBeUndefined()
+  expect(parsed.stream).toBeUndefined()
+  expect(parsed.thinking_budget).toBeUndefined()
+})
+
+test('hashRequestBody produces same hash for bodies with same messages but different other properties', () => {
+  const body1 = Buffer.from(
+    JSON.stringify({
+      messages: [{ role: 'user', content: 'test' }],
+      n: 1,
+      stream: true,
+      thinking_budget: 4000,
+    }),
+    'utf8',
+  )
+
+  const body2 = Buffer.from(
+    JSON.stringify({
+      messages: [{ role: 'user', content: 'test' }],
+      n: 2,
+      stream: false,
+      thinking_budget: 5000,
+    }),
+    'utf8',
+  )
+
+  const hash1 = HashRequestBody.hashRequestBody(body1)
+  const hash2 = HashRequestBody.hashRequestBody(body2)
+
+  // Both should produce the same hash since only messages are included
+  expect(hash1).toBe(hash2)
+})
+
+test('hashRequestBody produces different hashes for bodies with different messages', () => {
+  const body1 = Buffer.from(
+    JSON.stringify({
+      messages: [{ role: 'user', content: 'test1' }],
+      n: 1,
+      stream: true,
+    }),
+    'utf8',
+  )
+
+  const body2 = Buffer.from(
+    JSON.stringify({
+      messages: [{ role: 'user', content: 'test2' }],
+      n: 1,
+      stream: true,
+    }),
+    'utf8',
+  )
+
+  const hash1 = HashRequestBody.hashRequestBody(body1)
+  const hash2 = HashRequestBody.hashRequestBody(body2)
+
+  // Should produce different hashes due to different messages
+  expect(hash1).not.toBe(hash2)
+})

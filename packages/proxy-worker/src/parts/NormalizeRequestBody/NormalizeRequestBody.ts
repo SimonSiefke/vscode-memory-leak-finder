@@ -3,6 +3,12 @@ export const normalizeRequestBody = (body: Buffer): Buffer => {
     const bodyString = body.toString('utf8')
     const parsed = JSON.parse(bodyString)
 
+    // Check if body has a 'messages' property - if so, only include messages in the hash
+    if (parsed && typeof parsed === 'object' && parsed.messages !== undefined) {
+      const normalized = { messages: parsed.messages }
+      return Buffer.from(JSON.stringify(normalized), 'utf8')
+    }
+
     // Check if body has an 'input' property that is an array
     if (parsed && typeof parsed === 'object' && Array.isArray(parsed.input)) {
       // Create a copy to avoid mutating the original
