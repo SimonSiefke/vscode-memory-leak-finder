@@ -186,7 +186,6 @@ export const saveRequest = async (
         method: req.method,
         url: req.url,
         ...(requestBodyData !== undefined && { body: requestBodyData }),
-        ...(bodyHash && { bodyHash }),
       },
       response: {
         body: responseBodyData,

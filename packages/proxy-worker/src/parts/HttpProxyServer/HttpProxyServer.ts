@@ -193,17 +193,30 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
 
     // Save POST body if applicable (with response data)
     if (isPostPutPatch) {
-      const requestBody = Buffer.concat(requestBodyChunks)
-      await SavePostBody.savePostBody(req.method!, targetUrl, req.headers as Record<string, string>, requestBody, {
-        responseData,
-        responseHeaders: responseHeadersForSave,
-        statusCode: proxyRes.statusCode || 200,
-        statusMessage: proxyRes.statusMessage,
-      })
+      const requestBody = requestBodyChunks.length > 0 ? Buffer.concat(requestBodyChunks) : Buffer.alloc(0)
+      if (requestBody.length > 0) {
+        await SavePostBody.savePostBody(req.method!, targetUrl, req.headers as Record<string, string>, requestBody, {
+          responseData,
+          responseHeaders: responseHeadersForSave,
+          statusCode: proxyRes.statusCode || 200,
+          statusMessage: proxyRes.statusMessage,
+        })
+      }
     }
 
-    const requestBody =
-      req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH' ? Buffer.concat(requestBodyChunks) : undefined
+    // For POST/PUT/PATCH, ensure we have body chunks before creating the buffer
+    // If chunks are empty, it means the body wasn't captured (shouldn't happen if requestBodyComplete is true)
+    let requestBody: Buffer | undefined = undefined
+    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+      if (requestBodyChunks.length > 0) {
+        requestBody = Buffer.concat(requestBodyChunks)
+      } else {
+        // This shouldn't happen if requestBodyComplete is true, but log a warning
+        console.warn(
+          `[Proxy] POST/PUT/PATCH request body complete but no chunks found for ${targetUrl}. Body hash will not be included.`,
+        )
+      }
+    }
     SaveRequest.saveRequest(
       req,
       proxyRes.statusCode || 200,
