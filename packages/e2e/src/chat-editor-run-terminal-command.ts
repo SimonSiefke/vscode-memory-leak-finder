@@ -37,6 +37,7 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
     allowances: ['allow'],
   })
   await Workspace.waitForFile('result.txt')
+  await new Promise((r) => {})
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
