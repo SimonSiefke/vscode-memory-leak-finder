@@ -38,7 +38,7 @@ export const run = async ({ ChatEditor, Workspace, Explorer, SideBar, ActivityBa
   await Terminal.killAll()
   await ChatEditor.sendMessage({
     message:
-      "Please run the index.js file in the terminal using node. Don't write any extra sentence or word. Don\'t write to any files. Also do not run the cat command. Once running the index.js script has finished, read the result txt file normally. Just respond with the contents of result.txt. Ensure to respond with the contents of result.txt",
+      "Please run the index.js file in the terminal using node. Once running the index.js script has finished, read the result txt file normally. Ensure to respond with the contents of result.txt. That's it. Don't use any todo list. Don't create a todo. Under no circumstances use any tool except to run the index.js script and reading the result.txt file.",
     verify: true,
     expectedResponse: 'test result',
     expectedResponseType: 'includes',
