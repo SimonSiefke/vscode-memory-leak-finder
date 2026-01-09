@@ -264,16 +264,6 @@ export const runTestsWithCallback = async ({
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
 
-        // Set test name in proxy worker BEFORE creating workers
-        const testName = dirent.replace('.js', '').replace('.ts', '')
-        if (proxyWorkerRpc) {
-          try {
-            await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', testName)
-            console.log(`[TestCoordinator] Set test name in proxy: ${testName}`)
-          } catch (error) {
-            console.log(`[TestCoordinator] Could not set test name in proxy: ${error}`)
-          }
-        }
 
         const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
           arch,
@@ -320,16 +310,7 @@ export const runTestsWithCallback = async ({
 
         // Test name was already set in proxy worker before prepareTestsAndAttach
       } else {
-        // For subsequent tests, set test name in proxy worker before any operations
-        const testName = dirent.replace('.js', '').replace('.ts', '')
-        if (proxyWorkerRpc) {
-          try {
-            await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', testName)
-            console.log(`[TestCoordinator] Set test name in proxy: ${testName}`)
-          } catch (error) {
-            console.log(`[TestCoordinator] Could not set test name in proxy: ${error}`)
-          }
-        }
+
       }
 
       const { memoryRpc, testWorkerRpc, videoRpc } = workers
@@ -341,6 +322,17 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
+
+          // For subsequent tests, set test name in proxy worker before any operations
+        const testName = dirent.replace('.js', '').replace('.ts', '')
+        if (proxyWorkerRpc) {
+          try {
+            await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', testName)
+            console.log(`[TestCoordinator] Set test name in proxy: ${testName}`)
+          } catch (error) {
+            console.log(`[TestCoordinator] Could not set test name in proxy: ${error}`)
+          }
+        }
 
         const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
           testWorkerRpc,
