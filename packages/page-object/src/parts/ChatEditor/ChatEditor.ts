@@ -108,6 +108,7 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
     },
     async sendMessage({
       expectedResponse,
+      expectedResponseType,
       message,
       validateRequest = {
         exists: [],
@@ -199,8 +200,13 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
           await expect(requestMessage).toBeVisible()
           await page.waitForIdle()
           await expect(lines).toHaveText('')
-          const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
-          await expect(row).toBeVisible()
+          if (expectedResponseType === 'includes') {
+            const row = chatView.locator(`.monaco-list-row[aria-label*="${message}"]`)
+            await expect(row).toBeVisible()
+          } else {
+            const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
+            await expect(row).toBeVisible()
+          }
           await page.waitForIdle()
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
           await expect(response).toBeVisible({ timeout: 60_000 })
