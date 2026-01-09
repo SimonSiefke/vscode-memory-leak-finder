@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
-import { basename, dirname, join } from 'node:path'
 import { rename } from 'node:fs/promises'
+import { basename, dirname, join } from 'node:path'
 import * as Exec from '../Exec/Exec.ts'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
 import * as GetCompressOptions from '../GetCompressOptions/GetCompressOptions.ts'

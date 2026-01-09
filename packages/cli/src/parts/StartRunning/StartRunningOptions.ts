@@ -5,6 +5,7 @@ export interface StartRunningOptions {
   readonly clearExtensions: boolean
   readonly color: boolean
   readonly commit: string
+  readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -27,7 +28,6 @@ export interface StartRunningOptions {
   readonly measureNode: boolean
   readonly platform: string
   readonly recordVideo: boolean
-  readonly compressVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
   readonly runs: number

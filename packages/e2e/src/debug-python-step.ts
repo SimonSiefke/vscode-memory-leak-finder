@@ -42,8 +42,8 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
   // @ts-ignore
   await RunAndDebug.step({
     file: 'main.py',
-    line: 3,
     hasCallStack: false,
+    line: 3,
   })
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
