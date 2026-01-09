@@ -30,7 +30,7 @@ writeFileSync('result.txt', 'test result')
 export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message:
-      "Please run the index.js file in the terminal. Once you are finished. Respond exactly with the output of result.txt, which should be created. Don't write any extra sentence or word. Don\'t write to any files. Also dont use any todo list. Let me be very clear: Do not use the todo list. Also do not run the cat command. Read the result txt file normally. Just respond with the contents of result.txt. Ensure to respond with the contents of result.txt, which should be created by running the index.js script.",
+      "Please run the index.js file in the terminal using node. Once you are finished. Respond exactly with the output of result.txt, which should be created by running the script. Don't write any extra sentence or word. Don\'t write to any files. Also dont use any todo list. Let me be very clear: Do not use the todo list. If you think to yourself, I want to use a todo list now, forget it. Don\'t use a todo list at all. Also do not run the cat command. Once running the index.js script has finished, read the result txt file normally. Just respond with the contents of result.txt. Ensure to respond with the contents of result.txt",
     verify: true,
     expectedResponse: 'test result',
     expectedResponseType: 'includes',
