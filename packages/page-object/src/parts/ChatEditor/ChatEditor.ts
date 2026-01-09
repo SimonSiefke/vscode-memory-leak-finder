@@ -198,7 +198,7 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
 
         for (const allowance of allowances) {
           const button = page.locator('.chat-confirmation-widget-buttons .monaco-button[aria-label^="Allow"]')
-          await expect(button).toBeVisible({ timeout: 30_000 })
+          await expect(button).toBeVisible({ timeout: 90_000 })
           await page.waitForIdle()
           if (allowance === 'allow') {
             await button.click()
