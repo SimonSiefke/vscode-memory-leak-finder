@@ -221,7 +221,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
 
     // Handle errors on the response stream
-    proxyRes.on('error', (err) => {
+    proxyRes.on('error', (err: any) => {
       console.error(`[Proxy] Error receiving response from ${targetUrl}:`, err)
       if (!res.headersSent) {
         res.writeHead(500, { 'Content-Type': 'application/json' })
