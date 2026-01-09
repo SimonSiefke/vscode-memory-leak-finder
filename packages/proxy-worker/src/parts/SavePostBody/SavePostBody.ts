@@ -71,11 +71,11 @@ export const savePostBody = async (
 
       if (responseContentTypeLower.includes('application/zip')) {
         responseType = 'zip'
-        const zipFilePath = await SaveZipData.saveZipData(responseData.responseData, url, timestamp)
+        const zipFilePath = await SaveZipData.saveZipData(responseData.responseData, url, timestamp, currentTestName || undefined)
         responseBodyData = `file-reference:${zipFilePath}`
       } else if (responseContentTypeLower.includes('text/event-stream')) {
         responseType = 'sse'
-        const sseFilePath = await SaveSseData.saveSseData(responseData.responseData, url, timestamp)
+        const sseFilePath = await SaveSseData.saveSseData(responseData.responseData, url, timestamp, currentTestName || undefined)
         responseBodyData = `file-reference:${sseFilePath}`
       } else if (responseContentTypeLower.startsWith('image/')) {
         responseType = 'binary'

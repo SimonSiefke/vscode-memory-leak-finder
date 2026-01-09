@@ -546,6 +546,36 @@
     "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/workbench/workbench.desktop.main.js.map"
   },
   {
+    "filename": "main_vscode_cdn_net_sourcemaps_94e8ae2b28cb5cc932b86e1070569c4463565c37_core_vs_code_electron_browser_workbench_workbench_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/94e8ae2b28cb5cc932b86e1070569c4463565c37/core/vs/code/electron-browser/workbench/workbench.js.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_94e8ae2b28cb5cc932b86e1070569c4463565c37_core_vs_editor_common_services_editorWebWorkerMain_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/94e8ae2b28cb5cc932b86e1070569c4463565c37/core/vs/editor/common/services/editorWebWorkerMain.js.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_94e8ae2b28cb5cc932b86e1070569c4463565c37_core_vs_workbench_services_textMate_browser_backgroundTokenization_worker_textMateTokenizationWorker_workerMain_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/94e8ae2b28cb5cc932b86e1070569c4463565c37/core/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.workerMain.js.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_94e8ae2b28cb5cc932b86e1070569c4463565c37_core_vs_workbench_workbench_desktop_main_css_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/94e8ae2b28cb5cc932b86e1070569c4463565c37/core/vs/workbench/workbench.desktop.main.css.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_94e8ae2b28cb5cc932b86e1070569c4463565c37_core_vs_workbench_workbench_desktop_main_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/94e8ae2b28cb5cc932b86e1070569c4463565c37/core/vs/workbench/workbench.desktop.main.js.map"
+  },
+  {
     "hostname": "main.vscode-cdn.net",
     "pathname": "/sourcemaps/ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57/core/vs/code/electron-browser/workbench/workbench.js.map",
     "method": "GET",

@@ -5,10 +5,11 @@ import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 
 const ZIP_DATA_DIR = join(Root.root, '.vscode-zip-data')
 
-export const saveSseData = async (body: Buffer, url: string, timestamp: number): Promise<string> => {
-  await mkdir(ZIP_DATA_DIR, { recursive: true })
+export const saveSseData = async (body: Buffer, url: string, timestamp: number, testName?: string): Promise<string> => {
+  const testSpecificDir = testName ? join(ZIP_DATA_DIR, SanitizeFilename.sanitizeFilename(testName)) : ZIP_DATA_DIR
+  await mkdir(testSpecificDir, { recursive: true })
   const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}.txt`
-  const filepath = join(ZIP_DATA_DIR, filename)
+  const filepath = join(testSpecificDir, filename)
   await writeFile(filepath, body)
   return filepath
 }

@@ -45,11 +45,11 @@ const saveInterceptedRequest = async (
 
     if (contentTypeLower.includes('application/zip')) {
       responseType = 'zip'
-      const zipFilePath = await SaveZipData.saveZipData(responseBody, url, timestamp)
+      const zipFilePath = await SaveZipData.saveZipData(responseBody, url, timestamp, currentTestName || undefined)
       responseBodyData = `file-reference:${zipFilePath}`
     } else if (contentTypeLower.includes('text/event-stream')) {
       responseType = 'sse'
-      const sseFilePath = await SaveSseData.saveSseData(responseBody, url, timestamp)
+      const sseFilePath = await SaveSseData.saveSseData(responseBody, url, timestamp, currentTestName || undefined)
       responseBodyData = `file-reference:${sseFilePath}`
     } else if (contentTypeLower.startsWith('image/')) {
       responseType = 'binary'
