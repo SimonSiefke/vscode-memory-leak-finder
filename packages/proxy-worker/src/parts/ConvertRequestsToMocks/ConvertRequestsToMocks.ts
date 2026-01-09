@@ -5,6 +5,7 @@ import { URL } from 'node:url'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as Root from '../Root/Root.ts'
+import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
 import { VError } from '@lvce-editor/verror'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
@@ -170,10 +171,13 @@ const convertRequestsToMocks = async (): Promise<void> => {
         const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
         const mockFilePath = join(MOCK_REQUESTS_DIR, mockFileName)
 
+        // Replace JWT tokens in response body with new tokens that expire in 1 year
+        const processedBody = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)
+
         // Create mock data structure matching what GetMockResponse expects
         const mockData = {
           response: {
-            body: request.response.body,
+            body: processedBody,
             headers: request.response.headers || {},
             statusCode: request.response.statusCode,
             statusMessage: request.response.statusMessage,
