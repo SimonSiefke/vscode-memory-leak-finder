@@ -191,7 +191,10 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
         })
       }
 
-      SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeadersForSave, responseData).catch(
+      const requestBody = req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH' 
+        ? Buffer.concat(requestBodyChunks)
+        : undefined
+      SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeadersForSave, responseData, requestBody).catch(
         (error) => {
           console.error('[Proxy] Error saving request:', error)
         },

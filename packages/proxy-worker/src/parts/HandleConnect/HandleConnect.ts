@@ -7,6 +7,7 @@ import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import { CERT_DIR } from '../Constants/Constants.ts'
 import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertificateForDomain.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
+import * as HashRequestBody from '../HashRequestBody/HashRequestBody.ts'
 import * as Root from '../Root/Root.ts'
 import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
@@ -26,13 +27,29 @@ const saveInterceptedRequest = async (
   statusCode: number,
   responseHeaders: Record<string, string | string[]>,
   responseBody: Buffer,
+  requestBody?: Buffer,
 ): Promise<void> => {
   try {
     const currentTestName = SetCurrentTestName.getCurrentTestName()
     const testSpecificDir = currentTestName ? join(REQUESTS_DIR, SanitizeFilename.sanitizeFilename(currentTestName)) : REQUESTS_DIR
     await mkdir(testSpecificDir, { recursive: true })
     const timestamp = Date.now()
-    const filename = `${timestamp}_${sanitizeFilename(url)}.json`
+    
+    // Include body hash in filename for POST/PUT/PATCH requests
+    let bodyHash: string | undefined
+    let requestBodyData: any
+    if (requestBody && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+      bodyHash = HashRequestBody.hashRequestBody(requestBody)
+      // Try to parse as JSON, otherwise keep as string
+      try {
+        requestBodyData = JSON.parse(requestBody.toString('utf8'))
+      } catch {
+        requestBodyData = requestBody.toString('utf8')
+      }
+    }
+    
+    const hashSuffix = bodyHash ? `_${bodyHash}` : ''
+    const filename = `${timestamp}_${sanitizeFilename(url)}${hashSuffix}.json`
     const filepath = join(testSpecificDir, filename)
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
@@ -138,6 +155,8 @@ const saveInterceptedRequest = async (
         headers: requestHeaders,
         method,
         url,
+        ...(requestBodyData !== undefined && { body: requestBodyData }),
+        ...(bodyHash && { bodyHash }),
       },
       response: {
         body: responseBodyData,
@@ -295,7 +314,10 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
 
         // Check for mock response first (only if useProxyMock is enabled)
         if (useProxyMock) {
-          const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl)
+          const bodyHash = body && (method === 'POST' || method === 'PUT' || method === 'PATCH')
+            ? HashRequestBody.hashRequestBody(body)
+            : undefined
+          const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl, bodyHash)
           if (mockResponse) {
             console.log(`[Proxy] Returning mock response for ${method} ${fullUrl}`)
             let bodyBuffer: Buffer
@@ -399,7 +421,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
                 responseHeaders[k] = v
               }
             }
-            await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, responseHeaders, responseData)
+            await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, responseHeaders, responseData, body)
 
             // Write response back through TLS
             // Remove transfer-encoding header and set content-length instead

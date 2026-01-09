@@ -142,7 +142,28 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
   }
 }
 
-export const getMockResponse = async (method: string, url: string): Promise<MockResponse | null> => {
+const tryLoadMock = async (testSpecificDir: string | null, mockFileName: string): Promise<MockResponse | null> => {
+  // Try test-specific directory first
+  if (testSpecificDir) {
+    const testSpecificMockFile = join(testSpecificDir, mockFileName)
+    const testSpecificMockResponse = await loadMockResponse(testSpecificMockFile)
+    if (testSpecificMockResponse) {
+      return testSpecificMockResponse
+    }
+  }
+
+  // Fall back to root directory
+  const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
+  const mockResponse = await loadMockResponse(mockFile)
+
+  if (mockResponse) {
+    return mockResponse
+  }
+
+  return null
+}
+
+export const getMockResponse = async (method: string, url: string, bodyHash?: string): Promise<MockResponse | null> => {
   try {
     const parsedUrl = new URL(url)
     const { hostname, pathname } = parsedUrl
@@ -154,19 +175,7 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {
       const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-
-      // Try test-specific directory first
-      if (testSpecificDir) {
-        const testSpecificMockFile = join(testSpecificDir, mockFileName)
-        const testSpecificMockResponse = await loadMockResponse(testSpecificMockFile)
-        if (testSpecificMockResponse) {
-          return testSpecificMockResponse
-        }
-      }
-
-      // Fall back to root directory
-      const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
-      const mockResponse = await loadMockResponse(mockFile)
+      const mockResponse = await tryLoadMock(testSpecificDir, mockFileName)
 
       if (mockResponse) {
         return mockResponse
@@ -187,20 +196,18 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
     }
 
     // Try to load mock from file
-    const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-
-    // Try test-specific directory first
-    if (testSpecificDir) {
-      const testSpecificMockFile = join(testSpecificDir, mockFileName)
-      const testSpecificMockResponse = await loadMockResponse(testSpecificMockFile)
-      if (testSpecificMockResponse) {
-        return testSpecificMockResponse
+    // If we have a body hash, try with hash first, then fall back to without hash
+    if (bodyHash && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+      const mockFileNameWithHash = await GetMockFileName.getMockFileName(hostname, pathname, method, bodyHash)
+      const mockResponseWithHash = await tryLoadMock(testSpecificDir, mockFileNameWithHash)
+      if (mockResponseWithHash) {
+        return mockResponseWithHash
       }
     }
 
-    // Fall back to root directory
-    const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
-    const mockResponse = await loadMockResponse(mockFile)
+    // Try without hash (for backward compatibility or when no hash provided)
+    const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
+    const mockResponse = await tryLoadMock(testSpecificDir, mockFileName)
 
     if (mockResponse) {
       return mockResponse

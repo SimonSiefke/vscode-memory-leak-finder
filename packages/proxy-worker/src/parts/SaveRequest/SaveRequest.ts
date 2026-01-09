@@ -2,6 +2,7 @@ import type { IncomingMessage } from 'node:http'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
+import * as HashRequestBody from '../HashRequestBody/HashRequestBody.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
@@ -17,6 +18,7 @@ export const saveRequest = async (
   statusMessage: string | undefined,
   responseHeaders: Record<string, string | string[]>,
   responseData: Buffer,
+  requestBody?: Buffer,
 ): Promise<void> => {
   try {
     const currentTestName = SetCurrentTestName.getCurrentTestName()
@@ -30,7 +32,22 @@ export const saveRequest = async (
     await mkdir(testSpecificDir, { recursive: true })
     const timestamp = Date.now()
     const url = req.url || ''
-    const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}.json`
+    
+    // Include body hash in filename for POST/PUT/PATCH requests
+    let bodyHash: string | undefined
+    let requestBodyData: any
+    if (requestBody && (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH')) {
+      bodyHash = HashRequestBody.hashRequestBody(requestBody)
+      // Try to parse as JSON, otherwise keep as string
+      try {
+        requestBodyData = JSON.parse(requestBody.toString('utf8'))
+      } catch {
+        requestBodyData = requestBody.toString('utf8')
+      }
+    }
+    
+    const hashSuffix = bodyHash ? `_${bodyHash}` : ''
+    const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}${hashSuffix}.json`
     const filepath = join(testSpecificDir, filename)
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
@@ -136,6 +153,8 @@ export const saveRequest = async (
         headers: req.headers,
         method: req.method,
         url: req.url,
+        ...(requestBodyData !== undefined && { body: requestBodyData }),
+        ...(bodyHash && { bodyHash }),
       },
       response: {
         body: responseBodyData,

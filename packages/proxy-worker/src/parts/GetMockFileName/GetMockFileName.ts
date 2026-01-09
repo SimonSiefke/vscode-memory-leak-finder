@@ -50,19 +50,25 @@ const findConfigMatch = (config: MockConfigEntry[], hostname: string, pathname: 
   return null
 }
 
-export const getMockFileName = async (hostname: string, pathname: string, method: string): Promise<string> => {
+export const getMockFileName = async (hostname: string, pathname: string, method: string, bodyHash?: string): Promise<string> => {
   // Try to load config first
   const config = await loadConfig()
   const configMatch = findConfigMatch(config, hostname, pathname, method)
 
   if (configMatch) {
+    // If we have a body hash, append it to the config match filename
+    if (bodyHash) {
+      const baseName = configMatch.replace(/\.json$/, '')
+      return `${baseName}_${bodyHash}.json`
+    }
     return configMatch
   }
 
-  // Generic fallback: Convert URL to filename format: hostname_pathname_method.json
+  // Generic fallback: Convert URL to filename format: hostname_pathname_method[_bodyHash].json
   const hostnameSanitized = hostname.replaceAll(NON_ALPHANUMERIC_REGEX, '_')
   const pathnameSanitized = pathname.replaceAll(NON_ALPHANUMERIC_REGEX, '_').replace(LEADING_UNDERSCORES_REGEX, '')
   const methodLower = method.toLowerCase()
   const pathPart = pathnameSanitized || 'root'
-  return `${hostnameSanitized}_${pathPart}_${methodLower}.json`
+  const hashSuffix = bodyHash ? `_${bodyHash}` : ''
+  return `${hostnameSanitized}_${pathPart}_${methodLower}${hashSuffix}.json`
 }

@@ -23,6 +23,8 @@ interface RecordedRequestFile {
     headers: Record<string, string | string[]>
     method: string
     url: string
+    body?: any
+    bodyHash?: string
   }
   response: {
     statusCode: number
@@ -45,6 +47,8 @@ interface RecordedRequest {
   }
   timestamp: number
   url: string
+  body?: any
+  bodyHash?: string
 }
 
 const loadMockConfig = async (): Promise<MockConfigEntry[]> => {
@@ -226,10 +230,14 @@ const processRequestsDirectory = async (
         url: fileData.request.url,
         response: fileData.response,
         timestamp: fileData.metadata.timestamp,
+        body: fileData.request.body,
+        bodyHash: fileData.request.bodyHash,
       }
 
-      // Create a key from URL and method
-      const key = `${request.method}:${request.url}`
+      // Create a key from URL, method, and body hash (if present)
+      const key = request.bodyHash
+        ? `${request.method}:${request.url}:${request.bodyHash}`
+        : `${request.method}:${request.url}`
 
       // Check if we already have a request for this key
       const existing = latestRequests.get(key)
@@ -270,7 +278,7 @@ const processRequestsDirectory = async (
       const { hostname, pathname } = parsedUrl
 
       // Generate mock filename using the same logic as GetMockFileName
-      const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
+      const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method, request.bodyHash)
       const mockFilePath = join(mockDir, mockFileName)
 
       // Replace JWT tokens in response body with new tokens that expire in 1 year
