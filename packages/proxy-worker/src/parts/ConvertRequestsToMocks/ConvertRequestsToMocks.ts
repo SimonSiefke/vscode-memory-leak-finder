@@ -86,6 +86,39 @@ const hasConfigEntry = (config: MockConfigEntry[], hostname: string, pathname: s
   return false
 }
 
+const parseJsonSafely = (content: string): RecordedRequestFile | null => {
+  try {
+    return JSON.parse(content) as RecordedRequestFile
+  } catch (error) {
+    // Try to find the matching closing brace for the root object
+    // This handles cases where there's trailing garbage after valid JSON
+    let braceCount = 0
+    let rootObjectEnd = -1
+    
+    for (let i = 0; i < content.length; i++) {
+      if (content[i] === '{') {
+        braceCount++
+      } else if (content[i] === '}') {
+        braceCount--
+        if (braceCount === 0) {
+          rootObjectEnd = i
+          break
+        }
+      }
+    }
+    
+    if (rootObjectEnd > 0) {
+      try {
+        const truncatedContent = content.substring(0, rootObjectEnd + 1)
+        return JSON.parse(truncatedContent) as RecordedRequestFile
+      } catch {
+        // If truncated version also fails, return null
+      }
+    }
+    return null
+  }
+}
+
 const convertRequestsToMocks = async (): Promise<void> => {
   try {
     // Check if requests directory exists
@@ -179,7 +212,12 @@ const processRequestsDirectory = async (
     try {
       const filePath = join(requestsDir, file)
       const content = await readFile(filePath, 'utf8')
-      const fileData: RecordedRequestFile = JSON.parse(content)
+      const fileData = parseJsonSafely(content)
+      
+      if (!fileData) {
+        console.error(`Error processing file ${file}: Invalid JSON - skipping`)
+        continue
+      }
 
       // Transform nested structure to flat structure
       const request: RecordedRequest = {
