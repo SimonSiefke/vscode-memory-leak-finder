@@ -102,8 +102,7 @@ export const launchVsCode = async ({
     // Note: enableProxy might be undefined if RPC call doesn't pass it correctly
     // Default to false if undefined
     const shouldEnableProxy = enableProxy === true
-    if(shouldEnableProxy){
-
+    if (shouldEnableProxy) {
       console.log(`[LaunchVsCode] shouldEnableProxy: ${shouldEnableProxy} (enableProxy was: ${enableProxy})`)
     }
     let proxyEnvVars: Record<string, string> = {}
