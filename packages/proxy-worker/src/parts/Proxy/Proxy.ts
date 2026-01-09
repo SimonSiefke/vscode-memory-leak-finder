@@ -66,7 +66,6 @@ export const setupProxy = async (
 }
 
 export const setCurrentTestName = (testName: string | null): void => {
-  console.log(`[Proxy] Setting current test name: ${testName}`)
   SetCurrentTestName.setCurrentTestName(testName)
 }
 

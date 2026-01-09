@@ -140,11 +140,7 @@ export const saveRequest = async (
     }
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
-    if (currentTestName) {
-      console.log(`[Proxy] Saved request to ${filepath} (test: ${currentTestName})`)
-    } else {
-      console.log(`[Proxy] Saved request to ${filepath}`)
-    }
+    console.log(`[Proxy] Saved request to ${filepath}`)
   } catch (error) {
     // Ignore errors when saving requests
     console.error('[Proxy] Failed to save request:', error)

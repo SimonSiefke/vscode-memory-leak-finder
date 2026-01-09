@@ -218,8 +218,7 @@ export const runTestsWithCallback = async ({
     const intializeEnd = performance.now()
     const intializeTime = intializeEnd - initialStart
 
-
-     // Launch proxy worker first if proxy is enabled
+    // Launch proxy worker first if proxy is enabled
     if (enableProxy) {
       try {
         console.log('[TestCoordinator] Launching proxy worker...')
@@ -239,8 +238,6 @@ export const runTestsWithCallback = async ({
     }
 
     await callback(TestWorkerEventType.HandleInitialized, intializeTime)
-
-
 
     const testStart = performance.now()
     await callback(TestWorkerEventType.TestsStarting, total)
@@ -264,6 +261,17 @@ export const runTestsWithCallback = async ({
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
 
+        // Set test name in proxy worker BEFORE creating workers
+        // This ensures requests during VS Code initialization are saved to the correct directory
+        const testName = dirent.replace('.js', '').replace('.ts', '')
+        if (proxyWorkerRpc) {
+          try {
+            await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', testName)
+            console.log(`[TestCoordinator] Set test name in proxy BEFORE prepareTestsAndAttach: ${testName}`)
+          } catch (error) {
+            console.log(`[TestCoordinator] Could not set test name in proxy: ${error}`)
+          }
+        }
 
         const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
           arch,
@@ -310,7 +318,6 @@ export const runTestsWithCallback = async ({
 
         // Test name was already set in proxy worker before prepareTestsAndAttach
       } else {
-
       }
 
       const { memoryRpc, testWorkerRpc, videoRpc } = workers
@@ -323,7 +330,7 @@ export const runTestsWithCallback = async ({
       try {
         const start = i === 0 ? initialStart : Time.now()
 
-          // For subsequent tests, set test name in proxy worker before any operations
+        // For subsequent tests, set test name in proxy worker before any operations
         const testName = dirent.replace('.js', '').replace('.ts', '')
         if (proxyWorkerRpc) {
           try {
