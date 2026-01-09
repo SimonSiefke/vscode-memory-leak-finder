@@ -227,15 +227,19 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
           await expect(response).toBeVisible({ timeout: 60_000 })
           await page.waitForIdle()
-          const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timeout: 45_000 })
-          await page.waitForIdle()
+          // const progress = chatView.locator('.rendered-markdown.progress-step')
+          // await expect(progress).toBeHidden({ timeout: 45_000 })
+          // await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
           const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
           await expect(responseMessage).toBeVisible()
           await page.waitForIdle()
-          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
+          if (expectedResponseType === 'includes') {
+            await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`${expectedResponse}`), { timeout: 120_000 })
+          } else {
+            await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
+          }
         }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)

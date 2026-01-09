@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-export const setup = async ({ ChatEditor, Editor, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, Workspace, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([
     {
@@ -23,6 +23,7 @@ writeFileSync('result.txt', 'test result')
       name: 'index.js',
     },
   ])
+  await SideBar.hide()
   await ChatEditor.open()
 }
 
