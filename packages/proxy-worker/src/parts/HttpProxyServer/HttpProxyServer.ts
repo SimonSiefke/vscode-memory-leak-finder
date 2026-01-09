@@ -135,7 +135,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     const responseHeadersForSave: Record<string, string | string[]> = {}
     for (const [k, v] of Object.entries(proxyRes.headers)) {
       if (v !== undefined) {
-        responseHeadersForSave[k] = v
+        responseHeadersForSave[k] = v as string | string[]
       }
     }
 
@@ -216,8 +216,8 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     })
   }
 
-  const proxyReq = requestModule(options, (res) => {
-    proxyRes = res
+  const proxyReq = requestModule(options, (proxyResponse) => {
+    proxyRes = proxyResponse
     console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
 
     // Handle errors on the response stream
