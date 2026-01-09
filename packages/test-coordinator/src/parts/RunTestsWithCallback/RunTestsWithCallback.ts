@@ -209,6 +209,19 @@ export const runTestsWithCallback = async ({
       if (needsSetup) {
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
+
+        // Set test name BEFORE creating workers so proxy server knows which test is running
+        const testName = dirent.replace('.js', '').replace('.ts', '')
+        // Write test name to file so LaunchVsCode can read it when creating proxy server
+        try {
+          const { writeFileSync } = await import('node:fs')
+          const { join } = await import('node:path')
+          const testNameFile = join(root, '.vscode-test-name.txt')
+          writeFileSync(testNameFile, testName, 'utf8')
+        } catch (error) {
+          // Ignore errors
+        }
+
         const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
           arch,
           attachedToPageTimeout,
@@ -250,6 +263,28 @@ export const runTestsWithCallback = async ({
           testWorkerRpc: testWorkerRpc || emptyRpc,
           videoRpc: videoRpc || emptyRpc,
         }
+
+        // Set test name in global state and proxy worker immediately after workers are created
+        // The test name should have been set in LaunchVsCode when proxy was created,
+        // but set it again to ensure it's correct
+        try {
+          await workers.initializationWorkerRpc.invoke('Launch.setTestName', testName)
+          await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', testName)
+        } catch (error) {
+          // Ignore errors if proxy is not enabled
+          console.log(`[TestCoordinator] Could not set test name: ${error}`)
+        }
+      } else {
+        // For subsequent tests, set test name before any operations
+        const testName = dirent.replace('.js', '').replace('.ts', '')
+        try {
+          // Update test name in global state and proxy
+          await workers.initializationWorkerRpc.invoke('Launch.setTestName', testName)
+          await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', testName)
+        } catch (error) {
+          // Ignore errors if proxy is not enabled
+          console.log(`[TestCoordinator] Could not set test name: ${error}`)
+        }
       }
 
       const { memoryRpc, testWorkerRpc, videoRpc } = workers
@@ -261,15 +296,6 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-
-        // Set current test name in proxy worker
-        const testName = dirent.replace('.js', '').replace('.ts', '')
-        try {
-          await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', testName)
-        } catch (error) {
-          // Ignore errors if proxy is not enabled
-          console.log(`[TestCoordinator] Could not set test name in proxy: ${error}`)
-        }
 
         const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
           testWorkerRpc,
@@ -342,9 +368,17 @@ export const runTestsWithCallback = async ({
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
 
-          // Clear test name in proxy worker
+          // Clear test name in proxy worker and file
           try {
             await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', null)
+            const { unlinkSync } = await import('node:fs')
+            const { join } = await import('node:path')
+            const testNameFile = join(root, '.vscode-test-name.txt')
+            try {
+              unlinkSync(testNameFile)
+            } catch {
+              // Ignore if file doesn't exist
+            }
           } catch (error) {
             // Ignore errors if proxy is not enabled
           }
@@ -357,9 +391,17 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
-        // Clear test name in proxy worker on error
+        // Clear test name in proxy worker and file on error
         try {
           await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', null)
+          const { unlinkSync } = await import('node:fs')
+          const { join } = await import('node:path')
+          const testNameFile = join(root, '.vscode-test-name.txt')
+          try {
+            unlinkSync(testNameFile)
+          } catch {
+            // Ignore if file doesn't exist
+          }
         } catch {
           // Ignore errors if proxy is not enabled
         }

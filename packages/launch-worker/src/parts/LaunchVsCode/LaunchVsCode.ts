@@ -17,8 +17,10 @@ import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveV
 import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/RemoveVscodeWorkspaceStorage.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
+import * as GetTestNameFromFile from '../GetTestNameFromFile/GetTestNameFromFile.ts'
 import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 import * as ProxyWorkerState from '../ProxyWorkerState/ProxyWorkerState.ts'
+import * as TestNameState from '../TestNameState/TestNameState.ts'
 
 export const launchVsCode = async ({
   addDisposable,
@@ -120,6 +122,23 @@ export const launchVsCode = async ({
         // Get proxy environment variables
         if (proxyServer) {
           proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyServer.url)
+        }
+
+        // Set test name immediately after proxy server is created (if available)
+        // This ensures requests are saved to the correct test-specific directory
+        // Try to get test name from file first (set before prepareTestsAndAttach)
+        let testName = GetTestNameFromFile.getTestNameFromFile()
+        if (!testName) {
+          // Fall back to TestNameState (set via RPC)
+          testName = TestNameState.getTestName()
+        }
+        if (testName) {
+          try {
+            await proxyWorkerRpc.invoke('Proxy.setCurrentTestName', testName)
+            console.log(`[LaunchVsCode] Set test name in proxy: ${testName}`)
+          } catch (error) {
+            console.log(`[LaunchVsCode] Could not set test name in proxy: ${error}`)
+          }
         }
 
         // Keep proxy server alive
