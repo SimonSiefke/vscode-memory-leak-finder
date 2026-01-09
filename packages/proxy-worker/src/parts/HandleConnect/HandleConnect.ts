@@ -13,7 +13,6 @@ import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
-import { parseJsonIfApplicable } from '../ParseJson/ParseJson.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
