@@ -22,8 +22,8 @@ export const replaceJwtTokensInValue = async (value: any, parentKey?: string): P
 
   // Check if this is an expiration timestamp property
   if (parentKey && IsExpirationProperty.isExpirationProperty(parentKey) && IsUnixTimestamp.isUnixTimestamp(value)) {
-    const oneMonthFromNow = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
-    return oneMonthFromNow
+    const twoWeeksFromNow = Math.floor(Date.now() / 1000) + 14 * 24 * 60 * 60
+    return twoWeeksFromNow
   }
 
   if (Array.isArray(value)) {

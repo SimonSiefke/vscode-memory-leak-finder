@@ -215,6 +215,7 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
           await expect(requestMessage).toBeVisible()
           await page.waitForIdle()
           await expect(lines).toHaveText('')
+          await page.waitForIdle()
           if (expectedResponseType === 'includes') {
             const row = chatView.locator(`.monaco-list-row[aria-label*="${message}"]`)
             await expect(row).toBeVisible()
