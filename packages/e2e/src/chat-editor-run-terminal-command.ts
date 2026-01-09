@@ -33,7 +33,7 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
     verify: true,
     expectedResponse: 'test result',
     expectedResponseType: 'includes',
-    runCommand: 'allow',
+    allowances: ['allow', 'allow'],
   })
   await Workspace.waitForFile('result.txt')
 }
