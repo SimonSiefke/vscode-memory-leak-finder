@@ -438,6 +438,12 @@
     "pathname": "/extensions/github/copilot-chat/0.35.3/1767730520274/Microsoft.VisualStudio.Services.Content.Details"
   },
   {
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_35_3_1767730520274_Microsoft_VisualStudio_Services_Icons_Default_get.json",
+    "hostname": "github.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/github/copilot-chat/0.35.3/1767730520274/Microsoft.VisualStudio.Services.Icons.Default"
+  },
+  {
     "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_35_3_1767730520274_Microsoft_VisualStudio_Services_VSIXPackage_get.json",
     "hostname": "github.gallerycdn.vsassets.io",
     "method": "GET",
