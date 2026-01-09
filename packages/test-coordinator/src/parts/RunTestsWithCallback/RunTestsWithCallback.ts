@@ -1,3 +1,4 @@
+import { writeFileSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
@@ -20,7 +21,7 @@ import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 
 const emptyRpc = {
   async dispose() {},
-  invoke() {
+  invoke(_method: string, ..._params: unknown[]) {
     throw new Error(`not implemented`)
   },
 }
@@ -214,8 +215,6 @@ export const runTestsWithCallback = async ({
         const testName = dirent.replace('.js', '').replace('.ts', '')
         // Write test name to file so LaunchVsCode can read it when creating proxy server
         try {
-          const { writeFileSync } = await import('node:fs')
-          const { join } = await import('node:path')
           const testNameFile = join(root, '.vscode-test-name.txt')
           writeFileSync(testNameFile, testName, 'utf8')
         } catch (error) {
@@ -371,8 +370,6 @@ export const runTestsWithCallback = async ({
           // Clear test name in proxy worker and file
           try {
             await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', null)
-            const { unlinkSync } = await import('node:fs')
-            const { join } = await import('node:path')
             const testNameFile = join(root, '.vscode-test-name.txt')
             try {
               unlinkSync(testNameFile)
@@ -394,8 +391,6 @@ export const runTestsWithCallback = async ({
         // Clear test name in proxy worker and file on error
         try {
           await workers.initializationWorkerRpc.invoke('Launch.setProxyCurrentTestName', null)
-          const { unlinkSync } = await import('node:fs')
-          const { join } = await import('node:path')
           const testNameFile = join(root, '.vscode-test-name.txt')
           try {
             unlinkSync(testNameFile)
