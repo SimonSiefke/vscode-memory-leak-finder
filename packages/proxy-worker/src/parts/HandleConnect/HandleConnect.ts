@@ -418,11 +418,6 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
           }
         }
 
-        // Save POST body separately for inspection
-        if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
-          await SavePostBody.savePostBody(method, fullUrl, headers, body)
-        }
-
         // Forward request to target server
         const targetOptions = {
           headers,
@@ -453,6 +448,16 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
               }
             }
             await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, responseHeaders, responseData, body)
+
+            // Save POST body separately for inspection (with response data)
+            if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+              await SavePostBody.savePostBody(method, fullUrl, headers, body, {
+                responseData,
+                responseHeaders,
+                statusCode: targetRes.statusCode || 200,
+                statusMessage: targetRes.statusMessage,
+              })
+            }
 
             // Write response back through TLS
             // Remove transfer-encoding header and set content-length instead
@@ -527,42 +532,86 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             }
           })
 
-          targetRes.on('error', (error) => {
+          targetRes.on('error', async (error) => {
             const errorCode = (error as NodeJS.ErrnoException).code
+            const statusCode = 502
+            const statusMessage = 'Bad Gateway'
+            const errorResponseBody = Buffer.alloc(0)
+            const errorResponseHeaders: Record<string, string | string[]> = {
+              'Content-Type': 'application/json',
+              'Content-Length': '0',
+            }
+
+            // Save the error response
+            await saveInterceptedRequest(method, fullUrl, headers, statusCode, errorResponseHeaders, errorResponseBody, body)
+
+            // Save POST body separately for inspection (with error response data)
+            if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+              await SavePostBody.savePostBody(method, fullUrl, headers, body, {
+                responseData: errorResponseBody,
+                responseHeaders: errorResponseHeaders,
+                statusCode,
+                statusMessage,
+              })
+            }
+
             if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
               // Send error response back through TLS
-              const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
+              const errorResponse = `${httpVersion} ${statusCode} ${statusMessage}\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
               tlsSocket.write(errorResponse)
               return
             }
             console.error(`[Proxy] Error reading HTTPS response:`, error)
-            const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
+            const errorResponse = `${httpVersion} ${statusCode} ${statusMessage}\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
             tlsSocket.write(errorResponse)
           })
         })
 
-        targetReq.on('error', (error) => {
+        targetReq.on('error', async (error) => {
           const errorCode = (error as NodeJS.ErrnoException).code
+          let statusCode: number
+          let statusMessage: string
+          let errorBody: string
+
           if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
-            // Send error response back through TLS
-            const errorMessage = errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Bad Gateway'
-            const statusCode = errorCode === 'ETIMEDOUT' ? 504 : 502
-            const errorBody = JSON.stringify({
-              error: errorMessage,
+            statusMessage = errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Bad Gateway'
+            statusCode = errorCode === 'ETIMEDOUT' ? 504 : 502
+            errorBody = JSON.stringify({
+              error: statusMessage,
               message: errorCode === 'ETIMEDOUT' ? 'Connection timeout' : 'Connection error',
               target: fullUrl,
             })
-            const errorResponse = `${httpVersion} ${statusCode} ${errorMessage}\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
-            tlsSocket.write(errorResponse)
-            return
+          } else {
+            statusCode = 502
+            statusMessage = 'Bad Gateway'
+            errorBody = JSON.stringify({
+              error: 'Proxy Error',
+              message: error.message,
+              target: fullUrl,
+            })
+            console.error(`[Proxy] Error forwarding HTTPS request:`, error)
           }
-          console.error(`[Proxy] Error forwarding HTTPS request:`, error)
-          const errorBody = JSON.stringify({
-            error: 'Proxy Error',
-            message: error.message,
-            target: fullUrl,
-          })
-          const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
+
+          const errorResponseData = Buffer.from(errorBody, 'utf8')
+          const errorResponseHeaders: Record<string, string | string[]> = {
+            'Content-Type': 'application/json',
+            'Content-Length': String(errorResponseData.length),
+          }
+
+          // Save the error response
+          await saveInterceptedRequest(method, fullUrl, headers, statusCode, errorResponseHeaders, errorResponseData, body)
+
+          // Save POST body separately for inspection (with error response data)
+          if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+            await SavePostBody.savePostBody(method, fullUrl, headers, body, {
+              responseData: errorResponseData,
+              responseHeaders: errorResponseHeaders,
+              statusCode,
+              statusMessage,
+            })
+          }
+
+          const errorResponse = `${httpVersion} ${statusCode} ${statusMessage}\r\nContent-Type: application/json\r\nContent-Length: ${errorResponseData.length}\r\n\r\n${errorBody}`
           tlsSocket.write(errorResponse)
         })
 
