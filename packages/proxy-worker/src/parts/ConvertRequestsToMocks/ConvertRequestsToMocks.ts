@@ -5,12 +5,33 @@ import { URL } from 'node:url'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as Root from '../Root/Root.ts'
+import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
+import { VError } from '@lvce-editor/verror'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
 
 const __dirname = import.meta.dirname
 const MOCK_CONFIG_PATH = join(__dirname, '..', 'GetMockFileName', 'mock-config.json')
+
+interface RecordedRequestFile {
+  metadata: {
+    responseType: string
+    timestamp: number
+  }
+  request: {
+    headers: Record<string, string | string[]>
+    method: string
+    url: string
+  }
+  response: {
+    statusCode: number
+    statusMessage?: string
+    headers: Record<string, string | string[]>
+    body: any
+    wasCompressed?: boolean
+  }
+}
 
 interface RecordedRequest {
   headers: Record<string, string | string[]>
@@ -91,7 +112,16 @@ const convertRequestsToMocks = async (): Promise<void> => {
       try {
         const filePath = join(REQUESTS_DIR, file)
         const content = await readFile(filePath, 'utf8')
-        const request: RecordedRequest = JSON.parse(content)
+        const fileData: RecordedRequestFile = JSON.parse(content)
+
+        // Transform nested structure to flat structure
+        const request: RecordedRequest = {
+          headers: fileData.request.headers,
+          method: fileData.request.method,
+          url: fileData.request.url,
+          response: fileData.response,
+          timestamp: fileData.metadata.timestamp,
+        }
 
         // Create a key from URL and method
         const key = `${request.method}:${request.url}`
@@ -128,17 +158,26 @@ const convertRequestsToMocks = async (): Promise<void> => {
         }
 
         // Parse URL to get hostname and pathname
-        const parsedUrl = new URL(request.url)
+        let parsedUrl
+        try {
+          parsedUrl = new URL(request.url)
+        } catch (error) {
+          console.log({ request })
+          throw new VError(error, `Failed to parse ${request.url}`)
+        }
         const { hostname, pathname } = parsedUrl
 
         // Generate mock filename using the same logic as GetMockFileName
         const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
         const mockFilePath = join(MOCK_REQUESTS_DIR, mockFileName)
 
+        // Replace JWT tokens in response body with new tokens that expire in 1 year
+        const processedBody = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)
+
         // Create mock data structure matching what GetMockResponse expects
         const mockData = {
           response: {
-            body: request.response.body,
+            body: processedBody,
             headers: request.response.headers || {},
             statusCode: request.response.statusCode,
             statusMessage: request.response.statusMessage,

@@ -4,31 +4,11 @@ import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
-
-const parseJsonIfApplicable = (body: string, contentType: string | string[] | undefined): string | object => {
-  if (!contentType) {
-    return body
-  }
-
-  const contentTypeStr = Array.isArray(contentType) ? contentType[0] : contentType
-  const normalizedContentType = contentTypeStr.toLowerCase().trim()
-
-  // Check if content type is JSON
-  if (normalizedContentType.includes('application/json') || normalizedContentType.includes('text/json')) {
-    try {
-      return JSON.parse(body)
-    } catch {
-      // If parsing fails, return as string
-      return body
-    }
-  }
-
-  return body
-}
 
 export const saveRequest = async (
   req: IncomingMessage,
@@ -48,36 +28,112 @@ export const saveRequest = async (
     const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
     const contentTypeLower = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
 
-    // Handle zip files separately - don't decompress them
-    // Handle SSE (Server-Sent Events) separately - save as text file
-    let parsedBody: any
-    let wasCompressed = false
+    // Determine response type and process body accordingly
+    let responseType: 'json' | 'zip' | 'binary' | 'text' | 'sse'
+    let responseBodyData: string | object
+
     if (contentTypeLower.includes('application/zip')) {
+      responseType = 'zip'
       const zipFilePath = await SaveZipData.saveZipData(responseData, url, timestamp)
-      parsedBody = `file-reference:${zipFilePath}`
+      responseBodyData = `file-reference:${zipFilePath}`
     } else if (contentTypeLower.includes('text/event-stream')) {
+      responseType = 'sse'
       const sseFilePath = await SaveSseData.saveSseData(responseData, url, timestamp)
-      parsedBody = `file-reference:${sseFilePath}`
+      responseBodyData = `file-reference:${sseFilePath}`
+    } else if (contentTypeLower.startsWith('image/')) {
+      responseType = 'binary'
+      // Decompress if needed before saving
+      const compressionWorker = await CompressionWorker.getCompressionWorker()
+      const result = await compressionWorker.invoke('Compression.decompressBody', responseData, contentEncoding)
+      const decompressedBody = result.body
+
+      // Convert decompressed body to Buffer
+      let imageBuffer: Buffer
+      if (decompressedBody instanceof Uint8Array) {
+        imageBuffer = Buffer.from(decompressedBody)
+      } else if (Array.isArray(decompressedBody)) {
+        imageBuffer = Buffer.from(new Uint8Array(decompressedBody))
+      } else if (typeof decompressedBody === 'object' && decompressedBody !== null) {
+        // Handle case where Buffer was serialized as an object with numeric keys through IPC
+        const keys = Object.keys(decompressedBody)
+          .map((k) => Number.parseInt(k, 10))
+          .filter((k) => !isNaN(k))
+          .sort((a, b) => a - b)
+        if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+          const numbers = keys.map((k) => (decompressedBody as any)[k] as number)
+          imageBuffer = Buffer.from(new Uint8Array(numbers))
+        } else {
+          imageBuffer = Buffer.from(String(decompressedBody))
+        }
+      } else {
+        imageBuffer = Buffer.from(String(decompressedBody))
+      }
+
+      const imageFilePath = await SaveImageData.saveImageData(imageBuffer, url, timestamp, contentTypeLower)
+      responseBodyData = `file-reference:${imageFilePath}`
     } else {
       const compressionWorker = await CompressionWorker.getCompressionWorker()
       const result = await compressionWorker.invoke('Compression.decompressBody', responseData, contentEncoding)
       const decompressedBody = result.body
-      wasCompressed = result.wasCompressed
-      parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
+
+      // Handle Uint8Array (which may be serialized as an array through IPC)
+      let bodyString: string
+      if (decompressedBody instanceof Uint8Array) {
+        bodyString = new TextDecoder().decode(decompressedBody)
+      } else if (Array.isArray(decompressedBody)) {
+        // Handle case where Uint8Array was serialized as an array through IPC
+        bodyString = new TextDecoder().decode(new Uint8Array(decompressedBody))
+      } else if (typeof decompressedBody === 'object' && decompressedBody !== null) {
+        // Handle case where Buffer was serialized as an object with numeric keys through IPC
+        // Convert object like {"0": 123, "1": 10, ...} to Uint8Array
+        const keys = Object.keys(decompressedBody)
+          .map((k) => Number.parseInt(k, 10))
+          .filter((k) => !isNaN(k))
+          .sort((a, b) => a - b)
+        if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+          // Looks like a serialized Buffer/Uint8Array
+          const numbers = keys.map((k) => (decompressedBody as any)[k] as number)
+          bodyString = new TextDecoder().decode(new Uint8Array(numbers))
+        } else {
+          // Not a serialized buffer, treat as string
+          bodyString = String(decompressedBody)
+        }
+      } else {
+        bodyString = String(decompressedBody)
+      }
+
+      // Check if it's JSON
+      if (contentTypeLower.includes('application/json') || contentTypeLower.includes('text/json')) {
+        try {
+          responseType = 'json'
+          responseBodyData = JSON.parse(bodyString)
+        } catch {
+          // If parsing fails, treat as text
+          responseType = 'text'
+          responseBodyData = bodyString
+        }
+      } else {
+        responseType = 'text'
+        responseBodyData = bodyString
+      }
     }
 
     const requestData = {
-      headers: req.headers,
-      method: req.method,
+      metadata: {
+        responseType,
+        timestamp,
+      },
+      request: {
+        headers: req.headers,
+        method: req.method,
+        url: req.url,
+      },
       response: {
-        body: parsedBody,
+        body: responseBodyData,
         headers: responseHeaders,
         statusCode,
         statusMessage,
-        wasCompressed,
       },
-      timestamp,
-      url: req.url,
     }
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')

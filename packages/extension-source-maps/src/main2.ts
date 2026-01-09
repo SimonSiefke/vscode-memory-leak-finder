@@ -3,9 +3,15 @@ import * as AddOriginalSourcesToData from './parts/AddOriginalSourcesToData/AddO
 import { root } from './parts/Root/Root.ts'
 
 const main2 = async (): Promise<void> => {
-  const dataFilePath = join(root, '.vscode-memory-leak-finder-results', 'file.json')
-  const version = 'v0.36.2025121901'
-  const outputFilePath = join(root, '.vscode-memory-leak-finder-results', 'result.json')
+  const dataFilePath = join(
+    root,
+    '.vscode-memory-leak-finder-results',
+    'extension-host',
+    'named-function-count3',
+    'chat-editor-add-numbers.json',
+  )
+  const version = 'v0.35.3'
+  const outputFilePath = join(root, '.vscode-memory-leak-finder-results', 'extension-host', 'named-function-count3', 'result.json')
 
   await AddOriginalSourcesToData.addOriginalSourcesToData(dataFilePath, version, outputFilePath)
 }

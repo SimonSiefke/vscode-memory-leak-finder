@@ -17,6 +17,7 @@ import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveV
 import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/RemoveVscodeWorkspaceStorage.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
+import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 
 export const launchVsCode = async ({
   addDisposable,
@@ -61,6 +62,8 @@ export const launchVsCode = async ({
   vscodePath: string
   vscodeVersion: string
 }) => {
+  console.log(`[LaunchVsCode] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
+  console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
@@ -91,10 +94,47 @@ export const launchVsCode = async ({
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
+
+    // Copy default settings
     await copyFile(defaultSettingsSourcePath, settingsPath)
+
+    // Start proxy server if enabled
+    // Note: enableProxy might be undefined if RPC call doesn't pass it correctly
+    // Default to false if undefined
+    const shouldEnableProxy = enableProxy === true
+    if (shouldEnableProxy) {
+      console.log(`[LaunchVsCode] shouldEnableProxy: ${shouldEnableProxy} (enableProxy was: ${enableProxy})`)
+    }
+    let proxyEnvVars: Record<string, string> = {}
+    let proxyServer: { port: number; url: string } | null = null
+    let proxyWorkerRpc: Awaited<ReturnType<typeof ProxyWorker.launch>> | null = null
+    if (shouldEnableProxy) {
+      try {
+        console.log('[LaunchVsCode] Starting proxy worker...')
+        proxyWorkerRpc = await ProxyWorker.launch()
+        proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, settingsPath)
+
+        // Get proxy environment variables
+        if (proxyServer) {
+          proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyServer.url)
+        }
+
+        // Keep proxy server alive
+        if (addDisposable && proxyWorkerRpc) {
+          addDisposable(async () => {
+            console.log('[LaunchVsCode] Disposing proxy server...')
+            await proxyWorkerRpc!.invoke('Proxy.disposeProxyServer')
+            await proxyWorkerRpc!.dispose()
+          })
+        }
+      } catch (error) {
+        console.error('[LaunchVsCode] Error setting up proxy:', error)
+        // Continue even if proxy setup fails
+      }
+    }
     const args = GetVsCodeArgs.getVscodeArgs({
       enableExtensions,
-      enableProxy: enableProxy,
+      enableProxy,
       extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
       inspectExtensions,
@@ -105,11 +145,12 @@ export const launchVsCode = async ({
       inspectSharedProcessPort,
       userDataDir,
     })
-
     const env = GetVsCodeEnv.getVsCodeEnv({
       processEnv: process.env,
+      proxyEnvVars,
       runtimeDir,
     })
+
     const { child } = await LaunchElectron.launchElectron({
       addDisposable,
       args,

@@ -1,4 +1,4 @@
-import type { MockConfigEntry } from '../../MockConfigEntry/MockConfigEntry.ts'
+import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as MatchesPattern from '../MatchesPattern/MatchesPattern.ts'
 
 export const hasConfigEntry = (config: MockConfigEntry[], hostname: string, pathname: string, method: string): boolean => {
