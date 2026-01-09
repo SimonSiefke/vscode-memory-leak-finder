@@ -32,8 +32,6 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
         })
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         if (ideVersion && ideVersion.minor >= 108) {
-          // TODO
-          // await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
         } else {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)

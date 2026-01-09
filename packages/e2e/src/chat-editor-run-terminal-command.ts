@@ -27,7 +27,7 @@ writeFileSync('result.txt', 'test result')
   await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor, Workspace, Panel }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message:
       "Please run the index.js file in the terminal. Once you are finished. Respond exactly with the output of result.txt, which should be created. Don't write any extra sentence or word. Don\'t write to any files. Also dont use any todo list. Let me be very clear: Do not use the todo list. Just respond with the contents of result.txt",
@@ -37,7 +37,8 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
     allowances: ['allow'],
   })
   await Workspace.waitForFile('result.txt')
-  await new Promise((r) => {})
+  await Panel.hide()
+  await ChatEditor.clearAll()
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
