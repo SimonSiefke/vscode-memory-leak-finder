@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-export const setup = async ({ ChatEditor, Editor, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, Workspace, SideBar, ActivityBar, Explorer }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([
     {
@@ -23,11 +23,19 @@ writeFileSync('result.txt', 'test result')
       name: 'index.js',
     },
   ])
+  await ActivityBar.showExplorer()
+  await Explorer.refresh()
+  await Explorer.shouldHaveItem('index.js')
   await SideBar.hide()
   await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor, Workspace, Explorer, SideBar, ActivityBar }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor, Workspace, Explorer, SideBar, ActivityBar, Terminal }: TestContext): Promise<void> => {
+  await ActivityBar.showExplorer()
+  await Explorer.refresh()
+  await Explorer.shouldHaveItem('index.js')
+  await SideBar.hide()
+  await Terminal.killAll()
   await ChatEditor.sendMessage({
     message:
       "Please run the index.js file in the terminal using node. Once you are finished. Respond exactly with the output of result.txt, which should be created by running the script. Don't write any extra sentence or word. Don\'t write to any files. Also dont use any todo list. Let me be very clear: Do not use the todo list. If you think to yourself, I want to use a todo list now, forget it. Don\'t use a todo list at all. Also do not run the cat command. Once running the index.js script has finished, read the result txt file normally. Just respond with the contents of result.txt. Ensure to respond with the contents of result.txt",
@@ -39,9 +47,6 @@ export const run = async ({ ChatEditor, Workspace, Explorer, SideBar, ActivityBa
   await Workspace.waitForFile('result.txt')
   await ChatEditor.clearAll()
   await Workspace.remove('result.txt')
-  await ActivityBar.showExplorer()
-  await Explorer.refresh()
-  await SideBar.hide()
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
