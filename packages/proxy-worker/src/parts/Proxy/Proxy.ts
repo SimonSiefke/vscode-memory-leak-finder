@@ -66,7 +66,10 @@ export const setupProxy = async (
 }
 
 export const setCurrentTestName = (testName: string | null): void => {
+  console.log(`[Proxy.setCurrentTestName] Setting test name to: ${testName}`)
   SetCurrentTestName.setCurrentTestName(testName)
+  const verify = SetCurrentTestName.getCurrentTestName()
+  console.log(`[Proxy.setCurrentTestName] Verified test name is now: ${verify}`)
 }
 
 export { getProxyEnvVars } from '../GetProxyEnvVars/GetProxyEnvVars.ts'

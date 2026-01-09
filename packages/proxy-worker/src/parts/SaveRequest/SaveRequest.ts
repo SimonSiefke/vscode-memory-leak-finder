@@ -20,7 +20,13 @@ export const saveRequest = async (
 ): Promise<void> => {
   try {
     const currentTestName = SetCurrentTestName.getCurrentTestName()
+    if (!currentTestName) {
+      console.log(`[SaveRequest] WARNING: No test name set when saving request for ${req.method} ${req.url}`)
+    } else {
+      console.log(`[SaveRequest] Test name is set to: ${currentTestName} for ${req.method} ${req.url}`)
+    }
     const testSpecificDir = currentTestName ? join(REQUESTS_DIR, SanitizeFilename.sanitizeFilename(currentTestName)) : REQUESTS_DIR
+    console.log(`[SaveRequest] Will save to directory: ${testSpecificDir}`)
     await mkdir(testSpecificDir, { recursive: true })
     const timestamp = Date.now()
     const url = req.url || ''
