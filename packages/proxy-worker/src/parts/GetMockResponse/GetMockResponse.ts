@@ -80,6 +80,13 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
           }
         }
       }
+    } else if (responseType === 'text' && Array.isArray(body)) {
+      // If responseType is text and body is an array of strings, join with newlines
+      body = body.join('\n')
+    } else if (responseType === 'sse' && Array.isArray(body)) {
+      // If responseType is sse and body is an array of strings, join with newlines
+      body = body.join('\n')
+      isSseFile = true
     } else if (responseType === 'json' && typeof body === 'object') {
       // If responseType is json and body is already an object, stringify it
       body = JSON.stringify(body)

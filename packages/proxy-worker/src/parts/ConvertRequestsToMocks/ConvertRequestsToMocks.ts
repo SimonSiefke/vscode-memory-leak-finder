@@ -45,6 +45,7 @@ interface RecordedRequest {
     body: any
     wasCompressed?: boolean
   }
+  responseType?: string
   timestamp: number
   url: string
   body?: any
@@ -229,6 +230,7 @@ const processRequestsDirectory = async (
         method: fileData.request.method,
         url: fileData.request.url,
         response: fileData.response,
+        responseType: fileData.metadata.responseType,
         timestamp: fileData.metadata.timestamp,
         body: fileData.request.body,
         bodyHash: fileData.request.bodyHash,
@@ -284,6 +286,10 @@ const processRequestsDirectory = async (
 
       // Create mock data structure matching what GetMockResponse expects
       const mockData = {
+        metadata: {
+          responseType: request.responseType || 'text',
+          timestamp: request.timestamp,
+        },
         response: {
           body: processedBody,
           headers: request.response.headers || {},
