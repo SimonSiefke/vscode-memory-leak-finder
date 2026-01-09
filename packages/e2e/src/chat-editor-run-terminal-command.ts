@@ -32,7 +32,7 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
     message:
       "Please run the index.js file in the terminal. Once you are finished. Respond exactly with the output of result.txt, which should be created. Don't write any extra sentence or word. Don\'t write to any files. Also dont use any todo list. Let me be very clear: Do not use the todo list. Also do not run the cat command. Read the result txt file normally. Just respond with the contents of result.txt. Ensure to respond with the contents of result.txt, which should be created by running the index.js script.",
     verify: true,
-    expectedResponse: 'test resulwt',
+    expectedResponse: 'test result',
     expectedResponseType: 'includes',
     allowances: ['allow'],
   })
