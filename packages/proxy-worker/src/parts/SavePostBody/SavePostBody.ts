@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
+import * as HashRequestBody from '../HashRequestBody/HashRequestBody.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
@@ -30,7 +31,11 @@ export const savePostBody = async (
     const testSpecificDir = currentTestName ? join(REQUESTS_DIR, SanitizeFilename.sanitizeFilename(currentTestName)) : REQUESTS_DIR
     await mkdir(testSpecificDir, { recursive: true })
     const timestamp = Date.now()
-    const filename = `${timestamp}_${method}_${SanitizeFilename.sanitizeFilename(url)}.json`
+
+    // Include body hash in filename for POST/PUT/PATCH requests
+    const bodyHash = HashRequestBody.hashRequestBody(body)
+    const hashSuffix = `_${bodyHash}`
+    const filename = `${timestamp}_${method}_${SanitizeFilename.sanitizeFilename(url)}${hashSuffix}.json`
     const filepath = join(testSpecificDir, filename)
 
     const contentType = headers['content-type'] || headers['Content-Type'] || ''
