@@ -56,19 +56,31 @@ export const getMockFileName = async (hostname: string, pathname: string, method
   const configMatch = findConfigMatch(config, hostname, pathname, method)
 
   if (configMatch) {
-    // If we have a body hash, append it to the config match filename
+    // Ensure method is at the start of the filename
+    const methodUpper = method.toUpperCase()
+    let filename = configMatch
+    
+    // Check if filename already starts with the method
+    const methodPrefix = `${methodUpper}_`
+    if (!filename.startsWith(methodPrefix)) {
+      // Remove .json extension, prepend method, then add extension back
+      const baseName = filename.replace(/\.json$/, '')
+      filename = `${methodUpper}_${baseName}.json`
+    }
+    
+    // If we have a body hash, append it to the filename
     if (bodyHash) {
-      const baseName = configMatch.replace(/\.json$/, '')
+      const baseName = filename.replace(/\.json$/, '')
       return `${baseName}_${bodyHash}.json`
     }
-    return configMatch
+    return filename
   }
 
-  // Generic fallback: Convert URL to filename format: hostname_pathname_method[_bodyHash].json
+  // Generic fallback: Convert URL to filename format: method_hostname_pathname[_bodyHash].json
   const hostnameSanitized = hostname.replaceAll(NON_ALPHANUMERIC_REGEX, '_')
   const pathnameSanitized = pathname.replaceAll(NON_ALPHANUMERIC_REGEX, '_').replace(LEADING_UNDERSCORES_REGEX, '')
-  const methodLower = method.toLowerCase()
+  const methodUpper = method.toUpperCase()
   const pathPart = pathnameSanitized || 'root'
   const hashSuffix = bodyHash ? `_${bodyHash}` : ''
-  return `${hostnameSanitized}_${pathPart}_${methodLower}${hashSuffix}.json`
+  return `${methodUpper}_${hostnameSanitized}_${pathPart}${hashSuffix}.json`
 }
