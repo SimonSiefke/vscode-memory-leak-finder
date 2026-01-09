@@ -1,5 +1,6 @@
 import { expect, test } from '@jest/globals'
 import * as HashRequestBody from '../src/parts/HashRequestBody/HashRequestBody.ts'
+import * as NormalizeRequestBody from '../src/parts/NormalizeRequestBody/NormalizeRequestBody.ts'
 
 test('normalizeRequestBody filters out reasoning entries', () => {
   const body = Buffer.from(
@@ -15,7 +16,7 @@ test('normalizeRequestBody filters out reasoning entries', () => {
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   expect(parsed.input).toHaveLength(3)
@@ -37,7 +38,7 @@ test('normalizeRequestBody normalizes function_call IDs to sequential numbers', 
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   expect(parsed.input[0].call_id).toBe('call_1')
@@ -58,7 +59,7 @@ test('normalizeRequestBody matches function_call and function_call_output IDs', 
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   const functionCall1 = parsed.input.find((e: any) => e.type === 'function_call' && e.name === 'test_func')
@@ -80,7 +81,7 @@ test('normalizeRequestBody handles function_call_output without matching functio
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   // Should keep the original call_id if no matching function_call exists
@@ -98,7 +99,7 @@ test('normalizeRequestBody handles function_call without call_id', () => {
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   expect(parsed.input[0].call_id).toBeUndefined()
@@ -118,7 +119,7 @@ test('normalizeRequestBody preserves other properties', () => {
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   expect(parsed.model).toBe('gpt-5-mini')
@@ -132,7 +133,7 @@ test('normalizeRequestBody preserves other properties', () => {
 test('normalizeRequestBody returns original body if not JSON', () => {
   const body = Buffer.from('not json', 'utf8')
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
 
   expect(normalized.toString('utf8')).toBe('not json')
 })
@@ -146,7 +147,7 @@ test('normalizeRequestBody returns original body if no input property', () => {
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
 
   expect(normalized.toString('utf8')).toBe(body.toString('utf8'))
 })
@@ -159,7 +160,7 @@ test('normalizeRequestBody returns original body if input is not an array', () =
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
 
   expect(normalized.toString('utf8')).toBe(body.toString('utf8'))
 })
@@ -172,7 +173,7 @@ test('normalizeRequestBody handles empty input array', () => {
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   expect(parsed.input).toEqual([])
@@ -189,7 +190,7 @@ test('normalizeRequestBody handles input with only reasoning entries', () => {
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   expect(parsed.input).toEqual([])
@@ -210,7 +211,7 @@ test('normalizeRequestBody handles mixed entry types', () => {
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   expect(parsed.input).toHaveLength(4)
@@ -284,7 +285,7 @@ test('normalizeRequestBody handles complex nested structure from example', () =>
     'utf8',
   )
 
-  const normalized = HashRequestBody.normalizeRequestBody(body)
+  const normalized = NormalizeRequestBody.normalizeRequestBody(body)
   const parsed = JSON.parse(normalized.toString('utf8'))
 
   // Should filter out 2 reasoning entries
