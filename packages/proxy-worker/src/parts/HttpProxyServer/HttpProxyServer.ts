@@ -194,7 +194,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     // Save POST body if applicable (with response data)
     if (isPostPutPatch) {
       const requestBody = Buffer.concat(requestBodyChunks)
-      await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody, {
+      await SavePostBody.savePostBody(req.method!, targetUrl, req.headers as Record<string, string>, requestBody, {
         responseData,
         responseHeaders: responseHeadersForSave,
         statusCode: proxyRes.statusCode || 200,
