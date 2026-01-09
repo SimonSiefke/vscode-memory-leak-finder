@@ -114,6 +114,7 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
         exists: [],
       },
       verify = false,
+      runCommand = '',
     }) {
       try {
         await page.waitForIdle()
@@ -192,6 +193,16 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
           await expect(progress).toBeHidden({ timeout: 45_000 })
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
+          await page.waitForIdle()
+        }
+
+        if (runCommand && runCommand === 'allow') {
+          const button = page.locator('.chat-confirmation-widget-buttons .monaco-button[aria-label^="Allow"]')
+          await expect(button).toBeVisible()
+          await page.waitForIdle()
+          await button.click()
+          await page.waitForIdle()
+          await expect(button).toBeHidden()
           await page.waitForIdle()
         }
 

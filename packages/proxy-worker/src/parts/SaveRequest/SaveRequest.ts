@@ -32,7 +32,7 @@ export const saveRequest = async (
     await mkdir(testSpecificDir, { recursive: true })
     const timestamp = Date.now()
     const url = req.url || ''
-    
+
     // Include body hash in filename for POST/PUT/PATCH requests
     let bodyHash: string | undefined
     let requestBodyData: any
@@ -45,7 +45,7 @@ export const saveRequest = async (
         requestBodyData = requestBody.toString('utf8')
       }
     }
-    
+
     const hashSuffix = bodyHash ? `_${bodyHash}` : ''
     const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}${hashSuffix}.json`
     const filepath = join(testSpecificDir, filename)

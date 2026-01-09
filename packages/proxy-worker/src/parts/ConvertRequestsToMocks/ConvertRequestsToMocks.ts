@@ -98,7 +98,7 @@ const parseJsonSafely = (content: string): RecordedRequestFile | null => {
     // This handles cases where there's trailing garbage after valid JSON
     let braceCount = 0
     let rootObjectEnd = -1
-    
+
     for (let i = 0; i < content.length; i++) {
       if (content[i] === '{') {
         braceCount++
@@ -110,7 +110,7 @@ const parseJsonSafely = (content: string): RecordedRequestFile | null => {
         }
       }
     }
-    
+
     if (rootObjectEnd > 0) {
       try {
         const truncatedContent = content.substring(0, rootObjectEnd + 1)
@@ -217,7 +217,7 @@ const processRequestsDirectory = async (
       const filePath = join(requestsDir, file)
       const content = await readFile(filePath, 'utf8')
       const fileData = parseJsonSafely(content)
-      
+
       if (!fileData) {
         console.error(`Error processing file ${file}: Invalid JSON - skipping`)
         continue
@@ -235,9 +235,7 @@ const processRequestsDirectory = async (
       }
 
       // Create a key from URL, method, and body hash (if present)
-      const key = request.bodyHash
-        ? `${request.method}:${request.url}:${request.bodyHash}`
-        : `${request.method}:${request.url}`
+      const key = request.bodyHash ? `${request.method}:${request.url}:${request.bodyHash}` : `${request.method}:${request.url}`
 
       // Check if we already have a request for this key
       const existing = latestRequests.get(key)

@@ -34,7 +34,7 @@ const saveInterceptedRequest = async (
     const testSpecificDir = currentTestName ? join(REQUESTS_DIR, SanitizeFilename.sanitizeFilename(currentTestName)) : REQUESTS_DIR
     await mkdir(testSpecificDir, { recursive: true })
     const timestamp = Date.now()
-    
+
     // Include body hash in filename for POST/PUT/PATCH requests
     let bodyHash: string | undefined
     let requestBodyData: any
@@ -47,7 +47,7 @@ const saveInterceptedRequest = async (
         requestBodyData = requestBody.toString('utf8')
       }
     }
-    
+
     const hashSuffix = bodyHash ? `_${bodyHash}` : ''
     const filename = `${timestamp}_${sanitizeFilename(url)}${hashSuffix}.json`
     const filepath = join(testSpecificDir, filename)
@@ -314,9 +314,8 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
 
         // Check for mock response first (only if useProxyMock is enabled)
         if (useProxyMock) {
-          const bodyHash = body && (method === 'POST' || method === 'PUT' || method === 'PATCH')
-            ? HashRequestBody.hashRequestBody(body)
-            : undefined
+          const bodyHash =
+            body && (method === 'POST' || method === 'PUT' || method === 'PATCH') ? HashRequestBody.hashRequestBody(body) : undefined
           const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl, bodyHash)
           if (mockResponse) {
             console.log(`[Proxy] Returning mock response for ${method} ${fullUrl}`)
