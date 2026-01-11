@@ -1,8 +1,8 @@
+import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import * as Electron from '../Electron/Electron.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError, electronApp }) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }) => {
   return {
     async addContext(initialPrompt, secondPrompt, confirmText) {
       try {

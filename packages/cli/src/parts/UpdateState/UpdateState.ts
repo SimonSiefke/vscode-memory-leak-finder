@@ -51,6 +51,7 @@ export const updateState = async (newState: any): Promise<void> => {
       inspectSharedProcessPort: state.inspectSharedProcessPort,
       isGithubActions: state.isGithubActions,
       isWindows: state.isWindows,
+      login: false,
       measure: state.measure,
       measureAfter: state.measureAfter,
       measureNode: false,

@@ -55,6 +55,7 @@ export const runTestsWithCallback = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   isGithubActions,
+  login,
   measure,
   measureAfter,
   measureNode,
@@ -93,6 +94,7 @@ export const runTestsWithCallback = async ({
     Assert.string(ide)
     Assert.string(ideVersion)
     Assert.boolean(setupOnly)
+    Assert.boolean(login)
     Assert.boolean(enableExtensions)
 
     const connectionId = Id.create()
@@ -142,6 +144,69 @@ export const runTestsWithCallback = async ({
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
       await videoRpc?.dispose()
+      return {
+        duration: 0,
+        failed: 0,
+        filterValue,
+        leaked: 0,
+        passed: 0,
+        skipped: 0,
+        skippedFailed: 0,
+        total: 0,
+        type: 'success',
+      }
+    }
+
+    if (login) {
+      const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+        arch,
+        attachedToPageTimeout,
+        clearExtensions,
+        commit,
+        compressVideo,
+        connectionId,
+        cwd,
+        enableExtensions,
+        enableProxy,
+        headlessMode,
+        ide,
+        ideVersion,
+        idleTimeout,
+        insidersCommit,
+        inspectExtensions,
+        inspectExtensionsPort,
+        inspectPtyHost,
+        inspectPtyHostPort,
+        inspectSharedProcess,
+        inspectSharedProcessPort,
+        measureId: measure,
+        measureNode,
+        pageObjectPath,
+        platform,
+        recordVideo,
+        runMode,
+        screencastQuality,
+        timeouts,
+        updateUrl,
+        useProxyMock,
+        vscodePath,
+        vscodeVersion,
+      })
+      // Wait for user to interrupt (Ctrl+C) or terminate the process
+      const { promise, resolve } = Promise.withResolvers<void>()
+      const cleanup = async () => {
+        await testWorkerRpc.dispose()
+        await memoryRpc?.dispose()
+        await videoRpc?.dispose()
+        if (initializationWorkerRpc) {
+          await initializationWorkerRpc.dispose()
+        }
+        resolve()
+      }
+      process.once('SIGINT', cleanup)
+      process.once('SIGTERM', cleanup)
+      // The IDE is now running. User can login manually and then press Ctrl+C when done
+      await promise
       return {
         duration: 0,
         failed: 0,

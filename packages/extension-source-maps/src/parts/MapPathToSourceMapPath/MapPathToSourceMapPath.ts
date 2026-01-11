@@ -40,7 +40,7 @@ const extractJsDebug = (root: string, normalizedPath: string) => {
   }
   const version = '1.105.0'
   const relativePath = extensionMatch[1]
-  let cacheDirName = `vscode-js-debug-${version}`
+  const cacheDirName = `vscode-js-debug-${version}`
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, 'dist', relativePath + '.map')
   return sourceMapPath
 }

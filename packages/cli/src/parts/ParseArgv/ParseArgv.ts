@@ -190,6 +190,10 @@ const parseSetupOnly = (argv: readonly string[]): boolean => {
   return argv.includes('--setup-only')
 }
 
+const parseLogin = (argv: readonly string[]): boolean => {
+  return argv.includes('--login')
+}
+
 const parseWorkers = (argv: readonly string[]): boolean => {
   return argv.includes('--workers')
 }
@@ -309,6 +313,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
   const screencastQuality = parseScreencastQuality(argv)
   const setupOnly = parseSetupOnly(argv)
+  const login = parseLogin(argv)
   const timeoutBetween = parseTimeoutBetween(argv)
   const timeouts = parseTimeouts(argv)
   const useProxyMock = parseUseProxyMock(argv)
@@ -342,6 +347,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     inspectSharedProcess,
     inspectSharedProcessPort,
     isWindows,
+    login,
     measure,
     measureAfter,
     measureNode,
