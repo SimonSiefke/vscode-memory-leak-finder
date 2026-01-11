@@ -44,12 +44,12 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
     async clearAllOutputs() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError, platform })
-        await quickPick.executeCommand('Notebook: Clear all Outputs')
+        await quickPick.executeCommand('Notebook: Clear All Outputs')
         const webViews = page.locator('.webview')
         await expect(webViews).toHaveCount(0)
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to scroll up in notebook`)
+        throw new VError(error, `Failed to clear outputs`)
       }
     },
     async executeCell({ index, kernelSource = '', expectedOutput }: { index: number; kernelSource: string; expectedOutput: string }) {
