@@ -286,6 +286,8 @@ export interface LanguageModelEditor {
 export interface MarkdownPreview {
   shouldBeVisible(): Promise<void>
   shouldHaveHeading(subFrame: any, id: any): Promise<void>
+  shouldHaveCodeBlocks(subFrame: any, count: any): Promise<void>
+  shouldHaveCodeBlockWithLanguage(subFrame: any, language: any): Promise<void>
 }
 export interface MCP {
   addServer(options: any): Promise<void>
@@ -308,6 +310,9 @@ export interface Notebook {
   removeMarkdownCell(): Promise<void>
   scrollDown(): Promise<void>
   scrollUp(): Promise<void>
+  executeCell(cellIndex?: number): Promise<void>
+  splitCell(cellIndex?: number): Promise<void>
+  mergeCell(cellIndex?: number): Promise<void>
 }
 export interface Notification {
   closeAll(): Promise<void>
@@ -453,6 +458,8 @@ export interface SimpleBrowser {
   show(options: any): Promise<void>
   addElementToChat(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
+  clickLink(options: any): Promise<void>
+  shouldHaveTabTitle(options: any): Promise<void>
 }
 export interface SourceControl {
   checkoutBranch(branchName: any): Promise<void>
