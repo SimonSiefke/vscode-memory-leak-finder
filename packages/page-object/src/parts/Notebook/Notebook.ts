@@ -61,7 +61,7 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
           await quickPick.select(' Create Python Environment', true)
           await quickPick.select('Venv', true)
           await page.waitForIdle()
-          const focused = page.locator('.quick-input-list .monaco-list-row.focused')
+          const focused = page.locator('.quick-input-list .monaco-list-row[data-index="1"]')
           await expect(focused).toBeVisible()
           await page.waitForIdle()
           await focused.click()
