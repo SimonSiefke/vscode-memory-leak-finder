@@ -1,7 +1,7 @@
 export const getVsCodeEnv = ({
   processEnv,
-  runtimeDir,
   proxyEnvVars,
+  runtimeDir,
 }: {
   processEnv: NodeJS.ProcessEnv
   runtimeDir?: string
