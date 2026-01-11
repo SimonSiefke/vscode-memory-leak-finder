@@ -1,4 +1,4 @@
-import type { TestContext } from './types.ts'
+import type { TestContext } from '../types.ts'
 
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   const notebook = {
