@@ -50,5 +50,4 @@ export const run = async ({ Notebook }: TestContext): Promise<void> => {
   await Notebook.clearAllOutputs()
   // @ts-ignore
   await Notebook.executeCell({ index: 0, expectedOutput: 'Hello, World!\n' })
-  await new Promise((r) => {})
 }
