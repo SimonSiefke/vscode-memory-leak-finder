@@ -453,6 +453,8 @@ export interface SimpleBrowser {
   show(options: any): Promise<void>
   addElementToChat(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
+  clickLink(options: any): Promise<void>
+  shouldHaveTabTitle(options: any): Promise<void>
 }
 export interface SourceControl {
   checkoutBranch(branchName: any): Promise<void>
