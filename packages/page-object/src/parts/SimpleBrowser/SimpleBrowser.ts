@@ -175,10 +175,7 @@ export const create = ({ expect, page, platform, VError }) => {
           await expect(tabLabel).toHaveText(titleRegex, { timeout: 5000 })
         } catch {
           // If text doesn't match, try aria-label
-          const tabAriaLabel = await tab.getAttribute('aria-label')
-          if (!tabAriaLabel || !titleRegex.test(tabAriaLabel)) {
-            throw new Error(`Tab title does not match. Expected: ${title}, Tab label text: ${await tabLabel.textContent()}, Aria-label: ${tabAriaLabel}`)
-          }
+          await expect(tab).toHaveAttribute('aria-label', titleRegex, { timeout: 5000 })
         }
         await page.waitForIdle()
       } catch (error) {
