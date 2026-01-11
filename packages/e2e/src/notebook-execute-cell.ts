@@ -42,11 +42,11 @@ export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook, Ex
   await SideBar.hide()
   await Editor.open('test.ipynb')
   // @ts-ignore
-  await Notebook.executeCell({ index: 0, kernelSource: 'Python Environments...', expectedOutput: 'Hello, World!' })
+  await Notebook.executeCell({ index: 0, kernelSource: 'Python Environments...', expectedOutput: 'Hello, World!\n' })
 }
 
 export const run = async ({ Notebook }: TestContext): Promise<void> => {
   // @ts-ignore
-  await Notebook.executeCell({ index: 0 })
+  await Notebook.executeCell({ index: 0, expectedOutput: 'Hello, World!\n' })
   await new Promise((r) => {})
 }
