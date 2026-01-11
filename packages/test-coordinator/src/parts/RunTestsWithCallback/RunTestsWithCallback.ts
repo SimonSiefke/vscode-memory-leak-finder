@@ -55,6 +55,7 @@ export const runTestsWithCallback = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   isGithubActions,
+  login,
   measure,
   measureAfter,
   measureNode,
@@ -67,7 +68,6 @@ export const runTestsWithCallback = async ({
   runSkippedTestsAnyway,
   screencastQuality,
   setupOnly,
-  login,
   timeoutBetween,
   timeouts,
   updateUrl,
@@ -158,7 +158,7 @@ export const runTestsWithCallback = async ({
     }
 
     if (login && commit) {
-      const { memoryRpc, testWorkerRpc, videoRpc, initializationWorkerRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+      const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
         arch,
         attachedToPageTimeout,
         clearExtensions,
