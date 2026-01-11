@@ -38,6 +38,7 @@ export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook, Ex
   await Explorer.shouldHaveItem('test.ipynb')
   // @ts-ignore
   await Notebook.createVenv()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('.venv')
   await SideBar.hide()
   await Editor.open('test.ipynb')
