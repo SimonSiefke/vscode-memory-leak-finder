@@ -1,4 +1,6 @@
-export const create = ({ expect, page, VError }) => {
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async addMarkdownCell() {
       try {
@@ -31,6 +33,72 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll up in notebook`)
+      }
+    },
+    async executeCell(cellIndex = 0) {
+      try {
+        await page.waitForIdle()
+        const notebook = page.locator('[aria-label^="Notebook"]')
+        await expect(notebook).toBeVisible()
+        const cells = notebook.locator('.notebook-cell')
+        await expect(cells).toHaveCount({ min: cellIndex + 1 })
+        const cell = cells.nth(cellIndex)
+        await expect(cell).toBeVisible()
+        const runButton = cell.locator('[role="button"][aria-label*="Run"]').or(cell.locator('.codicon-play')).first()
+        await expect(runButton).toBeVisible()
+        await page.waitForIdle()
+        await runButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to execute notebook cell at index ${cellIndex}`)
+      }
+    },
+    async splitCell(cellIndex = 0) {
+      try {
+        await page.waitForIdle()
+        const notebook = page.locator('[aria-label^="Notebook"]')
+        await expect(notebook).toBeVisible()
+        const cells = notebook.locator('.notebook-cell')
+        await expect(cells.first()).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
+        const initialCellCount = await cells.count()
+        if (initialCellCount < cellIndex + 1) {
+          throw new Error(`Cell at index ${cellIndex} does not exist`)
+        }
+        const cell = cells.nth(cellIndex)
+        await expect(cell).toBeVisible()
+        await cell.click()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand('Notebook: Split Cell')
+        await page.waitForIdle()
+        await expect(cells).toHaveCount(initialCellCount + 1)
+      } catch (error) {
+        throw new VError(error, `Failed to split notebook cell at index ${cellIndex}`)
+      }
+    },
+    async mergeCell(cellIndex = 0) {
+      try {
+        await page.waitForIdle()
+        const notebook = page.locator('[aria-label^="Notebook"]')
+        await expect(notebook).toBeVisible()
+        const cells = notebook.locator('.notebook-cell')
+        await expect(cells.first()).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
+        const initialCellCount = await cells.count()
+        if (initialCellCount < cellIndex + 2) {
+          throw new Error(`Not enough cells to merge (need at least 2, have ${initialCellCount})`)
+        }
+        const cell = cells.nth(cellIndex)
+        await expect(cell).toBeVisible()
+        await cell.click()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand('Notebook: Merge Cell')
+        await page.waitForIdle()
+        await expect(cells).toHaveCount(initialCellCount - 1)
+      } catch (error) {
+        throw new VError(error, `Failed to merge notebook cell at index ${cellIndex}`)
       }
     },
   }

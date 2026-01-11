@@ -308,6 +308,9 @@ export interface Notebook {
   removeMarkdownCell(): Promise<void>
   scrollDown(): Promise<void>
   scrollUp(): Promise<void>
+  executeCell(cellIndex?: number): Promise<void>
+  splitCell(cellIndex?: number): Promise<void>
+  mergeCell(cellIndex?: number): Promise<void>
 }
 export interface Notification {
   closeAll(): Promise<void>
