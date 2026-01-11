@@ -1,6 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as Electron from '../Electron/Electron.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError, electronApp }) => {
   return {
     async addMarkdownCell() {
       try {
@@ -51,11 +52,16 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
 
         if (kernelSource) {
+          // const electron = Electron.create({ electronApp, VError })
+          // await using _ = await electron.mockDialog({
+          //   response: 4, // Install
+          // })
           const quickPick = QuickPick.create({ page, expect, VError, platform })
           await quickPick.select(kernelSource, true)
           await quickPick.select(' Create Python Environment', true)
           await quickPick.select('Venv', true)
           await quickPick.select(/Python /)
+
           await new Promise((r) => {})
         }
       } catch (error) {
