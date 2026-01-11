@@ -53,8 +53,10 @@ export const create = ({ expect, page, platform, VError }) => {
         if (kernelSource) {
           const quickPick = QuickPick.create({ page, expect, VError, platform })
           await quickPick.select(kernelSource, true)
+          await quickPick.select(' Create Python Environment', true)
+          await quickPick.select('Venv', true)
+          await quickPick.select(/Python /)
           await new Promise((r) => {})
-          await quickPick.select('Create Python Environment', true)
         }
       } catch (error) {
         throw new VError(error, `Failed to execute notebook cell at index ${index}`)
