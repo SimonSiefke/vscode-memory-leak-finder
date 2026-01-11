@@ -35,7 +35,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to check that webview is visible`)
       }
     },
-    async shouldBeVisible2({ extensionId, hasLineOfCodeCounter = true }) {
+    async shouldBeVisible2({ extensionId, hasLineOfCodeCounter = true, purpose }) {
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview')
@@ -43,7 +43,7 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         await expect(webView).toHaveClass('ready')
         await page.waitForIdle()
-        const regex = new RegExp(`extensionId=${extensionId}`)
+        const regex = purpose ? new RegExp(`purpose=${purpose}`) : new RegExp(`extensionId=${extensionId}`)
         const childPage = await page.waitForIframe({
           injectUtilityScript: false,
           url: regex,

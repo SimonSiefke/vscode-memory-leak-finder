@@ -2,6 +2,7 @@ import { join } from 'path'
 import * as Exec from '../Exec/Exec.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
+import * as WebView from '../WebView/WebView.ts'
 
 export const create = ({ expect, page, platform, VError, electronApp }) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
@@ -40,7 +41,7 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
         throw new VError(error, `Failed to scroll up in notebook`)
       }
     },
-    async executeCell({ index, kernelSource = '' }: { index: number; kernelSource: string }) {
+    async executeCell({ index, kernelSource = '', expectedOutput }: { index: number; kernelSource: string; expectedOutput: string }) {
       try {
         await page.waitForIdle()
         const notebook = page.locator('[aria-label^="Notebook"]')
@@ -59,6 +60,19 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
           const quickPick = QuickPick.create({ page, expect, VError, platform })
           await quickPick.select('Python Environments...', true)
           await quickPick.select(/\.venv/, true)
+        }
+        if (expectedOutput) {
+          const webView = WebView.create({ page, expect, VError })
+          const notebookOutput = await webView.shouldBeVisible2({
+            extensionId: '',
+            purpose: 'notebookRenderer',
+            hasLineOfCodeCounter: false,
+          })
+          const output = notebookOutput.locator('.output_container')
+          await expect(output).toBeVisible()
+          await page.waitForIdle()
+          await expect(output).toHaveText(expectedOutput)
+          await page.waitForIdle()
         }
       } catch (error) {
         throw new VError(error, `Failed to execute notebook cell at index ${index}`)
