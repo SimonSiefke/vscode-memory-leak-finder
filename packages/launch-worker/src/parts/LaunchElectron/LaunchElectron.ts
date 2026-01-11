@@ -47,6 +47,7 @@ export const launchElectron = async ({
     }
     return {
       child,
+      pid: child.pid,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch electron`)

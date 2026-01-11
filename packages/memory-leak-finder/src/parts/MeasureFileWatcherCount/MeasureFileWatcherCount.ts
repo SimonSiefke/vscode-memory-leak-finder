@@ -7,8 +7,8 @@ export const id = MeasureId.FileWatcherCount
 
 export const targets: readonly any[] = []
 
-export const create = (connectionId: number, pid: number) => {
-  return [connectionId, pid]
+export const create = ({ pid }: { pid: number }) => {
+  return [0, pid]
 }
 
 export const start = async (connectionId: number, pid: number): Promise<number> => {

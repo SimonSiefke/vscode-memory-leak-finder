@@ -5,6 +5,7 @@ export interface PrepareBothResult {
   readonly electronObjectId: string
   readonly initializationWorkerRpc: any
   readonly parsedVersion: string
+  readonly pid: number
   readonly sessionId: string
   readonly targetId: string
   readonly utilityContext: any
@@ -66,7 +67,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     vscodeVersion,
   } = options
   const initializationWorkerRpc = await launchInitializationWorker()
-  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, sessionId, targetId, utilityContext, webSocketUrl } =
+  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, pid, sessionId, targetId, utilityContext, webSocketUrl } =
     await initializationWorkerRpc.invoke('Launch.launch', {
       arch,
       attachedToPageTimeout,
@@ -98,6 +99,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     electronObjectId,
     initializationWorkerRpc,
     parsedVersion,
+    pid,
     sessionId,
     targetId,
     utilityContext,

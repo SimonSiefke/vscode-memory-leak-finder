@@ -54,7 +54,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   } = options
-  const { child, parsedVersion } = await LaunchIde.launchIde({
+  const { child, pid, parsedVersion } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
     clearExtensions,
@@ -91,6 +91,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     devtoolsWebSocketUrl,
     electronObjectId,
     parsedVersion,
+    pid,
     utilityContext,
     webSocketUrl,
   }

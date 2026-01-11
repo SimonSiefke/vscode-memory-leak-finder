@@ -153,7 +153,7 @@ export const launchVsCode = async ({
       runtimeDir,
     })
 
-    const { child } = await LaunchElectron.launchElectron({
+    const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,
       args,
       cliPath: binaryPath,
@@ -163,6 +163,7 @@ export const launchVsCode = async ({
     })
     return {
       child,
+      pid,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch VSCode`)
