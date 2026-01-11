@@ -57,19 +57,8 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
 
         if (kernelSource) {
           const quickPick = QuickPick.create({ page, expect, VError, platform })
+          await quickPick.select('Python Environments...', true)
           await quickPick.select(/\.venv/, true)
-          await quickPick.select(' Create Python Environment', true)
-          await quickPick.select('Venv', true)
-          await page.waitForIdle()
-          // const focused = page.locator('.quick-input-list .monaco-list-row[data-index="1"]')
-          // await expect(focused).toBeVisible()
-          // await expect(focused).toHaveText(/Python/)
-          // await page.waitForIdle()
-          // await focused.click()
-          // await page.waitForIdle()
-          // await quickPick.select(/Python /)
-
-          await new Promise((r) => {})
         }
       } catch (error) {
         throw new VError(error, `Failed to execute notebook cell at index ${index}`)
@@ -102,10 +91,10 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
     async createVenv() {
       try {
         await Exec.exec('python3', ['-m', 'venv', '.venv'], { cwd: workspace, env: { ...process.env } })
-        // await Exec.exec('bash', ['-c', 'source .venv/bin/activate && python -m pip install -r requirements.txt'], {
-        //   cwd: workspace,
-        //   env: { ...process.env },
-        // })
+        await Exec.exec('bash', ['-c', 'source .venv/bin/activate && python -m pip install ipykernel'], {
+          cwd: workspace,
+          env: { ...process.env },
+        })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to create venv`)
