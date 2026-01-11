@@ -62,6 +62,7 @@ export const updateState = async (newState: any): Promise<void> => {
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
       screencastQuality: state.screencastQuality,
       setupOnly: false,
+      login: false,
       timeoutBetween: state.timeoutBetween,
       timeouts: state.timeouts,
       updateUrl: 'https://update.code.visualstudio.com',

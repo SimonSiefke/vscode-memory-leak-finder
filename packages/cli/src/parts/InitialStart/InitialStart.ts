@@ -48,6 +48,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     screencastQuality: options.screencastQuality,
     setupOnly: options.setupOnly,
+    login: options.login,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
     updateUrl: options.updateUrl,

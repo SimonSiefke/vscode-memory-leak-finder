@@ -34,6 +34,7 @@ export interface StartRunningOptions {
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
   readonly setupOnly: boolean
+  readonly login: boolean
   readonly timeoutBetween: number
   readonly timeouts: boolean
   readonly updateUrl: string
