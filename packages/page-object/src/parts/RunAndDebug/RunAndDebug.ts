@@ -183,10 +183,10 @@ export const create = ({ expect, page, platform, VError }) => {
       }
     },
     async step({
-      file: file,
-      line: line,
       callStackSize: callStackSize,
+      file: file,
       hasCallStack = true,
+      line: line,
     }: {
       file: string
       line: number

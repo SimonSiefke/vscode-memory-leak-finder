@@ -5,6 +5,7 @@ export interface RunTestsOptions {
   readonly clearExtensions: boolean
   readonly color: boolean
   readonly commit: string
+  readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -26,7 +27,6 @@ export interface RunTestsOptions {
   readonly measureNode: boolean
   readonly platform: string
   readonly recordVideo: boolean
-  readonly compressVideo: boolean
   readonly restartBetween: boolean
   readonly root: string
   readonly runMode: number

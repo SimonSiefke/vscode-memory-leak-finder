@@ -6,6 +6,7 @@ import * as CompareHeapSnapshotsFunctions from '../CompareHeapSnapshotsFunctions
 import * as CompareNamedClosureCount from '../CompareNamedClosureCount/CompareNamedClosureCount.ts'
 import * as CompareNamedClosureCountWithReferences2 from '../CompareNamedClosureCountWithReferences2/CompareNamedClosureCountWithReferences2.ts'
 import * as CompareStringCount from '../CompareStringCount/CompareStringCount.ts'
+import { compareStrings2 } from '../CompareStrings2/CompareStrings2.ts'
 import * as GetArraysByClosureLocationFromHeapSnapshotCommand from '../GetArraysByClosureLocationFromHeapSnapshotCommand/GetArraysByClosureLocationFromHeapSnapshotCommand.ts'
 import * as GetDomTimerCountFromHeapSnapshot from '../GetDomTimerCountFromHeapSnapshot/GetDomTimerCountFromHeapSnapshot.ts'
 import * as GetLargestArraysFromHeapSnapshot from '../GetLargestArraysFromHeapSnapshot/GetLargestArraysFromHeapSnapshot.ts'
@@ -24,19 +25,18 @@ import * as ParseHeapSnapshotNumbers from '../ParseHeapSnapshotNumbers/ParseHeap
 import * as ParseHeapSnapshotStrings from '../ParseHeapSnapshotStrings/ParseHeapSnapshotStrings.ts'
 import * as ParseHeapSnapshotStringsCount from '../ParseHeapSnapshotStringsCount/ParseHeapSnapshotStringsCount.ts'
 import * as ParseUserStrings from '../ParseUserStrings/ParseUserStrings.ts'
-import { compareStrings2 } from '../CompareStrings2/CompareStrings2.ts'
 
 export const commandMap = {
   'HeapSnapshot.compareArrays2': CompareHeapsnapshotArrays2.compareHeapsnapshotArrays2,
   'HeapSnapshot.compareDomTimerCount': compareDomTimerCount,
   'HeapSnapshot.compareFunctions': CompareHeapSnapshotsFunctions.compareHeapSnapshotFunctions,
   'HeapSnapshot.compareFunctions2': CompareHeapSnapshotsFunctions2.compareHeapSnapshotFunctions2,
-  'HeapSnapshot.compareStrings2': compareStrings2,
   'HeapSnapshot.compareGrowingArrays': CompareGrowingArrays.compareGrowingArrays,
   'HeapSnapshot.compareNamedClosureCount': CompareNamedClosureCount.compareNamedClosureCountFromHeapSnapshot,
   'HeapSnapshot.compareNamedClosureCountWithReferences2':
     CompareNamedClosureCountWithReferences2.compareNamedClosureCountWithReferencesFromHeapSnapshot2,
   'HeapSnapshot.compareStringCount': CompareStringCount.compareStringCount,
+  'HeapSnapshot.compareStrings2': compareStrings2,
   'HeapSnapshot.dispose': HeapSnapshotState.dispose,
   'HeapSnapshot.getArraysByClosureLocation':
     GetArraysByClosureLocationFromHeapSnapshotCommand.getArraysByClosureLocationFromHeapSnapshotCommand,

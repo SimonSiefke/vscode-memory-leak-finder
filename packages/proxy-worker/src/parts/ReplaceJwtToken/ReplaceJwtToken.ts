@@ -1,4 +1,4 @@
-import * as CryptographyWorker from '../../CryptographyWorker/CryptographyWorker.ts'
+import * as CryptographyWorker from '../CryptographyWorker/CryptographyWorker.ts'
 
 export const replaceJwtToken = async (token: string): Promise<string> => {
   try {
