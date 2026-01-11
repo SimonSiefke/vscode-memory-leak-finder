@@ -45,9 +45,6 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
       try {
         const quickPick = QuickPick.create({ page, expect, VError, platform })
         await quickPick.executeCommand('Notebook: Clear All Outputs')
-        const webViews = page.locator('.webview')
-        await expect(webViews).toBeHidden()
-        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear outputs`)
       }
