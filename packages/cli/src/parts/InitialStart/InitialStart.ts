@@ -37,6 +37,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     inspectSharedProcessPort: options.inspectSharedProcessPort,
     isGithubActions: options.isGithubActions,
     isWindows: options.isWindows,
+    login: options.login,
     measure: options.measure,
     measureAfter: options.measureAfter,
     measureNode: options.measureNode,

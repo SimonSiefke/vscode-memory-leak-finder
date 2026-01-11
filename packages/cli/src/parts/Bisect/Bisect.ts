@@ -40,6 +40,7 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       inspectPtyHostPort: options.inspectPtyHostPort,
       inspectSharedProcess: options.inspectSharedProcess,
       inspectSharedProcessPort: options.inspectSharedProcessPort,
+      login: options.login,
       measure: options.measure,
       measureAfter: options.measureAfter,
       measureNode: options.measureNode,
