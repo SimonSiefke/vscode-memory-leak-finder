@@ -3,7 +3,15 @@ import { root } from '../Root/Root.ts'
 
 const cacheDir = join(root, '.extension-source-maps-cache')
 
-export const config = [
+interface ConfigItem {
+  readonly cacheDir: string
+  readonly extensionName: string
+  readonly repoUrl: string
+  readonly version: string
+  readonly buildScript: readonly string[]
+}
+
+export const config: readonly ConfigItem[] = [
   {
     cacheDir,
     extensionName: 'copilot-chat',
