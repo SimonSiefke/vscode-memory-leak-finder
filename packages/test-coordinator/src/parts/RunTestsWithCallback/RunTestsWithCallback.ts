@@ -157,7 +157,7 @@ export const runTestsWithCallback = async ({
       }
     }
 
-    if (login && commit) {
+    if (login) {
       const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
         arch,
         attachedToPageTimeout,
@@ -193,20 +193,20 @@ export const runTestsWithCallback = async ({
         vscodeVersion,
       })
       // Wait for user to interrupt (Ctrl+C) or terminate the process
-      await new Promise<void>((resolve) => {
-        const cleanup = async () => {
-          await testWorkerRpc.dispose()
-          await memoryRpc?.dispose()
-          await videoRpc?.dispose()
-          if (initializationWorkerRpc) {
-            await initializationWorkerRpc.dispose()
-          }
-          resolve()
+      const { promise, resolve } = Promise.withResolvers<void>()
+      const cleanup = async () => {
+        await testWorkerRpc.dispose()
+        await memoryRpc?.dispose()
+        await videoRpc?.dispose()
+        if (initializationWorkerRpc) {
+          await initializationWorkerRpc.dispose()
         }
-        process.once('SIGINT', cleanup)
-        process.once('SIGTERM', cleanup)
-        // The IDE is now running. User can login manually and then press Ctrl+C when done
-      })
+        resolve()
+      }
+      process.once('SIGINT', cleanup)
+      process.once('SIGTERM', cleanup)
+      // The IDE is now running. User can login manually and then press Ctrl+C when done
+      await promise
       return {
         duration: 0,
         failed: 0,
