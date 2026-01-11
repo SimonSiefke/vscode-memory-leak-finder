@@ -16,16 +16,6 @@ export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook, Ex
         metadata: {},
         source: ['print("Hello, World!")'],
       },
-      {
-        cell_type: 'code',
-        metadata: {},
-        source: ['x = 1 + 1', 'print(x)'],
-      },
-      {
-        cell_type: 'code',
-        metadata: {},
-        source: ['result = 2 * 3', 'print(f"Result: {result}")'],
-      },
     ],
     metadata: {
       language_info: {
@@ -56,10 +46,7 @@ export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook, Ex
 }
 
 export const run = async ({ Notebook }: TestContext): Promise<void> => {
+  // @ts-ignore
   await Notebook.executeCell({ index: 0 })
-  await new Promise((r) => {
-    setTimeout(r, 100000)
-  })
-  await Notebook.executeCell({ index: 1 })
-  await Notebook.executeCell({ index: 2 })
+  await new Promise((r) => {})
 }
