@@ -62,8 +62,10 @@ export const launchVsCode = async ({
   vscodePath: string
   vscodeVersion: string
 }) => {
-  console.log(`[LaunchVsCode] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
-  console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
+  if (enableProxy) {
+    console.log(`[LaunchVsCode] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
+    console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
+  }
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
