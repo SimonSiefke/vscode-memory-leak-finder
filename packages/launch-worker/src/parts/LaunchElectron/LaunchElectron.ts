@@ -34,6 +34,9 @@ export const launchElectron = async ({
       cwd,
       env,
     })
+    if (child.pid === undefined) {
+      throw new Error(`Failed to get PID from spawned process`)
+    }
     addDisposable(() => {
       child.kill('SIGKILL')
     })

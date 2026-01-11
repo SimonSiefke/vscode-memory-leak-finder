@@ -80,18 +80,23 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
   await using rpc = await launchInitializationWorker()
-  const { devtoolsWebSocketUrl, electronObjectId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
+  const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
     headlessMode,
     attachedToPageTimeout,
     port.port,
     parsedVersion,
   )
+  if (pid === undefined) {
+    throw new Error(`pid is undefined after launching IDE`)
+  }
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
     parsedVersion,
     pid,
+    sessionId,
+    targetId,
     utilityContext,
     webSocketUrl,
   }

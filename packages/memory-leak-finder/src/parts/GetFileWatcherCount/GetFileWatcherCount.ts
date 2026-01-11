@@ -52,6 +52,7 @@ const countInotifyWatchers = async (pid: number): Promise<number> => {
 }
 
 export const getFileWatcherCount = async (pid: number | undefined): Promise<number> => {
+  console.log({ pid })
   if (pid === undefined) {
     return 0
   }

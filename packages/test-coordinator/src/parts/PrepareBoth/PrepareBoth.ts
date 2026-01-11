@@ -67,33 +67,36 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     vscodeVersion,
   } = options
   const initializationWorkerRpc = await launchInitializationWorker()
-  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, pid, sessionId, targetId, utilityContext, webSocketUrl } =
-    await initializationWorkerRpc.invoke('Launch.launch', {
-      arch,
-      attachedToPageTimeout,
-      canUseIdleCallback,
-      clearExtensions,
-      commit,
-      connectionId,
-      cwd,
-      enableExtensions,
-      enableProxy,
-      headlessMode,
-      ide,
-      insidersCommit,
-      inspectExtensions,
-      inspectExtensionsPort,
-      inspectPtyHost,
-      inspectPtyHostPort,
-      inspectSharedProcess,
-      inspectSharedProcessPort,
-      isFirstConnection,
-      platform,
-      updateUrl,
-      useProxyMock,
-      vscodePath,
-      vscodeVersion,
-    })
+  const launchResult = await initializationWorkerRpc.invoke('Launch.launch', {
+    arch,
+    attachedToPageTimeout,
+    canUseIdleCallback,
+    clearExtensions,
+    commit,
+    connectionId,
+    cwd,
+    enableExtensions,
+    enableProxy,
+    headlessMode,
+    ide,
+    insidersCommit,
+    inspectExtensions,
+    inspectExtensionsPort,
+    inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcess,
+    inspectSharedProcessPort,
+    isFirstConnection,
+    platform,
+    updateUrl,
+    useProxyMock,
+    vscodePath,
+    vscodeVersion,
+  })
+  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, pid, sessionId, targetId, utilityContext, webSocketUrl } = launchResult
+  if (pid === undefined) {
+    throw new Error(`pid is undefined in Launch.launch result. Result keys: ${Object.keys(launchResult).join(', ')}`)
+  }
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
