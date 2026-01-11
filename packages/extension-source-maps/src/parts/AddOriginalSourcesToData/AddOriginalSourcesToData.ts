@@ -20,6 +20,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
     const enriched: any[] = [...items]
     const { positionPointers, sourceMapUrlToPositions } = CollectSourceMapPositions.collectSourceMapPositions(enriched, rootPath)
 
+    console.log({ sourceMapUrlToPositions })
     const sourceMapUrls = Object.keys(sourceMapUrlToPositions)
     console.log(`[addOriginalSourcesToData] Found ${sourceMapUrls.length} source map URLs to resolve`)
     if (sourceMapUrls.length === 0) {

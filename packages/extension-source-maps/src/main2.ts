@@ -8,9 +8,9 @@ const main2 = async (): Promise<void> => {
     '.vscode-memory-leak-finder-results',
     'extension-host',
     'named-function-count3',
-    'chat-editor-add-numbers.json',
+    'debug-javascript-step.json',
   )
-  const version = 'v0.35.3'
+  const version = 'v1.105.0'
   const outputFilePath = join(root, '.vscode-memory-leak-finder-results', 'extension-host', 'named-function-count3', 'result.json')
 
   await AddOriginalSourcesToData.addOriginalSourcesToData(dataFilePath, version, outputFilePath)
