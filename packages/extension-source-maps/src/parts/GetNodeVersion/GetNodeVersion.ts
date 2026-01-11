@@ -22,7 +22,7 @@ const parseNodeVersionFromNvmrc = (content: string): string | null => {
   // If it's a full version (has at least minor version), return it
   if (match[2] !== undefined) {
     // Ensure we have patch version, default to 0 if missing
-    const patch = match[3] !== undefined ? match[3] : '0'
+    const patch = match[3] === undefined ? '0' : match[3]
     return `${match[1]}.${match[2]}.${patch}`
   }
   // If it's just a major version, return it so we can fetch latest
@@ -45,7 +45,7 @@ export const getNodeVersion = async (repoPath: string): Promise<string> => {
           // If it's just a major version, fetch the latest for that major
           return await getLatestNodeVersionForMajor(parsedVersion)
         }
-      } catch (error) {
+      } catch {
         // If .nvmrc exists but can't be read/parsed, fall through to package.json
       }
     }
