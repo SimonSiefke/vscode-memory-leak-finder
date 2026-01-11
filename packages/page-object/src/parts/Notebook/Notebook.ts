@@ -35,22 +35,29 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to scroll up in notebook`)
       }
     },
-    async executeCell(cellIndex = 0) {
+    async executeCell({ index, kernelSource = '' }: { index: number; kernelSource: string }) {
       try {
         await page.waitForIdle()
         const notebook = page.locator('[aria-label^="Notebook"]')
         await expect(notebook).toBeVisible()
-        const cells = notebook.locator('.notebook-cell')
-        await expect(cells).toHaveCount({ min: cellIndex + 1 })
-        const cell = cells.nth(cellIndex)
+        await page.waitForIdle()
+        const cells = notebook.locator('.cell.code')
+        const cell = cells.nth(index)
         await expect(cell).toBeVisible()
-        const runButton = cell.locator('[role="button"][aria-label*="Run"]').or(cell.locator('.codicon-play')).first()
+        const runButton = cell.locator('[role="button"][aria-label^="Execute Cell"]')
         await expect(runButton).toBeVisible()
         await page.waitForIdle()
         await runButton.click()
         await page.waitForIdle()
+
+        if (kernelSource) {
+          const quickPick = QuickPick.create({ page, expect, VError, platform })
+          await quickPick.select(kernelSource, true)
+          await new Promise((r) => {})
+          await quickPick.select('Create Python Environment', true)
+        }
       } catch (error) {
-        throw new VError(error, `Failed to execute notebook cell at index ${cellIndex}`)
+        throw new VError(error, `Failed to execute notebook cell at index ${index}`)
       }
     },
     async splitCell(cellIndex = 0) {

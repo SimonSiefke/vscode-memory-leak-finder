@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook }: TestContext): Promise<void> => {
   const notebook = {
     cells: [
       {
@@ -36,12 +36,18 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('test.ipynb')
+  await SideBar.hide()
   await Editor.open('test.ipynb')
+  await Notebook.executeCell({ index: 0, kernelSource: 'Python Environments...' })
 }
 
 export const run = async ({ Notebook }: TestContext): Promise<void> => {
-  await Notebook.executeCell(0)
-  await Notebook.executeCell(1)
-  await Notebook.executeCell(2)
+  await Notebook.executeCell({ index: 0 })
+  await new Promise((r) => {
+    setTimeout(r, 100000)
+  })
+  await Notebook.executeCell({ index: 1 })
+  await Notebook.executeCell({ index: 2 })
 }
