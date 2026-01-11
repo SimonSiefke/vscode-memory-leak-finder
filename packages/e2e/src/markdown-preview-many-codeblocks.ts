@@ -2,14 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({
-  Editor,
-  Explorer,
-  MarkdownPreview,
-  QuickPick,
-  WellKnownCommands,
-  Workspace,
-}: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   const markdownContent = `# Code Examples
 
 This document contains multiple code blocks in different languages.
@@ -131,10 +124,10 @@ console.log(calc.getResult()); // 7
 <form id="contact-form">
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" required>
-    
+
     <label for="email">Email:</label>
     <input type="email" id="email" name="email" required>
-    
+
     <button type="submit">Submit</button>
 </form>
 \`\`\`
@@ -188,12 +181,7 @@ fetchData('https://api.example.com/data')
   await Explorer.shouldHaveItem('code-examples.md')
 }
 
-export const run = async ({
-  Editor,
-  MarkdownPreview,
-  QuickPick,
-  WellKnownCommands,
-}: TestContext): Promise<void> => {
+export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands }: TestContext): Promise<void> => {
   await Editor.open('code-examples.md')
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   const subFrame = await MarkdownPreview.shouldBeVisible()
