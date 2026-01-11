@@ -35,11 +35,6 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
       }
     },
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> origin/main
     async shouldHaveCodeBlocks(subFrame, count) {
       try {
         await page.waitForIdle()
@@ -60,9 +55,5 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to check that markdown preview has code block with language ${language}`)
       }
     },
-<<<<<<< HEAD
->>>>>>> feature/notebook2
-=======
->>>>>>> origin/main
   }
 }
