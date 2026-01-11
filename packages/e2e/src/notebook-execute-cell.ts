@@ -1,6 +1,14 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook, Extensions }: TestContext): Promise<void> => {
+  await Extensions.install({
+    id: 'ms-toolsai.jupyter',
+    name: 'Jupyter',
+  })
+  await Extensions.install({
+    id: 'ms-python.python',
+    name: 'Python',
+  })
   const notebook = {
     cells: [
       {

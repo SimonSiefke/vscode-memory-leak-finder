@@ -286,6 +286,8 @@ export interface LanguageModelEditor {
 export interface MarkdownPreview {
   shouldBeVisible(): Promise<void>
   shouldHaveHeading(subFrame: any, id: any): Promise<void>
+  shouldHaveCodeBlocks(subFrame: any, count: any): Promise<void>
+  shouldHaveCodeBlockWithLanguage(subFrame: any, language: any): Promise<void>
 }
 export interface MCP {
   addServer(options: any): Promise<void>
