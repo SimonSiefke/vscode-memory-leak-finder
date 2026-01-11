@@ -52,7 +52,7 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
     async executeCell({ index, kernelSource = '', expectedOutput }: { index: number; kernelSource: string; expectedOutput: string }) {
       try {
         await page.waitForIdle()
-        const notebook = page.locator('[aria-label^="Notebook"]')
+        const notebook = page.locator('.notebook-editor')
         await expect(notebook).toBeVisible()
         await page.waitForIdle()
         const cells = notebook.locator('.cell.code')
