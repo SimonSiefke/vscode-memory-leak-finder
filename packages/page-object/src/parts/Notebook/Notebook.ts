@@ -1,7 +1,13 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Electron from '../Electron/Electron.ts'
+import * as Root from '../Root/Root.ts'
+import * as Exec from '../Exec/Exec.ts'
+import { exec } from '../Exec/Exec.ts'
+import { join } from 'path'
 
 export const create = ({ expect, page, platform, VError, electronApp }) => {
+  const workspace = join(Root.root, '.vscode-test-workspace')
+
   return {
     async addMarkdownCell() {
       try {
@@ -63,6 +69,7 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
           await page.waitForIdle()
           const focused = page.locator('.quick-input-list .monaco-list-row[data-index="1"]')
           await expect(focused).toBeVisible()
+          await expect(focused).toHaveText(/Python/)
           await page.waitForIdle()
           await focused.click()
           await page.waitForIdle()
@@ -96,6 +103,16 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
         await expect(cells).toHaveCount(initialCellCount + 1)
       } catch (error) {
         throw new VError(error, `Failed to split notebook cell at index ${cellIndex}`)
+      }
+    },
+    async createVenv() {
+      try {
+        await Exec.exec('python3', ['-m', 'venv', '.venv'], { cwd: workspace, env: { ...process.env } })
+        await Exec.exec('source', ['.venv/bin/activate'], { cwd: workspace, env: { ...process.env } })
+        await Exec.exec('python3', ['-m', 'pip', 'install', '-r', 'requirements.txt'], { cwd: workspace, env: { ...process.env } })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to create venv`)
       }
     },
     async mergeCell(cellIndex = 0) {

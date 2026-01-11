@@ -38,8 +38,12 @@ export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook }: 
   await Explorer.focus()
   await Explorer.refresh()
   await Explorer.shouldHaveItem('test.ipynb')
+  // @ts-ignore
+  await Notebook.createVenv()
+  await Explorer.shouldHaveItem('.venv')
   await SideBar.hide()
   await Editor.open('test.ipynb')
+  // @ts-ignore
   await Notebook.executeCell({ index: 0, kernelSource: 'Python Environments...' })
 }
 
