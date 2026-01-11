@@ -35,7 +35,15 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to check that webview is visible`)
       }
     },
-    async shouldBeVisible2({ extensionId, hasLineOfCodeCounter = true, purpose }) {
+    async shouldBeVisible2({
+      extensionId,
+      hasLineOfCodeCounter = true,
+      purpose,
+    }: {
+      extensionId: string
+      hasLineOfCodeCounter?: boolean
+      purpose?: string
+    }) {
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview')
