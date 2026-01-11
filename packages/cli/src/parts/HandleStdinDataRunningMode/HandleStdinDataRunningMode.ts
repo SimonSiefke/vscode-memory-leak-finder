@@ -1,0 +1,36 @@
+import type * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
+import * as InterruptedMessage from '../InterruptedMessage/InterruptedMessage.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
+import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
+
+export const handleStdinDataRunningMode = async (
+  state: StdinDataState.StdinDataState,
+  key: string,
+): Promise<StdinDataState.StdinDataState> => {
+  switch (key) {
+    case AnsiKeys.AltBackspace:
+    case AnsiKeys.ArrowDown:
+    case AnsiKeys.ArrowLeft:
+    case AnsiKeys.ArrowRight:
+    case AnsiKeys.ArrowUp:
+    case AnsiKeys.Backspace(state.isWindows):
+    case AnsiKeys.ControlBackspace:
+      return state
+    case AnsiKeys.ControlC:
+    case AnsiKeys.ControlD:
+      return {
+        ...state,
+        mode: ModeType.Exit,
+      }
+    default: {
+      const interruptedMessage = await InterruptedMessage.print()
+      const watchUsageMessage = await WatchUsage.print()
+      return {
+        ...state,
+        mode: ModeType.Interrupted,
+        stdout: [...state.stdout, interruptedMessage + '\n' + watchUsageMessage],
+      }
+    }
+  }
+}

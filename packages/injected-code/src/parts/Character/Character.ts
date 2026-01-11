@@ -1,0 +1,6 @@
+export const Colon = ':'
+export const EmptyString = ''
+export const RoundOpen = '('
+export const RoundClose = ')'
+export const DoubleQuote = '"'
+export const Space = ' '

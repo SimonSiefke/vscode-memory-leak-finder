@@ -1,0 +1,53 @@
+{
+  "comment": ["this is copied from microsoft/playwright/packages/playwright-core/browsers.json (License Apache 2.0)"],
+  "browsers": [
+    {
+      "name": "chromium",
+      "revision": "1125",
+      "installByDefault": true,
+      "browserVersion": "127.0.6533.26"
+    },
+    {
+      "name": "chromium-tip-of-tree",
+      "revision": "1236",
+      "installByDefault": false,
+      "browserVersion": "128.0.6561.0"
+    },
+    {
+      "name": "firefox",
+      "revision": "1456",
+      "installByDefault": true,
+      "browserVersion": "127.0"
+    },
+    {
+      "name": "firefox-beta",
+      "revision": "1456",
+      "installByDefault": false,
+      "browserVersion": "128.0b3"
+    },
+    {
+      "name": "webkit",
+      "revision": "2039",
+      "installByDefault": true,
+      "revisionOverrides": {
+        "mac10.14": "1446",
+        "mac10.15": "1616",
+        "mac11": "1816",
+        "mac11-arm64": "1816",
+        "mac12": "2009",
+        "mac12-arm64": "2009"
+      },
+      "browserVersion": "17.4"
+    },
+    {
+      "name": "ffmpeg",
+      "revision": "1011",
+      "installByDefault": true
+    },
+    {
+      "name": "android",
+      "revision": "1001",
+      "installByDefault": false
+    }
+  ]
+}

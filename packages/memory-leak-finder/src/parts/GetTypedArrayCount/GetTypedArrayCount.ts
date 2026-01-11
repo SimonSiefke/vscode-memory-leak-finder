@@ -1,0 +1,71 @@
+import type { Session } from '../Session/Session.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+
+/**
+ *
+ * @param {any} session
+ * @returns {Promise<number>}
+ */
+export const getTypedArrayCount = async (session: Session, objectGroup: string) => {
+  const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: PrototypeExpression.Object,
+    objectGroup,
+    returnByValue: false,
+  })
+  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
+    objectGroup,
+    prototypeObjectId: prototypeDescriptor.objectId,
+  })
+  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+
+
+  const objects = this
+
+  const getValues = object => {
+    try {
+      return Object.values(object)
+    } catch {
+      return []
+    }
+  }
+
+  const typedArrayConstructors = new Set([
+    Uint8ClampedArray,
+    Float32Array,
+    Float64Array,
+    Int16Array,
+    Int32Array,
+    Int8Array,
+    Uint16Array,
+    Uint32Array,
+    Uint8Array,
+    BigInt64Array,
+    BigUint64Array,
+  ])
+
+  const isTypedArray = value => {
+    try {
+      return typedArrayConstructors.has(value.constructor)
+    } catch {
+      return false
+    }
+  }
+
+  let total = 0
+
+  for(const object of objects){
+    const values = getValues(object)
+    const typed = values.filter(isTypedArray)
+    total += typed.length
+  }
+
+  return total
+}`,
+    objectGroup,
+    objectId: objects.objects.objectId,
+    returnByValue: true,
+  })
+  return fnResult1
+}

@@ -1,0 +1,57 @@
+import type { Session } from '../Session/Session.ts'
+import * as Arrays from '../Arrays/Arrays.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+
+const compareNumber = (a, b) => {
+  return b - a
+}
+
+const sortNumbers = (numbers) => {
+  return Arrays.toSorted(numbers, compareNumber)
+}
+
+export const getNumbers = async (session: Session, objectGroup: string): Promise<readonly number[]> => {
+  const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: PrototypeExpression.Object,
+    objectGroup,
+    returnByValue: false,
+  })
+  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
+    objectGroup,
+    prototypeObjectId: prototype.objectId,
+  })
+  const result = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function () {
+  const objects = this
+
+  const numbers = []
+
+  const getValues = object => {
+    try {
+      return Object.values(object)
+    } catch {
+      return []
+    }
+  }
+
+  const maxArrayLength = 100_000_000
+
+  for(const object of objects){
+    const values = getValues(object)
+    for(const value of values){
+      if(typeof value === 'number' && numbers.length < maxArrayLength){
+        numbers.push(value)
+      }
+    }
+  }
+  return numbers
+}`,
+    objectGroup,
+    objectId: objects.objects.objectId,
+    returnByValue: true,
+  })
+
+  const sortedNumbers = sortNumbers(result)
+  return sortedNumbers
+}

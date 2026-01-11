@@ -1,0 +1,54 @@
+import { readFile, writeFile } from 'node:fs/promises'
+import { basename, dirname, join } from 'node:path'
+import * as Exec from '../Exec/Exec.ts'
+import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
+import * as SupportsNativeFfmpeg from '../SupportsNativeFfmpeg/SupportsNativeFfmpeg.ts'
+import * as VideoChapter from '../VideoChapter/VideoChapter.ts'
+
+const getMetaDataInputOptions = (baseName: string): readonly string[] => {
+  return ['-i', baseName, '-y', 'meta.ffmeta']
+}
+
+const getMetaDataOutputOptions = (baseName: string): readonly string[] => {
+  return ['-i', baseName, '-i', 'metadata.txt', '-map_metadata', '1', '-codec', 'copy', '-y', 'out.webm']
+}
+
+const getChaptersData = (previousMetaData: any, chapters: any): string => {
+  let start = 0
+  let data = previousMetaData + '\n'
+  for (const chapter of chapters) {
+    const end = chapter.time
+    data += `[CHAPTER]
+TIMEBASE=1/1000
+START=${Math.round(start)}
+END=${Math.round(end)}
+title=${chapter.name}
+
+`
+    start = end
+  }
+  return data
+}
+
+export const finalizeChapters = async () => {
+  if (!SupportsNativeFfmpeg.supportsNativeFfmpeg()) {
+    return
+  }
+  const outFile = FfmpegProcessState.getOutFile()
+  const ffmpegPath = 'ffmpeg'
+  const baseName = basename(outFile)
+  const folderName = dirname(outFile)
+  const metaDataInputArgs = getMetaDataInputOptions(baseName)
+  await Exec.exec(ffmpegPath, metaDataInputArgs, {
+    cwd: folderName,
+  })
+  const previousMetaData = await readFile(join(folderName, 'meta.ffmeta'))
+  const { chapters } = VideoChapter.state
+  const data = getChaptersData(previousMetaData, chapters)
+  const metaDataPath = join(folderName, 'metadata.txt')
+  const metaDataArgs = getMetaDataOutputOptions(baseName)
+  await writeFile(metaDataPath, data)
+  await Exec.exec(ffmpegPath, metaDataArgs, {
+    cwd: folderName,
+  })
+}

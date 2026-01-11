@@ -1,0 +1,47 @@
+import type { Session } from '../Session/Session.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+
+export const getBooleanCount = async (session: Session, objectGroup: string): Promise<number> => {
+  const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: PrototypeExpression.Object,
+    objectGroup,
+    returnByValue: false,
+  })
+  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
+    objectGroup,
+    prototypeObjectId: prototype.objectId,
+  })
+  const result = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function () {
+  const objects = this
+
+  const booleans = []
+
+  const getValues = object => {
+    try {
+      return Object.values(object)
+    } catch {
+      return []
+    }
+  }
+
+  const maxArrayLength = 100_000_000
+
+  for(const object of objects){
+    const values = getValues(object)
+    for(const value of values){
+      if(typeof value === 'boolean' && booleans.length < maxArrayLength){
+        booleans.push(value)
+      }
+    }
+  }
+  return booleans.length
+}`,
+    objectGroup,
+    objectId: objects.objects.objectId,
+    returnByValue: true,
+  })
+
+  return result
+}

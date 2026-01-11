@@ -1,0 +1,41 @@
+import type { Session } from '../Session/Session.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetConstructorInstances from '../GetConstructorInstances/GetConstructorInstances.ts'
+
+export const getDomListeners = async (session: Session, objectGroup: string) => {
+  const instances = await GetConstructorInstances.getConstructorInstances(session, objectGroup, 'DomListener')
+  const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const domListeners = this
+  const array = []
+
+  const getNodeDescription = (node) => {
+    if(!node){
+      return ''
+    }
+    if(node.className){
+      return node.className
+    }
+    if(node.nodeName){
+      node.nodeName.toLowerCase()
+    }
+    return ''
+  }
+
+  for(const domListener of domListeners){
+    array.push({
+      type: domListener._type,
+      handlerName: domListener._handler?.name || 'anonymous',
+      nodeDescription: getNodeDescription(domListener._node),
+      disposed: domListener._node === null && domListener._handler === null
+    })
+  }
+
+  return array
+}`,
+    objectGroup,
+    objectId: instances.objectId,
+    returnByValue: true,
+  })
+  return fnResult2
+}

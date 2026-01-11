@@ -1,0 +1,44 @@
+import { spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
+import * as Assert from '../Assert/Assert.ts'
+import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
+import * as GetFfmpegOptions from '../GetFfmpegOptions/GetFfmpegOptions.ts'
+import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.ts'
+
+const handleStdinError = () => {
+  console.log('[video-recording-worker] ffmpeg error')
+}
+
+const handleStdinFinished = () => {
+  console.log('[video-recording-worker] ffmpeg finished')
+}
+
+const handleExit = () => {
+  console.log('[video-recording-worker] ffmpeg exit')
+}
+
+export const start = async (platform: string, outFile: string): Promise<void> => {
+  Assert.string(outFile)
+  // TODO make ffmpegPath an argument
+  const ffmpegPath = GetFfmpegPath.getFfmpegPath(platform)
+  if (!existsSync(ffmpegPath)) {
+    throw new Error(`ffmpeg binary not found at ${ffmpegPath}`)
+  }
+  const fps = 25
+  const width = 1024
+  const height = 768
+  const options = GetFfmpegOptions.getFfmpegOptions(fps, width, height, outFile)
+  const childProcess = spawn(ffmpegPath, options, {
+    stdio: ['pipe', 'pipe', 'pipe'],
+  })
+  FfmpegProcessState.set(childProcess)
+  childProcess.stdout.on('data', (data) => {
+    console.log({ stdout: data.toString() })
+  })
+  childProcess.stderr.on('data', (data) => {
+    console.log({ stderr: data.toString() })
+  })
+  childProcess.stdin.on('finish', handleStdinFinished)
+  childProcess.stdin.on('error', handleStdinError)
+  childProcess.on('exit', handleExit)
+}

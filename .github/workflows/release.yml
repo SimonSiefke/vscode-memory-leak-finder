@@ -1,0 +1,99 @@
+name: release
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  create-release:
+    name: create-release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      upload_url: ${{ steps.release.outputs.upload_url }}
+      rg_version: ${{ env.RG_VERSION }}
+    steps:
+      - name: Get the release version from the tag
+        shell: bash
+        if: env.RG_VERSION == ''
+        run: |
+          echo "RG_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          echo "version is: ${{ env.RG_VERSION }}"
+      - name: Create GitHub release
+        id: release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.RG_VERSION }}
+          name: ${{ env.RG_VERSION }}
+
+  build-release:
+    name: build-release
+    needs: ['create-release']
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-26, windows-2025]
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v5
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v5
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm ci --ignore-scripts && npm run postinstall
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm run type-check
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - name: Run headless test
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm run e2e
+      - name: Run headless test (check leaks)
+        if: matrix.os != 'macos-26'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
+      - name: Run headless test (check leaks, event listeners)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
+      - name: Run headless test (check leaks, instance counts)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure instance-counts-with-source-map
+      - name: upload artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RG_VERSION }}
+          files: .vscode-memory-leak-finder-results

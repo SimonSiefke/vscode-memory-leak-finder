@@ -1,0 +1,11 @@
+{
+  "name": "@vscode-memory-leak-finder/page-object",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/main.ts",
+  "scripts": {},
+  "dependencies": {
+    "@lvce-editor/rpc": "^5.1.0"
+  }
+}

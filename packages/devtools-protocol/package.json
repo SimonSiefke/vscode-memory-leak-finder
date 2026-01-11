@@ -1,0 +1,27 @@
+{
+  "name": "@vscode-memory-leak-finder/devtools-protocol",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.vscode-test/"
+    ],
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 10,
+        "functions": 10,
+        "lines": 10,
+        "statements": 10
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
+import * as CompareEventListeners from '../CompareEventListeners/CompareEventListeners.ts'
+import * as GetEventListeners from '../GetEventListeners/GetEventListeners.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
+
+export const id = MeasureId.EventListeners
+
+export const targets = [TargetId.Browser]
+
+/**
+ *
+ * @param {any} session
+ */
+
+export const create = (session: Session) => {
+  const objectGroup = ObjectGroupId.create()
+  const scriptHandler = ScriptHandler.create()
+  return [session, objectGroup, scriptHandler]
+}
+
+export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+  await scriptHandler.start(session)
+  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
+  return result
+}
+
+export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+  await scriptHandler.stop(session)
+  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
+  return result
+}
+
+export const releaseResources = async (session: Session, objectGroup: string) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
+}
+
+export const compare = CompareEventListeners.compareEventListeners
+
+export const isLeak = (leakedEventListeners) => {
+  return leakedEventListeners.length > 0
+}

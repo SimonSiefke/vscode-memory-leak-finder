@@ -1,0 +1,51 @@
+import type { Session } from '../Session/Session.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+
+export const getCssInlineStyles = async (session: Session, objectGroup: string): Promise<number> => {
+  const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: PrototypeExpression.Node,
+    objectGroup,
+    returnByValue: false,
+  })
+  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
+    objectGroup,
+    prototypeObjectId: prototypeDescriptor.objectId,
+  })
+  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+const objects = this
+
+const getNodeInlineStyles = (node) => {
+  try {
+    const styleArray = [...node.style]
+    return styleArray
+  } catch {
+    return []
+  }
+}
+
+const createCountMap = (array) => {
+  const map = Object.create(null)
+  for(const item of array){
+    map[item] ||= 0
+    map[item]++
+  }
+  return map
+}
+
+const getTotalInlineStyleCount = (nodes) => {
+  const inlineStyles = nodes.flatMap(getNodeInlineStyles)
+  const countMap = createCountMap(inlineStyles)
+  return countMap
+}
+
+const countMap = getTotalInlineStyleCount(objects)
+return countMap
+}`,
+    objectGroup,
+    objectId: objects.objects.objectId,
+    returnByValue: true,
+  })
+  return fnResult1
+}

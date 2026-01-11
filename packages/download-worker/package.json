@@ -1,0 +1,52 @@
+{
+  "name": "@vscode-memory-leak-finder/download-worker",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/main.ts",
+  "bin": {
+    "download-worker": "bin/download-worker.js"
+  },
+  "scripts": {
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
+    },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
+    "testMatch": [
+      "<rootDir>/test/**/*.ts",
+      "<rootDir>/test/**/*.js"
+    ],
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 10,
+        "functions": 10,
+        "lines": 10,
+        "statements": 10
+      }
+    }
+  },
+  "dependencies": {
+    "@lvce-editor/assert": "^1.5.1",
+    "@lvce-editor/rpc": "^5.1.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}

@@ -1,0 +1,42 @@
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
+import * as CompareFunctionDifference from '../CompareFunctionDifference/CompareFunctionDifference.ts'
+import * as GetNamedFunctionCount from '../GetNamedFunctionCount/GetNamedFunctionCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
+
+export const id = MeasureId.NamedFunctionDifference
+
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
+
+export const create = (session: Session) => {
+  const objectGroup = ObjectGroupId.create()
+  const scriptHandler = ScriptHandler.create()
+  return [session, objectGroup, scriptHandler]
+}
+
+const includeSourceMap = false
+
+export const start = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
+  await scriptHandler.start(session)
+  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
+}
+
+export const stop = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
+  await scriptHandler.stop(session)
+  const result = await GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
+  return result
+}
+
+export const releaseResources = async (session: Session, objectGroup: string) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
+}
+
+export const compare = CompareFunctionDifference.compareFunctionDifference
+
+export const isLeak = (difference) => {
+  return difference.length > 0
+}

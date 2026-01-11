@@ -1,0 +1,25 @@
+import type { Session } from '../Session/Session.ts'
+import * as Assert from '../Assert/Assert.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.ts'
+import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.ts'
+
+export const getFunctionLocation = async (session: Session, objectId) => {
+  Assert.object(session)
+  Assert.string(objectId)
+  if (!objectId) {
+    return EmptyFunctionLocation.emptyFunctionLocation
+  }
+  const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
+    accessorPropertiesOnly: false,
+    generatePreview: false,
+    nonIndexedPropertiesOnly: false,
+    objectId,
+    ownProperties: true,
+  })
+  const functionLocation = fnResult1.internalProperties.find(IsFunctionLocation.isFunctionLocation)
+  if (!functionLocation) {
+    return EmptyFunctionLocation.emptyFunctionLocation
+  }
+  return functionLocation.value.value
+}

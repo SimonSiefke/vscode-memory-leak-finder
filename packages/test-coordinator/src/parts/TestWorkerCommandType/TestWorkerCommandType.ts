@@ -1,0 +1,7 @@
+export const ConnectDevtools = 'ConnectDevtools.connectDevtools'
+export const MemoryLeakFinderStart = 'MemoryLeakFinderStart.start'
+export const MemoryLeakFinderStop = 'MemoryLeakFinderStop.stop'
+export const MemoryLeakFinderCompare = 'MemoryLeakFinderStop.compare'
+export const RunTest = 'RunTest.runTest'
+export const SetupTest = 'Setuptest.setupTest'
+export const TearDownTest = 'TearDownTest.tearDownTest'

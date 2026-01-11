@@ -1,0 +1,22 @@
+import type { TestContext } from '../types.ts'
+
+export const skip = true
+
+export const setup = async ({ Editor, ExtensionDetailView, Extensions }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+  await Extensions.show()
+  await Extensions.search('@builtin html')
+  await Extensions.first.shouldBe('HTML Language Basics')
+  await Extensions.first.click()
+  await ExtensionDetailView.shouldHaveHeading('HTML Language Basics')
+  await ExtensionDetailView.shouldHaveTab('Details')
+}
+
+export const run = async ({ ExtensionDetailView, Extensions, SideBar }: TestContext): Promise<void> => {
+  await SideBar.hide()
+  await ExtensionDetailView.selectCategory('Programming Languages')
+  await Extensions.shouldHaveValue('@category:"Programming Languages"')
+
+  await Extensions.waitForProgressToBeHidden()
+  await Extensions.clear()
+}

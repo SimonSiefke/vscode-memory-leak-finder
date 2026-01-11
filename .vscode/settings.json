@@ -1,0 +1,14 @@
+{
+  "files.watcherExclude": {
+    "**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/.code-search": true,
+    "**/.vscode-extensions": true,
+    "**/.vscode-test": true,
+    "**/.vscode-test-workspace": true,
+    "**/.vscode-user-data-dir": true
+  }
+}

@@ -1,0 +1,37 @@
+import { mkdir } from 'node:fs/promises'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
+import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
+import * as VideosPath from '../VideosPath/VideosPath.ts'
+
+export const connectScreenRecording = async (sessionRpc: any, attachedToPageTimeout: number, screencastQuality: number): Promise<void> => {
+  await mkdir(VideosPath.videosPath, { recursive: true })
+
+  const handleFrame = async (message: any): Promise<void> => {
+    const ffmpegProcess = FfmpegProcessState.get()
+    if (!ffmpegProcess || !ffmpegProcess.stdin) {
+      return
+    }
+    const { data, sessionId } = message.params
+    ffmpegProcess.stdin.write(data, 'base64')
+    await DevtoolsProtocolPage.screencastFrameAck(sessionRpc, { sessionId })
+  }
+
+  sessionRpc.on(DevtoolsEventType.PageScreencastFrame, handleFrame)
+
+  await PTimeout.pTimeout(
+    Promise.all([
+      DevtoolsProtocolPage.enable(sessionRpc),
+      DevtoolsProtocolPage.startScreencast(sessionRpc, {
+        format: 'jpeg',
+        maxHeight: 768,
+        maxWidth: 1024,
+        quality: screencastQuality,
+      }),
+    ]),
+    {
+      milliseconds: attachedToPageTimeout,
+    },
+  )
+}

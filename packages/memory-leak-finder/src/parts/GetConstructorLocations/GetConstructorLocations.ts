@@ -1,0 +1,32 @@
+import type { Session } from '../Session/Session.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
+import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.ts'
+import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.ts'
+
+export const getConstructorLocations = async (session: Session, objectGroup: string, map: any) => {
+  const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const map = this
+  const array = []
+
+  for(const [instanceConstructor, count] of map.entries()){
+    array.push(instanceConstructor)
+  }
+
+  return array
+}`,
+    objectGroup,
+    objectId: map.objectId,
+    returnByValue: false,
+  })
+  const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
+    generatePreview: false,
+    objectId: fnResult2.objectId,
+    ownProperties: true,
+  })
+  const descriptors = GetDescriptorValues.getDescriptorValues(fnResult3.result)
+  const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
+  const functionLocations = await GetFunctionLocations.getFunctionLocations(session, functionObjectIds)
+  return functionLocations
+}

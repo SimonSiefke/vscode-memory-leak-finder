@@ -1,0 +1,836 @@
+[
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/subscribe_limited_user",
+    "method": "OPTIONS",
+    "filename": "api_github_com_copilot_internal_subscribe_limited_user_options.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/subscribe_limited_user",
+    "method": "POST",
+    "filename": "api_github_com_copilot_internal_subscribe_limited_user_post.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/user",
+    "method": "GET",
+    "filename": "api_github_com_copilot_internal_user_get.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/user",
+    "method": "OPTIONS",
+    "filename": "api_github_com_copilot_internal_user_options.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/v2/token",
+    "method": "*",
+    "filename": "api_github_com_copilot_internal_v2_token.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot/mcp_registry",
+    "method": "GET",
+    "filename": "api_github_com_copilot_mcp_registry_get.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot/mcp_registry",
+    "method": "OPTIONS",
+    "filename": "api_github_com_copilot_mcp_registry_options.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/embeddings",
+    "method": "POST",
+    "filename": "api_github_com_embeddings_post.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/embeddings/models",
+    "method": "GET",
+    "filename": "api_github_com_embeddings_models_get.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/user",
+    "method": "*",
+    "filename": "api_github_com_user.json"
+  },
+  {
+    "hostname": "api.individual.githubcopilot.com",
+    "pathname": "/agents",
+    "method": "*",
+    "filename": "api_individual_githubcopilot_com_agents.json"
+  },
+  {
+    "hostname": "api.individual.githubcopilot.com",
+    "pathname": "/chat/completions",
+    "method": "POST",
+    "filename": "api_individual_githubcopilot_com_chat_completions_post.json"
+  },
+  {
+    "hostname": "api.individual.githubcopilot.com",
+    "pathname": "/models",
+    "method": "GET",
+    "filename": "api_individual_githubcopilot_com_models_get.json"
+  },
+  {
+    "hostname": "api.individual.githubcopilot.com",
+    "pathname": "/models/session",
+    "method": "POST",
+    "filename": "api_individual_githubcopilot_com_models_session_post.json"
+  },
+  {
+    "hostname": "api.individual.githubcopilot.com",
+    "pathname": "/responses",
+    "method": "POST",
+    "filename": "api_individual_githubcopilot_com_responses_post.json"
+  },
+  {
+    "filename": "api_mcp_github_com_v0_1_servers_get.json",
+    "hostname": "api.mcp.github.com",
+    "method": "GET",
+    "pathname": "/v0.1/servers"
+  },
+  {
+    "hostname": "applicationinsights.azure.com",
+    "pathname": "*",
+    "method": "*",
+    "filename": "applicationinsights_azure_com.json"
+  },
+  {
+    "hostname": "automatalabs.gallerycdn.vsassets.io",
+    "pathname": "/extensions/automatalabs/copilot-mcp/0.0.88/1760769063637/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "automatalabs_gallerycdn_vsassets_io_extensions_automatalabs_copilot_mcp_0_0_88_1760769063637_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "avatars.githubusercontent.com",
+    "pathname": "/u/12345678",
+    "method": "GET",
+    "filename": "avatars_githubusercontent_com_u_12345678_get.json"
+  },
+  {
+    "filename": "avatars_githubusercontent_com_u_6154722_get.json",
+    "hostname": "avatars.githubusercontent.com",
+    "method": "GET",
+    "pathname": "/u/6154722"
+  },
+  {
+    "hostname": "avatars.githubusercontent.com",
+    "pathname": "/u/72156503",
+    "method": "GET",
+    "filename": "avatars_githubusercontent_com_u_72156503_get.json"
+  },
+  {
+    "filename": "avatars_githubusercontent_com_u_74989412_get.json",
+    "hostname": "avatars.githubusercontent.com",
+    "method": "GET",
+    "pathname": "/u/74989412"
+  },
+  {
+    "filename": "avatars_githubusercontent_com_u_9919_get.json",
+    "hostname": "avatars.githubusercontent.com",
+    "method": "GET",
+    "pathname": "/u/9919"
+  },
+  {
+    "hostname": "baiducomate.gallerycdn.vsassets.io",
+    "pathname": "/extensions/baiducomate/comate/3.22.3/1765370085985/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "baiducomate_gallerycdn_vsassets_io_extensions_baiducomate_comate_3_22_3_1765370085985_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "benjaminbenais.gallerycdn.vsassets.io",
+    "pathname": "/extensions/benjaminbenais/copilot-theme/1.1.0/1678903433839/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "benjaminbenais_gallerycdn_vsassets_io_extensions_benjaminbenais_copilot_theme_1_1_0_1678903433839_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "blackboxapp.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/Blackboxapp/extension/blackbox/2.8.51/assetbyname/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "blackboxapp_gallery_vsassets_io_apis_public_gallery_publisher_Blackboxapp_extension_blackbox_2_8_51_assetbyname_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "blackboxapp.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/Blackboxapp/extension/blackboxagent/3.5.44/assetbyname/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "blackboxapp_gallery_vsassets_io_apis_public_gallery_publisher_Blackboxapp_extension_blackboxagent_3_5_44_assetbyname_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "code.visualstudio.com",
+    "pathname": "/assets/docs/copilot/copilot-chat/inline-chat-question-example.png",
+    "method": "GET",
+    "filename": "code_visualstudio_com_assets_docs_copilot_copilot_chat_inline_chat_question_example_png_get.json"
+  },
+  {
+    "hostname": "code.visualstudio.com",
+    "pathname": "/assets/docs/copilot/inline-suggestions/nes-point.gif",
+    "method": "GET",
+    "filename": "code_visualstudio_com_assets_docs_copilot_inline_suggestions_nes_point_gif_get.json"
+  },
+  {
+    "hostname": "copilot-telemetry.githubusercontent.com",
+    "pathname": "/telemetry",
+    "method": "GET",
+    "filename": "copilot_telemetry_githubusercontent_com_telemetry_get.json"
+  },
+  {
+    "hostname": "cursor-coplit.gallerycdn.vsassets.io",
+    "pathname": "/extensions/cursor-coplit/cursor-copilot/1.0.1/1745645252082/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "cursor_coplit_gallerycdn_vsassets_io_extensions_cursor_coplit_cursor_copilot_1_0_1_1745645252082_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "eamodio.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/eamodio/extension/gitlens/17.7.1/assetbyname/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "eamodio_gallery_vsassets_io_apis_public_gallery_publisher_eamodio_extension_gitlens_17_7_1_assetbyname_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "eamodio.gallerycdn.vsassets.io",
+    "pathname": "/extensions/eamodio/gitlens/17.7.1/1763061694224/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "eamodio_gallerycdn_vsassets_io_extensions_eamodio_gitlens_17_7_1_1763061694224_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "filename": "eamodio_gallerycdn_vsassets_io_extensions_eamodio_gitlens_2026_1_804_1767863573040_Microsoft_VisualStudio_Services_Icons_Default_get.json",
+    "hostname": "eamodio.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/eamodio/gitlens/2026.1.804/1767863573040/Microsoft.VisualStudio.Services.Icons.Default"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/GitHub.copilot-chat.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_GitHub_copilot_chat_json_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/GitHub.copilot.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_GitHub_copilot_json_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/latest.txt",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_latest_txt_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/ms-vscode.js-debug-companion.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_ms_vscode_js_debug_companion_json_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/ms-vscode.js-debug.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_ms_vscode_js_debug_json_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/ms-vscode.vscode-js-profile-table.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_ms_vscode_vscode_js_profile_table_json_get.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_abc_abc_test_provider_sample_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/abc.abc-test-provider-sample.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.108/commands/core.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_core_json_get.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_e2e_tests_inline_completion_provider_typescript_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/e2e-tests.inline-completion-provider-typescript.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_e2e_tests_inline_completion_provider_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/e2e-tests.inline-completion-provider.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_GitHub_copilot_chat_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/GitHub.copilot-chat.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.108/commands/latest.txt",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_latest_txt_get.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_python_debugpy_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-python.debugpy.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_python_python_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-python.python.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_python_vscode_pylance_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-python.vscode-pylance.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_python_vscode_python_envs_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-python.vscode-python-envs.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_cpptools_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.cpptools.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_hexeditor_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.hexeditor.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_js_debug_companion_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.js-debug-companion.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_js_debug_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.js-debug.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_108_commands_ms_vscode_vscode_js_profile_table_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.108/commands/ms-vscode.vscode-js-profile-table.json"
+  },
+  {
+    "hostname": "feiskyer.gallerycdn.vsassets.io",
+    "pathname": "/extensions/feiskyer/chatgpt-copilot/4.10.1/1763558369862/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "feiskyer_gallerycdn_vsassets_io_extensions_feiskyer_chatgpt_copilot_4_10_1_1763558369862_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "github.com",
+    "pathname": "/microsoft/vscode-copilot-release/blob/main/images/agent-mode-readme.gif",
+    "method": "GET",
+    "filename": "github_com_microsoft_vscode_copilot_release_blob_main_images_agent_mode_readme_gif_get.json"
+  },
+  {
+    "hostname": "github.com",
+    "pathname": "/microsoft/vscode-copilot-release/blob/main/images/hero-dark.png",
+    "method": "GET",
+    "filename": "github_com_microsoft_vscode_copilot_release_blob_main_images_hero_dark_png_get.json"
+  },
+  {
+    "hostname": "github.com",
+    "pathname": "/microsoft/vscode-copilot-release/blob/main/images/participants-workspace.gif",
+    "method": "GET",
+    "filename": "github_com_microsoft_vscode_copilot_release_blob_main_images_participants_workspace_gif_get.json"
+  },
+  {
+    "hostname": "github.com",
+    "pathname": "/microsoft/vscode-copilot-release/raw/refs/heads/main/images/agent-mode-readme.gif",
+    "method": "GET",
+    "filename": "github_com_microsoft_vscode_copilot_release_raw_refs_heads_main_images_agent_mode_readme_gif_get.json"
+  },
+  {
+    "hostname": "github.com",
+    "pathname": "/microsoft/vscode-copilot-release/raw/refs/heads/main/images/hero-dark.png",
+    "method": "GET",
+    "filename": "github_com_microsoft_vscode_copilot_release_raw_refs_heads_main_images_hero_dark_png_get.json"
+  },
+  {
+    "hostname": "github.com",
+    "pathname": "/microsoft/vscode-copilot-release/raw/refs/heads/main/images/participants-workspace.gif",
+    "method": "GET",
+    "filename": "github_com_microsoft_vscode_copilot_release_raw_refs_heads_main_images_participants_workspace_gif_get.json"
+  },
+  {
+    "hostname": "github.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/GitHub/extension/copilot-chat/0.33.5/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage",
+    "method": "GET",
+    "filename": "github_gallery_vsassets_io_apis_public_gallery_publisher_GitHub_extension_copilot_chat_0_33_5_assetbyname_Microsoft_VisualStudio_Services_VSIXPackage_get.json"
+  },
+  {
+    "filename": "github_gallery_vsassets_io_apis_public_gallery_publisher_GitHub_extension_copilot_chat_0_35_3_assetbyname_Microsoft_VisualStudio_Services_VSIXPackage_get.json",
+    "hostname": "github.gallery.vsassets.io",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/publisher/GitHub/extension/copilot-chat/0.35.3/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+  },
+  {
+    "hostname": "github.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/GitHub/extension/copilot-chat/0.36.2025121004/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage",
+    "method": "GET",
+    "filename": "github_gallery_vsassets_io_apis_public_gallery_publisher_GitHub_extension_copilot_chat_0_36_2025121004_assetbyname_Microsoft_VisualStudio_Services_VSIXPackage_get.json"
+  },
+  {
+    "hostname": "github.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/GitHub/extension/copilot/1.388.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage",
+    "method": "GET",
+    "filename": "github_gallery_vsassets_io_apis_public_gallery_publisher_GitHub_extension_copilot_1_388_0_assetbyname_Microsoft_VisualStudio_Services_VSIXPackage_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot-chat/0.33.5/1765210039863/Microsoft.VisualStudio.Code.Manifest",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_33_5_1765210039863_Microsoft_VisualStudio_Code_Manifest_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot-chat/0.33.5/1765210039863/Microsoft.VisualStudio.Code.Manifest",
+    "method": "OPTIONS",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_33_5_1765210039863_Microsoft_VisualStudio_Code_Manifest_options.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot-chat/0.33.5/1765210039863/Microsoft.VisualStudio.Services.Content.Details",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_33_5_1765210039863_Microsoft_VisualStudio_Services_Content_Details_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot-chat/0.33.5/1765210039863/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_33_5_1765210039863_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot-chat/0.33.5/1765210039863/Microsoft.VisualStudio.Services.VSIXPackage",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_33_5_1765210039863_Microsoft_VisualStudio_Services_VSIXPackage_get.json"
+  },
+  {
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_35_3_1767730520274_Microsoft_VisualStudio_Code_Manifest_get.json",
+    "hostname": "github.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/github/copilot-chat/0.35.3/1767730520274/Microsoft.VisualStudio.Code.Manifest"
+  },
+  {
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_35_3_1767730520274_Microsoft_VisualStudio_Services_Content_Details_get.json",
+    "hostname": "github.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/github/copilot-chat/0.35.3/1767730520274/Microsoft.VisualStudio.Services.Content.Details"
+  },
+  {
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_35_3_1767730520274_Microsoft_VisualStudio_Services_Icons_Default_get.json",
+    "hostname": "github.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/github/copilot-chat/0.35.3/1767730520274/Microsoft.VisualStudio.Services.Icons.Default"
+  },
+  {
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_35_3_1767730520274_Microsoft_VisualStudio_Services_VSIXPackage_get.json",
+    "hostname": "github.gallerycdn.vsassets.io",
+    "method": "GET",
+    "pathname": "/extensions/github/copilot-chat/0.35.3/1767730520274/Microsoft.VisualStudio.Services.VSIXPackage"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot-chat/0.36.2025121004/1765391829792/Microsoft.VisualStudio.Code.Manifest",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_36_2025121004_1765391829792_Microsoft_VisualStudio_Code_Manifest_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot-chat/0.36.2025121004/1765391829792/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_36_2025121004_1765391829792_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot-chat/0.36.2025121004/1765391829792/Microsoft.VisualStudio.Services.VSIXPackage",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_chat_0_36_2025121004_1765391829792_Microsoft_VisualStudio_Services_VSIXPackage_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot-workspace/0.5.4/1739373511354/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_workspace_0_5_4_1739373511354_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot/1.388.0/1761326434179/Microsoft.VisualStudio.Code.Manifest",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_1_388_0_1761326434179_Microsoft_VisualStudio_Code_Manifest_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot/1.388.0/1761326434179/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_1_388_0_1761326434179_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "github.gallerycdn.vsassets.io",
+    "pathname": "/extensions/github/copilot/1.388.0/1761326434179/Microsoft.VisualStudio.Services.VSIXPackage",
+    "method": "GET",
+    "filename": "github_gallerycdn_vsassets_io_extensions_github_copilot_1_388_0_1761326434179_Microsoft_VisualStudio_Services_VSIXPackage_get.json"
+  },
+  {
+    "filename": "main_vscode_cdn_net_core_insiders_json_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/core/insiders.json"
+  },
+  {
+    "hostname": "main.vscode-cdn.net",
+    "pathname": "/extensions/chat.json",
+    "method": "*",
+    "filename": "main_vscode_cdn_net_extensions_chat_json.json"
+  },
+  {
+    "hostname": "main.vscode-cdn.net",
+    "pathname": "/extensions/copilotChat.json",
+    "method": "GET",
+    "filename": "main_vscode_cdn_net_extensions_copilotChat_json_get.json"
+  },
+  {
+    "hostname": "main.vscode-cdn.net",
+    "pathname": "/extensions/marketplace.json",
+    "method": "GET",
+    "filename": "main_vscode_cdn_net_extensions_marketplace_json_get.json"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_code_electron_browser_workbench_workbench_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/code/electron-browser/workbench/workbench.js.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_editor_common_services_editorWebWorkerMain_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/editor/common/services/editorWebWorkerMain.js.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_workbench_services_textMate_browser_backgroundTokenization_worker_textMateTokenizationWorker_workerMain_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.workerMain.js.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_workbench_workbench_desktop_main_css_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/workbench/workbench.desktop.main.css.map"
+  },
+  {
+    "filename": "main_vscode_cdn_net_sourcemaps_3d862df21449d5ead0b0b1fbe6d43eb05490cb1c_core_vs_workbench_workbench_desktop_main_js_map_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/sourcemaps/3d862df21449d5ead0b0b1fbe6d43eb05490cb1c/core/vs/workbench/workbench.desktop.main.js.map"
+  },
+  {
+    "hostname": "main.vscode-cdn.net",
+    "pathname": "/sourcemaps/ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57/core/vs/code/electron-browser/workbench/workbench.js.map",
+    "method": "GET",
+    "filename": "main_vscode_cdn_net_sourcemaps_ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57_core_vs_code_electron_browser_workbench_workbench_js_map_get.json"
+  },
+  {
+    "hostname": "main.vscode-cdn.net",
+    "pathname": "/sourcemaps/ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57/core/vs/editor/common/services/editorWebWorkerMain.js.map",
+    "method": "GET",
+    "filename": "main_vscode_cdn_net_sourcemaps_ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57_core_vs_editor_common_services_editorWebWorkerMain_js_map_get.json"
+  },
+  {
+    "hostname": "main.vscode-cdn.net",
+    "pathname": "/sourcemaps/ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57/core/vs/platform/profiling/electron-browser/profileAnalysisWorkerMain.js.map",
+    "method": "GET",
+    "filename": "main_vscode_cdn_net_sourcemaps_ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57_core_vs_platform_profiling_electron_browser_profileAnalysisWorkerMain_js_map_get.json"
+  },
+  {
+    "hostname": "main.vscode-cdn.net",
+    "pathname": "/sourcemaps/ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57/core/vs/workbench/workbench.desktop.main.css.map",
+    "method": "GET",
+    "filename": "main_vscode_cdn_net_sourcemaps_ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57_core_vs_workbench_workbench_desktop_main_css_map_get.json"
+  },
+  {
+    "hostname": "main.vscode-cdn.net",
+    "pathname": "/sourcemaps/ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57/core/vs/workbench/workbench.desktop.main.js.map",
+    "method": "GET",
+    "filename": "main_vscode_cdn_net_sourcemaps_ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57_core_vs_workbench_workbench_desktop_main_js_map_get.json"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/extensionquery",
+    "method": "POST",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_extensionquery_post.json"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_dbaeumer_vscode_eslint_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/dbaeumer/vscode-eslint/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_e2e_tests_inline_completion_provider_typescript_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/e2e-tests/inline-completion-provider-typescript/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_e2e_tests_inline_completion_provider_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/e2e-tests/inline-completion-provider/latest"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/vscode/eamodio/gitlens/latest",
+    "method": "GET",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_eamodio_gitlens_latest_get.json"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_firefox_devtools_vscode_firefox_debug_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/firefox-devtools/vscode-firefox-debug/latest"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/vscode/github/copilot-chat/latest",
+    "method": "GET",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_github_copilot_chat_latest_get.json"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/vscode/GitHub/copilot-chat/latest",
+    "method": "GET",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_GitHub_copilot_chat_latest_get.json"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/vscode/GitHub/copilot-chat/latest",
+    "method": "OPTIONS",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_GitHub_copilot_chat_latest_options.json"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_github_copilot_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/github/copilot/latest"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/vscode/GitHub/copilot/latest",
+    "method": "GET",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_GitHub_copilot_latest_get.json"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/vscode/ms-azuretools/vscode-containers/latest",
+    "method": "GET",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_azuretools_vscode_containers_latest_get.json"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_edgedevtools_vscode_edge_devtools_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-edgedevtools/vscode-edge-devtools/latest"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/vscode/ms-kubernetes-tools/vscode-kubernetes-tools/latest",
+    "method": "GET",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_kubernetes_tools_vscode_kubernetes_tools_latest_get.json"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_python_debugpy_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-python/debugpy/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_python_python_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-python/python/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_python_vscode_pylance_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-python/vscode-pylance/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_python_vscode_python_envs_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-python/vscode-python-envs/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_toolsai_jupyter_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-toolsai/jupyter/latest"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode-remote/remote-containers/latest",
+    "method": "GET",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_remote_remote_containers_latest_get.json"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_cpptools_extension_pack_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode/cpptools-extension-pack/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_cpptools_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode/cpptools/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_hexeditor_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode/hexeditor/latest"
+  },
+  {
+    "hostname": "marketplace.visualstudio.com",
+    "pathname": "/_apis/public/gallery/vscode/vscodevim/vim/latest",
+    "method": "GET",
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_vscodevim_vim_latest_get.json"
+  },
+  {
+    "hostname": "ms-azuretools.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/ms-azuretools/extension/vscode-containers/2.3.0/assetbyname/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_azuretools_gallery_vsassets_io_apis_public_gallery_publisher_ms_azuretools_extension_vscode_containers_2_3_0_assetbyname_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "ms-azuretools.gallerycdn.vsassets.io",
+    "pathname": "/extensions/ms-azuretools/vscode-azure-github-copilot/1.0.153/1765207712219/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_azuretools_gallerycdn_vsassets_io_extensions_ms_azuretools_vscode_azure_github_copilot_1_0_153_1765207712219_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "ms-azuretools.gallerycdn.vsassets.io",
+    "pathname": "/extensions/ms-azuretools/vscode-containers/2.3.0/1762798402707/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_azuretools_gallerycdn_vsassets_io_extensions_ms_azuretools_vscode_containers_2_3_0_1762798402707_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "ms-kubernetes-tools.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/ms-kubernetes-tools/extension/vscode-kubernetes-tools/1.3.27/assetbyname/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_kubernetes_tools_gallery_vsassets_io_apis_public_gallery_publisher_ms_kubernetes_tools_extension_vscode_kubernetes_tools_1_3_27_assetbyname_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "ms-kubernetes-tools.gallerycdn.vsassets.io",
+    "pathname": "/extensions/ms-kubernetes-tools/vscode-kubernetes-tools/1.3.27/1764092372350/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_kubernetes_tools_gallerycdn_vsassets_io_extensions_ms_kubernetes_tools_vscode_kubernetes_tools_1_3_27_1764092372350_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "ms-toolsai.gallerycdn.vsassets.io",
+    "pathname": "/extensions/ms-toolsai/jupyter/2025.9.1/1760397611682/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_toolsai_gallerycdn_vsassets_io_extensions_ms_toolsai_jupyter_2025_9_1_1760397611682_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "ms-vscode-remote.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/ms-vscode-remote/extension/remote-containers/0.431.1/assetbyname/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_vscode_remote_gallery_vsassets_io_apis_public_gallery_publisher_ms_vscode_remote_extension_remote_containers_0_431_1_assetbyname_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "ms-vscode-remote.gallerycdn.vsassets.io",
+    "pathname": "/extensions/ms-vscode-remote/remote-containers/0.431.1/1763128816407/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_vscode_remote_gallerycdn_vsassets_io_extensions_ms_vscode_remote_remote_containers_0_431_1_1763128816407_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "ms-vscode.gallerycdn.vsassets.io",
+    "pathname": "/extensions/ms-vscode/vscode-copilot-vision/0.1.1/1730762055572/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_vscode_gallerycdn_vsassets_io_extensions_ms_vscode_vscode_copilot_vision_0_1_1_1730762055572_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "ms-vscode.gallerycdn.vsassets.io",
+    "pathname": "/extensions/ms-vscode/vscode-websearchforcopilot/0.1.4/1758913974331/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "ms_vscode_gallerycdn_vsassets_io_extensions_ms_vscode_vscode_websearchforcopilot_0_1_4_1758913974331_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "proxy.individual.githubcopilot.com",
+    "pathname": "/models",
+    "method": "GET",
+    "filename": "proxy_individual_githubcopilot_com_models_get.json"
+  },
+  {
+    "hostname": "raw.githubusercontent.com",
+    "pathname": "/microsoft/vscode-copilot-release/refs/heads/main/images/agent-mode-readme.gif",
+    "method": "GET",
+    "filename": "raw_githubusercontent_com_microsoft_vscode_copilot_release_refs_heads_main_images_agent_mode_readme_gif_get.json"
+  },
+  {
+    "hostname": "raw.githubusercontent.com",
+    "pathname": "/microsoft/vscode-copilot-release/refs/heads/main/images/hero-dark.png",
+    "method": "GET",
+    "filename": "raw_githubusercontent_com_microsoft_vscode_copilot_release_refs_heads_main_images_hero_dark_png_get.json"
+  },
+  {
+    "hostname": "raw.githubusercontent.com",
+    "pathname": "/microsoft/vscode-copilot-release/refs/heads/main/images/participants-workspace.gif",
+    "method": "GET",
+    "filename": "raw_githubusercontent_com_microsoft_vscode_copilot_release_refs_heads_main_images_participants_workspace_gif_get.json"
+  },
+  {
+    "hostname": "telemetry.individual.githubcopilot.com",
+    "pathname": "/telemetry",
+    "method": "*",
+    "filename": "telemetry_individual_githubcopilot_com_telemetry.json"
+  },
+  {
+    "hostname": "vscjava.gallerycdn.vsassets.io",
+    "pathname": "/extensions/vscjava/migrate-java-to-azure/1.8.1/1765374106972/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "vscjava_gallerycdn_vsassets_io_extensions_vscjava_migrate_java_to_azure_1_8_1_1765374106972_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "vscjava.gallerycdn.vsassets.io",
+    "pathname": "/extensions/vscjava/vscode-java-upgrade/1.9.1/1764747707952/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "vscjava_gallerycdn_vsassets_io_extensions_vscjava_vscode_java_upgrade_1_9_1_1764747707952_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "vscodevim.gallery.vsassets.io",
+    "pathname": "/_apis/public/gallery/publisher/vscodevim/extension/vim/1.32.2/assetbyname/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "vscodevim_gallery_vsassets_io_apis_public_gallery_publisher_vscodevim_extension_vim_1_32_2_assetbyname_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "hostname": "vscodevim.gallerycdn.vsassets.io",
+    "pathname": "/extensions/vscodevim/vim/1.32.2/1764551967593/Microsoft.VisualStudio.Services.Icons.Default",
+    "method": "GET",
+    "filename": "vscodevim_gallerycdn_vsassets_io_extensions_vscodevim_vim_1_32_2_1764551967593_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  }
+]
