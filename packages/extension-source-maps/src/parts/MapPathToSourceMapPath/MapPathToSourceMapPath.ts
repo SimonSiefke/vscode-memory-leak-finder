@@ -1,7 +1,7 @@
 import { isAbsolute, join, relative, normalize } from 'node:path'
 
 const COPILOT_EXTENSION_PATH_REGEX = /\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/
-const JS_DEBUG_EXTENSION_PATH_REGEX = /\.vscode-extensions\/ms-vscode.js-debug\/(.+)$/
+const JS_DEBUG_EXTENSION_PATH_REGEX = /\/extensions\/ms-vscode\.js-debug\/(.+)$/
 const GITHUB_PREFIX_REGEX = /^github\./
 
 const normalizePathSeparators = (path: string): string => {
@@ -38,7 +38,7 @@ const extractJsDebug = (root: string, normalizedPath: string) => {
   if (!extensionMatch) {
     return null
   }
-  const relativePath = extensionMatch[2]
+  const relativePath = extensionMatch[1]
   let cacheDirName = `vscode-js-debug-1.1.05.0`
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, relativePath + '.map')
   return sourceMapPath
