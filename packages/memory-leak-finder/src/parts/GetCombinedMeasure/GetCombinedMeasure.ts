@@ -15,15 +15,7 @@ export const getCombinedMeasure = async (session: Session, measureId: string, co
   if (!measure.create) {
     throw new Error(`measure.create not available for ${measureId}`)
   }
-  let measureArgs: any
-  if (measureId === MeasureId.FileWatcherCount) {
-    if (pid === undefined) {
-      throw new Error(`pid is required for ${measureId} measure but was undefined`)
-    }
-    measureArgs = measure.create({ pid })
-  } else {
-    measureArgs = measure.create(session)
-  }
+  const measureArgs = measure.create(session)
   const combinedMeasure = MemoryLeakFinder.combine(measureArgs)
   return combinedMeasure
 }
