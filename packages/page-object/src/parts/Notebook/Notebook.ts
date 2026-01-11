@@ -41,6 +41,17 @@ export const create = ({ expect, page, platform, VError, electronApp }) => {
         throw new VError(error, `Failed to scroll up in notebook`)
       }
     },
+    async clearAllOutputs() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand('Notebook: Clear all Outputs')
+        const webViews = page.locator('.webview')
+        await expect(webViews).toHaveCount(0)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll up in notebook`)
+      }
+    },
     async executeCell({ index, kernelSource = '', expectedOutput }: { index: number; kernelSource: string; expectedOutput: string }) {
       try {
         await page.waitForIdle()

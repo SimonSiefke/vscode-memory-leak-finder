@@ -47,6 +47,8 @@ export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook, Ex
 
 export const run = async ({ Notebook }: TestContext): Promise<void> => {
   // @ts-ignore
+  await Notebook.clearAllOutputs()
+  // @ts-ignore
   await Notebook.executeCell({ index: 0, expectedOutput: 'Hello, World!\n' })
   await new Promise((r) => {})
 }
