@@ -7,19 +7,19 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const initialDiagnosticTimeout = 60_000
 
-const isNotebook = (file) => {
+const isNotebook = (file: string) => {
   return file.endsWith('.ipynb')
 }
 
-const isImage = (file) => {
+const isImage = (file: string) => {
   return file.endsWith('.svg')
 }
 
-const isVideo = (file) => {
+const isVideo = (file: string) => {
   return file.endsWith('.mp4') || file.endsWith('.webm') || file.endsWith('.avi')
 }
 
-const isBinary = (file) => {
+const isBinary = (file: string) => {
   return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
@@ -1359,6 +1359,17 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify editor text ${text}`)
+      }
+    },
+    async shouldHaveFile(fileName: string) {
+      try {
+        await page.waitForIdle()
+        const baseName = basename(fileName)
+        const editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify editor`)
       }
     },
     async shouldHaveToken(text, color) {
