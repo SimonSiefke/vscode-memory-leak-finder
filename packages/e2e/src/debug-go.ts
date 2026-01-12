@@ -7,6 +7,13 @@ export const requiresNetwork = true
 export const setup = async ({ Editor, Extensions, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
+      content: `module example
+
+go 1.21
+`,
+      name: 'go.mod',
+    },
+    {
       content: `package main
 
 import "fmt"
