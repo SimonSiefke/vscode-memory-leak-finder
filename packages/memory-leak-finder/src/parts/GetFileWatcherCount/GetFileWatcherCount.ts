@@ -2,6 +2,7 @@ import { exec } from 'node:child_process'
 import { readdir, readFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { promisify } from 'node:util'
+import * as Assert from '../Assert/Assert.ts'
 
 const execAsync = promisify(exec)
 
@@ -51,7 +52,8 @@ const countInotifyWatchers = async (pid: number): Promise<number> => {
   }
 }
 
-export const getFileWatcherCount = async (pid: number | undefined): Promise<number> => {
+export const getFileWatcherCount = async (pid: number): Promise<number> => {
+  Assert.number(pid)
   console.log({ pid })
   if (pid === undefined) {
     return 0
@@ -61,9 +63,11 @@ export const getFileWatcherCount = async (pid: number | undefined): Promise<numb
   }
   try {
     const allPids = await getAllDescendantPids(pid)
+    console.log({ allPids })
     let totalCount = 0
     for (const processPid of allPids) {
       const count = await countInotifyWatchers(processPid)
+      console.log({ count, processPid })
       totalCount += count
     }
     return totalCount
