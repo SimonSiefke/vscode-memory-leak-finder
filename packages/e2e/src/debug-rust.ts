@@ -7,6 +7,23 @@ export const requiresNetwork = true
 export const setup = async ({ Editor, Extensions, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
+      content: `{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug",
+            "program": "\${workspaceFolder}/main",
+            "args": [],
+            "cwd": "\${workspaceFolder}"
+        }
+    ]
+}
+`,
+      name: '.vscode/launch.json',
+    },
+    {
       content: `fn add(a: i32, b: i32) -> i32 {
     let result = a + b;
     result
@@ -37,7 +54,7 @@ export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Pr
   await ActivityBar.showRunAndDebug()
   await Editor.setBreakpoint(2)
   await RunAndDebug.runAndWaitForPaused({
-    debugLabel: 'LLDB: Debug',
+    debugLabel: 'Debug',
     file: 'main.rs',
     hasCallStack: false,
     line: 2,
