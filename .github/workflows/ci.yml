@@ -129,6 +129,8 @@ jobs:
             args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
           - name: named-function-count3-node
             args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --measure-node
+          - name: named-function-count3-pty-host
+            args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-ptyhost
           - name: mutation-observer-count
             args: --measure mutation-observer-count
           - name: resize-observer-count
@@ -334,6 +336,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-node
           path: ./vscode-memory-leak-finder-results-linux-named-function-count3-node
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-function-count3-pty-host
+          path: ./vscode-memory-leak-finder-results-linux-named-function-count3-pty-host
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
@@ -568,6 +575,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-node
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v5
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-function-count3-pty-host
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v5
         continue-on-error: true
