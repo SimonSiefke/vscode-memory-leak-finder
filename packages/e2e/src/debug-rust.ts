@@ -7,21 +7,14 @@ export const requiresNetwork = true
 export const setup = async ({ Editor, Extensions, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      content: `{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug",
-            "program": "\${workspaceFolder}/main",
-            "args": [],
-            "cwd": "\${workspaceFolder}"
-        }
-    ]
-}
+      content: `[package]
+name = "myapp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
 `,
-      name: '.vscode/launch.json',
+      name: 'Cargo.toml',
     },
     {
       content: `fn add(a: i32, b: i32) -> i32 {
@@ -34,7 +27,30 @@ fn main() {
     println!("{}", x);
 }
 `,
-      name: 'main.rs',
+      name: 'src/main.rs',
+    },
+    {
+      content: `{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug",
+            "cargo": {
+                "args": ["build", "--bin=myapp", "--package=myapp"],
+                "filter": {
+                    "name": "myapp",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "\${workspaceFolder}"
+        }
+    ]
+}
+`,
+      name: '.vscode/launch.json',
     },
   ])
   await Extensions.install({
@@ -50,7 +66,7 @@ fn main() {
 }
 
 export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Promise<void> => {
-  await Editor.open('main.rs')
+  await Editor.open('src/main.rs')
   await ActivityBar.showRunAndDebug()
   await Editor.setBreakpoint(2)
   await RunAndDebug.runAndWaitForPaused({
