@@ -66,10 +66,11 @@ fn main() {
 }
 
 export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Promise<void> => {
-  await Editor.open('src/main.rs')
+  await Editor.open('main.rs')
   await ActivityBar.showRunAndDebug()
   await Editor.setBreakpoint(2)
   await RunAndDebug.runAndWaitForPaused({
+    viaIcon: true,
     debugLabel: 'Debug',
     file: 'main.rs',
     hasCallStack: false,

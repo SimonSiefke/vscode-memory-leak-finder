@@ -136,13 +136,21 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to set variable value for ${variableName}`)
       }
     },
-    async startRunAndDebug({ debugConfiguration = '', debugLabel = 'Node.js' } = {}) {
+    async startRunAndDebug({ debugConfiguration = '', debugLabel = 'Node.js', viaIcon = false } = {}) {
       try {
-        await page.waitForIdle()
-        const button = page.locator('.monaco-button:has-text("Run and Debug")')
-        await expect(button).toBeVisible()
-        await page.waitForIdle()
-        await button.click()
+        if (viaIcon) {
+          const icon = page.locator('.codicon-debug-start')
+          await expect(icon).toBeVisible()
+          await page.waitForIdle()
+          await icon.click()
+          await page.waitForIdle()
+        } else {
+          await page.waitForIdle()
+          const button = page.locator('.monaco-button:has-text("Run and Debug")')
+          await expect(button).toBeVisible()
+          await page.waitForIdle()
+          await button.click()
+        }
         await page.waitForIdle()
         const quickPickWidget = page.locator('.quick-input-widget')
         const quickPickPromise = expect(quickPickWidget)
