@@ -22,5 +22,4 @@ export const run = async ({ Editor, Explorer }: TestContext): Promise<void> => {
   await Explorer.focus()
   await Explorer.openAllFiles()
   await Editor.closeAll()
-  await new Promise((r) => {})
 }
