@@ -68,7 +68,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to run debugger`)
       }
     },
-    async runAndWaitForPaused({ callStackSize, debugConfiguration, debugLabel, file, hasCallStack, line }) {
+    async runAndWaitForPaused({ callStackSize, debugConfiguration, debugLabel, file, hasCallStack, line, viaIcon }) {
       try {
         const quickPick = QuickPick.create({
           expect,
@@ -78,7 +78,7 @@ export const create = ({ expect, page, platform, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await page.waitForIdle()
-        await this.startRunAndDebug({ debugConfiguration, debugLabel })
+        await this.startRunAndDebug({ debugConfiguration, debugLabel, viaIcon })
         await this.waitForPaused({ callStackSize, file, hasCallStack, line })
       } catch (error) {
         throw new VError(error, `Failed to run debugger`)
