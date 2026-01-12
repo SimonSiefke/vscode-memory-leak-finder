@@ -17,6 +17,7 @@ export const connectWorkers = async (
   idleTimeout: number,
   pageObjectPath: string,
   parsedIdeVersion: any,
+  pid: number,
   timeouts: boolean,
   utilityContext: any,
   runMode: number,
@@ -75,6 +76,7 @@ export const connectWorkers = async (
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    pid,
   )
 
   return {

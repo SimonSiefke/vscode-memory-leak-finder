@@ -51,7 +51,7 @@ export const launchIde = async ({
 }) => {
   if (ide === Ide.Cursor) {
     const cursorVersion = '0.45.14' // TODO make it configurable
-    const result = await LaunchCursor.launchCursor({
+    const { child, pid } = await LaunchCursor.launchCursor({
       addDisposable,
       clearExtensions,
       cursorVersion,
@@ -69,7 +69,8 @@ export const launchIde = async ({
       vscodePath,
     })
     return {
-      ...result,
+      child,
+      pid,
       parsedVersion: ParseVersion.parseVersion(cursorVersion),
     }
   }
@@ -81,7 +82,7 @@ export const launchIde = async ({
   } else {
     versionToParse = vscodeVersion
   }
-  const result = await LaunchVsCode.launchVsCode({
+  const { child, pid } = await LaunchVsCode.launchVsCode({
     addDisposable,
     arch,
     clearExtensions,
@@ -105,7 +106,8 @@ export const launchIde = async ({
   })
 
   return {
-    ...result,
+    child,
+    pid,
     parsedVersion: ParseVersion.parseVersion(versionToParse),
   }
 }
