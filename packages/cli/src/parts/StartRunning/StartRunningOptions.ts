@@ -23,6 +23,7 @@ export interface StartRunningOptions {
   readonly inspectSharedProcessPort: number
   readonly isGithubActions: boolean
   readonly isWindows: boolean
+  readonly login: boolean
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean

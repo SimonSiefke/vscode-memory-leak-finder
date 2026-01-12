@@ -22,6 +22,7 @@ export interface RunTestsOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isGithubActions: boolean
+  readonly login: boolean
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean

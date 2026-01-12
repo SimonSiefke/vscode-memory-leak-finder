@@ -12,12 +12,12 @@ import * as GetVscodeRuntimeDir from '../GetVscodeRuntimeDir/GetVscodeRuntimeDir
 import * as IsCi from '../IsCi/IsCi.ts'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.ts'
 import { join } from '../Path/Path.ts'
+import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 import * as RemoveVscodeBackups from '../RemoveVscodeBackups/RemoveVscodeBackups.ts'
 import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveVscodeGlobalStorage.ts'
 import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/RemoveVscodeWorkspaceStorage.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
-import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 
 export const launchVsCode = async ({
   addDisposable,
@@ -153,7 +153,7 @@ export const launchVsCode = async ({
       runtimeDir,
     })
 
-    const { child } = await LaunchElectron.launchElectron({
+    const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,
       args,
       cliPath: binaryPath,
@@ -163,6 +163,7 @@ export const launchVsCode = async ({
     })
     return {
       child,
+      pid,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch VSCode`)
