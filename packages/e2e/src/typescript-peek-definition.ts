@@ -2,7 +2,8 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promise<void> => {
+  await SideBar.hide()
   await Workspace.setFiles([
     {
       content: `{}
@@ -31,7 +32,11 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 const element = new DebugNameData(1, 2, 3)`,
     },
   ])
-  await Editor.open('file.ts')
+  await Editor.goToFile({
+    file: 'file.ts',
+    line: 3,
+    column: 25,
+  })
   await Editor.shouldHaveSquigglyError()
 }
 
