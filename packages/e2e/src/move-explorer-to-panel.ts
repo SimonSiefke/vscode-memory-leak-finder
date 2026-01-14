@@ -8,7 +8,7 @@ export const setup = async ({ Panel, Editor, SideBar, ActivityBar }: TestContext
   await ActivityBar.resetViewLocations()
 }
 
-export const run = async ({ ActivityBar, Panel }: TestContext): Promise<void> => {
+export const run = async ({ ActivityBar }: TestContext): Promise<void> => {
   // @ts-ignore
   await ActivityBar.moveExplorerToPanel()
   // @ts-ignore
