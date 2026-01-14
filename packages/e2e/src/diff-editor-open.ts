@@ -29,3 +29,7 @@ export const run = async ({ DiffEditor, Editor }: TestContext): Promise<void> =>
   })
   await Editor.close()
 }
+
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+}

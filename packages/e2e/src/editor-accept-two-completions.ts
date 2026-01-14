@@ -4,6 +4,7 @@ export const skip = 1
 
 export const setup = async ({ Editor, SideBar, Workspace }: TestContext): Promise<void> => {
   await SideBar.hide()
+  await Editor.closeAll()
   await Workspace.setFiles([
     {
       content: `h1 {
