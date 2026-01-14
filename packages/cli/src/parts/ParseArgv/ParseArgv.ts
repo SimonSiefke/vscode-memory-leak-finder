@@ -279,8 +279,16 @@ const parsePlatform = (platform: string, argv: readonly string[]): string => {
   return platform
 }
 
+const parsePageObjectPath = (argv: readonly string[]): string => {
+  if (argv.includes('--page-object-path')) {
+    return parseArgvString(argv, '--page-object-path')
+  }
+  return ''
+}
+
 export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
   const platform = parsePlatform(processPlatform, argv)
+  const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const bisect = parseBisect(argv)
   const checkLeaks = parseCheckLeaks(argv)
@@ -351,6 +359,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     measure,
     measureAfter,
     measureNode,
+    pageObjectPath,
     platform,
     recordVideo,
     restartBetween,

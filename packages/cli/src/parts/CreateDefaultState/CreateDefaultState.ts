@@ -32,6 +32,7 @@ export const createDefaultState = (): StdinDataState => ({
   measureAfter: false,
   measureNode: false,
   mode: ModeType.Waiting,
+  pageObjectPath: '',
   platform: '',
   previousFilters: [],
   recordVideo: false,

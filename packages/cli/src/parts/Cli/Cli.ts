@@ -40,6 +40,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     measure: options.measure,
     measureAfter: options.measureAfter,
     measureNode: options.measureNode,
+    pageObjectPath: options.pageObjectPath,
     platform: options.platform,
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
