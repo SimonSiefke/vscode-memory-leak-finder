@@ -36,6 +36,7 @@ export const run = async ({ Terminal, Workspace, SettingsEditor }: TestContext):
 }
 
 export const teardown = async ({ Editor, SettingsEditor, Terminal }: TestContext): Promise<void> => {
+  await Editor.closeAll()
   await Terminal.killAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
