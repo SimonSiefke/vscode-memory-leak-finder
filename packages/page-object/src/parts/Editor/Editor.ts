@@ -471,6 +471,33 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to go to file ${file}`)
       }
     },
+    async peekDefinition({ itemCount }: { itemCount: number }) {
+      try {
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.PeekDefinition)
+        const widget = page.locator('.peekview-widget')
+        await expect(widget).toBeVisible()
+        const refs = widget.locator('.ref-tree .monaco-list-row')
+        await expect(refs).toHaveCount(itemCount)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open peek definition`)
+      }
+    },
+    async closePeekDefinition() {
+      try {
+        await page.waitForIdle()
+        const widget = page.locator('.peekview-widget')
+        await expect(widget).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
+        await expect(widget).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide peek definition`)
+      }
+    },
     async goToSourceDefinition({ hasDefinition }) {
       try {
         const quickPick = QuickPick.create({ expect, page, platform, VError })

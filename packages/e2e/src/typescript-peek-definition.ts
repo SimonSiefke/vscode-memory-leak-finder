@@ -40,10 +40,11 @@ const element = new DebugNameData(1, 2, 3)`,
   await Editor.shouldHaveSquigglyError()
 }
 
-export const run = async ({ Editor, Notification }: TestContext): Promise<void> => {
-  // TODO open peek definition
-  // await Editor.goToSourceDefinition({ hasDefinition: false })
-  // await Notification.closeAll()
+export const run = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.peekDefinition({
+    itemCount: 2,
+  })
+  await Editor.closePeekDefinition()
   await new Promise((r) => {})
 }
 
