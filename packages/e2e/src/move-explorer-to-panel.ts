@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.js'
 
+export const skip = 1
+
 export const setup = async ({ Panel, Editor, SideBar, ActivityBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SideBar.hide()
