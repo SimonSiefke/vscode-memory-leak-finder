@@ -59,6 +59,7 @@ export const runTestsWithCallback = async ({
   measure,
   measureAfter,
   measureNode,
+  pageObjectPath,
   platform,
   recordVideo,
   restartBetween,
@@ -100,7 +101,7 @@ export const runTestsWithCallback = async ({
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
-    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
+    const pageObjectPathResolved = GetPageObjectPath.getPageObjectPath(pageObjectPath)
 
     // TODO for each connection id, launch all needed workers
     // when a new connection id comes in, dispose them (even while running)
@@ -130,7 +131,7 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         measureId: measure,
         measureNode,
-        pageObjectPath,
+        pageObjectPath: pageObjectPathResolved,
         platform,
         recordVideo,
         runMode,
@@ -181,7 +182,7 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         measureId: measure,
         measureNode,
-        pageObjectPath,
+        pageObjectPath: pageObjectPathResolved,
         platform,
         recordVideo,
         runMode,
@@ -297,7 +298,7 @@ export const runTestsWithCallback = async ({
           inspectSharedProcessPort,
           measureId: measure,
           measureNode,
-          pageObjectPath,
+          pageObjectPath: pageObjectPathResolved,
           platform,
           recordVideo,
           runMode,
