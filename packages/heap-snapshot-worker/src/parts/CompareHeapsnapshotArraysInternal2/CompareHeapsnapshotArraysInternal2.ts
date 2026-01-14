@@ -181,7 +181,7 @@ const sortByCounts = (items: readonly any[]) => {
   return sorted
 }
 
-const compareCounts = (before, after) => {
+const compareCounts = (before, after, minCount: number) => {
   const beforeMap = Object.create(null)
   for (const item of before) {
     beforeMap[item.name] ||= 0
@@ -192,7 +192,7 @@ const compareCounts = (before, after) => {
     const oldCount = beforeMap[item.name] || 0
     const afterCount = item.count
     const delta = afterCount - oldCount
-    if (delta > 0) {
+    if (delta > minCount) {
       leaked.push({
         ...item,
         delta,
@@ -203,11 +203,11 @@ const compareCounts = (before, after) => {
   return sorted
 }
 
-export const compareHeapsnapshotArraysInternal2 = async (snapshotA: Snapshot, snapshotB: Snapshot) => {
+export const compareHeapsnapshotArraysInternal2 = async (snapshotA: Snapshot, snapshotB: Snapshot, minCount: number = 0) => {
   Assert.object(snapshotA)
   Assert.object(snapshotB)
   const countsA = getSortedCounts(snapshotA)
   const countsB = getSortedCounts(snapshotB)
-  const result = compareCounts(countsA, countsB)
+  const result = compareCounts(countsA, countsB, minCount)
   return result
 }
