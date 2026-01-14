@@ -70,30 +70,32 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open context menu`)
       }
     },
-    async openSubMenu(option: string) {
+    async openSubMenu(option: string, expands: boolean = true) {
       await page.waitForIdle()
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
       await expect(contextMenu).toBeVisible()
       await page.waitForIdle()
       await expect(contextMenu).toBeFocused()
       await page.waitForIdle()
-      const contextMenuItem = contextMenu.locator('.action-item', {
-        hasText: option,
-      })
+      const contextMenuItem = contextMenu.locator(`.action-item .action-label[aria-label="${option}"]`)
       await expect(contextMenuItem).toBeVisible()
       await page.waitForIdle()
       await contextMenuItem.click()
       await page.waitForIdle()
-      await expect(contextMenuItem).toHaveAttribute('aria-expanded', 'true')
+      if (expands) {
+        await expect(contextMenuItem).toHaveAttribute('aria-expanded', 'true')
+      }
 
       const subMenu = page.locator('.monaco-submenu')
       await expect(subMenu).toBeVisible()
     },
-    async select(option) {
+    async select(option: string, needsFocus: boolean = true) {
       await page.waitForIdle()
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
       await expect(contextMenu).toBeVisible()
-      await expect(contextMenu).toBeFocused()
+      if (needsFocus) {
+        await expect(contextMenu).toBeFocused()
+      }
       const contextMenuItem = contextMenu.locator('.action-item', {
         hasText: option,
       })
