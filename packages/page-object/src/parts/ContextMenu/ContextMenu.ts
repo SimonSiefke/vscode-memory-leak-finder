@@ -80,6 +80,9 @@ export const create = ({ expect, page, VError }) => {
       const contextMenuItem = contextMenu.locator(`.action-item .action-label[aria-label="${option}"]`)
       await expect(contextMenuItem).toBeVisible()
       await page.waitForIdle()
+      await new Promise((r) => {
+        setTimeout(r, 100) // TODO get rid of timeout
+      })
       await contextMenuItem.click()
       await page.waitForIdle()
       if (expands) {
@@ -93,6 +96,7 @@ export const create = ({ expect, page, VError }) => {
       await page.waitForIdle()
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
       await expect(contextMenu).toBeVisible()
+      await page.waitForIdle()
       if (needsFocus) {
         await expect(contextMenu).toBeFocused()
       }
