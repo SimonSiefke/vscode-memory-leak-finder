@@ -2,8 +2,6 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
-export const requiresNetwork = 1
-
 // Minimal valid MP4 file (ftyp box only)
 // This is the smallest valid MP4 file structure
 const minimalMp4 = Buffer.from([

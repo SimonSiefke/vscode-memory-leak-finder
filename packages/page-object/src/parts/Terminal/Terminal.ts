@@ -280,6 +280,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set terminal find input`)
       }
     },
+    async shouldHaveIncompleteDecoration(enabled: boolean) {
+      const terminal = page.locator('.terminal.xterm')
+      await page.waitForIdle()
+
+      const decoration = terminal.locator('.codicon-terminal-decoration-incomplete')
+      if (enabled) {
+        await expect(decoration).toBeVisible()
+      } else {
+        await expect(decoration).toBeHidden()
+      }
+      await page.waitForIdle()
+    },
     async shouldHaveSuccessDecoration() {
       try {
         await page.waitForIdle()

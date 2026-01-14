@@ -1,6 +1,7 @@
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 
 export const create = ({ expect, page, platform, VError }) => {
   return {
@@ -80,6 +81,33 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(tooltip).toHaveText(`Explorer (${keyBinding})`)
       } catch (error) {
         throw new VError(error, `Failed to show explorer tooltip`)
+      }
+    },
+    async moveExplorerToPanel() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Explorer'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        await contextMenu.open(activityBarItem)
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Panel', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move explorer to panel`)
+      }
+    },
+    async resetViewLocations() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError, platform })
+        await quickPick.executeCommand('View: Reset View Locations')
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Explorer'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        await expect(activityBarItem).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to reset view locations`)
       }
     },
     async showView({ ariaLabel, titleLabel = ariaLabel }) {
