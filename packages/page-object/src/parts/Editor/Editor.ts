@@ -684,13 +684,13 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           await this.waitForImageReady()
         } else if (options?.hasWarning) {
           await this.waitForWarning()
-        } else if (options?.hasError) {
-          // TODO
-          throw new Error(`not implemented`)
         } else if (isVideo(fileName)) {
           await this.waitForVideoReady(options?.hasError)
         } else if (isBinary(fileName)) {
           await this.waitForBinaryReady()
+        } else if (options?.hasError) {
+          // TODO
+          throw new Error(`not implemented`)
         } else {
           await this.waitforTextFileReady(fileName)
         }
@@ -1718,7 +1718,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       }
       await page.waitForIdle()
     },
-    async waitForVideoReady(hasError) {
+    async waitForVideoReady(hasError: boolean) {
       const webView = WebView.create({ expect, page, VError })
       const subFrame = await webView.shouldBeVisible2({
         extensionId: `vscode.media-preview`,
