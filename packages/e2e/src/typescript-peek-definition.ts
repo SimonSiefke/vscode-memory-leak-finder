@@ -41,11 +41,12 @@ const element = new DebugNameData(1, 2, 3)`,
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
+  // @ts-ignore
   await Editor.peekDefinition({
     itemCount: 2,
   })
+  // @ts-ignore
   await Editor.closePeekDefinition()
-  await new Promise((r) => {})
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
