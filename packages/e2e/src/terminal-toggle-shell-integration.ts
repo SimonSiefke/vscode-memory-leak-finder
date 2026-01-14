@@ -16,23 +16,46 @@ export const setup = async ({ Editor, Panel, SettingsEditor, SideBar, Terminal, 
     name: 'terminal.integrated.shellIntegration.enabled',
   })
   await Panel.hide()
+}
+
+export const run = async ({ Terminal, Editor, SettingsEditor }: TestContext): Promise<void> => {
+  await SettingsEditor.open()
+  await SettingsEditor.search({
+    resultCount: 5,
+    value: 'terminal.integrated.shellIntegration.enabled',
+  })
+  await SettingsEditor.enableCheckBox({
+    name: 'terminal.integrated.shellIntegration.enabled',
+  })
+  await Editor.closeAll()
+  await Terminal.killAll()
 
   await Terminal.show({
     waitForReady: true,
   })
-}
 
-export const run = async ({ Terminal, Workspace, SettingsEditor }: TestContext): Promise<void> => {
-  await SettingsEditor.enableCheckBox({
-    name: 'terminal.integrated.shellIntegration.enabled',
+  // @ts-ignore
+  await Terminal.shouldHaveIncompleteDecoration(true)
+
+  await SettingsEditor.open()
+  await SettingsEditor.search({
+    resultCount: 5,
+    value: 'terminal.integrated.shellIntegration.enabled',
   })
-  // TODO wait for shell integration to be visible
   await SettingsEditor.disableCheckBox({
     name: 'terminal.integrated.shellIntegration.enabled',
   })
-  // await Terminal.shouldHaveSuccessDecoration()
-  // await Terminal.clear()
-  // await Workspace.remove('test.txt')
+  await Editor.closeAll()
+  await Terminal.killAll()
+
+  await Terminal.show({
+    waitForReady: true,
+  })
+
+  // @ts-ignore
+  await Terminal.shouldHaveIncompleteDecoration(false)
+
+  await Terminal.killAll()
 }
 
 export const teardown = async ({ Editor, SettingsEditor, Terminal }: TestContext): Promise<void> => {
