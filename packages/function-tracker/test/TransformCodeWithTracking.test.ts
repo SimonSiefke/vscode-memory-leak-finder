@@ -26,7 +26,7 @@ test('TransformCodeWithTracking - should transform arrow functions', () => {
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const arrowFunction = () => {
-  trackFunctionCall(123, 3, 6);
+  trackFunctionCall(123, 2, 26);
   return 'arrow';
 };`
 
@@ -40,7 +40,7 @@ test('TransformCodeWithTracking - should transform concise arrow functions', () 
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const conciseArrow = x => {
-  trackFunctionCall(123, 3, 6);
+  trackFunctionCall(123, 2, 25);
   return x * 2;
 };`
 
@@ -1028,7 +1028,7 @@ test('Transform Script - transformCode - should transform arrow functions', () =
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const arrowFunction = () => {
-  trackFunctionCall(123, 3, 6);
+  trackFunctionCall(123, 2, 26);
   return 'arrow';
 };`
 
@@ -1042,7 +1042,7 @@ test('Transform Script - transformCode - should transform concise arrow function
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const conciseArrow = x => {
-  trackFunctionCall(123, 3, 6);
+  trackFunctionCall(123, 2, 25);
   return x * 2;
 };`
 
@@ -1058,7 +1058,7 @@ test('Transform Script - transformCode - should transform function expressions',
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const funcExpression = function () {
-  trackFunctionCall(123, 3, 6);
+  trackFunctionCall(123, 2, 26);
   return 'expression';
 };`
 
@@ -1079,11 +1079,11 @@ test('Transform Script - transformCode - should transform object methods', () =>
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const obj = {
   method() {
-    trackFunctionCall(123, 3, 6);
+    trackFunctionCall(123, 2, 26);
     return 'method';
   },
   arrowMethod: () => {
-    trackFunctionCall(123, 3, 6);
+    trackFunctionCall(123, 2, 26);
     return 'arrow method';
   }
 };`

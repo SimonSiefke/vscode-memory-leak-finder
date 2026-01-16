@@ -50,21 +50,22 @@ export const connectDevtools = async (
     // 1. Connect to devtools WebSocket
     webSocket = new WebSocket(devtoolsWebSocketUrl)
     
-    await new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error(`WebSocket connection timeout after ${attachedToPageTimeout}ms`))
-      }, attachedToPageTimeout)
-      
-      webSocket!.onopen = () => {
-        clearTimeout(timeout)
-        resolve()
-      }
-      
-      webSocket!.onerror = (error) => {
-        clearTimeout(timeout)
-        reject(new Error(`WebSocket connection failed: ${error}`))
-      }
-    })
+    const { promise: connectionPromise, resolve: connectionResolve, reject: connectionReject } = Promise.withResolvers<void>()
+    const connectionTimeout = setTimeout(() => {
+      connectionReject(new Error(`WebSocket connection timeout after ${attachedToPageTimeout}ms`))
+    }, attachedToPageTimeout)
+    
+    webSocket!.onopen = () => {
+      clearTimeout(connectionTimeout)
+      connectionResolve()
+    }
+    
+    webSocket!.onerror = (error) => {
+      clearTimeout(connectionTimeout)
+      connectionReject(new Error(`WebSocket connection failed: ${error}`))
+    }
+    
+    await connectionPromise
 
     const sendCommand = (method: string, params?: any): Promise<any> => {
       return new Promise((resolve, reject) => {
@@ -160,26 +161,26 @@ export const connectDevtools = async (
     })
 
     // Wait for attached to page event
-    const attachedEvent = await new Promise<any>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error(`Failed to attach to page within ${attachedToPageTimeout}ms`))
-      }, attachedToPageTimeout)
-      
-      const checkAttached = (event: MessageEvent) => {
-        try {
-          const message: DevToolsMessage = JSON.parse(event.data)
-          if (message.method === 'Target.attachedToTarget') {
-            clearTimeout(timeout)
-            webSocket!.removeEventListener('message', checkAttached)
-            resolve(message)
-          }
-        } catch (error) {
-          // Ignore parsing errors for other messages
+    const { promise: attachPromise, resolve: attachResolve, reject: attachReject } = Promise.withResolvers<DevToolsMessage>()
+    const attachTimeout = setTimeout(() => {
+      attachReject(new Error(`Failed to attach to page within ${attachedToPageTimeout}ms`))
+    }, attachedToPageTimeout)
+    
+    const checkAttached = (event: MessageEvent) => {
+      try {
+        const message: DevToolsMessage = JSON.parse(event.data)
+        if (message.method === 'Target.attachedToTarget') {
+          clearTimeout(attachTimeout)
+          webSocket!.removeEventListener('message', checkAttached)
+          attachResolve(message)
         }
+      } catch (error) {
+        // Ignore parsing errors for other messages
       }
-      
-      webSocket!.addEventListener('message', checkAttached)
-    })
+    }
+    
+    webSocket!.addEventListener('message', checkAttached)
+    const attachedEvent = await attachPromise
 
     sessionId = attachedEvent.params.sessionId
     targetId = attachedEvent.params.targetInfo.targetId
