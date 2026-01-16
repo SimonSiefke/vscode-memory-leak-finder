@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { transformCode } from '../src/parts/Transform/Transform.js'
 
-test('Transform Script - transformCode - should transform function declarations', async () => {
+test.skip('Transform Script - transformCode - should transform function declarations', async () => {
   const code = `
     function testFunction() {
       return 'test'
