@@ -14,7 +14,7 @@ interface FunctionStatistics {
 }
 
 
-export function transformCode(code: string, filename?: string): string {
+export const transformCode = (code: string, filename?: string): string => {
   try {
     // Try different parsing strategies
     let ast

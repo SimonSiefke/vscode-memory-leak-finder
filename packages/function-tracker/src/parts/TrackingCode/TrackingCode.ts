@@ -5,13 +5,13 @@ if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map()
 }
 
-function trackFunctionCall(functionName, location) {
+const trackFunctionCall = (functionName, location) => {
   const key = functionName + (location ? \` (\${location})\` : '')
   const current = globalThis.___functionStatistics.get(key) || 0
   globalThis.___functionStatistics.set(key, current + 1)
 }
 
-function getFunctionStatistics() {
+const getFunctionStatistics = () => {
   const stats = {}
   for (const [name, count] of globalThis.___functionStatistics) {
     stats[name] = count
@@ -19,7 +19,7 @@ function getFunctionStatistics() {
   return stats
 }
 
-function resetFunctionStatistics() {
+const resetFunctionStatistics = () => {
   globalThis.___functionStatistics.clear()
 }
 

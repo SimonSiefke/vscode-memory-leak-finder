@@ -7,7 +7,7 @@ export interface CreateFunctionWrapperPluginOptions {
   readonly excludePatterns?: string[]
 }
 
-export function createFunctionWrapperPlugin(options: CreateFunctionWrapperPluginOptions = {}): babel.PluginObj {
+export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPluginOptions = {}): babel.PluginObj => {
   const { filename = 'unknown', excludePatterns = [] } = options
 
   return {
