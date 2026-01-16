@@ -16,7 +16,7 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
     })
 
     const plugin = createFunctionWrapperPlugin(options)
-    traverse2(ast, plugin.visitor, undefined, ast)
+    traverse2(ast, plugin)
 
     const result = generate2(ast, {
       retainLines: false,
