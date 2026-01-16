@@ -15,7 +15,7 @@ export const transformCode = async (code: string, filename?: string, excludePatt
     const ast = parser.parse(code, {
       sourceType: 'module',
       allowImportExportEverywhere: true,
-      plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties'],
+      plugins: [],
     })
 
     // Add tracking code at the beginning
