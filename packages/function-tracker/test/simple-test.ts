@@ -1,4 +1,3 @@
-/// <reference types="jest" />
 import { test, expect } from '@jest/globals'
 import { transformCode } from '../dist/transform.js'
 
@@ -17,10 +16,10 @@ const arrowFunction = () => {
 `
 
   const transformed = transformCode(testCode, 'simple-test.js')
-  
+
   expect(transformed).toContain('trackFunctionCall("testFunction", "simple-test.js:2")')
   expect(transformed).toContain('function testFunction()')
   expect(transformed).toContain('globalThis.___functionStatistics')
-  
+
   console.log('✓ Basic transformation test passed')
 })
