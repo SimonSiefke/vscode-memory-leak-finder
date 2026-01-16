@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { transformCode, createFunctionWrapperPlugin } from '../src/parts/TransformScript/TransformScript.js'
+import { transformCode, createFunctionWrapperPlugin } from '../src/parts/Transform/Transform.js'
 
 test('Transform Script - transformCode - should transform function declarations', async () => {
   // Reset global statistics before each test
@@ -15,7 +15,7 @@ test('Transform Script - transformCode - should transform function declarations'
     }
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -54,7 +54,7 @@ test('Transform Script - transformCode - should transform arrow functions', asyn
     }
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -91,7 +91,7 @@ test('Transform Script - transformCode - should transform concise arrow function
     const conciseArrow = x => x * 2
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -130,7 +130,7 @@ test('Transform Script - transformCode - should transform function expressions',
     }
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -173,7 +173,7 @@ test('Transform Script - transformCode - should transform object methods', async
     }
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -223,7 +223,7 @@ test('Transform Script - transformCode - should transform class methods', async 
     }
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -270,7 +270,7 @@ test('Transform Script - transformCode - should exclude functions matching exclu
     }
   `
 
-  const transformed = await transformCode(code, 'test.js', ['private'])
+  const transformed = await transformCode(code, { filename: 'test.js', excludePatterns: ['private'] })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -320,7 +320,7 @@ test('Transform Script - transformCode - should not transform tracking functions
     }
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -361,7 +361,7 @@ function regularFunction() {
 
 test('Transform Script - transformCode - should handle empty code', async () => {
   const code = ''
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -391,7 +391,7 @@ globalThis.resetFunctionStatistics = resetFunctionStatistics;`
 
 test('Transform Script - transformCode - should handle invalid code gracefully', async () => {
   const code = 'invalid javascript syntax {{{'
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
 
   expect(transformed).toBe(code) // Should return original code
 })
@@ -446,7 +446,7 @@ test('Transform Script - transformCode - should transform IIFE (Immediately Invo
     })();
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -493,7 +493,7 @@ test('Transform Script - transformCode - should transform Promise constructor ca
     });
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -540,7 +540,7 @@ test('Transform Script - transformCode - should transform async functions', asyn
     };
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -588,7 +588,7 @@ test('Transform Script - transformCode - should transform generator functions', 
     };
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -638,7 +638,7 @@ test('Transform Script - transformCode - should transform computed property meth
     };
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -687,7 +687,7 @@ test('Transform Script - transformCode - should transform Symbol methods', async
     };
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -752,7 +752,7 @@ test('Transform Script - transformCode - should transform class property methods
     }
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -812,7 +812,7 @@ test('Transform Script - transformCode - should transform nested functions', asy
     }
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -869,7 +869,7 @@ test('Transform Script - transformCode - should transform functions as parameter
     [4, 5, 6].filter(item => item > 4);
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -922,7 +922,7 @@ test('Transform Script - transformCode - should transform destructured parameter
     const arrowDestructured = ({ x, y }) => x + y;
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -973,7 +973,7 @@ test('Transform Script - transformCode - should transform functions with default
     const arrowDefault = (a = 5, b = []) => a + b.length;
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1018,7 +1018,7 @@ test('Transform Script - transformCode - should transform functions with rest pa
     const arrowRest = (first, ...rest) => rest.length;
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1073,7 +1073,7 @@ test('Transform Script - transformCode - should transform functions with complex
     };
   `
 
-  const transformed = await transformCode(code, 'test.js')
+  const transformed = await transformCode(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();

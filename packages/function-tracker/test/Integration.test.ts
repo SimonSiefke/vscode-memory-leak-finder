@@ -340,12 +340,14 @@ test('Integration Tests - Statistics functionality - should accurately track mul
   // Check statistics
   if (typeof globalThis.getFunctionStatistics === 'function') {
     const stats = globalThis.getFunctionStatistics()
-    expect(stats).toHaveProperty('counter (stats.js:2)', 2)
-    expect(stats).toHaveProperty('multiplier (stats.js:6)', 3)
+    expect(stats).toEqual({
+      'counter (stats.js:2)': 2,
+      'multiplier (stats.js:6)': 3
+    })
   }
 })
 
-test('Integration Tests - Statistics functionality - should handle function call ordering', () => {
+test('Integration Tests - Statistics functionality - should handle function call ordering', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -367,7 +369,7 @@ test('Integration Tests - Statistics functionality - should handle function call
     }
   `
   
-  const transformed = transformCode(code, 'ordering.js')
+  const transformed = await transformCode(code, 'ordering.js')
   
   const executeCode = new Function(transformed + `
     return {
@@ -387,8 +389,10 @@ test('Integration Tests - Statistics functionality - should handle function call
   
   if (typeof globalThis.getFunctionStatistics === 'function') {
     const stats = globalThis.getFunctionStatistics()
-    expect(stats).toHaveProperty('first (ordering.js:2)', 2)
-    expect(stats).toHaveProperty('second (ordering.js:6)', 1)
-    expect(stats).toHaveProperty('third (ordering.js:10)', 1)
+    expect(stats).toEqual({
+      'first (ordering.js:2)': 2,
+      'second (ordering.js:6)': 1,
+      'third (ordering.js:10)': 1
+    })
   }
 })
