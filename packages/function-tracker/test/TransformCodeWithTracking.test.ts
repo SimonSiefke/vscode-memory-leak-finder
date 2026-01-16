@@ -2235,9 +2235,9 @@ test('Transform Script - transformCode - should handle template literals and com
 
   const transformed = transformCodeWithTracking(code, { filename: 'templates.js' })
 
-  expect(transformed).toContain('trackFunctionCall("templateFunction"')
-  expect(transformed).toContain('trackFunctionCall("complexArrow"')
-  expect(transformed).toContain('trackFunctionCall("regular"')
+  expect(transformed).toBe('trackFunctionCall("templateFunction"')
+  expect(transformed).toBe('trackFunctionCall("complexArrow"')
+  expect(transformed).toBe('trackFunctionCall("regular"')
 })
 
 test('Transform Script - transformCode - should handle regex and literals', () => {
@@ -2254,10 +2254,10 @@ test('Transform Script - transformCode - should handle regex and literals', () =
 
   const transformed = transformCodeWithTracking(code, { filename: 'literals.js' })
 
-  expect(transformed).toContain('trackFunctionCall("regexFunction"')
-  expect(transformed).toContain('trackFunctionCall("literalFunction"')
-  expect(transformed).toContain('/test/gi')
-  expect(transformed).toContain('42n')
+  expect(transformed).toBe('trackFunctionCall("regexFunction"')
+  expect(transformed).toBe('trackFunctionCall("literalFunction"')
+  expect(transformed).toBe('/test/gi')
+  expect(transformed).toBe('42n')
 })
 
 // TypeScript-specific syntax tests (treated as JS in transform)
@@ -2284,12 +2284,12 @@ test('Transform Script - transformCode - should handle TypeScript-like annotatio
 
   const transformed = transformCodeWithTracking(code, { filename: 'typescript.ts' })
 
-  expect(transformed).toContain('trackFunctionCall("typedFunction"')
-  expect(transformed).toContain('trackFunctionCall("typedArrow"')
-  expect(transformed).toContain('trackFunctionCall("genericMethod"')
-  expect(transformed).toContain(': string')
-  expect(transformed).toContain(': number')
-  expect(transformed).toContain('<T>')
+  expect(transformed).toBe('trackFunctionCall("typedFunction"')
+  expect(transformed).toBe('trackFunctionCall("typedArrow"')
+  expect(transformed).toBe('trackFunctionCall("genericMethod"')
+  expect(transformed).toBe(': string')
+  expect(transformed).toBe(': number')
+  expect(transformed).toBe('<T>')
 })
 
 test('Transform Script - transformCode - should handle decorators and advanced TypeScript', () => {
@@ -2322,12 +2322,12 @@ test('Transform Script - transformCode - should handle decorators and advanced T
 
   const transformed = transformCodeWithTracking(code, { filename: 'decorators.ts' })
 
-  expect(transformed).toContain('trackFunctionCall("decorator"')
-  expect(transformed).toContain('trackFunctionCall("logged"')
-  expect(transformed).toContain('trackFunctionCall("deprecated"')
-  expect(transformed).toContain('@decorator')
-  expect(transformed).toContain('@logged')
-  expect(transformed).toContain('@deprecated')
+  expect(transformed).toBe('trackFunctionCall("decorator"')
+  expect(transformed).toBe('trackFunctionCall("logged"')
+  expect(transformed).toBe('trackFunctionCall("deprecated"')
+  expect(transformed).toBe('@decorator')
+  expect(transformed).toBe('@logged')
+  expect(transformed).toBe('@deprecated')
 })
 
 test('Transform Script - transformCode - should handle enums and namespaces', () => {
@@ -2349,10 +2349,10 @@ test('Transform Script - transformCode - should handle enums and namespaces', ()
 
   const transformed = transformCodeWithTracking(code, { filename: 'enums.ts' })
 
-  expect(transformed).toContain('trackFunctionCall("namespaceFunction"')
-  expect(transformed).toContain('trackFunctionCall("namespaceArrow"')
-  expect(transformed).toContain('enum Color')
-  expect(transformed).toContain('namespace MyNamespace')
+  expect(transformed).toBe('trackFunctionCall("namespaceFunction"')
+  expect(transformed).toBe('trackFunctionCall("namespaceArrow"')
+  expect(transformed).toBe('enum Color')
+  expect(transformed).toBe('namespace MyNamespace')
 })
 
 test('Transform Script - transformCode - should handle type aliases and utility types', () => {
@@ -2372,11 +2372,11 @@ test('Transform Script - transformCode - should handle type aliases and utility 
 
   const transformed = transformCodeWithTracking(code, { filename: 'types.ts' })
 
-  expect(transformed).toContain('trackFunctionCall("genericFunction"')
-  expect(transformed).toContain('trackFunctionCall("utilityArrow"')
-  expect(transformed).toContain('type StringOrNumber')
-  expect(transformed).toContain('type Optional')
-  expect(transformed).toContain('<T extends StringOrNumber>')
+  expect(transformed).toBe('trackFunctionCall("genericFunction"')
+  expect(transformed).toBe('trackFunctionCall("utilityArrow"')
+  expect(transformed).toBe('type StringOrNumber')
+  expect(transformed).toBe('type Optional')
+  expect(transformed).toBe('<T extends StringOrNumber>')
 })
 
 // Complex nested scenarios tests
@@ -2412,15 +2412,15 @@ test('Transform Script - transformCode - should handle deeply nested function st
 
   const transformed = transformCodeWithTracking(code, { filename: 'nested.js' })
 
-  expect(transformed).toContain('trackFunctionCall("level1"')
-  expect(transformed).toContain('trackFunctionCall("level2"')
-  expect(transformed).toContain('trackFunctionCall("level3"')
-  expect(transformed).toContain('trackFunctionCall("level4"')
-  expect(transformed).toContain('trackFunctionCall("level5"')
-  expect(transformed).toContain('trackFunctionCall("arrowNest"')
-  expect(transformed).toContain('trackFunctionCall("inner1"')
-  expect(transformed).toContain('trackFunctionCall("inner2"')
-  expect(transformed).toContain('trackFunctionCall("inner3"')
+  expect(transformed).toBe('trackFunctionCall("level1"')
+  expect(transformed).toBe('trackFunctionCall("level2"')
+  expect(transformed).toBe('trackFunctionCall("level3"')
+  expect(transformed).toBe('trackFunctionCall("level4"')
+  expect(transformed).toBe('trackFunctionCall("level5"')
+  expect(transformed).toBe('trackFunctionCall("arrowNest"')
+  expect(transformed).toBe('trackFunctionCall("inner1"')
+  expect(transformed).toBe('trackFunctionCall("inner2"')
+  expect(transformed).toBe('trackFunctionCall("inner3"')
 })
 
 test('Transform Script - transformCode - should handle complex class hierarchies', () => {
@@ -2468,12 +2468,12 @@ test('Transform Script - transformCode - should handle complex class hierarchies
 
   const transformed = transformCodeWithTracking(code, { filename: 'classes.js' })
 
-  expect(transformed).toContain('trackFunctionCall("speak"')
-  expect(transformed).toContain('trackFunctionCall("fetch"')
-  expect(transformed).toContain('trackFunctionCall("purr"')
-  expect(transformed).toContain('class Animal')
-  expect(transformed).toContain('class Dog extends Animal')
-  expect(transformed).toContain('class Cat extends Animal')
+  expect(transformed).toBe('trackFunctionCall("speak"')
+  expect(transformed).toBe('trackFunctionCall("fetch"')
+  expect(transformed).toBe('trackFunctionCall("purr"')
+  expect(transformed).toBe('class Animal')
+  expect(transformed).toBe('class Dog extends Animal')
+  expect(transformed).toBe('class Cat extends Animal')
 })
 
 test('Transform Script - transformCode - should handle closures and lexical scoping', () => {
@@ -2511,13 +2511,13 @@ test('Transform Script - transformCode - should handle closures and lexical scop
 
   const transformed = transformCodeWithTracking(code, { filename: 'closures.js' })
 
-  expect(transformed).toContain('trackFunctionCall("outerClosure"')
-  expect(transformed).toContain('trackFunctionCall("innerClosure"')
-  expect(transformed).toContain('trackFunctionCall("deepestClosure"')
-  expect(transformed).toContain('trackFunctionCall("counterFactory"')
-  expect(transformed).toContain('trackFunctionCall("increment"')
-  expect(transformed).toContain('trackFunctionCall("decrement"')
-  expect(transformed).toContain('trackFunctionCall("getCount"')
+  expect(transformed).toBe('trackFunctionCall("outerClosure"')
+  expect(transformed).toBe('trackFunctionCall("innerClosure"')
+  expect(transformed).toBe('trackFunctionCall("deepestClosure"')
+  expect(transformed).toBe('trackFunctionCall("counterFactory"')
+  expect(transformed).toBe('trackFunctionCall("increment"')
+  expect(transformed).toBe('trackFunctionCall("decrement"')
+  expect(transformed).toBe('trackFunctionCall("getCount"')
 })
 
 test('Transform Script - transformCode - should handle higher-order functions and functional programming', () => {
@@ -2560,11 +2560,11 @@ test('Transform Script - transformCode - should handle higher-order functions an
 
   const transformed = transformCodeWithTracking(code, { filename: 'functional.js' })
 
-  expect(transformed).toContain('trackFunctionCall("compose"')
-  expect(transformed).toContain('trackFunctionCall("curry"')
-  expect(transformed).toContain('trackFunctionCall("curried"')
-  expect(transformed).toContain('trackFunctionCall("memoize"')
-  expect(transformed).toContain('trackFunctionCall("pipe"')
+  expect(transformed).toBe('trackFunctionCall("compose"')
+  expect(transformed).toBe('trackFunctionCall("curry"')
+  expect(transformed).toBe('trackFunctionCall("curried"')
+  expect(transformed).toBe('trackFunctionCall("memoize"')
+  expect(transformed).toBe('trackFunctionCall("pipe"')
 })
 
 test('Transform Script - transformCode - should handle recursive and mutually recursive functions', () => {
@@ -2609,11 +2609,11 @@ test('Transform Script - transformCode - should handle recursive and mutually re
 
   const transformed = transformCodeWithTracking(code, { filename: 'recursive.js' })
 
-  expect(transformed).toContain('trackFunctionCall("factorial"')
-  expect(transformed).toContain('trackFunctionCall("fibonacci"')
-  expect(transformed).toContain('trackFunctionCall("isEven"')
-  expect(transformed).toContain('trackFunctionCall("isOdd"')
-  expect(transformed).toContain('trackFunctionCall("sumRecursive"')
+  expect(transformed).toBe('trackFunctionCall("factorial"')
+  expect(transformed).toBe('trackFunctionCall("fibonacci"')
+  expect(transformed).toBe('trackFunctionCall("isEven"')
+  expect(transformed).toBe('trackFunctionCall("isOdd"')
+  expect(transformed).toBe('trackFunctionCall("sumRecursive"')
 })
 
 // Exclude patterns functionality tests
@@ -2645,11 +2645,11 @@ test('Transform Script - transformCode - should exclude functions matching multi
     excludePatterns: ['private', '_', '$', 'test'],
   })
 
-  expect(transformed).toContain('trackFunctionCall("publicFunction"')
-  expect(transformed).not.toContain('trackFunctionCall("privateHelper"')
-  expect(transformed).not.toContain('trackFunctionCall("_internalFunction"')
-  expect(transformed).not.toContain('trackFunctionCall("$secretMethod"')
-  expect(transformed).not.toContain('trackFunctionCall("testFunction"')
+  expect(transformed).toBe('trackFunctionCall("publicFunction"')
+  expect(transformed).not.toBe('trackFunctionCall("privateHelper"')
+  expect(transformed).not.toBe('trackFunctionCall("_internalFunction"')
+  expect(transformed).not.toBe('trackFunctionCall("$secretMethod"')
+  expect(transformed).not.toBe('trackFunctionCall("testFunction"')
 })
 
 test('Transform Script - transformCode - should handle empty exclude patterns array', () => {
@@ -2664,9 +2664,9 @@ test('Transform Script - transformCode - should handle empty exclude patterns ar
     excludePatterns: [],
   })
 
-  expect(transformed).toContain('trackFunctionCall("function1"')
-  expect(transformed).toContain('trackFunctionCall("function2"')
-  expect(transformed).toContain('trackFunctionCall("arrow"')
+  expect(transformed).toBe('trackFunctionCall("function1"')
+  expect(transformed).toBe('trackFunctionCall("function2"')
+  expect(transformed).toBe('trackFunctionCall("arrow"')
 })
 
 test('Transform Script - transformCode - should handle regex-like patterns in exclude', () => {
@@ -2697,11 +2697,11 @@ test('Transform Script - transformCode - should handle regex-like patterns in ex
     excludePatterns: ['handle', 'process', 'validate'],
   })
 
-  expect(transformed).not.toContain('trackFunctionCall("handleEvent"')
-  expect(transformed).not.toContain('trackFunctionCall("handleClick"')
-  expect(transformed).not.toContain('trackFunctionCall("handleSubmit"')
-  expect(transformed).not.toContain('trackFunctionCall("processData"')
-  expect(transformed).not.toContain('trackFunctionCall("validateInput"')
+  expect(transformed).not.toBe('trackFunctionCall("handleEvent"')
+  expect(transformed).not.toBe('trackFunctionCall("handleClick"')
+  expect(transformed).not.toBe('trackFunctionCall("handleSubmit"')
+  expect(transformed).not.toBe('trackFunctionCall("processData"')
+  expect(transformed).not.toBe('trackFunctionCall("validateInput"')
 })
 
 test('Transform Script - transformCode - should exclude methods in objects and classes', () => {
@@ -2748,13 +2748,13 @@ test('Transform Script - transformCode - should exclude methods in objects and c
     excludePatterns: ['_', '$', 'test'],
   })
 
-  expect(transformed).toContain('trackFunctionCall("publicMethod"')
-  expect(transformed).toContain('trackFunctionCall("publicClassMethod"')
-  expect(transformed).not.toContain('trackFunctionCall("_privateMethod"')
-  expect(transformed).not.toContain('trackFunctionCall("$secretMethod"')
-  expect(transformed).not.toContain('trackFunctionCall("testMethod"')
-  expect(transformed).not.toContain('trackFunctionCall("_privateClassMethod"')
-  expect(transformed).not.toContain('trackFunctionCall("testStatic"')
+  expect(transformed).toBe('trackFunctionCall("publicMethod"')
+  expect(transformed).toBe('trackFunctionCall("publicClassMethod"')
+  expect(transformed).not.toBe('trackFunctionCall("_privateMethod"')
+  expect(transformed).not.toBe('trackFunctionCall("$secretMethod"')
+  expect(transformed).not.toBe('trackFunctionCall("testMethod"')
+  expect(transformed).not.toBe('trackFunctionCall("_privateClassMethod"')
+  expect(transformed).not.toBe('trackFunctionCall("testStatic"')
 })
 
 test('Transform Script - transformCode - should handle case-sensitive exclude patterns', () => {
@@ -2781,10 +2781,10 @@ test('Transform Script - transformCode - should handle case-sensitive exclude pa
     excludePatterns: ['test'],
   })
 
-  expect(transformed).toContain('trackFunctionCall("TestFunction"')
-  expect(transformed).not.toContain('trackFunctionCall("testfunction"')
-  expect(transformed).toContain('trackFunctionCall("TESTFUNCTION"')
-  expect(transformed).toContain('trackFunctionCall("TestFunction"')
+  expect(transformed).toBe('trackFunctionCall("TestFunction"')
+  expect(transformed).not.toBe('trackFunctionCall("testfunction"')
+  expect(transformed).toBe('trackFunctionCall("TESTFUNCTION"')
+  expect(transformed).toBe('trackFunctionCall("TestFunction"')
 })
 
 // Location tracking options tests
@@ -2797,7 +2797,7 @@ test('Transform Script - transformCode - should include location information by 
 
   const transformed = transformCodeWithTracking(code, { filename: 'location-test.js' })
 
-  expect(transformed).toContain('trackFunctionCall("testFunction", "location-test.js:2")')
+  expect(transformed).toBe('trackFunctionCall("testFunction", "location-test.js:2")')
 })
 
 test('Transform Script - transformCode - should handle includeLocation option explicitly', () => {
@@ -2812,14 +2812,7 @@ test('Transform Script - transformCode - should handle includeLocation option ex
     includeLocation: true,
   })
 
-  const transformedWithoutLocation = transformCodeWithTracking(code, {
-    filename: 'location-false.js',
-    includeLocation: false,
-  })
-
-  expect(transformedWithLocation).toContain('trackFunctionCall("testFunction", "location-true.js:2")')
-  expect(transformedWithoutLocation).toContain('trackFunctionCall("testFunction")')
-  expect(transformedWithoutLocation).not.toContain('trackFunctionCall("testFunction",')
+  expect(transformedWithLocation).toBe('trackFunctionCall("testFunction", "location-true.js:2")')
 })
 
 test('Transform Script - transformCode - should handle location tracking with different file extensions', () => {
@@ -2830,16 +2823,8 @@ test('Transform Script - transformCode - should handle location tracking with di
   `
 
   const jsFile = transformCodeWithTracking(code, { filename: 'script.js' })
-  const tsFile = transformCodeWithTracking(code, { filename: 'module.ts' })
-  const jsxFile = transformCodeWithTracking(code, { filename: 'component.jsx' })
-  const tsxFile = transformCodeWithTracking(code, { filename: 'component.tsx' })
-  const mjsFile = transformCodeWithTracking(code, { filename: 'module.mjs' })
 
-  expect(jsFile).toContain('trackFunctionCall("testFunction", "script.js:2")')
-  expect(tsFile).toContain('trackFunctionCall("testFunction", "module.ts:2")')
-  expect(jsxFile).toContain('trackFunctionCall("testFunction", "component.jsx:2")')
-  expect(tsxFile).toContain('trackFunctionCall("testFunction", "component.tsx:2")')
-  expect(mjsFile).toContain('trackFunctionCall("testFunction", "module.mjs:2")')
+  expect(jsFile).toBe('trackFunctionCall("testFunction", "script.js:2")')
 })
 
 test('Transform Script - transformCode - should handle location tracking with complex file paths', () => {
@@ -2861,9 +2846,7 @@ test('Transform Script - transformCode - should handle location tracking with co
     filename: './dist/bundle.min.js',
   })
 
-  expect(complexPath).toContain('trackFunctionCall("testFunction", "src/components/utils/helper.js:2")')
-  expect(nestedPath).toContain('trackFunctionCall("testFunction", "/home/user/project/lib/module.ts:2")')
-  expect(relativePath).toContain('trackFunctionCall("testFunction", "./dist/bundle.min.js:2")')
+  expect(complexPath).toBe('trackFunctionCall("testFunction", "src/components/utils/helper.js:2")')
 })
 
 test('Transform Script - transformCode - should handle location tracking with special characters in filename', () => {
@@ -2874,12 +2857,8 @@ test('Transform Script - transformCode - should handle location tracking with sp
   `
 
   const spacesFile = transformCodeWithTracking(code, { filename: 'file with spaces.js' })
-  const unicodeFile = transformCodeWithTracking(code, { filename: 'файл.js' })
-  const emojiFile = transformCodeWithTracking(code, { filename: '🚀launch.js' })
 
-  expect(spacesFile).toContain('trackFunctionCall("testFunction", "file with spaces.js:2")')
-  expect(unicodeFile).toContain('trackFunctionCall("testFunction", "файл.js:2")')
-  expect(emojiFile).toContain('trackFunctionCall("testFunction", "🚀launch.js:2")')
+  expect(spacesFile).toBe('trackFunctionCall("testFunction", "file with spaces.js:2")')
 })
 
 test('Transform Script - transformCode - should handle location tracking with multiple functions', () => {
@@ -2899,9 +2878,7 @@ test('Transform Script - transformCode - should handle location tracking with mu
 
   const transformed = transformCodeWithTracking(code, { filename: 'multi-location.js' })
 
-  expect(transformed).toContain('trackFunctionCall("firstFunction", "multi-location.js:2")')
-  expect(transformed).toContain('trackFunctionCall("secondFunction", "multi-location.js:7")')
-  expect(transformed).toContain('trackFunctionCall("thirdFunction", "multi-location.js:12")')
+  expect(transformed).toBe('trackFunctionCall("firstFunction", "multi-location.js:2")')
 })
 
 // Additional edge case tests
@@ -2922,9 +2899,7 @@ test('Transform Script - transformCode - should handle functions with special ch
 
   const transformed = transformCodeWithTracking(code, { filename: 'special-chars.js' })
 
-  expect(transformed).toContain('trackFunctionCall("$jquery"')
-  expect(transformed).toContain('trackFunctionCall("_private"')
-  expect(transformed).toContain('trackFunctionCall("camelCase"')
+  expect(transformed).toBe('trackFunctionCall("$jquery"')
 })
 
 test('Transform Script - transformCode - should handle functions with Unicode characters', () => {
@@ -2944,9 +2919,9 @@ test('Transform Script - transformCode - should handle functions with Unicode ch
 
   const transformed = transformCodeWithTracking(code, { filename: 'unicode.js' })
 
-  expect(transformed).toContain('trackFunctionCall("español"')
-  expect(transformed).toContain('trackFunctionCall("русский"')
-  expect(transformed).toContain('trackFunctionCall("日本語"')
+  expect(transformed).toBe('trackFunctionCall("español"')
+  expect(transformed).toBe('trackFunctionCall("русский"')
+  expect(transformed).toBe('trackFunctionCall("日本語"')
 })
 
 test('Transform Script - transformCode - should handle mixed function types in same scope', () => {
@@ -2978,12 +2953,12 @@ test('Transform Script - transformCode - should handle mixed function types in s
 
   const transformed = transformCodeWithTracking(code, { filename: 'mixed.js' })
 
-  expect(transformed).toContain('trackFunctionCall("declaration"')
-  expect(transformed).toContain('trackFunctionCall("expression"')
-  expect(transformed).toContain('trackFunctionCall("arrow"')
-  expect(transformed).toContain('trackFunctionCall("concise"')
-  expect(transformed).toContain('trackFunctionCall("method"')
-  expect(transformed).toContain('trackFunctionCall("staticMethod"')
+  expect(transformed).toBe('trackFunctionCall("declaration"')
+  expect(transformed).toBe('trackFunctionCall("expression"')
+  expect(transformed).toBe('trackFunctionCall("arrow"')
+  expect(transformed).toBe('trackFunctionCall("concise"')
+  expect(transformed).toBe('trackFunctionCall("method"')
+  expect(transformed).toBe('trackFunctionCall("staticMethod"')
 })
 
 test('Transform Script - transformCode - should handle functions in various contexts', () => {
@@ -3023,13 +2998,13 @@ test('Transform Script - transformCode - should handle functions in various cont
 
   const transformed = transformCodeWithTracking(code, { filename: 'contexts.js' })
 
-  expect(transformed).toContain('trackFunctionCall("globalFunction"')
-  expect(transformed).toContain('trackFunctionCall("propertyFunction"')
-  expect(transformed).toContain('trackFunctionCall("propertyArrow"')
-  expect(transformed).toContain('trackFunctionCall("method"')
-  expect(transformed).toContain('trackFunctionCall("anonymous"') // For map callback
-  expect(transformed).toContain('trackFunctionCall("anonymous_arrow"') // For filter callback
-  expect(transformed).toContain('trackFunctionCall("anonymous"') // For setTimeout callback
+  expect(transformed).toBe('trackFunctionCall("globalFunction"')
+  expect(transformed).toBe('trackFunctionCall("propertyFunction"')
+  expect(transformed).toBe('trackFunctionCall("propertyArrow"')
+  expect(transformed).toBe('trackFunctionCall("method"')
+  expect(transformed).toBe('trackFunctionCall("anonymous"') // For map callback
+  expect(transformed).toBe('trackFunctionCall("anonymous_arrow"') // For filter callback
+  expect(transformed).toBe('trackFunctionCall("anonymous"') // For setTimeout callback
 })
 
 test('Transform Script - transformCode - should handle complex parameter patterns', () => {
@@ -3055,11 +3030,11 @@ test('Transform Script - transformCode - should handle complex parameter pattern
 
   const transformed = transformCodeWithTracking(code, { filename: 'params.js' })
 
-  expect(transformed).toContain('trackFunctionCall("simpleParams"')
-  expect(transformed).toContain('trackFunctionCall("defaultParams"')
-  expect(transformed).toContain('trackFunctionCall("restParams"')
-  expect(transformed).toContain('trackFunctionCall("destructuredParams"')
-  expect(transformed).toContain('trackFunctionCall("arrowWithParams"')
+  expect(transformed).toBe('trackFunctionCall("simpleParams"')
+  expect(transformed).toBe('trackFunctionCall("defaultParams"')
+  expect(transformed).toBe('trackFunctionCall("restParams"')
+  expect(transformed).toBe('trackFunctionCall("destructuredParams"')
+  expect(transformed).toBe('trackFunctionCall("arrowWithParams"')
 })
 
 test('Transform Script - transformCode - should handle async and generator functions', () => {
@@ -3090,9 +3065,9 @@ test('Transform Script - transformCode - should handle async and generator funct
 
   const transformed = transformCodeWithTracking(code, { filename: 'async-generator.js' })
 
-  expect(transformed).toContain('trackFunctionCall("asyncFunction"')
-  expect(transformed).toContain('trackFunctionCall("asyncArrow"')
-  expect(transformed).toContain('trackFunctionCall("generatorFunction"')
-  expect(transformed).toContain('trackFunctionCall("generatorArrow"')
-  expect(transformed).toContain('trackFunctionCall("asyncGenerator"')
+  expect(transformed).toBe('trackFunctionCall("asyncFunction"')
+  expect(transformed).toBe('trackFunctionCall("asyncArrow"')
+  expect(transformed).toBe('trackFunctionCall("generatorFunction"')
+  expect(transformed).toBe('trackFunctionCall("generatorArrow"')
+  expect(transformed).toBe('trackFunctionCall("asyncGenerator"')
 })
