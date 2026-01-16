@@ -2,7 +2,7 @@ import { test, expect } from '@jest/globals'
 import { transformCode } from '../src/parts/TransformScript/TransformScript.js'
 
 // Simple test to verify basic functionality
-test('Simple Test - should transform basic function', () => {
+test('Simple Test - should transform basic function', async () => {
   console.log('Testing transformCode function...')
 
   const testCode = `
@@ -15,7 +15,7 @@ const arrowFunction = () => {
 }
 `
 
-  const transformed = transformCode(testCode, 'simple-test.js')
+  const transformed = await transformCode(testCode, 'simple-test.js')
 
   expect(transformed).toContain('trackFunctionCall("testFunction", "simple-test.js:2")')
   expect(transformed).toContain('function testFunction()')
