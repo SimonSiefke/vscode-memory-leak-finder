@@ -55,6 +55,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
 
   // Transform visitor - locations are already collected
   const transformVisitor: Visitor = {
+
     FunctionDeclaration: (path: NodePath<t.FunctionDeclaration>) => {
       if (!shouldExclude(path.node)) {
         // Wrap function body
