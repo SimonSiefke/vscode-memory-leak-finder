@@ -4,6 +4,7 @@ import * as traverse from '@babel/traverse'
 import generate from '@babel/generator'
 import * as t from '@babel/types'
 import { trackingCode } from '../TrackingCode/TrackingCode.ts'
+import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
 
 const traverseDefault = (traverse as any).default || traverse
 const generateDefault = (generate as any).default || generate
@@ -16,129 +17,6 @@ declare global {
   var ___functionStatistics: Map<string, number> | undefined;
   var getFunctionStatistics: (() => FunctionStatistics) | undefined;
   var resetFunctionStatistics: (() => void) | undefined;
-}
-
-function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
-  return {
-    visitor: {
-      FunctionDeclaration(path: babel.NodePath<t.FunctionDeclaration>) {
-        const functionName: string = path.node.id ? path.node.id.name : 'anonymous'
-        const hub = path.hub as any;
-        const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
-        const location: string = `${actualFilename}:${path.node.loc?.start.line}`
-        
-        if (path.node.id && !path.node.id.name.startsWith('track')) {
-          // Wrap the function body
-          const originalBody: t.BlockStatement = path.node.body
-          const trackingCall: t.ExpressionStatement = t.expressionStatement(
-            t.callExpression(
-              t.identifier('trackFunctionCall'),
-              [
-                t.stringLiteral(functionName),
-                t.stringLiteral(location)
-              ]
-            )
-          )
-          
-          path.node.body = t.blockStatement([
-            trackingCall,
-            ...originalBody.body
-          ])
-        }
-      },
-      
-      FunctionExpression(path: babel.NodePath<t.FunctionExpression>) {
-        const parent: any = path.parent
-        let functionName: string = 'anonymous'
-        
-        const hub = path.hub as any;
-        const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
-        
-        if (t.isVariableDeclarator(parent) && t.isIdentifier(parent.id) && parent.id.name) {
-          functionName = parent.id.name
-        } else if (t.isAssignmentExpression(parent) && t.isIdentifier(parent.left)) {
-          functionName = parent.left.name
-        } else if (t.isProperty(parent) && t.isIdentifier(parent.key)) {
-          functionName = parent.key.name
-        }
-        
-        const location: string = `${actualFilename}:${path.node.loc?.start.line}`
-        
-        if (!functionName.startsWith('track')) {
-          const originalBody: t.BlockStatement = path.node.body
-          const trackingCall: t.ExpressionStatement = t.expressionStatement(
-            t.callExpression(
-              t.identifier('trackFunctionCall'),
-              [
-                t.stringLiteral(functionName),
-                t.stringLiteral(location)
-              ]
-            )
-          )
-          
-          path.node.body = t.blockStatement([
-            trackingCall,
-            ...originalBody.body
-          ])
-        }
-      },
-      
-      ArrowFunctionExpression(path: babel.NodePath<t.ArrowFunctionExpression>) {
-        const parent: any = path.parent
-        let functionName: string = 'anonymous_arrow'
-        
-        const hub = path.hub as any;
-        const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
-        
-        if (t.isVariableDeclarator(parent) && t.isIdentifier(parent.id) && parent.id.name) {
-          functionName = parent.id.name
-        } else if (t.isAssignmentExpression(parent) && t.isIdentifier(parent.left)) {
-          functionName = parent.left.name
-        } else if (t.isProperty(parent) && t.isIdentifier(parent.key)) {
-          functionName = parent.key.name
-        }
-        
-        const location: string = `${actualFilename}:${path.node.loc?.start.line}`
-        
-        if (!functionName.startsWith('track')) {
-          if (t.isBlockStatement(path.node.body)) {
-            const originalBody: t.BlockStatement = path.node.body
-            const trackingCall: t.ExpressionStatement = t.expressionStatement(
-              t.callExpression(
-                t.identifier('trackFunctionCall'),
-                [
-                  t.stringLiteral(functionName),
-                  t.stringLiteral(location)
-                ]
-              )
-            )
-            
-            path.node.body = t.blockStatement([
-              trackingCall,
-              ...originalBody.body
-            ])
-          } else {
-            // For concise arrow functions, wrap in block
-            const originalExpression: t.Expression = path.node.body
-            const trackingCall: t.ExpressionStatement = t.expressionStatement(
-              t.callExpression(
-                t.identifier('trackFunctionCall'),
-                [
-                  t.stringLiteral(functionName),
-                  t.stringLiteral(location)
-                ]
-              )
-            )
-            
-            path.node.body = t.blockStatement([
-              trackingCall,
-              t.returnStatement(originalExpression)
-            ])
-          }
-        }
-      }
-    }
-  }
 }
 
 export function transformCode(code: string, filename?: string): string {
@@ -209,7 +87,7 @@ export function transformCode(code: string, filename?: string): string {
     
     // Transform the original code with proper file context
     try {
-      const plugin = createFunctionWrapperPlugin(filename)
+      const plugin = createFunctionWrapperPlugin({ filename })
       traverseDefault(ast, plugin.visitor)
     } catch (error) {
       console.error('Error transforming code:', error)
