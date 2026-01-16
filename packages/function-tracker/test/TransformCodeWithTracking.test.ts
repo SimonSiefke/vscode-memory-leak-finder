@@ -1254,7 +1254,7 @@ test('Transform Script - transformCode - should transform async functions', () =
       return await fetch('/api/data');
     }
 
-    const asyncArrow = () => {
+    const asyncArrow = async () => {
       return await Promise.resolve('async arrow');
     };
   `
@@ -1263,7 +1263,7 @@ test('Transform Script - transformCode - should transform async functions', () =
   const expected = `async function asyncFunction() {
       return await fetch('/api/data');
     }
-const asyncArrow = () => {
+const asyncArrow = async () => {
       return await Promise.resolve('async arrow');
 };`
 
@@ -2336,7 +2336,7 @@ class TestClass {
   expect(transformed).not.toContain('trackFunctionCall("testStatic"')
 })
 
-test.only('Transform Script - transformCode - should handle case-sensitive exclude patterns', () => {
+test('Transform Script - transformCode - should handle case-sensitive exclude patterns', () => {
   const code = `function TestFunction() {
   return 'uppercase test';
 }
