@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { transformCode } from '../dist/transform.js'
+import { transformCode } from '../src/parts/TransformScript/TransformScript.js'
 
 // Simple test to verify basic functionality
 test('Simple Test - should transform basic function', () => {

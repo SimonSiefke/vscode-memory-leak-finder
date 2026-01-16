@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
-import { transformCode } from '../src/transform-script.js'
-import { FunctionStatistics } from '../src/types.js'
+import { transformCode } from '../src/parts/TransformScript/TransformScript.js'
+import { FunctionStatistics } from '../src/parts/Types/Types.js'
 
 test('Integration Tests - Real-world scenarios - should handle complex nested functions', () => {
   // Reset global statistics before each test

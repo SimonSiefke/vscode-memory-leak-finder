@@ -1,15 +1,17 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals'
-import { VSCodeFunctionTracker } from '../src/devtools-injector.js'
-import { VSCodeTrackerOptions, FunctionStatistics } from '../src/types.js'
+import { VSCodeFunctionTracker } from '../src/parts/Tracker/Tracker.js'
+import { VSCodeTrackerOptions, FunctionStatistics } from '../src/parts/Types/Types.js'
 import puppeteer from 'puppeteer'
 
 // Mock puppeteer to avoid actual browser launches in tests
 jest.mock('puppeteer')
 const mockPuppeteer = puppeteer as jest.Mocked<typeof puppeteer>
 
+import * as fs from 'fs'
+
 // Mock fs module
 jest.mock('fs')
-const mockFs = require('fs')
+const mockFs = fs as jest.Mocked<typeof fs>
 
 describe('VSCodeFunctionTracker', () => {
   describe('constructor', () => {

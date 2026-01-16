@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
-import { transformCode, createFunctionWrapperPlugin } from '../src/transform-script.js'
-import { FunctionStatistics } from '../src/types.js'
+import { transformCode, createFunctionWrapperPlugin } from '../src/parts/TransformScript/TransformScript.js'
+import { FunctionStatistics } from '../src/parts/Types/Types.js'
 
 // Extend globalThis for testing
 declare global {
