@@ -255,7 +255,7 @@ test('TransformCodeWithTracking - should transform async functions', () => {
       return await fetch('/api/data');
     }
 
-    const asyncArrow = () => {
+    const asyncArrow = async () => {
       return await Promise.resolve('async arrow');
     };
   `
@@ -264,7 +264,7 @@ test('TransformCodeWithTracking - should transform async functions', () => {
   const expected = `async function asyncFunction() {
       return await fetch('/api/data');
     }
-const asyncArrow = () => {
+const asyncArrow = async () => {
       return await Promise.resolve('async arrow');
 };`
 
