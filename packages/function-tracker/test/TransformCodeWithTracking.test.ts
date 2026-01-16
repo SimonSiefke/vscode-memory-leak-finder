@@ -496,7 +496,7 @@ test('TransformCodeWithTracking - should handle Unicode and special characters',
 
   const transformed = transformCodeWithTracking(code, { filename: 'unicode.js' })
   const expected = `function 测试函数() {
-  trackFunctionCall("\u6D4B\u8BD5\u51FD\u6570", "unicode.js:2");
+  trackFunctionCall("\\u6D4B\\u8BD5\\u51FD\\u6570", "unicode.js:2");
   return 'Unicode test 🚀';
 }
 const emojiFunc = () => {
@@ -2195,8 +2195,20 @@ test('Transform Script - transformCode - should handle Unicode and special chara
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'unicode.js' })
+  const expected = `function 测试函数() {
+  trackFunctionCall("\\u6D4B\\u8BD5\\u51FD\\u6570", "unicode.js:2");
+  return 'Unicode test 🚀';
+}
+const emojiFunc = () => {
+  trackFunctionCall("emojiFunc", "unicode.js:6");
+  return '🎉';
+};
+function special$Chars$_123() {
+  trackFunctionCall("special$Chars$_123", "unicode.js:8");
+  return 'special chars';
+}`
 
-  expect(transformed).toBe('trackFunctionCall')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle comments and directives', () => {
@@ -2952,13 +2964,34 @@ test('Transform Script - transformCode - should handle mixed function types in s
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'mixed.js' })
+  const expected = `function declaration() {
+  trackFunctionCall("declaration", "mixed.js:2");
+  return 'declaration';
+}
+const expression = function () {
+  trackFunctionCall("expression", "mixed.js:6");
+  return 'expression';
+};
+const arrow = () => {
+  trackFunctionCall("arrow", "mixed.js:10");
+  return 'arrow';
+};
+const concise = x => {
+  trackFunctionCall("concise", "mixed.js:14");
+  return x * 2;
+};
+class TestClass {
+  method() {
+    trackFunctionCall("method", "mixed.js:17");
+    return 'method';
+  }
+  static staticMethod() {
+    trackFunctionCall("staticMethod", "mixed.js:21");
+    return 'static';
+  }
+}`
 
-  expect(transformed).toBe('trackFunctionCall("declaration"')
-  expect(transformed).toBe('trackFunctionCall("expression"')
-  expect(transformed).toBe('trackFunctionCall("arrow"')
-  expect(transformed).toBe('trackFunctionCall("concise"')
-  expect(transformed).toBe('trackFunctionCall("method"')
-  expect(transformed).toBe('trackFunctionCall("staticMethod"')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle functions in various contexts', () => {
