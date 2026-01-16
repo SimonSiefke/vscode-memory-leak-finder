@@ -3,9 +3,11 @@ export interface FunctionStatistics {
 }
 
 export interface TransformOptions {
-  readonly scriptId: number
+  readonly scriptId?: number
+  readonly filename?: string
   readonly excludePatterns?: string[]
   readonly preambleOffset?: number
+  readonly includeLocation?: boolean
 }
 
 export interface TrackingConfig {

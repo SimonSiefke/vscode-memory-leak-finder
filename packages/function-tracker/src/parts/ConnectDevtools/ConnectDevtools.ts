@@ -1,4 +1,4 @@
-interface DevToolsConnection {
+export interface DevToolsConnection {
   dispose(): Promise<void>
   sessionId: string
   sessionRpc: any
@@ -101,28 +101,34 @@ export const connectDevtools = async (
         }
         
         // Handle network interceptions
-        if (message.method === 'Network.requestIntercepted') {
-          const interceptionId = message.params?.interceptionId
+        if (message.method === 'Fetch.requestPaused') {
+          const requestId = message.params?.requestId
           const request = message.params?.request
+          const resourceType = message.params?.resourceType
           
-          if (interceptionId && request) {
+          if (requestId && request && resourceType === 'Script') {
             // Check if this is a JavaScript file request
             if (request.url.endsWith('.js') || request.url.endsWith('.mjs') || request.url.endsWith('.cjs')) {
               // Here you can modify the JavaScript content before sending it
               // For now, we'll continue with the original request but you could:
-              // - Fetch the content, modify it, then provide it
+              // - Fetch the content, modify it, then provide it using Fetch.fulfillRequest
               // - Replace it with custom tracking code
               // - Inject function tracking
               
-              sendCommand('Network.continueInterceptedRequest', {
-                interceptionId
+              sendCommand('Fetch.continueRequest', {
+                requestId
               }).catch(console.error)
             } else {
               // Continue non-JS requests normally
-              sendCommand('Network.continueInterceptedRequest', {
-                interceptionId
+              sendCommand('Fetch.continueRequest', {
+                requestId
               }).catch(console.error)
             }
+          } else {
+            // Continue other resource types normally
+            sendCommand('Fetch.continueRequest', {
+              requestId
+            }).catch(console.error)
           }
         }
       } catch (error) {
@@ -193,18 +199,14 @@ export const connectDevtools = async (
     
     // 4. Setup logic to intercept JS network requests
     await sendCommand('Network.enable')
-    await sendCommand('Runtime.runIfWaitingForDebugger')
-    
-    // Set up request interception
-    const requestPatterns = [
-      { urlPattern: '*.js', requestStage: 'Response' },
-      { urlPattern: '*.mjs', requestStage: 'Response' },
-      { urlPattern: '*.cjs', requestStage: 'Response' }
-    ]
-    
-    await sendCommand('Network.setRequestInterception', {
-      patterns: requestPatterns
+    await sendCommand('Fetch.enable', {
+      patterns: [
+        { urlPattern: '*.js', requestStage: 'Request' },
+        { urlPattern: '*.mjs', requestStage: 'Request' },
+        { urlPattern: '*.cjs', requestStage: 'Request' }
+      ]
     })
+    await sendCommand('Runtime.runIfWaitingForDebugger')
 
     console.log(`DevTools connection established for connection ${connectionId}, measure ${measureId}`)
     
