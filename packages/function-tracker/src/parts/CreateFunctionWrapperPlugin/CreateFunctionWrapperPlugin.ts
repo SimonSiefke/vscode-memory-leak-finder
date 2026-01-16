@@ -57,12 +57,33 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
       }
     },
 
+    ObjectMethod(path: NodePath<t.ObjectMethod>) {
+      const methodName: string = t.isIdentifier(path.node.key) && path.node.key.name ? path.node.key.name : 'anonymous'
+      const actualFilename = filename || 'unknown'
+      const location: string = `${actualFilename}:${path.node.loc?.start.line}`
+
+      // Don't track methods matching exclude patterns
+      if (
+        methodName.startsWith('track') ||
+        excludePatterns.some((pattern) => methodName.includes(pattern))
+      ) {
+        return
+      }
+
+      const originalBody: t.BlockStatement = path.node.body
+      const trackingCall: t.ExpressionStatement = t.expressionStatement(
+        t.callExpression(t.identifier('trackFunctionCall'), [t.stringLiteral(methodName), t.stringLiteral(location)]),
+      )
+
+      path.node.body = t.blockStatement([trackingCall, ...originalBody.body])
+    },
+
     ClassMethod(path: NodePath<t.ClassMethod>) {
       const methodName: string = t.isIdentifier(path.node.key) && path.node.key.name ? path.node.key.name : 'anonymous'
       const actualFilename = filename || 'unknown'
       const location: string = `${actualFilename}:${path.node.loc?.start.line}`
 
-      // Don't track constructors
+      // Don't track constructors or methods matching exclude patterns
       if (
         methodName === 'constructor' ||
         methodName.startsWith('track') ||

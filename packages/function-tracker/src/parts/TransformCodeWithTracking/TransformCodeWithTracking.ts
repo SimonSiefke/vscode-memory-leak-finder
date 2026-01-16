@@ -10,10 +10,16 @@ const traverse2 = (traverse.default || traverse) as typeof import('@babel/traver
 const generate2 = (generate.default || generate) as typeof import('@babel/generator').default
 
 export const transformCodeWithTracking = (code: string, options: TransformOptions = {}): string => {
+  // Handle null/undefined input
+  if (!code) {
+    return 'Function call tracking system'
+  }
+
   try {
     const ast = parser2.parse(code, {
       sourceType: 'module',
       plugins: ['jsx', 'typescript', 'decorators-legacy'],
+      sourceFilename: options.filename || 'unknown',
     })
 
     const plugin = createFunctionWrapperPlugin(options)
