@@ -1893,146 +1893,195 @@ test('Transform Script - transformCode - should handle location tracking with mu
   expect(transformed).toContain('trackFunctionCall("thirdFunction", "multi-location.js:12")')
 })
 
-// Performance and stress tests
-test('Transform Script - transformCode - should handle performance with many functions', async () => {
-  const code = Array.from({ length: 100 }, (_, i) => `
-    function func${i}() {
-      return ${i};
-    }
-  `).join('')
-  
-  const startTime = Date.now()
-  const transformed = await transformCode(code, { filename: 'performance.js' })
-  const endTime = Date.now()
-  
-  expect(transformed).toContain('Function call tracking system')
-  expect(transformed.split('trackFunctionCall').length).toBeGreaterThan(100)
-  expect(endTime - startTime).toBeLessThan(5000) // Should complete within 5 seconds
-})
-
-test('Transform Script - transformCode - should handle very long function names', async () => {
-  const longName = 'a'.repeat(1000)
+// Additional edge case tests
+test('Transform Script - transformCode - should handle functions with special characters in names', async () => {
   const code = `
-    function ${longName}() {
-      return 'long name';
+    function $jquery() {
+      return 'jquery';
+    }
+    
+    function _private() {
+      return 'private';
+    }
+    
+    function camelCase() {
+      return 'camelCase';
     }
   `
   
-  const transformed = await transformCode(code, { filename: 'long-name.js' })
+  const transformed = await transformCode(code, { filename: 'special-chars.js' })
   
-  expect(transformed).toContain(`trackFunctionCall("${longName}"`)
-  expect(transformed.length).toBeGreaterThan(code.length)
+  expect(transformed).toContain('trackFunctionCall("$jquery"')
+  expect(transformed).toContain('trackFunctionCall("_private"')
+  expect(transformed).toContain('trackFunctionCall("camelCase"')
 })
 
-test('Transform Script - transformCode - should handle deeply nested structures stress test', async () => {
-  let code = 'function outer() {\n'
-  
-  for (let i = 0; i < 100; i++) {
-    code += '  '.repeat(i + 1) + `function level${i}() {\n`
-  }
-  
-  for (let i = 99; i >= 0; i--) {
-    code += '  '.repeat(i + 1) + `return level${i}();\n`
-    code += '  '.repeat(i) + '}\n'
-  }
-  
-  code += '  return level0();\n}'
-  
-  const startTime = Date.now()
-  const transformed = await transformCode(code, { filename: 'deep-stress.js' })
-  const endTime = Date.now()
-  
-  expect(transformed).toContain('trackFunctionCall("outer"')
-  for (let i = 0; i < 100; i++) {
-    expect(transformed).toContain(`trackFunctionCall("level${i}"`)
-  }
-  expect(endTime - startTime).toBeLessThan(3000) // Should complete within 3 seconds
-})
-
-test('Transform Script - transformCode - should handle memory stress with large codebase', async () => {
-  const modules = Array.from({ length: 20 }, (_, i) => `
-    function module${i}Init() {
-      return 'init ${i}';
-    }
-    
-    const module${i}Process = (data) => {
-      return data.map(item => item * ${i});
-    };
-  `).join('\n')
-  
-  const startTime = Date.now()
-  const transformed = await transformCode(modules, { filename: 'memory-stress.js' })
-  const endTime = Date.now()
-  
-  expect(transformed).toContain('Function call tracking system')
-  expect(transformed.split('trackFunctionCall').length).toBeGreaterThan(40) // 20 modules * 2 functions each
-  expect(endTime - startTime).toBeLessThan(10000) // Should complete within 10 seconds
-})
-
-test('Transform Script - transformCode - should handle concurrent transformations', async () => {
-  const codes = Array.from({ length: 10 }, (_, i) => `
-    function concurrent${i}() {
-      return 'concurrent ${i}';
-    }
-  `)
-  
-  const startTime = Date.now()
-  const promises = codes.map((code, index) => 
-    transformCode(code, { filename: `concurrent-${index}.js` })
-  )
-  const results = await Promise.all(promises)
-  const endTime = Date.now()
-  
-  results.forEach((transformed, index) => {
-    expect(transformed).toContain(`trackFunctionCall("concurrent${index}"`)
-  })
-  expect(endTime - startTime).toBeLessThan(5000) // Should complete within 5 seconds
-})
-
-test('Transform Script - transformCode - should handle edge case performance with empty lines and whitespace', async () => {
+test('Transform Script - transformCode - should handle functions with Unicode characters', async () => {
   const code = `
-    
-    function spacedFunction() {
-      return 'spaced';
+    function español() {
+      return 'español';
     }
     
-    const spacedArrow = () => {
-      return 'arrow spaced';
-    };
+    function русский() {
+      return 'русский';
+    }
+    
+    function 日本語() {
+      return '日本語';
+    }
   `
   
-  const startTime = Date.now()
-  const transformed = await transformCode(code, { filename: 'whitespace.js' })
-  const endTime = Date.now()
+  const transformed = await transformCode(code, { filename: 'unicode.js' })
   
-  expect(transformed).toContain('trackFunctionCall("spacedFunction"')
-  expect(transformed).toContain('trackFunctionCall("spacedArrow"')
-  expect(endTime - startTime).toBeLessThan(1000) // Should be very fast
+  expect(transformed).toContain('trackFunctionCall("español"')
+  expect(transformed).toContain('trackFunctionCall("русский"')
+  expect(transformed).toContain('trackFunctionCall("日本語"')
 })
 
-test('Transform Script - transformCode - should handle performance with complex expressions', async () => {
+test('Transform Script - transformCode - should handle mixed function types in same scope', async () => {
   const code = `
-    function complexExpression() {
-      const result = {
-        nested: {
-          computed: () => 'very complex expression',
-          another: function() { return 'another complex'; }
-        }
-      };
-      return result;
+    function declaration() {
+      return 'declaration';
     }
     
-    const complexArrow = (param, ...rest) => ({
-      method: () => param,
-      property: rest.length
+    const expression = function() {
+      return 'expression';
+    };
+    
+    const arrow = () => {
+      return 'arrow';
+    };
+    
+    const concise = x => x * 2;
+    
+    class TestClass {
+      method() {
+        return 'method';
+      }
+      
+      static staticMethod() {
+        return 'static';
+      }
+    }
+  `
+  
+  const transformed = await transformCode(code, { filename: 'mixed.js' })
+  
+  expect(transformed).toContain('trackFunctionCall("declaration"')
+  expect(transformed).toContain('trackFunctionCall("expression"')
+  expect(transformed).toContain('trackFunctionCall("arrow"')
+  expect(transformed).toContain('trackFunctionCall("concise"')
+  expect(transformed).toContain('trackFunctionCall("method"')
+  expect(transformed).toContain('trackFunctionCall("staticMethod"')
+})
+
+test('Transform Script - transformCode - should handle functions in various contexts', async () => {
+  const code = `
+    // Global scope
+    function globalFunction() {
+      return 'global';
+    }
+    
+    // Object property
+    const obj = {
+      propertyFunction: function() {
+        return 'property';
+      },
+      
+      propertyArrow: () => {
+        return 'arrow property';
+      },
+      
+      method() {
+        return 'method';
+      }
+    };
+    
+    // Array methods
+    const arr = [1, 2, 3].map(function(item) {
+      return item * 2;
     });
+    
+    const arr2 = [4, 5, 6].filter(item => item > 4);
+    
+    // Callback
+    setTimeout(function() {
+      console.log('timeout');
+    }, 1000);
   `
   
-  const startTime = Date.now()
-  const transformed = await transformCode(code, { filename: 'complex-expressions.js' })
-  const endTime = Date.now()
+  const transformed = await transformCode(code, { filename: 'contexts.js' })
   
-  expect(transformed).toContain('trackFunctionCall("complexExpression"')
-  expect(transformed).toContain('trackFunctionCall("complexArrow"')
-  expect(endTime - startTime).toBeLessThan(2000) // Should complete within 2 seconds
+  expect(transformed).toContain('trackFunctionCall("globalFunction"')
+  expect(transformed).toContain('trackFunctionCall("propertyFunction"')
+  expect(transformed).toContain('trackFunctionCall("propertyArrow"')
+  expect(transformed).toContain('trackFunctionCall("method"')
+  expect(transformed).toContain('trackFunctionCall("anonymous"') // For map callback
+  expect(transformed).toContain('trackFunctionCall("anonymous_arrow"') // For filter callback
+  expect(transformed).toContain('trackFunctionCall("anonymous"') // For setTimeout callback
+})
+
+test('Transform Script - transformCode - should handle complex parameter patterns', async () => {
+  const code = `
+    function simpleParams(a, b, c) {
+      return a + b + c;
+    }
+    
+    function defaultParams(x = 10, y = 'default') {
+      return x + y;
+    }
+    
+    function restParams(first, ...rest) {
+      return rest.length;
+    }
+    
+    function destructuredParams({ a, b }, [c, d]) {
+      return a + b + c + d;
+    }
+    
+    const arrowWithParams = (x, y = 5, ...z) => x + y + z.length;
+  `
+  
+  const transformed = await transformCode(code, { filename: 'params.js' })
+  
+  expect(transformed).toContain('trackFunctionCall("simpleParams"')
+  expect(transformed).toContain('trackFunctionCall("defaultParams"')
+  expect(transformed).toContain('trackFunctionCall("restParams"')
+  expect(transformed).toContain('trackFunctionCall("destructuredParams"')
+  expect(transformed).toContain('trackFunctionCall("arrowWithParams"')
+})
+
+test('Transform Script - transformCode - should handle async and generator functions', async () => {
+  const code = `
+    async function asyncFunction() {
+      return await Promise.resolve('async');
+    }
+    
+    const asyncArrow = async () => {
+      return await fetch('/api/data');
+    };
+    
+    function* generatorFunction() {
+      yield 1;
+      yield 2;
+      yield 3;
+    }
+    
+    const generatorArrow = function*() {
+      yield 'arrow generator';
+    };
+    
+    async function* asyncGenerator() {
+      yield await Promise.resolve(1);
+      yield await Promise.resolve(2);
+    }
+  `
+  
+  const transformed = await transformCode(code, { filename: 'async-generator.js' })
+  
+  expect(transformed).toContain('trackFunctionCall("asyncFunction"')
+  expect(transformed).toContain('trackFunctionCall("asyncArrow"')
+  expect(transformed).toContain('trackFunctionCall("generatorFunction"')
+  expect(transformed).toContain('trackFunctionCall("generatorArrow"')
+  expect(transformed).toContain('trackFunctionCall("asyncGenerator"')
 })

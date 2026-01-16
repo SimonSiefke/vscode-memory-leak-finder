@@ -1,9 +1,12 @@
 import parser from '@babel/parser'
-import generate from '@babel/generator'
 import { trackingCode } from '../TrackingCode/TrackingCode.js'
 
 export const addTrackingPreamble = async (code: string): Promise<string> => {
   try {
+    // Dynamic import for generate to avoid ES module issues
+    const generateModule = await import('@babel/generator')
+    const generate = generateModule.default
+    
     // Parse the tracking code
     const trackingAST = parser.parse(trackingCode, {
       sourceType: 'script'
