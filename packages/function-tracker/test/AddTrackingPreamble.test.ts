@@ -9,9 +9,9 @@ function testFunction() {
 }
 `
 
-  const result = await addTrackingPreamble(code)
+  const result = addTrackingPreamble(code)
 
-  const expected = code + '\n' + trackingCode
+  const expected = trackingCode + '\n' + code
 
   expect(result).toBe(expected)
 })
