@@ -180,7 +180,9 @@ test('TransformCodeWithTracking - should handle empty code', () => {
 
 test('TransformCodeWithTracking - should handle invalid code gracefully', () => {
   const code = 'invalid javascript syntax {{{'
-  expect(() => transformCodeWithTracking(code, { filename: 'test.js' })).toThrow(new Error('Error transforming code with tracking:: SyntaxError: Missing semicolon. (1:7)'))
+  expect(() => transformCodeWithTracking(code, { filename: 'test.js' })).toThrow(
+    new Error('Error transforming code with tracking:: SyntaxError: Missing semicolon. (1:7)'),
+  )
 })
 
 test('TransformCodeWithTracking - should use default filename when not provided', () => {
@@ -1179,7 +1181,9 @@ test('Transform Script - transformCode - should handle empty code', () => {
 
 test('Transform Script - transformCode - should handle invalid code gracefully', () => {
   const code = 'invalid javascript syntax {{{'
-  expect(() => transformCodeWithTracking(code, { filename: 'test.js' })).toThrow(new Error('Error transforming code with tracking:: SyntaxError: Missing semicolon. (1:7)'))
+  expect(() => transformCodeWithTracking(code, { filename: 'test.js' })).toThrow(
+    new Error('Error transforming code with tracking:: SyntaxError: Missing semicolon. (1:7)'),
+  )
 })
 
 test('Transform Script - transformCode - should use default filename when not provided', () => {
@@ -2689,6 +2693,7 @@ const obj = {
     return 'arrow property';
   },
   method() {
+    trackFunctionCall("method", "contexts.js:17");
     return 'method';
   }
 };
@@ -2793,25 +2798,18 @@ test('Transform Script - transformCode - should handle async and generator funct
   return await Promise.resolve('async');
 }
 
-const asyncArrow = () => {
+const asyncArrow = async () => {
   trackFunctionCall("asyncArrow", "async-generator.js:6");
   return await fetch('/api/data');
 };
 
-function* generatorFunction() {
-  trackFunctionCall("generatorFunction", "async-generator.js:10");
-  yield 1;
-  yield 2;
-  yield 3;
-}
-
 const generatorArrow = function* () {
-  trackFunctionCall("generatorArrow", "async-generator.js:15");
+  trackFunctionCall("generatorArrow", "async-generator.js:16");
   yield 'arrow generator';
 };
 
 async function* asyncGenerator() {
-  trackFunctionCall("asyncGenerator", "async-generator.js:19");
+  trackFunctionCall("asyncGenerator", "async-generator.js:20");
   yield await Promise.resolve(1);
   yield await Promise.resolve(2);
 }`

@@ -67,10 +67,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
       const location: string = `${actualFilename}:${(path.node.loc?.start.line || 1) - preambleOffset}`
 
       // Don't track methods matching exclude patterns
-      if (
-        methodName.startsWith('track') ||
-        excludePatterns.some((pattern) => methodName.includes(pattern))
-      ) {
+      if (methodName.startsWith('track') || excludePatterns.some((pattern) => methodName.includes(pattern))) {
         return
       }
 
