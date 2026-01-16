@@ -2246,10 +2246,26 @@ test('Transform Script - transformCode - should handle template literals and com
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'templates.js' })
+  const expected = `function templateFunction() {
+  trackFunctionCall("templateFunction", "templates.js:2");
+  const name = 'World';
+  return \`Hello \${name}!\`;
+}
+const complexArrow = () => {
+  trackFunctionCall("complexArrow", "templates.js:7");
+  return {
+    [computedKey]: () => {
+      trackFunctionCall("computedKey", "templates.js:8");
+      return 'nested computed';
+    },
+    regular: function () {
+      trackFunctionCall("regular", "templates.js:9");
+      return 'regular';
+    }
+  };
+};`
 
-  expect(transformed).toBe('trackFunctionCall("templateFunction"')
-  expect(transformed).toBe('trackFunctionCall("complexArrow"')
-  expect(transformed).toBe('trackFunctionCall("regular"')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle regex and literals', () => {
@@ -2265,11 +2281,17 @@ test('Transform Script - transformCode - should handle regex and literals', () =
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'literals.js' })
+  const expected = `function regexFunction() {
+  trackFunctionCall("regexFunction", "literals.js:2");
+  const pattern = /test/gi;
+  return pattern.test('test string');
+}
+function literalFunction() {
+  trackFunctionCall("literalFunction", "literals.js:7");
+  return 42n; // BigInt literal
+}`
 
-  expect(transformed).toBe('trackFunctionCall("regexFunction"')
-  expect(transformed).toBe('trackFunctionCall("literalFunction"')
-  expect(transformed).toBe('/test/gi')
-  expect(transformed).toBe('42n')
+  expect(transformed).toBe(expected)
 })
 
 // TypeScript-specific syntax tests (treated as JS in transform)
@@ -2295,13 +2317,25 @@ test('Transform Script - transformCode - should handle TypeScript-like annotatio
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'typescript.ts' })
+  const expected = `function typedFunction(param: string): number {
+  trackFunctionCall("typedFunction", "typescript.ts:2");
+  return param.length;
+}
+const typedArrow = (x: number, y: number): string => {
+  trackFunctionCall("typedArrow", "typescript.ts:6");
+  return (x + y).toString();
+};
+interface TestInterface {
+  method(): void;
+}
+class GenericClass<T> {
+  genericMethod(value: T): T {
+    trackFunctionCall("genericMethod", "typescript.ts:15");
+    return value;
+  }
+}`
 
-  expect(transformed).toBe('trackFunctionCall("typedFunction"')
-  expect(transformed).toBe('trackFunctionCall("typedArrow"')
-  expect(transformed).toBe('trackFunctionCall("genericMethod"')
-  expect(transformed).toBe(': string')
-  expect(transformed).toBe(': number')
-  expect(transformed).toBe('<T>')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle decorators and advanced TypeScript', () => {
