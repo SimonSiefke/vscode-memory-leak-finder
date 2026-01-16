@@ -177,16 +177,47 @@ export function transformCode(code: string, filename?: string): string {
     try {
       ast = parser.parse(code, {
         sourceType: 'unambiguous',  // Let Babel decide
-        plugins: ['jsx', 'typescript', 'decorators-legacy', 'objectRestSpread', 'classProperties', 'asyncGenerators', 'functionBind', 'exportDefaultFrom', 'exportNamespaceFrom', 'dynamicImport', 'nullishCoalescingOperator', 'optionalChaining']
+        allowImportExportEverywhere: true,
+        allowReturnOutsideFunction: true,
+        allowHashBang: true,
+        plugins: [
+          'jsx', 
+          'typescript', 
+          'decorators-legacy', 
+          'objectRestSpread', 
+          'classProperties', 
+          'asyncGenerators', 
+          'functionBind', 
+          'exportDefaultFrom', 
+          'exportNamespaceFrom', 
+          'dynamicImport', 
+          'nullishCoalescingOperator', 
+          'optionalChaining',
+          'bigInt',
+          'optionalCatchBinding',
+          'throwExpressions',
+          'pipelineOperator',
+          'numericSeparator',
+          'logicalAssignment',
+          'classPrivateProperties',
+          'classPrivateMethods'
+        ]
       })
     } catch (error) {
       console.error('Parser error:', error.message)
-      // Try with more permissive settings
-      ast = parser.parse(code, {
-        sourceType: 'script',
-        allowImportExportEverywhere: true,
-        plugins: ['jsx', 'typescript', 'decorators-legacy', 'objectRestSpread', 'classProperties', 'asyncGenerators', 'functionBind', 'exportDefaultFrom', 'exportNamespaceFrom', 'dynamicImport', 'nullishCoalescingOperator', 'optionalChaining']
-      })
+      // Try with flow parser which is more permissive
+      try {
+        ast = parser.parse(code, {
+          sourceType: 'script',
+          allowImportExportEverywhere: true,
+          allowReturnOutsideFunction: true,
+          allowHashBang: true,
+          plugins: ['flow', 'flowComments', 'jsx', 'typescript']
+        })
+      } catch (flowError) {
+        console.error('Flow parser also failed:', flowError.message)
+        throw flowError
+      }
     }
     
     // Add tracking code at the beginning
