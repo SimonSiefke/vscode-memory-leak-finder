@@ -24,9 +24,9 @@ test('TransformCodeWithTracking - should transform arrow functions', () => {
     }
   `
 
-  const transformed = transformCodeWithTracking(code, { scriptId: 456 })
+  const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const arrowFunction = () => {
-  trackFunctionCall(456, 2, 26);
+  trackFunctionCall(123, 2, 26);
   return 'arrow';
 };`
 
@@ -38,9 +38,9 @@ test('TransformCodeWithTracking - should transform concise arrow functions', () 
     const conciseArrow = x => x * 2
   `
 
-  const transformed = transformCodeWithTracking(code, { scriptId: 789 })
+  const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const conciseArrow = x => {
-  trackFunctionCall(789, 2, 25);
+  trackFunctionCall(123, 2, 25);
   return x * 2;
 };`
 
