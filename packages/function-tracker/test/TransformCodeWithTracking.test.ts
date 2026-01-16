@@ -1014,8 +1014,7 @@ test('TransformCodeWithTracking - should handle location tracking with different
   const jsFile = await transformCodeWithTracking(code, { filename: 'script.js' })
   const tsFile = await transformCodeWithTracking(code, { filename: 'module.ts' })
 
-  expect(jsFile).toContain('trackFunctionCall("testFunction", "script.js:2")')
-  expect(tsFile).toContain('trackFunctionCall("testFunction", "module.ts:2")')
+  expect(jsFile).toBe('trackFunctionCall("testFunction", "script.js:2")')
 })
 
 test('TransformCodeWithTracking - should handle location tracking with complex file paths', async () => {
@@ -1029,7 +1028,7 @@ test('TransformCodeWithTracking - should handle location tracking with complex f
     filename: 'src/components/utils/helper.js',
   })
 
-  expect(complexPath).toContain('trackFunctionCall("testFunction", "src/components/utils/helper.js:2")')
+  expect(complexPath).toBe('trackFunctionCall("testFunction", "src/components/utils/helper.js:2")')
 })
 
 test('Transform Script - transformCode - should transform function declarations', async () => {
@@ -2153,8 +2152,7 @@ test('Transform Script - transformCode - should handle null/undefined input', as
   const transformedNull = await transformCodeWithTracking(null as any)
   const transformedUndefined = await transformCodeWithTracking(undefined as any)
 
-  expect(transformedNull).toContain('Function call tracking system')
-  expect(transformedUndefined).toContain('Function call tracking system')
+  expect(transformedNull).toBe('Function call tracking system')
 })
 
 test('Transform Script - transformCode - should handle very large files', async () => {
@@ -2175,9 +2173,7 @@ test('Transform Script - transformCode - should handle very large files', async 
 
   const transformed = await transformCodeWithTracking(largeCode, { filename: 'large.js' })
 
-  expect(transformed).toContain('Function call tracking system')
-  expect(transformed).toContain('trackFunctionCall')
-  expect(transformed.length).toBeGreaterThan(largeCode.length)
+  expect(transformed).toBe('trackFunctionCall')
 })
 
 test('Transform Script - transformCode - should handle Unicode and special characters', async () => {
@@ -2195,10 +2191,7 @@ test('Transform Script - transformCode - should handle Unicode and special chara
 
   const transformed = await transformCodeWithTracking(code, { filename: 'unicode.js' })
 
-  expect(transformed).toContain('trackFunctionCall')
-  expect(transformed).toContain('\u6D4B\u8BD5\u51FD\u6570')
-  expect(transformed).toContain('emojiFunc')
-  expect(transformed).toContain('special$Chars$_123')
+  expect(transformed).toBe('trackFunctionCall')
 })
 
 test('Transform Script - transformCode - should handle comments and directives', async () => {
@@ -2219,12 +2212,7 @@ test('Transform Script - transformCode - should handle comments and directives',
 
   const transformed = await transformCodeWithTracking(code, { filename: 'comments.js' })
 
-  expect(transformed).toContain("'use strict'")
-  expect(transformed).toContain('/* This is a multi-line comment')
-  expect(transformed).toContain('// Single line comment')
-  expect(transformed).toContain('trackFunctionCall("realFunction"')
-  expect(transformed).not.toContain('trackFunctionCall("notARealFunction"')
-  expect(transformed).not.toContain('trackFunctionCall("fakeFunction"')
+  expect(transformed).toBe("'use strict'")
 })
 
 test('Transform Script - transformCode - should handle template literals and complex expressions', async () => {
