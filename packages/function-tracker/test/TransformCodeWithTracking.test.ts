@@ -1099,30 +1099,7 @@ test('Transform Script - transformCode - should transform function expressions',
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-const funcExpression = function () {
+  const expected = `const funcExpression = function () {
   trackFunctionCall("funcExpression", "test.js:2");
   return 'expression';
 };`
@@ -1142,30 +1119,7 @@ test('Transform Script - transformCode - should transform object methods', () =>
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-const obj = {
+  const expected = `const obj = {
   method() {
     return 'method';
   },
@@ -1192,30 +1146,7 @@ test('Transform Script - transformCode - should transform class methods', () => 
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-class TestClass {
+  const expected = `class TestClass {
   constructor() {
     this.value = 42;
   }
@@ -1239,30 +1170,7 @@ test('Transform Script - transformCode - should exclude functions matching exclu
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js', excludePatterns: ['private'] })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-function testFunction() {
+  const expected = `function testFunction() {
   trackFunctionCall("testFunction", "test.js:2");
   return 'test';
 }
@@ -1289,30 +1197,7 @@ test('Transform Script - transformCode - should not transform tracking functions
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-function trackFunctionCall() {
+  const expected = `function trackFunctionCall() {
   return 'tracking';
 }
 function getFunctionStatistics() {
