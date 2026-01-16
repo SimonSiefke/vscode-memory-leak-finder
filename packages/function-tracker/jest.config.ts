@@ -1,28 +1,27 @@
-import type { Config } from 'jest'
-
-const config: Config = {
+export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
-  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        useESM: true,
+      },
+    ],
   },
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts',
-  ],
-  moduleFileExtensions: ['ts', 'js', 'json'],
-  globals: {
-    'ts-jest': {
-      useESM: true,
-    },
-  },
+  extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  testMatch: ['<rootDir>/test/**/*.ts', '<rootDir>/test/**/*.js'],
+  injectGlobals: false,
+  collectCoverage: true,
+  coverageThreshold: {
+    global: {
+      branches: 30,
+      functions: 20,
+      lines: 40,
+      statements: 40,
+    },
+  },
 }
-
-export default config
