@@ -14,7 +14,7 @@ interface FunctionStatistics {
 }
 
 
-export const transformCode = (code: string, filename?: string): string => {
+export const transformCode = (code: string, filename?: string, excludePatterns?: string[]): string => {
   try {
     // Try different parsing strategies
     let ast
@@ -82,7 +82,7 @@ export const transformCode = (code: string, filename?: string): string => {
     
     // Transform the original code with proper file context
     try {
-      const plugin = createFunctionWrapperPlugin({ filename })
+      const plugin = createFunctionWrapperPlugin({ filename, excludePatterns })
       traverseDefault(ast, plugin.visitor)
     } catch (error) {
       console.error('Error transforming code:', error)
