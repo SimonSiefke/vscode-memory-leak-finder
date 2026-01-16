@@ -1,66 +1,64 @@
 import { test, expect } from '@jest/globals'
 import { transformCode, createFunctionWrapperPlugin } from '../src/parts/TransformScript/TransformScript.js'
 
-test('Transform Script - transformCode - should transform function declarations', () => {
+test('Transform Script - transformCode - should transform function declarations', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
     delete (globalThis as any).getFunctionStatistics
     delete (globalThis as any).resetFunctionStatistics
   }
-})
 
-test('Transform Script - transformCode - should transform function declarations', () => {
   const code = `
     function testFunction() {
       return 'test'
     }
   `
-
-  const transformed = transformCode(code, 'test.js')
+  
+  const transformed = await transformCode(code, 'test.js')
 
   expect(transformed).toContain('trackFunctionCall("testFunction", "test.js:2")')
   expect(transformed).toContain('function testFunction()')
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Transform Script - transformCode - should transform arrow functions', () => {
+test('Transform Script - transformCode - should transform arrow functions', async () => {
   const code = `
     const arrowFunction = () => {
       return 'arrow'
     }
   `
 
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   expect(transformed).toContain('trackFunctionCall("arrowFunction", "test.js:2")')
   expect(transformed).toContain('const arrowFunction = ()')
 })
 
-test('Transform Script - transformCode - should transform concise arrow functions', () => {
+test('Transform Script - transformCode - should transform concise arrow functions', async () => {
   const code = `
     const conciseArrow = x => x * 2
   `
 
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   expect(transformed).toContain('trackFunctionCall("conciseArrow", "test.js:2")')
   expect(transformed).toContain('return x * 2')
 })
 
-test('Transform Script - transformCode - should transform function expressions', () => {
+test('Transform Script - transformCode - should transform function expressions', async () => {
   const code = `
     const funcExpression = function() {
       return 'expression'
     }
   `
 
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   expect(transformed).toContain('trackFunctionCall("funcExpression", "test.js:2")')
 })
 
-test('Transform Script - transformCode - should transform object methods', () => {
+test('Transform Script - transformCode - should transform object methods', async () => {
   const code = `
     const obj = {
       method() {
@@ -71,12 +69,12 @@ test('Transform Script - transformCode - should transform object methods', () =>
     }
   `
 
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   expect(transformed).toContain('trackFunctionCall("arrowMethod", "test.js:5")')
 })
 
-test('Transform Script - transformCode - should transform class methods', () => {
+test('Transform Script - transformCode - should transform class methods', async () => {
   const code = `
     class TestClass {
       constructor() {
@@ -89,13 +87,13 @@ test('Transform Script - transformCode - should transform class methods', () => 
     }
   `
 
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   expect(transformed).toContain('trackFunctionCall("constructor", "test.js:2")')
   expect(transformed).toContain('trackFunctionCall("classMethod", "test.js:6")')
 })
 
-test('Transform Script - transformCode - should exclude functions matching exclude patterns', () => {
+test('Transform Script - transformCode - should exclude functions matching exclude patterns', async () => {
   const code = `
     function testFunction() {
       return 'test'
@@ -112,7 +110,7 @@ test('Transform Script - transformCode - should exclude functions matching exclu
   expect(transformed).not.toContain('trackFunctionCall("privateHelper"')
 })
 
-test('Transform Script - transformCode - should not transform tracking functions themselves', () => {
+test('Transform Script - transformCode - should not transform tracking functions themselves', async () => {
   const code = `
     function trackFunctionCall() {
       return 'tracking'
@@ -127,35 +125,35 @@ test('Transform Script - transformCode - should not transform tracking functions
     }
   `
 
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   expect(transformed).not.toContain('trackFunctionCall("trackFunctionCall"')
   expect(transformed).not.toContain('trackFunctionCall("getFunctionStatistics"')
   expect(transformed).toContain('trackFunctionCall("regularFunction", "test.js:10")')
 })
 
-test('Transform Script - transformCode - should handle empty code', () => {
+test('Transform Script - transformCode - should handle empty code', async () => {
   const code = ''
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Transform Script - transformCode - should handle invalid code gracefully', () => {
+test('Transform Script - transformCode - should handle invalid code gracefully', async () => {
   const code = 'invalid javascript syntax {{{'
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   expect(transformed).toBe(code) // Should return original code
 })
 
-test('Transform Script - transformCode - should use default filename when not provided', () => {
+test('Transform Script - transformCode - should use default filename when not provided', async () => {
   const code = `
     function testFunction() {
       return 'test'
     }
   `
 
-  const transformed = transformCode(code)
+  const transformed = await transformCode(code)
 
   expect(transformed).toContain('trackFunctionCall("testFunction", "unknown:2")')
 })
@@ -176,7 +174,7 @@ test('Transform Script - createFunctionWrapperPlugin - should handle default opt
   expect(plugin.visitor).toBeDefined()
 })
 
-test('Transform Script - Tracking functionality - should track function calls when executed', () => {
+test('Transform Script - Tracking functionality - should track function calls when executed', async () => {
   const code = `
     function testFunction() {
       return 'test'
@@ -187,7 +185,7 @@ test('Transform Script - Tracking functionality - should track function calls wh
     }
   `
 
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   // Execute the transformed code
   const executeCode = new Function(
@@ -214,14 +212,14 @@ test('Transform Script - Tracking functionality - should track function calls wh
   }
 })
 
-test('Transform Script - Tracking functionality - should reset statistics', () => {
+test('Transform Script - Tracking functionality - should reset statistics', async () => {
   const code = `
     function testFunction() {
       return 'test'
     }
   `
 
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   // Execute and call function
   const executeCode = new Function(
@@ -250,14 +248,14 @@ test('Transform Script - Tracking functionality - should reset statistics', () =
   }
 })
 
-test('Transform Script - Tracking functionality - should count multiple calls', () => {
+test('Transform Script - Tracking functionality - should count multiple calls', async () => {
   const code = `
     function testFunction() {
       return 'test'
     }
   `
 
-  const transformed = transformCode(code, 'test.js')
+  const transformed = await transformCode(code, 'test.js')
 
   const executeCode = new Function(
     transformed +

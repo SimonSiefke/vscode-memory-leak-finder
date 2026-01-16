@@ -13,8 +13,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     visitor: {
       FunctionDeclaration(path: NodePath<t.FunctionDeclaration>) {
         const functionName: string = path.node.id ? path.node.id.name : 'anonymous'
-        const hub = path.hub as any;
-        const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
+        const actualFilename = filename || 'unknown'
         const location: string = `${actualFilename}:${path.node.loc?.start.line}`
         
         if (path.node.id && 
@@ -43,8 +42,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
         const parent: any = path.parent
         let functionName: string = 'anonymous'
         
-        const hub = path.hub as any;
-        const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
+        const actualFilename = filename || 'unknown'
         
         if (t.isVariableDeclarator(parent) && t.isIdentifier(parent.id) && parent.id.name) {
           functionName = parent.id.name
@@ -80,8 +78,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
         const parent: any = path.parent
         let functionName: string = 'anonymous_arrow'
         
-        const hub = path.hub as any;
-        const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
+        const actualFilename = filename || 'unknown'
         
         if (t.isVariableDeclarator(parent) && t.isIdentifier(parent.id) && parent.id.name) {
           functionName = parent.id.name

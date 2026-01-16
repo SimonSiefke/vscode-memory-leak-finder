@@ -1,7 +1,7 @@
 import { test, expect } from '@jest/globals'
 import { transformCode } from '../src/parts/TransformScript/TransformScript.js'
 
-test('Integration Tests - Real-world scenarios - should handle complex nested functions', () => {
+test('Integration Tests - Real-world scenarios - should handle complex nested functions', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -26,13 +26,13 @@ test('Integration Tests - Real-world scenarios - should handle complex nested fu
     }
   `
   
-  const transformed = transformCode(code, 'complex.js')
+  const transformed = await transformCode(code, 'complex.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
   expect(transformed).toContain('trackFunctionCall')
 })
 
-test('Integration Tests - Real-world scenarios - should handle TypeScript syntax', () => {
+test('Integration Tests - Real-world scenarios - should handle TypeScript syntax', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -63,12 +63,12 @@ test('Integration Tests - Real-world scenarios - should handle TypeScript syntax
     }
   `
   
-  const transformed = transformCode(code, 'typescript.ts')
+  const transformed = await transformCode(code, 'typescript.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Integration Tests - Real-world scenarios - should handle async functions', () => {
+test('Integration Tests - Real-world scenarios - should handle async functions', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -87,13 +87,13 @@ test('Integration Tests - Real-world scenarios - should handle async functions',
     }
   `
   
-  const transformed = transformCode(code, 'async.ts')
+  const transformed = await transformCode(code, 'async.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
   expect(transformed).toContain('trackFunctionCall')
 })
 
-test('Integration Tests - Real-world scenarios - should handle generator functions', () => {
+test('Integration Tests - Real-world scenarios - should handle generator functions', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -115,12 +115,12 @@ test('Integration Tests - Real-world scenarios - should handle generator functio
     }
   `
   
-  const transformed = transformCode(code, 'generator.ts')
+  const transformed = await transformCode(code, 'generator.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Integration Tests - Real-world scenarios - should handle destructuring and complex parameters', () => {
+test('Integration Tests - Real-world scenarios - should handle destructuring and complex parameters', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -138,12 +138,12 @@ test('Integration Tests - Real-world scenarios - should handle destructuring and
     }
   `
   
-  const transformed = transformCode(code, 'destructuring.ts')
+  const transformed = await transformCode(code, 'destructuring.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Integration Tests - Real-world scenarios - should handle conditional functions', () => {
+test('Integration Tests - Real-world scenarios - should handle conditional functions', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -172,7 +172,7 @@ test('Integration Tests - Real-world scenarios - should handle conditional funct
     }
   `
   
-  const transformed = transformCode(code, 'conditional.ts')
+  const transformed = await transformCode(code, 'conditional.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
