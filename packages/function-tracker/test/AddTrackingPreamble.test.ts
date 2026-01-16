@@ -3,10 +3,10 @@ import { addTrackingPreamble } from '../src/parts/AddTrackingPreamble/AddTrackin
 
 test('AddTrackingPreamble - should add tracking preamble to simple function', async () => {
   const code = `
-    function testFunction() {
-      return 'test'
-    }
-  `
+function testFunction() {
+  return 'test'
+}
+`
 
   const result = await addTrackingPreamble(code)
 
