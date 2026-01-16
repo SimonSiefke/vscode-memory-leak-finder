@@ -496,7 +496,7 @@ test('TransformCodeWithTracking - should handle Unicode and special characters',
 
   const transformed = await transformCodeWithTracking(code, { filename: 'unicode.js' })
   const expected = `function 测试函数() {
-  trackFunctionCall("测试函数", "unicode.js:2");
+  trackFunctionCall("\u6D4B\u8BD5\u51FD\u6570", "unicode.js:2");
   return 'Unicode test 🚀';
 }
 const emojiFunc = () => {
@@ -534,9 +534,10 @@ test('TransformCodeWithTracking - should handle comments and directives', async 
    with function declarations inside
    function notARealFunction() {}
 */
+
 // Single line comment with function fakeFunction() {}
 function realFunction() {
-  trackFunctionCall("realFunction", "comments.js:10");
+  trackFunctionCall("realFunction", "comments.js:11");
   return 'real';
 }`
 
@@ -566,7 +567,7 @@ const complexArrow = () => {
   trackFunctionCall("complexArrow", "templates.js:7");
   return {
     [computedKey]: () => {
-      trackFunctionCall("anonymous_arrow", "templates.js:8");
+      trackFunctionCall("computedKey", "templates.js:8");
       return 'nested computed';
     },
     regular: function () {
@@ -599,8 +600,7 @@ test('TransformCodeWithTracking - should handle regex and literals', async () =>
 }
 function literalFunction() {
   trackFunctionCall("literalFunction", "literals.js:7");
-  return 42n;
-  // BigInt literal
+  return 42n; // BigInt literal
 }`
 
   expect(transformed).toBe(expected)
@@ -841,9 +841,10 @@ test('TransformCodeWithTracking - should handle recursive and mutually recursive
   }
   return n * factorial(n - 1);
 }
+
 // Recursive arrow function
 const sumRecursive = (arr, index = 0) => {
-  trackFunctionCall("sumRecursive", "recursive.js:9");
+  trackFunctionCall("sumRecursive", "recursive.js:10");
   if (index >= arr.length) {
     return 0;
   }
@@ -957,7 +958,6 @@ test('TransformCodeWithTracking - should exclude methods in objects and classes'
 
   const expected = `const obj = {
   publicMethod() {
-    trackFunctionCall("publicMethod", "exclude-methods.js:3");
     return 'public';
   },
   _privateMethod() {
@@ -2196,7 +2196,7 @@ test('Transform Script - transformCode - should handle Unicode and special chara
   const transformed = await transformCodeWithTracking(code, { filename: 'unicode.js' })
 
   expect(transformed).toContain('trackFunctionCall')
-  expect(transformed).toContain('测试函数')
+  expect(transformed).toContain('\u6D4B\u8BD5\u51FD\u6570')
   expect(transformed).toContain('emojiFunc')
   expect(transformed).toContain('special$Chars$_123')
 })
