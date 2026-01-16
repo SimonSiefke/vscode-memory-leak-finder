@@ -10,15 +10,34 @@ test('AddTrackingPreamble - should add tracking preamble to simple function', as
 
   const result = await addTrackingPreamble(code)
   
-  // Should contain tracking code
-  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
-  expect(result.includes('trackFunctionCall')).toBe(true)
-  expect(result.includes('getFunctionStatistics')).toBe(true)
-  expect(result.includes('resetFunctionStatistics')).toBe(true)
-  
-  // Should contain original function
-  expect(result.includes('function testFunction()')).toBe(true)
-  expect(result.includes("return 'test'")).toBe(true)
+  const expected = `// Function call tracking system
+if (!globalThis.___functionStatistics) {
+  globalThis.___functionStatistics = new Map();
+}
+const trackFunctionCall = (functionName, location) => {
+  const key = functionName + (location ? \` (\${location})\` : '');
+  const current = globalThis.___functionStatistics.get(key) || 0;
+  globalThis.___functionStatistics.set(key, current + 1);
+};
+const getFunctionStatistics = () => {
+  const stats = {};
+  for (const [name, count] of globalThis.___functionStatistics) {
+    stats[name] = count;
+  }
+  return stats;
+};
+const resetFunctionStatistics = () => {
+  globalThis.___functionStatistics.clear();
+};
+
+// Export for debugging
+globalThis.getFunctionStatistics = getFunctionStatistics;
+globalThis.resetFunctionStatistics = resetFunctionStatistics;
+function testFunction() {
+  return 'test';
+}`
+
+  expect(result).toBe(expected)
 })
 
 test('AddTrackingPreamble - should add tracking preamble to arrow function', async () => {
@@ -30,16 +49,65 @@ test('AddTrackingPreamble - should add tracking preamble to arrow function', asy
 
   const result = await addTrackingPreamble(code)
   
-  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
-  expect(result.includes('const arrowFunction = () =>')).toBe(true)
+  const expected = `// Function call tracking system
+if (!globalThis.___functionStatistics) {
+  globalThis.___functionStatistics = new Map();
+}
+const trackFunctionCall = (functionName, location) => {
+  const key = functionName + (location ? \` (\${location})\` : '');
+  const current = globalThis.___functionStatistics.get(key) || 0;
+  globalThis.___functionStatistics.set(key, current + 1);
+};
+const getFunctionStatistics = () => {
+  const stats = {};
+  for (const [name, count] of globalThis.___functionStatistics) {
+    stats[name] = count;
+  }
+  return stats;
+};
+const resetFunctionStatistics = () => {
+  globalThis.___functionStatistics.clear();
+};
+
+// Export for debugging
+globalThis.getFunctionStatistics = getFunctionStatistics;
+globalThis.resetFunctionStatistics = resetFunctionStatistics;
+const arrowFunction = () => {
+  return 'arrow';
+};`
+
+  expect(result).toBe(expected)
 })
 
 test('AddTrackingPreamble - should handle empty code', async () => {
   const code = ''
   const result = await addTrackingPreamble(code)
   
-  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
-  expect(result.includes('trackFunctionCall')).toBe(true)
+  const expected = `// Function call tracking system
+if (!globalThis.___functionStatistics) {
+  globalThis.___functionStatistics = new Map();
+}
+const trackFunctionCall = (functionName, location) => {
+  const key = functionName + (location ? \` (\${location})\` : '');
+  const current = globalThis.___functionStatistics.get(key) || 0;
+  globalThis.___functionStatistics.set(key, current + 1);
+};
+const getFunctionStatistics = () => {
+  const stats = {};
+  for (const [name, count] of globalThis.___functionStatistics) {
+    stats[name] = count;
+  }
+  return stats;
+};
+const resetFunctionStatistics = () => {
+  globalThis.___functionStatistics.clear();
+};
+
+// Export for debugging
+globalThis.getFunctionStatistics = getFunctionStatistics;
+globalThis.resetFunctionStatistics = resetFunctionStatistics;`
+
+  expect(result).toBe(expected)
 })
 
 test('AddTrackingPreamble - should handle TypeScript code', async () => {
@@ -51,8 +119,34 @@ test('AddTrackingPreamble - should handle TypeScript code', async () => {
 
   const result = await addTrackingPreamble(code)
   
-  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
-  expect(result.includes('function typedFunction(param: string): number')).toBe(true)
+  const expected = `// Function call tracking system
+if (!globalThis.___functionStatistics) {
+  globalThis.___functionStatistics = new Map();
+}
+const trackFunctionCall = (functionName, location) => {
+  const key = functionName + (location ? \` (\${location})\` : '');
+  const current = globalThis.___functionStatistics.get(key) || 0;
+  globalThis.___functionStatistics.set(key, current + 1);
+};
+const getFunctionStatistics = () => {
+  const stats = {};
+  for (const [name, count] of globalThis.___functionStatistics) {
+    stats[name] = count;
+  }
+  return stats;
+};
+const resetFunctionStatistics = () => {
+  globalThis.___functionStatistics.clear();
+};
+
+// Export for debugging
+globalThis.getFunctionStatistics = getFunctionStatistics;
+globalThis.resetFunctionStatistics = resetFunctionStatistics;
+function typedFunction(param: string): number {
+  return param.length;
+}`
+
+  expect(result).toBe(expected)
 })
 
 test('AddTrackingPreamble - should handle JSX code', async () => {
@@ -64,9 +158,34 @@ test('AddTrackingPreamble - should handle JSX code', async () => {
 
   const result = await addTrackingPreamble(code)
   
-  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
-  expect(result.includes('function Component()')).toBe(true)
-  expect(result.includes('<div>Hello</div>')).toBe(true)
+  const expected = `// Function call tracking system
+if (!globalThis.___functionStatistics) {
+  globalThis.___functionStatistics = new Map();
+}
+const trackFunctionCall = (functionName, location) => {
+  const key = functionName + (location ? \` (\${location})\` : '');
+  const current = globalThis.___functionStatistics.get(key) || 0;
+  globalThis.___functionStatistics.set(key, current + 1);
+};
+const getFunctionStatistics = () => {
+  const stats = {};
+  for (const [name, count] of globalThis.___functionStatistics) {
+    stats[name] = count;
+  }
+  return stats;
+};
+const resetFunctionStatistics = () => {
+  globalThis.___functionStatistics.clear();
+};
+
+// Export for debugging
+globalThis.getFunctionStatistics = getFunctionStatistics;
+globalThis.resetFunctionStatistics = resetFunctionStatistics;
+function Component() {
+  return <div>Hello</div>;
+}`
+
+  expect(result).toBe(expected)
 })
 
 test('AddTrackingPreamble - should handle invalid code gracefully', async () => {
@@ -90,12 +209,35 @@ test('AddTrackingPreamble - should preserve code structure', async () => {
 
   const result = await addTrackingPreamble(code)
   
-  // Should have tracking code at the beginning
-  expect(result.startsWith('// Function call tracking system')).toBe(true)
-  
-  // Should preserve original code structure
-  expect(result.includes('// Original comment')).toBe(true)
-  expect(result.includes('const constant = 42')).toBe(true)
-  expect(result.includes('function calculate(x: number, y: number): number')).toBe(true)
-  expect(result.includes('export { calculate }')).toBe(true)
+  const expected = `// Function call tracking system
+if (!globalThis.___functionStatistics) {
+  globalThis.___functionStatistics = new Map();
+}
+const trackFunctionCall = (functionName, location) => {
+  const key = functionName + (location ? \` (\${location})\` : '');
+  const current = globalThis.___functionStatistics.get(key) || 0;
+  globalThis.___functionStatistics.set(key, current + 1);
+};
+const getFunctionStatistics = () => {
+  const stats = {};
+  for (const [name, count] of globalThis.___functionStatistics) {
+    stats[name] = count;
+  }
+  return stats;
+};
+const resetFunctionStatistics = () => {
+  globalThis.___functionStatistics.clear();
+};
+
+// Export for debugging
+globalThis.getFunctionStatistics = getFunctionStatistics;
+globalThis.resetFunctionStatistics = resetFunctionStatistics;
+// Original comment
+const constant = 42;
+function calculate(x: number, y: number): number {
+  return x + y;
+}
+export { calculate };`
+
+  expect(result).toBe(expected)
 })
