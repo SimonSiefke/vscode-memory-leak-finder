@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { transformCode } from './transform-script.js'
+import { transformCode } from './transform-script.ts'
 
 // VS Code installation path
 const vscodePath: string =
