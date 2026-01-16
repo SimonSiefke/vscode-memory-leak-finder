@@ -172,52 +172,51 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
 
 export function transformCode(code: string, filename?: string): string {
   try {
-    // Try parsing as module first, then fallback to script
+    // Try different parsing strategies
     let ast
-    try {
-      ast = parser.parse(code, {
-        sourceType: 'unambiguous',  // Let Babel decide
+    const parseStrategies = [
+      // Strategy 1: Module with basic plugins
+      () => parser.parse(code, {
+        sourceType: 'module',
+        allowImportExportEverywhere: true,
+        plugins: ['jsx', 'typescript', 'decorators-legacy']
+      }),
+      // Strategy 2: Script with basic plugins  
+      () => parser.parse(code, {
+        sourceType: 'script',
+        allowImportExportEverywhere: true,
+        plugins: ['jsx', 'typescript', 'decorators-legacy']
+      }),
+      // Strategy 3: Module with more permissive settings
+      () => parser.parse(code, {
+        sourceType: 'module',
         allowImportExportEverywhere: true,
         allowReturnOutsideFunction: true,
-        allowHashBang: true,
-        plugins: [
-          'jsx', 
-          'typescript', 
-          'decorators-legacy', 
-          'objectRestSpread', 
-          'classProperties', 
-          'asyncGenerators', 
-          'functionBind', 
-          'exportDefaultFrom', 
-          'exportNamespaceFrom', 
-          'dynamicImport', 
-          'nullishCoalescingOperator', 
-          'optionalChaining',
-          'bigInt',
-          'optionalCatchBinding',
-          'throwExpressions',
-          'pipelineOperator',
-          'numericSeparator',
-          'logicalAssignment',
-          'classPrivateProperties',
-          'classPrivateMethods'
-        ]
+        plugins: ['jsx', 'typescript', 'decorators-legacy', 'objectRestSpread', 'classProperties']
+      }),
+      // Strategy 4: Script with more permissive settings
+      () => parser.parse(code, {
+        sourceType: 'script',
+        allowImportExportEverywhere: true,
+        allowReturnOutsideFunction: true,
+        plugins: ['jsx', 'typescript', 'decorators-legacy', 'objectRestSpread', 'classProperties']
       })
-    } catch (error) {
-      console.error('Parser error:', error.message)
-      // Try with flow parser which is more permissive
+    ]
+
+    for (const strategy of parseStrategies) {
       try {
-        ast = parser.parse(code, {
-          sourceType: 'script',
-          allowImportExportEverywhere: true,
-          allowReturnOutsideFunction: true,
-          allowHashBang: true,
-          plugins: ['flow', 'flowComments', 'jsx', 'typescript']
-        })
-      } catch (flowError) {
-        console.error('Flow parser also failed:', flowError.message)
-        throw flowError
+        ast = strategy()
+        console.log('Parse strategy succeeded!')
+        break // Success! Exit the loop
+      } catch (error) {
+        console.log('Parse strategy failed:', error.message.split('\n')[0])
+        continue // Try next strategy
       }
+    }
+
+    if (!ast) {
+      console.log('All parsing strategies failed - returning original code without transformation')
+      return code // Return original code if all parsing fails
     }
     
     // Add tracking code at the beginning
