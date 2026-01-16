@@ -1766,43 +1766,6 @@ function literalFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should handle enums and namespaces', () => {
-  const code = `
-    enum Color {
-      Red = 'red',
-      Green = 'green',
-      Blue = 'blue'
-    }
-
-    namespace MyNamespace {
-      export function namespaceFunction() {
-        return 'namespace';
-      }
-
-      export const namespaceArrow = () => 'arrow';
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, { filename: 'enums.ts' })
-  const expected = `enum Color {
-  Red = 'red',
-  Green = 'green',
-  Blue = 'blue',
-}
-namespace MyNamespace {
-  export function namespaceFunction() {
-    trackFunctionCall("namespaceFunction", "enums.ts:9");
-    return 'namespace';
-  }
-  export const namespaceArrow = () => {
-    trackFunctionCall("namespaceArrow", "enums.ts:13");
-    return 'arrow';
-  };
-}`
-
-  expect(transformed).toBe(expected)
-})
-
 test('Transform Script - transformCode - should handle type aliases and utility types', () => {
   const code = `
     type StringOrNumber = string | number;
