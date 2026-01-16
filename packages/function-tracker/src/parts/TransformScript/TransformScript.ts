@@ -28,7 +28,7 @@ export const transformCode = async (code: string, filename?: string, excludePatt
       const plugin = createFunctionWrapperPlugin({ filename, excludePatterns })
       console.log('Plugin created successfully:', plugin)
       console.log('AST before transformation:', ast)
-      traverseDefault(ast, plugin.visitor as any)
+      traverseDefault(ast, plugin as any)
       console.log('AST after transformation successful')
     } catch (error) {
       console.error('Error transforming code:', error)
