@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
-export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SideBar, Workspace }: TestContext): Promise<void> => {
   await SideBar.hide()
   await Workspace.setFiles([
     {
@@ -14,11 +14,13 @@ export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promis
   await Editor.shouldHaveText(`<h1>hello world<`)
   await Editor.shouldHaveBreadCrumb('h1')
   await Editor.setCursor(1, 17)
+  await Editor.deleteAll()
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.type('/')
+  await Editor.type('<h1>hello world</')
   await Editor.shouldHaveText(`<h1>hello world</h1>`)
+  await Editor.deleteAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {

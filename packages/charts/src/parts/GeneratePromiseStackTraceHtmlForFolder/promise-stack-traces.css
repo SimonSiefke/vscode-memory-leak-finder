@@ -1,0 +1,44 @@
+.PromiseStackTraces {
+  padding: 20px;
+  min-width: 70%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.PromiseItem {
+  margin-bottom: 30px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  background: #fafafa;
+}
+.PromiseItemHeader {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+}
+.PromiseItemHeader h3 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+.PromiseItemMeta {
+  color: #666;
+  font-size: 14px;
+}
+.PromiseItemMeta span {
+  margin-right: 15px;
+}
+.CodeBlock {
+  margin-top: 15px;
+}
+.CodeBlock pre {
+  margin: 0;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.CodeBlock code {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}

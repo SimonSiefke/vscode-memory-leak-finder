@@ -24,13 +24,13 @@ export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void
     name: 'editor.fontFamily',
     value: 'serif',
   })
-  // @ts-ignore
+
   await Editor.shouldHaveFontFamily('serif')
   await SettingsEditor.setTextInput({
     name: 'editor.fontFamily',
     value: 'sans-serif',
   })
-  // @ts-ignore
+
   await Editor.shouldHaveFontFamily('sans-serif')
 }
 

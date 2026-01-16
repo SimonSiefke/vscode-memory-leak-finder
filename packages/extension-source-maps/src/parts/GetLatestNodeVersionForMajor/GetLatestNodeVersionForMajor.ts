@@ -1,12 +1,11 @@
 import { VError } from '@lvce-editor/verror'
 import type { NodeVersionInfo } from '../NodeVersionTypes/NodeVersionTypes.ts'
 import { filterAndSortNodeVersions } from '../FilterAndSortNodeVersions/FilterAndSortNodeVersions.ts'
-import { launchNetworkWorker } from '../LaunchNetworkWorker/LaunchNetworkWorker.ts'
+import { getJson } from '../GetJson/GetJson.ts'
 
 export const getLatestNodeVersionForMajor = async (majorVersion: string): Promise<string> => {
   try {
-    await using networkWorker = await launchNetworkWorker()
-    const versions = (await networkWorker.invoke('Network.getJson', 'https://nodejs.org/dist/index.json')) as NodeVersionInfo[]
+    const versions = await getJson<NodeVersionInfo[]>('https://nodejs.org/dist/index.json')
     const majorVersionNum = Number.parseInt(majorVersion, 10)
 
     const matchingVersions = filterAndSortNodeVersions(versions, majorVersionNum)

@@ -28,14 +28,13 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestCo
 }
 
 export const run = async ({ Task }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Task.openQuickPick({
     item: 'echo',
   })
-  // @ts-ignore
+
   await Task.selectQuickPickItem({
     item: 'echo',
   })
-  // @ts-ignore
+
   await Task.clear()
 }

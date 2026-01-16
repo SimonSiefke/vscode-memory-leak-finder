@@ -33,8 +33,8 @@ for(let i=0;i<1000;i++){
   await RunAndDebug.runAndWaitForPaused({
     callStackSize: 11,
     file: 'main.js',
-    line: 4,
     hasCallStack: false,
+    line: 4,
   })
   await Editor.open('add.js')
   await Editor.setBreakpoint(2)
@@ -45,16 +45,22 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
   await RunAndDebug.waitForPaused({
     callStackSize: 11,
     file: 'add.js',
-    line: 3,
     hasCallStack: false,
+    line: 3,
   })
+
   // @ts-ignore
   await Editor.removeBreakPoint(2)
   await Editor.setBreakpoint(3)
   // @ts-ignore
-  await RunAndDebug.step('add.js', 3, 0, false)
+  await RunAndDebug.step({
+    callStackSize: 0,
+    file: 'add.js',
+    hasCallStack: false,
+    line: 3,
+  })
   // @ts-ignore
   await Editor.removeBreakPoint(3)
-  // @ts-ignore
+
   await Editor.setBreakpoint(2)
 }

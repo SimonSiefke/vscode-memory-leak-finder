@@ -28,8 +28,8 @@ export const run = async ({ DiffEditor, Editor }: TestContext): Promise<void> =>
   // @ts-ignore
   await DiffEditor.open({
     file1: 'a.txt',
-    file2: 'b.txt',
     file1Content: 'a',
+    file2: 'b.txt',
     file2Content: 'b',
   })
   await Editor.closeAll()

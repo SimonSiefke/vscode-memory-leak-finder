@@ -11,12 +11,14 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   ])
   await Editor.open('index.html')
   await Editor.shouldHaveBreadCrumb('h1')
+  await Editor.shouldHaveText('<h1>hello world</h1>')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // TODO triple click to select line
-  await Editor.select('h1')
-  await Editor.shouldHaveSelection('8px', /(15px|17px)/)
+  // @ts-ignore
+  await Editor.selectLine()
+  // @ts-ignore
+  await Editor.shouldHaveSelectedCharacters(20)
   await Editor.cursorRight()
   await Editor.shouldHaveEmptySelection()
 }

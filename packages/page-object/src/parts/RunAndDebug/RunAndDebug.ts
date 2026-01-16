@@ -47,7 +47,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to remove all breakpoints`)
       }
     },
-    async runAndWaitForDebugConsoleOutput({ output, debugLabel, debugConfiguration }) {
+    async runAndWaitForDebugConsoleOutput({ debugConfiguration, debugLabel, output }) {
       try {
         const quickPick = QuickPick.create({
           expect,
@@ -58,8 +58,8 @@ export const create = ({ expect, page, platform, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await page.waitForIdle()
         await this.startRunAndDebug({
-          debugLabel,
           debugConfiguration,
+          debugLabel,
         })
         if (output) {
           await this.waitForDebugConsoleOutput({ output })
@@ -68,7 +68,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to run debugger`)
       }
     },
-    async runAndWaitForPaused({ callStackSize, file, line, debugLabel, debugConfiguration, hasCallStack }) {
+    async runAndWaitForPaused({ callStackSize, debugConfiguration, debugLabel, file, hasCallStack, line, viaIcon }) {
       try {
         const quickPick = QuickPick.create({
           expect,
@@ -78,8 +78,8 @@ export const create = ({ expect, page, platform, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await page.waitForIdle()
-        await this.startRunAndDebug({ debugLabel, debugConfiguration })
-        await this.waitForPaused({ callStackSize, file, line, hasCallStack })
+        await this.startRunAndDebug({ debugConfiguration, debugLabel, viaIcon })
+        await this.waitForPaused({ callStackSize, file, hasCallStack, line })
       } catch (error) {
         throw new VError(error, `Failed to run debugger`)
       }
@@ -102,10 +102,10 @@ export const create = ({ expect, page, platform, VError }) => {
       }
     },
     async setValue({
-      variableName,
-      variableValue,
       newVariableValue,
       scopeName = 'Scope Module',
+      variableName,
+      variableValue,
     }: {
       variableName: string
       variableValue: string
@@ -136,13 +136,21 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to set variable value for ${variableName}`)
       }
     },
-    async startRunAndDebug({ debugLabel = 'Node.js', debugConfiguration }) {
+    async startRunAndDebug({ debugConfiguration = '', debugLabel = 'Node.js', viaIcon = false } = {}) {
       try {
-        await page.waitForIdle()
-        const button = page.locator('.monaco-button:has-text("Run and Debug")')
-        await expect(button).toBeVisible()
-        await page.waitForIdle()
-        await button.click()
+        if (viaIcon) {
+          const icon = page.locator('.codicon-debug-start')
+          await expect(icon).toBeVisible()
+          await page.waitForIdle()
+          await icon.click()
+          await page.waitForIdle()
+        } else {
+          await page.waitForIdle()
+          const button = page.locator('.monaco-button:has-text("Run and Debug")')
+          await expect(button).toBeVisible()
+          await page.waitForIdle()
+          await button.click()
+        }
         await page.waitForIdle()
         const quickPickWidget = page.locator('.quick-input-widget')
         const quickPickPromise = expect(quickPickWidget)
@@ -160,14 +168,15 @@ export const create = ({ expect, page, platform, VError }) => {
           .catch(() => 0)
         const value = await Promise.race([quickPickPromise, debugToolBarPromise])
         if (value === 1) {
-          const option = page.locator(`[role="option"][aria-label="${debugLabel}"]`)
+          const option = page.locator(`[role="option"][aria-label^="${debugLabel}"]`)
           await expect(quickPickWidget).toBeVisible()
+
           await page.waitForIdle()
           await option.click()
           await page.waitForIdle()
 
           if (debugConfiguration) {
-            const quickPick = QuickPick.create({ page, expect, VError, platform })
+            const quickPick = QuickPick.create({ expect, page, platform, VError })
             await quickPick.select(debugConfiguration)
             await page.waitForIdle()
           }
@@ -175,12 +184,23 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(debugToolBar).toBeVisible({
           timeout: 30_000,
         })
+
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to start run and debug`)
       }
     },
-    async step(expectedFile: string, expectedPauseLine: number, expectedCallStackSize: number, hasCallStack?: boolean) {
+    async step({
+      callStackSize: callStackSize,
+      file: file,
+      hasCallStack = true,
+      line: line,
+    }: {
+      file: string
+      line: number
+      callStackSize: number
+      hasCallStack?: boolean
+    }) {
       try {
         const quickPick = QuickPick.create({
           expect,
@@ -191,19 +211,19 @@ export const create = ({ expect, page, platform, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.DebugStepOver)
         await page.waitForIdle()
         await this.waitForPaused({
-          callStackSize: expectedCallStackSize,
-          file: expectedFile,
-          line: expectedPauseLine,
+          callStackSize: callStackSize,
+          file: file,
           hasCallStack,
+          line: line,
         })
       } catch (error) {
         throw new VError(error, `Failed to step over`)
       }
     },
     async stepInto({
+      expectedCallStackSize,
       expectedFile,
       expectedPauseLine,
-      expectedCallStackSize,
       hasCallStack,
     }: {
       expectedFile: string
@@ -226,8 +246,8 @@ export const create = ({ expect, page, platform, VError }) => {
         await this.waitForPaused({
           callStackSize: expectedCallStackSize,
           file: expectedFile,
-          line: expectedPauseLine,
           hasCallStack,
+          line: expectedPauseLine,
         })
         await page.waitForIdle()
       } catch (error) {
@@ -235,9 +255,9 @@ export const create = ({ expect, page, platform, VError }) => {
       }
     },
     async stepOutOf({
+      expectedCallStackSize,
       expectedFile,
       expectedPauseLine,
-      expectedCallStackSize,
       hasCallStack,
     }: {
       expectedFile: string
@@ -260,8 +280,8 @@ export const create = ({ expect, page, platform, VError }) => {
         await this.waitForPaused({
           callStackSize: expectedCallStackSize,
           file: expectedFile,
-          line: expectedPauseLine,
           hasCallStack,
+          line: expectedPauseLine,
         })
         await page.waitForIdle()
       } catch (error) {
@@ -301,7 +321,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to wait for debug console output`)
       }
     },
-    async waitForPaused({ callStackSize, file, line, hasCallStack = true }) {
+    async waitForPaused({ callStackSize, file, hasCallStack = true, line }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       await expect(continueButton).toBeVisible({ timeout: 30_000 })

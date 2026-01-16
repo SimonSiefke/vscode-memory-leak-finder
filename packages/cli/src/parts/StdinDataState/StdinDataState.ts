@@ -9,6 +9,7 @@ export interface StdinDataState {
   readonly buffering: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
+  readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -31,6 +32,7 @@ export interface StdinDataState {
   readonly measureAfter: boolean
   readonly measureNode?: boolean
   readonly mode: number
+  readonly pageObjectPath: string
   readonly platform: string
   readonly previousFilters: string[]
   readonly recordVideo: boolean
@@ -54,6 +56,7 @@ let state: StdinDataState = {
   buffering: false,
   checkLeaks: false,
   clearExtensions: true,
+  compressVideo: false,
   continueValue: '',
   cwd: Character.EmptyString,
   enableExtensions: false,
@@ -75,6 +78,7 @@ let state: StdinDataState = {
   measure: Character.EmptyString,
   measureAfter: false,
   mode: ModeType.Waiting,
+  pageObjectPath: '',
   platform: '',
   previousFilters: [],
   recordVideo: false,
@@ -139,6 +143,7 @@ export const setState = (newState: StdinDataState): void => {
     arch: newState.arch,
     bisect: newState.bisect,
     checkLeaks: newState.checkLeaks,
+    compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,
     cwd: newState.cwd,
     enableExtensions: newState.enableExtensions,
@@ -158,6 +163,7 @@ export const setState = (newState: StdinDataState): void => {
     measure: newState.measure,
     measureAfter: newState.measureAfter,
     mode: newState.mode,
+    pageObjectPath: newState.pageObjectPath,
     platform: newState.platform,
     previousFilters: newState.previousFilters,
     recordVideo: newState.recordVideo,

@@ -26,6 +26,12 @@
     }
   },
   "dependencies": {
-    "@lvce-editor/rpc": "^4.20.0"
+    "@babel/code-frame": "^7.28.6",
+    "@lvce-editor/rpc": "^5.4.0",
+    "escape-html": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/babel__code-frame": "^7.27.0",
+    "@types/escape-html": "^1.0.4"
   }
 }

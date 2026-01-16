@@ -1,10 +1,48 @@
 import { isAbsolute, join, relative, normalize } from 'node:path'
 
-const EXTENSION_PATH_REGEX = /\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/
+const COPILOT_EXTENSION_PATH_REGEX = /\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/
+const JS_DEBUG_EXTENSION_PATH_REGEX = /\/extensions\/ms-vscode\.js-debug\/(.+)$/
 const GITHUB_PREFIX_REGEX = /^github\./
 
 const normalizePathSeparators = (path: string): string => {
-  return path.replace(/\\/g, '/')
+  return path.replaceAll('\\', '/')
+}
+
+const extractCopilot = (root: string, normalizedPath: string) => {
+  // Check if this is a copilot extension file
+  const extensionMatch = normalizedPath.match(COPILOT_EXTENSION_PATH_REGEX)
+  if (!extensionMatch) {
+    return null
+  }
+  const extensionId = extensionMatch[1]
+  const relativePath = extensionMatch[2]
+
+  // Convert extension ID from github.copilot-chat-0.36.2025121004 to copilot-chat-0.36.2025121004
+  // Remove 'github.' prefix
+  let cacheDirName = extensionId.replace(GITHUB_PREFIX_REGEX, '')
+
+  // Strip 'v' prefix from version if present
+  // VS Code extension directories don't have 'v' prefix in version, so strip it if present
+  // This ensures consistency: copilot-chat-v0.36.2025121004 -> copilot-chat-0.36.2025121004
+  // Pattern: copilot-chat-v<version> -> copilot-chat-<version>
+  if (cacheDirName.startsWith('copilot-chat-v')) {
+    cacheDirName = cacheDirName.replace('copilot-chat-v', 'copilot-chat-')
+  }
+
+  // Map to source maps cache directory
+  const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, relativePath + '.map')
+  return sourceMapPath
+}
+const extractJsDebug = (root: string, normalizedPath: string) => {
+  const extensionMatch = normalizedPath.match(JS_DEBUG_EXTENSION_PATH_REGEX)
+  if (!extensionMatch) {
+    return null
+  }
+  const version = '1.105.0'
+  const relativePath = extensionMatch[1]
+  const cacheDirName = `vscode-js-debug-${version}`
+  const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, 'dist', relativePath + '.map')
+  return sourceMapPath
 }
 
 export const mapPathToSourceMapPath = (path: string, root: string): string | null => {
@@ -52,27 +90,6 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
     // Normalize separators for relative paths too (for regex matching)
     normalizedPath = normalizePathSeparators(normalizedPath)
   }
-  // Check if this is a copilot extension file
-  const extensionMatch = normalizedPath.match(EXTENSION_PATH_REGEX)
-  if (!extensionMatch) {
-    return null
-  }
-  const extensionId = extensionMatch[1]
-  const relativePath = extensionMatch[2]
 
-  // Convert extension ID from github.copilot-chat-0.36.2025121004 to copilot-chat-0.36.2025121004
-  // Remove 'github.' prefix
-  let cacheDirName = extensionId.replace(GITHUB_PREFIX_REGEX, '')
-
-  // Strip 'v' prefix from version if present
-  // VS Code extension directories don't have 'v' prefix in version, so strip it if present
-  // This ensures consistency: copilot-chat-v0.36.2025121004 -> copilot-chat-0.36.2025121004
-  // Pattern: copilot-chat-v<version> -> copilot-chat-<version>
-  if (cacheDirName.startsWith('copilot-chat-v')) {
-    cacheDirName = cacheDirName.replace('copilot-chat-v', 'copilot-chat-')
-  }
-
-  // Map to source maps cache directory
-  const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, relativePath + '.map')
-  return sourceMapPath
+  return extractCopilot(root, normalizedPath) || extractJsDebug(root, normalizedPath)
 }

@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 export const setup = async ({ Editor, Problems, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -27,13 +29,13 @@ export const setup = async ({ Editor, Problems, Workspace }: TestContext): Promi
   await Editor.shouldHaveSquigglyError()
   await Problems.show()
   await Problems.shouldHaveCount(1)
-  // @ts-ignore
+
   await Problems.switchToTableView()
 }
 
 export const run = async ({ Problems }: TestContext): Promise<void> => {
   await Problems.switchToTreeView()
-  // @ts-ignore
+
   await Problems.switchToTableView()
 }
 

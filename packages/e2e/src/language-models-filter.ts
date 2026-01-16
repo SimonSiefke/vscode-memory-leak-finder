@@ -9,15 +9,14 @@ export const setup = async ({ Editor, Electron, Extensions, LanguageModelEditor 
     response: 1,
   })
   await Extensions.install({
-    id: 'github copilot chat',
+    id: 'GitHub.copilot-chat',
     name: 'GitHub Copilot Chat',
   })
   await Editor.closeAll()
   await LanguageModelEditor.open()
 }
 
-// @ts-ignore
-export const run = async ({ Editor, LanguageModelEditor }: TestContext): Promise<void> => {
+export const run = async ({ LanguageModelEditor }: TestContext): Promise<void> => {
   await LanguageModelEditor.filter({
     searchValue: 'gpt',
   })

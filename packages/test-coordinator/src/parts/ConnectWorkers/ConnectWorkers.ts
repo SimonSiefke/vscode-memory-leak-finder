@@ -6,6 +6,7 @@ export const connectWorkers = async (
   platform: string,
   arch: string,
   recordVideo: boolean,
+  compressVideo: boolean,
   screencastQuality: number,
   connectionId: number,
   devtoolsWebSocketUrl: string,
@@ -16,6 +17,7 @@ export const connectWorkers = async (
   idleTimeout: number,
   pageObjectPath: string,
   parsedIdeVersion: any,
+  pid: number,
   timeouts: boolean,
   utilityContext: any,
   runMode: number,
@@ -30,7 +32,9 @@ export const connectWorkers = async (
 ) => {
   const promises: Promise<any>[] = []
   if (recordVideo) {
-    promises.push(VideoRecording.start(platform, arch, devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout, screencastQuality))
+    promises.push(
+      VideoRecording.start(platform, arch, devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout, screencastQuality, compressVideo),
+    )
   } else {
     promises.push(Promise.resolve(undefined))
   }
@@ -72,6 +76,7 @@ export const connectWorkers = async (
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    pid,
   )
 
   return {

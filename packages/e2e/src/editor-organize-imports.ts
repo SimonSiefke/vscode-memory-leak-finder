@@ -10,7 +10,9 @@ export const main = () => {
 
 export const skip = 1
 
-export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+export const requiresNetwork = 1
+
+export const setup = async ({ Editor, Explorer, SideBar, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: originalContent,
@@ -43,8 +45,10 @@ export const unused = () => {
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.expand('src')
   await Explorer.shouldHaveItem('main.ts')
+  await SideBar.hide()
   await Editor.open('main.ts')
   await Editor.setCursor(5, 1)
   await Editor.shouldHaveBreadCrumb('main.ts')
@@ -56,11 +60,6 @@ export const unused = () => {
 }
 
 export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
-  // Wait a bit for TypeScript language server to initialize
-
-  // TODO set cursor and wait for spark
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-
   await Editor.showSourceAction()
   await Editor.selectSourceAction('Organize Imports')
   await Editor.shouldHaveText(`import { used } from './add.ts'

@@ -57,6 +57,7 @@ test('initialStart - watch mode - show details', async () => {
     clearExtensions: true,
     color: true,
     commit: '',
+    compressVideo: false,
     continueValue: '',
     cwd: '',
     enableExtensions: false,
@@ -72,10 +73,13 @@ test('initialStart - watch mode - show details', async () => {
     inspectPtyHostPort: 0,
     inspectSharedProcess: false,
     inspectSharedProcessPort: 0,
+    isGithubActions: false,
     isWindows: false,
+    login: false,
     measure: '',
     measureAfter: false,
     measureNode: false,
+    pageObjectPath: '',
     platform: '',
     recordVideo: false,
     restartBetween: false,
@@ -92,7 +96,6 @@ test('initialStart - watch mode - show details', async () => {
     vscodeVersion: '',
     watch: true,
     workers: false,
-    isGithubActions: false,
   }
   // @ts-ignore
   WatchUsage.print.mockImplementation(async () => 'watch usage')
@@ -111,6 +114,7 @@ test('initialStart - watch mode - start running', async () => {
     clearExtensions: true,
     color: true,
     commit: '',
+    compressVideo: false,
     continueValue: '',
     cwd: '',
     enableExtensions: false,
@@ -126,10 +130,13 @@ test('initialStart - watch mode - start running', async () => {
     inspectPtyHostPort: 0,
     inspectSharedProcess: false,
     inspectSharedProcessPort: 0,
+    isGithubActions: false,
     isWindows: false,
+    login: false,
     measure: '',
     measureAfter: false,
     measureNode: false,
+    pageObjectPath: '',
     platform: '',
     recordVideo: false,
     restartBetween: false,
@@ -146,7 +153,6 @@ test('initialStart - watch mode - start running', async () => {
     vscodeVersion: '',
     watch: true,
     workers: false,
-    isGithubActions: false,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
@@ -163,6 +169,7 @@ test('initialStart - start running', async () => {
     clearExtensions: true,
     color: true,
     commit: '',
+    compressVideo: false,
     continueValue: '',
     cwd: '',
     enableExtensions: false,
@@ -178,10 +185,13 @@ test('initialStart - start running', async () => {
     inspectPtyHostPort: 0,
     inspectSharedProcess: false,
     inspectSharedProcessPort: 0,
+    isGithubActions: false,
     isWindows: false,
+    login: false,
     measure: '',
     measureAfter: false,
     measureNode: false,
+    pageObjectPath: '',
     platform: '',
     recordVideo: false,
     restartBetween: false,
@@ -198,7 +208,6 @@ test('initialStart - start running', async () => {
     vscodeVersion: '',
     watch: false,
     workers: false,
-    isGithubActions: false,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()

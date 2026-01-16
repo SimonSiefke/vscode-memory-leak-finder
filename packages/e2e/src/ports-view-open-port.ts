@@ -4,8 +4,9 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-export const setup = async ({ Panel, PortsView }: TestContext): Promise<void> => {
+export const setup = async ({ Panel, PortsView, SideBar }: TestContext): Promise<void> => {
   await Panel.hide()
+  await SideBar.hide()
   await PortsView.open()
 }
 

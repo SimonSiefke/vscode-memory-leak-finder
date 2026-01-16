@@ -43,6 +43,14 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to clear task terminal`)
       }
     },
+    async clearTerminal() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
+      } catch (error) {
+        throw new VError(error, `Failed to clear terminal`)
+      }
+    },
     async hideQuickPick() {
       try {
         await page.waitForIdle()
@@ -127,6 +135,20 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to pin "${name}"`)
       }
     },
+    async reRunLast({ hasError }: { hasError: boolean }) {
+      try {
+        const errorDecorations = page.locator('.terminal-command-decoration.codicon-terminal-decoration-error')
+        await expect(errorDecorations).toHaveCount(0)
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ReRunLastTask)
+        if (hasError) {
+          await expect(errorDecorations).toHaveCount(1)
+          await page.waitForIdle()
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to rerun last task`)
+      }
+    },
     async run(taskName: string) {
       try {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
@@ -156,6 +178,39 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to run task`)
+      }
+    },
+    async runError({ scanType, taskName }: { taskName: string; scanType: string }) {
+      try {
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
+        await page.waitForIdle()
+        const hasScanType = Boolean(scanType)
+        await quickPick.select(taskName, hasScanType)
+        await page.waitForIdle()
+        if (hasScanType) {
+          await quickPick.select(scanType, false)
+        }
+        const panel = page.locator('.part.panel')
+        await expect(panel).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
+        const terminal = page.locator('.terminal')
+        await expect(terminal).toHaveCount(1)
+        await page.waitForIdle()
+        await expect(terminal).toBeVisible()
+        await page.waitForIdle()
+        await expect(terminal).toHaveClass('xterm')
+        await page.waitForIdle()
+        const terminalActions = page.locator('[aria-label="Terminal actions"]')
+        await expect(terminalActions).toBeVisible()
+        await page.waitForIdle()
+        const actionLabel = terminalActions.locator('.action-label[aria-label^="Focus Terminal"]')
+        await expect(actionLabel).toBeVisible()
+        const errorIcon = actionLabel.locator('.codicon-error')
+        await expect(errorIcon).toBeVisible({ timeout: 15_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to run task with error`)
       }
     },
     async selectQuickPickItem({ item }) {

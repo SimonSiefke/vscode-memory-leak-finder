@@ -33,7 +33,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       return Env.env.VSCODE_PATH
     }
 
-    const { vscodeVersion, insidersCommit, platform, arch, updateUrl } = options
+    const { arch, insidersCommit, platform, updateUrl, vscodeVersion } = options
 
     if (insidersCommit) {
       return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(platform, arch, insidersCommit, updateUrl)
@@ -43,7 +43,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       throw new Error('Either vscodeVersion or insidersCommit must be provided')
     }
 
-    const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(vscodeVersion)
+    const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(vscodeVersion, platform, arch)
     if (cachedPath) {
       return cachedPath
     }
@@ -61,9 +61,9 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
       await LoadSourceMaps.loadSourceMaps(sourceMapUrls)
     }
-    await GetVscodeRuntimePath.setVscodeRuntimePath(vscodeVersion, path)
+    await GetVscodeRuntimePath.setVscodeRuntimePath(vscodeVersion, path, platform, arch)
     return path
   } catch (error) {
-    throw new VError(error, `Failed to download vscode`)
+    throw new VError(error, `Failed to download VSCode`)
   }
 }

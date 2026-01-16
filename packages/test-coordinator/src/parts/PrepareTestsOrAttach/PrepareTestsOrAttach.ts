@@ -14,6 +14,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly attachedToPageTimeout: number
   readonly clearExtensions: boolean
   readonly commit: string
+  readonly compressVideo: boolean
   readonly connectionId: number
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -49,6 +50,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     attachedToPageTimeout,
     clearExtensions,
     commit,
+    compressVideo,
     connectionId,
     cwd,
     enableExtensions,
@@ -113,12 +115,13 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   }
   const result = await state.promise
 
-  const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, utilityContext, webSocketUrl } = await result
+  const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, pid, utilityContext, webSocketUrl } = await result
 
   const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
     platform,
     arch,
     recordVideo,
+    compressVideo,
     screencastQuality,
     connectionId,
     devtoolsWebSocketUrl,
@@ -129,6 +132,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     idleTimeout,
     pageObjectPath,
     parsedVersion,
+    pid,
     timeouts,
     utilityContext,
     runMode,

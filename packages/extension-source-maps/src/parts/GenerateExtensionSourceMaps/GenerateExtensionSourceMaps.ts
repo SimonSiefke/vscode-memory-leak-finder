@@ -60,7 +60,7 @@ export const generateExtensionSourceMaps = async ({
 
   // Get node version
   const nodeVersion = await GetNodeVersion.getNodeVersion(repoPath)
-  console.log(`[extension-source-maps] Getting node version from package.json: ${nodeVersion}`)
+  console.log(`[extension-source-maps] Using node version: ${nodeVersion}`)
 
   // Install node version
   console.log(`[extension-source-maps] Installing node version ${nodeVersion}...`)

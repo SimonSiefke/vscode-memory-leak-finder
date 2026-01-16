@@ -46,8 +46,12 @@ const getFileSizeInMB = async (url: string): Promise<number | undefined> => {
 export const downloadAndUnzipInsiders = async (commit: string): Promise<string> => {
 =======
 export const downloadAndUnzipInsiders = async (platform: string, arch: string, commit: string, updateUrl: string): Promise<string> => {
+<<<<<<< HEAD
 >>>>>>> origin/main
   const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(commit)
+=======
+  const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(commit, platform, arch)
+>>>>>>> origin/main
   if (cachedPath) {
     return cachedPath
   }
@@ -73,7 +77,7 @@ export const downloadAndUnzipInsiders = async (platform: string, arch: string, c
     await Download.download('vscode-insiders', [metadata.url], tmpFile)
     console.log(`[download-worker] Download complete.`)
     const path = tmpFile
-    await GetVscodeRuntimePath.setVscodeRuntimePath(commit, path)
+    await GetVscodeRuntimePath.setVscodeRuntimePath(commit, path, platform, arch)
     return path
   }
 
@@ -94,6 +98,6 @@ export const downloadAndUnzipInsiders = async (platform: string, arch: string, c
     const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
     await LoadSourceMaps.loadSourceMaps(sourceMapUrls)
   }
-  await GetVscodeRuntimePath.setVscodeRuntimePath(commit, path)
+  await GetVscodeRuntimePath.setVscodeRuntimePath(commit, path, platform, arch)
   return path
 }

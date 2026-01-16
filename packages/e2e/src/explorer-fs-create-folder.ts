@@ -10,6 +10,7 @@ export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void>
     },
   ])
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('existing-file.txt')
 }
 
@@ -19,6 +20,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'nested content',
     name: 'new-folder/nested-file.txt',
   })
+  await Explorer.refresh()
 
   // Verify the folder appears in the explorer UI
   await Explorer.shouldHaveItem('new-folder')

@@ -26,6 +26,7 @@ export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void>
     },
   ])
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('file-to-move.txt')
   await Explorer.shouldHaveItem('source-folder')
   await Explorer.shouldHaveItem('destination-folder')
@@ -39,6 +40,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'content to be moved',
     name: 'destination-folder/file-to-move.txt',
   })
+  await Explorer.refresh()
 
   // Verify file is no longer in root and appears in destination folder
   await Explorer.not.toHaveItem('file-to-move.txt')
@@ -51,6 +53,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'file in source folder',
     name: 'destination-folder/file-in-source.txt',
   })
+  await Explorer.refresh()
 
   // Verify file moved from source to destination
   await Explorer.expand('source-folder')
@@ -68,6 +71,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'nested file content',
     name: 'another-folder/renamed-source-folder/nested-file.txt',
   })
+  await Explorer.refresh()
 
   // Verify folder structure change
   await Explorer.collapse('source-folder')
@@ -86,6 +90,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'nested file content',
     name: 'nested-file.txt',
   })
+  await Explorer.refresh()
 
   // Verify file is back in root
   await Explorer.collapse('renamed-source-folder')
@@ -98,18 +103,19 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'content to be moved',
     name: 'file-to-move.txt',
   })
+  await Explorer.refresh()
 
   await Workspace.remove('destination-folder/file-in-source.txt')
   await Workspace.add({
     content: 'file in source folder',
     name: 'source-folder/file-in-source.txt',
   })
-
   await Workspace.remove('nested-file.txt')
   await Workspace.add({
     content: 'nested file content',
     name: 'source-folder/nested-file.txt',
   })
+  await Explorer.refresh()
 
   // Verify original state is restored
   await Explorer.shouldHaveItem('file-to-move.txt')

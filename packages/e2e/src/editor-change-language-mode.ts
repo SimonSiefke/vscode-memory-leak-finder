@@ -12,9 +12,8 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.setLanguageMode('Clojure')
-  // @ts-ignore
+
   await Editor.setLanguageMode('Plain Text')
 }
 

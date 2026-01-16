@@ -5,13 +5,13 @@ export const skip = 1
 export const requiresNetwork = true
 
 export const setup = async ({
-  SideBar,
+  ActivityBar,
+  DebugConsole,
   Editor,
   Extensions,
   RunAndDebug,
+  SideBar,
   Workspace,
-  ActivityBar,
-  DebugConsole,
 }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -26,7 +26,7 @@ if __name__ == '__main__':
       name: 'main.py',
     },
   ])
-  // @ts-ignore
+
   await Extensions.install({
     id: 'ms-python.python',
     name: 'Python',
@@ -37,11 +37,11 @@ if __name__ == '__main__':
   await ActivityBar.showRunAndDebug()
   await Editor.setBreakpoint(2)
   await RunAndDebug.runAndWaitForPaused({
-    debugLabel: 'Python Debugger',
     debugConfiguration: 'Python File',
+    debugLabel: 'Python Debugger',
     file: 'main.py',
-    line: 2,
     hasCallStack: false,
+    line: 2,
   })
   await DebugConsole.show()
   await SideBar.hide()
@@ -49,13 +49,14 @@ if __name__ == '__main__':
 
 export const run = async ({ DebugConsole }: TestContext): Promise<void> => {
   await DebugConsole.evaluate({
-    expression: 'add',
     expectedResult: {
       message: /^<function add/,
       type: '',
     },
+    expression: 'add',
     hasSuggest: true,
   })
+
   // @ts-ignore
   await DebugConsole.expand({
     label: '<function add',

@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
-export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SideBar, Workspace }: TestContext): Promise<void> => {
   await SideBar.hide()
   await Workspace.setFiles([
     {
@@ -21,14 +21,15 @@ export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promis
 }
 
 export const run = async ({ Editor, Suggest }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Suggest.open('visibility, Property')
+
   // @ts-ignore
   await Suggest.accept('visibility, Property')
   const space = ' '
   await Editor.shouldHaveText(`h1 {
   visibility:${space}
 }`)
+
   // @ts-ignore
   await Suggest.accept(`hidden, Value`)
   await Editor.shouldHaveText(`h1 {

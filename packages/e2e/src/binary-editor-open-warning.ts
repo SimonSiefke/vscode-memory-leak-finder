@@ -17,7 +17,6 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.open('file.unknown', { hasWarning: true })
   await Editor.close()
 }

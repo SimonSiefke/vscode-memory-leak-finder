@@ -10,6 +10,5 @@ export const setup = async ({ Panel, Terminal, Workspace }: TestContext): Promis
 }
 
 export const run = async ({ Terminal }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Terminal.restartPtyHost()
 }

@@ -18,7 +18,6 @@ export const getMeasureRpc = async (
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
 
-  // Connect to the appropriate debug port based on the flags
   if (inspectSharedProcess) {
     await sessionRpc.dispose()
     const sharedProcessRpc = await connectToDevtoolsWithJsonUrl(inspectSharedProcessPort)
