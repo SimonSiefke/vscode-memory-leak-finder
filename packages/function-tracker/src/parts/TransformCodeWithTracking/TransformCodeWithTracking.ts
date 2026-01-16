@@ -3,6 +3,7 @@ import traverse from '@babel/traverse'
 import generate from '@babel/generator'
 import { TransformOptions } from '../Types/Types.js'
 import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.js'
+import { VError } from '@lvce-editor/verror'
 
 // @ts-ignore
 const parser2 = (parser.default || parser) as typeof import('@babel/parser')
@@ -35,7 +36,6 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
 
     return result.code
   } catch (error) {
-    console.error('Error transforming code with tracking:', error)
-    return code // Return original code if transformation fails
+    throw new VError(error, `Error transforming code with tracking:`)
   }
 }
