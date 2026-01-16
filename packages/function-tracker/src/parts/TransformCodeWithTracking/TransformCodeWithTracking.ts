@@ -18,7 +18,7 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
   try {
     const ast = parser2.parse(code, {
       sourceType: 'module',
-      plugins: ['jsx', 'typescript', 'decorators-legacy'],
+      plugins: [],
       sourceFilename: options.filename || 'unknown',
     })
 

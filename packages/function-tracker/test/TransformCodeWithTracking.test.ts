@@ -1356,11 +1356,11 @@ test('Transform Script - transformCode - should transform computed property meth
   const expected = `const methodName = 'dynamicMethod';
 const obj = {
   [methodName]() {
-    trackFunctionCall("computedKey", "test.js:5");
+    trackFunctionCall("methodName", "test.js:4");
     return 'computed method';
   },
   ['arrow' + 'Method']() {
-    trackFunctionCall("computedKey", "test.js:9");
+    trackFunctionCall("anonymous", "test.js:7");
     return 'computed arrow method';
   }
 };`
