@@ -39,23 +39,17 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
 
   const createTrackingCall = (node: any) => {
     const location = functionLocations.get(node)
-    // Calculate adjusted positions based on how Babel generator formats the code
-    // Most functions start at line 2 due to initial newline in test templates
-    // Column positions need to be adjusted for the final formatted output
-    let line = 2
-    let column = 4
-    
+
+    let line
+    let column
     if (location) {
       line = location.line
-      column = location.column
+      line = location.column
     } else if (node.loc?.start) {
       line = node.loc.start.line
-      column = node.loc.start.column
+      line = node.loc.start.column
     }
-    
-    // Adjust for common formatting patterns in tests
-    if (line === 1) line = 2 // Account for initial newline in test templates
-    
+
     return t.expressionStatement(
       t.callExpression(t.identifier('trackFunctionCall'), [t.numericLiteral(scriptId), t.numericLiteral(line), t.numericLiteral(column)]),
     )
