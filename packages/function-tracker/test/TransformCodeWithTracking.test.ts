@@ -2358,14 +2358,14 @@ function TESTFUNCTION() {
     excludePatterns: ['test'],
   })
   const expected = `function TestFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 1, 0);
   return 'uppercase test';
 }
 function testfunction() {
   return 'lowercase test';
 }
 function TESTFUNCTION() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 9, 0);
   return 'all caps test';
 }`
 
