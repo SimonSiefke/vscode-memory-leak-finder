@@ -180,9 +180,7 @@ test('TransformCodeWithTracking - should handle empty code', () => {
 
 test('TransformCodeWithTracking - should handle invalid code gracefully', () => {
   const code = 'invalid javascript syntax {{{'
-  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-
-  expect(transformed).toBe(code) // Should return original code
+  expect(() => transformCodeWithTracking(code, { filename: 'test.js' })).toThrow(new Error('abc'))
 })
 
 test('TransformCodeWithTracking - should use default filename when not provided', () => {
