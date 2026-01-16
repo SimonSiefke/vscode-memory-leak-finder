@@ -779,3 +779,254 @@ test('TransformCodeWithTracking - should handle closures and lexical scoping', a
 
   expect(transformed).toBe(expected)
 })
+
+test('TransformCodeWithTracking - should handle higher-order functions and functional programming', async () => {
+  const code = `
+    function compose(f, g) {
+      return function(x) {
+        return f(g(x));
+      };
+    }
+    
+    const pipe = (...fns) => (value) => 
+      fns.reduce((acc, fn) => fn(acc), value);
+  `
+
+  const transformed = await transformCodeWithTracking(code, { filename: 'functional.js' })
+  const expected = `function compose(f, g) {
+  trackFunctionCall("compose", "functional.js:2");
+  return function (x) {
+    trackFunctionCall("anonymous", "functional.js:3");
+    return f(g(x));
+  };
+}
+const pipe = (...fns) => {
+  trackFunctionCall("pipe", "functional.js:8");
+  return value => {
+    trackFunctionCall("anonymous_arrow", "functional.js:8");
+    return fns.reduce((acc, fn) => {
+      trackFunctionCall("anonymous_arrow", "functional.js:9");
+      return fn(acc);
+    }, value);
+  };
+};`
+
+  expect(transformed).toBe(expected)
+})
+
+test('TransformCodeWithTracking - should handle recursive and mutually recursive functions', async () => {
+  const code = `
+    function factorial(n) {
+      if (n <= 1) {
+        return 1;
+      }
+      return n * factorial(n - 1);
+    }
+    
+    // Recursive arrow function
+    const sumRecursive = (arr, index = 0) => {
+      if (index >= arr.length) {
+        return 0;
+      }
+      return arr[index] + sumRecursive(arr, index + 1);
+    };
+  `
+
+  const transformed = await transformCodeWithTracking(code, { filename: 'recursive.js' })
+  const expected = `function factorial(n) {
+  trackFunctionCall("factorial", "recursive.js:2");
+  if (n <= 1) {
+    return 1;
+  }
+  return n * factorial(n - 1);
+}
+// Recursive arrow function
+const sumRecursive = (arr, index = 0) => {
+  trackFunctionCall("sumRecursive", "recursive.js:9");
+  if (index >= arr.length) {
+    return 0;
+  }
+  return arr[index] + sumRecursive(arr, index + 1);
+};`
+
+  expect(transformed).toBe(expected)
+})
+
+test('TransformCodeWithTracking - should exclude functions matching multiple patterns', async () => {
+  const code = `
+    function publicFunction() {
+      return 'public';
+    }
+    
+    function privateHelper() {
+      return 'private helper';
+    }
+    
+    function _internalFunction() {
+      return 'internal';
+    }
+    
+    function $secretMethod() {
+      return 'secret';
+    }
+  `
+
+  const transformed = await transformCodeWithTracking(code, {
+    filename: 'exclude.js',
+    excludePatterns: ['private', '_', '$']
+  })
+
+  const expected = `function publicFunction() {
+  trackFunctionCall("publicFunction", "exclude.js:2");
+  return 'public';
+}
+function privateHelper() {
+  return 'private helper';
+}
+function _internalFunction() {
+  return 'internal';
+}
+function $secretMethod() {
+  return 'secret';
+}`
+
+  expect(transformed).toBe(expected)
+})
+
+test('TransformCodeWithTracking - should handle regex-like patterns in exclude', async () => {
+  const code = `
+    function handleEvent() {
+      return 'event';
+    }
+    
+    function handleClick() {
+      return 'click';
+    }
+    
+    function processData() {
+      return 'data';
+    }
+  `
+
+  const transformed = await transformCodeWithTracking(code, {
+    filename: 'regex-exclude.js',
+    excludePatterns: ['handle', 'process']
+  })
+
+  const expected = `function handleEvent() {
+  return 'event';
+}
+function handleClick() {
+  return 'click';
+}
+function processData() {
+  return 'data';
+}`
+
+  expect(transformed).toBe(expected)
+})
+
+test('TransformCodeWithTracking - should exclude methods in objects and classes', async () => {
+  const code = `
+    const obj = {
+      publicMethod() {
+        return 'public';
+      },
+      
+      _privateMethod() {
+        return 'private';
+      }
+    };
+    
+    class TestClass {
+      publicClassMethod() {
+        return this.value;
+      }
+      
+      _privateClassMethod() {
+        return 'private class method';
+      }
+    }
+  `
+
+  const transformed = await transformCodeWithTracking(code, {
+    filename: 'exclude-methods.js',
+    excludePatterns: ['_']
+  })
+
+  const expected = `const obj = {
+  publicMethod() {
+    trackFunctionCall("publicMethod", "exclude-methods.js:3");
+    return 'public';
+  },
+  _privateMethod() {
+    return 'private';
+  }
+};
+class TestClass {
+  publicClassMethod() {
+    trackFunctionCall("publicClassMethod", "exclude-methods.js:13");
+    return this.value;
+  }
+  _privateClassMethod() {
+    return 'private class method';
+  }
+}`
+
+  expect(transformed).toBe(expected)
+})
+
+test('TransformCodeWithTracking - should handle case-sensitive exclude patterns', async () => {
+  const code = `
+    function TestFunction() {
+      return 'uppercase test';
+    }
+    
+    function testfunction() {
+      return 'lowercase test';
+    }
+  `
+
+  const transformed = await transformCodeWithTracking(code, {
+    filename: 'case-exclude.js',
+    excludePatterns: ['test']
+  })
+
+  const expected = `function TestFunction() {
+  trackFunctionCall("TestFunction", "case-exclude.js:2");
+  return 'uppercase test';
+}
+function testfunction() {
+  return 'lowercase test';
+}`
+
+  expect(transformed).toBe(expected)
+})
+
+test('TransformCodeWithTracking - should handle location tracking with different file extensions', async () => {
+  const code = `
+    function testFunction() {
+      return 'test';
+    }
+  `
+
+  const jsFile = await transformCodeWithTracking(code, { filename: 'script.js' })
+  const tsFile = await transformCodeWithTracking(code, { filename: 'module.ts' })
+
+  expect(jsFile).toContain('trackFunctionCall("testFunction", "script.js:2")')
+  expect(tsFile).toContain('trackFunctionCall("testFunction", "module.ts:2")')
+})
+
+test('TransformCodeWithTracking - should handle location tracking with complex file paths', async () => {
+  const code = `
+    function testFunction() {
+      return 'test';
+    }
+  `
+
+  const complexPath = await transformCodeWithTracking(code, {
+    filename: 'src/components/utils/helper.js'
+  })
+
+  expect(complexPath).toContain('trackFunctionCall("testFunction", "src/components/utils/helper.js:2")')
+})
