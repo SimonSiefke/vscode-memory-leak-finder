@@ -12,67 +12,11 @@ const generateDefault = (generate as any).default || generate
 export const transformCode = async (code: string, filename?: string, excludePatterns?: string[]): Promise<string> => {
   try {
     // Try different parsing strategies
-    let ast
-    const parseStrategies = [
-      // Strategy 1: Try without TypeScript plugin (more permissive for JS)
-      () =>
-        parser.parse(code, {
-          sourceType: 'module',
-          allowImportExportEverywhere: true,
-          plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties'],
-        }),
-      // Strategy 2: Script without TypeScript
-      () =>
-        parser.parse(code, {
-          sourceType: 'script',
-          allowImportExportEverywhere: true,
-          plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties'],
-        }),
-      // Strategy 3: Minimal plugins
-      () =>
-        parser.parse(code, {
-          sourceType: 'module',
-          allowImportExportEverywhere: true,
-          plugins: ['jsx'],
-        }),
-      // Strategy 4: Script with minimal plugins
-      () =>
-        parser.parse(code, {
-          sourceType: 'script',
-          allowImportExportEverywhere: true,
-          plugins: ['jsx'],
-        }),
-      // Strategy 5: Try with TypeScript but more permissive
-      () =>
-        parser.parse(code, {
-          sourceType: 'module',
-          allowImportExportEverywhere: true,
-          plugins: ['jsx', 'typescript', 'decorators-legacy'],
-        }),
-      // Strategy 6: Script with TypeScript
-      () =>
-        parser.parse(code, {
-          sourceType: 'script',
-          allowImportExportEverywhere: true,
-          plugins: ['jsx', 'typescript', 'decorators-legacy'],
-        }),
-    ]
-
-    for (let i = 0; i < parseStrategies.length; i++) {
-      try {
-        ast = parseStrategies[i]()
-        console.log(`Parse strategy ${i + 1} succeeded!`)
-        break // Success! Exit the loop
-      } catch (error) {
-        console.log(`Parse strategy ${i + 1} failed:`, error.message.split('\n')[0])
-        continue // Try next strategy
-      }
-    }
-
-    if (!ast) {
-      console.log('All parsing strategies failed - returning original code without transformation')
-      return code // Return original code if all parsing fails
-    }
+    const ast = parser.parse(code, {
+      sourceType: 'module',
+      allowImportExportEverywhere: true,
+      plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties'],
+    })
 
     // Add tracking code at the beginning
     const trackingAST = parser.parse(trackingCode, {
