@@ -956,6 +956,7 @@ test('TransformCodeWithTracking - should exclude methods in objects and classes'
 
   const expected = `const obj = {
   publicMethod() {
+    trackFunctionCall("publicMethod", "exclude-methods.js:3");
     return 'public';
   },
   _privateMethod() {
@@ -1331,7 +1332,7 @@ test('Transform Script - transformCode - should transform generator functions', 
   yield 2;
 }
 const generatorArrow = function* () {
-  trackFunctionCall("generatorArrow", "test.js:6");
+  trackFunctionCall("generatorArrow", "test.js:7");
   yield 'arrow generator';
 };`
 
