@@ -84,11 +84,6 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     },
 
     ClassMethod: (path: NodePath<t.ClassMethod>) => {
-      // Don't track constructors
-      if (t.isIdentifier(path.node.key) && path.node.key.name === 'constructor') {
-        return
-      }
-
       if (!shouldExclude(path.node)) {
         const originalBody: t.BlockStatement = path.node.body
         const trackingCall = createTrackingCall(path.node)
