@@ -3030,14 +3030,44 @@ test('Transform Script - transformCode - should handle functions in various cont
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'contexts.js' })
+  const expected = `// Global scope
+function globalFunction() {
+  trackFunctionCall("globalFunction", "contexts.js:3");
+  return 'global';
+}
 
-  expect(transformed).toBe('trackFunctionCall("globalFunction"')
-  expect(transformed).toBe('trackFunctionCall("propertyFunction"')
-  expect(transformed).toBe('trackFunctionCall("propertyArrow"')
-  expect(transformed).toBe('trackFunctionCall("method"')
-  expect(transformed).toBe('trackFunctionCall("anonymous"') // For map callback
-  expect(transformed).toBe('trackFunctionCall("anonymous_arrow"') // For filter callback
-  expect(transformed).toBe('trackFunctionCall("anonymous"') // For setTimeout callback
+// Object property
+const obj = {
+  propertyFunction: function () {
+    trackFunctionCall("propertyFunction", "contexts.js:9");
+    return 'property';
+  },
+  propertyArrow: () => {
+    trackFunctionCall("propertyArrow", "contexts.js:13");
+    return 'arrow property';
+  },
+  method() {
+    return 'method';
+  }
+};
+
+// Array methods
+const arr = [1, 2, 3].map(function (item) {
+  trackFunctionCall("anonymous", "contexts.js:23");
+  return item * 2;
+});
+const arr2 = [4, 5, 6].filter(item => {
+  trackFunctionCall("anonymous_arrow", "contexts.js:27");
+  return item > 4;
+});
+
+// Callback
+setTimeout(function () {
+  trackFunctionCall("anonymous", "contexts.js:30");
+  console.log('timeout');
+}, 1000);`
+
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle complex parameter patterns', () => {
@@ -3062,12 +3092,31 @@ test('Transform Script - transformCode - should handle complex parameter pattern
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'params.js' })
+  const expected = `function simpleParams(a, b, c) {
+  trackFunctionCall("simpleParams", "params.js:2");
+  return a + b + c;
+}
+function defaultParams(x = 10, y = 'default') {
+  trackFunctionCall("defaultParams", "params.js:6");
+  return x + y;
+}
+function restParams(first, ...rest) {
+  trackFunctionCall("restParams", "params.js:10");
+  return rest.length;
+}
+function destructuredParams({
+  a,
+  b
+}, [c, d]) {
+  trackFunctionCall("destructuredParams", "params.js:14");
+  return a + b + c + d;
+}
+const arrowWithParams = (x, y = 5, ...z) => {
+  trackFunctionCall("arrowWithParams", "params.js:18");
+  return x + y + z.length;
+};`
 
-  expect(transformed).toBe('trackFunctionCall("simpleParams"')
-  expect(transformed).toBe('trackFunctionCall("defaultParams"')
-  expect(transformed).toBe('trackFunctionCall("restParams"')
-  expect(transformed).toBe('trackFunctionCall("destructuredParams"')
-  expect(transformed).toBe('trackFunctionCall("arrowWithParams"')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle async and generator functions', () => {
@@ -3076,7 +3125,7 @@ test('Transform Script - transformCode - should handle async and generator funct
       return await Promise.resolve('async');
     }
 
-    const asyncArrow =  () => {
+    const asyncArrow = () => {
       return await fetch('/api/data');
     };
 
@@ -3097,10 +3146,33 @@ test('Transform Script - transformCode - should handle async and generator funct
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'async-generator.js' })
+  const expected = `async function asyncFunction() {
+  trackFunctionCall("asyncFunction", "async-generator.js:2");
+  return await Promise.resolve('async');
+}
 
-  expect(transformed).toBe('trackFunctionCall("asyncFunction"')
-  expect(transformed).toBe('trackFunctionCall("asyncArrow"')
-  expect(transformed).toBe('trackFunctionCall("generatorFunction"')
-  expect(transformed).toBe('trackFunctionCall("generatorArrow"')
-  expect(transformed).toBe('trackFunctionCall("asyncGenerator"')
+const asyncArrow = () => {
+  trackFunctionCall("asyncArrow", "async-generator.js:6");
+  return await fetch('/api/data');
+};
+
+function* generatorFunction() {
+  trackFunctionCall("generatorFunction", "async-generator.js:10");
+  yield 1;
+  yield 2;
+  yield 3;
+}
+
+const generatorArrow = function* () {
+  trackFunctionCall("generatorArrow", "async-generator.js:15");
+  yield 'arrow generator';
+};
+
+async function* asyncGenerator() {
+  trackFunctionCall("asyncGenerator", "async-generator.js:19");
+  yield await Promise.resolve(1);
+  yield await Promise.resolve(2);
+}`
+
+  expect(transformed).toBe(expected)
 })
