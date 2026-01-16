@@ -754,16 +754,16 @@ test('TransformCodeWithTracking - should handle higher-order functions and funct
   const expected = `function compose(f, g) {
   trackFunctionCall(123, 2, 4);
   return function (x) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 13);
     return f(g(x));
   };
 }
 const pipe = (...fns) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 8, 17);
   return value => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 8, 29);
     return fns.reduce((acc, fn) => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 9, 17);
       return fn(acc);
     }, value);
   };
@@ -801,7 +801,7 @@ test('TransformCodeWithTracking - should handle recursive and mutually recursive
 
 // Recursive arrow function
 const sumRecursive = (arr, index = 0) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 10, 25);
   if (index >= arr.length) {
     return 0;
   }
@@ -2012,38 +2012,38 @@ test('Transform Script - transformCode - should handle higher-order functions an
   const expected = `function compose(f, g) {
   trackFunctionCall(123, 2, 4);
   return function (x) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 13);
     return f(g(x));
   };
 }
 function curry(fn) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 8, 4);
   return function curried(...args) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 9, 13);
     if (args.length >= fn.length) {
       return fn.apply(this, args);
     }
     return function (...nextArgs) {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 13, 15);
       return curried.apply(this, args.concat(nextArgs));
     };
   };
 }
 const pipe = (...fns) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 19, 17);
   return value => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 19, 29);
     return fns.reduce((acc, fn) => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 20, 17);
       return fn(acc);
     }, value);
   };
 };
 function memoize(fn) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 22, 4);
   const cache = new Map();
   return function (...args) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 25, 13);
     const key = JSON.stringify(args);
     if (cache.has(key)) {
       return cache.get(key);
@@ -2105,7 +2105,7 @@ test('Transform Script - transformCode - should handle recursive and mutually re
   return n * factorial(n - 1);
 }
 function fibonacci(n) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 9, 4);
   if (n <= 1) {
     return n;
   }
@@ -2114,14 +2114,14 @@ function fibonacci(n) {
 
 // Mutually recursive functions
 function isEven(n) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 17, 4);
   if (n === 0) {
     return true;
   }
   return isOdd(n - 1);
 }
 function isOdd(n) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 24, 4);
   if (n === 0) {
     return false;
   }
@@ -2130,7 +2130,7 @@ function isOdd(n) {
 
 // Recursive arrow function
 const sumRecursive = (arr, index = 0) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 32, 25);
   if (index >= arr.length) {
     return 0;
   }
@@ -2204,11 +2204,11 @@ test('Transform Script - transformCode - should handle empty exclude patterns ar
   return '1';
 }
 function function2() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 3, 4);
   return '2';
 }
 const arrow = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 4, 18);
   return 'arrow';
 };`
 
