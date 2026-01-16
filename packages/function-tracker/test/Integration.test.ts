@@ -177,7 +177,7 @@ test('Integration Tests - Real-world scenarios - should handle conditional funct
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Integration Tests - Performance tests - should handle large files efficiently', () => {
+test('Integration Tests - Performance tests - should handle large files efficiently', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -204,14 +204,14 @@ test('Integration Tests - Performance tests - should handle large files efficien
   }
   
   const startTime = Date.now()
-  const transformed = transformCode(code, 'large.js')
+  const transformed = await transformCode(code, 'large.js')
   const endTime = Date.now()
   
   expect(transformed).toContain('globalThis.___functionStatistics')
   expect(endTime - startTime).toBeLessThan(5000) // Should complete in under 5 seconds
 })
 
-test('Integration Tests - Performance tests - should handle deeply nested function structures', () => {
+test('Integration Tests - Performance tests - should handle deeply nested function structures', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -228,12 +228,12 @@ test('Integration Tests - Performance tests - should handle deeply nested functi
     code += '  '.repeat(i) + '}\n'
   }
   
-  const transformed = transformCode(code, 'nested.js')
+  const transformed = await transformCode(code, 'nested.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Integration Tests - Edge cases - should handle Unicode and special characters', () => {
+test('Integration Tests - Edge cases - should handle Unicode and special characters', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -253,12 +253,12 @@ test('Integration Tests - Edge cases - should handle Unicode and special charact
     }
   `
   
-  const transformed = transformCode(code, 'unicode.js')
+  const transformed = await transformCode(code, 'unicode.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Integration Tests - Edge cases - should handle minified code', () => {
+test('Integration Tests - Edge cases - should handle minified code', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -268,12 +268,12 @@ test('Integration Tests - Edge cases - should handle minified code', () => {
 
   const code = 'function a(){return 1}const b=()=>2;class c{d(){return 3}}'
   
-  const transformed = transformCode(code, 'minified.js')
+  const transformed = await transformCode(code, 'minified.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Integration Tests - Edge cases - should handle comments and whitespace', () => {
+test('Integration Tests - Edge cases - should handle comments and whitespace', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -297,12 +297,12 @@ test('Integration Tests - Edge cases - should handle comments and whitespace', (
     const documented = (name) => \`Hello \${name}!\`
   `
   
-  const transformed = transformCode(code, 'comments.js')
+  const transformed = await transformCode(code, 'comments.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
 
-test('Integration Tests - Statistics functionality - should accurately track multiple function calls', () => {
+test('Integration Tests - Statistics functionality - should accurately track multiple function calls', async () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -318,7 +318,7 @@ test('Integration Tests - Statistics functionality - should accurately track mul
     const multiplier = (x) => x * 2
   `
   
-  const transformed = transformCode(code, 'stats.js')
+  const transformed = await transformCode(code, 'stats.js')
   
   // Execute the transformed code
   const executeCode = new Function(transformed + `
