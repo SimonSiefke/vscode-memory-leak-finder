@@ -70,6 +70,7 @@ export const updateState = async (newState: any): Promise<void> => {
       vscodePath: '',
       vscodeVersion: VsCodeVersion.vscodeVersion,
       workers: state.workers,
+      trackFunctions: state.trackFunctions,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

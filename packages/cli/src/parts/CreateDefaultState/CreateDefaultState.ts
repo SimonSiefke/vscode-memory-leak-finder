@@ -48,4 +48,5 @@ export const createDefaultState = (): StdinDataState => ({
   value: '',
   watch: false,
   workers: false,
+  trackFunctions: false,
 })
