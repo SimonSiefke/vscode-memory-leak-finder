@@ -5,8 +5,8 @@ if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map()
 }
 
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '')
+const trackFunctionCall = (functionName, scriptId, line, column) => {
+  const key = functionName + (scriptId ? \` (\${scriptId}:\${line}:\${column})\` : '')
   const current = globalThis.___functionStatistics.get(key) || 0
   globalThis.___functionStatistics.set(key, current + 1)
 }

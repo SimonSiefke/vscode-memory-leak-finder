@@ -9,7 +9,7 @@ export interface CreateFunctionWrapperPluginOptions {
 }
 
 export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPluginOptions): Visitor => {
-  const { scriptId = 123, excludePatterns = [], preambleOffset = 0 } = options
+  const { scriptId = 123, excludePatterns = [] } = options
 
   // Add tracking system functions to exclude patterns
   const allExcludePatterns = [...excludePatterns, 'getFunctionStatistics', 'resetFunctionStatistics']
@@ -41,15 +41,10 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     const location = functionLocations.get(node)
     // Use fixed location (2, 5) for consistency with existing tests
     // when preambleOffset is 0 or undefined
-    const useFixedLocation = preambleOffset === 0
-    const line = useFixedLocation ? 2 : (location ? location.line : (node.loc?.start.line || 1) - preambleOffset)
-    const column = useFixedLocation ? 5 : (location ? location.column : (node.loc?.start.column || 0))
+    const line = location ? location.line : (node.loc?.start.line || 1) - 0
+    const column = location ? location.column : node.loc?.start.column || 0
     return t.expressionStatement(
-      t.callExpression(t.identifier('trackFunctionCall'), [
-        t.numericLiteral(scriptId),
-        t.numericLiteral(line),
-        t.numericLiteral(column),
-      ]),
+      t.callExpression(t.identifier('trackFunctionCall'), [t.numericLiteral(scriptId), t.numericLiteral(line), t.numericLiteral(column)]),
     )
   }
 
@@ -59,31 +54,31 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
       enter(path: NodePath<t.FunctionDeclaration>) {
         if (!shouldExclude(path.node)) {
           functionLocations.set(path.node, {
-            line: (path.node.loc?.start.line || 1) - preambleOffset,
+            line: path.node.loc?.start.line || 1,
             column: path.node.loc?.start.column || 0,
           })
         }
-      }
+      },
     },
     FunctionExpression: {
       enter(path: NodePath<t.FunctionExpression>) {
         if (!shouldExclude(path.node)) {
           functionLocations.set(path.node, {
-            line: (path.node.loc?.start.line || 1) - preambleOffset,
+            line: path.node.loc?.start.line || 1,
             column: path.node.loc?.start.column || 0,
           })
         }
-      }
+      },
     },
     ObjectMethod: {
       enter(path: NodePath<t.ObjectMethod>) {
         if (!shouldExclude(path.node)) {
           functionLocations.set(path.node, {
-            line: (path.node.loc?.start.line || 1) - preambleOffset,
+            line: path.node.loc?.start.line || 1,
             column: path.node.loc?.start.column || 0,
           })
         }
-      }
+      },
     },
     ClassMethod: {
       enter(path: NodePath<t.ClassMethod>) {
@@ -92,21 +87,21 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
         }
         if (!shouldExclude(path.node)) {
           functionLocations.set(path.node, {
-            line: (path.node.loc?.start.line || 1) - preambleOffset,
+            line: path.node.loc?.start.line || 1,
             column: path.node.loc?.start.column || 0,
           })
         }
-      }
+      },
     },
     ArrowFunctionExpression: {
       enter(path: NodePath<t.ArrowFunctionExpression>) {
         if (!shouldExclude(path.node)) {
           functionLocations.set(path.node, {
-            line: (path.node.loc?.start.line || 1) - preambleOffset,
+            line: path.node.loc?.start.line || 1,
             column: path.node.loc?.start.column || 0,
           })
         }
-      }
+      },
     },
   }
 
