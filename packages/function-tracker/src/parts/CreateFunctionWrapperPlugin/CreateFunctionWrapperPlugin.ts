@@ -40,8 +40,8 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
   const createTrackingCall = (node: any) => {
     const location = functionLocations.get(node)
 
-    let line
-    let column
+    let line = -1
+    let column = -1
     if (location) {
       line = location.line
       line = location.column
