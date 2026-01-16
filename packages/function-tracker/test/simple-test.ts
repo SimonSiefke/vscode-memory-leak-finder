@@ -1,4 +1,4 @@
-import { transformCode } from './transform.js'
+import { transformCode } from '../src/transform-script.js'
 
 // Simple test to verify basic functionality
 console.log('Testing transformCode function...')

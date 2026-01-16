@@ -1,6 +1,6 @@
-/// <reference types="jest" />
-import { transformCode, createFunctionWrapperPlugin } from './transform'
-import { TransformOptions, FunctionStatistics } from './types'
+import { describe, it, expect, beforeEach, jest } from '@jest/globals'
+import { transformCode, createFunctionWrapperPlugin } from '../src/transform-script.js'
+import { TransformOptions, FunctionStatistics } from '../src/types.js'
 
 // Extend globalThis for testing
 declare global {

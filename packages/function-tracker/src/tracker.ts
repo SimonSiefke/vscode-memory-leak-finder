@@ -1,6 +1,6 @@
 import puppeteer, { Browser, Page } from 'puppeteer'
 import fs from 'fs'
-import { VSCodeTrackerOptions, FunctionStatistics } from './types.js'
+import { VSCodeTrackerOptions, FunctionStatistics } from './types.ts'
 
 // Extend globalThis to include our tracking functions
 declare global {

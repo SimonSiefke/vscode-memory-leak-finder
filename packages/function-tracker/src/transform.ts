@@ -2,7 +2,7 @@ import babel from '@babel/core'
 import parser from '@babel/parser'
 import generate from '@babel/generator'
 import * as t from '@babel/types'
-import { TransformOptions, FunctionStatistics } from './types.js'
+import { TransformOptions, FunctionStatistics } from './types.ts'
 
 // Function call tracking infrastructure
 const trackingCode = `
