@@ -1,5 +1,3 @@
-import * as Assert from '@lvce-editor/assert'
-
 export const connectDevtools = async (
   devtoolsWebSocketUrl: string,
   electronWebSocketUrl: string,
