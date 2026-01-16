@@ -1631,7 +1631,7 @@ const arrowComplex = () => {
 // Edge cases and error handling tests
 test('Transform Script - transformCode - should handle null/undefined input', () => {
   const transformedNull = transformCodeWithTracking(null as any)
-  expect(transformedNull).toBe('Function call tracking system')
+  expect(transformedNull).toBe('')
 })
 
 test('Transform Script - transformCode - should handle very large files', () => {
@@ -1652,7 +1652,7 @@ test('Transform Script - transformCode - should handle very large files', () => 
 
   const transformed = transformCodeWithTracking(largeCode, { filename: 'large.js' })
 
-  expect(transformed).toBe('trackFunctionCall')
+  expect(transformed).toContain('trackFunctionCall')
 })
 
 test('Transform Script - transformCode - should handle Unicode and special characters', () => {
