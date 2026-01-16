@@ -3,6 +3,7 @@ import traverse from '@babel/traverse'
 import generate from '@babel/generator'
 import * as t from '@babel/types'
 import { trackingCode } from '../TrackingCode/TrackingCode.ts'
+import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.js'
 
 // Handle ESM imports properly
 const traverseDefault = (traverse as any).default || traverse
