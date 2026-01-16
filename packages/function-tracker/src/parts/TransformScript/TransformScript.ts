@@ -3,7 +3,6 @@ import traverse from '@babel/traverse'
 import generate from '@babel/generator'
 import * as t from '@babel/types'
 import { trackingCode } from '../TrackingCode/TrackingCode.ts'
-import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
 
 // Handle ESM imports properly
 const traverseDefault = (traverse as any).default || traverse
@@ -51,5 +50,3 @@ export const transformCode = async (code: string, filename?: string, excludePatt
     return code // Return original code if transformation fails
   }
 }
-
-export { createFunctionWrapperPlugin }
