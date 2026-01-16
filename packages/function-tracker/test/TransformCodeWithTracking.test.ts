@@ -2459,13 +2459,6 @@ test('Transform Script - transformCode - should handle location tracking with co
   return 'test';
 }`
 
-  const nestedPath = transformCodeWithTracking(code, {
-    filename: '/home/user/project/lib/module.ts',
-  })
-  const relativePath = transformCodeWithTracking(code, {
-    filename: './dist/bundle.min.js',
-  })
-
   expect(complexPath).toBe(expected)
 })
 
