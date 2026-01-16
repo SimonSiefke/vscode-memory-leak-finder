@@ -9,13 +9,16 @@ export interface CreateFunctionWrapperPluginOptions {
 export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPluginOptions = {}): Visitor => {
   const { filename = 'unknown', excludePatterns = [] } = options
 
+  // Add tracking system functions to exclude patterns
+  const allExcludePatterns = [...excludePatterns, 'getFunctionStatistics', 'resetFunctionStatistics']
+
   return {
     FunctionDeclaration(path: NodePath<t.FunctionDeclaration>) {
       const functionName: string = path.node.id ? path.node.id.name : 'anonymous'
       const actualFilename = filename || 'unknown'
       const location: string = `${actualFilename}:${path.node.loc?.start.line}`
 
-      if (path.node.id && !path.node.id.name.startsWith('track') && !excludePatterns.some((pattern) => functionName.includes(pattern))) {
+      if (path.node.id && !path.node.id.name.startsWith('track') && !allExcludePatterns.some((pattern) => functionName.includes(pattern))) {
         // Wrap the function body
         const originalBody: t.BlockStatement = path.node.body
         const trackingCall: t.ExpressionStatement = t.expressionStatement(
@@ -47,7 +50,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
 
       const location: string = `${actualFilename}:${path.node.loc?.start.line}`
 
-      if (!functionName.startsWith('track') && !excludePatterns.some((pattern) => functionName.includes(pattern))) {
+      if (!functionName.startsWith('track') && !allExcludePatterns.some((pattern) => functionName.includes(pattern))) {
         const originalBody: t.BlockStatement = path.node.body
         const trackingCall: t.ExpressionStatement = t.expressionStatement(
           t.callExpression(t.identifier('trackFunctionCall'), [t.stringLiteral(functionName), t.stringLiteral(location)]),
@@ -116,7 +119,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
 
       const location: string = `${actualFilename}:${path.node.loc?.start.line}`
 
-      if (!functionName.startsWith('track') && !excludePatterns.some((pattern) => functionName.includes(pattern))) {
+      if (!functionName.startsWith('track') && !allExcludePatterns.some((pattern) => functionName.includes(pattern))) {
         if (t.isBlockStatement(path.node.body)) {
           const originalBody: t.BlockStatement = path.node.body
           const trackingCall: t.ExpressionStatement = t.expressionStatement(

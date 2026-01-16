@@ -1496,30 +1496,7 @@ test('Transform Script - transformCode - should transform functions as parameter
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-setTimeout(function () {
+  const expected = `setTimeout(function () {
   trackFunctionCall("anonymous", "test.js:2");
   console.log('timeout callback');
 }, 1000);
@@ -1549,30 +1526,7 @@ test('Transform Script - transformCode - should transform destructured parameter
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-function destructuredFunction({
+  const expected = `function destructuredFunction({
   a,
   b
 }, [c, d]) {
@@ -1600,30 +1554,7 @@ test('Transform Script - transformCode - should transform functions with default
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-function defaultParams(x = 10, y = 'default') {
+  const expected = `function defaultParams(x = 10, y = 'default') {
   trackFunctionCall("defaultParams", "test.js:2");
   return x + y;
 }
