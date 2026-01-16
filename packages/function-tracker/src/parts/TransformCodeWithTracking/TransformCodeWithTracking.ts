@@ -17,11 +17,12 @@ export const transformCodeWithTracking = async (code: string, options: Transform
     traverse.default(ast, plugin.visitor, undefined, ast)
     
     const result = generate.default(ast, {
-      retainLines: true,
+      retainLines: false,
       compact: false,
       comments: true,
-      minified: false
-    })
+      minified: false,
+      jsonCompatibleStrings: false
+    } as any)
     
     return result.code
   } catch (error) {

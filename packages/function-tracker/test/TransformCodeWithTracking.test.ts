@@ -107,6 +107,7 @@ test('TransformCodeWithTracking - should transform class methods', async () => {
     this.value = 42;
   }
   classMethod() {
+    trackFunctionCall("classMethod", "test.js:7");
     return this.value;
   }
 }`
