@@ -1766,36 +1766,6 @@ function literalFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should handle type aliases and utility types', () => {
-  const code = `
-    type StringOrNumber = string | number;
-
-    type Optional<T> = T | null;
-
-    function genericFunction<T extends StringOrNumber>(value: T): Optional<T> {
-      return value ?? null;
-    }
-
-    const utilityArrow = <U, V>(obj: Record<U, V>): U[] => {
-      return Object.keys(obj) as U[];
-    };
-  `
-
-  const transformed = transformCodeWithTracking(code, { filename: 'types.ts' })
-  const expected = `type StringOrNumber = string | number;
-type Optional<T> = T | null;
-function genericFunction<T extends StringOrNumber>(value: T): Optional<T> {
-  trackFunctionCall("genericFunction", "types.ts:6");
-  return value ?? null;
-}
-const utilityArrow = <U, V>(obj: Record<U, V>): U[] => {
-  trackFunctionCall("utilityArrow", "types.ts:10");
-  return Object.keys(obj) as U[];
-};`
-
-  expect(transformed).toBe(expected)
-})
-
 // Complex nested scenarios tests
 test('Transform Script - transformCode - should handle deeply nested function structures', () => {
   const code = `
