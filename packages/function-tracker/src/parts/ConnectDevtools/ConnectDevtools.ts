@@ -49,29 +49,29 @@ export const connectDevtools = async (
   try {
     // 1. Connect to devtools WebSocket
     webSocket = new WebSocket(devtoolsWebSocketUrl)
-    
+
     const { promise: connectionPromise, resolve: connectionResolve, reject: connectionReject } = Promise.withResolvers<void>()
     const connectionTimeout = setTimeout(() => {
       connectionReject(new Error(`WebSocket connection timeout after ${attachedToPageTimeout}ms`))
     }, attachedToPageTimeout)
-    
+
     webSocket!.onopen = () => {
       clearTimeout(connectionTimeout)
       connectionResolve()
     }
-    
+
     webSocket!.onerror = (error) => {
       clearTimeout(connectionTimeout)
       connectionReject(new Error(`WebSocket connection failed: ${error}`))
     }
-    
+
     await connectionPromise
 
     const sendCommand = (method: string, params?: any): Promise<any> => {
       return new Promise((resolve, reject) => {
         const id = messageId++
         const message: DevToolsMessage = { id, method, params }
-        
+
         pendingCommands.set(id, { resolve, reject })
         webSocket!.send(JSON.stringify(message))
 
@@ -89,24 +89,24 @@ export const connectDevtools = async (
     const handleMessage = (event: MessageEvent) => {
       try {
         const message: DevToolsMessage = JSON.parse(event.data)
-        
+
         if (message.id && pendingCommands.has(message.id)) {
           const { resolve, reject } = pendingCommands.get(message.id)!
           pendingCommands.delete(message.id)
-          
+
           if (message.error) {
             reject(new Error(message.error.message || 'DevTools command failed'))
           } else {
             resolve(message.result)
           }
         }
-        
+
         // Handle network interceptions
         if (message.method === 'Fetch.requestPaused') {
           const requestId = message.params?.requestId
           const request = message.params?.request
           const resourceType = message.params?.resourceType
-          
+
           if (requestId && request && resourceType === 'Script') {
             // Check if this is a JavaScript file request
             if (request.url.endsWith('.js') || request.url.endsWith('.mjs') || request.url.endsWith('.cjs')) {
@@ -115,20 +115,20 @@ export const connectDevtools = async (
               // - Fetch the content, modify it, then provide it using Fetch.fulfillRequest
               // - Replace it with custom tracking code
               // - Inject function tracking
-              
+
               sendCommand('Fetch.continueRequest', {
-                requestId
+                requestId,
               }).catch(console.error)
             } else {
               // Continue non-JS requests normally
               sendCommand('Fetch.continueRequest', {
-                requestId
+                requestId,
               }).catch(console.error)
             }
           } else {
             // Continue other resource types normally
             sendCommand('Fetch.continueRequest', {
-              requestId
+              requestId,
             }).catch(console.error)
           }
         }
@@ -136,7 +136,7 @@ export const connectDevtools = async (
         console.error('Failed to parse DevTools message:', error)
       }
     }
-    
+
     webSocket!.onmessage = handleMessage
 
     // 2. Setup auto-attach and wait for session (following initialization-worker pattern)
@@ -165,7 +165,7 @@ export const connectDevtools = async (
     const attachTimeout = setTimeout(() => {
       attachReject(new Error(`Failed to attach to page within ${attachedToPageTimeout}ms`))
     }, attachedToPageTimeout)
-    
+
     const checkAttached = (event: MessageEvent) => {
       try {
         const message: DevToolsMessage = JSON.parse(event.data)
@@ -178,7 +178,7 @@ export const connectDevtools = async (
         // Ignore parsing errors for other messages
       }
     }
-    
+
     webSocket!.addEventListener('message', checkAttached)
     const attachedEvent = await attachPromise
 
@@ -189,28 +189,25 @@ export const connectDevtools = async (
     const sessionRpc = {
       invoke: async (method: string, params?: any) => {
         return sendCommand(method, params)
-      }
+      },
     }
 
     // 3. Pause page / ensure page is paused on start
     await sendCommand('Runtime.enable')
-    await sendCommand('Debugger.enable')
-    await sendCommand('Debugger.setBreakpointsActive', { active: true })
-    await sendCommand('Debugger.setPauseOnExceptions', { state: 'all' })
-    
+
     // 4. Setup logic to intercept JS network requests
     await sendCommand('Network.enable')
     await sendCommand('Fetch.enable', {
       patterns: [
         { urlPattern: '*.js', requestStage: 'Request' },
         { urlPattern: '*.mjs', requestStage: 'Request' },
-        { urlPattern: '*.cjs', requestStage: 'Request' }
-      ]
+        { urlPattern: '*.cjs', requestStage: 'Request' },
+      ],
     })
     await sendCommand('Runtime.runIfWaitingForDebugger')
 
     console.log(`DevTools connection established for connection ${connectionId}, measure ${measureId}`)
-    
+
     return {
       async dispose() {
         if (webSocket && webSocket.readyState === WebSocket.OPEN) {
@@ -221,7 +218,6 @@ export const connectDevtools = async (
       sessionRpc,
       targetId,
     }
-    
   } catch (error) {
     if (webSocket && webSocket.readyState === WebSocket.OPEN) {
       webSocket.close()
