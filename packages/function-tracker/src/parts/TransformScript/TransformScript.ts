@@ -2,8 +2,8 @@ import parser from '@babel/parser'
 import traverse from '@babel/traverse'
 import generate from '@babel/generator'
 import * as t from '@babel/types'
-import { trackingCode } from '../TrackingCode/TrackingCode.js'
-import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.js'
+import { trackingCode } from '../TrackingCode/TrackingCode.ts'
+import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
 
 // Handle ESM imports properly
 const traverseDefault = (traverse as any).default || traverse
@@ -15,41 +15,47 @@ export const transformCode = async (code: string, filename?: string, excludePatt
     let ast
     const parseStrategies = [
       // Strategy 1: Try without TypeScript plugin (more permissive for JS)
-      () => parser.parse(code, {
-        sourceType: 'module',
-        allowImportExportEverywhere: true,
-        plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties']
-      }),
+      () =>
+        parser.parse(code, {
+          sourceType: 'module',
+          allowImportExportEverywhere: true,
+          plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties'],
+        }),
       // Strategy 2: Script without TypeScript
-      () => parser.parse(code, {
-        sourceType: 'script',
-        allowImportExportEverywhere: true,
-        plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties']
-      }),
+      () =>
+        parser.parse(code, {
+          sourceType: 'script',
+          allowImportExportEverywhere: true,
+          plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties'],
+        }),
       // Strategy 3: Minimal plugins
-      () => parser.parse(code, {
-        sourceType: 'module',
-        allowImportExportEverywhere: true,
-        plugins: ['jsx']
-      }),
+      () =>
+        parser.parse(code, {
+          sourceType: 'module',
+          allowImportExportEverywhere: true,
+          plugins: ['jsx'],
+        }),
       // Strategy 4: Script with minimal plugins
-      () => parser.parse(code, {
-        sourceType: 'script',
-        allowImportExportEverywhere: true,
-        plugins: ['jsx']
-      }),
+      () =>
+        parser.parse(code, {
+          sourceType: 'script',
+          allowImportExportEverywhere: true,
+          plugins: ['jsx'],
+        }),
       // Strategy 5: Try with TypeScript but more permissive
-      () => parser.parse(code, {
-        sourceType: 'module',
-        allowImportExportEverywhere: true,
-        plugins: ['jsx', 'typescript', 'decorators-legacy']
-      }),
+      () =>
+        parser.parse(code, {
+          sourceType: 'module',
+          allowImportExportEverywhere: true,
+          plugins: ['jsx', 'typescript', 'decorators-legacy'],
+        }),
       // Strategy 6: Script with TypeScript
-      () => parser.parse(code, {
-        sourceType: 'script',
-        allowImportExportEverywhere: true,
-        plugins: ['jsx', 'typescript', 'decorators-legacy']
-      })
+      () =>
+        parser.parse(code, {
+          sourceType: 'script',
+          allowImportExportEverywhere: true,
+          plugins: ['jsx', 'typescript', 'decorators-legacy'],
+        }),
     ]
 
     for (let i = 0; i < parseStrategies.length; i++) {
@@ -67,12 +73,12 @@ export const transformCode = async (code: string, filename?: string, excludePatt
       console.log('All parsing strategies failed - returning original code without transformation')
       return code // Return original code if all parsing fails
     }
-    
+
     // Add tracking code at the beginning
     const trackingAST = parser.parse(trackingCode, {
-      sourceType: 'script'
+      sourceType: 'script',
     })
-    
+
     // Transform the original code with proper file context
     try {
       const plugin = createFunctionWrapperPlugin({ filename, excludePatterns })
@@ -86,15 +92,15 @@ export const transformCode = async (code: string, filename?: string, excludePatt
       console.error('Error stack:', error.stack)
       return code // Return original code if transformation fails
     }
-    
+
     // Combine tracking code with transformed code
     const combinedAST = t.program([...trackingAST.program.body, ...ast.program.body])
-    
+
     const result = generateDefault(combinedAST, {
       retainLines: false,
-      compact: false
+      compact: false,
     })
-    
+
     return result.code
   } catch (error) {
     console.error('Error transforming code:', error)
@@ -102,6 +108,4 @@ export const transformCode = async (code: string, filename?: string, excludePatt
   }
 }
 
-export {
-  createFunctionWrapperPlugin
-}
+export { createFunctionWrapperPlugin }

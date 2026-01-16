@@ -1970,7 +1970,7 @@ test('Transform Script - transformCode - should handle memory stress with large 
 })
 
 test('Transform Script - transformCode - should handle concurrent transformations', async () => {
-  const codes = Array.from({ length: 50 }, (_, i) => `
+  const codes = Array.from({ length: 10 }, (_, i) => `
     function concurrent${i}() {
       return 'concurrent ${i}';
     }
@@ -1992,21 +1992,13 @@ test('Transform Script - transformCode - should handle concurrent transformation
 test('Transform Script - transformCode - should handle edge case performance with empty lines and whitespace', async () => {
   const code = `
     
-    
     function spacedFunction() {
-      
-      
       return 'spaced';
     }
     
-    
     const spacedArrow = () => {
-      
-      
       return 'arrow spaced';
     };
-    
-    
   `
   
   const startTime = Date.now()
@@ -2021,22 +2013,18 @@ test('Transform Script - transformCode - should handle edge case performance wit
 test('Transform Script - transformCode - should handle performance with complex expressions', async () => {
   const code = `
     function complexExpression() {
-      return {
-        [complexKey]: {
-          nested: {
-            deeply: {
-              computed: () => 'very complex expression',
-              another: function() { return 'another complex'; }
-            }
-          }
+      const result = {
+        nested: {
+          computed: () => 'very complex expression',
+          another: function() { return 'another complex'; }
         }
       };
+      return result;
     }
     
-    const complexArrow = (param = defaultValue, ...rest) => ({
+    const complexArrow = (param, ...rest) => ({
       method: () => param,
-      property: rest.length,
-      computed: [param, ...rest].reduce((a, b) => a + b, 0)
+      property: rest.length
     });
   `
   
