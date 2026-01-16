@@ -6,11 +6,10 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
     "transform": "node src/transform-script.js",
-    "track": "node src/devtools-injector.js"
+    "track": "node src/devtools-injector.js",
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "dependencies": {
     "@babel/core": "^7.23.0",
