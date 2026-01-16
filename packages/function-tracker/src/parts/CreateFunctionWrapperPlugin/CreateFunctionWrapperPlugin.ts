@@ -44,10 +44,10 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     let column = -1
     if (location) {
       line = location.line
-      line = location.column
+      column = location.column
     } else if (node.loc?.start) {
       line = node.loc.start.line
-      line = node.loc.start.column
+      column = node.loc.start.column
     }
 
     return t.expressionStatement(
