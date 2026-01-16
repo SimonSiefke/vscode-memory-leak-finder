@@ -915,7 +915,7 @@ test('TransformCodeWithTracking - should exclude methods in objects and classes'
 
   const expected = `const obj = {
   publicMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 6);
     return 'public';
   },
   _privateMethod() {
@@ -924,7 +924,7 @@ test('TransformCodeWithTracking - should exclude methods in objects and classes'
 };
 class TestClass {
   publicClassMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 13, 6);
     return this.value;
   }
   _privateClassMethod() {
@@ -2306,7 +2306,7 @@ test('Transform Script - transformCode - should exclude methods in objects and c
   })
   const expected = `const obj = {
   publicMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 6);
     return 'public';
   },
   _privateMethod() {
@@ -2324,7 +2324,7 @@ class TestClass {
     this.value = 42;
   }
   publicClassMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 25, 6);
     return this.value;
   }
   _privateClassMethod() {
