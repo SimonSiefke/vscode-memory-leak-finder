@@ -1,6 +1,6 @@
 import babel from '@babel/core'
 import * as t from '@babel/types'
-import { TransformOptions } from '../Types/Types.ts'
+import { TransformOptions } from '../Types/Types.js'
 
 export interface CreateFunctionWrapperPluginOptions {
   readonly filename?: string

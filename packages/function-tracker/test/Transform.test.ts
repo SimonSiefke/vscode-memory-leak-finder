@@ -1,6 +1,5 @@
 import { test, expect } from '@jest/globals'
 import { transformCode, createFunctionWrapperPlugin } from '../src/parts/TransformScript/TransformScript.js'
-import { FunctionStatistics } from '../src/parts/Types/Types.js'
 
 test('Transform Script - transformCode - should transform function declarations', () => {
   // Reset global statistics before each test
