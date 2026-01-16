@@ -15,7 +15,7 @@ test('combineEventListenersWithSourceMapResults', () => {
       {
         column: 2,
         line: 2,
-        originalName: 'test',
+        name: 'test',
         source: 'index.ts',
       },
     ],
@@ -24,6 +24,7 @@ test('combineEventListenersWithSourceMapResults', () => {
     CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(eventListeners, map, cleanPositionMap),
   ).toEqual([
     {
+      originalName: 'test',
       originalStack: [`index.ts:2:2`],
       sourcesHash: null,
       stack: ['index.js:1:1'],
@@ -48,7 +49,7 @@ test('combineEventListenersWithSourceMapResults - multiple inputs', () => {
       {
         column: 2,
         line: 2,
-        originalName: 'test',
+        name: 'test',
         source: 'index.ts',
       },
     ],
@@ -57,11 +58,13 @@ test('combineEventListenersWithSourceMapResults - multiple inputs', () => {
     CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(eventListeners, map, cleanPositionMap),
   ).toEqual([
     {
+      originalName: 'test',
       originalStack: [`index.ts:2:2`],
       sourcesHash: null,
       stack: ['index.js:1:1'],
     },
     {
+      originalName: 'test',
       originalStack: [`index.ts:2:2`],
       sourcesHash: null,
       stack: ['index.js:1:1'],

@@ -1,9 +1,68 @@
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
+import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.ts'
 
 const compareCount = (a, b) => {
   return b.count - a.count
+}
+
+export const combineEventListenersWithSourceMapResults = (eventListeners, map, cleanPositionMap) => {
+  Assert.array(eventListeners)
+  Assert.object(map)
+  Assert.object(cleanPositionMap)
+  const newEventListeners: any[] = []
+  
+  for (const eventListener of eventListeners) {
+    const { stack, sourceMaps } = eventListener
+    if (!stack || !sourceMaps || stack.length === 0) {
+      newEventListeners.push(eventListener)
+      continue
+    }
+
+    const originalStack: string[] = []
+    let sourcesHash: string | null | undefined = null
+    let firstCleanPosition: any = null
+    
+    // Process each stack line
+    for (let i = 0; i < stack.length; i++) {
+      const stackLine = stack[i]
+      const sourceMap = sourceMaps[0] // Use first sourceMap for all lines
+      const { column, line } = ParseLineAndColumn.parseLineAndColumn(stackLine)
+      
+      if (sourceMap && line && column) {
+        const index = getIndex(map[sourceMap], line, column)
+        if (index !== -1) {
+          const cleanPosition = cleanPositionMap[sourceMap]?.[index]
+          if (cleanPosition) {
+            originalStack.push(`${cleanPosition.source}:${cleanPosition.line}:${cleanPosition.column}`)
+            if (i === 0) {
+              firstCleanPosition = cleanPosition
+            }
+            if (i === 0 && cleanPosition.sourcesHash) {
+              sourcesHash = cleanPosition.sourcesHash
+            }
+          } else {
+            originalStack.push(stackLine)
+          }
+        } else {
+          originalStack.push(stackLine)
+        }
+      } else {
+        originalStack.push(stackLine)
+      }
+    }
+
+    const { sourceMaps: _, ...rest } = eventListener
+    newEventListeners.push({
+      ...rest,
+      originalName: firstCleanPosition?.name || '',
+      originalStack,
+      sourcesHash,
+    })
+  }
+  const sorted = Arrays.toSorted(newEventListeners, compareCount)
+  return sorted
 }
 
 const getIndex = (values, line, column) => {
@@ -15,32 +74,4 @@ const getIndex = (values, line, column) => {
     }
   }
   return -1
-}
-
-export const combineEventListenersWithSourceMapResults = (eventListeners, map, cleanPositionMap) => {
-  Assert.array(eventListeners)
-  Assert.object(map)
-  Assert.object(cleanPositionMap)
-  const newEventListeners: any[] = []
-  for (const eventListener of eventListeners) {
-    const { column, line, sourceMapUrl } = GetSourceMapUrl.getSourceMapUrl(eventListener)
-    const index = getIndex(map[sourceMapUrl], line, column)
-    if (index === -1) {
-      throw new Error(`index not found for ${sourceMapUrl}:${line}:${column}`)
-    }
-    const cleanPosition = cleanPositionMap[sourceMapUrl]?.[index]
-    if (cleanPosition) {
-      const { sourceMaps, ...rest } = eventListener
-      newEventListeners.push({
-        ...rest,
-        originalName: cleanPosition.name,
-        originalStack: [`${cleanPosition.source}:${cleanPosition.line}:${cleanPosition.column}`],
-        sourcesHash: cleanPosition.sourcesHash || null,
-      })
-    } else {
-      newEventListeners.push(eventListener)
-    }
-  }
-  const sorted = Arrays.toSorted(newEventListeners, compareCount)
-  return sorted
 }
