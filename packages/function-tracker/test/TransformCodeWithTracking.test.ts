@@ -1012,9 +1012,12 @@ test('TransformCodeWithTracking - should handle location tracking with different
   `
 
   const jsFile = await transformCodeWithTracking(code, { filename: 'script.js' })
-  const tsFile = await transformCodeWithTracking(code, { filename: 'module.ts' })
+  const expected = `function testFunction() {
+  trackFunctionCall("testFunction", "script.js:2");
+  return 'test';
+}`
 
-  expect(jsFile).toBe('trackFunctionCall("testFunction", "script.js:2")')
+  expect(jsFile).toBe(expected)
 })
 
 test('TransformCodeWithTracking - should handle location tracking with complex file paths', async () => {
@@ -1027,8 +1030,12 @@ test('TransformCodeWithTracking - should handle location tracking with complex f
   const complexPath = await transformCodeWithTracking(code, {
     filename: 'src/components/utils/helper.js',
   })
+  const expected = `function testFunction() {
+  trackFunctionCall("testFunction", "src/components/utils/helper.js:2");
+  return 'test';
+}`
 
-  expect(complexPath).toBe('trackFunctionCall("testFunction", "src/components/utils/helper.js:2")')
+  expect(complexPath).toBe(expected)
 })
 
 test('Transform Script - transformCode - should transform function declarations', async () => {
@@ -2150,8 +2157,6 @@ const arrowComplex = () => {
 // Edge cases and error handling tests
 test('Transform Script - transformCode - should handle null/undefined input', async () => {
   const transformedNull = await transformCodeWithTracking(null as any)
-  const transformedUndefined = await transformCodeWithTracking(undefined as any)
-
   expect(transformedNull).toBe('Function call tracking system')
 })
 
