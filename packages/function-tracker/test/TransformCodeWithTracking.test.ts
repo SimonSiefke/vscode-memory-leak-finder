@@ -2753,7 +2753,7 @@ test('Transform Script - transformCode - should handle async and generator funct
       return await Promise.resolve('async');
     }
 
-    const asyncArrow = () => {
+    const asyncArrow = async () => {
       return await fetch('/api/data');
     };
 
