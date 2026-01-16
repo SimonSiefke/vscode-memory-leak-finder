@@ -5,7 +5,7 @@ const traverse2 = (traverse.default || traverse) as typeof import('@babel/traver
 
 export const getFunctionLocations = (ast: any): Map<any, { line: number; column: number }> => {
   const functionLocations = new Map<any, { line: number; column: number }>()
-  
+
   const collectionVisitor = {
     FunctionDeclaration: (path: any) => {
       if (path.node.loc?.start) {

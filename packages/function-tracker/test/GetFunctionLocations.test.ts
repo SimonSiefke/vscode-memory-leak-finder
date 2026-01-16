@@ -15,16 +15,16 @@ test('GetFunctionLocations - should collect function declarations', () => {
       return 'another'
     }
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(2)
-  
+
   const locationArray = Array.from(locations.values())
   expect(locationArray).toContainEqual({ line: 2, column: 4 })
   expect(locationArray).toContainEqual({ line: 6, column: 4 })
@@ -40,16 +40,16 @@ test('GetFunctionLocations - should collect function expressions', () => {
       return 'named'
     }
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(2)
-  
+
   const locationArray = Array.from(locations.values())
   expect(locationArray).toContainEqual({ line: 2, column: 27 })
   expect(locationArray).toContainEqual({ line: 6, column: 28 })
@@ -67,16 +67,16 @@ test('GetFunctionLocations - should collect arrow functions', () => {
       return await Promise.resolve('async')
     }
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(3)
-  
+
   const locationArray = Array.from(locations.values())
   expect(locationArray).toContainEqual({ line: 2, column: 26 })
   expect(locationArray).toContainEqual({ line: 6, column: 25 })
@@ -97,16 +97,16 @@ test('GetFunctionLocations - should collect object methods', () => {
       }
     }
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(3)
-  
+
   const locationArray = Array.from(locations.values())
   expect(locationArray).toContainEqual({ line: 3, column: 6 })
   expect(locationArray).toContainEqual({ line: 7, column: 19 })
@@ -137,16 +137,16 @@ test('GetFunctionLocations - should collect class methods', () => {
       }
     }
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(5) // constructor + 4 methods
-  
+
   const locationArray = Array.from(locations.values())
   expect(locationArray).toContainEqual({ line: 3, column: 6 }) // constructor
   expect(locationArray).toContainEqual({ line: 7, column: 6 }) // classMethod
@@ -169,16 +169,16 @@ test('GetFunctionLocations - should handle nested functions', () => {
       return innerFunction()
     }
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(3)
-  
+
   const locationArray = Array.from(locations.values())
   expect(locationArray).toContainEqual({ line: 2, column: 4 }) // outerFunction
   expect(locationArray).toContainEqual({ line: 3, column: 6 }) // innerFunction
@@ -197,16 +197,16 @@ test('GetFunctionLocations - should handle functions as parameters', () => {
     
     [4, 5, 6].filter(item => item > 4)
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(3)
-  
+
   const locationArray = Array.from(locations.values())
   expect(locationArray).toContainEqual({ line: 2, column: 15 }) // setTimeout callback
   expect(locationArray).toContainEqual({ line: 6, column: 18 }) // map callback
@@ -227,16 +227,16 @@ test('GetFunctionLocations - should handle complex parameter patterns', () => {
       return a + b + c + d
     }
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(3)
-  
+
   const locationArray = Array.from(locations.values())
   expect(locationArray).toContainEqual({ line: 2, column: 4 }) // defaultParams
   expect(locationArray).toContainEqual({ line: 6, column: 4 }) // restParams
@@ -245,14 +245,14 @@ test('GetFunctionLocations - should handle complex parameter patterns', () => {
 
 test('GetFunctionLocations - should handle empty code', () => {
   const code = ''
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(0)
 })
 
@@ -262,14 +262,14 @@ test('GetFunctionLocations - should handle code with no functions', () => {
     const y = 'hello'
     console.log(x, y)
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(0)
 })
 
@@ -283,16 +283,16 @@ test('GetFunctionLocations - should handle functions with Unicode and special ch
       return 'special chars'
     }
   `
-  
+
   const ast = parser2.parse(code, {
     sourceType: 'module',
     plugins: [],
   })
-  
+
   const locations = getFunctionLocations(ast)
-  
+
   expect(locations.size).toBe(2)
-  
+
   const locationArray = Array.from(locations.values())
   expect(locationArray).toContainEqual({ line: 2, column: 4 }) // Unicode function
   expect(locationArray).toContainEqual({ line: 6, column: 4 }) // special chars function

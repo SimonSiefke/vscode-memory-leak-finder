@@ -2476,16 +2476,17 @@ test('Transform Script - transformCode - should handle location tracking with mu
   `
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
+  
   const expected = `function firstFunction() {
   trackFunctionCall(123, 2, 4);
   return 'first';
 }
 const secondFunction = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 6, 27);
   return 'second';
 };
 function thirdFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 10, 4);
   return 'third';
 }`
 
@@ -2590,24 +2591,24 @@ test('Transform Script - transformCode - should handle mixed function types in s
   return 'declaration';
 }
 const expression = function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 6, 23);
   return 'expression';
 };
 const arrow = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 10, 18);
   return 'arrow';
 };
 const concise = x => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 14, 20);
   return x * 2;
 };
 class TestClass {
   method() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 17, 6);
     return 'method';
   }
   static staticMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 21, 6);
     return 'static';
   }
 }`
@@ -2653,39 +2654,39 @@ test('Transform Script - transformCode - should handle functions in various cont
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `// Global scope
 function globalFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 3, 4);
   return 'global';
 }
 
 // Object property
 const obj = {
   propertyFunction: function () {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 9, 24);
     return 'property';
   },
   propertyArrow: () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 13, 21);
     return 'arrow property';
   },
   method() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 17, 6);
     return 'method';
   }
 };
 
 // Array methods
 const arr = [1, 2, 3].map(function (item) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 23, 30);
   return item * 2;
 });
 const arr2 = [4, 5, 6].filter(item => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 27, 34);
   return item > 4;
 });
 
 // Callback
 setTimeout(function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 30, 15);
   console.log('timeout');
 }, 1000);`
 
@@ -2719,22 +2720,22 @@ test('Transform Script - transformCode - should handle complex parameter pattern
   return a + b + c;
 }
 function defaultParams(x = 10, y = 'default') {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 6, 4);
   return x + y;
 }
 function restParams(first, ...rest) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 10, 4);
   return rest.length;
 }
 function destructuredParams({
   a,
   b
 }, [c, d]) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 14, 4);
   return a + b + c + d;
 }
 const arrowWithParams = (x, y = 5, ...z) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 18, 28);
   return x + y + z.length;
 };`
 
@@ -2773,21 +2774,21 @@ test('Transform Script - transformCode - should handle async and generator funct
   return await Promise.resolve('async');
 }
 const asyncArrow = async () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 6, 23);
   return await fetch('/api/data');
 };
 function* generatorFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 10, 4);
   yield 1;
   yield 2;
   yield 3;
 }
 const generatorArrow = function* () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 16, 27);
   yield 'arrow generator';
 };
 async function* asyncGenerator() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 20, 4);
   yield await Promise.resolve(1);
   yield await Promise.resolve(2);
 }`
