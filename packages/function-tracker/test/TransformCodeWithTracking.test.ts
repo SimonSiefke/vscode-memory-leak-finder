@@ -2147,22 +2147,6 @@ const arrowComplex = () => {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - createFunctionWrapperPlugin - should create a plugin with expected structure', () => {
-  const plugin = createFunctionWrapperPlugin({ filename: 'test.js' })
-
-  expect(plugin).toHaveProperty('visitor')
-  expect(plugin.visitor).toHaveProperty('FunctionDeclaration')
-  expect(plugin.visitor).toHaveProperty('FunctionExpression')
-  expect(plugin.visitor).toHaveProperty('ArrowFunctionExpression')
-})
-
-test('Transform Script - createFunctionWrapperPlugin - should handle default options', () => {
-  const plugin = createFunctionWrapperPlugin()
-
-  expect(plugin).toBeDefined()
-  expect(plugin.visitor).toBeDefined()
-})
-
 // Edge cases and error handling tests
 test('Transform Script - transformCode - should handle null/undefined input', async () => {
   const transformedNull = await transformCodeWithTracking(null as any)

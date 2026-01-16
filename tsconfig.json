@@ -16,6 +16,7 @@
     { "path": "./packages/exec-worker" },
     { "path": "./packages/extension-source-maps" },
     { "path": "./packages/file-system-worker" },
+    { "path": "./packages/function-tracker" },
     { "path": "./packages/file-watcher-worker" },
     { "path": "./packages/heap-snapshot-worker" },
     { "path": "./packages/initialization-worker" },
