@@ -2367,13 +2367,33 @@ test('Transform Script - transformCode - should handle decorators and advanced T
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'decorators.ts' })
+  const expected = `@decorator
+class DecoratedClass {
+  @logged
+  decoratedMethod() {
+    trackFunctionCall("decoratedMethod", "decorators.ts:4");
+    return 'decorated';
+  }
+  @deprecated
+  deprecatedMethod(): never {
+    trackFunctionCall("deprecatedMethod", "decorators.ts:9");
+    throw new Error('Deprecated');
+  }
+}
+function decorator(target: any) {
+  trackFunctionCall("decorator", "decorators.ts:15");
+  return target;
+}
+function logged(target: any, key: string) {
+  trackFunctionCall("logged", "decorators.ts:19");
+  console.log(\`Logging \${key}\`);
+}
+function deprecated(target: any, key: string) {
+  trackFunctionCall("deprecated", "decorators.ts:23");
+  console.warn(\`\${key} is deprecated\`);
+}`
 
-  expect(transformed).toBe('trackFunctionCall("decorator"')
-  expect(transformed).toBe('trackFunctionCall("logged"')
-  expect(transformed).toBe('trackFunctionCall("deprecated"')
-  expect(transformed).toBe('@decorator')
-  expect(transformed).toBe('@logged')
-  expect(transformed).toBe('@deprecated')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle enums and namespaces', () => {
