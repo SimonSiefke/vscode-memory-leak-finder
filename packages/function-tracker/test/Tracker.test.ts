@@ -1,17 +1,21 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals'
 import { VSCodeFunctionTracker } from '../src/parts/Tracker/Tracker.js'
 import { VSCodeTrackerOptions, FunctionStatistics } from '../src/parts/Types/Types.js'
-import puppeteer from 'puppeteer'
 
 // Mock puppeteer to avoid actual browser launches in tests
-jest.mock('puppeteer')
-const mockPuppeteer = puppeteer as jest.Mocked<typeof puppeteer>
+const mockPuppeteer = {
+  launch: jest.fn()
+}
 
-import * as fs from 'fs'
+jest.mock('puppeteer', () => mockPuppeteer)
 
 // Mock fs module
-jest.mock('fs')
-const mockFs = fs as jest.Mocked<typeof fs>
+const mockFs = {
+  existsSync: jest.fn(),
+  readFileSync: jest.fn()
+}
+
+jest.mock('fs', () => mockFs)
 
 describe('VSCodeFunctionTracker', () => {
   describe('constructor', () => {
@@ -35,8 +39,8 @@ describe('VSCodeFunctionTracker', () => {
 
   describe('initialize', () => {
     let tracker: VSCodeFunctionTracker
-    let mockBrowser: jest.Mocked<puppeteer.Browser>
-    let mockPage: jest.Mocked<puppeteer.Page>
+    let mockBrowser: any
+    let mockPage: any
 
     beforeEach(() => {
       jest.clearAllMocks()

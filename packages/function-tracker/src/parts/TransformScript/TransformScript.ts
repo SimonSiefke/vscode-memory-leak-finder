@@ -83,9 +83,14 @@ export const transformCode = (code: string, filename?: string, excludePatterns?:
     // Transform the original code with proper file context
     try {
       const plugin = createFunctionWrapperPlugin({ filename, excludePatterns })
-      traverseDefault(ast, plugin.visitor)
+      console.log('Plugin created successfully:', plugin)
+      console.log('AST before transformation:', ast)
+      traverseDefault(ast, plugin.visitor, null, ast)
+      console.log('AST after transformation successful')
     } catch (error) {
       console.error('Error transforming code:', error)
+      console.error('Error details:', error.message)
+      console.error('Error stack:', error.stack)
       return code // Return original code if transformation fails
     }
     
