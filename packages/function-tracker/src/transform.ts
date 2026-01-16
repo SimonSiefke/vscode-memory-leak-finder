@@ -1,9 +1,11 @@
 import babel from '@babel/core'
 import parser from '@babel/parser'
-import traverse from '@babel/traverse'
 import generate from '@babel/generator'
 import * as t from '@babel/types'
 import { TransformOptions, FunctionStatistics } from './types.js'
+
+// Import traverse using require to avoid ES module issues
+const traverse = require('@babel/traverse').default
 
 // Function call tracking infrastructure
 const trackingCode = `
@@ -12,21 +14,21 @@ if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map()
 }
 
-function trackFunctionCall(functionName: string, location?: string): void {
+function trackFunctionCall(functionName, location) {
   const key = functionName + (location ? " (" + location + ")" : "")
   const current = globalThis.___functionStatistics.get(key) || 0
   globalThis.___functionStatistics.set(key, current + 1)
 }
 
-function getFunctionStatistics(): FunctionStatistics {
-  const stats: FunctionStatistics = {}
+function getFunctionStatistics() {
+  const stats = {}
   for (const [name, count] of globalThis.___functionStatistics) {
     stats[name] = count
   }
   return stats
 }
 
-function resetFunctionStatistics(): void {
+function resetFunctionStatistics() {
   globalThis.___functionStatistics.clear()
 }
 
@@ -172,7 +174,7 @@ export function transformCode(code: string, options: TransformOptions = {}): str
     
     // Transform the original code with proper file context
     const plugin = createFunctionWrapperPlugin(options)
-    ;(traverse as any)(ast, plugin.visitor, null, ast)
+    traverseModule.default(ast, plugin.visitor, undefined, ast)
     
     // Combine tracking code with transformed code
     const combinedAST = {
