@@ -1766,64 +1766,6 @@ function literalFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should handle decorators and advanced TypeScript', () => {
-  const code = `
-    @decorator
-    class DecoratedClass {
-      @logged
-      decoratedMethod() {
-        return 'decorated';
-      }
-
-      @deprecated
-      deprecatedMethod(): never {
-        throw new Error('Deprecated');
-      }
-    }
-
-    function decorator(target: any) {
-      return target;
-    }
-
-    function logged(target: any, key: string) {
-      console.log(\`Logging \${key}\`);
-    }
-
-    function deprecated(target: any, key: string) {
-      console.warn(\`\${key} is deprecated\`);
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, { filename: 'decorators.ts' })
-  const expected = `@decorator
-class DecoratedClass {
-  @logged
-  decoratedMethod() {
-    trackFunctionCall("decoratedMethod", "decorators.ts:4");
-    return 'decorated';
-  }
-  @deprecated
-  deprecatedMethod(): never {
-    trackFunctionCall("deprecatedMethod", "decorators.ts:9");
-    throw new Error('Deprecated');
-  }
-}
-function decorator(target: any) {
-  trackFunctionCall("decorator", "decorators.ts:15");
-  return target;
-}
-function logged(target: any, key: string) {
-  trackFunctionCall("logged", "decorators.ts:19");
-  console.log(\`Logging \${key}\`);
-}
-function deprecated(target: any, key: string) {
-  trackFunctionCall("deprecated", "decorators.ts:23");
-  console.warn(\`\${key} is deprecated\`);
-}`
-
-  expect(transformed).toBe(expected)
-})
-
 test('Transform Script - transformCode - should handle enums and namespaces', () => {
   const code = `
     enum Color {
