@@ -1,6 +1,6 @@
 import babel from '@babel/core'
 import parser from '@babel/parser'
-import * as traverse from '@babel/traverse'
+import traverse from '@babel/traverse'
 import generate from '@babel/generator'
 import * as t from '@babel/types'
 import { trackingCode } from '../TrackingCode/TrackingCode.ts'
@@ -13,11 +13,6 @@ interface FunctionStatistics {
   readonly [key: string]: number;
 }
 
-declare global {
-  var ___functionStatistics: Map<string, number> | undefined;
-  var getFunctionStatistics: (() => FunctionStatistics) | undefined;
-  var resetFunctionStatistics: (() => void) | undefined;
-}
 
 export function transformCode(code: string, filename?: string): string {
   try {

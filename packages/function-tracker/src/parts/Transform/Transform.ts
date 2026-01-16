@@ -6,7 +6,7 @@ import { TransformOptions, FunctionStatistics } from '../Types/Types.ts'
 import { trackingCode } from '../TrackingCode/TrackingCode.ts'
 import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
 
-export async function transformCode(code: string, options: TransformOptions = {}): Promise<string> {
+export const transformCode = async (code: string, options: TransformOptions = {}): Promise<string> => {
   try {
     const { filename = 'unknown' } = options
     
