@@ -2797,17 +2797,20 @@ test('Transform Script - transformCode - should handle async and generator funct
   trackFunctionCall("asyncFunction", "async-generator.js:2");
   return await Promise.resolve('async');
 }
-
 const asyncArrow = async () => {
   trackFunctionCall("asyncArrow", "async-generator.js:6");
   return await fetch('/api/data');
 };
-
+function* generatorFunction() {
+  trackFunctionCall("generatorFunction", "async-generator.js:10");
+  yield 1;
+  yield 2;
+  yield 3;
+}
 const generatorArrow = function* () {
   trackFunctionCall("generatorArrow", "async-generator.js:16");
   yield 'arrow generator';
 };
-
 async function* asyncGenerator() {
   trackFunctionCall("asyncGenerator", "async-generator.js:20");
   yield await Promise.resolve(1);
