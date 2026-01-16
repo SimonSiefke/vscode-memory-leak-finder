@@ -180,7 +180,7 @@ test('TransformCodeWithTracking - should handle empty code', () => {
 
 test('TransformCodeWithTracking - should handle invalid code gracefully', () => {
   const code = 'invalid javascript syntax {{{'
-  expect(() => transformCodeWithTracking(code, { filename: 'test.js' })).toThrow(new Error('abc'))
+  expect(() => transformCodeWithTracking(code, { filename: 'test.js' })).toThrow(new Error('Error transforming code with tracking:: SyntaxError: Missing semicolon. (1:7)'))
 })
 
 test('TransformCodeWithTracking - should use default filename when not provided', () => {
@@ -260,10 +260,12 @@ test('TransformCodeWithTracking - should transform async functions', () => {
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `async function asyncFunction() {
-      return await fetch('/api/data');
-    }
+  trackFunctionCall("asyncFunction", "test.js:2");
+  return await fetch('/api/data');
+}
 const asyncArrow = async () => {
-      return await Promise.resolve('async arrow');
+  trackFunctionCall("asyncArrow", "test.js:6");
+  return await Promise.resolve('async arrow');
 };`
 
   expect(transformed).toBe(expected)
@@ -1177,7 +1179,7 @@ test('Transform Script - transformCode - should handle empty code', () => {
 
 test('Transform Script - transformCode - should handle invalid code gracefully', () => {
   const code = 'invalid javascript syntax {{{'
-  expect(() => transformCodeWithTracking(code, { filename: 'test.js' })).toThrow(new Error(`abc`))
+  expect(() => transformCodeWithTracking(code, { filename: 'test.js' })).toThrow(new Error('Error transforming code with tracking:: SyntaxError: Missing semicolon. (1:7)'))
 })
 
 test('Transform Script - transformCode - should use default filename when not provided', () => {
@@ -1257,10 +1259,12 @@ test('Transform Script - transformCode - should transform async functions', () =
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `async function asyncFunction() {
-      return await fetch('/api/data');
-    }
+  trackFunctionCall("asyncFunction", "test.js:2");
+  return await fetch('/api/data');
+}
 const asyncArrow = async () => {
-      return await Promise.resolve('async arrow');
+  trackFunctionCall("asyncArrow", "test.js:6");
+  return await Promise.resolve('async arrow');
 };`
 
   expect(transformed).toBe(expected)
