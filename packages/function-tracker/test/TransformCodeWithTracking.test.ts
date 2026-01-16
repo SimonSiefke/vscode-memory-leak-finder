@@ -2186,7 +2186,6 @@ function testFunction() {
 }`
 
   expect(transformed).toBe(expected)
-  expect(transformed).toContain('trackFunctionCall("publicFunction"')
 })
 
 test('Transform Script - transformCode - should handle empty exclude patterns array', () => {
@@ -2337,8 +2336,6 @@ class TestClass {
 }`
 
   expect(transformed).toBe(expected)
-  expect(transformed).toContain('trackFunctionCall("publicMethod"')
-  expect(transformed).toContain('trackFunctionCall("publicClassMethod"')
 })
 
 test('Transform Script - transformCode - should handle case-sensitive exclude patterns', () => {
