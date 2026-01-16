@@ -32,7 +32,7 @@ console.log('Local file link: file:///home/user/test.txt');
   await Terminal.execute('node print-links.js')
 
   // Wait a moment for the output to appear
-  await new Promise(resolve => setTimeout(resolve, 1000))
+  await new Promise((resolve) => setTimeout(resolve, 1000))
 
   // Clear the terminal
   await Terminal.clear()
