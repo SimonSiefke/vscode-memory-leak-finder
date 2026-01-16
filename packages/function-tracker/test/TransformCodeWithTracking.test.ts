@@ -77,11 +77,11 @@ test('TransformCodeWithTracking - should transform object methods', () => {
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const obj = {
   method() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 6);
     return 'method';
   },
   arrowMethod: () => {
-    trackFunctionCall(123, 2, 26);
+    trackFunctionCall(123, 7, 19);
     return 'arrow method';
   }
 };`
@@ -108,7 +108,7 @@ test('TransformCodeWithTracking - should transform class methods', () => {
     this.value = 42;
   }
   classMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 7, 6);
     return this.value;
   }
 }`
@@ -1058,7 +1058,7 @@ test('Transform Script - transformCode - should transform function expressions',
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const funcExpression = function () {
-  trackFunctionCall(123, 2, 26);
+  trackFunctionCall(123, 2, 27);
   return 'expression';
 };`
 
@@ -1079,11 +1079,11 @@ test('Transform Script - transformCode - should transform object methods', () =>
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const obj = {
   method() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 6);
     return 'method';
   },
   arrowMethod: () => {
-    trackFunctionCall(123, 2, 26);
+    trackFunctionCall(123, 7, 19);
     return 'arrow method';
   }
 };`
