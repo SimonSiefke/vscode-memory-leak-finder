@@ -10,7 +10,7 @@ test('TransformCodeWithTracking - should transform function declarations', () =>
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -77,11 +77,11 @@ test('TransformCodeWithTracking - should transform object methods', () => {
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const obj = {
   method() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'method';
   },
   arrowMethod: () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'arrow method';
   }
 };`
@@ -108,7 +108,7 @@ test('TransformCodeWithTracking - should transform class methods', () => {
     this.value = 42;
   }
   classMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return this.value;
   }
 }`
@@ -132,7 +132,7 @@ test('TransformCodeWithTracking - should exclude functions matching exclude patt
     excludePatterns: ['private'],
   })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }
 function privateHelper() {
@@ -165,7 +165,7 @@ function getFunctionStatistics() {
   return 'stats';
 }
 function regularFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'regular';
 }`
 
@@ -194,7 +194,7 @@ test('TransformCodeWithTracking - should use default filename when not provided'
 
   const transformed = transformCodeWithTracking(code)
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -214,11 +214,11 @@ test('TransformCodeWithTracking - should transform IIFE (Immediately Invoked Fun
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `(function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('IIFE executed');
 })();
 (() => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('Arrow IIFE executed');
 })();`
 
@@ -238,11 +238,11 @@ test('TransformCodeWithTracking - should transform Promise constructor callbacks
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `new Promise((resolve, reject) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   resolve('success');
 });
 new Promise(function (resolve, reject) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   reject('error');
 });`
 
@@ -262,11 +262,11 @@ test('TransformCodeWithTracking - should transform async functions', () => {
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `async function asyncFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return await fetch('/api/data');
 }
 const asyncArrow = async () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return await Promise.resolve('async arrow');
 };`
 
@@ -287,12 +287,12 @@ test('TransformCodeWithTracking - should transform generator functions', () => {
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function* generatorFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   yield 1;
   yield 2;
 }
 const generatorArrow = function* () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   yield 'arrow generator';
 };`
 
@@ -316,13 +316,13 @@ test('TransformCodeWithTracking - should transform nested functions', () => {
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function outerFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   function innerFunction() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'inner';
   }
   const innerArrow = () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'inner arrow';
   };
   return innerFunction();
@@ -350,19 +350,19 @@ test('TransformCodeWithTracking - should transform functions as parameters', () 
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `setTimeout(function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('timeout callback');
 }, 1000);
 setInterval(() => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('interval callback');
 }, 2000);
 [1, 2, 3].map(function (item) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return item * 2;
 });
 [4, 5, 6].filter(item => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return item > 4;
 });`
 
@@ -383,14 +383,14 @@ test('TransformCodeWithTracking - should transform destructured parameter functi
   a,
   b
 }, [c, d]) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return a + b + c + d;
 }
 const arrowDestructured = ({
   x,
   y
 }) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return x + y;
 };`
 
@@ -408,11 +408,11 @@ test('TransformCodeWithTracking - should transform functions with default parame
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function defaultParams(x = 10, y = 'default') {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return x + y;
 }
 const arrowDefault = (a = 5, b = []) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return a + b.length;
 };`
 
@@ -430,11 +430,11 @@ test('TransformCodeWithTracking - should transform functions with rest parameter
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function restParams(...args) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return args.join(', ');
 }
 const arrowRest = (first, ...rest) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return rest.length;
 };`
 
@@ -462,7 +462,7 @@ test('TransformCodeWithTracking - should transform functions with complex return
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function complexReturn() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   if (Math.random() > 0.5) {
     return 'success';
   } else {
@@ -470,7 +470,7 @@ test('TransformCodeWithTracking - should transform functions with complex return
   }
 }
 const arrowComplex = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   try {
     return riskyOperation();
   } catch (error) {
@@ -496,15 +496,15 @@ test('TransformCodeWithTracking - should handle Unicode and special characters',
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function 测试函数() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'Unicode test 🚀';
 }
 const emojiFunc = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return '🎉';
 };
 function special$Chars$_123() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'special chars';
 }`
 
@@ -537,7 +537,7 @@ test('TransformCodeWithTracking - should handle comments and directives', () => 
 
 // Single line comment with function fakeFunction() {}
 function realFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'real';
 }`
 
@@ -559,19 +559,19 @@ test('TransformCodeWithTracking - should handle template literals and complex ex
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function templateFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   const name = 'World';
   return \`Hello \${name}!\`;
 }
 const complexArrow = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return {
     [computedKey]: () => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return 'nested computed';
     },
     regular: function () {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return 'regular';
     }
   };
@@ -594,12 +594,12 @@ test('TransformCodeWithTracking - should handle regex and literals', () => {
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function regexFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   const pattern = /test/gi;
   return pattern.test('test string');
 }
 function literalFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 42n; // BigInt literal
 }`
 
@@ -627,15 +627,15 @@ test('TransformCodeWithTracking - should handle deeply nested function structure
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function level1() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   function level2() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     function level3() {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       function level4() {
-        trackFunctionCall(123, 2, 4);
+        trackFunctionCall(123, 2, 5);
         function level5() {
-          trackFunctionCall(123, 2, 4);
+          trackFunctionCall(123, 2, 5);
           return 'deeply nested';
         }
         return level5();
@@ -684,7 +684,7 @@ test('TransformCodeWithTracking - should handle complex class hierarchies', () =
     this.name = name;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return \`\${this.name} makes a sound\`;
   }
 }
@@ -694,11 +694,11 @@ class Dog extends Animal {
     this.breed = breed;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return \`\${this.name} barks\`;
   }
   static purr() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'Purring';
   }
 }`
@@ -723,13 +723,13 @@ test('TransformCodeWithTracking - should handle closures and lexical scoping', (
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function outerClosure(outerParam) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   const outerVar = 'outer';
   return function innerClosure(innerParam) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     const innerVar = 'inner';
     return function deepestClosure(deepestParam) {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return outerParam + outerVar + innerParam + innerVar + deepestParam;
     };
   };
@@ -752,18 +752,18 @@ test('TransformCodeWithTracking - should handle higher-order functions and funct
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function compose(f, g) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return function (x) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return f(g(x));
   };
 }
 const pipe = (...fns) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return value => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return fns.reduce((acc, fn) => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return fn(acc);
     }, value);
   };
@@ -792,7 +792,7 @@ test('TransformCodeWithTracking - should handle recursive and mutually recursive
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function factorial(n) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   if (n <= 1) {
     return 1;
   }
@@ -801,7 +801,7 @@ test('TransformCodeWithTracking - should handle recursive and mutually recursive
 
 // Recursive arrow function
 const sumRecursive = (arr, index = 0) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   if (index >= arr.length) {
     return 0;
   }
@@ -836,7 +836,7 @@ test('TransformCodeWithTracking - should exclude functions matching multiple pat
   })
 
   const expected = `function publicFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'public';
 }
 function privateHelper() {
@@ -915,7 +915,7 @@ test('TransformCodeWithTracking - should exclude methods in objects and classes'
 
   const expected = `const obj = {
   publicMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'public';
   },
   _privateMethod() {
@@ -924,7 +924,7 @@ test('TransformCodeWithTracking - should exclude methods in objects and classes'
 };
 class TestClass {
   publicClassMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return this.value;
   }
   _privateClassMethod() {
@@ -952,7 +952,7 @@ test('TransformCodeWithTracking - should handle case-sensitive exclude patterns'
   })
 
   const expected = `function TestFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'uppercase test';
 }
 function testfunction() {
@@ -971,7 +971,7 @@ test('TransformCodeWithTracking - should handle location tracking with different
 
   const jsFile = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -989,7 +989,7 @@ test('TransformCodeWithTracking - should handle location tracking with complex f
     filename: 'src/components/utils/helper.js',
   })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -1012,7 +1012,7 @@ test('Transform Script - transformCode - should transform function declarations'
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -1079,11 +1079,11 @@ test('Transform Script - transformCode - should transform object methods', () =>
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const obj = {
   method() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 6);
     return 'method';
   },
   arrowMethod: () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 6);
     return 'arrow method';
   }
 };`
@@ -1110,7 +1110,7 @@ test('Transform Script - transformCode - should transform class methods', () => 
     this.value = 42;
   }
   classMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 7, 6);
     return this.value;
   }
 }`
@@ -1131,7 +1131,7 @@ test('Transform Script - transformCode - should exclude functions matching exclu
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }
 function privateHelper() {
@@ -1164,7 +1164,7 @@ function getFunctionStatistics() {
   return 'stats';
 }
 function regularFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'regular';
 }`
 
@@ -1195,7 +1195,7 @@ test('Transform Script - transformCode - should use default filename when not pr
 
   const transformed = transformCodeWithTracking(code)
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -1215,11 +1215,11 @@ test('Transform Script - transformCode - should transform IIFE (Immediately Invo
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `(function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('IIFE executed');
 })();
 (() => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('Arrow IIFE executed');
 })();`
 
@@ -1239,11 +1239,11 @@ test('Transform Script - transformCode - should transform Promise constructor ca
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `new Promise((resolve, reject) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   resolve('success');
 });
 new Promise(function (resolve, reject) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   reject('error');
 });`
 
@@ -1263,11 +1263,11 @@ test('Transform Script - transformCode - should transform async functions', () =
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `async function asyncFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return await fetch('/api/data');
 }
 const asyncArrow = async () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return await Promise.resolve('async arrow');
 };`
 
@@ -1288,12 +1288,12 @@ test('Transform Script - transformCode - should transform generator functions', 
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function* generatorFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   yield 1;
   yield 2;
 }
 const generatorArrow = function* () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   yield 'arrow generator';
 };`
 
@@ -1317,11 +1317,11 @@ test('Transform Script - transformCode - should transform computed property meth
   const expected = `const methodName = 'dynamicMethod';
 const obj = {
   [methodName]() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'computed method';
   },
   ['arrow' + 'Method']() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'computed arrow method';
   }
 };`
@@ -1344,10 +1344,10 @@ test('Transform Script - transformCode - should transform Symbol methods', () =>
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `const obj = {
   [Symbol.iterator]() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return {
       next: () => {
-        trackFunctionCall(123, 2, 4);
+        trackFunctionCall(123, 2, 5);
         return {
           value: 1,
           done: false
@@ -1356,7 +1356,7 @@ test('Transform Script - transformCode - should transform Symbol methods', () =>
     };
   },
   [Symbol.dispose]() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     console.log('disposed');
   }
 };`
@@ -1388,19 +1388,19 @@ test('Transform Script - transformCode - should transform class property methods
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `class TestClass {
   propertyMethod = () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'class property arrow';
   };
   propertyFunction = function () {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'class property function';
   };
   static staticMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'static method';
   }
   static staticArrow = () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'static arrow';
   };
 }`
@@ -1425,13 +1425,13 @@ test('Transform Script - transformCode - should transform nested functions', () 
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function outerFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   function innerFunction() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'inner';
   }
   const innerArrow = () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'inner arrow';
   };
   return innerFunction();
@@ -1459,19 +1459,19 @@ test('Transform Script - transformCode - should transform functions as parameter
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `setTimeout(function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('timeout callback');
 }, 1000);
 setInterval(() => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('interval callback');
 }, 2000);
 [1, 2, 3].map(function (item) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return item * 2;
 });
 [4, 5, 6].filter(item => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return item > 4;
 });`
 
@@ -1492,14 +1492,14 @@ test('Transform Script - transformCode - should transform destructured parameter
   a,
   b
 }, [c, d]) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return a + b + c + d;
 }
 const arrowDestructured = ({
   x,
   y
 }) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return x + y;
 };`
 
@@ -1517,11 +1517,11 @@ test('Transform Script - transformCode - should transform functions with default
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function defaultParams(x = 10, y = 'default') {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return x + y;
 }
 const arrowDefault = (a = 5, b = []) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return a + b.length;
 };`
 
@@ -1539,11 +1539,11 @@ test('Transform Script - transformCode - should transform functions with rest pa
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function restParams(...args) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return args.join(', ');
 }
 const arrowRest = (first, ...rest) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return rest.length;
 };`
 
@@ -1571,7 +1571,7 @@ test('Transform Script - transformCode - should transform functions with complex
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function complexReturn() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   if (Math.random() > 0.5) {
     return 'success';
   } else {
@@ -1579,7 +1579,7 @@ test('Transform Script - transformCode - should transform functions with complex
   }
 }
 const arrowComplex = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   try {
     return riskyOperation();
   } catch (error) {
@@ -1632,15 +1632,15 @@ test('Transform Script - transformCode - should handle Unicode and special chara
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function 测试函数() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'Unicode test 🚀';
 }
 const emojiFunc = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return '🎉';
 };
 function special$Chars$_123() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'special chars';
 }`
 
@@ -1674,7 +1674,7 @@ test('Transform Script - transformCode - should handle comments and directives',
 
 // Single line comment with function fakeFunction() {}
 function realFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'real';
 }`
 
@@ -1696,19 +1696,19 @@ test('Transform Script - transformCode - should handle template literals and com
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function templateFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   const name = 'World';
   return \`Hello \${name}!\`;
 }
 const complexArrow = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return {
     [computedKey]: () => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return 'nested computed';
     },
     regular: function () {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return 'regular';
     }
   };
@@ -1731,12 +1731,12 @@ test('Transform Script - transformCode - should handle regex and literals', () =
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function regexFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   const pattern = /test/gi;
   return pattern.test('test string');
 }
 function literalFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 42n; // BigInt literal
 }`
 
@@ -1776,15 +1776,15 @@ test('Transform Script - transformCode - should handle deeply nested function st
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function level1() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   function level2() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     function level3() {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       function level4() {
-        trackFunctionCall(123, 2, 4);
+        trackFunctionCall(123, 2, 5);
         function level5() {
-          trackFunctionCall(123, 2, 4);
+          trackFunctionCall(123, 2, 5);
           return 'deeply nested';
         }
         return level5();
@@ -1796,13 +1796,13 @@ test('Transform Script - transformCode - should handle deeply nested function st
   return level2();
 }
 const arrowNest = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   const inner1 = () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     const inner2 = () => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       const inner3 = () => {
-        trackFunctionCall(123, 2, 4);
+        trackFunctionCall(123, 2, 5);
         return 'arrow nested';
       };
       return inner3();
@@ -1864,7 +1864,7 @@ test('Transform Script - transformCode - should handle complex class hierarchies
     this.name = name;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return \`\${this.name} makes a sound\`;
   }
 }
@@ -1874,11 +1874,11 @@ class Dog extends Animal {
     this.breed = breed;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return \`\${this.name} barks\`;
   }
   fetch() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'Fetching ball';
   }
 }
@@ -1888,11 +1888,11 @@ class Cat extends Animal {
     this.color = color;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return \`\${this.name} meows\`;
   }
   static purr() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'Purring';
   }
 }`
@@ -1935,33 +1935,33 @@ test('Transform Script - transformCode - should handle closures and lexical scop
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function outerClosure(outerParam) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   const outerVar = 'outer';
   return function innerClosure(innerParam) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     const innerVar = 'inner';
     return function deepestClosure(deepestParam) {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return outerParam + outerVar + innerParam + innerVar + deepestParam;
     };
   };
 }
 function counterFactory() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   let count = 0;
   return {
     increment: function () {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       count++;
       return count;
     },
     decrement: () => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       count--;
       return count;
     },
     getCount: function () {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return count;
     }
   };
@@ -2010,40 +2010,40 @@ test('Transform Script - transformCode - should handle higher-order functions an
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function compose(f, g) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return function (x) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return f(g(x));
   };
 }
 function curry(fn) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return function curried(...args) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     if (args.length >= fn.length) {
       return fn.apply(this, args);
     }
     return function (...nextArgs) {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return curried.apply(this, args.concat(nextArgs));
     };
   };
 }
 const pipe = (...fns) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return value => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return fns.reduce((acc, fn) => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 2, 5);
       return fn(acc);
     }, value);
   };
 };
 function memoize(fn) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   const cache = new Map();
   return function (...args) {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     const key = JSON.stringify(args);
     if (cache.has(key)) {
       return cache.get(key);
@@ -2098,14 +2098,14 @@ test('Transform Script - transformCode - should handle recursive and mutually re
   `
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function factorial(n) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   if (n <= 1) {
     return 1;
   }
   return n * factorial(n - 1);
 }
 function fibonacci(n) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   if (n <= 1) {
     return n;
   }
@@ -2114,14 +2114,14 @@ function fibonacci(n) {
 
 // Mutually recursive functions
 function isEven(n) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   if (n === 0) {
     return true;
   }
   return isOdd(n - 1);
 }
 function isOdd(n) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   if (n === 0) {
     return false;
   }
@@ -2130,7 +2130,7 @@ function isOdd(n) {
 
 // Recursive arrow function
 const sumRecursive = (arr, index = 0) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   if (index >= arr.length) {
     return 0;
   }
@@ -2169,7 +2169,7 @@ test('Transform Script - transformCode - should exclude functions matching multi
     excludePatterns: ['private', '_', '$', 'test'],
   })
   const expected = `function publicFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'public';
 }
 function privateHelper() {
@@ -2201,15 +2201,15 @@ test('Transform Script - transformCode - should handle empty exclude patterns ar
     excludePatterns: [],
   })
   const expected = `function function1() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return '1';
 }
 function function2() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return '2';
 }
 const arrow = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'arrow';
 };`
 
@@ -2307,7 +2307,7 @@ test('Transform Script - transformCode - should exclude methods in objects and c
   })
   const expected = `const obj = {
   publicMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'public';
   },
   _privateMethod() {
@@ -2325,7 +2325,7 @@ class TestClass {
     this.value = 42;
   }
   publicClassMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return this.value;
   }
   _privateClassMethod() {
@@ -2361,14 +2361,14 @@ function TESTFUNCTION() {
     excludePatterns: ['test'],
   })
   const expected = `function TestFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'uppercase test';
 }
 function testfunction() {
   return 'lowercase test';
 }
 function TESTFUNCTION() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'all caps test';
 }`
 
@@ -2387,7 +2387,7 @@ test('Transform Script - transformCode - should include location information by 
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -2406,7 +2406,7 @@ test('Transform Script - transformCode - should handle includeLocation option ex
     includeLocation: true,
   })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -2422,7 +2422,7 @@ test('Transform Script - transformCode - should handle location tracking with di
 
   const jsFile = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -2440,7 +2440,7 @@ test('Transform Script - transformCode - should handle location tracking with co
     filename: 'src/components/utils/helper.js',
   })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -2456,7 +2456,7 @@ test('Transform Script - transformCode - should handle location tracking with sp
 
   const spacesFile = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'test';
 }`
 
@@ -2480,15 +2480,15 @@ test('Transform Script - transformCode - should handle location tracking with mu
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function firstFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'first';
 }
 const secondFunction = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'second';
 };
 function thirdFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'third';
 }`
 
@@ -2513,15 +2513,15 @@ test('Transform Script - transformCode - should handle functions with special ch
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function $jquery() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'jquery';
 }
 function _private() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'private';
 }
 function camelCase() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'camelCase';
 }`
 
@@ -2545,15 +2545,15 @@ test.skip('Transform Script - transformCode - should handle functions with Unico
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function español() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'español';
 }
 function русский() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'русский';
 }
 function 日本語() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return '日本語';
 }`
 
@@ -2589,28 +2589,28 @@ test('Transform Script - transformCode - should handle mixed function types in s
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function declaration() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'declaration';
 }
 const expression = function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'expression';
 };
 const arrow = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'arrow';
 };
 const concise = x => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return x * 2;
 };
 class TestClass {
   method() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'method';
   }
   static staticMethod() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'static';
   }
 }`
@@ -2656,39 +2656,39 @@ test('Transform Script - transformCode - should handle functions in various cont
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `// Global scope
 function globalFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return 'global';
 }
 
 // Object property
 const obj = {
   propertyFunction: function () {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'property';
   },
   propertyArrow: () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'arrow property';
   },
   method() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 2, 5);
     return 'method';
   }
 };
 
 // Array methods
 const arr = [1, 2, 3].map(function (item) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return item * 2;
 });
 const arr2 = [4, 5, 6].filter(item => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return item > 4;
 });
 
 // Callback
 setTimeout(function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('timeout');
 }, 1000);`
 
@@ -2718,26 +2718,26 @@ test('Transform Script - transformCode - should handle complex parameter pattern
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function simpleParams(a, b, c) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return a + b + c;
 }
 function defaultParams(x = 10, y = 'default') {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return x + y;
 }
 function restParams(first, ...rest) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return rest.length;
 }
 function destructuredParams({
   a,
   b
 }, [c, d]) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return a + b + c + d;
 }
 const arrowWithParams = (x, y = 5, ...z) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return x + y + z.length;
 };`
 
@@ -2772,25 +2772,25 @@ test('Transform Script - transformCode - should handle async and generator funct
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `async function asyncFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return await Promise.resolve('async');
 }
 const asyncArrow = async () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   return await fetch('/api/data');
 };
 function* generatorFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   yield 1;
   yield 2;
   yield 3;
 }
 const generatorArrow = function* () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   yield 'arrow generator';
 };
 async function* asyncGenerator() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   yield await Promise.resolve(1);
   yield await Promise.resolve(2);
 }`
