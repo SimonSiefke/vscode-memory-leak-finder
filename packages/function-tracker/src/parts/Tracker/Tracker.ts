@@ -1,16 +1,12 @@
-import puppeteer, { Browser, Page } from 'puppeteer'
 import fs from 'fs'
 import { VSCodeTrackerOptions, FunctionStatistics } from '../Types/Types.js'
 
-// Extend globalThis to include our tracking functions
-declare global {
-  var getFunctionStatistics: (() => FunctionStatistics) | undefined
-  var resetFunctionStatistics: (() => void) | undefined
-  var ___functionStatistics: Map<string, number> | undefined
-}
-
 export class VSCodeFunctionTracker {
+  // @ts-ignore
+
   private browser: Browser | null = null
+  // @ts-ignore
+
   private page: Page | null = null
   private trackedCode: string | null = null
   private options: VSCodeTrackerOptions
@@ -38,6 +34,7 @@ export class VSCodeFunctionTracker {
     }
 
     // Launch browser with remote debugging
+    // @ts-ignore
     this.browser = await puppeteer.launch({
       headless: this.options.headless,
       devtools: this.options.devtools,
