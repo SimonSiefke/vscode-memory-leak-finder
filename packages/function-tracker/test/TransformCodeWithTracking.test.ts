@@ -1053,30 +1053,7 @@ test('Transform Script - transformCode - should transform function declarations'
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-function testFunction() {
+  const expected = `function testFunction() {
   trackFunctionCall("testFunction", "test.js:2");
   return 'test';
 }`
@@ -1092,30 +1069,7 @@ test('Transform Script - transformCode - should transform arrow functions', () =
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-const arrowFunction = () => {
+  const expected = `const arrowFunction = () => {
   trackFunctionCall("arrowFunction", "test.js:2");
   return 'arrow';
 };`
@@ -1129,30 +1083,7 @@ test('Transform Script - transformCode - should transform concise arrow function
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-const conciseArrow = x => {
+  const expected = `const conciseArrow = x => {
   trackFunctionCall("conciseArrow", "test.js:2");
   return x * 2;
 };`
@@ -3230,8 +3161,20 @@ test('Transform Script - transformCode - should handle location tracking with mu
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'multi-location.js' })
+  const expected = `function firstFunction() {
+  trackFunctionCall("firstFunction", "multi-location.js:2");
+  return 'first';
+}
+const secondFunction = () => {
+  trackFunctionCall("secondFunction", "multi-location.js:6");
+  return 'second';
+};
+function thirdFunction() {
+  trackFunctionCall("thirdFunction", "multi-location.js:10");
+  return 'third';
+}`
 
-  expect(transformed).toBe('trackFunctionCall("firstFunction", "multi-location.js:2")')
+  expect(transformed).toBe(expected)
 })
 
 // Additional edge case tests
@@ -3251,8 +3194,20 @@ test('Transform Script - transformCode - should handle functions with special ch
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'special-chars.js' })
+  const expected = `function $jquery() {
+  trackFunctionCall("$jquery", "special-chars.js:2");
+  return 'jquery';
+}
+function _private() {
+  trackFunctionCall("_private", "special-chars.js:6");
+  return 'private';
+}
+function camelCase() {
+  trackFunctionCall("camelCase", "special-chars.js:10");
+  return 'camelCase';
+}`
 
-  expect(transformed).toBe('trackFunctionCall("$jquery"')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle functions with Unicode characters', () => {
@@ -3271,10 +3226,20 @@ test('Transform Script - transformCode - should handle functions with Unicode ch
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'unicode.js' })
+  const expected = `function español() {
+  trackFunctionCall("español", "unicode.js:2");
+  return 'español';
+}
+function русский() {
+  trackFunctionCall("русский", "unicode.js:6");
+  return 'русский';
+}
+function 日本語() {
+  trackFunctionCall("日本語", "unicode.js:10");
+  return '日本語';
+}`
 
-  expect(transformed).toBe('trackFunctionCall("español"')
-  expect(transformed).toBe('trackFunctionCall("русский"')
-  expect(transformed).toBe('trackFunctionCall("日本語"')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle mixed function types in same scope', () => {
