@@ -4,9 +4,6 @@ import generate from '@babel/generator'
 import * as t from '@babel/types'
 import { TransformOptions, FunctionStatistics } from './types.js'
 
-// Import traverse using require to avoid ES module issues
-const traverse = require('@babel/traverse').default
-
 // Function call tracking infrastructure
 const trackingCode = `
 // Function call tracking system
@@ -174,7 +171,7 @@ export function transformCode(code: string, options: TransformOptions = {}): str
     
     // Transform the original code with proper file context
     const plugin = createFunctionWrapperPlugin(options)
-    traverseModule.default(ast, plugin.visitor, undefined, ast)
+    traverse(ast, plugin.visitor, undefined, ast)
     
     // Combine tracking code with transformed code
     const combinedAST = {
