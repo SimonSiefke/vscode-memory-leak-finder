@@ -2,7 +2,7 @@
   "name": "@vscode-memory-leak-finder/function-tracker",
   "version": "0.0.0-dev",
   "description": "Function call tracking for VS Code performance analysis",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -17,16 +17,7 @@
     "@babel/generator": "^7.23.0",
     "@babel/parser": "^7.23.0",
     "@babel/traverse": "^7.23.0",
-    "@babel/types": "^7.23.0",
-    "puppeteer": "^21.0.0"
+    "@babel/types": "^7.23.0"
   },
-  "devDependencies": {
-    "@types/jest": "^29.5.0",
-    "@types/node": "^25.0.3",
-    "jest": "^29.5.0",
-    "jest-environment-node": "^29.5.0",
-    "ts-jest": "^29.1.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
-  }
+  "devDependencies": {}
 }

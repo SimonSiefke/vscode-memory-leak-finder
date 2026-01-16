@@ -155,9 +155,13 @@ function createFunctionWrapperPlugin(options: TransformOptions = {}) {
   }
 }
 
-export function transformCode(code: string, options: TransformOptions = {}): string {
+export async function transformCode(code: string, options: TransformOptions = {}): Promise<string> {
   try {
     const { filename = 'unknown' } = options
+    
+    // Dynamic import for traverse to avoid ES module issues
+    const traverseModule = await import('@babel/traverse')
+    const traverse = traverseModule.default
     
     const ast = parser.parse(code, {
       sourceType: 'module',
@@ -171,7 +175,7 @@ export function transformCode(code: string, options: TransformOptions = {}): str
     
     // Transform the original code with proper file context
     const plugin = createFunctionWrapperPlugin(options)
-    traverse(ast, plugin.visitor, undefined, ast)
+    ;(traverse as any)(ast, plugin.visitor, undefined, ast)
     
     // Combine tracking code with transformed code
     const combinedAST = {
