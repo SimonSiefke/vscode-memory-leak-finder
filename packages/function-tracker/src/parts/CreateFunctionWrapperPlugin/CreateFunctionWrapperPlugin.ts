@@ -1,18 +1,17 @@
-import babel from '@babel/core'
 import * as t from '@babel/types'
-import { TransformOptions } from '../Types/Types.js'
+import type { PluginObj, NodePath } from '@babel/core'
 
 export interface CreateFunctionWrapperPluginOptions {
   readonly filename?: string
   readonly excludePatterns?: string[]
 }
 
-export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPluginOptions = {}): babel.PluginObj => {
+export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPluginOptions = {}): PluginObj => {
   const { filename = 'unknown', excludePatterns = [] } = options
 
   return {
     visitor: {
-      FunctionDeclaration(path: babel.NodePath<t.FunctionDeclaration>) {
+      FunctionDeclaration(path: NodePath<t.FunctionDeclaration>) {
         const functionName: string = path.node.id ? path.node.id.name : 'anonymous'
         const hub = path.hub as any;
         const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
@@ -40,7 +39,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
         }
       },
       
-      FunctionExpression(path: babel.NodePath<t.FunctionExpression>) {
+      FunctionExpression(path: NodePath<t.FunctionExpression>) {
         const parent: any = path.parent
         let functionName: string = 'anonymous'
         
@@ -77,7 +76,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
         }
       },
       
-      ArrowFunctionExpression(path: babel.NodePath<t.ArrowFunctionExpression>) {
+      ArrowFunctionExpression(path: NodePath<t.ArrowFunctionExpression>) {
         const parent: any = path.parent
         let functionName: string = 'anonymous_arrow'
         

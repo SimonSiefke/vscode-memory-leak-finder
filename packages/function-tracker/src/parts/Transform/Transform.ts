@@ -1,15 +1,11 @@
-import babel from '@babel/core'
 import parser from '@babel/parser'
 import generate from '@babel/generator'
-import * as t from '@babel/types'
-import { TransformOptions, FunctionStatistics } from '../Types/Types.ts'
-import { trackingCode } from '../TrackingCode/TrackingCode.ts'
-import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
+import { TransformOptions } from '../Types/Types.js'
+import { trackingCode } from '../TrackingCode/TrackingCode.js'
+import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.js'
 
 export const transformCode = async (code: string, options: TransformOptions = {}): Promise<string> => {
   try {
-    const { filename = 'unknown' } = options
-    
     // Dynamic import for traverse to avoid ES module issues
     const traverseModule = await import('@babel/traverse')
     const traverse = traverseModule.default

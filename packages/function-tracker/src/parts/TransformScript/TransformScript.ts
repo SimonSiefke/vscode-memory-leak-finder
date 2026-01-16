@@ -1,4 +1,3 @@
-import babel from '@babel/core'
 import parser from '@babel/parser'
 import traverse from '@babel/traverse'
 import generate from '@babel/generator'
@@ -8,10 +7,6 @@ import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/Crea
 
 const traverseDefault = (traverse as any).default || traverse
 const generateDefault = (generate as any).default || generate
-
-interface FunctionStatistics {
-  readonly [key: string]: number;
-}
 
 
 export const transformCode = (code: string, filename?: string, excludePatterns?: string[]): string => {
@@ -23,14 +18,12 @@ export const transformCode = (code: string, filename?: string, excludePatterns?:
       () => parser.parse(code, {
         sourceType: 'module',
         allowImportExportEverywhere: true,
-        allowHashBang: true,
         plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties']
       }),
       // Strategy 2: Script without TypeScript
       () => parser.parse(code, {
         sourceType: 'script',
         allowImportExportEverywhere: true,
-        allowHashBang: true,
         plugins: ['jsx', 'decorators-legacy', 'objectRestSpread', 'classProperties']
       }),
       // Strategy 3: Minimal plugins

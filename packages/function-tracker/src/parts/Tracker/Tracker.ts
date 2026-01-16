@@ -83,7 +83,7 @@ export class VSCodeFunctionTracker {
     await this.page.goto(this.options.vscodeUrl!)
     
     // Wait for VS Code to load
-    await this.page.waitForTimeout(5000)
+    await new Promise(resolve => setTimeout(resolve, 5000))
     
     console.log('VS Code loaded with function tracking enabled')
   }
