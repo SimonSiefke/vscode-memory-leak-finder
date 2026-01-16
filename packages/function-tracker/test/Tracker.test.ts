@@ -5,12 +5,12 @@ import { VSCodeTrackerOptions } from '../src/parts/Types/Types.js'
 // Simple mock for fs
 jest.mock('fs', () => ({
   existsSync: jest.fn(),
-  readFileSync: jest.fn()
+  readFileSync: jest.fn(),
 }))
 
 // Simple mock for puppeteer
 jest.mock('puppeteer', () => ({
-  launch: jest.fn()
+  launch: jest.fn(),
 }))
 
 describe('VSCodeFunctionTracker', () => {
@@ -25,9 +25,9 @@ describe('VSCodeFunctionTracker', () => {
         headless: true,
         devtools: false,
         remoteDebuggingPort: 9333,
-        vscodeUrl: 'http://localhost:3000'
+        vscodeUrl: 'http://localhost:3000',
       }
-      
+
       const customTracker = new VSCodeFunctionTracker(options)
       expect(customTracker).toBeDefined()
     })

@@ -10,8 +10,4 @@ export const transformCode = async (code: string, options: TransformOptions = {}
   return transformedCode
 }
 
-export {
-  addTrackingPreamble,
-  transformCodeWithTracking,
-  createFunctionWrapperPlugin
-}
+export { addTrackingPreamble, transformCodeWithTracking, createFunctionWrapperPlugin }

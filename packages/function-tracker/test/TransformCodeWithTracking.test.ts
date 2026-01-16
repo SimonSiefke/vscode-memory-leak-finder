@@ -2414,11 +2414,23 @@ test('Transform Script - transformCode - should handle enums and namespaces', ()
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'enums.ts' })
+  const expected = `enum Color {
+  Red = 'red',
+  Green = 'green',
+  Blue = 'blue',
+}
+namespace MyNamespace {
+  export function namespaceFunction() {
+    trackFunctionCall("namespaceFunction", "enums.ts:9");
+    return 'namespace';
+  }
+  export const namespaceArrow = () => {
+    trackFunctionCall("namespaceArrow", "enums.ts:13");
+    return 'arrow';
+  };
+}`
 
-  expect(transformed).toBe('trackFunctionCall("namespaceFunction"')
-  expect(transformed).toBe('trackFunctionCall("namespaceArrow"')
-  expect(transformed).toBe('enum Color')
-  expect(transformed).toBe('namespace MyNamespace')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle type aliases and utility types', () => {
@@ -2437,12 +2449,18 @@ test('Transform Script - transformCode - should handle type aliases and utility 
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'types.ts' })
+  const expected = `type StringOrNumber = string | number;
+type Optional<T> = T | null;
+function genericFunction<T extends StringOrNumber>(value: T): Optional<T> {
+  trackFunctionCall("genericFunction", "types.ts:6");
+  return value ?? null;
+}
+const utilityArrow = <U, V>(obj: Record<U, V>): U[] => {
+  trackFunctionCall("utilityArrow", "types.ts:10");
+  return Object.keys(obj) as U[];
+};`
 
-  expect(transformed).toBe('trackFunctionCall("genericFunction"')
-  expect(transformed).toBe('trackFunctionCall("utilityArrow"')
-  expect(transformed).toBe('type StringOrNumber')
-  expect(transformed).toBe('type Optional')
-  expect(transformed).toBe('<T extends StringOrNumber>')
+  expect(transformed).toBe(expected)
 })
 
 // Complex nested scenarios tests
@@ -2477,16 +2495,43 @@ test('Transform Script - transformCode - should handle deeply nested function st
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'nested.js' })
+  const expected = `function level1() {
+  trackFunctionCall("level1", "nested.js:2");
+  function level2() {
+    trackFunctionCall("level2", "nested.js:3");
+    function level3() {
+      trackFunctionCall("level3", "nested.js:4");
+      function level4() {
+        trackFunctionCall("level4", "nested.js:5");
+        function level5() {
+          trackFunctionCall("level5", "nested.js:6");
+          return 'deeply nested';
+        }
+        return level5();
+      }
+      return level4();
+    }
+    return level3();
+  }
+  return level2();
+}
+const arrowNest = () => {
+  trackFunctionCall("arrowNest", "nested.js:10");
+  const inner1 = () => {
+    trackFunctionCall("inner1", "nested.js:11");
+    const inner2 = () => {
+      trackFunctionCall("inner2", "nested.js:12");
+      const inner3 = () => {
+        trackFunctionCall("inner3", "nested.js:13");
+        return 'arrow nested';
+      };
+      return inner2();
+    };
+    return inner1();
+  };
+};`
 
-  expect(transformed).toBe('trackFunctionCall("level1"')
-  expect(transformed).toBe('trackFunctionCall("level2"')
-  expect(transformed).toBe('trackFunctionCall("level3"')
-  expect(transformed).toBe('trackFunctionCall("level4"')
-  expect(transformed).toBe('trackFunctionCall("level5"')
-  expect(transformed).toBe('trackFunctionCall("arrowNest"')
-  expect(transformed).toBe('trackFunctionCall("inner1"')
-  expect(transformed).toBe('trackFunctionCall("inner2"')
-  expect(transformed).toBe('trackFunctionCall("inner3"')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle complex class hierarchies', () => {
@@ -2533,13 +2578,45 @@ test('Transform Script - transformCode - should handle complex class hierarchies
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'classes.js' })
+  const expected = `class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    trackFunctionCall("speak", "classes.js:7");
+    return \`\${this.name} makes a sound\`;
+  }
+}
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name);
+    this.breed = breed;
+  }
+  speak() {
+    trackFunctionCall("speak", "classes.js:18");
+    return \`\${this.name} barks\`;
+  }
+  fetch() {
+    trackFunctionCall("fetch", "classes.js:22");
+    return 'Fetching ball';
+  }
+}
+class Cat extends Animal {
+  constructor(name, color) {
+    super(name);
+    this.color = color;
+  }
+  speak() {
+    trackFunctionCall("speak", "classes.js:33");
+    return \`\${this.name} meows\`;
+  }
+  static purr() {
+    trackFunctionCall("purr", "classes.js:37");
+    return 'Purring';
+  }
+}`
 
-  expect(transformed).toBe('trackFunctionCall("speak"')
-  expect(transformed).toBe('trackFunctionCall("fetch"')
-  expect(transformed).toBe('trackFunctionCall("purr"')
-  expect(transformed).toBe('class Animal')
-  expect(transformed).toBe('class Dog extends Animal')
-  expect(transformed).toBe('class Cat extends Animal')
+  expect(transformed).toBe(expected)
 })
 
 test('Transform Script - transformCode - should handle closures and lexical scoping', () => {
