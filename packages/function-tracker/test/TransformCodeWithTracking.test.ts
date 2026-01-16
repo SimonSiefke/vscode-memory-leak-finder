@@ -1576,30 +1576,7 @@ test('Transform Script - transformCode - should transform functions with rest pa
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-function restParams(...args) {
+  const expected = `function restParams(...args) {
   trackFunctionCall("restParams", "test.js:2");
   return args.join(', ');
 }
@@ -1631,30 +1608,7 @@ test('Transform Script - transformCode - should transform functions with complex
   `
 
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
-  const expected = `// Function call tracking system
-if (!globalThis.___functionStatistics) {
-  globalThis.___functionStatistics = new Map();
-}
-const trackFunctionCall = (functionName, location) => {
-  const key = functionName + (location ? \` (\${location})\` : '');
-  const current = globalThis.___functionStatistics.get(key) || 0;
-  globalThis.___functionStatistics.set(key, current + 1);
-};
-const getFunctionStatistics = () => {
-  const stats = {};
-  for (const [name, count] of globalThis.___functionStatistics) {
-    stats[name] = count;
-  }
-  return stats;
-};
-const resetFunctionStatistics = () => {
-  globalThis.___functionStatistics.clear();
-};
-
-// Export for debugging
-globalThis.getFunctionStatistics = getFunctionStatistics;
-globalThis.resetFunctionStatistics = resetFunctionStatistics;
-function complexReturn() {
+  const expected = `function complexReturn() {
   trackFunctionCall("complexReturn", "test.js:2");
   if (Math.random() > 0.5) {
     return 'success';
@@ -1663,7 +1617,7 @@ function complexReturn() {
   }
 }
 const arrowComplex = () => {
-  trackFunctionCall("arrowComplex", "test.js:10");
+  trackFunctionCall("arrowComplex", "test.js:9");
   try {
     return riskyOperation();
   } catch (error) {

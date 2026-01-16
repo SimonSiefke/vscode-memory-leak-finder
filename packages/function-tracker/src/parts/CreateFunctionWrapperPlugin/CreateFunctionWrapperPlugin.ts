@@ -4,10 +4,11 @@ import * as t from '@babel/types'
 export interface CreateFunctionWrapperPluginOptions {
   readonly filename?: string
   readonly excludePatterns?: string[]
+  readonly preambleOffset?: number
 }
 
 export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPluginOptions = {}): Visitor => {
-  const { filename = 'unknown', excludePatterns = [] } = options
+  const { filename = 'unknown', excludePatterns = [], preambleOffset = 0 } = options
 
   // Add tracking system functions to exclude patterns
   const allExcludePatterns = [...excludePatterns, 'getFunctionStatistics', 'resetFunctionStatistics']
@@ -16,7 +17,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     FunctionDeclaration(path: NodePath<t.FunctionDeclaration>) {
       const functionName: string = path.node.id ? path.node.id.name : 'anonymous'
       const actualFilename = filename || 'unknown'
-      const location: string = `${actualFilename}:${path.node.loc?.start.line}`
+      const location: string = `${actualFilename}:${(path.node.loc?.start.line || 1) - preambleOffset}`
 
       if (path.node.id && !path.node.id.name.startsWith('track') && !allExcludePatterns.some((pattern) => functionName.includes(pattern))) {
         // Wrap the function body
@@ -48,7 +49,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
         }
       }
 
-      const location: string = `${actualFilename}:${path.node.loc?.start.line}`
+      const location: string = `${actualFilename}:${(path.node.loc?.start.line || 1) - preambleOffset}`
 
       if (!functionName.startsWith('track') && !allExcludePatterns.some((pattern) => functionName.includes(pattern))) {
         const originalBody: t.BlockStatement = path.node.body
@@ -63,7 +64,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     ObjectMethod(path: NodePath<t.ObjectMethod>) {
       const methodName: string = t.isIdentifier(path.node.key) && path.node.key.name ? path.node.key.name : 'anonymous'
       const actualFilename = filename || 'unknown'
-      const location: string = `${actualFilename}:${path.node.loc?.start.line}`
+      const location: string = `${actualFilename}:${(path.node.loc?.start.line || 1) - preambleOffset}`
 
       // Don't track methods matching exclude patterns
       if (
@@ -84,7 +85,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     ClassMethod(path: NodePath<t.ClassMethod>) {
       const methodName: string = t.isIdentifier(path.node.key) && path.node.key.name ? path.node.key.name : 'anonymous'
       const actualFilename = filename || 'unknown'
-      const location: string = `${actualFilename}:${path.node.loc?.start.line}`
+      const location: string = `${actualFilename}:${(path.node.loc?.start.line || 1) - preambleOffset}`
 
       // Don't track constructors or methods matching exclude patterns
       if (
@@ -117,7 +118,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
         functionName = parent.key.name
       }
 
-      const location: string = `${actualFilename}:${path.node.loc?.start.line}`
+      const location: string = `${actualFilename}:${(path.node.loc?.start.line || 1) - preambleOffset}`
 
       if (!functionName.startsWith('track') && !allExcludePatterns.some((pattern) => functionName.includes(pattern))) {
         if (t.isBlockStatement(path.node.body)) {

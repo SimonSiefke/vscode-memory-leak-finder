@@ -6,6 +6,7 @@ export interface TransformOptions {
   readonly filename?: string
   readonly includeLocation?: boolean
   readonly excludePatterns?: string[]
+  readonly preambleOffset?: number
 }
 
 export interface TrackingConfig {
