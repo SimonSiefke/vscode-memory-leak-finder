@@ -14,11 +14,13 @@ export const transformCodeWithTracking = async (code: string, options: Transform
     
     // Transform the original code with proper file context
     const plugin = createFunctionWrapperPlugin(options)
-    ;(traverse as any)(ast, plugin.visitor, undefined, ast)
+    traverse.default(ast, plugin.visitor, undefined, ast)
     
-    const result = (generate as any)(ast, {
-      retainLines: false,
-      compact: false
+    const result = generate.default(ast, {
+      retainLines: true,
+      compact: false,
+      comments: true,
+      minified: false
     })
     
     return result.code

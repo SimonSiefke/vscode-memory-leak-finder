@@ -50,6 +50,11 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
           functionName = parent.left.name
         } else if (t.isProperty(parent) && t.isIdentifier(parent.key)) {
           functionName = parent.key.name
+        } else if (t.isReturnStatement(parent)) {
+          // Check if this is a named function in a return statement
+          if (path.node.id && path.node.id.name) {
+            functionName = path.node.id.name
+          }
         }
         
         const location: string = `${actualFilename}:${path.node.loc?.start.line}`
@@ -72,6 +77,35 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
             ...originalBody.body
           ])
         }
+      },
+      
+      ClassMethod(path: NodePath<t.ClassMethod>) {
+        const methodName: string = (t.isIdentifier(path.node.key) && path.node.key.name) ? path.node.key.name : 'anonymous'
+        const actualFilename = filename || 'unknown'
+        const location: string = `${actualFilename}:${path.node.loc?.start.line}`
+        
+        // Don't track constructors
+        if (methodName === 'constructor' ||
+            methodName.startsWith('track') ||
+            excludePatterns.some(pattern => methodName.includes(pattern))) {
+          return
+        }
+        
+        const originalBody: t.BlockStatement = path.node.body
+        const trackingCall: t.ExpressionStatement = t.expressionStatement(
+          t.callExpression(
+            t.identifier('trackFunctionCall'),
+            [
+              t.stringLiteral(methodName),
+              t.stringLiteral(location)
+            ]
+          )
+        )
+        
+        path.node.body = t.blockStatement([
+          trackingCall,
+          ...originalBody.body
+        ])
       },
       
       ArrowFunctionExpression(path: NodePath<t.ArrowFunctionExpression>) {
