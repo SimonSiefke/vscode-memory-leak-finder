@@ -470,12 +470,12 @@ const resetFunctionStatistics = () => {
 // Export for debugging
 globalThis.getFunctionStatistics = getFunctionStatistics;
 globalThis.resetFunctionStatistics = resetFunctionStatistics;
-(function() {
+(function () {
   trackFunctionCall("anonymous", "test.js:2");
   console.log('IIFE executed');
 })();
 (() => {
-  trackFunctionCall("anonymous", "test.js:6");
+  trackFunctionCall("anonymous_arrow", "test.js:6");
   console.log('Arrow IIFE executed');
 })();`
 
@@ -518,10 +518,10 @@ const resetFunctionStatistics = () => {
 globalThis.getFunctionStatistics = getFunctionStatistics;
 globalThis.resetFunctionStatistics = resetFunctionStatistics;
 new Promise((resolve, reject) => {
-  trackFunctionCall("anonymous", "test.js:2");
+  trackFunctionCall("anonymous_arrow", "test.js:2");
   resolve('success');
 });
-new Promise(function(resolve, reject) {
+new Promise(function (resolve, reject) {
   trackFunctionCall("anonymous", "test.js:6");
   reject('error');
 });`
@@ -617,7 +617,7 @@ function* generatorFunction() {
   yield 1;
   yield 2;
 }
-const generatorArrow = function*() {
+const generatorArrow = function* () {
   trackFunctionCall("generatorArrow", "test.js:7");
   yield 'arrow generator';
 };`
