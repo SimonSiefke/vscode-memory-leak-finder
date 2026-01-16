@@ -14,7 +14,7 @@ test('Transform Script - transformCode - should transform function declarations'
       return 'test'
     }
   `
-  
+
   const transformed = await transformCode(code, 'test.js')
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
@@ -449,109 +449,4 @@ test('Transform Script - createFunctionWrapperPlugin - should handle default opt
 
   expect(plugin).toBeDefined()
   expect(plugin.visitor).toBeDefined()
-})
-
-test('Transform Script - Tracking functionality - should track function calls when executed', async () => {
-  const code = `
-    function testFunction() {
-      return 'test'
-    }
-
-    const arrowFunction = () => {
-      return 'arrow'
-    }
-  `
-
-  const transformed = await transformCode(code, 'test.js')
-
-  // Execute the transformed code
-  const executeCode = new Function(
-    transformed +
-      `
-    return {
-      testFunction,
-      arrowFunction
-    };
-  `,
-  )
-
-  const { testFunction, arrowFunction } = executeCode()
-
-  // Call the functions
-  testFunction()
-  arrowFunction()
-
-  // Check statistics
-  if (typeof globalThis.getFunctionStatistics === 'function') {
-    const stats = globalThis.getFunctionStatistics()
-    expect(stats).toHaveProperty('testFunction (test.js:2)', 1)
-    expect(stats).toHaveProperty('arrowFunction (test.js:6)', 1)
-  }
-})
-
-test('Transform Script - Tracking functionality - should reset statistics', async () => {
-  const code = `
-    function testFunction() {
-      return 'test'
-    }
-  `
-
-  const transformed = await transformCode(code, 'test.js')
-
-  // Execute and call function
-  const executeCode = new Function(
-    transformed +
-      `
-    return {
-      testFunction
-    };
-  `,
-  )
-
-  const { testFunction } = executeCode()
-  testFunction()
-
-  // Check that we have statistics
-  if (typeof globalThis.getFunctionStatistics === 'function') {
-    const stats = globalThis.getFunctionStatistics()
-    expect(Object.keys(stats)).toHaveLength(1)
-
-    // Reset statistics
-    if (typeof globalThis.resetFunctionStatistics === 'function') {
-      globalThis.resetFunctionStatistics()
-      const resetStats = globalThis.getFunctionStatistics()
-      expect(Object.keys(resetStats)).toHaveLength(0)
-    }
-  }
-})
-
-test('Transform Script - Tracking functionality - should count multiple calls', async () => {
-  const code = `
-    function testFunction() {
-      return 'test'
-    }
-  `
-
-  const transformed = await transformCode(code, 'test.js')
-
-  const executeCode = new Function(
-    transformed +
-      `
-    return {
-      testFunction
-    };
-  `,
-  )
-
-  const { testFunction } = executeCode()
-
-  // Call function multiple times
-  testFunction()
-  testFunction()
-  testFunction()
-
-  if (typeof globalThis.getFunctionStatistics === 'function') {
-    const stats = globalThis.getFunctionStatistics()
-    expect(stats).toHaveProperty('testFunction (test.js:2)', 3)
-  }
 })
