@@ -1,18 +1,13 @@
 import { transformCode } from './transform'
 import { FunctionStatistics } from './types'
 
-describe('Integration Tests', () => {
-  beforeEach(() => {
-    // Reset global statistics before each test
-    if (typeof globalThis !== 'undefined') {
-      delete (globalThis as any).___functionStatistics
-      delete (globalThis as any).getFunctionStatistics
-      delete (globalThis as any).resetFunctionStatistics
-    }
-  })
-
-  describe('Real-world scenarios', () => {
-    it('should handle complex nested functions', () => {
+test('Integration Tests - Real-world scenarios - should handle complex nested functions', () => {
+  // Reset global statistics before each test
+  if (typeof globalThis !== 'undefined') {
+    delete (globalThis as any).___functionStatistics
+    delete (globalThis as any).getFunctionStatistics
+    delete (globalThis as any).resetFunctionStatistics
+  }
       const code = `
         function outerFunction(x) {
           const innerFunction = (y) => {
@@ -36,7 +31,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('trackFunctionCall')
     })
 
-    it('should handle TypeScript syntax', () => {
+test('Integration Tests - Real-world scenarios - should handle TypeScript syntax', () => {
       const code = `
         function typedFunction(name: string): string {
           return \`Hello, \${name}!\`
@@ -65,7 +60,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('globalThis.___functionStatistics')
     })
 
-    it('should handle async functions', () => {
+test('Integration Tests - Real-world scenarios - should handle async functions', () => {
       const code = `
         async function fetchData(url: string): Promise<any> {
           const response = await fetch(url)
@@ -83,7 +78,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('trackFunctionCall')
     })
 
-    it('should handle generator functions', () => {
+test('Integration Tests - Real-world scenarios - should handle generator functions', () => {
       const code = `
         function* numberGenerator() {
           let i = 0
@@ -103,7 +98,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('globalThis.___functionStatistics')
     })
 
-    it('should handle destructuring and complex parameters', () => {
+test('Integration Tests - Real-world scenarios - should handle destructuring and complex parameters', () => {
       const code = `
         function processUser({ name, age }: { name: string; age: number }) {
           return \`\${name} is \${age} years old\`
@@ -119,7 +114,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('globalThis.___functionStatistics')
     })
 
-    it('should handle conditional functions', () => {
+test('Integration Tests - Real-world scenarios - should handle conditional functions', () => {
       const code = `
         let dynamicFunction
         
@@ -146,9 +141,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('globalThis.___functionStatistics')
     })
   })
-
-  describe('Performance tests', () => {
-    it('should handle large files efficiently', () => {
+test('Integration Tests - Performance tests - should handle large files efficiently', () => {
       // Generate a large file with many functions
       let code = ''
       for (let i = 0; i < 100; i++) {
@@ -175,7 +168,7 @@ describe('Integration Tests', () => {
       expect(endTime - startTime).toBeLessThan(5000) // Should complete in under 5 seconds
     })
 
-    it('should handle deeply nested function structures', () => {
+test('Integration Tests - Performance tests - should handle deeply nested function structures', () => {
       let code = 'function level0() {\n'
       for (let i = 1; i <= 10; i++) {
         code += '  '.repeat(i) + `function level${i}() {\n`
@@ -190,9 +183,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('globalThis.___functionStatistics')
     })
   })
-
-  describe('Edge cases', () => {
-    it('should handle Unicode and special characters', () => {
+test('Integration Tests - Edge cases - should handle Unicode and special characters', () => {
       const code = `
         function 中文函数() {
           return '中文'
@@ -210,7 +201,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('globalThis.___functionStatistics')
     })
 
-    it('should handle minified code', () => {
+test('Integration Tests - Edge cases - should handle minified code', () => {
       const code = 'function a(){return 1}const b=()=>2;class c{d(){return 3}}'
       
       const transformed = transformCode(code, { filename: 'minified.js' })
@@ -218,7 +209,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('globalThis.___functionStatistics')
     })
 
-    it('should handle comments and whitespace', () => {
+test('Integration Tests - Edge cases - should handle comments and whitespace', () => {
       const code = `
         // This is a comment
         function /* inline comment */ commentedFunction() {
@@ -240,9 +231,7 @@ describe('Integration Tests', () => {
       expect(transformed).toContain('globalThis.___functionStatistics')
     })
   })
-
-  describe('Statistics functionality', () => {
-    it('should accurately track multiple function calls', () => {
+test('Integration Tests - Statistics functionality - should accurately track multiple function calls', () => {
       const code = `
         function counter() {
           return Math.random()
@@ -278,7 +267,7 @@ describe('Integration Tests', () => {
       }
     })
 
-    it('should handle function call ordering', () => {
+test('Integration Tests - Statistics functionality - should handle function call ordering', () => {
       const code = `
         function first() {
           return 'first'

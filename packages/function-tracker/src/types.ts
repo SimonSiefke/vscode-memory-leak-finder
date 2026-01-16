@@ -1,22 +1,22 @@
 export interface FunctionStatistics {
-  [functionName: string]: number
+  readonly [functionName: string]: number
 }
 
 export interface TransformOptions {
-  filename?: string
-  includeLocation?: boolean
-  excludePatterns?: string[]
+  readonly filename?: string
+  readonly includeLocation?: boolean
+  readonly excludePatterns?: string[]
 }
 
 export interface TrackingConfig {
-  enabled: boolean
-  includeLocation: boolean
-  excludePatterns: string[]
+  readonly enabled: boolean
+  readonly includeLocation: boolean
+  readonly excludePatterns: string[]
 }
 
 export interface VSCodeTrackerOptions {
-  headless?: boolean
-  devtools?: boolean
-  remoteDebuggingPort?: number
-  vscodeUrl?: string
+  readonly headless?: boolean
+  readonly devtools?: boolean
+  readonly remoteDebuggingPort?: number
+  readonly vscodeUrl?: string
 }
