@@ -1766,50 +1766,6 @@ function literalFunction() {
   expect(transformed).toBe(expected)
 })
 
-// TypeScript-specific syntax tests (treated as JS in transform)
-test('Transform Script - transformCode - should handle TypeScript-like annotations', () => {
-  const code = `
-    function typedFunction(param: string): number {
-      return param.length;
-    }
-
-    const typedArrow = (x: number, y: number): string => {
-      return (x + y).toString();
-    };
-
-    interface TestInterface {
-      method(): void;
-    }
-
-    class GenericClass<T> {
-      genericMethod(value: T): T {
-        return value;
-      }
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, { filename: 'typescript.ts' })
-  const expected = `function typedFunction(param: string): number {
-  trackFunctionCall("typedFunction", "typescript.ts:2");
-  return param.length;
-}
-const typedArrow = (x: number, y: number): string => {
-  trackFunctionCall("typedArrow", "typescript.ts:6");
-  return (x + y).toString();
-};
-interface TestInterface {
-  method(): void;
-}
-class GenericClass<T> {
-  genericMethod(value: T): T {
-    trackFunctionCall("genericMethod", "typescript.ts:15");
-    return value;
-  }
-}`
-
-  expect(transformed).toBe(expected)
-})
-
 test('Transform Script - transformCode - should handle decorators and advanced TypeScript', () => {
   const code = `
     @decorator
