@@ -105,6 +105,7 @@ test('TransformCodeWithTracking - should transform class methods', () => {
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `class TestClass {
   constructor() {
+    trackFunctionCall(123, 3, 6);
     this.value = 42;
   }
   classMethod() {
@@ -165,7 +166,7 @@ function getFunctionStatistics() {
   return 'stats';
 }
 function regularFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 10, 4);
   return 'regular';
 }`
 
@@ -681,24 +682,26 @@ test('TransformCodeWithTracking - should handle complex class hierarchies', () =
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `class Animal {
   constructor(name) {
+    trackFunctionCall(123, 3, 6);
     this.name = name;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 7, 6);
     return \`\${this.name} makes a sound\`;
   }
 }
 class Dog extends Animal {
   constructor(name, breed) {
+    trackFunctionCall(123, 13, 6);
     super(name);
     this.breed = breed;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 18, 6);
     return \`\${this.name} barks\`;
   }
   static purr() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 22, 6);
     return 'Purring';
   }
 }`
@@ -1107,6 +1110,7 @@ test('Transform Script - transformCode - should transform class methods', () => 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `class TestClass {
   constructor() {
+    trackFunctionCall(123, 3, 6);
     this.value = 42;
   }
   classMethod() {
@@ -1164,7 +1168,7 @@ function getFunctionStatistics() {
   return 'stats';
 }
 function regularFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 10, 4);
   return 'regular';
 }`
 
@@ -1861,38 +1865,41 @@ test('Transform Script - transformCode - should handle complex class hierarchies
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `class Animal {
   constructor(name) {
+    trackFunctionCall(123, 3, 6);
     this.name = name;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 7, 6);
     return \`\${this.name} makes a sound\`;
   }
 }
 class Dog extends Animal {
   constructor(name, breed) {
+    trackFunctionCall(123, 13, 6);
     super(name);
     this.breed = breed;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 18, 6);
     return \`\${this.name} barks\`;
   }
   fetch() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 22, 6);
     return 'Fetching ball';
   }
 }
 class Cat extends Animal {
   constructor(name, color) {
+    trackFunctionCall(123, 28, 6);
     super(name);
     this.color = color;
   }
   speak() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 33, 6);
     return \`\${this.name} meows\`;
   }
   static purr() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 37, 6);
     return 'Purring';
   }
 }`
@@ -2321,6 +2328,7 @@ test('Transform Script - transformCode - should exclude methods in objects and c
 };
 class TestClass {
   constructor() {
+    trackFunctionCall(123, 21, 6);
     this.value = 42;
   }
   publicClassMethod() {
