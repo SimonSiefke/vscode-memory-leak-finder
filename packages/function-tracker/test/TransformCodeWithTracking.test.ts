@@ -1,14 +1,14 @@
 import { test, expect } from '@jest/globals'
 import { transformCodeWithTracking } from '../src/parts/TransformCodeWithTracking/TransformCodeWithTracking.js'
 
-test('TransformCodeWithTracking - should transform function declarations', async () => {
+test('TransformCodeWithTracking - should transform function declarations', () => {
   const code = `
     function testFunction() {
       return 'test'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `function testFunction() {
   trackFunctionCall("testFunction", "test.js:2");
   return 'test';
@@ -17,14 +17,14 @@ test('TransformCodeWithTracking - should transform function declarations', async
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform arrow functions', async () => {
+test('TransformCodeWithTracking - should transform arrow functions', () => {
   const code = `
     const arrowFunction = () => {
       return 'arrow'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `const arrowFunction = () => {
   trackFunctionCall("arrowFunction", "test.js:2");
   return 'arrow';
@@ -33,12 +33,12 @@ test('TransformCodeWithTracking - should transform arrow functions', async () =>
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform concise arrow functions', async () => {
+test('TransformCodeWithTracking - should transform concise arrow functions', () => {
   const code = `
     const conciseArrow = x => x * 2
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `const conciseArrow = x => {
   trackFunctionCall("conciseArrow", "test.js:2");
   return x * 2;
@@ -47,14 +47,14 @@ test('TransformCodeWithTracking - should transform concise arrow functions', asy
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform function expressions', async () => {
+test('TransformCodeWithTracking - should transform function expressions', () => {
   const code = `
     const funcExpression = function() {
       return 'expression'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `const funcExpression = function () {
   trackFunctionCall("funcExpression", "test.js:2");
   return 'expression';
@@ -63,7 +63,7 @@ test('TransformCodeWithTracking - should transform function expressions', async 
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform object methods', async () => {
+test('TransformCodeWithTracking - should transform object methods', () => {
   const code = `
     const obj = {
       method() {
@@ -74,7 +74,7 @@ test('TransformCodeWithTracking - should transform object methods', async () => 
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `const obj = {
   method() {
     return 'method';
@@ -88,7 +88,7 @@ test('TransformCodeWithTracking - should transform object methods', async () => 
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform class methods', async () => {
+test('TransformCodeWithTracking - should transform class methods', () => {
   const code = `
     class TestClass {
       constructor() {
@@ -101,7 +101,7 @@ test('TransformCodeWithTracking - should transform class methods', async () => {
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `class TestClass {
   constructor() {
     this.value = 42;
@@ -115,7 +115,7 @@ test('TransformCodeWithTracking - should transform class methods', async () => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should exclude functions matching exclude patterns', async () => {
+test('TransformCodeWithTracking - should exclude functions matching exclude patterns', () => {
   const code = `
     function testFunction() {
       return 'test'
@@ -126,7 +126,7 @@ test('TransformCodeWithTracking - should exclude functions matching exclude patt
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'test.js',
     excludePatterns: ['private'],
   })
@@ -141,7 +141,7 @@ function privateHelper() {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should not transform tracking functions themselves', async () => {
+test('TransformCodeWithTracking - should not transform tracking functions themselves', () => {
   const code = `
     function trackFunctionCall() {
       return 'tracking'
@@ -156,7 +156,7 @@ test('TransformCodeWithTracking - should not transform tracking functions themse
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `function trackFunctionCall() {
   return 'tracking';
 }
@@ -172,27 +172,27 @@ function regularFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle empty code', async () => {
+test('TransformCodeWithTracking - should handle empty code', () => {
   const code = ''
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   expect(transformed).toBe('')
 })
 
-test('TransformCodeWithTracking - should handle invalid code gracefully', async () => {
+test('TransformCodeWithTracking - should handle invalid code gracefully', () => {
   const code = 'invalid javascript syntax {{{'
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
 
   expect(transformed).toBe(code) // Should return original code
 })
 
-test('TransformCodeWithTracking - should use default filename when not provided', async () => {
+test('TransformCodeWithTracking - should use default filename when not provided', () => {
   const code = `
     function testFunction() {
       return 'test'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code)
+  const transformed = transformCodeWithTracking(code)
   const expected = `function testFunction() {
   trackFunctionCall("testFunction", "unknown:2");
   return 'test';
@@ -201,7 +201,7 @@ test('TransformCodeWithTracking - should use default filename when not provided'
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform IIFE (Immediately Invoked Function Expressions)', async () => {
+test('TransformCodeWithTracking - should transform IIFE (Immediately Invoked Function Expressions)', () => {
   const code = `
     (function() {
       console.log('IIFE executed');
@@ -212,7 +212,7 @@ test('TransformCodeWithTracking - should transform IIFE (Immediately Invoked Fun
     })();
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `(function () {
   trackFunctionCall("anonymous", "test.js:2");
   console.log('IIFE executed');
@@ -225,7 +225,7 @@ test('TransformCodeWithTracking - should transform IIFE (Immediately Invoked Fun
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform Promise constructor callbacks', async () => {
+test('TransformCodeWithTracking - should transform Promise constructor callbacks', () => {
   const code = `
     new Promise((resolve, reject) => {
       resolve('success');
@@ -236,7 +236,7 @@ test('TransformCodeWithTracking - should transform Promise constructor callbacks
     });
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `new Promise((resolve, reject) => {
   trackFunctionCall("anonymous_arrow", "test.js:2");
   resolve('success');
@@ -249,23 +249,23 @@ new Promise(function (resolve, reject) {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform async functions', async () => {
+test('TransformCodeWithTracking - should transform async functions', () => {
   const code = `
     async function asyncFunction() {
       return await fetch('/api/data');
     }
 
-    const asyncArrow = async () => {
+    const asyncArrow =  () => {
       return await Promise.resolve('async arrow');
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `async function asyncFunction() {
   trackFunctionCall("asyncFunction", "test.js:2");
   return await fetch('/api/data');
 }
-const asyncArrow = async () => {
+const asyncArrow =  () => {
   trackFunctionCall("asyncArrow", "test.js:6");
   return await Promise.resolve('async arrow');
 };`
@@ -273,7 +273,7 @@ const asyncArrow = async () => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform generator functions', async () => {
+test('TransformCodeWithTracking - should transform generator functions', () => {
   const code = `
     function* generatorFunction() {
       yield 1;
@@ -285,7 +285,7 @@ test('TransformCodeWithTracking - should transform generator functions', async (
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `function* generatorFunction() {
   trackFunctionCall("generatorFunction", "test.js:2");
   yield 1;
@@ -299,7 +299,7 @@ const generatorArrow = function* () {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform nested functions', async () => {
+test('TransformCodeWithTracking - should transform nested functions', () => {
   const code = `
     function outerFunction() {
       function innerFunction() {
@@ -314,7 +314,7 @@ test('TransformCodeWithTracking - should transform nested functions', async () =
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `function outerFunction() {
   trackFunctionCall("outerFunction", "test.js:2");
   function innerFunction() {
@@ -331,7 +331,7 @@ test('TransformCodeWithTracking - should transform nested functions', async () =
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform functions as parameters', async () => {
+test('TransformCodeWithTracking - should transform functions as parameters', () => {
   const code = `
     setTimeout(function() {
       console.log('timeout callback');
@@ -348,7 +348,7 @@ test('TransformCodeWithTracking - should transform functions as parameters', asy
     [4, 5, 6].filter(item => item > 4);
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `setTimeout(function () {
   trackFunctionCall("anonymous", "test.js:2");
   console.log('timeout callback');
@@ -369,7 +369,7 @@ setInterval(() => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform destructured parameter functions', async () => {
+test('TransformCodeWithTracking - should transform destructured parameter functions', () => {
   const code = `
     function destructuredFunction({ a, b }, [c, d]) {
       return a + b + c + d;
@@ -378,7 +378,7 @@ test('TransformCodeWithTracking - should transform destructured parameter functi
     const arrowDestructured = ({ x, y }) => x + y;
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `function destructuredFunction({
   a,
   b
@@ -397,7 +397,7 @@ const arrowDestructured = ({
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform functions with default parameters', async () => {
+test('TransformCodeWithTracking - should transform functions with default parameters', () => {
   const code = `
     function defaultParams(x = 10, y = 'default') {
       return x + y;
@@ -406,7 +406,7 @@ test('TransformCodeWithTracking - should transform functions with default parame
     const arrowDefault = (a = 5, b = []) => a + b.length;
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `function defaultParams(x = 10, y = 'default') {
   trackFunctionCall("defaultParams", "test.js:2");
   return x + y;
@@ -419,7 +419,7 @@ const arrowDefault = (a = 5, b = []) => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform functions with rest parameters', async () => {
+test('TransformCodeWithTracking - should transform functions with rest parameters', () => {
   const code = `
     function restParams(...args) {
       return args.join(', ');
@@ -428,7 +428,7 @@ test('TransformCodeWithTracking - should transform functions with rest parameter
     const arrowRest = (first, ...rest) => rest.length;
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `function restParams(...args) {
   trackFunctionCall("restParams", "test.js:2");
   return args.join(', ');
@@ -441,7 +441,7 @@ const arrowRest = (first, ...rest) => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should transform functions with complex return statements', async () => {
+test('TransformCodeWithTracking - should transform functions with complex return statements', () => {
   const code = `
     function complexReturn() {
       if (Math.random() > 0.5) {
@@ -460,7 +460,7 @@ test('TransformCodeWithTracking - should transform functions with complex return
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `function complexReturn() {
   trackFunctionCall("complexReturn", "test.js:2");
   if (Math.random() > 0.5) {
@@ -481,7 +481,7 @@ const arrowComplex = () => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle Unicode and special characters', async () => {
+test('TransformCodeWithTracking - should handle Unicode and special characters', () => {
   const code = `
     function 测试函数() {
       return 'Unicode test 🚀';
@@ -494,7 +494,7 @@ test('TransformCodeWithTracking - should handle Unicode and special characters',
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'unicode.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'unicode.js' })
   const expected = `function 测试函数() {
   trackFunctionCall("\u6D4B\u8BD5\u51FD\u6570", "unicode.js:2");
   return 'Unicode test 🚀';
@@ -511,7 +511,7 @@ function special$Chars$_123() {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle comments and directives', async () => {
+test('TransformCodeWithTracking - should handle comments and directives', () => {
   const code = `
     'use strict';
 
@@ -527,7 +527,7 @@ test('TransformCodeWithTracking - should handle comments and directives', async 
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'comments.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'comments.js' })
   const expected = `'use strict';
 
 /* This is a multi-line comment
@@ -544,7 +544,7 @@ function realFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle template literals and complex expressions', async () => {
+test('TransformCodeWithTracking - should handle template literals and complex expressions', () => {
   const code = `
     function templateFunction() {
       const name = 'World';
@@ -557,7 +557,7 @@ test('TransformCodeWithTracking - should handle template literals and complex ex
     });
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'templates.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'templates.js' })
   const expected = `function templateFunction() {
   trackFunctionCall("templateFunction", "templates.js:2");
   const name = 'World';
@@ -580,7 +580,7 @@ const complexArrow = () => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle regex and literals', async () => {
+test('TransformCodeWithTracking - should handle regex and literals', () => {
   const code = `
     function regexFunction() {
       const pattern = /test/gi;
@@ -592,7 +592,7 @@ test('TransformCodeWithTracking - should handle regex and literals', async () =>
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'literals.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'literals.js' })
   const expected = `function regexFunction() {
   trackFunctionCall("regexFunction", "literals.js:2");
   const pattern = /test/gi;
@@ -606,7 +606,7 @@ function literalFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle TypeScript-like annotations', async () => {
+test('TransformCodeWithTracking - should handle TypeScript-like annotations', () => {
   const code = `
     function typedFunction(param: string): number {
       return param.length;
@@ -627,7 +627,7 @@ test('TransformCodeWithTracking - should handle TypeScript-like annotations', as
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'typescript.ts' })
+  const transformed = transformCodeWithTracking(code, { filename: 'typescript.ts' })
   const expected = `function typedFunction(param: string): number {
   trackFunctionCall("typedFunction", "typescript.ts:2");
   return param.length;
@@ -649,7 +649,7 @@ class GenericClass<T> {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle deeply nested function structures', async () => {
+test('TransformCodeWithTracking - should handle deeply nested function structures', () => {
   const code = `
     function level1() {
       function level2() {
@@ -668,7 +668,7 @@ test('TransformCodeWithTracking - should handle deeply nested function structure
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'nested.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'nested.js' })
   const expected = `function level1() {
   trackFunctionCall("level1", "nested.js:2");
   function level2() {
@@ -693,7 +693,7 @@ test('TransformCodeWithTracking - should handle deeply nested function structure
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle complex class hierarchies', async () => {
+test('TransformCodeWithTracking - should handle complex class hierarchies', () => {
   const code = `
     class Animal {
       constructor(name) {
@@ -721,7 +721,7 @@ test('TransformCodeWithTracking - should handle complex class hierarchies', asyn
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'classes.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'classes.js' })
   const expected = `class Animal {
   constructor(name) {
     this.name = name;
@@ -749,7 +749,7 @@ class Dog extends Animal {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle closures and lexical scoping', async () => {
+test('TransformCodeWithTracking - should handle closures and lexical scoping', () => {
   const code = `
     function outerClosure(outerParam) {
       const outerVar = 'outer';
@@ -764,7 +764,7 @@ test('TransformCodeWithTracking - should handle closures and lexical scoping', a
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'closures.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'closures.js' })
   const expected = `function outerClosure(outerParam) {
   trackFunctionCall("outerClosure", "closures.js:2");
   const outerVar = 'outer';
@@ -781,7 +781,7 @@ test('TransformCodeWithTracking - should handle closures and lexical scoping', a
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle higher-order functions and functional programming', async () => {
+test('TransformCodeWithTracking - should handle higher-order functions and functional programming', () => {
   const code = `
     function compose(f, g) {
       return function(x) {
@@ -793,7 +793,7 @@ test('TransformCodeWithTracking - should handle higher-order functions and funct
       fns.reduce((acc, fn) => fn(acc), value);
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'functional.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'functional.js' })
   const expected = `function compose(f, g) {
   trackFunctionCall("compose", "functional.js:2");
   return function (x) {
@@ -815,7 +815,7 @@ const pipe = (...fns) => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle recursive and mutually recursive functions', async () => {
+test('TransformCodeWithTracking - should handle recursive and mutually recursive functions', () => {
   const code = `
     function factorial(n) {
       if (n <= 1) {
@@ -833,7 +833,7 @@ test('TransformCodeWithTracking - should handle recursive and mutually recursive
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'recursive.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'recursive.js' })
   const expected = `function factorial(n) {
   trackFunctionCall("factorial", "recursive.js:2");
   if (n <= 1) {
@@ -854,7 +854,7 @@ const sumRecursive = (arr, index = 0) => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should exclude functions matching multiple patterns', async () => {
+test('TransformCodeWithTracking - should exclude functions matching multiple patterns', () => {
   const code = `
     function publicFunction() {
       return 'public';
@@ -873,7 +873,7 @@ test('TransformCodeWithTracking - should exclude functions matching multiple pat
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'exclude.js',
     excludePatterns: ['private', '_', '$'],
   })
@@ -895,7 +895,7 @@ function $secretMethod() {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle regex-like patterns in exclude', async () => {
+test('TransformCodeWithTracking - should handle regex-like patterns in exclude', () => {
   const code = `
     function handleEvent() {
       return 'event';
@@ -910,7 +910,7 @@ test('TransformCodeWithTracking - should handle regex-like patterns in exclude',
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'regex-exclude.js',
     excludePatterns: ['handle', 'process'],
   })
@@ -928,7 +928,7 @@ function processData() {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should exclude methods in objects and classes', async () => {
+test('TransformCodeWithTracking - should exclude methods in objects and classes', () => {
   const code = `
     const obj = {
       publicMethod() {
@@ -951,7 +951,7 @@ test('TransformCodeWithTracking - should exclude methods in objects and classes'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'exclude-methods.js',
     excludePatterns: ['_'],
   })
@@ -977,7 +977,7 @@ class TestClass {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle case-sensitive exclude patterns', async () => {
+test('TransformCodeWithTracking - should handle case-sensitive exclude patterns', () => {
   const code = `
     function TestFunction() {
       return 'uppercase test';
@@ -988,7 +988,7 @@ test('TransformCodeWithTracking - should handle case-sensitive exclude patterns'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'case-exclude.js',
     excludePatterns: ['test'],
   })
@@ -1004,14 +1004,14 @@ function testfunction() {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle location tracking with different file extensions', async () => {
+test('TransformCodeWithTracking - should handle location tracking with different file extensions', () => {
   const code = `
     function testFunction() {
       return 'test';
     }
   `
 
-  const jsFile = await transformCodeWithTracking(code, { filename: 'script.js' })
+  const jsFile = transformCodeWithTracking(code, { filename: 'script.js' })
   const expected = `function testFunction() {
   trackFunctionCall("testFunction", "script.js:2");
   return 'test';
@@ -1020,14 +1020,14 @@ test('TransformCodeWithTracking - should handle location tracking with different
   expect(jsFile).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should handle location tracking with complex file paths', async () => {
+test('TransformCodeWithTracking - should handle location tracking with complex file paths', () => {
   const code = `
     function testFunction() {
       return 'test';
     }
   `
 
-  const complexPath = await transformCodeWithTracking(code, {
+  const complexPath = transformCodeWithTracking(code, {
     filename: 'src/components/utils/helper.js',
   })
   const expected = `function testFunction() {
@@ -1038,7 +1038,7 @@ test('TransformCodeWithTracking - should handle location tracking with complex f
   expect(complexPath).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform function declarations', async () => {
+test('Transform Script - transformCode - should transform function declarations', () => {
   // Reset global statistics before each test
   if (typeof globalThis !== 'undefined') {
     delete (globalThis as any).___functionStatistics
@@ -1052,7 +1052,7 @@ test('Transform Script - transformCode - should transform function declarations'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1084,14 +1084,14 @@ function testFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform arrow functions', async () => {
+test('Transform Script - transformCode - should transform arrow functions', () => {
   const code = `
     const arrowFunction = () => {
       return 'arrow'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1123,12 +1123,12 @@ const arrowFunction = () => {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform concise arrow functions', async () => {
+test('Transform Script - transformCode - should transform concise arrow functions', () => {
   const code = `
     const conciseArrow = x => x * 2
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1160,14 +1160,14 @@ const conciseArrow = x => {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform function expressions', async () => {
+test('Transform Script - transformCode - should transform function expressions', () => {
   const code = `
     const funcExpression = function() {
       return 'expression'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1199,7 +1199,7 @@ const funcExpression = function () {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform object methods', async () => {
+test('Transform Script - transformCode - should transform object methods', () => {
   const code = `
     const obj = {
       method() {
@@ -1210,7 +1210,7 @@ test('Transform Script - transformCode - should transform object methods', async
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1247,7 +1247,7 @@ const obj = {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform class methods', async () => {
+test('Transform Script - transformCode - should transform class methods', () => {
   const code = `
     class TestClass {
       constructor() {
@@ -1260,7 +1260,7 @@ test('Transform Script - transformCode - should transform class methods', async 
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1296,7 +1296,7 @@ class TestClass {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should exclude functions matching exclude patterns', async () => {
+test('Transform Script - transformCode - should exclude functions matching exclude patterns', () => {
   const code = `
     function testFunction() {
       return 'test'
@@ -1307,7 +1307,7 @@ test('Transform Script - transformCode - should exclude functions matching exclu
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js', excludePatterns: ['private'] })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js', excludePatterns: ['private'] })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1342,7 +1342,7 @@ function privateHelper() {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should not transform tracking functions themselves', async () => {
+test('Transform Script - transformCode - should not transform tracking functions themselves', () => {
   const code = `
     function trackFunctionCall() {
       return 'tracking'
@@ -1357,7 +1357,7 @@ test('Transform Script - transformCode - should not transform tracking functions
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1396,9 +1396,9 @@ function regularFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should handle empty code', async () => {
+test('Transform Script - transformCode - should handle empty code', () => {
   const code = ''
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1426,21 +1426,21 @@ globalThis.resetFunctionStatistics = resetFunctionStatistics;`
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should handle invalid code gracefully', async () => {
+test('Transform Script - transformCode - should handle invalid code gracefully', () => {
   const code = 'invalid javascript syntax {{{'
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
 
   expect(transformed).toBe(code) // Should return original code
 })
 
-test('Transform Script - transformCode - should use default filename when not provided', async () => {
+test('Transform Script - transformCode - should use default filename when not provided', () => {
   const code = `
     function testFunction() {
       return 'test'
     }
   `
 
-  const transformed = await transformCodeWithTracking(code)
+  const transformed = transformCodeWithTracking(code)
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1472,7 +1472,7 @@ function testFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform IIFE (Immediately Invoked Function Expressions)', async () => {
+test('Transform Script - transformCode - should transform IIFE (Immediately Invoked Function Expressions)', () => {
   const code = `
     (function() {
       console.log('IIFE executed');
@@ -1483,7 +1483,7 @@ test('Transform Script - transformCode - should transform IIFE (Immediately Invo
     })();
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1519,7 +1519,7 @@ globalThis.resetFunctionStatistics = resetFunctionStatistics;
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform Promise constructor callbacks', async () => {
+test('Transform Script - transformCode - should transform Promise constructor callbacks', () => {
   const code = `
     new Promise((resolve, reject) => {
       resolve('success');
@@ -1530,7 +1530,7 @@ test('Transform Script - transformCode - should transform Promise constructor ca
     });
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1566,18 +1566,18 @@ new Promise(function (resolve, reject) {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform async functions', async () => {
+test('Transform Script - transformCode - should transform async functions', () => {
   const code = `
     async function asyncFunction() {
       return await fetch('/api/data');
     }
 
-    const asyncArrow = async () => {
+    const asyncArrow =  () => {
       return await Promise.resolve('async arrow');
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1605,7 +1605,7 @@ async function asyncFunction() {
   trackFunctionCall("asyncFunction", "test.js:2");
   return await fetch('/api/data');
 }
-const asyncArrow = async () => {
+const asyncArrow =  () => {
   trackFunctionCall("asyncArrow", "test.js:6");
   return await Promise.resolve('async arrow');
 };`
@@ -1613,7 +1613,7 @@ const asyncArrow = async () => {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform generator functions', async () => {
+test('Transform Script - transformCode - should transform generator functions', () => {
   const code = `
     function* generatorFunction() {
       yield 1;
@@ -1625,7 +1625,7 @@ test('Transform Script - transformCode - should transform generator functions', 
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1662,7 +1662,7 @@ const generatorArrow = function* () {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform computed property methods', async () => {
+test('Transform Script - transformCode - should transform computed property methods', () => {
   const code = `
     const methodName = 'dynamicMethod';
     const obj = {
@@ -1675,7 +1675,7 @@ test('Transform Script - transformCode - should transform computed property meth
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1712,7 +1712,7 @@ const obj = {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform Symbol methods', async () => {
+test('Transform Script - transformCode - should transform Symbol methods', () => {
   const code = `
     const obj = {
       [Symbol.iterator]() {
@@ -1724,7 +1724,7 @@ test('Transform Script - transformCode - should transform Symbol methods', async
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1768,7 +1768,7 @@ const obj = {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform class property methods', async () => {
+test('Transform Script - transformCode - should transform class property methods', () => {
   const code = `
     class TestClass {
       propertyMethod = () => {
@@ -1789,7 +1789,7 @@ test('Transform Script - transformCode - should transform class property methods
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1834,7 +1834,7 @@ class TestClass {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform nested functions', async () => {
+test('Transform Script - transformCode - should transform nested functions', () => {
   const code = `
     function outerFunction() {
       function innerFunction() {
@@ -1849,7 +1849,7 @@ test('Transform Script - transformCode - should transform nested functions', asy
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1889,7 +1889,7 @@ function outerFunction() {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform functions as parameters', async () => {
+test('Transform Script - transformCode - should transform functions as parameters', () => {
   const code = `
     setTimeout(function() {
       console.log('timeout callback');
@@ -1906,7 +1906,7 @@ test('Transform Script - transformCode - should transform functions as parameter
     [4, 5, 6].filter(item => item > 4);
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -1950,7 +1950,7 @@ setInterval(() => {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform destructured parameter functions', async () => {
+test('Transform Script - transformCode - should transform destructured parameter functions', () => {
   const code = `
     function destructuredFunction({ a, b }, [c, d]) {
       return a + b + c + d;
@@ -1959,7 +1959,7 @@ test('Transform Script - transformCode - should transform destructured parameter
     const arrowDestructured = ({ x, y }) => x + y;
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -2001,7 +2001,7 @@ const arrowDestructured = ({
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform functions with default parameters', async () => {
+test('Transform Script - transformCode - should transform functions with default parameters', () => {
   const code = `
     function defaultParams(x = 10, y = 'default') {
       return x + y;
@@ -2010,7 +2010,7 @@ test('Transform Script - transformCode - should transform functions with default
     const arrowDefault = (a = 5, b = []) => a + b.length;
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -2046,7 +2046,7 @@ const arrowDefault = (a = 5, b = []) => {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform functions with rest parameters', async () => {
+test('Transform Script - transformCode - should transform functions with rest parameters', () => {
   const code = `
     function restParams(...args) {
       return args.join(', ');
@@ -2055,7 +2055,7 @@ test('Transform Script - transformCode - should transform functions with rest pa
     const arrowRest = (first, ...rest) => rest.length;
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -2091,7 +2091,7 @@ const arrowRest = (first, ...rest) => {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should transform functions with complex return statements', async () => {
+test('Transform Script - transformCode - should transform functions with complex return statements', () => {
   const code = `
     function complexReturn() {
       if (Math.random() > 0.5) {
@@ -2110,7 +2110,7 @@ test('Transform Script - transformCode - should transform functions with complex
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `// Function call tracking system
 if (!globalThis.___functionStatistics) {
   globalThis.___functionStatistics = new Map();
@@ -2155,12 +2155,12 @@ const arrowComplex = () => {
 })
 
 // Edge cases and error handling tests
-test('Transform Script - transformCode - should handle null/undefined input', async () => {
-  const transformedNull = await transformCodeWithTracking(null as any)
+test('Transform Script - transformCode - should handle null/undefined input', () => {
+  const transformedNull = transformCodeWithTracking(null as any)
   expect(transformedNull).toBe('Function call tracking system')
 })
 
-test('Transform Script - transformCode - should handle very large files', async () => {
+test('Transform Script - transformCode - should handle very large files', () => {
   const largeCode = `
     function func${'1'.repeat(100)}() { return 'large'; }
     ${Array.from(
@@ -2176,12 +2176,12 @@ test('Transform Script - transformCode - should handle very large files', async 
     ).join('')}
   `
 
-  const transformed = await transformCodeWithTracking(largeCode, { filename: 'large.js' })
+  const transformed = transformCodeWithTracking(largeCode, { filename: 'large.js' })
 
   expect(transformed).toBe('trackFunctionCall')
 })
 
-test('Transform Script - transformCode - should handle Unicode and special characters', async () => {
+test('Transform Script - transformCode - should handle Unicode and special characters', () => {
   const code = `
     function 测试函数() {
       return 'Unicode test 🚀';
@@ -2194,12 +2194,12 @@ test('Transform Script - transformCode - should handle Unicode and special chara
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'unicode.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'unicode.js' })
 
   expect(transformed).toBe('trackFunctionCall')
 })
 
-test('Transform Script - transformCode - should handle comments and directives', async () => {
+test('Transform Script - transformCode - should handle comments and directives', () => {
   const code = `
     'use strict';
 
@@ -2215,12 +2215,12 @@ test('Transform Script - transformCode - should handle comments and directives',
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'comments.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'comments.js' })
 
   expect(transformed).toBe("'use strict'")
 })
 
-test('Transform Script - transformCode - should handle template literals and complex expressions', async () => {
+test('Transform Script - transformCode - should handle template literals and complex expressions', () => {
   const code = `
     function templateFunction() {
       const name = 'World';
@@ -2233,14 +2233,14 @@ test('Transform Script - transformCode - should handle template literals and com
     });
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'templates.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'templates.js' })
 
   expect(transformed).toContain('trackFunctionCall("templateFunction"')
   expect(transformed).toContain('trackFunctionCall("complexArrow"')
   expect(transformed).toContain('trackFunctionCall("regular"')
 })
 
-test('Transform Script - transformCode - should handle regex and literals', async () => {
+test('Transform Script - transformCode - should handle regex and literals', () => {
   const code = `
     function regexFunction() {
       const pattern = /test/gi;
@@ -2252,7 +2252,7 @@ test('Transform Script - transformCode - should handle regex and literals', asyn
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'literals.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'literals.js' })
 
   expect(transformed).toContain('trackFunctionCall("regexFunction"')
   expect(transformed).toContain('trackFunctionCall("literalFunction"')
@@ -2261,7 +2261,7 @@ test('Transform Script - transformCode - should handle regex and literals', asyn
 })
 
 // TypeScript-specific syntax tests (treated as JS in transform)
-test('Transform Script - transformCode - should handle TypeScript-like annotations', async () => {
+test('Transform Script - transformCode - should handle TypeScript-like annotations', () => {
   const code = `
     function typedFunction(param: string): number {
       return param.length;
@@ -2282,7 +2282,7 @@ test('Transform Script - transformCode - should handle TypeScript-like annotatio
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'typescript.ts' })
+  const transformed = transformCodeWithTracking(code, { filename: 'typescript.ts' })
 
   expect(transformed).toContain('trackFunctionCall("typedFunction"')
   expect(transformed).toContain('trackFunctionCall("typedArrow"')
@@ -2292,7 +2292,7 @@ test('Transform Script - transformCode - should handle TypeScript-like annotatio
   expect(transformed).toContain('<T>')
 })
 
-test('Transform Script - transformCode - should handle decorators and advanced TypeScript', async () => {
+test('Transform Script - transformCode - should handle decorators and advanced TypeScript', () => {
   const code = `
     @decorator
     class DecoratedClass {
@@ -2320,7 +2320,7 @@ test('Transform Script - transformCode - should handle decorators and advanced T
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'decorators.ts' })
+  const transformed = transformCodeWithTracking(code, { filename: 'decorators.ts' })
 
   expect(transformed).toContain('trackFunctionCall("decorator"')
   expect(transformed).toContain('trackFunctionCall("logged"')
@@ -2330,7 +2330,7 @@ test('Transform Script - transformCode - should handle decorators and advanced T
   expect(transformed).toContain('@deprecated')
 })
 
-test('Transform Script - transformCode - should handle enums and namespaces', async () => {
+test('Transform Script - transformCode - should handle enums and namespaces', () => {
   const code = `
     enum Color {
       Red = 'red',
@@ -2347,7 +2347,7 @@ test('Transform Script - transformCode - should handle enums and namespaces', as
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'enums.ts' })
+  const transformed = transformCodeWithTracking(code, { filename: 'enums.ts' })
 
   expect(transformed).toContain('trackFunctionCall("namespaceFunction"')
   expect(transformed).toContain('trackFunctionCall("namespaceArrow"')
@@ -2355,7 +2355,7 @@ test('Transform Script - transformCode - should handle enums and namespaces', as
   expect(transformed).toContain('namespace MyNamespace')
 })
 
-test('Transform Script - transformCode - should handle type aliases and utility types', async () => {
+test('Transform Script - transformCode - should handle type aliases and utility types', () => {
   const code = `
     type StringOrNumber = string | number;
 
@@ -2370,7 +2370,7 @@ test('Transform Script - transformCode - should handle type aliases and utility 
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'types.ts' })
+  const transformed = transformCodeWithTracking(code, { filename: 'types.ts' })
 
   expect(transformed).toContain('trackFunctionCall("genericFunction"')
   expect(transformed).toContain('trackFunctionCall("utilityArrow"')
@@ -2380,7 +2380,7 @@ test('Transform Script - transformCode - should handle type aliases and utility 
 })
 
 // Complex nested scenarios tests
-test('Transform Script - transformCode - should handle deeply nested function structures', async () => {
+test('Transform Script - transformCode - should handle deeply nested function structures', () => {
   const code = `
     function level1() {
       function level2() {
@@ -2410,7 +2410,7 @@ test('Transform Script - transformCode - should handle deeply nested function st
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'nested.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'nested.js' })
 
   expect(transformed).toContain('trackFunctionCall("level1"')
   expect(transformed).toContain('trackFunctionCall("level2"')
@@ -2423,7 +2423,7 @@ test('Transform Script - transformCode - should handle deeply nested function st
   expect(transformed).toContain('trackFunctionCall("inner3"')
 })
 
-test('Transform Script - transformCode - should handle complex class hierarchies', async () => {
+test('Transform Script - transformCode - should handle complex class hierarchies', () => {
   const code = `
     class Animal {
       constructor(name) {
@@ -2466,7 +2466,7 @@ test('Transform Script - transformCode - should handle complex class hierarchies
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'classes.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'classes.js' })
 
   expect(transformed).toContain('trackFunctionCall("speak"')
   expect(transformed).toContain('trackFunctionCall("fetch"')
@@ -2476,7 +2476,7 @@ test('Transform Script - transformCode - should handle complex class hierarchies
   expect(transformed).toContain('class Cat extends Animal')
 })
 
-test('Transform Script - transformCode - should handle closures and lexical scoping', async () => {
+test('Transform Script - transformCode - should handle closures and lexical scoping', () => {
   const code = `
     function outerClosure(outerParam) {
       const outerVar = 'outer';
@@ -2509,7 +2509,7 @@ test('Transform Script - transformCode - should handle closures and lexical scop
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'closures.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'closures.js' })
 
   expect(transformed).toContain('trackFunctionCall("outerClosure"')
   expect(transformed).toContain('trackFunctionCall("innerClosure"')
@@ -2520,7 +2520,7 @@ test('Transform Script - transformCode - should handle closures and lexical scop
   expect(transformed).toContain('trackFunctionCall("getCount"')
 })
 
-test('Transform Script - transformCode - should handle higher-order functions and functional programming', async () => {
+test('Transform Script - transformCode - should handle higher-order functions and functional programming', () => {
   const code = `
     function compose(f, g) {
       return function(x) {
@@ -2558,7 +2558,7 @@ test('Transform Script - transformCode - should handle higher-order functions an
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'functional.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'functional.js' })
 
   expect(transformed).toContain('trackFunctionCall("compose"')
   expect(transformed).toContain('trackFunctionCall("curry"')
@@ -2567,7 +2567,7 @@ test('Transform Script - transformCode - should handle higher-order functions an
   expect(transformed).toContain('trackFunctionCall("pipe"')
 })
 
-test('Transform Script - transformCode - should handle recursive and mutually recursive functions', async () => {
+test('Transform Script - transformCode - should handle recursive and mutually recursive functions', () => {
   const code = `
     function factorial(n) {
       if (n <= 1) {
@@ -2607,7 +2607,7 @@ test('Transform Script - transformCode - should handle recursive and mutually re
     };
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'recursive.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'recursive.js' })
 
   expect(transformed).toContain('trackFunctionCall("factorial"')
   expect(transformed).toContain('trackFunctionCall("fibonacci"')
@@ -2617,7 +2617,7 @@ test('Transform Script - transformCode - should handle recursive and mutually re
 })
 
 // Exclude patterns functionality tests
-test('Transform Script - transformCode - should exclude functions matching multiple patterns', async () => {
+test('Transform Script - transformCode - should exclude functions matching multiple patterns', () => {
   const code = `
     function publicFunction() {
       return 'public';
@@ -2640,7 +2640,7 @@ test('Transform Script - transformCode - should exclude functions matching multi
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'exclude.js',
     excludePatterns: ['private', '_', '$', 'test'],
   })
@@ -2652,14 +2652,14 @@ test('Transform Script - transformCode - should exclude functions matching multi
   expect(transformed).not.toContain('trackFunctionCall("testFunction"')
 })
 
-test('Transform Script - transformCode - should handle empty exclude patterns array', async () => {
+test('Transform Script - transformCode - should handle empty exclude patterns array', () => {
   const code = `
     function function1() { return '1'; }
     function function2() { return '2'; }
     const arrow = () => 'arrow';
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'no-exclude.js',
     excludePatterns: [],
   })
@@ -2669,7 +2669,7 @@ test('Transform Script - transformCode - should handle empty exclude patterns ar
   expect(transformed).toContain('trackFunctionCall("arrow"')
 })
 
-test('Transform Script - transformCode - should handle regex-like patterns in exclude', async () => {
+test('Transform Script - transformCode - should handle regex-like patterns in exclude', () => {
   const code = `
     function handleEvent() {
       return 'event';
@@ -2692,7 +2692,7 @@ test('Transform Script - transformCode - should handle regex-like patterns in ex
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'regex-exclude.js',
     excludePatterns: ['handle', 'process', 'validate'],
   })
@@ -2704,7 +2704,7 @@ test('Transform Script - transformCode - should handle regex-like patterns in ex
   expect(transformed).not.toContain('trackFunctionCall("validateInput"')
 })
 
-test('Transform Script - transformCode - should exclude methods in objects and classes', async () => {
+test('Transform Script - transformCode - should exclude methods in objects and classes', () => {
   const code = `
     const obj = {
       publicMethod() {
@@ -2743,7 +2743,7 @@ test('Transform Script - transformCode - should exclude methods in objects and c
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'exclude-methods.js',
     excludePatterns: ['_', '$', 'test'],
   })
@@ -2757,7 +2757,7 @@ test('Transform Script - transformCode - should exclude methods in objects and c
   expect(transformed).not.toContain('trackFunctionCall("testStatic"')
 })
 
-test('Transform Script - transformCode - should handle case-sensitive exclude patterns', async () => {
+test('Transform Script - transformCode - should handle case-sensitive exclude patterns', () => {
   const code = `
     function TestFunction() {
       return 'uppercase test';
@@ -2776,7 +2776,7 @@ test('Transform Script - transformCode - should handle case-sensitive exclude pa
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, {
+  const transformed = transformCodeWithTracking(code, {
     filename: 'case-exclude.js',
     excludePatterns: ['test'],
   })
@@ -2788,31 +2788,31 @@ test('Transform Script - transformCode - should handle case-sensitive exclude pa
 })
 
 // Location tracking options tests
-test('Transform Script - transformCode - should include location information by default', async () => {
+test('Transform Script - transformCode - should include location information by default', () => {
   const code = `
     function testFunction() {
       return 'test';
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'location-test.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'location-test.js' })
 
   expect(transformed).toContain('trackFunctionCall("testFunction", "location-test.js:2")')
 })
 
-test('Transform Script - transformCode - should handle includeLocation option explicitly', async () => {
+test('Transform Script - transformCode - should handle includeLocation option explicitly', () => {
   const code = `
     function testFunction() {
       return 'test';
     }
   `
 
-  const transformedWithLocation = await transformCodeWithTracking(code, {
+  const transformedWithLocation = transformCodeWithTracking(code, {
     filename: 'location-true.js',
     includeLocation: true,
   })
 
-  const transformedWithoutLocation = await transformCodeWithTracking(code, {
+  const transformedWithoutLocation = transformCodeWithTracking(code, {
     filename: 'location-false.js',
     includeLocation: false,
   })
@@ -2822,18 +2822,18 @@ test('Transform Script - transformCode - should handle includeLocation option ex
   expect(transformedWithoutLocation).not.toContain('trackFunctionCall("testFunction",')
 })
 
-test('Transform Script - transformCode - should handle location tracking with different file extensions', async () => {
+test('Transform Script - transformCode - should handle location tracking with different file extensions', () => {
   const code = `
     function testFunction() {
       return 'test';
     }
   `
 
-  const jsFile = await transformCodeWithTracking(code, { filename: 'script.js' })
-  const tsFile = await transformCodeWithTracking(code, { filename: 'module.ts' })
-  const jsxFile = await transformCodeWithTracking(code, { filename: 'component.jsx' })
-  const tsxFile = await transformCodeWithTracking(code, { filename: 'component.tsx' })
-  const mjsFile = await transformCodeWithTracking(code, { filename: 'module.mjs' })
+  const jsFile = transformCodeWithTracking(code, { filename: 'script.js' })
+  const tsFile = transformCodeWithTracking(code, { filename: 'module.ts' })
+  const jsxFile = transformCodeWithTracking(code, { filename: 'component.jsx' })
+  const tsxFile = transformCodeWithTracking(code, { filename: 'component.tsx' })
+  const mjsFile = transformCodeWithTracking(code, { filename: 'module.mjs' })
 
   expect(jsFile).toContain('trackFunctionCall("testFunction", "script.js:2")')
   expect(tsFile).toContain('trackFunctionCall("testFunction", "module.ts:2")')
@@ -2842,22 +2842,22 @@ test('Transform Script - transformCode - should handle location tracking with di
   expect(mjsFile).toContain('trackFunctionCall("testFunction", "module.mjs:2")')
 })
 
-test('Transform Script - transformCode - should handle location tracking with complex file paths', async () => {
+test('Transform Script - transformCode - should handle location tracking with complex file paths', () => {
   const code = `
     function testFunction() {
       return 'test';
     }
   `
 
-  const complexPath = await transformCodeWithTracking(code, {
+  const complexPath = transformCodeWithTracking(code, {
     filename: 'src/components/utils/helper.js',
   })
 
-  const nestedPath = await transformCodeWithTracking(code, {
+  const nestedPath = transformCodeWithTracking(code, {
     filename: '/home/user/project/lib/module.ts',
   })
 
-  const relativePath = await transformCodeWithTracking(code, {
+  const relativePath = transformCodeWithTracking(code, {
     filename: './dist/bundle.min.js',
   })
 
@@ -2866,23 +2866,23 @@ test('Transform Script - transformCode - should handle location tracking with co
   expect(relativePath).toContain('trackFunctionCall("testFunction", "./dist/bundle.min.js:2")')
 })
 
-test('Transform Script - transformCode - should handle location tracking with special characters in filename', async () => {
+test('Transform Script - transformCode - should handle location tracking with special characters in filename', () => {
   const code = `
     function testFunction() {
       return 'test';
     }
   `
 
-  const spacesFile = await transformCodeWithTracking(code, { filename: 'file with spaces.js' })
-  const unicodeFile = await transformCodeWithTracking(code, { filename: 'файл.js' })
-  const emojiFile = await transformCodeWithTracking(code, { filename: '🚀launch.js' })
+  const spacesFile = transformCodeWithTracking(code, { filename: 'file with spaces.js' })
+  const unicodeFile = transformCodeWithTracking(code, { filename: 'файл.js' })
+  const emojiFile = transformCodeWithTracking(code, { filename: '🚀launch.js' })
 
   expect(spacesFile).toContain('trackFunctionCall("testFunction", "file with spaces.js:2")')
   expect(unicodeFile).toContain('trackFunctionCall("testFunction", "файл.js:2")')
   expect(emojiFile).toContain('trackFunctionCall("testFunction", "🚀launch.js:2")')
 })
 
-test('Transform Script - transformCode - should handle location tracking with multiple functions', async () => {
+test('Transform Script - transformCode - should handle location tracking with multiple functions', () => {
   const code = `
     function firstFunction() {
       return 'first';
@@ -2897,7 +2897,7 @@ test('Transform Script - transformCode - should handle location tracking with mu
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'multi-location.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'multi-location.js' })
 
   expect(transformed).toContain('trackFunctionCall("firstFunction", "multi-location.js:2")')
   expect(transformed).toContain('trackFunctionCall("secondFunction", "multi-location.js:7")')
@@ -2905,7 +2905,7 @@ test('Transform Script - transformCode - should handle location tracking with mu
 })
 
 // Additional edge case tests
-test('Transform Script - transformCode - should handle functions with special characters in names', async () => {
+test('Transform Script - transformCode - should handle functions with special characters in names', () => {
   const code = `
     function $jquery() {
       return 'jquery';
@@ -2920,14 +2920,14 @@ test('Transform Script - transformCode - should handle functions with special ch
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'special-chars.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'special-chars.js' })
 
   expect(transformed).toContain('trackFunctionCall("$jquery"')
   expect(transformed).toContain('trackFunctionCall("_private"')
   expect(transformed).toContain('trackFunctionCall("camelCase"')
 })
 
-test('Transform Script - transformCode - should handle functions with Unicode characters', async () => {
+test('Transform Script - transformCode - should handle functions with Unicode characters', () => {
   const code = `
     function español() {
       return 'español';
@@ -2942,14 +2942,14 @@ test('Transform Script - transformCode - should handle functions with Unicode ch
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'unicode.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'unicode.js' })
 
   expect(transformed).toContain('trackFunctionCall("español"')
   expect(transformed).toContain('trackFunctionCall("русский"')
   expect(transformed).toContain('trackFunctionCall("日本語"')
 })
 
-test('Transform Script - transformCode - should handle mixed function types in same scope', async () => {
+test('Transform Script - transformCode - should handle mixed function types in same scope', () => {
   const code = `
     function declaration() {
       return 'declaration';
@@ -2976,7 +2976,7 @@ test('Transform Script - transformCode - should handle mixed function types in s
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'mixed.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'mixed.js' })
 
   expect(transformed).toContain('trackFunctionCall("declaration"')
   expect(transformed).toContain('trackFunctionCall("expression"')
@@ -2986,7 +2986,7 @@ test('Transform Script - transformCode - should handle mixed function types in s
   expect(transformed).toContain('trackFunctionCall("staticMethod"')
 })
 
-test('Transform Script - transformCode - should handle functions in various contexts', async () => {
+test('Transform Script - transformCode - should handle functions in various contexts', () => {
   const code = `
     // Global scope
     function globalFunction() {
@@ -3021,7 +3021,7 @@ test('Transform Script - transformCode - should handle functions in various cont
     }, 1000);
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'contexts.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'contexts.js' })
 
   expect(transformed).toContain('trackFunctionCall("globalFunction"')
   expect(transformed).toContain('trackFunctionCall("propertyFunction"')
@@ -3032,7 +3032,7 @@ test('Transform Script - transformCode - should handle functions in various cont
   expect(transformed).toContain('trackFunctionCall("anonymous"') // For setTimeout callback
 })
 
-test('Transform Script - transformCode - should handle complex parameter patterns', async () => {
+test('Transform Script - transformCode - should handle complex parameter patterns', () => {
   const code = `
     function simpleParams(a, b, c) {
       return a + b + c;
@@ -3053,7 +3053,7 @@ test('Transform Script - transformCode - should handle complex parameter pattern
     const arrowWithParams = (x, y = 5, ...z) => x + y + z.length;
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'params.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'params.js' })
 
   expect(transformed).toContain('trackFunctionCall("simpleParams"')
   expect(transformed).toContain('trackFunctionCall("defaultParams"')
@@ -3062,13 +3062,13 @@ test('Transform Script - transformCode - should handle complex parameter pattern
   expect(transformed).toContain('trackFunctionCall("arrowWithParams"')
 })
 
-test('Transform Script - transformCode - should handle async and generator functions', async () => {
+test('Transform Script - transformCode - should handle async and generator functions', () => {
   const code = `
     async function asyncFunction() {
       return await Promise.resolve('async');
     }
 
-    const asyncArrow = async () => {
+    const asyncArrow =  () => {
       return await fetch('/api/data');
     };
 
@@ -3088,7 +3088,7 @@ test('Transform Script - transformCode - should handle async and generator funct
     }
   `
 
-  const transformed = await transformCodeWithTracking(code, { filename: 'async-generator.js' })
+  const transformed = transformCodeWithTracking(code, { filename: 'async-generator.js' })
 
   expect(transformed).toContain('trackFunctionCall("asyncFunction"')
   expect(transformed).toContain('trackFunctionCall("asyncArrow"')

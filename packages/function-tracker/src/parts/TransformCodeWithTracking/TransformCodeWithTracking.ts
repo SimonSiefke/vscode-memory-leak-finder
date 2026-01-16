@@ -4,6 +4,7 @@ import generate from '@babel/generator'
 import { TransformOptions } from '../Types/Types.js'
 import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.js'
 
+// @ts-ignore
 const parser2 = (parser.default || parser) as typeof import('@babel/parser')
 const traverse2 = (traverse.default || traverse) as typeof import('@babel/traverse').default
 const generate2 = (generate.default || generate) as typeof import('@babel/generator').default
