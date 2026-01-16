@@ -2100,9 +2100,8 @@ test('Transform Script - transformCode - should handle recursive and mutually re
   }
   return n * factorial(n - 1);
 }
-
 function fibonacci(n) {
-  trackFunctionCall("fibonacci", "recursive.js:8");
+  trackFunctionCall("fibonacci", "recursive.js:9");
   if (n <= 1) {
     return n;
   }
@@ -2111,15 +2110,14 @@ function fibonacci(n) {
 
 // Mutually recursive functions
 function isEven(n) {
-  trackFunctionCall("isEven", "recursive.js:16");
+  trackFunctionCall("isEven", "recursive.js:17");
   if (n === 0) {
     return true;
   }
   return isOdd(n - 1);
 }
-
 function isOdd(n) {
-  trackFunctionCall("isOdd", "recursive.js:21");
+  trackFunctionCall("isOdd", "recursive.js:24");
   if (n === 0) {
     return false;
   }
@@ -2128,7 +2126,7 @@ function isOdd(n) {
 
 // Recursive arrow function
 const sumRecursive = (arr, index = 0) => {
-  trackFunctionCall("sumRecursive", "recursive.js:28");
+  trackFunctionCall("sumRecursive", "recursive.js:32");
   if (index >= arr.length) {
     return 0;
   }
@@ -2332,7 +2330,7 @@ class TestClass {
     this.value = 42;
   }
   publicClassMethod() {
-    trackFunctionCall("publicClassMethod", "exclude-methods.js:17");
+    trackFunctionCall("publicClassMethod", "exclude-methods.js:25");
     return this.value;
   }
   _privateClassMethod() {
@@ -2373,17 +2371,16 @@ function TESTFUNCTION() {
     excludePatterns: ['test'],
   })
   const expected = `function TestFunction() {
-  trackFunctionCall("TestFunction", "case-exclude.js:2");
+  trackFunctionCall("TestFunction", "case-exclude.js:1");
   return 'uppercase test';
 }
 function testfunction() {
   return 'lowercase test';
 }
 function TESTFUNCTION() {
-  trackFunctionCall("TESTFUNCTION", "case-exclude.js:8");
+  trackFunctionCall("TESTFUNCTION", "case-exclude.js:9");
   return 'all caps test';
-}
-`
+}`
 
   expect(transformed).toBe(expected)
   expect(transformed).toContain('trackFunctionCall("TestFunction"')
@@ -2566,15 +2563,15 @@ test('Transform Script - transformCode - should handle functions with Unicode ch
 
   const transformed = transformCodeWithTracking(code, { filename: 'unicode.js' })
   const expected = `function español() {
-  trackFunctionCall("español", "unicode.js:2");
+  trackFunctionCall("espa\xF1ol", "unicode.js:2");
   return 'español';
 }
 function русский() {
-  trackFunctionCall("русский", "unicode.js:6");
+  trackFunctionCall("\u0440\u0443\u0441\u0441\u043A\u0438\u0439", "unicode.js:6");
   return 'русский';
 }
 function 日本語() {
-  trackFunctionCall("日本語", "unicode.js:10");
+  trackFunctionCall("\u65E5\u672C\u8A9E", "unicode.js:10");
   return '日本語';
 }`
 
