@@ -116,7 +116,7 @@ test('Integration Tests - Real-world scenarios - should handle generator functio
     }
   `
   
-  const transformed = transformCode(code, { filename: 'generator.ts' })
+  const transformed = transformCode(code, 'generator.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
@@ -139,7 +139,7 @@ test('Integration Tests - Real-world scenarios - should handle destructuring and
     }
   `
   
-  const transformed = transformCode(code, { filename: 'destructuring.ts' })
+  const transformed = transformCode(code, 'destructuring.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
@@ -173,7 +173,7 @@ test('Integration Tests - Real-world scenarios - should handle conditional funct
     }
   `
   
-  const transformed = transformCode(code, { filename: 'conditional.ts' })
+  const transformed = transformCode(code, 'conditional.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
@@ -205,7 +205,7 @@ test('Integration Tests - Performance tests - should handle large files efficien
   }
   
   const startTime = Date.now()
-  const transformed = transformCode(code, { filename: 'large.js' })
+  const transformed = transformCode(code, 'large.js')
   const endTime = Date.now()
   
   expect(transformed).toContain('globalThis.___functionStatistics')

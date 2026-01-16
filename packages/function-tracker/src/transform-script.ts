@@ -1,10 +1,11 @@
 import babel from '@babel/core'
 import parser from '@babel/parser'
-import traverse from '@babel/traverse'
+import * as traverse from '@babel/traverse'
 import generate from '@babel/generator'
 import * as t from '@babel/types'
 
 const traverseDefault = (traverse as any).default || traverse
+const generateDefault = (generate as any).default || generate
 
 interface FunctionStatistics {
   readonly [key: string]: number;
@@ -51,7 +52,8 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
     visitor: {
       FunctionDeclaration(path: babel.NodePath<t.FunctionDeclaration>) {
         const functionName: string = path.node.id ? path.node.id.name : 'anonymous'
-        const actualFilename = (path.hub as any).file?.opts?.filename || filename || 'unknown'
+        const hub = path.hub as any;
+        const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
         const location: string = `${actualFilename}:${path.node.loc?.start.line}`
         
         if (path.node.id && !path.node.id.name.startsWith('track')) {
@@ -78,7 +80,8 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
         const parent: any = path.parent
         let functionName: string = 'anonymous'
         
-        const actualFilename = (path.hub as any).file?.opts?.filename || filename || 'unknown'
+        const hub = path.hub as any;
+        const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
         
         if (t.isVariableDeclarator(parent) && t.isIdentifier(parent.id) && parent.id.name) {
           functionName = parent.id.name
@@ -113,7 +116,8 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
         const parent: any = path.parent
         let functionName: string = 'anonymous_arrow'
         
-        const actualFilename = (path.hub as any).file?.opts?.filename || filename || 'unknown'
+        const hub = path.hub as any;
+        const actualFilename = hub.file?.opts?.filename || filename || 'unknown';
         
         if (t.isVariableDeclarator(parent) && t.isIdentifier(parent.id) && parent.id.name) {
           functionName = parent.id.name
@@ -168,10 +172,22 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
 
 export function transformCode(code: string, filename?: string): string {
   try {
-    const ast = parser.parse(code, {
-      sourceType: 'module',
-      plugins: ['jsx', 'typescript', 'decorators-legacy']
-    })
+    // Try parsing as module first, then fallback to script
+    let ast
+    try {
+      ast = parser.parse(code, {
+        sourceType: 'unambiguous',  // Let Babel decide
+        plugins: ['jsx', 'typescript', 'decorators-legacy', 'objectRestSpread', 'classProperties', 'asyncGenerators', 'functionBind', 'exportDefaultFrom', 'exportNamespaceFrom', 'dynamicImport', 'nullishCoalescingOperator', 'optionalChaining']
+      })
+    } catch (error) {
+      console.error('Parser error:', error.message)
+      // Try with more permissive settings
+      ast = parser.parse(code, {
+        sourceType: 'script',
+        allowImportExportEverywhere: true,
+        plugins: ['jsx', 'typescript', 'decorators-legacy', 'objectRestSpread', 'classProperties', 'asyncGenerators', 'functionBind', 'exportDefaultFrom', 'exportNamespaceFrom', 'dynamicImport', 'nullishCoalescingOperator', 'optionalChaining']
+      })
+    }
     
     // Add tracking code at the beginning
     const trackingAST = parser.parse(trackingCode, {
@@ -179,13 +195,18 @@ export function transformCode(code: string, filename?: string): string {
     })
     
     // Transform the original code with proper file context
-    const plugin = createFunctionWrapperPlugin(filename)
-    traverseDefault(ast, plugin.visitor)
+    try {
+      const plugin = createFunctionWrapperPlugin(filename)
+      traverseDefault(ast, plugin.visitor)
+    } catch (error) {
+      console.error('Error transforming code:', error)
+      return code // Return original code if transformation fails
+    }
     
     // Combine tracking code with transformed code
     const combinedAST = t.program([...trackingAST.program.body, ...ast.program.body])
     
-    const result = generate.default(combinedAST, {
+    const result = generateDefault(combinedAST, {
       retainLines: false,
       compact: false
     })

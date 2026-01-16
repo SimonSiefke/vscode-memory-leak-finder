@@ -1,8 +1,9 @@
 import fs from 'fs'
-import { transformCode } from './transform-script.ts'
+import { transformCode } from './transform-script.js'
 
 // VS Code installation path
-const vscodePath: string = '/home/simon/.cache/repos/vscode/out/vs/workbench/workbench.desktop.main.js'
+const vscodePath: string =
+  '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.108.0/resources/app/out/vs/workbench/workbench.desktop.main.js'
 const outputPath: string = '/home/simon/.cache/repos/vscode-memory-leak-finder/packages/function-tracker/workbench.desktop.main.tracked.js'
 
 console.log('Reading VS Code workbench file...')
