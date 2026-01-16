@@ -1,3 +1,4 @@
+// @ts-ignore
 import puppeteer, { Browser, Page } from 'puppeteer'
 import fs from 'fs'
 
