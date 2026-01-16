@@ -1119,6 +1119,7 @@ test('Transform Script - transformCode - should transform object methods', () =>
   const transformed = transformCodeWithTracking(code, { filename: 'test.js' })
   const expected = `const obj = {
   method() {
+    trackFunctionCall("method", "test.js:3");
     return 'method';
   },
   arrowMethod: () => {
