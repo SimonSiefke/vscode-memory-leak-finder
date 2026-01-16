@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals'
-import { VSCodeFunctionTracker } from '../src/tracker.js'
+import { VSCodeFunctionTracker } from '../src/devtools-injector.js'
 import { VSCodeTrackerOptions, FunctionStatistics } from '../src/types.js'
 import puppeteer from 'puppeteer'
 
@@ -11,12 +11,14 @@ const mockPuppeteer = puppeteer as jest.Mocked<typeof puppeteer>
 jest.mock('fs')
 const mockFs = require('fs')
 
-test('VSCodeFunctionTracker - constructor - should initialize with default options', () => {
+describe('VSCodeFunctionTracker', () => {
+  describe('constructor', () => {
+    it('should initialize with default options', () => {
       const defaultTracker = new VSCodeFunctionTracker()
       expect(defaultTracker).toBeDefined()
     })
 
-test('VSCodeFunctionTracker - constructor - should accept custom options', () => {
+    it('should accept custom options', () => {
       const options: VSCodeTrackerOptions = {
         headless: true,
         devtools: false,
@@ -29,44 +31,46 @@ test('VSCodeFunctionTracker - constructor - should accept custom options', () =>
     })
   })
 
-test('VSCodeFunctionTracker - initialize - should initialize successfully when transformed code exists', async () => {
-  let tracker: VSCodeFunctionTracker
-  let mockBrowser: jest.Mocked<puppeteer.Browser>
-  let mockPage: jest.Mocked<puppeteer.Page>
+  describe('initialize', () => {
+    let tracker: VSCodeFunctionTracker
+    let mockBrowser: jest.Mocked<puppeteer.Browser>
+    let mockPage: jest.Mocked<puppeteer.Page>
 
-  beforeEach(() => {
-    jest.clearAllMocks()
-    
-    // Create mock browser and page
-    mockBrowser = {
-      close: jest.fn().mockResolvedValue(undefined),
-      newPage: jest.fn(),
-      on: jest.fn(),
-      off: jest.fn(),
-      isConnected: jest.fn().mockReturnValue(true)
-    } as any
+    beforeEach(() => {
+      jest.clearAllMocks()
+      
+      // Create mock browser and page
+      mockBrowser = {
+        close: jest.fn().mockResolvedValue(undefined),
+        newPage: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn(),
+        isConnected: jest.fn().mockReturnValue(true)
+      } as any
 
-    mockPage = {
-      goto: jest.fn().mockResolvedValue(undefined),
-      setRequestInterception: jest.fn().mockResolvedValue(undefined),
-      on: jest.fn(),
-      evaluate: jest.fn(),
-      waitForTimeout: jest.fn().mockResolvedValue(undefined)
-    } as any
+      mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        setRequestInterception: jest.fn().mockResolvedValue(undefined),
+        on: jest.fn(),
+        evaluate: jest.fn(),
+        waitForTimeout: jest.fn().mockResolvedValue(undefined)
+      } as any
 
-    mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
-    mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
-    
-    // Mock fs.existsSync and fs.readFileSync
-    mockFs.existsSync = jest.fn().mockReturnValue(true)
-    mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
+      mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
+      mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
+      
+      // Mock fs.existsSync and fs.readFileSync
+      mockFs.existsSync = jest.fn().mockReturnValue(true)
+      mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
 
-    tracker = new VSCodeFunctionTracker()
-  })
+      tracker = new VSCodeFunctionTracker()
+    })
 
-  afterEach(async () => {
-    await tracker.close()
-  })
+    afterEach(async () => {
+      await tracker.close()
+    })
+
+    it('should initialize successfully when transformed code exists', async () => {
       await tracker.initialize()
       
       expect(mockFs.existsSync).toHaveBeenCalled()
@@ -85,44 +89,7 @@ test('VSCodeFunctionTracker - initialize - should initialize successfully when t
       expect(mockPage.on).toHaveBeenCalledWith('request', expect.any(Function))
     })
 
-test('VSCodeFunctionTracker - initialize - should throw error when transformed code does not exist', async () => {
-  let tracker: VSCodeFunctionTracker
-  let mockBrowser: jest.Mocked<puppeteer.Browser>
-  let mockPage: jest.Mocked<puppeteer.Page>
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-    
-    // Create mock browser and page
-    mockBrowser = {
-      close: jest.fn().mockResolvedValue(undefined),
-      newPage: jest.fn(),
-      on: jest.fn(),
-      off: jest.fn(),
-      isConnected: jest.fn().mockReturnValue(true)
-    } as any
-
-    mockPage = {
-      goto: jest.fn().mockResolvedValue(undefined),
-      setRequestInterception: jest.fn().mockResolvedValue(undefined),
-      on: jest.fn(),
-      evaluate: jest.fn(),
-      waitForTimeout: jest.fn().mockResolvedValue(undefined)
-    } as any
-
-    mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
-    mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
-    
-    // Mock fs.existsSync and fs.readFileSync
-    mockFs.existsSync = jest.fn().mockReturnValue(true)
-    mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
-
-    tracker = new VSCodeFunctionTracker()
-  })
-
-  afterEach(async () => {
-    await tracker.close()
-  })
+    it('should throw error when transformed code does not exist', async () => {
       mockFs.existsSync = jest.fn().mockReturnValue(false)
       
       await expect(tracker.initialize()).rejects.toThrow(
@@ -130,44 +97,7 @@ test('VSCodeFunctionTracker - initialize - should throw error when transformed c
       )
     })
 
-test('VSCodeFunctionTracker - initialize - should use custom options when initializing', async () => {
-  let tracker: VSCodeFunctionTracker
-  let mockBrowser: jest.Mocked<puppeteer.Browser>
-  let mockPage: jest.Mocked<puppeteer.Page>
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-    
-    // Create mock browser and page
-    mockBrowser = {
-      close: jest.fn().mockResolvedValue(undefined),
-      newPage: jest.fn(),
-      on: jest.fn(),
-      off: jest.fn(),
-      isConnected: jest.fn().mockReturnValue(true)
-    } as any
-
-    mockPage = {
-      goto: jest.fn().mockResolvedValue(undefined),
-      setRequestInterception: jest.fn().mockResolvedValue(undefined),
-      on: jest.fn(),
-      evaluate: jest.fn(),
-      waitForTimeout: jest.fn().mockResolvedValue(undefined)
-    } as any
-
-    mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
-    mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
-    
-    // Mock fs.existsSync and fs.readFileSync
-    mockFs.existsSync = jest.fn().mockReturnValue(true)
-    mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
-
-    tracker = new VSCodeFunctionTracker()
-  })
-
-  afterEach(async () => {
-    await tracker.close()
-  })
+    it('should use custom options when initializing', async () => {
       const options: VSCodeTrackerOptions = {
         headless: true,
         devtools: false,
@@ -191,6 +121,44 @@ test('VSCodeFunctionTracker - initialize - should use custom options when initia
   })
 
   describe('loadVSCode', () => {
+    let tracker: VSCodeFunctionTracker
+    let mockBrowser: jest.Mocked<puppeteer.Browser>
+    let mockPage: jest.Mocked<puppeteer.Page>
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+      
+      // Create mock browser and page
+      mockBrowser = {
+        close: jest.fn().mockResolvedValue(undefined),
+        newPage: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn(),
+        isConnected: jest.fn().mockReturnValue(true)
+      } as any
+
+      mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        setRequestInterception: jest.fn().mockResolvedValue(undefined),
+        on: jest.fn(),
+        evaluate: jest.fn(),
+        waitForTimeout: jest.fn().mockResolvedValue(undefined)
+      } as any
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
+      mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
+      
+      // Mock fs.existsSync and fs.readFileSync
+      mockFs.existsSync = jest.fn().mockReturnValue(true)
+      mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
+
+      tracker = new VSCodeFunctionTracker()
+    })
+
+    afterEach(async () => {
+      await tracker.close()
+    })
+
     it('should load VS Code after initialization', async () => {
       await tracker.initialize()
       await tracker.loadVSCode()
@@ -219,11 +187,47 @@ test('VSCodeFunctionTracker - initialize - should use custom options when initia
   })
 
   describe('getFunctionStatistics', () => {
-    beforeEach(async () => {
-      await tracker.initialize()
+    let tracker: VSCodeFunctionTracker
+    let mockBrowser: jest.Mocked<puppeteer.Browser>
+    let mockPage: jest.Mocked<puppeteer.Page>
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+      
+      // Create mock browser and page
+      mockBrowser = {
+        close: jest.fn().mockResolvedValue(undefined),
+        newPage: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn(),
+        isConnected: jest.fn().mockReturnValue(true)
+      } as any
+
+      mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        setRequestInterception: jest.fn().mockResolvedValue(undefined),
+        on: jest.fn(),
+        evaluate: jest.fn(),
+        waitForTimeout: jest.fn().mockResolvedValue(undefined)
+      } as any
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
+      mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
+      
+      // Mock fs.existsSync and fs.readFileSync
+      mockFs.existsSync = jest.fn().mockReturnValue(true)
+      mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
+
+      tracker = new VSCodeFunctionTracker()
+    })
+
+    afterEach(async () => {
+      await tracker.close()
     })
 
     it('should return function statistics', async () => {
+      await tracker.initialize()
+
       const mockStats: FunctionStatistics = {
         'testFunction (test.js:2)': 5,
         'arrowFunction (test.js:6)': 3
@@ -238,14 +242,14 @@ test('VSCodeFunctionTracker - initialize - should use custom options when initia
     })
 
     it('should throw error when not initialized', async () => {
-      const uninitializedTracker = new VSCodeFunctionTracker()
-      
-      await expect(uninitializedTracker.getFunctionStatistics()).rejects.toThrow(
+      await expect(tracker.getFunctionStatistics()).rejects.toThrow(
         'Tracker not initialized. Call initialize() first.'
       )
     })
 
     it('should handle empty statistics', async () => {
+      await tracker.initialize()
+
       mockPage.evaluate = jest.fn().mockResolvedValue({})
       
       const stats = await tracker.getFunctionStatistics()
@@ -255,11 +259,47 @@ test('VSCodeFunctionTracker - initialize - should use custom options when initia
   })
 
   describe('resetStatistics', () => {
-    beforeEach(async () => {
-      await tracker.initialize()
+    let tracker: VSCodeFunctionTracker
+    let mockBrowser: jest.Mocked<puppeteer.Browser>
+    let mockPage: jest.Mocked<puppeteer.Page>
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+      
+      // Create mock browser and page
+      mockBrowser = {
+        close: jest.fn().mockResolvedValue(undefined),
+        newPage: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn(),
+        isConnected: jest.fn().mockReturnValue(true)
+      } as any
+
+      mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        setRequestInterception: jest.fn().mockResolvedValue(undefined),
+        on: jest.fn(),
+        evaluate: jest.fn(),
+        waitForTimeout: jest.fn().mockResolvedValue(undefined)
+      } as any
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
+      mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
+      
+      // Mock fs.existsSync and fs.readFileSync
+      mockFs.existsSync = jest.fn().mockReturnValue(true)
+      mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
+
+      tracker = new VSCodeFunctionTracker()
+    })
+
+    afterEach(async () => {
+      await tracker.close()
     })
 
     it('should reset statistics', async () => {
+      await tracker.initialize()
+
       mockPage.evaluate = jest.fn().mockResolvedValue(undefined)
       
       await tracker.resetStatistics()
@@ -268,20 +308,54 @@ test('VSCodeFunctionTracker - initialize - should use custom options when initia
     })
 
     it('should throw error when not initialized', async () => {
-      const uninitializedTracker = new VSCodeFunctionTracker()
-      
-      await expect(uninitializedTracker.resetStatistics()).rejects.toThrow(
+      await expect(tracker.resetStatistics()).rejects.toThrow(
         'Tracker not initialized. Call initialize() first.'
       )
     })
   })
 
   describe('printStatistics', () => {
-    beforeEach(async () => {
-      await tracker.initialize()
+    let tracker: VSCodeFunctionTracker
+    let mockBrowser: jest.Mocked<puppeteer.Browser>
+    let mockPage: jest.Mocked<puppeteer.Page>
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+      
+      // Create mock browser and page
+      mockBrowser = {
+        close: jest.fn().mockResolvedValue(undefined),
+        newPage: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn(),
+        isConnected: jest.fn().mockReturnValue(true)
+      } as any
+
+      mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        setRequestInterception: jest.fn().mockResolvedValue(undefined),
+        on: jest.fn(),
+        evaluate: jest.fn(),
+        waitForTimeout: jest.fn().mockResolvedValue(undefined)
+      } as any
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
+      mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
+      
+      // Mock fs.existsSync and fs.readFileSync
+      mockFs.existsSync = jest.fn().mockReturnValue(true)
+      mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
+
+      tracker = new VSCodeFunctionTracker()
+    })
+
+    afterEach(async () => {
+      await tracker.close()
     })
 
     it('should print statistics', async () => {
+      await tracker.initialize()
+
       const mockStats: FunctionStatistics = {
         'testFunction (test.js:2)': 5,
         'arrowFunction (test.js:6)': 3,
@@ -303,6 +377,44 @@ test('VSCodeFunctionTracker - initialize - should use custom options when initia
   })
 
   describe('close', () => {
+    let tracker: VSCodeFunctionTracker
+    let mockBrowser: jest.Mocked<puppeteer.Browser>
+    let mockPage: jest.Mocked<puppeteer.Page>
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+      
+      // Create mock browser and page
+      mockBrowser = {
+        close: jest.fn().mockResolvedValue(undefined),
+        newPage: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn(),
+        isConnected: jest.fn().mockReturnValue(true)
+      } as any
+
+      mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        setRequestInterception: jest.fn().mockResolvedValue(undefined),
+        on: jest.fn(),
+        evaluate: jest.fn(),
+        waitForTimeout: jest.fn().mockResolvedValue(undefined)
+      } as any
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
+      mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
+      
+      // Mock fs.existsSync and fs.readFileSync
+      mockFs.existsSync = jest.fn().mockReturnValue(true)
+      mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
+
+      tracker = new VSCodeFunctionTracker()
+    })
+
+    afterEach(async () => {
+      await tracker.close()
+    })
+
     it('should close browser and clean up', async () => {
       await tracker.initialize()
       await tracker.close()
@@ -311,13 +423,49 @@ test('VSCodeFunctionTracker - initialize - should use custom options when initia
     })
 
     it('should handle closing when not initialized', async () => {
-      const uninitializedTracker = new VSCodeFunctionTracker()
-      
-      await expect(uninitializedTracker.close()).resolves.not.toThrow()
+      await expect(tracker.close()).resolves.not.toThrow()
     })
   })
 
   describe('isInitialized', () => {
+    let tracker: VSCodeFunctionTracker
+    let mockBrowser: jest.Mocked<puppeteer.Browser>
+    let mockPage: jest.Mocked<puppeteer.Page>
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+      
+      // Create mock browser and page
+      mockBrowser = {
+        close: jest.fn().mockResolvedValue(undefined),
+        newPage: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn(),
+        isConnected: jest.fn().mockReturnValue(true)
+      } as any
+
+      mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        setRequestInterception: jest.fn().mockResolvedValue(undefined),
+        on: jest.fn(),
+        evaluate: jest.fn(),
+        waitForTimeout: jest.fn().mockResolvedValue(undefined)
+      } as any
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
+      mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
+      
+      // Mock fs.existsSync and fs.readFileSync
+      mockFs.existsSync = jest.fn().mockReturnValue(true)
+      mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
+
+      tracker = new VSCodeFunctionTracker()
+    })
+
+    afterEach(async () => {
+      await tracker.close()
+    })
+
     it('should return false when not initialized', () => {
       expect(tracker.isInitialized()).toBe(false)
     })
@@ -335,6 +483,44 @@ test('VSCodeFunctionTracker - initialize - should use custom options when initia
   })
 
   describe('request interception', () => {
+    let tracker: VSCodeFunctionTracker
+    let mockBrowser: jest.Mocked<puppeteer.Browser>
+    let mockPage: jest.Mocked<puppeteer.Page>
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+      
+      // Create mock browser and page
+      mockBrowser = {
+        close: jest.fn().mockResolvedValue(undefined),
+        newPage: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn(),
+        isConnected: jest.fn().mockReturnValue(true)
+      } as any
+
+      mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        setRequestInterception: jest.fn().mockResolvedValue(undefined),
+        on: jest.fn(),
+        evaluate: jest.fn(),
+        waitForTimeout: jest.fn().mockResolvedValue(undefined)
+      } as any
+
+      mockBrowser.newPage = jest.fn().mockResolvedValue(mockPage)
+      mockPuppeteer.launch = jest.fn().mockResolvedValue(mockBrowser)
+      
+      // Mock fs.existsSync and fs.readFileSync
+      mockFs.existsSync = jest.fn().mockReturnValue(true)
+      mockFs.readFileSync = jest.fn().mockReturnValue('mock transformed code')
+
+      tracker = new VSCodeFunctionTracker()
+    })
+
+    afterEach(async () => {
+      await tracker.close()
+    })
+
     it('should intercept workbench requests', async () => {
       await tracker.initialize()
       

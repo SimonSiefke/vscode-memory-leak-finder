@@ -27,7 +27,7 @@ test('Integration Tests - Real-world scenarios - should handle complex nested fu
     }
   `
   
-  const transformed = transformCode(code, { filename: 'complex.js' })
+  const transformed = transformCode(code, 'complex.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
   expect(transformed).toContain('trackFunctionCall')
@@ -64,7 +64,7 @@ test('Integration Tests - Real-world scenarios - should handle TypeScript syntax
     }
   `
   
-  const transformed = transformCode(code, { filename: 'typescript.ts' })
+  const transformed = transformCode(code, 'typescript.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
@@ -88,7 +88,7 @@ test('Integration Tests - Real-world scenarios - should handle async functions',
     }
   `
   
-  const transformed = transformCode(code, { filename: 'async.ts' })
+  const transformed = transformCode(code, 'async.ts')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
   expect(transformed).toContain('trackFunctionCall')
@@ -229,7 +229,7 @@ test('Integration Tests - Performance tests - should handle deeply nested functi
     code += '  '.repeat(i) + '}\n'
   }
   
-  const transformed = transformCode(code, { filename: 'nested.js' })
+  const transformed = transformCode(code, 'nested.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
@@ -254,7 +254,7 @@ test('Integration Tests - Edge cases - should handle Unicode and special charact
     }
   `
   
-  const transformed = transformCode(code, { filename: 'unicode.js' })
+  const transformed = transformCode(code, 'unicode.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
@@ -269,7 +269,7 @@ test('Integration Tests - Edge cases - should handle minified code', () => {
 
   const code = 'function a(){return 1}const b=()=>2;class c{d(){return 3}}'
   
-  const transformed = transformCode(code, { filename: 'minified.js' })
+  const transformed = transformCode(code, 'minified.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
@@ -298,7 +298,7 @@ test('Integration Tests - Edge cases - should handle comments and whitespace', (
     const documented = (name) => \`Hello \${name}!\`
   `
   
-  const transformed = transformCode(code, { filename: 'comments.js' })
+  const transformed = transformCode(code, 'comments.js')
   
   expect(transformed).toContain('globalThis.___functionStatistics')
 })
@@ -319,7 +319,7 @@ test('Integration Tests - Statistics functionality - should accurately track mul
     const multiplier = (x) => x * 2
   `
   
-  const transformed = transformCode(code, { filename: 'stats.js' })
+  const transformed = transformCode(code, 'stats.js')
   
   // Execute the transformed code
   const executeCode = new Function(transformed + `
@@ -368,7 +368,7 @@ test('Integration Tests - Statistics functionality - should handle function call
     }
   `
   
-  const transformed = transformCode(code, { filename: 'ordering.js' })
+  const transformed = transformCode(code, 'ordering.js')
   
   const executeCode = new Function(transformed + `
     return {

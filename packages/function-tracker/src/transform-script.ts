@@ -51,7 +51,8 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
     visitor: {
       FunctionDeclaration(path: babel.NodePath<t.FunctionDeclaration>) {
         const functionName: string = path.node.id ? path.node.id.name : 'anonymous'
-        const location: string = `${filename || 'unknown'}:${path.node.loc?.start.line}`
+        const actualFilename = (path.hub as any).file?.opts?.filename || filename || 'unknown'
+        const location: string = `${actualFilename}:${path.node.loc?.start.line}`
         
         if (path.node.id && !path.node.id.name.startsWith('track')) {
           // Wrap the function body
@@ -77,6 +78,8 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
         const parent: any = path.parent
         let functionName: string = 'anonymous'
         
+        const actualFilename = (path.hub as any).file?.opts?.filename || filename || 'unknown'
+        
         if (t.isVariableDeclarator(parent) && t.isIdentifier(parent.id) && parent.id.name) {
           functionName = parent.id.name
         } else if (t.isAssignmentExpression(parent) && t.isIdentifier(parent.left)) {
@@ -85,7 +88,7 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
           functionName = parent.key.name
         }
         
-        const location: string = `${filename || 'unknown'}:${path.node.loc?.start.line}`
+        const location: string = `${actualFilename}:${path.node.loc?.start.line}`
         
         if (!functionName.startsWith('track')) {
           const originalBody: t.BlockStatement = path.node.body
@@ -110,6 +113,8 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
         const parent: any = path.parent
         let functionName: string = 'anonymous_arrow'
         
+        const actualFilename = (path.hub as any).file?.opts?.filename || filename || 'unknown'
+        
         if (t.isVariableDeclarator(parent) && t.isIdentifier(parent.id) && parent.id.name) {
           functionName = parent.id.name
         } else if (t.isAssignmentExpression(parent) && t.isIdentifier(parent.left)) {
@@ -118,7 +123,7 @@ function createFunctionWrapperPlugin(filename?: string): babel.PluginObj {
           functionName = parent.key.name
         }
         
-        const location: string = `${filename || 'unknown'}:${path.node.loc?.start.line}`
+        const location: string = `${actualFilename}:${path.node.loc?.start.line}`
         
         if (!functionName.startsWith('track')) {
           if (t.isBlockStatement(path.node.body)) {
