@@ -11,14 +11,14 @@ test('AddTrackingPreamble - should add tracking preamble to simple function', as
   const result = await addTrackingPreamble(code)
   
   // Should contain tracking code
-  expect(result).toMatch(/globalThis\.___functionStatistics/)
-  expect(result).toMatch(/trackFunctionCall/)
-  expect(result).toMatch(/getFunctionStatistics/)
-  expect(result).toMatch(/resetFunctionStatistics/)
+  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
+  expect(result.includes('trackFunctionCall')).toBe(true)
+  expect(result.includes('getFunctionStatistics')).toBe(true)
+  expect(result.includes('resetFunctionStatistics')).toBe(true)
   
   // Should contain original function
-  expect(result).toMatch(/function testFunction\(\)/)
-  expect(result).toMatch(/return 'test'/)
+  expect(result.includes('function testFunction()')).toBe(true)
+  expect(result.includes("return 'test'")).toBe(true)
 })
 
 test('AddTrackingPreamble - should add tracking preamble to arrow function', async () => {
@@ -30,16 +30,16 @@ test('AddTrackingPreamble - should add tracking preamble to arrow function', asy
 
   const result = await addTrackingPreamble(code)
   
-  expect(result).toMatch(/globalThis\.___functionStatistics/)
-  expect(result).toMatch(/const arrowFunction = \(\) =>/)
+  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
+  expect(result.includes('const arrowFunction = () =>')).toBe(true)
 })
 
 test('AddTrackingPreamble - should handle empty code', async () => {
   const code = ''
   const result = await addTrackingPreamble(code)
   
-  expect(result).toMatch(/globalThis\.___functionStatistics/)
-  expect(result).toMatch(/trackFunctionCall/)
+  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
+  expect(result.includes('trackFunctionCall')).toBe(true)
 })
 
 test('AddTrackingPreamble - should handle TypeScript code', async () => {
@@ -51,8 +51,8 @@ test('AddTrackingPreamble - should handle TypeScript code', async () => {
 
   const result = await addTrackingPreamble(code)
   
-  expect(result).toMatch(/globalThis\.___functionStatistics/)
-  expect(result).toMatch(/function typedFunction\(param: string\): number/)
+  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
+  expect(result.includes('function typedFunction(param: string): number')).toBe(true)
 })
 
 test('AddTrackingPreamble - should handle JSX code', async () => {
@@ -64,9 +64,9 @@ test('AddTrackingPreamble - should handle JSX code', async () => {
 
   const result = await addTrackingPreamble(code)
   
-  expect(result).toMatch(/globalThis\.___functionStatistics/)
-  expect(result).toMatch(/function Component\(\)/)
-  expect(result).toMatch(/<div>Hello<\/div>/)
+  expect(result.includes('globalThis.___functionStatistics')).toBe(true)
+  expect(result.includes('function Component()')).toBe(true)
+  expect(result.includes('<div>Hello</div>')).toBe(true)
 })
 
 test('AddTrackingPreamble - should handle invalid code gracefully', async () => {
@@ -91,11 +91,11 @@ test('AddTrackingPreamble - should preserve code structure', async () => {
   const result = await addTrackingPreamble(code)
   
   // Should have tracking code at the beginning
-  expect(result).toMatch(/^\/\/ Function call tracking system/)
+  expect(result.startsWith('// Function call tracking system')).toBe(true)
   
   // Should preserve original code structure
-  expect(result).toMatch(/\/\/ Original comment/)
-  expect(result).toMatch(/const constant = 42/)
-  expect(result).toMatch(/function calculate\(x: number, y: number\): number/)
-  expect(result).toMatch(/export \{ calculate \}/)
+  expect(result.includes('// Original comment')).toBe(true)
+  expect(result.includes('const constant = 42')).toBe(true)
+  expect(result.includes('function calculate(x: number, y: number): number')).toBe(true)
+  expect(result.includes('export { calculate }')).toBe(true)
 })
