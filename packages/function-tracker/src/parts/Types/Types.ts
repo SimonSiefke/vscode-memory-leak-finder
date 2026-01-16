@@ -3,8 +3,7 @@ export interface FunctionStatistics {
 }
 
 export interface TransformOptions {
-  readonly filename?: string
-  readonly includeLocation?: boolean
+  readonly scriptId: number
   readonly excludePatterns?: string[]
   readonly preambleOffset?: number
 }
