@@ -2,7 +2,14 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+interface CreateParams {
+  expect: any
+  page: any
+  platform: string
+  VError: any
+}
+
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {
@@ -71,7 +78,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to clear search input`)
       }
     },
-    async closeSettingsContextMenu(name) {
+    async closeSettingsContextMenu(name: string) {
       try {
         await page.waitForIdle()
         const outerItem = page.locator(`.settings-editor-tree .monaco-list-row[aria-label^="${name}"]`)
@@ -313,7 +320,7 @@ export const create = ({ expect, page, platform, VError }) => {
         const searchCount = page.locator('.settings-count-widget')
         await expect(searchCount).toBeVisible()
         await page.waitForIdle()
-        if (resultCount === 'many') {
+        if (resultCount > 1) {
           await expect(searchCount).toHaveText(new RegExp(`\\d+ Settings Found`))
         } else {
           const word = resultCount === 1 ? 'Setting' : 'Settings'

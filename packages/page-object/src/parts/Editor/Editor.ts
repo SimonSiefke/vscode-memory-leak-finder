@@ -25,7 +25,7 @@ const isBinary = (file: string) => {
 
 interface CreateParams {
   expect: any
-  ideVersion: string
+  ideVersion: { major?: number; minor?: number; patch?: number } | string
   page: any
   platform: string
   VError: any
@@ -94,7 +94,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to execute auto fix`)
       }
     },
-    async click(text) {
+    async click(text: string) {
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
@@ -232,7 +232,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to delete all`)
       }
     },
-    async deleteCharactersLeft({ count }) {
+    async deleteCharactersLeft({ count }: { count: number }) {
       try {
         for (let i = 0; i < count; i++) {
           await page.waitForIdle()
@@ -243,7 +243,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to delete character left`)
       }
     },
-    async deleteCharactersRight({ count }) {
+    async deleteCharactersRight({ count }: { count: number }) {
       try {
         await page.waitForIdle()
         for (let i = 0; i < count; i++) {
@@ -378,7 +378,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     async focus() {
       const editor = page.locator('.editor-instance')
       await expect(editor).toBeVisible()
-      if (ideVersion && ideVersion.minor <= 100) {
+      if (ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100) {
         const editorInput = editor.locator('.inputarea')
         await editorInput.focus()
         await expect(editorInput).toBeFocused()
@@ -946,7 +946,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     async scrollDown() {
       try {
         await page.waitForIdle()
-        await this.selectAll()
+        await this.selectAll({ viaKeyBoard: false })
         await page.waitForIdle()
         await page.keyboard.press('ArrowRight')
         await page.waitForIdle()
@@ -957,7 +957,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     async scrollUp() {
       try {
         await page.waitForIdle()
-        await this.selectAll()
+        await this.selectAll({ viaKeyBoard: false })
         await page.waitForIdle()
         await page.keyboard.press('ArrowLeft')
         await page.waitForIdle()
@@ -1071,7 +1071,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         await page.waitForIdle()
         await quickPick.type(`:${line}:${column}`)
         await page.waitForIdle()
-        if (ideVersion.minor >= 105) {
+        if (typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor >= 105) {
           await quickPick.select(`Press 'Enter' to go to line ${line} at column ${column}.`)
         } else {
           await quickPick.select(`Go to line ${line} and character ${column}.`)
@@ -1585,16 +1585,17 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       }
     },
     async splitDown() {
-      return this.split(WellKnownCommands.ViewSplitEditorDown)
+      return this.split(WellKnownCommands.ViewSplitEditorDown, {})
     },
     async splitLeft() {
-      return this.split(WellKnownCommands.ViewSplitEditorLeft)
+      return this.split(WellKnownCommands.ViewSplitEditorLeft, {})
     },
     async splitRight({ groupCount = undefined }: { groupCount?: number }) {
-      return this.split(WellKnownCommands.ViewSplitEditorRight, { groupCount })
+      const params = groupCount !== undefined ? { groupCount } : {}
+      return this.split(WellKnownCommands.ViewSplitEditorRight, params)
     },
     async splitUp() {
-      return this.split(WellKnownCommands.ViewSplitEditorUp)
+      return this.split(WellKnownCommands.ViewSplitEditorUp, {})
     },
     async switchToTab(name: string) {
       try {
@@ -1755,7 +1756,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       await expect(editor).toBeVisible()
       await page.waitForIdle()
 
-      if (ideVersion && ideVersion.minor <= 100) {
+      if (ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100) {
         const editorInput = editor.locator('.inputarea')
         await expect(editorInput).toBeFocused()
         await page.waitForIdle()

@@ -7,7 +7,15 @@ const isNoteBook = (file: string) => {
   return file.endsWith('.ipynb')
 }
 
-export const create = ({ electronApp, expect, page, platform, VError }) => {
+interface CreateParams {
+  electronApp: any
+  expect: any
+  page: any
+  platform: string
+  VError: any
+}
+
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
     async expectModified(text: string) {
       try {
