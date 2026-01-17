@@ -100,24 +100,13 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     vscodePath,
     vscodeVersion,
   })
-  const {
-    devtoolsWebSocketUrl,
-    electronObjectId,
-    functionTrackerRpc,
-    parsedVersion,
-    pid,
-    sessionId,
-    targetId,
-    utilityContext,
-    webSocketUrl,
-  } = launchResult
+  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, pid, sessionId, targetId, utilityContext, webSocketUrl } = launchResult
   if (pid === undefined) {
     throw new Error(`pid is undefined in Launch.launch result. Result keys: ${Object.keys(launchResult).join(', ')}`)
   }
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
-    functionTrackerRpc,
     initializationWorkerRpc,
     parsedVersion,
     pid,

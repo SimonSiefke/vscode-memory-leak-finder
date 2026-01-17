@@ -52,7 +52,7 @@ export const prepareBoth = async (
     objectId: monkeyPatchedElectronId,
   })
 
-  const { dispose, functionTrackerRpc, sessionId, targetId } = await connectDevtoolsPromise
+  const { dispose, sessionId, targetId } = await connectDevtoolsPromise
 
   // Dispose browserRpc but keep functionTrackerRpc alive (it will be disposed later by test-coordinator)
   await Promise.all([electronRpc.dispose(), dispose()])
@@ -60,7 +60,6 @@ export const prepareBoth = async (
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
-    functionTrackerRpc,
     monkeyPatchedElectronId,
     sessionId,
     targetId,

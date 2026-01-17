@@ -44,7 +44,6 @@ export const connectDevtools = async (
       // Don't dispose functionTrackerRpc here - it will be disposed by test-coordinator
       await browserRpc.dispose()
     },
-    functionTrackerRpc,
     sessionId,
     sessionRpc,
     targetId,
