@@ -3,7 +3,6 @@ import { launchInitializationWorker } from '../LaunchInitializationWorker/Launch
 export interface PrepareBothResult {
   readonly devtoolsWebSocketUrl: string
   readonly electronObjectId: string
-  readonly functionTrackerRpc: any
   readonly initializationWorkerRpc: any
   readonly parsedVersion: string
   readonly pid: number
