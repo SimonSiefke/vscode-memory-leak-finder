@@ -14,7 +14,11 @@ interface ExecResult {
 }
 
 export const exec = async (command: string, args: readonly string[], options: ExecOptions = {}): Promise<ExecResult> => {
-  const result = await execa(command, args, { ...options, reject: options.reject })
+  const execaOptions = {
+    ...options,
+    reject: options.reject ?? true,
+  }
+  const result = await execa(command, args, execaOptions)
   return {
     exitCode: result.exitCode || 0,
     stderr: result.stderr || '',
