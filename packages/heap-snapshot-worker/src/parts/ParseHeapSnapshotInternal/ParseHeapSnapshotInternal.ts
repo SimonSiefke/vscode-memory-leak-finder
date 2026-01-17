@@ -6,15 +6,15 @@ import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNod
 import * as ParseHeapSnapshotLocations from '../ParseHeapSnapshotLocations/ParseHeapSnapshotLocations.ts'
 
 export const parseHeapSnapshotInternal = (
-  nodes,
-  nodeFields,
-  nodeTypes,
-  edges,
-  edgeFields,
-  edgeTypes,
-  strings,
-  locations,
-  locationFields,
+  nodes: any,
+  nodeFields: any,
+  nodeTypes: any,
+  edges: any,
+  edgeFields: any,
+  edgeTypes: any,
+  strings: any,
+  locations: any,
+  locationFields: any,
 ) => {
   // Assert.array(nodes)
   Assert.array(nodeFields)
@@ -34,7 +34,7 @@ export const parseHeapSnapshotInternal = (
     strings,
   )
   const graph = ParseHeapSnapshotInternalGraph.parseHeapSnapshotInternalGraph(parsedNodes, parsedEdges)
-  const cleanNodes = CleanNodes.cleanNode(parsedNodes)
+  const cleanNodes = CleanNodes.cleanNode(parsedNodes as any[])
   const parsedLocations = ParseHeapSnapshotLocations.parseHeapSnapshotLocations(locations, locationFields, nodeFields.length)
   return {
     graph,

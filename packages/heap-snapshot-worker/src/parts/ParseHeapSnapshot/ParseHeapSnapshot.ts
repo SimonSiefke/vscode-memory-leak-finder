@@ -1,6 +1,6 @@
 import * as ParseHeapSnapshotInternal from '../ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.ts'
 
-export const parseHeapSnapshot = (heapsnapshot) => {
+export const parseHeapSnapshot = (heapsnapshot: any) => {
   const { edges, locations, nodes, snapshot, strings } = heapsnapshot
   const meta = heapsnapshot.meta || snapshot.meta
   const { edge_fields, edge_types, location_fields, node_fields, node_types } = meta

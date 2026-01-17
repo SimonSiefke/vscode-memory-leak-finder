@@ -12,7 +12,7 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   writeFileContent: mockWriteFileContent,
 }))
 
-let applyFileOperationsModule
+let applyFileOperationsModule: typeof import('../src/parts/ApplyFileOperations/ApplyFileOperations.ts')
 
 beforeEach(async () => {
   // Reset all mocks
@@ -40,7 +40,7 @@ test('applyFileOperations - applies copy operation', async () => {
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
-      type: 'copy',
+      type: 'copy' as const,
     },
   ]
 
@@ -56,7 +56,7 @@ test('applyFileOperations - applies mkdir operation', async () => {
   const operations = [
     {
       path: '/path/to/directory',
-      type: 'mkdir',
+      type: 'mkdir' as const,
     },
   ]
 
@@ -72,7 +72,7 @@ test('applyFileOperations - applies remove operation', async () => {
   const operations = [
     {
       from: '/path/to/file.txt',
-      type: 'remove',
+      type: 'remove' as const,
     },
   ]
 
@@ -89,7 +89,7 @@ test('applyFileOperations - applies write operation', async () => {
     {
       content: 'new content',
       path: '/path/to/file.ts',
-      type: 'write',
+      type: 'write' as const,
     },
   ]
 
@@ -107,16 +107,16 @@ test('applyFileOperations - applies multiple operations in sequence', async () =
   const operations = [
     {
       path: '/path/to/directory',
-      type: 'mkdir',
+      type: 'mkdir' as const,
     },
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
-      type: 'copy',
+      type: 'copy' as const,
     },
     {
       from: '/old/file.txt',
-      type: 'remove',
+      type: 'remove' as const,
     },
   ]
 
@@ -141,7 +141,7 @@ test('applyFileOperations - handles copy operation error', async () => {
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
-      type: 'copy',
+      type: 'copy' as const,
     },
   ]
 
@@ -157,7 +157,7 @@ test('applyFileOperations - handles mkdir operation error', async () => {
   const operations = [
     {
       path: '/path/to/directory',
-      type: 'mkdir',
+      type: 'mkdir' as const,
     },
   ]
 
@@ -173,7 +173,7 @@ test('applyFileOperations - handles remove operation error', async () => {
   const operations = [
     {
       from: '/path/to/file.txt',
-      type: 'remove',
+      type: 'remove' as const,
     },
   ]
 
@@ -191,11 +191,11 @@ test('applyFileOperations - stops on first error and does not continue with rema
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
-      type: 'copy',
+      type: 'copy' as const,
     },
     {
       path: '/path/to/directory',
-      type: 'mkdir',
+      type: 'mkdir' as const,
     },
   ]
 
@@ -213,12 +213,12 @@ test('applyFileOperations - handles multiple copy operations', async () => {
     {
       from: '/source1/file1.txt',
       to: '/dest1/file1.txt',
-      type: 'copy',
+      type: 'copy' as const,
     },
     {
       from: '/source2/file2.txt',
       to: '/dest2/file2.txt',
-      type: 'copy',
+      type: 'copy' as const,
     },
   ]
 
@@ -235,11 +235,11 @@ test('applyFileOperations - handles multiple mkdir operations', async () => {
   const operations = [
     {
       path: '/path1/directory1',
-      type: 'mkdir',
+      type: 'mkdir' as const,
     },
     {
       path: '/path2/directory2',
-      type: 'mkdir',
+      type: 'mkdir' as const,
     },
   ]
 
@@ -256,11 +256,11 @@ test('applyFileOperations - handles multiple remove operations', async () => {
   const operations = [
     {
       from: '/path1/file1.txt',
-      type: 'remove',
+      type: 'remove' as const,
     },
     {
       from: '/path2/file2.txt',
-      type: 'remove',
+      type: 'remove' as const,
     },
   ]
 
@@ -283,15 +283,15 @@ test('applyFileOperations - handles mixed operations with errors', async () => {
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
-      type: 'copy',
+      type: 'copy' as const,
     },
     {
       path: '/path/to/directory',
-      type: 'mkdir',
+      type: 'mkdir' as const,
     },
     {
       from: '/path/to/file.txt',
-      type: 'remove',
+      type: 'remove' as const,
     },
   ]
 

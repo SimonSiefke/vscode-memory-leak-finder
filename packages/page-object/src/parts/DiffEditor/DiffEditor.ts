@@ -7,7 +7,15 @@ const isNoteBook = (file: string) => {
   return file.endsWith('.ipynb')
 }
 
-export const create = ({ electronApp, expect, page, platform, VError }) => {
+interface CreateParams {
+  electronApp: any
+  expect: any
+  page: any
+  platform: string
+  VError: any
+}
+
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
     async expectModified(text: string) {
       try {
@@ -25,7 +33,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to verify original text ${text}`)
       }
     },
-    async open({
+async open({
       cell1Content,
       cell2Content,
       file1,
@@ -106,7 +114,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to scroll up in diff editor`)
       }
     },
-    async shouldHaveModifiedEditor(text) {
+    async shouldHaveModifiedEditor(text: string) {
       try {
         const editor = page.locator('.editor.modified')
         const editorLines = editor.locator('.view-lines')
@@ -118,7 +126,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to assert modified editor contents`)
       }
     },
-    async shouldHaveOriginalEditor(text) {
+    async shouldHaveOriginalEditor(text: string) {
       try {
         const editor = page.locator('.editor.original')
         const editorLines = editor.locator('.view-lines')

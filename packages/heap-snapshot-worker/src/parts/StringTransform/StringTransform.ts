@@ -6,7 +6,7 @@ export class StringTransform extends Transform {
       objectMode: true,
     })
   }
-  _transform(chunk, encoding, callback) {
+  _transform(chunk: any, encoding: any, callback: any) {
     const string = chunk.toString()
     this.push(string)
     callback()

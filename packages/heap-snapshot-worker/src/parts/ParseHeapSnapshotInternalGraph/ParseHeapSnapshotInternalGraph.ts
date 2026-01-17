@@ -1,6 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 
-export const parseHeapSnapshotInternalGraph = (nodes, edges) => {
+export const parseHeapSnapshotInternalGraph = (nodes: any, edges: any) => {
   Assert.array(edges)
   Assert.array(nodes)
   const graph = Object.create(null)

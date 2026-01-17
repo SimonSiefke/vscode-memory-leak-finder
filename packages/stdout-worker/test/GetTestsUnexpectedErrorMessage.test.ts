@@ -33,7 +33,6 @@ test('getTestsUnexpectedErrorMessage - handles error with empty codeFrame', () =
 
 test('getTestsUnexpectedErrorMessage - handles error with no codeFrame', () => {
   const error = {
-    codeFrame: null,
     message: 'Unexpected token',
     stack: 'SyntaxError: Unexpected token\n    at Module._compile (module.js:434:26)',
     type: 'SyntaxError',

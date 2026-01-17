@@ -1,7 +1,14 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+interface CreateParams {
+  expect: any
+  page: any
+  platform: string
+  VError: any
+}
+
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async toggleScreenCastMode() {
       try {

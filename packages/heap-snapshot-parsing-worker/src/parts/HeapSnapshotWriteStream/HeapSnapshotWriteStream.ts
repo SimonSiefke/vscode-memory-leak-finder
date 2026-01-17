@@ -14,17 +14,17 @@ import { parseStringArray } from '../WriteStringArrayData/WriteStringArrayData.t
 class HeapSnapshotWriteStream extends Writable {
   arrayIndex: number
   currentNumber: number
-  data: Uint8Array<ArrayBuffer>
-  edges: Uint32Array<ArrayBuffer>
+  data: Uint8Array
+  edges: Uint32Array
   hasDigits: boolean
-  intermediateArray: Uint32Array<ArrayBuffer>
-  locations: Uint32Array<ArrayBuffer>
+  intermediateArray: Uint32Array
+  locations: Uint32Array
   metaData: any
-  nodes: Uint32Array<ArrayBuffer>
-  options: any
+  nodes: Uint32Array
+  options: { parseStrings?: boolean; validate?: boolean }
   state: number
   strings: string[]
-  validate: any
+  validate: boolean
 
   constructor(options: { parseStrings?: boolean; validate?: boolean } = {}) {
     super()

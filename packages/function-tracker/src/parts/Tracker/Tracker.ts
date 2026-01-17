@@ -49,7 +49,7 @@ export class VSCodeFunctionTracker {
 
     // Set up request interception to modify scripts
     await this.page.setRequestInterception(true)
-    this.page.on('request', (request) => {
+    this.page.on('request', (request: any) => {
       const url = request.url()
 
       // Intercept workbench.desktop.main.js requests

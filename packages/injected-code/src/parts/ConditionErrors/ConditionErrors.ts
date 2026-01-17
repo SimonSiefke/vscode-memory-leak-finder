@@ -2,14 +2,14 @@ import * as GetStyleValue from '../GetStyleValue/GetStyleValue.ts'
 import * as QuerySelector from '../QuerySelector/QuerySelector.ts'
 import * as StringifyElement from '../StringifyElement/StringifyElement.ts'
 
-export const toBeVisible = (locator, options) => {
+export const toBeVisible = (locator: any, options: any) => {
   if (options.timeout) {
     return `expected selector to be visible ${locator.selector} within ${options.timeout} ms`
   }
   return `expected selector to be visible ${locator.selector}`
 }
 
-export const toHaveValue = (locator, { value }) => {
+export const toHaveValue = (locator: any, { value }: { value: any }) => {
   const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
@@ -19,7 +19,7 @@ export const toHaveValue = (locator, { value }) => {
   return `expected selector ${locatorString} to have text "${value}" but was "${element.value}"`
 }
 
-const printLocator = (locator) => {
+const printLocator = (locator: any) => {
   if (locator._nth !== -1 && locator._nth !== undefined) {
     return `${locator.selector}:nth(${locator._nth})`
   }
@@ -29,7 +29,7 @@ const printLocator = (locator) => {
   return `${locator.selector}`
 }
 
-export const toHaveText = (locator, options) => {
+export const toHaveText = (locator: any, options: any) => {
   const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
@@ -60,21 +60,21 @@ export const toHaveAttribute = (locator, { key, value }) => {
   return `expected ${locatorString} to have attribute ${key} ${value} but was ${actual}`
 }
 
-export const toHaveCount = (locator, { count }) => {
+export const toHaveCount = (locator: any, { count }: { count: any }) => {
   const elements = QuerySelector.querySelectorAll(locator.selector)
   const actualCount = elements.length
   const locatorString = printLocator(locator)
   return `expected ${locatorString} to have count ${count} but was ${actualCount}`
 }
 
-export const toBeFocused = (locator) => {
+export const toBeFocused = (locator: any) => {
   const locatorString = printLocator(locator)
   const { activeElement } = document
   const stringifiedActiveElement = StringifyElement.stringifyElement(activeElement)
   return `expected ${locatorString} to be focused but active element is ${stringifiedActiveElement}`
 }
 
-export const toHaveClass = (locator, { className }) => {
+export const toHaveClass = (locator: any, { className }: { className: any }) => {
   const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
@@ -83,7 +83,7 @@ export const toHaveClass = (locator, { className }) => {
   return `expected ${locatorString} to have class "${className}" but was "${element.className}"`
 }
 
-export const toHaveId = (locator, { id }) => {
+export const toHaveId = (locator: any, { id }: { id: any }) => {
   const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
@@ -92,7 +92,7 @@ export const toHaveId = (locator, { id }) => {
   return `expected ${locatorString} to have id ${id} but was ${element.id}`
 }
 
-export const toBeHidden = (locator) => {
+export const toBeHidden = (locator: any) => {
   const locatorString = printLocator(locator)
   return `expected ${locatorString} to be hidden`
 }

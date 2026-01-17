@@ -9,6 +9,8 @@
     "strict": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,

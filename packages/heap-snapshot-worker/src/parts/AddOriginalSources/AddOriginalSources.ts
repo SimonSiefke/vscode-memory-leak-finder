@@ -10,7 +10,7 @@ export interface ScriptInfo {
   readonly url?: string
 }
 
-const isRelativeSourceMap = (sourceMapUrl) => {
+const isRelativeSourceMap = (sourceMapUrl: string) => {
   if (sourceMapUrl.startsWith('file://')) {
     return false
   }
