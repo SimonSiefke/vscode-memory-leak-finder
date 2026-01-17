@@ -38,20 +38,6 @@ export const connectDevtools = async (
   ])
   const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
 
-  browserRpc.on('Fetch.requestPaused', (event) => {
-    console.log('paused', event)
-  })
-
-  await browserRpc.invoke('Fetch.enable', {
-    patterns: [
-      {
-        // resourceType: 'Script',
-        requestStage: 'Request',
-        // urlPattern: '*.js', requestStage: 'Request'
-      },
-    ],
-  })
-
   const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
   const frameId = frameTree.frame.id
 
