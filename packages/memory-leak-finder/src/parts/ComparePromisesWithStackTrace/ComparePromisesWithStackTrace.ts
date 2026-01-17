@@ -85,16 +85,21 @@ const mergeOriginal = (items, cleanInstances) => {
   for (const item of items) {
     originalIndex++
     const originalStack: any[] = []
+    let sourcesHash: string | null | undefined = null
     for (let i = 0; i < item.stackTrace.length; i++) {
       originalIndex++
       const instance = reverseMap[originalIndex]
       if (instance && instance.originalStack) {
         originalStack.push(instance.originalStack[0])
+        if (i === 0 && instance.sourcesHash) {
+          sourcesHash = instance.sourcesHash
+        }
       }
     }
     merged.push({
       ...item,
       originalStack,
+      sourcesHash,
     })
   }
   return merged

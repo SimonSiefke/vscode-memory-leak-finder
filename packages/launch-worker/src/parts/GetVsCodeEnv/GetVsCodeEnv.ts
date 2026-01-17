@@ -1,4 +1,12 @@
-export const getVsCodeEnv = ({ processEnv, runtimeDir }: { processEnv: NodeJS.ProcessEnv; runtimeDir?: string }): NodeJS.ProcessEnv => {
+export const getVsCodeEnv = ({
+  processEnv,
+  proxyEnvVars,
+  runtimeDir,
+}: {
+  processEnv: NodeJS.ProcessEnv
+  runtimeDir?: string
+  proxyEnvVars?: any
+}): NodeJS.ProcessEnv => {
   const env = {
     ...processEnv,
   }
@@ -12,5 +20,9 @@ export const getVsCodeEnv = ({ processEnv, runtimeDir }: { processEnv: NodeJS.Pr
   delete env.VSCODE_GIT_ASKPASS_NODE
   delete env.NODE_OPTIONS
   delete env.ELECTRON_RUN_AS_NODE
+
+  // Set HTTP_PROXY/HTTPS_PROXY environment variables if proxy is configured
+  Object.assign(env, proxyEnvVars)
+
   return env
 }

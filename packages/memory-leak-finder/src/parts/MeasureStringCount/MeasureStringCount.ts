@@ -28,7 +28,7 @@ export const stop = (session: Session, objectGroup: string) => {
 
 const compareHeapSnapshotStringCount = async (before: string, after: string) => {
   await using rpc = await launchHeapSnapshotWorker()
-  const { beforeCount, afterCount } = await HeapSnapshotFunctions.compareStringCounts(rpc, before, after)
+  const { afterCount, beforeCount } = await HeapSnapshotFunctions.compareStringCounts(rpc, before, after)
   return {
     after: afterCount,
     before: beforeCount,

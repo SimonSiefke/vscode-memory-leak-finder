@@ -12,7 +12,6 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.format()
   await Editor.shouldHaveText('<h1>hello world </h1>')
   await Editor.undo()

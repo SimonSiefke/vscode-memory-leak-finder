@@ -17,7 +17,22 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
     }
 
     const mockData = JSON.parse(await readFile(mockFile, 'utf8'))
-    const { response } = mockData
+
+    // Handle new format: { metadata, request, response }
+    let response: any
+    let responseType: 'json' | 'zip' | 'binary' | 'text' | 'sse' | undefined
+
+    if (mockData.metadata && mockData.response) {
+      // New format
+      response = mockData.response
+      responseType = mockData.metadata.responseType
+    } else if (mockData.response) {
+      // Old format (backward compatibility)
+      response = mockData.response
+    } else {
+      // Fallback: assume old format structure
+      response = mockData
+    }
 
     // Handle OPTIONS requests specially - they might have empty body
     if (response.statusCode === 204) {
@@ -28,28 +43,72 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
       }
     }
 
-    // Handle file references (for zip files)
-    let { body } = response
+    // Handle file references (for zip files, SSE files, images, etc.)
+    let body: any = response.body
     let isZipFile = false
+    let isSseFile = false
+    let isImageFile = false
+
     if (typeof body === 'string' && body.startsWith('file-reference:')) {
-      const zipData = await LoadZipData.loadZipData(body)
-      if (zipData) {
-        body = zipData
+      const fileData = await LoadZipData.loadZipData(body)
+      if (fileData) {
+        body = fileData
+        // Determine file type from responseType or content type
+        if (responseType === 'zip') {
+          isZipFile = true
+        } else if (responseType === 'sse') {
+          isSseFile = true
+        } else if (responseType === 'binary') {
+          // Check if it's an image based on content type
+          const contentType = response.headers['content-type'] || response.headers['Content-Type']
+          const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+          if (contentTypeStr.startsWith('image/')) {
+            isImageFile = true
+          }
+        } else {
+          // Fallback to content type check
+          const contentType = response.headers['content-type'] || response.headers['Content-Type']
+          const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+          if (contentTypeStr.includes('application/zip')) {
+            isZipFile = true
+          } else if (contentTypeStr.includes('text/event-stream')) {
+            isSseFile = true
+          } else if (contentTypeStr.startsWith('image/')) {
+            isImageFile = true
+          }
+        }
+      }
+    } else if (responseType === 'json' && typeof body === 'object') {
+      // If responseType is json and body is already an object, stringify it
+      body = JSON.stringify(body)
+    } else if (responseType === 'zip') {
+      isZipFile = true
+    } else if (responseType === 'sse') {
+      isSseFile = true
+    } else if (responseType === 'binary') {
+      // Check if it's an image based on content type
+      const contentType = response.headers['content-type'] || response.headers['Content-Type']
+      const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+      if (contentTypeStr.startsWith('image/')) {
+        isImageFile = true
+      }
+    } else {
+      // Fallback: check content type
+      const contentType = response.headers['content-type'] || response.headers['Content-Type']
+      const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+      if (contentTypeStr.includes('application/zip')) {
         isZipFile = true
+      } else if (contentTypeStr.includes('text/event-stream')) {
+        isSseFile = true
+      } else if (contentTypeStr.startsWith('image/')) {
+        isImageFile = true
       }
     }
 
-    // Check if this is a zip file by content type
-    const contentType = response.headers['content-type'] || response.headers['Content-Type']
-    const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
-    if (contentTypeStr.includes('application/zip')) {
-      isZipFile = true
-    }
-
-    // Remove Content-Encoding and Transfer-Encoding headers for zip files
-    // since the binary data is not encoded
+    // Remove Content-Encoding and Transfer-Encoding headers for zip files, SSE files, and images
+    // since the binary/text data is not encoded
     const cleanedHeaders = { ...response.headers }
-    if (isZipFile) {
+    if (isZipFile || isSseFile || isImageFile) {
       const lowerCaseHeaders: Set<string> = new Set()
       for (const k of Object.keys(cleanedHeaders)) {
         lowerCaseHeaders.add(k.toLowerCase())
@@ -138,17 +197,25 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
     bodyBuffer = Buffer.from(JSON.stringify(mockResponse.body), 'utf8')
   }
 
-  // Check if this is a zip file (binary data)
+  // Check if this is a zip file (binary data) or SSE file (text/event-stream)
   const contentType = mockResponse.headers['content-type'] || mockResponse.headers['Content-Type']
   const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
   // Check for ZIP magic bytes (PK - ZIP file signature)
   const hasZipMagicBytes = Buffer.isBuffer(bodyBuffer) && bodyBuffer.length >= 2 && bodyBuffer[0] === 0x50 && bodyBuffer[1] === 0x4b
   const isZipFile = contentTypeStr.includes('application/zip') || hasZipMagicBytes
+  const isSseFile = contentTypeStr.includes('text/event-stream')
+  const isImageFile = contentTypeStr.startsWith('image/')
 
   if (isZipFile) {
     console.log(
       `[Proxy] Detected zip file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}, Has magic bytes: ${hasZipMagicBytes}`,
     )
+  }
+  if (isSseFile) {
+    console.log(`[Proxy] Detected SSE file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}`)
+  }
+  if (isImageFile) {
+    console.log(`[Proxy] Detected image file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}`)
   }
 
   // Convert headers to the format expected by writeHead and check for existing CORS headers
@@ -158,15 +225,22 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   for (const [key, value] of Object.entries(mockResponse.headers)) {
     const lowerKey = key.toLowerCase()
     // Skip Content-Length headers (case-insensitive) - we'll set it below
-    // Skip Content-Encoding and Transfer-Encoding headers for zip files - binary data is not encoded
-    if (lowerKey !== 'content-length' && !(isZipFile && (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding'))) {
+    // Skip Transfer-Encoding headers - we'll set Content-Length instead
+    // Skip Content-Encoding headers - mock body is already decompressed, so we can't send gzip encoding
+    // Skip Content-Encoding and Transfer-Encoding headers for zip files, SSE files, and images - data is not encoded
+    if (
+      lowerKey !== 'content-length' &&
+      lowerKey !== 'transfer-encoding' &&
+      lowerKey !== 'content-encoding' &&
+      !((isZipFile || isSseFile || isImageFile) && lowerKey === 'content-encoding')
+    ) {
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
       lowerCaseHeaders.add(lowerKey)
     }
   }
 
-  // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files
-  if (isZipFile) {
+  // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files, SSE files, and images
+  if (isZipFile || isSseFile || isImageFile) {
     const keysToRemove: string[] = []
     for (const k of Object.keys(headers)) {
       const lowerKey = k.toLowerCase()
@@ -178,7 +252,8 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
       delete headers[k]
       lowerCaseHeaders.delete(k.toLowerCase())
     }
-    console.log(`[Proxy] sendMockResponse - Final headers for zip file (after cleanup):`, Object.keys(headers))
+    const fileType = isZipFile ? 'zip file' : isSseFile ? 'SSE file' : 'image file'
+    console.log(`[Proxy] sendMockResponse - Final headers for ${fileType} (after cleanup):`, Object.keys(headers))
   }
 
   // Add CORS headers if not already present (case-insensitive check)
@@ -193,6 +268,17 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   }
   if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
     headers['Access-Control-Allow-Credentials'] = 'true'
+  }
+
+  // Explicitly remove Transfer-Encoding and Content-Encoding headers if they somehow got through
+  // (case-insensitive check) - we're setting Content-Length, so Transfer-Encoding can't be present
+  // Content-Encoding is removed because mock body is already decompressed
+  for (const key of Object.keys(headers)) {
+    const lowerKey = key.toLowerCase()
+    if (lowerKey === 'transfer-encoding' || lowerKey === 'content-encoding') {
+      delete headers[key]
+      lowerCaseHeaders.delete(lowerKey)
+    }
   }
 
   // Always set Content-Length to match actual body length

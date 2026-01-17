@@ -18,7 +18,7 @@ export const setup = async ({
     response: 1,
   })
   await Extensions.install({
-    id: 'github copilot chat',
+    id: 'GitHub.copilot-chat',
     name: 'GitHub Copilot Chat',
   })
   await Editor.closeAll()
@@ -35,14 +35,13 @@ export const setup = async ({
   await Editor.closeAll()
   await Workspace.setFiles([])
   await Panel.hide()
-  // @ts-ignore
+
   await Terminal.show({
     waitForReady: true,
   })
 }
 
-// @ts-ignore
-export const run = async ({ Terminal, TerminalInlineChat, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ TerminalInlineChat }: TestContext): Promise<void> => {
   await TerminalInlineChat.show()
   await TerminalInlineChat.sendMessage({
     message: 'test',

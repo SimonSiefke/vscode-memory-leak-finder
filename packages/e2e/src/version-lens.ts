@@ -26,8 +26,7 @@ export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Pro
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.enableVersionLens()
-  // @ts-ignore
+
   await Editor.disableVersionLens()
 }

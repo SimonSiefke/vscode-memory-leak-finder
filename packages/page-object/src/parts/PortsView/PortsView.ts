@@ -13,6 +13,13 @@ export const create = ({ expect, page, platform, VError }) => {
         const forwardPortButton = page.locator('[role="button"]', { hasText: 'Forward a Port' })
         await expect(forwardPortButton).toBeVisible()
         await page.waitForIdle()
+        const portInput = page.locator('.ports-view-actionbar-cell .monaco-inputbox .input')
+        await expect(portInput).toBeHidden()
+        await page.waitForIdle()
+        const welcome = page.locator('.panel .welcome-view-content')
+        await expect(welcome).toBeVisible()
+        await expect(welcome).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to cancel port edit`)
       }
@@ -80,10 +87,9 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to open ports view`)
       }
     },
-    async setPortInput(portId) {
+    async setPortInput(portId: number) {
       try {
         await page.waitForIdle()
-        await new Promise((r) => {})
         const forwardPortButton = page.locator('[role="button"]', { hasText: 'Forward a Port' })
         await expect(forwardPortButton).toBeVisible()
         await page.waitForIdle()
@@ -92,11 +98,15 @@ export const create = ({ expect, page, platform, VError }) => {
         const tunnelView = page.locator('[aria-label="Tunnel View"]')
         await expect(tunnelView).toBeVisible()
         await page.waitForIdle()
-        const portInput = page.locator('input[placeholder^="Port number"]')
+        const inputs = page.locator('.ports-view-actionbar-cell .monaco-inputbox .input')
+        const count = await inputs.count()
+        const portInput = inputs.nth(count - 1)
         await expect(portInput).toBeVisible()
         await expect(portInput).toBeFocused()
         await page.waitForIdle()
         await portInput.type(`${portId}`)
+        await page.waitForIdle()
+        await expect(portInput).toHaveValue(`${portId}`)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to forward port ${portId}`)

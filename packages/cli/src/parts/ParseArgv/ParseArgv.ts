@@ -1,5 +1,7 @@
+import { join } from 'node:path'
 import * as Ide from '../Ide/Ide.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
+import { root } from '../Root/Root.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
@@ -66,7 +68,13 @@ const parseHeadless = (argv: readonly string[]): boolean => {
 }
 
 const parseCheckLeaks = (argv: readonly string[]): boolean => {
-  return argv.includes('--check-leaks')
+  if (argv.includes('--check-leaks')) {
+    return true
+  }
+  if (argv.includes('--measure')) {
+    return true
+  }
+  return false
 }
 
 const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
@@ -75,6 +83,10 @@ const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
 
 const parseRecordVideo = (argv: readonly string[]): boolean => {
   return argv.includes('--record-video')
+}
+
+const parseCompressVideo = (argv: readonly string[]): boolean => {
+  return argv.includes('--compress-video')
 }
 
 const parseRuns = (argv: readonly string[]): number => {
@@ -88,7 +100,7 @@ const parseCwd = (cwd: string, argv: readonly string[]): string => {
   if (argv.includes('--cwd')) {
     return parseArgvString(argv, '--cwd')
   }
-  return cwd
+  return join(root, 'packages/e2e')
 }
 
 const parseMeasure = (argv: readonly string[]): string => {
@@ -101,6 +113,9 @@ const parseMeasure = (argv: readonly string[]): string => {
 const parseFilter = (argv: readonly string[]): string => {
   if (argv.includes('--only')) {
     const filterValue = parseArgvString(argv, '--only')
+    if (filterValue.endsWith('.ts')) {
+      return filterValue
+    }
     // Replace dots with dashes for backwards compatibility
     return filterValue.replaceAll('.', '-')
   }
@@ -175,6 +190,10 @@ const parseSetupOnly = (argv: readonly string[]): boolean => {
   return argv.includes('--setup-only')
 }
 
+const parseLogin = (argv: readonly string[]): boolean => {
+  return argv.includes('--login')
+}
+
 const parseWorkers = (argv: readonly string[]): boolean => {
   return argv.includes('--workers')
 }
@@ -239,7 +258,7 @@ const parseScreencastQuality = (argv: readonly string[]): number => {
   if (argv.includes('--screencast-quality')) {
     return parseArgvNumber(argv, '--screencast-quality')
   }
-  return 90
+  return 95
 }
 
 const parseClearExtensions = (argv: readonly string[]): boolean => {
@@ -260,8 +279,16 @@ const parsePlatform = (platform: string, argv: readonly string[]): string => {
   return platform
 }
 
+const parsePageObjectPath = (argv: readonly string[]): string => {
+  if (argv.includes('--page-object-path')) {
+    return parseArgvString(argv, '--page-object-path')
+  }
+  return ''
+}
+
 export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
   const platform = parsePlatform(processPlatform, argv)
+  const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const bisect = parseBisect(argv)
   const checkLeaks = parseCheckLeaks(argv)
@@ -287,12 +314,14 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
   const recordVideo = parseRecordVideo(argv)
+  const compressVideo = parseCompressVideo(argv)
   const restartBetween = parseRestartBetween(argv)
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
   const screencastQuality = parseScreencastQuality(argv)
   const setupOnly = parseSetupOnly(argv)
+  const login = parseLogin(argv)
   const timeoutBetween = parseTimeoutBetween(argv)
   const timeouts = parseTimeouts(argv)
   const useProxyMock = parseUseProxyMock(argv)
@@ -309,6 +338,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     clearExtensions,
     color,
     commit,
+    compressVideo,
     continueValue,
     cwd,
     enableExtensions,
@@ -325,9 +355,11 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     inspectSharedProcess,
     inspectSharedProcessPort,
     isWindows,
+    login,
     measure,
     measureAfter,
     measureNode,
+    pageObjectPath,
     platform,
     recordVideo,
     restartBetween,

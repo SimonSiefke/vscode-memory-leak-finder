@@ -278,11 +278,12 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           page,
           VError,
         })
-        await contextMenu.shouldHaveItem(`Graph`)
         // @ts-ignore
-        await contextMenu.check('Graph')
+        await contextMenu.openSubMenu('Views')
+        // @ts-ignore
+        await contextMenu.checkSubItem('Graph')
         await page.waitForIdle()
-        await contextMenu.close()
+        // await contextMenu.close()
         await page.waitForIdle()
         await expect(graph).toBeVisible()
         await page.waitForIdle()

@@ -3,6 +3,8 @@ import type { TestContext } from '../types.ts'
 export const skip = 1
 
 export const setup = async ({ ActivityBar, Editor, Explorer, SourceControl, Workspace }: TestContext): Promise<void> => {
+  // @ts-ignore
+  // await SideBar.hideSecondary()
   await Workspace.setFiles([
     {
       content: '<h1>hello world</h1>',
@@ -12,6 +14,8 @@ export const setup = async ({ ActivityBar, Editor, Explorer, SourceControl, Work
   await Workspace.initializeGitRepository()
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
+  await Explorer.shouldHaveItem('src')
   await ActivityBar.showSourceControl()
   await SourceControl.shouldHaveUnstagedFile('index.html')
   await SourceControl.stageFile('index.html', 'src')
@@ -25,7 +29,6 @@ export const run = async ({ SourceControl }: TestContext): Promise<void> => {
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.saveAll()
   await Editor.closeAll()
   await Workspace.setFiles([])

@@ -1,3 +1,1 @@
-import escapeHtml from 'escape-html'
-
-export { escapeHtml }
+export { default as escapeHtml } from 'escape-html'

@@ -21,7 +21,7 @@ if __name__ == '__main__':
       name: 'main.py',
     },
   ])
-  // @ts-ignore
+
   await Extensions.install({
     id: 'ms-python.python',
     name: 'Python',
@@ -41,6 +41,7 @@ export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
     hasCallStack: false,
     line: 4,
   })
+
   // @ts-ignore
   await RunAndDebug.stepInto({
     expectedCallStackSize: 2,

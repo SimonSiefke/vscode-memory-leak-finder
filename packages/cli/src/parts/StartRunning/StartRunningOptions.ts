@@ -5,6 +5,7 @@ export interface StartRunningOptions {
   readonly clearExtensions: boolean
   readonly color: boolean
   readonly commit: string
+  readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -22,6 +23,7 @@ export interface StartRunningOptions {
   readonly inspectSharedProcessPort: number
   readonly isGithubActions: boolean
   readonly isWindows: boolean
+  readonly login: boolean
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean

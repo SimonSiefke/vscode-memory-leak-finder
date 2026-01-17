@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { MockConfigEntry } from '../../MockConfigEntry/MockConfigEntry.ts'
+import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
 const __dirname = import.meta.dirname
 const MOCK_CONFIG_PATH = join(__dirname, '..', '..', 'GetMockFileName', 'mock-config.json')

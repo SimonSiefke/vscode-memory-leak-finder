@@ -47,12 +47,12 @@ export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void
   await SettingsEditor.disableCheckBox({
     name: 'editor.folding',
   })
-  // @ts-ignore
+
   await Editor.shouldHaveFoldingGutter(false)
   await SettingsEditor.enableCheckBox({
     name: 'editor.folding',
   })
-  // @ts-ignore
+
   await Editor.shouldHaveFoldingGutter(true)
 }
 

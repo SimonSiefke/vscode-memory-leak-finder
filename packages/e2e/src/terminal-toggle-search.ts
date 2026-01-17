@@ -6,15 +6,14 @@ export const setup = async ({ SideBar, Terminal, Workspace }: TestContext): Prom
   await Terminal.killAll()
   await Workspace.setFiles([])
   await SideBar.hide()
-  // @ts-ignore
+
   await Terminal.show({
     waitForReady: true,
   })
 }
 
 export const run = async ({ Terminal }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Terminal.openFind()
-  // @ts-ignore
+
   await Terminal.closeFind()
 }

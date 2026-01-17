@@ -62,6 +62,7 @@ export const getOriginalPositions = async (
         line: originalPosition.line,
         name: originalPosition.name,
         source: originalPosition.source,
+        sourcesHash: extensionSourceMapDir ? null : hash,
       })
     }
     return intermediateItems

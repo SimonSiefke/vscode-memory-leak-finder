@@ -2,8 +2,8 @@ import { join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
-import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
+import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
@@ -38,6 +38,7 @@ export const runTestsWithCallback = async ({
   clearExtensions,
   color,
   commit,
+  compressVideo,
   continueValue,
   cwd,
   enableExtensions,
@@ -54,9 +55,11 @@ export const runTestsWithCallback = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   isGithubActions,
+  login,
   measure,
   measureAfter,
   measureNode,
+  pageObjectPath,
   platform,
   recordVideo,
   restartBetween,
@@ -92,12 +95,13 @@ export const runTestsWithCallback = async ({
     Assert.string(ide)
     Assert.string(ideVersion)
     Assert.boolean(setupOnly)
+    Assert.boolean(login)
     Assert.boolean(enableExtensions)
 
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
-    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
+    const pageObjectPathResolved = GetPageObjectPath.getPageObjectPath(pageObjectPath)
 
     // TODO for each connection id, launch all needed workers
     // when a new connection id comes in, dispose them (even while running)
@@ -109,6 +113,7 @@ export const runTestsWithCallback = async ({
         attachedToPageTimeout,
         clearExtensions,
         commit,
+        compressVideo,
         connectionId,
         cwd,
         enableExtensions,
@@ -126,7 +131,7 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         measureId: measure,
         measureNode,
-        pageObjectPath,
+        pageObjectPath: pageObjectPathResolved,
         platform,
         recordVideo,
         runMode,
@@ -140,6 +145,69 @@ export const runTestsWithCallback = async ({
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
       await videoRpc?.dispose()
+      return {
+        duration: 0,
+        failed: 0,
+        filterValue,
+        leaked: 0,
+        passed: 0,
+        skipped: 0,
+        skippedFailed: 0,
+        total: 0,
+        type: 'success',
+      }
+    }
+
+    if (login) {
+      const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+        arch,
+        attachedToPageTimeout,
+        clearExtensions,
+        commit,
+        compressVideo,
+        connectionId,
+        cwd,
+        enableExtensions,
+        enableProxy,
+        headlessMode,
+        ide,
+        ideVersion,
+        idleTimeout,
+        insidersCommit,
+        inspectExtensions,
+        inspectExtensionsPort,
+        inspectPtyHost,
+        inspectPtyHostPort,
+        inspectSharedProcess,
+        inspectSharedProcessPort,
+        measureId: measure,
+        measureNode,
+        pageObjectPath: pageObjectPathResolved,
+        platform,
+        recordVideo,
+        runMode,
+        screencastQuality,
+        timeouts,
+        updateUrl,
+        useProxyMock,
+        vscodePath,
+        vscodeVersion,
+      })
+      // Wait for user to interrupt (Ctrl+C) or terminate the process
+      const { promise, resolve } = Promise.withResolvers<void>()
+      const cleanup = async () => {
+        await testWorkerRpc.dispose()
+        await memoryRpc?.dispose()
+        await videoRpc?.dispose()
+        if (initializationWorkerRpc) {
+          await initializationWorkerRpc.dispose()
+        }
+        resolve()
+      }
+      process.once('SIGINT', cleanup)
+      process.once('SIGTERM', cleanup)
+      // The IDE is now running. User can login manually and then press Ctrl+C when done
+      await promise
       return {
         duration: 0,
         failed: 0,
@@ -212,6 +280,7 @@ export const runTestsWithCallback = async ({
           attachedToPageTimeout,
           clearExtensions,
           commit,
+          compressVideo,
           connectionId,
           cwd,
           enableExtensions,
@@ -229,7 +298,7 @@ export const runTestsWithCallback = async ({
           inspectSharedProcessPort,
           measureId: measure,
           measureNode,
-          pageObjectPath,
+          pageObjectPath: pageObjectPathResolved,
           platform,
           recordVideo,
           runMode,
@@ -337,6 +406,7 @@ export const runTestsWithCallback = async ({
               leaking++
             }
             if (result.summary) {
+              // TODO log it in cli or stdout worker
               console.log(result.summary)
             }
           } else {

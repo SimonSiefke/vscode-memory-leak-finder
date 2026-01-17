@@ -3,6 +3,10 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
+const isNoteBook = (file: string) => {
+  return file.endsWith('.ipynb')
+}
+
 export const create = ({ electronApp, expect, page, platform, VError }) => {
   return {
     async expectModified(text: string) {
@@ -21,7 +25,21 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to verify original text ${text}`)
       }
     },
-    async open({ file1, file1Content, file2, file2Content }: { file1: string; file2: string; file1Content: string; file2Content: string }) {
+    async open({
+      cell1Content,
+      cell2Content,
+      file1,
+      file1Content,
+      file2,
+      file2Content,
+    }: {
+      file1: string
+      file2: string
+      file1Content: string
+      file2Content: string
+      cell2Content: string
+      cell1Content: string
+    }) {
       try {
         const explorer = Explorer.create({ electronApp, expect, page, platform, VError })
         const contextMenu = ContextMenu.create({ expect, page, VError })
@@ -36,17 +54,32 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         const tab = page.locator('.tab', { hasText: `${file1} ${arrow} ${file2}` })
         await expect(tab).toBeVisible()
         await page.waitForIdle()
-        const original = page.locator(`.monaco-diff-editor .monaco-editor[data-uri$="${file1}"]`)
-        await expect(original).toBeVisible()
-        const modified = page.locator(`.monaco-diff-editor .monaco-editor[data-uri$="${file2}"]`)
-        await expect(modified).toBeVisible()
-        if (file1Content) {
-          const lines = original.locator('.view-lines')
-          await expect(lines).toHaveText(file1Content)
-        }
-        if (file2Content) {
-          const lines = modified.locator('.view-lines')
-          await expect(lines).toHaveText(file2Content)
+        if (isNoteBook(file1)) {
+          const original = page.locator(`.monaco-diff-editor .monaco-editor[data-uri*="${file1}"]`)
+          await expect(original).toBeVisible()
+          const modified = page.locator(`.monaco-diff-editor .monaco-editor[data-uri*="${file2}"]`)
+          await expect(modified).toBeVisible()
+          if (cell1Content) {
+            const lines = original.locator('.view-lines')
+            await expect(lines).toHaveText(cell1Content)
+          }
+          if (cell2Content) {
+            const lines = modified.locator('.view-lines')
+            await expect(lines).toHaveText(cell2Content)
+          }
+        } else {
+          const original = page.locator(`.monaco-diff-editor .monaco-editor[data-uri$="${file1}"]`)
+          await expect(original).toBeVisible()
+          const modified = page.locator(`.monaco-diff-editor .monaco-editor[data-uri$="${file2}"]`)
+          await expect(modified).toBeVisible()
+          if (file1Content) {
+            const lines = original.locator('.view-lines')
+            await expect(lines).toHaveText(file1Content)
+          }
+          if (file2Content) {
+            const lines = modified.locator('.view-lines')
+            await expect(lines).toHaveText(file2Content)
+          }
         }
       } catch (error) {
         throw new VError(error, `Failed to open diff editor`)

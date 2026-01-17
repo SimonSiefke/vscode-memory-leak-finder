@@ -13,8 +13,11 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.select('h1')
-  await Editor.shouldHaveSelection('8px', /(15px|17px)/)
+  await Editor.setCursor(1, 2)
+  // @ts-ignore
+  await Editor.expandSelection()
+  // @ts-ignore
+  await Editor.shouldHaveSelectedCharacters(20)
   await Editor.cursorRight()
   await Editor.shouldHaveEmptySelection()
 }

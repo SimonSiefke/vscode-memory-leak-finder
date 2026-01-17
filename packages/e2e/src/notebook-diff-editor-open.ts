@@ -198,6 +198,7 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('notebook-1.ipynb')
   await Explorer.shouldHaveItem('notebook-2.ipynb')
   await Editor.open('notebook-1.ipynb')
@@ -206,10 +207,10 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
 export const run = async ({ DiffEditor, Editor }: TestContext): Promise<void> => {
   // @ts-ignore
   await DiffEditor.open({
+    cell1Content: 'a',
+    cell2Content: 'aa',
     file1: 'notebook-1.ipynb',
     file2: 'notebook-2.ipynb',
   })
-  await DiffEditor.shouldHaveOriginalEditor('a')
-  await DiffEditor.shouldHaveModifiedEditor('aa')
   await Editor.closeAll()
 }

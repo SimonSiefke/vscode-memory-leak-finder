@@ -11,11 +11,11 @@ export const setup = async ({ SideBar, Terminal, Workspace }: TestContext): Prom
     },
   ])
   await SideBar.hide()
-  // @ts-ignore
+
   await Terminal.show({
     waitForReady: true,
   })
-  // @ts-ignore
+
   await Terminal.execute('cat file.txt && touch test.txt', {
     waitForFile: 'test.txt',
   })
@@ -23,8 +23,7 @@ export const setup = async ({ SideBar, Terminal, Workspace }: TestContext): Prom
 }
 
 export const run = async ({ Terminal }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Terminal.scrollToTop()
-  // @ts-ignore
+
   await Terminal.scrollToBottom()
 }

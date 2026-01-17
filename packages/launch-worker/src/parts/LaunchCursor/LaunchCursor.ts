@@ -88,7 +88,7 @@ export const launchCursor = async ({
       processEnv: process.env,
       runtimeDir,
     })
-    const { child } = await LaunchElectron.launchElectron({
+    const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,
       args,
       cliPath: binaryPath,
@@ -98,6 +98,7 @@ export const launchCursor = async ({
     })
     return {
       child,
+      pid,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch Cursor`)

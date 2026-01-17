@@ -20,6 +20,7 @@ export const addOriginalPositions = async (intermediateItems: readonly Intermedi
       line: item.line,
       name: originalName || item.name || '',
       source: item.source,
+      sourcesHash: item.sourcesHash,
     })
   }
   return finalResults

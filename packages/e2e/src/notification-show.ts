@@ -4,7 +4,7 @@ export const skip = 1
 
 export const setup = async ({ Extensions }: TestContext) => {
   // @ts-ignore
-  await Extensions.add({ path: `packages/e2e/fixtures/sample.show-notification`, expectedName: 'helloworld-sample' })
+  await Extensions.add({ expectedName: 'helloworld-sample', path: `packages/e2e/fixtures/sample.show-notification` })
 }
 
 export const run = async ({ Notification, QuickPick }: TestContext): Promise<void> => {
@@ -12,7 +12,6 @@ export const run = async ({ Notification, QuickPick }: TestContext): Promise<voi
   await QuickPick.type('Hello world')
   await QuickPick.select('Hello World')
 
-  // @ts-ignore
   await Notification.shouldHaveItem('Hello World!')
   await Notification.closeAll()
 }

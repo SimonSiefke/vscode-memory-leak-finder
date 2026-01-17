@@ -7,6 +7,7 @@ import * as LocatorCount from '../LocatorCount/LocatorCount.ts'
 import * as LocatorFill from '../LocatorFill/LocatorFill.ts'
 import * as LocatorFocus from '../LocatorFocus/LocatorFocus.ts'
 import * as LocatorGetAttribute from '../LocatorGetAttribute/LocatorGetAttribute.ts'
+import * as LocatorGetValue from '../LocatorGetValue/LocatorGetValue.ts'
 import * as LocatorHover from '../LocatorHover/LocatorHover.ts'
 import * as LocatorIsVisible from '../LocatorIsVisible/LocatorIsVisible.ts'
 import * as LocatorPress from '../LocatorPress/LocatorPress.ts'
@@ -15,7 +16,6 @@ import * as LocatorScrollUp from '../LocatorScrollUp/LocatorScrollUp.ts'
 import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.ts'
 import * as LocatorSetChecked from '../LocatorSetChecked/LocatorSetChecked.ts'
 import * as LocatorSetValue from '../LocatorSetValue/LocatorSetValue.ts'
-import * as LocatorGetValue from '../LocatorGetValue/LocatorGetValue.ts'
 import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.ts'
 import * as LocatorType from '../LocatorType/LocatorType.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
@@ -67,9 +67,10 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     dblclick() {
       return LocatorClick.dblclick(this)
     },
-    fill(text) {
+    fill(text: string) {
       return LocatorFill.fill(
         {
+          ...this,
           selector: this.selector,
         },
         text,
@@ -86,6 +87,9 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     },
     getAttribute(attributeName) {
       return LocatorGetAttribute.getAttribute(this, attributeName)
+    },
+    getValue() {
+      return LocatorGetValue.getValue(this)
     },
     hover() {
       return LocatorHover.hover(this)
@@ -126,9 +130,6 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     },
     setValue(value) {
       return LocatorSetValue.setValue(this, value)
-    },
-    getValue() {
-      return LocatorGetValue.getValue(this)
     },
     textContent({ allowHidden = false } = {}) {
       return LocatorTextContent.getTextContent(this, { allowHidden })

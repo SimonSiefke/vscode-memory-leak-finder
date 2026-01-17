@@ -20,6 +20,9 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)
 
     const ipc = {
+      get connectionClosed() {
+        return connectionClosed
+      },
       dispose() {
         webSocket.removeEventListener('error', errorHandler)
         webSocket.removeEventListener('close', closeHandler)
@@ -42,9 +45,6 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
           return
         }
         webSocket.send(Json.stringify(message))
-      },
-      get connectionClosed() {
-        return connectionClosed
       },
     }
     const rpc = createRpc(ipc)

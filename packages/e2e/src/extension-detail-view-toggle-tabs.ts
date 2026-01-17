@@ -2,7 +2,6 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-// @ts-ignore
 export const setup = async ({ Editor, ExtensionDetailView, Extensions }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
@@ -12,7 +11,6 @@ export const setup = async ({ Editor, ExtensionDetailView, Extensions }: TestCon
   await ExtensionDetailView.shouldHaveHeading('HTML Language Basics')
 }
 
-// @ts-ignore
 export const run = async ({ ExtensionDetailView }: TestContext): Promise<void> => {
   await ExtensionDetailView.shouldHaveTab('Details')
   await ExtensionDetailView.openTab('Features', { timeout: 30_000, webView: false })

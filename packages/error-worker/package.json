@@ -9,11 +9,11 @@
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "dependencies": {
-    "@babel/code-frame": "^7.27.1",
+    "@babel/code-frame": "^7.28.6",
     "@lvce-editor/assert": "^1.5.1",
-    "@lvce-editor/rpc": "^4.20.0"
+    "@lvce-editor/rpc": "^5.4.0"
   },
   "devDependencies": {
-    "@types/babel__code-frame": "^7.0.6"
+    "@types/babel__code-frame": "^7.27.0"
   }
 }

@@ -5,6 +5,7 @@ export interface RunTestsOptions {
   readonly clearExtensions: boolean
   readonly color: boolean
   readonly commit: string
+  readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -21,9 +22,11 @@ export interface RunTestsOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isGithubActions: boolean
+  readonly login: boolean
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
   readonly restartBetween: boolean
