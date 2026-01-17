@@ -2,11 +2,7 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-<<<<<<< HEAD
-export const create = ({ expect, page, VError }: { expect: any; page: any; VError: any }) => {
-=======
 export const create = ({ expect, page, platform, VError }) => {
->>>>>>> origin/main
   return {
     async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {

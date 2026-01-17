@@ -24,48 +24,14 @@ const getBinaryPathFromExtractDir = (platform: string, arch: string, extractDir:
   return join(extractDir, `VSCode-linux-${archSuffix}`, 'code-insiders')
 }
 
-<<<<<<< HEAD
-const getFileSizeInMB = async (url: string): Promise<number | undefined> => {
-  try {
-    const response = await fetch(url, {
-      method: 'HEAD',
-      signal: AbortSignal.timeout(30_000),
-    })
-    const contentLength = response.headers.get('content-length')
-    if (contentLength) {
-      const sizeInBytes = Number.parseInt(contentLength, 10)
-      const sizeInMB = sizeInBytes / (1024 * 1024)
-      return sizeInMB
-    }
-    return undefined
-  } catch {
-    return undefined
-  }
-}
-
-export const downloadAndUnzipInsiders = async (commit: string): Promise<string> => {
-=======
 export const downloadAndUnzipInsiders = async (platform: string, arch: string, commit: string, updateUrl: string): Promise<string> => {
-<<<<<<< HEAD
->>>>>>> origin/main
-  const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(commit)
-=======
   const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(commit, platform, arch)
->>>>>>> origin/main
   if (cachedPath) {
     return cachedPath
   }
   const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(platform, arch, commit, updateUrl)
   const insidersVersionsDir = join(Root.root, '.vscode-insiders-versions')
   const extractDir = join(insidersVersionsDir, commit)
-<<<<<<< HEAD
-  const fileSizeMB = await getFileSizeInMB(metadata.url)
-  if (fileSizeMB !== undefined) {
-    console.log(`[download-worker] Downloading ${metadata.url} (${fileSizeMB.toFixed(2)} MB)`)
-  } else {
-    console.log(`[download-worker] Downloading ${metadata.url}`)
-  }
-=======
   console.log(`[download-worker] Downloading ${metadata.url}`)
 
   const urlBasename = basename(new URL(metadata.url).pathname)
@@ -81,12 +47,7 @@ export const downloadAndUnzipInsiders = async (platform: string, arch: string, c
     return path
   }
 
-<<<<<<< HEAD
->>>>>>> origin/main
-  await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
-=======
   await DownloadAndExtract.downloadAndExtract(platform, 'vscode-insiders', [metadata.url], extractDir)
->>>>>>> origin/main
   console.log(`[download-worker] Download complete.`)
   const path = getBinaryPathFromExtractDir(platform, arch, extractDir)
   const productPath = GetProductJsonPath.getProductJsonPath(platform, path, commit)

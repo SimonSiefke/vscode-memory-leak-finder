@@ -23,21 +23,7 @@ const isBinary = (file: string) => {
   return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
-<<<<<<< HEAD
-export const create = ({
-  expect,
-  ideVersion,
-  page,
-  VError,
-}: {
-  expect: any
-  ideVersion: any
-  page: any
-  VError: any
-}) => {
-=======
 export const create = ({ expect, ideVersion, page, platform, VError }) => {
->>>>>>> origin/main
   return {
     async acceptInlineCompletion() {
       try {
