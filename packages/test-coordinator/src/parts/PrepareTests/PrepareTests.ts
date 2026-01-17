@@ -65,7 +65,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, pid, utilityContext, webSocketUrl } =
+  const { devtoolsWebSocketUrl, electronObjectId, functionTrackerRpc, initializationWorkerRpc, parsedVersion, pid, utilityContext, webSocketUrl } =
     await prepareBoth({
       arch,
       attachedToPageTimeout,
@@ -98,6 +98,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
+    functionTrackerRpc,
     initializationWorkerRpc,
     parsedVersion,
     pid,

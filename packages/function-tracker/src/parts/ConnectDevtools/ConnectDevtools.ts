@@ -1,3 +1,5 @@
+import { setSessionRpc } from '../GetFunctionStatistics/GetFunctionStatistics.ts'
+
 export interface DevToolsConnection {
   dispose(): Promise<void>
   sessionId: string
@@ -209,7 +211,6 @@ export const connectDevtools = async (
     console.log(`DevTools connection established for connection ${connectionId}, measure ${measureId}`)
 
     // Store sessionRpc for GetFunctionStatistics
-    const { setSessionRpc } = await import('../GetFunctionStatistics/GetFunctionStatistics.ts')
     setSessionRpc(sessionRpc)
 
     return {
@@ -217,7 +218,6 @@ export const connectDevtools = async (
         if (webSocket && webSocket.readyState === WebSocket.OPEN) {
           webSocket.close()
         }
-        const { setSessionRpc } = await import('../GetFunctionStatistics/GetFunctionStatistics.ts')
         setSessionRpc(undefined)
       },
       sessionId,

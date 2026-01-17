@@ -75,6 +75,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     runMode,
     screencastQuality,
     timeouts,
+    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,
