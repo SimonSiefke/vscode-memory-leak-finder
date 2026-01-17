@@ -33,15 +33,7 @@ export const prepareBoth = async (
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
-  const connectDevtoolsPromise = connectDevtools(
-    devtoolsWebSocketUrl,
-    attachedToPageTimeout,
-    trackFunctions,
-    webSocketUrl,
-    connectionId,
-    measureId,
-    pid,
-  )
+  const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
 
   if (headlessMode) {
     // TODO
