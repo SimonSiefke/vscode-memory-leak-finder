@@ -31,11 +31,12 @@ export const connectDevtools = async (
   }
 
   try {
-
     console.log('befor connction')
     // Create our own separate browser connection
     const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
     const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
+
+    console.log('after conncection')
 
     // Get existing targets and find the page target
     const targets = await DevtoolsProtocolTarget.getTargets(browserRpc)
@@ -45,19 +46,16 @@ export const connectDevtools = async (
       throw new Error('No page target found')
     }
 
+    console.log({ pageTarget })
     // Attach to the existing target
     const sessionId = await DevtoolsProtocolTarget.attachToTarget(browserRpc, {
       targetId: pageTarget.targetId,
       flatten: true,
     })
 
+    console.log({ sessionId })
     // Create session RPC connection
     const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-
-    // Inject tracking code into the page
-    await sessionRpc.invoke('Runtime.evaluate', {
-      expression: trackingCode,
-    })
 
     // Setup logic to intercept JS network requests
     await sessionRpc.invoke('Network.enable')
@@ -68,6 +66,13 @@ export const connectDevtools = async (
         { urlPattern: '*.cjs', requestStage: 'Response' },
       ],
     })
+
+    console.log('will eval')
+    // Inject tracking code into the page
+    void sessionRpc.invoke('Runtime.evaluate', {
+      expression: trackingCode,
+    })
+    console.log('did eval')
 
     console.log(`Function tracker connected for connection ${connectionId}, measure ${measureId}`)
 
