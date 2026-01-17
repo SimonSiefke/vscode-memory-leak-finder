@@ -1,6 +1,6 @@
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
-export const parseHeapSnapshotStrings = (id) => {
+export const parseHeapSnapshotStrings = (id: any) => {
   const heapsnapshot = HeapSnapshotState.get(id)
 
   const { strings } = heapsnapshot

@@ -1,4 +1,4 @@
-export const waitForEvent = (worker) => {
+export const waitForEvent = (worker: any) => {
   const { promise, resolve } = Promise.withResolvers()
   const cleanup = (result) => {
     worker.off('message', messageHandler)
