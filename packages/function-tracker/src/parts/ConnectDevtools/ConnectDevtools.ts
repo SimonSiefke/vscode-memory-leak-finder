@@ -27,13 +27,13 @@ export const connectDevtools = async (
     throw new Error('measureId must be a non-empty string')
   }
 
+  console.log('called')
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-  const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, 19990)
+  console.log('browser')
+  const { sessionRpc } = await waitForSession(browserRpc, 19990)
+  console.log('sess')
 
-  const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
-  const frameId = frameTree.frame.id
-
-  console.log({ frameId })
+  console.log('session rpc', sessionRpc)
 
   sessionRpc.on('Fetch.requestPaused', (event) => {
     console.log('paused', event)
@@ -44,13 +44,13 @@ export const connectDevtools = async (
   })
 
   console.log('fetch enabled')
-  void sessionRpc
-    .invoke('Runtime.evaluate', {
-      expression: trackingCode,
-    })
-    .catch((error) => {
-      console.error('err', error)
-    })
+  // void sessionRpc
+  //   .invoke('Runtime.evaluate', {
+  //     expression: trackingCode,
+  //   })
+  //   .catch((error) => {
+  //     console.error('err', error)
+  //   })
 
   // Store sessionRpc for GetFunctionStatistics
   setSessionRpc(sessionRpc)
