@@ -5,7 +5,7 @@
 // when using --remote-debugging-port
 export const monkeyPatchElectronScript = `function () {
   const electron = this
-  const { app, BrowserWindow } = electron
+  const { app } = electron
   const originalWhenReady = app.whenReady()
   const originalEmit = app.emit.bind(app)
 
@@ -41,13 +41,6 @@ export const monkeyPatchElectronScript = `function () {
     isReady = true
     resolve(event)
     originalEmit('ready', ...readyEventArgs)
-    // const i = setInterval(()=>{
-    //   const window = BrowserWindow.getFocusedWindow()
-    //   if(window && window.webContents){
-    //     clearInterval(i)
-    //     window.webContents.openDevtools()
-    //   }
-    // }, 1000)
   }
 }
 `
