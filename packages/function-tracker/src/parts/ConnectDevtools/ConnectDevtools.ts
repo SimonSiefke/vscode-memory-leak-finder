@@ -1,4 +1,7 @@
 import { setSessionRpc } from '../GetFunctionStatistics/GetFunctionStatistics.ts'
+import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
+import { trackingCode } from '../TrackingCode/TrackingCode.ts'
+import { Buffer } from 'node:buffer'
 
 export interface DevToolsConnection {
   dispose(): Promise<void>
@@ -107,20 +110,52 @@ export const connectDevtools = async (
         if (message.method === 'Fetch.requestPaused') {
           const requestId = message.params?.requestId
           const request = message.params?.request
-          const resourceType = message.params?.resourceType
+          const responseStatusCode = message.params?.responseStatusCode
+          const responseHeaders = message.params?.responseHeaders
 
-          if (requestId && request && resourceType === 'Script') {
-            // Check if this is a JavaScript file request
-            if (request.url.endsWith('.js') || request.url.endsWith('.mjs') || request.url.endsWith('.cjs')) {
-              // Here you can modify the JavaScript content before sending it
-              // For now, we'll continue with the original request but you could:
-              // - Fetch the content, modify it, then provide it using Fetch.fulfillRequest
-              // - Replace it with custom tracking code
-              // - Inject function tracking
+          // Intercept responses (not requests) for JS files
+          if (requestId && request && responseStatusCode !== undefined) {
+            const url = request.url
+            if (url.endsWith('.js') || url.endsWith('.mjs') || url.endsWith('.cjs')) {
+              // Intercept and transform the JavaScript response
+              ;(async () => {
+                try {
+                  // Get the response body
+                  const responseBody = await sendCommand('Fetch.getResponseBody', { requestId })
+                  if (responseBody.body) {
+                    let code: string
+                    if (responseBody.base64Encoded) {
+                      // Decode base64 in Node.js environment
+                      code = Buffer.from(responseBody.body, 'base64').toString('utf-8')
+                    } else {
+                      code = responseBody.body
+                    }
 
-              sendCommand('Fetch.continueRequest', {
-                requestId,
-              }).catch(console.error)
+                    // Transform the code with tracking
+                    const transformedCode = transformCodeWithTracking(code, {
+                      scriptId: 0,
+                    })
+                    // Combine tracking code with transformed code
+                    const finalCode = trackingCode + '\n' + transformedCode
+                    // Encode the transformed code to base64
+                    const encodedBody = Buffer.from(finalCode, 'utf-8').toString('base64')
+                    // Fulfill the request with transformed code
+                    await sendCommand('Fetch.fulfillRequest', {
+                      requestId,
+                      responseCode: responseStatusCode || 200,
+                      responseHeaders: responseHeaders || [{ name: 'Content-Type', value: 'application/javascript' }],
+                      body: encodedBody,
+                    })
+                  } else {
+                    // If we can't get the body, continue with original response
+                    await sendCommand('Fetch.continueRequest', { requestId })
+                  }
+                } catch (error) {
+                  console.error('Error intercepting and transforming JS:', error)
+                  // Continue with original response on error
+                  await sendCommand('Fetch.continueRequest', { requestId }).catch(console.error)
+                }
+              })()
             } else {
               // Continue non-JS requests normally
               sendCommand('Fetch.continueRequest', {
@@ -128,7 +163,7 @@ export const connectDevtools = async (
               }).catch(console.error)
             }
           } else {
-            // Continue other resource types normally
+            // Continue other requests normally
             sendCommand('Fetch.continueRequest', {
               requestId,
             }).catch(console.error)
@@ -197,13 +232,18 @@ export const connectDevtools = async (
     // 3. Pause page / ensure page is paused on start
     await sendCommand('Runtime.enable')
 
+    // Inject tracking code into the page before any scripts run
+    await sendCommand('Runtime.evaluate', {
+      expression: trackingCode,
+    })
+
     // 4. Setup logic to intercept JS network requests
     await sendCommand('Network.enable')
     await sendCommand('Fetch.enable', {
       patterns: [
-        { urlPattern: '*.js', requestStage: 'Request' },
-        { urlPattern: '*.mjs', requestStage: 'Request' },
-        { urlPattern: '*.cjs', requestStage: 'Request' },
+        { urlPattern: '*.js', requestStage: 'Response' },
+        { urlPattern: '*.mjs', requestStage: 'Response' },
+        { urlPattern: '*.cjs', requestStage: 'Response' },
       ],
     })
     await sendCommand('Runtime.runIfWaitingForDebugger')

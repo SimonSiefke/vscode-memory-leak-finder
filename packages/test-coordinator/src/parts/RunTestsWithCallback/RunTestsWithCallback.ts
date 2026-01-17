@@ -26,8 +26,11 @@ const emptyRpc = {
 }
 
 const disposeWorkers = async (workers) => {
-  const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
+  const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
   await Promise.all([memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
+  if (functionTrackerRpc) {
+    await functionTrackerRpc.dispose()
+  }
   await initializationWorkerRpc.dispose()
 }
 
@@ -109,7 +112,7 @@ export const runTestsWithCallback = async ({
     // Then recreate the workers, ensuring a clean state
 
     if (setupOnly && commit) {
-      const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+      const { functionTrackerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
         arch,
         attachedToPageTimeout,
         clearExtensions,
@@ -161,7 +164,7 @@ export const runTestsWithCallback = async ({
     }
 
     if (login) {
-      const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+      const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
         arch,
         attachedToPageTimeout,
         clearExtensions,
@@ -202,6 +205,9 @@ export const runTestsWithCallback = async ({
         await testWorkerRpc.dispose()
         await memoryRpc?.dispose()
         await videoRpc?.dispose()
+        if (functionTrackerRpc) {
+          await functionTrackerRpc.dispose()
+        }
         if (initializationWorkerRpc) {
           await initializationWorkerRpc.dispose()
         }
@@ -262,6 +268,7 @@ export const runTestsWithCallback = async ({
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
     let workers = {
+      functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
       testWorkerRpc: emptyRpc,
@@ -278,7 +285,7 @@ export const runTestsWithCallback = async ({
       if (needsSetup) {
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
-        const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+        const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
           arch,
           attachedToPageTimeout,
           clearExtensions,
@@ -314,6 +321,7 @@ export const runTestsWithCallback = async ({
           vscodeVersion,
         })
         workers = {
+          functionTrackerRpc: functionTrackerRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
           // @ts-ignore
           memoryRpc: memoryRpc || emptyRpc,
@@ -322,7 +330,7 @@ export const runTestsWithCallback = async ({
         }
       }
 
-      const { memoryRpc, testWorkerRpc, videoRpc } = workers
+      const { functionTrackerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
 
       let wasOriginallySkipped = false
       if (i !== 0) {
@@ -401,6 +409,19 @@ export const runTestsWithCallback = async ({
             await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
+          
+          // Write tracked function results if tracking is enabled
+          if (trackFunctions && functionTrackerRpc && functionTrackerRpc !== emptyRpc) {
+            try {
+              const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
+              const testName = fileName.replace('.json', '')
+              const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'tracked-functions', testName + '.json')
+              await functionTrackerRpc.invoke('FunctionTracker.writeFunctionStatistics', resultPath)
+            } catch (error) {
+              console.error('Error writing tracked function results:', error)
+            }
+          }
+          
           const end = Time.now()
           const duration = end - start
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak, wasOriginallySkipped)
@@ -414,6 +435,18 @@ export const runTestsWithCallback = async ({
         } else {
           failed++
         }
+        // Write tracked function results if tracking is enabled (even on failure)
+        if (trackFunctions && functionTrackerRpc && functionTrackerRpc !== emptyRpc) {
+          try {
+            const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
+            const testName = fileName.replace('.json', '')
+            const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'tracked-functions', testName + '.json')
+            await functionTrackerRpc.invoke('FunctionTracker.writeFunctionStatistics', resultPath)
+          } catch (error) {
+            console.error('Error writing tracked function results:', error)
+          }
+        }
+        
         const prettyError = await GetPrettyError.getPrettyError(error, color, root)
         await callback(
           TestWorkerEventType.TestFailed,
@@ -434,6 +467,7 @@ export const runTestsWithCallback = async ({
     // TODO when in watch mode, dispose all workers except initialization worker to keep the application running
     await disposeWorkers(workers)
     workers = {
+      functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
       testWorkerRpc: emptyRpc,
