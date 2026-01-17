@@ -328,6 +328,9 @@ export const runTestsWithCallback = async ({
           testWorkerRpc: testWorkerRpc || emptyRpc,
           videoRpc: videoRpc || emptyRpc,
         }
+        if (trackFunctions) {
+          console.log(`[FunctionTracker] Workers initialized - functionTrackerRpc: ${workers.functionTrackerRpc === emptyRpc ? 'emptyRpc' : 'exists'}`)
+        }
       }
 
       const { functionTrackerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
@@ -416,9 +419,15 @@ export const runTestsWithCallback = async ({
               const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
               const testName = fileName.replace('.json', '')
               const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'tracked-functions', testName + '.json')
+              console.log(`[FunctionTracker] Writing results to: ${resultPath}`)
               await functionTrackerRpc.invoke('FunctionTracker.writeFunctionStatistics', resultPath)
+              console.log(`[FunctionTracker] Results written successfully`)
             } catch (error) {
               console.error('Error writing tracked function results:', error)
+            }
+          } else {
+            if (trackFunctions) {
+              console.log(`[FunctionTracker] Skipping write - functionTrackerRpc: ${functionTrackerRpc ? 'exists' : 'undefined'}, emptyRpc: ${functionTrackerRpc === emptyRpc}`)
             }
           }
           
