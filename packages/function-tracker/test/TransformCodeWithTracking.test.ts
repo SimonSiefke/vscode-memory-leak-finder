@@ -160,6 +160,7 @@ test('TransformCodeWithTracking - should not transform tracking functions themse
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `function trackFunctionCall() {
+  trackFunctionCall(123, 2, 4);
   return 'tracking';
 }
 function getFunctionStatistics() {
@@ -215,11 +216,11 @@ test('TransformCodeWithTracking - should transform IIFE (Immediately Invoked Fun
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `(function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 5);
   console.log('IIFE executed');
 })();
 (() => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 6, 5);
   console.log('Arrow IIFE executed');
 })();`
 
@@ -239,11 +240,11 @@ test('TransformCodeWithTracking - should transform Promise constructor callbacks
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `new Promise((resolve, reject) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 16);
   resolve('success');
 });
 new Promise(function (resolve, reject) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 6, 16);
   reject('error');
 });`
 
@@ -267,7 +268,7 @@ test('TransformCodeWithTracking - should transform async functions', () => {
   return await fetch('/api/data');
 }
 const asyncArrow = async () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 6, 23);
   return await Promise.resolve('async arrow');
 };`
 
@@ -293,7 +294,7 @@ test('TransformCodeWithTracking - should transform generator functions', () => {
   yield 2;
 }
 const generatorArrow = function* () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 7, 27);
   yield 'arrow generator';
 };`
 
@@ -319,11 +320,11 @@ test('TransformCodeWithTracking - should transform nested functions', () => {
   const expected = `function outerFunction() {
   trackFunctionCall(123, 2, 4);
   function innerFunction() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 6);
     return 'inner';
   }
   const innerArrow = () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 7, 25);
     return 'inner arrow';
   };
   return innerFunction();
@@ -351,19 +352,19 @@ test('TransformCodeWithTracking - should transform functions as parameters', () 
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
   const expected = `setTimeout(function () {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 2, 15);
   console.log('timeout callback');
 }, 1000);
 setInterval(() => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 6, 16);
   console.log('interval callback');
 }, 2000);
 [1, 2, 3].map(function (item) {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 10, 18);
   return item * 2;
 });
 [4, 5, 6].filter(item => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 14, 21);
   return item > 4;
 });`
 
@@ -391,7 +392,7 @@ const arrowDestructured = ({
   x,
   y
 }) => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 6, 30);
   return x + y;
 };`
 
