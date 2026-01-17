@@ -27,7 +27,7 @@ export const connectDevtools = async (
     throw new Error('measureId must be a non-empty string')
   }
 
-  const [browserRpc] = await Promise.all([DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)])
+  const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, 19990)
 
   const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)

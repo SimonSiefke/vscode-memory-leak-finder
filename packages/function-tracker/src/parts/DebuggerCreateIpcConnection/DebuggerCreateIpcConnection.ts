@@ -1,36 +1,37 @@
+import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
+import * as Json from '../Json/Json.ts'
 import { VError } from '@lvce-editor/verror'
+import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
 
-export const createConnection = async (wsUrl: string) => {
+/**
+ * @param {string} wsUrl
+ */
+export const createConnection = async (wsUrl) => {
   try {
-    // @ts-ignore
     const webSocket = new WebSocket(wsUrl)
-    await new Promise<void>((resolve, reject) => {
-      if (webSocket.readyState === WebSocket.OPEN) {
-        resolve()
-        return
-      }
-      webSocket.addEventListener('open', () => resolve(), { once: true })
-      webSocket.addEventListener('error', (error) => reject(error), { once: true })
-    })
-    return {
-      dispose() {
-        webSocket.close()
-      },
+    await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
+    const ipc = {
       get onmessage() {
         return webSocket.onmessage
       },
-      set onmessage(listener: ((this: WebSocket, ev: MessageEvent) => void) | null) {
-        const handleMessage = (event: MessageEvent) => {
+      set onmessage(listener) {
+        const handleMessage = (event) => {
           const parsed = JSON.parse(event.data)
           // @ts-ignore
           listener(parsed)
         }
         webSocket.onmessage = handleMessage
       },
-      send(message: unknown): void {
-        webSocket.send(JSON.stringify(message))
+      /**
+       *
+       * @param {any} message
+       */
+      send(message) {
+        webSocket.send(Json.stringify(message))
       },
     }
+    const rpc = DebuggerCreateRpcConnection.createRpc(ipc, true)
+    return rpc
   } catch (error) {
     throw new VError(error, `Failed to create websocket connection`)
   }
