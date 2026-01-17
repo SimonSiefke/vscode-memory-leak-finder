@@ -70,8 +70,8 @@ export const launchIde = async ({
     })
     return {
       child,
-      pid,
       parsedVersion: ParseVersion.parseVersion(cursorVersion),
+      pid,
     }
   }
   let versionToParse: string
@@ -107,7 +107,7 @@ export const launchIde = async ({
 
   return {
     child,
-    pid,
     parsedVersion: ParseVersion.parseVersion(versionToParse),
+    pid,
   }
 }

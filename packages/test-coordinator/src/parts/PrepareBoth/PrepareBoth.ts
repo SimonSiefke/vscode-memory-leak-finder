@@ -32,7 +32,9 @@ export interface PrepareBothOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
+  readonly measureId: string
   readonly platform: string
+  readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -60,7 +62,9 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     inspectSharedProcess,
     inspectSharedProcessPort,
     isFirstConnection,
+    measureId,
     platform,
+    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -87,7 +91,9 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     inspectSharedProcess,
     inspectSharedProcessPort,
     isFirstConnection,
+    measureId,
     platform,
+    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,

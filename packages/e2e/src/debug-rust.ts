@@ -70,11 +70,11 @@ export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Pr
   await ActivityBar.showRunAndDebug()
   await Editor.setBreakpoint(2)
   await RunAndDebug.runAndWaitForPaused({
-    viaIcon: true,
     debugLabel: 'Debug',
     file: 'main.rs',
     hasCallStack: false,
     line: 2,
+    viaIcon: true,
   })
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()

@@ -18,8 +18,8 @@ export interface MemoryLeakFinderState {
   after?: any
   before?: any
   readonly measure: Measure
-  readonly rpc: RpcConnection
   readonly pid: number
+  readonly rpc: RpcConnection
 }
 
 export const state: {

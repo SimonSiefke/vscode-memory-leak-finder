@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook, Extensions }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Extensions, Notebook, SideBar, Workspace }: TestContext): Promise<void> => {
   await Extensions.install({
     id: 'ms-toolsai.jupyter',
     name: 'Jupyter',
@@ -47,12 +47,12 @@ export const setup = async ({ Editor, Explorer, Workspace, SideBar, Notebook, Ex
   await SideBar.hide()
   await Editor.open('test.ipynb')
   // @ts-ignore
-  await Notebook.executeCell({ index: 0, kernelSource: 'Python Environments...', expectedOutput: 'Hello, World!\n' })
+  await Notebook.executeCell({ expectedOutput: 'Hello, World!\n', index: 0, kernelSource: 'Python Environments...' })
 }
 
 export const run = async ({ Notebook }: TestContext): Promise<void> => {
   // @ts-ignore
   await Notebook.clearAllOutputs()
   // @ts-ignore
-  await Notebook.executeCell({ index: 0, expectedOutput: 'Hello, World!\n' })
+  await Notebook.executeCell({ expectedOutput: 'Hello, World!\n', index: 0 })
 }

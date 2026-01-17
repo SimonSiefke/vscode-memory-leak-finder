@@ -65,6 +65,7 @@ export const updateState = async (newState: any): Promise<void> => {
       setupOnly: false,
       timeoutBetween: state.timeoutBetween,
       timeouts: state.timeouts,
+      trackFunctions: state.trackFunctions,
       updateUrl: 'https://update.code.visualstudio.com',
       useProxyMock: state.useProxyMock,
       vscodePath: '',

@@ -25,16 +25,6 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to check that markdown preview is visible`)
       }
     },
-    async shouldHaveHeading(subFrame, id) {
-      try {
-        await page.waitForIdle()
-        const heading = subFrame.locator(`#${id}`)
-        await expect(heading).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
-      }
-    },
     async shouldHaveCodeBlocks(subFrame, count) {
       try {
         await page.waitForIdle()
@@ -53,6 +43,16 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview has code block with language ${language}`)
+      }
+    },
+    async shouldHaveHeading(subFrame, id) {
+      try {
+        await page.waitForIdle()
+        const heading = subFrame.locator(`#${id}`)
+        await expect(heading).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
       }
     },
   }
