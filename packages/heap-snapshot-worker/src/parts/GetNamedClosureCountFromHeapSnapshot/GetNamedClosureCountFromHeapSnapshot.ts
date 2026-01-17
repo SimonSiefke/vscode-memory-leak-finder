@@ -3,15 +3,15 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as IsImportantEdge from '../IsImportantEdge/IsImportantEdge.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
-const isClosure = (node) => {
+const isClosure = (node: any) => {
   return node.type === 'closure'
 }
 
-const isContext = (edge) => {
+const isContext = (edge: any) => {
   return edge.name === 'context'
 }
 
-const getName = (node, contextNodes) => {
+const getName = (node: any, contextNodes: any[]) => {
   if (node.name) {
     return node.name
   }
@@ -21,7 +21,7 @@ const getName = (node, contextNodes) => {
     .slice(0, 100)
 }
 
-export const getNamedClosureCountFromHeapSnapshot = async (id) => {
+export const getNamedClosureCountFromHeapSnapshot = async (id: any) => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)

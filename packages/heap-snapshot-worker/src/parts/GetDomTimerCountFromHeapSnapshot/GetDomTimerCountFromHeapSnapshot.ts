@@ -1,7 +1,7 @@
 import { getDomTimerCountFromHeapSnapshotInternal } from '../GetDomTimerCountFromHeapSnapshotInternal/GetDomTimerCountFromHeapSnapshotInternal.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
-export const getDomTimerCountFromHeapSnapshot = async (path) => {
+export const getDomTimerCountFromHeapSnapshot = async (path: string) => {
   const snapshot = await prepareHeapSnapshot(path, {
     parseStrings: true,
   })
