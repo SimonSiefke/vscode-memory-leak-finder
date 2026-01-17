@@ -1,7 +1,13 @@
-export const createRpc = (ipc: any) => {
+import * as ObjectType from '../ObjectType/ObjectType.ts'
+
+/**
+ *
+ * @param {any} ipc
+ * @returns
+ */
+export const createRpc = (ipc, canUseIdleCallback) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message: any) => {
-    console.log(message)
+  const handleMessage = (message) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -28,11 +34,9 @@ export const createRpc = (ipc: any) => {
   let _id = 0
   return {
     callbacks,
-    async dispose() {
-      await ipc.dispose()
-    },
-    invoke(method: string, params: any) {
-      const { promise, reject, resolve } = Promise.withResolvers<any>()
+    canUseIdleCallback,
+    invoke(method, params) {
+      const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
       callbacks[id] = { reject, resolve }
       ipc.send({
@@ -42,8 +46,8 @@ export const createRpc = (ipc: any) => {
       })
       return promise
     },
-    invokeWithSession(sessionId: string, method: string, params: any) {
-      const { promise, reject, resolve } = Promise.withResolvers<any>()
+    invokeWithSession(sessionId, method, params) {
+      const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
       callbacks[id] = { reject, resolve }
       ipc.send({
@@ -54,15 +58,29 @@ export const createRpc = (ipc: any) => {
       })
       return promise
     },
+    invokeWithTarget(targetId, sessionId, method, params) {
+      const { promise, reject, resolve } = Promise.withResolvers()
+      const id = _id++
+      callbacks[id] = { reject, resolve }
+      ipc.send({
+        id,
+        method,
+        params,
+        sessionId,
+        targetId,
+      })
+      return promise
+    },
     listeners,
-    off(event: string, listener: any) {
+    objectType: ObjectType.Rpc,
+    off(event, listener) {
       delete listener[event]
     },
-    on(event: string, listener: any) {
+    on(event, listener) {
       listeners[event] = listener
     },
-    once(event: string) {
-      const { promise, resolve } = Promise.withResolvers<any>()
+    once(event) {
+      const { promise, resolve } = Promise.withResolvers()
       onceListeners[event] = resolve
       return promise
     },
