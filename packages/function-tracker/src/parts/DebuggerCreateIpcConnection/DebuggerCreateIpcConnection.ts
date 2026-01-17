@@ -17,6 +17,7 @@ export const createConnection = async (wsUrl) => {
       set onmessage(listener) {
         const handleMessage = (event) => {
           const parsed = JSON.parse(event.data)
+          console.log(parsed)
           // @ts-ignore
           listener(parsed)
         }

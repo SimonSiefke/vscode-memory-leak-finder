@@ -18,6 +18,7 @@ export const connectDevtools = async (
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
   const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
 
+  console.log('ses', sessionId)
   let functionTrackerRpc: any = undefined
   if (trackFunctions) {
     const functionTrackerUrl = GetFunctionTrackerUrl.getFunctionTrackerUrl()
@@ -36,9 +37,10 @@ export const connectDevtools = async (
       attachedToPageTimeout,
       pid,
     )
+    console.log('done')
+  } else {
+    await DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)
   }
-
-  await DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)
   console.log('continue')
   return {
     async dispose() {

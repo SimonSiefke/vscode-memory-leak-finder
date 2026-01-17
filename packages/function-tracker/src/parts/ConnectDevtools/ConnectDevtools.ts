@@ -1,7 +1,6 @@
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
-import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { setSessionRpc } from '../GetFunctionStatistics/GetFunctionStatistics.ts'
-import { trackingCode } from '../TrackingCode/TrackingCode.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export interface DevToolsConnection {
@@ -30,7 +29,7 @@ export const connectDevtools = async (
   console.log('called')
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   console.log('browser')
-  const { sessionRpc } = await waitForSession(browserRpc, 19990)
+  const { sessionRpc, sessionId } = await waitForSession(browserRpc, 19990)
   console.log('sess')
 
   console.log('session rpc', sessionRpc)
@@ -39,9 +38,14 @@ export const connectDevtools = async (
     console.log('paused', event)
   })
 
+  console.log('session id', sessionId)
   await sessionRpc.invoke('Fetch.enable', {
     patterns: [{ urlPattern: '*.js', requestStage: 'Request' }],
   })
+
+  console.log('before call')
+  // await DevtoolsProtocolRuntime.enable(sessionRpc)
+  // await DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)
 
   console.log('fetch enabled')
   // void sessionRpc
