@@ -9,7 +9,7 @@ import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
-export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: number, port: MessagePort, trackFunctions: boolean, connectionId: number, measureId: string, pid: number): Promise<any> => {
+export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: number, port: MessagePort, parsedVersion: any, trackFunctions: boolean, connectionId: number, measureId: string, pid: number): Promise<any> => {
   const stream = new PortReadStream(port)
   const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(stream)
 
