@@ -1678,7 +1678,7 @@ test('Transform Script - transformCode - should handle comments and directives',
 
 // Single line comment with function fakeFunction() {}
 function realFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 11, 4);
   return 'real';
 }`
 
@@ -1705,14 +1705,14 @@ test('Transform Script - transformCode - should handle template literals and com
   return \`Hello \${name}!\`;
 }
 const complexArrow = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 7, 25);
   return {
     [computedKey]: () => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 8, 21);
       return 'nested computed';
     },
     regular: function () {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 9, 15);
       return 'regular';
     }
   };
@@ -1740,7 +1740,7 @@ test('Transform Script - transformCode - should handle regex and literals', () =
   return pattern.test('test string');
 }
 function literalFunction() {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 7, 4);
   return 42n; // BigInt literal
 }`
 
@@ -1782,13 +1782,13 @@ test('Transform Script - transformCode - should handle deeply nested function st
   const expected = `function level1() {
   trackFunctionCall(123, 2, 4);
   function level2() {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 3, 6);
     function level3() {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 4, 8);
       function level4() {
-        trackFunctionCall(123, 2, 4);
+        trackFunctionCall(123, 5, 10);
         function level5() {
-          trackFunctionCall(123, 2, 4);
+          trackFunctionCall(123, 6, 12);
           return 'deeply nested';
         }
         return level5();
@@ -1800,13 +1800,13 @@ test('Transform Script - transformCode - should handle deeply nested function st
   return level2();
 }
 const arrowNest = () => {
-  trackFunctionCall(123, 2, 4);
+  trackFunctionCall(123, 18, 22);
   const inner1 = () => {
-    trackFunctionCall(123, 2, 4);
+    trackFunctionCall(123, 19, 21);
     const inner2 = () => {
-      trackFunctionCall(123, 2, 4);
+      trackFunctionCall(123, 20, 23);
       const inner3 = () => {
-        trackFunctionCall(123, 2, 4);
+        trackFunctionCall(123, 21, 25);
         return 'arrow nested';
       };
       return inner3();
