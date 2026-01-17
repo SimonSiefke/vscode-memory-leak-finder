@@ -1,5 +1,5 @@
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
-import { setSessionRpc } from '../GetFunctionStatistics/GetFunctionStatistics.ts'
+import { setSessionRpc } from '../SessionState/SessionState.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export interface DevToolsConnection {

@@ -1,12 +1,8 @@
+import { getSessionRpc } from '../SessionState/SessionState.ts'
 import type { FunctionStatistics } from '../Types/Types.ts'
 
-let currentSessionRpc: any = undefined
-
-export const setSessionRpc = (sessionRpc: any): void => {
-  currentSessionRpc = sessionRpc
-}
-
 export const getFunctionStatistics = async (): Promise<FunctionStatistics> => {
+  const currentSessionRpc = getSessionRpc()
   if (!currentSessionRpc) {
     throw new Error('Function tracker not connected. Call connectDevtools first.')
   }
