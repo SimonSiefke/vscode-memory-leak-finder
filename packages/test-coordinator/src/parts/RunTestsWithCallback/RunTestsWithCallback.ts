@@ -27,10 +27,7 @@ const emptyRpc = {
 
 const disposeWorkers = async (workers) => {
   const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
-  await Promise.all([memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
-  if (functionTrackerRpc) {
-    await functionTrackerRpc.dispose()
-  }
+  await Promise.all([functionTrackerRpc.dispose(), memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()
 }
 
@@ -112,7 +109,7 @@ export const runTestsWithCallback = async ({
     // Then recreate the workers, ensuring a clean state
 
     if (setupOnly && commit) {
-      const { functionTrackerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+      const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
         arch,
         attachedToPageTimeout,
         clearExtensions,
@@ -206,9 +203,7 @@ export const runTestsWithCallback = async ({
         await testWorkerRpc.dispose()
         await memoryRpc?.dispose()
         await videoRpc?.dispose()
-        if (functionTrackerRpc) {
-          await functionTrackerRpc.dispose()
-        }
+        await functionTrackerRpc?.dispose()
         if (initializationWorkerRpc) {
           await initializationWorkerRpc.dispose()
         }
@@ -330,11 +325,6 @@ export const runTestsWithCallback = async ({
           testWorkerRpc: testWorkerRpc || emptyRpc,
           videoRpc: videoRpc || emptyRpc,
         }
-        if (trackFunctions) {
-          console.log(
-            `[FunctionTracker] Workers initialized - functionTrackerRpc: ${workers.functionTrackerRpc === emptyRpc ? 'emptyRpc' : 'exists'}`,
-          )
-        }
       }
 
       const { functionTrackerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
@@ -416,25 +406,6 @@ export const runTestsWithCallback = async ({
             await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
-
-          // Write tracked function results if tracking is enabled
-          console.log(
-            `[FunctionTracker] Check - trackFunctions: ${trackFunctions}, functionTrackerRpc exists: ${!!functionTrackerRpc}, is emptyRpc: ${functionTrackerRpc === emptyRpc}`,
-          )
-          if (trackFunctions && functionTrackerRpc && functionTrackerRpc !== emptyRpc) {
-            try {
-              const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
-              const testName = fileName.replace('.json', '')
-              const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'tracked-functions', testName + '.json')
-              console.log(`[FunctionTracker] Writing results to: ${resultPath}`)
-              await functionTrackerRpc.invoke('FunctionTracker.writeFunctionStatistics', resultPath)
-              console.log(`[FunctionTracker] Results written successfully`)
-            } catch (error) {
-              console.error('Error writing tracked function results:', error)
-              console.error('Error stack:', error instanceof Error ? error.stack : String(error))
-            }
-          }
-
           const end = Time.now()
           const duration = end - start
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak, wasOriginallySkipped)
@@ -448,18 +419,6 @@ export const runTestsWithCallback = async ({
         } else {
           failed++
         }
-        // Write tracked function results if tracking is enabled (even on failure)
-        if (trackFunctions && functionTrackerRpc && functionTrackerRpc !== emptyRpc) {
-          try {
-            const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
-            const testName = fileName.replace('.json', '')
-            const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'tracked-functions', testName + '.json')
-            await functionTrackerRpc.invoke('FunctionTracker.writeFunctionStatistics', resultPath)
-          } catch (error) {
-            console.error('Error writing tracked function results:', error)
-          }
-        }
-
         const prettyError = await GetPrettyError.getPrettyError(error, color, root)
         await callback(
           TestWorkerEventType.TestFailed,
