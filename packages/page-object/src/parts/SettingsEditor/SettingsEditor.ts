@@ -341,13 +341,13 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to open select`)
       }
     },
-    async setTextInput({ name, value }) {
+    async setTextInput({ name, value, type = 'text' }) {
       try {
         await page.waitForIdle()
         const settingItem = page.locator(`.setting-item-contents[data-key="${name}"]`)
         await expect(settingItem).toBeVisible()
         await page.waitForIdle()
-        const input = settingItem.locator('input[type="text"]')
+        const input = settingItem.locator(`input[type="${type}"]`)
         await expect(input).toBeVisible()
         await page.waitForIdle()
         await input.click()
