@@ -43,7 +43,7 @@ export const monkeyPatchElectronScript = `function () {
     originalEmit('ready', ...readyEventArgs)
     const i = setInterval(()=>{
       const window = BrowserWindow.getFocusedWindow()
-      if(window){
+      if(window && window.webContents){
         clearInterval(i)
         window.webContents.openDevtools()
       }

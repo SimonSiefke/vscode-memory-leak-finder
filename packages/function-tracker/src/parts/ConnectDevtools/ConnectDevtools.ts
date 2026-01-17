@@ -17,8 +17,6 @@ export const connectDevtools = async (
   webSocketUrl: string,
   connectionId: number,
   measureId: string,
-  attachedToPageTimeout: number,
-  pid: number,
 ): Promise<void> => {
   if (typeof devtoolsWebSocketUrl !== 'string' || !devtoolsWebSocketUrl.trim()) {
     throw new Error('devtoolsWebSocketUrl must be a non-empty string')
@@ -30,41 +28,42 @@ export const connectDevtools = async (
     throw new Error('measureId must be a non-empty string')
   }
 
-  try {
-    // Create our own separate browser connection
-    const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-    const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
+  // Create our own separate browser connection
+  const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
+  const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
-    // Get existing targets and find the page target
-    const targets = await DevtoolsProtocolTarget.getTargets(browserRpc)
-    const pageTarget = targets.find((target: any) => target.type === 'page')
+  // Get existing targets and find the page target
+  const targets = await DevtoolsProtocolTarget.getTargets(browserRpc)
+  const pageTarget = targets.find((target: any) => target.type === 'page')
 
-    if (!pageTarget) {
-      throw new Error('No page target found')
-    }
+  if (!pageTarget) {
+    throw new Error('No page target found')
+  }
 
-    const sessionId = await DevtoolsProtocolTarget.attachToTarget(browserRpc, {
-      targetId: pageTarget.targetId,
-      flatten: true,
-    })
+  const sessionId = await DevtoolsProtocolTarget.attachToTarget(browserRpc, {
+    targetId: pageTarget.targetId,
+    flatten: true,
+  })
 
-    const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+  const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
-    await sessionRpc.invoke('Fetch.enable', {
-      patterns: [
-        { urlPattern: '*.js', requestStage: 'Response' },
-        { urlPattern: '*.mjs', requestStage: 'Response' },
-        { urlPattern: '*.cjs', requestStage: 'Response' },
-      ],
-    })
+  sessionRpc.on('Fetch.requestPaused', (event) => {
+    console.log('paused', event)
+  })
 
-    void sessionRpc.invoke('Runtime.evaluate', {
+  await sessionRpc.invoke('Fetch.enable', {
+    patterns: [{ urlPattern: '*.js', requestStage: 'Response' }],
+  })
+
+  console.log('fetch enabled')
+  void sessionRpc
+    .invoke('Runtime.evaluate', {
       expression: trackingCode,
     })
+    .catch((error) => {
+      console.error('err', error)
+    })
 
-    // Store sessionRpc for GetFunctionStatistics
-    setSessionRpc(sessionRpc)
-  } catch (error) {
-    throw new Error(`Failed to setup function tracking: ${error instanceof Error ? error.message : String(error)}`)
-  }
+  // Store sessionRpc for GetFunctionStatistics
+  setSessionRpc(sessionRpc)
 }
