@@ -6,10 +6,10 @@ import { setSessionRpc } from '../GetFunctionStatistics/GetFunctionStatistics.ts
 import { trackingCode } from '../TrackingCode/TrackingCode.ts'
 
 export interface DevToolsConnection {
-  dispose(): Promise<void>
-  sessionId: string
-  sessionRpc: any
-  targetId: string
+  readonly dispose: () => Promise<void>
+  readonly sessionId: string
+  readonly sessionRpc: any
+  readonly targetId: string
 }
 
 export const connectDevtools = async (
@@ -19,7 +19,7 @@ export const connectDevtools = async (
   measureId: string,
   attachedToPageTimeout: number,
   pid: number,
-): Promise<DevToolsConnection> => {
+): Promise<void> => {
   if (typeof devtoolsWebSocketUrl !== 'string' || !devtoolsWebSocketUrl.trim()) {
     throw new Error('devtoolsWebSocketUrl must be a non-empty string')
   }
@@ -57,8 +57,8 @@ export const connectDevtools = async (
     // Create session RPC connection
     const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
+    console.log('before network')
     // Setup logic to intercept JS network requests
-    await sessionRpc.invoke('Network.enable')
     await sessionRpc.invoke('Fetch.enable', {
       patterns: [
         { urlPattern: '*.js', requestStage: 'Response' },
@@ -67,6 +67,7 @@ export const connectDevtools = async (
       ],
     })
 
+    console.log('after network')
     console.log('will eval')
     // Inject tracking code into the page
     void sessionRpc.invoke('Runtime.evaluate', {
@@ -78,16 +79,6 @@ export const connectDevtools = async (
 
     // Store sessionRpc for GetFunctionStatistics
     setSessionRpc(sessionRpc)
-
-    return {
-      async dispose() {
-        setSessionRpc(undefined)
-        await browserRpc.dispose()
-      },
-      sessionId,
-      sessionRpc,
-      targetId: pageTarget.targetId,
-    }
   } catch (error) {
     throw new Error(`Failed to setup function tracking: ${error instanceof Error ? error.message : String(error)}`)
   }
