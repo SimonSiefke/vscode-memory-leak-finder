@@ -25,15 +25,22 @@ export const transformCode = async (code: string, filename?: string, excludePatt
 
     // Transform the original code with proper file context
     try {
-      const plugin = createFunctionWrapperPlugin({ filename, excludePatterns })
+      const pluginOptions: any = {}
+      if (filename !== undefined) {
+        pluginOptions.filename = filename
+      }
+      if (excludePatterns !== undefined) {
+        pluginOptions.excludePatterns = excludePatterns
+      }
+      const plugin = createFunctionWrapperPlugin(pluginOptions)
       console.log('Plugin created successfully:', plugin)
       console.log('AST before transformation:', ast)
       traverseDefault(ast, plugin as any)
       console.log('AST after transformation successful')
     } catch (error) {
       console.error('Error transforming code:', error)
-      console.error('Error details:', error.message)
-      console.error('Error stack:', error.stack)
+      console.error('Error details:', (error as Error).message)
+      console.error('Error stack:', (error as Error).stack)
       return code // Return original code if transformation fails
     }
 
