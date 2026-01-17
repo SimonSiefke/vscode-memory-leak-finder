@@ -21,31 +21,45 @@ export const connectDevtools = async (
   console.log('ses', sessionId)
   let functionTrackerRpc: any = undefined
   if (trackFunctions) {
-    const functionTrackerUrl = GetFunctionTrackerUrl.getFunctionTrackerUrl()
-    functionTrackerRpc = await NodeForkedProcessRpcParent.create({
-      commandMap: {},
-      execArgv: [],
-      path: functionTrackerUrl,
-      stdio: 'inherit',
-    })
-    await functionTrackerRpc.invoke(
-      'FunctionTracker.connectDevtools',
-      devtoolsWebSocketUrl,
-      webSocketUrl,
-      connectionId,
-      measureId,
-      attachedToPageTimeout,
-      pid,
-    )
-    console.log('done')
+    // const functionTrackerUrl = GetFunctionTrackerUrl.getFunctionTrackerUrl()
+    // functionTrackerRpc = await NodeForkedProcessRpcParent.create({
+    //   commandMap: {},
+    //   execArgv: [],
+    //   path: functionTrackerUrl,
+    //   stdio: 'inherit',
+    // })
+    // await functionTrackerRpc.invoke(
+    //   'FunctionTracker.connectDevtools',
+    //   devtoolsWebSocketUrl,
+    //   webSocketUrl,
+    //   connectionId,
+    //   measureId,
+    //   attachedToPageTimeout,
+    //   pid,
+    // )
+    // console.log('done')
   } else {
-    await DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)
   }
+  sessionRpc.on('Fetch.requestPaused', (event) => {
+    console.log('paused', event)
+  })
+  const r = await sessionRpc.invoke('Fetch.enable', {
+    patterns: [
+      {
+        resourceType: 'Script',
+        // urlPattern: '*.js', requestStage: 'Request'
+      },
+    ],
+  })
+  console.log({ r })
+
+  await DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)
   console.log('continue')
   return {
     async dispose() {
+      console.log('dispoing...')
       // Don't dispose functionTrackerRpc here - it will be disposed by test-coordinator
-      await browserRpc.dispose()
+      // await browserRpc.dispose()
     },
     sessionId,
     sessionRpc,

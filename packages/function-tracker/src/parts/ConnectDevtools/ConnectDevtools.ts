@@ -39,9 +39,13 @@ export const connectDevtools = async (
   })
 
   console.log('session id', sessionId)
-  await sessionRpc.invoke('Fetch.enable', {
-    patterns: [{ urlPattern: '*.js', requestStage: 'Request' }],
+  await new Promise((r) => {
+    setTimeout(r, 3000)
   })
+  // await sessionRpc.invoke('Network.enable')
+  // await sessionRpc.invoke('Network.setRequestInterception', {
+  //   patterns: [{ urlPattern: '*.js', requestStage: 'Request' }],
+  // })
 
   console.log('before call')
   // await DevtoolsProtocolRuntime.enable(sessionRpc)
