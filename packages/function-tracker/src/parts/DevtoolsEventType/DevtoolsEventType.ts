@@ -1,23 +1,7 @@
-const DebuggerPaused = 'Debugger.paused'
-const DebuggerResumed = 'Debugger.resumed'
-const DebuggerScriptParsed = 'Debugger.scriptParsed'
-
-const PageFrameNavigated = 'Page.frameNavigated'
-const PageFrameAttached = 'Page.frameAttached'
-const PageFrameStartedNavigating = 'Page.frameStartedNavigating'
 export const PageFrameRequestedNavigation = 'Page.frameRequestedNavigation'
-const PageLifeCycleEvent = 'Page.lifecycleEvent'
-const PageLoadEventFired = 'Page.loadEventFired'
 export const PageFrameStoppedLoading = 'Page.frameStoppedLoading'
 export const PageDocumentOpened = 'Page.documentOpened'
 
 export const RuntimeExecutionContextCreated = 'Runtime.executionContextCreated'
-const RuntimeExecutionContextDestroyed = 'Runtime.executionContextDestroyed'
-const RuntimeExecutionContextsCleared = 'Runtime.executionContextsCleared'
 
 export const TargetAttachedToTarget = 'Target.attachedToTarget'
-const TargetDetachedFromTarget = 'Target.detachedFromTarget'
-const TargetTargetCrashed = 'Target.targetCrashed'
-const TargetTargetCreated = 'Target.targetCreated'
-const TargetTargetDestroyed = 'Target.targetDestroyed'
-const TargetTargetInfoChanged = 'Target.targetInfoChanged'
