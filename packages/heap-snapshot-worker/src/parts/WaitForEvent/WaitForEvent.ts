@@ -1,12 +1,12 @@
 export const waitForEvent = (worker: any) => {
   const { promise, resolve } = Promise.withResolvers()
-  const cleanup = (result) => {
+  const cleanup = (result: any) => {
     worker.off('message', messageHandler)
     worker.off('exit', exitHandler)
     resolve(result)
   }
 
-  const messageHandler = (message) => {
+  const messageHandler = (message: any) => {
     if (message.error) {
       cleanup({
         error: new Error(message.error),
@@ -20,7 +20,7 @@ export const waitForEvent = (worker: any) => {
     })
   }
 
-  const exitHandler = (code) => {
+  const exitHandler = (code: any) => {
     if (code === 0) {
       cleanup({
         error: new Error('Worker exited unexpectedly'),

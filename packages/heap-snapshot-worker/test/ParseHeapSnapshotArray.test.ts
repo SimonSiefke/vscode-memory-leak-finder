@@ -2,7 +2,7 @@ import { expect, test } from '@jest/globals'
 import { parseHeapSnapshotArray } from '../src/parts/ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 
 // Helper function to convert string to Uint8Array
-const toBuffer = (str) => new TextEncoder().encode(str)
+const toBuffer = (str: any) => new TextEncoder().encode(str)
 
 test('parseHeapSnapshotArray - single number', () => {
   const data = toBuffer('1,') // Add comma to trigger storage

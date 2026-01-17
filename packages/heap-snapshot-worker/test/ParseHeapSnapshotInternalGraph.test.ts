@@ -13,7 +13,7 @@ test('single node', () => {
       type: 0,
     },
   ]
-  const edges = []
+  const edges: any[] = []
   expect(ParseHeapSnapshotInternalGraph.parseHeapSnapshotInternalGraph(nodes, edges)).toEqual({
     0: [],
   })
@@ -40,7 +40,7 @@ test('two unconnected nodes', () => {
       type: 0,
     },
   ]
-  const edges = []
+  const edges: any[] = []
   expect(ParseHeapSnapshotInternalGraph.parseHeapSnapshotInternalGraph(nodes, edges)).toEqual({
     0: [],
     1: [],
