@@ -5,7 +5,7 @@
  * @param {readonly any[]} edge_fields
  * @returns {Object}
  */
-export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, edge_fields) => {
+export const computeHeapSnapshotIndices = (node_types: any[], node_fields: any[], edge_types: any[], edge_fields: any[]) => {
   // Type indices
   const objectTypeIndex = node_types[0].indexOf('object')
   const nativeTypeIndex = node_types[0].indexOf('native')

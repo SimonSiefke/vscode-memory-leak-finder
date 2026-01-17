@@ -1,13 +1,13 @@
 export const createHeapSnapshotNode = (
-  array,
-  startIndex,
-  nodeFields,
-  valueTypes,
-  typeKey,
-  nameKey,
-  indexMultiplierKey,
-  indexMultiplier,
-  strings,
+  array: any[],
+  startIndex: number,
+  nodeFields: any[],
+  valueTypes: any[],
+  typeKey: number,
+  nameKey: number,
+  indexMultiplierKey: number,
+  indexMultiplier: number,
+  strings: any[],
 ) => {
   const node = Object.create(null)
   const nodeFieldCount = nodeFields.length
