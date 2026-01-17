@@ -1,6 +1,6 @@
 import * as ActuallyDispatchEvent from '../ActuallyDispatchEvent/ActuallyDispatchEvent.ts'
 import * as DomEventType from '../DomEventType/DomEventType.ts'
 
-export const change = (element, options) => {
+export const change = (element: any, options: any) => {
   ActuallyDispatchEvent.actuallyDispatchEvent(element, DomEventType.Change, options)
 }
