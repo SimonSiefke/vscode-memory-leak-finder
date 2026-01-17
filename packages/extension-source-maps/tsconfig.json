@@ -12,7 +12,9 @@
     "isolatedModules": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true,
     "composite": true,
     "allowImportingTsExtensions": true,
     "rootDir": ".",
@@ -21,5 +23,5 @@
     "noUnusedLocals": true,
     "strictNullChecks": true
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "rollup.config.js"]
 }

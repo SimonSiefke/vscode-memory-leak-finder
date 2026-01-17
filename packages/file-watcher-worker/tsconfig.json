@@ -1,28 +1,27 @@
 {
   "compilerOptions": {
     "lib": ["esnext"],
-    "target": "esnext",
     "checkJs": true,
-    "module": "NodeNext",
+    "target": "esnext",
     "types": ["node"],
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "isolatedModules": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
-    "noUncheckedSideEffectImports": true,
-    "exactOptionalPropertyTypes": true,
-    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
-    "resolveJsonModule": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true,
+    "composite": true,
+    "allowImportingTsExtensions": true,
     "rootDir": ".",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "composite": true
+    "strictNullChecks": true
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "rollup.config.js"]
 }
