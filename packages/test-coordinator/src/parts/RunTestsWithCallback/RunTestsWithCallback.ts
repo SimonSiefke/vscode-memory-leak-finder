@@ -414,6 +414,7 @@ export const runTestsWithCallback = async ({
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
           
           // Write tracked function results if tracking is enabled
+          console.log(`[FunctionTracker] Check - trackFunctions: ${trackFunctions}, functionTrackerRpc exists: ${!!functionTrackerRpc}, is emptyRpc: ${functionTrackerRpc === emptyRpc}`)
           if (trackFunctions && functionTrackerRpc && functionTrackerRpc !== emptyRpc) {
             try {
               const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
@@ -424,10 +425,7 @@ export const runTestsWithCallback = async ({
               console.log(`[FunctionTracker] Results written successfully`)
             } catch (error) {
               console.error('Error writing tracked function results:', error)
-            }
-          } else {
-            if (trackFunctions) {
-              console.log(`[FunctionTracker] Skipping write - functionTrackerRpc: ${functionTrackerRpc ? 'exists' : 'undefined'}, emptyRpc: ${functionTrackerRpc === emptyRpc}`)
+              console.error('Error stack:', error instanceof Error ? error.stack : String(error))
             }
           }
           

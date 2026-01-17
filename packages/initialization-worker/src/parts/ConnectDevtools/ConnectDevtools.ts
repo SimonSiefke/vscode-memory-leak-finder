@@ -33,9 +33,7 @@ export const connectDevtools = async (
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)
   return {
     async dispose() {
-      if (functionTrackerRpc) {
-        await functionTrackerRpc.dispose()
-      }
+      // Don't dispose functionTrackerRpc here - it will be disposed by test-coordinator
       await browserRpc.dispose()
     },
     functionTrackerRpc,

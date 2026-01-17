@@ -37,6 +37,7 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
 
   const { dispose, functionTrackerRpc, sessionId, targetId } = await connectDevtoolsPromise
 
+  // Dispose browserRpc but keep functionTrackerRpc alive (it will be disposed later by test-coordinator)
   await Promise.all([electronRpc.dispose(), dispose()])
 
   return {
