@@ -2,7 +2,6 @@ import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import type { Session } from '../Session/Session.ts'
 import * as CompareDetachedDomNodesWithStackTraces from '../CompareDetachedDomNodesWithStackTraces/CompareDetachedDomNodesWithStackTraces.ts'
 import * as GetDetachedDomNodesWithStackTraces from '../GetDetachedDomNodesWithStackTraces/GetDetachedDomNodesWithStackTraces.ts'
-import * as GetTotalInstanceCounts from '../GetTotalInstanceCounts/GetTotalInstanceCounts.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
@@ -40,13 +39,23 @@ export const releaseResources = async (session: Session, objectGroup: string) =>
 
 export const compare = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces
 
-export const isLeak = ({ after, before }) => {
-  return GetTotalInstanceCounts.getTotalInstanceCounts(after) > GetTotalInstanceCounts.getTotalInstanceCounts(before)
+export const isLeak = ({ after }) => {
+  if (!after || !Array.isArray(after)) {
+    return false
+  }
+  return after.length > 0
 }
 
-export const summary = ({ after, before }) => {
+export const summary = ({ after }) => {
+  if (!after || !Array.isArray(after)) {
+    return {
+      after: 0,
+      before: 0,
+    }
+  }
+  const totalDelta = after.reduce((sum, node) => sum + (node.delta || 0), 0)
   return {
-    after: GetTotalInstanceCounts.getTotalInstanceCounts(after),
-    before: GetTotalInstanceCounts.getTotalInstanceCounts(before),
+    after: totalDelta,
+    before: 0,
   }
 }
