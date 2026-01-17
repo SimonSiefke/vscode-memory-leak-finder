@@ -1,0 +1,5 @@
+export const ElectronApp = 'electronApp'
+export const Rpc = 'rpc'
+const Browser = 'browser'
+export const Locator = 'locator'
+export const Page = 'page'
