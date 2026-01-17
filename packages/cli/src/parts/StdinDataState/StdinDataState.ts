@@ -98,50 +98,9 @@ let state: StdinDataState = {
   workers: false,
 }
 
-<<<<<<< HEAD
-export const setState = (newState: Partial<StdinDataState>): void => {
-=======
 export const setState = (newState: StdinDataState): void => {
->>>>>>> origin/main
   state = {
     ...state,
-<<<<<<< HEAD
-    bisect: newState.bisect ?? state.bisect,
-    checkLeaks: newState.checkLeaks ?? state.checkLeaks,
-    continueValue: newState.continueValue ?? state.continueValue,
-    cwd: newState.cwd ?? state.cwd,
-    enableExtensions: newState.enableExtensions ?? state.enableExtensions,
-    enableProxy: newState.enableProxy ?? state.enableProxy,
-    headless: newState.headless ?? state.headless,
-    ide: newState.ide ?? state.ide,
-    ideVersion: newState.ideVersion ?? state.ideVersion,
-    insidersCommit: newState.insidersCommit ?? state.insidersCommit,
-    inspectExtensions: newState.inspectExtensions ?? state.inspectExtensions,
-    inspectExtensionsPort: newState.inspectExtensionsPort ?? state.inspectExtensionsPort,
-    inspectPtyHost: newState.inspectPtyHost ?? state.inspectPtyHost,
-    inspectPtyHostPort: newState.inspectPtyHostPort ?? state.inspectPtyHostPort,
-    inspectSharedProcess: newState.inspectSharedProcess ?? state.inspectSharedProcess,
-    inspectSharedProcessPort: newState.inspectSharedProcessPort ?? state.inspectSharedProcessPort,
-    isGithubActions: newState.isGithubActions ?? state.isGithubActions,
-    isWindows: newState.isWindows ?? state.isWindows,
-    measure: newState.measure ?? state.measure,
-    measureAfter: newState.measureAfter ?? state.measureAfter,
-    mode: newState.mode ?? state.mode,
-    previousFilters: newState.previousFilters ?? state.previousFilters,
-    recordVideo: newState.recordVideo ?? state.recordVideo,
-    restartBetween: newState.restartBetween ?? state.restartBetween,
-    runMode: newState.runMode ?? state.runMode,
-    runs: newState.runs ?? state.runs,
-    runSkippedTestsAnyway: newState.runSkippedTestsAnyway ?? state.runSkippedTestsAnyway,
-    screencastQuality: newState.screencastQuality ?? state.screencastQuality,
-    stdout: newState.stdout ?? state.stdout,
-    timeoutBetween: newState.timeoutBetween ?? state.timeoutBetween,
-    timeouts: newState.timeouts ?? state.timeouts,
-    useProxyMock: newState.useProxyMock ?? state.useProxyMock,
-    value: newState.value ?? state.value,
-    watch: newState.watch ?? state.watch,
-    workers: newState.workers ?? state.workers,
-=======
     arch: newState.arch,
     bisect: newState.bisect,
     checkLeaks: newState.checkLeaks,
@@ -182,7 +141,6 @@ export const setState = (newState: StdinDataState): void => {
     value: newState.value,
     watch: newState.watch,
     workers: newState.workers,
->>>>>>> origin/main
   }
 }
 
