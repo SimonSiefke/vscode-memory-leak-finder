@@ -59,7 +59,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   } = options
-  const { child, pid, parsedVersion } = await LaunchIde.launchIde({
+  const { child, parsedVersion, pid } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
     clearExtensions,
