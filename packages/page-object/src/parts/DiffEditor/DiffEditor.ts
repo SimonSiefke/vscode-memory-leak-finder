@@ -25,14 +25,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to verify original text ${text}`)
       }
     },
-<<<<<<< HEAD
-<<<<<<< HEAD
-    async open(a: string, b: string) {
-=======
-    async open({ file1, file2, file1Content, file2Content }: { file1: string; file2: string; file1Content: string; file2Content: string }) {
->>>>>>> origin/main
-=======
-    async open({
+async open({
       cell1Content,
       cell2Content,
       file1,
@@ -47,7 +40,6 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
       cell2Content: string
       cell1Content: string
     }) {
->>>>>>> origin/main
       try {
         const explorer = Explorer.create({ electronApp, expect, page, platform, VError })
         const contextMenu = ContextMenu.create({ expect, page, VError })
