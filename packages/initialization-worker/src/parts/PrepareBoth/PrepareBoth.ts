@@ -9,7 +9,7 @@ import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
-export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: number, port: MessagePort): Promise<any> => {
+export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: number, port: MessagePort, trackFunctions: boolean, connectionId: number, measureId: string, pid: number): Promise<any> => {
   const stream = new PortReadStream(port)
   const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(stream)
 
@@ -24,7 +24,7 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
-  const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
+  const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout, trackFunctions, webSocketUrl, connectionId, measureId, pid)
 
   if (headlessMode) {
     // TODO
@@ -35,13 +35,14 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
     objectId: monkeyPatchedElectronId,
   })
 
-  const { dispose, sessionId, targetId } = await connectDevtoolsPromise
+  const { dispose, functionTrackerRpc, sessionId, targetId } = await connectDevtoolsPromise
 
   await Promise.all([electronRpc.dispose(), dispose()])
 
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
+    functionTrackerRpc,
     monkeyPatchedElectronId,
     sessionId,
     targetId,

@@ -38,6 +38,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly runMode: number
   readonly screencastQuality: number
   readonly timeouts: any
+  readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -107,6 +108,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       recordVideo,
       runMode,
       timeouts,
+      trackFunctions,
       updateUrl,
       useProxyMock,
       vscodePath,

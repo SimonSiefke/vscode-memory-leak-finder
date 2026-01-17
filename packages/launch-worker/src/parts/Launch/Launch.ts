@@ -23,7 +23,9 @@ export interface LaunchOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
+  readonly measureId: string
   readonly platform: string
+  readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -36,6 +38,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     attachedToPageTimeout,
     clearExtensions,
     commit,
+    connectionId,
     cwd,
     enableExtensions,
     enableProxy,
@@ -48,7 +51,9 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    measureId,
     platform,
+    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -80,19 +85,24 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
   await using rpc = await launchInitializationWorker()
-  const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
+  if (pid === undefined) {
+    throw new Error(`pid is undefined after launching IDE`)
+  }
+  const { devtoolsWebSocketUrl, electronObjectId, functionTrackerRpc, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
     headlessMode,
     attachedToPageTimeout,
     port.port,
     parsedVersion,
+    trackFunctions,
+    connectionId,
+    measureId,
+    pid,
   )
-  if (pid === undefined) {
-    throw new Error(`pid is undefined after launching IDE`)
-  }
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
+    functionTrackerRpc,
     parsedVersion,
     pid,
     sessionId,

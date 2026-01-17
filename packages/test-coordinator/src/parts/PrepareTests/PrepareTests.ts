@@ -28,6 +28,7 @@ export interface PrepareTestsOptions {
   readonly recordVideo: boolean
   readonly runMode: number
   readonly timeouts: any
+  readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -53,7 +54,9 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    measureId,
     platform,
+    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -83,7 +86,9 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       inspectSharedProcess,
       inspectSharedProcessPort,
       isFirstConnection,
+      measureId,
       platform,
+      trackFunctions,
       updateUrl,
       useProxyMock,
       vscodePath,
