@@ -3,28 +3,11 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-export const create = ({
-  electronApp,
-  expect,
-  page,
-  VError,
-}: {
-  electronApp: any
-  expect: any
-  page: any
-  VError: any
-}) => {
-=======
-=======
 const isNoteBook = (file: string) => {
   return file.endsWith('.ipynb')
 }
 
->>>>>>> origin/main
 export const create = ({ electronApp, expect, page, platform, VError }) => {
->>>>>>> origin/main
   return {
     async expectModified(text: string) {
       try {
