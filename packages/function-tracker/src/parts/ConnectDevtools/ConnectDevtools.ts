@@ -1,9 +1,8 @@
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
-import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
-import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { setSessionRpc } from '../GetFunctionStatistics/GetFunctionStatistics.ts'
 import { trackingCode } from '../TrackingCode/TrackingCode.ts'
+import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export interface DevToolsConnection {
   readonly dispose: () => Promise<void>
@@ -28,31 +27,20 @@ export const connectDevtools = async (
     throw new Error('measureId must be a non-empty string')
   }
 
-  // Create our own separate browser connection
-  const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-  const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
+  const [browserRpc] = await Promise.all([DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)])
+  const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, 19990)
 
-  // Get existing targets and find the page target
-  const targets = await DevtoolsProtocolTarget.getTargets(browserRpc)
-  const pageTarget = targets.find((target: any) => target.type === 'page')
+  const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
+  const frameId = frameTree.frame.id
 
-  if (!pageTarget) {
-    throw new Error('No page target found')
-  }
-
-  const sessionId = await DevtoolsProtocolTarget.attachToTarget(browserRpc, {
-    targetId: pageTarget.targetId,
-    flatten: true,
-  })
-
-  const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+  console.log({ frameId })
 
   sessionRpc.on('Fetch.requestPaused', (event) => {
     console.log('paused', event)
   })
 
   await sessionRpc.invoke('Fetch.enable', {
-    patterns: [{ urlPattern: '*.js', requestStage: 'Response' }],
+    patterns: [{ urlPattern: '*.js', requestStage: 'Request' }],
   })
 
   console.log('fetch enabled')

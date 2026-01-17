@@ -41,13 +41,13 @@ export const monkeyPatchElectronScript = `function () {
     isReady = true
     resolve(event)
     originalEmit('ready', ...readyEventArgs)
-    const i = setInterval(()=>{
-      const window = BrowserWindow.getFocusedWindow()
-      if(window && window.webContents){
-        clearInterval(i)
-        window.webContents.openDevtools()
-      }
-    }, 1000)
+    // const i = setInterval(()=>{
+    //   const window = BrowserWindow.getFocusedWindow()
+    //   if(window && window.webContents){
+    //     clearInterval(i)
+    //     window.webContents.openDevtools()
+    //   }
+    // }, 1000)
   }
 }
 `
