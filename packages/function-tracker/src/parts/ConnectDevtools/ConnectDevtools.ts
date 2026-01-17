@@ -1,5 +1,4 @@
 import { setSessionRpc } from '../GetFunctionStatistics/GetFunctionStatistics.ts'
-import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
 import { trackingCode } from '../TrackingCode/TrackingCode.ts'
 import { Buffer } from 'node:buffer'
 
@@ -131,12 +130,9 @@ export const connectDevtools = async (
                       code = responseBody.body
                     }
 
-                    // Transform the code with tracking
-                    const transformedCode = transformCodeWithTracking(code, {
-                      scriptId: 0,
-                    })
-                    // Combine tracking code with transformed code
-                    const finalCode = trackingCode + '\n' + transformedCode
+                    // For now, just prepend tracking code without transformation
+                    // TODO: Add proper code transformation to wrap functions
+                    const finalCode = trackingCode + '\n' + code
                     // Encode the transformed code to base64
                     const encodedBody = Buffer.from(finalCode, 'utf-8').toString('base64')
                     // Fulfill the request with transformed code

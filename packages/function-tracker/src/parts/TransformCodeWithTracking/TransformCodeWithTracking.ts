@@ -1,7 +1,7 @@
 import parser from '@babel/parser'
 import traverse from '@babel/traverse'
 import generate from '@babel/generator'
-import { TransformOptions } from '../Types/Types.ts'
+import type { TransformOptions } from '../Types/Types.ts'
 import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
 import { getFunctionLocations } from '../GetFunctionLocations/GetFunctionLocations.ts'
 import { VError } from '@lvce-editor/verror'
