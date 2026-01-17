@@ -327,7 +327,7 @@ export const runTestsWithCallback = async ({
         }
       }
 
-      const { functionTrackerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
+      const { memoryRpc, testWorkerRpc, videoRpc } = workers
 
       let wasOriginallySkipped = false
       if (i !== 0) {
