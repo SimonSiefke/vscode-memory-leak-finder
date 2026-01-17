@@ -5,7 +5,7 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
  * @param {string} path
  * @returns {Promise<readonly string[]>}
  */
-export const getStrings = async (path) => {
+export const getStrings = async (path: string) => {
   const snapshot = await prepareHeapSnapshot(path, {
     parseStrings: true,
   })
