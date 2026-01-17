@@ -23,8 +23,8 @@ console.log('Local file link: file:///home/user/test.txt');
   // Write the script to a file
   await Workspace.setFiles([
     {
-      name: 'print-links.js',
       content: linkScript,
+      name: 'print-links.js',
     },
   ])
 

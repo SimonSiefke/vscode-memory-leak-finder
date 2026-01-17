@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Editor, Workspace, ActivityBar, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   const files = []
   const count = 25
   for (let i = 1; i <= count; i++) {

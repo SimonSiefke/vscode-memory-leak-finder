@@ -44,7 +44,7 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
     }
 
     // Handle file references (for zip files, SSE files, images, etc.)
-    let body: any = response.body
+    let { body } = response
     let isZipFile = false
     let isSseFile = false
     let isImageFile = false
@@ -54,19 +54,68 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
       if (fileData) {
         body = fileData
         // Determine file type from responseType or content type
-        if (responseType === 'zip') {
-          isZipFile = true
-        } else if (responseType === 'sse') {
-          isSseFile = true
-        } else if (responseType === 'binary') {
+        switch (responseType) {
+          case 'binary': {
+            // Check if it's an image based on content type
+            const contentType = response.headers['content-type'] || response.headers['Content-Type']
+            const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+            if (contentTypeStr.startsWith('image/')) {
+              isImageFile = true
+            }
+
+            break
+          }
+          case 'sse': {
+            isSseFile = true
+
+            break
+          }
+          case 'zip': {
+            isZipFile = true
+
+            break
+          }
+          default: {
+            // Fallback to content type check
+            const contentType = response.headers['content-type'] || response.headers['Content-Type']
+            const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+            if (contentTypeStr.includes('application/zip')) {
+              isZipFile = true
+            } else if (contentTypeStr.includes('text/event-stream')) {
+              isSseFile = true
+            } else if (contentTypeStr.startsWith('image/')) {
+              isImageFile = true
+            }
+          }
+        }
+      }
+    } else if (responseType === 'json' && typeof body === 'object') {
+      // If responseType is json and body is already an object, stringify it
+      body = JSON.stringify(body)
+    } else
+      switch (responseType) {
+        case 'binary': {
           // Check if it's an image based on content type
           const contentType = response.headers['content-type'] || response.headers['Content-Type']
           const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
           if (contentTypeStr.startsWith('image/')) {
             isImageFile = true
           }
-        } else {
-          // Fallback to content type check
+
+          break
+        }
+        case 'sse': {
+          isSseFile = true
+
+          break
+        }
+        case 'zip': {
+          isZipFile = true
+
+          break
+        }
+        default: {
+          // Fallback: check content type
           const contentType = response.headers['content-type'] || response.headers['Content-Type']
           const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
           if (contentTypeStr.includes('application/zip')) {
@@ -78,32 +127,6 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
           }
         }
       }
-    } else if (responseType === 'json' && typeof body === 'object') {
-      // If responseType is json and body is already an object, stringify it
-      body = JSON.stringify(body)
-    } else if (responseType === 'zip') {
-      isZipFile = true
-    } else if (responseType === 'sse') {
-      isSseFile = true
-    } else if (responseType === 'binary') {
-      // Check if it's an image based on content type
-      const contentType = response.headers['content-type'] || response.headers['Content-Type']
-      const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
-      if (contentTypeStr.startsWith('image/')) {
-        isImageFile = true
-      }
-    } else {
-      // Fallback: check content type
-      const contentType = response.headers['content-type'] || response.headers['Content-Type']
-      const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
-      if (contentTypeStr.includes('application/zip')) {
-        isZipFile = true
-      } else if (contentTypeStr.includes('text/event-stream')) {
-        isSseFile = true
-      } else if (contentTypeStr.startsWith('image/')) {
-        isImageFile = true
-      }
-    }
 
     // Remove Content-Encoding and Transfer-Encoding headers for zip files, SSE files, and images
     // since the binary/text data is not encoded
