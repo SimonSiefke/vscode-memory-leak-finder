@@ -2489,7 +2489,7 @@ test('Transform Script - transformCode - should handle location tracking with mu
   `
 
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
-  
+
   const expected = `function firstFunction() {
   trackFunctionCall(123, 2, 4);
   return 'first';
