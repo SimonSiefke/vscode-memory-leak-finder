@@ -164,41 +164,42 @@ export const runTestsWithCallback = async ({
     }
 
     if (login) {
-      const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
-        arch,
-        attachedToPageTimeout,
-        clearExtensions,
-        commit,
-        compressVideo,
-        connectionId,
-        cwd,
-        enableExtensions,
-        enableProxy,
-        headlessMode,
-        ide,
-        ideVersion,
-        idleTimeout,
-        insidersCommit,
-        inspectExtensions,
-        inspectExtensionsPort,
-        inspectPtyHost,
-        inspectPtyHostPort,
-        inspectSharedProcess,
-        inspectSharedProcessPort,
-        measureId: measure,
-        measureNode,
-        pageObjectPath: pageObjectPathResolved,
-        platform,
-        recordVideo,
-        runMode,
-        screencastQuality,
-        timeouts,
-        trackFunctions,
-        updateUrl,
-        useProxyMock,
-        vscodePath,
-        vscodeVersion,
-      })
+      const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
+        await PrepareTestsOrAttach.prepareTestsAndAttach({
+          arch,
+          attachedToPageTimeout,
+          clearExtensions,
+          commit,
+          compressVideo,
+          connectionId,
+          cwd,
+          enableExtensions,
+          enableProxy,
+          headlessMode,
+          ide,
+          ideVersion,
+          idleTimeout,
+          insidersCommit,
+          inspectExtensions,
+          inspectExtensionsPort,
+          inspectPtyHost,
+          inspectPtyHostPort,
+          inspectSharedProcess,
+          inspectSharedProcessPort,
+          measureId: measure,
+          measureNode,
+          pageObjectPath: pageObjectPathResolved,
+          platform,
+          recordVideo,
+          runMode,
+          screencastQuality,
+          timeouts,
+          trackFunctions,
+          updateUrl,
+          useProxyMock,
+          vscodePath,
+          vscodeVersion,
+        })
       // Wait for user to interrupt (Ctrl+C) or terminate the process
       const { promise, resolve } = Promise.withResolvers<void>()
       const cleanup = async () => {
@@ -285,41 +286,42 @@ export const runTestsWithCallback = async ({
       if (needsSetup) {
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
-        const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
-          arch,
-          attachedToPageTimeout,
-          clearExtensions,
-          commit,
-          compressVideo,
-          connectionId,
-          cwd,
-          enableExtensions,
-          enableProxy,
-          headlessMode,
-          ide,
-          ideVersion,
-          idleTimeout,
-          insidersCommit,
-          inspectExtensions,
-          inspectExtensionsPort,
-          inspectPtyHost,
-          inspectPtyHostPort,
-          inspectSharedProcess,
-          inspectSharedProcessPort,
-          measureId: measure,
-          measureNode,
-          pageObjectPath: pageObjectPathResolved,
-          platform,
-          recordVideo,
-          runMode,
-          screencastQuality,
-          timeouts,
-          trackFunctions,
-          updateUrl,
-          useProxyMock,
-          vscodePath,
-          vscodeVersion,
-        })
+        const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
+          await PrepareTestsOrAttach.prepareTestsAndAttach({
+            arch,
+            attachedToPageTimeout,
+            clearExtensions,
+            commit,
+            compressVideo,
+            connectionId,
+            cwd,
+            enableExtensions,
+            enableProxy,
+            headlessMode,
+            ide,
+            ideVersion,
+            idleTimeout,
+            insidersCommit,
+            inspectExtensions,
+            inspectExtensionsPort,
+            inspectPtyHost,
+            inspectPtyHostPort,
+            inspectSharedProcess,
+            inspectSharedProcessPort,
+            measureId: measure,
+            measureNode,
+            pageObjectPath: pageObjectPathResolved,
+            platform,
+            recordVideo,
+            runMode,
+            screencastQuality,
+            timeouts,
+            trackFunctions,
+            updateUrl,
+            useProxyMock,
+            vscodePath,
+            vscodeVersion,
+          })
         workers = {
           functionTrackerRpc: functionTrackerRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
@@ -329,7 +331,9 @@ export const runTestsWithCallback = async ({
           videoRpc: videoRpc || emptyRpc,
         }
         if (trackFunctions) {
-          console.log(`[FunctionTracker] Workers initialized - functionTrackerRpc: ${workers.functionTrackerRpc === emptyRpc ? 'emptyRpc' : 'exists'}`)
+          console.log(
+            `[FunctionTracker] Workers initialized - functionTrackerRpc: ${workers.functionTrackerRpc === emptyRpc ? 'emptyRpc' : 'exists'}`,
+          )
         }
       }
 
@@ -412,9 +416,11 @@ export const runTestsWithCallback = async ({
             await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
-          
+
           // Write tracked function results if tracking is enabled
-          console.log(`[FunctionTracker] Check - trackFunctions: ${trackFunctions}, functionTrackerRpc exists: ${!!functionTrackerRpc}, is emptyRpc: ${functionTrackerRpc === emptyRpc}`)
+          console.log(
+            `[FunctionTracker] Check - trackFunctions: ${trackFunctions}, functionTrackerRpc exists: ${!!functionTrackerRpc}, is emptyRpc: ${functionTrackerRpc === emptyRpc}`,
+          )
           if (trackFunctions && functionTrackerRpc && functionTrackerRpc !== emptyRpc) {
             try {
               const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
@@ -428,7 +434,7 @@ export const runTestsWithCallback = async ({
               console.error('Error stack:', error instanceof Error ? error.stack : String(error))
             }
           }
-          
+
           const end = Time.now()
           const duration = end - start
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak, wasOriginallySkipped)
@@ -453,7 +459,7 @@ export const runTestsWithCallback = async ({
             console.error('Error writing tracked function results:', error)
           }
         }
-        
+
         const prettyError = await GetPrettyError.getPrettyError(error, color, root)
         await callback(
           TestWorkerEventType.TestFailed,

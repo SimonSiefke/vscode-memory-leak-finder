@@ -31,6 +31,8 @@ export const connectDevtools = async (
   }
 
   try {
+
+    console.log('befor connction')
     // Create our own separate browser connection
     const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
     const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)

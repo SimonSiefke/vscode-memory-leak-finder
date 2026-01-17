@@ -118,7 +118,16 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   }
   const result = await state.promise
 
-  const { devtoolsWebSocketUrl, electronObjectId, functionTrackerRpc, initializationWorkerRpc, parsedVersion, pid, utilityContext, webSocketUrl } = await result
+  const {
+    devtoolsWebSocketUrl,
+    electronObjectId,
+    functionTrackerRpc,
+    initializationWorkerRpc,
+    parsedVersion,
+    pid,
+    utilityContext,
+    webSocketUrl,
+  } = await result
 
   const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
     platform,

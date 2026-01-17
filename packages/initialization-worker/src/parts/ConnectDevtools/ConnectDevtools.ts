@@ -27,7 +27,15 @@ export const connectDevtools = async (
       path: functionTrackerUrl,
       stdio: 'inherit',
     })
-    await functionTrackerRpc.invoke('FunctionTracker.connectDevtools', devtoolsWebSocketUrl, webSocketUrl, connectionId, measureId, attachedToPageTimeout, pid)
+    await functionTrackerRpc.invoke(
+      'FunctionTracker.connectDevtools',
+      devtoolsWebSocketUrl,
+      webSocketUrl,
+      connectionId,
+      measureId,
+      attachedToPageTimeout,
+      pid,
+    )
   }
 
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)

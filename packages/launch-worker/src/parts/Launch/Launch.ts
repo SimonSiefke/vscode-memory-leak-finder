@@ -88,17 +88,18 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
-  const { devtoolsWebSocketUrl, electronObjectId, functionTrackerRpc, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
-    'Initialize.prepare',
-    headlessMode,
-    attachedToPageTimeout,
-    port.port,
-    parsedVersion,
-    trackFunctions,
-    connectionId,
-    measureId,
-    pid,
-  )
+  const { devtoolsWebSocketUrl, electronObjectId, functionTrackerRpc, sessionId, targetId, utilityContext, webSocketUrl } =
+    await rpc.invokeAndTransfer(
+      'Initialize.prepare',
+      headlessMode,
+      attachedToPageTimeout,
+      port.port,
+      parsedVersion,
+      trackFunctions,
+      connectionId,
+      measureId,
+      pid,
+    )
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
