@@ -38,5 +38,5 @@ export const connectDevtools = async (
   )
 
   const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid)
-  MemoryLeakFinderState.set(connectionId, { measure, rpc: measureRpc, pid })
+  MemoryLeakFinderState.set(connectionId, { measure, pid, rpc: measureRpc })
 }

@@ -15,7 +15,7 @@ const getChildPids = async (pid: number): Promise<readonly number[]> => {
       .map((line) => Number.parseInt(line.trim(), 10))
       .filter((pid) => !Number.isNaN(pid))
     return childPids
-  } catch (error) {
+  } catch {
     return []
   }
 }

@@ -1,12 +1,12 @@
+import { VError } from '@lvce-editor/verror'
 import { existsSync } from 'node:fs'
 import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
-import * as Root from '../Root/Root.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
-import { VError } from '@lvce-editor/verror'
+import * as Root from '../Root/Root.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
@@ -118,9 +118,9 @@ const convertRequestsToMocks = async (): Promise<void> => {
         const request: RecordedRequest = {
           headers: fileData.request.headers,
           method: fileData.request.method,
-          url: fileData.request.url,
           response: fileData.response,
           timestamp: fileData.metadata.timestamp,
+          url: fileData.request.url,
         }
 
         // Create a key from URL and method

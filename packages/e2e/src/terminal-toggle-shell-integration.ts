@@ -18,7 +18,7 @@ export const setup = async ({ Editor, Panel, SettingsEditor, SideBar, Workspace 
   await Panel.hide()
 }
 
-export const run = async ({ Terminal, Editor, SettingsEditor }: TestContext): Promise<void> => {
+export const run = async ({ Editor, SettingsEditor, Terminal }: TestContext): Promise<void> => {
   await SettingsEditor.open()
   await SettingsEditor.search({
     resultCount: 5,
