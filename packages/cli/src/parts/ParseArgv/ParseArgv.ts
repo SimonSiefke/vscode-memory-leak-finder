@@ -287,7 +287,7 @@ const parsePageObjectPath = (argv: readonly string[]): string => {
 }
 
 const parseTrackFunctions = (argv: readonly string[]): boolean => {
-  return argv.includes('--trackFunctions') || argv.includes('--track-functions')
+  return argv.includes('--track-functions')
 }
 
 export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
