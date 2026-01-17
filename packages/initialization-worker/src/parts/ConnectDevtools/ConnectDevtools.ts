@@ -1,9 +1,9 @@
+import { NodeForkedProcessRpcParent } from '@lvce-editor/rpc'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import { waitForSession } from '../WaitForSession/WaitForSession.ts'
-import { NodeForkedProcessRpcParent } from '@lvce-editor/rpc'
 import * as GetFunctionTrackerUrl from '../GetFunctionTrackerUrl/GetFunctionTrackerUrl.ts'
+import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export const connectDevtools = async (
   devtoolsWebSocketUrl: string,
@@ -19,7 +19,7 @@ export const connectDevtools = async (
   const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
 
   console.log('ses', sessionId)
-  let functionTrackerRpc: any = undefined
+  const functionTrackerRpc: any = undefined
   if (trackFunctions) {
     // const functionTrackerUrl = GetFunctionTrackerUrl.getFunctionTrackerUrl()
     // functionTrackerRpc = await NodeForkedProcessRpcParent.create({
