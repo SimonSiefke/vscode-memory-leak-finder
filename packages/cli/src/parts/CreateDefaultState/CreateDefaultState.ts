@@ -44,6 +44,7 @@ export const createDefaultState = (): StdinDataState => ({
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
+  trackFunctions: false,
   useProxyMock: false,
   value: '',
   watch: false,

@@ -1,8 +1,9 @@
 import parser from '@babel/parser'
 import traverse from '@babel/traverse'
 import generate from '@babel/generator'
-import { TransformOptions } from '../Types/Types.js'
-import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.js'
+import type { TransformOptions } from '../Types/Types.ts'
+import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
+import { getFunctionLocations } from '../GetFunctionLocations/GetFunctionLocations.ts'
 import { VError } from '@lvce-editor/verror'
 
 // @ts-ignore
@@ -17,16 +18,24 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
   }
 
   try {
-    const ast = parser2.parse(code, {
+    // First pass: parse AST and collect original function locations
+    const originalAst = parser2.parse(code, {
       sourceType: 'module',
       plugins: [],
-      sourceFilename: options.filename || 'unknown',
     })
 
-    const plugin = createFunctionWrapperPlugin(options)
-    traverse2(ast, plugin)
+    const functionLocations = getFunctionLocations(originalAst)
 
-    const result = generate2(ast, {
+    // Second pass: parse fresh AST for transformation to avoid location contamination
+    const transformAst = parser2.parse(code, {
+      sourceType: 'module',
+      plugins: [],
+    })
+
+    const plugin = createFunctionWrapperPlugin({ ...options, functionLocations })
+    traverse2(transformAst, plugin)
+
+    const result = generate2(transformAst, {
       retainLines: false,
       compact: false,
       comments: true,

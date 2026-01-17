@@ -23,7 +23,9 @@ export interface LaunchOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
+  readonly measureId: string
   readonly platform: string
+  readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -36,6 +38,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     attachedToPageTimeout,
     clearExtensions,
     commit,
+    connectionId,
     cwd,
     enableExtensions,
     enableProxy,
@@ -48,13 +51,15 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    measureId,
     platform,
+    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
   } = options
-  const { child, pid, parsedVersion } = await LaunchIde.launchIde({
+  const { child, parsedVersion, pid } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
     clearExtensions,
@@ -80,19 +85,25 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
   await using rpc = await launchInitializationWorker()
-  const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
-    'Initialize.prepare',
-    headlessMode,
-    attachedToPageTimeout,
-    port.port,
-    parsedVersion,
-  )
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
+  const { devtoolsWebSocketUrl, electronObjectId, functionTrackerRpc, sessionId, targetId, utilityContext, webSocketUrl } =
+    await rpc.invokeAndTransfer(
+      'Initialize.prepare',
+      headlessMode,
+      attachedToPageTimeout,
+      port.port,
+      parsedVersion,
+      trackFunctions,
+      connectionId,
+      measureId,
+      pid,
+    )
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
+    functionTrackerRpc,
     parsedVersion,
     pid,
     sessionId,

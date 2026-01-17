@@ -9,7 +9,16 @@ import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
-export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: number, port: MessagePort): Promise<any> => {
+export const prepareBoth = async (
+  headlessMode: boolean,
+  attachedToPageTimeout: number,
+  port: MessagePort,
+  parsedVersion: any,
+  trackFunctions: boolean,
+  connectionId: number,
+  measureId: string,
+  pid: number,
+): Promise<any> => {
   const stream = new PortReadStream(port)
   const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(stream)
 
@@ -37,6 +46,7 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
 
   const { dispose, sessionId, targetId } = await connectDevtoolsPromise
 
+  // Dispose browserRpc but keep functionTrackerRpc alive (it will be disposed later by test-coordinator)
   await Promise.all([electronRpc.dispose(), dispose()])
 
   return {

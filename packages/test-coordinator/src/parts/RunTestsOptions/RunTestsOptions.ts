@@ -38,6 +38,7 @@ export interface RunTestsOptions {
   readonly setupOnly: boolean
   readonly timeoutBetween: number
   readonly timeouts: any
+  readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string

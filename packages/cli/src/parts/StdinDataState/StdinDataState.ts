@@ -44,6 +44,7 @@ export interface StdinDataState {
   readonly stdout: string[]
   readonly timeoutBetween: number
   readonly timeouts: boolean
+  readonly trackFunctions: boolean
   readonly useProxyMock: boolean
   readonly value: string
   readonly watch: boolean
@@ -90,6 +91,7 @@ let state: StdinDataState = {
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
+  trackFunctions: false,
   useProxyMock: false,
   value: Character.EmptyString,
   watch: false,
@@ -134,6 +136,7 @@ export const setState = (newState: StdinDataState): void => {
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
     timeouts: newState.timeouts,
+    trackFunctions: newState.trackFunctions,
     useProxyMock: newState.useProxyMock,
     value: newState.value,
     watch: newState.watch,
