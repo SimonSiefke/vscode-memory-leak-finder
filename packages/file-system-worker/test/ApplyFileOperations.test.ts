@@ -86,11 +86,11 @@ test('applyFileOperations - applies remove operation', async () => {
 test('applyFileOperations - applies write operation', async () => {
   mockWriteFileContent.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       content: 'new content',
       path: '/path/to/file.ts',
-      type: 'write' as const,
+      type: 'write',
     },
   ]
 
@@ -210,16 +210,16 @@ test('applyFileOperations - stops on first error and does not continue with rema
 test('applyFileOperations - handles multiple copy operations', async () => {
   mockCopy.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/source1/file1.txt',
       to: '/dest1/file1.txt',
-      type: 'copy' as const,
+      type: 'copy',
     },
     {
       from: '/source2/file2.txt',
       to: '/dest2/file2.txt',
-      type: 'copy' as const,
+      type: 'copy',
     },
   ]
 
@@ -233,14 +233,14 @@ test('applyFileOperations - handles multiple copy operations', async () => {
 test('applyFileOperations - handles multiple mkdir operations', async () => {
   mockMakeDirectory.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       path: '/path1/directory1',
-      type: 'mkdir' as const,
+      type: 'mkdir',
     },
     {
       path: '/path2/directory2',
-      type: 'mkdir' as const,
+      type: 'mkdir',
     },
   ]
 
