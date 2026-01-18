@@ -4,7 +4,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as Root from '../Root/Root.ts'
 
-export const create = ({ page, VError }: CreateParams.CreateParams) => {
+export const create = ({ page, VError }: CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
 
   return {

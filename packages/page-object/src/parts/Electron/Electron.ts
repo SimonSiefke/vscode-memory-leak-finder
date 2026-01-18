@@ -1,6 +1,6 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ electronApp, VError }: CreateParams.CreateParams) => {
+export const create = ({ electronApp, VError }: CreateParams) => {
   return {
     async evaluate(expression: string) {
       return await electronApp.evaluate(expression)

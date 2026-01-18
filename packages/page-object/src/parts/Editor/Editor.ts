@@ -24,7 +24,7 @@ const isBinary = (file: string) => {
   return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
-export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ expect, ideVersion, page, platform, VError, electronApp }: CreateParams) => {
   return {
     async acceptInlineCompletion() {
       try {
@@ -1775,7 +1775,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       await page.waitForIdle()
     },
     async waitForVideoReady(hasError: boolean) {
-      const webView = WebView.create({ expect, ideVersion, page, platform, VError })
+      const webView = WebView.create({ expect, ideVersion, page, platform, VError, electronApp })
       const subFrame = await webView.shouldBeVisible2({
         extensionId: `vscode.media-preview`,
         hasLineOfCodeCounter: false,
