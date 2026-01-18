@@ -436,44 +436,7 @@ export const runTestsWithCallback = async ({
     if (recordVideo) {
       await VideoRecording.finalize(workers.videoRpc)
     }
-    
-    // Get and print function statistics if tracking is enabled
-    if (trackFunctions) {
-      try {
-        const statistics = await workers.initializationWorkerRpc.invoke('Launch.getFunctionStatistics')
-        console.log('\nFunction Call Statistics:')
-        console.log('='.repeat(60))
-        if (statistics && Object.keys(statistics).length > 0) {
-          // Sort by count (descending) then by name
-          const entries = Object.entries(statistics)
-            .map(([name, count]) => ({ name, count: count as number }))
-            .sort((a, b) => {
-              if (b.count !== a.count) {
-                return b.count - a.count
-              }
-              return a.name.localeCompare(b.name)
-            })
-          for (const { name, count } of entries) {
-            console.log(`${name}: ${count}`)
-          }
-          console.log('='.repeat(60))
-          console.log(`Total unique functions called: ${entries.length}`)
-          const totalCalls = entries.reduce((sum, entry) => sum + entry.count, 0)
-          console.log(`Total function calls: ${totalCalls}`)
-        } else {
-          console.log('No function statistics collected.')
-          console.log('This may mean:')
-          console.log('  - The transformed code file was not found')
-          console.log('  - No functions were called during the test')
-          console.log('  - The tracking code was not properly injected')
-        }
-        console.log('='.repeat(60))
-        console.log('')
-      } catch (error) {
-        console.error('Error getting function statistics:', error)
-      }
-    }
-    
+
     // TODO when in watch mode, dispose all workers except initialization worker to keep the application running
     await disposeWorkers(workers)
     workers = {
