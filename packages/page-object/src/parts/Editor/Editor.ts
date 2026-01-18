@@ -1734,10 +1734,13 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       await subFrame.waitForIdle()
     },
     async waitForNoteBookReady() {
+      await page.waitForIdle()
       const notebookEditor = page.locator('.notebook-editor')
       const list = notebookEditor.locator('.monaco-list')
+      await expect(list).toBeVisible()
       await page.waitForIdle()
       await expect(list).toBeFocused()
+      await page.waitForIdle()
     },
     async waitforTextFileReady(fileName: string) {
       await page.waitForIdle()

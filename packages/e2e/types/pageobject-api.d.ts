@@ -536,6 +536,10 @@ export interface TerminalInlineChat {
   sendMessage(options?: any): Promise<void>
   show(): Promise<void>
 }
+export interface NotebookInlineChat {
+  hide(): Promise<void>
+  show(): Promise<void>
+}
 export interface Testing {
   focusOnTestExplorerView(): Promise<void>
   runAllTests(options: any): Promise<void>
@@ -612,6 +616,7 @@ export interface PageObjectApi {
   readonly MCP: MCP
   readonly MultiDiffEditor: MultiDiffEditor
   readonly Notebook: Notebook
+  readonly NotebookInlineChat: NotebookInlineChat
   readonly Notification: Notification
   readonly Output: Output
   readonly Panel: Panel
