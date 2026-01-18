@@ -6,7 +6,7 @@ import * as FetchAllInsidersVersions from '../FetchAllInsidersVersions/FetchAllI
 import * as PerformBisect from '../PerformBisect/PerformBisect.ts'
 import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
 
-const callback = async (method: string, ...params: readonly unknown[]): Promise<unknown> => {
+const callback = async (method: string, ...params: readonly unknown[]): Promise<void> => {
   await CliProcess.invoke(method, ...params)
 }
 
