@@ -50,7 +50,11 @@ export const toHaveText = (locator: any, options: any) => {
   return 'unknown text error'
 }
 
-export const toHaveAttribute = (locator, { key, value }) => {
+type Locator = {
+  readonly selector: string
+}
+
+export const toHaveAttribute = (locator: Locator, { key, value }: { key: string; value: string }) => {
   const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
@@ -97,7 +101,7 @@ export const toBeHidden = (locator: any) => {
   return `expected ${locatorString} to be hidden`
 }
 
-export const toHaveCss = (locator, { key, value }) => {
+export const toHaveCss = (locator: Locator, { key, value }: { key: string; value: string }) => {
   const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {

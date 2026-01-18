@@ -348,11 +348,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to open select`)
       }
     },
-<<<<<<< HEAD
-    async setTextInput({ name, value }: { name: string; value: string }) {
-=======
     async setTextInput({ name, value, type = 'text' }) {
->>>>>>> origin/main
       try {
         await page.waitForIdle()
         const settingItem = page.locator(`.setting-item-contents[data-key="${name}"]`)
