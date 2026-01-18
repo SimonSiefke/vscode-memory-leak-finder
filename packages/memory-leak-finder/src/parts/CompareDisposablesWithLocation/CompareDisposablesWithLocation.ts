@@ -22,9 +22,7 @@ const addDeltas = (prettyBefore: readonly DisposableItem[], prettyAfter: readonl
       count,
       delta,
       name,
-    }
-    if (location !== undefined) {
-      newItem.location = location
+      ...(location !== undefined ? { location } : {}),
     }
     newItems.push(newItem)
   }

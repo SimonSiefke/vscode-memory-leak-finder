@@ -56,7 +56,7 @@ export const performAction = async (locator: Locator, fnName: string, options: u
   while (currentTime < endTime) {
     const element = QuerySelector.querySelector(locator.selector)
     if (element) {
-      fn(element, options)
+      fn(element, options as any)
       return
     }
     await Timeout.waitForMutation(document.body, 100)
@@ -89,7 +89,7 @@ export const checkSingleElementCondition = async (locator: Locator, fnName: stri
   while (currentTime < endTime) {
     const element = QuerySelector.querySelector(locator.selector)
     if (element) {
-      const successful = fn(element, options)
+      const successful = fn(element, options as any)
       if (successful) {
         return
       }
@@ -98,7 +98,7 @@ export const checkSingleElementCondition = async (locator: Locator, fnName: stri
     currentTime = Time.getTimeStamp()
   }
   const errorMessageFn = ConditionErrorMap.getFunction(fnName)
-  const message = errorMessageFn(locator, options)
+  const message = errorMessageFn(locator, options as any)
   throw new AssertionError(message)
 }
 
@@ -115,7 +115,7 @@ export const checkHidden = async (locator: Locator, options: { timeout?: number 
     if (!element) {
       return
     }
-    const successful = fn(element, options)
+    const successful = fn(element, options as any)
     if (successful) {
       return
     }
@@ -123,7 +123,7 @@ export const checkHidden = async (locator: Locator, options: { timeout?: number 
     currentTime = Time.getTimeStamp()
   }
   const errorMessageFn = ConditionErrorMap.getFunction('toBeHidden')
-  const message = errorMessageFn(locator, options)
+  const message = errorMessageFn(locator, options as any)
   throw new AssertionError(message)
 }
 
@@ -155,7 +155,7 @@ export const checkMultiElementCondition = async (locator: Locator, fnName: strin
   const fn = MultiElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
     const elements = QuerySelector.querySelectorAll(locator.selector)
-    const successful = fn(elements, options)
+    const successful = fn(elements, options as any)
     if (successful) {
       return
     }
@@ -229,8 +229,8 @@ export const clickExponential = async ({ button = '', locator, timeout = maxTime
   const toBeHidden = SingleElementConditionMap.getFunction('toBeHidden')
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   let current = 1
-  const buttonValue: number | 'right' = button === 'right' ? 'right' : (button ? Number.parseInt(button, 10) : 0)
-  const clickOptions: MouseEventInit & { button?: number | 'right' } = {
+  const buttonValue: number = button === 'right' ? 2 : (button ? Number.parseInt(button, 10) : 0)
+  const clickOptions: MouseEventInit & { button?: number } = {
     bubbles: true,
     button: buttonValue,
   }
@@ -345,7 +345,7 @@ export const getTextContent = async (locator: Locator, { allowHidden = false }: 
   }
 
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
-  if (!toBeVisible(element, {} as any)) {
+  if (!toBeVisible(element, {})) {
     throw new Error(`must be visible`)
   }
   const text = element.textContent

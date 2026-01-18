@@ -29,5 +29,6 @@ test('select inside iframe', () => {
     nodeName: 'IFRAME',
   } as unknown as Element
   const roots: readonly Element[] = [element]
-  expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots, '', '')).toEqual([element.contentDocument])
+  const iframeElement = element as unknown as HTMLIFrameElement
+  expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots, '', '')).toEqual([iframeElement.contentDocument])
 })

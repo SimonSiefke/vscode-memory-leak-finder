@@ -15,7 +15,7 @@ const compareEventTarget = (a: { count: number; description?: string }, b: { cou
   return compareCount(a, b) || compareDescription(a, b)
 }
 
-const sort = (eventTargets: readonly { count: number; description?: string }[]): readonly { count: number; description?: string }[] => {
+const sort = (eventTargets: readonly { count: number; description?: string; delta: number }[]): readonly { count: number; description?: string; delta: number }[] => {
   return Arrays.toSorted(eventTargets, compareEventTarget)
 }
 
@@ -28,7 +28,7 @@ export const compareEventTargets = (before: unknown, after: unknown): readonly {
     beforeMap[item.description] ||= 0
     beforeMap[item.description] += item.count
   }
-  const leaked: any[] = []
+  const leaked: { count: number; description?: string; delta: number }[] = []
   for (const item of pretty.after) {
     const beforeCount = beforeMap[item.description] || 0
     const afterCount = item.count

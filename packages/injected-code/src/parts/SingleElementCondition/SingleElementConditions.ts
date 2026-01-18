@@ -13,8 +13,9 @@ export const toBeVisible = (element: Element): boolean => {
 }
 
 export const toBeHidden = (element: Element) => {
-  if (typeof element.checkVisible === 'function') {
-    return !element.checkVisible()
+  const elementWithCheckVisible = element as Element & { checkVisible?: () => boolean; checkVisibility?: () => boolean }
+  if (typeof elementWithCheckVisible.checkVisible === 'function') {
+    return !elementWithCheckVisible.checkVisible()
   }
   const style = getComputedStyle(element)
   if (style.display === 'none') {

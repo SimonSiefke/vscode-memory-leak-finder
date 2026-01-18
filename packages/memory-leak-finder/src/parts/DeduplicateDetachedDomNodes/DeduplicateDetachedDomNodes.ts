@@ -3,6 +3,7 @@ import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.ts'
 
 type DetachedDomNode = {
   readonly count: number
+  readonly description?: string
   readonly [key: string]: unknown
 }
 

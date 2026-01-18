@@ -1,1 +1,1 @@
-{"compilerOptions": {"composite": true}, "include": ["src/**/*"]}
+{"compilerOptions": {"composite": true, "allowJs": true}, "include": ["src/**/*.js"]}

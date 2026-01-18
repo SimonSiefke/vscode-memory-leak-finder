@@ -31,8 +31,9 @@ type EventListener = {
   readonly [key: string]: unknown
 }
 
+type Position = { column?: number; line?: number; name?: string; source?: string; sourcesHash?: string | null } | undefined
 type CleanPositionMap = {
-  readonly [sourceMapUrl: string]: readonly (readonly { column?: number; line?: number; name?: string; source?: string; sourcesHash?: string | null } | undefined)[] | undefined
+  readonly [sourceMapUrl: string]: readonly Position[] | undefined
 }
 
 export const combineEventListenersWithSourceMapResults = (eventListeners: readonly EventListener[], map: { readonly [sourceMapUrl: string]: readonly number[] }, cleanPositionMap: CleanPositionMap): readonly EventListener[] => {
