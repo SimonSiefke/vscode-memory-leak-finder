@@ -1,6 +1,4 @@
-import * as CreateParams from '../CreateParams/CreateParams.ts'
-
-export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, VError }: any) => {
   return {
     async hide() {
       try {
