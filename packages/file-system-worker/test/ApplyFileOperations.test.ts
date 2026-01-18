@@ -1,5 +1,5 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
-import type { CopyOperation, MkdirOperation, RemoveOperation, WriteOperation, FileOperation } from '../src/parts/ApplyFileOperation/ApplyFileOperation.ts'
+import type { FileOperation } from '../src/parts/ApplyFileOperation/ApplyFileOperation.ts'
 
 const mockCopy = jest.fn()
 const mockMakeDirectory = jest.fn()
