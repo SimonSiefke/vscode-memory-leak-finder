@@ -40,8 +40,6 @@ export const DebuggerEvaluateOnCallFrame = 'Debugger.evaluateOnCallFrame'
 
 export const DebuggerScriptParsed = 'Debugger.scriptParsed'
 
-export const DebuggerSetScriptSource = 'Debugger.setScriptSource'
-
 export const DebuggerPaused = 'Debugger.paused'
 
 export const DebuggerResumed = 'Debugger.resumed'
@@ -97,13 +95,3 @@ export const MemoryGetDomCounters = 'Memory.getDOMCounters'
 export const RuntimeGetHeapUsage = 'Runtime.getHeapUsage'
 
 export const RuntimeGlobalLexicalScopeNames = 'Runtime.globalLexicalScopeNames'
-
-export const FetchEnable = 'Fetch.enable'
-
-export const FetchDisable = 'Fetch.disable'
-
-export const FetchContinueRequest = 'Fetch.continueRequest'
-
-export const FetchFulfillRequest = 'Fetch.fulfillRequest'
-
-export const FetchRequestPaused = 'Fetch.requestPaused'
