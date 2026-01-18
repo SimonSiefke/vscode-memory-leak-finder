@@ -2,7 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as ParseSelector from '../ParseSelector/ParseSelector.ts'
 import * as QuerySelectorAll from '../QuerySelectorAll/QuerySelectorAll.ts'
 
-export const querySelectorAll = (root: Element, selector: string): Element[] => {
+export const querySelectorAll = (root: Element, selector: string): readonly HTMLHtmlElement[] => {
   Assert.object(root)
   Assert.string(selector)
   const parts = ParseSelector.parseSelector(selector)

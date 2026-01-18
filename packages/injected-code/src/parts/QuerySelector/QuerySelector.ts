@@ -9,6 +9,6 @@ export const querySelectorAll = (selector: string): readonly Element[] => {
  * @param {any} selector
  * @returns {HTMLElement|undefined}
  */
-export const querySelector = (selector: string): Element | undefined => {
+export const querySelector = (selector: string): HTMLElement | undefined => {
   return QuerySelectorAllRoot.querySelector(document.documentElement, selector)
 }
