@@ -134,6 +134,34 @@ export const prepareBoth = async (
             return mimeTypes[ext] || 'application/octet-stream'
           }
           
+          // Check if we should skip transformation (for blob scripts, workers, etc.)
+          const shouldSkipTransformation = (url, filePath) => {
+            const lowerUrl = url.toLowerCase()
+            const lowerPath = filePath.toLowerCase()
+            
+            // Skip blob scripts
+            if (lowerUrl.includes('blob:') || lowerPath.includes('blob')) {
+              return true
+            }
+            
+            // Skip worker scripts
+            if (lowerPath.includes('worker') || lowerUrl.includes('worker')) {
+              return true
+            }
+            
+            // Skip service worker scripts
+            if (lowerPath.includes('service-worker') || lowerUrl.includes('service-worker')) {
+              return true
+            }
+            
+            // Skip web worker scripts
+            if (lowerPath.includes('web-worker') || lowerUrl.includes('web-worker')) {
+              return true
+            }
+            
+            return false
+          }
+          
           // Set up protocol interceptor - will be called when app becomes ready
           const setupInterceptor = () => {
             if (!app.isReady()) {
@@ -168,23 +196,29 @@ export const prepareBoth = async (
                 filePath = filePath.substring(0, hashIndex)
               }
               
-              // Check if it's a JavaScript file (check the file path without query params)
-              const isJavaScript = filePath.endsWith('.js')
-              
-              if (isJavaScript) {
-                // Try to get transformed code from function tracker
-                try {
-                  const transformedCode = await queryFunctionTracker(url)
-                  if (transformedCode) {
-                    console.log('[ProtocolInterceptor] Returning transformed code for:', url)
-                    callback({
-                      data: Buffer.from(transformedCode, 'utf8'),
-                      mimeType: 'application/javascript',
-                    })
-                    return
+              // Check if we should skip transformation (blob scripts, workers, etc.)
+              if (shouldSkipTransformation(url, filePath)) {
+                console.log('[ProtocolInterceptor] Skipping transformation for blob/worker script:', url)
+                // Fall through to read original file
+              } else {
+                // Check if it's a JavaScript file (check the file path without query params)
+                const isJavaScript = filePath.endsWith('.js')
+                
+                if (isJavaScript) {
+                  // Try to get transformed code from function tracker
+                  try {
+                    const transformedCode = await queryFunctionTracker(url)
+                    if (transformedCode) {
+                      console.log('[ProtocolInterceptor] Returning transformed code for:', url)
+                      callback({
+                        data: Buffer.from(transformedCode, 'utf8'),
+                        mimeType: 'application/javascript',
+                      })
+                      return
+                    }
+                  } catch (error) {
+                    console.error('[ProtocolInterceptor] Error getting transformed code:', error)
                   }
-                } catch (error) {
-                  console.error('[ProtocolInterceptor] Error getting transformed code:', error)
                 }
               }
               
