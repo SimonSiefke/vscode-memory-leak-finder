@@ -7,7 +7,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async toggleScreenCastMode() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.ToggleScreenCastMode)
         await page.waitForIdle()
       } catch (error) {

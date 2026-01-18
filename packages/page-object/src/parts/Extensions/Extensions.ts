@@ -39,7 +39,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const nameLocator = firstExtension.locator('.name')
         await expect(nameLocator).toBeVisible()
         await expect(nameLocator).toHaveText(expectedName)
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
         await page.waitForIdle()
         await page.waitForIdle()
@@ -99,7 +99,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
           await page.waitForIdle()
           await expect(nameLocator).toHaveText(name)
           await page.waitForIdle()
-          const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError }))
+          const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError } as any))
           await contextMenu.open(firstExtension)
         } catch (error) {
           throw new VError(error, `Failed to open context menu`)
@@ -163,9 +163,9 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         await this.search(`@id:${id}`)
         await this.first.shouldBe(name)
         await this.first.click()
-        const extensionDetailView = ExtensionDetailView.create(CreateParams.asCreateParams({ expect, page, VError }))
+        const extensionDetailView = ExtensionDetailView.create(CreateParams.asCreateParams({ expect, page, VError } as any))
         await extensionDetailView.installExtension()
-        const sideBar = SideBar.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const sideBar = SideBar.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await sideBar.hide()
         await editor.closeAll()
         await page.waitForIdle()
@@ -179,7 +179,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         await this.search(`@id:${id}`)
         await this.first.shouldBe(name)
         await this.first.click()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
       } catch (error) {
         throw new VError(error, `Failed to clear`)
@@ -213,7 +213,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     async restart() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
         await page.waitForIdle()
       } catch (error) {

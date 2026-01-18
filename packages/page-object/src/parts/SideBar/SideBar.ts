@@ -27,7 +27,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
           return
         }
         await expect(secondarySideBar).toBeVisible()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.HideSecondarySideBar)
         await expect(secondarySideBar).toBeHidden()
         await page.waitForIdle()
@@ -68,14 +68,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async toggle() {
       try {
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
       } catch (error) {
         throw new VError(error, `Failed to toggle side bar`)
       }
     },
     async togglePosition() {
-      const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+      const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
       await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarPosition)
     },
   }

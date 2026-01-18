@@ -53,7 +53,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async show() {
       try {
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.OpenKeyboardShortcuts)
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible({

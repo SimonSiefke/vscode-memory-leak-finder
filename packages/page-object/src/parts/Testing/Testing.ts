@@ -6,7 +6,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
   return {
     async focusOnTestExplorerView() {
       try {
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.FocusOnTestExplorerView)
         await page.waitForIdle()
         const testExplorer = page.locator('.test-explorer')
@@ -19,7 +19,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async runAllTests({ expectedRowCount, expectedTestOutputRowCount }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.RunAllTests)
         await page.waitForIdle()
         const testExplorer = page.locator('.test-explorer')
@@ -46,7 +46,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async runTask(taskName: string): Promise<void> {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand('Tasks: Run Task')
         await page.waitForIdle()
         await quickPick.select(taskName)

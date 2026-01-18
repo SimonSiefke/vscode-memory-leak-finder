@@ -20,7 +20,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.McpAddServer, {
           pressKeyOnce: true,
           stayVisible: true,

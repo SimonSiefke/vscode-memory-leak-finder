@@ -25,7 +25,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
           canceled: false,
           filePaths: [extensionsFolder],
         })
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.InstallExtensionFromLocation)
         await page.waitForIdle()
       } catch (error) {

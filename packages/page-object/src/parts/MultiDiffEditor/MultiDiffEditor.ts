@@ -19,9 +19,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
           throw new Error('MultiDiffEditor requires at least 2 files')
         }
 
-        const explorer = Explorer.create(CreateParams.asCreateParams({ electronApp, expect, page, platform, VError }))
-        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError }))
-        const sideBar = SideBar.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const explorer = Explorer.create(CreateParams.asCreateParams({ electronApp, expect, page, platform, VError } as any))
+        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError } as any))
+        const sideBar = SideBar.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
 
         await explorer.focus()
 

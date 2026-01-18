@@ -72,7 +72,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     },
     async collapseAll() {
       try {
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.CollapseFoldersInExplorer)
       } catch (error) {
         throw new VError(error, `Failed to collapse all`)
@@ -110,7 +110,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     },
     async executeContextMenuCommand(locator, option) {
       await page.waitForIdle()
-      const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError }))
+      const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError } as any))
       await page.waitForIdle()
       await contextMenu.open(locator)
       await page.waitForIdle()
@@ -223,10 +223,10 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await page.waitForIdle()
         await this.openContextMenu(`1.txt`)
         await page.waitForIdle()
-        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError }))
+        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError } as any))
         await contextMenu.select('Open to the Side')
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.CloseOtherGroups)
         await page.waitForIdle()
         // TODO open context menu, the open to the side

@@ -52,7 +52,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async clickLink({ href }) {
       try {
         await page.waitForIdle()
-        const webView = WebView.create(CreateParams.asCreateParams({ expect, page, VError }))
+        const webView = WebView.create(CreateParams.asCreateParams({ expect, page, VError } as any))
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,
@@ -139,7 +139,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async show({ port }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -161,7 +161,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await expect(tab).toHaveCount(1)
         await page.waitForIdle()
 
-        const webView = WebView.create(CreateParams.asCreateParams({ expect, page, VError }))
+        const webView = WebView.create(CreateParams.asCreateParams({ expect, page, VError } as any))
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,

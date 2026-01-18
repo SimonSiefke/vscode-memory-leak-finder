@@ -9,7 +9,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeVisible()
-        const panel = Panel.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const panel = Panel.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await panel.hide()
         await expect(markersPanel).toBeHidden()
       } catch (error) {
@@ -34,7 +34,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeHidden()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
         await quickPick.executeCommand(WellKnownCommands.ProblemsFocusOnProblemsView)
         await expect(markersPanel).toBeVisible()
       } catch (error) {
