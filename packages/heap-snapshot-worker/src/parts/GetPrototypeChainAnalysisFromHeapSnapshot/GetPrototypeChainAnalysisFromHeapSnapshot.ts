@@ -103,14 +103,14 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (
     node_fields,
     node_types[0],
     strings,
-  ) as ParsedNode[]
+  ) as unknown as ParsedNode[]
   const parsedEdges = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
     edges,
     edge_fields,
     edge_types[0],
     node_fields.length,
     strings,
-  ) as ParsedEdge[]
+  ) as unknown as ParsedEdge[]
 
   // Find all objects and their prototype chains
   const prototypeAnalysis = analyzePrototypeChains(parsedNodes, parsedEdges)
