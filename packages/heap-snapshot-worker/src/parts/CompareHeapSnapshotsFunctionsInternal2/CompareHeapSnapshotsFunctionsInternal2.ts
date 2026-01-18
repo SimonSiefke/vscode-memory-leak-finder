@@ -66,7 +66,9 @@ export interface CompareFunctionsOptions {
   readonly minCount?: number
 }
 
-const filterOutExcluded = (items: readonly any[], excludes: readonly string[]): readonly any[] => {
+import type { CompareResult } from './CompareResult.ts'
+
+const filterOutExcluded = (items: readonly CompareResult[], excludes: readonly string[]): readonly CompareResult[] => {
   if (excludes.length > 0) {
     const lowered = excludes.map((e) => e.toLowerCase())
     return items.filter((item) => {

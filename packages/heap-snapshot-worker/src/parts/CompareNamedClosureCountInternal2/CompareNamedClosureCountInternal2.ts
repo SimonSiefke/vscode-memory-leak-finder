@@ -12,7 +12,15 @@ const createKeyMap = (keys: string[]) => {
   return map
 }
 
-const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
+interface MatchingNode {
+  readonly nodeId: number
+  readonly nodeIndex: number
+  readonly nodeName: string
+}
+
+type MatchingNodeMap = Record<string, readonly MatchingNode[]>
+
+const getMatchingNodes = (snapshot: Snapshot, keyMap: Record<string, boolean>): MatchingNodeMap => {
   const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(
     snapshot.meta.location_fields,
   )
@@ -46,7 +54,7 @@ const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
   return matchingNodeMap
 }
 
-const getNodeHash = (node: any) => {
+const getNodeHash = (node: MatchingNode): string => {
   return `${node.nodeName}:${node.nodeId}`
 }
 
@@ -81,9 +89,9 @@ export interface CompareClosuresOptions {
 export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
-  scriptMap: any,
+  scriptMap: Record<string, unknown>,
   options: CompareClosuresOptions = {},
-): Promise<any> => {
+): Promise<MatchingNodeMap> => {
   const minCount = options.minCount ?? 1
   const map1 = getUniqueLocationMap2(snapshotA)
   const map2 = getUniqueLocationMap2(snapshotB)

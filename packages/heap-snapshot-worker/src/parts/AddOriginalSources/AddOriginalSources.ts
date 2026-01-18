@@ -41,7 +41,7 @@ const getSourceMapUrl = (script: ScriptInfo): string => {
   return sourceMapUrl
 }
 
-export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly any[]> => {
+export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly CompareResult[]> => {
   let scriptMap: Record<number, ScriptInfo> | undefined
   // Always attempt to load script maps from disk
   try {
