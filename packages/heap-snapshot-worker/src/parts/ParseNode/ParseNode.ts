@@ -1,3 +1,7 @@
+type ParsedNode = {
+  readonly [key: string]: number
+}
+
 /**
  * Parses a node from the flat nodes array at the given index
  * @param nodeIndex - The index of the node to parse
@@ -5,7 +9,7 @@
  * @param nodeFields - The node fields metadata
  * @returns The parsed node object or null if the index is out of bounds
  */
-export const parseNode = (nodeIndex: number, nodes: Uint32Array, nodeFields: readonly string[]): any => {
+export const parseNode = (nodeIndex: number, nodes: Uint32Array, nodeFields: readonly string[]): ParsedNode | null => {
   const ITEMS_PER_NODE = nodeFields.length
   const nodeStart = nodeIndex * ITEMS_PER_NODE
 
@@ -13,7 +17,7 @@ export const parseNode = (nodeIndex: number, nodes: Uint32Array, nodeFields: rea
     return null
   }
 
-  const node: any = {}
+  const node: ParsedNode = {} as ParsedNode
   for (let i = 0; i < nodeFields.length; i++) {
     const fieldIndex = nodeStart + i
     if (fieldIndex < nodes.length) {

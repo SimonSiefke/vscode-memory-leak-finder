@@ -13,22 +13,32 @@ const createCountMap = (names: string[]) => {
   return map
 }
 
-const filterByArray = (value: any) => {
+interface NameMapValue {
+  readonly nodeName: string
+  readonly edgeName?: string
+}
+
+const filterByArray = (value: NameMapValue): boolean => {
   return value.nodeName === 'Array'
 }
 
-const getValueName = (value: any) => {
+const getValueName = (value: NameMapValue): string => {
   return value.edgeName || value.nodeName
 }
 
-const getArrayNames = (nameMap: any) => {
+const getArrayNames = (nameMap: Record<string, NameMapValue>): readonly string[] => {
   const values = Object.values(nameMap)
   const filtered = values.filter(filterByArray)
   const mapped = filtered.map(getValueName)
   return mapped
 }
 
-const getArrayNamesWithCount = (countMap: any) => {
+interface CountResult {
+  readonly count: number
+  readonly name: string
+}
+
+const getArrayNamesWithCount = (countMap: Record<string, number>): readonly CountResult[] => {
   const arrayNamesWithCount = Object.entries(countMap).map(([key, value]) => {
     return {
       count: value,
@@ -38,7 +48,10 @@ const getArrayNamesWithCount = (countMap: any) => {
   return arrayNamesWithCount
 }
 
-export const getNamedArrayCountFromHeapSnapshot = async (id: any, scriptMap: any = {}) => {
+export const getNamedArrayCountFromHeapSnapshot = async (
+  id: number,
+  scriptMap: Record<string, unknown> = {},
+): Promise<readonly CountResult[]> => {
   const heapsnapshot = HeapSnapshotState.get(id)
 
   Assert.object(heapsnapshot)

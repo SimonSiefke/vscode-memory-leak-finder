@@ -3,15 +3,33 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as IsImportantEdge from '../IsImportantEdge/IsImportantEdge.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
-const isClosure = (node: any) => {
+interface NodeWithType {
+  readonly type: string
+}
+
+interface EdgeWithName {
+  readonly name: string
+}
+
+interface NodeWithName extends NodeWithType {
+  readonly name: string
+  readonly id: number
+}
+
+interface GraphEdge {
+  readonly index: number
+  readonly name: string
+}
+
+const isClosure = (node: NodeWithType): boolean => {
   return node.type === 'closure'
 }
 
-const isContext = (edge: any) => {
+const isContext = (edge: EdgeWithName): boolean => {
   return edge.name === 'context'
 }
 
-const getName = (node: any, contextNodes: any[]) => {
+const getName = (node: NodeWithName, contextNodes: readonly EdgeWithName[]): string => {
   if (node.name) {
     return node.name
   }
@@ -21,7 +39,11 @@ const getName = (node: any, contextNodes: any[]) => {
     .slice(0, 100)
 }
 
-export const getNamedClosureCountFromHeapSnapshot = async (id: any) => {
+interface ClosureWithContextCount extends NodeWithName {
+  readonly contextNodeCount: number
+}
+
+export const getNamedClosureCountFromHeapSnapshot = async (id: number): Promise<readonly ClosureWithContextCount[]> => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
@@ -42,7 +64,7 @@ export const getNamedClosureCountFromHeapSnapshot = async (id: any) => {
       name,
     }
   })
-  const sorted = mapped.toSorted((a: any, b: any) => {
+  const sorted = mapped.toSorted((a: ClosureWithContextCount, b: ClosureWithContextCount) => {
     return (b.contextNodeCount || 0) - (a.contextNodeCount || 0) || a.name.localeCompare(b.name)
   })
   return sorted

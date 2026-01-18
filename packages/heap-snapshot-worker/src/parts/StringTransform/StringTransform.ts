@@ -1,4 +1,5 @@
 import { Transform } from 'node:stream'
+import type { TransformCallback } from 'node:stream'
 
 export class StringTransform extends Transform {
   constructor() {
@@ -6,7 +7,7 @@ export class StringTransform extends Transform {
       objectMode: true,
     })
   }
-  _transform(chunk: any, encoding: any, callback: any) {
+  _transform(chunk: unknown, encoding: BufferEncoding, callback: TransformCallback): void {
     const string = chunk.toString()
     this.push(string)
     callback()

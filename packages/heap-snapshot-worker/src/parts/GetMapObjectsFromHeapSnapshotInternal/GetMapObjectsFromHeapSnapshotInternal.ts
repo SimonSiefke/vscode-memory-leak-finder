@@ -24,7 +24,9 @@ interface MapObject {
   variableNames: VariableName[]
 }
 
-export const getMapObjectsFromHeapSnapshotInternal = (snapshot: any) => {
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
+
+export const getMapObjectsFromHeapSnapshotInternal = (snapshot: Snapshot): readonly MapObject[] => {
   const { edges, nodes, strings } = snapshot
   const { edge_fields, edge_types, node_fields, node_types } = snapshot.meta
 

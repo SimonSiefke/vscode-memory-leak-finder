@@ -13,13 +13,17 @@ const createDisposableWorker = (workerPath: string) => {
   }
 }
 
+interface PrepareHeapSnapshotOptions {
+  readonly parseStrings?: boolean
+}
+
 /**
  * Prepares a heap snapshot by parsing it in a separate worker for better performance
  * @param {string} path - The file path to the heap snapshot
- * @param {{parseStrings?:boolean}} options - Options for parsing
- * @returns {Promise<import('../Snapshot/Snapshot.ts').Snapshot>}>}
+ * @param {PrepareHeapSnapshotOptions} options - Options for parsing
+ * @returns {Promise<Snapshot>}
  */
-export const prepareHeapSnapshot = async (path: string, options: any): Promise<Snapshot> => {
+export const prepareHeapSnapshot = async (path: string, options: PrepareHeapSnapshotOptions): Promise<Snapshot> => {
   const workerPath = getHeapSnapshotWorkerPath()
   await using worker = createDisposableWorker(workerPath)
   const resultPromise = waitForResult(worker.worker)

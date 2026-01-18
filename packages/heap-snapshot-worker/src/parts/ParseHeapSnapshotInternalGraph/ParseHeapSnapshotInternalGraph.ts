@@ -1,6 +1,26 @@
 import * as Assert from '../Assert/Assert.ts'
 
-export const parseHeapSnapshotInternalGraph = (nodes: any, edges: any) => {
+interface NodeWithIdAndEdgeCount {
+  readonly id: number
+  readonly edgeCount: number
+}
+
+interface EdgeWithToNodeAndName {
+  readonly toNode: number
+  readonly nameOrIndex: string
+}
+
+interface GraphNode {
+  readonly index: number
+  readonly name: string
+}
+
+type Graph = Record<number, readonly GraphNode[]>
+
+export const parseHeapSnapshotInternalGraph = (
+  nodes: readonly NodeWithIdAndEdgeCount[],
+  edges: readonly EdgeWithToNodeAndName[],
+): Graph => {
   Assert.array(edges)
   Assert.array(nodes)
   const graph = Object.create(null)

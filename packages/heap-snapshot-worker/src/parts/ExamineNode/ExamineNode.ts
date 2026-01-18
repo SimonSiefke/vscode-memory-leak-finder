@@ -18,7 +18,7 @@ export interface NodeExaminationResult {
       readonly type: string | null
     }
   }>
-  readonly node: any
+  readonly node: ReturnType<typeof parseNode>
   readonly nodeId: number
   readonly nodeIndex: number
   readonly nodeName: string | null
@@ -119,7 +119,14 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
           type: getNodeTypeName(targetNode, node_types),
         }
       : undefined
-    const edgeData: any = { edgeName, nameIndex, toNode, type, typeName }
+    const edgeData: {
+      edgeName: string
+      nameIndex: number
+      toNode: number
+      type: number
+      typeName: string
+      targetNodeInfo?: { name: string | null; type: string | null }
+    } = { edgeName, nameIndex, toNode, type, typeName }
     if (targetNodeInfo !== undefined) {
       edgeData.targetNodeInfo = targetNodeInfo
     }

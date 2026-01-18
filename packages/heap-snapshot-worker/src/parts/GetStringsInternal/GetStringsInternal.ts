@@ -1,7 +1,9 @@
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
+
 /**
- * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
+ * @param {Snapshot} snapshot
  * @returns {readonly string[]}
  */
-export const getStringsInternal = (snapshot: any) => {
+export const getStringsInternal = (snapshot: Snapshot): readonly string[] => {
   return snapshot.strings
 }
