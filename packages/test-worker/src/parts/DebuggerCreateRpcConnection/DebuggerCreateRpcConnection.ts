@@ -12,7 +12,7 @@ type Ipc = {
 
 export const createRpc = (ipc: Ipc, canUseIdleCallback: boolean) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message: unknown) => {
+  const handleMessage = (message) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -63,7 +63,7 @@ export const createRpc = (ipc: Ipc, canUseIdleCallback: boolean) => {
       })
       return promise
     },
-    invokeWithTarget(targetId, sessionId, method, params) {
+    invokeWithTarget(targetId: string, sessionId: string, method: string, params?: unknown) {
       const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
       callbacks[id] = { reject, resolve }
