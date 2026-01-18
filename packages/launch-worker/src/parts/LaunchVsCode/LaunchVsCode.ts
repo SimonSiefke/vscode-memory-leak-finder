@@ -94,8 +94,8 @@ export const launchVsCode = async ({
     let workbenchFileRestore: (() => Promise<void>) | null = null
     if (trackFunctions) {
       try {
-        // Use dynamic import to avoid circular dependencies
-        const functionTrackerModule = await import('../../../function-tracker/src/parts/ReplaceWorkbenchFile/ReplaceWorkbenchFile.ts')
+        // Use dynamic import with correct path
+        const functionTrackerModule = await import('../../../../function-tracker/src/parts/ReplaceWorkbenchFile/ReplaceWorkbenchFile.ts')
         const result = await functionTrackerModule.replaceWorkbenchFile(binaryPath, platform)
         workbenchFileRestore = result.restored
         if (addDisposable && workbenchFileRestore) {
