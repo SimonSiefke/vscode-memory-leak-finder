@@ -8,15 +8,19 @@ import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
 const createUnknown = (id: number, name: string | null, value?: string): UnknownNode => {
-  const result: UnknownNode = {
+  if (value !== undefined) {
+    return {
+      id,
+      name,
+      type: 'unknown',
+      value,
+    }
+  }
+  return {
     id,
     name,
     type: 'unknown',
   }
-  if (value !== undefined) {
-    result.value = value
-  }
-  return result
 }
 
 export const buildAstForNode = (
@@ -172,10 +176,16 @@ export const buildAstForNode = (
       }
     }
     if (nodeTypeName === 'code') {
-      const codeNode: CodeNode = { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: 'code', value: undefined }
+      const codeNode: CodeNode = { id, name, type: 'code' }
+      if (columnValue !== undefined) codeNode.column = columnValue
+      if (lineValue !== undefined) codeNode.line = lineValue
+      if (scriptIdValue !== undefined) codeNode.scriptId = scriptIdValue
       return codeNode
     }
-    const closureNode: CodeNode = { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: 'closure', value: undefined }
+    const closureNode: CodeNode = { id, name, type: 'closure' }
+    if (columnValue !== undefined) closureNode.column = columnValue
+    if (lineValue !== undefined) closureNode.line = lineValue
+    if (scriptIdValue !== undefined) closureNode.scriptId = scriptIdValue
     return closureNode
   }
 
