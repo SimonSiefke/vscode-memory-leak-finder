@@ -10,7 +10,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         const toastContainer = page.locator('.notifications-toasts')
         await expect(toastContainer).toBeVisible()
         const quickPick = QuickPick.create({
+          electronApp: undefined,
           expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,

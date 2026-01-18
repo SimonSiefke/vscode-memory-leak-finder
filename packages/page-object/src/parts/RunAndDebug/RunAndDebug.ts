@@ -86,7 +86,12 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await page.waitForIdle()
         await this.startRunAndDebug({ debugConfiguration, debugLabel, viaIcon })
-        await this.waitForPaused({ callStackSize, file, hasCallStack: hasCallStack === undefined ? undefined : hasCallStack, line })
+        await this.waitForPaused({
+          callStackSize,
+          file,
+          ...(hasCallStack !== undefined ? { hasCallStack } : {}),
+          line,
+        })
       } catch (error) {
         throw new VError(error, `Failed to run debugger`)
       }

@@ -10,11 +10,11 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to click status bar item ${label}`)
       }
     },
-    getSelector(id) {
+    getSelector(id: string) {
       const selector = `#${id.replaceAll('.', '\\.')}`
       return selector
     },
-    async hideItem(id) {
+    async hideItem(id: string) {
       try {
         await page.waitForIdle()
         const selector = this.getSelector(id)

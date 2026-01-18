@@ -6,7 +6,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
   return {
     async show() {
       const quickPick = QuickPick.create({
+        electronApp: undefined,
         expect,
+        ideVersion: { major: 0, minor: 0, patch: 0 },
         page,
         platform,
         VError,

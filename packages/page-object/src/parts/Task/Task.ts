@@ -116,7 +116,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to open configuration`)
       }
     },
-    async pin(name) {
+    async pin(name: string) {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
@@ -214,7 +214,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to run task with error`)
       }
     },
-    async selectQuickPickItem({ item }) {
+    async selectQuickPickItem({ item }: { item: string }) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
