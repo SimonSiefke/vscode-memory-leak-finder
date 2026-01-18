@@ -58,7 +58,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to install extension`)
       }
     },
-    async openFeature(featureName) {
+    async openFeature(featureName: string) {
       try {
         const tab = page.locator(`.extension-feature-list-item[aria-label="${featureName}"]`)
         await expect(tab).toBeVisible()
@@ -69,7 +69,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to open feature ${featureName}`)
       }
     },
-    async openTab(text, options) {
+    async openTab(text: string, options?: any) {
       try {
         const tab = page.locator('.extension-editor .action-label', {
           hasText: text,
@@ -96,7 +96,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to open extension detail tab ${text}`)
       }
     },
-    async selectCategory(text) {
+    async selectCategory(text: string) {
       try {
         await page.waitForIdle()
         const category = page.locator('.extension-editor .category', {
@@ -110,7 +110,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to select extension detail category ${text}`)
       }
     },
-    async shouldHaveFeatureHeading(featureText) {
+    async shouldHaveFeatureHeading(featureText: string) {
       try {
         const featureTitle = page.locator(`.feature-title`)
         await expect(featureTitle).toBeVisible()
@@ -119,7 +119,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to check feature heading ${featureText}`)
       }
     },
-    async shouldHaveHeading(text) {
+    async shouldHaveHeading(text: string) {
       try {
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
@@ -130,7 +130,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to verify extension detail heading ${text}`)
       }
     },
-    async shouldHaveTab(text) {
+    async shouldHaveTab(text: string) {
       try {
         const tab = page.locator('.extension-editor .action-label', {
           hasText: text,

@@ -23,7 +23,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to clear filter`)
       }
     },
-    async filter({ expectedResults, searchValue }) {
+    async filter({ searchValue }: { searchValue: string }) {
       try {
         await page.waitForIdle()
         const table = page.locator('.ai-models-management-editor .models-table-container')

@@ -83,7 +83,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       const path = '/mcp'
       const server = Server.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
       const requests: any[] = []
-      const requestHandler = (req, res) => {
+      const requestHandler = (req: any, res: any) => {
         requests.push({
           url: req.url,
         })
@@ -243,7 +243,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       try {
         for (const [key, value] of Object.entries(servers)) {
           await value.dispose()
-          delete servers[key]
+          delete servers[key as string]
         }
         const storagePath = join(root, '.vscode-user-data-dir', 'User')
         const mcpPath = join(storagePath, 'mcp.json')
@@ -311,7 +311,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       }
     },
 
-    async selectCommand(text, stayVisible = false) {
+    async selectCommand(text: string, stayVisible = false) {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()

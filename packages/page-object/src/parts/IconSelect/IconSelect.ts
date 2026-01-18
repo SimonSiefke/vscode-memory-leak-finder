@@ -2,7 +2,7 @@ import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
   return {
-    async select(iconName) {
+    async select(iconName: string) {
       try {
         const iconSelectorContainer = page.locator('.icon-select-box-container')
         await expect(iconSelectorContainer).toBeVisible()

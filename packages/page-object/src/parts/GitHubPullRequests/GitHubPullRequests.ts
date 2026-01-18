@@ -23,7 +23,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
           expect,
           ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
-          platform: undefined,
+          platform: '',
           VError,
         })
         const subFrame = await webView.shouldBeVisible2({

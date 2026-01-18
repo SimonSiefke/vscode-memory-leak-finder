@@ -2,7 +2,7 @@ import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const getKeybindingButtonsText = (keyBinding, platform) => {
+const getKeybindingButtonsText = (keyBinding: string, platform: string) => {
   if (keyBinding.startsWith('Control+')) {
     if (IsMacos.isMacos(platform)) {
       return `⌃${keyBinding.slice('Control+'.length)}`
@@ -27,7 +27,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to search for ${searchValue}`)
       }
     },
-    async setKeyBinding(commandName, keyBinding) {
+    async setKeyBinding(commandName: string, keyBinding: string) {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible()

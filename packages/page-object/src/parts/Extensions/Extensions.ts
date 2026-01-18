@@ -175,7 +175,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to install ${id}`)
       }
     },
-    async open({ id, name }) {
+    async open({ id, name }: { id: string; name: string }) {
       try {
         await this.show()
         await this.search(`@id:${id}`)
@@ -306,7 +306,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed select item ${name}`)
       }
     },
-    async shouldHaveMcpItem({ name }) {
+    async shouldHaveMcpItem({ name }: { name: string }) {
       try {
         const paneHeader = page.locator('[aria-label="MCP Servers - Installed Section"]')
         await expect(paneHeader).toBeVisible()
@@ -318,7 +318,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to verify that mcp item is visible ${name}`)
       }
     },
-    async shouldHaveMcpWelcomeHeading(expectedText) {
+    async shouldHaveMcpWelcomeHeading(expectedText: string) {
       try {
         const mcpWelcomeTitle = page.locator('.mcp-welcome-title')
         await expect(mcpWelcomeTitle).toBeVisible()
@@ -327,7 +327,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to check mcp welcome heading`)
       }
     },
-    async shouldHaveTitle(expectedTtitle) {
+    async shouldHaveTitle(expectedTtitle: string) {
       try {
         const title = page.locator('.sidebar .title-label h2')
         await expect(title).toBeVisible()
@@ -336,7 +336,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to check extensions title`)
       }
     },
-    async shouldHaveValue(value) {
+    async shouldHaveValue(value: string) {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()

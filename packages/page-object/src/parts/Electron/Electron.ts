@@ -2,10 +2,10 @@ import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ electronApp, VError }: CreateParams.CreateParams) => {
   return {
-    async evaluate(expression) {
+    async evaluate(expression: string) {
       return await electronApp.evaluate(expression)
     },
-    async mockDialog(response) {
+    async mockDialog(response: any) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
         await this.mockElectron('dialog', 'showMessageBox', ` () => { return JSON.parse(${responseString}) }`)
@@ -26,7 +26,7 @@ export const create = ({ electronApp, VError }: CreateParams.CreateParams) => {
   electron['${namespace}']['${key}'] = ${implementationCode}
 })()`)
     },
-    async mockOpenDialog(response) {
+    async mockOpenDialog(response: any) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
         await this.mockElectron('dialog', 'showOpenDialog', `() => { return JSON.parse(${responseString}) }`)
@@ -34,7 +34,7 @@ export const create = ({ electronApp, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to mock electron open dialog`)
       }
     },
-    async mockSaveDialog(response) {
+    async mockSaveDialog(response: any) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
         await this.mockElectron('dialog', 'showSaveDialog', `() => { return JSON.parse(${responseString}) }`)
