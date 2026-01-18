@@ -47,7 +47,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to clear chat context`)
       }
     },
-    async clearContext(contextName) {
+    async clearContext(contextName: string) {
       try {
         const contextLabel = page.locator(`[aria-label="Attached context, ${contextName}"]`)
         await expect(contextLabel).toBeVisible()

@@ -23,7 +23,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to send message`)
       }
     },
-    async shouldHaveMessageCount(count) {
+    async shouldHaveMessageCount(count: number) {
       try {
         await page.waitForIdle()
         const conversations = page.locator('.conversations')
@@ -48,7 +48,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async show() {
       try {
-        const quickPick = QuickPick.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand('Cursor: New Chat')
         const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()

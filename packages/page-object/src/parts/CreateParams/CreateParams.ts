@@ -5,7 +5,7 @@ interface IdeVersion {
 }
 
 export type CreateParams = {
-  readonly electronApp: any
+  readonly electronApp?: any
   readonly expect: any
   readonly ideVersion: IdeVersion
   readonly page: any
