@@ -1,4 +1,4 @@
-export const dispatchEditContextUpdate = (element, newValue) => {
+export const dispatchEditContextUpdate = (element: any, newValue: any) => {
   // @ts-ignore
   if (element && element.editContext && typeof TextUpdateEvent !== 'undefined') {
     element.editContext.dispatchEvent(

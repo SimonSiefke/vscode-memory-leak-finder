@@ -2,7 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as ParseSelector from '../ParseSelector/ParseSelector.ts'
 import * as QuerySelectorAll from '../QuerySelectorAll/QuerySelectorAll.ts'
 
-export const querySelectorAll = (root, selector) => {
+export const querySelectorAll = (root: Element, selector: string): Element[] => {
   Assert.object(root)
   Assert.string(selector)
   const parts = ParseSelector.parseSelector(selector)
@@ -15,7 +15,7 @@ export const querySelectorAll = (root, selector) => {
   return currentRoots
 }
 
-export const querySelector = (root, selector) => {
+export const querySelector = (root: Element, selector: string): Element | undefined => {
   Assert.object(root)
   Assert.string(selector)
   const elements = querySelectorAll(root, selector)
