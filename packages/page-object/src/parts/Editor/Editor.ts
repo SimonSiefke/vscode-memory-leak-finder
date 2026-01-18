@@ -1733,14 +1733,14 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
       await page.waitForIdle()
       await quickPick.select('Hex Editor') // TODO make this configurable
       await page.waitForIdle()
-      const webView = WebView.create({ expect, ideVersion, page, platform, VError })
+      const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
       await webView.shouldBeVisible2({
         extensionId: `ms-vscode.hexeditor`,
         hasLineOfCodeCounter: false,
       })
     },
     async waitForImageReady() {
-      const webView = WebView.create({ expect, ideVersion, page, platform, VError })
+      const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
       const subFrame = await webView.shouldBeVisible2({
         extensionId: `vscode.media-preview`,
         hasLineOfCodeCounter: false,
