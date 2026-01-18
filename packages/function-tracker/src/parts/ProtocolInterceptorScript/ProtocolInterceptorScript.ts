@@ -52,37 +52,72 @@ export const protocolInterceptorScript = (socketPath: string): string => {
   
   // Intercept vscode-file:// protocol using interceptBufferProtocol
   // This allows us to return a Buffer with the transformed code
-  protocol.interceptBufferProtocol('vscode-file', async (request, callback) => {
+  protocol.interceptBufferProtocol('vscode-file', (request, callback) => {
     const url = request.url
     
     // Only intercept workbench.desktop.main.js
     if (url.includes('workbench.desktop.main.js')) {
-      try {
-        const transformedCode = await queryFunctionTracker(url)
-        if (transformedCode) {
-          callback({
-            data: Buffer.from(transformedCode, 'utf8'),
-            mimeType: 'application/javascript',
-          })
-          return
+      let callbackCalled = false
+      const ensureCallback = () => {
+        if (!callbackCalled) {
+          callbackCalled = true
+          fallbackToFileReading()
         }
-      } catch (error) {
-        console.error('[ProtocolInterceptor] Error getting transformed code:', error)
       }
+      
+      // Set timeout to ensure callback is always called
+      const timeout = setTimeout(() => {
+        console.error('[ProtocolInterceptor] Timeout waiting for transformed code')
+        ensureCallback()
+      }, 5000)
+      
+      queryFunctionTracker(url)
+        .then((transformedCode) => {
+          if (callbackCalled) return
+          clearTimeout(timeout)
+          
+          if (transformedCode && typeof transformedCode === 'string') {
+            try {
+              callbackCalled = true
+              callback({
+                data: Buffer.from(transformedCode, 'utf8'),
+                mimeType: 'application/javascript',
+              })
+              return
+            } catch (error) {
+              console.error('[ProtocolInterceptor] Error creating buffer:', error)
+              // Fall through to file reading
+            }
+          }
+          // Fall through to file reading if transformedCode is null or invalid
+          ensureCallback()
+        })
+        .catch((error) => {
+          if (callbackCalled) return
+          clearTimeout(timeout)
+          console.error('[ProtocolInterceptor] Error getting transformed code:', error)
+          // Fall through to file reading on error
+          ensureCallback()
+        })
+      return
     }
     
     // Fall through: convert vscode-file://vscode-app to file path and read file
-    if (url.startsWith('vscode-file://vscode-app')) {
-      const filePath = url.slice('vscode-file://vscode-app'.length)
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          callback({ error: -6 })
-        } else {
-          callback({ data, mimeType: 'application/javascript' })
-        }
-      })
-    } else {
-      callback({ error: -6 })
+    fallbackToFileReading()
+    
+    function fallbackToFileReading() {
+      if (url.startsWith('vscode-file://vscode-app')) {
+        const filePath = url.slice('vscode-file://vscode-app'.length)
+        fs.readFile(filePath, (err, data) => {
+          if (err) {
+            callback({ error: -6 })
+          } else {
+            callback({ data, mimeType: 'application/javascript' })
+          }
+        })
+      } else {
+        callback({ error: -6 })
+      }
     }
   })
   

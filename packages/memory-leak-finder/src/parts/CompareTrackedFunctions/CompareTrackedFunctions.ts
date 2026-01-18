@@ -94,6 +94,31 @@ const getSourceMapUrl = (script: { readonly url?: string; readonly sourceMapUrl?
   return sourceMapUrl
 }
 
+const convertScriptIdToUrl = (
+  scriptMap: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>,
+  scriptId: string,
+): string | null => {
+  // Try to find script by scriptId and return its URL
+  if (scriptId in scriptMap) {
+    return scriptMap[scriptId].url || null
+  }
+  // Try parsing as numeric scriptId
+  const numericScriptId = Number.parseInt(scriptId, 10)
+  if (!Number.isNaN(numericScriptId)) {
+    if (String(numericScriptId) in scriptMap) {
+      return scriptMap[String(numericScriptId)].url || null
+    }
+    // Also check if any key in scriptMap is a number that matches
+    for (const key of Object.keys(scriptMap)) {
+      const keyNum = Number.parseInt(key, 10)
+      if (!Number.isNaN(keyNum) && keyNum === numericScriptId) {
+        return scriptMap[key].url || null
+      }
+    }
+  }
+  return null
+}
+
 const findScript = (
   scriptMap: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>,
   urlOrScriptId: string,
@@ -227,7 +252,22 @@ export const compareTrackedFunctions = async (
       const parsed = parseFunctionName(result.functionName)
 
       if (parsed.url && parsed.line !== null) {
-        const script = findScript(scriptMap, parsed.url)
+        // Try to find the script - findScript handles both scriptId and URL lookups
+        let script = findScript(scriptMap, parsed.url)
+
+        // If not found and parsed.url looks like a scriptId (numeric), try converting to URL first
+        // This helps when the scriptId format doesn't match the scriptMap key format
+        if (!script) {
+          const numericScriptId = Number.parseInt(parsed.url, 10)
+          if (!Number.isNaN(numericScriptId)) {
+            // It's a scriptId, try to convert to URL and lookup again
+            const convertedUrl = convertScriptIdToUrl(scriptMap, parsed.url)
+            if (convertedUrl) {
+              script = findScript(scriptMap, convertedUrl)
+            }
+          }
+        }
+
         if (script) {
           const sourceMapUrl = getSourceMapUrl(script)
           if (!sourceMapUrl) {
