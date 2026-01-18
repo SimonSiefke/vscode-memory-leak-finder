@@ -33,7 +33,7 @@ test.skip('exec returns stdout, stderr, and exitCode', async () => {
 
 test.skip('exec handles empty stdout and stderr', async () => {
   const command = 'test'
-  const args = []
+  const args: readonly string[] = []
   const mockResult = {
     exitCode: 1,
     stderr: '',
@@ -53,7 +53,7 @@ test.skip('exec handles empty stdout and stderr', async () => {
 
 test.skip('exec uses default options when not provided', async () => {
   const command = 'ls'
-  const args = ['-la']
+  const args: readonly string[] = ['-la']
   const mockResult = {
     exitCode: 0,
     stderr: '',
@@ -70,7 +70,7 @@ test.skip('exec uses default options when not provided', async () => {
 
 test.skip('exec handles non-zero exit code', async () => {
   const command = 'false'
-  const args = []
+  const args: readonly string[] = []
   const mockResult = {
     exitCode: 1,
     stderr: 'Command failed',
