@@ -7,4 +7,3 @@ export * as DevtoolsProtocolMemory from '../DevtoolsProtocolMemory/DevtoolsProto
 export * as DevtoolsProtocolPage from '../DevtoolsProtocolPage/DevtoolsProtocolPage.js'
 export * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js'
 export * as DevtoolsProtocolTarget from '../DevtoolsProtocolTarget/DevtoolsProtocolTarget.js'
-export * as DevtoolsProtocolFetch from '../DevtoolsProtocolFetch/DevtoolsProtocolFetch.js'
