@@ -3,7 +3,7 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
     async close() {
       try {

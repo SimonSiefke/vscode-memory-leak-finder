@@ -33,7 +33,7 @@ const getListId = (classNameString: string) => {
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
     async cancel() {
       try {
