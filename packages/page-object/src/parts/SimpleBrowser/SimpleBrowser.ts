@@ -34,7 +34,7 @@ const createMockServer = async ({ port }: { port: number }): Promise<MockServer>
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async addElementToChat({ selector: _selector }: { selector: string }) {
       try {

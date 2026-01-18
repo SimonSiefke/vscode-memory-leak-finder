@@ -9,7 +9,7 @@ import { root } from '../Root/Root.ts'
 import * as Server from '../Server/Server.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   const servers: Record<number, Server.ServerInfo> = Object.create(null)
   return {
     async addServer({ serverName }: { serverName: string }) {

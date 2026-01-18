@@ -3,7 +3,7 @@ import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async expandStep(name: string) {
       try {

@@ -18,7 +18,7 @@ const nonBreakingSpace = String.fromCharCode(160)
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async add({ expectedName, path }: { path: string; expectedName: string }) {
       try {
