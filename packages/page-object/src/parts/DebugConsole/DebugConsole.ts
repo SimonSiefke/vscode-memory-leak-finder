@@ -24,7 +24,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to clear debug console input`)
       }
     },
-    async evaluate({ expectedResult, expression, hasSuggest }) {
+    async evaluate({ expectedResult, expression, hasSuggest }: { expectedResult: any; expression: string; hasSuggest: boolean }) {
       try {
         const repl = page.locator('.repl')
         await expect(repl).toBeVisible()
@@ -99,7 +99,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to hide debug console`)
       }
     },
-    async shouldHaveCompletions(items) {
+    async shouldHaveCompletions(items: readonly string[]) {
       try {
         const completions = page.locator('.repl-input-wrapper .suggest-widget')
         const count = await completions.count()
@@ -120,7 +120,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to verify debug console completion items`)
       }
     },
-    async shouldHaveLogpointOutput(expectedMessage) {
+    async shouldHaveLogpointOutput(expectedMessage: string) {
       try {
         const debugConsole = page.locator('[aria-label="Debug Console"]')
         await expect(debugConsole).toBeVisible()

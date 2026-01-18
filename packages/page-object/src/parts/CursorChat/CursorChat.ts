@@ -12,7 +12,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to reset focus`)
       }
     },
-    async sendMessage(question) {
+    async sendMessage(question: string) {
       try {
         const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()
@@ -34,7 +34,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to verify message count`)
       }
     },
-    async shouldHaveResponse(responseText) {
+    async shouldHaveResponse(responseText: string) {
       try {
         await page.waitForIdle()
         const conversations = page.locator('.conversations')

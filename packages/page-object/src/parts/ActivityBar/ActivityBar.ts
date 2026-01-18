@@ -105,7 +105,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await activityBarItem.hover()
         const tooltip = page.locator('[role="tooltip"]')
         await expect(tooltip).toBeVisible()
-        const keyBinding = IsMacos.isMacos(platform) ? '⇧⌘E' : 'Ctrl+Shift+E'
+        const keyBinding = platform && IsMacos.isMacos(platform) ? '⇧⌘E' : 'Ctrl+Shift+E'
         await expect(tooltip).toHaveText(`Explorer (${keyBinding})`)
       } catch (error) {
         throw new VError(error, `Failed to show explorer tooltip`)

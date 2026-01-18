@@ -5,7 +5,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
-    async addContext(initialPrompt, secondPrompt, confirmText) {
+    async addContext(initialPrompt: string, secondPrompt: string, confirmText: string) {
       try {
         const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
         await addContextButton.click()
@@ -32,7 +32,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           response: 1,
         })
         const quickPick = QuickPick.create({ expect, page, platform, VError })
-        if (ideVersion && ideVersion.minor >= 108) {
+        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
           // TODO
           // await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
@@ -229,7 +229,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async setMode(modeLabel: string) {
       try {
-        if (ideVersion.minor < 107) {
+        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor < 107) {
           await this.setModeLegacy(modeLabel)
           return
         }

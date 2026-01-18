@@ -1,4 +1,4 @@
-export interface CreateParams {
+export type CreateParams = {
   readonly electronApp?: any
   readonly expect?: any
   readonly ideVersion?: { major?: number; minor?: number; patch?: number } | string

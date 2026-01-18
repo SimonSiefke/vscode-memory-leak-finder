@@ -110,7 +110,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         waitForHidden: contextMenu,
       })
     },
-    async shouldHaveItem(option) {
+    async shouldHaveItem(option: string) {
       await page.waitForIdle()
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
       await expect(contextMenu).toBeVisible()
