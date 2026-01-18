@@ -8,13 +8,13 @@ const getTransformedCodePath = (): string => {
 }
 
 interface TransformRequest {
-  type: 'transform'
-  url: string
+  readonly type: 'transform'
+  readonly url: string
 }
 
 interface TransformResponse {
-  type: 'transformed' | 'skip'
-  code?: string
+  readonly type: 'transformed' | 'skip'
+  readonly code?: string
 }
 
 let socketServer: Server | null = null
