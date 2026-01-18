@@ -6,7 +6,7 @@ import { isChromeInternalArrayName } from '../IsChromeInternalArrayName/IsChrome
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 
-const getSortedCounts = (heapsnapshot: Snapshot) => {
+const getSortedCounts = (heapsnapshot: Snapshot, scriptMap: any) => {
   const { edges, nodes, strings } = heapsnapshot
   const { meta } = heapsnapshot
   const { edge_fields, edge_types, node_fields } = meta
