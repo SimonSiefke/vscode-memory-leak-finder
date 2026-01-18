@@ -5,7 +5,7 @@ import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyP
 const protocolInterceptorScript = (): string => {
   return `function() {
   const electron = this
-  const { protocol, app } = electron
+  const { protocol, app, BrowserWindow } = electron
   // Wait for app to be ready before intercepting protocol
   if (!app.isReady()) {
     console.error('[ProtocolInterceptor] App is not ready yet')
@@ -21,6 +21,18 @@ const protocolInterceptorScript = (): string => {
       mimeType: 'text/html',
     })
   })
+  
+  // Open DevTools when window shows
+  const originalInit = BrowserWindow.prototype._init
+  BrowserWindow.prototype._init = function () {
+    originalInit.call(this)
+    
+    // Open DevTools when window is ready to show
+    this.once('ready-to-show', () => {
+      console.log('[ProtocolInterceptor] Opening DevTools for window')
+      this.webContents.openDevTools()
+    })
+  }
   
   console.log('[ProtocolInterceptor] Protocol interceptor installed')
 }`
