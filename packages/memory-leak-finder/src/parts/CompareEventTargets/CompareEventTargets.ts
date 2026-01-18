@@ -19,7 +19,7 @@ const prettifyEventTargets = (eventTargets: readonly { description: string }[]):
   const result: { count: number; description: string }[] = []
   for (const [key, value] of Object.entries(countMap)) {
     result.push({
-      count: value,
+      count: value as number,
       description: key,
     })
   }

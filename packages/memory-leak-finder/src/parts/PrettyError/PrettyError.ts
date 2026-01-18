@@ -22,7 +22,7 @@ const prepareModuleNotFoundError = (error: Error & { stack?: string }): { codeFr
     return {
       codeFrame: '',
       message,
-      stack: error.stack,
+      stack: error.stack || '',
     }
   }
   const notFoundModule = match[1]
@@ -120,14 +120,16 @@ export const prepare = async (error: Error & { code?: string; codeFrame?: string
       stack: relevantStack,
     }
   }
-  const { message } = error
-  if (error && error.cause) {
-    const cause = error.cause()
+  let { message } = error
+  let errorToUse: Error & { stack?: string } = error
+  if (error && 'cause' in error && typeof (error as { cause?: () => Error | undefined }).cause === 'function') {
+    const cause = (error as { cause: () => Error | undefined }).cause()
     if (cause) {
-      error = cause
+      errorToUse = cause
+      message = cause.message || message
     }
   }
-  const cleanedStack = CleanStack.cleanStack(error.stack, { root })
+  const cleanedStack = CleanStack.cleanStack(errorToUse.stack, { root })
   const lines = SplitLines.splitLines(cleanedStack)
   const codeFrame = getCodeFrame(cleanedStack, { color })
   const relevantStack = lines.join('\n')
