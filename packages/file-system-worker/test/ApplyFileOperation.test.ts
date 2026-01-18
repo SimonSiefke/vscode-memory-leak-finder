@@ -1,4 +1,5 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
+import type { CopyOperation, MkdirOperation, RemoveOperation } from '../src/parts/ApplyFileOperation/ApplyFileOperation.ts'
 
 const mockCopy = jest.fn()
 const mockMakeDirectory = jest.fn()
@@ -24,10 +25,10 @@ beforeEach(async () => {
 test('applyFileOperation - applies copy operation', async () => {
   mockCopy.mockReturnValue(undefined)
 
-  const operation = {
+  const operation: CopyOperation = {
     from: '/source/file.txt',
     to: '/dest/file.txt',
-    type: 'copy' as const,
+    type: 'copy',
   }
 
   await applyFileOperationModule.applyFileOperation(operation)
@@ -39,9 +40,9 @@ test('applyFileOperation - applies copy operation', async () => {
 test('applyFileOperation - applies mkdir operation', async () => {
   mockMakeDirectory.mockReturnValue(undefined)
 
-  const operation = {
+  const operation: MkdirOperation = {
     path: '/path/to/directory',
-    type: 'mkdir' as const,
+    type: 'mkdir',
   }
 
   await applyFileOperationModule.applyFileOperation(operation)
@@ -53,9 +54,9 @@ test('applyFileOperation - applies mkdir operation', async () => {
 test('applyFileOperation - applies remove operation', async () => {
   mockRemove.mockReturnValue(undefined)
 
-  const operation = {
+  const operation: RemoveOperation = {
     from: '/path/to/file.txt',
-    type: 'remove' as const,
+    type: 'remove',
   }
 
   await applyFileOperationModule.applyFileOperation(operation)
@@ -70,10 +71,10 @@ test('applyFileOperation - handles copy operation error', async () => {
     throw error
   })
 
-  const operation = {
+  const operation: CopyOperation = {
     from: '/source/file.txt',
     to: '/dest/file.txt',
-    type: 'copy' as const,
+    type: 'copy',
   }
 
   await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation copy')
@@ -85,9 +86,9 @@ test('applyFileOperation - handles mkdir operation error', async () => {
     throw error
   })
 
-  const operation = {
+  const operation: MkdirOperation = {
     path: '/path/to/directory',
-    type: 'mkdir' as const,
+    type: 'mkdir',
   }
 
   await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation mkdir')
@@ -99,9 +100,9 @@ test('applyFileOperation - handles remove operation error', async () => {
     throw error
   })
 
-  const operation = {
+  const operation: RemoveOperation = {
     from: '/path/to/file.txt',
-    type: 'remove' as const,
+    type: 'remove',
   }
 
   await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation remove')
