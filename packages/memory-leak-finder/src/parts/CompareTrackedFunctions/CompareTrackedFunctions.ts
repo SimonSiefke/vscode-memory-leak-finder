@@ -8,6 +8,9 @@ export interface TrackedFunctionResult {
   readonly functionName: string
   readonly callCount: number
   readonly originalLocation?: string | null
+  readonly originalLine?: number | null
+  readonly originalColumn?: number | null
+  readonly originalSource?: string | null
 }
 
 interface ParsedFunctionName {
@@ -297,7 +300,9 @@ export const compareTrackedFunctions = async (
       } else {
         // Function without location info - log for debugging
         // Note: We can't resolve these without location info, but they should have been tracked with location
-        console.log(`[CompareTrackedFunctions] Function "${parsed.name}" has no location info - this should not happen if tracking is working correctly`)
+        console.log(
+          `[CompareTrackedFunctions] Function "${parsed.name}" has no location info - this should not happen if tracking is working correctly`,
+        )
       }
     }
 
@@ -320,17 +325,17 @@ export const compareTrackedFunctions = async (
           const parsed = pointer.parsed
 
           // Keep functionName with minified location, add originalLocation separately
-          // Always include both line and column in originalLocation format when available
+          // Always include both line and column in originalLocation format: <file>:<line>:<column>
           let originalLocation: string | null = null
           if (original) {
-            // Build the original location string - always include column when we have line
+            // Build the original location string - always include both line and column when we have source and line
             if (original.source && original.line !== null) {
               // Always include column (default to 0 if not available)
               const column = original.column !== null ? original.column : 0
               originalLocation = `${original.source}:${original.line}:${column}`
-            } else if (original.source) {
-              originalLocation = original.source
             }
+            // If we don't have both source and line, don't set originalLocation (keep it null)
+            // This ensures originalLocation always follows the format <file>:<line>:<column>
           }
 
           results[pointer.index] = {
