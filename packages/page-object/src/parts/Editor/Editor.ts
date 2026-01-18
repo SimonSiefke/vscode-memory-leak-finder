@@ -1145,6 +1145,18 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       await expect(breadCrumb).toBeVisible({ timeout: 10_000 })
       await page.waitForIdle()
     },
+    async shouldHaveFontSize(expectedFontSize: string) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const line = editor.locator('.view-lines')
+        await expect(line).toHaveCss('font-size', expectedFontSize)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to check font size`)
+      }
+    },
     async shouldHaveCodeLens(options?: { timeout?: number }) {
       try {
         await page.waitForIdle()
