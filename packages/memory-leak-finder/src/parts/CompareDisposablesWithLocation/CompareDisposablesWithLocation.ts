@@ -28,7 +28,7 @@ const addDeltas = (prettyBefore: readonly DisposableItem[], prettyAfter: readonl
   return newItems
 }
 
-export const compareDisposablesWithLocation = async (before, after) => {
+export const compareDisposablesWithLocation = async (before: readonly unknown[], after: { result: readonly unknown[]; scriptMap: unknown }): Promise<readonly (DisposableItem & { delta: number })[]> => {
   const beforeResult = before
   const afterResult = after.result
   const { scriptMap } = after

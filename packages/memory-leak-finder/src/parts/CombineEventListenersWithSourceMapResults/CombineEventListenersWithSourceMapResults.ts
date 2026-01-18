@@ -11,7 +11,7 @@ const compareCount = (a: EventListenerWithCount, b: EventListenerWithCount): num
   return b.count - a.count
 }
 
-const getIndex = (values, line, column) => {
+const getIndex = (values: readonly number[], line: number, column: number): number => {
   for (let i = 0; i < values.length; i += 2) {
     const valueLine = values[i]
     const valueColumn = values[i + 1]

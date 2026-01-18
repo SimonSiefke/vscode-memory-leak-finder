@@ -6,7 +6,7 @@ const sortEntries = (entries: readonly [string, number][]): readonly [string, nu
   })
 }
 
-const prettifyMap = (map) => {
+const prettifyMap = (map: { readonly [key: string]: number }): { readonly [key: string]: number } => {
   const entries = Object.entries(map)
   const sortedEntries = sortEntries(entries)
   const sortedMap = Object.create(null)

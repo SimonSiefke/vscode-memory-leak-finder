@@ -17,7 +17,7 @@ const getSourceMaps = (sourceMapUrl: string | null | undefined): readonly string
   return [sourceMapUrl]
 }
 
-export const cleanInstanceCount = (instance, constructorLocation, scriptMap) => {
+export const cleanInstanceCount = (instance: Record<string, unknown>, constructorLocation: { scriptId: string; lineNumber: number; columnNumber: number }, scriptMap: unknown): Record<string, unknown> => {
   Assert.object(instance)
   Assert.object(constructorLocation)
   Assert.object(scriptMap)

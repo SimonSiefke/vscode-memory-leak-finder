@@ -33,7 +33,7 @@ const isInternal = (line) => {
   return false
 }
 
-const cleanLine = (line) => {
+const cleanLine = (line: string): string => {
   const trimmedLine = line.trim()
   if (trimmedLine.startsWith('at Module.')) {
     return line.replace('at Module.', 'at ')
@@ -54,7 +54,7 @@ const getCleanLines = (lines) => {
   return lines.map(cleanLine)
 }
 
-const getRelevantLines = (lines, stack) => {
+const getRelevantLines = (lines: readonly string[], stack: string): readonly string[] => {
   const isAssertionError =
     stack.includes('AssertionError:') ||
     stack.includes('ExpectError:') ||

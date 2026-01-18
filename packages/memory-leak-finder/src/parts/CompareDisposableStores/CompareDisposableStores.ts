@@ -8,15 +8,15 @@ const hasStackTrace = (stackTrace: string): boolean => {
   return stackTrace !== ''
 }
 
-const hasItems = (disposableStore) => {
-  return disposableStore.length && disposableStore.some(hasStackTrace)
+const hasItems = (disposableStore: DisposableStore): boolean => {
+  return disposableStore.length > 0 && disposableStore.some(hasStackTrace)
 }
 
-const compareSize = (a, b) => {
+const compareSize = (a: DisposableStore, b: DisposableStore): number => {
   return b.length - a.length
 }
 
-const prettifyDisposableStores = (disposableStores) => {
+const prettifyDisposableStores = (disposableStores: readonly DisposableStore[]): readonly DisposableStore[] => {
   const viableStores = disposableStores.filter(hasItems)
   const sortedStores = viableStores.sort(compareSize)
   return sortedStores
