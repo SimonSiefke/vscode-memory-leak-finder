@@ -3,7 +3,14 @@ import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+interface CreateParams {
+  readonly expect: unknown
+  readonly page: unknown
+  readonly platform: string
+  readonly VError: new (error: unknown, message: string) => Error
+}
+
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async hide() {
       try {
@@ -110,7 +117,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to show explorer tooltip`)
       }
     },
-    async showView({ ariaLabel, titleLabel = ariaLabel }) {
+    async showView({ ariaLabel, titleLabel = ariaLabel }: { ariaLabel: string; titleLabel?: string | RegExp }) {
       try {
         await page.waitForIdle()
         const activityBar = page.locator('.part.activitybar')

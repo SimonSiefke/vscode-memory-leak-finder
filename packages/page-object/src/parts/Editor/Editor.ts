@@ -23,7 +23,15 @@ const isBinary = (file: string) => {
   return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+interface CreateParams {
+  expect: any
+  ideVersion: { major?: number; minor?: number; patch?: number } | string
+  page: any
+  platform: string
+  VError: any
+}
+
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async acceptInlineCompletion() {
       try {
@@ -66,7 +74,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to add cursor below`)
       }
     },
-    async autoFix({ hasFixes }) {
+    async autoFix({ hasFixes }: { hasFixes: boolean }) {
       try {
         const quickPick = QuickPick.create({
           expect,
@@ -86,7 +94,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to execute auto fix`)
       }
     },
-    async click(text) {
+    async click(text: string) {
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
@@ -224,7 +232,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to delete all`)
       }
     },
-    async deleteCharactersLeft({ count }) {
+    async deleteCharactersLeft({ count }: { count: number }) {
       try {
         for (let i = 0; i < count; i++) {
           await page.waitForIdle()
@@ -235,7 +243,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to delete character left`)
       }
     },
-    async deleteCharactersRight({ count }) {
+    async deleteCharactersRight({ count }: { count: number }) {
       try {
         await page.waitForIdle()
         for (let i = 0; i < count; i++) {
@@ -370,7 +378,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     async focus() {
       const editor = page.locator('.editor-instance')
       await expect(editor).toBeVisible()
-      if (ideVersion && ideVersion.minor <= 100) {
+      if (ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100) {
         const editorInput = editor.locator('.inputarea')
         await editorInput.focus()
         await expect(editorInput).toBeFocused()
@@ -472,7 +480,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to set cursor to end of line`)
       }
     },
-    async goToFile({ column, file, line }) {
+    async goToFile({ column, file, line }: { column: number; file: string; line: number }) {
       try {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GoToFile, {
@@ -485,7 +493,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to go to file ${file}`)
       }
     },
-    async goToSourceDefinition({ hasDefinition }) {
+    async goToSourceDefinition({ hasDefinition }: { hasDefinition: boolean }) {
       try {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TypeScriptGoToSourceDefinition)
@@ -827,7 +835,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
         await expect(lineNumberElement).toBeVisible()
-        await page.waitForIdle()
         const contextMenu = ContextMenu.create({ expect, page, VError })
         await contextMenu.open(lineNumberElement)
         await page.waitForIdle()
@@ -851,7 +858,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to rename text ${newText}`)
       }
     },
-    async renameCancel(newText) {
+    async renameCancel(newText: string) {
       try {
         const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
@@ -891,6 +898,20 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to rename with preview ${newText}`)
       }
     },
+    async replaceText({ newText }: { newText: string }) {
+      try {
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
+        const renameInput = page.locator('.rename-input')
+        await expect(renameInput).toBeVisible()
+        await expect(renameInput).toBeFocused()
+        await renameInput.type(newText)
+        await page.waitForIdle()
+        await page.keyboard.press('Enter')
+      } catch (error) {
+        throw new VError(error, `Failed to replace text ${newText}`)
+      }
+    },
     async save(options?: { viaKeyBoard: boolean }) {
       try {
         if (options?.viaKeyBoard) {
@@ -925,7 +946,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     async scrollDown() {
       try {
         await page.waitForIdle()
-        await this.selectAll()
+        await this.selectAll({ viaKeyBoard: false })
         await page.waitForIdle()
         await page.keyboard.press('ArrowRight')
         await page.waitForIdle()
@@ -936,7 +957,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     async scrollUp() {
       try {
         await page.waitForIdle()
-        await this.selectAll()
+        await this.selectAll({ viaKeyBoard: false })
         await page.waitForIdle()
         await page.keyboard.press('ArrowLeft')
         await page.waitForIdle()
@@ -944,7 +965,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to scroll up in editor`)
       }
     },
-    async select(text) {
+    async select(text: string) {
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
@@ -962,7 +983,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to select ${text}`)
       }
     },
-    async selectAll({ viaKeyBoard = false } = {}) {
+    async selectAll({ viaKeyBoard = false }: { viaKeyBoard: boolean }) {
       try {
         if (viaKeyBoard) {
           await page.waitForIdle()
@@ -1050,7 +1071,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
         await quickPick.type(`:${line}:${column}`)
         await page.waitForIdle()
-        if (ideVersion.minor >= 105) {
+        if (typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor >= 105) {
           await quickPick.select(`Press 'Enter' to go to line ${line} at column ${column}.`)
         } else {
           await quickPick.select(`Go to line ${line} and character ${column}.`)
@@ -1061,7 +1082,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to set cursor`)
       }
     },
-    async setLanguageMode(languageId) {
+    async setLanguageMode(languageId: string) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
@@ -1079,7 +1100,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to change language mode`)
       }
     },
-    async setLogpoint(lineNumber, logMessage) {
+    async setLogpoint(lineNumber: number, logMessage: string) {
       try {
         await page.waitForIdle()
         const editor = page.locator('.part.editor .editor-instance')
@@ -1104,7 +1125,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to set logpoint`)
       }
     },
-    async shouldHaveActiveLineNumber(value) {
+    async shouldHaveActiveLineNumber(value: number) {
       try {
         const stringValue = `${value}`
         await page.waitForIdle()
@@ -1116,7 +1137,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify active line number ${value}`)
       }
     },
-    async shouldHaveBreadCrumb(text) {
+    async shouldHaveBreadCrumb(text: string) {
       await page.waitForIdle()
       const breadCrumb = page.locator(`.monaco-breadcrumb-item`, {
         hasText: text,
@@ -1168,7 +1189,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify code lens shows version information`)
       }
     },
-    async shouldHaveCursor(estimate) {
+    async shouldHaveCursor(estimate: string) {
       try {
         await page.waitForIdle()
         const cursor = page.locator('.cursor')
@@ -1187,7 +1208,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify editor selection`)
       }
     },
-    async shouldHaveError(fileName) {
+    async shouldHaveError(fileName: string) {
       try {
         await page.waitForIdle()
         const tab = page.locator(`[role="tab"][aria-label="${fileName}"]`)
@@ -1274,7 +1295,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify inline completion with text "${expectedText}"`)
       }
     },
-    async shouldHaveInspectedToken(name) {
+    async shouldHaveInspectedToken(name: string) {
       try {
         const inspectedToken = page.locator('h2.tiw-token')
         await expect(inspectedToken).toHaveText(name)
@@ -1294,7 +1315,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify lightbulb`)
       }
     },
-    async shouldHaveOverlayMessage(message) {
+    async shouldHaveOverlayMessage(message: string) {
       try {
         const messageElement = page.locator('.monaco-editor-overlaymessage')
         await expect(messageElement).toBeVisible()
@@ -1315,7 +1336,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify selected character count`)
       }
     },
-    async shouldHaveSelection(left, width) {
+    async shouldHaveSelection(left: string, width: string) {
       try {
         const selection = page.locator('.selected-text')
         await expect(selection).toBeVisible()
@@ -1411,7 +1432,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
     },
-    async shouldHaveToken(text, color) {
+    async shouldHaveToken(text: string, color: string) {
       await page.waitForIdle()
       const token = page.locator(`[class^="mtk"]`, {
         hasText: text,
@@ -1479,7 +1500,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to show color picker`)
       }
     },
-    async showDebugHover({ expectedTitle }) {
+    async showDebugHover({ expectedTitle }: { expectedTitle: string }) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, platform, VError })
@@ -1555,7 +1576,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to show empty source action`)
       }
     },
-    async split(command: string, { groupCount = undefined } = {}) {
+    async split(command: string, { groupCount = undefined }: { groupCount?: number }) {
       try {
         // TODO count editor groups
         const editors = page.locator('.editor-instance')
@@ -1576,18 +1597,19 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       }
     },
     async splitDown() {
-      return this.split(WellKnownCommands.ViewSplitEditorDown)
+      return this.split(WellKnownCommands.ViewSplitEditorDown, {})
     },
     async splitLeft() {
-      return this.split(WellKnownCommands.ViewSplitEditorLeft)
+      return this.split(WellKnownCommands.ViewSplitEditorLeft, {})
     },
-    async splitRight({ groupCount = undefined } = {}) {
-      return this.split(WellKnownCommands.ViewSplitEditorRight, { groupCount })
+    async splitRight({ groupCount = undefined }: { groupCount?: number }) {
+      const params = groupCount !== undefined ? { groupCount } : {}
+      return this.split(WellKnownCommands.ViewSplitEditorRight, params)
     },
     async splitUp() {
-      return this.split(WellKnownCommands.ViewSplitEditorUp)
+      return this.split(WellKnownCommands.ViewSplitEditorUp, {})
     },
-    async switchToTab(name) {
+    async switchToTab(name: string) {
       try {
         const tab = page.locator(`[role="tab"][data-resource-name="${name}"]`)
         await expect(tab).toBeVisible()
@@ -1746,7 +1768,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       await expect(editor).toBeVisible()
       await page.waitForIdle()
 
-      if (ideVersion && ideVersion.minor <= 100) {
+      if (ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100) {
         const editorInput = editor.locator('.inputarea')
         await expect(editorInput).toBeFocused()
         await page.waitForIdle()

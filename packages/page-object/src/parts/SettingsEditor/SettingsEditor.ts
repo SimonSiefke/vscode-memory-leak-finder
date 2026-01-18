@@ -2,9 +2,16 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+interface CreateParams {
+  expect: any
+  page: any
+  platform: string
+  VError: any
+}
+
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
-    async addItem({ key, name, value }) {
+    async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {
         await page.waitForIdle()
         const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
@@ -39,7 +46,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to add item to settings editor`)
       }
     },
-    async applyFilter({ filterName, filterText }) {
+    async applyFilter({ filterName, filterText }: { filterName: string; filterText: string }) {
       try {
         await page.waitForIdle()
         const settingsFilter = page.locator('[aria-label="Filter Settings"]')
@@ -71,7 +78,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to clear search input`)
       }
     },
-    async closeSettingsContextMenu(name) {
+    async closeSettingsContextMenu(name: string) {
       try {
         await page.waitForIdle()
         const outerItem = page.locator(`.settings-editor-tree .monaco-list-row[aria-label^="${name}"]`)
@@ -85,7 +92,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to close settings context menu for "${name}"`)
       }
     },
-    async collapse(groupName) {
+    async collapse(groupName: string) {
       try {
         const group = page.locator(`[aria-label="${groupName}, group"]`)
         await expect(group).toBeVisible()
@@ -109,7 +116,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to collapse outline`)
       }
     },
-    async disableCheckBox({ name }) {
+    async disableCheckBox({ name }: { name: string }) {
       try {
         await page.waitForIdle()
         const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
@@ -123,7 +130,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to disable checkbox "${name}"`)
       }
     },
-    async enableCheckBox({ name }) {
+    async enableCheckBox({ name }: { name: string }) {
       try {
         await page.waitForIdle()
         const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
@@ -147,7 +154,7 @@ export const create = ({ expect, page, platform, VError }) => {
       await quickPick.hide()
       await page.waitForIdle()
     },
-    async expand(groupName) {
+    async expand(groupName: string) {
       try {
         const group = page.locator(`[aria-label="${groupName}, group"]`)
         await expect(group).toBeVisible()
@@ -158,7 +165,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to expand ${groupName}`)
       }
     },
-    async focusOutline(name) {
+    async focusOutline(name: string) {
       try {
         await page.waitForIdle()
         const tableOfContents = page.locator('[aria-label="Settings Table of Contents"]')
@@ -243,7 +250,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to open settings ui`)
       }
     },
-    async openSettingsContextMenu(name, { waitForItem }) {
+    async openSettingsContextMenu(name: string, { waitForItem }: { waitForItem: string }) {
       try {
         await page.waitForIdle()
         const item = page.locator(`.setting-item-category`, {
@@ -270,7 +277,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to open settings context menu for "${name}"`)
       }
     },
-    async openTab(tabName) {
+    async openTab(tabName: string) {
       try {
         const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
         await expect(settingsSwitcher).toBeVisible()
@@ -285,7 +292,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to open tab "${tabName}"`)
       }
     },
-    async removeItem({ name }) {
+    async removeItem({ name }: { name: string }) {
       try {
         await page.waitForIdle()
         const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
@@ -300,7 +307,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to remove item`)
       }
     },
-    async search({ resultCount, value }) {
+    async search({ resultCount, value }: { resultCount: number; value: string }) {
       try {
         await page.waitForIdle()
         const searchInput = page.locator('.search-container [role="textbox"]')
@@ -313,7 +320,7 @@ export const create = ({ expect, page, platform, VError }) => {
         const searchCount = page.locator('.settings-count-widget')
         await expect(searchCount).toBeVisible()
         await page.waitForIdle()
-        if (resultCount === 'many') {
+        if (resultCount > 1) {
           await expect(searchCount).toHaveText(new RegExp(`\\d+ Settings Found`))
         } else {
           const word = resultCount === 1 ? 'Setting' : 'Settings'
@@ -324,7 +331,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to search for ${value}`)
       }
     },
-    async select({ name, value }) {
+    async select({ name, value }: { name: string; value: string }) {
       try {
         await page.waitForIdle()
         const select = page.locator(`.monaco-select-box[aria-label="${name}"]`)
@@ -362,7 +369,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to set text input for ${name}`)
       }
     },
-    async toggleCheckBox({ name }) {
+    async toggleCheckBox({ name }: { name: string }) {
       try {
         await page.waitForIdle()
         const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
