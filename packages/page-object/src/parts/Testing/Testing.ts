@@ -1,11 +1,11 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async focusOnTestExplorerView() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusOnTestExplorerView)
         await page.waitForIdle()
         const testExplorer = page.locator('.test-explorer')
@@ -18,7 +18,7 @@ export const create = ({ expect, page, VError }) => {
     async runAllTests({ expectedRowCount, expectedTestOutputRowCount }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RunAllTests)
         await page.waitForIdle()
         const testExplorer = page.locator('.test-explorer')
@@ -45,7 +45,7 @@ export const create = ({ expect, page, VError }) => {
     async runTask(taskName: string): Promise<void> {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand('Tasks: Run Task')
         await page.waitForIdle()
         await quickPick.select(taskName)

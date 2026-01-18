@@ -8,9 +8,8 @@ export const setup = async ({ ChatEditor, Editor, Electron, Extensions }: TestCo
   await Electron.mockDialog({
     response: 1,
   })
-  // @ts-ignore
   await Extensions.install({
-    id: 'github copilot chat',
+    id: 'GitHub.copilot-chat',
     name: 'GitHub Copilot Chat',
   })
   await Editor.closeAll()
@@ -20,13 +19,12 @@ export const setup = async ({ ChatEditor, Editor, Electron, Extensions }: TestCo
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   // TODO send message and clear it
   for (let i = 0; i < 10; i++) {
-    // @ts-ignore
     await ChatEditor.sendMessage({
       message: 'test',
       verify: true,
     })
   }
-  // @ts-ignore
+
   await ChatEditor.clearAll()
 }
 

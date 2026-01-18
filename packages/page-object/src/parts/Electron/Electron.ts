@@ -7,13 +7,20 @@ export const create = ({ electronApp, VError }) => {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
         await this.mockElectron('dialog', 'showMessageBox', ` () => { return JSON.parse(${responseString}) }`)
+        const that = this
+        return {
+          async [Symbol.asyncDispose]() {
+            await that.unmockElectron('dialog', 'showMessageBox')
+          },
+        }
       } catch (error) {
         throw new VError(error, `Failed to mock electron dialog`)
       }
     },
-    async mockElectron(namespace, key, implementationCode) {
+    async mockElectron(namespace: string, key: string, implementationCode: string) {
       await this.evaluate(`(() => {
   const electron = globalThis._____electron
+  globalThis['____electron_original_${namespace}'] = electron['${namespace}']['${key}']
   electron['${namespace}']['${key}'] = ${implementationCode}
 })()`)
     },
@@ -47,6 +54,16 @@ export const create = ({ electronApp, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to mock electron shell trash item`)
       }
+    },
+    async unmockElectron(namespace: string, key: string) {
+      await this.evaluate(`(() => {
+  const electron = globalThis._____electron
+  const original = globalThis['____electron_original_${namespace}']
+  if(!original){
+    throw new Error("original function not found")
+  }
+  electron['${namespace}']['${key}'] = original
+})()`)
     },
   }
 }

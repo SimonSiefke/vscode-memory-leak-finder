@@ -1,8 +1,8 @@
-import { existsSync } from 'fs'
-import { readFile, writeFile } from 'fs/promises'
-import { basename, dirname, join } from 'path'
+import { readFile, writeFile } from 'node:fs/promises'
+import { basename, dirname, join } from 'node:path'
 import * as Exec from '../Exec/Exec.ts'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
+import * as SupportsNativeFfmpeg from '../SupportsNativeFfmpeg/SupportsNativeFfmpeg.ts'
 import * as VideoChapter from '../VideoChapter/VideoChapter.ts'
 
 const getMetaDataInputOptions = (baseName: string): readonly string[] => {
@@ -30,12 +30,8 @@ title=${chapter.name}
   return data
 }
 
-const supportsNativeFfmpeg = (): boolean => {
-  return existsSync('/usr/bin/ffmpeg')
-}
-
 export const finalizeChapters = async () => {
-  if (!supportsNativeFfmpeg()) {
+  if (!SupportsNativeFfmpeg.supportsNativeFfmpeg()) {
     return
   }
   const outFile = FfmpegProcessState.getOutFile()

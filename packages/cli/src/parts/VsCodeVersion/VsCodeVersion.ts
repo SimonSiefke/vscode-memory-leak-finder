@@ -1,1 +1,1 @@
-export const vscodeVersion = process.env.VSCODE_VERSION || '1.107.0'
+export const vscodeVersion = process.env.VSCODE_VERSION || '1.108.0'

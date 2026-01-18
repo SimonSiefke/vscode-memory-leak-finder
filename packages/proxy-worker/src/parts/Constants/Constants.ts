@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
 export const CERT_DIR = join(Root.root, '.vscode-proxy-certs')

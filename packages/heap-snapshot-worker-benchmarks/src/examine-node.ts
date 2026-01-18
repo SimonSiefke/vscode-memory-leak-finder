@@ -1,5 +1,5 @@
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
 async function testGetObjectsWithProperties(): Promise<void> {

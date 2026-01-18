@@ -15,6 +15,7 @@ const getExecArgv = (runMode: number): readonly string[] => {
 
 // TODO dispose worker on next test run
 export const launchTestWorker = async (
+  platform: string,
   runMode: number,
   connectionId: number,
   devtoolsWebSocketUrl: string,
@@ -44,6 +45,7 @@ export const launchTestWorker = async (
     })
     await ConnectDevtools.connectDevtools(
       rpc,
+      platform,
       connectionId,
       devtoolsWebSocketUrl,
       electronObjectId,

@@ -23,12 +23,11 @@ export const setup = async ({ Editor, SideBar, Testing, Workspace }: TestContext
   await Editor.closeAll()
   await SideBar.hide()
   await Editor.open('test-file-1.md')
-  // @ts-ignore
+
   await Testing.focusOnTestExplorerView()
 }
 
-// @ts-ignore
-export const run = async ({ Testing }): Promise<void> => {
+export const run = async ({ Testing }: TestContext): Promise<void> => {
   // TODO
   await Testing.runAllTests({
     expectedRowCount: 1,

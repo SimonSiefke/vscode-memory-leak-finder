@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
-import { generateKeyPairSync } from 'crypto'
 import jwt from 'jsonwebtoken'
+import { generateKeyPairSync } from 'node:crypto'
 import { replaceJwtToken } from '../src/parts/ReplaceJwtToken/ReplaceJwtToken.ts'
 
 test('replaceJwtToken - replaces HS256 token with extended expiration', () => {
@@ -15,9 +15,10 @@ test('replaceJwtToken - replaces HS256 token with extended expiration', () => {
   if (decoded && typeof decoded !== 'string') {
     const payload = decoded.payload as { exp?: number; iat?: number }
     expect(payload.exp).toBeDefined()
-    const oneMonthInSeconds = 30 * 24 * 60 * 60
-    expect(payload.exp).toBeGreaterThan(Math.floor(Date.now() / 1000) + oneMonthInSeconds - 60)
-    expect(payload.exp).toBeLessThan(Math.floor(Date.now() / 1000) + oneMonthInSeconds + 60)
+    const oneYearInSeconds = 365 * 24 * 60 * 60
+    expect(payload.exp).toBeGreaterThan(Math.floor(Date.now() / 1000) + oneYearInSeconds - 60)
+    expect(payload.exp).toBeLessThan(Math.floor(Date.now() / 1000) + oneYearInSeconds + 60)
+    expect(decoded.header.alg).toBe('none')
   }
 })
 
@@ -36,6 +37,7 @@ test('replaceJwtToken - replaces RS256 token with extended expiration', () => {
   if (decoded && typeof decoded !== 'string') {
     const payload = decoded.payload as { exp?: number }
     expect(payload.exp).toBeDefined()
+    expect(decoded.header.alg).toBe('none')
   }
 })
 
@@ -54,6 +56,7 @@ test('replaceJwtToken - replaces ES256 token with extended expiration', () => {
   if (decoded && typeof decoded !== 'string') {
     const payload = decoded.payload as { exp?: number }
     expect(payload.exp).toBeDefined()
+    expect(decoded.header.alg).toBe('none')
   }
 })
 
@@ -142,6 +145,7 @@ test('replaceJwtToken - handles token without exp field', () => {
   if (decoded && typeof decoded !== 'string') {
     const payload = decoded.payload as { exp?: number }
     expect(payload.exp).toBeDefined()
+    expect(decoded.header.alg).toBe('none')
   }
 })
 
@@ -167,10 +171,15 @@ test('replaceJwtToken - handles RS512 token', () => {
   expect(replacedToken).not.toBe(originalToken)
 })
 
-test('replaceJwtToken - handles unknown algorithm by falling back to HS256', () => {
+test('replaceJwtToken - always uses algorithm none', () => {
   const originalToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600, sub: '123' }, 'secret', {
     algorithm: 'HS256',
   })
   const replacedToken = replaceJwtToken(originalToken)
   expect(replacedToken).not.toBe(originalToken)
+  const decoded = jwt.decode(replacedToken, { complete: true })
+  expect(decoded).toBeTruthy()
+  if (decoded && typeof decoded !== 'string') {
+    expect(decoded.header.alg).toBe('none')
+  }
 })

@@ -5,6 +5,7 @@ export interface PrepareBothResult {
   readonly electronObjectId: string
   readonly initializationWorkerRpc: any
   readonly parsedVersion: string
+  readonly pid: number
   readonly sessionId: string
   readonly targetId: string
   readonly utilityContext: any
@@ -12,8 +13,10 @@ export interface PrepareBothResult {
 }
 
 export interface PrepareBothOptions {
+  readonly arch: string
   readonly attachedToPageTimeout: number
   readonly canUseIdleCallback: boolean
+  readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
@@ -29,6 +32,10 @@ export interface PrepareBothOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
+  readonly measureId: string
+  readonly platform: string
+  readonly trackFunctions: boolean
+  readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
@@ -36,8 +43,10 @@ export interface PrepareBothOptions {
 
 export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareBothResult> => {
   const {
+    arch,
     attachedToPageTimeout,
     canUseIdleCallback,
+    clearExtensions,
     commit,
     connectionId,
     cwd,
@@ -53,39 +62,53 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     inspectSharedProcess,
     inspectSharedProcessPort,
     isFirstConnection,
+    measureId,
+    platform,
+    trackFunctions,
+    updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
   } = options
   const initializationWorkerRpc = await launchInitializationWorker()
-  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, sessionId, targetId, utilityContext, webSocketUrl } =
-    await initializationWorkerRpc.invoke('Launch.launch', {
-      attachedToPageTimeout,
-      canUseIdleCallback,
-      commit,
-      connectionId,
-      cwd,
-      enableExtensions,
-      enableProxy,
-      headlessMode,
-      ide,
-      insidersCommit,
-      inspectExtensions,
-      inspectExtensionsPort,
-      inspectPtyHost,
-      inspectPtyHostPort,
-      inspectSharedProcess,
-      inspectSharedProcessPort,
-      isFirstConnection,
-      useProxyMock,
-      vscodePath,
-      vscodeVersion,
-    })
+  const launchResult = await initializationWorkerRpc.invoke('Launch.launch', {
+    arch,
+    attachedToPageTimeout,
+    canUseIdleCallback,
+    clearExtensions,
+    commit,
+    connectionId,
+    cwd,
+    enableExtensions,
+    enableProxy,
+    headlessMode,
+    ide,
+    insidersCommit,
+    inspectExtensions,
+    inspectExtensionsPort,
+    inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcess,
+    inspectSharedProcessPort,
+    isFirstConnection,
+    measureId,
+    platform,
+    trackFunctions,
+    updateUrl,
+    useProxyMock,
+    vscodePath,
+    vscodeVersion,
+  })
+  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, pid, sessionId, targetId, utilityContext, webSocketUrl } = launchResult
+  if (pid === undefined) {
+    throw new Error(`pid is undefined in Launch.launch result. Result keys: ${Object.keys(launchResult).join(', ')}`)
+  }
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
     initializationWorkerRpc,
     parsedVersion,
+    pid,
     sessionId,
     targetId,
     utilityContext,

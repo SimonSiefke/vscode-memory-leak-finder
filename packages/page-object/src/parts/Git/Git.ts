@@ -1,6 +1,6 @@
-import { execa } from 'execa'
 import { mkdir, readdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
+import * as Exec from '../Exec/Exec.ts'
 import * as Root from '../Root/Root.ts'
 
 export const create = ({ page, VError }) => {
@@ -10,7 +10,7 @@ export const create = ({ page, VError }) => {
     async add() {
       try {
         await page.waitForIdle()
-        await execa('git', ['add', '-f', '.'], { cwd: workspace, env: { ...process.env } })
+        await Exec.exec('git', ['add', '-f', '.'], { cwd: workspace, env: { ...process.env } })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to add`)
@@ -19,7 +19,7 @@ export const create = ({ page, VError }) => {
     async checkoutBranch(branchName: string) {
       try {
         await page.waitForIdle()
-        await execa('git', ['checkout', branchName], { cwd: workspace, env: { ...process.env } })
+        await Exec.exec('git', ['checkout', branchName], { cwd: workspace, env: { ...process.env } })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to checkout branch ${branchName}`)
@@ -33,13 +33,13 @@ export const create = ({ page, VError }) => {
         await rm(absolutePath, { force: true, recursive: true })
       }
       // Clone directly into the workspace directory
-      await execa('git', ['clone', repoUrl, '.'], { cwd: workspace, env: { ...process.env } })
+      await Exec.exec('git', ['clone', repoUrl, '.'], { cwd: workspace, env: { ...process.env } })
       await page.waitForIdle()
     },
     async commit(message: string) {
       try {
         await page.waitForIdle()
-        await execa('git', ['commit', '-m', message], { cwd: workspace, env: { ...process.env } })
+        await Exec.exec('git', ['commit', '-m', message], { cwd: workspace, env: { ...process.env } })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to commit`)
@@ -48,7 +48,7 @@ export const create = ({ page, VError }) => {
     async createBranch(branchName: string) {
       try {
         await page.waitForIdle()
-        await execa('git', ['checkout', '-b', branchName], { cwd: workspace, env: { ...process.env } })
+        await Exec.exec('git', ['checkout', '-b', branchName], { cwd: workspace, env: { ...process.env } })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to create branch ${branchName}`)
@@ -57,9 +57,9 @@ export const create = ({ page, VError }) => {
     async init() {
       try {
         await mkdir(workspace, { recursive: true })
-        await execa('git', ['init', '-b', 'main'], { cwd: workspace, env: { ...process.env } })
-        await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace, env: { ...process.env } })
-        await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace, env: { ...process.env } })
+        await Exec.exec('git', ['init', '-b', 'main'], { cwd: workspace, env: { ...process.env } })
+        await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: workspace, env: { ...process.env } })
+        await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace, env: { ...process.env } })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to init`)

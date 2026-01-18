@@ -9,5 +9,15 @@ export const launch = async () => {
     path: url,
     stdio: 'inherit',
   })
-  return rpc
+  return {
+    invoke(method: string, ...params: unknown[]) {
+      return rpc.invoke(method, ...params)
+    },
+    invokeAndTransfer(method: string, ...params: unknown[]) {
+      return rpc.invokeAndTransfer(method, ...params)
+    },
+    async [Symbol.asyncDispose]() {
+      await rpc.dispose()
+    },
+  }
 }

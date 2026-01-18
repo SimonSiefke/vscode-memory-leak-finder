@@ -4,9 +4,12 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export interface StdinDataState {
+  readonly arch: string
   readonly bisect: boolean
   readonly buffering: boolean
   readonly checkLeaks: boolean
+  readonly clearExtensions: boolean
+  readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -29,6 +32,8 @@ export interface StdinDataState {
   readonly measureAfter: boolean
   readonly measureNode?: boolean
   readonly mode: number
+  readonly pageObjectPath: string
+  readonly platform: string
   readonly previousFilters: string[]
   readonly recordVideo: boolean
   readonly restartBetween: boolean
@@ -39,6 +44,7 @@ export interface StdinDataState {
   readonly stdout: string[]
   readonly timeoutBetween: number
   readonly timeouts: boolean
+  readonly trackFunctions: boolean
   readonly useProxyMock: boolean
   readonly value: string
   readonly watch: boolean
@@ -46,9 +52,12 @@ export interface StdinDataState {
 }
 
 let state: StdinDataState = {
+  arch: '',
   bisect: false,
   buffering: false,
   checkLeaks: false,
+  clearExtensions: true,
+  compressVideo: false,
   continueValue: '',
   cwd: Character.EmptyString,
   enableExtensions: false,
@@ -70,6 +79,8 @@ let state: StdinDataState = {
   measure: Character.EmptyString,
   measureAfter: false,
   mode: ModeType.Waiting,
+  pageObjectPath: '',
+  platform: '',
   previousFilters: [],
   recordVideo: false,
   restartBetween: false,
@@ -80,17 +91,20 @@ let state: StdinDataState = {
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
+  trackFunctions: false,
   useProxyMock: false,
   value: Character.EmptyString,
   watch: false,
   workers: false,
 }
 
-export const setState = (newState): void => {
+export const setState = (newState: StdinDataState): void => {
   state = {
     ...state,
+    arch: newState.arch,
     bisect: newState.bisect,
     checkLeaks: newState.checkLeaks,
+    compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,
     cwd: newState.cwd,
     enableExtensions: newState.enableExtensions,
@@ -110,6 +124,8 @@ export const setState = (newState): void => {
     measure: newState.measure,
     measureAfter: newState.measureAfter,
     mode: newState.mode,
+    pageObjectPath: newState.pageObjectPath,
+    platform: newState.platform,
     previousFilters: newState.previousFilters,
     recordVideo: newState.recordVideo,
     restartBetween: newState.restartBetween,
@@ -120,6 +136,7 @@ export const setState = (newState): void => {
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
     timeouts: newState.timeouts,
+    trackFunctions: newState.trackFunctions,
     useProxyMock: newState.useProxyMock,
     value: newState.value,
     watch: newState.watch,

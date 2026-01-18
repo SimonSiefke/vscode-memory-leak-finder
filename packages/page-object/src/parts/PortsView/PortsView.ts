@@ -3,7 +3,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Server from '../Server/Server.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async cancelPortEdit() {
       try {
@@ -12,6 +12,13 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const forwardPortButton = page.locator('[role="button"]', { hasText: 'Forward a Port' })
         await expect(forwardPortButton).toBeVisible()
+        await page.waitForIdle()
+        const portInput = page.locator('.ports-view-actionbar-cell .monaco-inputbox .input')
+        await expect(portInput).toBeHidden()
+        await page.waitForIdle()
+        const welcome = page.locator('.panel .welcome-view-content')
+        await expect(welcome).toBeVisible()
+        await expect(welcome).toBeFocused()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to cancel port edit`)
@@ -22,7 +29,7 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const portsView = page.locator('#\\~remote\\.forwardedPortsContainer')
         await expect(portsView).toBeVisible()
-        const panel = Panel.create({ expect, page, VError })
+        const panel = Panel.create({ expect, page, platform, VError })
         await panel.hide()
         await page.waitForIdle()
       } catch (error) {
@@ -40,7 +47,7 @@ export const create = ({ expect, page, VError }) => {
             res.end('Hello World')
           },
         })
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ForwardAPort, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -70,7 +77,7 @@ export const create = ({ expect, page, VError }) => {
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusPortsView)
         await page.waitForIdle()
         const portsView = page.locator('#\\~remote\\.forwardedPortsContainer')
@@ -80,10 +87,9 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open ports view`)
       }
     },
-    async setPortInput(portId) {
+    async setPortInput(portId: number) {
       try {
         await page.waitForIdle()
-        await new Promise((r) => {})
         const forwardPortButton = page.locator('[role="button"]', { hasText: 'Forward a Port' })
         await expect(forwardPortButton).toBeVisible()
         await page.waitForIdle()
@@ -92,11 +98,15 @@ export const create = ({ expect, page, VError }) => {
         const tunnelView = page.locator('[aria-label="Tunnel View"]')
         await expect(tunnelView).toBeVisible()
         await page.waitForIdle()
-        const portInput = page.locator('input[placeholder^="Port number"]')
+        const inputs = page.locator('.ports-view-actionbar-cell .monaco-inputbox .input')
+        const count = await inputs.count()
+        const portInput = inputs.nth(count - 1)
         await expect(portInput).toBeVisible()
         await expect(portInput).toBeFocused()
         await page.waitForIdle()
         await portInput.type(`${portId}`)
+        await page.waitForIdle()
+        await expect(portInput).toHaveValue(`${portId}`)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to forward port ${portId}`)
@@ -116,7 +126,7 @@ export const create = ({ expect, page, VError }) => {
     async unforwardAllPorts(port: number): Promise<void> {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.StopPortForwarding, {
           pressKeyOnce: true,
           stayVisible: true,

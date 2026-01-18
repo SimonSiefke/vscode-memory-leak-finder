@@ -15,6 +15,18 @@ const getAllOptions = (options) => {
       },
     ]
   }
+  if (options.key === '.') {
+    return [
+      {
+        ...options,
+        bubbles: true,
+        cancelable: true,
+        code: 'Period',
+        key: '.',
+        keyCode: 190,
+      },
+    ]
+  }
   const allOptions = [options]
 
   // if (options.ctrlKey) {

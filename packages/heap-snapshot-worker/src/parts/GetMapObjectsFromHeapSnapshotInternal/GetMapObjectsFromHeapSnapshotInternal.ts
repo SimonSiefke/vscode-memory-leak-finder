@@ -7,42 +7,42 @@ import { isInternalMap } from '../IsInternalMap/IsInternalMap.ts'
  */
 interface VariableName {
   readonly name: string
-  readonly sourceType: string
   readonly sourceName: string
+  readonly sourceType: string
 }
 interface MapObject {
-  id: number
-  name: string
-  type: 'map'
-  selfSize: number
-  edgeCount: number
   detachedness: number
-  nodeDataIndex: number
-  variableNames: VariableName[]
+  edgeCount: number
+  id: number
   keys: string[]
+  name: string
+  nodeDataIndex: number
   note: string
+  selfSize: number
   size?: string
+  type: 'map'
+  variableNames: VariableName[]
 }
 
 export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
-  const { nodes, edges, strings } = snapshot
-  const { node_types, node_fields, edge_types, edge_fields } = snapshot.meta
+  const { edges, nodes, strings } = snapshot
+  const { edge_fields, edge_types, node_fields, node_types } = snapshot.meta
 
   const {
-    objectTypeIndex,
-    ITEMS_PER_NODE,
-    ITEMS_PER_EDGE,
-    typeFieldIndex,
-    nameFieldIndex,
-    idFieldIndex,
-    selfSizeFieldIndex,
-    edgeCountFieldIndex,
     detachednessFieldIndex,
-    edgeTypeFieldIndex,
+    edgeCountFieldIndex,
     edgeNameFieldIndex,
     edgeToNodeFieldIndex,
+    edgeTypeFieldIndex,
     edgeTypes,
+    idFieldIndex,
+    ITEMS_PER_EDGE,
+    ITEMS_PER_NODE,
+    nameFieldIndex,
     nodeTypes,
+    objectTypeIndex,
+    selfSizeFieldIndex,
+    typeFieldIndex,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
   if (objectTypeIndex === -1) {
@@ -66,16 +66,16 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
         const detachedness = nodes[i + detachednessFieldIndex]
 
         const mapObj: MapObject = {
-          id,
-          name,
-          type: 'map', // Only Map objects
-          selfSize,
-          edgeCount,
           detachedness,
-          nodeDataIndex: i, // Store node data index for later use
-          variableNames: [], // Will be populated by scanning edges
+          edgeCount,
+          id,
           keys: [], // Will be populated by extracting from table array
+          name,
+          nodeDataIndex: i, // Store node data index for later use
           note: 'Map object found in heap snapshot',
+          selfSize,
+          type: 'map', // Only Map objects
+          variableNames: [], // Will be populated by scanning edges
         }
 
         mapObjects.push(mapObj)
@@ -119,8 +119,8 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
         if (isInternalMap(edgeTypeName, edgeName)) {
           mapObj.variableNames.push({
             name: edgeName,
-            sourceType: sourceTypeName,
             sourceName: sourceName,
+            sourceType: sourceTypeName,
           })
         }
       }
@@ -209,9 +209,9 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
     // For now, let's use a heuristic: collect unique string values and known large numbers
     // that are likely to be keys rather than common small values
     interface ExtractedValue {
-      readonly value: string
-      readonly type: 'string' | 'number'
       readonly isLikelyKey: boolean
+      readonly type: 'string' | 'number'
+      readonly value: string
     }
     const extractedValues: ExtractedValue[] = []
     const actualKeyEdges = Math.max(0, tableEdgeCount - 1)
@@ -232,7 +232,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
       if (edgeTypeName === 'internal' && targetName && targetName !== 'system / Map' && !targetName.startsWith('system')) {
         if (targetTypeName === 'string') {
           // String values - these could be keys or values
-          extractedValues.push({ value: targetName, type: 'string', isLikelyKey: true })
+          extractedValues.push({ isLikelyKey: true, type: 'string', value: targetName })
         } else if (targetTypeName === 'number' && targetName === 'heap number') {
           // Numeric value - follow the first edge to get the actual string representation
           const numEdgeCount = nodes[edgeToNode + edgeCountFieldIndex]
@@ -249,9 +249,9 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
 
             if (actualNumericValue && actualNumericValue !== 'system / Map') {
               // Heuristic: large numbers (>1000) are more likely to be keys than small values
-              const numValue = parseInt(actualNumericValue, 10)
+              const numValue = Number.parseInt(actualNumericValue, 10)
               const isLikelyKey = isNaN(numValue) || numValue > 1000 || actualNumericValue.length > 3
-              extractedValues.push({ value: actualNumericValue, type: 'number', isLikelyKey })
+              extractedValues.push({ isLikelyKey, type: 'number', value: actualNumericValue })
             }
           }
         }
@@ -283,8 +283,8 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
 
       return {
         id: obj.id,
-        name: nameField,
         keys: obj.keys,
+        name: nameField,
         note: obj.keys.length > 0 ? `Map object with ${obj.keys.length} keys (values not accessible)` : 'Map object found in heap snapshot',
       }
     })

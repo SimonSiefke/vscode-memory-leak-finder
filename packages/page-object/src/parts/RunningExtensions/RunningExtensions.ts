@@ -1,12 +1,13 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
     async show() {
       const quickPick = QuickPick.create({
         expect,
         page,
+        platform,
         VError,
       })
       await quickPick.executeCommand(WellKnownCommands.ShowRunningExtensions)

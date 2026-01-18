@@ -25,6 +25,7 @@ test('combineEventListenersWithSourceMapResults', () => {
   ).toEqual([
     {
       originalStack: [`index.ts:2:2`],
+      sourcesHash: null,
       stack: ['index.js:1:1'],
     },
   ])
@@ -57,10 +58,12 @@ test('combineEventListenersWithSourceMapResults - multiple inputs', () => {
   ).toEqual([
     {
       originalStack: [`index.ts:2:2`],
+      sourcesHash: null,
       stack: ['index.js:1:1'],
     },
     {
       originalStack: [`index.ts:2:2`],
+      sourcesHash: null,
       stack: ['index.js:1:1'],
     },
   ])

@@ -6,10 +6,10 @@ import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
-export const run = async (platform: string, argv: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
+export const run = async (platform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
   await StdoutWorker.initialize()
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
-  const options = ParseArgv.parseArgv(argv)
+  const options = ParseArgv.parseArgv(platform, arch, argv)
 
   // Parse isGithubActions once at startup
   const isGithubActions = Boolean(env.GITHUB_ACTIONS)
@@ -17,8 +17,10 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
 
   StdinDataState.setState({
     ...StdinDataState.getState(),
+    arch: options.arch,
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
+    // @ts-ignore
     commit: options.commit,
     continueValue: options.continueValue,
     cwd: options.cwd,
@@ -38,6 +40,8 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     measure: options.measure,
     measureAfter: options.measureAfter,
     measureNode: options.measureNode,
+    pageObjectPath: options.pageObjectPath,
+    platform: options.platform,
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
@@ -46,11 +50,12 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
+    trackFunctions: options.trackFunctions,
     value: options.filter,
     vscodePath: options.vscodePath,
     vscodeVersion: options.vscodeVersion,
     watch: options.watch,
     workers: options.workers,
   })
-  return InitialStart.initialStart(options)
+  return InitialStart.initialStart({ ...options, isGithubActions } as ReturnType<typeof ParseArgv.parseArgv> & { isGithubActions: boolean })
 }

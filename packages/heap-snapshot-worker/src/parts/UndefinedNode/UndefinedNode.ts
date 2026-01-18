@@ -1,4 +1,4 @@
-import { Node } from '../Node/Node.ts'
+import type { Node } from '../Node/Node.ts'
 
 export interface UndefinedNode extends Node {
   type: 'undefined'

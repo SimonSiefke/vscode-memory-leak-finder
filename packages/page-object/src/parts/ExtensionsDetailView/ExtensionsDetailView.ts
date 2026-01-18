@@ -11,15 +11,22 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to disable extension`)
       }
     },
-    async enableExtension(options) {
+    async enableExtension(options?: any) {
       try {
         const extensionEditor = page.locator('.extension-editor')
+        await expect(extensionEditor).toBeVisible()
         const disabledStatusLabel = extensionEditor.locator('.extension-status-label[aria-label="Disabled"]')
         if (!options?.force) {
           await expect(disabledStatusLabel).toBeVisible()
         }
-        const action = extensionEditor.locator('.action-label[aria-label^="Enable"]')
-        await action.click()
+        const enableAction = extensionEditor.locator('.action-label[aria-label^="Enable"]')
+        const disableAction = extensionEditor.locator('.action-label[aria-label^="Disable"]')
+        const disableCount = await disableAction.count()
+        if (disableCount > 0) {
+          return
+        }
+        await enableAction.click()
+        await page.waitForIdle()
         await expect(disabledStatusLabel).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to enable extension`)
@@ -31,6 +38,11 @@ export const create = ({ expect, page, VError }) => {
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
         await page.waitForIdle()
+        const unInstallButton = extensionEditor.locator('.action-label[aria-label^="Uninstall"], .action-label[aria-label*="Uninstall"]')
+        const count = await unInstallButton.count()
+        if (count > 0) {
+          return
+        }
         const installButton = extensionEditor.locator('.action-label[aria-label^="Install"], .action-label[aria-label*="Install"]')
         await expect(installButton).toBeVisible()
         await page.waitForIdle()
@@ -38,7 +50,6 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         await expect(installButton).toBeHidden()
         await page.waitForIdle()
-        const unInstallButton = extensionEditor.locator('.action-label[aria-label^="Uninstall"], .action-label[aria-label*="Uninstall"]')
         await expect(unInstallButton).toBeVisible({ timeout: 120_000 })
         await page.waitForIdle()
       } catch (error) {

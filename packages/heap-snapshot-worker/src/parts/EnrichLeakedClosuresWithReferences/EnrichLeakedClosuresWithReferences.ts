@@ -1,15 +1,10 @@
 import { readFile } from 'node:fs/promises'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
+import type { LeakedClosureWithReferences } from './LeakedClosureWithReferences.ts'
 import { collectLeakedNodeByteOffsets } from '../CollectLeakedNodeByteOffsets/CollectLeakedNodeByteOffsets.ts'
-import { initializeReferencesMap } from '../InitializeReferencesMap/InitializeReferencesMap.ts'
 import { collectReferencesToLeakedNodes } from '../CollectReferencesToLeakedNodes/CollectReferencesToLeakedNodes.ts'
 import { enrichClosuresWithReferences } from '../EnrichClosuresWithReferences/EnrichClosuresWithReferences.ts'
-
-export interface LeakedClosureWithReferences {
-  readonly nodeName: string
-  readonly references: readonly ReferencePath[]
-}
+import { initializeReferencesMap } from '../InitializeReferencesMap/InitializeReferencesMap.ts'
 
 export const enrichLeakedClosuresWithReferences = (
   leakedClosures: Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>,
@@ -20,3 +15,5 @@ export const enrichLeakedClosuresWithReferences = (
   collectReferencesToLeakedNodes(snapshot, leakedNodeByteOffsets, referencesMap)
   return enrichClosuresWithReferences(leakedClosures, referencesMap)
 }
+
+export { type LeakedClosureWithReferences } from './LeakedClosureWithReferences.ts'

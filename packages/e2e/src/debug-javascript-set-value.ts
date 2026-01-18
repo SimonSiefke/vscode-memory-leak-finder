@@ -27,8 +27,10 @@ setInterval(()=>{
 }
 
 export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
-  await RunAndDebug.setValue('x', '1', '5')
-  await RunAndDebug.setValue('x', '5', '1')
+  // @ts-ignore
+  await RunAndDebug.setValue({ newVariableValue: '5', variableName: 'x', variableValue: '1' })
+  // @ts-ignore
+  await RunAndDebug.setValue({ newVariableValue: '1', variableName: 'x', variableValue: '5' })
 }
 
 export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {

@@ -1,1 +1,1 @@
-export const isWindows = (platform) => platform === 'win32'
+export const isWindows = (platform: string): boolean => platform === 'win32'

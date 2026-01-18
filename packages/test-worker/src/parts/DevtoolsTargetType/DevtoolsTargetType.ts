@@ -1,9 +1,9 @@
 export const Page = 'page'
 
-export const Worker = 'worker'
+const Worker = 'worker'
 
-export const Iframe = 'iframe'
+const Iframe = 'iframe'
 
-export const Browser = 'browser'
+const Browser = 'browser'
 
-export const ServiceWorker = 'service_worker'
+const ServiceWorker = 'service_worker'

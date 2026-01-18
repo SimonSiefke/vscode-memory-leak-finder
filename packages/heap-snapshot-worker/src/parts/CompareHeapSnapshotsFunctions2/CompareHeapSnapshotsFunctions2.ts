@@ -1,6 +1,6 @@
+import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareResult.ts'
 import {
   compareHeapSnapshotFunctionsInternal2,
-  type CompareResult,
   type CompareFunctionsOptions,
 } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'

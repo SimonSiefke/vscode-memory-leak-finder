@@ -151,8 +151,7 @@ const getFunctionName = (functionPath: NodePath): string | undefined => {
   if (parent && parent.isAssignmentExpression()) {
     const leftNode = parent.node.left
     if (leftNode && leftNode.type === 'MemberExpression') {
-      const { object } = leftNode
-      const { property } = leftNode
+      const { object, property } = leftNode
       if (object && object.type === 'MemberExpression') {
         const objectName = object.object.type === 'Identifier' ? object.object.name : undefined
         const propName = property && property.type === 'Identifier' ? property.name : undefined
@@ -185,8 +184,7 @@ const getSuperClassName = (classPath: NodePath): string | undefined => {
 
 const getMemberExpressionName = (memberExpr: any): string | undefined => {
   if (memberExpr.type === 'MemberExpression') {
-    const { object } = memberExpr
-    const { property } = memberExpr
+    const { object, property } = memberExpr
 
     if (object && object.type === 'Identifier' && property && property.type === 'Identifier') {
       return `${object.name}.${property.name}`

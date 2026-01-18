@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import * as GetVscodeUserDataPath from '../GetVscodeUserDataPath/GetVsCodeUserDataPath.js'
 
 export const getStorageFolders = () => {

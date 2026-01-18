@@ -1,18 +1,15 @@
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as Assert from '../Assert/Assert.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { isChromeInternalArrayName } from '../IsChromeInternalArrayName/IsChromeInternalArrayName.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 
-const getSortedCounts = (
-  heapsnapshot: Snapshot,
-  scriptMap: Record<number, { readonly url?: string; readonly sourceMapUrl?: string }> = {},
-) => {
-  const { nodes, edges, strings } = heapsnapshot
-  const meta = heapsnapshot.meta
-  const { node_fields, edge_fields, edge_types } = meta
+const getSortedCounts = (heapsnapshot: Snapshot) => {
+  const { edges, nodes, strings } = heapsnapshot
+  const { meta } = heapsnapshot
+  const { edge_fields, edge_types, node_fields } = meta
 
   const nodeFieldCount = node_fields.length
   const edgeFieldCount = edge_fields.length
@@ -379,7 +376,6 @@ const getSortedCounts = (
         return locationKey
       })
       return {
-        name: key,
         // @ts-ignore
         count: value.count,
         locations: enrichedLocations,

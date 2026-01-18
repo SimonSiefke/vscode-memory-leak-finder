@@ -1,5 +1,6 @@
 import { copyFile, mkdir, rm } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
 import * as DownloadAndUnzipCursor from '../DownloadAndUnzipCursor/DownloadAndUnzipCursor.ts'
@@ -15,6 +16,7 @@ import { VError } from '../VError/VError.ts'
 
 export const launchCursor = async ({
   addDisposable,
+  clearExtensions,
   cursorVersion,
   cwd,
   enableExtensions,
@@ -28,6 +30,22 @@ export const launchCursor = async ({
   inspectSharedProcessPort,
   useProxyMock,
   vscodePath,
+}: {
+  addDisposable: (fn: () => Promise<void> | void) => void
+  clearExtensions: boolean
+  cursorVersion: string
+  cwd: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  headlessMode: boolean
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  useProxyMock: boolean
+  vscodePath?: string
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
@@ -42,8 +60,12 @@ export const launchCursor = async ({
     const binaryPath = vscodePath || (await DownloadAndUnzipCursor.downloadAndUnzipCursor(cursorVersion))
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
-    await rm(extensionsDir, { force: true, recursive: true })
-    await mkdir(extensionsDir)
+    if (clearExtensions) {
+      await rm(extensionsDir, { force: true, recursive: true })
+      await mkdir(extensionsDir)
+    } else {
+      await ClearExtensionsDirIfEmpty.clearExtensionsDirIfEmpty(extensionsDir)
+    }
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
@@ -66,7 +88,7 @@ export const launchCursor = async ({
       processEnv: process.env,
       runtimeDir,
     })
-    const { child } = await LaunchElectron.launchElectron({
+    const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,
       args,
       cliPath: binaryPath,
@@ -76,6 +98,7 @@ export const launchCursor = async ({
     })
     return {
       child,
+      pid,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch Cursor`)

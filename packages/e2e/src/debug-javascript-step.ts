@@ -16,6 +16,7 @@ setInterval(()=>{
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('index.js')
   await RunAndDebug.removeAllBreakpoints()
 }
@@ -28,7 +29,11 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
     file: 'index.js',
     line: 4,
   })
-  await RunAndDebug.step('index.js', 5)
+  // @ts-ignore
+  await RunAndDebug.step({
+    file: 'index.js',
+    line: 5,
+  })
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()

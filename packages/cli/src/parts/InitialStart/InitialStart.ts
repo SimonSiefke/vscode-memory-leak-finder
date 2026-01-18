@@ -1,9 +1,10 @@
+import type * as ParseArgv from '../ParseArgv/ParseArgv.ts'
 import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
 import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
-export const initialStart = async (options): Promise<void> => {
+export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArgv> & { isGithubActions: boolean }): Promise<void> => {
   if (options.watch) {
     await SpecialStdin.start()
   }
@@ -12,10 +13,13 @@ export const initialStart = async (options): Promise<void> => {
     return
   }
   await StartRunning.startRunning({
+    arch: options.arch,
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
+    clearExtensions: options.clearExtensions,
     color: options.color,
     commit: options.commit,
+    compressVideo: options.compressVideo,
     continueValue: options.continueValue,
     cwd: options.cwd,
     enableExtensions: options.enableExtensions,
@@ -31,10 +35,13 @@ export const initialStart = async (options): Promise<void> => {
     inspectPtyHostPort: options.inspectPtyHostPort,
     inspectSharedProcess: options.inspectSharedProcess,
     inspectSharedProcessPort: options.inspectSharedProcessPort,
+    isGithubActions: options.isGithubActions,
     isWindows: options.isWindows,
+    login: options.login,
     measure: options.measure,
     measureAfter: options.measureAfter,
     measureNode: options.measureNode,
+    platform: options.platform,
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
@@ -44,6 +51,8 @@ export const initialStart = async (options): Promise<void> => {
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
+    trackFunctions: options.trackFunctions,
+    updateUrl: options.updateUrl,
     useProxyMock: options.useProxyMock,
     vscodePath: options.vscodePath,
     vscodeVersion: options.vscodeVersion,

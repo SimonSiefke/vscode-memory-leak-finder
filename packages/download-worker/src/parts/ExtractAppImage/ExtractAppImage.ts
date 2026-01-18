@@ -1,11 +1,11 @@
 import { VError } from '@lvce-editor/verror'
-import { execa } from 'execa'
-import { dirname } from 'path'
+import { dirname } from 'node:path'
+import * as Exec from '../Exec/Exec.ts'
 
 export const extractAppImage = async (appImagePath: string): Promise<void> => {
   try {
     const folder = dirname(appImagePath)
-    await execa(appImagePath, ['--appimage-extract'], {
+    await Exec.exec(appImagePath, ['--appimage-extract'], {
       cwd: folder,
     })
   } catch (error) {

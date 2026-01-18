@@ -3,13 +3,14 @@ import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOpt
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
+import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
-import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
+import * as TestWorkerRunTests from '../TestWorkerRunTests/TestWorkerRunTests.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
 import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as Time from '../Time/Time.ts'
@@ -25,16 +26,19 @@ const emptyRpc = {
 }
 
 const disposeWorkers = async (workers) => {
-  const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
-  await Promise.all([memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
+  const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
+  await Promise.all([functionTrackerRpc.dispose(), memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()
 }
 
 export const runTestsWithCallback = async ({
+  arch,
   callback,
   checkLeaks,
+  clearExtensions,
   color,
   commit,
+  compressVideo,
   continueValue,
   cwd,
   enableExtensions,
@@ -50,9 +54,13 @@ export const runTestsWithCallback = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  isGithubActions,
+  login,
   measure,
   measureAfter,
   measureNode,
+  pageObjectPath,
+  platform,
   recordVideo,
   restartBetween,
   root,
@@ -63,6 +71,8 @@ export const runTestsWithCallback = async ({
   setupOnly,
   timeoutBetween,
   timeouts,
+  trackFunctions,
+  updateUrl,
   useProxyMock,
   vscodePath,
   vscodeVersion,
@@ -86,12 +96,13 @@ export const runTestsWithCallback = async ({
     Assert.string(ide)
     Assert.string(ideVersion)
     Assert.boolean(setupOnly)
+    Assert.boolean(login)
     Assert.boolean(enableExtensions)
 
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
-    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
+    const pageObjectPathResolved = GetPageObjectPath.getPageObjectPath(pageObjectPath)
 
     // TODO for each connection id, launch all needed workers
     // when a new connection id comes in, dispose them (even while running)
@@ -99,8 +110,11 @@ export const runTestsWithCallback = async ({
 
     if (setupOnly && commit) {
       const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+        arch,
         attachedToPageTimeout,
+        clearExtensions,
         commit,
+        compressVideo,
         connectionId,
         cwd,
         enableExtensions,
@@ -118,11 +132,14 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         measureId: measure,
         measureNode,
-        pageObjectPath,
+        pageObjectPath: pageObjectPathResolved,
+        platform,
         recordVideo,
         runMode,
         screencastQuality,
         timeouts,
+        trackFunctions,
+        updateUrl,
         useProxyMock,
         vscodePath,
         vscodeVersion,
@@ -130,6 +147,72 @@ export const runTestsWithCallback = async ({
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
       await videoRpc?.dispose()
+      return {
+        duration: 0,
+        failed: 0,
+        filterValue,
+        leaked: 0,
+        passed: 0,
+        skipped: 0,
+        skippedFailed: 0,
+        total: 0,
+        type: 'success',
+      }
+    }
+
+    if (login) {
+      const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
+        await PrepareTestsOrAttach.prepareTestsAndAttach({
+          arch,
+          attachedToPageTimeout,
+          clearExtensions,
+          commit,
+          compressVideo,
+          connectionId,
+          cwd,
+          enableExtensions,
+          enableProxy,
+          headlessMode,
+          ide,
+          ideVersion,
+          idleTimeout,
+          insidersCommit,
+          inspectExtensions,
+          inspectExtensionsPort,
+          inspectPtyHost,
+          inspectPtyHostPort,
+          inspectSharedProcess,
+          inspectSharedProcessPort,
+          measureId: measure,
+          measureNode,
+          pageObjectPath: pageObjectPathResolved,
+          platform,
+          recordVideo,
+          runMode,
+          screencastQuality,
+          timeouts,
+          trackFunctions,
+          updateUrl,
+          useProxyMock,
+          vscodePath,
+          vscodeVersion,
+        })
+      // Wait for user to interrupt (Ctrl+C) or terminate the process
+      const { promise, resolve } = Promise.withResolvers<void>()
+      const cleanup = async () => {
+        await testWorkerRpc.dispose()
+        await memoryRpc?.dispose()
+        await videoRpc?.dispose()
+        await functionTrackerRpc?.dispose()
+        if (initializationWorkerRpc) {
+          await initializationWorkerRpc.dispose()
+        }
+        resolve()
+      }
+      process.once('SIGINT', cleanup)
+      process.once('SIGTERM', cleanup)
+      // The IDE is now running. User can login manually and then press Ctrl+C when done
+      await promise
       return {
         duration: 0,
         failed: 0,
@@ -181,6 +264,7 @@ export const runTestsWithCallback = async ({
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
     let workers = {
+      functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
       testWorkerRpc: emptyRpc,
@@ -197,36 +281,44 @@ export const runTestsWithCallback = async ({
       if (needsSetup) {
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
-        const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
-          attachedToPageTimeout,
-          commit,
-          connectionId,
-          cwd,
-          enableExtensions,
-          enableProxy,
-          headlessMode,
-          ide,
-          ideVersion,
-          idleTimeout,
-          insidersCommit,
-          inspectExtensions,
-          inspectExtensionsPort,
-          inspectPtyHost,
-          inspectPtyHostPort,
-          inspectSharedProcess,
-          inspectSharedProcessPort,
-          measureId: measure,
-          measureNode,
-          pageObjectPath,
-          recordVideo,
-          runMode,
-          screencastQuality,
-          timeouts,
-          useProxyMock,
-          vscodePath,
-          vscodeVersion,
-        })
+        const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
+          await PrepareTestsOrAttach.prepareTestsAndAttach({
+            arch,
+            attachedToPageTimeout,
+            clearExtensions,
+            commit,
+            compressVideo,
+            connectionId,
+            cwd,
+            enableExtensions,
+            enableProxy,
+            headlessMode,
+            ide,
+            ideVersion,
+            idleTimeout,
+            insidersCommit,
+            inspectExtensions,
+            inspectExtensionsPort,
+            inspectPtyHost,
+            inspectPtyHostPort,
+            inspectSharedProcess,
+            inspectSharedProcessPort,
+            measureId: measure,
+            measureNode,
+            pageObjectPath: pageObjectPathResolved,
+            platform,
+            recordVideo,
+            runMode,
+            screencastQuality,
+            timeouts,
+            trackFunctions,
+            updateUrl,
+            useProxyMock,
+            vscodePath,
+            vscodeVersion,
+          })
         workers = {
+          functionTrackerRpc: functionTrackerRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
           // @ts-ignore
           memoryRpc: memoryRpc || emptyRpc,
@@ -244,7 +336,14 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerRpc, connectionId, absolutePath, forceRun, timeouts)
+        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
+          testWorkerRpc,
+          connectionId,
+          absolutePath,
+          forceRun,
+          timeouts,
+          isGithubActions,
+        )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped
 
@@ -266,14 +365,10 @@ export const runTestsWithCallback = async ({
           let isLeak = false
           if (checkLeaks) {
             if (measureAfter) {
-              for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
-              }
+              await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
             }
             await MemoryLeakFinder.start(memoryRpc, connectionId)
-            for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
-            }
+            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
@@ -304,12 +399,11 @@ export const runTestsWithCallback = async ({
               leaking++
             }
             if (result.summary) {
+              // TODO log it in cli or stdout worker
               console.log(result.summary)
             }
           } else {
-            for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
-            }
+            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
           }
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
           const end = Time.now()
@@ -325,8 +419,7 @@ export const runTestsWithCallback = async ({
         } else {
           failed++
         }
-        const PrettyError = await import('../PrettyError/PrettyError.ts')
-        const prettyError = await PrettyError.prepare(error, { color, root })
+        const prettyError = await GetPrettyError.getPrettyError(error, color, root)
         await callback(
           TestWorkerEventType.TestFailed,
           absolutePath,
@@ -346,6 +439,7 @@ export const runTestsWithCallback = async ({
     // TODO when in watch mode, dispose all workers except initialization worker to keep the application running
     await disposeWorkers(workers)
     workers = {
+      functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
       testWorkerRpc: emptyRpc,
@@ -363,8 +457,7 @@ export const runTestsWithCallback = async ({
       type: 'success',
     }
   } catch (error) {
-    const PrettyError = await import('../PrettyError/PrettyError.ts')
-    const prettyError = await PrettyError.prepare(error, { color, root })
+    const prettyError = await GetPrettyError.getPrettyError(error, color, root)
     return {
       prettyError,
       type: 'error',

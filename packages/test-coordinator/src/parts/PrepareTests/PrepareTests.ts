@@ -3,7 +3,9 @@ import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExist
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 
 export interface PrepareTestsOptions {
+  readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
@@ -22,9 +24,12 @@ export interface PrepareTestsOptions {
   readonly inspectSharedProcessPort: number
   readonly measureId: string
   readonly pageObjectPath: string
+  readonly platform: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly timeouts: any
+  readonly trackFunctions: boolean
+  readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
@@ -32,7 +37,9 @@ export interface PrepareTestsOptions {
 
 export const prepareTests = async (options: PrepareTestsOptions) => {
   const {
+    arch,
     attachedToPageTimeout,
+    clearExtensions,
     commit,
     connectionId,
     cwd,
@@ -47,6 +54,10 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    measureId,
+    platform,
+    trackFunctions,
+    updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
@@ -54,10 +65,12 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, utilityContext, webSocketUrl } =
+  const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, pid, utilityContext, webSocketUrl } =
     await prepareBoth({
+      arch,
       attachedToPageTimeout,
       canUseIdleCallback,
+      clearExtensions,
       commit,
       connectionId,
       cwd,
@@ -73,6 +86,10 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       inspectSharedProcess,
       inspectSharedProcessPort,
       isFirstConnection,
+      measureId,
+      platform,
+      trackFunctions,
+      updateUrl,
       useProxyMock,
       vscodePath,
       vscodeVersion,
@@ -83,6 +100,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     electronObjectId,
     initializationWorkerRpc,
     parsedVersion,
+    pid,
     utilityContext,
     webSocketUrl,
   }

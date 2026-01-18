@@ -4,9 +4,12 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export const createDefaultState = (): StdinDataState => ({
+  arch: '',
   bisect: false,
   buffering: false,
   checkLeaks: false,
+  clearExtensions: true,
+  compressVideo: false,
   continueValue: '',
   cwd: '',
   enableExtensions: false,
@@ -29,6 +32,8 @@ export const createDefaultState = (): StdinDataState => ({
   measureAfter: false,
   measureNode: false,
   mode: ModeType.Waiting,
+  pageObjectPath: '',
+  platform: '',
   previousFilters: [],
   recordVideo: false,
   restartBetween: false,
@@ -39,6 +44,7 @@ export const createDefaultState = (): StdinDataState => ({
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
+  trackFunctions: false,
   useProxyMock: false,
   value: '',
   watch: false,

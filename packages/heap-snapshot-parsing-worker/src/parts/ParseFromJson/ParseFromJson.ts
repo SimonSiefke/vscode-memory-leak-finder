@@ -8,7 +8,7 @@ import { createReadableString } from '../ReadableString/ReadableString.ts'
  * @param {boolean} [options.parseStrings=false] - Whether to parse and return strings
  * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array, strings: string[]}>} Promise containing parsed heap snapshot data with transferable arrays
  */
-export const parseFromJson = async (json, options = { parseStrings: false }) => {
+export const parseFromJson = async (json: unknown, options: { parseStrings?: boolean } = { parseStrings: false }) => {
   const string = JSON.stringify(json)
   const stream = createReadableString(string)
   const result = await parseFromStream(stream, options)

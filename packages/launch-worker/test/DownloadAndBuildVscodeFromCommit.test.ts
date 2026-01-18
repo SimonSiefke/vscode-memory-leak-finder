@@ -7,5 +7,5 @@ test('downloadAndBuildVscodeFromCommit - function exists and is callable', () =>
 
 test('downloadAndBuildVscodeFromCommit - function signature is correct', () => {
   const fn = DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit
-  expect(fn.length).toBe(5)
+  expect(fn.length).toBe(7)
 })

@@ -6,12 +6,12 @@ const linker = () => {
   throw new Error(`test imports are not allowed when running test in a vm`)
 }
 
-export const importUsingVm = async (file: string): Promise<any> => {
+export const importUsingVm = async (platform: string, file: string): Promise<any> => {
   try {
     const content = await readFile(file, 'utf8')
     const context = vm.createContext({
       process: {
-        platform: process.platform,
+        platform,
       },
     })
     const module = new vm.SourceTextModule(content, {

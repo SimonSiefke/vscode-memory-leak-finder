@@ -1,22 +1,26 @@
+import { readFile } from 'node:fs/promises'
+import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { addUrls } from '../AddUrls/AddUrls.ts'
 import {
   compareNamedClosureCountFromHeapSnapshotInternal2,
   type CompareClosuresOptions,
 } from '../CompareNamedClosureCountInternal2/CompareNamedClosureCountInternal2.ts'
 import { enrichLeakedClosuresWithReferences } from '../EnrichLeakedClosuresWithReferences/EnrichLeakedClosuresWithReferences.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
-import { readFile } from 'fs/promises'
-import { addUrls } from '../AddUrls/AddUrls.ts'
+
+export interface ReferencePathWithCount extends ReferencePath {
+  readonly count: number
+}
 
 export interface ReferencePathWithCount extends ReferencePath {
   readonly count: number
 }
 
 export interface LeakedClosureWithReferences {
+  readonly count: number
   readonly nodeName: string
   readonly references: readonly ReferencePathWithCount[]
-  readonly count: number
 }
 
 export interface LocationWithReferences {
@@ -44,7 +48,7 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   const scriptMap = JSON.parse(scriptMapContent)
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, scriptMap, options)
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
-  console.log({ leaked, enriched })
+  console.log({ enriched, leaked })
   const final = addUrls(enriched, scriptMap)
   return transformToArray(final)
 }
@@ -72,7 +76,7 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = a
 const normalizePath = (path: string): string => {
   // Replace node IDs in paths like [array 3018681].internal with [array].internal
   // This allows us to merge references that differ only by node ID
-  return path.replace(/\[(\w+)\s+\d+\]/g, '[$1]')
+  return path.replaceAll(/\[(\w+)\s+\d+\]/g, '[$1]')
 }
 
 const areReferencePathsEqual = (a: ReferencePath, b: ReferencePath): boolean => {
@@ -170,9 +174,9 @@ const groupAndCountReferences = (
   for (let i = 0; i < grouped.length; i++) {
     const groupedReferencePaths = groupAndCountReferencePaths(grouped[i].references)
     result.push({
+      count: counts[i] || 1,
       nodeName: grouped[i].nodeName,
       references: groupedReferencePaths,
-      count: counts[i] || 1,
     })
   }
 

@@ -9,8 +9,15 @@ interface MockServer {
 
 const createMockServer = async ({ port }): Promise<MockServer> => {
   const server = createServer((req, res) => {
-    res.statusCode = 200
-    res.end('<h1>hello world</h1>')
+    if (req.url === '/page-b') {
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'text/html')
+      res.end('<html><head><title>Page B</title></head><body><h1>Page B</h1></body></html>')
+    } else {
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'text/html')
+      res.end('<html><head><title>Page A</title></head><body><h1>Page A</h1><a href="/page-b">Go to Page B</a></body></html>')
+    }
   })
   const { promise, resolve } = Promise.withResolvers()
   server.once('listening', resolve)
@@ -25,8 +32,54 @@ const createMockServer = async ({ port }): Promise<MockServer> => {
   }
 }
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, platform, VError }) => {
   return {
+    async addElementToChat({ selector }) {
+      try {
+        await page.waitForIdle()
+        const add = page.locator('.element-selection-message')
+        await expect(add).toBeVisible()
+        const button = add.locator('[role="button"][aria-label="Click to select an element."]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add element to chat`)
+      }
+    },
+    async clickLink({ href }) {
+      try {
+        await page.waitForIdle()
+        const webView = WebView.create({ expect, page, VError })
+        const subFrame = await webView.shouldBeVisible2({
+          extensionId: 'vscode.simple-browser',
+          hasLineOfCodeCounter: false,
+        })
+        await subFrame.waitForIdle()
+        await page.waitForIdle()
+        const subIframe = subFrame.locator('.content iframe')
+        await expect(subIframe).toBeVisible()
+        await page.waitForIdle()
+        const innerFrame = await subFrame.waitForSubIframe({
+          injectUtilityScript: false,
+          url: /http:\/\/localhost/,
+        })
+        await innerFrame.waitForIdle()
+        const link = innerFrame.locator(`a[href="${href}"]`)
+        await expect(link).toBeVisible()
+        await link.click()
+        await innerFrame.waitForIdle()
+        await page.waitForIdle()
+        // Wait for navigation to complete
+        await subFrame.waitForSubIframe({
+          injectUtilityScript: false,
+          url: new RegExp(href),
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to click link ${href}`)
+      }
+    },
     async createMockServer({ id, port }) {
       try {
         await page.waitForIdle()
@@ -46,11 +99,45 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to dispose mock server`)
       }
     },
+    async mockElectronDebugger({ selector }) {
+      try {
+        await page.waitForIdle()
+        const add = page.locator('.element-selection-message')
+        await expect(add).toBeVisible()
+        const button = add.locator('[role="button"][aria-label="Click to select an element."]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add element to chat`)
+      }
+    },
     mockServers: Object.create(null),
+    async shouldHaveTabTitle({ title }) {
+      try {
+        await page.waitForIdle()
+        const tab = page.locator('.tab', { hasText: `Simple Browser` })
+        await expect(tab).toBeVisible()
+        await page.waitForIdle()
+        // Check both tab-label text and aria-label
+        // The title might be "Simple Browser: Page B" or just "Page B"
+        const tabLabel = tab.locator('.tab-label')
+        const titleRegex = new RegExp(title)
+        try {
+          await expect(tabLabel).toHaveText(titleRegex, { timeout: 5000 })
+        } catch {
+          // If text doesn't match, try aria-label
+          await expect(tab).toHaveAttribute('aria-label', titleRegex, { timeout: 5000 })
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify tab title ${title}`)
+      }
+    },
     async show({ port }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
           stayVisible: true,

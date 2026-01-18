@@ -1,0 +1,29 @@
+import type { TestContext } from '../types.js'
+
+export const skip = 1
+
+export const requiresNetwork = 1
+
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
+  await Workspace.setFiles([
+    {
+      content: 'h1 { visibil }',
+      name: 'index.css',
+    },
+  ])
+  await Editor.open('index.css')
+  await Editor.shouldHaveBreadCrumb('h1')
+  await Editor.setCursor(1, 13)
+}
+
+export const run = async ({ Editor, Extensions, Suggest }: TestContext): Promise<void> => {
+  await Extensions.restart()
+  await Editor.shouldHaveBreadCrumb('h1')
+  await Suggest.open('visibility, Property')
+  await Suggest.close()
+}
+
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.save({ viaKeyBoard: true })
+  await Editor.closeAll()
+}

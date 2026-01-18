@@ -1,0 +1,17 @@
+{
+  "name": "@vscode-memory-leak-finder/network-worker",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/main.ts",
+  "scripts": {
+    "dev": "node src/main.ts",
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
+  "dependencies": {
+    "@lvce-editor/rpc": "^5.4.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "got": "^14.6.6"
+  }
+}

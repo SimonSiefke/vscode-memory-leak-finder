@@ -1,14 +1,14 @@
 export interface FunctionObject {
-  readonly url: string
-  readonly sourceMapUrl: string | null
   readonly name: string
+  readonly sourceMapUrl: string | null
+  readonly url: string
 }
 
 export interface AggregatedFunction {
-  readonly name: string
-  readonly url: string
-  readonly sourceMapUrl: string | null
   readonly count: number
+  readonly name: string
+  readonly sourceMapUrl: string | null
+  readonly url: string
 }
 
 interface StringNumberMap {
@@ -27,16 +27,16 @@ export const aggregateFunctionObjects = (functionObjects: readonly FunctionObjec
   }
   const seen: StringBooleanMap = Object.create(null)
   const aggregated: AggregatedFunction[] = []
-  for (const { url, sourceMapUrl, name } of functionObjects) {
+  for (const { name, sourceMapUrl, url } of functionObjects) {
     if (url in seen) {
       continue
     }
     seen[url] = true
     aggregated.push({
-      name,
-      url,
-      sourceMapUrl,
       count: map[url],
+      name,
+      sourceMapUrl,
+      url,
     })
   }
   return aggregated

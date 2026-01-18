@@ -1,71 +1,12 @@
-import { readFileSync, writeFileSync } from 'fs'
-import { dirname, join, resolve } from 'path'
-import { fileURLToPath } from 'url'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { extractMethodInfo } from './generateApiTypes/ExtractMethodInfo.ts'
+import { extractProperties } from './generateApiTypes/ExtractProperties.ts'
+import { generateInterfaceFromMethods } from './generateApiTypes/GenerateInterface.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-
-interface MethodInfo {
-  name: string
-  parameters: string[]
-  returnType: string
-  isAsync: boolean
-}
-
-const extractMethodInfo = (content: string): MethodInfo[] => {
-  const methods: MethodInfo[] = []
-
-  // Match async method definitions
-  const asyncMethodRegex = /async\s+(\w+)\s*\([^)]*\)\s*{/g
-  let match
-
-  while ((match = asyncMethodRegex.exec(content)) !== null) {
-    const methodName = match[1]
-    const fullMatch = match[0]
-
-    // Extract parameters from the method signature
-    const paramMatch = fullMatch.match(/\(([^)]*)\)/)
-    let parameters: string[] = []
-
-    if (paramMatch) {
-      const paramString = paramMatch[1].trim()
-      if (paramString) {
-        // Only process simple parameters (no destructuring or complex syntax)
-        if (!paramString.includes('{') && !paramString.includes('[') && !paramString.includes('=')) {
-          parameters = paramString
-            .split(',')
-            .map((p) => p.trim())
-            .filter((p) => p)
-        } else {
-          // For complex parameters, just use a generic name
-          parameters = ['options']
-        }
-      }
-    }
-
-    methods.push({
-      name: methodName,
-      parameters,
-      returnType: 'Promise<void>',
-      isAsync: true,
-    })
-  }
-
-  return methods
-}
-
-const generateInterfaceFromMethods = (methods: MethodInfo[], interfaceName: string): string => {
-  const methodSignatures = methods
-    .map((method) => {
-      // For now, just use any for all parameters to avoid syntax issues
-      const params = method.parameters.length > 0 ? method.parameters.map((param) => `${param}: any`).join(', ') : ''
-
-      return `  ${method.name}(${params}): ${method.returnType}`
-    })
-    .join('\n')
-
-  return `export interface ${interfaceName} {\n${methodSignatures}\n}`
-}
 
 export const generateApiTypes = async (): Promise<void> => {
   const pageObjectDir = resolve(__dirname, '../../page-object/src/parts')
@@ -89,20 +30,54 @@ export const generateApiTypes = async (): Promise<void> => {
 
     // Process each part
     for (const partName of partNames) {
-      const partFile = join(pageObjectDir, partName, `${partName}.ts`)
+      // Try the exact name first, then try variations (e.g., ExtensionDetailView -> ExtensionsDetailView)
+      let partFile = join(pageObjectDir, partName, `${partName}.ts`)
+      let found = false
+
+      // Check if file exists, if not try variations
+      try {
+        readFileSync(partFile, 'utf8')
+        found = true
+      } catch {
+        // Try adding 's' to Extension (e.g., ExtensionDetailView -> ExtensionsDetailView)
+        const alternativeName = partName.replace(/^Extension([A-Z])/, 'Extensions$1')
+        if (alternativeName !== partName) {
+          const alternativeFile = join(pageObjectDir, alternativeName, `${alternativeName}.ts`)
+          try {
+            readFileSync(alternativeFile, 'utf8')
+            partFile = alternativeFile
+            found = true
+          } catch {
+            // Try other variations if needed
+          }
+        }
+      }
+
+      if (!found) {
+        // @ts-ignore
+        console.warn(`Warning: Could not find file for ${partName}, adding as 'any' type`)
+        apiProperties.push(`${partName}: any`)
+        continue
+      }
 
       try {
         const content = readFileSync(partFile, 'utf8')
         const methods = extractMethodInfo(content)
+        const properties = extractProperties(content)
 
-        if (methods.length > 0) {
-          const interfaceDef = generateInterfaceFromMethods(methods, partName)
+        if (methods.length > 0 || properties.length > 0) {
+          const interfaceDef = generateInterfaceFromMethods(methods, properties, partName)
           interfaces.push(interfaceDef)
           apiProperties.push(`${partName}: ${partName}`)
+        } else {
+          // Even if no methods/properties, add it as 'any' type
+          apiProperties.push(`${partName}: any`)
         }
       } catch (error) {
         // @ts-ignore
         console.warn(`Warning: Could not process ${partFile}:`, error.message)
+        // Still add it to the API as 'any' type
+        apiProperties.push(`${partName}: any`)
       }
     }
 
@@ -111,13 +86,13 @@ export const generateApiTypes = async (): Promise<void> => {
 
     // Generate context interface
     const contextInterface = `export interface PageObjectContext {
-  page: any
-  expect: any
-  VError: any
-  ideVersion?: {
-    minor: number
+  readonly page: any
+  readonly expect: any
+  readonly VError: any
+  readonly ideVersion?: {
+    readonly minor: number
   }
-  electronApp?: any
+  readonly electronApp?: any
 }`
 
     // Combine all interfaces
@@ -139,7 +114,7 @@ export const generateApiTypes = async (): Promise<void> => {
 
     // Ensure the output directory exists
     const outputDir = resolve(__dirname, '../../e2e/types')
-    const { mkdirSync } = await import('fs')
+    const { mkdirSync } = await import('node:fs')
     try {
       mkdirSync(outputDir, { recursive: true })
     } catch (error) {

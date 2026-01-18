@@ -1,11 +1,13 @@
-import type { ChildProcess } from 'child_process'
+import type { ChildProcess } from 'node:child_process'
 
 interface State {
+  compressVideo: boolean
   outFile: string
   process: ChildProcess | undefined
 }
 
 export const state: State = {
+  compressVideo: false,
   outFile: '',
   process: undefined,
 }
@@ -24,4 +26,12 @@ export const getOutFile = () => {
 
 export const setOutFile = (outFile: string) => {
   state.outFile = outFile
+}
+
+export const setCompressVideo = (compressVideo: boolean) => {
+  state.compressVideo = compressVideo
+}
+
+export const getCompressVideo = (): boolean => {
+  return state.compressVideo
 }

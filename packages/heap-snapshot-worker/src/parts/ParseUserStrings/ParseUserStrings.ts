@@ -5,6 +5,6 @@ export const parseUserStrings = async (path: string): Promise<number> => {
   const snapshot: any = await prepareHeapSnapshot(path, {
     parseStrings: true,
   })
-  const { strings } = snapshot as any
+  const { strings } = snapshot
   return strings.length
 }
