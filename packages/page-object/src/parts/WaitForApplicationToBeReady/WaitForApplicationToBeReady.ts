@@ -8,7 +8,7 @@ const isDevtoolsCannotFindContextError = (error: any): boolean => {
   )
 }
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async waitForApplicationToBeReady({
       enableExtensions,

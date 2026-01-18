@@ -3,7 +3,7 @@ import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async addContext(initialPrompt: string, secondPrompt: string, confirmText: string) {
       try {
