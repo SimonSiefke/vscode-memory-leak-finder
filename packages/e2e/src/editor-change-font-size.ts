@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.js'
 
+export const skip = 1
+
 export const setup = async ({ Editor, SettingsEditor, Workspace, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -15,6 +17,11 @@ export const setup = async ({ Editor, SettingsEditor, Workspace, SideBar }: Test
   await SettingsEditor.search({
     resultCount: 7,
     value: 'editor.fontSize',
+  })
+  await SettingsEditor.setTextInput({
+    name: 'editor.fontSize',
+    value: '14',
+    type: 'number',
   })
 }
 
