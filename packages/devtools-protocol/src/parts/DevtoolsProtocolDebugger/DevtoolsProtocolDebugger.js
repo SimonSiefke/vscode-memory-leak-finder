@@ -68,3 +68,16 @@ export const evaluateOnCallFrame = async (rpc, params) => {
   }
   return rawResult
 }
+
+/**
+ * @param {*} rpc
+ * @param {{scriptId: string, scriptSource: string, dryRun?: boolean}} params
+ * @returns
+ */
+export const setScriptSource = async (rpc, params) => {
+  const rawResult = await rpc.invoke(DevtoolsCommandType.DebuggerSetScriptSource, params)
+  if ('error' in rawResult) {
+    throw new DevtoolsProtocolError(rawResult.error.message)
+  }
+  return rawResult
+}

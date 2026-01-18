@@ -40,6 +40,8 @@ export const DebuggerEvaluateOnCallFrame = 'Debugger.evaluateOnCallFrame'
 
 export const DebuggerScriptParsed = 'Debugger.scriptParsed'
 
+export const DebuggerSetScriptSource = 'Debugger.setScriptSource'
+
 export const DebuggerPaused = 'Debugger.paused'
 
 export const DebuggerResumed = 'Debugger.resumed'
