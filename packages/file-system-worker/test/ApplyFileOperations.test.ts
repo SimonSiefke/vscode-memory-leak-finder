@@ -254,14 +254,14 @@ test('applyFileOperations - handles multiple mkdir operations', async () => {
 test('applyFileOperations - handles multiple remove operations', async () => {
   mockRemove.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/path1/file1.txt',
-      type: 'remove' as const,
+      type: 'remove',
     },
     {
       from: '/path2/file2.txt',
-      type: 'remove' as const,
+      type: 'remove',
     },
   ]
 
@@ -280,19 +280,19 @@ test('applyFileOperations - handles mixed operations with errors', async () => {
     throw error
   })
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
-      type: 'copy' as const,
+      type: 'copy',
     },
     {
       path: '/path/to/directory',
-      type: 'mkdir' as const,
+      type: 'mkdir',
     },
     {
       from: '/path/to/file.txt',
-      type: 'remove' as const,
+      type: 'remove',
     },
   ]
 
