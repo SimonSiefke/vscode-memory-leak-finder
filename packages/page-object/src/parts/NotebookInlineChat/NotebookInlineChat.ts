@@ -26,7 +26,6 @@ export const create = ({ expect, page, VError }: any) => {
         await expect(chat).toBeHidden()
         await page.waitForIdle()
         await page.keyboard.press('Control+i')
-        // await new Promise((r) => {})
         await page.waitForIdle()
         await expect(chat).toBeVisible()
         const editor = chat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
