@@ -86,7 +86,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async openFile(fileName) {
       try {
         await page.waitForIdle()
-        await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform) })
+        await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform || '') })
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
@@ -180,7 +180,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async showCommands({ pressKeyOnce = false } = {}) {
       try {
-        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform), pressKeyOnce })
+        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform || ''), pressKeyOnce })
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }

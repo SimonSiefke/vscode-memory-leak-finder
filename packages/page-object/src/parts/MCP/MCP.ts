@@ -20,7 +20,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.McpAddServer, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -81,7 +81,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     },
     async createMCPServer(): Promise<Server.ServerInfo> {
       const path = '/mcp'
-      const server = Server.create({ VError })
+      const server = Server.create({ expect, ideVersion, page, platform, VError })
       const requests: any[] = []
       const requestHandler = (req, res) => {
         requests.push({

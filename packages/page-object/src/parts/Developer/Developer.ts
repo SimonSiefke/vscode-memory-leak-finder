@@ -7,7 +7,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async toggleScreenCastMode() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleScreenCastMode)
         await page.waitForIdle()
       } catch (error) {

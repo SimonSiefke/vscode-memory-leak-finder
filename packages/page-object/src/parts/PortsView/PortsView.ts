@@ -30,7 +30,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await page.waitForIdle()
         const portsView = page.locator('#\\~remote\\.forwardedPortsContainer')
         await expect(portsView).toBeVisible()
-        const panel = Panel.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const panel = Panel.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await panel.hide()
         await page.waitForIdle()
       } catch (error) {
@@ -41,14 +41,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       [Symbol.asyncDispose]: () => Promise<void>
     }> {
       try {
-        const server = Server.create({ VError })
+        const server = Server.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         const serverInfo = await server.start({
           port,
           requestHandler(req, res) {
             res.end('Hello World')
           },
         })
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ForwardAPort, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -78,7 +78,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusPortsView)
         await page.waitForIdle()
         const portsView = page.locator('#\\~remote\\.forwardedPortsContainer')
@@ -127,7 +127,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async unforwardAllPorts(port: number): Promise<void> {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.StopPortForwarding, {
           pressKeyOnce: true,
           stayVisible: true,

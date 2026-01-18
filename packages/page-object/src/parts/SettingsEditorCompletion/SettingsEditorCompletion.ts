@@ -17,7 +17,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         await row.click()
         await page.waitForIdle()
         await expect(suggest).toBeHidden()
-        const settingsEditorInput = SettingsEditorInput.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
+        const settingsEditorInput = SettingsEditorInput.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
         await settingsEditorInput.shouldHaveText(`${completionText}${Character.NonBreakingSpace}`)
       } catch (error) {
         throw new VError(error, `Failed to select completion ${completionName}`)

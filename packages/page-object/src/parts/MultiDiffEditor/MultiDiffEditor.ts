@@ -21,7 +21,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
 
         const explorer = Explorer.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
-        const sideBar = SideBar.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const sideBar = SideBar.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
 
         await explorer.focus()
 
