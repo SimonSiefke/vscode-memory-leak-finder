@@ -171,7 +171,7 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
   return sorted
 }
 
-const compareItem = (a, b) => {
+const compareItem = (a: any, b: any) => {
   return b.count - a.count
 }
 
@@ -181,7 +181,7 @@ const sortByCounts = (items: readonly any[]) => {
   return sorted
 }
 
-const compareCounts = (before, after) => {
+const compareCounts = (before: any, after: any) => {
   const beforeMap = Object.create(null)
   for (const item of before) {
     beforeMap[item.name] ||= 0

@@ -8,7 +8,7 @@ import { waitForResult } from '../WaitForResult/WaitForResult.ts'
  * @param {{parseStrings?:boolean}} options - Options for parsing
  * @returns {Promise<{metaData: any, nodes: Uint32Array<ArrayBuffer>, edges: Uint32Array<ArrayBuffer>, locations: Uint32Array<ArrayBuffer>, strings: string[]}>}
  */
-export const prepareHeapSnapshotFromJson = async (json, options) => {
+export const prepareHeapSnapshotFromJson = async (json: any, options: any) => {
   const workerPath = getHeapSnapshotWorkerPath()
   const worker = new Worker(workerPath)
 

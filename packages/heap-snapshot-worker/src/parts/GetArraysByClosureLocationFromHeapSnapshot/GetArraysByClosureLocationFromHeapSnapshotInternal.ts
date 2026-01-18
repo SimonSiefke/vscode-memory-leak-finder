@@ -58,17 +58,17 @@ export interface ResultGroup {
 }
 
 export const getArraysByClosureLocationFromHeapSnapshotInternal = (
-  strings,
-  nodes,
-  node_types,
-  node_fields,
-  edges,
-  edge_types,
-  edge_fields,
-  parsedNodes,
-  locations,
-  locationFields,
-  scriptMap,
+  strings: any,
+  nodes: any,
+  node_types: any,
+  node_fields: any,
+  edges: any,
+  edge_types: any,
+  edge_fields: any,
+  parsedNodes: any,
+  locations: any,
+  locationFields: any,
+  scriptMap: any,
 ) => {
   const {
     detachednessFieldIndex,

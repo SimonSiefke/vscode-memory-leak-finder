@@ -4,7 +4,7 @@ import * as GetConstructorScope from '../GetConstructorScope/GetConstructorScope
 import * as GetConstructorScopeMap from '../GetConstructorScopeMap/GetConstructorScopeMap.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
-const createCounts = (constructorNodesWithInfo) => {
+const createCounts = (constructorNodesWithInfo: any[]) => {
   const map = Object.create(null)
   for (const node of constructorNodesWithInfo) {
     map[node.name] ||= 0
@@ -19,7 +19,7 @@ const createCounts = (constructorNodesWithInfo) => {
   return array
 }
 
-const isImportantScopeName = (name) => {
+const isImportantScopeName = (name: string) => {
   switch (name) {
     case '':
     case '(object properties)':
@@ -32,7 +32,7 @@ const isImportantScopeName = (name) => {
   }
 }
 
-const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
+const getDetailedNodeInfo = (parsedNodes: any[], scopeMap: any, edgeMap: any, node: any) => {
   const { scopeEdge, scopeNode } = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, node)
   const parentScope = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, scopeNode)
   if (isImportantScopeName(parentScope.scopeNode.name)) {
@@ -47,7 +47,7 @@ const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
   }
 }
 
-export const getNamedConstructorCountFromHeapSnapshot = async (heapsnapshot, constructorName) => {
+export const getNamedConstructorCountFromHeapSnapshot = async (heapsnapshot: any, constructorName: any) => {
   Assert.object(heapsnapshot)
   const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const constructorNodes = GetConstructorNodes.getConstructorNodes(parsedNodes, constructorName)
