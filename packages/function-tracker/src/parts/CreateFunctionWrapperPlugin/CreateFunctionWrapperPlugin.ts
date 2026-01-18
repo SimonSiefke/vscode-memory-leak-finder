@@ -37,6 +37,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
 
   const createTrackingCall = (node: any) => {
     const location = functionLocations.get(node)
+    const functionName = getFunctionName(node)
 
     let line = -1
     let column = -1
@@ -49,7 +50,12 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     }
 
     return t.expressionStatement(
-      t.callExpression(t.identifier('trackFunctionCall'), [t.numericLiteral(scriptId), t.numericLiteral(line), t.numericLiteral(column)]),
+      t.callExpression(t.identifier('trackFunctionCall'), [
+        t.stringLiteral(functionName),
+        t.numericLiteral(scriptId),
+        t.numericLiteral(line),
+        t.numericLiteral(column),
+      ]),
     )
   }
 
