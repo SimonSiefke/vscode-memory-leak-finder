@@ -251,6 +251,7 @@ export const compareTrackedFunctions = async (
       const result = results[i]
       const parsed = parseFunctionName(result.functionName)
 
+      // Process functions with location info
       if (parsed.url && parsed.line !== null) {
         // Try to find the script - findScript handles both scriptId and URL lookups
         let script = findScript(scriptMap, parsed.url)
@@ -285,6 +286,10 @@ export const compareTrackedFunctions = async (
         } else {
           console.log(`[CompareTrackedFunctions] Script not found in scriptMap for ${parsed.url}`)
         }
+      } else {
+        // Function without location info - log for debugging
+        // Note: We can't resolve these without location info, but they should have been tracked with location
+        console.log(`[CompareTrackedFunctions] Function "${parsed.name}" has no location info - this should not happen if tracking is working correctly`)
       }
     }
 
