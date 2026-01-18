@@ -276,7 +276,7 @@ export const type = (text) => {
   fn(document.activeElement, { text })
 }
 
-export const getValue = (locator: Locator): string => {
+export const getValue = (locator) => {
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
     throw new Error(`element not found`)
@@ -377,7 +377,7 @@ const mouseState = {
   y: 0,
 }
 
-const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
+const pointerLikeEvent = (element: Element, pointerEventType: string, mouseEventType: string, x: number, y: number): void => {
   const button = 0
   const buttons = 0
   const bubbles = true

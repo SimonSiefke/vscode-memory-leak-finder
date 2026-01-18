@@ -1,4 +1,7 @@
 export const stringifyElement = (element: Element | null): string => {
+  if (!element) {
+    return 'null'
+  }
   if (element.id) {
     return `#${element.id}`
   }
