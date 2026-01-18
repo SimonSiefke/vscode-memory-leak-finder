@@ -1,5 +1,8 @@
 import { copyFile, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { join, resolve } from 'node:path'
+import { promisify } from 'node:util'
+
+const copyFileAsync = promisify(copyFile)
 
 const getTransformedCodePath = (): string => {
   const root = join(import.meta.dirname, '..', '..', '..', '..', '..')
@@ -31,7 +34,7 @@ export const replaceWorkbenchFile = async (binaryPath: string, platform: string)
     const transformedCode = readFileSync(transformedPath, 'utf8')
     
     // Create backup of original file
-    await copyFile(originalPath, backupPath)
+    await copyFileAsync(originalPath, backupPath)
 
     // Replace with transformed code
     writeFileSync(originalPath, transformedCode, 'utf8')
@@ -42,7 +45,7 @@ export const replaceWorkbenchFile = async (binaryPath: string, platform: string)
       backupPath,
       async restored() {
         // Restore original file from backup
-        await copyFile(backupPath, originalPath)
+        await copyFileAsync(backupPath, originalPath)
         console.log(`[FunctionTracker] Restored original file from backup`)
       },
     }

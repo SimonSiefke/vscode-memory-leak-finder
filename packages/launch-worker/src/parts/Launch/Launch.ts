@@ -87,6 +87,18 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   })
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
+  
+  // Launch function-tracker worker BEFORE PrepareBoth if tracking is enabled
+  // This ensures the socket server is ready when the protocol interceptor is injected
+  let functionTrackerRpc: Awaited<ReturnType<typeof LaunchFunctionTrackerWorker.launchFunctionTrackerWorker>> | null = null
+  if (trackFunctions) {
+    functionTrackerRpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
+    // Store in state so we can access it later to get statistics
+    FunctionTrackerState.setFunctionTrackerRpc(functionTrackerRpc)
+    // Wait a bit for socket server to be ready
+    await new Promise((resolve) => setTimeout(resolve, 100))
+  }
+  
   await using rpc = await launchInitializationWorker()
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
@@ -104,18 +116,11 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
       pid,
     )
 
-  // Launch function-tracker worker if tracking is enabled
-  // Connect it AFTER the page is created but BEFORE undoing monkey patch
-  let functionTrackerRpc: Awaited<ReturnType<typeof LaunchFunctionTrackerWorker.launchFunctionTrackerWorker>> | null = null
-  if (trackFunctions) {
-    functionTrackerRpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
-    // Store in state so we can access it later to get statistics
-    FunctionTrackerState.setFunctionTrackerRpc(functionTrackerRpc)
-    // Connect function-tracker devtools BEFORE undoing monkey patch
-    // This ensures the window is paused and we can intercept network requests
+  // Connect function-tracker devtools AFTER the page is created
+  if (trackFunctions && functionTrackerRpc) {
     await functionTrackerRpc.invoke('FunctionTracker.connectDevtools', devtoolsWebSocketUrl, webSocketUrl, connectionId, measureId)
     // Now undo the monkey patch to continue loading the window
-    // The function-tracker is already connected and will intercept network requests
+    // The protocol interceptor is already injected and will intercept network requests
     await rpc.invoke('Initialize.connectFunctionTracker')
   }
 
