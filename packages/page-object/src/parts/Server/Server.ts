@@ -10,7 +10,7 @@ export interface ServerInfo {
   readonly url: string
 }
 
-export const create = ({ VError }: CreateParams.CreateParams) => {
+export const create = ({ VError }: CreateParams) => {
   return {
     async start(
       { port = DEFAULT_PORT, requestHandler } = {} as { port: number; requestHandler?: (req: any, res: any) => void },
