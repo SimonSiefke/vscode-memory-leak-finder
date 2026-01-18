@@ -166,15 +166,9 @@ export const connectElectron = async (electronRpc: RpcConnection, headlessMode: 
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
 
-  // Inject protocol interceptor if function tracking is enabled
-  // This must be done AFTER MakeRequireAvailableGlobally so that globalThis._____require is available
-  if (trackFunctions) {
-    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: protocolInterceptorScript(SOCKET_PATH),
-      objectId: electronObjectId,
-    })
-    console.log('[ConnectElectron] Injected protocol interceptor for function tracking')
-  }
+  // Note: Protocol interceptor is NOT injected here because protocol.interceptBufferProtocol
+  // can only be called when app is ready. It will be injected in ConnectFunctionTracker
+  // after the monkey patch is undone (which happens when app becomes ready).
 
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
