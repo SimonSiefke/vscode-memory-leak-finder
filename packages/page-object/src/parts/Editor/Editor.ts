@@ -1,7 +1,7 @@
 import { basename } from 'node:path'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
-import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -24,7 +24,7 @@ const isBinary = (file: string) => {
   return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
-export const create = ({ expect, ideVersion, page, platform, VError, electronApp }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async acceptInlineCompletion() {
       try {
@@ -1140,18 +1140,6 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
       await expect(breadCrumb).toBeVisible({ timeout: 10_000 })
       await page.waitForIdle()
     },
-    async shouldHaveFontSize(expectedFontSize: string) {
-      try {
-        await page.waitForIdle()
-        const editor = page.locator('.editor-instance')
-        await expect(editor).toBeVisible()
-        const line = editor.locator('.view-lines')
-        await expect(line).toHaveCss('font-size', expectedFontSize)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to check font size`)
-      }
-    },
     async shouldHaveCodeLens(options?: { timeout?: number }) {
       try {
         await page.waitForIdle()
@@ -1269,6 +1257,18 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify font family`)
+      }
+    },
+    async shouldHaveFontSize(expectedFontSize: string) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const line = editor.locator('.view-lines')
+        await expect(line).toHaveCss('font-size', expectedFontSize)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to check font size`)
       }
     },
     async shouldHaveInlineCompletion(expectedText: string) {
@@ -1598,7 +1598,7 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
       return this.split(WellKnownCommands.ViewSplitEditorLeft, {})
     },
     async splitRight({ groupCount = undefined }: { groupCount?: number }) {
-      const params = groupCount !== undefined ? { groupCount } : {}
+      const params = groupCount === undefined ? {} : { groupCount }
       return this.split(WellKnownCommands.ViewSplitEditorRight, params)
     },
     async splitUp() {
@@ -1775,7 +1775,7 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
       await page.waitForIdle()
     },
     async waitForVideoReady(hasError: boolean) {
-      const webView = WebView.create({ expect, ideVersion, page, platform, VError, electronApp })
+      const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
       const subFrame = await webView.shouldBeVisible2({
         extensionId: `vscode.media-preview`,
         hasLineOfCodeCounter: false,

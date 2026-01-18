@@ -1,8 +1,8 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 const getMatchingText = async (styleElements: any, className: string): Promise<string> => {
   const [first, second] = className.split(' ')

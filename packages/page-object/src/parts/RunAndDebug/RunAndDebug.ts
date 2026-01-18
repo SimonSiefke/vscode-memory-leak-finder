@@ -120,7 +120,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await this.waitForPaused({
           callStackSize,
           file,
-          ...(hasCallStack !== undefined ? { hasCallStack } : {}),
+          ...(hasCallStack === undefined ? {} : { hasCallStack }),
           line,
         })
       } catch (error) {

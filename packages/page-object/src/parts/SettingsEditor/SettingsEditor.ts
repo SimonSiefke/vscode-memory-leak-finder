@@ -1,5 +1,5 @@
-import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
@@ -359,7 +359,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to open select`)
       }
     },
-    async setTextInput({ name, value, type = 'text' }: { name: string; value: string; type?: string }) {
+    async setTextInput({ name, type = 'text', value }: { name: string; value: string; type?: string }) {
       try {
         await page.waitForIdle()
         const settingItem = page.locator(`.setting-item-contents[data-key="${name}"]`)
