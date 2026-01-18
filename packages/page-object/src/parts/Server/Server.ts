@@ -1,5 +1,5 @@
 import { createServer } from 'node:http'
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 const DEFAULT_PORT = 0
 

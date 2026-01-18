@@ -31,7 +31,7 @@ const getListId = (classNameString: string) => {
   throw new Error(`Failed to extract list id from explorer`)
 }
 
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
@@ -72,7 +72,14 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     },
     async collapseAll() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.CollapseFoldersInExplorer)
       } catch (error) {
         throw new VError(error, `Failed to collapse all`)
@@ -225,10 +232,24 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await page.waitForIdle()
         await this.openContextMenu(`1.txt`)
         await page.waitForIdle()
-        const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await contextMenu.select('Open to the Side')
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.CloseOtherGroups)
         await page.waitForIdle()
         // TODO open context menu, the open to the side

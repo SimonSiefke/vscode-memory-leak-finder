@@ -1,6 +1,6 @@
 import { mkdir, readdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as Root from '../Root/Root.ts'
 

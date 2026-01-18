@@ -1,4 +1,4 @@
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Terminal from '../Terminal/Terminal.ts'
 
 const isDevtoolsCannotFindContextError = (error: any): boolean => {

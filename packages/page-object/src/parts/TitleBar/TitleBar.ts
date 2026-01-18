@@ -7,7 +7,7 @@ const TitleBarMenuItems = {
   View: 'View',
 }
 
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
   return {

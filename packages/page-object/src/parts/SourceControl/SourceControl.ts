@@ -50,7 +50,7 @@ const getDecorationContent = (text: string, className: string): string => {
   return content
 }
 
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {

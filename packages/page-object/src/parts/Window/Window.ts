@@ -1,4 +1,4 @@
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ page, VError }: CreateParams.CreateParams) => {
   return {

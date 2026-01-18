@@ -29,7 +29,7 @@ const waitForTerminalReady = async ({ page, row1 }: { page: any; row1: any }): P
   return false
 }
 
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {

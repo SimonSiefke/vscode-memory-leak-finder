@@ -32,7 +32,7 @@ const createMockServer = async ({ port }: { port: number }): Promise<MockServer>
   }
 }
 
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
