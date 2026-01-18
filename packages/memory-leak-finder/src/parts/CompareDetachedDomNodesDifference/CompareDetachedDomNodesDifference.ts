@@ -8,7 +8,7 @@ type DetachedDomNode = {
 }
 
 const getDifference = (prettyBefore: readonly DetachedDomNode[], prettyAfter: readonly DetachedDomNode[]): readonly (DetachedDomNode & { beforeCount: number })[] => {
-  const beforeMap: { readonly [description: string]: number } = Object.create(null)
+  const beforeMap: { [description: string]: number } = Object.create(null)
   for (const element of prettyBefore) {
     beforeMap[element.description] = element.count
   }
@@ -28,8 +28,8 @@ const getDifference = (prettyBefore: readonly DetachedDomNode[], prettyAfter: re
 export const compareDetachedDomNodesDifference = (before: readonly unknown[], after: readonly unknown[]): readonly (DetachedDomNode & { beforeCount: number })[] => {
   Assert.array(before)
   Assert.array(after)
-  const prettyBefore = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(before)
-  const prettyAfter = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(after)
+  const prettyBefore = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(before as readonly Record<string, unknown>[])
+  const prettyAfter = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(after as readonly Record<string, unknown>[])
   const difference = getDifference(prettyBefore, prettyAfter)
   return difference
 }

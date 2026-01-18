@@ -4,8 +4,8 @@ type DisposableStore = {
   readonly some: (predicate: (item: { readonly stackTrace: string }) => boolean) => boolean
 }
 
-const hasStackTrace = (stackTrace: string): boolean => {
-  return stackTrace !== ''
+const hasStackTrace = (item: { readonly stackTrace: string }): boolean => {
+  return item.stackTrace !== ''
 }
 
 const hasItems = (disposableStore: DisposableStore): boolean => {

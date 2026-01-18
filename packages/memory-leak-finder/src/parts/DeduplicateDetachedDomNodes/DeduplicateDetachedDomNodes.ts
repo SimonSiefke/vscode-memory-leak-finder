@@ -11,8 +11,8 @@ const compareNode = (a: DetachedDomNode, b: DetachedDomNode): number => {
 }
 
 export const deduplicatedDetachedDomNodes = (detachedDomNodes: readonly Record<string, unknown>[]): readonly DetachedDomNode[] => {
-  const countMap: { readonly [hash: string]: number } = Object.create(null)
-  const detachedDomNodeMap: { readonly [hash: string]: Record<string, unknown> } = Object.create(null)
+  const countMap: { [hash: string]: number } = Object.create(null)
+  const detachedDomNodeMap: { [hash: string]: Record<string, unknown> } = Object.create(null)
   for (const domNode of detachedDomNodes) {
     const hash = GetDomNodeHash.getDomNodeHash(domNode)
     detachedDomNodeMap[hash] = domNode
