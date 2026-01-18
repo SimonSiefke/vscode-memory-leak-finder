@@ -21,7 +21,92 @@ const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {
   }
 }
 
-export const connectElectron = async (electronRpc: RpcConnection, headlessMode: boolean) => {
+const SOCKET_PATH = '/tmp/function-tracker-socket'
+
+const protocolInterceptorScript = (socketPath: string): string => {
+  return `function() {
+  const electron = this
+  const { protocol } = electron
+  const net = require('net')
+  const fs = require('fs')
+  
+  const queryFunctionTracker = (url) => {
+    return new Promise((resolve) => {
+      const socket = net.createConnection('${socketPath}')
+      let responseData = ''
+      
+      socket.on('connect', () => {
+        const request = JSON.stringify({ type: 'transform', url })
+        socket.write(request)
+      })
+      
+      socket.on('data', (data) => {
+        responseData += data.toString()
+      })
+      
+      socket.on('end', () => {
+        try {
+          const response = JSON.parse(responseData)
+          if (response.type === 'transformed' && response.code) {
+            resolve(response.code)
+          } else {
+            resolve(null)
+          }
+        } catch (error) {
+          console.error('[ProtocolInterceptor] Error parsing response:', error)
+          resolve(null)
+        }
+      })
+      
+      socket.on('error', (error) => {
+        console.error('[ProtocolInterceptor] Socket error:', error)
+        resolve(null)
+      })
+      
+      setTimeout(() => {
+        socket.destroy()
+        resolve(null)
+      }, 5000)
+    })
+  }
+  
+  protocol.interceptBufferProtocol('vscode-file', async (request, callback) => {
+    const url = request.url
+    
+    if (url.includes('workbench.desktop.main.js')) {
+      try {
+        const transformedCode = await queryFunctionTracker(url)
+        if (transformedCode) {
+          callback({
+            data: Buffer.from(transformedCode, 'utf8'),
+            mimeType: 'application/javascript',
+          })
+          return
+        }
+      } catch (error) {
+        console.error('[ProtocolInterceptor] Error getting transformed code:', error)
+      }
+    }
+    
+    if (url.startsWith('vscode-file://vscode-app')) {
+      const filePath = url.slice('vscode-file://vscode-app'.length)
+      fs.readFile(filePath, (err, data) => {
+        if (err) {
+          callback({ error: -6 })
+        } else {
+          callback({ data, mimeType: 'application/javascript' })
+        }
+      })
+    } else {
+      callback({ error: -6 })
+    }
+  })
+  
+  return '${socketPath}'
+}`
+}
+
+export const connectElectron = async (electronRpc: RpcConnection, headlessMode: boolean, trackFunctions: boolean) => {
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
@@ -60,6 +145,15 @@ export const connectElectron = async (electronRpc: RpcConnection, headlessMode: 
       functionDeclaration: monkeyPatchElectronHeadlessMode,
       objectId: electronObjectId,
     })
+  }
+
+  // Inject protocol interceptor if function tracking is enabled
+  if (trackFunctions) {
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: protocolInterceptorScript(SOCKET_PATH),
+      objectId: electronObjectId,
+    })
+    console.log('[ConnectElectron] Injected protocol interceptor for function tracking')
   }
 
   await Promise.all([

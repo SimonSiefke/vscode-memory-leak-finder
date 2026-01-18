@@ -28,7 +28,7 @@ export const prepareBoth = async (
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode)
+  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode, trackFunctions)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 

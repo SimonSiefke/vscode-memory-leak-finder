@@ -88,25 +88,6 @@ export const launchVsCode = async ({
     await mkdir(sourcesDir, { recursive: true })
     const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
     
-    // Replace workbench.desktop.main.js with transformed version if function tracking is enabled
-    // Note: This is needed because Fetch domain cannot intercept vscode-file:// protocol requests
-    // The file will be loaded from disk, so we replace it before VS Code starts
-    let workbenchFileRestore: (() => Promise<void>) | null = null
-    if (trackFunctions) {
-      try {
-        // Use dynamic import with correct path
-        const functionTrackerModule = await import('../../../../function-tracker/src/parts/ReplaceWorkbenchFile/ReplaceWorkbenchFile.ts')
-        const result = await functionTrackerModule.replaceWorkbenchFile(binaryPath, platform)
-        workbenchFileRestore = result.restored
-        if (addDisposable && workbenchFileRestore) {
-          addDisposable(workbenchFileRestore)
-        }
-      } catch (error) {
-        console.error('[LaunchVsCode] Error replacing workbench file for function tracking:', error)
-        // Continue anyway - function tracking might still work via other means
-      }
-    }
-    
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
     if (clearExtensions) {
