@@ -1,4 +1,5 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import type { FileOperation } from '../src/parts/ApplyFileOperation/ApplyFileOperation.ts'
 
 const mockCopy = jest.fn()
 const mockMakeDirectory = jest.fn()
@@ -12,7 +13,7 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   writeFileContent: mockWriteFileContent,
 }))
 
-let applyFileOperationsModule
+let applyFileOperationsModule: typeof import('../src/parts/ApplyFileOperations/ApplyFileOperations.ts')
 
 beforeEach(async () => {
   // Reset all mocks
@@ -36,7 +37,7 @@ test('applyFileOperations handles empty array gracefully', async () => {
 test('applyFileOperations - applies copy operation', async () => {
   mockCopy.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
@@ -53,7 +54,7 @@ test('applyFileOperations - applies copy operation', async () => {
 test('applyFileOperations - applies mkdir operation', async () => {
   mockMakeDirectory.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       path: '/path/to/directory',
       type: 'mkdir',
@@ -69,7 +70,7 @@ test('applyFileOperations - applies mkdir operation', async () => {
 test('applyFileOperations - applies remove operation', async () => {
   mockRemove.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/path/to/file.txt',
       type: 'remove',
@@ -85,7 +86,7 @@ test('applyFileOperations - applies remove operation', async () => {
 test('applyFileOperations - applies write operation', async () => {
   mockWriteFileContent.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       content: 'new content',
       path: '/path/to/file.ts',
@@ -104,7 +105,7 @@ test('applyFileOperations - applies multiple operations in sequence', async () =
   mockMakeDirectory.mockReturnValue(undefined)
   mockRemove.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       path: '/path/to/directory',
       type: 'mkdir',
@@ -137,7 +138,7 @@ test('applyFileOperations - handles copy operation error', async () => {
     throw error
   })
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
@@ -154,7 +155,7 @@ test('applyFileOperations - handles mkdir operation error', async () => {
     throw error
   })
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       path: '/path/to/directory',
       type: 'mkdir',
@@ -170,7 +171,7 @@ test('applyFileOperations - handles remove operation error', async () => {
     throw error
   })
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/path/to/file.txt',
       type: 'remove',
@@ -187,7 +188,7 @@ test('applyFileOperations - stops on first error and does not continue with rema
   })
   mockMakeDirectory.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
@@ -209,7 +210,7 @@ test('applyFileOperations - stops on first error and does not continue with rema
 test('applyFileOperations - handles multiple copy operations', async () => {
   mockCopy.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/source1/file1.txt',
       to: '/dest1/file1.txt',
@@ -232,7 +233,7 @@ test('applyFileOperations - handles multiple copy operations', async () => {
 test('applyFileOperations - handles multiple mkdir operations', async () => {
   mockMakeDirectory.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       path: '/path1/directory1',
       type: 'mkdir',
@@ -253,7 +254,7 @@ test('applyFileOperations - handles multiple mkdir operations', async () => {
 test('applyFileOperations - handles multiple remove operations', async () => {
   mockRemove.mockReturnValue(undefined)
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/path1/file1.txt',
       type: 'remove',
@@ -279,7 +280,7 @@ test('applyFileOperations - handles mixed operations with errors', async () => {
     throw error
   })
 
-  const operations = [
+  const operations: FileOperation[] = [
     {
       from: '/source/file.txt',
       to: '/dest/file.txt',
