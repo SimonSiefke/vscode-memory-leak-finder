@@ -107,18 +107,12 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   let functionTrackerRpc: Awaited<ReturnType<typeof LaunchFunctionTrackerWorker.launchFunctionTrackerWorker>> | null = null
   if (trackFunctions) {
     functionTrackerRpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
-    // Connect function-tracker and undo monkey patch
-    // This ensures the window is paused until function-tracker is connected
-    await rpc.invoke(
-      'Initialize.connectFunctionTracker',
-      electronObjectId,
-      monkeyPatchedElectronId,
-      functionTrackerRpc,
-      devtoolsWebSocketUrl,
-      webSocketUrl,
-      connectionId,
-      measureId,
-    )
+    // Connect function-tracker devtools BEFORE undoing monkey patch
+    // This ensures the window is paused and we can intercept network requests
+    await functionTrackerRpc.invoke('FunctionTracker.connectDevtools', devtoolsWebSocketUrl, webSocketUrl, connectionId, measureId)
+    // Now undo the monkey patch to continue loading the window
+    // The function-tracker is already connected and will intercept network requests
+    await rpc.invoke('Initialize.connectFunctionTracker')
   }
 
   return {

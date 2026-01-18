@@ -3,7 +3,9 @@ import { connectDevtools } from '../ConnectDevtools/ConnectDevtools.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
-import { DevtoolsProtocolDebugger } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as ElectronRpcState from '../ElectronRpcState/ElectronRpcState.ts'
+import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
@@ -42,11 +44,22 @@ export const prepareBoth = async (
   // This ensures the page exists before we try to connect the function-tracker
   const { dispose, sessionId, targetId } = await connectDevtoolsPromise
 
-  // Don't undo monkey patch here - it will be done by ConnectFunctionTracker
-  // This keeps the window paused until function-tracker is connected
+  // Store electronRpc in state so ConnectFunctionTracker can access it
+  // Don't dispose it here - it will be disposed in ConnectFunctionTracker
+  ElectronRpcState.setElectronRpc(electronRpc, monkeyPatchedElectronId)
 
-  // Dispose browserRpc
-  await Promise.all([electronRpc.dispose(), dispose()])
+  if (!trackFunctions) {
+    // If not tracking, undo monkey patch immediately and dispose electronRpc
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+      objectId: monkeyPatchedElectronId,
+    })
+    await electronRpc.dispose()
+    ElectronRpcState.clearElectronRpc()
+  }
+
+  // Dispose browserRpc from connectDevtools
+  await dispose()
 
   return {
     devtoolsWebSocketUrl,

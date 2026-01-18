@@ -1,23 +1,23 @@
+import * as ElectronRpcState from '../ElectronRpcState/ElectronRpcState.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 
-export const connectFunctionTracker = async (
-  electronRpc: any,
-  monkeyPatchedElectronId: string,
-  functionTrackerRpc: any,
-  devtoolsWebSocketUrl: string,
-  webSocketUrl: string,
-  connectionId: number,
-  measureId: string,
-): Promise<void> => {
-  // Connect function-tracker devtools BEFORE undoing monkey patch
-  // This ensures the window is paused and we can intercept network requests
-  await functionTrackerRpc.invoke('FunctionTracker.connectDevtools', devtoolsWebSocketUrl, webSocketUrl, connectionId, measureId)
+export const connectFunctionTracker = async (): Promise<void> => {
+  const electronRpcState = ElectronRpcState.getElectronRpc()
+  if (!electronRpcState) {
+    throw new Error('electronRpc not found in state. Make sure PrepareBoth was called first.')
+  }
 
-  // Now undo the monkey patch to continue loading the window
-  // The function-tracker is already connected and will intercept network requests
+  const { electronRpc, monkeyPatchedElectronId } = electronRpcState
+
+  // Undo the monkey patch to continue loading the window
+  // The function-tracker should already be connected before this is called
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
     objectId: monkeyPatchedElectronId,
   })
+
+  // Dispose electronRpc after undoing monkey patch
+  await electronRpc.dispose()
+  ElectronRpcState.clearElectronRpc()
 }
