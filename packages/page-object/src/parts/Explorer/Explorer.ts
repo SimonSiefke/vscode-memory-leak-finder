@@ -110,7 +110,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     },
     async executeContextMenuCommand(locator, option) {
       await page.waitForIdle()
-      const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+      const contextMenu = ContextMenu.create({ electronApp, expect, page, platform, VError })
       await page.waitForIdle()
       await contextMenu.open(locator)
       await page.waitForIdle()
@@ -136,7 +136,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
+          electronApp,
           expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,
@@ -223,7 +225,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await page.waitForIdle()
         await this.openContextMenu(`1.txt`)
         await page.waitForIdle()
-        const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const contextMenu = ContextMenu.create({ electronApp, expect, page, platform, VError })
         await contextMenu.select('Open to the Side')
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
