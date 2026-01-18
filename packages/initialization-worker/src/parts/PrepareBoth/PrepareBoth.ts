@@ -139,8 +139,8 @@ export const prepareBoth = async (
             const lowerUrl = url.toLowerCase()
             const lowerPath = filePath.toLowerCase()
             
-            // Skip blob scripts
-            if (lowerUrl.includes('blob:') || lowerPath.includes('blob')) {
+            // Skip blob scripts - check if URL starts with blob: or contains blob: pattern
+            if (lowerUrl.startsWith('blob:') || lowerUrl.includes('blob:') || lowerPath.includes('blob')) {
               return true
             }
             
@@ -162,6 +162,18 @@ export const prepareBoth = async (
             return false
           }
           
+          // Check if file content indicates it should be skipped (e.g., blob scripts with specific patterns)
+          const shouldSkipByContent = (content) => {
+            if (typeof content !== 'string') {
+              return false
+            }
+            // Check for the specific pattern that indicates blob/worker scripts
+            if (content.includes('return p ? 0 : (performance.now() - b >= 1e3 && (p = !0), w <= 2 ? w : m(w - 1) + m(w - 2));')) {
+              return true
+            }
+            return false
+          }
+          
           // Set up protocol interceptor - will be called when app becomes ready
           const setupInterceptor = () => {
             if (!app.isReady()) {
@@ -173,6 +185,13 @@ export const prepareBoth = async (
             protocol.interceptBufferProtocol('vscode-file', async (request, callback) => {
               const url = request.url
               console.log('[ProtocolInterceptor] Intercepting vscode-file request:', url)
+              
+              // Check if URL starts with blob: - skip transformation for blob URLs
+              if (url.toLowerCase().startsWith('blob:')) {
+                console.log('[ProtocolInterceptor] Skipping blob URL:', url)
+                callback({ error: -6 })
+                return
+              }
               
               // Convert vscode-file://vscode-app to file path
               if (!url.startsWith('vscode-file://vscode-app')) {
@@ -197,32 +216,56 @@ export const prepareBoth = async (
               }
               
               // Check if we should skip transformation (blob scripts, workers, etc.)
-              if (shouldSkipTransformation(url, filePath)) {
+              const shouldSkip = shouldSkipTransformation(url, filePath)
+              
+              // Check if it's a JavaScript file (check the file path without query params)
+              const isJavaScript = filePath.endsWith('.js')
+              
+              if (shouldSkip) {
                 console.log('[ProtocolInterceptor] Skipping transformation for blob/worker script:', url)
                 // Fall through to read original file
-              } else {
-                // Check if it's a JavaScript file (check the file path without query params)
-                const isJavaScript = filePath.endsWith('.js')
-                
-                if (isJavaScript) {
-                  // Try to get transformed code from function tracker
-                  try {
-                    const transformedCode = await queryFunctionTracker(url)
-                    if (transformedCode) {
-                      console.log('[ProtocolInterceptor] Returning transformed code for:', url)
-                      callback({
-                        data: Buffer.from(transformedCode, 'utf8'),
-                        mimeType: 'application/javascript',
-                      })
-                      return
-                    }
-                  } catch (error) {
-                    console.error('[ProtocolInterceptor] Error getting transformed code:', error)
+              } else if (isJavaScript) {
+                // For JS files, read the original file first to check its content
+                fs.readFile(filePath, async (err, data) => {
+                  if (err) {
+                    console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
+                    callback({ error: -6 })
+                    return
                   }
-                }
+                  
+                  // Check if content indicates it should be skipped
+                  const content = data.toString('utf8')
+                  if (shouldSkipByContent(content)) {
+                    console.log('[ProtocolInterceptor] Skipping transformation based on content pattern:', url)
+                    const mimeType = getMimeType(filePath)
+                    callback({ data, mimeType })
+                    return
+                  }
+                  
+                  // Try to get transformed code from function tracker
+                 try {
+                   const transformedCode = await queryFunctionTracker(url)
+                   if (transformedCode) {
+                     console.log('[ProtocolInterceptor] Returning transformed code for:', url)
+                     callback({
+                       data: Buffer.from(transformedCode, 'utf8'),
+                       mimeType: 'application/javascript',
+                     })
+                     return
+                   }
+                 } catch (error) {
+                   console.error('[ProtocolInterceptor] Error getting transformed code:', error)
+                 }
+                 
+                 // Fall through: return original file
+                 const mimeType = getMimeType(filePath)
+                 console.log('[ProtocolInterceptor] Returning original JS file:', filePath)
+                 callback({ data, mimeType })
+               })
+               return
               }
               
-              // Fall through: read original file from disk
+              // Fall through: read original file from disk (for non-JS files or skipped files)
               fs.readFile(filePath, (err, data) => {
                 if (err) {
                   console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
