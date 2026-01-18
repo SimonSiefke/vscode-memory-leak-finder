@@ -79,6 +79,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     platform,
+    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,

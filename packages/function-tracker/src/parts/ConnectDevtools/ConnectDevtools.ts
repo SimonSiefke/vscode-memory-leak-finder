@@ -67,17 +67,30 @@ export const connectDevtools = async (
       try {
         // Replace the script source with transformed code
         // This must be done before the script executes
-        const result = await DevtoolsProtocolDebugger.setScriptSource(sessionRpc, {
-          scriptId,
-          scriptSource: transformedCode,
+        // Note: setScriptSource has limitations - it may not work for large scripts or scripts that have already executed
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('setScriptSource timeout')), 5000)
         })
-        if (result.result && result.result.stackChanged !== undefined) {
-          console.log(`[FunctionTracker] Successfully replaced script source (stackChanged: ${result.result.stackChanged})`)
+        const result = await Promise.race([
+          DevtoolsProtocolDebugger.setScriptSource(sessionRpc, {
+            scriptId,
+            scriptSource: transformedCode,
+          }),
+          timeoutPromise,
+        ])
+        if (result && typeof result === 'object' && 'result' in result) {
+          if (result.result && result.result.stackChanged !== undefined) {
+            console.log(`[FunctionTracker] Successfully replaced script source (stackChanged: ${result.result.stackChanged})`)
+          } else {
+            console.log(`[FunctionTracker] setScriptSource completed but result:`, JSON.stringify(result.result))
+          }
         } else {
-          console.log(`[FunctionTracker] setScriptSource returned:`, JSON.stringify(result, null, 2))
+          console.log(`[FunctionTracker] setScriptSource returned unexpected result:`, result)
         }
       } catch (error) {
         console.error(`[FunctionTracker] Error replacing script source:`, error)
+        console.error(`[FunctionTracker] Note: vscode-file:// protocol requests don't go through Fetch domain.`)
+        console.error(`[FunctionTracker] setScriptSource may not work for large scripts or scripts that have already executed.`)
         // Script might have already executed, or setScriptSource might not be supported
         // Fallback: tracking code is already injected via Page.addScriptToEvaluateOnNewDocument
         // but we can't replace the script source, so functions won't be tracked unless
