@@ -1,4 +1,6 @@
-export const create = ({ expect, ideVersion, page, VError }) => {
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, ideVersion, page, VError }: CreateParams.CreateParams) => {
   return {
     async openReplace() {
       try {

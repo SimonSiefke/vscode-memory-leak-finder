@@ -31,7 +31,9 @@ const getListId = (classNameString) => {
   throw new Error(`Failed to extract list id from explorer`)
 }
 
-export const create = ({ electronApp, expect, page, platform, VError }) => {
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
+
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async cancel() {
       try {

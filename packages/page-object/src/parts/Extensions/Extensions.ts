@@ -16,7 +16,9 @@ const getSelectAll = (platform: string): string => {
 const space = ' '
 const nonBreakingSpace = String.fromCharCode(160)
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async add({ expectedName, path }: { path: string; expectedName: string }) {
       try {

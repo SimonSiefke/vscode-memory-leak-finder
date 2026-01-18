@@ -1,10 +1,11 @@
 import { join } from 'path'
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WebView from '../WebView/WebView.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
 
   return {

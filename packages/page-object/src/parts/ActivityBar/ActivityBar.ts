@@ -40,7 +40,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await expect(activityBar).toBeVisible()
         const ariaLabel = 'Explorer'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
-        const contextMenu = ContextMenu.create({ expect, page, VError })
+        const contextMenu = ContextMenu.create({ expect, page, platform, VError })
         await contextMenu.open(activityBarItem)
         await contextMenu.openSubMenu('Move To', false)
         await contextMenu.select('Panel', false)

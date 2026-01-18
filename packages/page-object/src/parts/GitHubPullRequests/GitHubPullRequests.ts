@@ -1,10 +1,11 @@
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const indexDelta = 5
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async checkoutIndex(index: number): Promise<void> {
       try {
