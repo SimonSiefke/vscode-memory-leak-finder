@@ -11,30 +11,29 @@ const protocolInterceptorScript = (): string => {
     console.error('[ProtocolInterceptor] App is not ready yet')
     return
   }
-  
+
   // Intercept all vscode-file protocol requests and return <h1>hello world</h1>
   protocol.interceptBufferProtocol('vscode-file', (request, callback) => {
     console.log('[ProtocolInterceptor] Intercepting vscode-file request:', request.url)
-    const html = '<h1>hello world</h1>'
+    const html = \`<h1 style="color:red; font-size:200px; z-index:400;position:absolute">hello world</h1>\`
     callback({
       data: Buffer.from(html, 'utf8'),
       mimeType: 'text/html',
     })
   })
-  
+
   // Open DevTools when window shows
-  const originalInit = BrowserWindow.prototype._init
-  BrowserWindow.prototype._init = function () {
-    originalInit.call(this)
-    
-    // Open DevTools when window is ready to show
-    this.once('ready-to-show', () => {
-      console.log('[ProtocolInterceptor] Opening DevTools for window')
-      this.webContents.openDevTools()
-    })
-  }
-  
-  console.log('[ProtocolInterceptor] Protocol interceptor installed')
+  // const originalInit = BrowserWindow.prototype._init
+  // BrowserWindow.prototype._init = function () {
+  //   originalInit.call(this)
+
+  //   // Open DevTools when window is ready to show
+  //   this.once('ready-to-show', () => {
+  //     console.log('[ProtocolInterceptor] Opening DevTools for window')
+  //     this.webContents.openDevTools()
+  //   })
+  // }
+
 }`
 }
 
@@ -61,10 +60,10 @@ export const connectFunctionTracker = async (): Promise<void> => {
       expression: 'globalThis._____electron',
       returnByValue: false,
     })
-    
+
     // The result structure can vary, check both possible structures
     const objectId = electronGlobal?.objectId || electronGlobal?.result?.objectId || electronGlobal?.result?.result?.objectId
-    
+
     if (objectId) {
       await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
         functionDeclaration: protocolInterceptorScript(),
@@ -72,7 +71,10 @@ export const connectFunctionTracker = async (): Promise<void> => {
       })
       console.log('[ConnectFunctionTracker] Injected protocol interceptor for function tracking')
     } else {
-      console.error('[ConnectFunctionTracker] Could not get electron object ID from globalThis._____electron', JSON.stringify(electronGlobal, null, 2))
+      console.error(
+        '[ConnectFunctionTracker] Could not get electron object ID from globalThis._____electron',
+        JSON.stringify(electronGlobal, null, 2),
+      )
     }
   } catch (error) {
     console.error('[ConnectFunctionTracker] Error injecting protocol interceptor:', error)
