@@ -33,7 +33,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async toggle() {
       try {
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.TogglePanelVisibilty)
       } catch (error) {
         throw new VError(error, `Failed to toggle panel`)

@@ -12,5 +12,3 @@ export type CreateParams = {
   readonly platform: string
   readonly VError: any
 }
-
-export const asCreateParams = (params: any): CreateParams => params as CreateParams

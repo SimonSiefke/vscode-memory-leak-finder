@@ -22,9 +22,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await page.waitForIdle()
         await actionLabel.click()
         await page.waitForIdle()
-        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError } as any))
+        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError }))
         await contextMenu.select('Change Icon...')
-        const iconSelect = IconSelect.create(CreateParams.asCreateParams({ expect, page, VError } as any))
+        const iconSelect = IconSelect.create(CreateParams.asCreateParams({ expect, page, VError }))
         await iconSelect.select(toIcon)
         await page.waitForIdle()
         const newIcon = actionLabel.locator(`.codicon-${toIcon}`)
@@ -37,7 +37,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async clear() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
         await page.waitForIdle()
       } catch (error) {
@@ -46,7 +46,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async clearTerminal() {
       try {
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
       } catch (error) {
         throw new VError(error, `Failed to clear terminal`)
@@ -55,7 +55,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async hideQuickPick() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.close()
       } catch (error) {
         throw new VError(error, `Failed to close task quickpick`)
@@ -64,7 +64,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.ConfigureTask, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -88,7 +88,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async openQuickPick({ item }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.RunTask, {
           stayVisible: true,
         })
@@ -100,7 +100,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async openRun() {
       try {
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
         // await quickPick.select('Create tasks.json file from template', true)
@@ -140,7 +140,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const errorDecorations = page.locator('.terminal-command-decoration.codicon-terminal-decoration-error')
         await expect(errorDecorations).toHaveCount(0)
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.ReRunLastTask)
         if (hasError) {
           await expect(errorDecorations).toHaveCount(1)
@@ -152,7 +152,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async run(taskName: string) {
       try {
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
         await quickPick.select(taskName)
@@ -183,7 +183,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async runError({ scanType, taskName }: { taskName: string; scanType: string }) {
       try {
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
         const hasScanType = Boolean(scanType)
@@ -217,7 +217,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async selectQuickPickItem({ item }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.RunTask, {
           stayVisible: true,
         })

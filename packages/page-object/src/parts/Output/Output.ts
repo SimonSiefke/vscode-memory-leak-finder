@@ -64,7 +64,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       try {
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
-        const panel = Panel.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const panel = Panel.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await panel.hide()
         await expect(outputView).toBeHidden()
       } catch (error) {
@@ -83,7 +83,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         await page.waitForIdle()
         await moreActions.click()
         await page.waitForIdle()
-        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError } as any))
+        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError }))
         await contextMenu.shouldHaveItem('Open Output in Editor')
         await contextMenu.select('Open Output in Editor')
         await page.waitForIdle()
@@ -105,7 +105,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         if (current === channelName) {
           return
         }
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.SelectOutputChannel, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -136,7 +136,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.OutputFocusOnOutputView)
         await page.waitForIdle()
         await expect(outputView).toBeVisible()

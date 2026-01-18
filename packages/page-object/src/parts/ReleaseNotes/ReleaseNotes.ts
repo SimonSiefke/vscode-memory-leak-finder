@@ -8,7 +8,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const webView = page.locator('.webview.ready')
         await expect(webView).toBeHidden()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError } as any))
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await page.waitForIdle()
         await quickPick.show({
           pressKeyOnce: true,
