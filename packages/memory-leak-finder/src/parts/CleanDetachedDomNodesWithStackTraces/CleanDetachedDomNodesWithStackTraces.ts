@@ -43,7 +43,7 @@ const mergeOriginal = (nodes: readonly DetachedDomNode[], cleanInstances: readon
   return merged
 }
 
-export const cleanDetachedDomNodesWithStackTraces = async (nodes, scriptMap) => {
+export const cleanDetachedDomNodesWithStackTraces = async (nodes: readonly DetachedDomNode[], scriptMap: unknown): Promise<readonly DetachedDomNode[]> => {
   const stackTraces = nodes.map((node: DetachedDomNode) => node.stackTrace)
   const fullQuery = GetEventListenersQuery.getEventListenerQuery(stackTraces, scriptMap)
   const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)

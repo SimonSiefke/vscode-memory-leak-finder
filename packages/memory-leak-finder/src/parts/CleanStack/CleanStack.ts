@@ -1,4 +1,4 @@
-const isTestWorkerLine = (line) => {
+const isTestWorkerLine = (line: string): boolean => {
   if (line.includes('test-worker/src')) {
     return true
   }
@@ -77,7 +77,7 @@ const getRelevantLines = (lines, stack) => {
   return relevantLines
 }
 
-export const cleanStack = (stack, { root = '' } = {}) => {
+export const cleanStack = (stack: string | null | undefined, { root = '' }: { root?: string } = {}): string => {
   if (!stack) {
     return ''
   }

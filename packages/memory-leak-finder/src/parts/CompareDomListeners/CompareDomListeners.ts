@@ -1,6 +1,14 @@
 import * as Arrays from '../Arrays/Arrays.ts'
 
-const getHash = (node) => {
+type DomListenerNode = {
+  readonly type: string
+  readonly disposed: boolean
+  readonly handlerName: string
+  readonly nodeDescription: string
+  readonly [key: string]: unknown
+}
+
+const getHash = (node: DomListenerNode): string => {
   return `${node.type}:${node.disposed}:${node.handlerName}:${node.nodeDescription}`
 }
 
@@ -40,7 +48,7 @@ export const compareDomListeners = (before, after) => {
     newCountMap[hash]++
   }
   const unique = getUnique(after)
-  const leaked: any[] = []
+  const leaked: LeakedDomListener[] = []
   for (const item of unique) {
     const hash = getHash(item)
     const oldCount = oldCountMap[hash] || 0

@@ -1,6 +1,12 @@
 import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.ts'
 
-export const compareDetachedDomNodes = (before, after) => {
+type DetachedDomNode = {
+  readonly description: string
+  readonly count: number
+  readonly [key: string]: unknown
+}
+
+export const compareDetachedDomNodes = (before: readonly unknown[], after: readonly unknown[]): { after: readonly DetachedDomNode[]; before: readonly DetachedDomNode[] } => {
   const prettyBefore = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(before)
   const prettyAfter = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(after)
   return {

@@ -1,4 +1,10 @@
-const hasStackTrace = (stackTrace) => {
+type DisposableStore = {
+  readonly length: number
+  readonly [index: number]: { readonly stackTrace: string }
+  readonly some: (predicate: (item: { readonly stackTrace: string }) => boolean) => boolean
+}
+
+const hasStackTrace = (stackTrace: string): boolean => {
   return stackTrace !== ''
 }
 
@@ -16,7 +22,7 @@ const prettifyDisposableStores = (disposableStores) => {
   return sortedStores
 }
 
-export const compareDisposableStores = (before, after) => {
+export const compareDisposableStores = (before: readonly DisposableStore[], after: readonly DisposableStore[]): { after: readonly DisposableStore[]; before: readonly DisposableStore[] } => {
   const prettyBefore = prettifyDisposableStores(before)
   const prettyAfter = prettifyDisposableStores(after)
   return {

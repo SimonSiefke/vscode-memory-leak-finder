@@ -1,4 +1,4 @@
-export const compareCount = (before, after) => {
+export const compareCount = (before: number, after: number): { after: number; before: number } => {
   return {
     after,
     before,

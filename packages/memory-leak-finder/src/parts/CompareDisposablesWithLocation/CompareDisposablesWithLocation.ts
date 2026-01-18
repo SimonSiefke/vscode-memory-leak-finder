@@ -1,8 +1,15 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as ImproveDisposableOutput from '../ImproveDisposableOutput/ImproveDisposableOutput.ts'
 
-const addDeltas = (prettyBefore, prettyAfter) => {
-  const newItems: any[] = []
+type DisposableItem = {
+  readonly count: number
+  readonly location?: string
+  readonly name: string
+  readonly [key: string]: unknown
+}
+
+const addDeltas = (prettyBefore: readonly DisposableItem[], prettyAfter: readonly DisposableItem[]): readonly (DisposableItem & { delta: number })[] => {
+  const newItems: (DisposableItem & { delta: number })[] = []
   const countMap = Object.create(null)
   for (const item of prettyBefore) {
     countMap[item.name] = item.count

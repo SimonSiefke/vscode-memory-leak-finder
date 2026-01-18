@@ -10,7 +10,7 @@ const compareFunction = (a: FunctionLocation, b: FunctionLocation): number => {
   return b.count - a.count || a.name.localeCompare(b.name)
 }
 
-export const cleanFunctionLocations = (names: readonly string[], counts: readonly number[], functionLocations: readonly unknown[]): readonly FunctionLocation[] => {
+export const cleanFunctionLocations = (names: readonly string[], counts: readonly number[], functionLocations: readonly Record<string, unknown>[]): readonly FunctionLocation[] => {
   const instances: FunctionLocation[] = []
   for (let i = 0; i < functionLocations.length; i++) {
     const name = names[i]

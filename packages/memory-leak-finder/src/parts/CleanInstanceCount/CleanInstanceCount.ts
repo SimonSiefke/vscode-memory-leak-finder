@@ -10,14 +10,14 @@ const getStack = (url: string | null | undefined, lineNumber: number, columnNumb
   return [formattedUrl]
 }
 
-const getSourceMaps = (sourceMapUrl) => {
+const getSourceMaps = (sourceMapUrl: string | null | undefined): readonly string[] => {
   if (!sourceMapUrl) {
     return []
   }
   return [sourceMapUrl]
 }
 
-export const cleanInstanceCount = (instance: unknown, constructorLocation: { scriptId: string; lineNumber: number; columnNumber: number }, scriptMap: unknown) => {
+export const cleanInstanceCount = (instance, constructorLocation, scriptMap) => {
   Assert.object(instance)
   Assert.object(constructorLocation)
   Assert.object(scriptMap)
