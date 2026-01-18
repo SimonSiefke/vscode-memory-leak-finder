@@ -201,7 +201,7 @@ export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, wait
     if (waitForElement && toBeVisible(waitForElement, {} as any)) {
       return
     }
-    const element = QuerySelector.querySelector(locator.selector)
+    const element = QuerySelector.querySelector(locator.selector) as any
     fn(element, { text: '' })
     fn(element, { text })
     current *= exponentialFactor
@@ -272,8 +272,8 @@ export const type = (text) => {
   fn(document.activeElement, { text })
 }
 
-export const getValue = (locator) => {
-  const element = QuerySelector.querySelector(locator.selector)
+export const getValue = (locator: any) => {
+  const element = QuerySelector.querySelector(locator.selector) as HTMLInputElement
   if (!element) {
     throw new Error(`element not found`)
   }
