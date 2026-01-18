@@ -123,22 +123,21 @@ export const connectFunctionTracker = async (): Promise<void> => {
 
   // Now that app is ready, inject protocol interceptor
   // Use globalThis._____electron which was set by MakeElectronAvailableGlobally
-  await DevtoolsProtocolRuntime.evaluate(electronRpc, {
-    expression: `(function() {
-      const electron = globalThis._____electron
-      if (!electron) {
-        console.error('[ConnectFunctionTracker] electron is not available in globalThis')
-        return
-      }
-      const { protocol, app } = electron
-      if (!app.isReady()) {
-        console.error('[ConnectFunctionTracker] App is not ready')
-        return
-      }
-      ${protocolInterceptorScript(SOCKET_PATH).replace(/^function\(\) \{/, '').replace(/\}$/, '')}
-    })()`,
+  // We need to get the electron object ID first
+  const electronGlobal = await DevtoolsProtocolRuntime.evaluate(electronRpc, {
+    expression: 'globalThis._____electron',
+    returnByValue: false,
   })
-  console.log('[ConnectFunctionTracker] Injected protocol interceptor for function tracking')
+  
+  if (electronGlobal.result.objectId) {
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: protocolInterceptorScript(SOCKET_PATH),
+      objectId: electronGlobal.result.objectId,
+    })
+    console.log('[ConnectFunctionTracker] Injected protocol interceptor for function tracking')
+  } else {
+    console.error('[ConnectFunctionTracker] Could not get electron object ID from globalThis._____electron')
+  }
 
   // Dispose electronRpc after injecting protocol interceptor
   await electronRpc.dispose()
