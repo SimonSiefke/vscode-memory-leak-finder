@@ -52,7 +52,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async clickLink({ href }) {
       try {
         await page.waitForIdle()
-        const webView = WebView.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,
@@ -139,7 +139,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async show({ port }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -161,7 +161,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await expect(tab).toHaveCount(1)
         await page.waitForIdle()
 
-        const webView = WebView.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,

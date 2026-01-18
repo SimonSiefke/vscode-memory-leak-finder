@@ -8,7 +8,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const webView = page.locator('.webview.ready')
         await expect(webView).toBeHidden()
-        const quickPick = QuickPick.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await page.waitForIdle()
         await quickPick.show({
           pressKeyOnce: true,
