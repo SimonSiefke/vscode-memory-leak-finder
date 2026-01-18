@@ -57,8 +57,8 @@ export const connectDevtools = async (
   })
   console.log('[FunctionTracker] Injected tracking code via Page.addScriptToEvaluateOnNewDocument')
 
-  // Enable Debugger domain to intercept script parsing and replace workbench.desktop.main.js
-  await DevtoolsProtocolDebugger.enable(sessionRpc)
+  // Set up Debugger.scriptParsed handler BEFORE enabling Debugger domain
+  // This ensures we catch the event when the script is parsed
   sessionRpc.on('Debugger.scriptParsed', async (event: any) => {
     const { url, scriptId } = event.params
     if (url && url.includes('workbench.desktop.main.js') && transformedCode) {
@@ -71,13 +71,23 @@ export const connectDevtools = async (
           scriptId,
           scriptSource: transformedCode,
         })
-        console.log(`[FunctionTracker] Successfully replaced script source`)
+        if (result.result && result.result.stackChanged !== undefined) {
+          console.log(`[FunctionTracker] Successfully replaced script source (stackChanged: ${result.result.stackChanged})`)
+        } else {
+          console.log(`[FunctionTracker] setScriptSource returned:`, JSON.stringify(result, null, 2))
+        }
       } catch (error) {
         console.error(`[FunctionTracker] Error replacing script source:`, error)
         // Script might have already executed, or setScriptSource might not be supported
+        // Fallback: tracking code is already injected via Page.addScriptToEvaluateOnNewDocument
+        // but we can't replace the script source, so functions won't be tracked unless
+        // the transformed code file is used
       }
     }
   })
+
+  // Enable Debugger domain to intercept script parsing and replace workbench.desktop.main.js
+  await DevtoolsProtocolDebugger.enable(sessionRpc)
 
   // Set up event listener BEFORE enabling Fetch domain
   // This ensures we don't miss any events
