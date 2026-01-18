@@ -8,7 +8,7 @@ export const click = (element: Element, options: MouseEventInit & { button?: num
   mutableOptions.cancelable = true
   mutableOptions.bubbles = true
   let buttonValue: number | 'right' | undefined = options.button
-  if (buttonValue === 'right') {
+  if (buttonValue === 'right' as const) {
     buttonValue = 2
     mutableOptions.button = 2
   }

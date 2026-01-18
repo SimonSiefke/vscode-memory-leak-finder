@@ -42,14 +42,14 @@ const Time = {
 
 const maxTimeout = 2000
 
-export const performAction = async (locator: any, fnName: string, options: any): Promise<void> => {
+export const performAction = async (locator: Locator, fnName: string, options: unknown): Promise<void> => {
   Assert.object(locator)
   Assert.string(fnName)
   Assert.object(options)
   const startTime = Time.getTimeStamp()
   const endTime = startTime + maxTimeout
   let currentTime = startTime
-  const fn = (ElementAction as { [key: string]: (element: Element, options: unknown) => void })[fnName]
+  const fn = (ElementAction as unknown as { [key: string]: (element: Element, options: unknown) => void })[fnName]
   if (!fn) {
     throw new Error(`action ${fnName} not found`)
   }
@@ -65,9 +65,12 @@ export const performAction = async (locator: any, fnName: string, options: any):
   throw new Error(`element not found ${locator.selector}`)
 }
 
-export const performKeyBoardAction = (fnName: string, options: any): void => {
-  const fn = KeyBoardActions[fnName]
-  fn(options)
+export const performKeyBoardAction = (fnName: string, options: KeyboardEventInit): void => {
+  if (fnName === 'press') {
+    KeyBoardActions.press(options)
+  } else {
+    throw new Error(`keyboard action ${fnName} not found`)
+  }
 }
 
 type Locator = {
@@ -79,7 +82,7 @@ export const checkSingleElementCondition = async (locator: Locator, fnName: stri
   Assert.string(fnName)
   Assert.object(options)
   const startTime = Time.getTimeStamp()
-  const timeout = options.timeout || maxTimeout
+  const timeout = (options as { timeout?: number }).timeout || maxTimeout
   const endTime = startTime + timeout
   let currentTime = startTime
   const fn = SingleElementConditionMap.getFunction(fnName)
@@ -164,7 +167,7 @@ export const checkMultiElementCondition = async (locator: Locator, fnName: strin
   throw new AssertionError(message)
 }
 
-export const pressKeyExponential = async ({ key, timeout = maxTimeout, waitFor }) => {
+export const pressKeyExponential = async ({ key, timeout = maxTimeout, waitFor }: { key: string; timeout?: number; waitFor: Locator }): Promise<void> => {
   Assert.string(key)
   Assert.object(waitFor)
   const locator = waitFor
@@ -178,7 +181,7 @@ export const pressKeyExponential = async ({ key, timeout = maxTimeout, waitFor }
   while (currentTime < endTime) {
     KeyBoardActions.press(keyboardEventOptions)
     const element = QuerySelector.querySelector(locator.selector)
-    if (element && toBeVisible(element, {} as any)) {
+    if (element && toBeVisible(element, {})) {
       return
     }
     current *= exponentialFactor
@@ -189,7 +192,7 @@ export const pressKeyExponential = async ({ key, timeout = maxTimeout, waitFor }
   throw new AssertionError(message)
 }
 
-export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, waitFor }) => {
+export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, waitFor }: { locator: Locator; text: string; timeout?: number; waitFor: Locator }): Promise<void> => {
   Assert.object(locator)
   Assert.string(text)
   Assert.object(waitFor)
@@ -199,15 +202,17 @@ export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, wait
   let currentTime = startTime
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   let current = 1
-  const fn = ElementAction['setValue']
+  const fn = ElementAction.setValue
   while (currentTime < endTime) {
     const waitForElement = QuerySelector.querySelector(waitFor.selector)
-    if (waitForElement && toBeVisible(waitForElement, {} as any)) {
+    if (waitForElement && toBeVisible(waitForElement, {})) {
       return
     }
     const element = QuerySelector.querySelector(locator.selector)
-    fn(element, { text: '' })
-    fn(element, { text })
+    if (element && (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) {
+      fn(element, { text: '' })
+      fn(element, { text })
+    }
     current *= exponentialFactor
     await Timeout.waitForMutation(document.body, current)
     currentTime = Time.getTimeStamp()
@@ -216,7 +221,7 @@ export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, wait
   throw new AssertionError(message)
 }
 
-export const clickExponential = async ({ button = '', locator, timeout = maxTimeout, waitFor, waitForHidden }) => {
+export const clickExponential = async ({ button = '', locator, timeout = maxTimeout, waitFor, waitForHidden }: { button?: string; locator: Locator; timeout?: number; waitFor?: Locator; waitForHidden?: Locator }): Promise<void> => {
   const exponentialFactor = 2
   const startTime = Time.getTimeStamp()
   const endTime = startTime + timeout
@@ -224,9 +229,10 @@ export const clickExponential = async ({ button = '', locator, timeout = maxTime
   const toBeHidden = SingleElementConditionMap.getFunction('toBeHidden')
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   let current = 1
-  const clickOptions = {
+  const buttonValue: number | 'right' = button === 'right' ? 'right' : (button ? Number.parseInt(button, 10) : 0)
+  const clickOptions: MouseEventInit & { button?: number | 'right' } = {
     bubbles: true,
-    button,
+    button: buttonValue,
   }
   while (currentTime < endTime) {
     const element = QuerySelector.querySelector(locator.selector)
@@ -235,12 +241,12 @@ export const clickExponential = async ({ button = '', locator, timeout = maxTime
     }
     if (waitFor) {
       const visibleElement = QuerySelector.querySelector(waitFor.selector)
-      if (visibleElement && toBeVisible(visibleElement, {} as any)) {
+      if (visibleElement && toBeVisible(visibleElement, {})) {
         return
       }
     } else if (waitForHidden) {
       const hiddenElement = QuerySelector.querySelector(waitForHidden.selector)
-      if (!hiddenElement || toBeHidden(hiddenElement, {} as any)) {
+      if (!hiddenElement || toBeHidden(hiddenElement, {})) {
         return
       }
     }
@@ -257,7 +263,7 @@ export const clickExponential = async ({ button = '', locator, timeout = maxTime
   throw new AssertionError(message)
 }
 
-export const pressKey = async (key) => {
+export const pressKey = async (key: string): Promise<void> => {
   Assert.string(key)
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
   KeyBoardActions.press(keyboardEventOptions)
@@ -270,26 +276,32 @@ export const pressKey = async (key) => {
   }
 }
 
-export const type = (text) => {
+export const type = (text: string): void => {
   Assert.string(text)
   const fn = ElementAction.type
-  fn(document.activeElement, { text })
+  const activeElement = document.activeElement
+  if (activeElement && (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement)) {
+    fn(activeElement, { text })
+  }
 }
 
-export const getValue = (locator) => {
+export const getValue = (locator: Locator): string => {
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
     throw new Error(`element not found`)
   }
-  return element.value
+  if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    return element.value
+  }
+  throw new Error(`element is not an input or textarea`)
 }
 
-export const contentEditableInsert = ({ value }) => {
+export const contentEditableInsert = ({ value }: { value: string }): void => {
   // TODO find non-deprecated alternative
   document.execCommand('insertText', false, value)
 }
 
-export const boundingBox = (locator) => {
+export const boundingBox = (locator: Locator): { height: number; width: number; x: number; y: number } => {
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
     throw new Error(`element not found ${locator.selector}`)
@@ -315,7 +327,7 @@ const getTextFromSheet = (style: HTMLStyleElement) => {
   return all.join('\n')
 }
 
-export const getTextContent = async (locator, { allowHidden = false } = {}) => {
+export const getTextContent = async (locator: Locator, { allowHidden = false }: { allowHidden?: boolean } = {}): Promise<string | null> => {
   Assert.object(locator)
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
@@ -340,31 +352,31 @@ export const getTextContent = async (locator, { allowHidden = false } = {}) => {
   return text
 }
 
-export const getAttribute = async (locator, attributeName) => {
+export const getAttribute = async (locator: Locator, attributeName: string): Promise<string | null> => {
   Assert.object(locator)
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
     throw new Error(`element not found ${locator.selector}`)
   }
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
-  if (!toBeVisible(element, {} as any)) {
+  if (!toBeVisible(element, {})) {
     throw new Error(`must be visible`)
   }
   const attributeValue = element.getAttribute(attributeName)
   return attributeValue
 }
 
-export const isVisible = async (locator) => {
+export const isVisible = async (locator: Locator): Promise<boolean> => {
   Assert.object(locator)
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
     return false
   }
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
-  return toBeVisible(element, {} as any)
+  return toBeVisible(element, {})
 }
 
-export const count = (locator) => {
+export const count = (locator: Locator): number => {
   Assert.object(locator)
   const elements = QuerySelector.querySelectorAll(locator.selector)
   const count = elements.length
@@ -377,7 +389,7 @@ const mouseState = {
   y: 0,
 }
 
-const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
+const pointerLikeEvent = (element: Element, pointerEventType: string, mouseEventType: string, x: number, y: number): void => {
   const button = 0
   const buttons = 0
   const bubbles = true
@@ -410,7 +422,7 @@ export const mouseDown = async (): Promise<void> => {
   pointerLikeEvent(element, DomEventType.PointerDown, DomEventType.MouseDown, x, y)
 }
 
-export const mouseMove = async (x, y) => {
+export const mouseMove = async (x: number, y: number): Promise<void> => {
   Assert.number(x)
   Assert.number(y)
   if (x < 0) {

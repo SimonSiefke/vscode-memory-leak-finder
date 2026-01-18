@@ -18,12 +18,15 @@ const addDeltas = (prettyBefore: readonly DisposableItem[], prettyAfter: readonl
     const { count, location, name } = item
     const oldCount = countMap[item.name] || 0
     const delta = count - oldCount
-    newItems.push({
+    const newItem: DisposableItem & { delta: number } = {
       count,
       delta,
-      location,
       name,
-    })
+    }
+    if (location !== undefined) {
+      newItem.location = location
+    }
+    newItems.push(newItem)
   }
   return newItems
 }

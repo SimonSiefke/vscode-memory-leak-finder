@@ -5,7 +5,7 @@ const isTestWorkerLine = (line: string): boolean => {
   return false
 }
 
-const isInternal = (line) => {
+const isInternal = (line: string): boolean => {
   if (line.includes('node:')) {
     return true
   }
@@ -50,7 +50,7 @@ const cleanLine = (line: string): string => {
   return line
 }
 
-const getCleanLines = (lines) => {
+const getCleanLines = (lines: readonly string[]): string[] => {
   return lines.map(cleanLine)
 }
 

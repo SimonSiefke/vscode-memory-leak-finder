@@ -5,7 +5,7 @@ import { test, expect } from '@jest/globals'
 import * as QuerySelectorAllInternalEnterFrame from '../src/parts/QuerySelectorAllInternalEnterFrame/QuerySelectorAllInternalEnterFrame.ts'
 
 test('no elements found', () => {
-  const roots = []
+  const roots: readonly Element[] = []
   expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots, '', '')).toEqual([])
 })
 
@@ -27,7 +27,7 @@ test('select inside iframe', () => {
       querySelectorAll() {},
     },
     nodeName: 'IFRAME',
-  }
-  const roots = [element]
+  } as unknown as Element
+  const roots: readonly Element[] = [element]
   expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots, '', '')).toEqual([element.contentDocument])
 })

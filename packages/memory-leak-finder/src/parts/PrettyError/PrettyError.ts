@@ -6,7 +6,7 @@ import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
 import * as FileSystem from '../FileSystem/FileSystem.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
 
-const getActualPath = (fileUri) => {
+const getActualPath = (fileUri: string): string => {
   if (fileUri.startsWith('file://')) {
     return fileURLToPath(fileUri)
   }
@@ -15,7 +15,7 @@ const getActualPath = (fileUri) => {
 
 const RE_MODULE_NOT_FOUND_STACK = /Cannot find package '([^']+)' imported from (.+)$/
 
-const prepareModuleNotFoundError = (error) => {
+const prepareModuleNotFoundError = (error: Error & { stack?: string }): { codeFrame: string; message: string; stack: string } => {
   const { message } = error
   const match = message.match(RE_MODULE_NOT_FOUND_STACK)
   if (!match) {
@@ -106,7 +106,7 @@ const getCodeFrame = (cleanedStack, { color }) => {
   }
 }
 
-export const prepare = async (error, { color = true, root = '' } = {}) => {
+export const prepare = async (error: Error & { code?: string; codeFrame?: string; cause?: () => Error | undefined; message?: string; stack?: string }, { color = true, root = '' }: { color?: boolean; root?: string } = {}): Promise<{ codeFrame: string; message: string; stack: string }> => {
   if (error && error.code === ErrorCodes.ERR_MODULE_NOT_FOUND) {
     return prepareModuleNotFoundError(error)
   }

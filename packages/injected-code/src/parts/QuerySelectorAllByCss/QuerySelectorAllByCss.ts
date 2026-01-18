@@ -7,7 +7,7 @@ const querySelectorRoot = (root: Element, body: string): Element[] => {
   return Array.from(nodeList)
 }
 
-export const querySelectorAll = (roots: readonly Element[], body: string): Element[] => {
+export const querySelectorAll = (roots: readonly Element[], body: string, _selector: string): Element[] => {
   Assert.array(roots)
   Assert.string(body)
   return roots.flatMap((root) => {

@@ -12,7 +12,7 @@ export const toBeVisible = (element: Element): boolean => {
   return element.isConnected
 }
 
-export const toBeHidden = (element) => {
+export const toBeHidden = (element: Element) => {
   if (typeof element.checkVisible === 'function') {
     return !element.checkVisible()
   }
