@@ -2,7 +2,7 @@ import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
   return {
-    async click(label) {
+    async click(label: string) {
       try {
         const item = page.locator(`[aria-label="${label}"]`).first()
         await item.click()
@@ -44,7 +44,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to hide status bar item "${id}"`)
       }
     },
-    async selectItem(id) {
+    async selectItem(id: string) {
       try {
         const selector = this.getSelector(id)
         const item = page.locator(selector).first()
@@ -54,7 +54,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Failed to select status bar item`)
       }
     },
-    async showItem(id) {
+    async showItem(id: string) {
       try {
         await page.waitForIdle()
         const selector = this.getSelector(id)

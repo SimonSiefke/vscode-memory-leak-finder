@@ -25,7 +25,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
       }
     },
     isFirst: false,
-    async sendMessage({ message, verify = true }) {
+    async sendMessage({ message, verify = true }: { message: string; verify?: boolean }) {
       const terminal = page.locator('.terminal.xterm')
       await expect(terminal).toBeVisible()
       await page.waitForIdle()

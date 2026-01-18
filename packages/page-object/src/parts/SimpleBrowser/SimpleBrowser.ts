@@ -34,7 +34,7 @@ const createMockServer = async ({ port }: { port: number }): Promise<MockServer>
 
 import * as CreateParams from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async addElementToChat({ selector: _selector }: { selector: string }) {
       try {
@@ -49,10 +49,10 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to add element to chat`)
       }
     },
-    async clickLink({ href }) {
+    async clickLink({ href }: { href: string }) {
       try {
         await page.waitForIdle()
-        const webView = WebView.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,
@@ -82,7 +82,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to click link ${href}`)
       }
     },
-    async createMockServer({ id, port }) {
+    async createMockServer({ id, port }: { id: string; port: number }) {
       try {
         await page.waitForIdle()
         const server = await createMockServer({ port })
@@ -92,7 +92,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to create mock server`)
       }
     },
-    async disposeMockServer({ id }) {
+    async disposeMockServer({ id }: { id: string }) {
       try {
         const server = this.mockServers[id]
         await server[Symbol.asyncDispose]()
@@ -139,7 +139,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async show({ port }: { port: number }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -161,7 +161,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await expect(tab).toHaveCount(1)
         await page.waitForIdle()
 
-        const webView = WebView.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,

@@ -5,7 +5,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
-    async expandStep(name) {
+    async expandStep(name: string) {
       try {
         const step = page.locator(`.getting-started-step[data-step-id="${name}"]`)
         await expect(step).toHaveAttribute('aria-expanded', 'false')

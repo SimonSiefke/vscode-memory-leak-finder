@@ -14,7 +14,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       const workbench = page.locator('.monaco-workbench')
       await expect(workbench).toBeVisible()
     },
-    async shouldHaveEditorBackground(color) {
+    async shouldHaveEditorBackground(color: string) {
       try {
         const workbench = page.locator('.monaco-workbench')
         await expect(workbench).toHaveCss('--vscode-editor-background', color, {

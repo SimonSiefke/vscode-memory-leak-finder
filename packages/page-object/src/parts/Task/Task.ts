@@ -6,7 +6,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
-    async changeIcon(fromIcon, toIcon) {
+    async changeIcon(fromIcon: string, toIcon: string) {
       try {
         await page.waitForIdle()
         const terminalActions = page.locator('[aria-label="Terminal actions"]')
@@ -85,7 +85,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to open task`)
       }
     },
-    async openQuickPick({ item }) {
+    async openQuickPick({ item }: { item: string }) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
@@ -238,7 +238,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to select quickpick item`)
       }
     },
-    async unpin(name) {
+    async unpin(name: string) {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()

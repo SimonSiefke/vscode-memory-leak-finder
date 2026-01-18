@@ -16,7 +16,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, 'Failed to focus test explorer')
       }
     },
-    async runAllTests({ expectedRowCount, expectedTestOutputRowCount }) {
+    async runAllTests({ expectedRowCount, expectedTestOutputRowCount }: { expectedRowCount: number; expectedTestOutputRowCount: number }) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })

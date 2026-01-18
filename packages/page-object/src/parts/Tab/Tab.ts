@@ -2,7 +2,7 @@ import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
   return {
-    async openContextMenu(label) {
+    async openContextMenu(_label: string) {
       try {
         await page.waitForIdle()
         const tab = page.locator('.tab', { hasText: 'file.txt' })

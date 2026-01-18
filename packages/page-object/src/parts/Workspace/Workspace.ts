@@ -10,13 +10,13 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
-    async add(file) {
+    async add(file: { name: string; content: string }) {
       const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, file.name)
       await mkdir(dirname(absolutePath), { recursive: true })
       await writeFile(absolutePath, file.content)
     },
-    async addExtension(name) {
+    async addExtension(name: string) {
       try {
         const electron = Electron.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         const extensionsFolder = join(Root.root, '.vscode-extensions-source', name)
@@ -32,7 +32,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         throw new VError(error, `Failed to add extension ${name}`)
       }
     },
-    getWorkspaceFilePath(relativePath) {
+    getWorkspaceFilePath(relativePath: string): string {
       const filePath = join(Root.root, '.vscode-test-workspace', relativePath)
       return filePath
     },
@@ -46,12 +46,12 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
       await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
       await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
     },
-    async remove(file) {
+    async remove(file: string) {
       const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, file)
       await rm(absolutePath, { force: true, recursive: true })
     },
-    async setFiles(files) {
+    async setFiles(files: Array<{ name: string; content: string }>) {
       await page.waitForIdle()
       const workspace = join(Root.root, '.vscode-test-workspace')
       const dirents = await readdir(workspace)
@@ -66,7 +66,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
       }
       await page.waitForIdle()
     },
-    async waitForFile(fileName) {
+    async waitForFile(fileName: string): Promise<boolean> {
       const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, fileName)
       if (existsSync(absolutePath)) {

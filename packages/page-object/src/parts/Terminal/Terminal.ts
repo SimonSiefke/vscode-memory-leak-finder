@@ -3,7 +3,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as Workspace from '../Workspace/Workspace.ts'
 
-const cleanup = async ({ page, row1 }) => {
+const cleanup = async ({ page, row1 }: { page: any; row1: any }) => {
   for (let i = 0; i < 50; i++) {
     await page.waitForIdle()
     await page.keyboard.press('Backspace')
@@ -15,7 +15,7 @@ const cleanup = async ({ page, row1 }) => {
   }
 }
 
-const waitForTerminalReady = async ({ page, row1 }) => {
+const waitForTerminalReady = async ({ page, row1 }: { page: any; row1: any }): Promise<boolean> => {
   for (let i = 0; i < 50; i++) {
     await page.waitForIdle()
     await page.keyboard.press('a')

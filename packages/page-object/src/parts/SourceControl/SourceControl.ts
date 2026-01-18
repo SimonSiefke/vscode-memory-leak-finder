@@ -3,7 +3,7 @@ import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const getMatchingText = async (styleElements, className) => {
+const getMatchingText = async (styleElements: any, className: string): Promise<string> => {
   const [first, second] = className.split(' ')
   const styleCount = await styleElements.count()
   for (let i = 0; i < styleCount; i++) {
@@ -101,7 +101,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       await contextMenu.select(name)
       await page.waitForIdle()
     },
-    async enableInlineBlame({ expectedDecoration }) {
+    async enableInlineBlame({ expectedDecoration }: { expectedDecoration: RegExp }) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
@@ -209,7 +209,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to select branch "${branchName}"`)
       }
     },
-    async shouldHaveHistoryItem(name) {
+    async shouldHaveHistoryItem(name: string) {
       try {
         const history = page.locator('[aria-label="Source Control History"]')
         await expect(history).toBeVisible()
@@ -219,7 +219,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to verify history item`)
       }
     },
-    async shouldHaveUnstagedFile(name) {
+    async shouldHaveUnstagedFile(name: string) {
       try {
         const changesPart = page.locator('[role="treeitem"][aria-label="Changes"]')
         await expect(changesPart).toBeVisible()
@@ -229,7 +229,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to check unstaged file`)
       }
     },
-    async shouldNotHaveHistoryItem(name) {
+    async shouldNotHaveHistoryItem(name: string) {
       try {
         const history = page.locator('[aria-label="Source Control History"]')
         await expect(history).toBeVisible()
@@ -324,7 +324,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to undo last commit`)
       }
     },
-    async unstageFile(name) {
+    async unstageFile(name: string) {
       try {
         const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitUnstageAllChanges)

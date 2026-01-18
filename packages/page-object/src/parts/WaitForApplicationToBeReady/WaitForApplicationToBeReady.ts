@@ -1,7 +1,7 @@
 import * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Terminal from '../Terminal/Terminal.ts'
 
-const isDevtoolsCannotFindContextError = (error) => {
+const isDevtoolsCannotFindContextError = (error: any): boolean => {
   return (
     error.name === 'DevtoolsProtocolError' &&
     (error.message === 'Cannot find context with specified id' || error.message === 'uniqueContextId not found')
