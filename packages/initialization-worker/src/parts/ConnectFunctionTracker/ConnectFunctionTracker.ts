@@ -2,107 +2,27 @@ import * as ElectronRpcState from '../ElectronRpcState/ElectronRpcState.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 
-const SOCKET_PATH = '/tmp/function-tracker-socket'
-
-const protocolInterceptorScript = (socketPath: string): string => {
+const protocolInterceptorScript = (): string => {
   return `function() {
   const electron = this
   const { protocol, app } = electron
   // Wait for app to be ready before intercepting protocol
   if (!app.isReady()) {
     console.error('[ProtocolInterceptor] App is not ready yet')
-    return '${socketPath}'
+    return
   }
-  // Capture require in a closure so it's available when protocol handler is called
-  // Try to get require from globalThis._____require first, fallback to global.require
-  let requireFn = globalThis._____require
-  if (!requireFn || typeof requireFn !== 'function') {
-    // Try global.require as fallback
-    if (typeof global !== 'undefined' && global.require) {
-      requireFn = global.require
-    }
-  }
-  if (!requireFn || typeof requireFn !== 'function') {
-    console.error('[ProtocolInterceptor] require is not available or not a function', typeof requireFn, requireFn)
-    return '${socketPath}'
-  }
-  // Capture net and fs modules in closure
-  const net = requireFn('net')
-  const fs = requireFn('fs')
   
-  const queryFunctionTracker = (url) => {
-    return new Promise((resolve) => {
-      const socket = net.createConnection('${socketPath}')
-      let responseData = ''
-      
-      socket.on('connect', () => {
-        const request = JSON.stringify({ type: 'transform', url })
-        socket.write(request)
-      })
-      
-      socket.on('data', (data) => {
-        responseData += data.toString()
-      })
-      
-      socket.on('end', () => {
-        try {
-          const response = JSON.parse(responseData)
-          if (response.type === 'transformed' && response.code) {
-            resolve(response.code)
-          } else {
-            resolve(null)
-          }
-        } catch (error) {
-          console.error('[ProtocolInterceptor] Error parsing response:', error)
-          resolve(null)
-        }
-      })
-      
-      socket.on('error', (error) => {
-        console.error('[ProtocolInterceptor] Socket error:', error)
-        resolve(null)
-      })
-      
-      setTimeout(() => {
-        socket.destroy()
-        resolve(null)
-      }, 5000)
+  // Intercept all vscode-file protocol requests and return <h1>hello world</h1>
+  protocol.interceptBufferProtocol('vscode-file', (request, callback) => {
+    console.log('[ProtocolInterceptor] Intercepting vscode-file request:', request.url)
+    const html = '<h1>hello world</h1>'
+    callback({
+      data: Buffer.from(html, 'utf8'),
+      mimeType: 'text/html',
     })
-  }
-  
-  protocol.interceptBufferProtocol('vscode-file', async (request, callback) => {
-    const url = request.url
-    
-    if (url.includes('workbench.desktop.main.js')) {
-      try {
-        const transformedCode = await queryFunctionTracker(url)
-        if (transformedCode) {
-          callback({
-            data: Buffer.from(transformedCode, 'utf8'),
-            mimeType: 'application/javascript',
-          })
-          return
-        }
-      } catch (error) {
-        console.error('[ProtocolInterceptor] Error getting transformed code:', error)
-      }
-    }
-    
-    if (url.startsWith('vscode-file://vscode-app')) {
-      const filePath = url.slice('vscode-file://vscode-app'.length)
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          callback({ error: -6 })
-        } else {
-          callback({ data, mimeType: 'application/javascript' })
-        }
-      })
-    } else {
-      callback({ error: -6 })
-    }
   })
   
-  return '${socketPath}'
+  console.log('[ProtocolInterceptor] Protocol interceptor installed')
 }`
 }
 
@@ -135,7 +55,7 @@ export const connectFunctionTracker = async (): Promise<void> => {
     
     if (objectId) {
       await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-        functionDeclaration: protocolInterceptorScript(SOCKET_PATH),
+        functionDeclaration: protocolInterceptorScript(),
         objectId: objectId,
       })
       console.log('[ConnectFunctionTracker] Injected protocol interceptor for function tracking')

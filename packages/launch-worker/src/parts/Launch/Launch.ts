@@ -116,11 +116,9 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
       pid,
     )
 
-  // Connect function-tracker devtools AFTER the page is created
-  if (trackFunctions && functionTrackerRpc) {
-    await functionTrackerRpc.invoke('FunctionTracker.connectDevtools', devtoolsWebSocketUrl, webSocketUrl, connectionId, measureId)
-    // Now undo the monkey patch to continue loading the window
-    // The protocol interceptor is already injected and will intercept network requests
+  // Set up function-tracker protocol interceptor
+  if (trackFunctions) {
+    // The protocol interceptor will intercept vscode-file protocol requests
     await rpc.invoke('Initialize.connectFunctionTracker')
   }
 
