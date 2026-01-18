@@ -2,7 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
 import * as GetSourceMapUrlFromScriptMap from '../GetSourceMapUrlFromScriptMap/GetSourceMapUrlFromScriptMap.ts'
 
-const getStack = (url, lineNumber, columnNumber) => {
+const getStack = (url: string | null | undefined, lineNumber: number, columnNumber: number): readonly string[] => {
   if (!url) {
     return []
   }
@@ -17,7 +17,7 @@ const getSourceMaps = (sourceMapUrl) => {
   return [sourceMapUrl]
 }
 
-export const cleanInstanceCount = (instance, constructorLocation, scriptMap) => {
+export const cleanInstanceCount = (instance: unknown, constructorLocation: { scriptId: string; lineNumber: number; columnNumber: number }, scriptMap: unknown) => {
   Assert.object(instance)
   Assert.object(constructorLocation)
   Assert.object(scriptMap)
