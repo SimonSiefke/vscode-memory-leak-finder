@@ -27,6 +27,7 @@ const protocolInterceptorScript = (socketPath: string): string => {
   return `function() {
   const electron = this
   const { protocol } = electron
+  const require = globalThis._____require
   const net = require('net')
   const fs = require('fs')
   
