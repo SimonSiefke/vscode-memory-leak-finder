@@ -176,16 +176,24 @@ export const buildAstForNode = (
       }
     }
     if (nodeTypeName === 'code') {
-      const codeNode: CodeNode = { id, name, type: 'code' }
-      if (columnValue !== undefined) codeNode.column = columnValue
-      if (lineValue !== undefined) codeNode.line = lineValue
-      if (scriptIdValue !== undefined) codeNode.scriptId = scriptIdValue
+      const codeNode: CodeNode = {
+        id,
+        name,
+        type: 'code',
+        ...(columnValue !== undefined && { column: columnValue }),
+        ...(lineValue !== undefined && { line: lineValue }),
+        ...(scriptIdValue !== undefined && { scriptId: scriptIdValue }),
+      }
       return codeNode
     }
-    const closureNode: CodeNode = { id, name, type: 'closure' }
-    if (columnValue !== undefined) closureNode.column = columnValue
-    if (lineValue !== undefined) closureNode.line = lineValue
-    if (scriptIdValue !== undefined) closureNode.scriptId = scriptIdValue
+    const closureNode: CodeNode = {
+      id,
+      name,
+      type: 'closure',
+      ...(columnValue !== undefined && { column: columnValue }),
+      ...(lineValue !== undefined && { line: lineValue }),
+      ...(scriptIdValue !== undefined && { scriptId: scriptIdValue }),
+    }
     return closureNode
   }
 

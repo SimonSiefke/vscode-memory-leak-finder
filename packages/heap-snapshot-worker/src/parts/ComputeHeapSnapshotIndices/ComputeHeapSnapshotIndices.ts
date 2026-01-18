@@ -1,13 +1,6 @@
 type NodeTypes = [readonly string[]]
 type EdgeTypes = [readonly string[]]
 
-/**
- * @param {readonly any[]} node_types
- * @param {readonly any[]} node_fields
- * @param {readonly any[]} edge_types
- * @param {readonly any[]} edge_fields
- * @returns {Object}
- */
 export const computeHeapSnapshotIndices = (node_types: NodeTypes, node_fields: readonly string[], edge_types: EdgeTypes, edge_fields: readonly string[]) => {
   // Type indices
   const objectTypeIndex = node_types[0].indexOf('object')
