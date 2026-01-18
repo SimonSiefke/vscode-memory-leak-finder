@@ -2,7 +2,12 @@ import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtoc
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
-const getMatchingContext = (contexts: Record<string, any>, utilityExecutionContextName: string) => {
+type ExecutionContext = {
+  readonly name: string
+  readonly [key: string]: unknown
+}
+
+const getMatchingContext = (contexts: Record<string, ExecutionContext>, utilityExecutionContextName: string): ExecutionContext | undefined => {
   for (const value of Object.values(contexts)) {
     if (value.name === utilityExecutionContextName) {
       return value
@@ -11,7 +16,7 @@ const getMatchingContext = (contexts: Record<string, any>, utilityExecutionConte
   return undefined
 }
 
-export const addUtilityExecutionContext = async (rpc, utilityExecutionContextName, frameId) => {
+export const addUtilityExecutionContext = async (rpc: { invoke: (method: string, ...args: readonly unknown[]) => Promise<unknown> }, utilityExecutionContextName: string, frameId: string): Promise<ExecutionContext> => {
   const contexts = Object.create(null)
 
   const executionContextPromise = waitForUtilityExecutionContext(rpc, utilityExecutionContextName, contexts)

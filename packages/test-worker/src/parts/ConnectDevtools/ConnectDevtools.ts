@@ -77,7 +77,7 @@ export const connectDevtools = async (
     evaluateInDefaultContext(item) {
       throw new Error(`not implemented`)
     },
-    evaluateInUtilityContext(item) {},
+    evaluateInUtilityContext(item: unknown) {},
     expect: Expect.expect,
     ideVersion: parsedIdeVersion,
     page: firstWindow,

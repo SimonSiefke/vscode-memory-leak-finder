@@ -11,9 +11,14 @@ import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
-const emptyRpc = {
-  async dispose() {},
-  invoke() {
+type Rpc = {
+  dispose(): Promise<void>
+  invoke(method: string, ...params: readonly unknown[]): Promise<unknown>
+}
+
+const emptyRpc: Rpc = {
+  async dispose(): Promise<void> {},
+  async invoke(): Promise<never> {
     throw new Error(`not implemented`)
   },
 }
@@ -40,7 +45,7 @@ export const prepareBoth = async (
 
   // Launch function tracker worker and connect devtools BEFORE resuming debugger
   // This ensures request interception is set up before JavaScript files are loaded
-  let functionTrackerRpc = emptyRpc
+  let functionTrackerRpc: Rpc = emptyRpc
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
   if (trackFunctions) {
     const functionTrackerUrl = GetFunctionTrackerUrl.getFunctionTrackerUrl()

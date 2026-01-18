@@ -5,9 +5,14 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
  * @param {any} ipc
  * @returns
  */
-export const createRpc = (ipc, canUseIdleCallback) => {
+type Ipc = {
+  onmessage: ((message: unknown) => void) | null
+  send(message: unknown): void
+}
+
+export const createRpc = (ipc: Ipc, canUseIdleCallback: boolean) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message) => {
+  const handleMessage = (message: unknown) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
