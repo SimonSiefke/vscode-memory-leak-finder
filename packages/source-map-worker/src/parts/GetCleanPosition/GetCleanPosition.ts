@@ -12,21 +12,10 @@ export const getCleanPosition = (position: Position | null | undefined): Positio
   if (!position) {
     return undefined
   }
-  const { source, sourcesHash, column, line, name } = position
-  const result: Position = {
+  const { source, sourcesHash } = position
+  return {
+    ...position,
     source: CleanSource.cleanSource(source),
+    sourcesHash,
   }
-  if (sourcesHash !== undefined && sourcesHash !== null) {
-    result.sourcesHash = sourcesHash
-  }
-  if (column !== undefined && column !== null) {
-    result.column = column
-  }
-  if (line !== undefined && line !== null) {
-    result.line = line
-  }
-  if (name !== undefined && name !== null) {
-    result.name = name
-  }
-  return result
 }
