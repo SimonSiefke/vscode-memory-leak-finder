@@ -1,6 +1,6 @@
 import * as ActuallyDispatchEvent from '../ActuallyDispatchEvent/ActuallyDispatchEvent.ts'
 import * as DomEventType from '../DomEventType/DomEventType.ts'
 
-export const dblclick = (element: any, options: any) => {
+export const dblclick = (element: Element, options: MouseEventInit) => {
   ActuallyDispatchEvent.actuallyDispatchEvent(element, DomEventType.DoubleClick, options)
 }

@@ -1,4 +1,4 @@
-export const getStyleValue = (element, key) => {
+export const getStyleValue = (element: Element, key: string): string | undefined => {
   const style = getComputedStyle(element)
   if (key.startsWith('--')) {
     const rawValue = style.getPropertyValue(key)

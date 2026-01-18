@@ -16,5 +16,5 @@ export const invoke = async (method: string, ...params: unknown[]): Promise<unkn
   if (!state.rpc) {
     throw new Error(`cli process rpc is not available`)
   }
-  await state.rpc.invoke(method, ...params)
+  return await state.rpc.invoke(method, ...params)
 }

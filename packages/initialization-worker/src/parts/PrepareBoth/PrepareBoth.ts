@@ -1,13 +1,22 @@
 import type { MessagePort } from 'node:worker_threads'
+import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { connectDevtools } from '../ConnectDevtools/ConnectDevtools.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetFunctionTrackerUrl from '../GetFunctionTrackerUrl/GetFunctionTrackerUrl.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
+
+const emptyRpc = {
+  async dispose() {},
+  invoke() {
+    throw new Error(`not implemented`)
+  },
+}
 
 export const prepareBoth = async (
   headlessMode: boolean,
@@ -29,9 +38,22 @@ export const prepareBoth = async (
 
   const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode)
 
-  await DevtoolsProtocolDebugger.resume(electronRpc)
-
+  // Launch function tracker worker and connect devtools BEFORE resuming debugger
+  // This ensures request interception is set up before JavaScript files are loaded
+  let functionTrackerRpc = emptyRpc
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
+  if (trackFunctions) {
+    const functionTrackerUrl = GetFunctionTrackerUrl.getFunctionTrackerUrl()
+    functionTrackerRpc = await NodeWorkerRpcParent.create({
+      commandMap: {},
+      execArgv: [],
+      path: functionTrackerUrl,
+      stdio: 'inherit',
+    })
+    await functionTrackerRpc.invoke('FunctionTracker.connectDevtools', devtoolsWebSocketUrl, webSocketUrl, connectionId, measureId)
+  }
+
+  await DevtoolsProtocolDebugger.resume(electronRpc)
 
   const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
 
@@ -52,6 +74,7 @@ export const prepareBoth = async (
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
+    functionTrackerRpc,
     monkeyPatchedElectronId,
     sessionId,
     targetId,

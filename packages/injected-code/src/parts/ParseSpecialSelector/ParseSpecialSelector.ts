@@ -3,7 +3,7 @@ import * as SpecialSelectorPrefix from '../SpecialSelectorPrefix/SpecialSelector
 
 const specialSelectors = Object.values(SpecialSelectorPrefix)
 
-export const parseSpecialSelector = (selector, i) => {
+export const parseSpecialSelector = (selector: string, i: number): string => {
   const part = selector.slice(i)
   for (const specialSelector of specialSelectors) {
     if (part.startsWith(specialSelector)) {

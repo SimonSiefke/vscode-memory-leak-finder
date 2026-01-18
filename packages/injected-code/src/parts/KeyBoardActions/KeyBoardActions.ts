@@ -2,7 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as DispatchEvent from '../DispatchEvent/DispatchEvent.ts'
 import { isInputElement } from '../ElementActionType/ElementActionType.ts'
 
-const getAllOptions = (options) => {
+const getAllOptions = (options: KeyboardEventInit) => {
   if (options.key === ' ' || options.key === 'Space') {
     return [
       {
@@ -56,11 +56,11 @@ const getAllOptions = (options) => {
   return allOptions
 }
 
-const isSpaceLike = (key) => {
+const isSpaceLike = (key: string) => {
   return key === ' ' || key === 'Space'
 }
 
-export const press = (options, element = document.activeElement) => {
+export const press = (options: KeyboardEventInit, element: Element | null = document.activeElement) => {
   if (!element) {
     throw new Error(`element not found`)
   }
