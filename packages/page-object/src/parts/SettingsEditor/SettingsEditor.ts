@@ -40,7 +40,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to add item to settings editor`)
       }
     },
-    async applyFilter({ filterName, filterText }: { filterName: string; filterText: string }) {
+    async applyFilter({ filterName, filterText: _filterText }: { filterName: string; filterText: string }) {
       try {
         await page.waitForIdle()
         const settingsFilter = page.locator('[aria-label="Filter Settings"]')
@@ -345,7 +345,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to open select`)
       }
     },
-    async setTextInput({ name, value, type = 'text' }) {
+    async setTextInput({ name, value, type = 'text' }: { name: string; value: string; type?: string }) {
       try {
         await page.waitForIdle()
         const settingItem = page.locator(`.setting-item-contents[data-key="${name}"]`)

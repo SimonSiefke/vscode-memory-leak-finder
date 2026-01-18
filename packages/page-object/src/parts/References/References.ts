@@ -34,7 +34,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         throw new VError(error, `Expected references to be visible`)
       }
     },
-    async shouldHaveMessage(message) {
+    async shouldHaveMessage(message: string) {
       try {
         await page.waitForIdle()
         const messageItem = page.locator('.sidebar .tree-explorer-viewlet-tree-view .message')

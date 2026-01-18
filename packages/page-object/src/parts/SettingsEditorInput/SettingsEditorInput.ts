@@ -3,7 +3,7 @@ import * as Character from '../Character/Character.ts'
 
 export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
   return {
-    async shouldHaveText(text) {
+    async shouldHaveText(text: string) {
       try {
         await page.waitForIdle()
         const settingsHeader = page.locator('.settings-header')

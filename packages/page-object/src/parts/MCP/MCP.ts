@@ -243,7 +243,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
       try {
         for (const [key, value] of Object.entries(servers)) {
           await value.dispose()
-          delete servers[key as string]
+          delete servers[Number.parseInt(key)]
         }
         const storagePath = join(root, '.vscode-user-data-dir', 'User')
         const mcpPath = join(storagePath, 'mcp.json')

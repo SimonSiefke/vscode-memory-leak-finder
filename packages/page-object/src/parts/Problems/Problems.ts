@@ -16,7 +16,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to hide problems`)
       }
     },
-    async shouldHaveCount(count) {
+    async shouldHaveCount(count: number) {
       try {
         const problemsBadge = page.locator('[role="tab"] [aria-label^="Problems"] + .badge')
         const badgeContent = problemsBadge.locator('.badge-content')

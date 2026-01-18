@@ -44,7 +44,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         const server = Server.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         const serverInfo = await server.start({
           port,
-          requestHandler(req, res) {
+          requestHandler(_req, res) {
             res.end('Hello World')
           },
         })

@@ -16,7 +16,7 @@ import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
-    async searchFor(searchValue) {
+    async searchFor(searchValue: string) {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         const input = keyBindingsEditor.locator('.keybindings-header input')

@@ -13,7 +13,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         throw new VError(error, `Failed to close diff editor`)
       }
     },
-    async open(files) {
+    async open(files: string[]) {
       try {
         if (files.length < 2) {
           throw new Error('MultiDiffEditor requires at least 2 files')

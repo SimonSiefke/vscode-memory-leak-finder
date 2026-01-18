@@ -4,7 +4,7 @@ import * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput
 
 export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
   return {
-    async select({ completionName, completionText }) {
+    async select({ completionName, completionText }: { completionName: string; completionText: string }) {
       try {
         await page.waitForIdle()
         const suggest = page.locator('.settings-header .suggest-input-container .suggest-widget')
@@ -17,7 +17,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         await row.click()
         await page.waitForIdle()
         await expect(suggest).toBeHidden()
-        const settingsEditorInput = SettingsEditorInput.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
+        const settingsEditorInput = SettingsEditorInput.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: '', VError })
         await settingsEditorInput.shouldHaveText(`${completionText}${Character.NonBreakingSpace}`)
       } catch (error) {
         throw new VError(error, `Failed to select completion ${completionName}`)

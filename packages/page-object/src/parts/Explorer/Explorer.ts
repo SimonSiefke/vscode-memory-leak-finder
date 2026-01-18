@@ -358,7 +358,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         throw new VError(error, `Failed to verify that explorer has focused dirent "${direntName}"`)
       }
     },
-    async shouldHaveItem(direntName) {
+    async shouldHaveItem(direntName: string) {
       return this.toHaveItem(direntName)
     },
     async toHaveItem(direntName: string) {

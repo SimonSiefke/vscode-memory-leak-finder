@@ -11,7 +11,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to close quick pick`)
       }
     },
-    async executeCommand(command, { pressKeyOnce = false, stayVisible = false } = {}) {
+    async executeCommand(command: string, { pressKeyOnce = false, stayVisible = false } = {}) {
       try {
         await page.waitForIdle()
         await this.showCommands({ pressKeyOnce })
@@ -83,7 +83,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to hide quick pick`)
       }
     },
-    async openFile(fileName) {
+    async openFile(fileName: string) {
       try {
         await page.waitForIdle()
         await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform || '') })
@@ -185,7 +185,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to show quick pick`)
       }
     },
-    async type(value) {
+    async type(value: string) {
       try {
         const quickPick = page.locator('.quick-input-widget')
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')

@@ -3,7 +3,7 @@ import * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput
 
 export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
   return {
-    async select({ filterName, filterText }) {
+    async select({ filterName, filterText }: { filterName: string; filterText: string }) {
       try {
         await page.waitForIdle()
         const settingsFilter = page.locator('[aria-label="Filter Settings"]')
@@ -22,7 +22,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         })
         await page.waitForIdle()
         await expect(menu).toBeHidden()
-        const settingsEditorInput = SettingsEditorInput.create({ expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
+        const settingsEditorInput = SettingsEditorInput.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: '', VError })
         await settingsEditorInput.shouldHaveText(filterText)
       } catch (error) {
         throw new VError(error, `Failed to select filter ${filterName}`)

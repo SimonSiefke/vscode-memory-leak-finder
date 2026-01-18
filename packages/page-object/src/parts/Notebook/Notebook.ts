@@ -5,7 +5,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WebView from '../WebView/WebView.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
 
   return {
@@ -56,7 +56,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
           await quickPick.select(/\.venv/, true)
         }
         if (expectedOutput) {
-          const webView = WebView.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
+          const webView = WebView.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: '', VError })
           const notebookOutput = await webView.shouldBeVisible2({
             extensionId: '',
             hasLineOfCodeCounter: false,

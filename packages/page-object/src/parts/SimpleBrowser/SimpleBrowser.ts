@@ -7,7 +7,7 @@ interface MockServer {
   [Symbol.asyncDispose]: () => Promise<void>
 }
 
-const createMockServer = async ({ port }): Promise<MockServer> => {
+const createMockServer = async ({ port }: { port: number }): Promise<MockServer> => {
   const server = createServer((req, res) => {
     if (req.url === '/page-b') {
       res.statusCode = 200
@@ -36,7 +36,7 @@ import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
-    async addElementToChat({ selector }) {
+    async addElementToChat({ selector: _selector }: { selector: string }) {
       try {
         await page.waitForIdle()
         const add = page.locator('.element-selection-message')
@@ -101,7 +101,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to dispose mock server`)
       }
     },
-    async mockElectronDebugger({ selector }) {
+    async mockElectronDebugger({ selector: _selector }: { selector: string }) {
       try {
         await page.waitForIdle()
         const add = page.locator('.element-selection-message')
@@ -115,7 +115,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       }
     },
     mockServers: Object.create(null),
-    async shouldHaveTabTitle({ title }) {
+    async shouldHaveTabTitle({ title }: { title: string }) {
       try {
         await page.waitForIdle()
         const tab = page.locator('.tab', { hasText: `Simple Browser` })
@@ -136,7 +136,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to verify tab title ${title}`)
       }
     },
-    async show({ port }) {
+    async show({ port }: { port: number }) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })

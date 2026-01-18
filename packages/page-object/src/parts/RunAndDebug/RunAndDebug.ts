@@ -50,7 +50,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to remove all breakpoints`)
       }
     },
-    async runAndWaitForDebugConsoleOutput({ debugConfiguration, debugLabel, output }) {
+    async runAndWaitForDebugConsoleOutput({ debugConfiguration, debugLabel, output }: { debugConfiguration: string; debugLabel: string; output?: string }) {
       try {
         const quickPick = QuickPick.create({
           electronApp: undefined,
@@ -73,7 +73,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to run debugger`)
       }
     },
-    async runAndWaitForPaused({ callStackSize, debugConfiguration, debugLabel, file, hasCallStack, line, viaIcon }) {
+    async runAndWaitForPaused({ callStackSize, debugConfiguration, debugLabel, file, hasCallStack, line, viaIcon }: { callStackSize: number; debugConfiguration: string; debugLabel: string; file: string; hasCallStack?: boolean; line: number; viaIcon?: boolean }) {
       try {
         const quickPick = QuickPick.create({
           electronApp: undefined,
@@ -86,12 +86,12 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await page.waitForIdle()
         await this.startRunAndDebug({ debugConfiguration, debugLabel, viaIcon })
-        await this.waitForPaused({ callStackSize, file, hasCallStack, line })
+        await this.waitForPaused({ callStackSize, file, hasCallStack: hasCallStack === undefined ? undefined : hasCallStack, line })
       } catch (error) {
         throw new VError(error, `Failed to run debugger`)
       }
     },
-    async setPauseOnExceptions({ pauseOnCaughtExceptions, pauseOnExceptions }) {
+    async setPauseOnExceptions({ pauseOnCaughtExceptions, pauseOnExceptions }: { pauseOnCaughtExceptions: boolean; pauseOnExceptions: boolean }) {
       try {
         await page.waitForIdle()
         const breakpoints = page.locator('.debug-breakpoints')
@@ -321,7 +321,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to stop`)
       }
     },
-    async waitForDebugConsoleOutput({ output }) {
+    async waitForDebugConsoleOutput({ output: _output }: { output: string }) {
       try {
         await page.waitForIdle()
         const repl = page.locator('.repl')
@@ -334,7 +334,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to wait for debug console output`)
       }
     },
-    async waitForPaused({ callStackSize, file, hasCallStack = true, line }) {
+    async waitForPaused({ callStackSize, file, hasCallStack = true, line }: { callStackSize?: number; file: string; hasCallStack?: boolean; line: number }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       await expect(continueButton).toBeVisible({ timeout: 30_000 })
@@ -370,7 +370,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       await expect(editor).toBeFocused()
       await page.waitForIdle()
     },
-    async waitForPausedOnException({ exception = false, file, line }) {
+    async waitForPausedOnException({ exception = false, file, line }: { exception?: boolean; file: string; line: number }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       await expect(continueButton).toBeVisible({ timeout: 30_000 })

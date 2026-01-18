@@ -277,7 +277,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         await page.waitForIdle()
       },
     },
-    async selectMcpItem({ name }) {
+    async selectMcpItem({ name }: { name: string }) {
       try {
         const list = page.locator('.monaco-list[aria-label="MCP Servers"]')
         await expect(list).toBeVisible()
