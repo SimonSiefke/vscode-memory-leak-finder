@@ -55,9 +55,84 @@ export const prepareBoth = async (
       const objectId = electronGlobal?.objectId || electronGlobal?.result?.objectId || electronGlobal?.result?.result?.objectId
 
       if (objectId) {
+        const SOCKET_PATH = '/tmp/function-tracker-socket'
         const protocolInterceptorScript = `function() {
           const electron = this
           const { protocol, app, BrowserWindow } = electron
+          
+          // Get require function
+          let requireFn = globalThis._____require
+          if (!requireFn || typeof requireFn !== 'function') {
+            if (typeof global !== 'undefined' && global.require) {
+              requireFn = global.require
+            }
+          }
+          if (!requireFn || typeof requireFn !== 'function') {
+            console.error('[ProtocolInterceptor] require is not available')
+            return
+          }
+          
+          const net = requireFn('net')
+          const fs = requireFn('fs')
+          const path = requireFn('path')
+          
+          // Query function tracker for transformed code
+          const queryFunctionTracker = (url) => {
+            return new Promise((resolve) => {
+              const socket = net.createConnection('${SOCKET_PATH}')
+              let responseData = ''
+              
+              socket.on('connect', () => {
+                const request = JSON.stringify({ type: 'transform', url })
+                socket.write(request)
+              })
+              
+              socket.on('data', (data) => {
+                responseData += data.toString()
+              })
+              
+              socket.on('end', () => {
+                try {
+                  const response = JSON.parse(responseData)
+                  if (response.type === 'transformed' && response.code) {
+                    resolve(response.code)
+                  } else {
+                    resolve(null)
+                  }
+                } catch (error) {
+                  console.error('[ProtocolInterceptor] Error parsing response:', error)
+                  resolve(null)
+                }
+              })
+              
+              socket.on('error', (error) => {
+                console.error('[ProtocolInterceptor] Socket error:', error)
+                resolve(null)
+              })
+              
+              setTimeout(() => {
+                socket.destroy()
+                resolve(null)
+              }, 5000)
+            })
+          }
+          
+          // Get MIME type from file extension
+          const getMimeType = (filePath) => {
+            const ext = path.extname(filePath).toLowerCase()
+            const mimeTypes = {
+              '.js': 'application/javascript',
+              '.json': 'application/json',
+              '.html': 'text/html',
+              '.css': 'text/css',
+              '.png': 'image/png',
+              '.jpg': 'image/jpeg',
+              '.jpeg': 'image/jpeg',
+              '.gif': 'image/gif',
+              '.svg': 'image/svg+xml',
+            }
+            return mimeTypes[ext] || 'application/octet-stream'
+          }
           
           // Set up protocol interceptor - will be called when app becomes ready
           const setupInterceptor = () => {
@@ -66,13 +141,63 @@ export const prepareBoth = async (
               return
             }
 
-            // Intercept all vscode-file protocol requests and return <h1>hello world</h1>
-            protocol.interceptBufferProtocol('vscode-file', (request, callback) => {
-              console.log('[ProtocolInterceptor] Intercepting vscode-file request:', request.url)
-              const html = \`<h1 style="color:red; font-size:200px; z-index:400;position:absolute">hello world</h1>\`
-              callback({
-                data: Buffer.from(html, 'utf8'),
-                mimeType: 'text/html',
+            // Intercept vscode-file protocol requests
+            protocol.interceptBufferProtocol('vscode-file', async (request, callback) => {
+              const url = request.url
+              console.log('[ProtocolInterceptor] Intercepting vscode-file request:', url)
+              
+              // Convert vscode-file://vscode-app to file path
+              if (!url.startsWith('vscode-file://vscode-app')) {
+                callback({ error: -6 })
+                return
+              }
+              
+              // Parse URL to remove query parameters and hash
+              // Extract just the pathname part (everything after vscode-file://vscode-app but before ? or #)
+              let filePath = url.slice('vscode-file://vscode-app'.length)
+              
+              // Remove query parameters (everything after ?)
+              const queryIndex = filePath.indexOf('?')
+              if (queryIndex !== -1) {
+                filePath = filePath.substring(0, queryIndex)
+              }
+              
+              // Remove hash (everything after #)
+              const hashIndex = filePath.indexOf('#')
+              if (hashIndex !== -1) {
+                filePath = filePath.substring(0, hashIndex)
+              }
+              
+              // Check if it's a JavaScript file (check the file path without query params)
+              const isJavaScript = filePath.endsWith('.js')
+              
+              if (isJavaScript) {
+                // Try to get transformed code from function tracker
+                try {
+                  const transformedCode = await queryFunctionTracker(url)
+                  if (transformedCode) {
+                    console.log('[ProtocolInterceptor] Returning transformed code for:', url)
+                    callback({
+                      data: Buffer.from(transformedCode, 'utf8'),
+                      mimeType: 'application/javascript',
+                    })
+                    return
+                  }
+                } catch (error) {
+                  console.error('[ProtocolInterceptor] Error getting transformed code:', error)
+                }
+              }
+              
+              // Fall through: read original file from disk
+              fs.readFile(filePath, (err, data) => {
+                if (err) {
+                  console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
+                  callback({ error: -6 })
+                } else {
+                  const mimeType = getMimeType(filePath)
+                  console.log('[ProtocolInterceptor] Returning original file:', filePath, 'mimeType:', mimeType)
+                  callback({ data, mimeType })
+                }
               })
             })
 
