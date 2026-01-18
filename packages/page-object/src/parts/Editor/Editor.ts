@@ -799,7 +799,7 @@ export const create = ({ expect, ideVersion, page, platform, VError, electronApp
         for (const view of expectViews) {
           // TODO check view matching tab
           if (view.endsWith('.svg')) {
-            const webView = WebView.create({ expect, ideVersion, page, platform, VError })
+            const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
             const subFrame = await webView.shouldBeVisible2({
               extensionId: `vscode.media-preview`,
               hasLineOfCodeCounter: false,
