@@ -119,14 +119,7 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
           type: getNodeTypeName(targetNode, node_types),
         }
       : undefined
-    const edgeData: {
-      edgeName: string
-      nameIndex: number
-      toNode: number
-      type: number
-      typeName: string
-      targetNodeInfo?: { name: string | null; type: string | null }
-    } = { edgeName, nameIndex, toNode, type, typeName }
+    const edgeData: any = { edgeName, nameIndex, toNode, type, typeName }
     if (targetNodeInfo !== undefined) {
       edgeData.targetNodeInfo = targetNodeInfo
     }
@@ -231,9 +224,7 @@ export const analyzeNodeFromFile = async (filePath: string, nodeId: number): Pro
   const { prepareHeapSnapshot } = await import('../PrepareHeapSnapshot/PrepareHeapSnapshot.ts')
 
   try {
-    // @ts-ignore minimal typing for migration
-    const snapshot: any = await prepareHeapSnapshot(filePath, { parseStrings: true })
-    // @ts-ignore minimal typing for migration
+    const snapshot = await prepareHeapSnapshot(filePath, { parseStrings: true })
     return examineNodeById(nodeId, snapshot)
   } catch (error) {
     console.error(`Error loading heap snapshot from ${filePath}:`, error)

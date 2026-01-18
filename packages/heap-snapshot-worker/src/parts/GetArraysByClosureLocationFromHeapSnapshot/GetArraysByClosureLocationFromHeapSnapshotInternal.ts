@@ -57,19 +57,25 @@ export interface ResultGroup {
   readonly totalSize: number
 }
 
+interface ParsedNode {
+  readonly id: number
+  readonly name: string
+  readonly type: string
+}
+
 export const getArraysByClosureLocationFromHeapSnapshotInternal = (
-  strings: any,
-  nodes: any,
-  node_types: any,
-  node_fields: any,
-  edges: any,
-  edge_types: any,
-  edge_fields: any,
-  parsedNodes: any,
-  locations: any,
-  locationFields: any,
-  scriptMap: any,
-) => {
+  strings: readonly string[],
+  nodes: Uint32Array,
+  node_types: readonly [readonly string[]],
+  node_fields: readonly string[],
+  edges: Uint32Array,
+  edge_types: readonly [readonly string[]],
+  edge_fields: readonly string[],
+  parsedNodes: readonly ParsedNode[],
+  locations: Uint32Array,
+  locationFields: readonly string[],
+  scriptMap: Record<string, unknown>,
+): readonly ResultGroup[] => {
   const {
     detachednessFieldIndex,
     edgeCountFieldIndex,
