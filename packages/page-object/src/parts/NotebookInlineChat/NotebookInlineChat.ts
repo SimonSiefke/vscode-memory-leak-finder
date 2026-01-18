@@ -22,7 +22,6 @@ export const create = ({ expect, page, VError }: any) => {
         throw new VError(error, `Failed to hide notebook inline chat`)
       }
     },
-    isFirst: false,
     async show() {
       try {
         const notebook = page.locator('.notebook-editor')
@@ -30,10 +29,9 @@ export const create = ({ expect, page, VError }: any) => {
         await page.waitForIdle()
         await page.keyboard.press('Control+i')
         await page.waitForIdle()
-        const notebookInlineChat = page.locator('.notebook-inline-chat:not(.hide)')
-        await expect(notebookInlineChat).toBeVisible()
-        await page.waitForIdle()
-        const editor = notebookInlineChat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        const chat = page.locator('.chat-widget')
+        await expect(chat).toBeVisible()
+        const editor = chat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
         await expect(editor).toBeVisible()
         const editContext = editor.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
