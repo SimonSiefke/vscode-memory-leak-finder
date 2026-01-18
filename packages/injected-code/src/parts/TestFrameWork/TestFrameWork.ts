@@ -70,7 +70,11 @@ export const performKeyBoardAction = (fnName: string, options: any): void => {
   fn(options)
 }
 
-export const checkSingleElementCondition = async (locator, fnName, options) => {
+type Locator = {
+  readonly selector: string
+}
+
+export const checkSingleElementCondition = async (locator: Locator, fnName: string, options: unknown): Promise<void> => {
   Assert.object(locator)
   Assert.string(fnName)
   Assert.object(options)
@@ -95,7 +99,7 @@ export const checkSingleElementCondition = async (locator, fnName, options) => {
   throw new AssertionError(message)
 }
 
-export const checkHidden = async (locator, options) => {
+export const checkHidden = async (locator: Locator, options: { timeout?: number }): Promise<void> => {
   Assert.object(locator)
   Assert.object(options)
   const startTime = Time.getTimeStamp()
@@ -120,7 +124,7 @@ export const checkHidden = async (locator, options) => {
   throw new AssertionError(message)
 }
 
-export const checkTitle = async (expectedTitle) => {
+export const checkTitle = async (expectedTitle: string): Promise<void> => {
   Assert.string(expectedTitle)
   const startTime = Time.getTimeStamp()
   const endTime = startTime + maxTimeout
@@ -140,7 +144,7 @@ export const checkTitle = async (expectedTitle) => {
   throw new AssertionError(message)
 }
 
-export const checkMultiElementCondition = async (locator, fnName, options) => {
+export const checkMultiElementCondition = async (locator: Locator, fnName: string, options: { timeout?: number; count?: number }): Promise<void> => {
   const startTime = Time.getTimeStamp()
   const timeout = options.timeout || maxTimeout
   const endTime = startTime + timeout
@@ -272,7 +276,7 @@ export const type = (text) => {
   fn(document.activeElement, { text })
 }
 
-export const getValue = (locator) => {
+export const getValue = (locator: Locator): string => {
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
     throw new Error(`element not found`)

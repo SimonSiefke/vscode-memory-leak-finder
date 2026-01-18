@@ -1,4 +1,4 @@
-export const stringifyElement = (element) => {
+export const stringifyElement = (element: Element | null): string => {
   if (element.id) {
     return `#${element.id}`
   }

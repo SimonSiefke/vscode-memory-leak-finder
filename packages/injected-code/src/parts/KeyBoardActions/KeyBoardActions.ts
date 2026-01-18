@@ -76,7 +76,7 @@ export const press = (options: KeyboardEventInit, element: Element | null = docu
   for (const option of allOptions) {
     DispatchEvent.keyPress(element, option)
   }
-  if (isInputElement(element) && isSpaceLike(options.key)) {
+  if (isInputElement(element) && options.key && isSpaceLike(options.key)) {
     element.dispatchEvent(new InputEvent('input', { data: ' ', inputType: 'insertText', isComposing: false }))
   }
   for (const option of allOptions) {

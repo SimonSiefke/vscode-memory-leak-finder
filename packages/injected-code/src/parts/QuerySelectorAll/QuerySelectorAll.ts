@@ -6,8 +6,9 @@ import * as QuerySelectorAllInternalEnterFrame from '../QuerySelectorAllInternal
 import * as QuerySelectorAllNth from '../QuerySelectorAllNth/QuerySelectorAllNth.ts'
 import * as SelectorType from '../SelectorType/SelectorType.ts'
 
-export const getSelectorModule = (type) => {
-  switch (type) {
+export const getSelectorModule = (type: string | number): { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => Element[] } => {
+  const typeNumber = typeof type === 'string' ? Number.parseInt(type, 10) : type
+  switch (typeNumber) {
     case SelectorType.Css:
       return QuerySelectorAllByCss
     case SelectorType.EnterShadow:

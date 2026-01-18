@@ -7,5 +7,5 @@ export const getStyleValue = (element: Element, key: string): string | undefined
     }
     return rawValue
   }
-  return style[key]
+  return (style as unknown as { [key: string]: string | undefined })[key]
 }
