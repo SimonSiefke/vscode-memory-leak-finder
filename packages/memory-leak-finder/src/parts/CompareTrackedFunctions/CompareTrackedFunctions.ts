@@ -7,6 +7,7 @@ import { normalize, resolve, isAbsolute } from 'node:path'
 export interface TrackedFunctionResult {
   readonly functionName: string
   readonly callCount: number
+  readonly originalLocation?: string | null
 }
 
 interface ParsedFunctionName {
@@ -273,6 +274,7 @@ export const compareTrackedFunctions = async (
           const sourceMapUrl = getSourceMapUrl(script)
           if (!sourceMapUrl) {
             console.log(`[CompareTrackedFunctions] No source map URL found for ${parsed.url}`)
+            // Keep the minified location in functionName, no originalLocation
             continue
           }
           if (!sourceMapUrlToPositions[sourceMapUrl]) {
@@ -285,6 +287,7 @@ export const compareTrackedFunctions = async (
           positionPointers.push({ index: i, sourceMapUrl, parsed })
         } else {
           console.log(`[CompareTrackedFunctions] Script not found in scriptMap for ${parsed.url}`)
+          // Keep the minified location in functionName, no originalLocation
         }
       } else {
         // Function without location info - log for debugging
@@ -308,24 +311,25 @@ export const compareTrackedFunctions = async (
           const original = positions[offset]
           offsetMap[pointer.sourceMapUrl] = offset + 1
 
-          if (original) {
-            const result = results[pointer.index]
-            const parsed = pointer.parsed
-            let newFunctionName = parsed.name
+          const result = results[pointer.index]
+          const parsed = pointer.parsed
 
+          // Keep functionName with minified location, add originalLocation separately
+          let originalLocation: string | null = null
+          if (original) {
             // Build the original location string
             if (original.source && original.line !== null && original.column !== null) {
-              newFunctionName = `${parsed.name} (${original.source}:${original.line}:${original.column})`
+              originalLocation = `${original.source}:${original.line}:${original.column}`
             } else if (original.source && original.line !== null) {
-              newFunctionName = `${parsed.name} (${original.source}:${original.line})`
+              originalLocation = `${original.source}:${original.line}`
             } else if (original.source) {
-              newFunctionName = `${parsed.name} (${original.source})`
+              originalLocation = original.source
             }
+          }
 
-            results[pointer.index] = {
-              ...result,
-              functionName: newFunctionName,
-            }
+          results[pointer.index] = {
+            ...result,
+            originalLocation,
           }
         }
       } catch (error) {
