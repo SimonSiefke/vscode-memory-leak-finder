@@ -1,8 +1,8 @@
 export interface CreateParams {
-  electronApp?: any
-  expect: any
-  ideVersion?: { major?: number; minor?: number; patch?: number } | string
-  page: any
-  platform: string
-  VError: any
+  readonly electronApp?: any
+  readonly expect: any
+  readonly ideVersion?: { major?: number; minor?: number; patch?: number }
+  readonly page: any
+  readonly platform: string
+  readonly VError: any
 }

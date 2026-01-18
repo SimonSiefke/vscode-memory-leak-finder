@@ -1,9 +1,10 @@
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Server from '../Server/Server.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async cancelPortEdit() {
       try {
