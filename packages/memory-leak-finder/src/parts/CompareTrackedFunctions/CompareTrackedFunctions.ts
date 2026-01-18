@@ -19,12 +19,14 @@ interface ParsedFunctionName {
 
 const parseFunctionName = (functionName: string): ParsedFunctionName => {
   // Format: "functionName (url:line)" or "functionName (url:line:column)" or "functionName (scriptId:line:column)"
+  // Handle both formats: with column and without column (backward compatibility)
   const match = functionName.match(/^(.+?)\s*\((.+?):(\d+)(?::(\d+))?\)$/)
   if (match) {
     const name = match[1]
     const urlOrScriptId = match[2]
     const line = Number.parseInt(match[3], 10)
-    const column = match[4] ? Number.parseInt(match[4], 10) : null
+    // If column is missing, default to 0 (we always need column for source map resolution)
+    const column = match[4] ? Number.parseInt(match[4], 10) : 0
     return {
       column,
       line,
@@ -281,8 +283,11 @@ export const compareTrackedFunctions = async (
             sourceMapUrlToPositions[sourceMapUrl] = []
           }
           // Use 0-based line/column for source map (they're 1-based in the functionName)
+          // Always use both line and column (column defaults to 0 in 0-based if missing)
           const line = parsed.line - 1
-          const column = parsed.column !== null ? parsed.column - 1 : 0
+          // parsed.column is already defaulted to 0 (1-based) in parsing if missing, so convert to 0-based
+          // If it's 0 (1-based), use 0 (0-based) - start of line
+          const column = parsed.column !== null && parsed.column > 0 ? parsed.column - 1 : 0
           sourceMapUrlToPositions[sourceMapUrl].push(line, column)
           positionPointers.push({ index: i, sourceMapUrl, parsed })
         } else {
@@ -315,13 +320,14 @@ export const compareTrackedFunctions = async (
           const parsed = pointer.parsed
 
           // Keep functionName with minified location, add originalLocation separately
+          // Always include both line and column in originalLocation format when available
           let originalLocation: string | null = null
           if (original) {
-            // Build the original location string
-            if (original.source && original.line !== null && original.column !== null) {
-              originalLocation = `${original.source}:${original.line}:${original.column}`
-            } else if (original.source && original.line !== null) {
-              originalLocation = `${original.source}:${original.line}`
+            // Build the original location string - always include column when we have line
+            if (original.source && original.line !== null) {
+              // Always include column (default to 0 if not available)
+              const column = original.column !== null ? original.column : 0
+              originalLocation = `${original.source}:${original.line}:${column}`
             } else if (original.source) {
               originalLocation = original.source
             }
