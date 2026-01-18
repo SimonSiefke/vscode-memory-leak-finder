@@ -84,7 +84,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
   const positionPointers: { index: number; sourceMapUrl: string }[] = []
 
   for (let i = 0; i < enriched.length; i++) {
-    const item = enriched[i] as any
+    const item = enriched[i]
     const script = scriptMap[item.scriptId]
     if (script) {
       item.url = script.url

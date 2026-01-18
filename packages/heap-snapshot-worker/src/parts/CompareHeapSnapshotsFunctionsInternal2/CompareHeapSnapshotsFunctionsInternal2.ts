@@ -106,7 +106,7 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   before: Snapshot,
   after: Snapshot,
   options: CompareFunctionsOptions,
-): Promise<readonly any[]> => {
+): Promise<readonly CompareResult[]> => {
   const minCount = options.minCount || 0
   const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(
     after.meta.location_fields,
