@@ -9,7 +9,7 @@ const TitleBarMenuItems = {
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
     async hideMenu(text: string) {
       try {

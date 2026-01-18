@@ -2,7 +2,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Character from '../Character/Character.ts'
 import * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput.ts'
 
-export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
     async select({ completionName, completionText }: { completionName: string; completionText: string }) {
       try {

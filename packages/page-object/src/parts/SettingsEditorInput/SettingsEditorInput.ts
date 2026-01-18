@@ -1,7 +1,7 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Character from '../Character/Character.ts'
 
-export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
     async shouldHaveText(text: string) {
       try {
