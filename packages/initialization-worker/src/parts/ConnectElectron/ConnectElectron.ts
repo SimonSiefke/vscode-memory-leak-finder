@@ -27,9 +27,22 @@ const protocolInterceptorScript = (socketPath: string): string => {
   return `function() {
   const electron = this
   const { protocol } = electron
-  const require = globalThis._____require
-  const net = require('net')
-  const fs = require('fs')
+  // Capture require in a closure so it's available when protocol handler is called
+  // Try to get require from globalThis._____require first, fallback to global.require
+  let requireFn = globalThis._____require
+  if (!requireFn || typeof requireFn !== 'function') {
+    // Try global.require as fallback
+    if (typeof global !== 'undefined' && global.require) {
+      requireFn = global.require
+    }
+  }
+  if (!requireFn || typeof requireFn !== 'function') {
+    console.error('[ProtocolInterceptor] require is not available or not a function', typeof requireFn, requireFn)
+    return '${socketPath}'
+  }
+  // Capture net and fs modules in closure
+  const net = requireFn('net')
+  const fs = requireFn('fs')
   
   const queryFunctionTracker = (url) => {
     return new Promise((resolve) => {
@@ -148,7 +161,13 @@ export const connectElectron = async (electronRpc: RpcConnection, headlessMode: 
     })
   }
 
+  await Promise.all([
+    MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
+    MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
+  ])
+
   // Inject protocol interceptor if function tracking is enabled
+  // This must be done AFTER MakeRequireAvailableGlobally so that globalThis._____require is available
   if (trackFunctions) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
       functionDeclaration: protocolInterceptorScript(SOCKET_PATH),
@@ -156,11 +175,6 @@ export const connectElectron = async (electronRpc: RpcConnection, headlessMode: 
     })
     console.log('[ConnectElectron] Injected protocol interceptor for function tracking')
   }
-
-  await Promise.all([
-    MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
-    MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
-  ])
 
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
