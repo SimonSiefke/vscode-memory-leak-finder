@@ -20,10 +20,10 @@ export const start = async (
   return rpc
 }
 
-export const addChapter = (rpc, name, time) => {
+export const addChapter = (rpc: { invoke: (method: string, ...args: readonly unknown[]) => Promise<unknown> }, name: string, time: number): Promise<unknown> => {
   return rpc.invoke('VideoRecording.addChapter', name, time)
 }
 
-export const finalize = (rpc) => {
+export const finalize = (rpc: { invoke: (method: string, ...args: readonly unknown[]) => Promise<unknown> }): Promise<unknown> => {
   return rpc.invoke('VideoRecording.finalize')
 }

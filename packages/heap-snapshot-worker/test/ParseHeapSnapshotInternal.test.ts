@@ -23,9 +23,9 @@ test('single node', () => {
   const edgeFields = ['type', 'name_or_index', 'to_node']
   const edgeTypes = ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
   const nodes = [0, 0, 0, 0, 0, 0, 0]
-  const edges = []
+  const edges: any[] = []
   const strings = ['a']
-  const locations = []
+  const locations: any[] = []
   const locationFields = ['object_index', 'script_id', 'line', 'column']
   expect(
     ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
@@ -78,9 +78,9 @@ test('two nodes', () => {
     0, 0, 0, 0, 0, 0, 0, // first node
     0, 1, 1, 0, 0, 0, 0 // second node
   ]
-  const edges = []
+  const edges: any[] = []
   const strings = ['a', 'b']
-  const locations = []
+  const locations: any[] = []
   const locationFields = ['object_index', 'script_id', 'line', 'column']
   expect(
     ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
@@ -143,7 +143,7 @@ test('two nodes connected by edge', () => {
   ]
   const edges = [0, 0, 7]
   const strings = ['a', 'b']
-  const locations = []
+  const locations: any[] = []
   const locationFields = ['object_index', 'script_id', 'line', 'column']
   expect(
     ParseHeapSnapshotInternal.parseHeapSnapshotInternal(

@@ -6,7 +6,7 @@ import * as Disposables from '../Disposables/Disposables.ts'
 import * as FetchCommits from '../FetchCommits/FetchCommits.ts'
 import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
 
-const callback = async (method, ...params) => {
+const callback = async (method: string, ...params: readonly unknown[]): Promise<void> => {
   await CliProcess.invoke(method, ...params)
 }
 

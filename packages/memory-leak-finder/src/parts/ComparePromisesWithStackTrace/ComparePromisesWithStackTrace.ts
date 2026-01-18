@@ -3,7 +3,7 @@ import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOrigi
 import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.ts'
 import * as Hash from '../Hash/Hash.ts'
 
-const hashPromise = (item) => {
+const hashPromise = (item: { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[] }): string => {
   const { preview, stackTrace } = item
   const { properties } = preview
   return Hash.hash({
@@ -12,8 +12,8 @@ const hashPromise = (item) => {
   })
 }
 
-const getAdded = (before, after) => {
-  const beforeMap = Object.create(null)
+const getAdded = (before: readonly { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[] }[], after: readonly { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[] }[]): { afterCounts: Record<string, number>; beforeCounts: Record<string, number>; leaked: readonly { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[] }[] } => {
+  const beforeMap: { [hash: string]: number } = Object.create(null)
   for (const item of before) {
     const hash = hashPromise(item)
     beforeMap[hash] ||= 0
@@ -24,7 +24,7 @@ const getAdded = (before, after) => {
     beforeCounts[hash] = beforeMap[hash]
   }
   const afterCounts: Record<string, number> = Object.create(null)
-  const leaked: any[] = []
+  const leaked: { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[] }[] = []
   for (const item of after) {
     const hash = hashPromise(item)
     afterCounts[hash] ||= 0
@@ -38,29 +38,29 @@ const getAdded = (before, after) => {
   return { afterCounts, beforeCounts, leaked }
 }
 
-const deduplicate = (leaked, beforeCounts: Record<string, number>, afterCounts: Record<string, number>) => {
-  const map = Object.create(null)
+const deduplicate = (leaked: readonly { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[] }[], beforeCounts: Record<string, number>, afterCounts: Record<string, number>): readonly { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[]; count: number; delta: number; [key: string]: unknown }[] => {
+  const map: { [hash: string]: { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[] } } = Object.create(null)
   for (const item of leaked) {
     const hash = hashPromise(item)
     if (!map[hash]) {
       map[hash] = item
     }
   }
-  const deduplicated: any[] = []
+  const deduplicated: { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[]; count: number; delta: number; [key: string]: unknown }[] = []
   for (const [key, value] of Object.entries(map)) {
     const beforeCount = beforeCounts[key] || 0
     const afterCount = afterCounts[key] || 0
     const delta = afterCount - beforeCount
     deduplicated.push({
-      ...(value as any),
+      ...value,
       count: afterCount,
       delta,
-    })
+    } as { preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[]; count: number; delta: number; [key: string]: unknown })
   }
   return deduplicated
 }
 
-const cleanItem = (item) => {
+const cleanItem = (item: { count: number; delta: number; preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[] }): { count: number; delta: number; properties: readonly unknown[]; stackTrace: readonly string[] } => {
   const { count, delta, preview, stackTrace } = item
   const { properties } = preview
   return {
@@ -71,20 +71,22 @@ const cleanItem = (item) => {
   }
 }
 
-const clean = (items) => {
+const clean = (items: readonly { count: number; delta: number; preview: { properties: readonly unknown[] }; stackTrace: string | readonly string[] }[]): readonly { count: number; delta: number; properties: readonly unknown[]; stackTrace: readonly string[] }[] => {
   return items.map(cleanItem)
 }
 
-const mergeOriginal = (items, cleanInstances) => {
-  const reverseMap = Object.create(null)
+const mergeOriginal = (items: readonly { count: number; delta: number; properties: readonly unknown[]; stackTrace: readonly string[] }[], cleanInstances: readonly { originalIndex?: number; originalStack?: readonly string[]; sourcesHash?: string | null }[]): readonly { count: number; delta: number; properties: readonly unknown[]; stackTrace: readonly string[]; originalStack: readonly string[]; sourcesHash: string | null | undefined }[] => {
+  const reverseMap: { [index: number]: { originalIndex?: number; originalStack?: readonly string[]; sourcesHash?: string | null } } = Object.create(null)
   for (const instance of cleanInstances) {
-    reverseMap[instance.originalIndex] = instance
+    if (instance.originalIndex !== undefined) {
+      reverseMap[instance.originalIndex] = instance
+    }
   }
-  const merged: any[] = []
+  const merged: { count: number; delta: number; properties: readonly unknown[]; stackTrace: readonly string[]; originalStack: readonly string[]; sourcesHash: string | null | undefined }[] = []
   let originalIndex = 0
   for (const item of items) {
     originalIndex++
-    const originalStack: any[] = []
+    const originalStack: string[] = []
     let sourcesHash: string | null | undefined = null
     for (let i = 0; i < item.stackTrace.length; i++) {
       originalIndex++
@@ -129,7 +131,7 @@ export const comparePromisesWithStackTrace = async (before, after, context = {})
   let filtered = cleanLeaked
   if (context && typeof context === 'object' && 'runs' in context && typeof context.runs === 'number') {
     const { runs } = context
-    filtered = cleanLeaked.filter((item) => item.delta >= runs)
+    filtered = cleanLeaked.filter((item: { delta: number }) => item.delta >= runs)
   }
   if (scriptMap) {
     const stackTraces = filtered.map((item) => item.stackTrace)

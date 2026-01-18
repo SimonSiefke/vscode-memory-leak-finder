@@ -7,7 +7,7 @@ export const testWorkerRunTests = async (
   absolutePath: string,
   forceRun: boolean,
   runMode: number,
-  platform,
+  platform: string,
   runs: number,
 ) => {
   Assert.object(rpc)

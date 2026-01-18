@@ -25,7 +25,7 @@ const emptyRpc = {
   },
 }
 
-const disposeWorkers = async (workers) => {
+const disposeWorkers = async (workers: { functionTrackerRpc: { dispose: () => Promise<void> }; initializationWorkerRpc: { dispose: () => Promise<void> }; memoryRpc: { dispose: () => Promise<void> }; testWorkerRpc: { dispose: () => Promise<void> }; videoRpc: { dispose: () => Promise<void> } }): Promise<void> => {
   const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
   await Promise.all([functionTrackerRpc.dispose(), memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()

@@ -66,33 +66,33 @@ export const connectDevtools = async (
   })
   const pageObjectContext = {
     defaultContext: {
-      callFunctionOn(options) {
+      callFunctionOn(options: unknown) {
         return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-          ...options,
+          ...(options as { expression: string }),
           uniqueContextId: utilityContext.uniqueId,
         })
       },
     },
     electronApp,
-    evaluateInDefaultContext(item) {
+    evaluateInDefaultContext(item: unknown) {
       throw new Error(`not implemented`)
     },
-    evaluateInUtilityContext(item) {},
+    evaluateInUtilityContext(item: unknown) {},
     expect: Expect.expect,
     ideVersion: parsedIdeVersion,
     page: firstWindow,
     platform,
     sessionRpc,
     utilityContext: {
-      callFunctionOn(options) {
+      callFunctionOn(options: unknown) {
         return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {
-          ...options,
+          ...(options as { functionDeclaration: string; objectId?: string }),
           uniqueContextId: utilityContext.uniqueId,
         })
       },
-      evaluate(options) {
+      evaluate(options: unknown) {
         return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-          ...options,
+          ...(options as { expression: string }),
           uniqueContextId: utilityContext.uniqueId,
         })
       },

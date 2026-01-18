@@ -6,7 +6,7 @@ import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWe
 /**
  * @param {string} wsUrl
  */
-export const createConnection = async (wsUrl) => {
+export const createConnection = async (wsUrl: string): Promise<{ onmessage: ((message: unknown) => void) | null; send: (message: unknown) => void }> => {
   try {
     const webSocket = new WebSocket(wsUrl)
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
@@ -26,7 +26,7 @@ export const createConnection = async (wsUrl) => {
        *
        * @param {any} message
        */
-      send(message) {
+      send(message: unknown): void {
         webSocket.send(Json.stringify(message))
       },
     }

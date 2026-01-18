@@ -1,7 +1,7 @@
 import * as SelectorType from '../SelectorType/SelectorType.ts'
 import * as SpecialSelectorPrefix from '../SpecialSelectorPrefix/SpecialSelectorPrefix.ts'
 
-export const getSpecialSelectorType = (specialSelector) => {
+export const getSpecialSelectorType = (specialSelector: string) => {
   switch (specialSelector) {
     case SpecialSelectorPrefix.EnterShadow:
       return SelectorType.EnterShadow

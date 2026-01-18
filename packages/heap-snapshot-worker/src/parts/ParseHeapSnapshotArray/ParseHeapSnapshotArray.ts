@@ -6,7 +6,7 @@ const CLOSING_BRACKET = 3
 const MINUS = 4
 const CHAR_0 = '0'.charCodeAt(0)
 
-const getDigitCount = (number) => {
+const getDigitCount = (number: number) => {
   if (number === 0) {
     return 1
   }
@@ -23,7 +23,7 @@ const getDigitCount = (number) => {
  * @returns {{dataIndex: number, arrayIndex: number, done: boolean, currentNumber: number, hasDigits: boolean}} - The new data index, array index, completion status, and parsing state
  * @throws {RangeError} When array index is out of bounds
  */
-export const parseHeapSnapshotArray = (data, array, arrayIndex, currentNumber = 0, hasDigits = false) => {
+export const parseHeapSnapshotArray = (data: any, array: any, arrayIndex: any, currentNumber = 0, hasDigits = false) => {
   const dataLength = data.length
 
   for (let i = 0; i < dataLength; i++) {
