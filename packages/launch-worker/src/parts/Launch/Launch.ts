@@ -2,6 +2,7 @@ import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
+import * as LaunchFunctionTrackerWorker from '../LaunchFunctionTrackerWorker/LaunchFunctionTrackerWorker.ts'
 
 export interface LaunchOptions {
   readonly arch: string
@@ -88,7 +89,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
-  const { devtoolsWebSocketUrl, electronObjectId, functionTrackerRpc, sessionId, targetId, utilityContext, webSocketUrl } =
+  const { devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId, sessionId, targetId, utilityContext, webSocketUrl } =
     await rpc.invokeAndTransfer(
       'Initialize.prepare',
       headlessMode,
@@ -100,10 +101,30 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
       measureId,
       pid,
     )
+
+  // Launch function-tracker worker if tracking is enabled
+  // Connect it AFTER the page is created but BEFORE undoing monkey patch
+  let functionTrackerRpc: Awaited<ReturnType<typeof LaunchFunctionTrackerWorker.launchFunctionTrackerWorker>> | null = null
+  if (trackFunctions) {
+    functionTrackerRpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
+    // Connect function-tracker and undo monkey patch
+    // This ensures the window is paused until function-tracker is connected
+    await rpc.invoke(
+      'Initialize.connectFunctionTracker',
+      electronObjectId,
+      monkeyPatchedElectronId,
+      functionTrackerRpc,
+      devtoolsWebSocketUrl,
+      webSocketUrl,
+      connectionId,
+      measureId,
+    )
+  }
+
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
-    functionTrackerRpc,
+    functionTrackerRpc: functionTrackerRpc || undefined,
     parsedVersion,
     pid,
     sessionId,
