@@ -16,7 +16,7 @@ export const setup = async ({ SideBar, Editor, Electron, Extensions, SettingsEdi
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    resultCount: 1,
+    resultCount: 4,
     value: 'github.copilot.chat.advanced.inlineChat2',
   })
   await SettingsEditor.enableCheckBox({
