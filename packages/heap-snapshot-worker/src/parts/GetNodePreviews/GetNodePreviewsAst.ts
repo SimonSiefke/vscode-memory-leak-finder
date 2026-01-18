@@ -1,4 +1,4 @@
-import type { ArrayNode, AstNode, ObjectNode, PropertyEntry } from '../AstNode/AstNode.ts'
+import type { ArrayNode, AstNode, CodeNode, ObjectNode, PropertyEntry, UnknownNode } from '../AstNode/AstNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
@@ -7,12 +7,17 @@ import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
-const createUnknown = (id: number, name: string | null, value?: string): AstNode => ({
-  id,
-  name,
-  type: 'unknown',
-  value,
-})
+const createUnknown = (id: number, name: string | null, value?: string): UnknownNode => {
+  const result: UnknownNode = {
+    id,
+    name,
+    type: 'unknown',
+  }
+  if (value !== undefined) {
+    result.value = value
+  }
+  return result
+}
 
 export const buildAstForNode = (
   nodeIndex: number,
@@ -38,7 +43,7 @@ export const buildAstForNode = (
   if (!node) return null
   const nodeTypeName = getNodeTypeName(node, nodeTypes) || 'unknown'
   const name = getNodeName(node, strings)
-  const { id } = node
+  const id = node.id as number
 
   if (visited.has(id)) {
     return createUnknown(id, name, `[Circular ${id}]`)
@@ -166,7 +171,12 @@ export const buildAstForNode = (
         }
       }
     }
-    return { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: nodeTypeName as any }
+    if (nodeTypeName === 'code') {
+      const codeNode: CodeNode = { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: 'code', value: undefined }
+      return codeNode
+    }
+    const closureNode: CodeNode = { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: 'closure', value: undefined }
+    return closureNode
   }
 
   return createUnknown(id, name, `[${nodeTypeName} ${id}]`)
