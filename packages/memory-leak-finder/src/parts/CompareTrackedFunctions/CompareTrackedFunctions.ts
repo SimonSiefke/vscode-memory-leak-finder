@@ -2,6 +2,7 @@ import type { Session } from '../Session/Session.ts'
 import * as FindMatchingSourceMap from '../FindMatchingSourceMap/FindMatchingSourceMap.ts'
 import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.ts'
 import { fileURLToPath } from 'node:url'
+import { normalize, resolve, isAbsolute } from 'node:path'
 
 export interface TrackedFunctionResult {
   readonly functionName: string
@@ -41,10 +42,25 @@ const parseFunctionName = (functionName: string): ParsedFunctionName => {
 
 const normalizeUrl = (url: string): string => {
   try {
+    let path: string
     if (url.startsWith('file://')) {
-      return fileURLToPath(url)
+      path = fileURLToPath(url)
+    } else {
+      path = url
     }
-    return url
+    // Normalize the path (resolve relative paths, normalize separators, etc.)
+    try {
+      if (isAbsolute(path)) {
+        // For absolute paths, just normalize (don't resolve)
+        return normalize(path)
+      } else {
+        // For relative paths, resolve then normalize
+        return normalize(resolve(path))
+      }
+    } catch {
+      // If anything fails, just normalize
+      return normalize(path)
+    }
   } catch {
     return url
   }
@@ -83,16 +99,67 @@ const findScript = (
   urlOrScriptId: string,
 ): { readonly url?: string; readonly sourceMapUrl?: string } | null => {
   // First try to find by scriptId (if urlOrScriptId is a scriptId key in the map)
+  // Check both string and numeric versions of the key
   if (urlOrScriptId in scriptMap) {
     return scriptMap[urlOrScriptId]
   }
+  // Try parsing as numeric scriptId and check both string and number keys
+  const numericScriptId = Number.parseInt(urlOrScriptId, 10)
+  if (!Number.isNaN(numericScriptId)) {
+    if (String(numericScriptId) in scriptMap) {
+      return scriptMap[String(numericScriptId)]
+    }
+    // Also check if any key in scriptMap is a number that matches
+    for (const key of Object.keys(scriptMap)) {
+      const keyNum = Number.parseInt(key, 10)
+      if (!Number.isNaN(keyNum) && keyNum === numericScriptId) {
+        return scriptMap[key]
+      }
+    }
+  }
   // Then try to find by URL (normalize both for comparison)
   const normalizedTarget = normalizeUrl(urlOrScriptId)
-  for (const script of Object.values(scriptMap)) {
+  for (const [key, script] of Object.entries(scriptMap)) {
     if (script.url) {
       const normalizedScriptUrl = normalizeUrl(script.url)
-      if (normalizedScriptUrl === normalizedTarget || script.url === urlOrScriptId) {
+      // Compare normalized paths, and also try direct comparison
+      if (
+        normalizedScriptUrl === normalizedTarget ||
+        script.url === urlOrScriptId ||
+        normalizeUrl(script.url) === normalizeUrl(urlOrScriptId)
+      ) {
         return script
+      }
+      // Also try comparing just the filename and path segments
+      // This handles cases where paths might have different prefixes but same relative structure
+      try {
+        const targetParts = normalizedTarget.split(/[/\\]/)
+        const scriptParts = normalizedScriptUrl.split(/[/\\]/)
+        // Compare from the end (filename) backwards
+        if (targetParts.length > 0 && scriptParts.length > 0) {
+          const targetFilename = targetParts[targetParts.length - 1]
+          const scriptFilename = scriptParts[scriptParts.length - 1]
+          if (targetFilename === scriptFilename && targetFilename) {
+            // If filenames match, check if the last few path segments match
+            // Look for workbench.desktop.main.js specifically and match more segments
+            const isWorkbenchFile = targetFilename === 'workbench.desktop.main.js'
+            const segmentsToCheck = isWorkbenchFile
+              ? Math.min(5, targetParts.length, scriptParts.length)
+              : Math.min(3, targetParts.length, scriptParts.length)
+            let segmentsMatch = true
+            for (let i = 1; i <= segmentsToCheck; i++) {
+              if (targetParts[targetParts.length - i] !== scriptParts[scriptParts.length - i]) {
+                segmentsMatch = false
+                break
+              }
+            }
+            if (segmentsMatch) {
+              return script
+            }
+          }
+        }
+      } catch {
+        // Ignore errors in path comparison
       }
     }
   }
