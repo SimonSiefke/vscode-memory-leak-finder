@@ -1,5 +1,6 @@
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import * as FunctionTrackerState from '../FunctionTrackerState/FunctionTrackerState.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
 import * as LaunchFunctionTrackerWorker from '../LaunchFunctionTrackerWorker/LaunchFunctionTrackerWorker.ts'
@@ -107,6 +108,8 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   let functionTrackerRpc: Awaited<ReturnType<typeof LaunchFunctionTrackerWorker.launchFunctionTrackerWorker>> | null = null
   if (trackFunctions) {
     functionTrackerRpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
+    // Store in state so we can access it later to get statistics
+    FunctionTrackerState.setFunctionTrackerRpc(functionTrackerRpc)
     // Connect function-tracker devtools BEFORE undoing monkey patch
     // This ensures the window is paused and we can intercept network requests
     await functionTrackerRpc.invoke('FunctionTracker.connectDevtools', devtoolsWebSocketUrl, webSocketUrl, connectionId, measureId)
