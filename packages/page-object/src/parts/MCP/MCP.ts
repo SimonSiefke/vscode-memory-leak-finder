@@ -2,7 +2,7 @@ import assert from 'node:assert'
 import { rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import { root } from '../Root/Root.ts'
@@ -20,7 +20,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.McpAddServer, {
           pressKeyOnce: true,
           stayVisible: true,

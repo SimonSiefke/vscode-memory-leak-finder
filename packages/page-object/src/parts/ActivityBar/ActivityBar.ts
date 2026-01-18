@@ -1,5 +1,5 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -10,7 +10,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.HideActivityBar)
         await expect(activityBar).toBeHidden()
       } catch (error) {
@@ -40,7 +40,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await expect(activityBar).toBeVisible()
         const ariaLabel = 'Explorer'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
-        const contextMenu = ContextMenu.create({ expect, page, platform, VError })
+        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await contextMenu.open(activityBarItem)
         await contextMenu.openSubMenu('Move To', false)
         await contextMenu.select('Panel', false)
@@ -50,7 +50,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async resetViewLocations() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand('View: Reset View Locations')
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
@@ -65,7 +65,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.FocusActivityBar)
         await expect(activityBar).toBeVisible({ timeout: 10_000 })
       } catch (error) {

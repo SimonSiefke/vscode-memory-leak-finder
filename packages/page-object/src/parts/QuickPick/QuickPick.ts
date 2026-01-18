@@ -1,4 +1,4 @@
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 

@@ -1,4 +1,4 @@
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -41,7 +41,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async focusView() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.FocusOnPullRequestsView)
         await page.waitForIdle()
         const viewlet = page.locator('#workbench\\.view\\.extension\\.github-pull-requests')

@@ -1,4 +1,4 @@
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
@@ -48,7 +48,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async show() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand('Cursor: New Chat')
         const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()

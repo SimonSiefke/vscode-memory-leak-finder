@@ -1,4 +1,4 @@
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -11,7 +11,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await addContextButton.click()
         await page.waitForIdle()
 
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.select(initialPrompt, true)
         await quickPick.select(secondPrompt)
         await page.waitForIdle()
@@ -31,7 +31,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await using _mockDialog = await electron.mockDialog({
           response: 1,
         })
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
           // TODO
           // await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
@@ -76,7 +76,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     isFirst: false,
     async open() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.NewChartEditor)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')

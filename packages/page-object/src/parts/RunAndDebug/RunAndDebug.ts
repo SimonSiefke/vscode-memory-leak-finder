@@ -1,4 +1,4 @@
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
@@ -23,7 +23,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         const pauseButton = debugToolBar.locator('[aria-label^="Pause"]')
         await expect(pauseButton).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.DebugPause)
         await page.waitForIdle()
         await expect(pauseButton).toBeHidden({
@@ -177,7 +177,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
           await page.waitForIdle()
 
           if (debugConfiguration) {
-            const quickPick = QuickPick.create({ expect, page, platform, VError })
+            const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
             await quickPick.select(debugConfiguration)
             await page.waitForIdle()
           }
@@ -298,7 +298,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         const stopButton = debugToolBar.locator('[aria-label^="Stop"]')
         await expect(stopButton).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.DebugStop)
         await expect(stopButton).toBeHidden({
           timeout: 5000,

@@ -50,14 +50,14 @@ const getDecorationContent = (text: string, className: string): string => {
   return content
 }
 
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async checkoutBranch(branchName: string) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.GitCheckoutTo, {
           stayVisible: true,
         })
@@ -73,7 +73,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const decoration = page.locator('[class^="ced-1-TextEditorDecorationType"]').nth(1)
         await expect(decoration).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
         await page.waitForIdle()
         await expect(decoration).toBeHidden()
@@ -101,7 +101,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     async enableInlineBlame({ expectedDecoration }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
         await page.waitForIdle()
         const editor = Editor.create({ expect, ideVersion, page, platform, VError })
@@ -182,7 +182,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     },
     async refresh() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.GitRefresh)
       } catch (error) {
         throw new VError(error, `Failed to git refresh`)
@@ -295,7 +295,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     },
     async stageFile(name: string, parentFolder?: string) {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.GitStageAllChanges)
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
         if (parentFolder) {
@@ -309,7 +309,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     },
     async undoLastCommit() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.UndoLastCommit)
       } catch (error) {
         throw new VError(error, `Failed to undo last commit`)
@@ -317,7 +317,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     },
     async unstageFile(name) {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.GitUnstageAllChanges)
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
         await expect(file).toHaveAttribute('aria-label', `${name}, Untracked`)

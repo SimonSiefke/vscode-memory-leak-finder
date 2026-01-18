@@ -1,6 +1,6 @@
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
@@ -42,9 +42,9 @@ async open({
       cell1Content: string
     }) {
       try {
-        const explorer = Explorer.create({ electronApp, expect, page, platform, VError })
-        const contextMenu = ContextMenu.create({ expect, page, VError })
-        const sideBar = SideBar.create({ expect, page, platform, VError })
+        const explorer = Explorer.create(CreateParams.asCreateParams({ electronApp, expect, page, platform, VError }))
+        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError }))
+        const sideBar = SideBar.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await explorer.focus()
         await explorer.openContextMenu(file1)
         await contextMenu.select('Select for Compare')

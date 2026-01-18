@@ -1,4 +1,4 @@
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ electronApp, VError }: CreateParams.CreateParams) => {
   return {

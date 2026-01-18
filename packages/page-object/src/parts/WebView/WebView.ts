@@ -7,7 +7,7 @@ const waitForExtraIdle = async (page) => {
   }
 }
 
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
   return {

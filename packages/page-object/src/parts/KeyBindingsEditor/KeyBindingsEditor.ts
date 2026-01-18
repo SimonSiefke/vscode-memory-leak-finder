@@ -12,7 +12,7 @@ const getKeybindingButtonsText = (keyBinding, platform) => {
   return keyBinding
 }
 
-import type * as CreateParams from '../CreateParams/CreateParams.ts'
+import * as CreateParams from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
@@ -53,7 +53,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async show() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
         await quickPick.executeCommand(WellKnownCommands.OpenKeyboardShortcuts)
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible({
