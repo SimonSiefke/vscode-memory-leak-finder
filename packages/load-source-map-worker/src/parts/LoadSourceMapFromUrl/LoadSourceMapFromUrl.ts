@@ -8,8 +8,8 @@ import { normalizeSourceMap } from '../NormalizeSourceMap/NormalizeSourceMap.ts'
 import { readJson } from '../ReadJson/ReadJson.ts'
 import * as Root from '../Root/Root.ts'
 
-const isNotFoundOrNotAvailableError = (error) => {
-  return error && error.message && isNotFoundOrNotAvailableMessage(error.message)
+const isNotFoundOrNotAvailableError = (error: unknown): boolean => {
+  return Boolean(error && error instanceof Error && isNotFoundOrNotAvailableMessage(error.message))
 }
 
 export const loadSourceMap = async (url: string, hash: string): Promise<any> => {
