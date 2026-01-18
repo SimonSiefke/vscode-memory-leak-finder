@@ -1,5 +1,6 @@
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
@@ -7,15 +8,7 @@ const isNoteBook = (file: string) => {
   return file.endsWith('.ipynb')
 }
 
-interface CreateParams {
-  electronApp: any
-  expect: any
-  page: any
-  platform: string
-  VError: any
-}
-
-export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async expectModified(text: string) {
       try {

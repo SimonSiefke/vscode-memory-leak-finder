@@ -1,8 +1,9 @@
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async close() {
       try {

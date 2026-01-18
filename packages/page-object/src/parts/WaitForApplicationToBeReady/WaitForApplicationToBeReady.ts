@@ -1,3 +1,4 @@
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Terminal from '../Terminal/Terminal.ts'
 
 const isDevtoolsCannotFindContextError = (error) => {
@@ -7,7 +8,7 @@ const isDevtoolsCannotFindContextError = (error) => {
   )
 }
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async waitForApplicationToBeReady({
       enableExtensions,

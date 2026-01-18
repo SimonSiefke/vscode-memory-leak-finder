@@ -1,3 +1,4 @@
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -7,7 +8,7 @@ interface ProfileCreateInfo {
   readonly removeOthers?: boolean
 }
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async create(info: ProfileCreateInfo) {
       try {

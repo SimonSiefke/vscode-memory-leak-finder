@@ -1,8 +1,9 @@
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async expandStep(name) {
       try {

@@ -1,13 +1,14 @@
 import { existsSync } from 'node:fs'
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Electron from '../Electron/Electron.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async add(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')

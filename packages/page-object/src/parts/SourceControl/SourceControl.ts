@@ -50,7 +50,9 @@ const getDecorationContent = (text: string, className: string): string => {
   return content
 }
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async checkoutBranch(branchName: string) {
       try {

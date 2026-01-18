@@ -1,4 +1,6 @@
-export const create = ({ page, VError }) => {
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
+
+export const create = ({ page, VError }: CreateParams.CreateParams) => {
   return {
     async blur() {
       try {

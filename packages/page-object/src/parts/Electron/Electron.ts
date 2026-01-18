@@ -1,4 +1,6 @@
-export const create = ({ electronApp, VError }) => {
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
+
+export const create = ({ electronApp, VError }: CreateParams.CreateParams) => {
   return {
     async evaluate(expression) {
       return await electronApp.evaluate(expression)

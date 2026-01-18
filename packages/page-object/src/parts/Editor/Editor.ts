@@ -1,6 +1,7 @@
 import { basename } from 'node:path'
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -23,15 +24,7 @@ const isBinary = (file: string) => {
   return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
-interface CreateParams {
-  expect: any
-  ideVersion: { major?: number; minor?: number; patch?: number } | string
-  page: any
-  platform: string
-  VError: any
-}
-
-export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async acceptInlineCompletion() {
       try {

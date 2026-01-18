@@ -1,15 +1,9 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-interface CreateParams {
-  expect: any
-  page: any
-  platform: string
-  VError: any
-}
-
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {

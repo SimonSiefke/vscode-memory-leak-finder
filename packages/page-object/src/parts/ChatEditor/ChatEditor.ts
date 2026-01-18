@@ -1,17 +1,9 @@
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-interface CreateParams {
-  readonly electronApp: unknown
-  readonly expect: unknown
-  readonly ideVersion: unknown
-  readonly page: unknown
-  readonly platform: string
-  readonly VError: new (error: unknown, message: string) => Error
-}
-
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   return {
     async addContext(initialPrompt, secondPrompt, confirmText) {
       try {

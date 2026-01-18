@@ -2,13 +2,14 @@ import assert from 'node:assert'
 import { rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
+import type * as CreateParams from '../CreateParams/CreateParams.ts'
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import { root } from '../Root/Root.ts'
 import * as Server from '../Server/Server.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams.CreateParams) => {
   const servers: Record<number, Server.ServerInfo> = Object.create(null)
   return {
     async addServer({ serverName }: { serverName: string }) {
