@@ -1,4 +1,4 @@
-export const querySelectorAll = (roots, body, selector) => {
+export const querySelectorAll = (roots: readonly Element[], body: string, selector: string): Element[] => {
   if (roots.length === 0) {
     return []
   }
@@ -9,6 +9,6 @@ export const querySelectorAll = (roots, body, selector) => {
   if (!element.shadowRoot) {
     throw new Error('no shadowRoot found')
   }
-  const child = element.shadowRoot
+  const child = element.shadowRoot as unknown as Element
   return [child]
 }
