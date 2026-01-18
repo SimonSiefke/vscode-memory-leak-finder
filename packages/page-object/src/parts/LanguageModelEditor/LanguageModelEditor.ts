@@ -47,7 +47,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async open() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ManageLanguageModels)
         // TODO verify editor is open
         const container = page.locator('.models-search-container')

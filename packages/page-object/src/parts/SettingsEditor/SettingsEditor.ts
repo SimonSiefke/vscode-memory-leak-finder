@@ -143,7 +143,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       // TODO maybe find a better way
       // create random quickpick to avoid race condition
       await page.waitForIdle()
-      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
       await quickPick.show()
       await quickPick.hide()
       await page.waitForIdle()
@@ -228,7 +228,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
         await page.waitForIdle()
         const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')

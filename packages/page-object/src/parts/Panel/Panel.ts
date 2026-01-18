@@ -33,7 +33,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async toggle() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TogglePanelVisibilty)
       } catch (error) {
         throw new VError(error, `Failed to toggle panel`)

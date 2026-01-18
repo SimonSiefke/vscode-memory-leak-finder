@@ -16,7 +16,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async clearInput() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectAll)
         await quickPick.executeCommand(WellKnownCommands.DeleteAllLeft)
         await page.waitForIdle()
@@ -91,7 +91,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const repl = page.locator('.repl')
         await expect(repl).toBeVisible()
-        const panel = Panel.create({ expect, page, platform, VError })
+        const panel = Panel.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await panel.hide()
         await expect(repl).toBeHidden()
         await page.waitForIdle()
@@ -104,7 +104,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         const completions = page.locator('.repl-input-wrapper .suggest-widget')
         const count = await completions.count()
         if (count === 0) {
-          const quickPick = QuickPick.create({ expect, page, platform, VError })
+          const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
           await quickPick.executeCommand(WellKnownCommands.TriggerSuggest)
           await page.waitForIdle()
         }
@@ -139,7 +139,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const repl = page.locator('.repl')
         await expect(repl).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
         await expect(repl).toBeVisible()
       } catch (error) {
@@ -149,7 +149,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async type(value: string) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
         await page.waitForIdle()
         const replInputWrapper = page.locator('.repl-input-wrapper')

@@ -17,7 +17,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     },
     async clearAllOutputs() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand('Notebook: Clear All Outputs')
       } catch (error) {
         throw new VError(error, `Failed to clear outputs`)
@@ -51,12 +51,12 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await page.waitForIdle()
 
         if (kernelSource) {
-          const quickPick = QuickPick.create({ expect, page, platform, VError })
+          const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
           await quickPick.select('Python Environments...', true)
           await quickPick.select(/\.venv/, true)
         }
         if (expectedOutput) {
-          const webView = WebView.create({ expect, page, VError })
+          const webView = WebView.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: undefined, VError })
           const notebookOutput = await webView.shouldBeVisible2({
             extensionId: '',
             hasLineOfCodeCounter: false,
@@ -88,7 +88,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await expect(cell).toBeVisible()
         await cell.click()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand('Notebook: Merge Cell')
         await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount - 1)
@@ -139,7 +139,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await expect(cell).toBeVisible()
         await cell.click()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand('Notebook: Split Cell')
         await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount + 1)

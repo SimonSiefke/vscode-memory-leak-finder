@@ -10,7 +10,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         const suggestWidget = page.locator('.suggest-widget')
         await expect(suggestWidget).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TriggerSuggest, {
           pressKeyOnce: true,
         })
@@ -44,7 +44,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         const suggestWidget = page.locator('.suggest-widget')
         await expect(suggestWidget).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TriggerSuggest, {
           pressKeyOnce: true,
         })
