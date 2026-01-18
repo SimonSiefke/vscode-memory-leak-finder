@@ -1,4 +1,4 @@
-export const querySelectorAll = (roots: any[], body: string, selector: string): any[] => {
+export const querySelectorAll = (roots: readonly Element[], body: string, selector: string): Element[] => {
   if (roots.length === 0) {
     return []
   }
@@ -9,6 +9,10 @@ export const querySelectorAll = (roots: any[], body: string, selector: string): 
   if (element.nodeName !== 'IFRAME') {
     throw new Error('node is not of type iframe')
   }
-  const { contentDocument } = element
-  return [contentDocument]
+  const iframeElement = element as HTMLIFrameElement
+  const contentDocument = iframeElement.contentDocument
+  if (!contentDocument) {
+    return []
+  }
+  return [contentDocument as unknown as Element]
 }

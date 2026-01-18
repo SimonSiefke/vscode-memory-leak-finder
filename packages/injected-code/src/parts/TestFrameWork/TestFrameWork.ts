@@ -49,7 +49,7 @@ export const performAction = async (locator: any, fnName: string, options: any):
   const startTime = Time.getTimeStamp()
   const endTime = startTime + maxTimeout
   let currentTime = startTime
-  const fn = ElementAction[fnName]
+  const fn = (ElementAction as { [key: string]: (element: Element, options: unknown) => void })[fnName]
   if (!fn) {
     throw new Error(`action ${fnName} not found`)
   }
@@ -377,7 +377,7 @@ const mouseState = {
   y: 0,
 }
 
-const pointerLikeEvent = (element: Element, pointerEventType: string, mouseEventType: string, x: number, y: number): void => {
+const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
   const button = 0
   const buttons = 0
   const bubbles = true
@@ -401,7 +401,7 @@ const pointerLikeEvent = (element: Element, pointerEventType: string, mouseEvent
   })
 }
 
-export const mouseDown = async () => {
+export const mouseDown = async (): Promise<void> => {
   const { x, y } = mouseState
   const element = document.elementFromPoint(x, y)
   if (!element) {
@@ -428,7 +428,7 @@ export const mouseMove = async (x, y) => {
   pointerLikeEvent(element, DomEventType.PointerMove, DomEventType.MouseMove, x, y)
 }
 
-export const mouseUp = async () => {
+export const mouseUp = async (): Promise<void> => {
   const { x, y } = mouseState
   const element = document.elementFromPoint(x, y)
   if (!element) {

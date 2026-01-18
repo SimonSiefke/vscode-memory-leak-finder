@@ -20,6 +20,6 @@ export const click = (element: Element, options: MouseEventInit & { button?: num
   DispatchEvent.mouseUp(element, mutableOptions)
   DispatchEvent.pointerUp(element, mutableOptions)
   if (buttonValue === 2 /* right */) {
-    DispatchEvent.contextMenu(element, options)
+    DispatchEvent.contextMenu(element, mutableOptions)
   }
 }
