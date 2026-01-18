@@ -40,17 +40,18 @@ export const prepareBoth = async (
     // TODO
   }
 
-  // Store electronRpc in state so ConnectFunctionTracker can access it
-  // Don't dispose it here - it will be disposed in ConnectFunctionTracker when tracking
+  // Store electronRpc in state so ConnectFunctionTracker can access it when tracking
   ElectronRpcState.setElectronRpc(electronRpc, monkeyPatchedElectronId)
 
+  // Always undo monkey patch immediately to allow page creation
+  // When tracking, we'll pause again after function-tracker is connected
+  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+    objectId: monkeyPatchedElectronId,
+  })
+
   if (!trackFunctions) {
-    // If not tracking, undo monkey patch immediately (while connectDevtools is running)
-    // This allows the page to be created
-    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-      objectId: monkeyPatchedElectronId,
-    })
+    // If not tracking, dispose electronRpc immediately
     await electronRpc.dispose()
     ElectronRpcState.clearElectronRpc()
   }

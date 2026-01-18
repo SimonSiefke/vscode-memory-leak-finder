@@ -115,10 +115,12 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     await rpc.invoke('Initialize.connectFunctionTracker')
   }
 
+  // Note: functionTrackerRpc cannot be transferred via postMessage, so we don't return it
+  // It will be disposed separately if needed
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
-    functionTrackerRpc: functionTrackerRpc || undefined,
+    functionTrackerRpc: undefined, // Cannot be transferred via postMessage
     parsedVersion,
     pid,
     sessionId,
