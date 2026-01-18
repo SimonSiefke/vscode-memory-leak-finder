@@ -1,8 +1,8 @@
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async hide() {
       try {
@@ -33,7 +33,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async toggle() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.TogglePanelVisibilty)
       } catch (error) {
         throw new VError(error, `Failed to toggle panel`)

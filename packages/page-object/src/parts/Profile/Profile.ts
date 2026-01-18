@@ -1,4 +1,4 @@
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -8,12 +8,19 @@ interface ProfileCreateInfo {
   readonly removeOthers?: boolean
 }
 
-export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async create(info: ProfileCreateInfo) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ProfilesNewProfile, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -55,7 +62,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async export({ name }: { name: string }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ProfilesExport)
         const profileViewContainer = page.locator('.profile-view-tree-container')
         await expect(profileViewContainer).toBeVisible()
@@ -87,7 +101,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async remove(info: any) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ProfilesDeleteProfile, {
           stayVisible: true,
         })
@@ -113,7 +134,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const profilesList = page.locator('.profiles-list')
         const profileListIems = profilesList.locator(`.profile-list-item`)
-        const contextMenu = ContextMenu.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const contextMenu = ContextMenu.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         const count = await profileListIems.count()
         for (let i = 2; i < count; i++) {
           const second = profileListIems.nth(1)

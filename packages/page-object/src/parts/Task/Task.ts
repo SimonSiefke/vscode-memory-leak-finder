@@ -1,10 +1,10 @@
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as IconSelect from '../IconSelect/IconSelect.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async changeIcon(fromIcon: string, toIcon: string) {
       try {
@@ -22,9 +22,23 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await page.waitForIdle()
         await actionLabel.click()
         await page.waitForIdle()
-        const contextMenu = ContextMenu.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const contextMenu = ContextMenu.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await contextMenu.select('Change Icon...')
-        const iconSelect = IconSelect.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const iconSelect = IconSelect.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await iconSelect.select(toIcon)
         await page.waitForIdle()
         const newIcon = actionLabel.locator(`.codicon-${toIcon}`)
@@ -37,7 +51,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async clear() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
         await page.waitForIdle()
       } catch (error) {
@@ -46,7 +67,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async clearTerminal() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
       } catch (error) {
         throw new VError(error, `Failed to clear terminal`)
@@ -55,7 +83,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async hideQuickPick() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.close()
       } catch (error) {
         throw new VError(error, `Failed to close task quickpick`)
@@ -64,7 +99,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ConfigureTask, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -88,7 +130,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async openQuickPick({ item }: { item: string }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.RunTask, {
           stayVisible: true,
         })
@@ -100,7 +149,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async openRun() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
         // await quickPick.select('Create tasks.json file from template', true)
@@ -140,7 +196,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const errorDecorations = page.locator('.terminal-command-decoration.codicon-terminal-decoration-error')
         await expect(errorDecorations).toHaveCount(0)
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ReRunLastTask)
         if (hasError) {
           await expect(errorDecorations).toHaveCount(1)
@@ -152,7 +215,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async run(taskName: string) {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
         await quickPick.select(taskName)
@@ -183,7 +253,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async runError({ scanType, taskName }: { taskName: string; scanType: string }) {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
         await page.waitForIdle()
         const hasScanType = Boolean(scanType)
@@ -217,7 +294,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async selectQuickPickItem({ item }: { item: string }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.RunTask, {
           stayVisible: true,
         })

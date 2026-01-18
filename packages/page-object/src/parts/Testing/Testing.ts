@@ -1,12 +1,19 @@
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async focusOnTestExplorerView() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.FocusOnTestExplorerView)
         await page.waitForIdle()
         const testExplorer = page.locator('.test-explorer')
@@ -19,7 +26,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async runAllTests({ expectedRowCount, expectedTestOutputRowCount }: { expectedRowCount: number; expectedTestOutputRowCount: number }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.RunAllTests)
         await page.waitForIdle()
         const testExplorer = page.locator('.test-explorer')
@@ -46,7 +60,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     async runTask(taskName: string): Promise<void> {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand('Tasks: Run Task')
         await page.waitForIdle()
         await quickPick.select(taskName)

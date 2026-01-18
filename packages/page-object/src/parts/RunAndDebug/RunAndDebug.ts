@@ -1,8 +1,8 @@
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async continue() {
       try {
@@ -23,7 +23,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         const pauseButton = debugToolBar.locator('[aria-label^="Pause"]')
         await expect(pauseButton).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.DebugPause)
         await page.waitForIdle()
         await expect(pauseButton).toBeHidden({
@@ -50,7 +57,15 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to remove all breakpoints`)
       }
     },
-    async runAndWaitForDebugConsoleOutput({ debugConfiguration, debugLabel, output }: { debugConfiguration: string; debugLabel: string; output?: string }) {
+    async runAndWaitForDebugConsoleOutput({
+      debugConfiguration,
+      debugLabel,
+      output,
+    }: {
+      debugConfiguration: string
+      debugLabel: string
+      output?: string
+    }) {
       try {
         const quickPick = QuickPick.create({
           electronApp: undefined,
@@ -73,7 +88,23 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to run debugger`)
       }
     },
-    async runAndWaitForPaused({ callStackSize, debugConfiguration, debugLabel, file, hasCallStack, line, viaIcon }: { callStackSize: number; debugConfiguration: string; debugLabel: string; file: string; hasCallStack?: boolean; line: number; viaIcon?: boolean }) {
+    async runAndWaitForPaused({
+      callStackSize,
+      debugConfiguration,
+      debugLabel,
+      file,
+      hasCallStack,
+      line,
+      viaIcon,
+    }: {
+      callStackSize: number
+      debugConfiguration: string
+      debugLabel: string
+      file: string
+      hasCallStack?: boolean
+      line: number
+      viaIcon?: boolean
+    }) {
       try {
         const quickPick = QuickPick.create({
           electronApp: undefined,
@@ -96,7 +127,13 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to run debugger`)
       }
     },
-    async setPauseOnExceptions({ pauseOnCaughtExceptions, pauseOnExceptions }: { pauseOnCaughtExceptions: boolean; pauseOnExceptions: boolean }) {
+    async setPauseOnExceptions({
+      pauseOnCaughtExceptions,
+      pauseOnExceptions,
+    }: {
+      pauseOnCaughtExceptions: boolean
+      pauseOnExceptions: boolean
+    }) {
       try {
         await page.waitForIdle()
         const breakpoints = page.locator('.debug-breakpoints')
@@ -188,7 +225,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
           await page.waitForIdle()
 
           if (debugConfiguration) {
-            const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+            const quickPick = QuickPick.create({
+              electronApp: undefined,
+              expect,
+              ideVersion: { major: 0, minor: 0, patch: 0 },
+              page,
+              platform,
+              VError,
+            })
             await quickPick.select(debugConfiguration)
             await page.waitForIdle()
           }
@@ -315,7 +359,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         const stopButton = debugToolBar.locator('[aria-label^="Stop"]')
         await expect(stopButton).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.DebugStop)
         await expect(stopButton).toBeHidden({
           timeout: 5000,
@@ -339,7 +390,17 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         throw new VError(error, `Failed to wait for debug console output`)
       }
     },
-    async waitForPaused({ callStackSize, file, hasCallStack = true, line }: { callStackSize?: number; file: string; hasCallStack?: boolean; line: number }) {
+    async waitForPaused({
+      callStackSize,
+      file,
+      hasCallStack = true,
+      line,
+    }: {
+      callStackSize?: number
+      file: string
+      hasCallStack?: boolean
+      line: number
+    }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       await expect(continueButton).toBeVisible({ timeout: 30_000 })

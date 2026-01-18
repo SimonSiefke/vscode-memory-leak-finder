@@ -1,11 +1,11 @@
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const indexDelta = 5
 
-export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async checkoutIndex(index: number): Promise<void> {
       try {
@@ -44,7 +44,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async focusView() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.FocusOnPullRequestsView)
         await page.waitForIdle()
         const viewlet = page.locator('#workbench\\.view\\.extension\\.github-pull-requests')

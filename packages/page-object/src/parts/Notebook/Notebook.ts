@@ -1,11 +1,11 @@
 import { join } from 'path'
-import * as CreateParams from '../CreateParams/CreateParams.ts'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WebView from '../WebView/WebView.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams.CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
 
   return {
@@ -17,7 +17,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
     },
     async clearAllOutputs() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand('Notebook: Clear All Outputs')
       } catch (error) {
         throw new VError(error, `Failed to clear outputs`)
@@ -51,12 +58,26 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await page.waitForIdle()
 
         if (kernelSource) {
-          const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+          const quickPick = QuickPick.create({
+            electronApp: undefined,
+            expect,
+            ideVersion: { major: 0, minor: 0, patch: 0 },
+            page,
+            platform,
+            VError,
+          })
           await quickPick.select('Python Environments...', true)
           await quickPick.select(/\.venv/, true)
         }
         if (expectedOutput) {
-          const webView = WebView.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform: '', VError })
+          const webView = WebView.create({
+            electronApp: undefined,
+            expect,
+            ideVersion: { major: 0, minor: 0, patch: 0 },
+            page,
+            platform: '',
+            VError,
+          })
           const notebookOutput = await webView.shouldBeVisible2({
             extensionId: '',
             hasLineOfCodeCounter: false,
@@ -88,7 +109,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await expect(cell).toBeVisible()
         await cell.click()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand('Notebook: Merge Cell')
         await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount - 1)
@@ -139,7 +167,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
         await expect(cell).toBeVisible()
         await cell.click()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand('Notebook: Split Cell')
         await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount + 1)
