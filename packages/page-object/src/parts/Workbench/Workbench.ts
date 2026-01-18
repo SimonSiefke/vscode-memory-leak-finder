@@ -6,7 +6,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
   return {
     async focusLeftEditorGroup() {
       await page.waitForIdle()
-      const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+      const quickPick = QuickPick.create({ expect, page, platform, VError })
       await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
       await page.waitForIdle()
     },

@@ -42,9 +42,9 @@ async open({
       cell1Content: string
     }) {
       try {
-        const explorer = Explorer.create(CreateParams.asCreateParams({ electronApp, expect, page, platform, VError }))
-        const contextMenu = ContextMenu.create(CreateParams.asCreateParams({ expect, page, VError }))
-        const sideBar = SideBar.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const explorer = Explorer.create({ electronApp, expect, page, platform, VError })
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        const sideBar = SideBar.create({ expect, page, platform, VError })
         await explorer.focus()
         await explorer.openContextMenu(file1)
         await contextMenu.select('Select for Compare')

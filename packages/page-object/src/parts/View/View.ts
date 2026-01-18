@@ -8,7 +8,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const indicator = page.locator(`.nostatusbar.fullscreen`)
         await expect(indicator).toBeHidden()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleZenMode)
         await expect(indicator).toBeVisible()
       } catch (error) {
@@ -19,7 +19,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams.CreatePa
       try {
         const indicator = page.locator(`.nostatusbar.fullscreen`)
         await expect(indicator).toBeVisible()
-        const quickPick = QuickPick.create(CreateParams.asCreateParams({ expect, page, platform, VError }))
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleZenMode)
         await expect(indicator).toBeHidden()
       } catch (error) {

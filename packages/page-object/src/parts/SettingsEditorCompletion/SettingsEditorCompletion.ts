@@ -17,7 +17,7 @@ export const create = ({ expect, page, VError }: CreateParams.CreateParams) => {
         await row.click()
         await page.waitForIdle()
         await expect(suggest).toBeHidden()
-        const settingsEditorInput = SettingsEditorInput.create(CreateParams.asCreateParams({ expect, page, VError }))
+        const settingsEditorInput = SettingsEditorInput.create({ expect, page, VError })
         await settingsEditorInput.shouldHaveText(`${completionText}${Character.NonBreakingSpace}`)
       } catch (error) {
         throw new VError(error, `Failed to select completion ${completionName}`)
