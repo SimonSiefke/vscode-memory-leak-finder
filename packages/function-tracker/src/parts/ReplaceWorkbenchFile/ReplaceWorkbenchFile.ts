@@ -24,7 +24,10 @@ const getOriginalWorkbenchPath = (binaryPath: string, platform: string): string 
   return resolve(binaryPath, '..', 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js')
 }
 
-export const replaceWorkbenchFile = async (binaryPath: string, platform: string): Promise<{ backupPath: string; restored: () => Promise<void> }> => {
+export const replaceWorkbenchFile = async (
+  binaryPath: string,
+  platform: string,
+): Promise<{ backupPath: string; restored: () => Promise<void> }> => {
   const originalPath = getOriginalWorkbenchPath(binaryPath, platform)
   const transformedPath = getTransformedCodePath()
   const backupPath = `${originalPath}.backup`
@@ -32,7 +35,7 @@ export const replaceWorkbenchFile = async (binaryPath: string, platform: string)
   try {
     // Check if transformed file exists
     const transformedCode = readFileSync(transformedPath, 'utf8')
-    
+
     // Create backup of original file
     await copyFileAsync(originalPath, backupPath)
 

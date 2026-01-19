@@ -4,10 +4,12 @@ import { getFunctionLocations } from '../GetFunctionLocations/GetFunctionLocatio
 import { VError } from '@lvce-editor/verror'
 import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 
-export const transformCodeWithTracking = (code: string, options: TransformOptions = {}, scriptId: number = 123): string => {
+export const transformCodeWithTracking = (code: string, options: TransformOptions = {}): string => {
   if (!code) {
     return ''
   }
+
+  const { scriptId = 123, ...restOptions } = options
 
   try {
     const originalAst = parser2.parse(code, {
@@ -17,7 +19,7 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
 
     const functionLocations = getFunctionLocations(originalAst)
 
-    const plugin = createFunctionWrapperPlugin({ ...options, functionLocations, scriptId })
+    const plugin = createFunctionWrapperPlugin({ ...restOptions, functionLocations, scriptId })
     traverse2(originalAst, plugin)
 
     const result = generate2(originalAst, {

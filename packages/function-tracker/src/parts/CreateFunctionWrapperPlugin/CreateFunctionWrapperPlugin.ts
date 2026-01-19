@@ -27,10 +27,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
 
     return t.expressionStatement(
       t.callExpression(
-        t.memberExpression(
-          t.memberExpression(t.identifier('globalThis'), t.identifier('test')),
-          t.identifier('trackFunctionCall'),
-        ),
+        t.memberExpression(t.memberExpression(t.identifier('globalThis'), t.identifier('test')), t.identifier('trackFunctionCall')),
         [t.numericLiteral(scriptId), t.numericLiteral(line), t.numericLiteral(column)],
       ),
     )
