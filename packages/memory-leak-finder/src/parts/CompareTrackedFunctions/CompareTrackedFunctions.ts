@@ -229,6 +229,12 @@ export const compareTrackedFunctions = async (
   // Get all unique function names from both before and after
   const allFunctionNames = new Set([...Object.keys(beforeFunctions), ...Object.keys(afterFunctions)])
 
+  // Log a few original functionNames from statistics to see their format
+  const sampleFunctionNames = Array.from(allFunctionNames).slice(0, 3)
+  for (const fn of sampleFunctionNames) {
+    console.log(`[CompareTrackedFunctions] Sample functionName from statistics:`, fn)
+  }
+
   // Calculate call counts for each function
   for (const functionName of allFunctionNames) {
     const beforeCount = beforeFunctions[functionName] || 0
