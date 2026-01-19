@@ -33,8 +33,21 @@ export const protocolInterceptorScript = (socketPath: string): string => {
       try {
         const response = JSON.parse(responseData)
         if (response.jsonrpc === '2.0' && response.id === requestId) {
-          if (response.result && response.result.code) {
-            resolve(response.result.code)
+          if (response.result && response.result.filePath) {
+            // Read transformed code from temporary file
+            try {
+              const transformedCode = fs.readFileSync(response.result.filePath, 'utf8')
+              // Clean up temporary file
+              try {
+                fs.unlinkSync(response.result.filePath)
+              } catch (unlinkError) {
+                // Ignore cleanup errors
+              }
+              resolve(transformedCode)
+            } catch (readError) {
+              console.error('[ProtocolInterceptor] Error reading transformed code file:', readError)
+              resolve(null)
+            }
           } else if (response.error) {
             console.error('[ProtocolInterceptor] JSON-RPC error:', response.error)
             resolve(null)

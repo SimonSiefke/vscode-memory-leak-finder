@@ -1,4 +1,5 @@
-import { existsSync, readFileSync, unlinkSync } from 'node:fs'
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
+import { randomUUID } from 'node:crypto'
 import { createServer, Server, Socket } from 'net'
 import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
 import { transformCode } from '../Transform/Transform.ts'
@@ -202,9 +203,13 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     minify: true,
                   })
 
+                  // Write transformed code to temporary file
+                  const tempFilePath = `/tmp/${randomUUID()}`
+                  writeFileSync(tempFilePath, transformedCode, 'utf8')
+
                   const response: JsonRpcSuccessResponse = {
                     jsonrpc: '2.0',
-                    result: { code: transformedCode },
+                    result: { filePath: tempFilePath },
                     id: request.id ?? null,
                   }
                   socket.write(JSON.stringify(response))
