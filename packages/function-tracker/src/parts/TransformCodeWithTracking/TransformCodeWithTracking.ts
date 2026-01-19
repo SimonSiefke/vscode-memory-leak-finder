@@ -1,24 +1,17 @@
-import parser from '@babel/parser'
-import traverse from '@babel/traverse'
-import generate from '@babel/generator'
 import type { TransformOptions } from '../Types/Types.ts'
 import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
 import { getFunctionLocations } from '../GetFunctionLocations/GetFunctionLocations.ts'
 import { VError } from '@lvce-editor/verror'
-
-// @ts-ignore
-const parser2 = (parser.default || parser) as typeof import('@babel/parser')
-const traverse2 = (traverse.default || traverse) as typeof import('@babel/traverse').default
-const generate2 = (generate.default || generate) as typeof import('@babel/generator').default
+import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 
 export const transformCodeWithTracking = (code: string, options: TransformOptions = {}): string => {
-  // Handle null/undefined input
   if (!code) {
-    return 'Function call tracking system'
+    return ''
   }
 
+  const { scriptId = 123, ...restOptions } = options
+
   try {
-    // First pass: parse AST and collect original function locations
     const originalAst = parser2.parse(code, {
       sourceType: 'module',
       plugins: [],
@@ -26,16 +19,10 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
 
     const functionLocations = getFunctionLocations(originalAst)
 
-    // Second pass: parse fresh AST for transformation to avoid location contamination
-    const transformAst = parser2.parse(code, {
-      sourceType: 'module',
-      plugins: [],
-    })
+    const plugin = createFunctionWrapperPlugin({ ...restOptions, functionLocations, scriptId })
+    traverse2(originalAst, plugin)
 
-    const plugin = createFunctionWrapperPlugin({ ...options, functionLocations })
-    traverse2(transformAst, plugin)
-
-    const result = generate2(transformAst, {
+    const result = generate2(originalAst, {
       retainLines: false,
       compact: false,
       comments: true,
