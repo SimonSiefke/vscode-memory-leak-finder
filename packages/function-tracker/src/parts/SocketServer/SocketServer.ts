@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, unlinkSync } from 'node:fs'
 import { createServer, Server, Socket } from 'net'
-import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.js'
+import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
 
 interface JsonRpcRequest {
   readonly jsonrpc: '2.0'
