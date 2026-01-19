@@ -65,11 +65,11 @@ export const setup = async ({ DiffEditor, Editor, Explorer, Workspace, SideBar, 
   // @ts-ignore
   await DiffEditor.open({
     file1: 'file1.txt',
-    file1Content: 'line 1',
+    file1Content: '',
     file2: 'file2.txt',
-    file2Content: 'line 1',
+    file2Content: '',
   })
-  await QuickPick.executeCommand('Toggle Inline View')
+  await QuickPick.executeCommand('Compare: Toggle Inline View')
 }
 
 export const run = async ({ DiffEditor }: TestContext): Promise<void> => {
