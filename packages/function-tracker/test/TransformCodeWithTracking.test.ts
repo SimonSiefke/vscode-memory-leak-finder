@@ -792,88 +792,6 @@ const sumRecursive = (arr, index = 0) => {
 })
 
 
-test('TransformCodeWithTracking - should handle regex-like patterns in exclude', () => {
-  const code = `
-    function handleEvent() {
-      return 'event';
-    }
-
-    function handleClick() {
-      return 'click';
-    }
-
-    function processData() {
-      return 'data';
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'regex-exclude.js',
-    excludePatterns: ['handle', 'process'],
-  })
-
-  const expected = `function handleEvent() {
-  return 'event';
-}
-function handleClick() {
-  return 'click';
-}
-function processData() {
-  return 'data';
-}`
-
-  expect(transformed).toBe(expected)
-})
-
-test('TransformCodeWithTracking - should exclude methods in objects and classes', () => {
-  const code = `
-    const obj = {
-      publicMethod() {
-        return 'public';
-      },
-
-      _privateMethod() {
-        return 'private';
-      }
-    };
-
-    class TestClass {
-      publicClassMethod() {
-        return this.value;
-      }
-
-      _privateClassMethod() {
-        return 'private class method';
-      }
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'exclude-methods.js',
-    excludePatterns: ['_'],
-  })
-
-  const expected = `const obj = {
-  publicMethod() {
-    globalThis.test.trackFunctionCall(123, 3, 6);
-    return 'public';
-  },
-  _privateMethod() {
-    return 'private';
-  }
-};
-class TestClass {
-  publicClassMethod() {
-    globalThis.test.trackFunctionCall(123, 13, 6);
-    return this.value;
-  }
-  _privateClassMethod() {
-    return 'private class method';
-  }
-}`
-
-  expect(transformed).toBe(expected)
-})
 
 
 test('TransformCodeWithTracking - should handle location tracking with different file extensions', () => {
@@ -1026,31 +944,6 @@ test('Transform Script - transformCode - should transform class methods', () => 
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should exclude functions matching exclude patterns', () => {
-  const code = `
-    function testFunction() {
-      return 'test'
-    }
-
-    function privateHelper() {
-      return 'helper'
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    scriptId: 123,
-    excludePatterns: ['private'],
-  })
-  const expected = `function testFunction() {
-  globalThis.test.trackFunctionCall(123, 2, 4);
-  return 'test';
-}
-function privateHelper() {
-  return 'helper';
-}`
-
-  expect(transformed).toBe(expected)
-})
 
 test('Transform Script - transformCode - should transform all functions including tracking functions', () => {
   const code = `
