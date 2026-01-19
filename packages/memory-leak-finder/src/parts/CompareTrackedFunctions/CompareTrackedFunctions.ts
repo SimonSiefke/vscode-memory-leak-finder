@@ -22,19 +22,33 @@ interface ParsedFunctionName {
 
 const parseFunctionName = (functionName: string): ParsedFunctionName => {
   // Format: "functionName (url:line)" or "functionName (url:line:column)" or "functionName (scriptId:line:column)"
+  // Or just "scriptId:line:column" (e.g., "123:38:57140")
   // Handle both formats: with column and without column (backward compatibility)
-  const match = functionName.match(/^(.+?)\s*\((.+?):(\d+)(?::(\d+))?\)$/)
-  if (match) {
-    const name = match[1]
-    const urlOrScriptId = match[2]
-    const line = Number.parseInt(match[3], 10)
+  const matchWithName = functionName.match(/^(.+?)\s*\((.+?):(\d+)(?::(\d+))?\)$/)
+  if (matchWithName) {
+    const name = matchWithName[1]
+    const urlOrScriptId = matchWithName[2]
+    const line = Number.parseInt(matchWithName[3], 10)
     // If column is missing, default to 0 (we always need column for source map resolution)
-    const column = match[4] ? Number.parseInt(match[4], 10) : 0
+    const column = matchWithName[4] ? Number.parseInt(matchWithName[4], 10) : 0
     return {
       column,
       line,
       name,
       url: urlOrScriptId,
+    }
+  }
+  // Format: "scriptId:line:column" (e.g., "123:38:57140")
+  const matchScriptIdOnly = functionName.match(/^(\d+):(\d+):(\d+)$/)
+  if (matchScriptIdOnly) {
+    const scriptId = matchScriptIdOnly[1]
+    const line = Number.parseInt(matchScriptIdOnly[2], 10)
+    const column = Number.parseInt(matchScriptIdOnly[3], 10)
+    return {
+      column,
+      line,
+      name: functionName,
+      url: scriptId,
     }
   }
   // No location info, just function name
@@ -125,6 +139,18 @@ const convertScriptIdToUrl = (
   return null
 }
 
+const findWorkbenchScript = (
+  scriptMap: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>,
+): { readonly url?: string; readonly sourceMapUrl?: string } | null => {
+  // Find the script that corresponds to workbench.desktop.main.js
+  for (const [_key, script] of Object.entries(scriptMap)) {
+    if (script.url && script.url.includes('workbench.desktop.main.js')) {
+      return script
+    }
+  }
+  return null
+}
+
 const findScript = (
   scriptMap: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>,
   urlOrScriptId: string,
@@ -146,6 +172,12 @@ const findScript = (
       if (!Number.isNaN(keyNum) && keyNum === numericScriptId) {
         return scriptMap[key]
       }
+    }
+    // If scriptId is "123" (or any numeric ID that doesn't match), assume it's workbench.desktop.main.js
+    // This is a special case where scriptId 123 always refers to workbench.desktop.main.js
+    const workbenchScript = findWorkbenchScript(scriptMap)
+    if (workbenchScript) {
+      return workbenchScript
     }
   }
   // Then try to find by URL (normalize both for comparison)
