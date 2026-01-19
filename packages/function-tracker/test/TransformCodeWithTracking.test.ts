@@ -1001,13 +1001,6 @@ test('TransformCodeWithTracking - should handle location tracking with complex f
 })
 
 test('Transform Script - transformCode - should transform function declarations', () => {
-  // Reset global statistics before each test
-  if (typeof globalThis !== 'undefined') {
-    delete (globalThis as any).___functionStatistics
-    delete (globalThis as any).getFunctionStatistics
-    delete (globalThis as any).resetFunctionStatistics
-  }
-
   const code = `
     function testFunction() {
       return 'test'

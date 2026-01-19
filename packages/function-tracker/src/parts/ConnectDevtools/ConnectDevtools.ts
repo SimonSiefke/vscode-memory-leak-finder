@@ -48,7 +48,7 @@ export const connectDevtools = async (
 
   // Enable Page domain to inject tracking code before page loads
   await DevtoolsProtocolPage.enable(sessionRpc)
-  
+
   // Inject tracking code using Page.addScriptToEvaluateOnNewDocument
   // This ensures the tracking infrastructure is available before any scripts execute
   const { trackingCode } = await import('../TrackingCode/TrackingCode.ts')
@@ -121,9 +121,7 @@ export const connectDevtools = async (
         await DevtoolsProtocolFetch.fulfillRequest(sessionRpc, {
           requestId,
           responseCode: 200,
-          responseHeaders: [
-            { name: 'Content-Type', value: 'application/javascript' },
-          ],
+          responseHeaders: [{ name: 'Content-Type', value: 'application/javascript' }],
           body: bodyBase64,
         })
         console.log(`[FunctionTracker] Successfully fulfilled request with transformed code`)
