@@ -211,7 +211,9 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     result: { filePath: tempFilePath },
                     id: request.id ?? null,
                   }
-                  socket.write(JSON.stringify(response))
+                  const { resolve, promise } = Promise.withResolvers()
+                  socket.write(JSON.stringify(response), resolve)
+                  await promise
                   socket.end()
                   return
                 } catch (error) {
