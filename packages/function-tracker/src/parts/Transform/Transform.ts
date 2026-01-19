@@ -1,19 +1,19 @@
-import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.js'
-import { TransformOptions } from '../Types/Types.js'
+import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
+import type { TransformOptions } from '../Types/Types.ts'
 
 const PREAMBLE_CODE = `(() => {
   const functionStatistics = Object.create(null)
-  
+
   if (!globalThis.test) {
     globalThis.test = {}
   }
-  
+
   globalThis.test.trackFunctionCall = (scriptId, line, column) => {
     const key = \`\${scriptId}:\${line}:\${column})\`
     functionStatistics[key] ||= 0
     functionStatistics[key]++
   }
-  
+
   globalThis.test.getFunctionStatistics = () => {
     return functionStatistics
   }
