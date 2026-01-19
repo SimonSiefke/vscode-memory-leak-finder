@@ -1,13 +1,14 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Terminal from '../Terminal/Terminal.ts'
 
-const isDevtoolsCannotFindContextError = (error) => {
+const isDevtoolsCannotFindContextError = (error: any): boolean => {
   return (
     error.name === 'DevtoolsProtocolError' &&
     (error.message === 'Cannot find context with specified id' || error.message === 'uniqueContextId not found')
   )
 }
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async waitForApplicationToBeReady({
       enableExtensions,

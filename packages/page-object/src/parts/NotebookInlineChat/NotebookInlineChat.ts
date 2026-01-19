@@ -39,5 +39,26 @@ export const create = ({ expect, page, VError }: any) => {
         throw new VError(error, `Failed to show notebook inline chat`)
       }
     },
+    async type(message: string) {
+      try {
+        const notebook = page.locator('.notebook-editor')
+        await expect(notebook).toBeVisible()
+        await page.waitForIdle()
+        const chat = page.locator('.chat-widget')
+        const editor = chat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(editor).toBeVisible()
+        const editContext = editor.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        await expect(editContext).toBeFocused()
+        await page.waitForIdle()
+        await editContext.clear()
+        await page.waitForIdle()
+        await editContext.type(message)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to type into notebook inline chat`)
+      }
+    },
   }
 }

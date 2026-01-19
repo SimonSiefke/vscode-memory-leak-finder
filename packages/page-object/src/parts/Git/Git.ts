@@ -1,9 +1,10 @@
 import { mkdir, readdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as Root from '../Root/Root.ts'
 
-export const create = ({ page, VError }) => {
+export const create = ({ page, VError }: CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
 
   return {

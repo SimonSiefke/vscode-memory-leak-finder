@@ -2,7 +2,7 @@ import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const getKeybindingButtonsText = (keyBinding, platform) => {
+const getKeybindingButtonsText = (keyBinding: string, platform: string) => {
   if (keyBinding.startsWith('Control+')) {
     if (IsMacos.isMacos(platform)) {
       return `⌃${keyBinding.slice('Control+'.length)}`
@@ -12,9 +12,11 @@ const getKeybindingButtonsText = (keyBinding, platform) => {
   return keyBinding
 }
 
-export const create = ({ expect, page, platform, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
-    async searchFor(searchValue) {
+    async searchFor(searchValue: string) {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         const input = keyBindingsEditor.locator('.keybindings-header input')
@@ -25,7 +27,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to search for ${searchValue}`)
       }
     },
-    async setKeyBinding(commandName, keyBinding) {
+    async setKeyBinding(commandName: string, keyBinding: string) {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible()
@@ -51,7 +53,14 @@ export const create = ({ expect, page, platform, VError }) => {
     },
     async show() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.OpenKeyboardShortcuts)
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible({
