@@ -17,24 +17,39 @@ export const getTrackedFunctionsData = async (basePath: string) => {
         continue
       }
       const filePath = join(resultsPath, dirent)
-      const data = await readJson(filePath)
-      const trackedFunctions = Array.isArray(data) ? data : data.trackedFunctions || []
+      const rawData = await readJson(filePath)
+      const trackedFunctions = Array.isArray(rawData) ? rawData : rawData.trackedFunctions || []
+      const fileData: any[] = []
+      const nameCounts = new Map<string, number>()
       for (const item of trackedFunctions) {
         const displayName = item.originalName || item.functionName || 'Unknown'
         const count = item.totalCount || item.callCount || 0
         const delta = item.delta || 0
-        allData.push({
-          name: displayName,
+
+        // Ensure unique labels by appending numbers to duplicates
+        const currentCount = nameCounts.get(displayName) || 0
+        nameCounts.set(displayName, currentCount + 1)
+        const uniqueName = currentCount === 0 ? displayName : `${displayName}${currentCount}`
+
+        fileData.push({
+          name: uniqueName,
           count: count,
           delta: delta,
         })
       }
+      fileData.sort((a, b) => b.count - a.count)
+      // Limit to top 100 functions for readability per file
+      const limitedData = fileData.slice(0, 100)
+      // Add filename metadata to the data
+      const dataWithFilename = {
+        data: limitedData,
+        filename: dirent.replace('.json', ''),
+      }
+      allData.push(dataWithFilename)
     }
   } catch (error) {
     console.error('Error reading tracked functions data:', error)
     return []
   }
-  allData.sort((a, b) => b.count - a.count)
-  // Limit to top 100 functions for readability
-  return allData.slice(0, 100)
+  return allData
 }

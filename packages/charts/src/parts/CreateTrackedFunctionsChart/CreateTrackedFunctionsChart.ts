@@ -27,3 +27,5 @@ export const createChart = (): {
     yLabel: 'Function Name',
   }
 }
+
+export const multiple = true
