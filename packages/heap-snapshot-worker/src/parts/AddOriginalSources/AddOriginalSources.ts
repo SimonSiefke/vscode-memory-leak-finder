@@ -125,11 +125,8 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
         target.originalLine = original.line ?? null
         target.originalColumn = original.column ?? null
         target.originalName = original.name ?? null
-        // Always include both line and column in originalLocation format: <file>:<line>:<column>
-        if (target.originalUrl && target.originalLine !== null) {
-          // Always include column (default to 0 if not available)
-          const column = target.originalColumn !== null ? target.originalColumn : 0
-          target.originalLocation = `${target.originalUrl}:${target.originalLine}:${column}`
+        if (target.originalUrl && target.originalLine !== null && target.originalColumn !== null) {
+          target.originalLocation = `${target.originalUrl}:${target.originalLine}:${target.originalColumn}`
         }
       }
     }
