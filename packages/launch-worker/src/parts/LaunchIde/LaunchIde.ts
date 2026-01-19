@@ -22,7 +22,6 @@ export const launchIde = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
-  trackFunctions,
   updateUrl,
   useProxyMock,
   vscodePath,
@@ -45,9 +44,8 @@ export const launchIde = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform: string
-  trackFunctions: boolean
-  updateUrl: string
   useProxyMock: boolean
+  updateUrl: string
   vscodePath: string
   vscodeVersion: string
 }) => {
@@ -101,7 +99,6 @@ export const launchIde = async ({
     inspectSharedProcess,
     inspectSharedProcessPort,
     platform,
-    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,
