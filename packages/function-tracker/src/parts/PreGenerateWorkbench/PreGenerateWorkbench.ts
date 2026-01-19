@@ -1,5 +1,5 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
-import { join, dirname } from 'node:path'
+import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'node:fs'
+import { join, dirname, resolve } from 'node:path'
 import { transformCode } from '../Transform/Transform.ts'
 
 export const preGenerateWorkbench = async (vscodeBinaryPath: string, outputPath: string): Promise<void> => {
@@ -9,8 +9,24 @@ export const preGenerateWorkbench = async (vscodeBinaryPath: string, outputPath:
     return
   }
 
+  // Get the installation directory - binaryPath might be the executable file or the directory
+  let installDir: string
+  try {
+    const stats = statSync(vscodeBinaryPath)
+    if (stats.isFile()) {
+      // If it's a file (executable), get its directory
+      installDir = resolve(vscodeBinaryPath, '..')
+    } else {
+      // If it's already a directory, use it directly
+      installDir = vscodeBinaryPath
+    }
+  } catch {
+    // If stat fails, assume it's a directory
+    installDir = vscodeBinaryPath
+  }
+
   // Construct path to workbench.desktop.main.js
-  const workbenchPath = join(vscodeBinaryPath, 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js')
+  const workbenchPath = join(installDir, 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js')
 
   console.log(`[PreGenerateWorkbench] Reading workbench file from: ${workbenchPath}`)
   const originalCode = readFileSync(workbenchPath, 'utf8')
