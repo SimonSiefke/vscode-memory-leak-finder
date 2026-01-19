@@ -14,16 +14,6 @@ export const setup = async ({ SideBar, Editor, Electron, Extensions, Workspace }
     name: 'GitHub Copilot Chat',
   })
   await Editor.closeAll()
-  // await SettingsEditor.open()
-  // await SettingsEditor.search({
-  //   resultCount: 3,
-  //   value: 'github.copilot.chat.advanced.inlineChat2',
-  // })
-  // TODO maybe
-  // await SettingsEditor.enableCheckBox({
-  //   name: 'github.copilot.chat.advanced.inlineChat2',
-  // })
-  await Editor.closeAll()
 
   const notebook = {
     cells: [
