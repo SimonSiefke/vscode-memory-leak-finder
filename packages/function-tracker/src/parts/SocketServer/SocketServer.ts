@@ -212,9 +212,9 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     id: request.id ?? null,
                   }
                   const { resolve, promise } = Promise.withResolvers()
+                  console.log({ response })
                   socket.write(JSON.stringify(response), resolve)
                   await promise
-                  socket.end()
                   return
                 } catch (error) {
                   console.error('[SocketServer] Error transforming code:', error)
