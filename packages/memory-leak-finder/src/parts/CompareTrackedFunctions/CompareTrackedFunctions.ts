@@ -150,7 +150,7 @@ const findScript = (
   }
   // Then try to find by URL (normalize both for comparison)
   const normalizedTarget = normalizeUrl(urlOrScriptId)
-  for (const [key, script] of Object.entries(scriptMap)) {
+  for (const [_key, script] of Object.entries(scriptMap)) {
     if (script.url) {
       const normalizedScriptUrl = normalizeUrl(script.url)
       // Compare normalized paths, and also try direct comparison
@@ -356,7 +356,6 @@ export const compareTrackedFunctions = async (
           offsetMap[pointer.sourceMapUrl] = offset + 1
 
           const result = results[pointer.index]
-          const parsed = pointer.parsed
 
           // Keep functionName with minified location, add originalLocation separately
           // Always include both line and column in originalLocation format: <file>:<line>:<column>
