@@ -22,6 +22,7 @@ export const prepareBoth = async (
   connectionId: number,
   measureId: string,
   pid: number,
+  preGeneratedWorkbenchPath: string | null,
 ): Promise<any> => {
   const stream = new PortReadStream(port)
   const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(stream)
@@ -31,7 +32,7 @@ export const prepareBoth = async (
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode, trackFunctions, HTTP_SERVER_PORT)
+  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode, trackFunctions, HTTP_SERVER_PORT, preGeneratedWorkbenchPath)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 

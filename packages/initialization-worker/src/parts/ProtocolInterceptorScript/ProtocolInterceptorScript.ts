@@ -1,4 +1,5 @@
-export const protocolInterceptorScript = (port: number): string => {
+export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPath: string | null): string => {
+  const preGeneratedPath = preGeneratedWorkbenchPath ? JSON.stringify(preGeneratedWorkbenchPath) : 'null'
   return `function() {
   const electron = this
   const require = globalThis._____require
@@ -6,23 +7,11 @@ export const protocolInterceptorScript = (port: number): string => {
 
   const fs = require('fs')
   const path = require('path')
+  const preGeneratedWorkbenchPath = ${preGeneratedPath}
 
-  // Query function tracker for transformed code
-  const queryFunctionTracker = async (url) => {
-    try {
-      const encodedUrl = encodeURIComponent(url)
-      const response = await fetch(\`http://localhost:${port}/transform?url=\${encodedUrl}\`)
-      if (response.ok) {
-        const transformedCode = await response.text()
-        return transformedCode || null
-      } else {
-        console.error('[ProtocolInterceptor] HTTP error:', response.status, response.statusText)
-        return null
-      }
-    } catch (error) {
-      console.error('[ProtocolInterceptor] Error fetching transformed code:', error)
-      return null
-    }
+  // Check if this is workbench.desktop.main.js and load pre-generated file
+  const isWorkbenchMain = (filePath) => {
+    return filePath.endsWith('workbench.desktop.main.js')
   }
 
   // Get MIME type from file extension
@@ -132,24 +121,32 @@ export const protocolInterceptorScript = (port: number): string => {
       if (shouldSkip) {
         console.log('[ProtocolInterceptor] Skipping transformation for blob/worker script:', url)
         // Fall through to read original file
-      } else if (isJavaScript) {
-        // For JS files, always query function-tracker first for transformed code
-        try {
-          const transformedCode = await queryFunctionTracker(url)
-          if (transformedCode) {
-            console.log('[ProtocolInterceptor] Returning transformed code from function-tracker for:', url)
-            callback({
-              data: Buffer.from(transformedCode, 'utf8'),
-              mimeType: 'application/javascript',
+      } else if (isJavaScript && isWorkbenchMain(filePath) && preGeneratedWorkbenchPath) {
+        // For workbench.desktop.main.js, load the pre-generated file directly
+        console.log('[ProtocolInterceptor] Loading pre-generated workbench.desktop.main.js from:', preGeneratedWorkbenchPath)
+        fs.readFile(preGeneratedWorkbenchPath, (err, data) => {
+          if (err) {
+            console.error('[ProtocolInterceptor] Error reading pre-generated workbench file:', preGeneratedWorkbenchPath, err)
+            // Fall back to original file
+            fs.readFile(filePath, (err2, data2) => {
+              if (err2) {
+                console.error('[ProtocolInterceptor] Error reading original file:', filePath, err2)
+                callback({ error: -6 })
+                return
+              }
+              const mimeType = getMimeType(filePath)
+              callback({ data: data2, mimeType })
             })
             return
           }
-        } catch (error) {
-          console.error('[ProtocolInterceptor] Error getting transformed code from function-tracker:', error)
-        }
-
-        // If function-tracker didn't return transformed code, fall back to original file
-        // (This should rarely happen as function-tracker now transforms on-the-fly)
+          callback({
+            data,
+            mimeType: 'application/javascript',
+          })
+        })
+        return
+      } else if (isJavaScript) {
+        // For other JS files, return original file (no transformation)
         fs.readFile(filePath, (err, data) => {
           if (err) {
             console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
@@ -167,7 +164,7 @@ export const protocolInterceptorScript = (port: number): string => {
           }
 
           const mimeType = getMimeType(filePath)
-          console.log('[ProtocolInterceptor] Returning original JS file (function-tracker did not return transformed code):', filePath)
+          console.log('[ProtocolInterceptor] Returning original JS file:', filePath)
           callback({ data, mimeType })
         })
         return
