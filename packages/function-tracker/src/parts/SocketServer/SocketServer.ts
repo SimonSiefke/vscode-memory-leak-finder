@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, unlinkSync } from 'node:fs'
 import { createServer, Server, Socket } from 'net'
 import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
+import { transformCode } from '../Transform/Transform.ts'
 
 interface JsonRpcRequest {
   readonly jsonrpc: '2.0'
@@ -196,7 +197,7 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
 
                 // Transform code on-the-fly
                 try {
-                  const transformedCode = transformCodeWithTracking(originalCode, {
+                  const transformedCode = transformCode(originalCode, {
                     filename: filePath,
                     minify: true,
                   })

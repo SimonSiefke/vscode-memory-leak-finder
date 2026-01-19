@@ -1,7 +1,25 @@
 import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.js'
 import { TransformOptions } from '../Types/Types.js'
 
+const PREAMBLE_CODE = `(() => {
+  const functionStatistics = Object.create(null)
+  
+  if (!globalThis.test) {
+    globalThis.test = {}
+  }
+  
+  globalThis.test.trackFunctionCall = (scriptId, line, column) => {
+    const key = \`\${scriptId}:\${line}:\${column})\`
+    functionStatistics[key] ||= 0
+    functionStatistics[key]++
+  }
+  
+  globalThis.test.getFunctionStatistics = () => {
+    return functionStatistics
+  }
+})()`
+
 export const transformCode = async (code: string, options: TransformOptions = {}): Promise<string> => {
   const transformedCode = transformCodeWithTracking(code, { ...options })
-  return transformedCode
+  return PREAMBLE_CODE + '\n' + transformedCode
 }
