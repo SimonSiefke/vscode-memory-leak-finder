@@ -336,9 +336,12 @@ export const compareTrackedFunctions = async (
         if (actualUrl && script) {
           // The column was tracked and is in the original functionName, use it directly
           const column = originalColumn !== null ? originalColumn : 0
+          // If the original name was just "scriptId:line:column", show it as "anonymous" or just the location
+          // Otherwise, keep the original name
+          const displayName = parsed.name === result.functionName && /^\d+:\d+:\d+$/.test(parsed.name) ? 'anonymous' : parsed.name
           // Always update to ensure URL format with column is shown
           // @ts-ignore
-          results[i].functionName = `${parsed.name} (${actualUrl}:${parsed.line}:${column})`
+          results[i].functionName = `${displayName} (${actualUrl}:${parsed.line}:${column})`
         }
 
         if (script) {
