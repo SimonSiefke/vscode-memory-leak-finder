@@ -21,7 +21,7 @@ jest.unstable_mockModule('path-exists', () => ({
   pathExists: mockPathExists,
 }))
 
-let filesystemModule
+let filesystemModule: typeof import('../src/parts/Filesystem/Filesystem.ts')
 
 beforeEach(async () => {
   // Reset all mocks

@@ -1,4 +1,5 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
+import type { CopyOperation, MkdirOperation, RemoveOperation } from '../src/parts/ApplyFileOperation/ApplyFileOperation.ts'
 
 const mockCopy = jest.fn()
 const mockMakeDirectory = jest.fn()
@@ -11,7 +12,7 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   writeFileContent: jest.fn(),
 }))
 
-let applyFileOperationModule
+let applyFileOperationModule: typeof import('../src/parts/ApplyFileOperation/ApplyFileOperation.ts')
 
 beforeEach(async () => {
   // Reset all mocks
@@ -24,7 +25,7 @@ beforeEach(async () => {
 test('applyFileOperation - applies copy operation', async () => {
   mockCopy.mockReturnValue(undefined)
 
-  const operation = {
+  const operation: CopyOperation = {
     from: '/source/file.txt',
     to: '/dest/file.txt',
     type: 'copy',
@@ -39,7 +40,7 @@ test('applyFileOperation - applies copy operation', async () => {
 test('applyFileOperation - applies mkdir operation', async () => {
   mockMakeDirectory.mockReturnValue(undefined)
 
-  const operation = {
+  const operation: MkdirOperation = {
     path: '/path/to/directory',
     type: 'mkdir',
   }
@@ -53,7 +54,7 @@ test('applyFileOperation - applies mkdir operation', async () => {
 test('applyFileOperation - applies remove operation', async () => {
   mockRemove.mockReturnValue(undefined)
 
-  const operation = {
+  const operation: RemoveOperation = {
     from: '/path/to/file.txt',
     type: 'remove',
   }
@@ -70,7 +71,7 @@ test('applyFileOperation - handles copy operation error', async () => {
     throw error
   })
 
-  const operation = {
+  const operation: CopyOperation = {
     from: '/source/file.txt',
     to: '/dest/file.txt',
     type: 'copy',
@@ -85,7 +86,7 @@ test('applyFileOperation - handles mkdir operation error', async () => {
     throw error
   })
 
-  const operation = {
+  const operation: MkdirOperation = {
     path: '/path/to/directory',
     type: 'mkdir',
   }
@@ -99,7 +100,7 @@ test('applyFileOperation - handles remove operation error', async () => {
     throw error
   })
 
-  const operation = {
+  const operation: RemoveOperation = {
     from: '/path/to/file.txt',
     type: 'remove',
   }
