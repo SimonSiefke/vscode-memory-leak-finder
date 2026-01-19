@@ -230,6 +230,9 @@ const findScript = (
   return null
 }
 
+const SCRIPT_ID_PATTERN = /^\d+:\d+:\d+$/
+const FUNCTION_NAME_LOCATION_PATTERN = /^.+?\s*\((.+?)\)$/
+
 export const compareTrackedFunctions = async (
   before:
     | Record<string, number>
@@ -257,7 +260,7 @@ export const compareTrackedFunctions = async (
   const afterFunctions = afterData.trackedFunctions
   const scriptMap = afterData.scriptMap
 
-  const results: TrackedFunctionResult[] = []
+  let results: TrackedFunctionResult[] = []
 
   // Get all unique function names from both before and after
   const allFunctionNames = new Set([...Object.keys(beforeFunctions), ...Object.keys(afterFunctions)])
@@ -283,7 +286,7 @@ export const compareTrackedFunctions = async (
   }
 
   // Sort by call count descending (highest first)
-  results.sort((a, b) => b.callCount - a.callCount)
+  results = results.toSorted((a, b) => b.callCount - a.callCount)
 
   // If we have a scriptMap, resolve source maps for the results
   if (scriptMap && Object.keys(scriptMap).length > 0) {
@@ -339,7 +342,7 @@ export const compareTrackedFunctions = async (
           const column = originalColumn !== null ? originalColumn : 0
           // If the original name was just "scriptId:line:column", show it as "anonymous" or just the location
           // Otherwise, keep the original name
-          const displayName = parsed.name === result.functionName && /^\d+:\d+:\d+$/.test(parsed.name) ? 'anonymous' : parsed.name
+          const displayName = parsed.name === result.functionName && SCRIPT_ID_PATTERN.test(parsed.name) ? 'anonymous' : parsed.name
           // Always update to ensure URL format with column is shown
           // @ts-ignore
           results[i].functionName = `${displayName} (${actualUrl}:${parsed.line}:${column})`
@@ -421,7 +424,7 @@ export const compareTrackedFunctions = async (
           let updatedFunctionName = result.functionName
           if (originalName) {
             // Extract the location part from the current functionName (everything after the first space and opening paren)
-            const locationMatch = result.functionName.match(/^.+?\s*\((.+?)\)$/)
+            const locationMatch = result.functionName.match(FUNCTION_NAME_LOCATION_PATTERN)
             if (locationMatch) {
               updatedFunctionName = `${originalName} (${locationMatch[1]})`
             } else {
