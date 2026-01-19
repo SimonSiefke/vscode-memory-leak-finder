@@ -10,56 +10,57 @@ export const protocolInterceptorScript = (socketPath: string): string => {
 
   // Query function tracker for transformed code
   const queryFunctionTracker = (url) => {
-    return new Promise((resolve) => {
-      const socket = net.createConnection('${socketPath}')
-      let responseData = ''
-      let requestId = Math.floor(Math.random() * 1000000)
+    const { promise, resolve } = Promise.withResolvers()
+    const socket = net.createConnection('${socketPath}')
+    let responseData = ''
+    let requestId = Math.floor(Math.random() * 1000000)
 
-      socket.on('connect', () => {
-        const request = JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'transform',
-          params: { url },
-          id: requestId,
-        })
-        socket.write(request)
+    socket.on('connect', () => {
+      const request = JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'transform',
+        params: { url },
+        id: requestId,
       })
+      socket.write(request)
+    })
 
-      socket.on('data', (data) => {
-        responseData += data.toString()
-      })
+    socket.on('data', (data) => {
+      responseData += data.toString()
+    })
 
-      socket.on('end', () => {
-        try {
-          const response = JSON.parse(responseData)
-          if (response.jsonrpc === '2.0' && response.id === requestId) {
-            if (response.result && response.result.code) {
-              resolve(response.result.code)
-            } else if (response.error) {
-              console.error('[ProtocolInterceptor] JSON-RPC error:', response.error)
-              resolve(null)
-            } else {
-              resolve(null)
-            }
+    socket.on('end', () => {
+      try {
+        const response = JSON.parse(responseData)
+        if (response.jsonrpc === '2.0' && response.id === requestId) {
+          if (response.result && response.result.code) {
+            resolve(response.result.code)
+          } else if (response.error) {
+            console.error('[ProtocolInterceptor] JSON-RPC error:', response.error)
+            resolve(null)
           } else {
             resolve(null)
           }
-        } catch (error) {
-          console.error('[ProtocolInterceptor] Error parsing response:', error)
+        } else {
           resolve(null)
         }
-      })
-
-      socket.on('error', (error) => {
-        console.error('[ProtocolInterceptor] Socket error:', error)
+      } catch (error) {
+        console.error('[ProtocolInterceptor] Error parsing response:', error)
         resolve(null)
-      })
-
-      setTimeout(() => {
-        socket.destroy()
-        resolve(null)
-      }, 5000)
+      }
     })
+
+    socket.on('error', (error) => {
+      console.error('[ProtocolInterceptor] Socket error:', error)
+      resolve(null)
+    })
+
+    setTimeout(() => {
+      socket.destroy()
+      resolve(null)
+    }, 5000)
+
+    return promise
   }
 
   // Get MIME type from file extension
