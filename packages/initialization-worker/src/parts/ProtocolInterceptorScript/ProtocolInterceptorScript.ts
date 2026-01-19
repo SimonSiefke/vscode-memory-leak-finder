@@ -237,26 +237,6 @@ export const protocolInterceptorScript = (socketPath: string): string => {
       })
     })
 
-
-    // Open DevTools when window shows using setInterval
-    const devToolsInterval = setInterval(() => {
-      try {
-        const focusedWindow = BrowserWindow.getFocusedWindow()
-        if (focusedWindow && focusedWindow.webContents) {
-          console.log('[ProtocolInterceptor] Found focused window, opening DevTools')
-          focusedWindow.webContents.openDevTools()
-          clearInterval(devToolsInterval)
-        }
-      } catch (error) {
-        console.error('[ProtocolInterceptor] Error checking for focused window:', error)
-      }
-    }, 100)
-
-    // Clear interval after 30 seconds to avoid infinite polling
-    setTimeout(() => {
-      clearInterval(devToolsInterval)
-    }, 30000)
-
     console.log('[ProtocolInterceptor] Protocol interceptor installed')
   }
 
