@@ -1,5 +1,5 @@
 import * as t from '@babel/types'
-import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.js'
+import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
 import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 
 export const transformCode = async (code: string, filename?: string, excludePatterns?: string[]): Promise<string> => {
