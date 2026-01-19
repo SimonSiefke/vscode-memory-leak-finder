@@ -22,9 +22,11 @@ export const getTrackedFunctionsData = async (basePath: string) => {
       for (const item of trackedFunctions) {
         const displayName = item.originalName || item.functionName || 'Unknown'
         const count = item.totalCount || item.callCount || 0
+        const delta = item.delta || 0
         allData.push({
           name: displayName,
-          value: count,
+          count: count,
+          delta: delta,
         })
       }
     }
@@ -32,7 +34,7 @@ export const getTrackedFunctionsData = async (basePath: string) => {
     console.error('Error reading tracked functions data:', error)
     return []
   }
-  allData.sort((a, b) => b.value - a.value)
+  allData.sort((a, b) => b.count - a.count)
   // Limit to top 100 functions for readability
   return allData.slice(0, 100)
 }

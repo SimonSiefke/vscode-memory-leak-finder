@@ -19,11 +19,11 @@ export const createChart = (): {
     fontSize: 12,
     marginLeft: 200,
     marginRight: 50,
-    type: 'bar-chart',
+    type: 'dual-bar-chart',
     width: 1200,
-    x: 'value',
-    xLabel: 'Call Count',
-    y: 'name',
-    yLabel: 'Function Name',
+    x: 'index',
+    xLabel: 'Index',
+    y: 'count',
+    yLabel: 'Function Counts',
   }
 }
