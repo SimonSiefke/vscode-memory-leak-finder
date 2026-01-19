@@ -22,7 +22,13 @@ const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {
   }
 }
 
-export const connectElectron = async (electronRpc: RpcConnection, headlessMode: boolean, trackFunctions: boolean, port: number, preGeneratedWorkbenchPath: string | null) => {
+export const connectElectron = async (
+  electronRpc: RpcConnection,
+  headlessMode: boolean,
+  trackFunctions: boolean,
+  port: number,
+  preGeneratedWorkbenchPath: string | null,
+) => {
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),

@@ -98,14 +98,14 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     functionTrackerRpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
     // Store in state so we can access it later to get statistics
     FunctionTrackerState.setFunctionTrackerRpc(functionTrackerRpc)
-    
+
     // Pre-generate workbench.desktop.main.js to avoid memory issues
     const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
     preGeneratedWorkbenchPath = join(Root.root, '.vscode-workbench-tracked', 'workbench.desktop.main.js')
     console.log(`[Launch] Pre-generating workbench.desktop.main.js from ${binaryPath} to ${preGeneratedWorkbenchPath}`)
     await functionTrackerRpc.invoke('FunctionTracker.preGenerateWorkbench', binaryPath, preGeneratedWorkbenchPath)
     console.log(`[Launch] Successfully pre-generated workbench.desktop.main.js`)
-    
+
     // Wait a bit for socket server to be ready
     await new Promise((resolve) => setTimeout(resolve, 100))
   }

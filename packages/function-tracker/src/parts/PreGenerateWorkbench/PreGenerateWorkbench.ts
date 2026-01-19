@@ -1,8 +1,14 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { transformCode } from '../Transform/Transform.ts'
 
 export const preGenerateWorkbench = async (vscodeBinaryPath: string, outputPath: string): Promise<void> => {
+  // Check if output file already exists (cache check)
+  if (existsSync(outputPath)) {
+    console.log(`[PreGenerateWorkbench] Cached file already exists at: ${outputPath}, skipping transformation`)
+    return
+  }
+
   // Construct path to workbench.desktop.main.js
   const workbenchPath = join(vscodeBinaryPath, 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js')
 
