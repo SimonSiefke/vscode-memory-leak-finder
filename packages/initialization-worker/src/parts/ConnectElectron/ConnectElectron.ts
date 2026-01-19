@@ -48,9 +48,15 @@ const protocolInterceptorScript = (socketPath: string): string => {
     return new Promise((resolve) => {
       const socket = net.createConnection('${socketPath}')
       let responseData = ''
+      let requestId = Math.floor(Math.random() * 1000000)
       
       socket.on('connect', () => {
-        const request = JSON.stringify({ type: 'transform', url })
+        const request = JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'transform',
+          params: { url },
+          id: requestId,
+        })
         socket.write(request)
       })
       
@@ -61,8 +67,15 @@ const protocolInterceptorScript = (socketPath: string): string => {
       socket.on('end', () => {
         try {
           const response = JSON.parse(responseData)
-          if (response.type === 'transformed' && response.code) {
-            resolve(response.code)
+          if (response.jsonrpc === '2.0' && response.id === requestId) {
+            if (response.result && response.result.code) {
+              resolve(response.result.code)
+            } else if (response.error) {
+              console.error('[ProtocolInterceptor] JSON-RPC error:', response.error)
+              resolve(null)
+            } else {
+              resolve(null)
+            }
           } else {
             resolve(null)
           }
