@@ -1,4 +1,5 @@
 import type { Worker } from 'node:worker_threads'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 interface WorkerMessage {
   readonly error?: string
@@ -10,8 +11,8 @@ interface WorkerMessage {
  * @param {Worker} worker - The worker to wait for
  * @returns {Promise<unknown>} - The result from the worker
  */
-export const waitForResult = (worker: Worker): Promise<unknown> => {
-  const { promise, reject, resolve } = Promise.withResolvers<unknown>()
+export const waitForResult = (worker: Worker): Promise<Snapshot> => {
+  const { promise, reject, resolve } = Promise.withResolvers<Snapshot>()
 
   const cleanup = (): void => {
     // Clean up listeners
@@ -24,7 +25,7 @@ export const waitForResult = (worker: Worker): Promise<unknown> => {
     if (message.error) {
       reject(new Error(message.error))
     } else {
-      resolve(message.result)
+      resolve(message.result as Snapshot)
     }
   }
 
