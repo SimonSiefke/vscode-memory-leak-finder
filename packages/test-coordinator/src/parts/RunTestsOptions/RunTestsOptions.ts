@@ -39,6 +39,7 @@ export interface RunTestsOptions {
   readonly timeoutBetween: number
   readonly timeouts: any
   readonly trackFunctions: boolean
+  readonly openDevtools: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string

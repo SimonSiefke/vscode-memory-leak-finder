@@ -39,6 +39,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly screencastQuality: number
   readonly timeouts: any
   readonly trackFunctions: boolean
+  readonly openDevtools: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -76,6 +77,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     screencastQuality,
     timeouts,
     trackFunctions,
+    openDevtools,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -110,6 +112,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       runMode,
       timeouts,
       trackFunctions,
+      openDevtools,
       updateUrl,
       useProxyMock,
       vscodePath,

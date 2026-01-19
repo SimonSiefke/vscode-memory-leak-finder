@@ -290,6 +290,10 @@ const parseTrackFunctions = (argv: readonly string[]): boolean => {
   return argv.includes('--track-functions') || parseMeasure(argv) === 'tracked-functions'
 }
 
+const parseOpenDevtools = (argv: readonly string[]): boolean => {
+  return argv.includes('--open-devtools')
+}
+
 export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
   const platform = parsePlatform(processPlatform, argv)
   const pageObjectPath = parsePageObjectPath(argv)
@@ -329,6 +333,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const timeoutBetween = parseTimeoutBetween(argv)
   const timeouts = parseTimeouts(argv)
   const trackFunctions = parseTrackFunctions(argv)
+  const openDevtools = parseOpenDevtools(argv)
   const useProxyMock = parseUseProxyMock(argv)
   const updateUrl = parseUpdateUrl(argv)
   const vscodePath = parseVscodePath(argv)
@@ -376,6 +381,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     timeoutBetween,
     timeouts,
     trackFunctions,
+    openDevtools,
     updateUrl,
     useProxyMock,
     vscodePath,

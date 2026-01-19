@@ -31,6 +31,7 @@ export interface LaunchOptions {
   readonly measureId: string
   readonly platform: string
   readonly trackFunctions: boolean
+  readonly openDevtools: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -59,6 +60,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     measureId,
     platform,
     trackFunctions,
+    openDevtools,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -121,6 +123,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     port.port,
     parsedVersion,
     trackFunctions,
+    openDevtools,
     connectionId,
     measureId,
     pid,
