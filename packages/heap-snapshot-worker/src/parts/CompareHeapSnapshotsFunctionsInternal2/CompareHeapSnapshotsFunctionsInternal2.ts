@@ -1,9 +1,9 @@
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import type { UniqueLocation, UniqueLocationMap } from '../UniqueLocationMap/UniqueLocationMap.ts'
-import type { CompareResult } from './CompareResult.ts'
 import { addOriginalSources } from '../AddOriginalSources/AddOriginalSources.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import type { UniqueLocation, UniqueLocationMap } from '../UniqueLocationMap/UniqueLocationMap.ts'
+import type { CompareResult } from './CompareResult.ts'
 
 const emptyItem = {
   count: 0,
@@ -65,8 +65,6 @@ export interface CompareFunctionsOptions {
   readonly excludeOriginalPaths?: readonly string[]
   readonly minCount?: number
 }
-
-import type { CompareResult } from './CompareResult.ts'
 
 const filterOutExcluded = (items: readonly CompareResult[], excludes: readonly string[]): readonly CompareResult[] => {
   if (excludes.length > 0) {
