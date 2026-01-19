@@ -275,6 +275,7 @@ export const compareTrackedFunctions = async (
       // Process functions with location info
       if (parsed.url && parsed.line !== null) {
         // Try to find the script - findScript handles both scriptId and URL lookups
+        // @ts-ignore
         let script = findScript(scriptMap, parsed.url)
         let actualUrl = parsed.url
 
@@ -284,9 +285,11 @@ export const compareTrackedFunctions = async (
           const numericScriptId = Number.parseInt(parsed.url, 10)
           if (!Number.isNaN(numericScriptId)) {
             // It's a scriptId, try to convert to URL and lookup again
+            // @ts-ignore
             const convertedUrl = convertScriptIdToUrl(scriptMap, parsed.url)
             if (convertedUrl) {
               actualUrl = convertedUrl
+              // @ts-ignore
               script = findScript(scriptMap, convertedUrl)
             }
           }
@@ -302,6 +305,7 @@ export const compareTrackedFunctions = async (
           // The column was tracked and is in the original functionName, use it directly
           const column = originalColumn !== null ? originalColumn : 0
           // Always update to ensure URL format with column is shown
+          // @ts-ignore
           results[i].functionName = `${parsed.name} (${actualUrl}:${parsed.line}:${column})`
         }
 
