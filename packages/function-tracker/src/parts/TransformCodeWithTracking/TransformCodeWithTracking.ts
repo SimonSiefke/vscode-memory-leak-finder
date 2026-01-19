@@ -9,11 +9,7 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
     return ''
   }
 
-<<<<<<< HEAD
   const { scriptId = 123, minify = false, ...restOptions } = options
-=======
-  const { scriptId = 123, ...restOptions } = options
->>>>>>> origin/main
 
   try {
     const originalAst = parser2.parse(code, {
