@@ -6,13 +6,7 @@ export const getTrackedFunctions = async (session: Session): Promise<Record<stri
   try {
     const result = await DevtoolsProtocolRuntime.evaluate(session, {
       expression: `(() => {
-        if (!globalThis.___functionStatistics) {
-          return {}
-        }
-        const stats = {}
-        for (const [name, count] of globalThis.___functionStatistics) {
-          stats[name] = count
-        }
+        const stats = globalThis.getFunctionStatistics()
         return stats
       })()`,
       returnByValue: true,
