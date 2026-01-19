@@ -114,7 +114,10 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                 },
                 id: request.id ?? null,
               }
-              socket.write(JSON.stringify(errorResponse))
+              if (socket.writable && !socket.destroyed) {
+                socket.write(JSON.stringify(errorResponse))
+                socket.end()
+              }
               return
             }
 
@@ -130,7 +133,10 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                   },
                   id: request.id ?? null,
                 }
-                socket.write(JSON.stringify(errorResponse))
+                if (socket.writable && !socket.destroyed) {
+                  socket.write(JSON.stringify(errorResponse))
+                  socket.end()
+                }
                 return
               }
 
@@ -143,7 +149,10 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     result: null,
                     id: request.id ?? null,
                   }
-                  socket.write(JSON.stringify(response))
+                  if (socket.writable && !socket.destroyed) {
+                    socket.write(JSON.stringify(response))
+                    socket.end()
+                  }
                   return
                 }
 
@@ -168,8 +177,10 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     result: null,
                     id: request.id ?? null,
                   }
-                  socket.write(JSON.stringify(response))
-                  socket.end()
+                  if (socket.writable && !socket.destroyed) {
+                    socket.write(JSON.stringify(response))
+                    socket.end()
+                  }
                   return
                 }
 
@@ -187,8 +198,10 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     },
                     id: request.id ?? null,
                   }
-                  socket.write(JSON.stringify(errorResponse))
-                  socket.end()
+                  if (socket.writable && !socket.destroyed) {
+                    socket.write(JSON.stringify(errorResponse))
+                    socket.end()
+                  }
                   return
                 }
 
@@ -208,10 +221,77 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     result: { filePath: tempFilePath },
                     id: request.id ?? null,
                   }
-                  const { resolve, promise } = Promise.withResolvers()
                   console.log({ response })
-                  socket.write(JSON.stringify(response), resolve)
+                  
+                  // Check if socket is still writable before writing
+                  if (!socket.writable || socket.destroyed) {
+                    console.error('[SocketServer] Socket is not writable, cannot send response')
+                    return
+                  }
+                  
+                  const { resolve, promise } = Promise.withResolvers<void>()
+                  const responseString = JSON.stringify(response)
+                  
+                  // Set up error handlers before writing
+                  const errorHandler = (error: Error) => {
+                    console.error('[SocketServer] Socket error during write:', error)
+                    resolve()
+                  }
+                  const closeHandler = () => {
+                    console.log('[SocketServer] Socket closed during write')
+                    resolve()
+                  }
+                  
+                  socket.once('error', errorHandler)
+                  socket.once('close', closeHandler)
+                  
+                  // Write with error handling
+                  try {
+                    const writeResult = socket.write(responseString, (error) => {
+                      socket.removeListener('error', errorHandler)
+                      socket.removeListener('close', closeHandler)
+                      if (error) {
+                        console.error('[SocketServer] Error writing response:', error)
+                        resolve()
+                      } else {
+                        resolve()
+                      }
+                    })
+                    
+                    // If write returns false, the buffer is full, wait for drain
+                    // Note: the write callback will still be called after drain
+                    if (!writeResult) {
+                      // Wait for drain, but don't resolve yet - wait for write callback
+                      await new Promise<void>((resolveDrain) => {
+                        const drainHandler = () => {
+                          socket.removeListener('error', errorHandler)
+                          socket.removeListener('close', closeHandler)
+                          resolveDrain()
+                        }
+                        socket.once('drain', drainHandler)
+                        socket.once('error', () => {
+                          socket.removeListener('drain', drainHandler)
+                          resolveDrain()
+                        })
+                        socket.once('close', () => {
+                          socket.removeListener('drain', drainHandler)
+                          resolveDrain()
+                        })
+                      })
+                    }
+                  } catch (writeError) {
+                    socket.removeListener('error', errorHandler)
+                    socket.removeListener('close', closeHandler)
+                    console.error('[SocketServer] Exception during write:', writeError)
+                    resolve()
+                  }
+                  
                   await promise
+                  
+                  // Close the socket after sending response (client expects this)
+                  if (socket.writable && !socket.destroyed) {
+                    socket.end()
+                  }
                   return
                 } catch (error) {
                   console.error('[SocketServer] Error transforming code:', error)
@@ -223,7 +303,10 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     },
                     id: request.id ?? null,
                   }
-                  socket.write(JSON.stringify(errorResponse))
+                  if (socket.writable && !socket.destroyed) {
+                    socket.write(JSON.stringify(errorResponse))
+                    socket.end()
+                  }
                   return
                 }
               } catch (error) {
@@ -236,7 +319,10 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                   },
                   id: request.id ?? null,
                 }
-                socket.write(JSON.stringify(errorResponse))
+                if (socket.writable && !socket.destroyed) {
+                  socket.write(JSON.stringify(errorResponse))
+                  socket.end()
+                }
                 return
               }
             }
@@ -250,7 +336,10 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
               },
               id: request.id ?? null,
             }
-            socket.write(JSON.stringify(errorResponse))
+            if (socket.writable && !socket.destroyed) {
+              socket.write(JSON.stringify(errorResponse))
+              socket.end()
+            }
           } catch (parseError) {
             // Invalid JSON
             const errorResponse: JsonRpcErrorResponse = {
@@ -261,7 +350,10 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
               },
               id: null,
             }
-            socket.write(JSON.stringify(errorResponse))
+            if (socket.writable && !socket.destroyed) {
+              socket.write(JSON.stringify(errorResponse))
+              socket.end()
+            }
           }
         }
       } catch (error) {
