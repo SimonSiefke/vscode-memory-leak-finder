@@ -12,23 +12,8 @@ export interface CreateFunctionWrapperPluginOptions {
 export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPluginOptions): Visitor => {
   const { scriptId = 123, functionLocations = new Map() } = options
 
-  // Helper function to get function name from node
-  const getFunctionName = (node: any): string => {
-    if (t.isFunctionDeclaration(node) && node.id) {
-      return node.id.name
-    }
-    if (t.isFunctionExpression(node) && node.id) {
-      return node.id.name
-    }
-    if ((t.isObjectMethod(node) || t.isClassMethod(node)) && t.isIdentifier(node.key)) {
-      return node.key.name
-    }
-    return 'anonymous'
-  }
-
   const createTrackingCall = (node: any) => {
     const location = functionLocations.get(node)
-    const functionName = getFunctionName(node)
 
     let line = -1
     let column = -1
@@ -41,12 +26,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     }
 
     return t.expressionStatement(
-      t.callExpression(t.identifier('trackFunctionCall'), [
-        t.stringLiteral(functionName),
-        t.numericLiteral(scriptId),
-        t.numericLiteral(line),
-        t.numericLiteral(column),
-      ]),
+      t.callExpression(t.identifier('trackFunctionCall'), [t.numericLiteral(scriptId), t.numericLiteral(line), t.numericLiteral(column)]),
     )
   }
 
