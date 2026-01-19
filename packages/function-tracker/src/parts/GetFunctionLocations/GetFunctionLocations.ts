@@ -1,7 +1,12 @@
 import { traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 
-export const getFunctionLocations = (ast: any): Map<any, { line: number; column: number }> => {
-  const functionLocations = new Map<any, { line: number; column: number }>()
+interface FunctionLocation {
+  readonly line: number
+  readonly column: number
+}
+
+export const getFunctionLocations = (ast: any): Map<any, FunctionLocation> => {
+  const functionLocations = new Map<any, FunctionLocation>()
 
   const collectionVisitor = {
     FunctionDeclaration: (path: any) => {
