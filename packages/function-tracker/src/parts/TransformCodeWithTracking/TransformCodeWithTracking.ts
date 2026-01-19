@@ -9,24 +9,34 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
     return ''
   }
 
-  const { scriptId = 123, ...restOptions } = options
+  const { scriptId = 123, minify = false, ...restOptions } = options
 
   try {
+    // Optimize parser options to reduce memory usage:
+    // - tokens: false - don't store token information
+    // - ranges: false - don't store range information (we only need loc)
+    // - attachComments: false - don't attach comments to nodes (saves memory)
     const originalAst = parser2.parse(code, {
       sourceType: 'module',
       plugins: [],
+      tokens: false,
+      ranges: false,
     })
 
+    // Must collect locations BEFORE mutating AST, as mutations change node locations
     const functionLocations = getFunctionLocations(originalAst)
 
     const plugin = createFunctionWrapperPlugin({ ...restOptions, functionLocations, scriptId })
     traverse2(originalAst, plugin)
 
+    // Clear functionLocations map to help GC (though it will be GC'd when function returns anyway)
+    functionLocations.clear()
+
     const result = generate2(originalAst, {
       retainLines: false,
       compact: false,
       comments: true,
-      minified: false,
+      minified: minify,
       jsonCompatibleStrings: false,
     })
 

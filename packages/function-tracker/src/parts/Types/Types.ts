@@ -6,6 +6,7 @@ export interface TransformOptions {
   readonly scriptId?: number
   readonly filename?: string
   readonly includeLocation?: boolean
+  readonly minify?: boolean
 }
 
 export interface TrackingConfig {

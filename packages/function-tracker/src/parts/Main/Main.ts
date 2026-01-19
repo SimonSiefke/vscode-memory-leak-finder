@@ -1,12 +1,12 @@
 import { NodeForkedProcessRpcClient } from '@lvce-editor/rpc'
 import * as CommandMap from '../CommandMap/CommandMap.ts'
-import * as SocketServer from '../SocketServer/SocketServer.ts'
+import * as HttpServer from '../SocketServer/SocketServer.ts'
 
-const SOCKET_PATH = '/tmp/function-tracker-socket'
+const PORT = 9876
 
 export const main = async () => {
-  // Start socket server for protocol interception
-  await SocketServer.startSocketServer(SOCKET_PATH)
+  // Start HTTP server for protocol interception
+  await HttpServer.startServer(PORT)
 
   await NodeForkedProcessRpcClient.create({
     commandMap: CommandMap.commandMap,
@@ -14,14 +14,14 @@ export const main = async () => {
 
   // Cleanup on exit
   process.on('exit', async () => {
-    await SocketServer.stopSocketServer()
+    await HttpServer.stopServer()
   })
   process.on('SIGINT', async () => {
-    await SocketServer.stopSocketServer()
+    await HttpServer.stopServer()
     process.exit(0)
   })
   process.on('SIGTERM', async () => {
-    await SocketServer.stopSocketServer()
+    await HttpServer.stopServer()
     process.exit(0)
   })
 }
