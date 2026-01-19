@@ -115,7 +115,6 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                 id: request.id ?? null,
               }
               socket.write(JSON.stringify(errorResponse))
-              socket.end()
               return
             }
 
@@ -132,7 +131,6 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                   id: request.id ?? null,
                 }
                 socket.write(JSON.stringify(errorResponse))
-                socket.end()
                 return
               }
 
@@ -146,7 +144,6 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     id: request.id ?? null,
                   }
                   socket.write(JSON.stringify(response))
-                  socket.end()
                   return
                 }
 
