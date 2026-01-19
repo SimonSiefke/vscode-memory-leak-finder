@@ -6,7 +6,8 @@ import { normalize, resolve, isAbsolute } from 'node:path'
 
 export interface TrackedFunctionResult {
   readonly functionName: string
-  readonly callCount: number
+  readonly totalCount: number
+  readonly delta: number
   readonly originalLocation?: string | null
   readonly originalLine?: number | null
   readonly originalColumn?: number | null
@@ -275,18 +276,19 @@ export const compareTrackedFunctions = async (
   for (const functionName of allFunctionNames) {
     const beforeCount = beforeFunctions[functionName] || 0
     const afterCount = afterFunctions[functionName] || 0
-    const callCount = afterCount - beforeCount
+    const delta = afterCount - beforeCount
 
-    if (callCount > 0) {
+    if (delta > 0) {
       results.push({
         functionName,
-        callCount,
+        totalCount: afterCount,
+        delta,
       })
     }
   }
 
-  // Sort by call count descending (highest first)
-  results = results.toSorted((a, b) => b.callCount - a.callCount)
+  // Sort by delta descending (highest first)
+  results = results.toSorted((a, b) => b.delta - a.delta)
 
   // If we have a scriptMap, resolve source maps for the results
   if (scriptMap && Object.keys(scriptMap).length > 0) {
