@@ -18,7 +18,12 @@ export const createChart = async (data: any, options: any): Promise<string> => {
   }
 
   if (options.compress) {
-    return await CompressSvg.compressSvg(svg)
+    try {
+      return await CompressSvg.compressSvg(svg)
+    } catch (error) {
+      console.error('SVG compression failed, returning uncompressed SVG:', error)
+      return svg
+    }
   }
 
   return svg
