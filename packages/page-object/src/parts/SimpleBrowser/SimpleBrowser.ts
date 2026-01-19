@@ -7,7 +7,7 @@ interface MockServer {
   [Symbol.asyncDispose]: () => Promise<void>
 }
 
-const createMockServer = async ({ port }): Promise<MockServer> => {
+const createMockServer = async ({ port }: { port: number }): Promise<MockServer> => {
   const server = createServer((req, res) => {
     if (req.url === '/page-b') {
       res.statusCode = 200
@@ -32,9 +32,11 @@ const createMockServer = async ({ port }): Promise<MockServer> => {
   }
 }
 
-export const create = ({ expect, page, platform, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
-    async addElementToChat({ selector }) {
+    async addElementToChat({ selector: _selector }: { selector: string }) {
       try {
         await page.waitForIdle()
         const add = page.locator('.element-selection-message')
@@ -47,10 +49,10 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to add element to chat`)
       }
     },
-    async clickLink({ href }) {
+    async clickLink({ href }: { href: string }) {
       try {
         await page.waitForIdle()
-        const webView = WebView.create({ expect, page, VError })
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,
@@ -80,7 +82,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to click link ${href}`)
       }
     },
-    async createMockServer({ id, port }) {
+    async createMockServer({ id, port }: { id: string; port: number }) {
       try {
         await page.waitForIdle()
         const server = await createMockServer({ port })
@@ -90,7 +92,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to create mock server`)
       }
     },
-    async disposeMockServer({ id }) {
+    async disposeMockServer({ id }: { id: string }) {
       try {
         const server = this.mockServers[id]
         await server[Symbol.asyncDispose]()
@@ -99,7 +101,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to dispose mock server`)
       }
     },
-    async mockElectronDebugger({ selector }) {
+    async mockElectronDebugger({ selector: _selector }: { selector: string }) {
       try {
         await page.waitForIdle()
         const add = page.locator('.element-selection-message')
@@ -113,7 +115,7 @@ export const create = ({ expect, page, platform, VError }) => {
       }
     },
     mockServers: Object.create(null),
-    async shouldHaveTabTitle({ title }) {
+    async shouldHaveTabTitle({ title }: { title: string }) {
       try {
         await page.waitForIdle()
         const tab = page.locator('.tab', { hasText: `Simple Browser` })
@@ -134,10 +136,10 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to verify tab title ${title}`)
       }
     },
-    async show({ port }) {
+    async show({ port }: { port: number }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -159,7 +161,7 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(tab).toHaveCount(1)
         await page.waitForIdle()
 
-        const webView = WebView.create({ expect, page, VError })
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,

@@ -1,7 +1,8 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async closeAll() {
       try {
@@ -9,7 +10,9 @@ export const create = ({ expect, page, platform, VError }) => {
         const toastContainer = page.locator('.notifications-toasts')
         await expect(toastContainer).toBeVisible()
         const quickPick = QuickPick.create({
+          electronApp: undefined,
           expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,

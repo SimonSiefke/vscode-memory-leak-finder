@@ -1,9 +1,10 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const getMatchingText = async (styleElements, className) => {
+const getMatchingText = async (styleElements: any, className: string): Promise<string> => {
   const [first, second] = className.split(' ')
   const styleCount = await styleElements.count()
   for (let i = 0; i < styleCount; i++) {
@@ -50,12 +51,12 @@ const getDecorationContent = (text: string, className: string): string => {
   return content
 }
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async checkoutBranch(branchName: string) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitCheckoutTo, {
           stayVisible: true,
         })
@@ -71,7 +72,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const decoration = page.locator('[class^="ced-1-TextEditorDecorationType"]').nth(1)
         await expect(decoration).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
         await page.waitForIdle()
         await expect(decoration).toBeHidden()
@@ -87,8 +88,11 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       await moreActions.click()
       await page.waitForIdle()
       const contextMenu = ContextMenu.create({
+        electronApp: undefined,
         expect,
+        ideVersion,
         page,
+        platform,
         VError,
       })
       await contextMenu.shouldHaveItem(name)
@@ -96,13 +100,13 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       await contextMenu.select(name)
       await page.waitForIdle()
     },
-    async enableInlineBlame({ expectedDecoration }) {
+    async enableInlineBlame({ expectedDecoration }: { expectedDecoration: RegExp }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
         await page.waitForIdle()
-        const editor = Editor.create({ expect, ideVersion, page, platform, VError })
+        const editor = Editor.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await editor.focus()
         await editor.cursorRight()
         await page.waitForIdle()
@@ -162,8 +166,11 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await moreActions.click()
         await page.waitForIdle()
         const contextMenu = ContextMenu.create({
+          electronApp: undefined,
           expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
+          platform,
           VError,
         })
         await contextMenu.shouldHaveItem(`Graph`)
@@ -180,7 +187,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async refresh() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitRefresh)
       } catch (error) {
         throw new VError(error, `Failed to git refresh`)
@@ -201,7 +208,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to select branch "${branchName}"`)
       }
     },
-    async shouldHaveHistoryItem(name) {
+    async shouldHaveHistoryItem(name: string) {
       try {
         const history = page.locator('[aria-label="Source Control History"]')
         await expect(history).toBeVisible()
@@ -211,7 +218,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify history item`)
       }
     },
-    async shouldHaveUnstagedFile(name) {
+    async shouldHaveUnstagedFile(name: string) {
       try {
         const changesPart = page.locator('[role="treeitem"][aria-label="Changes"]')
         await expect(changesPart).toBeVisible()
@@ -221,7 +228,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to check unstaged file`)
       }
     },
-    async shouldNotHaveHistoryItem(name) {
+    async shouldNotHaveHistoryItem(name: string) {
       try {
         const history = page.locator('[aria-label="Source Control History"]')
         await expect(history).toBeVisible()
@@ -274,8 +281,11 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await moreActions.click()
         await page.waitForIdle()
         const contextMenu = ContextMenu.create({
+          electronApp: undefined,
           expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
+          platform,
           VError,
         })
         // @ts-ignore
@@ -293,7 +303,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async stageFile(name: string, parentFolder?: string) {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitStageAllChanges)
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
         if (parentFolder) {
@@ -307,15 +317,15 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async undoLastCommit() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.UndoLastCommit)
       } catch (error) {
         throw new VError(error, `Failed to undo last commit`)
       }
     },
-    async unstageFile(name) {
+    async unstageFile(name: string) {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitUnstageAllChanges)
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
         await expect(file).toHaveAttribute('aria-label', `${name}, Untracked`)

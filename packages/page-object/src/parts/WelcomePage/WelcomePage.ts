@@ -1,10 +1,11 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
-    async expandStep(name) {
+    async expandStep(name: string) {
       try {
         const step = page.locator(`.getting-started-step[data-step-id="${name}"]`)
         await expect(step).toHaveAttribute('aria-expanded', 'false')
@@ -18,7 +19,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       try {
         const gettingStartedContainer = page.locator('.gettingStartedContainer')
         await expect(gettingStartedContainer).toBeVisible()
-        const editor = Editor.create({ expect, ideVersion, page, platform, VError })
+        const editor = Editor.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await expect(gettingStartedContainer).toBeHidden()
       } catch (error) {
@@ -29,7 +30,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       try {
         const gettingStartedContainer = page.locator('.gettingStartedContainer')
         await expect(gettingStartedContainer).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.HelpWelcome)
         await expect(gettingStartedContainer).toBeVisible()
       } catch (error) {

@@ -1,15 +1,23 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async hide() {
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.HideActivityBar)
         await expect(activityBar).toBeHidden()
       } catch (error) {
@@ -39,7 +47,14 @@ export const create = ({ expect, page, platform, VError }) => {
         await expect(activityBar).toBeVisible()
         const ariaLabel = 'Explorer'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
-        const contextMenu = ContextMenu.create({ expect, page, VError })
+        const contextMenu = ContextMenu.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await contextMenu.open(activityBarItem)
         await contextMenu.openSubMenu('Move To', false)
         await contextMenu.select('Panel', false)
@@ -49,7 +64,14 @@ export const create = ({ expect, page, platform, VError }) => {
     },
     async resetViewLocations() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand('View: Reset View Locations')
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
@@ -64,7 +86,14 @@ export const create = ({ expect, page, platform, VError }) => {
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.FocusActivityBar)
         await expect(activityBar).toBeVisible({ timeout: 10_000 })
       } catch (error) {
@@ -104,13 +133,13 @@ export const create = ({ expect, page, platform, VError }) => {
         await activityBarItem.hover()
         const tooltip = page.locator('[role="tooltip"]')
         await expect(tooltip).toBeVisible()
-        const keyBinding = IsMacos.isMacos(platform) ? '⇧⌘E' : 'Ctrl+Shift+E'
+        const keyBinding = platform && IsMacos.isMacos(platform) ? '⇧⌘E' : 'Ctrl+Shift+E'
         await expect(tooltip).toHaveText(`Explorer (${keyBinding})`)
       } catch (error) {
         throw new VError(error, `Failed to show explorer tooltip`)
       }
     },
-    async showView({ ariaLabel, titleLabel = ariaLabel }) {
+    async showView({ ariaLabel, titleLabel = ariaLabel }: { ariaLabel: string; titleLabel?: string | RegExp }) {
       try {
         await page.waitForIdle()
         const activityBar = page.locator('.part.activitybar')
