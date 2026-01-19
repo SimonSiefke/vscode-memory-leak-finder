@@ -198,6 +198,7 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                 try {
                   const transformedCode = transformCodeWithTracking(originalCode, {
                     filename: filePath,
+                    minify: true,
                   })
 
                   const response: JsonRpcSuccessResponse = {

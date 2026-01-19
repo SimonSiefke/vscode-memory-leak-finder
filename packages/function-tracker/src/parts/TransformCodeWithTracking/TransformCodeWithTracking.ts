@@ -9,7 +9,7 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
     return ''
   }
 
-  const { scriptId = 123, ...restOptions } = options
+  const { scriptId = 123, minify = false, ...restOptions } = options
 
   try {
     const originalAst = parser2.parse(code, {
@@ -26,7 +26,7 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
       retainLines: false,
       compact: false,
       comments: true,
-      minified: false,
+      minified: minify,
       jsonCompatibleStrings: false,
     })
 
