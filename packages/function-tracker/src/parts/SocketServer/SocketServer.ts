@@ -198,7 +198,7 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
 
                 // Transform code on-the-fly
                 try {
-                  const transformedCode = transformCode(originalCode, {
+                  const transformedCode = await transformCode(originalCode, {
                     filename: filePath,
                     minify: true,
                   })
