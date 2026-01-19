@@ -11,7 +11,7 @@ import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDe
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
 // TODO maybe pass it as argument from above
-const SOCKET_PATH = '/tmp/function-tracker-socket'
+const HTTP_SERVER_PORT = 9876
 
 export const prepareBoth = async (
   headlessMode: boolean,
@@ -31,7 +31,7 @@ export const prepareBoth = async (
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode, trackFunctions, SOCKET_PATH)
+  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode, trackFunctions, HTTP_SERVER_PORT)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 

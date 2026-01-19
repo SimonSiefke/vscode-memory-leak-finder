@@ -1,389 +1,114 @@
-import { createServer, Server, Socket } from 'net'
-import { randomUUID } from 'node:crypto'
-import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
+import { createServer, Server, IncomingMessage, ServerResponse } from 'http'
+import { readFileSync } from 'node:fs'
 import { transformCode } from '../Transform/Transform.ts'
 
-interface JsonRpcRequest {
-  readonly jsonrpc: '2.0'
-  readonly method: string
-  readonly params?: unknown
-  readonly id: number | string | null
-}
+let httpServer: Server | null = null
 
-interface JsonRpcSuccessResponse {
-  readonly jsonrpc: '2.0'
-  readonly result: unknown
-  readonly id: number | string | null
-}
-
-interface JsonRpcErrorResponse {
-  readonly jsonrpc: '2.0'
-  readonly error: {
-    readonly code: number
-    readonly message: string
-    readonly data?: unknown
-  }
-  readonly id: number | string | null
-}
-
-type JsonRpcResponse = JsonRpcSuccessResponse | JsonRpcErrorResponse
-
-interface TransformParams {
-  readonly url: string
-}
-
-let socketServer: Server | null = null
-
-const isWellBalancedJson = (buffer: string): number => {
-  // Find complete JSON object by counting braces
-  let braceCount = 0
-  let inString = false
-  let escapeNext = false
-
-  for (let i = 0; i < buffer.length; i++) {
-    const char = buffer[i]
-
-    if (escapeNext) {
-      escapeNext = false
-      continue
-    }
-
-    if (char === '\\') {
-      escapeNext = true
-      continue
-    }
-
-    if (char === '"') {
-      inString = !inString
-      continue
-    }
-
-    if (inString) {
-      continue
-    }
-
-    if (char === '{') {
-      braceCount++
-    } else if (char === '}') {
-      braceCount--
-      if (braceCount === 0) {
-        return i + 1
-      }
-    }
-  }
-
-  return 0
-}
-
-export const startSocketServer = async (socketPath: string): Promise<void> => {
-  // Remove existing socket file if it exists
-  try {
-    if (existsSync(socketPath)) {
-      unlinkSync(socketPath)
-    }
-  } catch (error) {
-    // Ignore errors
-  }
-
+export const startServer = async (port: number): Promise<void> => {
   const { promise, resolve, reject } = Promise.withResolvers<void>()
 
-  socketServer = createServer((socket: Socket) => {
-    let requestBuffer = ''
-
-    socket.on('data', async (data: Buffer) => {
-      requestBuffer += data.toString()
-
-      // Try to parse complete JSON requests
-      try {
-        const endIndex = isWellBalancedJson(requestBuffer)
-
-        if (endIndex > 0) {
-          const requestJson = requestBuffer.substring(0, endIndex)
-          requestBuffer = requestBuffer.substring(endIndex)
-
-          try {
-            const request: JsonRpcRequest = JSON.parse(requestJson)
-
-            // Validate JSON-RPC 2.0 request
-            if (request.jsonrpc !== '2.0' || !request.method) {
-              const errorResponse: JsonRpcErrorResponse = {
-                jsonrpc: '2.0',
-                error: {
-                  code: -32600,
-                  message: 'Invalid Request',
-                },
-                id: request.id ?? null,
-              }
-              if (socket.writable && !socket.destroyed) {
-                socket.write(JSON.stringify(errorResponse))
-                socket.end()
-              }
-              return
-            }
-
-            // Handle transform method
-            if (request.method === 'transform') {
-              const params = request.params as TransformParams
-              if (!params || typeof params.url !== 'string') {
-                const errorResponse: JsonRpcErrorResponse = {
-                  jsonrpc: '2.0',
-                  error: {
-                    code: -32602,
-                    message: 'Invalid params',
-                  },
-                  id: request.id ?? null,
-                }
-                if (socket.writable && !socket.destroyed) {
-                  socket.write(JSON.stringify(errorResponse))
-                  socket.end()
-                }
-                return
-              }
-
-              try {
-                // Extract file path from URL
-                // URL format: vscode-file://vscode-app/path/to/file.js
-                if (!params.url.startsWith('vscode-file://vscode-app')) {
-                  const response: JsonRpcSuccessResponse = {
-                    jsonrpc: '2.0',
-                    result: null,
-                    id: request.id ?? null,
-                  }
-                  if (socket.writable && !socket.destroyed) {
-                    socket.write(JSON.stringify(response))
-                    socket.end()
-                  }
-                  return
-                }
-
-                let filePath = params.url.slice('vscode-file://vscode-app'.length)
-
-                // Remove query parameters (everything after ?)
-                const queryIndex = filePath.indexOf('?')
-                if (queryIndex !== -1) {
-                  filePath = filePath.substring(0, queryIndex)
-                }
-
-                // Remove hash (everything after #)
-                const hashIndex = filePath.indexOf('#')
-                if (hashIndex !== -1) {
-                  filePath = filePath.substring(0, hashIndex)
-                }
-
-                // Only transform JavaScript files
-                if (!filePath.endsWith('.js')) {
-                  const response: JsonRpcSuccessResponse = {
-                    jsonrpc: '2.0',
-                    result: null,
-                    id: request.id ?? null,
-                  }
-                  if (socket.writable && !socket.destroyed) {
-                    socket.write(JSON.stringify(response))
-                    socket.end()
-                  }
-                  return
-                }
-
-                // Read original file from disk
-                let originalCode: string
-                try {
-                  originalCode = readFileSync(filePath, 'utf8')
-                } catch (error) {
-                  console.error(`[SocketServer] Error reading file ${filePath}:`, error)
-                  const errorResponse: JsonRpcErrorResponse = {
-                    jsonrpc: '2.0',
-                    error: {
-                      code: -32000,
-                      message: error instanceof Error ? error.message : 'Failed to read file',
-                    },
-                    id: request.id ?? null,
-                  }
-                  if (socket.writable && !socket.destroyed) {
-                    socket.write(JSON.stringify(errorResponse))
-                    socket.end()
-                  }
-                  return
-                }
-
-                // Transform code on-the-fly
-                try {
-                  const transformedCode = await transformCode(originalCode, {
-                    filename: filePath,
-                    minify: true,
-                  })
-
-                  // Write transformed code to temporary file
-                  const tempFilePath = `/tmp/${randomUUID()}`
-                  writeFileSync(tempFilePath, transformedCode, 'utf8')
-
-                  const response: JsonRpcSuccessResponse = {
-                    jsonrpc: '2.0',
-                    result: { filePath: tempFilePath },
-                    id: request.id ?? null,
-                  }
-                  console.log({ response })
-                  
-                  // Check if socket is still writable before writing
-                  if (!socket.writable || socket.destroyed) {
-                    console.error('[SocketServer] Socket is not writable, cannot send response')
-                    return
-                  }
-                  
-                  const { resolve, promise } = Promise.withResolvers<void>()
-                  const responseString = JSON.stringify(response)
-                  
-                  // Set up error handlers before writing
-                  const errorHandler = (error: Error) => {
-                    console.error('[SocketServer] Socket error during write:', error)
-                    resolve()
-                  }
-                  const closeHandler = () => {
-                    console.log('[SocketServer] Socket closed during write')
-                    resolve()
-                  }
-                  
-                  socket.once('error', errorHandler)
-                  socket.once('close', closeHandler)
-                  
-                  // Write with error handling
-                  try {
-                    const writeResult = socket.write(responseString, (error) => {
-                      socket.removeListener('error', errorHandler)
-                      socket.removeListener('close', closeHandler)
-                      if (error) {
-                        console.error('[SocketServer] Error writing response:', error)
-                        resolve()
-                      } else {
-                        resolve()
-                      }
-                    })
-                    
-                    // If write returns false, the buffer is full, wait for drain
-                    // Note: the write callback will still be called after drain
-                    if (!writeResult) {
-                      // Wait for drain, but don't resolve yet - wait for write callback
-                      await new Promise<void>((resolveDrain) => {
-                        const drainHandler = () => {
-                          socket.removeListener('error', errorHandler)
-                          socket.removeListener('close', closeHandler)
-                          resolveDrain()
-                        }
-                        socket.once('drain', drainHandler)
-                        socket.once('error', () => {
-                          socket.removeListener('drain', drainHandler)
-                          resolveDrain()
-                        })
-                        socket.once('close', () => {
-                          socket.removeListener('drain', drainHandler)
-                          resolveDrain()
-                        })
-                      })
-                    }
-                  } catch (writeError) {
-                    socket.removeListener('error', errorHandler)
-                    socket.removeListener('close', closeHandler)
-                    console.error('[SocketServer] Exception during write:', writeError)
-                    resolve()
-                  }
-                  
-                  await promise
-                  
-                  // Close the socket after sending response (client expects this)
-                  if (socket.writable && !socket.destroyed) {
-                    socket.end()
-                  }
-                  return
-                } catch (error) {
-                  console.error('[SocketServer] Error transforming code:', error)
-                  const errorResponse: JsonRpcErrorResponse = {
-                    jsonrpc: '2.0',
-                    error: {
-                      code: -32000,
-                      message: error instanceof Error ? error.message : 'Server error',
-                    },
-                    id: request.id ?? null,
-                  }
-                  if (socket.writable && !socket.destroyed) {
-                    socket.write(JSON.stringify(errorResponse))
-                    socket.end()
-                  }
-                  return
-                }
-              } catch (error) {
-                console.error('[SocketServer] Error handling transform request:', error)
-                const errorResponse: JsonRpcErrorResponse = {
-                  jsonrpc: '2.0',
-                  error: {
-                    code: -32000,
-                    message: error instanceof Error ? error.message : 'Server error',
-                  },
-                  id: request.id ?? null,
-                }
-                if (socket.writable && !socket.destroyed) {
-                  socket.write(JSON.stringify(errorResponse))
-                  socket.end()
-                }
-                return
-              }
-            }
-
-            // Unknown method
-            const errorResponse: JsonRpcErrorResponse = {
-              jsonrpc: '2.0',
-              error: {
-                code: -32601,
-                message: 'Method not found',
-              },
-              id: request.id ?? null,
-            }
-            if (socket.writable && !socket.destroyed) {
-              socket.write(JSON.stringify(errorResponse))
-              socket.end()
-            }
-          } catch (parseError) {
-            // Invalid JSON
-            const errorResponse: JsonRpcErrorResponse = {
-              jsonrpc: '2.0',
-              error: {
-                code: -32700,
-                message: 'Parse error',
-              },
-              id: null,
-            }
-            if (socket.writable && !socket.destroyed) {
-              socket.write(JSON.stringify(errorResponse))
-              socket.end()
-            }
-          }
-        }
-      } catch (error) {
-        // Not complete JSON yet, wait for more data
+  httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    try {
+      // Only handle GET requests to /transform
+      if (req.method !== 'GET' || !req.url) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' })
+        res.end('Not Found')
+        return
       }
-    })
 
-    socket.on('error', (error) => {
-      console.error('[SocketServer] Socket error:', error)
-    })
+      const url = new URL(req.url, `http://localhost:${port}`)
+      if (url.pathname !== '/transform') {
+        res.writeHead(404, { 'Content-Type': 'text/plain' })
+        res.end('Not Found')
+        return
+      }
+
+      const fileUrl = url.searchParams.get('url')
+      if (!fileUrl) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' })
+        res.end('Missing url parameter')
+        return
+      }
+
+      // Extract file path from URL
+      // URL format: vscode-file://vscode-app/path/to/file.js
+      if (!fileUrl.startsWith('vscode-file://vscode-app')) {
+        res.writeHead(200, { 'Content-Type': 'text/plain' })
+        res.end('')
+        return
+      }
+
+      let filePath = fileUrl.slice('vscode-file://vscode-app'.length)
+
+      // Remove query parameters (everything after ?)
+      const queryIndex = filePath.indexOf('?')
+      if (queryIndex !== -1) {
+        filePath = filePath.substring(0, queryIndex)
+      }
+
+      // Remove hash (everything after #)
+      const hashIndex = filePath.indexOf('#')
+      if (hashIndex !== -1) {
+        filePath = filePath.substring(0, hashIndex)
+      }
+
+      // Only transform JavaScript files
+      if (!filePath.endsWith('.js')) {
+        res.writeHead(200, { 'Content-Type': 'text/plain' })
+        res.end('')
+        return
+      }
+
+      // Read original file from disk
+      let originalCode: string
+      try {
+        originalCode = readFileSync(filePath, 'utf8')
+      } catch (error) {
+        console.error(`[HttpServer] Error reading file ${filePath}:`, error)
+        res.writeHead(500, { 'Content-Type': 'text/plain' })
+        res.end(error instanceof Error ? error.message : 'Failed to read file')
+        return
+      }
+
+      // Transform code on-the-fly
+      try {
+        const transformedCode = await transformCode(originalCode, {
+          filename: filePath,
+          minify: true,
+        })
+
+        res.writeHead(200, { 'Content-Type': 'text/plain' })
+        res.end(transformedCode)
+      } catch (error) {
+        console.error('[HttpServer] Error transforming code:', error)
+        res.writeHead(500, { 'Content-Type': 'text/plain' })
+        res.end(error instanceof Error ? error.message : 'Server error')
+      }
+    } catch (error) {
+      console.error('[HttpServer] Error handling request:', error)
+      res.writeHead(500, { 'Content-Type': 'text/plain' })
+      res.end(error instanceof Error ? error.message : 'Server error')
+    }
   })
 
-  socketServer.on('error', (error) => {
-    console.error('[SocketServer] Server error:', error)
+  httpServer.on('error', (error) => {
+    console.error('[HttpServer] Server error:', error)
     reject(error)
   })
 
-  socketServer.listen(socketPath, () => {
-    console.log(`[FunctionTracker] Socket server listening on ${socketPath}`)
+  httpServer.listen(port, () => {
+    console.log(`[FunctionTracker] HTTP server listening on port ${port}`)
     resolve()
   })
 
   await promise
 }
 
-export const stopSocketServer = async (): Promise<void> => {
-  if (socketServer) {
+export const stopServer = async (): Promise<void> => {
+  if (httpServer) {
     const { promise, resolve } = Promise.withResolvers<void>()
-    socketServer.close(() => {
-      socketServer = null
+    httpServer.close(() => {
+      httpServer = null
       resolve()
     })
     await promise

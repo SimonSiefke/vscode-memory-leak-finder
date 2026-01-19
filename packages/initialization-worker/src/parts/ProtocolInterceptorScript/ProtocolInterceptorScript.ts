@@ -1,79 +1,28 @@
-export const protocolInterceptorScript = (socketPath: string): string => {
+export const protocolInterceptorScript = (port: number): string => {
   return `function() {
   const electron = this
   const require = globalThis._____require
   const { protocol, app, BrowserWindow } = electron
 
-  const net = require('net')
   const fs = require('fs')
   const path = require('path')
 
   // Query function tracker for transformed code
-  const queryFunctionTracker = (url) => {
-    const { promise, resolve } = Promise.withResolvers()
-    const socket = net.createConnection('${socketPath}')
-    let responseData = ''
-    let requestId = Math.floor(Math.random() * 1000000)
-
-    socket.on('connect', () => {
-      const request = JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'transform',
-        params: { url },
-        id: requestId,
-      })
-      socket.write(request)
-    })
-
-    socket.on('data', (data) => {
-      responseData += data.toString()
-    })
-
-    socket.on('end', () => {
-      try {
-        const response = JSON.parse(responseData)
-        if (response.jsonrpc === '2.0' && response.id === requestId) {
-          if (response.result && response.result.filePath) {
-            // Read transformed code from temporary file
-            try {
-              const transformedCode = fs.readFileSync(response.result.filePath, 'utf8')
-              // Clean up temporary file
-              try {
-                fs.unlinkSync(response.result.filePath)
-              } catch (unlinkError) {
-                // Ignore cleanup errors
-              }
-              resolve(transformedCode)
-            } catch (readError) {
-              console.error('[ProtocolInterceptor] Error reading transformed code file:', readError)
-              resolve(null)
-            }
-          } else if (response.error) {
-            console.error('[ProtocolInterceptor] JSON-RPC error:', response.error)
-            resolve(null)
-          } else {
-            resolve(null)
-          }
-        } else {
-          resolve(null)
-        }
-      } catch (error) {
-        console.error('[ProtocolInterceptor] Error parsing response:', error)
-        resolve(null)
+  const queryFunctionTracker = async (url) => {
+    try {
+      const encodedUrl = encodeURIComponent(url)
+      const response = await fetch(\`http://localhost:${port}/transform?url=\${encodedUrl}\`)
+      if (response.ok) {
+        const transformedCode = await response.text()
+        return transformedCode || null
+      } else {
+        console.error('[ProtocolInterceptor] HTTP error:', response.status, response.statusText)
+        return null
       }
-    })
-
-    socket.on('error', (error) => {
-      console.error('[ProtocolInterceptor] Socket error:', error)
-      resolve(null)
-    })
-
-    setTimeout(() => {
-      socket.destroy()
-      resolve(null)
-    }, 5000)
-
-    return promise
+    } catch (error) {
+      console.error('[ProtocolInterceptor] Error fetching transformed code:', error)
+      return null
+    }
   }
 
   // Get MIME type from file extension
