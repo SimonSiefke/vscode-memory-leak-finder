@@ -9,18 +9,36 @@ const generateFileContent = (lines: number): string => {
     .join('\n')
 }
 
-export const setup = async ({ DiffEditor, Editor, Explorer, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ DiffEditor, Editor, Explorer, Workspace, SideBar, QuickPick }: TestContext): Promise<void> => {
   const file1Content = generateFileContent(100)
   const file2Content = generateFileContent(100)
     .split('\n')
     .map((line, i) => {
-      // Create multiple diff sections:
-      // Section 1: lines 10-20 (modified)
-      // Section 2: lines 30-40 (unchanged)
-      // Section 3: lines 50-60 (modified)
-      // Section 4: lines 70-80 (unchanged)
-      // Section 5: lines 90-100 (modified)
-      if ((i >= 9 && i < 20) || (i >= 49 && i < 60) || (i >= 89 && i < 100)) {
+      // Create multiple small, irregular diff sections:
+      // Line 5-7 (3 lines), 10-12 (3 lines), 15-18 (4 lines), 22-23 (2 lines),
+      // 28-30 (3 lines), 33-36 (4 lines), 40-41 (2 lines), 45-48 (4 lines),
+      // 52-53 (2 lines), 58-60 (3 lines), 65-67 (3 lines), 72-75 (4 lines),
+      // 80-81 (2 lines), 85-88 (4 lines), 92-94 (3 lines), 97-99 (3 lines)
+      const diffRanges = [
+        [4, 7], // 3 lines
+        [9, 12], // 3 lines
+        [14, 18], // 4 lines
+        [21, 23], // 2 lines
+        [27, 30], // 3 lines
+        [32, 36], // 4 lines
+        [39, 41], // 2 lines
+        [44, 48], // 4 lines
+        [51, 53], // 2 lines
+        [57, 60], // 3 lines
+        [64, 67], // 3 lines
+        [71, 75], // 4 lines
+        [79, 81], // 2 lines
+        [84, 88], // 4 lines
+        [91, 94], // 3 lines
+        [96, 99], // 3 lines
+      ]
+      const isInDiff = diffRanges.some(([start, end]) => i >= start && i < end)
+      if (isInDiff) {
         return `modified ${line}`
       }
       return line
@@ -51,6 +69,7 @@ export const setup = async ({ DiffEditor, Editor, Explorer, Workspace, SideBar }
     file2: 'file2.txt',
     file2Content: 'line 1',
   })
+  await QuickPick.executeCommand('Toggle Inline View')
 }
 
 export const run = async ({ DiffEditor }: TestContext): Promise<void> => {
