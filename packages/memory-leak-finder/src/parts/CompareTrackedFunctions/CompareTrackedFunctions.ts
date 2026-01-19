@@ -261,6 +261,7 @@ export const compareTrackedFunctions = async (
       if (parsed.url && parsed.line !== null) {
         // Try to find the script - findScript handles both scriptId and URL lookups
         let script = findScript(scriptMap, parsed.url)
+        let actualUrl = parsed.url
 
         // If not found and parsed.url looks like a scriptId (numeric), try converting to URL first
         // This helps when the scriptId format doesn't match the scriptMap key format
@@ -270,9 +271,21 @@ export const compareTrackedFunctions = async (
             // It's a scriptId, try to convert to URL and lookup again
             const convertedUrl = convertScriptIdToUrl(scriptMap, parsed.url)
             if (convertedUrl) {
+              actualUrl = convertedUrl
               script = findScript(scriptMap, convertedUrl)
             }
           }
+        } else if (script.url) {
+          // If we found the script and it has a URL, use that URL
+          actualUrl = script.url
+        }
+
+        // Update functionName to show URL with line and column if we have a URL
+        // Always include column in the functionName format: (url:line:column)
+        if (actualUrl && script) {
+          const column = parsed.column !== null && parsed.column >= 0 ? parsed.column : 0
+          // Always update to ensure URL format with column is shown
+          results[i].functionName = `${parsed.name} (${actualUrl}:${parsed.line}:${column})`
         }
 
         if (script) {
@@ -327,7 +340,15 @@ export const compareTrackedFunctions = async (
           // Keep functionName with minified location, add originalLocation separately
           // Always include both line and column in originalLocation format: <file>:<line>:<column>
           let originalLocation: string | null = null
+          let originalLine: number | null = null
+          let originalColumn: number | null = null
+          let originalSource: string | null = null
           if (original) {
+            // Set individual fields
+            originalLine = original.line ?? null
+            originalColumn = original.column ?? null
+            originalSource = original.source ?? null
+
             // Build the original location string - always include both line and column when we have source and line
             if (original.source && original.line !== null) {
               // Always include column (default to 0 if not available)
@@ -341,6 +362,9 @@ export const compareTrackedFunctions = async (
           results[pointer.index] = {
             ...result,
             originalLocation,
+            originalLine,
+            originalColumn,
+            originalSource,
           }
         }
       } catch (error) {
