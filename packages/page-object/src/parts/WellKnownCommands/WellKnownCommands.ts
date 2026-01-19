@@ -112,6 +112,7 @@ export const TogglePrimarySideBarVisibility = 'View: Toggle Primary Side Bar Vis
 export const ToggleScreenCastMode = 'Developer: Toggle Screencast Mode'
 export const ToggleScreenReaderAccessibilityMode = 'Toggle Screen Reader Accessibility Mode'
 export const ToggleZenMode = 'View: Toggle Zen Mode'
+export const TriggerInlineSuggestion = 'Trigger Inline Suggestion'
 export const TriggerSuggest = 'Trigger Suggest'
 export const TypeScriptGoToSourceDefinition = 'TypeScript: Go to Source Definition'
 export const Undo = 'Undo'

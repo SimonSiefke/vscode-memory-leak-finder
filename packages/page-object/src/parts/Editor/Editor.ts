@@ -1594,6 +1594,40 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async splitDown() {
       return this.split(WellKnownCommands.ViewSplitEditorDown, {})
     },
+    async showInlineSuggestions({ accept = false }) {
+      const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+      await quickPick.executeCommand(WellKnownCommands.TriggerInlineSuggestion)
+      const editor = page.locator('.editor-instance')
+      await expect(editor).toBeVisible()
+      await page.waitForIdle()
+      const ghost = editor.locator('.ghost-text-decoration.syntax-highlighted')
+      await expect(ghost).toBeVisible({ timeout: 10_000 })
+      await page.waitForIdle()
+      if (accept) {
+        await page.keyboard.press('Tab')
+        await page.waitForIdle()
+        await expect(ghost).toBeHidden()
+        await page.waitForIdle()
+      }
+    },
+    async acceptInlineSuggestion() {
+      try {
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.TriggerInlineSuggestion)
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const ghost = editor.locator('.ghost-text-decoration.syntax-highlighted')
+        await expect(ghost).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
+        await page.keyboard.press('Tab')
+        await page.waitForIdle()
+        await expect(ghost).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to accept inline suggestion`)
+      }
+    },
     async splitLeft() {
       return this.split(WellKnownCommands.ViewSplitEditorLeft, {})
     },

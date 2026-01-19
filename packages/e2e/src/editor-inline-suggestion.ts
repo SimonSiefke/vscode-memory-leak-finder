@@ -16,27 +16,22 @@ export const setup = async ({ SideBar, Editor, Electron, Extensions, Workspace }
   await Editor.closeAll()
   await Workspace.setFiles([
     {
-      content: 'add',
+      content: '',
       name: 'add.ts',
     },
   ])
   await Editor.open('add.ts')
-  await Editor.shouldHaveText('add')
-  await Editor.shouldHaveSquigglyError()
+  await Editor.shouldHaveText('')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.type('const addNumbers')
   // @ts-ignore
-  await Editor.showInlineChat()
-  // @ts-ignore
-  await Editor.sendInlineChatMessage(
-    'add a function here that adds two numbers. use arrow function and const for the function declaration.',
-  )
-  await Editor.shouldHaveText('const abc = (a: number, b: number): number => a + b;')
-  // @ts-ignore
-  await Editor.hideInlineChat()
+  await Editor.acceptInlineSuggestion()
   await Editor.undo()
-  await Editor.shouldHaveText('add')
+  await Editor.undo()
+  await Editor.undo()
+  await Editor.shouldHaveText('')
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
