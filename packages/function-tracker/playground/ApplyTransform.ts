@@ -10,7 +10,7 @@ console.log('Reading VS Code workbench file...')
 const originalCode: string = fs.readFileSync(vscodePath, 'utf8')
 
 console.log('Transforming code with function call tracking...')
-const transformedCode: string = await transformCode(originalCode, vscodePath)
+const transformedCode: string = await transformCode(originalCode, vscodePath, false)
 
 console.log('Writing transformed code...')
 fs.writeFileSync(outputPath, transformedCode)
