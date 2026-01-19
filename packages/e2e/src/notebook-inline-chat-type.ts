@@ -1,4 +1,4 @@
-import type { TestContext } from '../types.ts'
+import type { TestContext } from '../types.js'
 
 export const skip = 1
 
@@ -13,6 +13,16 @@ export const setup = async ({ SideBar, Editor, Electron, Extensions, Workspace }
     id: 'GitHub.copilot-chat',
     name: 'GitHub Copilot Chat',
   })
+  await Editor.closeAll()
+  // await SettingsEditor.open()
+  // await SettingsEditor.search({
+  //   resultCount: 3,
+  //   value: 'github.copilot.chat.advanced.inlineChat2',
+  // })
+  // TODO maybe
+  // await SettingsEditor.enableCheckBox({
+  //   name: 'github.copilot.chat.advanced.inlineChat2',
+  // })
   await Editor.closeAll()
 
   const notebook = {
@@ -43,6 +53,8 @@ export const setup = async ({ SideBar, Editor, Electron, Extensions, Workspace }
 
 export const run = async ({ NotebookInlineChat }: TestContext): Promise<void> => {
   await NotebookInlineChat.show()
+  // @ts-ignore
+  await NotebookInlineChat.type('Hello World')
   await NotebookInlineChat.hide()
 }
 
