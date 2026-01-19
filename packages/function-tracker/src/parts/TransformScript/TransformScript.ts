@@ -1,5 +1,4 @@
 import * as t from '@babel/types'
-import { trackingCode } from '../TrackingCode/TrackingCode.ts'
 import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.js'
 import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 
@@ -10,11 +9,6 @@ export const transformCode = async (code: string, filename?: string, excludePatt
       sourceType: 'module',
       allowImportExportEverywhere: true,
       plugins: [],
-    })
-
-    // Add tracking code at the beginning
-    const trackingAST = parser2.parse(trackingCode, {
-      sourceType: 'script',
     })
 
     // Transform the original code with proper file context
@@ -32,7 +26,7 @@ export const transformCode = async (code: string, filename?: string, excludePatt
     }
 
     // Combine tracking code with transformed code
-    const combinedAST = t.program([...trackingAST.program.body, ...ast.program.body])
+    const combinedAST = t.program(ast.program.body)
 
     const result = generate2(combinedAST, {
       retainLines: false,
