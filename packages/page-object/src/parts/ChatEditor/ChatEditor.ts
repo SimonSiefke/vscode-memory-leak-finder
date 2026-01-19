@@ -77,7 +77,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async open() {
       try {
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.NewChartEditor)
+        await quickPick.executeCommand(WellKnownCommands.NewChatEditor)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
