@@ -118,7 +118,7 @@ test('TransformCodeWithTracking - should transform class methods', () => {
 })
 
 
-test('TransformCodeWithTracking - should not transform tracking functions themselves', () => {
+test('TransformCodeWithTracking - should transform all functions including tracking functions', () => {
   const code = `
     function trackFunctionCall() {
       return 'tracking'
@@ -139,6 +139,7 @@ test('TransformCodeWithTracking - should not transform tracking functions themse
   return 'tracking';
 }
 function getFunctionStatistics() {
+  globalThis.test.trackFunctionCall(123, 6, 4);
   return 'stats';
 }
 function regularFunction() {
@@ -152,7 +153,7 @@ function regularFunction() {
 test('TransformCodeWithTracking - should handle empty code', () => {
   const code = ''
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
-  expect(transformed).toBe('Function call tracking system')
+  expect(transformed).toBe('')
 })
 
 test('TransformCodeWithTracking - should handle invalid code gracefully', () => {
@@ -1051,7 +1052,7 @@ function privateHelper() {
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should not transform tracking functions themselves', () => {
+test('Transform Script - transformCode - should transform all functions including tracking functions', () => {
   const code = `
     function trackFunctionCall() {
       return 'tracking'
@@ -1072,6 +1073,7 @@ test('Transform Script - transformCode - should not transform tracking functions
   return 'tracking';
 }
 function getFunctionStatistics() {
+  globalThis.test.trackFunctionCall(123, 6, 4);
   return 'stats';
 }
 function regularFunction() {
@@ -1085,7 +1087,7 @@ function regularFunction() {
 test('Transform Script - transformCode - should handle empty code', () => {
   const code = ''
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
-  const expected = 'Function call tracking system'
+  const expected = ''
 
   expect(transformed).toBe(expected)
 })
@@ -1504,7 +1506,7 @@ const arrowComplex = () => {
 // Edge cases and error handling tests
 test('Transform Script - transformCode - should handle null/undefined input', () => {
   const transformedNull = transformCodeWithTracking(null as any)
-  expect(transformedNull).toBe('Function call tracking system')
+  expect(transformedNull).toBe('')
 })
 
 test('Transform Script - transformCode - should handle very large files', () => {
