@@ -19,6 +19,7 @@ export const prepareBoth = async (
   port: MessagePort,
   parsedVersion: any,
   trackFunctions: boolean,
+  openDevtools: boolean,
   connectionId: number,
   measureId: string,
   pid: number,
@@ -36,6 +37,7 @@ export const prepareBoth = async (
     electronRpc,
     headlessMode,
     trackFunctions,
+    openDevtools,
     HTTP_SERVER_PORT,
     preGeneratedWorkbenchPath,
   )

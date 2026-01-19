@@ -194,6 +194,7 @@ export const runTestsWithCallback = async ({
           screencastQuality,
           timeouts,
           trackFunctions,
+          openDevtools,
           updateUrl,
           useProxyMock,
           vscodePath,

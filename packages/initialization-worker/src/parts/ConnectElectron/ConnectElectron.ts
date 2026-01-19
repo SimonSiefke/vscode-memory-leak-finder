@@ -26,6 +26,7 @@ export const connectElectron = async (
   electronRpc: RpcConnection,
   headlessMode: boolean,
   trackFunctions: boolean,
+  openDevtools: boolean,
   port: number,
   preGeneratedWorkbenchPath: string | null,
 ) => {
