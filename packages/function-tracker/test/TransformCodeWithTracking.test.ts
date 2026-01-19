@@ -117,7 +117,6 @@ test('TransformCodeWithTracking - should transform class methods', () => {
   expect(transformed).toBe(expected)
 })
 
-
 test('TransformCodeWithTracking - should transform all functions including tracking functions', () => {
   const code = `
     function trackFunctionCall() {
@@ -791,9 +790,6 @@ const sumRecursive = (arr, index = 0) => {
   expect(transformed).toBe(expected)
 })
 
-
-
-
 test('TransformCodeWithTracking - should handle location tracking with different file extensions', () => {
   const code = `
     function testFunction() {
@@ -943,7 +939,6 @@ test('Transform Script - transformCode - should transform class methods', () => 
 
   expect(transformed).toBe(expected)
 })
-
 
 test('Transform Script - transformCode - should transform all functions including tracking functions', () => {
   const code = `
@@ -1948,7 +1943,6 @@ const sumRecursive = (arr, index = 0) => {
 
   expect(transformed).toBe(expected)
 })
-
 
 // Location tracking options tests
 test('Transform Script - transformCode - should include location information by default', () => {
