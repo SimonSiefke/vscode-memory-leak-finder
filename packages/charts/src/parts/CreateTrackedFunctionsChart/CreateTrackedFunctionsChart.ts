@@ -21,9 +21,9 @@ export const createChart = (): {
     marginRight: 50,
     type: 'dual-bar-chart',
     width: 1200,
-    x: 'index',
-    xLabel: 'Index',
-    y: 'count',
-    yLabel: 'Function Counts',
+    x: 'value',
+    xLabel: 'Call Count',
+    y: 'name',
+    yLabel: 'Function Name',
   }
 }
