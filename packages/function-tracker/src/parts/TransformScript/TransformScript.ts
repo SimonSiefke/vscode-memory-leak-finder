@@ -12,9 +12,7 @@ export const transformCode = async (code: string, filename?: string, excludePatt
 
     // Transform the original code with proper file context
     const plugin = createFunctionWrapperPlugin({ filename, excludePatterns })
-    traverse2(ast, plugin as any)
-
-    // Combine tracking code with transformed code
+    traverse2(ast, plugin)
 
     const result = generate2(ast, {
       retainLines: false,
