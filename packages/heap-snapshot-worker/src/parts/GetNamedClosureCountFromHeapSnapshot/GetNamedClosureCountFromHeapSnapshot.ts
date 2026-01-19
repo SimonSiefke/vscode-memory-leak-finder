@@ -16,11 +16,6 @@ interface NodeWithName extends NodeWithType {
   readonly id: number
 }
 
-interface GraphEdge {
-  readonly index: number
-  readonly name: string
-}
-
 const isClosure = (node: NodeWithType): boolean => {
   return node.type === 'closure'
 }

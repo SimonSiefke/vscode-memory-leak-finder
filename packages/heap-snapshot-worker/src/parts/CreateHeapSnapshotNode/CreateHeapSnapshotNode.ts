@@ -3,7 +3,7 @@ type HeapSnapshotNode = {
 }
 
 export const createHeapSnapshotNode = (
-  array: readonly number[],
+  array: readonly number[] | Uint32Array,
   startIndex: number,
   nodeFields: readonly string[],
   valueTypes: readonly string[],

@@ -7,7 +7,7 @@ type HeapSnapshotNode = {
 }
 
 export const parseHeapSnapshotObjects = (
-  values: readonly number[],
+  values: Uint32Array,
   valueFields: readonly string[],
   valueTypes: readonly string[],
   typeKey: string,
@@ -24,7 +24,7 @@ export const parseHeapSnapshotObjects = (
   const camelCaseNodeFields = valueFields.map(CamelCase.camelCase)
   for (let i = 0; i < values.length; i += nodeFieldCount) {
     const node = CreateHeapSnapshotNode.createHeapSnapshotNode(
-      values as number[],
+      values,
       i,
       camelCaseNodeFields as string[],
       valueTypes as string[],
