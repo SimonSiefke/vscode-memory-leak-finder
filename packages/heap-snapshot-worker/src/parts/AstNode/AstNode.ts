@@ -86,7 +86,7 @@ export interface CodeNode extends BaseAstNode {
 
 export interface UnknownNode extends BaseAstNode {
   readonly type: 'unknown'
-  readonly value?: string
+  readonly value?: any
 }
 
 export type AstNode =
