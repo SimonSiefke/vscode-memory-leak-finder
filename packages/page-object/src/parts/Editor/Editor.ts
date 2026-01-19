@@ -1597,7 +1597,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async splitLeft() {
       return this.split(WellKnownCommands.ViewSplitEditorLeft, {})
     },
-    async splitRight({ groupCount = undefined }: { groupCount?: number }) {
+    async splitRight({ groupCount = undefined }: { groupCount?: number } = {}) {
       const params = groupCount === undefined ? {} : { groupCount }
       return this.split(WellKnownCommands.ViewSplitEditorRight, params)
     },
