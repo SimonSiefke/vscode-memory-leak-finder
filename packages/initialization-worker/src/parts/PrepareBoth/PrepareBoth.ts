@@ -59,18 +59,6 @@ export const prepareBoth = async (
   // Wait for the page to be created by the initialization worker's connectDevtools
   const { dispose, sessionId, targetId } = await connectDevtoolsPromise
 
-  // Inject function counter snippet early via addScriptToEvaluateOnNewDocument if tracking is enabled
-  // This ensures globalThis.test.trackFunctionCall is available before any scripts are loaded
-  if (trackFunctions) {
-    const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-    const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
-    const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
-    await DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
-      source: FunctionCounterSnippet.functionCounterSnippet,
-    })
-    await browserRpc.dispose()
-  }
-
   // Dispose browserRpc from connectDevtools
   await dispose()
 
