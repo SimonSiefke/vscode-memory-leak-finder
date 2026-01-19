@@ -26,11 +26,7 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     }
 
     return t.expressionStatement(
-      t.callExpression(t.identifier('trackFunctionCall'), [
-        t.numericLiteral(scriptId),
-        t.numericLiteral(line),
-        t.numericLiteral(column),
-      ]),
+      t.callExpression(t.identifier('trackFunctionCall'), [t.numericLiteral(scriptId), t.numericLiteral(line), t.numericLiteral(column)]),
     )
   }
 
