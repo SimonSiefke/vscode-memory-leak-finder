@@ -30,8 +30,6 @@ interface JsonRpcErrorResponse {
   readonly id: number | string | null
 }
 
-type JsonRpcResponse = JsonRpcSuccessResponse | JsonRpcErrorResponse
-
 interface TransformParams {
   readonly url: string
 }
