@@ -256,6 +256,8 @@ export const compareTrackedFunctions = async (
     for (let i = 0; i < results.length; i++) {
       const result = results[i]
       const parsed = parseFunctionName(result.functionName)
+      // Store original column from parsed result before we potentially modify it
+      const originalColumn = parsed.column
 
       // Process functions with location info
       if (parsed.url && parsed.line !== null) {
@@ -282,8 +284,11 @@ export const compareTrackedFunctions = async (
 
         // Update functionName to show URL with line and column if we have a URL
         // Always include column in the functionName format: (url:line:column)
+        // Use the original column from parsing, which should be preserved from the tracking
         if (actualUrl && script) {
-          const column = parsed.column !== null && parsed.column >= 0 ? parsed.column : 0
+          // Use the original column that was parsed from the functionName
+          // The parser defaults to 0 if column was missing, but if it was in the original, use it
+          const column = originalColumn !== null && originalColumn >= 0 ? originalColumn : 0
           // Always update to ensure URL format with column is shown
           results[i].functionName = `${parsed.name} (${actualUrl}:${parsed.line}:${column})`
         }
