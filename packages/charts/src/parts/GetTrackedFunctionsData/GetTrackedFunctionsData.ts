@@ -39,7 +39,7 @@ export const getTrackedFunctionsData = async (basePath: string) => {
       }
       fileData.sort((a, b) => b.count - a.count)
       // Limit to top 100 functions for readability per file
-      const limitedData = fileData.slice(0, 100)
+      const limitedData = fileData.slice(0, 10000)
       // Add filename metadata to the data
       const dataWithFilename = {
         data: limitedData,
