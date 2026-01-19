@@ -57,6 +57,15 @@ export const examineNodeById = (nodeId: number, snapshot: Snapshot): NodeExamina
   return examineNodeByIndex(nodeIndex, snapshot)
 }
 
+interface ProcessedEdge {
+  readonly type: number
+  readonly typeName: string
+  readonly nameIndex: number
+  readonly edgeName: string
+  readonly toNode: number
+  readonly targetNodeInfo?: { name: string | null; type: string | null }
+}
+
 /**
  * Examines a specific node by index and returns detailed information about it
  * @param nodeIndex - The index of the node to examine (0-based)
@@ -92,14 +101,7 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
   const edgeNameFieldIndex = edge_fields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
 
-  const processedEdges = [] as Array<{
-    type: number
-    typeName: string
-    nameIndex: number
-    edgeName: string
-    toNode: number
-    targetNodeInfo?: { name: string | null; type: string | null }
-  }>
+  const processedEdges: ProcessedEdge[] = []
   for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
     const type = nodeEdges[i + edgeTypeFieldIndex]
     const nameIndex = nodeEdges[i + edgeNameFieldIndex]
@@ -119,6 +121,7 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
           type: getNodeTypeName(targetNode, node_types),
         }
       : undefined
+    // @ts-ignore
     processedEdges.push({ edgeName, nameIndex, targetNodeInfo, toNode, type, typeName })
   }
 

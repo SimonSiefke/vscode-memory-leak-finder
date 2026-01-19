@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
 import type { TransformOptions } from '../Types/Types.ts'
 
@@ -23,4 +24,12 @@ const PREAMBLE_CODE = `(() => {
 export const transformCode = async (code: string, options: TransformOptions = {}): Promise<string> => {
   const transformedCode = transformCodeWithTracking(code, { ...options })
   return PREAMBLE_CODE + '\n' + transformedCode
+=======
+import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.js'
+import { TransformOptions } from '../Types/Types.js'
+
+export const transformCode = async (code: string, options: TransformOptions = {}): Promise<string> => {
+  const transformedCode = transformCodeWithTracking(code, { ...options })
+  return transformedCode
+>>>>>>> origin/main
 }

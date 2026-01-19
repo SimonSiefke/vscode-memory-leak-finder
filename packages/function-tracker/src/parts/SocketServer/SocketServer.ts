@@ -1,8 +1,19 @@
+<<<<<<< HEAD
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
 import { createServer, Server, Socket } from 'net'
 import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
 import { transformCode } from '../Transform/Transform.ts'
+=======
+import { existsSync, readFileSync, unlinkSync } from 'node:fs'
+import { join } from 'node:path'
+import { createServer, Server, Socket } from 'net'
+
+const getTransformedCodePath = (): string => {
+  const root = join(import.meta.dirname, '..', '..', '..', '..', '..')
+  return join(root, 'packages', 'function-tracker', 'workbench.desktop.main.tracked.js')
+}
+>>>>>>> origin/main
 
 interface JsonRpcRequest {
   readonly jsonrpc: '2.0'
@@ -27,8 +38,11 @@ interface JsonRpcErrorResponse {
   readonly id: number | string | null
 }
 
+<<<<<<< HEAD
 type JsonRpcResponse = JsonRpcSuccessResponse | JsonRpcErrorResponse
 
+=======
+>>>>>>> origin/main
 interface TransformParams {
   readonly url: string
 }
@@ -137,6 +151,7 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                 return
               }
 
+<<<<<<< HEAD
               try {
                 // Extract file path from URL
                 // URL format: vscode-file://vscode-app/path/to/file.js
@@ -215,6 +230,39 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                   socket.write(JSON.stringify(response))
                   socket.end()
                   return
+=======
+              if (params.url.includes('workbench.desktop.main.js')) {
+                try {
+                  // Read pre-transformed file
+                  const transformedPath = getTransformedCodePath()
+                  let transformedCode: string | null = null
+
+                  try {
+                    transformedCode = readFileSync(transformedPath, 'utf8')
+                    console.log(`[SocketServer] Returning transformed code for ${params.url}`)
+                  } catch (error) {
+                    console.warn(`[SocketServer] Transformed file not found at ${transformedPath}, skipping transformation`)
+                    const response: JsonRpcSuccessResponse = {
+                      jsonrpc: '2.0',
+                      result: null,
+                      id: request.id ?? null,
+                    }
+                    socket.write(JSON.stringify(response))
+                    socket.end()
+                    return
+                  }
+
+                  if (transformedCode) {
+                    const response: JsonRpcSuccessResponse = {
+                      jsonrpc: '2.0',
+                      result: { code: transformedCode },
+                      id: request.id ?? null,
+                    }
+                    socket.write(JSON.stringify(response))
+                    socket.end()
+                    return
+                  }
+>>>>>>> origin/main
                 } catch (error) {
                   console.error('[SocketServer] Error transforming code:', error)
                   const errorResponse: JsonRpcErrorResponse = {
@@ -229,6 +277,7 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                   socket.end()
                   return
                 }
+<<<<<<< HEAD
               } catch (error) {
                 console.error('[SocketServer] Error handling transform request:', error)
                 const errorResponse: JsonRpcErrorResponse = {
@@ -243,6 +292,19 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                 socket.end()
                 return
               }
+=======
+              }
+
+              // Skip transformation for other files
+              const response: JsonRpcSuccessResponse = {
+                jsonrpc: '2.0',
+                result: null,
+                id: request.id ?? null,
+              }
+              socket.write(JSON.stringify(response))
+              socket.end()
+              return
+>>>>>>> origin/main
             }
 
             // Unknown method

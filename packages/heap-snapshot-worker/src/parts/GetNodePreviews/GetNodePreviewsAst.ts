@@ -11,7 +11,7 @@ const createUnknown = (id: number, name: string | null, value?: string): AstNode
   id,
   name,
   type: 'unknown',
-  value,
+  value: undefined,
 })
 
 export const buildAstForNode = (

@@ -1,3 +1,3 @@
-export const stringify = (value) => {
+export const stringify = (value: unknown): string => {
   return JSON.stringify(value)
 }
