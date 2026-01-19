@@ -1,10 +1,7 @@
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
-export const parseHeapSnapshotStrings = (id: number): readonly string[] => {
+export const parseHeapSnapshotStrings = (id) => {
   const heapsnapshot = HeapSnapshotState.get(id)
-  if (!heapsnapshot) {
-    throw new Error(`snapshot not found`)
-  }
 
   const { strings } = heapsnapshot
   if (!Array.isArray(strings)) {

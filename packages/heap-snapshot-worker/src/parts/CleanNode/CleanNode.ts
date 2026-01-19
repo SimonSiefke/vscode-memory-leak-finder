@@ -1,10 +1,4 @@
-interface NodeWithIdNameType {
-  readonly id: number
-  readonly name: string
-  readonly type: string
-}
-
-export const cleanNode = (node: NodeWithIdNameType): NodeWithIdNameType => {
+export const cleanNode = (node) => {
   const { id, name, type } = node
   return {
     id,

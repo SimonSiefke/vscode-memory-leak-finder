@@ -3,14 +3,14 @@ import { writeFile, unlink, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as ParseHeapSnapshotNumbers from '../src/parts/ParseHeapSnapshotNumbers/ParseHeapSnapshotNumbers.js'
 
-const createTestFile = async (fileName: string, content: unknown): Promise<string> => {
+const createTestFile = async (fileName, content) => {
   const filePath = join('./test-temp', fileName)
   await mkdir('./test-temp', { recursive: true })
   await writeFile(filePath, JSON.stringify(content))
   return filePath
 }
 
-const cleanupTestFile = async (filePath: string): Promise<void> => {
+const cleanupTestFile = async (filePath) => {
   try {
     await unlink(filePath)
   } catch (error) {

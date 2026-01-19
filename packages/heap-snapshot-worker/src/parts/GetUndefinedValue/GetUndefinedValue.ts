@@ -69,16 +69,7 @@ const analyzeUndefinedNodes = (snapshot: Snapshot): { undefinedNodeId: number | 
  * @param propertyName - The property name this node is referenced by (for context)
  * @returns '[undefined nodeId]' if the node represents undefined, null otherwise
  */
-interface NodeWithId {
-  readonly id: number
-}
-
-export const getUndefinedValue = (
-  targetNode: NodeWithId | null,
-  snapshot: Snapshot,
-  edgeMap: Uint32Array,
-  propertyName?: string,
-): string | null => {
+export const getUndefinedValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uint32Array, propertyName?: string): string | null => {
   if (!targetNode) return null
 
   const nodeTypeName = getNodeTypeName(targetNode, snapshot.meta.node_types)

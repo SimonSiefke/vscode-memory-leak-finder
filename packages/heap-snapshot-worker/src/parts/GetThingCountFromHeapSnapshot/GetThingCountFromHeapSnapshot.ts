@@ -1,15 +1,14 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
 import { getThingCountFromHeapSnapshotInternal } from '../GetObjectCountFromHeapSnapshotInternal/GetThingCountFromHeapSnapshotInternal.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
  *
- * @param {Snapshot} snapshot
- * @param {string} typeName
- * @param {string} objectName
+ * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
+ * @param {*} typeName
+ * @param {*} objectName
  * @returns {number}
  */
-export const getThingCountFromHeapSnapshot = (snapshot: Snapshot, typeName: string, objectName: string): number => {
+export const getThingCountFromHeapSnapshot = (snapshot, typeName, objectName) => {
   const { meta, nodes, strings } = snapshot
   const { edge_fields, edge_types, node_fields, node_types } = meta
   const typeIndex = node_types[0].indexOf(typeName)

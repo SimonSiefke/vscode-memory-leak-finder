@@ -2,9 +2,9 @@ import { test, expect } from '@jest/globals'
 import { computeHeapSnapshotIndices } from '../src/parts/ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
 
 test('computeHeapSnapshotIndices - basic functionality', () => {
-  const node_types: [readonly string[]] = [['hidden', 'array', 'string', 'object', 'bigint', 'regexp']]
+  const node_types = [['hidden', 'array', 'string', 'object', 'bigint', 'regexp']]
   const node_fields = ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness']
-  const edge_types: [readonly string[]] = [['context', 'element', 'property', 'internal', 'hidden']]
+  const edge_types = [['context', 'element', 'property', 'internal', 'hidden']]
   const edge_fields = ['type', 'name_or_index', 'to_node']
 
   const result = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
@@ -41,9 +41,9 @@ test('computeHeapSnapshotIndices - basic functionality', () => {
 })
 
 test('computeHeapSnapshotIndices - missing types return -1', () => {
-  const node_types: [readonly string[]] = [['hidden', 'array', 'string']] // No object, bigint, or regexp
+  const node_types = [['hidden', 'array', 'string']] // No object, bigint, or regexp
   const node_fields = ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness']
-  const edge_types: [readonly string[]] = [['context', 'element', 'property']]
+  const edge_types = [['context', 'element', 'property']]
   const edge_fields = ['type', 'name_or_index', 'to_node']
 
   const result = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
@@ -56,9 +56,9 @@ test('computeHeapSnapshotIndices - missing types return -1', () => {
 })
 
 test('computeHeapSnapshotIndices - different field order', () => {
-  const node_types: [readonly string[]] = [['object', 'bigint', 'string']]
+  const node_types = [['object', 'bigint', 'string']]
   const node_fields = ['id', 'type', 'name', 'self_size', 'detachedness', 'edge_count'] // Different order
-  const edge_types: [readonly string[]] = [['property', 'element', 'context']]
+  const edge_types = [['property', 'element', 'context']]
   const edge_fields = ['name_or_index', 'type', 'to_node'] // Different order
 
   const result = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)

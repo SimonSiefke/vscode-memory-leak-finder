@@ -18,7 +18,7 @@ export interface NodeExaminationResult {
       readonly type: string | null
     }
   }>
-  readonly node: ReturnType<typeof parseNode>
+  readonly node: any
   readonly nodeId: number
   readonly nodeIndex: number
   readonly nodeName: string | null
@@ -119,11 +119,7 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
           type: getNodeTypeName(targetNode, node_types),
         }
       : undefined
-    const edgeData: any = { edgeName, nameIndex, toNode, type, typeName }
-    if (targetNodeInfo !== undefined) {
-      edgeData.targetNodeInfo = targetNodeInfo
-    }
-    processedEdges.push(edgeData)
+    processedEdges.push({ edgeName, nameIndex, targetNodeInfo, toNode, type, typeName })
   }
 
   // Extract properties (property-type edges) with improved value detection
@@ -224,7 +220,9 @@ export const analyzeNodeFromFile = async (filePath: string, nodeId: number): Pro
   const { prepareHeapSnapshot } = await import('../PrepareHeapSnapshot/PrepareHeapSnapshot.ts')
 
   try {
-    const snapshot = await prepareHeapSnapshot(filePath, { parseStrings: true })
+    // @ts-ignore minimal typing for migration
+    const snapshot: any = await prepareHeapSnapshot(filePath, { parseStrings: true })
+    // @ts-ignore minimal typing for migration
     return examineNodeById(nodeId, snapshot)
   } catch (error) {
     console.error(`Error loading heap snapshot from ${filePath}:`, error)

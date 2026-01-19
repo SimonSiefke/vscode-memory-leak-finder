@@ -1,30 +1,14 @@
 import { Worker } from 'node:worker_threads'
 import { getHeapSnapshotWorkerPath } from '../GetHeapSnapshotWorkerPath/GetHeapSnapshotWorkerPath.ts'
-import type { SnapshotMetaData } from '../Snapshot/Snapshot.ts'
 import { waitForResult } from '../WaitForResult/WaitForResult.ts'
-
-interface PrepareHeapSnapshotOptions {
-  readonly parseStrings?: boolean
-}
-
-interface PrepareHeapSnapshotFromJsonResult {
-  readonly metaData: SnapshotMetaData
-  readonly nodes: Uint32Array
-  readonly edges: Uint32Array
-  readonly locations: Uint32Array
-  readonly strings: readonly string[]
-}
 
 /**
  * Prepares a heap snapshot by parsing it in a separate worker for better performance
- * @param {unknown} json - The JSON data to parse
- * @param {PrepareHeapSnapshotOptions} options - Options for parsing
- * @returns {Promise<PrepareHeapSnapshotFromJsonResult>}
+ * @param {string} json - The file path to the heap snapshot
+ * @param {{parseStrings?:boolean}} options - Options for parsing
+ * @returns {Promise<{metaData: any, nodes: Uint32Array<ArrayBuffer>, edges: Uint32Array<ArrayBuffer>, locations: Uint32Array<ArrayBuffer>, strings: string[]}>}
  */
-export const prepareHeapSnapshotFromJson = async (
-  json: unknown,
-  options: PrepareHeapSnapshotOptions,
-): Promise<PrepareHeapSnapshotFromJsonResult> => {
+export const prepareHeapSnapshotFromJson = async (json, options) => {
   const workerPath = getHeapSnapshotWorkerPath()
   const worker = new Worker(workerPath)
 
@@ -39,7 +23,7 @@ export const prepareHeapSnapshotFromJson = async (
     })
 
     // Wait for the result
-    return (await resultPromise) as PrepareHeapSnapshotFromJsonResult
+    return await resultPromise
   } finally {
     // Always terminate the worker
     await worker.terminate()

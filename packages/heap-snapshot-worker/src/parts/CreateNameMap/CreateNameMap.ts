@@ -1,24 +1,4 @@
-interface ParsedNode {
-  readonly id: number
-  readonly name: string
-}
-
-interface GraphEdge {
-  readonly index: number
-  readonly name: string
-}
-
-type Graph = Record<number, readonly GraphEdge[]>
-
-interface NameMapValue {
-  readonly edgeName: string
-  readonly nodeName: string
-}
-
-export const createNameMap = (
-  parsedNodes: readonly ParsedNode[],
-  graph: Graph,
-): Record<number, NameMapValue> => {
+export const createNameMap = (parsedNodes, graph) => {
   const nameMap = Object.create(null)
   for (const node of parsedNodes) {
     const edges = graph[node.id]

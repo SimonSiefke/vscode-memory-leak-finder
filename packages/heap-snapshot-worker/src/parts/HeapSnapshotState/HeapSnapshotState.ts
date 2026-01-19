@@ -1,17 +1,15 @@
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
+const snapshots = Object.create(null)
 
-const snapshots: Record<number, Snapshot> = Object.create(null)
-
-export const set = (id: number, value: Snapshot): void => {
+export const set = (id, value) => {
   snapshots[id] = value
 }
 
-export const get = (id: number): Snapshot | undefined => {
+export const get = (id) => {
   const value = snapshots[id]
   delete snapshots[id]
   return value
 }
 
-export const dispose = (id: number): void => {
+export const dispose = (id) => {
   delete snapshots[id]
 }

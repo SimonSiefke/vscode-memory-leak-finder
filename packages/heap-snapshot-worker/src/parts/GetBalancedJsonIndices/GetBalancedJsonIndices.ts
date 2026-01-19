@@ -6,7 +6,7 @@ const Character = {
   SquareOpen: '[',
 }
 
-export const getBalancedJsonIndices = (data: string, startIndex: number) => {
+export const getBalancedJsonIndices = (data, startIndex) => {
   let balance = 0
   for (let i = startIndex; i < data.length; i++) {
     switch (data[i]) {

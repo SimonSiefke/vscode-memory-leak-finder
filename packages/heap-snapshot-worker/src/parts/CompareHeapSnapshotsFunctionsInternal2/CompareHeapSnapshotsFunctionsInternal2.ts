@@ -1,9 +1,9 @@
-import { addOriginalSources } from '../AddOriginalSources/AddOriginalSources.ts'
-import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
-import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { UniqueLocation, UniqueLocationMap } from '../UniqueLocationMap/UniqueLocationMap.ts'
 import type { CompareResult } from './CompareResult.ts'
+import { addOriginalSources } from '../AddOriginalSources/AddOriginalSources.ts'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
+import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
 
 const emptyItem = {
   count: 0,
@@ -66,7 +66,7 @@ export interface CompareFunctionsOptions {
   readonly minCount?: number
 }
 
-const filterOutExcluded = (items: readonly CompareResult[], excludes: readonly string[]): readonly CompareResult[] => {
+const filterOutExcluded = (items: readonly any[], excludes: readonly string[]): readonly any[] => {
   if (excludes.length > 0) {
     const lowered = excludes.map((e) => e.toLowerCase())
     return items.filter((item) => {
@@ -85,11 +85,11 @@ const filterOutExcluded = (items: readonly CompareResult[], excludes: readonly s
   return items
 }
 
-const compareCount = (a: any, b: any) => {
+const compareCount = (a, b) => {
   return b.count - a.count
 }
 
-const cleanItem = (item: any) => {
+const cleanItem = (item) => {
   return {
     count: item.count,
     delta: item.delta,
@@ -104,7 +104,7 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   before: Snapshot,
   after: Snapshot,
   options: CompareFunctionsOptions,
-): Promise<readonly CompareResult[]> => {
+): Promise<readonly any[]> => {
   const minCount = options.minCount || 0
   const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(
     after.meta.location_fields,

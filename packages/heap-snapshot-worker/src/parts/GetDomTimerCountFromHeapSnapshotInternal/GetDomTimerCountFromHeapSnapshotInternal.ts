@@ -9,9 +9,9 @@ export const getDomTimerCountFromHeapSnapshotInternal = (snapshot: Snapshot): nu
   const { edge_fields, edge_types, node_fields, node_types } = meta
   const { ITEMS_PER_NODE, nameFieldIndex, nativeTypeIndex, objectTypeIndex, typeFieldIndex } = computeHeapSnapshotIndices(
     node_types,
-    node_fields as readonly string[],
+    node_fields,
     edge_types,
-    edge_fields as readonly string[],
+    edge_fields,
   )
 
   let timerCount = 0

@@ -1,18 +1,14 @@
-type HeapSnapshotNode = {
-  readonly [key: string]: number | string | undefined
-}
-
 export const createHeapSnapshotNode = (
-  array: readonly number[] | Uint32Array,
-  startIndex: number,
-  nodeFields: readonly string[],
-  valueTypes: readonly string[],
-  typeKey: string | number,
-  nameKey: string | number,
-  indexMultiplierKey: string | number,
-  indexMultiplier: number,
-  strings: readonly string[],
-): HeapSnapshotNode => {
+  array,
+  startIndex,
+  nodeFields,
+  valueTypes,
+  typeKey,
+  nameKey,
+  indexMultiplierKey,
+  indexMultiplier,
+  strings,
+) => {
   const node = Object.create(null)
   const nodeFieldCount = nodeFields.length
   for (let j = 0; j < nodeFieldCount; j++) {
