@@ -2,13 +2,6 @@ import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/Deb
 import { setSessionRpc } from '../SessionState/SessionState.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
-export interface DevToolsConnection {
-  readonly dispose: () => Promise<void>
-  readonly sessionId: string
-  readonly sessionRpc: any
-  readonly targetId: string
-}
-
 export const connectDevtools = async (
   devtoolsWebSocketUrl: string,
   webSocketUrl: string,
