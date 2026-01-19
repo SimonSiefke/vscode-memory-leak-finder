@@ -227,7 +227,6 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                     id: request.id ?? null,
                   }
                   socket.write(JSON.stringify(errorResponse))
-                  socket.end()
                   return
                 }
               } catch (error) {
@@ -241,7 +240,6 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                   id: request.id ?? null,
                 }
                 socket.write(JSON.stringify(errorResponse))
-                socket.end()
                 return
               }
             }
@@ -256,7 +254,6 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
               id: request.id ?? null,
             }
             socket.write(JSON.stringify(errorResponse))
-            socket.end()
           } catch (parseError) {
             // Invalid JSON
             const errorResponse: JsonRpcErrorResponse = {
@@ -268,7 +265,6 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
               id: null,
             }
             socket.write(JSON.stringify(errorResponse))
-            socket.end()
           }
         }
       } catch (error) {
