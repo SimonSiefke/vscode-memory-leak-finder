@@ -33,6 +33,7 @@ export const connectElectron = async (electronRpc: RpcConnection, headlessMode: 
   const callFrame = msg.params.callFrames[0]
   const { callFrameId } = callFrame
 
+  // TODO do this in parallel
   const electron = await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
     callFrameId,
     expression: `require('electron')`,
