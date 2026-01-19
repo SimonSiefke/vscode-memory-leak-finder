@@ -224,6 +224,7 @@ export const protocolInterceptorScript = (socketPath: string): string => {
       })
     })
 
+
     // Open DevTools when window shows using setInterval
     const devToolsInterval = setInterval(() => {
       try {

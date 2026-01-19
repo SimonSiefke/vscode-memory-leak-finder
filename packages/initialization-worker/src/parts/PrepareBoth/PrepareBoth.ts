@@ -4,12 +4,14 @@ import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as ElectronRpcState from '../ElectronRpcState/ElectronRpcState.ts'
-import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolDebugger, DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as FunctionCounterSnippet from '../FunctionCounterSnippet/FunctionCounterSnippet.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { protocolInterceptorScript } from '../ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
 import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
+import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 // TODO maybe pass it as argument from above
 const SOCKET_PATH = '/tmp/function-tracker-socket'
@@ -56,6 +58,18 @@ export const prepareBoth = async (
 
   // Wait for the page to be created by the initialization worker's connectDevtools
   const { dispose, sessionId, targetId } = await connectDevtoolsPromise
+
+  // Inject function counter snippet early via addScriptToEvaluateOnNewDocument if tracking is enabled
+  // This ensures globalThis.test.trackFunctionCall is available before any scripts are loaded
+  if (trackFunctions) {
+    const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
+    const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
+    const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
+    await DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
+      source: FunctionCounterSnippet.functionCounterSnippet,
+    })
+    await browserRpc.dispose()
+  }
 
   // Dispose browserRpc from connectDevtools
   await dispose()
