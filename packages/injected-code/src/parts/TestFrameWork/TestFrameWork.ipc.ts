@@ -1,4 +1,4 @@
-import { trackFunctionCall } from '../TrackFunctionCall/TrackFunctionCall.ts'
+import { getFunctionStatistics, trackFunctionCall } from '../TrackFunctionCall/TrackFunctionCall.ts'
 import * as TestFrameWork from './TestFrameWork.ts'
 
 export const Commands = {
@@ -25,4 +25,5 @@ export const Commands = {
   type: TestFrameWork.type,
   typeAndWaitFor: TestFrameWork.typeAndWaitFor,
   trackFunctionCall: trackFunctionCall,
+  getFunctionStatistics: getFunctionStatistics,
 }

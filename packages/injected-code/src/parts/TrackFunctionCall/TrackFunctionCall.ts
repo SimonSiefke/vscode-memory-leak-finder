@@ -6,4 +6,6 @@ export const trackFunctionCall = (scriptId, line, column) => {
   functionStatistics[key]++
 }
 
-globalThis.___functionStatistics = Object.create(null)
+export const getFunctionStatistics = () => {
+  return functionStatistics
+}
