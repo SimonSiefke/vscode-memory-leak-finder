@@ -21,7 +21,6 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
       plugins: [],
       tokens: false,
       ranges: false,
-      attachComments: false,
     })
 
     // Must collect locations BEFORE mutating AST, as mutations change node locations
