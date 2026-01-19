@@ -87,7 +87,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   })
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
-  
+
   // Launch function-tracker worker BEFORE PrepareBoth if tracking is enabled
   // This ensures the socket server is ready when the protocol interceptor is injected
   let functionTrackerRpc: Awaited<ReturnType<typeof LaunchFunctionTrackerWorker.launchFunctionTrackerWorker>> | null = null
@@ -98,7 +98,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     // Wait a bit for socket server to be ready
     await new Promise((resolve) => setTimeout(resolve, 100))
   }
-  
+
   await using rpc = await launchInitializationWorker()
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
