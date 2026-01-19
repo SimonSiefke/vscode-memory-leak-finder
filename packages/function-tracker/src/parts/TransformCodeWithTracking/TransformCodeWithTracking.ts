@@ -7,7 +7,7 @@ import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 export const transformCodeWithTracking = (code: string, options: TransformOptions = {}): string => {
   // Handle null/undefined input
   if (!code) {
-    return 'Function call tracking system'
+    return ''
   }
 
   try {
@@ -19,16 +19,10 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
 
     const functionLocations = getFunctionLocations(originalAst)
 
-    // Second pass: parse fresh AST for transformation to avoid location contamination
-    const transformAst = parser2.parse(code, {
-      sourceType: 'module',
-      plugins: [],
-    })
-
     const plugin = createFunctionWrapperPlugin({ ...options, functionLocations })
-    traverse2(transformAst, plugin)
+    traverse2(originalAst, plugin)
 
-    const result = generate2(transformAst, {
+    const result = generate2(originalAst, {
       retainLines: false,
       compact: false,
       comments: true,
