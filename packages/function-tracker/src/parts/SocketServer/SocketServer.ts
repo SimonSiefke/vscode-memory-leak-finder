@@ -1,11 +1,6 @@
 import { existsSync, readFileSync, unlinkSync } from 'node:fs'
-import { join } from 'node:path'
 import { createServer, Server, Socket } from 'net'
-
-const getTransformedCodePath = (): string => {
-  const root = join(import.meta.dirname, '..', '..', '..', '..', '..')
-  return join(root, 'packages', 'function-tracker', 'workbench.desktop.main.tracked.js')
-}
+import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.js'
 
 interface JsonRpcRequest {
   readonly jsonrpc: '2.0'
@@ -140,37 +135,79 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                 return
               }
 
-              if (params.url.includes('workbench.desktop.main.js')) {
+              try {
+                // Extract file path from URL
+                // URL format: vscode-file://vscode-app/path/to/file.js
+                if (!params.url.startsWith('vscode-file://vscode-app')) {
+                  const response: JsonRpcSuccessResponse = {
+                    jsonrpc: '2.0',
+                    result: null,
+                    id: request.id ?? null,
+                  }
+                  socket.write(JSON.stringify(response))
+                  socket.end()
+                  return
+                }
+
+                let filePath = params.url.slice('vscode-file://vscode-app'.length)
+
+                // Remove query parameters (everything after ?)
+                const queryIndex = filePath.indexOf('?')
+                if (queryIndex !== -1) {
+                  filePath = filePath.substring(0, queryIndex)
+                }
+
+                // Remove hash (everything after #)
+                const hashIndex = filePath.indexOf('#')
+                if (hashIndex !== -1) {
+                  filePath = filePath.substring(0, hashIndex)
+                }
+
+                // Only transform JavaScript files
+                if (!filePath.endsWith('.js')) {
+                  const response: JsonRpcSuccessResponse = {
+                    jsonrpc: '2.0',
+                    result: null,
+                    id: request.id ?? null,
+                  }
+                  socket.write(JSON.stringify(response))
+                  socket.end()
+                  return
+                }
+
+                // Read original file from disk
+                let originalCode: string
                 try {
-                  // Read pre-transformed file
-                  const transformedPath = getTransformedCodePath()
-                  let transformedCode: string | null = null
-
-                  try {
-                    transformedCode = readFileSync(transformedPath, 'utf8')
-                    console.log(`[SocketServer] Returning transformed code for ${params.url}`)
-                  } catch (error) {
-                    console.warn(`[SocketServer] Transformed file not found at ${transformedPath}, skipping transformation`)
-                    const response: JsonRpcSuccessResponse = {
-                      jsonrpc: '2.0',
-                      result: null,
-                      id: request.id ?? null,
-                    }
-                    socket.write(JSON.stringify(response))
-                    socket.end()
-                    return
+                  originalCode = readFileSync(filePath, 'utf8')
+                } catch (error) {
+                  console.error(`[SocketServer] Error reading file ${filePath}:`, error)
+                  const errorResponse: JsonRpcErrorResponse = {
+                    jsonrpc: '2.0',
+                    error: {
+                      code: -32000,
+                      message: error instanceof Error ? error.message : 'Failed to read file',
+                    },
+                    id: request.id ?? null,
                   }
+                  socket.write(JSON.stringify(errorResponse))
+                  socket.end()
+                  return
+                }
 
-                  if (transformedCode) {
-                    const response: JsonRpcSuccessResponse = {
-                      jsonrpc: '2.0',
-                      result: { code: transformedCode },
-                      id: request.id ?? null,
-                    }
-                    socket.write(JSON.stringify(response))
-                    socket.end()
-                    return
+                // Transform code on-the-fly
+                try {
+                  const transformedCode = transformCodeWithTracking(originalCode, {
+                    filename: filePath,
+                  })
+
+                  const response: JsonRpcSuccessResponse = {
+                    jsonrpc: '2.0',
+                    result: { code: transformedCode },
+                    id: request.id ?? null,
                   }
+                  socket.write(JSON.stringify(response))
+                  socket.end()
+                  return
                 } catch (error) {
                   console.error('[SocketServer] Error transforming code:', error)
                   const errorResponse: JsonRpcErrorResponse = {
@@ -185,17 +222,20 @@ export const startSocketServer = async (socketPath: string): Promise<void> => {
                   socket.end()
                   return
                 }
+              } catch (error) {
+                console.error('[SocketServer] Error handling transform request:', error)
+                const errorResponse: JsonRpcErrorResponse = {
+                  jsonrpc: '2.0',
+                  error: {
+                    code: -32000,
+                    message: error instanceof Error ? error.message : 'Server error',
+                  },
+                  id: request.id ?? null,
+                }
+                socket.write(JSON.stringify(errorResponse))
+                socket.end()
+                return
               }
-
-              // Skip transformation for other files
-              const response: JsonRpcSuccessResponse = {
-                jsonrpc: '2.0',
-                result: null,
-                id: request.id ?? null,
-              }
-              socket.write(JSON.stringify(response))
-              socket.end()
-              return
             }
 
             // Unknown method

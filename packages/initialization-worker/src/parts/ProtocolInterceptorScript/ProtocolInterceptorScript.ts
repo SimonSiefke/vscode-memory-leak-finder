@@ -171,8 +171,24 @@ export const protocolInterceptorScript = (socketPath: string): string => {
         console.log('[ProtocolInterceptor] Skipping transformation for blob/worker script:', url)
         // Fall through to read original file
       } else if (isJavaScript) {
-        // For JS files, read the original file first to check its content
-        fs.readFile(filePath, async (err, data) => {
+        // For JS files, always query function-tracker first for transformed code
+        try {
+          const transformedCode = await queryFunctionTracker(url)
+          if (transformedCode) {
+            console.log('[ProtocolInterceptor] Returning transformed code from function-tracker for:', url)
+            callback({
+              data: Buffer.from(transformedCode, 'utf8'),
+              mimeType: 'application/javascript',
+            })
+            return
+          }
+        } catch (error) {
+          console.error('[ProtocolInterceptor] Error getting transformed code from function-tracker:', error)
+        }
+
+        // If function-tracker didn't return transformed code, fall back to original file
+        // (This should rarely happen as function-tracker now transforms on-the-fly)
+        fs.readFile(filePath, (err, data) => {
           if (err) {
             console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
             callback({ error: -6 })
@@ -188,27 +204,11 @@ export const protocolInterceptorScript = (socketPath: string): string => {
             return
           }
 
-          // Try to get transformed code from function tracker
-         try {
-           const transformedCode = await queryFunctionTracker(url)
-           if (transformedCode) {
-             console.log('[ProtocolInterceptor] Returning transformed code for:', url)
-             callback({
-               data: Buffer.from(transformedCode, 'utf8'),
-               mimeType: 'application/javascript',
-             })
-             return
-           }
-         } catch (error) {
-           console.error('[ProtocolInterceptor] Error getting transformed code:', error)
-         }
-
-         // Fall through: return original file
-         const mimeType = getMimeType(filePath)
-         console.log('[ProtocolInterceptor] Returning original JS file:', filePath)
-         callback({ data, mimeType })
-       })
-       return
+          const mimeType = getMimeType(filePath)
+          console.log('[ProtocolInterceptor] Returning original JS file (function-tracker did not return transformed code):', filePath)
+          callback({ data, mimeType })
+        })
+        return
       }
 
       // Fall through: read original file from disk (for non-JS files or skipped files)
