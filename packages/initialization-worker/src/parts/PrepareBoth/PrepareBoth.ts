@@ -11,6 +11,9 @@ import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
+// TODO maybe pass it as argument from above
+const SOCKET_PATH = '/tmp/function-tracker-socket'
+
 export const prepareBoth = async (
   headlessMode: boolean,
   attachedToPageTimeout: number,
@@ -29,7 +32,7 @@ export const prepareBoth = async (
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode, trackFunctions)
+  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode, trackFunctions, SOCKET_PATH)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 
@@ -43,31 +46,6 @@ export const prepareBoth = async (
 
   // Store electronRpc in state so ConnectFunctionTracker can access it when tracking
   ElectronRpcState.setElectronRpc(electronRpc, monkeyPatchedElectronId)
-
-  // If tracking, inject protocol interceptor BEFORE undoing monkey patch
-  // This ensures it's ready as soon as app becomes ready
-  if (trackFunctions) {
-    try {
-      const electronGlobal = await DevtoolsProtocolRuntime.evaluate(electronRpc, {
-        expression: 'globalThis._____electron',
-        returnByValue: false,
-      })
-
-      const objectId = electronGlobal?.objectId || electronGlobal?.result?.objectId || electronGlobal?.result?.result?.objectId
-
-      if (objectId) {
-        const SOCKET_PATH = '/tmp/function-tracker-socket'
-
-        await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-          functionDeclaration: protocolInterceptorScript(SOCKET_PATH),
-          objectId: objectId,
-        })
-        console.log('[PrepareBoth] Injected protocol interceptor before app becomes ready')
-      }
-    } catch (error) {
-      console.error('[PrepareBoth] Error injecting protocol interceptor:', error)
-    }
-  }
 
   // Always undo monkey patch immediately to allow page creation
   // When tracking, we'll pause again after function-tracker is connected
