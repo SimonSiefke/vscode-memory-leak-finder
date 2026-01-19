@@ -1753,8 +1753,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async hideInlineChat() {
       try {
         await page.waitForIdle()
-        const notebook = page.locator('.editor')
-        await expect(notebook).toBeVisible()
+        const editor = page.locator('.editor')
+        await expect(editor).toBeVisible()
         await page.waitForIdle()
         const chat = page.locator('.chat-widget')
         await expect(chat).toBeVisible()
@@ -1769,8 +1769,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async showInlineChat() {
       try {
-        const notebook = page.locator('.editor')
-        await expect(notebook).toBeVisible()
+        const editor = page.locator('.editor')
+        await expect(editor).toBeVisible()
         await page.waitForIdle()
         const chat = page.locator('.chat-widget')
         await expect(chat).toBeHidden()
@@ -1778,9 +1778,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.keyboard.press('Control+i')
         await page.waitForIdle()
         await expect(chat).toBeVisible()
-        const editor = chat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
-        await expect(editor).toBeVisible()
-        const editContext = editor.locator('.native-edit-context')
+        const chatEditor = chat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(chatEditor).toBeVisible()
+        const editContext = chatEditor.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
         await page.waitForIdle()
         await expect(editContext).toBeFocused()
