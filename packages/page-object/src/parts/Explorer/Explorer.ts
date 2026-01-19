@@ -5,7 +5,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const RE_NUMER_AT_END = /\d+$/
 
-const getNextActiveDescendant = (listId, activeDescendant) => {
+const getNextActiveDescendant = (listId: string, activeDescendant: string | null) => {
   // TODO list id can be dynamic
   if (activeDescendant === null) {
     return `${listId}_0`
@@ -18,7 +18,7 @@ const getNextActiveDescendant = (listId, activeDescendant) => {
   return `${listId}_${number + 1}`
 }
 
-const getListId = (classNameString) => {
+const getListId = (classNameString: string) => {
   if (typeof classNameString !== 'string') {
     throw new TypeError(`className must be of type string`)
   }
@@ -31,7 +31,9 @@ const getListId = (classNameString) => {
   throw new Error(`Failed to extract list id from explorer`)
 }
 
-export const create = ({ electronApp, expect, page, platform, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
     async cancel() {
       try {
@@ -70,13 +72,20 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
     },
     async collapseAll() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.CollapseFoldersInExplorer)
       } catch (error) {
         throw new VError(error, `Failed to collapse all`)
       }
     },
-    async copy(dirent) {
+    async copy(dirent: string) {
       try {
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const oldDirent = explorer.locator('.monaco-list-row', {
@@ -90,7 +99,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
     },
     async delete(item: string) {
       try {
-        const electron = Electron.create({ electronApp, VError })
+        const electron = Electron.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await electron.mockShellTrashItem()
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -106,9 +115,9 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to delete ${item}`)
       }
     },
-    async executeContextMenuCommand(locator, option) {
+    async executeContextMenuCommand(locator: any, option: string) {
       await page.waitForIdle()
-      const contextMenu = ContextMenu.create({ expect, page, VError })
+      const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
       await page.waitForIdle()
       await contextMenu.open(locator)
       await page.waitForIdle()
@@ -134,7 +143,9 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
+          electronApp,
           expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,
@@ -160,7 +171,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to focus next item in explorer`)
       }
     },
-    async newFile(name) {
+    async newFile(name: string) {
       try {
         await page.waitForIdle()
         const newFileButton = page.locator('.sidebar [aria-label="New File..."]')
@@ -179,7 +190,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to create new file`)
       }
     },
-    async newFolder({ error, name }) {
+    async newFolder({ error, name }: { error: any; name: string }) {
       try {
         await page.waitForIdle()
         const newFolderButton = page.locator('.sidebar [aria-label="New Folder..."]')
@@ -202,7 +213,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
       }
     },
     not: {
-      async toHaveItem(direntName) {
+      async toHaveItem(direntName: string) {
         try {
           const explorer = page.locator('.explorer-folders-view .monaco-list')
           const dirent = explorer.locator('.monaco-list-row', {
@@ -221,10 +232,24 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         await page.waitForIdle()
         await this.openContextMenu(`1.txt`)
         await page.waitForIdle()
-        const contextMenu = ContextMenu.create({ expect, page, VError })
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await contextMenu.select('Open to the Side')
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.CloseOtherGroups)
         await page.waitForIdle()
         // TODO open context menu, the open to the side
@@ -233,7 +258,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to open all files`)
       }
     },
-    async openContextMenu(dirent: string, select = undefined) {
+    async openContextMenu(dirent: string, _select = undefined) {
       try {
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -282,7 +307,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
     },
     async refresh() {
       try {
-        const electron = Electron.create({ electronApp, VError })
+        const electron = Electron.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await electron.mockShellTrashItem()
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -337,7 +362,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to rename explorer item from "${oldDirentName}" to "${newDirentName}"`)
       }
     },
-    async shouldHaveFocusedItem(direntName) {
+    async shouldHaveFocusedItem(direntName: string) {
       try {
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const dirent = explorer.locator('.monaco-list-row', {
@@ -354,10 +379,10 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to verify that explorer has focused dirent "${direntName}"`)
       }
     },
-    async shouldHaveItem(direntName) {
+    async shouldHaveItem(direntName: string) {
       return this.toHaveItem(direntName)
     },
-    async toHaveItem(direntName) {
+    async toHaveItem(direntName: string) {
       try {
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')

@@ -1,37 +1,45 @@
 import { existsSync } from 'node:fs'
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Electron from '../Electron/Electron.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
-    async add(file) {
+    async add(file: { name: string; content: string }) {
       const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, file.name)
       await mkdir(dirname(absolutePath), { recursive: true })
       await writeFile(absolutePath, file.content)
     },
-    async addExtension(name) {
+    async addExtension(name: string) {
       try {
-        const electron = Electron.create({ electronApp, VError })
+        const electron = Electron.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         const extensionsFolder = join(Root.root, '.vscode-extensions-source', name)
         await electron.mockOpenDialog({
           bookmarks: [],
           canceled: false,
           filePaths: [extensionsFolder],
         })
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.InstallExtensionFromLocation)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to add extension ${name}`)
       }
     },
-    getWorkspaceFilePath(relativePath) {
+    getWorkspaceFilePath(relativePath: string): string {
       const filePath = join(Root.root, '.vscode-test-workspace', relativePath)
       return filePath
     },
@@ -45,12 +53,12 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
       await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
       await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
     },
-    async remove(file) {
+    async remove(file: string) {
       const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, file)
       await rm(absolutePath, { force: true, recursive: true })
     },
-    async setFiles(files) {
+    async setFiles(files: Array<{ name: string; content: string }>) {
       await page.waitForIdle()
       const workspace = join(Root.root, '.vscode-test-workspace')
       const dirents = await readdir(workspace)
@@ -65,7 +73,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
       }
       await page.waitForIdle()
     },
-    async waitForFile(fileName) {
+    async waitForFile(fileName: string): Promise<boolean> {
       const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, fileName)
       if (existsSync(absolutePath)) {

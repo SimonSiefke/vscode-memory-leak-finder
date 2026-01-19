@@ -1,7 +1,8 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async clearFilter() {
       try {
@@ -22,7 +23,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to clear filter`)
       }
     },
-    async filter({ expectedResults, searchValue }) {
+    async filter({ searchValue }: { searchValue: string }) {
       try {
         await page.waitForIdle()
         const table = page.locator('.ai-models-management-editor .models-table-container')
@@ -46,7 +47,14 @@ export const create = ({ expect, page, platform, VError }) => {
     },
     async open() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ManageLanguageModels)
         // TODO verify editor is open
         const container = page.locator('.models-search-container')
