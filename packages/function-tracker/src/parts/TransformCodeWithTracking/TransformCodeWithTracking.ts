@@ -5,13 +5,11 @@ import { VError } from '@lvce-editor/verror'
 import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 
 export const transformCodeWithTracking = (code: string, options: TransformOptions = {}): string => {
-  // Handle null/undefined input
   if (!code) {
     return ''
   }
 
   try {
-    // First pass: parse AST and collect original function locations
     const originalAst = parser2.parse(code, {
       sourceType: 'module',
       plugins: [],
