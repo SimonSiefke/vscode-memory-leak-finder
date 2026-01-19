@@ -17,7 +17,7 @@ export const parseNode = (nodeIndex: number, nodes: Uint32Array, nodeFields: rea
     return null
   }
 
-  const node: ParsedNode = {} as ParsedNode
+  const node: any = {}
   for (let i = 0; i < nodeFields.length; i++) {
     const fieldIndex = nodeStart + i
     if (fieldIndex < nodes.length) {

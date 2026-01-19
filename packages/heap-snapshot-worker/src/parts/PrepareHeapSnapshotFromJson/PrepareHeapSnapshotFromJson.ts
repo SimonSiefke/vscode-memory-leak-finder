@@ -1,7 +1,7 @@
 import { Worker } from 'node:worker_threads'
 import { getHeapSnapshotWorkerPath } from '../GetHeapSnapshotWorkerPath/GetHeapSnapshotWorkerPath.ts'
+import type { SnapshotMetaData } from '../Snapshot/Snapshot.ts'
 import { waitForResult } from '../WaitForResult/WaitForResult.ts'
-import type { Snapshot, SnapshotMetaData } from '../Snapshot/Snapshot.ts'
 
 interface PrepareHeapSnapshotOptions {
   readonly parseStrings?: boolean
