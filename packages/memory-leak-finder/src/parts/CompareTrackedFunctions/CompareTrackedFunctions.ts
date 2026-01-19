@@ -11,6 +11,7 @@ export interface TrackedFunctionResult {
   readonly originalLine?: number | null
   readonly originalColumn?: number | null
   readonly originalSource?: string | null
+  readonly originalName?: string | null
 }
 
 interface ParsedFunctionName {
@@ -398,11 +399,13 @@ export const compareTrackedFunctions = async (
           let originalLine: number | null = null
           let originalColumn: number | null = null
           let originalSource: string | null = null
+          let originalName: string | null = null
           if (original) {
             // Set individual fields
             originalLine = original.line ?? null
             originalColumn = original.column ?? null
             originalSource = original.source ?? null
+            originalName = original.name ?? null
 
             // Build the original location string - always include both line and column when we have source and line
             if (original.source && original.line !== null) {
@@ -414,12 +417,27 @@ export const compareTrackedFunctions = async (
             // This ensures originalLocation always follows the format <file>:<line>:<column>
           }
 
+          // Update functionName to use original name if available
+          let updatedFunctionName = result.functionName
+          if (originalName) {
+            // Extract the location part from the current functionName (everything after the first space and opening paren)
+            const locationMatch = result.functionName.match(/^.+?\s*\((.+?)\)$/)
+            if (locationMatch) {
+              updatedFunctionName = `${originalName} (${locationMatch[1]})`
+            } else {
+              // If we can't parse the location, just use the original name
+              updatedFunctionName = originalName
+            }
+          }
+
           results[pointer.index] = {
             ...result,
+            functionName: updatedFunctionName,
             originalLocation,
             originalLine,
             originalColumn,
             originalSource,
+            originalName,
           }
         }
       } catch (error) {
