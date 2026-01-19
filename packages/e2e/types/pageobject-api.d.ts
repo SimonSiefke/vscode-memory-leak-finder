@@ -70,7 +70,9 @@ export interface DiffEditor {
   expectOriginal(text: any): Promise<void>
   open(a: any, b: any): Promise<void>
   scrollDown(): Promise<void>
+  scrollDownInline(): Promise<void>
   scrollUp(): Promise<void>
+  scrollUpInline(): Promise<void>
   shouldHaveModifiedEditor(text: any): Promise<void>
   shouldHaveOriginalEditor(text: any): Promise<void>
 }
