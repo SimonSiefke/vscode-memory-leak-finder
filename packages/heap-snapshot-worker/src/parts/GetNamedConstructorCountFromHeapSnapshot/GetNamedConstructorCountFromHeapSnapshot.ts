@@ -21,7 +21,7 @@ const createCounts = (constructorNodesWithInfo: readonly ConstructorNodeWithInfo
   }
   const array = Object.entries(map).map(([key, value]) => {
     return {
-      count: value,
+      count: value as number,
       name: key,
     }
   })
