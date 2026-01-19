@@ -49,13 +49,13 @@ export const runTests = async ({
   screencastQuality,
   setupOnly,
   timeoutBetween,
-    timeouts,
-    trackFunctions,
-    openDevtools,
-    updateUrl,
-    useProxyMock,
-    vscodePath,
-    vscodeVersion,
+  timeouts,
+  trackFunctions,
+  openDevtools,
+  updateUrl,
+  useProxyMock,
+  vscodePath,
+  vscodeVersion,
 }: RunTestsOptions): Promise<RunTestsResult> => {
   let insidersCommit = insidersCommitInput
   if (insidersCommit === 'today') {

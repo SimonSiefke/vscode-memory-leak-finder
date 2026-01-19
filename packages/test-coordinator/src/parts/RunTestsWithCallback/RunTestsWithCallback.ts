@@ -70,13 +70,13 @@ export const runTestsWithCallback = async ({
   screencastQuality,
   setupOnly,
   timeoutBetween,
-    timeouts,
-    trackFunctions,
-    openDevtools,
-    updateUrl,
-    useProxyMock,
-    vscodePath,
-    vscodeVersion,
+  timeouts,
+  trackFunctions,
+  openDevtools,
+  updateUrl,
+  useProxyMock,
+  vscodePath,
+  vscodeVersion,
 }: RunTestsWithCallbackOptions): Promise<RunTestsResult> => {
   try {
     Assert.string(root)

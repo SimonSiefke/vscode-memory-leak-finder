@@ -2,6 +2,9 @@ import { transformCodeWithTracking } from '../TransformCodeWithTracking/Transfor
 import type { TransformOptions } from '../Types/Types.ts'
 
 const PREAMBLE_CODE = `(() => {
+  if(globalThis.trackFunctionCall){
+    return
+  }
   const functionStatistics = Object.create(null)
 
   const trackFunctionCall = (scriptId, line, column) => {
@@ -10,11 +13,11 @@ const PREAMBLE_CODE = `(() => {
     functionStatistics[key]++
   }
 
-  if (!globalThis.test) {
-    globalThis.test = {}
-  }
 
-  globalThis.test.getFunctionStatistics = () => {
+
+  globalThis.trackFunctionCall = trackFunctionCall
+
+  globalThis.getFunctionStatistics = () => {
     return functionStatistics
   }
 })();
