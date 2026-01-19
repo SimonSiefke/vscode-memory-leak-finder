@@ -1,3 +1,4 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
@@ -7,7 +8,7 @@ const isNoteBook = (file: string) => {
   return file.endsWith('.ipynb')
 }
 
-export const create = ({ electronApp, expect, page, platform, VError }) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
     async expectModified(text: string) {
       try {
@@ -41,9 +42,16 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
       cell1Content: string
     }) {
       try {
-        const explorer = Explorer.create({ electronApp, expect, page, platform, VError })
-        const contextMenu = ContextMenu.create({ expect, page, VError })
-        const sideBar = SideBar.create({ expect, page, platform, VError })
+        const explorer = Explorer.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
+        const sideBar = SideBar.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await explorer.focus()
         await explorer.openContextMenu(file1)
         await contextMenu.select('Select for Compare')
@@ -106,7 +114,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to scroll up in diff editor`)
       }
     },
-    async shouldHaveModifiedEditor(text) {
+    async shouldHaveModifiedEditor(text: string) {
       try {
         const editor = page.locator('.editor.modified')
         const editorLines = editor.locator('.view-lines')
@@ -118,7 +126,7 @@ export const create = ({ electronApp, expect, page, platform, VError }) => {
         throw new VError(error, `Failed to assert modified editor contents`)
       }
     },
-    async shouldHaveOriginalEditor(text) {
+    async shouldHaveOriginalEditor(text: string) {
       try {
         const editor = page.locator('.editor.original')
         const editorLines = editor.locator('.view-lines')

@@ -1,16 +1,17 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
-    async addContext(initialPrompt, secondPrompt, confirmText) {
+    async addContext(initialPrompt: string, secondPrompt: string, confirmText: string) {
       try {
         const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
         await addContextButton.click()
         await page.waitForIdle()
 
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.select(initialPrompt, true)
         await quickPick.select(secondPrompt)
         await page.waitForIdle()
@@ -26,12 +27,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async clearAll() {
       try {
-        const electron = Electron.create({ electronApp, VError })
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
         await using _mockDialog = await electron.mockDialog({
           response: 1,
         })
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
-        if (ideVersion && ideVersion.minor >= 108) {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
           // TODO
           // await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
@@ -46,7 +47,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to clear chat context`)
       }
     },
-    async clearContext(contextName) {
+    async clearContext(contextName: string) {
       try {
         const contextLabel = page.locator(`[aria-label="Attached context, ${contextName}"]`)
         await expect(contextLabel).toBeVisible()
@@ -75,7 +76,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     isFirst: false,
     async open() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.NewChartEditor)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -113,6 +114,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         exists: [],
       },
       verify = false,
+      viewLinesText = '',
+    }: {
+      expectedResponse?: string
+      message: string
+      validateRequest?: { exists: readonly unknown[] }
+      verify?: boolean
+      viewLinesText?: string
     }) {
       try {
         await page.waitForIdle()
@@ -136,7 +144,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const nonBreakingSpace = String.fromCharCode(160)
         const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
-        await expect(lines).toHaveText(adjustedMessage)
+        await expect(lines).toHaveText(viewLinesText || adjustedMessage)
         await page.waitForIdle()
         const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
         await expect(interactiveInput).toBeVisible()
@@ -221,7 +229,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async setMode(modeLabel: string) {
       try {
-        if (ideVersion.minor < 107) {
+        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor < 107) {
           await this.setModeLegacy(modeLabel)
           return
         }

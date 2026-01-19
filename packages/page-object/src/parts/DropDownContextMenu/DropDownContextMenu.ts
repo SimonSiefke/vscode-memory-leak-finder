@@ -1,4 +1,6 @@
-export const create = ({ expect, page, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
     async close() {
       try {
@@ -7,7 +9,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to close context menu`)
       }
     },
-    async shouldHaveItem(option) {
+    async shouldHaveItem(option: string) {
       await page.waitForIdle()
       const contextMenu = page.locator(
         '.monaco-dropdown.active .shadow-root-host:enter-shadow() .context-view.monaco-menu-container .actions-container',

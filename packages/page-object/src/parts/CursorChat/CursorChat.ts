@@ -1,6 +1,7 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async resetFocus() {
       try {
@@ -11,7 +12,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to reset focus`)
       }
     },
-    async sendMessage(question) {
+    async sendMessage(question: string) {
       try {
         const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()
@@ -22,7 +23,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to send message`)
       }
     },
-    async shouldHaveMessageCount(count) {
+    async shouldHaveMessageCount(count: number) {
       try {
         await page.waitForIdle()
         const conversations = page.locator('.conversations')
@@ -33,7 +34,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to verify message count`)
       }
     },
-    async shouldHaveResponse(responseText) {
+    async shouldHaveResponse(responseText: string) {
       try {
         await page.waitForIdle()
         const conversations = page.locator('.conversations')
@@ -47,7 +48,14 @@ export const create = ({ expect, page, platform, VError }) => {
     },
     async show() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand('Cursor: New Chat')
         const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()

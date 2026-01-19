@@ -1,7 +1,8 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async close() {
       try {
@@ -10,7 +11,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to close quick pick`)
       }
     },
-    async executeCommand(command, { pressKeyOnce = false, stayVisible = false } = {}) {
+    async executeCommand(command: string, { pressKeyOnce = false, stayVisible = false } = {}) {
       try {
         await page.waitForIdle()
         await this.showCommands({ pressKeyOnce })
@@ -82,10 +83,10 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to hide quick pick`)
       }
     },
-    async openFile(fileName) {
+    async openFile(fileName: string) {
       try {
         await page.waitForIdle()
-        await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform) })
+        await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform || '') })
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
@@ -179,12 +180,12 @@ export const create = ({ expect, page, platform, VError }) => {
     },
     async showCommands({ pressKeyOnce = false } = {}) {
       try {
-        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform), pressKeyOnce })
+        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform || ''), pressKeyOnce })
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }
     },
-    async type(value) {
+    async type(value: string) {
       try {
         const quickPick = page.locator('.quick-input-widget')
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')

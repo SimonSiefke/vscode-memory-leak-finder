@@ -1,21 +1,22 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async hide() {
       try {
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeVisible()
-        const panel = Panel.create({ expect, page, platform, VError })
+        const panel = Panel.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         await panel.hide()
         await expect(markersPanel).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide problems`)
       }
     },
-    async shouldHaveCount(count) {
+    async shouldHaveCount(count: number) {
       try {
         const problemsBadge = page.locator('[role="tab"] [aria-label^="Problems"] + .badge')
         const badgeContent = problemsBadge.locator('.badge-content')
@@ -33,7 +34,14 @@ export const create = ({ expect, page, platform, VError }) => {
       try {
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ProblemsFocusOnProblemsView)
         await expect(markersPanel).toBeVisible()
       } catch (error) {

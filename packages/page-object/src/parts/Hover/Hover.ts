@@ -1,4 +1,6 @@
-export const create = ({ expect, page, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
     async hide() {
       try {
@@ -24,7 +26,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide hover`)
       }
     },
-    async shouldHaveText(text) {
+    async shouldHaveText(text: string) {
       try {
         const tooltip = page.locator('.monaco-hover')
         await expect(tooltip).toBeVisible()

@@ -7,9 +7,11 @@ const TitleBarMenuItems = {
   View: 'View',
 }
 
-export const create = ({ expect, page, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async hideMenu(text) {
+    async hideMenu(text: string) {
       try {
         const titleBar = page.locator('.part.titlebar')
         await expect(titleBar).toBeVisible()
@@ -27,7 +29,7 @@ export const create = ({ expect, page, VError }) => {
     async hideMenuFile() {
       return this.hideMenu(TitleBarMenuItems.File)
     },
-    async showMenu(text) {
+    async showMenu(text: string) {
       try {
         const titleBar = page.locator('.part.titlebar')
         await expect(titleBar).toBeVisible()
