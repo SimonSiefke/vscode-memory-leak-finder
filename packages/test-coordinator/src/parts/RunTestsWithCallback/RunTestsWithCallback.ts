@@ -436,7 +436,6 @@ export const runTestsWithCallback = async ({
     if (recordVideo) {
       await VideoRecording.finalize(workers.videoRpc)
     }
-
     // TODO when in watch mode, dispose all workers except initialization worker to keep the application running
     await disposeWorkers(workers)
     workers = {
