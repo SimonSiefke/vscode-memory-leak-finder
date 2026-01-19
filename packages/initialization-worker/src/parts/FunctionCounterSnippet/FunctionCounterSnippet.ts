@@ -6,7 +6,7 @@ export const functionCounterSnippet = `(() => {
   }
   
   globalThis.test.trackFunctionCall = (scriptId, line, column) => {
-    const key = \`\${scriptId}:\${line}:\${column})\`
+    const key = \`\${scriptId}:\${line}:\${column}\`
     functionStatistics[key] ||= 0
     functionStatistics[key]++
   }

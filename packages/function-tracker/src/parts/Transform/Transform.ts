@@ -9,7 +9,7 @@ const PREAMBLE_CODE = `(() => {
   }
 
   globalThis.test.trackFunctionCall = (scriptId, line, column) => {
-    const key = \`\${scriptId}:\${line}:\${column})\`
+    const key = \`\${scriptId}:\${line}:\${column}\`
     functionStatistics[key] ||= 0
     functionStatistics[key]++
   }
