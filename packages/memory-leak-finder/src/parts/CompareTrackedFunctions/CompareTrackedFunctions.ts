@@ -150,7 +150,11 @@ const findScript = (
   }
   // Then try to find by URL (normalize both for comparison)
   const normalizedTarget = normalizeUrl(urlOrScriptId)
+<<<<<<< HEAD
   for (const [key, script] of Object.entries(scriptMap)) {
+=======
+  for (const [_key, script] of Object.entries(scriptMap)) {
+>>>>>>> origin/main
     if (script.url) {
       const normalizedScriptUrl = normalizeUrl(script.url)
       // Compare normalized paths, and also try direct comparison
@@ -275,6 +279,10 @@ export const compareTrackedFunctions = async (
       // Process functions with location info
       if (parsed.url && parsed.line !== null) {
         // Try to find the script - findScript handles both scriptId and URL lookups
+<<<<<<< HEAD
+=======
+        // @ts-ignore
+>>>>>>> origin/main
         let script = findScript(scriptMap, parsed.url)
         let actualUrl = parsed.url
 
@@ -284,9 +292,17 @@ export const compareTrackedFunctions = async (
           const numericScriptId = Number.parseInt(parsed.url, 10)
           if (!Number.isNaN(numericScriptId)) {
             // It's a scriptId, try to convert to URL and lookup again
+<<<<<<< HEAD
             const convertedUrl = convertScriptIdToUrl(scriptMap, parsed.url)
             if (convertedUrl) {
               actualUrl = convertedUrl
+=======
+            // @ts-ignore
+            const convertedUrl = convertScriptIdToUrl(scriptMap, parsed.url)
+            if (convertedUrl) {
+              actualUrl = convertedUrl
+              // @ts-ignore
+>>>>>>> origin/main
               script = findScript(scriptMap, convertedUrl)
             }
           }
@@ -302,6 +318,10 @@ export const compareTrackedFunctions = async (
           // The column was tracked and is in the original functionName, use it directly
           const column = originalColumn !== null ? originalColumn : 0
           // Always update to ensure URL format with column is shown
+<<<<<<< HEAD
+=======
+          // @ts-ignore
+>>>>>>> origin/main
           results[i].functionName = `${parsed.name} (${actualUrl}:${parsed.line}:${column})`
         }
 
@@ -352,7 +372,10 @@ export const compareTrackedFunctions = async (
           offsetMap[pointer.sourceMapUrl] = offset + 1
 
           const result = results[pointer.index]
+<<<<<<< HEAD
           const parsed = pointer.parsed
+=======
+>>>>>>> origin/main
 
           // Keep functionName with minified location, add originalLocation separately
           // Always include both line and column in originalLocation format: <file>:<line>:<column>
