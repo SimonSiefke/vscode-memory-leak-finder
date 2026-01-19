@@ -42,6 +42,7 @@ export interface BooleanNode extends BaseAstNode {
 
 export interface UndefinedNode extends BaseAstNode {
   readonly type: 'undefined'
+  readonly value: undefined
 }
 
 export interface PropertyEntry {
