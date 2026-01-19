@@ -17,7 +17,8 @@ const PREAMBLE_CODE = `(() => {
   globalThis.test.getFunctionStatistics = () => {
     return functionStatistics
   }
-})();`
+})();
+`
 
 export const transformCode = async (code: string, options: TransformOptions = {}): Promise<string> => {
   const transformedCode = transformCodeWithTracking(code, { ...options })
