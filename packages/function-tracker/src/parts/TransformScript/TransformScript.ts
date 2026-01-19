@@ -1,25 +1,19 @@
-import parser from '@babel/parser'
-import traverse from '@babel/traverse'
-import generate from '@babel/generator'
 import * as t from '@babel/types'
 import { trackingCode } from '../TrackingCode/TrackingCode.ts'
 import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.js'
-
-// Handle ESM imports properly
-const traverseDefault = (traverse as any).default || traverse
-const generateDefault = (generate as any).default || generate
+import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 
 export const transformCode = async (code: string, filename?: string, excludePatterns?: string[]): Promise<string> => {
   try {
     // Try different parsing strategies
-    const ast = parser.parse(code, {
+    const ast = parser2.parse(code, {
       sourceType: 'module',
       allowImportExportEverywhere: true,
       plugins: [],
     })
 
     // Add tracking code at the beginning
-    const trackingAST = parser.parse(trackingCode, {
+    const trackingAST = parser2.parse(trackingCode, {
       sourceType: 'script',
     })
 
@@ -28,7 +22,7 @@ export const transformCode = async (code: string, filename?: string, excludePatt
       const plugin = createFunctionWrapperPlugin({ filename, excludePatterns })
       console.log('Plugin created successfully:', plugin)
       console.log('AST before transformation:', ast)
-      traverseDefault(ast, plugin as any)
+      traverse2(ast, plugin as any)
       console.log('AST after transformation successful')
     } catch (error) {
       console.error('Error transforming code:', error)
@@ -40,7 +34,7 @@ export const transformCode = async (code: string, filename?: string, excludePatt
     // Combine tracking code with transformed code
     const combinedAST = t.program([...trackingAST.program.body, ...ast.program.body])
 
-    const result = generateDefault(combinedAST, {
+    const result = generate2(combinedAST, {
       retainLines: false,
       compact: false,
     })

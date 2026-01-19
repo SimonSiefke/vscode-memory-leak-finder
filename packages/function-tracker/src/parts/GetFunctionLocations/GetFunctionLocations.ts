@@ -1,7 +1,4 @@
-import traverse from '@babel/traverse'
-
-// @ts-ignore
-const traverse2 = (traverse.default || traverse) as typeof import('@babel/traverse').default
+import { traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 
 export const getFunctionLocations = (ast: any): Map<any, { line: number; column: number }> => {
   const functionLocations = new Map<any, { line: number; column: number }>()
