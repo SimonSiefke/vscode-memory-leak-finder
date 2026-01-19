@@ -255,9 +255,16 @@ export const compareTrackedFunctions = async (
     // Collect positions for source map resolution
     for (let i = 0; i < results.length; i++) {
       const result = results[i]
+      // Log first few functionNames to see what we're getting
+      if (i < 3) {
+        console.log(`[CompareTrackedFunctions] Original functionName[${i}]:`, result.functionName)
+      }
       const parsed = parseFunctionName(result.functionName)
       // Store original column from parsed result before we potentially modify it
       const originalColumn = parsed.column
+      if (i < 3) {
+        console.log(`[CompareTrackedFunctions] Parsed column[${i}]:`, originalColumn)
+      }
 
       // Process functions with location info
       if (parsed.url && parsed.line !== null) {
