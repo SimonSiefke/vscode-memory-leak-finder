@@ -1767,6 +1767,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to hide inline chat`)
       }
     },
+    async sendInlineChatMessage(message: string) {
+      try {
+        const chat = page.locator('.chat-widget')
+        const chatEditor = chat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(chatEditor).toBeVisible()
+        const editContext = chatEditor.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        await expect(editContext).toBeFocused()
+        await editContext.type(message)
+        await page.waitForIdle()
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+        // await new Promise((r) => {})
+        // await expect(chat).toBeHidden()
+        // await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide inline chat`)
+      }
+    },
     async showInlineChat() {
       try {
         const editor = page.locator('.editor')
