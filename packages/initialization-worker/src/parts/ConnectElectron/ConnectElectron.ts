@@ -83,6 +83,24 @@ export const connectElectron = async (
     })
   }
 
+  if (openDevtools) {
+    const openDevtoolsScript = `(function () {
+      const electron = globalThis._____electron
+      const { BrowserWindow } = electron
+      const intervalId = setInterval(() => {
+        const focusedWindow = BrowserWindow.getFocusedWindow()
+        if (focusedWindow) {
+          clearInterval(intervalId)
+          focusedWindow.webContents.openDevTools()
+        }
+      }, 100)
+    })()`
+    await DevtoolsProtocolRuntime.evaluate(electronRpc, {
+      expression: openDevtoolsScript,
+      awaitPromise: false,
+    })
+  }
+
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
   return {
