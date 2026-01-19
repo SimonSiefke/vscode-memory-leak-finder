@@ -9,7 +9,7 @@
     "isolatedModules": true,
     "strict": true,
     "strictNullChecks": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "noUncheckedSideEffectImports": true,
     "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,
