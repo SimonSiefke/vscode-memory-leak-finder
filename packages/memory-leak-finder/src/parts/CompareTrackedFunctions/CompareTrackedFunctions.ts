@@ -284,11 +284,10 @@ export const compareTrackedFunctions = async (
 
         // Update functionName to show URL with line and column if we have a URL
         // Always include column in the functionName format: (url:line:column)
-        // Use the original column from parsing, which should be preserved from the tracking
+        // Use the original column from parsing - it was tracked, so we have it
         if (actualUrl && script) {
-          // Use the original column that was parsed from the functionName
-          // The parser defaults to 0 if column was missing, but if it was in the original, use it
-          const column = originalColumn !== null && originalColumn >= 0 ? originalColumn : 0
+          // The column was tracked and is in the original functionName, use it directly
+          const column = originalColumn !== null ? originalColumn : 0
           // Always update to ensure URL format with column is shown
           results[i].functionName = `${parsed.name} (${actualUrl}:${parsed.line}:${column})`
         }
