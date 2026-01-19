@@ -7,25 +7,16 @@ export const transformCode = async (code: string, filename?: string, excludePatt
     // Try different parsing strategies
     const ast = parser2.parse(code, {
       sourceType: 'module',
-      allowImportExportEverywhere: true,
       plugins: [],
     })
 
     // Transform the original code with proper file context
-    try {
-      const plugin = createFunctionWrapperPlugin({ filename, excludePatterns })
-      traverse2(ast, plugin as any)
-    } catch (error) {
-      console.error('Error transforming code:', error)
-      console.error('Error details:', error.message)
-      console.error('Error stack:', error.stack)
-      return code // Return original code if transformation fails
-    }
+    const plugin = createFunctionWrapperPlugin({ filename, excludePatterns })
+    traverse2(ast, plugin as any)
 
     // Combine tracking code with transformed code
-    const combinedAST = t.program(ast.program.body)
 
-    const result = generate2(combinedAST, {
+    const result = generate2(ast, {
       retainLines: false,
       compact: false,
     })
