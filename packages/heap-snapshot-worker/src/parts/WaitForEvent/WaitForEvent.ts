@@ -6,7 +6,7 @@ interface WorkerMessage {
 }
 
 interface WaitForEventResult {
-  readonly error?: Error
+  readonly error?: Error | undefined
   readonly result?: unknown
 }
 
