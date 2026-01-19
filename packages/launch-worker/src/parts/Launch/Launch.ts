@@ -79,7 +79,6 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     platform,
-    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -103,31 +102,21 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
-  const { devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId, sessionId, targetId, utilityContext, webSocketUrl } =
-    await rpc.invokeAndTransfer(
-      'Initialize.prepare',
-      headlessMode,
-      attachedToPageTimeout,
-      port.port,
-      parsedVersion,
-      trackFunctions,
-      connectionId,
-      measureId,
-      pid,
-    )
+  const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
+    'Initialize.prepare',
+    headlessMode,
+    attachedToPageTimeout,
+    port.port,
+    parsedVersion,
+    trackFunctions,
+    connectionId,
+    measureId,
+    pid,
+  )
 
-  // Set up function-tracker protocol interceptor
-  if (trackFunctions) {
-    // The protocol interceptor will intercept vscode-file protocol requests
-    await rpc.invoke('Initialize.connectFunctionTracker')
-  }
-
-  // Note: functionTrackerRpc cannot be transferred via postMessage, so we don't return it
-  // It will be disposed separately if needed
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
-    functionTrackerRpc: undefined, // Cannot be transferred via postMessage
     parsedVersion,
     pid,
     sessionId,
