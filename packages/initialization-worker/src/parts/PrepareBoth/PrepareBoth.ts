@@ -54,12 +54,6 @@ export const prepareBoth = async (
     objectId: monkeyPatchedElectronId,
   })
 
-  if (!trackFunctions) {
-    // If not tracking, dispose electronRpc immediately
-    await electronRpc.dispose()
-    ElectronRpcState.clearElectronRpc()
-  }
-
   // Wait for the page to be created by the initialization worker's connectDevtools
   const { dispose, sessionId, targetId } = await connectDevtoolsPromise
 
