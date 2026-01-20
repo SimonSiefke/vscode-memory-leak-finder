@@ -17,7 +17,7 @@ export const config: readonly ConfigItem[] = [
     cacheDir,
     extensionName: 'copilot-chat',
     repoUrl: 'git@github.com:microsoft/vscode-copilot-chat.git',
-    version: 'v0.35.3',
+    version: 'v0.36.1',
   },
   {
     buildScript: [`npm`, `run`, `package`],
