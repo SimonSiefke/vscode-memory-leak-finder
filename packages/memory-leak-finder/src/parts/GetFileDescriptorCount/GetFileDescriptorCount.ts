@@ -41,7 +41,8 @@ const getProcessName = async (pid: number): Promise<string> => {
   try {
     const { stdout } = await execAsync(`ps -p ${pid} -o comm=`)
     return stdout.trim() || 'unknown'
-  } catch {
+  } catch (error) {
+    console.log(`[GetFileDescriptorCount] Error getting process name for ${pid}:`, error)
     return 'unknown'
   }
 }
@@ -51,20 +52,24 @@ const getFileDescriptorCount = async (pid: number): Promise<number> => {
     const fdDir = `/proc/${pid}/fd`
     const files = await readdir(fdDir)
     return files.length
-  } catch {
+  } catch (error) {
+    console.log(`[GetFileDescriptorCount] Error getting file descriptor count for ${pid}:`, error)
     return 0
   }
 }
 
 export const getFileDescriptorCountForProcess = async (pid: number | undefined): Promise<ProcessInfo[]> => {
   if (pid === undefined) {
+    console.log('[GetFileDescriptorCount] PID is undefined, returning empty array')
     return []
   }
   if (platform() !== 'linux') {
+    console.log(`[GetFileDescriptorCount] Platform is ${platform()}, not Linux, returning empty array`)
     return []
   }
   try {
     const allPids = await getAllDescendantPids(pid)
+    console.log(`[GetFileDescriptorCount] Found ${allPids.length} processes (including main process ${pid})`)
     const processInfos: ProcessInfo[] = []
 
     for (const processPid of allPids) {
@@ -80,8 +85,10 @@ export const getFileDescriptorCountForProcess = async (pid: number | undefined):
     // Sort by file descriptor count descending
     processInfos.sort((a, b) => b.fileDescriptorCount - a.fileDescriptorCount)
 
+    console.log(`[GetFileDescriptorCount] Returning ${processInfos.length} process infos`)
     return processInfos
-  } catch {
+  } catch (error) {
+    console.log(`[GetFileDescriptorCount] Error getting file descriptor count for PID ${pid}:`, error)
     return []
   }
 }
