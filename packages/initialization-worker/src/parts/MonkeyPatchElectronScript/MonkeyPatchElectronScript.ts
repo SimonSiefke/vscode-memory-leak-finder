@@ -53,6 +53,22 @@ export const monkeyPatchElectronScript = `function () {
         timestamp: Date.now(),
         type: 'on',
         args: args.map(arg => {
+          // Check if it's a Buffer
+          if (Buffer.isBuffer(arg)) {
+            return {
+              type: 'buffer',
+              length: arg.length,
+              content: arg.toString('utf8')
+            }
+          }
+          // Check if it's a Uint8Array
+          if (arg instanceof Uint8Array) {
+            return {
+              type: 'uint8array',
+              length: arg.length,
+              content: Buffer.from(arg).toString('utf8')
+            }
+          }
           try {
             return JSON.stringify(arg)
           } catch (e) {
@@ -78,6 +94,22 @@ export const monkeyPatchElectronScript = `function () {
         timestamp: Date.now(),
         type: 'handle-request',
         args: args.map(arg => {
+          // Check if it's a Buffer
+          if (Buffer.isBuffer(arg)) {
+            return {
+              type: 'buffer',
+              length: arg.length,
+              content: arg.toString('utf8')
+            }
+          }
+          // Check if it's a Uint8Array
+          if (arg instanceof Uint8Array) {
+            return {
+              type: 'uint8array',
+              length: arg.length,
+              content: Buffer.from(arg).toString('utf8')
+            }
+          }
           try {
             return JSON.stringify(arg)
           } catch (e) {
@@ -98,6 +130,22 @@ export const monkeyPatchElectronScript = `function () {
           timestamp: Date.now(),
           type: 'handle-response',
           result: (() => {
+            // Check if result is a Buffer
+            if (Buffer.isBuffer(result)) {
+              return {
+                type: 'buffer',
+                length: result.length,
+                content: result.toString('utf8')
+              }
+            }
+            // Check if result is a Uint8Array
+            if (result instanceof Uint8Array) {
+              return {
+                type: 'uint8array',
+                length: result.length,
+                content: Buffer.from(result).toString('utf8')
+              }
+            }
             try {
               return JSON.stringify(result)
             } catch (e) {
