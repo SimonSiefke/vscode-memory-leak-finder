@@ -9,9 +9,9 @@ import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
+  const workspace = join(Root.root, '.vscode-test-workspace')
   return {
     async add(file: { name: string; content: string }) {
-      const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, file.name)
       await mkdir(dirname(absolutePath), { recursive: true })
       await writeFile(absolutePath, file.content)
@@ -44,23 +44,19 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
       return filePath
     },
     getWorkspacePath() {
-      const workspace = join(Root.root, '.vscode-test-workspace')
       return workspace
     },
     async initializeGitRepository() {
-      const workspace = join(Root.root, '.vscode-test-workspace')
       await Exec.exec('git', ['init'], { cwd: workspace })
       await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
       await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
     },
     async remove(file: string) {
-      const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, file)
       await rm(absolutePath, { force: true, recursive: true })
     },
     async setFiles(files: Array<{ name: string; content: string }>) {
       await page.waitForIdle()
-      const workspace = join(Root.root, '.vscode-test-workspace')
       const dirents = await readdir(workspace)
       for (const dirent of dirents) {
         const absolutePath = join(workspace, dirent)
@@ -74,7 +70,6 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
       await page.waitForIdle()
     },
     async waitForFile(fileName: string): Promise<boolean> {
-      const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, fileName)
       if (existsSync(absolutePath)) {
         return true
