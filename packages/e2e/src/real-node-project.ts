@@ -13,6 +13,7 @@ export const setup = async ({ Editor, Explorer, Terminal, Workspace }: TestConte
 
 export const run = async ({ ActivityBar, Editor, Explorer, Terminal, Workspace, SimpleBrowser, Task }: TestContext): Promise<void> => {
   await Editor.closeAll()
+  await Terminal.killAll()
   await Explorer.focus()
   // Show terminal and create Vite React project
   await Terminal.show({
