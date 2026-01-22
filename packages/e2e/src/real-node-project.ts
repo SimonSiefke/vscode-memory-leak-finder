@@ -69,6 +69,7 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace
 
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('my-vite-app')
   await RunAndDebug.removeAllBreakpoints()
 }
