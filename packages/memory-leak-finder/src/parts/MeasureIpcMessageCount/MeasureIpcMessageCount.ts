@@ -8,7 +8,7 @@ import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.IpcMessageCount
 
-export const targets = [TargetId.Browser, TargetId.Worker, TargetId.Node]
+export const targets = [TargetId.Node]
 
 export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
@@ -16,7 +16,7 @@ export const create = (session: Session) => {
 }
 
 export const start = async (session: Session, objectGroup: string) => {
-  return GetIpcMessages.getIpcMessages(session)
+  return await GetIpcMessages.getIpcMessages(session)
 }
 
 export const stop = async (session: Session, objectGroup: string) => {
@@ -28,6 +28,7 @@ export const releaseResources = async (session: Session, objectGroup: string) =>
 }
 
 export const compare = (before, after) => {
+  console.log({ before, after })
   return {
     before,
     after,
