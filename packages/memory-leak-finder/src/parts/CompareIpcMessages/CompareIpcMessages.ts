@@ -1,6 +1,6 @@
 import * as Hash from '../Hash/Hash.ts'
 
-export const compare = (before: any, after: any) => {
+export const compare = (before: readonly any[], after: readonly any[]): readonly any[] => {
   const b = Array.isArray(before) ? before : []
   const a = Array.isArray(after) ? after : []
 
