@@ -9,6 +9,11 @@ export const getIpcMessages = async (session: Session): Promise<void> => {
     generatePreview: true,
     returnByValue: true,
   })
+  console.log({ result })
+
+  if (Map) {
+    return
+  }
 
   const messages = GetValue.getValue(result.result)
 
