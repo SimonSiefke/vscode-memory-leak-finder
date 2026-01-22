@@ -65,23 +65,20 @@ export const getFileDescriptorCountForProcess = async (pid: number | undefined):
   try {
     const allPids = await getAllDescendantPids(pid)
     const processInfos: ProcessInfo[] = []
-    
+
     for (const processPid of allPids) {
-      const [name, fdCount] = await Promise.all([
-        getProcessName(processPid),
-        getFileDescriptorCount(processPid)
-      ])
-      
+      const [name, fdCount] = await Promise.all([getProcessName(processPid), getFileDescriptorCount(processPid)])
+
       processInfos.push({
         pid: processPid,
         name,
-        fileDescriptorCount: fdCount
+        fileDescriptorCount: fdCount,
       })
     }
-    
+
     // Sort by file descriptor count descending
     processInfos.sort((a, b) => b.fileDescriptorCount - a.fileDescriptorCount)
-    
+
     return processInfos
   } catch {
     return []
