@@ -4,9 +4,9 @@ import { platform } from 'node:os'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 
 export interface ProcessInfo {
-  pid: number
-  name: string
-  fileDescriptorCount: number
+  readonly pid: number
+  readonly name: string
+  readonly fileDescriptorCount: number
 }
 
 const getFileDescriptorCount = async (pid: number): Promise<number> => {
