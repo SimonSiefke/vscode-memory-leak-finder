@@ -27,7 +27,7 @@ export const releaseResources = async (session: Session, objectGroup: string) =>
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
-export const compare = ({ before, after }) => {
+export const compare = (before, after) => {
   return {
     before,
     after,
