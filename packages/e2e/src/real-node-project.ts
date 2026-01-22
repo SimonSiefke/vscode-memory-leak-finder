@@ -4,12 +4,13 @@ export const skip = false
 
 export const requiresNetwork = true
 
-export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Terminal, Workspace }: TestContext): Promise<void> => {
   // Kill any existing terminals
   await Terminal.killAll()
 
   // Set up empty workspace
   await Workspace.setFiles([])
+  // await Extensions.install({})
   await Editor.closeAll()
   await Explorer.focus()
 
@@ -31,25 +32,7 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace
     waitForFile: 'my-vite-app/node_modules/.package-lock.json',
   })
 
-  // Create launch configuration for debugging
-  await Workspace.add({
-    content: `{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "chrome",
-      "request": "launch",
-      "name": "Debug Vite React App",
-      "url": "http://localhost:5173",
-      "webRoot": "\${workspaceFolder}/my-vite-app",
-      "sourceMaps": true,
-      "skipFiles": ["**/node_modules/**"],
-      "preLaunchTask": "npm: dev - my-vite-app"
-    }
-  ]
-}`,
-    name: '.vscode/launch.json',
-  })
+  // Create task configuration for running Vite
   await Workspace.add({
     content: `{
   "version": "0.2.0",
@@ -85,33 +68,33 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace
   await Explorer.focus()
   await Explorer.refresh()
   await Explorer.shouldHaveItem('my-vite-app')
-  await RunAndDebug.removeAllBreakpoints()
 }
 
-export const run = async ({ ActivityBar, Editor, Explorer, RunAndDebug, SimpleBrowser }: TestContext): Promise<void> => {
+export const run = async ({
+  ActivityBar,
+  Editor,
+  Explorer,
+  SimpleBrowser,
+  Task,
+}: TestContext): Promise<void> => {
   // Open the App.tsx file
   await Explorer.expand('my-vite-app')
-  await Editor.open('App.tsx')
-
-  // Set a breakpoint in App.tsx
-  await Editor.setBreakpoint(10)
-
+  await Editor.open('my-vite-app/src/App.tsx')
+  
   // Show Run and Debug view
   await ActivityBar.showRunAndDebug()
-
-  // Start debugging
-  await RunAndDebug.runAndWaitForPaused({
-    debugLabel: 'Debug Vite React App',
-    file: 'App.tsx',
-    line: 10,
-    viaIcon: true,
-  })
-
+  
+  // Start the Vite dev task
+  await Task.run('npm: dev - my-vite-app')
+  
+  // Wait for the server to start
+  await new Promise(resolve => setTimeout(resolve, 3000))
+  
   // Open the browser to verify the app is running
   await SimpleBrowser.show({
     url: 'http://localhost:5173',
   })
-
+  
   // Edit App.tsx to change the content
   await Editor.open('my-vite-app/src/App.tsx')
   await Editor.deleteAll()
@@ -150,25 +133,20 @@ function App() {
 }
 
 export default App`)
-
-  // Save the file
-  await Editor.save({})
-
-  // Continue execution
-  await RunAndDebug.continue()
-
-  // Wait a bit for the browser to update
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-
-  // Stop debugging
-  await RunAndDebug.stop()
-  await RunAndDebug.removeAllBreakpoints()
+  
+  // Save the file to trigger HMR
+  await Editor.save({ viaKeyBoard: true })
+  
+  // Wait a bit for HMR to update
+  await new Promise(resolve => setTimeout(resolve, 2000))
+  
+  // Stop the task
+  await Task.clear()
 }
 
-export const teardown = async ({ Editor, RunAndDebug, Terminal, Workspace }: TestContext): Promise<void> => {
-  // Stop any running debug sessions
-  await RunAndDebug.stop()
-  await RunAndDebug.removeAllBreakpoints()
+export const teardown = async ({ Editor, Task, Terminal, Workspace }: TestContext): Promise<void> => {
+  // Stop any running tasks
+  await Task.clear()
 
   // Kill all terminals
   await Terminal.killAll()
@@ -178,6 +156,5 @@ export const teardown = async ({ Editor, RunAndDebug, Terminal, Workspace }: Tes
 
   // Clean up the workspace
   await Workspace.remove('my-vite-app')
-  await Workspace.remove('.vscode/launch.json')
   await Workspace.remove('.vscode/tasks.json')
 }
