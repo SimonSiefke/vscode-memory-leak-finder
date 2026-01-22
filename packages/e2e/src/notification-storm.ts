@@ -13,7 +13,7 @@ export const run = async ({ Notification, QuickPick }: TestContext): Promise<voi
   await QuickPick.select('Notification Storm')
 
   // Wait for all 50 notifications to appear
-  await new Promise(resolve => setTimeout(resolve, 2000))
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
   // Close all notifications
   await Notification.closeAll()
