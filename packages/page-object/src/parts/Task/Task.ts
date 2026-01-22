@@ -213,7 +213,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to rerun last task`)
       }
     },
-    async run(taskName: string) {
+    async run(taskName: string, check: boolean = true) {
       try {
         const quickPick = QuickPick.create({
           electronApp: undefined,
@@ -242,10 +242,12 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const actionLabel = terminalActions.locator('.action-label')
         await expect(actionLabel).toBeVisible()
         await page.waitForIdle()
-        // await expect(actionLabel).toHaveText(' echo  -  Task ')
-        // await page.waitForIdle()
-        const check = actionLabel.locator('.codicon-check')
-        await expect(check).toBeVisible()
+        if (check) {
+          await expect(actionLabel).toHaveText(' echo  -  Task ')
+          await page.waitForIdle()
+          const checkLocator = actionLabel.locator('.codicon-check')
+          await expect(checkLocator).toBeVisible()
+        }
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to run task`)

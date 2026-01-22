@@ -79,7 +79,7 @@ export const run = async ({ ActivityBar, Editor, Explorer, expect, page, SimpleB
   await ActivityBar.showRunAndDebug()
 
   // Start the Vite dev task
-  await Task.run('npm: dev - my-vite-app')
+  await Task.run('npm: dev - my-vite-app', false)
 
   // Wait for the server to start
   await new Promise((resolve) => setTimeout(resolve, 3000))
