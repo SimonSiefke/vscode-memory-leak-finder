@@ -22,6 +22,9 @@ export interface ActivityBar {
   showRunAndDebug(): Promise<void>
   showSearch(): Promise<void>
   showSourceControl(): Promise<void>
+  moveExplorerToPanel(): Promise<void>
+  moveExtensionsToPanel(): Promise<void>
+  resetViewLocations(): Promise<void>
 }
 export interface ChatEditor {
   addContext(initialPrompt: any, secondPrompt: any, confirmText: any): Promise<void>
