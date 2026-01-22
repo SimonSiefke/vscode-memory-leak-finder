@@ -27,7 +27,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
         content: `echo hello world`,
       },
     ],
-    model: 'Xiaomi MiMo-v2-Flash (free)',
+    model: 'Xiaomi: MiMo-V2-Flash (free)',
   })
   await ChatEditor.clearAll()
 }
