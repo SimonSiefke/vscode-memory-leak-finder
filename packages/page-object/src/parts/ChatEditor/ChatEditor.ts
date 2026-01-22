@@ -125,11 +125,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to move chat`)
       }
     },
-    async selectModel(modelName: string) {
+    async selectModel(modelName: string, retry = true) {
       try {
         const modelPickerItem = page.locator('.chat-modelPicker-item').nth(1)
         await expect(modelPickerItem).toBeVisible()
+        await page.waitForIdle()
         const modelLocator = modelPickerItem.locator('.chat-model-label')
+        await expect(modelLocator).toBeVisible()
+        await page.waitForIdle()
         const modelText = await modelLocator.textContent()
         await page.waitForIdle()
         if (modelText === modelName) {
@@ -137,12 +140,23 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         await modelLocator.click()
         await page.waitForIdle()
-        await new Promise((r) => {})
         const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
         await expect(item).toBeVisible()
         await item.click()
         await page.waitForIdle()
         await expect(modelLocator).toHaveText(modelName)
+        // TODO for some reason, it can switch back
+        await new Promise((r) => {
+          setTimeout(r, 4000)
+        })
+        const modelText2 = await modelLocator.textContent()
+        if (modelText2 !== modelName) {
+          if (retry) {
+            this.selectModel(modelName, false)
+          } else {
+            throw new Error(`Model switch did not persist, expected ${modelName} but got ${modelText2}`)
+          }
+        }
       } catch (error) {
         throw new VError(error, `Failed to select model ${modelName}`)
       }
