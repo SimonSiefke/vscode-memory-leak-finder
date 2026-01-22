@@ -7,6 +7,7 @@ export const getIpcMessages = async (session: Session): Promise<void> => {
   const result = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `globalThis.__ipcMessages || []`,
     generatePreview: true,
+    returnByValue: true,
   })
 
   const messages = GetValue.getValue(result.result)

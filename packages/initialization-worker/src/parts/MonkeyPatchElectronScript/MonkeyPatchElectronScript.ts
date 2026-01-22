@@ -43,6 +43,7 @@ export const monkeyPatchElectronScript = `function () {
   // Intercept IPC messages
   const { ipcMain } = electron
   const originalIpcMainOn = ipcMain.on.bind(ipcMain)
+  const originalIpcMainHandle = ipcMain.handle.bind(ipcMain)
 
   ipcMain.on = function(channel, listener) {
     const wrappedListener = (event, ...args) => {
@@ -50,6 +51,7 @@ export const monkeyPatchElectronScript = `function () {
       const message = {
         channel,
         timestamp: Date.now(),
+        type: 'on',
         args: args.map(arg => {
           try {
             return JSON.stringify(arg)
@@ -66,6 +68,65 @@ export const monkeyPatchElectronScript = `function () {
     }
 
     return originalIpcMainOn(channel, wrappedListener)
+  }
+
+  ipcMain.handle = function(channel, listener) {
+    const wrappedListener = async (event, ...args) => {
+      // Log the IPC handle request
+      const requestMessage = {
+        channel,
+        timestamp: Date.now(),
+        type: 'handle-request',
+        args: args.map(arg => {
+          try {
+            return JSON.stringify(arg)
+          } catch (e) {
+            return '[unserializable]'
+          }
+        })
+      }
+
+      globalThis.__ipcMessages.push(requestMessage)
+      globalThis.__ipcMessageCount++
+
+      try {
+        const result = await listener(event, ...args)
+
+        // Log the IPC handle response
+        const responseMessage = {
+          channel,
+          timestamp: Date.now(),
+          type: 'handle-response',
+          result: (() => {
+            try {
+              return JSON.stringify(result)
+            } catch (e) {
+              return '[unserializable]'
+            }
+          })()
+        }
+
+        globalThis.__ipcMessages.push(responseMessage)
+        globalThis.__ipcMessageCount++
+
+        return result
+      } catch (error) {
+        // Log the IPC handle error
+        const errorMessage = {
+          channel,
+          timestamp: Date.now(),
+          type: 'handle-error',
+          error: error?.message || String(error)
+        }
+
+        globalThis.__ipcMessages.push(errorMessage)
+        globalThis.__ipcMessageCount++
+
+        throw error
+      }
+    }
+
+    return originalIpcMainHandle(channel, wrappedListener)
   }
 
   return async () => {
