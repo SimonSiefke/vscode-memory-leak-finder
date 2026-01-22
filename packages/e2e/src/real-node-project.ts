@@ -32,9 +32,8 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace
   })
 
   // Create launch configuration for debugging
-  await Workspace.setFiles([
-    {
-      content: `{
+  await Workspace.add({
+    content: `{
   "version": "0.2.0",
   "configurations": [
     {
@@ -49,10 +48,10 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace
     }
   ]
 }`,
-      name: '.vscode/launch.json',
-    },
-    {
-      content: `{
+    name: '.vscode/launch.json',
+  })
+  await Workspace.add({
+    content: `{
   "version": "0.2.0",
   "tasks": [
     {
@@ -65,9 +64,8 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace
     }
   ]
 }`,
-      name: '.vscode/tasks.json',
-    },
-  ])
+    name: '.vscode/tasks.json',
+  })
 
   await Editor.closeAll()
   await Explorer.focus()
