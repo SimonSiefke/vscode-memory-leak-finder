@@ -20,7 +20,7 @@ test('CleanIpcMessages should read a larger multi-byte integer', () => {
   // 0x81 0x80 0x01 = 129 + 128*128 = 16513
   const buffer = Buffer.from([0x81, 0x80, 0x01])
   const result = CleanIpcMessages.readIntVQL(buffer, 0)
-  expect(result.value).toBe(16513)
+  expect(result.value).toBe(16385)
   expect(result.bytesRead).toBe(3)
 })
 
@@ -405,16 +405,33 @@ test('CleanIpcMessages should decode real-world uint8array with embedded JSON', 
         type: 'uint8array',
         length: 184,
         content:
-          "\u0004\u0004\u0006d\u0006\uFFFD\u0006\u0001\u000flocalFilesystem\u0001\u0004stat\u0004\u0001\u0005\uFFFD\u0001{\"$mid\":1,\"path\":\"/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json\",\"scheme\":\"file\"}"
+          '\u0004\u0004\u0006d\u0006\uFFFD\u0006\u0001\u000flocalFilesystem\u0001\u0004stat\u0004\u0001\u0005\uFFFD\u0001{"$mid":1,"path":"/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json","scheme":"file"}',
       },
     ],
   }
 
   const cleaned = CleanIpcMessages.cleanMessages([rawMessage])
-  expect(cleaned).toHaveLength(1)
-  const msg = cleaned[0]
-  expect(msg.args).toBeDefined()
-  const firstArg = msg.args[0]
-  // Ensure the embedded JSON path is present after cleaning
-  expect(JSON.stringify(firstArg)).toContain('package.nls.json')
+  expect(cleaned).toEqual([
+    {
+      args: [
+        {
+          type: 'deserialized',
+          value: [
+            100,
+            13590511,
+            'localFilesystem',
+            'stat',
+            {
+              $mid: 1,
+              path: '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json',
+              scheme: 'file',
+            },
+          ],
+        },
+      ],
+      channel: 'vscode:message',
+      timestamp: 1769124893541,
+      type: 'on',
+    },
+  ])
 })
