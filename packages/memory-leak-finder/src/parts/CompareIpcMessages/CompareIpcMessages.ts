@@ -9,7 +9,7 @@ export const compare = (before: any, after: any) => {
     const m = new Map<string, number>()
     const sample = new Map<string, string>()
     for (const item of arr) {
-      const key = Hash.objectHash(item)
+      const key = Hash.hash(item)
       m.set(key, (m.get(key) || 0) + 1)
       if (!sample.has(key)) {
         try {
