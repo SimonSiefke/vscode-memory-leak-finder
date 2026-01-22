@@ -143,6 +143,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         })
         const row = page.locator(`.monaco-list-row[aria-label^="${item}"]`)
         await expect(row).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open task quickpick`)
       }
