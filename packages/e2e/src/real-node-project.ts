@@ -70,33 +70,46 @@ export const setup = async ({ Editor, Explorer, Terminal, Workspace }: TestConte
   await Explorer.shouldHaveItem('my-vite-app')
 }
 
-export const run = async ({
-  ActivityBar,
-  Editor,
-  Explorer,
-  SimpleBrowser,
-  Task,
-}: TestContext): Promise<void> => {
+export const run = async ({ ActivityBar, Editor, Explorer, expect, page, SimpleBrowser, Task }: TestContext): Promise<void> => {
   // Open the App.tsx file
   await Explorer.expand('my-vite-app')
-  await Editor.open('my-vite-app/src/App.tsx')
-  
+  await Editor.open('App.tsx')
+
   // Show Run and Debug view
   await ActivityBar.showRunAndDebug()
-  
+
   // Start the Vite dev task
   await Task.run('npm: dev - my-vite-app')
-  
+
   // Wait for the server to start
-  await new Promise(resolve => setTimeout(resolve, 3000))
-  
+  await new Promise((resolve) => setTimeout(resolve, 3000))
+
   // Open the browser to verify the app is running
   await SimpleBrowser.show({
     url: 'http://localhost:5173',
   })
-  
+
+  // Verify the initial h1 content
+  // @ts-ignore
+  // const webView = page.locator('.webview')
+  // await expect(webView).toBeVisible()
+  // // @ts-ignore
+  // const subFrame = await page.waitForIframe({
+  //   injectUtilityScript: false,
+  //   url: /http:\/\/localhost:5173/,
+  // })
+  // // @ts-ignore
+  // const innerFrame = await subFrame.waitForSubIframe({
+  //   injectUtilityScript: false,
+  //   url: /http:\/\/localhost:5173/,
+  // })
+  // await innerFrame.waitForIdle()
+  // const h1 = innerFrame.locator('h1')
+  // await expect(h1).toBeVisible()
+  // await expect(h1).toHaveText('Hello World')
+
   // Edit App.tsx to change the content
-  await Editor.open('my-vite-app/src/App.tsx')
+  await Editor.open('App.tsx')
   await Editor.deleteAll()
   await Editor.type(`import { useState } from 'react'
 import reactLogo from './assets/react.svg'
@@ -133,13 +146,17 @@ function App() {
 }
 
 export default App`)
-  
+
   // Save the file to trigger HMR
   await Editor.save({ viaKeyBoard: true })
-  
+
   // Wait a bit for HMR to update
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  
+  await new Promise((resolve) => setTimeout(resolve, 2000))
+
+  // Verify the updated h1 content
+  // await innerFrame.waitForIdle()
+  // await expect(h1).toHaveText('TEST EDITED APP')
+
   // Stop the task
   await Task.clear()
 }
