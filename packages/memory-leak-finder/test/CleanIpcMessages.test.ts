@@ -394,3 +394,27 @@ test('CleanIpcMessages should preserve all other message properties', () => {
   expect(result[0].customProp).toBe('custom value')
   expect(result[0].args).toEqual(['arg1'])
 })
+
+test('CleanIpcMessages should decode real-world uint8array with embedded JSON', () => {
+  const rawMessage = {
+    channel: 'vscode:message',
+    timestamp: 1769124893541,
+    type: 'on',
+    args: [
+      {
+        type: 'uint8array',
+        length: 184,
+        content:
+          "\u0004\u0004\u0006d\u0006\uFFFD\u0006\u0001\u000flocalFilesystem\u0001\u0004stat\u0004\u0001\u0005\uFFFD\u0001{\"$mid\":1,\"path\":\"/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json\",\"scheme\":\"file\"}"
+      },
+    ],
+  }
+
+  const cleaned = CleanIpcMessages.cleanMessages([rawMessage])
+  expect(cleaned).toHaveLength(1)
+  const msg = cleaned[0]
+  expect(msg.args).toBeDefined()
+  const firstArg = msg.args[0]
+  // Ensure the embedded JSON path is present after cleaning
+  expect(JSON.stringify(firstArg)).toContain('package.nls.json')
+})

@@ -50,14 +50,28 @@ export function deserialize(buffer: Buffer, offset: number = 0): { value: any; b
       const { value: length, bytesRead: lengthBytes } = readIntVQL(buffer, offset)
       offset += lengthBytes
       const buf = buffer.subarray(offset, offset + length)
-      return { value: buf, bytesRead: 1 + lengthBytes + length }
+      // Try to parse buffer contents as UTF-8 JSON, fall back to raw buffer
+      try {
+        const str = buf.toString('utf8')
+        const parsed = JSON.parse(str)
+        return { value: parsed, bytesRead: 1 + lengthBytes + length }
+      } catch (e) {
+        return { value: buf, bytesRead: 1 + lengthBytes + length }
+      }
     }
 
     case DataType.VSBuffer: {
       const { value: length, bytesRead: lengthBytes } = readIntVQL(buffer, offset)
       offset += lengthBytes
       const buf = buffer.subarray(offset, offset + length)
-      return { value: buf, bytesRead: 1 + lengthBytes + length }
+      // Try to parse buffer contents as UTF-8 JSON, fall back to raw buffer
+      try {
+        const str = buf.toString('utf8')
+        const parsed = JSON.parse(str)
+        return { value: parsed, bytesRead: 1 + lengthBytes + length }
+      } catch (e) {
+        return { value: buf, bytesRead: 1 + lengthBytes + length }
+      }
     }
 
     case DataType.Array: {
@@ -93,6 +107,19 @@ export function deserialize(buffer: Buffer, offset: number = 0): { value: any; b
   }
 }
 
+function bufferFromContent(content: string): Buffer {
+  // The monkey-patch stores binary data by doing `Buffer.from(arg).toString('utf8')`.
+  // That may produce replacement characters for some byte sequences. To be resilient
+  // we first try to reconstruct the raw bytes by interpreting the string as 'latin1'
+  // (where each code point 0..255 maps to the same byte). If that fails to
+  // deserialize we fall back to 'utf8'.
+  try {
+    return Buffer.from(content, 'latin1')
+  } catch (e) {
+    return Buffer.from(content, 'utf8')
+  }
+}
+
 // Clean up the IPC messages by deserializing VSCode binary data
 export function cleanMessages(messages: any[]): any[] {
   return messages.map((msg) => {
@@ -101,40 +128,67 @@ export function cleanMessages(messages: any[]): any[] {
     // Clean args
     if (msg.args && Array.isArray(msg.args)) {
       cleanedMsg.args = msg.args.map((arg) => {
-        // If it's a uint8array with VSCode binary data, try to deserialize it
-        if (arg && arg.type === 'uint8array' && arg.content) {
+        // If it's a uint8array or buffer with VSCode binary data, try to deserialize it
+        if (arg && (arg.type === 'uint8array' || arg.type === 'buffer') && arg.content) {
+          // Convert the content string back to a buffer, prefer 'latin1' to preserve raw bytes
           try {
-            // Convert the content string back to a buffer
-            // The content is already a string representation of the binary data
-            const buffer = Buffer.from(arg.content, 'utf8')
+            const buffer = bufferFromContent(arg.content)
             const { value, bytesRead } = deserialize(buffer)
 
-            // If we successfully deserialized something, return the deserialized value
-            // Only return deserialized if we got a meaningful value (not undefined)
             if (bytesRead > 0 && value !== undefined) {
               return value
             }
+
+            // Fallback: try to parse the raw content as JSON (utf8)
+            try {
+              return JSON.parse(buffer.toString('utf8'))
+            } catch (e) {
+              return arg
+            }
           } catch (e) {
-            // If deserialization fails, return the original
             return arg
           }
         }
+
+        // If it's a JSON string produced by the monkey-patch (JSON.stringify), try to parse it
+        if (typeof arg === 'string') {
+          try {
+            return JSON.parse(arg)
+          } catch (e) {
+            return arg
+          }
+        }
+
         return arg
       })
     }
 
     // Clean result (for handle-response)
-    if (msg.result && msg.result.type === 'uint8array' && msg.result.content) {
-      try {
-        const buffer = Buffer.from(msg.result.content, 'utf8')
-        const { value, bytesRead } = deserialize(buffer)
+    if (msg.result) {
+      // If it's a typed binary result, try to deserialize
+      if (msg.result.type && (msg.result.type === 'uint8array' || msg.result.type === 'buffer') && msg.result.content) {
+        try {
+          const buffer = bufferFromContent(msg.result.content)
+          const { value, bytesRead } = deserialize(buffer)
 
-        // Only return deserialized if we got a meaningful value (not undefined)
-        if (bytesRead > 0 && value !== undefined) {
-          cleanedMsg.result = value
+          if (bytesRead > 0 && value !== undefined) {
+            cleanedMsg.result = value
+          } else {
+            try {
+              cleanedMsg.result = JSON.parse(buffer.toString('utf8'))
+            } catch (e) {
+              // keep original
+            }
+          }
+        } catch (e) {
+          // keep original
         }
-      } catch (e) {
-        // If deserialization fails, keep the original
+      } else if (typeof msg.result === 'string') {
+        try {
+          cleanedMsg.result = JSON.parse(msg.result)
+        } catch (e) {
+          // keep original
+        }
       }
     }
 
