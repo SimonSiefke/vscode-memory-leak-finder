@@ -58,7 +58,21 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace
       "type": "npm",
       "script": "dev",
       "path": "my-vite-app",
-      "problemMatcher": [],
+      "problemMatcher": [
+        {
+          "owner": "vite",
+          "fileLocation": ["relative", "\${workspaceFolder}/my-vite-app"],
+          "pattern": {
+            "regexp": "^.*$",
+            "message": 1
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.*$",
+            "endsPattern": "^.*$"
+          }
+        }
+      ],
       "isBackground": true,
       "label": "npm: dev - my-vite-app"
     }
