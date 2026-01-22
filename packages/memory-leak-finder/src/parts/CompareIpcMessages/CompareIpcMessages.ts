@@ -1,51 +1,35 @@
 import * as Hash from '../Hash/Hash.ts'
 
 export const compare = (before: readonly any[], after: readonly any[]): readonly any[] => {
-  const b = Array.isArray(before) ? before : []
-  const a = Array.isArray(after) ? after : []
-
-  // Map from stable key -> count
-  const countMap = (arr: any[]) => {
-    const m = new Map<string, number>()
-    const sample = new Map<string, string>()
-    for (const item of arr) {
-      const key = Hash.hash(item)
-      m.set(key, (m.get(key) || 0) + 1)
-      if (!sample.has(key)) {
-        try {
-          sample.set(key, JSON.stringify(item))
-        } catch (e) {
-          sample.set(key, String(item))
-        }
-      }
+  const counts = Object.create(null)
+  for (const item of before) {
+    const hash = Hash.hash(item)
+    if (!counts[hash]) {
+      counts[hash] = 0
     }
-    return { m, sample }
+    counts[hash]++
   }
-
-  const { m: beforeMap, sample: beforeSample } = countMap(b)
-  const { m: afterMap, sample: afterSample } = countMap(a)
+  const afterCounts = Object.create(null)
+  for (const item of after) {
+    const hash = Hash.hash(item)
+    if (!afterCounts[hash]) {
+      afterCounts[hash] = 0
+    }
+    afterCounts[hash]++
+  }
 
   const added: any[] = []
 
-  for (const [key, afterCount] of afterMap.entries()) {
-    const beforeCount = beforeMap.get(key) || 0
+  for (const item of after) {
+    const hash = Hash.hash(item)
+    const beforeCount = counts[hash] ?? 0
+    const afterCount = afterCounts[hash] ?? 0
     const diff = afterCount - beforeCount
     if (diff > 0) {
-      const sampleStr = afterSample.get(key) || beforeSample.get(key) || key
-      try {
-        const parsed = JSON.parse(sampleStr)
-        added.push(...Array(diff).fill(parsed))
-      } catch (e) {
-        added.push(...Array(diff).fill(sampleStr))
-      }
+      added.push(item)
+      afterCounts[hash]--
     }
   }
 
-  return {
-    before: b,
-    after: a,
-    added,
-  }
+  return added
 }
-
-export default { compare }
