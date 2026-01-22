@@ -62,6 +62,27 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to move explorer to panel`)
       }
     },
+    async moveExtensionsToPanel() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Extensions'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        const contextMenu = ContextMenu.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(activityBarItem)
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Panel', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move extensions to panel`)
+      }
+    },
     async resetViewLocations() {
       try {
         const quickPick = QuickPick.create({

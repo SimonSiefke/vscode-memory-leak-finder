@@ -25,6 +25,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat context`)
       }
     },
+    async addAllProblemsAsContext() {
+      try {
+        await this.addContext('Problems...', 'All Problems', 'All Problems')
+      } catch (error) {
+        throw new VError(error, `Failed to set chat context`)
+      }
+    },
     async clearAll() {
       try {
         const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
@@ -125,6 +132,42 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to move chat`)
       }
     },
+    async selectModel(modelName: string, retry = true) {
+      try {
+        const modelPickerItem = page.locator('.chat-modelPicker-item').nth(1)
+        await expect(modelPickerItem).toBeVisible()
+        await page.waitForIdle()
+        const modelLocator = modelPickerItem.locator('.chat-model-label')
+        await expect(modelLocator).toBeVisible()
+        await page.waitForIdle()
+        const modelText = await modelLocator.textContent()
+        await page.waitForIdle()
+        if (modelText === modelName) {
+          return
+        }
+        await modelLocator.click()
+        await page.waitForIdle()
+        const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
+        await expect(item).toBeVisible()
+        await item.click()
+        await page.waitForIdle()
+        await expect(modelLocator).toHaveText(modelName)
+        // TODO for some reason, it can switch back
+        await new Promise((r) => {
+          setTimeout(r, 7000)
+        })
+        const modelText2 = await modelLocator.textContent()
+        if (modelText2 !== modelName) {
+          if (retry) {
+            this.selectModel(modelName, false)
+          } else {
+            throw new Error(`Model switch did not persist, expected ${modelName} but got ${modelText2}`)
+          }
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to select model ${modelName}`)
+      }
+    },
     async sendMessage({
       expectedResponse,
       message,
@@ -133,18 +176,25 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       },
       verify = false,
       viewLinesText = '',
+      toolInvocations = [],
+      model,
     }: {
       expectedResponse?: string
       message: string
       validateRequest?: { exists: readonly unknown[] }
       verify?: boolean
       viewLinesText?: string
+      toolInvocations?: readonly any[]
+      model?: string
     }) {
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
         await page.waitForIdle()
+        if (model) {
+          await this.selectModel(model)
+        }
         const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
         await expect(editArea).toBeVisible()
         await page.waitForIdle()
@@ -218,6 +268,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
+        }
+
+        if (toolInvocations) {
+          const element = chatView.locator('.chat-tool-invocation-part')
+          await expect(element).toBeVisible({ timeout: 20_000 })
+          await page.waitForIdle()
+          for (const toolInvocation of toolInvocations) {
+            const block = element.locator('.chat-terminal-command-block')
+            await expect(block).toBeVisible({
+              timeout: 2_000,
+            })
+            await expect(block).toHaveText(` ${toolInvocation.content}`)
+            await page.waitForIdle()
+          }
         }
 
         if (expectedResponse) {

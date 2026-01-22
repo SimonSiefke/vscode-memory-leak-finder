@@ -32,6 +32,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'undoRedoService.ts',
       'uri.ts',
       'uriIdentityService.ts',
+      '^webpack://xterm',
     ],
     minCount: threshold,
   }
