@@ -8,7 +8,8 @@ export const setup = async ({ ChatEditor, Editor }: TestContext): Promise<void> 
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
-  await ChatEditor.addContext('Problems...', 'All Problems', 'All Problems')
+  // @ts-ignore
+  await ChatEditor.addAllProblemsAsContext()
   await ChatEditor.clearContext('All Problems')
 }
 

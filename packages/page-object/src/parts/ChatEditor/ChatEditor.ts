@@ -25,6 +25,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat context`)
       }
     },
+    async addAllProblemsAsContext() {
+      try {
+        await this.addContext('Problems...', 'All Problems', 'All Problems')
+      } catch (error) {
+        throw new VError(error, `Failed to set chat context`)
+      }
+    },
     async clearAll() {
       try {
         const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
