@@ -273,7 +273,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             await expect(block).toBeVisible({
               timeout: 2_000,
             })
-            await expect(block).toHaveText(toolInvocation.content)
+            await expect(block).toHaveText(` ${toolInvocation.content}`)
             await page.waitForIdle()
           }
         }
