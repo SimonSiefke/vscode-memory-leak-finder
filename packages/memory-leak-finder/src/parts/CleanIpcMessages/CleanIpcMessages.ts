@@ -110,10 +110,10 @@ export function cleanMessages(messages: any[]): any[] {
             const { value, bytesRead } = deserialize(buffer)
 
             // If we successfully deserialized something, return the deserialized value
-            if (bytesRead > 0) {
+            // Only return deserialized if we got a meaningful value (not undefined)
+            if (bytesRead > 0 && value !== undefined) {
               return {
                 type: 'deserialized',
-                original: arg,
                 value,
               }
             }
@@ -132,10 +132,10 @@ export function cleanMessages(messages: any[]): any[] {
         const buffer = Buffer.from(msg.result.content, 'utf8')
         const { value, bytesRead } = deserialize(buffer)
 
-        if (bytesRead > 0) {
+        // Only return deserialized if we got a meaningful value (not undefined)
+        if (bytesRead > 0 && value !== undefined) {
           cleanedMsg.result = {
             type: 'deserialized',
-            original: msg.result,
             value,
           }
         }
