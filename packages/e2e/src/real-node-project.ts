@@ -70,7 +70,7 @@ export const setup = async ({ Editor, Explorer, Terminal, Workspace }: TestConte
   await Explorer.shouldHaveItem('my-vite-app')
 }
 
-export const run = async ({ ActivityBar, Editor, Explorer, expect, page, SimpleBrowser, Task }: TestContext): Promise<void> => {
+export const run = async ({ ActivityBar, Editor, Explorer, Terminal, Workspace, SimpleBrowser, Task }: TestContext): Promise<void> => {
   // Open the App.tsx file
   await Explorer.expand('my-vite-app')
   await Editor.open('App.tsx')
@@ -78,9 +78,10 @@ export const run = async ({ ActivityBar, Editor, Explorer, expect, page, SimpleB
   // Show Run and Debug view
   await ActivityBar.showRunAndDebug()
 
-  // Start the Vite dev task
+  // @ts-ignore
   await Task.run('npm: dev - my-vite-app', false)
 
+  // TODO wait on port instead
   // Wait for the server to start
   await new Promise((resolve) => setTimeout(resolve, 3000))
 
@@ -89,24 +90,7 @@ export const run = async ({ ActivityBar, Editor, Explorer, expect, page, SimpleB
     url: 'http://localhost:5173',
   })
 
-  // Verify the initial h1 content
-  // @ts-ignore
-  // const webView = page.locator('.webview')
-  // await expect(webView).toBeVisible()
-  // // @ts-ignore
-  // const subFrame = await page.waitForIframe({
-  //   injectUtilityScript: false,
-  //   url: /http:\/\/localhost:5173/,
-  // })
-  // // @ts-ignore
-  // const innerFrame = await subFrame.waitForSubIframe({
-  //   injectUtilityScript: false,
-  //   url: /http:\/\/localhost:5173/,
-  // })
-  // await innerFrame.waitForIdle()
-  // const h1 = innerFrame.locator('h1')
-  // await expect(h1).toBeVisible()
-  // await expect(h1).toHaveText('Hello World')
+  // TODO verify h1 is displayed
 
   // Edit App.tsx to change the content
   await Editor.open('App.tsx')
@@ -157,8 +141,15 @@ export default App`)
   // await innerFrame.waitForIdle()
   // await expect(h1).toHaveText('TEST EDITED APP')
 
-  // Stop the task
+  // Stop any running tasks
   await Task.clear()
+  // Close all editors
+  await Editor.closeAll()
+
+  // Kill all terminals
+  await Terminal.killAll()
+
+  await Workspace.setFiles([])
 }
 
 export const teardown = async ({ Editor, Task, Terminal, Workspace }: TestContext): Promise<void> => {
