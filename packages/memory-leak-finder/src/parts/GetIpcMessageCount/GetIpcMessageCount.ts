@@ -1,7 +1,6 @@
+import { getIpcMessages } from '../GetIpcMessages/GetIpcMessages.ts'
 import type { Session } from '../Session/Session.ts'
-import * as GetObjectCount from '../GetObjectCount/GetObjectCount.ts'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
-export const getIpcMessageCount = async (session: Session, objectGroup: string): Promise<number> => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.IpcMessage, objectGroup)
+export const getIpcMessageCount = async (session: Session, objectGroup: string): Promise<any> => {
+  return getIpcMessages(session)
 }
