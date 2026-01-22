@@ -25,7 +25,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat context`)
       }
     },
-<<<<<<< HEAD
     async attachImage(file: string) {
       try {
         const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
@@ -42,13 +41,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to attach image`)
-=======
+      }
+    },
     async addAllProblemsAsContext() {
       try {
         await this.addContext('Problems...', 'All Problems', 'All Problems')
       } catch (error) {
         throw new VError(error, `Failed to set chat context`)
->>>>>>> origin/main
       }
     },
     async clearAll() {
@@ -195,24 +194,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       },
       verify = false,
       viewLinesText = '',
-<<<<<<< HEAD
       image = '',
-=======
       toolInvocations = [],
       model,
->>>>>>> origin/main
     }: {
       expectedResponse?: string
       message: string
       validateRequest?: { exists: readonly unknown[] }
       verify?: boolean
       viewLinesText?: string
-<<<<<<< HEAD
       image?: string
-=======
       toolInvocations?: readonly any[]
       model?: string
->>>>>>> origin/main
     }) {
       try {
         await page.waitForIdle()
