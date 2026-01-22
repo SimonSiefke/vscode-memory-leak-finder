@@ -147,7 +147,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(modelLocator).toHaveText(modelName)
         // TODO for some reason, it can switch back
         await new Promise((r) => {
-          setTimeout(r, 4000)
+          setTimeout(r, 7000)
         })
         const modelText2 = await modelLocator.textContent()
         if (modelText2 !== modelName) {
