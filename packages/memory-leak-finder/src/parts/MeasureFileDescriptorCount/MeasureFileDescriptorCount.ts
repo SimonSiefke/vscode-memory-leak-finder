@@ -9,14 +9,14 @@ export const id = MeasureId.FileDescriptorCount
 export const targets: readonly any[] = []
 
 export const create = ({ pid }: { pid: number }) => {
-  return [0, pid]
+  return [pid]
 }
 
-export const start = async (connectionId: number, pid: number): Promise<ProcessInfo[]> => {
+export const start = async (pid: number): Promise<ProcessInfo[]> => {
   return await GetFileDescriptorCount.getFileDescriptorCountForProcess(pid)
 }
 
-export const stop = async (connectionId: number, pid: number): Promise<ProcessInfo[]> => {
+export const stop = async (pid: number): Promise<ProcessInfo[]> => {
   return await GetFileDescriptorCount.getFileDescriptorCountForProcess(pid)
 }
 
