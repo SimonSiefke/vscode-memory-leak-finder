@@ -1,23 +1,29 @@
+import * as Hash from '../Hash/Hash.ts'
+
 export const compare = (before: any, after: any) => {
   const b = Array.isArray(before) ? before : []
   const a = Array.isArray(after) ? after : []
 
+  // Map from stable key -> count
   const countMap = (arr: any[]) => {
     const m = new Map<string, number>()
+    const sample = new Map<string, string>()
     for (const item of arr) {
-      try {
-        const key = JSON.stringify(item)
-        m.set(key, (m.get(key) || 0) + 1)
-      } catch (e) {
-        const key = String(item)
-        m.set(key, (m.get(key) || 0) + 1)
+      const key = Hash.objectHash(item)
+      m.set(key, (m.get(key) || 0) + 1)
+      if (!sample.has(key)) {
+        try {
+          sample.set(key, JSON.stringify(item))
+        } catch (e) {
+          sample.set(key, String(item))
+        }
       }
     }
-    return m
+    return { m, sample }
   }
 
-  const beforeMap = countMap(b)
-  const afterMap = countMap(a)
+  const { m: beforeMap, sample: beforeSample } = countMap(b)
+  const { m: afterMap, sample: afterSample } = countMap(a)
 
   const added: any[] = []
 
@@ -25,10 +31,12 @@ export const compare = (before: any, after: any) => {
     const beforeCount = beforeMap.get(key) || 0
     const diff = afterCount - beforeCount
     if (diff > 0) {
+      const sampleStr = afterSample.get(key) || beforeSample.get(key) || key
       try {
-        added.push(...Array(diff).fill(JSON.parse(key)))
+        const parsed = JSON.parse(sampleStr)
+        added.push(...Array(diff).fill(parsed))
       } catch (e) {
-        added.push(...Array(diff).fill(key))
+        added.push(...Array(diff).fill(sampleStr))
       }
     }
   }
