@@ -5,6 +5,7 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import * as CompareIpcMessages from '../CompareIpcMessages/CompareIpcMessages.ts'
 
 export const id = MeasureId.IpcMessageCount
 
@@ -27,12 +28,6 @@ export const releaseResources = async (session: Session, objectGroup: string) =>
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
-export const compare = (before, after) => {
-  console.log({ before, after })
-  return {
-    before,
-    after,
-  }
-}
+export const compare = CompareIpcMessages.compare
 
 export const isLeak = IsLeakCount.isLeakCount
