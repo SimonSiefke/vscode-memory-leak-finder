@@ -19,7 +19,7 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace
   })
 
   // Create Vite React project
-  await Terminal.execute(' npm create vite@latest my-vite-app -- --template react --no-interactive', {
+  await Terminal.execute(' npm create vite@latest my-vite-app -- --template react-ts --no-interactive', {
     waitForFile: 'my-vite-app/package.json',
   })
 
