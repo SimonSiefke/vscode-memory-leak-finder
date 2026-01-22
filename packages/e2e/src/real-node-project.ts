@@ -77,7 +77,7 @@ export const setup = async ({ Editor, Explorer, RunAndDebug, Terminal, Workspace
 export const run = async ({ ActivityBar, Editor, Explorer, RunAndDebug, SimpleBrowser }: TestContext): Promise<void> => {
   // Open the App.tsx file
   await Explorer.expand('my-vite-app')
-  await Editor.open('my-vite-app/src/App.tsx')
+  await Editor.open('App.tsx')
 
   // Set a breakpoint in App.tsx
   await Editor.setBreakpoint(10)
