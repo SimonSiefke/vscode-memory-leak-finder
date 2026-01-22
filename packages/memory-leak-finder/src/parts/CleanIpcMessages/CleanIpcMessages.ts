@@ -1,12 +1,12 @@
 // VSCode binary serialization format
-export enum DataType {
-  Undefined = 0,
-  String = 1,
-  Buffer = 2,
-  VSBuffer = 3,
-  Array = 4,
-  Object = 5,
-  Int = 6,
+export const DataType = {
+  Undefined: 0,
+  String: 1,
+  Buffer: 2,
+  VSBuffer: 3,
+  Array: 4,
+  Object: 5,
+  Int: 6,
 }
 
 // Read variable-length quantity (VQL) integer
