@@ -28,7 +28,10 @@ export const releaseResources = async (session: Session, objectGroup: string) =>
 }
 
 export const compare = (before, after) => {
-  return {}
+  return {
+    before,
+    after,
+  }
 }
 
 export const isLeak = IsLeakCount.isLeakCount
