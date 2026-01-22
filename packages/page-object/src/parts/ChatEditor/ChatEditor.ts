@@ -127,7 +127,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async selectModel(modelName: string) {
       try {
-        const modelLocator = page.locator('.chat-model-label')
+        const modelPickerItem = page.locator('.chat-modelPicker-item').nth(1)
+        await expect(modelPickerItem).toBeVisible()
+        const modelLocator = modelPickerItem.locator('.chat-model-label')
         const modelText = await modelLocator.textContent()
         await page.waitForIdle()
         if (modelText === modelName) {
@@ -135,7 +137,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         await modelLocator.click()
         await page.waitForIdle()
-        const item = page.locator(`.monaco-list-row.action[aria-label^="${modelName}"]`)
+        await new Promise((r) => {})
+        const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
         await expect(item).toBeVisible()
         await item.click()
         await page.waitForIdle()
