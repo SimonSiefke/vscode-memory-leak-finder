@@ -112,10 +112,7 @@ export function cleanMessages(messages: any[]): any[] {
             // If we successfully deserialized something, return the deserialized value
             // Only return deserialized if we got a meaningful value (not undefined)
             if (bytesRead > 0 && value !== undefined) {
-              return {
-                type: 'deserialized',
-                value,
-              }
+              return value
             }
           } catch (e) {
             // If deserialization fails, return the original
@@ -134,10 +131,7 @@ export function cleanMessages(messages: any[]): any[] {
 
         // Only return deserialized if we got a meaningful value (not undefined)
         if (bytesRead > 0 && value !== undefined) {
-          cleanedMsg.result = {
-            type: 'deserialized',
-            value,
-          }
+          cleanedMsg.result = value
         }
       } catch (e) {
         // If deserialization fails, keep the original
