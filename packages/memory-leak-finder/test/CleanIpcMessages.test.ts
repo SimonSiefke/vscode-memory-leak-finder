@@ -183,7 +183,7 @@ describe('CleanIpcMessages', () => {
             {
               type: 'uint8array',
               length: 10,
-              content: 'invalid binary data',
+              content: '\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF', // Invalid binary data
             },
           ],
         },
