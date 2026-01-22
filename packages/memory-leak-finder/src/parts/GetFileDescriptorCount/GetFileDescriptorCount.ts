@@ -1,50 +1,12 @@
-import { exec } from 'node:child_process'
+import { execSync } from 'node:child_process'
 import { readdir } from 'node:fs/promises'
 import { platform } from 'node:os'
-import { promisify } from 'node:util'
-
-const execAsync = promisify(exec)
+import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 
 export interface ProcessInfo {
   pid: number
   name: string
   fileDescriptorCount: number
-}
-
-const getChildPids = async (pid: number): Promise<readonly number[]> => {
-  try {
-    const { stdout } = await execAsync(`pgrep -P ${pid}`)
-    const childPids = stdout
-      .trim()
-      .split('\n')
-      .filter((line) => line.trim())
-      .map((line) => Number.parseInt(line.trim(), 10))
-      .filter((pid) => !Number.isNaN(pid))
-    return childPids
-  } catch (error) {
-    console.log(`[GetFileDescriptorCount] Error getting child PIDs for ${pid}:`, error)
-    return []
-  }
-}
-
-const getAllDescendantPids = async (pid: number): Promise<readonly number[]> => {
-  const allPids: number[] = [pid]
-  const childPids = await getChildPids(pid)
-  for (const childPid of childPids) {
-    const descendants = await getAllDescendantPids(childPid)
-    allPids.push(...descendants)
-  }
-  return allPids
-}
-
-const getProcessName = async (pid: number): Promise<string> => {
-  try {
-    const { stdout } = await execAsync(`ps -p ${pid} -o comm=`)
-    return stdout.trim() || 'unknown'
-  } catch (error) {
-    console.log(`[GetFileDescriptorCount] Error getting process name for ${pid}:`, error)
-    return 'unknown'
-  }
 }
 
 const getFileDescriptorCount = async (pid: number): Promise<number> => {
@@ -55,6 +17,16 @@ const getFileDescriptorCount = async (pid: number): Promise<number> => {
   } catch (error) {
     console.log(`[GetFileDescriptorCount] Error getting file descriptor count for ${pid}:`, error)
     return 0
+  }
+}
+
+const getProcessName = async (pid: number): Promise<string> => {
+  try {
+    const stdout = execSync(`ps -p ${pid} -o comm=`).toString()
+    return stdout.trim() || 'unknown'
+  } catch (error) {
+    console.log(`[GetFileDescriptorCount] Error getting process name for ${pid}:`, error)
+    return 'unknown'
   }
 }
 
