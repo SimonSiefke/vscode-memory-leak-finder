@@ -10,7 +10,7 @@ export const getIpcMessages = async (session: Session): Promise<any> => {
     returnByValue: true,
   })
 
-  const messages = result.result
+  const messages = result
 
   // Clean up the messages by deserializing VSCode binary data
   const cleanedMessages = CleanIpcMessages.cleanMessages(messages)
