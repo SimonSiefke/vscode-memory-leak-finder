@@ -107,6 +107,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open finish setup`)
       }
     },
+    async moveToSideBar() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand('Chat: Move Chat into Side Bar')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to move chat`)
+      }
+    },
+    async moveToEditor() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand('Chat: Move Chat into Editor Area')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to move chat`)
+      }
+    },
     async sendMessage({
       expectedResponse,
       message,

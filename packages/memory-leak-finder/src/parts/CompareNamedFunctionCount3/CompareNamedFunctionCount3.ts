@@ -11,6 +11,8 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
   const options = {
     excludeOriginalPaths: [
       'async.ts',
+      'commandsQuickAccess.ts',
+      'contextKeyService.ts',
       'debugName.ts',
       'diffEditorInput.ts',
       'editStack.ts',
