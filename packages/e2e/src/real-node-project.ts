@@ -164,14 +164,11 @@ export default App`)
 export const teardown = async ({ Editor, Task, Terminal, Workspace }: TestContext): Promise<void> => {
   // Stop any running tasks
   await Task.clear()
+  // Close all editors
+  await Editor.closeAll()
 
   // Kill all terminals
   await Terminal.killAll()
 
-  // Close all editors
-  await Editor.closeAll()
-
-  // Clean up the workspace
-  await Workspace.remove('my-vite-app')
-  await Workspace.remove('.vscode/tasks.json')
+  await Workspace.setFiles([])
 }
