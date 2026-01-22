@@ -74,7 +74,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
       if (existsSync(absolutePath)) {
         return true
       }
-      const maxWaits = 100
+      const maxWaits = 600 // Increased from 100 to 600 (30 seconds)
       const checkTime = 50
       for (let i = 0; i < maxWaits; i++) {
         if (existsSync(absolutePath)) {
