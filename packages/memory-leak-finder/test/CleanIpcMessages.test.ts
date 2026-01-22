@@ -163,8 +163,7 @@ test('CleanIpcMessages should deserialize uint8array args', () => {
   ]
 
   const result = CleanIpcMessages.cleanMessages(messages)
-  expect(result[0].args[0].type).toBe('deserialized')
-  expect(result[0].args[0].value).toBe(str)
+  expect(result[0].args[0]).toBe(str)
 })
 
 test('CleanIpcMessages should handle uint8array with invalid binary data', () => {
@@ -209,8 +208,7 @@ test('CleanIpcMessages should deserialize uint8array result', () => {
   ]
 
   const result = CleanIpcMessages.cleanMessages(messages)
-  expect(result[0].result.type).toBe('deserialized')
-  expect(result[0].result.value).toBe(str)
+  expect(result[0].result).toBe(str)
 })
 
 test('CleanIpcMessages should handle buffer type args', () => {
@@ -273,8 +271,7 @@ test('CleanIpcMessages should handle complex nested messages', () => {
   ]
 
   const result = CleanIpcMessages.cleanMessages(messages)
-  expect(result[0].args[0].type).toBe('deserialized')
-  expect(result[0].args[0].value).toEqual(['logger', 'onDidChangeVisibility', []])
+  expect(result[0].args[0]).toEqual(['logger', 'onDidChangeVisibility', []])
 })
 
 test('CleanIpcMessages should handle multiple args with mixed types', () => {
@@ -303,8 +300,7 @@ test('CleanIpcMessages should handle multiple args with mixed types', () => {
 
   const result = CleanIpcMessages.cleanMessages(messages)
   expect(result[0].args[0]).toBe('regular string')
-  expect(result[0].args[1].type).toBe('deserialized')
-  expect(result[0].args[1].value).toBe(str)
+  expect(result[0].args[1]).toBe(str)
   expect(result[0].args[2]).toBe(123)
   expect(result[0].args[3]).toEqual({ key: 'value' })
 })
@@ -414,20 +410,17 @@ test('CleanIpcMessages should decode real-world uint8array with embedded JSON', 
   expect(cleaned).toEqual([
     {
       args: [
-        {
-          type: 'deserialized',
-          value: [
-            100,
-            13590511,
-            'localFilesystem',
-            'stat',
-            {
-              $mid: 1,
-              path: '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json',
-              scheme: 'file',
-            },
-          ],
-        },
+        [
+          100,
+          13590511,
+          'localFilesystem',
+          'stat',
+          {
+            $mid: 1,
+            path: '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json',
+            scheme: 'file',
+          },
+        ],
       ],
       channel: 'vscode:message',
       timestamp: 1769124893541,
