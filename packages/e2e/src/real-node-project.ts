@@ -5,20 +5,19 @@ export const skip = false
 export const requiresNetwork = true
 
 export const setup = async ({ Editor, Explorer, Terminal, Workspace }: TestContext): Promise<void> => {
-  // Kill any existing terminals
-  await Terminal.killAll()
-
-  // Set up empty workspace
   await Workspace.setFiles([])
-  // await Extensions.install({})
+  await Terminal.killAll()
   await Editor.closeAll()
   await Explorer.focus()
+}
 
+export const run = async ({ ActivityBar, Editor, Explorer, Terminal, Workspace, SimpleBrowser, Task }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+  await Explorer.focus()
   // Show terminal and create Vite React project
   await Terminal.show({
     waitForReady: true,
   })
-
   // Create Vite React project
   await Terminal.execute(' npm create vite@latest my-vite-app -- --template react-ts --no-interactive', {
     waitForFile: 'my-vite-app/package.json',
@@ -68,9 +67,6 @@ export const setup = async ({ Editor, Explorer, Terminal, Workspace }: TestConte
   await Explorer.focus()
   await Explorer.refresh()
   await Explorer.shouldHaveItem('my-vite-app')
-}
-
-export const run = async ({ ActivityBar, Editor, Explorer, Terminal, Workspace, SimpleBrowser, Task }: TestContext): Promise<void> => {
   // Open the App.tsx file
   await Explorer.expand('my-vite-app')
   await Editor.open('App.tsx')
