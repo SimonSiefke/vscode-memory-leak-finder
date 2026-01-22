@@ -1571,7 +1571,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to show empty source action`)
       }
     },
-    async split(command: string, { groupCount = undefined }: { groupCount?: number }) {
+    async split(command: string, { groupCount = undefined }: { groupCount?: number | undefined }) {
       try {
         // TODO count editor groups
         const editors = page.locator('.editor-instance')
@@ -1591,8 +1591,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to split editor`)
       }
     },
-    async splitDown() {
-      return this.split(WellKnownCommands.ViewSplitEditorDown, {})
+    async splitDown({ groupCount = undefined, splitInto = false }: { groupCount?: number; splitInto?: boolean } = {}) {
+      if (splitInto) {
+        return this.split(WellKnownCommands.ViewSplitEditorDownInto, { groupCount })
+      } else {
+        return this.split(WellKnownCommands.ViewSplitEditorDown, { groupCount })
+      }
     },
     async splitLeft() {
       return this.split(WellKnownCommands.ViewSplitEditorLeft, {})
