@@ -265,12 +265,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
         if (toolInvocations) {
           const element = chatView.locator('.chat-tool-invocation-part')
-          await expect(element).toBeVisible({ timeout: 60_000 })
+          await expect(element).toBeVisible({ timeout: 20_000 })
           await page.waitForIdle()
           for (const toolInvocation of toolInvocations) {
-            const block = element.locator('.chat-tool-invocation-block')
+            const block = element.locator('.terminal-command-block')
             await expect(block).toBeVisible({
-              timeout: 60_000,
+              timeout: 20_000,
             })
             await expect(block).toHaveText(toolInvocation.content)
             await page.waitForIdle()
