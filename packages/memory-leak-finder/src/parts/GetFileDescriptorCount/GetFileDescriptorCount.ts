@@ -1,4 +1,5 @@
 import { exec } from 'node:child_process'
+import { readdir } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { promisify } from 'node:util'
 
@@ -47,9 +48,8 @@ const getProcessName = async (pid: number): Promise<string> => {
 const getFileDescriptorCount = async (pid: number): Promise<number> => {
   try {
     const fdDir = `/proc/${pid}/fd`
-    const { stdout } = await execAsync(`ls ${fdDir} 2>/dev/null | wc -l`)
-    const count = Number.parseInt(stdout.trim(), 10)
-    return Number.isNaN(count) ? 0 : count
+    const files = await readdir(fdDir)
+    return files.length
   } catch {
     return 0
   }
