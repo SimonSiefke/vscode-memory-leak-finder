@@ -1,6 +1,5 @@
 import type { Session } from '../Session/Session.ts'
-import * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.ts'
-import * as GetValue from '../GetValue/GetValue.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export const getIpcMessages = async (session: Session): Promise<void> => {
   // Get the IPC messages array from global state
@@ -8,16 +7,16 @@ export const getIpcMessages = async (session: Session): Promise<void> => {
     expression: `globalThis.__ipcMessages || []`,
     generatePreview: true,
   })
-  
+
   const messages = await GetValue.getValue(session, result.result)
-  
+
   // Write to file
   if (messages && messages.length > 0) {
     const fs = require('fs')
     const path = '/tmp/ipc-messages.txt'
     const timestamp = new Date().toISOString()
     const logEntry = `[${timestamp}] IPC Messages: ${JSON.stringify(messages, null, 2)}\n`
-    
+
     try {
       fs.appendFileSync(path, logEntry)
     } catch (error) {
