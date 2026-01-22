@@ -12,6 +12,10 @@ export const monkeyPatchElectronScript = `function () {
   let readyEventArgs
   let isReady = false
 
+  // Initialize IPC message tracking
+  globalThis.__ipcMessages = []
+  globalThis.__ipcMessageCount = 0
+
   const { resolve, promise } = Promise.withResolvers();
 
   const patchedAppEmit = (event, ...args) => {
@@ -35,6 +39,34 @@ export const monkeyPatchElectronScript = `function () {
   app.emit = patchedAppEmit
   app.whenReady = patchedWhenReady
   app.isReady = patchedIsReady
+
+  // Intercept IPC messages
+  const { ipcMain } = electron
+  const originalIpcMainOn = ipcMain.on.bind(ipcMain)
+
+  ipcMain.on = function(channel, listener) {
+    const wrappedListener = (event, ...args) => {
+      // Log the IPC message
+      const message = {
+        channel,
+        timestamp: Date.now(),
+        args: args.map(arg => {
+          try {
+            return JSON.stringify(arg)
+          } catch (e) {
+            return '[unserializable]'
+          }
+        })
+      }
+
+      globalThis.__ipcMessages.push(message)
+      globalThis.__ipcMessageCount++
+
+      return listener(event, ...args)
+    }
+
+    return originalIpcMainOn(channel, wrappedListener)
+  }
 
   return async () => {
     const event = await originalWhenReady
