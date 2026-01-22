@@ -133,6 +133,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       },
       verify = false,
       viewLinesText = '',
+      image = '',
     }: {
       expectedResponse?: string
       message: string
@@ -148,6 +149,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
         await expect(editArea).toBeVisible()
         await page.waitForIdle()
+        if (image) {
+          // TODO attach it
+          await new Promise((r) => {})
+        }
         const editContext = editArea.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
         await page.waitForIdle()
