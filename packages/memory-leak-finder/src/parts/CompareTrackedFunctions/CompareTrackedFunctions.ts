@@ -6,13 +6,11 @@ import { normalize, resolve, isAbsolute } from 'node:path'
 
 export interface TrackedFunctionResult {
   readonly functionName: string
-  readonly totalCount: number
-  readonly delta: number
+  readonly callCount: number
   readonly originalLocation?: string | null
   readonly originalLine?: number | null
   readonly originalColumn?: number | null
   readonly originalSource?: string | null
-  readonly originalName?: string | null
 }
 
 interface ParsedFunctionName {
@@ -24,33 +22,19 @@ interface ParsedFunctionName {
 
 const parseFunctionName = (functionName: string): ParsedFunctionName => {
   // Format: "functionName (url:line)" or "functionName (url:line:column)" or "functionName (scriptId:line:column)"
-  // Or just "scriptId:line:column" (e.g., "123:38:57140")
   // Handle both formats: with column and without column (backward compatibility)
-  const matchWithName = functionName.match(/^(.+?)\s*\((.+?):(\d+)(?::(\d+))?\)$/)
-  if (matchWithName) {
-    const name = matchWithName[1]
-    const urlOrScriptId = matchWithName[2]
-    const line = Number.parseInt(matchWithName[3], 10)
+  const match = functionName.match(/^(.+?)\s*\((.+?):(\d+)(?::(\d+))?\)$/)
+  if (match) {
+    const name = match[1]
+    const urlOrScriptId = match[2]
+    const line = Number.parseInt(match[3], 10)
     // If column is missing, default to 0 (we always need column for source map resolution)
-    const column = matchWithName[4] ? Number.parseInt(matchWithName[4], 10) : 0
+    const column = match[4] ? Number.parseInt(match[4], 10) : 0
     return {
       column,
       line,
       name,
       url: urlOrScriptId,
-    }
-  }
-  // Format: "scriptId:line:column" (e.g., "123:38:57140")
-  const matchScriptIdOnly = functionName.match(/^(\d+):(\d+):(\d+)$/)
-  if (matchScriptIdOnly) {
-    const scriptId = matchScriptIdOnly[1]
-    const line = Number.parseInt(matchScriptIdOnly[2], 10)
-    const column = Number.parseInt(matchScriptIdOnly[3], 10)
-    return {
-      column,
-      line,
-      name: functionName,
-      url: scriptId,
     }
   }
   // No location info, just function name
@@ -141,18 +125,6 @@ const convertScriptIdToUrl = (
   return null
 }
 
-const findWorkbenchScript = (
-  scriptMap: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>,
-): { readonly url?: string; readonly sourceMapUrl?: string } | null => {
-  // Find the script that corresponds to workbench.desktop.main.js
-  for (const [_key, script] of Object.entries(scriptMap)) {
-    if (script.url && script.url.includes('workbench.desktop.main.js')) {
-      return script
-    }
-  }
-  return null
-}
-
 const findScript = (
   scriptMap: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>,
   urlOrScriptId: string,
@@ -174,12 +146,6 @@ const findScript = (
       if (!Number.isNaN(keyNum) && keyNum === numericScriptId) {
         return scriptMap[key]
       }
-    }
-    // If scriptId is "123" (or any numeric ID that doesn't match), assume it's workbench.desktop.main.js
-    // This is a special case where scriptId 123 always refers to workbench.desktop.main.js
-    const workbenchScript = findWorkbenchScript(scriptMap)
-    if (workbenchScript) {
-      return workbenchScript
     }
   }
   // Then try to find by URL (normalize both for comparison)
@@ -231,9 +197,6 @@ const findScript = (
   return null
 }
 
-const SCRIPT_ID_PATTERN = /^\d+:\d+:\d+$/
-const FUNCTION_NAME_LOCATION_PATTERN = /^.+?\s*\((.+?)\)$/
-
 export const compareTrackedFunctions = async (
   before:
     | Record<string, number>
@@ -261,7 +224,7 @@ export const compareTrackedFunctions = async (
   const afterFunctions = afterData.trackedFunctions
   const scriptMap = afterData.scriptMap
 
-  let results: TrackedFunctionResult[] = []
+  const results: TrackedFunctionResult[] = []
 
   // Get all unique function names from both before and after
   const allFunctionNames = new Set([...Object.keys(beforeFunctions), ...Object.keys(afterFunctions)])
@@ -276,19 +239,18 @@ export const compareTrackedFunctions = async (
   for (const functionName of allFunctionNames) {
     const beforeCount = beforeFunctions[functionName] || 0
     const afterCount = afterFunctions[functionName] || 0
-    const delta = afterCount - beforeCount
+    const callCount = afterCount - beforeCount
 
-    if (delta > 0) {
+    if (callCount > 0) {
       results.push({
         functionName,
-        totalCount: afterCount,
-        delta,
+        callCount,
       })
     }
   }
 
-  // Sort by delta descending (highest first)
-  results = results.toSorted((a, b) => b.delta - a.delta)
+  // Sort by call count descending (highest first)
+  results.sort((a, b) => b.callCount - a.callCount)
 
   // If we have a scriptMap, resolve source maps for the results
   if (scriptMap && Object.keys(scriptMap).length > 0) {
@@ -342,12 +304,9 @@ export const compareTrackedFunctions = async (
         if (actualUrl && script) {
           // The column was tracked and is in the original functionName, use it directly
           const column = originalColumn !== null ? originalColumn : 0
-          // If the original name was just "scriptId:line:column", show it as "anonymous" or just the location
-          // Otherwise, keep the original name
-          const displayName = parsed.name === result.functionName && SCRIPT_ID_PATTERN.test(parsed.name) ? 'anonymous' : parsed.name
           // Always update to ensure URL format with column is shown
           // @ts-ignore
-          results[i].functionName = `${displayName} (${actualUrl}:${parsed.line}:${column})`
+          results[i].functionName = `${parsed.name} (${actualUrl}:${parsed.line}:${column})`
         }
 
         if (script) {
@@ -404,13 +363,11 @@ export const compareTrackedFunctions = async (
           let originalLine: number | null = null
           let originalColumn: number | null = null
           let originalSource: string | null = null
-          let originalName: string | null = null
           if (original) {
             // Set individual fields
             originalLine = original.line ?? null
             originalColumn = original.column ?? null
             originalSource = original.source ?? null
-            originalName = original.name ?? null
 
             // Build the original location string - always include both line and column when we have source and line
             if (original.source && original.line !== null) {
@@ -422,27 +379,12 @@ export const compareTrackedFunctions = async (
             // This ensures originalLocation always follows the format <file>:<line>:<column>
           }
 
-          // Update functionName to use original name if available
-          let updatedFunctionName = result.functionName
-          if (originalName) {
-            // Extract the location part from the current functionName (everything after the first space and opening paren)
-            const locationMatch = result.functionName.match(FUNCTION_NAME_LOCATION_PATTERN)
-            if (locationMatch) {
-              updatedFunctionName = `${originalName} (${locationMatch[1]})`
-            } else {
-              // If we can't parse the location, just use the original name
-              updatedFunctionName = originalName
-            }
-          }
-
           results[pointer.index] = {
             ...result,
-            functionName: updatedFunctionName,
             originalLocation,
             originalLine,
             originalColumn,
             originalSource,
-            originalName,
           }
         }
       } catch (error) {
