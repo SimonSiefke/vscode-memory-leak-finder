@@ -51,11 +51,8 @@ export const connectElectron = async (electronRpc: RpcConnection, headlessMode: 
 
   // TODO headlessmode
 
-  const baseFunctionDeclaration =
-    MonkeyPatchElectronScript.monkeyPatchElectronScriptPrefix + MonkeyPatchElectronScript.monkeyPatchElectronScriptSuffix
-
   const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: baseFunctionDeclaration,
+    functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
     objectId: electronObjectId,
   })
 
