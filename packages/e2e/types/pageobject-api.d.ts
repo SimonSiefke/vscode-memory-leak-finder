@@ -22,6 +22,9 @@ export interface ActivityBar {
   showRunAndDebug(): Promise<void>
   showSearch(): Promise<void>
   showSourceControl(): Promise<void>
+  moveSearchToPanel(): Promise<void>
+  moveSourceControlToPanel(): Promise<void>
+  moveRunAndDebugToPanel(): Promise<void>
   moveExplorerToPanel(): Promise<void>
   moveExtensionsToPanel(): Promise<void>
   resetViewLocations(): Promise<void>
@@ -327,6 +330,7 @@ export interface Output {
   clearFilter(): Promise<void>
   filter(filterValue: any): Promise<void>
   hide(): Promise<void>
+  moveOutputToSidebar(): Promise<void>
   openEditor(): Promise<void>
   select(channelName: any): Promise<void>
   show(): Promise<void>
@@ -349,6 +353,7 @@ export interface Problems {
   hide(): Promise<void>
   shouldHaveCount(count: any): Promise<void>
   show(): Promise<void>
+  moveProblemsToSidebar(): Promise<void>
   switchToTableView(): Promise<void>
   switchToTreeView(): Promise<void>
 }

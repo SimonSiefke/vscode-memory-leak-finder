@@ -71,6 +71,20 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to hide output`)
       }
     },
+    async moveOutputToSidebar() {
+      try {
+        const outputView = page.locator('.pane-body.output-view')
+        await expect(outputView).toBeVisible()
+        const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
+        await expect(moreActions).toBeVisible()
+        await moreActions.click()
+        const contextMenu = ContextMenu.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Sidebar', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move output to sidebar`)
+      }
+    },
     async openEditor() {
       try {
         await page.waitForIdle()

@@ -83,6 +83,69 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to move extensions to panel`)
       }
     },
+    async moveSearchToPanel() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Search'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        const contextMenu = ContextMenu.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(activityBarItem)
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Panel', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move search to panel`)
+      }
+    },
+    async moveSourceControlToPanel() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Source Control'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        const contextMenu = ContextMenu.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(activityBarItem)
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Panel', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move source control to panel`)
+      }
+    },
+    async moveRunAndDebugToPanel() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Run and Debug'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        const contextMenu = ContextMenu.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(activityBarItem)
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Panel', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move run and debug to panel`)
+      }
+    },
     async resetViewLocations() {
       try {
         const quickPick = QuickPick.create({
