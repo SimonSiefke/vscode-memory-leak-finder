@@ -1,7 +1,6 @@
 export const monkeyPatchElectronIpcMain = `function () { const electron = this
   // Initialize IPC message tracking
   globalThis.__ipcMessages = []
-  globalThis.__ipcMessageCount = 0
 
   // Intercept IPC messages
   const { ipcMain } = electron
@@ -23,7 +22,6 @@ export const monkeyPatchElectronIpcMain = `function () { const electron = this
 
   const pushMessage = (message) => {
     globalThis.__ipcMessages.push(message)
-    globalThis.__ipcMessageCount++
   }
 
   ipcMain.on = function(channel, listener) {
