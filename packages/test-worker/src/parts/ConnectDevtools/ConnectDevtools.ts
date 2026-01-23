@@ -27,7 +27,6 @@ export const connectDevtools = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
-  trackFunctions: boolean,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
