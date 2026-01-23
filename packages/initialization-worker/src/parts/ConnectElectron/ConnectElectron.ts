@@ -4,7 +4,6 @@ import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally
 import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
 import { monkeyPatchElectronHeadlessMode } from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
-import { protocolInterceptorScript } from '../ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
 import { VError } from '../VError/VError.ts'
 
 interface RpcConnection {
@@ -22,14 +21,7 @@ const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {
   }
 }
 
-export const connectElectron = async (
-  electronRpc: RpcConnection,
-  headlessMode: boolean,
-  trackFunctions: boolean,
-  openDevtools: boolean,
-  port: number,
-  preGeneratedWorkbenchPath: string | null,
-) => {
+export const connectElectron = async (electronRpc: RpcConnection, headlessMode: boolean) => {
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
@@ -40,7 +32,6 @@ export const connectElectron = async (
   const callFrame = msg.params.callFrames[0]
   const { callFrameId } = callFrame
 
-  // TODO do this in parallel
   const electron = await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
     callFrameId,
     expression: `require('electron')`,
@@ -75,31 +66,6 @@ export const connectElectron = async (
     MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
-
-  if (trackFunctions) {
-    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: protocolInterceptorScript(port, preGeneratedWorkbenchPath),
-      objectId: electronObjectId,
-    })
-  }
-
-  if (openDevtools) {
-    const openDevtoolsScript = `(function () {
-      const electron = globalThis._____electron
-      const { BrowserWindow } = electron
-      const intervalId = setInterval(() => {
-        const focusedWindow = BrowserWindow.getFocusedWindow()
-        if (focusedWindow) {
-          clearInterval(intervalId)
-          focusedWindow.webContents.openDevTools()
-        }
-      }, 100)
-    })()`
-    await DevtoolsProtocolRuntime.evaluate(electronRpc, {
-      expression: openDevtoolsScript,
-      awaitPromise: false,
-    })
-  }
 
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
