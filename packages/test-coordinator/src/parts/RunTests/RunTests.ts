@@ -50,7 +50,6 @@ export const runTests = async ({
   setupOnly,
   timeoutBetween,
   timeouts,
-  trackFunctions,
   openDevtools,
   updateUrl,
   useProxyMock,
