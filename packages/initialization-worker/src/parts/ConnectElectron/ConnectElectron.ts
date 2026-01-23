@@ -4,6 +4,7 @@ import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally
 import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
 import { monkeyPatchElectronHeadlessMode } from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
+import * as MonkeyPatchElectronIpcMain from '../MonkeyPatchElectronScript/MonkeyPatchElectronIpcMain.ts'
 import { VError } from '../VError/VError.ts'
 
 interface RpcConnection {
@@ -21,7 +22,7 @@ const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {
   }
 }
 
-export const connectElectron = async (electronRpc: RpcConnection, headlessMode: boolean) => {
+export const connectElectron = async (electronRpc: RpcConnection, headlessMode: boolean, measureId?: string) => {
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
@@ -50,8 +51,14 @@ export const connectElectron = async (electronRpc: RpcConnection, headlessMode: 
 
   // TODO headlessmode
 
+  let functionDeclaration = MonkeyPatchElectronScript.monkeyPatchElectronScriptPrefix + MonkeyPatchElectronScript.monkeyPatchElectronScriptSuffix
+
+  if (measureId && (measureId === 'ipcMessageCount' || measureId === 'ipcmessagecount')) {
+    functionDeclaration = MonkeyPatchElectronScript.monkeyPatchElectronScriptPrefix + MonkeyPatchElectronIpcMain.monkeyPatchElectronIpcMain + MonkeyPatchElectronScript.monkeyPatchElectronScriptSuffix
+  }
+
   const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
+    functionDeclaration,
     objectId: electronObjectId,
   })
 
