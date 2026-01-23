@@ -21,7 +21,6 @@ export const connectDevtools = (
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
-  trackFunctions: boolean,
 ) => {
   Assert.object(rpc)
   Assert.string(platform)
@@ -47,6 +46,5 @@ export const connectDevtools = (
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
-    trackFunctions,
   )
 }
