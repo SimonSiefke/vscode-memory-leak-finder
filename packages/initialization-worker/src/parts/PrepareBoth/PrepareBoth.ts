@@ -33,7 +33,6 @@ export const prepareBoth = async (
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-<<<<<<< HEAD
   const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(
     electronRpc,
     headlessMode,
@@ -41,10 +40,8 @@ export const prepareBoth = async (
     openDevtools,
     HTTP_SERVER_PORT,
     preGeneratedWorkbenchPath,
+    measureId,
   )
-=======
-  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode, measureId)
->>>>>>> origin/main
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 
