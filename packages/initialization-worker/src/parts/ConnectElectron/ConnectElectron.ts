@@ -51,16 +51,21 @@ export const connectElectron = async (electronRpc: RpcConnection, headlessMode: 
 
   // TODO headlessmode
 
-  let functionDeclaration = MonkeyPatchElectronScript.monkeyPatchElectronScriptPrefix + MonkeyPatchElectronScript.monkeyPatchElectronScriptSuffix
-
-  if (measureId && (measureId === 'ipcMessageCount' || measureId === 'ipcmessagecount')) {
-    functionDeclaration = MonkeyPatchElectronScript.monkeyPatchElectronScriptPrefix + MonkeyPatchElectronIpcMain.monkeyPatchElectronIpcMain + MonkeyPatchElectronScript.monkeyPatchElectronScriptSuffix
-  }
+  const baseFunctionDeclaration =
+    MonkeyPatchElectronScript.monkeyPatchElectronScriptPrefix + MonkeyPatchElectronScript.monkeyPatchElectronScriptSuffix
 
   const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration,
+    functionDeclaration: baseFunctionDeclaration,
     objectId: electronObjectId,
   })
+
+  if (measureId && (measureId === 'ipcMessageCount' || measureId === 'ipcmessagecount')) {
+    const ipcFunctionDeclaration = `function () { const electron = this\n${MonkeyPatchElectronIpcMain.monkeyPatchElectronIpcMain}\n}`
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: ipcFunctionDeclaration,
+      objectId: electronObjectId,
+    })
+  }
 
   if (headlessMode) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
