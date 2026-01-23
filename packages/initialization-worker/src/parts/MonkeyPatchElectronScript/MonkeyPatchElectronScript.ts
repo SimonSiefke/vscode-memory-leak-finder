@@ -3,7 +3,7 @@
 // it is necessary to defer the app ready event to avoid
 // race conditions when attaching to the debugger
 // when using --remote-debugging-port
-export const monkeyPatchElectronScriptPrefix = `function () {
+export const monkeyPatchElectronScript = `function () {
   const electron = this
   const { app } = electron
   const originalWhenReady = app.whenReady()
@@ -35,9 +35,7 @@ export const monkeyPatchElectronScriptPrefix = `function () {
   app.emit = patchedAppEmit
   app.whenReady = patchedWhenReady
   app.isReady = patchedIsReady
-`
 
-export const monkeyPatchElectronScriptSuffix = `
   return async () => {
     const event = await originalWhenReady
     isReady = true
