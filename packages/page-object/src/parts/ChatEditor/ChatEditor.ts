@@ -25,6 +25,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat context`)
       }
     },
+    async attachImage(file: string) {
+      try {
+        const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
+        await addContextButton.click()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.select('Files & Folders...', true)
+        await quickPick.type(file)
+        await quickPick.select(file)
+        await page.waitForIdle()
+        const attachedContext = page.locator('.chat-attached-context')
+        const attachedImage = attachedContext.locator(`[aria-label$="${file}"]`)
+        await expect(attachedImage).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to attach image`)
+      }
+    },
     async addAllProblemsAsContext() {
       try {
         await this.addContext('Problems...', 'All Problems', 'All Problems')
@@ -176,6 +194,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       },
       verify = false,
       viewLinesText = '',
+      image = '',
       toolInvocations = [],
       model,
     }: {
@@ -184,6 +203,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       validateRequest?: { exists: readonly unknown[] }
       verify?: boolean
       viewLinesText?: string
+      image?: string
       toolInvocations?: readonly any[]
       model?: string
     }) {
@@ -198,6 +218,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
         await expect(editArea).toBeVisible()
         await page.waitForIdle()
+        if (image) {
+          await this.attachImage(image)
+        }
         const editContext = editArea.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
         await page.waitForIdle()
