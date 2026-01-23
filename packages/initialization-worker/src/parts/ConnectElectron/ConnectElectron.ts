@@ -57,9 +57,8 @@ export const connectElectron = async (electronRpc: RpcConnection, headlessMode: 
   })
 
   if (measureId && (measureId === 'ipcMessageCount' || measureId === 'ipcmessagecount')) {
-    const ipcFunctionDeclaration = `function () { const electron = this\n${MonkeyPatchElectronIpcMain.monkeyPatchElectronIpcMain}\n}`
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: ipcFunctionDeclaration,
+      functionDeclaration: MonkeyPatchElectronIpcMain.monkeyPatchElectronIpcMain,
       objectId: electronObjectId,
     })
   }

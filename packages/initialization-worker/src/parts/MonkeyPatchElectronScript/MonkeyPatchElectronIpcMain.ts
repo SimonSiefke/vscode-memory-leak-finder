@@ -1,4 +1,4 @@
-export const monkeyPatchElectronIpcMain = `
+export const monkeyPatchElectronIpcMain = `function () { const electron = this
   // Initialize IPC message tracking
   globalThis.__ipcMessages = []
   globalThis.__ipcMessageCount = 0
@@ -129,4 +129,5 @@ export const monkeyPatchElectronIpcMain = `
 
     return originalIpcMainHandle(channel, wrappedListener)
   }
-`
+}`
+
