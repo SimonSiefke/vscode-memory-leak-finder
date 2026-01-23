@@ -3,15 +3,15 @@ import * as CompareIpcMessages from '../src/parts/CompareIpcMessages/CompareIpcM
 
 test('CompareIpcMessages should return empty added for empty inputs', () => {
   const result = CompareIpcMessages.compare([], [])
-  expect(result.added).toEqual([])
+  expect(result).toEqual([])
 })
 
 test('CompareIpcMessages should detect a single added message', () => {
   const before: any[] = []
   const after: any[] = [{ channel: 'test', timestamp: 1, type: 'on', args: ['a'] }]
   const result = CompareIpcMessages.compare(before, after)
-  expect(result.added).toHaveLength(1)
-  expect(result.added[0]).toEqual(after[0])
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual(after[0])
 })
 
 test('CompareIpcMessages should handle duplicates by count', () => {
@@ -19,8 +19,8 @@ test('CompareIpcMessages should handle duplicates by count', () => {
   const before = [msg, msg]
   const after = [msg, msg, msg]
   const result = CompareIpcMessages.compare(before, after)
-  expect(result.added).toHaveLength(1)
-  expect(result.added[0]).toEqual(msg)
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual(msg)
 })
 
 test('CompareIpcMessages should parse added messages back from string keys when possible', () => {
@@ -28,6 +28,6 @@ test('CompareIpcMessages should parse added messages back from string keys when 
   const before: any[] = [complex]
   const after: any[] = [complex, complex]
   const result = CompareIpcMessages.compare(before, after)
-  expect(result.added).toHaveLength(1)
-  expect(result.added[0]).toEqual(complex)
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual(complex)
 })
