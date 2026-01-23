@@ -130,4 +130,3 @@ export const monkeyPatchElectronIpcMain = `function () { const electron = this
     return originalIpcMainHandle(channel, wrappedListener)
   }
 }`
-
