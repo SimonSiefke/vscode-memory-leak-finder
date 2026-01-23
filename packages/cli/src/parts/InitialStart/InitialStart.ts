@@ -52,6 +52,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
     trackFunctions: options.trackFunctions,
+    openDevtools: options.openDevtools,
     updateUrl: options.updateUrl,
     useProxyMock: options.useProxyMock,
     vscodePath: options.vscodePath,

@@ -35,6 +35,7 @@ export interface PrepareBothOptions {
   readonly measureId: string
   readonly platform: string
   readonly trackFunctions: boolean
+  readonly openDevtools: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -65,6 +66,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     measureId,
     platform,
     trackFunctions,
+    openDevtools,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -94,6 +96,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     measureId,
     platform,
     trackFunctions,
+    openDevtools,
     updateUrl,
     useProxyMock,
     vscodePath,

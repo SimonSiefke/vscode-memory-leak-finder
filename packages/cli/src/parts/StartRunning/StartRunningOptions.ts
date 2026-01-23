@@ -38,6 +38,7 @@ export interface StartRunningOptions {
   readonly timeoutBetween: number
   readonly timeouts: boolean
   readonly trackFunctions: boolean
+  readonly openDevtools: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string

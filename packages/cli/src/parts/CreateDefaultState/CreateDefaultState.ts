@@ -32,6 +32,7 @@ export const createDefaultState = (): StdinDataState => ({
   measureAfter: false,
   measureNode: false,
   mode: ModeType.Waiting,
+  openDevtools: false,
   pageObjectPath: '',
   platform: '',
   previousFilters: [],
