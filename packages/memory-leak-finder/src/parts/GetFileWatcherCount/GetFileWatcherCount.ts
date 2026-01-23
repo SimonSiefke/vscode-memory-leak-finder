@@ -1,7 +1,5 @@
-import { exec } from 'node:child_process'
 import { readdir, readFile } from 'node:fs/promises'
 import { platform } from 'node:os'
-import { promisify } from 'node:util'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 
 const countInotifyWatchers = async (pid: number): Promise<number> => {
