@@ -32,6 +32,7 @@ export interface StdinDataState {
   readonly measureAfter: boolean
   readonly measureNode?: boolean
   readonly mode: number
+  readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly previousFilters: string[]
@@ -79,6 +80,7 @@ let state: StdinDataState = {
   measure: Character.EmptyString,
   measureAfter: false,
   mode: ModeType.Waiting,
+  openDevtools: false,
   pageObjectPath: '',
   platform: '',
   previousFilters: [],
