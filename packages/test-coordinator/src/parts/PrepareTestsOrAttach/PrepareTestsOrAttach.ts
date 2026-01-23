@@ -159,7 +159,6 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
-    trackFunctions,
   )
   return {
     functionTrackerRpc,
