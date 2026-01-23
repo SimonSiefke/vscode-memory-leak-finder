@@ -2,8 +2,9 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
   return {
     async hide() {
       try {
@@ -86,6 +87,20 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to switch to tree view`)
+      }
+    },
+    async moveProblemsToSidebar() {
+      try {
+        const markersPanel = page.locator('.markers-panel')
+        await expect(markersPanel).toBeVisible()
+        const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
+        await expect(moreActions).toBeVisible()
+        await moreActions.click()
+        const contextMenu = ContextMenu.create({ electronApp, expect, page, VError, ideVersion, platform })
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Sidebar', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move problems to sidebar`)
       }
     },
   }
