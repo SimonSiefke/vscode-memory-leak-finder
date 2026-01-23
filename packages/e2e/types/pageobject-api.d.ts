@@ -22,6 +22,9 @@ export interface ActivityBar {
   showRunAndDebug(): Promise<void>
   showSearch(): Promise<void>
   showSourceControl(): Promise<void>
+  moveExplorerToPanel(): Promise<void>
+  moveExtensionsToPanel(): Promise<void>
+  resetViewLocations(): Promise<void>
 }
 export interface ChatEditor {
   addContext(initialPrompt: any, secondPrompt: any, confirmText: any): Promise<void>
@@ -70,7 +73,9 @@ export interface DiffEditor {
   expectOriginal(text: any): Promise<void>
   open(a: any, b: any): Promise<void>
   scrollDown(): Promise<void>
+  scrollDownInline(): Promise<void>
   scrollUp(): Promise<void>
+  scrollUpInline(): Promise<void>
   shouldHaveModifiedEditor(text: any): Promise<void>
   shouldHaveOriginalEditor(text: any): Promise<void>
 }

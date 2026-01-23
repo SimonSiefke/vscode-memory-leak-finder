@@ -117,33 +117,7 @@ test('TransformCodeWithTracking - should transform class methods', () => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should exclude functions matching exclude patterns', () => {
-  const code = `
-    function testFunction() {
-      return 'test'
-    }
-
-    function privateHelper() {
-      return 'helper'
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'test.js',
-    excludePatterns: ['private'],
-  })
-  const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
-  return 'test';
-}
-function privateHelper() {
-  return 'helper';
-}`
-
-  expect(transformed).toBe(expected)
-})
-
-test('TransformCodeWithTracking - should not transform tracking functions themselves', () => {
+test('TransformCodeWithTracking - should transform all functions including tracking functions', () => {
   const code = `
     function trackFunctionCall() {
       return 'tracking'
@@ -164,6 +138,7 @@ test('TransformCodeWithTracking - should not transform tracking functions themse
   return 'tracking';
 }
 function getFunctionStatistics() {
+  trackFunctionCall(123, 6, 4);
   return 'stats';
 }
 function regularFunction() {
@@ -177,7 +152,7 @@ function regularFunction() {
 test('TransformCodeWithTracking - should handle empty code', () => {
   const code = ''
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
-  expect(transformed).toBe('Function call tracking system')
+  expect(transformed).toBe('')
 })
 
 test('TransformCodeWithTracking - should handle invalid code gracefully', () => {
@@ -815,157 +790,6 @@ const sumRecursive = (arr, index = 0) => {
   expect(transformed).toBe(expected)
 })
 
-test('TransformCodeWithTracking - should exclude functions matching multiple patterns', () => {
-  const code = `
-    function publicFunction() {
-      return 'public';
-    }
-
-    function privateHelper() {
-      return 'private helper';
-    }
-
-    function _internalFunction() {
-      return 'internal';
-    }
-
-    function $secretMethod() {
-      return 'secret';
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'exclude.js',
-    excludePatterns: ['private', '_', '$'],
-  })
-
-  const expected = `function publicFunction() {
-  trackFunctionCall(123, 2, 4);
-  return 'public';
-}
-function privateHelper() {
-  return 'private helper';
-}
-function _internalFunction() {
-  return 'internal';
-}
-function $secretMethod() {
-  return 'secret';
-}`
-
-  expect(transformed).toBe(expected)
-})
-
-test('TransformCodeWithTracking - should handle regex-like patterns in exclude', () => {
-  const code = `
-    function handleEvent() {
-      return 'event';
-    }
-
-    function handleClick() {
-      return 'click';
-    }
-
-    function processData() {
-      return 'data';
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'regex-exclude.js',
-    excludePatterns: ['handle', 'process'],
-  })
-
-  const expected = `function handleEvent() {
-  return 'event';
-}
-function handleClick() {
-  return 'click';
-}
-function processData() {
-  return 'data';
-}`
-
-  expect(transformed).toBe(expected)
-})
-
-test('TransformCodeWithTracking - should exclude methods in objects and classes', () => {
-  const code = `
-    const obj = {
-      publicMethod() {
-        return 'public';
-      },
-
-      _privateMethod() {
-        return 'private';
-      }
-    };
-
-    class TestClass {
-      publicClassMethod() {
-        return this.value;
-      }
-
-      _privateClassMethod() {
-        return 'private class method';
-      }
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'exclude-methods.js',
-    excludePatterns: ['_'],
-  })
-
-  const expected = `const obj = {
-  publicMethod() {
-    trackFunctionCall(123, 3, 6);
-    return 'public';
-  },
-  _privateMethod() {
-    return 'private';
-  }
-};
-class TestClass {
-  publicClassMethod() {
-    trackFunctionCall(123, 13, 6);
-    return this.value;
-  }
-  _privateClassMethod() {
-    return 'private class method';
-  }
-}`
-
-  expect(transformed).toBe(expected)
-})
-
-test('TransformCodeWithTracking - should handle case-sensitive exclude patterns', () => {
-  const code = `
-    function TestFunction() {
-      return 'uppercase test';
-    }
-
-    function testfunction() {
-      return 'lowercase test';
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'case-exclude.js',
-    excludePatterns: ['test'],
-  })
-
-  const expected = `function TestFunction() {
-  trackFunctionCall(123, 2, 4);
-  return 'uppercase test';
-}
-function testfunction() {
-  return 'lowercase test';
-}`
-
-  expect(transformed).toBe(expected)
-})
-
 test('TransformCodeWithTracking - should handle location tracking with different file extensions', () => {
   const code = `
     function testFunction() {
@@ -1001,13 +825,6 @@ test('TransformCodeWithTracking - should handle location tracking with complex f
 })
 
 test('Transform Script - transformCode - should transform function declarations', () => {
-  // Reset global statistics before each test
-  if (typeof globalThis !== 'undefined') {
-    delete (globalThis as any).___functionStatistics
-    delete (globalThis as any).getFunctionStatistics
-    delete (globalThis as any).resetFunctionStatistics
-  }
-
   const code = `
     function testFunction() {
       return 'test'
@@ -1123,33 +940,7 @@ test('Transform Script - transformCode - should transform class methods', () => 
   expect(transformed).toBe(expected)
 })
 
-test('Transform Script - transformCode - should exclude functions matching exclude patterns', () => {
-  const code = `
-    function testFunction() {
-      return 'test'
-    }
-
-    function privateHelper() {
-      return 'helper'
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    scriptId: 123,
-    excludePatterns: ['private'],
-  })
-  const expected = `function testFunction() {
-  trackFunctionCall(123, 2, 4);
-  return 'test';
-}
-function privateHelper() {
-  return 'helper';
-}`
-
-  expect(transformed).toBe(expected)
-})
-
-test('Transform Script - transformCode - should not transform tracking functions themselves', () => {
+test('Transform Script - transformCode - should transform all functions including tracking functions', () => {
   const code = `
     function trackFunctionCall() {
       return 'tracking'
@@ -1170,6 +961,7 @@ test('Transform Script - transformCode - should not transform tracking functions
   return 'tracking';
 }
 function getFunctionStatistics() {
+  trackFunctionCall(123, 6, 4);
   return 'stats';
 }
 function regularFunction() {
@@ -1183,7 +975,7 @@ function regularFunction() {
 test('Transform Script - transformCode - should handle empty code', () => {
   const code = ''
   const transformed = transformCodeWithTracking(code, { scriptId: 123 })
-  const expected = 'Function call tracking system'
+  const expected = ''
 
   expect(transformed).toBe(expected)
 })
@@ -1602,7 +1394,7 @@ const arrowComplex = () => {
 // Edge cases and error handling tests
 test('Transform Script - transformCode - should handle null/undefined input', () => {
   const transformedNull = transformCodeWithTracking(null as any)
-  expect(transformedNull).toBe('Function call tracking system')
+  expect(transformedNull).toBe('')
 })
 
 test('Transform Script - transformCode - should handle very large files', () => {
@@ -2150,241 +1942,6 @@ const sumRecursive = (arr, index = 0) => {
 };`
 
   expect(transformed).toBe(expected)
-})
-
-// Exclude patterns functionality tests
-test('Transform Script - transformCode - should exclude functions matching multiple patterns', () => {
-  const code = `
-    function publicFunction() {
-      return 'public';
-    }
-
-    function privateHelper() {
-      return 'private helper';
-    }
-
-    function _internalFunction() {
-      return 'internal';
-    }
-
-    function $secretMethod() {
-      return 'secret';
-    }
-
-    function testFunction() {
-      return 'test';
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'exclude.js',
-    excludePatterns: ['private', '_', '$', 'test'],
-  })
-  const expected = `function publicFunction() {
-  trackFunctionCall(123, 2, 4);
-  return 'public';
-}
-function privateHelper() {
-  return 'private helper';
-}
-function _internalFunction() {
-  return 'internal';
-}
-function $secretMethod() {
-  return 'secret';
-}
-function testFunction() {
-  return 'test';
-}`
-
-  expect(transformed).toBe(expected)
-})
-
-test('Transform Script - transformCode - should handle empty exclude patterns array', () => {
-  const code = `
-    function function1() { return '1'; }
-    function function2() { return '2'; }
-    const arrow = () => 'arrow';
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'no-exclude.js',
-    excludePatterns: [],
-  })
-  const expected = `function function1() {
-  trackFunctionCall(123, 2, 4);
-  return '1';
-}
-function function2() {
-  trackFunctionCall(123, 3, 4);
-  return '2';
-}
-const arrow = () => {
-  trackFunctionCall(123, 4, 18);
-  return 'arrow';
-};`
-
-  expect(transformed).toBe(expected)
-})
-
-test('Transform Script - transformCode - should handle regex-like patterns in exclude', () => {
-  const code = `
-    function handleEvent() {
-      return 'event';
-    }
-
-    function handleClick() {
-      return 'click';
-    }
-
-    function handleSubmit() {
-      return 'submit';
-    }
-
-    function processData() {
-      return 'data';
-    }
-
-    function validateInput() {
-      return 'valid';
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'regex-exclude.js',
-    excludePatterns: ['handle', 'process', 'validate'],
-  })
-  const expected = `function handleEvent() {
-  return 'event';
-}
-function handleClick() {
-  return 'click';
-}
-function handleSubmit() {
-  return 'submit';
-}
-function processData() {
-  return 'data';
-}
-function validateInput() {
-  return 'valid';
-}`
-
-  expect(transformed).toBe(expected)
-})
-
-test('Transform Script - transformCode - should exclude methods in objects and classes', () => {
-  const code = `
-    const obj = {
-      publicMethod() {
-        return 'public';
-      },
-
-      _privateMethod() {
-        return 'private';
-      },
-
-      $secretMethod() {
-        return 'secret';
-      },
-
-      testMethod() {
-        return 'test';
-      }
-    };
-
-    class TestClass {
-      constructor() {
-        this.value = 42;
-      }
-
-      publicClassMethod() {
-        return this.value;
-      }
-
-      _privateClassMethod() {
-        return 'private class method';
-      }
-
-      static testStatic() {
-        return 'static test';
-      }
-    }
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'exclude-methods.js',
-    excludePatterns: ['_', '$', 'test'],
-  })
-  const expected = `const obj = {
-  publicMethod() {
-    trackFunctionCall(123, 3, 6);
-    return 'public';
-  },
-  _privateMethod() {
-    return 'private';
-  },
-  $secretMethod() {
-    return 'secret';
-  },
-  testMethod() {
-    return 'test';
-  }
-};
-class TestClass {
-  constructor() {
-    trackFunctionCall(123, 21, 6);
-    this.value = 42;
-  }
-  publicClassMethod() {
-    trackFunctionCall(123, 25, 6);
-    return this.value;
-  }
-  _privateClassMethod() {
-    return 'private class method';
-  }
-  static testStatic() {
-    return 'static test';
-  }
-}`
-
-  expect(transformed).toBe(expected)
-})
-
-test('Transform Script - transformCode - should handle case-sensitive exclude patterns', () => {
-  const code = `function TestFunction() {
-  return 'uppercase test';
-}
-
-function testfunction() {
-  return 'lowercase test';
-}
-
-function TESTFUNCTION() {
-  return 'all caps test';
-}
-
-  `
-
-  const transformed = transformCodeWithTracking(code, {
-    filename: 'case-exclude.js',
-    excludePatterns: ['test'],
-  })
-  const expected = `function TestFunction() {
-  trackFunctionCall(123, 1, 0);
-  return 'uppercase test';
-}
-function testfunction() {
-  return 'lowercase test';
-}
-function TESTFUNCTION() {
-  trackFunctionCall(123, 9, 0);
-  return 'all caps test';
-}`
-
-  expect(transformed).toBe(expected)
-  expect(transformed).toContain('trackFunctionCall(123, 1, 0)')
-  expect(transformed).toContain('trackFunctionCall(123, 9, 0)')
 })
 
 // Location tracking options tests

@@ -75,6 +75,9 @@ const filterOutExcluded = (items: readonly CompareResult[], excludes: readonly s
         return true
       }
       for (const ex of lowered) {
+        if (ex.startsWith('^') && original.startsWith(ex.slice(1))) {
+          return false
+        }
         if (original.includes(ex)) {
           return false
         }

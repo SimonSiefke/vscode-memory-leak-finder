@@ -1571,7 +1571,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to show empty source action`)
       }
     },
-    async split(command: string, { groupCount = undefined }: { groupCount?: number }) {
+    async split(command: string, { groupCount = undefined }: { groupCount?: number | undefined }) {
       try {
         // TODO count editor groups
         const editors = page.locator('.editor-instance')
@@ -1591,8 +1591,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to split editor`)
       }
     },
-    async splitDown() {
-      return this.split(WellKnownCommands.ViewSplitEditorDown, {})
+    async splitDown({ groupCount = undefined, splitInto = false }: { groupCount?: number; splitInto?: boolean } = {}) {
+      if (splitInto) {
+        return this.split(WellKnownCommands.ViewSplitEditorDownInto, { groupCount })
+      } else {
+        return this.split(WellKnownCommands.ViewSplitEditorDown, { groupCount })
+      }
     },
     async splitLeft() {
       return this.split(WellKnownCommands.ViewSplitEditorLeft, {})
@@ -1749,6 +1753,45 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const img = subFrame.locator('img')
       await expect(img).toBeVisible()
       await subFrame.waitForIdle()
+    },
+    async hideInlineChat() {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const chat = page.locator('.chat-widget')
+        await expect(chat).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
+        await expect(chat).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide inline chat`)
+      }
+    },
+    async showInlineChat() {
+      try {
+        const editor = page.locator('.editor')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const chat = page.locator('.chat-widget')
+        await expect(chat).toBeHidden()
+        await page.waitForIdle()
+        await page.keyboard.press('Control+i')
+        await page.waitForIdle()
+        await expect(chat).toBeVisible()
+        const chatEditor = chat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(chatEditor).toBeVisible()
+        const editContext = chatEditor.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        await expect(editContext).toBeFocused()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show inline chat`)
+      }
     },
     async waitForNoteBookReady() {
       await page.waitForIdle()

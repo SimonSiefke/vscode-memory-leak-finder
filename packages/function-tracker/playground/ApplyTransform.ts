@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { transformCode } from '../src/parts/TransformScript/TransformScript.ts'
+import { transformCode } from '../src/parts/Transform/Transform.ts'
 
 // VS Code installation path
 const vscodePath: string =
@@ -10,7 +10,10 @@ console.log('Reading VS Code workbench file...')
 const originalCode: string = fs.readFileSync(vscodePath, 'utf8')
 
 console.log('Transforming code with function call tracking...')
-const transformedCode: string = await transformCode(originalCode, vscodePath)
+const transformedCode: string = await transformCode(originalCode, {
+  filename: vscodePath,
+  minify: true,
+})
 
 console.log('Writing transformed code...')
 fs.writeFileSync(outputPath, transformedCode)

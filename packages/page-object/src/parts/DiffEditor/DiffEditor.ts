@@ -114,6 +114,28 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         throw new VError(error, `Failed to scroll up in diff editor`)
       }
     },
+    async scrollDownInline() {
+      try {
+        await page.waitForIdle()
+        const scrollContainer = page.locator('.monaco-diff-editor .monaco-scrollable-element')
+        await expect(scrollContainer).toBeVisible()
+        await scrollContainer.scrollDown()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down in inline diff editor`)
+      }
+    },
+    async scrollUpInline() {
+      try {
+        await page.waitForIdle()
+        const scrollContainer = page.locator('.monaco-diff-editor .monaco-scrollable-element')
+        await expect(scrollContainer).toBeVisible()
+        await scrollContainer.scrollUp()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll up in inline diff editor`)
+      }
+    },
     async shouldHaveModifiedEditor(text: string) {
       try {
         const editor = page.locator('.editor.modified')
