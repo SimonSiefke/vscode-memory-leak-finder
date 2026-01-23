@@ -4,7 +4,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
   return {
     async hide() {
       try {
@@ -96,7 +96,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
         await expect(moreActions).toBeVisible()
         await moreActions.click()
-        const contextMenu = ContextMenu.create({ electronApp: undefined, expect, page, VError })
+        const contextMenu = ContextMenu.create({ electronApp, expect, page, VError, ideVersion, platform })
         await contextMenu.openSubMenu('Move To', false)
         await contextMenu.select('Sidebar', false)
       } catch (error) {
