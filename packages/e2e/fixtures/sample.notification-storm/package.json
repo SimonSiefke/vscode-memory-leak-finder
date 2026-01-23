@@ -1,0 +1,19 @@
+{
+  "name": "notification-storm-sample",
+  "displayName": "notification-storm-sample",
+  "version": "0.0.0-dev",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.notificationStorm",
+        "title": "Notification Storm"
+      }
+    ]
+  }
+}
