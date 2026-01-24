@@ -9,6 +9,7 @@ import * as Root from '../Root/Root.ts'
 
 export const resolveFromPath = async (uris: readonly string[]): Promise<readonly ResolveResult[]> => {
   const rootPath = Root.root
+  // @ts-ignore
   const results: ResolveResult[] = Array.from({ length: uris.length }).fill({})
 
   // Parse each URI and collect positions for source maps
