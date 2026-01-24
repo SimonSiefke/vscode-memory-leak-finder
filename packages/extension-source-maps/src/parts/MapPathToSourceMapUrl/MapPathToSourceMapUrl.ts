@@ -122,19 +122,19 @@ const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion?: str
   return extractCopilot(root, normalizedPath) || extractJsDebug(root, normalizedPath, jsDebugVersion)
 }
 
-export const mapPathToSourceMapUrl = (path: string, root: string, jsDebugVersion?: string): string | null => {
+export const mapPathToSourceMapUrl = (path: string, root: string, jsDebugVersion?: string): string => {
   if (!path) {
-    return null
+    return ''
   }
   try {
     const sourceMapPath = mapPathToSourceMapPath(path, root, jsDebugVersion)
     if (!sourceMapPath) {
-      return null
+      return ''
     }
     // Always return a file URL, regardless of whether the file exists
     const sourceMapUrl = pathToFileURL(sourceMapPath).toString()
     return sourceMapUrl
   } catch {
-    return null
+    return ''
   }
 }
