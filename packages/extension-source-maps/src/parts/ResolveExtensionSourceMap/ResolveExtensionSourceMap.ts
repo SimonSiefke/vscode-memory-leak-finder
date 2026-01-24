@@ -17,6 +17,7 @@ interface ResolveExtensionSourceMapConfig {
 
 const resolveVersion = (extensionpath: string) => {
   const packageJsonPath = join(extensionpath, 'package.json')
+  console.log({ extensionpath })
   if (!existsSync(packageJsonPath)) {
     throw new Error(`package json not found`)
   }
@@ -65,6 +66,10 @@ export const resolveExtensionSourceMap = async (
     })
     const relative = uri.slice(index + config.match.length)
     const finalPath = getFinalPath(relative, version, config)
+    if (!existsSync(finalPath)) {
+      throw new Error(`Source map not found`)
+    }
+    console.log({ finalPath })
     return finalPath
   }
   return ''
