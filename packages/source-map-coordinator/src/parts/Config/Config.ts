@@ -3,8 +3,6 @@ import * as Root from '../Root/Root.ts'
 
 const cacheDir = join(Root.root, '.extension-source-maps-cache')
 
-const platform = process.platform
-
 interface IConfig {
   readonly extensionName: string
   readonly repoUrl: string
@@ -16,6 +14,7 @@ interface IConfig {
 }
 
 export const getConfigs = (): readonly IConfig[] => {
+  const platform = process.platform // TODO pass platform as argument
   return [
     {
       extensionName: 'vscode-js-debug',

@@ -17,6 +17,7 @@ export const connectDevtools = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   pid: number,
+  resolveExtensionSourceMaps: boolean,
 ): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
   Assert.string(electronWebSocketUrl)

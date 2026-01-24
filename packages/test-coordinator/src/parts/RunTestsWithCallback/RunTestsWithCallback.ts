@@ -315,6 +315,7 @@ export const runTestsWithCallback = async ({
             pageObjectPath: pageObjectPathResolved,
             platform,
             recordVideo,
+            resolveExtensionSourceMaps,
             runMode,
             screencastQuality,
             timeouts,
