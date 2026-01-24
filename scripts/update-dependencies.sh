@@ -58,6 +58,7 @@ cd packages/prompts && updateDependencies && cd ../../ &&
 cd packages/proxy-worker && updateDependencies && cd ../../ &&
 cd packages/repository-worker && updateDependencies && cd ../../ &&
 cd packages/source-map-worker && updateDependencies && cd ../../ &&
+cd packages/source-map-coordinator && updateDependencies && cd ../../ &&
 cd packages/stdout-worker && updateDependencies && cd ../../ &&
 cd packages/storage-worker && updateDependencies && cd ../../ &&
 cd packages/test-coordinator && updateDependencies && cd ../../ &&
