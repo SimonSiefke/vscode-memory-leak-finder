@@ -55,7 +55,7 @@ export const cleanSourceMapUrlMap = async (
 
       if (sourceMapUrl) {
         cleanedSourceMapUrlMap[sourceMapUrl] = value
-        reverseMap[key] = sourceMapUrl
+        reverseMap[sourceMapUrl] = key
       } else {
         cleanedSourceMapUrlMap[key] = value
       }
