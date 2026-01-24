@@ -40,6 +40,7 @@ export const startWorker = async (
     inspectSharedProcessPort,
     inspectExtensionsPort,
     pid,
+    resolveExtensionSourceMaps,
   )
   return rpc
 }

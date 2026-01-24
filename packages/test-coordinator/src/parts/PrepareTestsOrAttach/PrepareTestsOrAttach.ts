@@ -36,6 +36,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
+  readonly resolveExtensionSourceMaps: boolean
   readonly runMode: number
   readonly screencastQuality: number
   readonly timeouts: any
@@ -74,6 +75,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     pageObjectPath,
     platform,
     recordVideo,
+    resolveExtensionSourceMaps,
     runMode,
     screencastQuality,
     timeouts,
@@ -160,6 +162,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectSharedProcessPort,
     inspectExtensionsPort,
     trackFunctions,
+    resolveExtensionSourceMaps,
   )
   return {
     functionTrackerRpc,

@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { join, dirname } from 'node:path'
+import { join } from 'node:path'
 
 const JS_DEBUG_EXTENSION_PATH_REGEX = /extensions\/ms-vscode\.js-debug\/(.+)$/
 
@@ -9,20 +9,12 @@ const JS_DEBUG_EXTENSION_PATH_REGEX = /extensions\/ms-vscode\.js-debug\/(.+)$/
  */
 export const extractJsDebugVersionFromPath = (path: string): string | null => {
   const match = path.match(JS_DEBUG_EXTENSION_PATH_REGEX)
-  if (!match) {
+  if (!match || match.index === undefined) {
     return null
   }
 
-  // Resolve package.json path from the given path
-  // The package.json should be in the ms-vscode.js-debug directory (the extension root)
-  // We need to find the ms-vscode.js-debug directory, not the subdirectory
-
-  // Find the ms-vscode.js-debug directory by going up from the current path
-  // The path structure is: .../extensions/ms-vscode.js-debug/<subpath>
-  // We need to find the package.json in the ms-vscode.js-debug directory
-  // The package.json should be in the ms-vscode.js-debug directory
-  // If the path is .../ms-vscode.js-debug/src/extension.js.map, we need to go up to .../ms-vscode.js-debug/
-  const jsDebugDir = dirname(dirname(path))
+  const matchIndex = match.index
+  const jsDebugDir = path.substring(0, matchIndex + match[0].length - match[1].length)
   const packageJsonPath = join(jsDebugDir, 'package.json')
 
   if (!existsSync(packageJsonPath)) {
