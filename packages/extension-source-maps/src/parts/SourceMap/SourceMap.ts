@@ -1,5 +1,3 @@
-import { SourceMapConsumer } from 'source-map'
-
 export const getOriginalPositions = async (
   sourceMap: any,
   value: readonly number[],

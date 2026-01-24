@@ -79,7 +79,7 @@ export const generateExtensionSourceMaps = async ({
   console.log(`[extension-source-maps] Dependencies installed successfully`)
 
   // Modify esbuild config
-  if (modifications.length > 0) {
+  if (modifications && modifications.length > 0) {
     // TODO
     await ModifyEsbuildConfig.modifyEsbuildConfig(repoPath)
   }
