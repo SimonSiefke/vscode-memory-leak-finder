@@ -2,7 +2,6 @@ import { fileURLToPath } from 'node:url'
 import * as ExtractJsDebugVersion from '../ExtractJsDebugVersion/ExtractJsDebugVersion.ts'
 import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
 import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSourceMapUrl.ts'
-import * as Root from '../Root/Root.ts'
 import * as Assert from '@lvce-editor/assert'
 
 interface ResolveExtensionSourceMapConfig {

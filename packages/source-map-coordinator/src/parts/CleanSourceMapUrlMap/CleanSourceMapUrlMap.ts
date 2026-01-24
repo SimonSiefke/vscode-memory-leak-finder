@@ -1,7 +1,6 @@
-import { join } from 'node:path'
+import { getConfigs } from '../Config/Config.ts'
 import { launchExtensionSourceMapWorker } from '../LaunchExtensionSourceMapWorker/LaunchExtensionSourceMapWorker.ts'
 import * as Root from '../Root/Root.ts'
-import { getConfigs } from '../Config/Config.ts'
 
 interface SourceMapUrlMap {
   [key: string]: number[]
