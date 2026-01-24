@@ -7,7 +7,7 @@ import * as Root from '../Root/Root.ts'
 interface ResolveExtensionSourceMapConfig {
   extensionName: string
   repoUrl: string
-  cacheDir?: string
+  cacheDir: string
 }
 
 /**
@@ -19,19 +19,13 @@ interface ResolveExtensionSourceMapConfig {
  * 2. Generates source maps for that version if they don't exist
  * 3. Returns the source map URL
  */
-export const resolveExtensionSourceMap = async (
-  path: string,
-  root: string | undefined,
-  config: ResolveExtensionSourceMapConfig,
-): Promise<string | null> => {
-  const rootPath = root || Root.root
-
+export const resolveExtensionSourceMap = async (path: string, config: ResolveExtensionSourceMapConfig): Promise<string | null> => {
   // Extract js-debug version from the path
   const jsDebugVersion = ExtractJsDebugVersion.extractJsDebugVersion(path)
 
   // Generate source maps if this is a js-debug extension and version was found
   if (jsDebugVersion) {
-    const cacheDir = config.cacheDir || join(rootPath, '.extension-source-maps-cache')
+    const cacheDir = config.cacheDir
     console.log(`[resolveExtensionSourceMap] Generating source maps for ${config.extensionName} version ${jsDebugVersion}...`)
     try {
       await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
