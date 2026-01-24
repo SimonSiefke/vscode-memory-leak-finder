@@ -26,7 +26,11 @@ export const prettifyConstructorStackTracesWithSourceMap = async (constructorSta
     const eventListeners = GetEventListenersQuery.getEventListenerQuery(stackTrace, scriptMap)
     fullQuery.push(...eventListeners)
   }
-  const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false, context.connectionId)
+  const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(
+    fullQuery,
+    false,
+    context.connectionId,
+  )
   const sorted = sortOriginal(cleanPrettyInstances)
   return sorted
 }
