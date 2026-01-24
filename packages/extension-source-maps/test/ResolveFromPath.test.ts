@@ -211,6 +211,18 @@ test('resolveFromPath - handles js-debug extension path', async () => {
 })
 
 test('resolveFromPath - handles empty array', async () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
+  })
+
   const result = await ResolveFromPath.resolveFromPath([])
 
   expect(result).toHaveLength(0)
@@ -221,7 +233,17 @@ test('resolveFromPath - handles source map resolution error', async () => {
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
 
   // Mock the source map worker to throw an error
-  mockInvoke.mockRejectedValueOnce(new Error('Source map resolution failed'))
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      throw new Error('Source map resolution failed')
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
+  })
 
   const result = await ResolveFromPath.resolveFromPath([path])
 
@@ -239,15 +261,28 @@ test('resolveFromPath - handles paths with special characters', async () => {
     'copilot-chat-0.36.2025121004',
     'dist/file-name_with.special-chars.js.map',
   )
-  mockInvoke.mockResolvedValueOnce({
-    [sourceMapUrl]: [
-      {
-        line: 20,
-        column: 30,
-        source: 'src/file-name_with.special-chars.ts',
-        name: 'specialFunction',
-      },
-    ],
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      if (method === 'SourceMap.getCleanPositionsMap') {
+        return {
+          [sourceMapUrl]: [
+            {
+              line: 20,
+              column: 30,
+              source: 'src/file-name_with.special-chars.ts',
+              name: 'specialFunction',
+            },
+          ],
+        }
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
@@ -268,15 +303,28 @@ test('resolveFromPath - handles paths with null original source', async () => {
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
 
   const sourceMapUrl = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
-  mockInvoke.mockResolvedValueOnce({
-    [sourceMapUrl]: [
-      {
-        line: 100,
-        column: 200,
-        source: null,
-        name: null,
-      },
-    ],
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      if (method === 'SourceMap.getCleanPositionsMap') {
+        return {
+          [sourceMapUrl]: [
+            {
+              line: 100,
+              column: 200,
+              source: null,
+              name: null,
+            },
+          ],
+        }
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
@@ -297,15 +345,28 @@ test('resolveFromPath - handles paths with null line or column', async () => {
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
 
   const sourceMapUrl = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
-  mockInvoke.mockResolvedValueOnce({
-    [sourceMapUrl]: [
-      {
-        line: null,
-        column: null,
-        source: 'src/extension.ts',
-        name: 'activate',
-      },
-    ],
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      if (method === 'SourceMap.getCleanPositionsMap') {
+        return {
+          [sourceMapUrl]: [
+            {
+              line: null,
+              column: null,
+              source: 'src/extension.ts',
+              name: 'activate',
+            },
+          ],
+        }
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
@@ -326,15 +387,28 @@ test('resolveFromPath - handles paths with ../ prefixes in source', async () => 
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
 
   const sourceMapUrl = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
-  mockInvoke.mockResolvedValueOnce({
-    [sourceMapUrl]: [
-      {
-        line: 100,
-        column: 200,
-        source: '../src/extension.ts',
-        name: 'activate',
-      },
-    ],
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      if (method === 'SourceMap.getCleanPositionsMap') {
+        return {
+          [sourceMapUrl]: [
+            {
+              line: 100,
+              column: 200,
+              source: '../src/extension.ts',
+              name: 'activate',
+            },
+          ],
+        }
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
