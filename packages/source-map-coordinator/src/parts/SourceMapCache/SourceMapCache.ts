@@ -1,12 +1,12 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { cwd } from 'node:process'
+import { root } from '../Root/Root.ts'
 
 const CACHE_DIR_NAME = '.vscode-resolve-source-map-cache'
 
 const getCachePath = (hash: string): string => {
-  const projectRoot = cwd()
-  return join(projectRoot, CACHE_DIR_NAME, `${hash}.json`)
+  return join(root, CACHE_DIR_NAME, `${hash}.json`)
 }
 
 export const getCachedData = async (hash: string): Promise<any | null> => {
