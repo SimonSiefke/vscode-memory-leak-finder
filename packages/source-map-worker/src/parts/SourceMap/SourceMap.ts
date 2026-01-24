@@ -24,7 +24,7 @@ const getExtensionSourceMapDir = (sourceMapUrl: string): string | null => {
 
 export const getOriginalPositions = async (
   sourceMap: RawSourceMap,
-  positions: number[],
+  positions: readonly number[],
   classNames: boolean,
   hash: string,
   sourceMapUrl?: string,
