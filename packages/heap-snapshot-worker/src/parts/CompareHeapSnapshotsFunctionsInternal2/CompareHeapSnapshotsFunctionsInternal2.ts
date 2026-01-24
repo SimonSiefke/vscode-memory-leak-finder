@@ -113,16 +113,9 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
     after.meta.location_fields,
   )
   const nodeNameOffset = after.meta.node_fields.indexOf('name')
-  console.time('unique1')
   const map1 = getUniqueLocationMap2(before)
-  console.timeEnd('unique1')
-  console.time('unique2')
   const map2 = getUniqueLocationMap2(after)
-  console.timeEnd('unique2')
-  console.time('new')
   const newItems = getNewItems(map1, map2, minCount)
-  console.timeEnd('new')
-  console.log('new', newItems.length)
   const formattedItems = formatUniqueLocations(
     newItems,
     after.locations,
