@@ -39,6 +39,19 @@ const getFinalPath = (relative: string, version: string, config: ResolveExtensio
   return finalPath
 }
 
+const findMatchingConfig = (
+  uri: string,
+  configs: readonly ResolveExtensionSourceMapConfig[],
+): ResolveExtensionSourceMapConfig | undefined => {
+  for (const config of configs) {
+    const index = uri.indexOf(config.match)
+    if (index !== -1) {
+      return config
+    }
+  }
+  return undefined
+}
+
 export const resolveExtensionSourceMap = async (
   uri: string,
   root: string,
@@ -48,29 +61,27 @@ export const resolveExtensionSourceMap = async (
   Assert.string(root)
   Assert.array(configs)
 
-  for (const config of configs) {
-    const index = uri.indexOf(config.match)
-    if (index === -1) {
-      continue
-    }
-    const extensionFolderUri = uri.slice(0, index + config.match.length - 1)
-    const extensionsFolder = fileURLToPath(extensionFolderUri)
-    const version = resolveVersion(extensionsFolder)
-    await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
-      cacheDir: config.cacheDir,
-      extensionName: config.extensionName,
-      repoUrl: config.repoUrl,
-      version: version,
-      buildScript: config.buildScript,
-      platform: config.platform,
-      modifications: config.moditications,
-    })
-    const relative = uri.slice(index + config.match.length)
-    const finalPath = getFinalPath(relative, version, config)
-    if (!existsSync(finalPath)) {
-      throw new Error(`Source map not found`)
-    }
-    return finalPath
+  const config = findMatchingConfig(uri, configs)
+  if (!config) {
+    return ''
   }
-  return ''
+  const index = uri.indexOf(config.match)
+  const extensionFolderUri = uri.slice(0, index + config.match.length - 1)
+  const extensionsFolder = fileURLToPath(extensionFolderUri)
+  const version = resolveVersion(extensionsFolder)
+  await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
+    cacheDir: config.cacheDir,
+    extensionName: config.extensionName,
+    repoUrl: config.repoUrl,
+    version: version,
+    buildScript: config.buildScript,
+    platform: config.platform,
+    modifications: config.moditications,
+  })
+  const relative = uri.slice(index + config.match.length)
+  const finalPath = getFinalPath(relative, version, config)
+  if (!existsSync(finalPath)) {
+    throw new Error(`Source map not found`)
+  }
+  return finalPath
 }
