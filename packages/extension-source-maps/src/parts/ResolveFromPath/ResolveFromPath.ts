@@ -1,21 +1,11 @@
 import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSourceMapUrl.ts'
 import * as ParseSourceLocation from '../ParseSourceLocation/ParseSourceLocation.ts'
-import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 import * as Root from '../Root/Root.ts'
-import * as NormalizeSourcePath from '../NormalizeSourcePath/NormalizeSourcePath.ts'
 import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
+import * as ExtractJsDebugVersion from '../ExtractJsDebugVersion/ExtractJsDebugVersion.ts'
+import * as ResolveOriginalPositions from '../ResolveOriginalPositions/ResolveOriginalPositions.ts'
+import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
 import { join } from 'node:path'
-
-interface OriginalPosition {
-  column?: number | null
-  line?: number | null
-  name?: string | null
-  source?: string | null
-}
-
-interface CleanPositionMap {
-  [key: string]: OriginalPosition[]
-}
 
 interface ResolveResult {
   originalUrl?: string | null
@@ -24,37 +14,6 @@ interface ResolveResult {
   originalName?: string | null
   originalSource?: string | null
   originalLocation?: string | null
-}
-
-const JS_DEBUG_EXTENSION_PATH_REGEX = /\.vscode-extensions\/ms-vscode\.js-debug\/(.+)$/
-
-/**
- * Extract js-debug version from a path
- * Example: .vscode-extensions/ms-vscode.js-debug-1.105.0/dist/extension.js -> 1.105.0
- */
-const extractJsDebugVersion = (path: string): string | null => {
-  const match = path.match(JS_DEBUG_EXTENSION_PATH_REGEX)
-  if (!match) {
-    return null
-  }
-  
-  // The path after .vscode-extensions/ms-vscode.js-debug/
-  const relativePath = match[1]
-  
-  // Extract version from path like: 1.105.0/dist/extension.js
-  // or from directory name like: ms-vscode.js-debug-1.105.0/dist/extension.js
-  const versionMatch = relativePath.match(/^(\d+\.\d+\.\d+)/)
-  if (versionMatch) {
-    return versionMatch[1]
-  }
-  
-  // Try to extract from directory name pattern: ms-vscode.js-debug-1.105.0
-  const dirMatch = path.match(/\.vscode-extensions\/ms-vscode\.js-debug-(\d+\.\d+\.\d+)/)
-  if (dirMatch) {
-    return dirMatch[1]
-  }
-  
-  return null
 }
 
 export const resolveFromPath = async (uris: readonly string[]): Promise<readonly ResolveResult[]> => {
@@ -79,7 +38,7 @@ export const resolveFromPath = async (uris: readonly string[]): Promise<readonly
     }
 
     // Extract js-debug version from the path
-    const jsDebugVersion = extractJsDebugVersion(parsed.url)
+    const jsDebugVersion = ExtractJsDebugVersion.extractJsDebugVersion(parsed.url)
     if (jsDebugVersion) {
       jsDebugVersionsToGenerate.add(jsDebugVersion)
     }
@@ -124,45 +83,7 @@ export const resolveFromPath = async (uris: readonly string[]): Promise<readonly
     return results
   }
 
-  try {
-    console.log('[resolveFromPath] Launching source map worker...')
-    await using rpc = await LaunchSourceMapWorker.launchSourceMapWorker()
-    console.log('[resolveFromPath] Source map worker launched')
-    const extendedOriginalNames = true
-    const cleanPositionMap: CleanPositionMap = await rpc.invoke(
-      'SourceMap.getCleanPositionsMap',
-      sourceMapUrlToPositions,
-      extendedOriginalNames,
-    )
-    console.log('[resolveFromPath] cleanPositionMap:', cleanPositionMap)
-
-    // Apply original positions to results
-    const offsetMap: Record<string, number> = Object.create(null)
-    for (const pointer of positionPointers) {
-      const positions = cleanPositionMap[pointer.sourceMapUrl] || []
-      const offset = offsetMap[pointer.sourceMapUrl] || 0
-      const original = positions[offset]
-      offsetMap[pointer.sourceMapUrl] = offset + 1
-
-      if (original) {
-        const normalizedSource = NormalizeSourcePath.normalizeSourcePath(original.source ?? null)
-        results[pointer.index] = {
-          originalUrl: normalizedSource,
-          originalLine: original.line ?? null,
-          originalColumn: original.column ?? null,
-          originalName: original.name ?? null,
-          originalSource: normalizedSource,
-          originalLocation:
-            normalizedSource && original.line !== null && original.column !== null
-              ? `${normalizedSource}:${original.line}:${original.column}`
-              : null,
-        }
-      }
-    }
-  } catch (error) {
-    console.log({ error })
-    // ignore sourcemap resolution errors
-  }
+  await ResolveOriginalPositions.resolveOriginalPositionsToResults(results, sourceMapUrlToPositions, positionPointers)
 
   return results
 }

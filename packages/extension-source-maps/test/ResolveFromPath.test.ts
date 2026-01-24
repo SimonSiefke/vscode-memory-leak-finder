@@ -9,13 +9,18 @@ jest.mock('../src/parts/Root/Root.ts', () => ({
 }))
 
 // Mock the LaunchSourceMapWorker module
-const mockInvoke = jest.fn()
+const mockInvoke = jest.fn() as jest.Mock
 
 jest.mock('../src/parts/LaunchSourceMapWorker/LaunchSourceMapWorker.ts', () => ({
   launchSourceMapWorker: async () => ({
     invoke: mockInvoke,
     [Symbol.asyncDispose]: async () => {},
   }),
+}))
+
+// Mock the file system to always return true for existsSync
+jest.mock('node:fs', () => ({
+  existsSync: jest.fn(() => true),
 }))
 
 import * as ResolveFromPath from '../src/parts/ResolveFromPath/ResolveFromPath.ts'
@@ -37,10 +42,10 @@ test('resolveFromPath - resolves single path', async () => {
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
-  
+
   console.log('Result:', result)
   console.log('Mock called:', mockInvoke.mock.calls)
-  
+
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
     originalUrl: 'src/extension.ts',

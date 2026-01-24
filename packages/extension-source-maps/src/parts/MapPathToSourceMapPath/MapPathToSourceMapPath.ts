@@ -38,7 +38,11 @@ const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: s
   if (!extensionMatch) {
     return null
   }
-  const version = jsDebugVersion || '1.105.0'
+  if (!jsDebugVersion) {
+    console.log('[mapPathToSourceMapPath] jsDebugVersion not provided for js-debug extension')
+    return null
+  }
+  const version = jsDebugVersion
   const relativePath = extensionMatch[1]
   const cacheDirName = `vscode-js-debug-${version}`
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, 'dist', relativePath + '.map')
