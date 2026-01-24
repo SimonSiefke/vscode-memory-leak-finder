@@ -21,7 +21,9 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Pr
 
   let extensionSourceMapWorker: any = null
 
-  const configs = getConfigs()
+  const platform = process.platform
+
+  const configs = getConfigs(platform)
 
   for (const [key, value] of Object.entries(sourceMapUrlMap)) {
     if (!key) {

@@ -13,8 +13,7 @@ interface IConfig {
   readonly platform: string
 }
 
-export const getConfigs = (): readonly IConfig[] => {
-  const platform = process.platform // TODO pass platform as argument
+export const getConfigs = (platform: string): readonly IConfig[] => {
   return [
     {
       extensionName: 'vscode-js-debug',
