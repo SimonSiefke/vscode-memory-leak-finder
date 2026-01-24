@@ -16,8 +16,6 @@ export const parseSourceLocation = (sourceLocation: string): { url: string; line
   const line = Number.parseInt(match[2], 10)
   const column = Number.parseInt(match[3], 10)
 
-  console.log('[parseSourceLocation] Original path:', path)
-
   // Convert file:// URLs to paths (but not filenames that happen to start with "file:")
   // file:// URLs have at least 3 slashes (file:///) or a path after file:/
   // A filename like "file:name.js" should not be converted
@@ -25,22 +23,17 @@ export const parseSourceLocation = (sourceLocation: string): { url: string; line
   if (path.startsWith('file://')) {
     try {
       path = fileURLToPath(path)
-      console.log('[parseSourceLocation] Converted file:// to path:', path)
     } catch {
       // If conversion fails, keep the original path
-      console.log('[parseSourceLocation] Failed to convert file:// URL')
     }
   } else if (path.startsWith('file:/') && path.length > 7) {
     // Handle non-standard file:/ format by converting to file:///
     // file:/path -> file:///path
     const standardizedUrl = 'file://' + path.slice(5) // Remove 'file:' and add 'file://'
-    console.log('[parseSourceLocation] Standardized URL:', standardizedUrl)
     try {
       path = fileURLToPath(standardizedUrl)
-      console.log('[parseSourceLocation] Converted file:/ to path:', path)
     } catch {
       // If conversion fails, keep the original path
-      console.log('[parseSourceLocation] Failed to convert file:/ URL')
     }
   }
 

@@ -1,4 +1,5 @@
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import * as ExtractJsDebugVersion from '../ExtractJsDebugVersion/ExtractJsDebugVersion.ts'
 import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
 import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSourceMapUrl.ts'
@@ -26,8 +27,30 @@ export const resolveExtensionSourceMap = async (
 ): Promise<string | null> => {
   const rootPath = root || Root.root
 
+  // Convert file:// URLs to paths (but not filenames that happen to start with "file:")
+  // file:// URLs have at least 3 slashes (file:///) or a path after file:/
+  // A filename like "file:name.js" should not be converted
+  // Handle both file:// and file:/ formats (file:/ is not standard but may appear)
+  let normalizedPath = path
+  if (path.startsWith('file://')) {
+    try {
+      normalizedPath = fileURLToPath(path)
+    } catch {
+      // If conversion fails, keep the original path
+    }
+  } else if (path.startsWith('file:/') && path.length > 7) {
+    // Handle non-standard file:/ format by converting to file:///
+    // file:/path -> file:///path
+    const standardizedUrl = 'file://' + path.slice(5) // Remove 'file:' and add 'file://'
+    try {
+      normalizedPath = fileURLToPath(standardizedUrl)
+    } catch {
+      // If conversion fails, keep the original path
+    }
+  }
+
   // Extract js-debug version from the path
-  const jsDebugVersion = ExtractJsDebugVersion.extractJsDebugVersion(path)
+  const jsDebugVersion = ExtractJsDebugVersion.extractJsDebugVersion(normalizedPath)
 
   // Generate source maps if this is a js-debug extension and version was found
   if (jsDebugVersion) {
@@ -47,5 +70,5 @@ export const resolveExtensionSourceMap = async (
   }
 
   // Now resolve the source map URL with the version (if any)
-  return MapPathToSourceMapUrl.mapPathToSourceMapUrl(path, rootPath, jsDebugVersion ?? undefined)
+  return MapPathToSourceMapUrl.mapPathToSourceMapUrl(normalizedPath, rootPath, jsDebugVersion ?? undefined)
 }
