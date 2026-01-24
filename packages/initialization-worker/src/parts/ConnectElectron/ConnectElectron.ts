@@ -1,14 +1,8 @@
+import { applyMonkeyPatches } from '../ApplyMonkeyPatches/ApplyMonkeyPatches.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally/MakeElectronAvailableGlobally.ts'
-import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
-import { monkeyPatchElectronHeadlessMode } from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.ts'
-import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
-import * as MonkeyPatchElectronIpcMain from '../MonkeyPatchElectronScript/MonkeyPatchElectronIpcMain.ts'
-import { protocolInterceptorScript } from '../ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
+import type { RpcConnection } from '../RpcConnection/RpcConnection.ts'
 import { VError } from '../VError/VError.ts'
-import { applyMonkeyPatches } from '../ApplyMonkeyPatches/ApplyMonkeyPatches.ts'
-import { RpcConnection } from '../RpcConnection/RpcConnection.ts'
 
 const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {
   try {

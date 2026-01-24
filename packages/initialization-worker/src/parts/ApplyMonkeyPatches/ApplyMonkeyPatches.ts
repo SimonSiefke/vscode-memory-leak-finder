@@ -6,7 +6,7 @@ import * as MonkeyPatchElectronIpcMain from '../MonkeyPatchElectronScript/Monkey
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { openDevtoolsScript } from '../OpenDevtoolsScript/OpenDevtoolsScript.ts'
 import { protocolInterceptorScript } from '../ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
-import { RpcConnection } from '../RpcConnection/RpcConnection.ts'
+import type { RpcConnection } from '../RpcConnection/RpcConnection.ts'
 
 export const applyMonkeyPatches = async (
   electronRpc: RpcConnection,
