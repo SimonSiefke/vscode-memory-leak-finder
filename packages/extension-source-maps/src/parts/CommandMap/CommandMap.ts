@@ -3,4 +3,3 @@ import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSource
 export const commandMap: Record<string, (...args: any[]) => any> = {
   'ExtensionSourceMap.mapPathToSourceMapUrl': MapPathToSourceMapUrl.mapPathToSourceMapUrl,
 }
-

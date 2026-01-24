@@ -8,17 +8,17 @@ export const getOriginalPositions = async (
   key: string,
 ): Promise<readonly any[]> => {
   const positions: any[] = []
-  
+
   for (let i = 0; i < value.length; i += 2) {
     const line = value[i]
     const column = value[i + 1]
-    
+
     try {
       const originalPosition = await sourceMap.originalPositionFor({
         line,
         column,
       })
-      
+
       if (originalPosition) {
         positions.push({
           line: originalPosition.line,
@@ -34,6 +34,6 @@ export const getOriginalPositions = async (
       positions.push(null)
     }
   }
-  
+
   return positions
 }
