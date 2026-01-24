@@ -18,7 +18,6 @@ interface ResolveExtensionSourceMapConfig {
 
 const resolveVersion = (extensionPath: string) => {
   const packageJsonPath = join(extensionPath, 'package.json')
-  console.log({ extensionpath: extensionPath })
   if (!existsSync(packageJsonPath)) {
     throw new Error(`package json not found`)
   }
