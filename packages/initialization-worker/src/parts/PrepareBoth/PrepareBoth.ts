@@ -4,8 +4,7 @@ import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as FunctionTrackerState from '../FunctionTrackerState/FunctionTrackerState.ts'
-import * as LaunchFunctionTrackerWorker from '../LaunchFunctionTrackerWorker/LaunchFunctionTrackerWorker.ts'
+import { launchFunctionTrackerAndPreGenerateWorkbench } from '../LaunchFunctionTrackerWorker/LaunchFunctionTrackerAndPreGenerateWorkbench.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
@@ -29,19 +28,8 @@ export const prepareBoth = async (
 ): Promise<any> => {
   // Launch function-tracker worker BEFORE PrepareBoth if tracking is enabled
   // This ensures the socket server is ready when the protocol interceptor is injected
-  let functionTrackerRpc: Awaited<ReturnType<typeof LaunchFunctionTrackerWorker.launchFunctionTrackerWorker>> | null = null
   if (trackFunctions && binaryPath) {
-    functionTrackerRpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
-    // Store in state so we can access it later to get statistics
-    FunctionTrackerState.setFunctionTrackerRpc(functionTrackerRpc)
-
-    // Pre-generate workbench.desktop.main.js to avoid memory issues
-    console.log(`[Launch] Pre-generating workbench.desktop.main.js from ${binaryPath} to ${preGeneratedWorkbenchPath}`)
-    await functionTrackerRpc.invoke('FunctionTracker.preGenerateWorkbench', binaryPath, preGeneratedWorkbenchPath)
-    console.log(`[Launch] Successfully pre-generated workbench.desktop.main.js`)
-
-    // Wait a bit for socket server to be ready
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await launchFunctionTrackerAndPreGenerateWorkbench(binaryPath, preGeneratedWorkbenchPath)
   }
 
   const stream = new PortReadStream(port)

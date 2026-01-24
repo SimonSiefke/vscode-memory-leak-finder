@@ -90,24 +90,12 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
 
-  // Launch function-tracker worker BEFORE PrepareBoth if tracking is enabled
-  // This ensures the socket server is ready when the protocol interceptor is injected
-  let functionTrackerRpc: Awaited<ReturnType<typeof LaunchFunctionTrackerWorker.launchFunctionTrackerWorker>> | null = null
+  // Compute binary path and pre-generated workbench path for function tracking
+  let binaryPath: string | null = null
   let preGeneratedWorkbenchPath: string | null = null
   if (trackFunctions) {
-    functionTrackerRpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
-    // Store in state so we can access it later to get statistics
-    FunctionTrackerState.setFunctionTrackerRpc(functionTrackerRpc)
-
-    // Pre-generate workbench.desktop.main.js to avoid memory issues
-    const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
+    binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
     preGeneratedWorkbenchPath = join(Root.root, '.vscode-workbench-tracked', 'workbench.desktop.main.js')
-    console.log(`[Launch] Pre-generating workbench.desktop.main.js from ${binaryPath} to ${preGeneratedWorkbenchPath}`)
-    await functionTrackerRpc.invoke('FunctionTracker.preGenerateWorkbench', binaryPath, preGeneratedWorkbenchPath)
-    console.log(`[Launch] Successfully pre-generated workbench.desktop.main.js`)
-
-    // Wait a bit for socket server to be ready
-    await new Promise((resolve) => setTimeout(resolve, 100))
   }
 
   await using rpc = await launchInitializationWorker()
@@ -126,6 +114,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     measureId,
     pid,
     preGeneratedWorkbenchPath,
+    binaryPath,
   )
 
   return {
