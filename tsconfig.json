@@ -31,6 +31,7 @@
     { "path": "./packages/proxy-worker" },
     { "path": "./packages/repository-worker" },
     { "path": "./packages/source-map-worker" },
+    { "path": "./packages/source-map-coordinator" },
     { "path": "./packages/stdout-worker" },
     { "path": "./packages/storage-worker" },
     { "path": "./packages/test-coordinator" },
