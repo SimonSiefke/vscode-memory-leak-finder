@@ -34,16 +34,11 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Pr
 
       // Get the source map URL from the extension source maps worker
       // This will also extract the js-debug version and generate source maps if needed
-      const sourceMapUrl = await extensionSourceMapWorker.invoke(
-        'ExtensionSourceMap.resolveExtensionSourceMap',
-        key,
-        Root.root,
-        {
-          extensionName: 'vscode-js-debug',
-          repoUrl: 'git@github.com:microsoft/vscode-js-debug.git',
-          cacheDir: join(Root.root, '.extension-source-maps-cache'),
-        },
-      )
+      const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', key, {
+        extensionName: 'vscode-js-debug',
+        repoUrl: 'git@github.com:microsoft/vscode-js-debug.git',
+        cacheDir: join(Root.root, '.extension-source-maps-cache'),
+      })
 
       if (sourceMapUrl) {
         // Add the source map URL to the cleaned map

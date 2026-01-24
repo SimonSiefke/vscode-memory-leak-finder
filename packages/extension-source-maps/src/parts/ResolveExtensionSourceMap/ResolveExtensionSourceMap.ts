@@ -19,7 +19,13 @@ interface ResolveExtensionSourceMapConfig {
  * 2. Generates source maps for that version if they don't exist
  * 3. Returns the source map URL
  */
-export const resolveExtensionSourceMap = async (path: string, config: ResolveExtensionSourceMapConfig): Promise<string | null> => {
+export const resolveExtensionSourceMap = async (
+  path: string,
+  root: string | undefined,
+  config: ResolveExtensionSourceMapConfig,
+): Promise<string | null> => {
+  const rootPath = root || Root.root
+
   // Extract js-debug version from the path
   const jsDebugVersion = ExtractJsDebugVersion.extractJsDebugVersion(path)
 
