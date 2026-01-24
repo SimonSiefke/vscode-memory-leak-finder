@@ -19,14 +19,14 @@ const sortOriginal = (cleanInstances) => {
   return cleaned
 }
 
-export const prettifyConstructorStackTracesWithSourceMap = async (constructorStackTraces, scriptMap) => {
+export const prettifyConstructorStackTracesWithSourceMap = async (constructorStackTraces, scriptMap, context) => {
   const fullQuery: any[] = []
   for (let i = 0; i < constructorStackTraces.length; i++) {
     const stackTrace = constructorStackTraces[i]
     const eventListeners = GetEventListenersQuery.getEventListenerQuery(stackTrace, scriptMap)
     fullQuery.push(...eventListeners)
   }
-  const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
+  const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false, context.connectionId)
   const sorted = sortOriginal(cleanPrettyInstances)
   return sorted
 }

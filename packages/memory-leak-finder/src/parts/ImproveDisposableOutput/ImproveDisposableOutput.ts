@@ -34,10 +34,10 @@ const finishDisposables = (disposablesWithStack) => {
   return disposablesWithStack.map(finishDisposable)
 }
 
-export const improveDisposableOutput = async (disposables, scriptMap) => {
+export const improveDisposableOutput = async (disposables, scriptMap, context) => {
   const prepared = prepareDisposables(disposables, scriptMap)
   const classNames = true
-  const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(prepared, classNames)
+  const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(prepared, classNames, context.connectionId)
   const finished = finishDisposables(withOriginalStack)
   return finished
 }
