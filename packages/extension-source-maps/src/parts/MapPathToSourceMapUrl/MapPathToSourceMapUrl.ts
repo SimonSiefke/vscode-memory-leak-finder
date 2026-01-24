@@ -35,7 +35,7 @@ const extractCopilot = (root: string, normalizedPath: string) => {
   return sourceMapPath
 }
 
-const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: string) => {
+const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion: string) => {
   const extensionMatch = normalizedPath.match(JS_DEBUG_EXTENSION_PATH_REGEX)
   if (!extensionMatch) {
     return null
@@ -57,7 +57,7 @@ const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: s
   return sourceMapPath
 }
 
-const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion?: string): string | null => {
+const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion: string): string | null => {
   if (!path) {
     return null
   }
