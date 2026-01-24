@@ -3,7 +3,7 @@
   "version": "0.0.0-dev",
   "license": "MIT",
   "type": "module",
-  "main": "src/sourceMapCoordinator.ts",
+  "main": "src/main.ts",
   "bin": {
     "source-map-coordinator": "bin/source-map-coordinator.js"
   },
@@ -12,7 +12,6 @@
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "dependencies": {
-    "@lvce-editor/assert": "^1.5.1",
     "@lvce-editor/rpc": "^5.4.0",
     "@lvce-editor/verror": "^1.7.0"
   },
