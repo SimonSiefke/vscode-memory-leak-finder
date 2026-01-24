@@ -11,6 +11,5 @@
   "dependencies": {
     "@lvce-editor/rpc": "^5.4.0",
     "@lvce-editor/verror": "^1.7.0"
-  },
-  "devDependencies": {}
+  }
 }
