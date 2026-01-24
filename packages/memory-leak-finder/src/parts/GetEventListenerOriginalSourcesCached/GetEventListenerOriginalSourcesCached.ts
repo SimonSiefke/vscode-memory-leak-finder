@@ -7,7 +7,7 @@ import * as Hash from '../Hash/Hash.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as SortEventListenersBySourceMap from '../SortEventListenersBySourceMap/SortEventListenersBySourceMap.ts'
 
-export const getEventListenerOriginalSourcesCached = async (eventListeners, classNames) => {
+export const getEventListenerOriginalSourcesCached = async (eventListeners, classNames, connectionId) => {
   const sorted = SortEventListenersBySourceMap.sortEventListenersBySourceMap(eventListeners)
   const sourceMapUrlMap = GetSourceMapUrlMap.getSourceMapUrlMap(sorted)
   const hash = Hash.hash({ ...sourceMapUrlMap, classNames })
@@ -18,7 +18,7 @@ export const getEventListenerOriginalSourcesCached = async (eventListeners, clas
     return eventListeners
   }
   if (!Exists.exists(cachePath)) {
-    const result = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlMap, classNames)
+    const result = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlMap, classNames, connectionId)
     await JsonFile.writeJson(cachePath, result)
   }
   const sourceMapResults = await JsonFile.readJson(cachePath)
