@@ -17,6 +17,7 @@ export const generateExtensionSourceMaps = async ({
   version,
   buildScript,
   platform,
+  modifications,
 }: {
   extensionName: string
   version: string
@@ -24,6 +25,7 @@ export const generateExtensionSourceMaps = async ({
   cacheDir: string
   platform: string
   buildScript: readonly string[]
+  modifications: readonly any[]
 }): Promise<void> => {
   // Check if already built
   // Normalize version by stripping 'v' prefix if present
@@ -77,8 +79,10 @@ export const generateExtensionSourceMaps = async ({
   console.log(`[extension-source-maps] Dependencies installed successfully`)
 
   // Modify esbuild config
-  console.log(`[extension-source-maps] Modifying esbuild config to generate sourcemaps...`)
-  await ModifyEsbuildConfig.modifyEsbuildConfig(repoPath)
+  if (modifications.length > 0) {
+    // TODO
+    await ModifyEsbuildConfig.modifyEsbuildConfig(repoPath)
+  }
 
   // Build extension
   console.log(`[extension-source-maps] Building extension...`)

@@ -1,4 +1,3 @@
-import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as ExtractJsDebugVersion from '../ExtractJsDebugVersion/ExtractJsDebugVersion.ts'
 import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
@@ -9,8 +8,9 @@ interface ResolveExtensionSourceMapConfig {
   readonly extensionName: string
   readonly repoUrl: string
   readonly cacheDir: string
+  readonly platform: string
   readonly buildScript: readonly string[]
-  readonly moditications?: readonly any[]
+  readonly moditications: readonly any[]
 }
 
 /**
@@ -70,7 +70,8 @@ export const resolveExtensionSourceMap = async (
         repoUrl: config.repoUrl,
         version: jsDebugVersion,
         buildScript: config.buildScript,
-        platform,
+        platform: config.platform,
+        modifications: config.moditications,
       })
     } catch (error) {
       console.log(`[resolveExtensionSourceMap] Failed to generate source maps for ${config.extensionName} ${jsDebugVersion}:`, error)
