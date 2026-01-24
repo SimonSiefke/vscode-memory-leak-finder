@@ -23,9 +23,16 @@ const ensureUri = (file: string): string => {
  * Extension files (containing ms-vscode.js-debug) are processed by the extension-source-maps worker,
  * while normal files are processed by the regular source-map-worker.
  */
-export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap, platform: string): Promise<SourceMapUrlMap> => {
+export const cleanSourceMapUrlMap = async (
+  sourceMapUrlMap: SourceMapUrlMap,
+  platform: string,
+): Promise<{
+  cleanedSourceMapUrlMap: SourceMapUrlMap
+  reverseMap: Record<string, string>
+}> => {
   const cleanedSourceMapUrlMap: SourceMapUrlMap = Object.create(null)
 
+  const reverseMap: Record<string, string> = Object.create(null)
   let extensionSourceMapWorker: any = null
 
   const configs = getConfigs(platform)
@@ -59,5 +66,5 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap, pla
     await extensionSourceMapWorker[Symbol.asyncDispose]()
   }
 
-  return cleanedSourceMapUrlMap
+  return { cleanedSourceMapUrlMap, reverseMap }
 }

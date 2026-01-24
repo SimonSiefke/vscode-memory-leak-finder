@@ -12,10 +12,24 @@ interface CleanPositionMap {
   [key: string]: any[]
 }
 
+// TODO maybe there is a better way to do this. but the caller providers the source map url
+// that it gets from the file. that gets converted to a different source map url, for example
+// in .extension-source-maps-cache. But to keep the order of items correct, the caller needs
+// to get the same source map urls back that it passed in, even though that might not be the
+// real source map urls that were used to get the original positions
+const reverseCleanSourceMapUrlMap = (cleanPositionsMap: any, reverseMap: any): any => {
+  const result = Object.create(null)
+  for (const [key, value] of Object.entries(cleanPositionsMap)) {
+    const originalKey = reverseMap[key] || key
+    result[originalKey] = value
+  }
+  return result
+}
+
 export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, classNames: boolean): Promise<CleanPositionMap> => {
   const platform = process.platform
   console.log({ sourceMapUrlMap })
-  const cleanedSourceMapUrlMap = await cleanSourceMapUrlMap(sourceMapUrlMap, platform)
+  const { cleanedSourceMapUrlMap, reverseMap } = await cleanSourceMapUrlMap(sourceMapUrlMap, platform)
   console.log({ cleanedSourceMapUrlMap })
   await using sourceMapWorker = await launchSourceMapWorker()
   const cleanPositionMap: CleanPositionMap = Object.create(null)
@@ -30,5 +44,6 @@ export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, cla
     const cleanPositions = originalPositions.map(GetCleanPosition.getCleanPosition)
     cleanPositionMap[key] = cleanPositions
   }
-  return cleanPositionMap
+  const finalResult = reverseCleanSourceMapUrlMap(cleanPositionMap, reverseMap)
+  return finalResult
 }
