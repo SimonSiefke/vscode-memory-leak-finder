@@ -22,7 +22,7 @@ const testFunctionCount = async (): Promise<void> => {
       'undoRedoService.ts',
       'editStack.ts',
     ],
-    minCount: 0,
+    minCount: 7,
   })
   console.log(count.length)
   await mkdir(dirname(resultPath), { recursive: true })

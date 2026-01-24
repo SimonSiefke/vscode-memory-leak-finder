@@ -122,6 +122,7 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   console.time('new')
   const newItems = getNewItems(map1, map2, minCount)
   console.timeEnd('new')
+  console.log('new', newItems.length)
   const formattedItems = formatUniqueLocations(
     newItems,
     after.locations,
