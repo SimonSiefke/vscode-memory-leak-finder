@@ -1,6 +1,5 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
-import { cwd } from 'node:process'
 import { root } from '../Root/Root.ts'
 
 const CACHE_DIR_NAME = '.vscode-resolve-source-map-cache'
