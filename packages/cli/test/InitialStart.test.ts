@@ -214,6 +214,7 @@ test('initialStart - start running', async () => {
     vscodeVersion: '',
     watch: false,
     workers: false,
+    resolveExtensionSourceMaps:false
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()
