@@ -1,6 +1,6 @@
 import { join } from 'node:path'
-import * as AddOriginalSourcesToData from './parts/AddOriginalSourcesToData/AddOriginalSourcesToData.ts'
-import { root } from './parts/Root/Root.ts'
+import * as AddOriginalSourcesToData from '../src/parts/AddOriginalSourcesToData/AddOriginalSourcesToData.ts'
+import { root } from '../src/parts/Root/Root.ts'
 
 const main2 = async (): Promise<void> => {
   const dataFilePath = join(
