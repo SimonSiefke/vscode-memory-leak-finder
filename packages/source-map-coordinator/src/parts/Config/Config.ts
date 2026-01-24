@@ -31,7 +31,6 @@ export const getConfigs = (): readonly IConfig[] => {
       cacheDir,
       extensionName: 'copilot-chat',
       repoUrl: 'git@github.com:microsoft/vscode-copilot-chat.git',
-      version: 'v0.35.3',
       enabled: false,
       modifications: [
         {
