@@ -1,6 +1,7 @@
 import { expect, test, jest } from '@jest/globals'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { MockRpc } from '@lvce-editor/rpc'
 
 // Mock the Root module before importing ResolveFromPath
 const mockRoot = tmpdir()
@@ -9,7 +10,11 @@ jest.unstable_mockModule('../src/parts/Root/Root.ts', () => ({
 }))
 
 // Mock the LaunchSourceMapWorker module
-const mockInvoke = jest.fn<Promise<Record<string, any[]>>, [string, ...any[]]>()
+const mockLaunchSourceMapWorker = jest.fn()
+
+jest.unstable_mockModule('../src/parts/LaunchSourceMapWorker/LaunchSourceMapWorker.ts', () => ({
+  launchSourceMapWorker: mockLaunchSourceMapWorker,
+}))
 
 // Mock the file system to always return true for existsSync
 jest.unstable_mockModule('node:fs', () => ({
@@ -25,21 +30,31 @@ test('resolveFromPath - resolves single path', async () => {
 
   // Mock the source map worker response
   const sourceMapUrl = join(mockRoot, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
-  mockInvoke.mockResolvedValueOnce({
-    [sourceMapUrl]: [
-      {
-        line: 100,
-        column: 200,
-        source: 'src/extension.ts',
-        name: 'activate',
-      },
-    ],
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      if (method === 'SourceMap.getCleanPositionsMap') {
+        return {
+          [sourceMapUrl]: [
+            {
+              line: 100,
+              column: 200,
+              source: 'src/extension.ts',
+              name: 'activate',
+            },
+          ],
+        }
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
-
-  console.log('Result:', result)
-  console.log('Mock called:', mockInvoke.mock.calls)
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
@@ -59,23 +74,36 @@ test('resolveFromPath - resolves multiple paths', async () => {
   // Mock the source map worker response
   const sourceMapUrl1 = join(mockRoot, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   const sourceMapUrl2 = join(mockRoot, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/utils.js.map')
-  mockInvoke.mockResolvedValueOnce({
-    [sourceMapUrl1]: [
-      {
-        line: 100,
-        column: 200,
-        source: 'src/extension.ts',
-        name: 'activate',
-      },
-    ],
-    [sourceMapUrl2]: [
-      {
-        line: 30,
-        column: 5,
-        source: 'src/utils.ts',
-        name: 'helperFunction',
-      },
-    ],
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      if (method === 'SourceMap.getCleanPositionsMap') {
+        return {
+          [sourceMapUrl1]: [
+            {
+              line: 100,
+              column: 200,
+              source: 'src/extension.ts',
+              name: 'activate',
+            },
+          ],
+          [sourceMapUrl2]: [
+            {
+              line: 30,
+              column: 5,
+              source: 'src/utils.ts',
+              name: 'helperFunction',
+            },
+          ],
+        }
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
   })
 
   const result = await ResolveFromPath.resolveFromPath([path1, path2])
@@ -100,6 +128,18 @@ test('resolveFromPath - resolves multiple paths', async () => {
 })
 
 test('resolveFromPath - returns empty object for invalid path', async () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
+  })
+
   const result = await ResolveFromPath.resolveFromPath(['invalid-path'])
 
   expect(result).toHaveLength(1)
