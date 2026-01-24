@@ -49,6 +49,7 @@ test('mapPathToSourceMapUrl - returns file URL for js-debug extension path from 
   const result = MapPathToSourceMapUrl.mapPathToSourceMapUrl(absolutePath, root, '1.105.0')
 
   expect(result).toBeTruthy()
-  expect(result).toMatch(/^file:\/\//)
-  expect(result).toContain('.extension-source-maps-cache/vscode-js-debug-1.105.0/dist/src/extension.js.map')
+  expect(result).toBe(
+    'file:///test/.cache/repos/vscode-memory-leak-finder/.extension-source-maps-cache/vscode-js-debug-1.105.0/dist/src/extension.js.map',
+  )
 })
