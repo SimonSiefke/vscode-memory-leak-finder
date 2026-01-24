@@ -4,22 +4,13 @@ import { VError } from '../VError/VError.ts'
 
 export const getTrackedFunctions = async (session: Session): Promise<Record<string, number>> => {
   try {
-    console.log('before eval')
     const result = await DevtoolsProtocolRuntime.evaluate(session, {
       expression: `(() => {
-        if (!globalThis.___functionStatistics) {
-          return {}
-        }
-        const stats = {}
-        for (const [name, count] of globalThis.___functionStatistics) {
-          stats[name] = count
-        }
+        const stats = globalThis.getFunctionStatistics()
         return stats
       })()`,
       returnByValue: true,
     })
-
-    console.log('after eval')
 
     if (typeof result !== 'object' || result === null) {
       return {}
