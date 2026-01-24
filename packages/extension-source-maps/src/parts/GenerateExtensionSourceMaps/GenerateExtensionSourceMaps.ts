@@ -16,11 +16,13 @@ export const generateExtensionSourceMaps = async ({
   repoUrl,
   version,
   buildScript,
+  platform,
 }: {
   extensionName: string
   version: string
   repoUrl: string
   cacheDir: string
+  platform: string
   buildScript: readonly string[]
 }): Promise<void> => {
   // Check if already built
@@ -80,7 +82,7 @@ export const generateExtensionSourceMaps = async ({
 
   // Build extension
   console.log(`[extension-source-maps] Building extension...`)
-  await BuildExtension.buildExtension(repoPath, nodeVersion, buildScript)
+  await BuildExtension.buildExtension(repoPath, nodeVersion, platform, buildScript)
 
   console.log(`[extension-source-maps] Successfully generated source maps for ${extensionName} ${version}`)
 }
