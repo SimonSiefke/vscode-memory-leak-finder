@@ -86,10 +86,6 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
     installDependencies: async () => {},
   }))
 
-  jest.unstable_mockModule('../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts', () => ({
-    modifyEsbuildConfig: async () => {},
-  }))
-
   jest.unstable_mockModule('../src/parts/BuildExtension/BuildExtension.ts', () => ({
     buildExtension: async () => {},
   }))

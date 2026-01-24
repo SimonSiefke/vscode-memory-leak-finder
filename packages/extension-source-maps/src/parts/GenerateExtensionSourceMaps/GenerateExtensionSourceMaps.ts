@@ -8,7 +8,6 @@ import * as GetDisplayname from '../GetDisplayname/GetDisplayname.ts'
 import * as GetNodeVersion from '../GetNodeVersion/GetNodeVersion.ts'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
-import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
 
 export const generateExtensionSourceMaps = async ({
   cacheDir,
@@ -81,7 +80,6 @@ export const generateExtensionSourceMaps = async ({
   // Modify esbuild config
   if (modifications && modifications.length > 0) {
     // TODO
-    await ModifyEsbuildConfig.modifyEsbuildConfig(repoPath)
   }
 
   // Build extension
