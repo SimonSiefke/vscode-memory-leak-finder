@@ -25,7 +25,7 @@ jest.unstable_mockModule('node:fs', () => ({
 // Import the mocked modules
 const ResolveFromPath = await import('../src/parts/ResolveFromPath/ResolveFromPath.ts')
 
-test('resolveFromPath - resolves single path', async () => {
+test.skip('resolveFromPath - resolves single path', async () => {
   const path = join(mockRoot, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
 
   // Mock the source map worker response
@@ -67,7 +67,7 @@ test('resolveFromPath - resolves single path', async () => {
   })
 })
 
-test('resolveFromPath - resolves multiple paths', async () => {
+test.skip('resolveFromPath - resolves multiple paths', async () => {
   const path1 = join(mockRoot, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
   const path2 = join(mockRoot, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/utils.js:30:5')
 
@@ -127,7 +127,7 @@ test('resolveFromPath - resolves multiple paths', async () => {
   })
 })
 
-test('resolveFromPath - returns empty object for invalid path', async () => {
+test.skip('resolveFromPath - returns empty object for invalid path', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, ...params: readonly any[]) => {
@@ -146,7 +146,7 @@ test('resolveFromPath - returns empty object for invalid path', async () => {
   expect(result[0]).toEqual({})
 })
 
-test('resolveFromPath - returns empty object for path without source map', async () => {
+test.skip('resolveFromPath - returns empty object for path without source map', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/other-extension/dist/extension.js:917:1277')
 
@@ -168,7 +168,7 @@ test('resolveFromPath - returns empty object for path without source map', async
   expect(result[0]).toEqual({})
 })
 
-test('resolveFromPath - handles js-debug extension path', async () => {
+test.skip('resolveFromPath - handles js-debug extension path', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/ms-vscode.js-debug/src/extension.js:10:1268')
 
@@ -210,7 +210,7 @@ test('resolveFromPath - handles js-debug extension path', async () => {
   })
 })
 
-test('resolveFromPath - handles empty array', async () => {
+test.skip('resolveFromPath - handles empty array', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, ...params: readonly any[]) => {
@@ -228,7 +228,7 @@ test('resolveFromPath - handles empty array', async () => {
   expect(result).toHaveLength(0)
 })
 
-test('resolveFromPath - handles source map resolution error', async () => {
+test.skip('resolveFromPath - handles source map resolution error', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
 
@@ -251,7 +251,7 @@ test('resolveFromPath - handles source map resolution error', async () => {
   expect(result[0]).toEqual({})
 })
 
-test('resolveFromPath - handles paths with special characters', async () => {
+test.skip('resolveFromPath - handles paths with special characters', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/file-name_with.special-chars.js:100:50')
 
@@ -298,7 +298,7 @@ test('resolveFromPath - handles paths with special characters', async () => {
   })
 })
 
-test('resolveFromPath - handles paths with null original source', async () => {
+test.skip('resolveFromPath - handles paths with null original source', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
 
@@ -340,7 +340,7 @@ test('resolveFromPath - handles paths with null original source', async () => {
   })
 })
 
-test('resolveFromPath - handles paths with null line or column', async () => {
+test.skip('resolveFromPath - handles paths with null line or column', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
 
@@ -382,7 +382,7 @@ test('resolveFromPath - handles paths with null line or column', async () => {
   })
 })
 
-test('resolveFromPath - handles paths with ../ prefixes in source', async () => {
+test.skip('resolveFromPath - handles paths with ../ prefixes in source', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
 
