@@ -1,0 +1,32 @@
+import { readFile, writeFile, mkdir } from 'node:fs/promises'
+import { join } from 'node:path'
+import { cwd } from 'node:process'
+
+const CACHE_DIR_NAME = '.vscode-resolve-source-map-cache'
+
+const getCachePath = (hash: string): string => {
+  const projectRoot = cwd()
+  return join(projectRoot, CACHE_DIR_NAME, `${hash}.json`)
+}
+
+export const getCachedData = async (hash: string): Promise<any | null> => {
+  try {
+    const cachePath = getCachePath(hash)
+    const data = await readFile(cachePath, 'utf-8')
+    return JSON.parse(data)
+  } catch {
+    return null
+  }
+}
+
+export const setCachedData = async (hash: string, data: any): Promise<void> => {
+  try {
+    const projectRoot = cwd()
+    const cacheDir = join(projectRoot, CACHE_DIR_NAME)
+    await mkdir(cacheDir, { recursive: true })
+    const cachePath = getCachePath(hash)
+    await writeFile(cachePath, JSON.stringify(data), 'utf-8')
+  } catch {
+    // Silently fail if cache cannot be written
+  }
+}

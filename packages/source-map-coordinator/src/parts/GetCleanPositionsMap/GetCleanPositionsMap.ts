@@ -2,6 +2,7 @@ import * as GetCleanPosition from '../GetCleanPosition/GetCleanPosition.ts'
 import * as Hash from '../Hash/Hash.ts'
 import { launchSourceMapWorker } from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 import * as LoadSourceMap from '../LoadSourceMap/LoadSourceMap.ts'
+import * as SourceMapCache from '../SourceMapCache/SourceMapCache.ts'
 
 interface SourceMapUrlMap {
   [key: string]: number[]
@@ -12,6 +13,13 @@ interface CleanPositionMap {
 }
 
 export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, classNames: boolean): Promise<CleanPositionMap> => {
+  const cacheHash = Hash.hash(sourceMapUrlMap)
+  const cachedData = await SourceMapCache.getCachedData(cacheHash)
+  
+  if (cachedData) {
+    return cachedData
+  }
+  
   await using sourceMapWorker = await launchSourceMapWorker()
   const cleanPositionMap: CleanPositionMap = Object.create(null)
   for (const [key, value] of Object.entries(sourceMapUrlMap)) {
@@ -25,5 +33,7 @@ export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, cla
     const cleanPositions = originalPositions.map(GetCleanPosition.getCleanPosition)
     cleanPositionMap[key] = cleanPositions
   }
+  
+  await SourceMapCache.setCachedData(cacheHash, cleanPositionMap)
   return cleanPositionMap
 }
