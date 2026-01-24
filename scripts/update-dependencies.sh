@@ -16,7 +16,7 @@ fi
 
 function updateDependencies {
   echo "updating dependencies..."
-  OUTPUT=`ncu -u   -x lerna -x jsdom`
+  OUTPUT=`ncu -u -x @types/node -x jest -x @jest/globals -x rollup -x lerna -x jsdom`
   SUB='All dependencies match the latest package versions'
   if [[ "$OUTPUT" == *"$SUB"* ]]; then
     echo "$OUTPUT"
@@ -58,6 +58,7 @@ cd packages/prompts && updateDependencies && cd ../../ &&
 cd packages/proxy-worker && updateDependencies && cd ../../ &&
 cd packages/repository-worker && updateDependencies && cd ../../ &&
 cd packages/source-map-worker && updateDependencies && cd ../../ &&
+cd packages/source-map-coordinator && updateDependencies && cd ../../ &&
 cd packages/stdout-worker && updateDependencies && cd ../../ &&
 cd packages/storage-worker && updateDependencies && cd ../../ &&
 cd packages/test-coordinator && updateDependencies && cd ../../ &&
