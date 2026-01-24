@@ -21,8 +21,7 @@ export const getCachedData = async (hash: string): Promise<any | null> => {
 
 export const setCachedData = async (hash: string, data: any): Promise<void> => {
   try {
-    const projectRoot = cwd()
-    const cacheDir = join(projectRoot, CACHE_DIR_NAME)
+    const cacheDir = join(root, CACHE_DIR_NAME)
     await mkdir(cacheDir, { recursive: true })
     const cachePath = getCachePath(hash)
     await writeFile(cachePath, JSON.stringify(data, null, 2) + '\n', 'utf-8')
