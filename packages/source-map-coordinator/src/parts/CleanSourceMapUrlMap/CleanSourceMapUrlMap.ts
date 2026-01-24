@@ -43,6 +43,8 @@ export const cleanSourceMapUrlMap = async (
       continue
     }
 
+    reverseMap[key] = key
+
     if (isExtensionFile(key)) {
       if (!extensionSourceMapWorker) {
         extensionSourceMapWorker = await launchExtensionSourceMapWorker()
@@ -54,6 +56,7 @@ export const cleanSourceMapUrlMap = async (
       console.log({ sourceMapUrl })
       if (sourceMapUrl) {
         cleanedSourceMapUrlMap[sourceMapUrl] = value
+        reverseMap[key] = sourceMapUrl
       } else {
         cleanedSourceMapUrlMap[key] = value
       }
