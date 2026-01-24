@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 import * as MapPathToSourceMapPath from '../MapPathToSourceMapPath/MapPathToSourceMapPath.ts'
 
@@ -11,12 +10,9 @@ export const mapPathToSourceMapUrl = (path: string, root: string, jsDebugVersion
     if (!sourceMapPath) {
       return null
     }
-    if (existsSync(sourceMapPath)) {
-      const sourceMapUrl = pathToFileURL(sourceMapPath).toString()
-      return sourceMapUrl
-    }
-    console.log(`[addOriginalSourcesToData] Source map not found: ${sourceMapPath}`)
-    return null
+    // Always return a file URL, regardless of whether the file exists
+    const sourceMapUrl = pathToFileURL(sourceMapPath).toString()
+    return sourceMapUrl
   } catch {
     return null
   }

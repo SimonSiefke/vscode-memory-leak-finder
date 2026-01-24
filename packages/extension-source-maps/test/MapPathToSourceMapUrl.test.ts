@@ -20,11 +20,13 @@ test('mapPathToSourceMapUrl - returns file URL when source map exists', async ()
   await rm(tempRoot, { force: true, recursive: true })
 })
 
-test('mapPathToSourceMapUrl - returns null when source map does not exist', () => {
+test('mapPathToSourceMapUrl - returns file URL when source map does not exist', () => {
   const tempRoot = tmpdir()
   const path = '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js'
   const result = MapPathToSourceMapUrl.mapPathToSourceMapUrl(path, tempRoot)
-  expect(result).toBeNull()
+  expect(result).toBeTruthy()
+  expect(result).toMatch(/^file:\/\//)
+  expect(result).toContain('extension.js.map')
 })
 
 test('mapPathToSourceMapUrl - returns null for empty path', () => {
