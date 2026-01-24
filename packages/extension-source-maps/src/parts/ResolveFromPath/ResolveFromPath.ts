@@ -1,11 +1,10 @@
+import { join } from 'node:path'
+import * as ExtractJsDebugVersion from '../ExtractJsDebugVersion/ExtractJsDebugVersion.ts'
+import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
 import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSourceMapUrl.ts'
 import * as ParseSourceLocation from '../ParseSourceLocation/ParseSourceLocation.ts'
-import * as Root from '../Root/Root.ts'
-import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
-import * as ExtractJsDebugVersion from '../ExtractJsDebugVersion/ExtractJsDebugVersion.ts'
 import * as ResolveOriginalPositions from '../ResolveOriginalPositions/ResolveOriginalPositions.ts'
-import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
-import { join } from 'node:path'
+import * as Root from '../Root/Root.ts'
 
 interface ResolveResult {
   originalUrl?: string | null

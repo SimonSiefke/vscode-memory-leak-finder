@@ -37,14 +37,7 @@ export const extractJsDebugVersionFromPath = (path: string): string | null => {
  * Looks for the package.json in the VS Code insiders versions directory
  */
 export const extractJsDebugVersionFromPackageJson = (vscodeInsidersPath: string): string | null => {
-  const packageJsonPath = join(
-    vscodeInsidersPath,
-    'resources',
-    'app',
-    'extensions',
-    'ms-vscode.js-debug',
-    'package.json',
-  )
+  const packageJsonPath = join(vscodeInsidersPath, 'resources', 'app', 'extensions', 'ms-vscode.js-debug', 'package.json')
 
   if (!existsSync(packageJsonPath)) {
     console.log(`[extractJsDebugVersion] Package.json not found at: ${packageJsonPath}`)
