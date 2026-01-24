@@ -3,7 +3,13 @@ import * as Assert from '../Assert/Assert.ts'
 import * as GetMeasure from '../GetMeasure/GetMeasure.ts'
 import * as LoadMemoryLeakFinder from '../LoadMemoryLeakFinder/LoadMemoryLeakFinder.ts'
 
-export const getCombinedMeasure = async (session: Session, measureId: string, connectionId: number, pid: number, resolveExtensionSourceMaps: boolean): Promise<any> => {
+export const getCombinedMeasure = async (
+  session: Session,
+  measureId: string,
+  connectionId: number,
+  pid: number,
+  resolveExtensionSourceMaps: boolean,
+): Promise<any> => {
   Assert.object(session)
   Assert.string(measureId)
   const MemoryLeakFinder = LoadMemoryLeakFinder.loadMemoryLeakFinder()
