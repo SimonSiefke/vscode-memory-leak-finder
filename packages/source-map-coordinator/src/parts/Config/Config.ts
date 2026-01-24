@@ -3,7 +3,19 @@ import * as Root from '../Root/Root.ts'
 
 const cacheDir = join(Root.root, '.extension-source-maps-cache')
 
-export const getConfigs = () => {
+const platform = process.platform
+
+interface IConfig {
+  readonly extensionName: string
+  readonly repoUrl: string
+  readonly cacheDir: string
+  readonly buildScript: readonly string[]
+  readonly enabled: boolean
+  readonly modifications: readonly any[]
+  readonly platform: string
+}
+
+export const getConfigs = (): readonly IConfig[] => {
   return [
     {
       extensionName: 'vscode-js-debug',
@@ -12,6 +24,7 @@ export const getConfigs = () => {
       enabled: true,
       cacheDir,
       modifications: [],
+      platform,
     },
     {
       buildScript: ['npm', 'run', 'build'],
@@ -27,6 +40,7 @@ export const getConfigs = () => {
           replacement: "sourcemap: isDev ? 'linked' : 'linked'",
         },
       ],
+      platform,
     },
   ]
 }

@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { launchExtensionSourceMapWorker } from '../LaunchExtensionSourceMapWorker/LaunchExtensionSourceMapWorker.ts'
 import * as Root from '../Root/Root.ts'
+import { getConfigs } from '../Config/Config.ts'
 
 interface SourceMapUrlMap {
   [key: string]: number[]
@@ -20,12 +21,7 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Pr
 
   let extensionSourceMapWorker: any = null
 
-  const config = {
-    extensionName: 'vscode-js-debug',
-    repoUrl: 'git@github.com:microsoft/vscode-js-debug.git',
-    cacheDir: join(Root.root, '.extension-source-maps-cache'),
-    buildScript: [`npm`, `run`, `package`],
-  }
+  const configs = getConfigs()
 
   for (const [key, value] of Object.entries(sourceMapUrlMap)) {
     if (!key) {
@@ -41,7 +37,7 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Pr
 
       // Get the source map URL from the extension source maps worker
       // This will also extract the js-debug version and generate source maps if needed
-      const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', key, Root.root, config)
+      const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', key, Root.root, configs)
 
       if (sourceMapUrl) {
         // Add the source map URL to the cleaned map

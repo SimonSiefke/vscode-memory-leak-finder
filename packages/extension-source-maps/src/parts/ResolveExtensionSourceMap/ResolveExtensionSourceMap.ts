@@ -10,6 +10,7 @@ interface ResolveExtensionSourceMapConfig {
   readonly repoUrl: string
   readonly cacheDir: string
   readonly buildScript: readonly string[]
+  readonly moditications?: readonly any[]
 }
 
 /**
@@ -24,7 +25,7 @@ interface ResolveExtensionSourceMapConfig {
 export const resolveExtensionSourceMap = async (
   path: string,
   root: string | undefined,
-  config: ResolveExtensionSourceMapConfig,
+  configs: readonly ResolveExtensionSourceMapConfig[],
 ): Promise<string | null> => {
   const rootPath = root || Root.root
 
@@ -55,6 +56,11 @@ export const resolveExtensionSourceMap = async (
 
   // Generate source maps if this is a js-debug extension and version was found
   if (jsDebugVersion) {
+    const config = configs.find((c) => c.extensionName === 'vscode-js-debug')
+    if (!config) {
+      console.log(`[resolveExtensionSourceMap] No configuration found for vscode-js-debug.`)
+      return null
+    }
     const cacheDir = config.cacheDir
     console.log(`[resolveExtensionSourceMap] Generating source maps for ${config.extensionName} version ${jsDebugVersion}...`)
     try {
@@ -64,6 +70,7 @@ export const resolveExtensionSourceMap = async (
         repoUrl: config.repoUrl,
         version: jsDebugVersion,
         buildScript: config.buildScript,
+        platform,
       })
     } catch (error) {
       console.log(`[resolveExtensionSourceMap] Failed to generate source maps for ${config.extensionName} ${jsDebugVersion}:`, error)
