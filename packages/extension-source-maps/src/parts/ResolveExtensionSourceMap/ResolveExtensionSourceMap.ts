@@ -3,6 +3,7 @@ import * as ExtractJsDebugVersion from '../ExtractJsDebugVersion/ExtractJsDebugV
 import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
 import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSourceMapUrl.ts'
 import * as Root from '../Root/Root.ts'
+import * as Assert from '@lvce-editor/assert'
 
 interface ResolveExtensionSourceMapConfig {
   readonly extensionName: string
@@ -27,7 +28,9 @@ export const resolveExtensionSourceMap = async (
   root: string,
   configs: readonly ResolveExtensionSourceMapConfig[],
 ): Promise<string> => {
-  const rootPath = root || Root.root
+  Assert.string(path)
+  Assert.string(root)
+  Assert.array(configs)
 
   // Convert file:// URLs to paths (but not filenames that happen to start with "file:")
   // file:// URLs have at least 3 slashes (file:///) or a path after file:/
@@ -80,5 +83,5 @@ export const resolveExtensionSourceMap = async (
   }
 
   // Now resolve the source map URL with the version (if any)
-  return MapPathToSourceMapUrl.mapPathToSourceMapUrl(normalizedPath, rootPath, jsDebugVersion)
+  return MapPathToSourceMapUrl.mapPathToSourceMapUrl(normalizedPath, root, jsDebugVersion)
 }
