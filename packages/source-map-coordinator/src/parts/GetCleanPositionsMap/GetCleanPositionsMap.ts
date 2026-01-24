@@ -28,9 +28,7 @@ const reverseCleanSourceMapUrlMap = (cleanPositionsMap: any, reverseMap: any): a
 
 export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, classNames: boolean): Promise<CleanPositionMap> => {
   const platform = process.platform
-  console.log({ sourceMapUrlMap })
   const { cleanedSourceMapUrlMap, reverseMap } = await cleanSourceMapUrlMap(sourceMapUrlMap, platform)
-  console.log({ cleanedSourceMapUrlMap })
   await using sourceMapWorker = await launchSourceMapWorker()
   const cleanPositionMap: CleanPositionMap = Object.create(null)
   for (const [key, value] of Object.entries(cleanedSourceMapUrlMap)) {
