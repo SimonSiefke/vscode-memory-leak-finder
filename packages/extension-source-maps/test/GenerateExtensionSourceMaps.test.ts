@@ -100,6 +100,9 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
     extensionName,
     repoUrl,
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(cloneCalled).toBe(true)
@@ -186,6 +189,9 @@ test.skip('generateExtensionSourceMaps - finds commit and checks out', async () 
     extensionName,
     repoUrl,
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(findCommitCalled).toBe(true)
@@ -342,6 +348,9 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
     extensionName,
     repoUrl,
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(workflowCalls).toEqual([
@@ -427,6 +436,9 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
     extensionName,
     repoUrl,
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Finding commit for version ${version}...`)

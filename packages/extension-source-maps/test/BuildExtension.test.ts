@@ -119,7 +119,9 @@ test.skip('buildExtension - throws error when npm ci fails', async () => {
   }))
 
   const { buildExtension } = await import('../src/parts/BuildExtension/BuildExtension.ts')
-  await expect(buildExtension(repoPath, nodeVersion, 'linux', ['npm ci', 'npm run compile'])).rejects.toThrow('npm ci failed: npm ci failed')
+  await expect(buildExtension(repoPath, nodeVersion, 'linux', ['npm ci', 'npm run compile'])).rejects.toThrow(
+    'npm ci failed: npm ci failed',
+  )
 })
 
 test.skip('buildExtension - throws error when both compile and build fail', async () => {
@@ -180,7 +182,9 @@ test.skip('buildExtension - throws VError when exec throws', async () => {
   }))
 
   const { buildExtension } = await import('../src/parts/BuildExtension/BuildExtension.ts')
-  await expect(buildExtension(repoPath, nodeVersion, 'linux', ['npm ci', 'npm run compile'])).rejects.toThrow(`Failed to build extension in '${repoPath}'`)
+  await expect(buildExtension(repoPath, nodeVersion, 'linux', ['npm ci', 'npm run compile'])).rejects.toThrow(
+    `Failed to build extension in '${repoPath}'`,
+  )
 })
 
 test.skip('buildExtension - uses correct node version in commands', async () => {
@@ -226,5 +230,7 @@ test.skip('buildExtension - throws error when platform is win32', async () => {
   const nodeVersion = '18.0.0'
 
   const { buildExtension } = await import('../src/parts/BuildExtension/BuildExtension.ts')
-  await expect(buildExtension(repoPath, nodeVersion, 'win32', ['npm ci', 'npm run compile'])).rejects.toThrow('Windows is not supported for this operation')
+  await expect(buildExtension(repoPath, nodeVersion, 'win32', ['npm ci', 'npm run compile'])).rejects.toThrow(
+    'Windows is not supported for this operation',
+  )
 })
