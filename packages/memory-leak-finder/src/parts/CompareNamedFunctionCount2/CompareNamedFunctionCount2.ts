@@ -14,7 +14,11 @@ const addSourceLocations = async (functionObjects, scriptMap, connectionId) => {
       url: url,
     }
   })
-  const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(requests, classNames, connectionId)
+  const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(
+    requests,
+    classNames,
+    connectionId,
+  )
   const normalized = withOriginalStack.map((item) => {
     const { count, delta, name, originalName, originalStack, stack } = item
 
