@@ -33,8 +33,6 @@ export const generateExtensionSourceMaps = async ({
   const extensionId = `${extensionName}-${normalizedVersion}`
   const sourceMapsOutputPath = join(cacheDir, extensionId)
   if (existsSync(sourceMapsOutputPath)) {
-    const displayName = GetDisplayname.getDisplayname(extensionName)
-    console.log(`[extension-source-maps] Source maps for ${displayName} ${version} already exist, skipping...`)
     return
   }
 
