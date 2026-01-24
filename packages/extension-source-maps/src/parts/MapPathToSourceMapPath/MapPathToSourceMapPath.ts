@@ -33,21 +33,14 @@ const extractCopilot = (root: string, normalizedPath: string) => {
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, relativePath + '.map')
   return sourceMapPath
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
 const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: string) => {
   const extensionMatch = normalizedPath.match(JS_DEBUG_EXTENSION_PATH_REGEX)
   if (!extensionMatch) {
     return null
   }
   if (!jsDebugVersion) {
-<<<<<<< HEAD
     console.log('[extension-source-maps] jsDebugVersion not provided for js-debug extension')
-=======
-    console.log('[mapPathToSourceMapPath] jsDebugVersion not provided for js-debug extension')
->>>>>>> origin/main
     return null
   }
   const version = jsDebugVersion
@@ -74,19 +67,11 @@ export const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersio
   const normalizedPathInput = normalizePathSeparators(normalize(path))
   const looksAbsolute = isAbsolute(path) || normalizedPathInput.startsWith('/')
 
-<<<<<<< HEAD
   console.log('[extension-source-maps] path:', path)
   console.log('[extension-source-maps] root:', root)
   console.log('[extension-source-maps] normalizedRoot:', normalizedRoot)
   console.log('[extension-source-maps] normalizedPathInput:', normalizedPathInput)
   console.log('[extension-source-maps] looksAbsolute:', looksAbsolute)
-=======
-  console.log('[mapPathToSourceMapPath] path:', path)
-  console.log('[mapPathToSourceMapPath] root:', root)
-  console.log('[mapPathToSourceMapPath] normalizedRoot:', normalizedRoot)
-  console.log('[mapPathToSourceMapPath] normalizedPathInput:', normalizedPathInput)
-  console.log('[mapPathToSourceMapPath] looksAbsolute:', looksAbsolute)
->>>>>>> origin/main
 
   let normalizedPath = path
   if (looksAbsolute) {
@@ -112,7 +97,6 @@ export const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersio
       } catch {
         normalizedPath = relativePathResult
       }
-<<<<<<< HEAD
       console.log('[extension-source-maps] normalizedPath:', normalizedPath)
       // Ensure it starts with .vscode-extensions or contains extensions/ms-vscode.js-debug
       if (
@@ -127,16 +111,6 @@ export const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersio
       }
     } else {
       console.log('[extension-source-maps] normalizedPathInput does not start with normalizedRoot')
-=======
-      console.log('[mapPathToSourceMapPath] normalizedPath:', normalizedPath)
-      // Ensure it starts with .vscode-extensions
-      if (!normalizedPath.startsWith('.vscode-extensions')) {
-        console.log('[mapPathToSourceMapPath] normalizedPath does not start with .vscode-extensions')
-        return null
-      }
-    } else {
-      console.log('[mapPathToSourceMapPath] normalizedPathInput does not start with normalizedRoot')
->>>>>>> origin/main
       return null
     }
   } else {
