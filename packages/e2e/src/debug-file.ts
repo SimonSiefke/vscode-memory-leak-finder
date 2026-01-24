@@ -17,6 +17,7 @@ setInterval(()=>{
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('index.js')
   await Editor.open('index.js')
 }
@@ -27,4 +28,9 @@ export const run = async ({ ActivityBar, Explorer, RunAndDebug }: TestContext): 
   await RunAndDebug.startRunAndDebug()
   await RunAndDebug.stop()
   await Explorer.focus()
+}
+
+export const teardown = async ({ SideBar, Editor }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+  await SideBar.hide()
 }
