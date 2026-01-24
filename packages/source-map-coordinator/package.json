@@ -1,12 +1,15 @@
 {
-  "name": "@vscode-memory-leak-finder/source-map-worker",
+  "name": "@vscode-memory-leak-finder/source-map-coordinator",
   "version": "0.0.0-dev",
   "license": "MIT",
   "type": "module",
-  "main": "src/sourceMapWorkerMain.ts",
+  "main": "src/main.ts",
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@lvce-editor/rpc": "^5.4.0",
+    "@lvce-editor/verror": "^1.7.0"
+  }
 }

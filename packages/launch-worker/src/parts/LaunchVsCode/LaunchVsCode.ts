@@ -164,6 +164,7 @@ export const launchVsCode = async ({
     return {
       child,
       pid,
+      binaryPath,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch VSCode`)
