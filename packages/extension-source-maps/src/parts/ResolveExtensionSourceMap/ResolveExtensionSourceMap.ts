@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
 import { root } from '../Root/Root.ts'
+import { fileURLToPath } from 'node:url'
 
 interface ResolveExtensionSourceMapConfig {
   readonly extensionName: string
@@ -15,9 +16,9 @@ interface ResolveExtensionSourceMapConfig {
   readonly pathReplacements: readonly any[]
 }
 
-const resolveVersion = (extensionpath: string) => {
-  const packageJsonPath = join(extensionpath, 'package.json')
-  console.log({ extensionpath })
+const resolveVersion = (extensionPath: string) => {
+  const packageJsonPath = join(extensionPath, 'package.json')
+  console.log({ extensionpath: extensionPath })
   if (!existsSync(packageJsonPath)) {
     throw new Error(`package json not found`)
   }
@@ -53,8 +54,9 @@ export const resolveExtensionSourceMap = async (
     if (index === -1) {
       continue
     }
-    const extensionFolder = uri.slice(0, index + config.match.length)
-    const version = resolveVersion(extensionFolder)
+    const extensionFolderUri = uri.slice(0, index + config.match.length - 1)
+    const extensionsFolder = fileURLToPath(extensionFolderUri)
+    const version = resolveVersion(extensionsFolder)
     await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
       cacheDir: config.cacheDir,
       extensionName: config.extensionName,
