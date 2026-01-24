@@ -1,11 +1,9 @@
 import { join } from 'node:path'
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
-import * as FunctionTrackerState from '../FunctionTrackerState/FunctionTrackerState.ts'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
-import * as LaunchFunctionTrackerWorker from '../LaunchFunctionTrackerWorker/LaunchFunctionTrackerWorker.ts'
 import * as Root from '../Root/Root.ts'
 
 export interface LaunchOptions {

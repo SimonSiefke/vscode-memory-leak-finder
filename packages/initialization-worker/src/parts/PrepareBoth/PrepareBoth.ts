@@ -1,5 +1,4 @@
 import type { MessagePort } from 'node:worker_threads'
-import { join } from 'node:path'
 import { connectDevtools } from '../ConnectDevtools/ConnectDevtools.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
@@ -9,7 +8,6 @@ import * as FunctionTrackerState from '../FunctionTrackerState/FunctionTrackerSt
 import * as LaunchFunctionTrackerWorker from '../LaunchFunctionTrackerWorker/LaunchFunctionTrackerWorker.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
-import * as Root from '../Root/Root.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
@@ -27,7 +25,25 @@ export const prepareBoth = async (
   measureId: string,
   pid: number,
   preGeneratedWorkbenchPath: string | null,
+  binaryPath: string | null,
 ): Promise<any> => {
+  // Launch function-tracker worker BEFORE PrepareBoth if tracking is enabled
+  // This ensures the socket server is ready when the protocol interceptor is injected
+  let functionTrackerRpc: Awaited<ReturnType<typeof LaunchFunctionTrackerWorker.launchFunctionTrackerWorker>> | null = null
+  if (trackFunctions && binaryPath) {
+    functionTrackerRpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
+    // Store in state so we can access it later to get statistics
+    FunctionTrackerState.setFunctionTrackerRpc(functionTrackerRpc)
+
+    // Pre-generate workbench.desktop.main.js to avoid memory issues
+    console.log(`[Launch] Pre-generating workbench.desktop.main.js from ${binaryPath} to ${preGeneratedWorkbenchPath}`)
+    await functionTrackerRpc.invoke('FunctionTracker.preGenerateWorkbench', binaryPath, preGeneratedWorkbenchPath)
+    console.log(`[Launch] Successfully pre-generated workbench.desktop.main.js`)
+
+    // Wait a bit for socket server to be ready
+    await new Promise((resolve) => setTimeout(resolve, 100))
+  }
+
   const stream = new PortReadStream(port)
   const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(stream)
 
