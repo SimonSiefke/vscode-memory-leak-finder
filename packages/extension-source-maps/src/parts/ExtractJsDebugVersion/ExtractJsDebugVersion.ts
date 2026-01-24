@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const JS_DEBUG_EXTENSION_PATH_REGEX = /\.vscode-extensions\/ms-vscode\.js-debug\/(.+)$/
+const JS_DEBUG_EXTENSION_PATH_REGEX = /extensions\/ms-vscode\.js-debug\/(.+)$/
 const VERSION_REGEX = /^(\d+\.\d+\.\d+)/
 const DIRECTORY_VERSION_REGEX = /extensions\/ms-vscode\.js-debug-(\d+\.\d+\.\d+)/
 

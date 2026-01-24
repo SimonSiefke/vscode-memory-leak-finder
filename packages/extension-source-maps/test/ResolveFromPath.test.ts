@@ -150,6 +150,18 @@ test('resolveFromPath - returns empty object for path without source map', async
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/other-extension/dist/extension.js:917:1277')
 
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
+  })
+
   const result = await ResolveFromPath.resolveFromPath([path])
 
   expect(result).toHaveLength(1)
@@ -161,15 +173,28 @@ test('resolveFromPath - handles js-debug extension path', async () => {
   const path = join(root, '.vscode-extensions/ms-vscode.js-debug/src/extension.js:10:1268')
 
   const sourceMapUrl = join(root, '.extension-source-maps-cache', 'vscode-js-debug-1.105.0', 'dist/src/extension.js.map')
-  mockInvoke.mockResolvedValueOnce({
-    [sourceMapUrl]: [
-      {
-        line: 5,
-        column: 100,
-        source: 'src/extension.ts',
-        name: 'activate',
-      },
-    ],
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...params: readonly any[]) => {
+      if (method === 'SourceMap.getCleanPositionsMap') {
+        return {
+          [sourceMapUrl]: [
+            {
+              line: 5,
+              column: 100,
+              source: 'src/extension.ts',
+              name: 'activate',
+            },
+          ],
+        }
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  mockLaunchSourceMapWorker.mockReturnValue({
+    invoke: mockRpc.invoke.bind(mockRpc),
+    async [Symbol.asyncDispose]() {},
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
