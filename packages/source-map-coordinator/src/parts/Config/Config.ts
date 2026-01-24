@@ -4,13 +4,14 @@ import * as Root from '../Root/Root.ts'
 const cacheDir = join(Root.root, '.extension-source-maps-cache')
 
 interface IConfig {
-  readonly extensionName: string
-  readonly repoUrl: string
-  readonly cacheDir: string
   readonly buildScript: readonly string[]
+  readonly cacheDir: string
   readonly enabled: boolean
+  readonly extensionName: string
+  readonly friendlyName: string
   readonly modifications: readonly any[]
   readonly platform: string
+  readonly repoUrl: string
 }
 
 export const getConfigs = (platform: string): readonly IConfig[] => {
@@ -23,8 +24,10 @@ export const getConfigs = (platform: string): readonly IConfig[] => {
       cacheDir,
       modifications: [],
       platform,
+      friendlyName: 'js-debug',
     },
     {
+      friendlyName: 'github-copilot-chat',
       buildScript: ['npm', 'run', 'build'],
       cacheDir,
       extensionName: 'copilot-chat',
