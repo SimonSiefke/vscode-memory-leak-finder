@@ -24,7 +24,7 @@ interface ResolveExtensionSourceMapConfig {
  */
 export const resolveExtensionSourceMap = async (
   path: string,
-  root: string | undefined,
+  root: string,
   configs: readonly ResolveExtensionSourceMapConfig[],
 ): Promise<string> => {
   const rootPath = root || Root.root
