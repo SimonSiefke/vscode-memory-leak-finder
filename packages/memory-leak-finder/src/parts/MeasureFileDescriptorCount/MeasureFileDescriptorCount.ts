@@ -1,7 +1,6 @@
 import type { ProcessInfo } from '../GetFileDescriptorCount/GetFileDescriptorCount.ts'
 import * as CompareFileDescriptorCount from '../CompareFileDescriptorCount/CompareFileDescriptorCount.ts'
 import * as GetFileDescriptorCount from '../GetFileDescriptorCount/GetFileDescriptorCount.ts'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 export const id = MeasureId.FileDescriptorCount
