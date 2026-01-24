@@ -3,7 +3,7 @@ import * as DeduplicateEventListeners from '../DeduplicateEventListeners/Dedupli
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
-export const compareEventListeners = async (before, after) => {
+export const compareEventListeners = async (before, after, context) => {
   const leaked = CompareMapLeak.compareMapLeak(before, after, GetEventListenerKey.getEventListenerKey)
   if (leaked.length === 0) {
     return []
@@ -13,6 +13,7 @@ export const compareEventListeners = async (before, after) => {
   const cleanLeakedEventListeners = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(
     deduplicatedEventListeners,
     classNames,
+    context.connectionId,
   )
   return cleanLeakedEventListeners
 }
