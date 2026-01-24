@@ -36,8 +36,9 @@ export const connectDevtools = async (
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    resolveExtensionSourceMaps,
   )
 
-  const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid)
+  const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid, resolveExtensionSourceMaps)
   MemoryLeakFinderState.set(connectionId, { measure, pid, rpc: measureRpc })
 }
