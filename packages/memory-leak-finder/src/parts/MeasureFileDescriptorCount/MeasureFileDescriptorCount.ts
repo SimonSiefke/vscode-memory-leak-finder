@@ -1,5 +1,5 @@
 import type { ProcessInfo } from '../GetFileDescriptorCount/GetFileDescriptorCount.ts'
-import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as CompareFileDescriptorCount from '../CompareFileDescriptorCount/CompareFileDescriptorCount.ts'
 import * as GetFileDescriptorCount from '../GetFileDescriptorCount/GetFileDescriptorCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
@@ -22,6 +22,8 @@ export const stop = async (pid: number): Promise<ProcessInfo[]> => {
   return await GetFileDescriptorCount.getFileDescriptorCountForProcess(pid)
 }
 
-export const compare = CompareCount.compareCount
+export const compare = CompareFileDescriptorCount.compareFileDescriptorCount
 
-export const isLeak = IsLeakCount.isLeakCount
+export const isLeak = (result: readonly any[]) => {
+  return result.length > 0
+}
