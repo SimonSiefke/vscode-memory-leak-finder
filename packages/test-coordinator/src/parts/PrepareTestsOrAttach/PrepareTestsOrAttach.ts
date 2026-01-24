@@ -32,6 +32,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly inspectSharedProcessPort: number
   readonly measureId: string
   readonly measureNode: boolean
+  readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
@@ -39,7 +40,6 @@ export interface PrepareTestsAndAttachOptions {
   readonly screencastQuality: number
   readonly timeouts: any
   readonly trackFunctions: boolean
-  readonly openDevtools: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -70,6 +70,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectSharedProcessPort,
     measureId,
     measureNode,
+    openDevtools,
     pageObjectPath,
     platform,
     recordVideo,
@@ -77,7 +78,6 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     screencastQuality,
     timeouts,
     trackFunctions,
-    openDevtools,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -106,13 +106,13 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       inspectSharedProcess,
       inspectSharedProcessPort,
       measureId,
+      openDevtools,
       pageObjectPath,
       platform,
       recordVideo,
       runMode,
       timeouts,
       trackFunctions,
-      openDevtools,
       updateUrl,
       useProxyMock,
       vscodePath,

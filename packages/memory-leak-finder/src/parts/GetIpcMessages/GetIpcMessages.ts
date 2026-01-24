@@ -1,6 +1,6 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import type { Session } from '../Session/Session.ts'
 import * as CleanIpcMessages from '../CleanIpcMessages/CleanIpcMessages.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export const getIpcMessages = async (session: Session): Promise<any> => {
   const result = await DevtoolsProtocolRuntime.evaluate(session, {

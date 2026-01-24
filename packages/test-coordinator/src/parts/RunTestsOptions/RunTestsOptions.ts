@@ -26,6 +26,7 @@ export interface RunTestsOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
@@ -39,7 +40,6 @@ export interface RunTestsOptions {
   readonly timeoutBetween: number
   readonly timeouts: any
   readonly trackFunctions: boolean
-  readonly openDevtools: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string

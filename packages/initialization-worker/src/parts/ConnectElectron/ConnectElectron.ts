@@ -1,7 +1,7 @@
+import type { RpcConnection } from '../RpcConnection/RpcConnection.ts'
 import { applyMonkeyPatches } from '../ApplyMonkeyPatches/ApplyMonkeyPatches.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import type { RpcConnection } from '../RpcConnection/RpcConnection.ts'
 import { VError } from '../VError/VError.ts'
 
 const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {

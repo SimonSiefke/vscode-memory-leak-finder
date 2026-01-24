@@ -1,25 +1,25 @@
+import { normalize, resolve, isAbsolute } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import type { Session } from '../Session/Session.ts'
 import * as FindMatchingSourceMap from '../FindMatchingSourceMap/FindMatchingSourceMap.ts'
 import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.ts'
-import { fileURLToPath } from 'node:url'
-import { normalize, resolve, isAbsolute } from 'node:path'
 
 export interface TrackedFunctionResult {
-  readonly functionName: string
-  readonly totalCount: number
   readonly delta: number
-  readonly originalLocation?: string | null
-  readonly originalLine?: number | null
+  readonly functionName: string
   readonly originalColumn?: number | null
-  readonly originalSource?: string | null
+  readonly originalLine?: number | null
+  readonly originalLocation?: string | null
   readonly originalName?: string | null
+  readonly originalSource?: string | null
+  readonly totalCount: number
 }
 
 interface ParsedFunctionName {
+  readonly column: number | null
+  readonly line: number | null
   readonly name: string
   readonly url: string | null
-  readonly line: number | null
-  readonly column: number | null
 }
 
 const parseFunctionName = (functionName: string): ParsedFunctionName => {
@@ -250,16 +250,11 @@ export const compareTrackedFunctions = async (
   _context: Session,
 ): Promise<readonly TrackedFunctionResult[]> => {
   // Handle both old format (Record<string, number>) and new format (object with trackedFunctions and scriptMap)
-  const beforeFunctions =
-    typeof before === 'object' && before !== null && 'trackedFunctions' in before
-      ? before.trackedFunctions
-      : (before as Record<string, number>)
+  const beforeFunctions = typeof before === 'object' && before !== null && 'trackedFunctions' in before ? before.trackedFunctions : before
   const afterData =
-    typeof after === 'object' && after !== null && 'trackedFunctions' in after
-      ? after
-      : { trackedFunctions: after as Record<string, number>, scriptMap: undefined }
+    typeof after === 'object' && after !== null && 'trackedFunctions' in after ? after : { scriptMap: undefined, trackedFunctions: after }
   const afterFunctions = afterData.trackedFunctions
-  const scriptMap = afterData.scriptMap
+  const { scriptMap } = afterData
 
   let results: TrackedFunctionResult[] = []
 
@@ -267,7 +262,7 @@ export const compareTrackedFunctions = async (
   const allFunctionNames = new Set([...Object.keys(beforeFunctions), ...Object.keys(afterFunctions)])
 
   // Log a few original functionNames from statistics to see their format
-  const sampleFunctionNames = Array.from(allFunctionNames).slice(0, 3)
+  const sampleFunctionNames = [...allFunctionNames].slice(0, 3)
   for (const fn of sampleFunctionNames) {
     console.log(`[CompareTrackedFunctions] Sample functionName from statistics:`, fn)
   }
@@ -280,9 +275,9 @@ export const compareTrackedFunctions = async (
 
     if (delta > 0) {
       results.push({
+        delta,
         functionName,
         totalCount: afterCount,
-        delta,
       })
     }
   }
@@ -341,7 +336,7 @@ export const compareTrackedFunctions = async (
         // Use the original column from parsing - it was tracked, so we have it
         if (actualUrl && script) {
           // The column was tracked and is in the original functionName, use it directly
-          const column = originalColumn !== null ? originalColumn : 0
+          const column = originalColumn === null ? 0 : originalColumn
           // If the original name was just "scriptId:line:column", show it as "anonymous" or just the location
           // Otherwise, keep the original name
           const displayName = parsed.name === result.functionName && SCRIPT_ID_PATTERN.test(parsed.name) ? 'anonymous' : parsed.name
@@ -367,7 +362,7 @@ export const compareTrackedFunctions = async (
           // If it's 0 (1-based), use 0 (0-based) - start of line
           const column = parsed.column !== null && parsed.column > 0 ? parsed.column - 1 : 0
           sourceMapUrlToPositions[sourceMapUrl].push(line, column)
-          positionPointers.push({ index: i, sourceMapUrl, parsed })
+          positionPointers.push({ index: i, parsed, sourceMapUrl })
         } else {
           console.log(`[CompareTrackedFunctions] Script not found in scriptMap for ${parsed.url}`)
           // Keep the minified location in functionName, no originalLocation
@@ -415,7 +410,7 @@ export const compareTrackedFunctions = async (
             // Build the original location string - always include both line and column when we have source and line
             if (original.source && original.line !== null) {
               // Always include column (default to 0 if not available)
-              const column = original.column !== null ? original.column : 0
+              const column = original.column === null ? 0 : original.column
               originalLocation = `${original.source}:${original.line}:${column}`
             }
             // If we don't have both source and line, don't set originalLocation (keep it null)
@@ -438,11 +433,11 @@ export const compareTrackedFunctions = async (
           results[pointer.index] = {
             ...result,
             functionName: updatedFunctionName,
-            originalLocation,
-            originalLine,
             originalColumn,
-            originalSource,
+            originalLine,
+            originalLocation,
             originalName,
+            originalSource,
           }
         }
       } catch (error) {
