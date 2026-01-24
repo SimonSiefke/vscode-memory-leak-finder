@@ -17,6 +17,7 @@ export const startWorker = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   pid: number,
+  resolveExtensionSourceMaps: boolean,
 ) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await NodeWorkerRpcParent.create({

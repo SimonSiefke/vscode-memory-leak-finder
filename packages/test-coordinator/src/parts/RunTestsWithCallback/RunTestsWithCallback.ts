@@ -63,6 +63,7 @@ export const runTestsWithCallback = async ({
   pageObjectPath,
   platform,
   recordVideo,
+  resolveExtensionSourceMaps,
   restartBetween,
   root,
   runMode,
