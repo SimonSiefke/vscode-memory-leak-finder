@@ -24,6 +24,9 @@ test.skip('generateExtensionSourceMaps - skips when source maps already exist', 
     extensionName,
     repoUrl: 'git@github.com:test/repo.git',
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(existsSync(sourceMapsOutputPath)).toBe(true)
@@ -238,6 +241,9 @@ test.skip('generateExtensionSourceMaps - throws error when checkout fails', asyn
       extensionName,
       repoUrl,
       version,
+      platform: 'linux',
+      buildScript: ['npm ci', 'npm run compile'],
+      modifications: [],
     }),
   ).rejects.toThrow('Failed to checkout commit abc123: checkout failed')
 
