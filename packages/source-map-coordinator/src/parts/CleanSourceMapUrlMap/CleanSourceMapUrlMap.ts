@@ -16,12 +16,10 @@ const isExtensionFile = (url: string): boolean => {
  * Extension files (containing ms-vscode.js-debug) are processed by the extension-source-maps worker,
  * while normal files are processed by the regular source-map-worker.
  */
-export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Promise<SourceMapUrlMap> => {
+export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap, platform: string): Promise<SourceMapUrlMap> => {
   const cleanedSourceMapUrlMap: SourceMapUrlMap = Object.create(null)
 
   let extensionSourceMapWorker: any = null
-
-  const platform = process.platform
 
   const configs = getConfigs(platform)
 

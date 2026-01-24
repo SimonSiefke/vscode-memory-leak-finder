@@ -13,7 +13,8 @@ interface CleanPositionMap {
 }
 
 export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, classNames: boolean): Promise<CleanPositionMap> => {
-  const cleanedSourceMapUrlMap = await cleanSourceMapUrlMap(sourceMapUrlMap)
+  const platform = process.platform
+  const cleanedSourceMapUrlMap = await cleanSourceMapUrlMap(sourceMapUrlMap, platform)
   await using sourceMapWorker = await launchSourceMapWorker()
   const cleanPositionMap: CleanPositionMap = Object.create(null)
   for (const [key, value] of Object.entries(cleanedSourceMapUrlMap)) {
