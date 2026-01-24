@@ -7,10 +7,10 @@ const JS_DEBUG_EXTENSION_PATH_REGEX = /extensions\/ms-vscode\.js-debug\/(.+)$/
  * Extract js-debug version from a path by reading package.json
  * Example: .vscode-extensions/ms-vscode.js-debug/dist/extension.js -> reads package.json to get version
  */
-export const extractJsDebugVersionFromPath = (path: string): string | null => {
+export const extractJsDebugVersion = (path: string): string => {
   const match = path.match(JS_DEBUG_EXTENSION_PATH_REGEX)
   if (!match || match.index === undefined) {
-    return null
+    return ''
   }
 
   const matchIndex = match.index
@@ -19,7 +19,7 @@ export const extractJsDebugVersionFromPath = (path: string): string | null => {
 
   if (!existsSync(packageJsonPath)) {
     console.log(`[extractJsDebugVersion] Package.json not found at: ${packageJsonPath}`)
-    return null
+    return ''
   }
 
   try {
@@ -33,16 +33,9 @@ export const extractJsDebugVersionFromPath = (path: string): string | null => {
     }
 
     console.log(`[extractJsDebugVersion] No valid version found in package.json`)
-    return null
+    return ''
   } catch (error) {
     console.log(`[extractJsDebugVersion] Error reading package.json:`, error)
-    return null
+    return ''
   }
-}
-
-/**
- * Extract js-debug version from a path by reading package.json
- */
-export const extractJsDebugVersion = (path: string): string | null => {
-  return extractJsDebugVersionFromPath(path)
 }

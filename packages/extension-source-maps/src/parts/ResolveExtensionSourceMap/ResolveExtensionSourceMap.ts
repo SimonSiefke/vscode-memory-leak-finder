@@ -80,5 +80,5 @@ export const resolveExtensionSourceMap = async (
   }
 
   // Now resolve the source map URL with the version (if any)
-  return MapPathToSourceMapUrl.mapPathToSourceMapUrl(normalizedPath, rootPath, jsDebugVersion ?? undefined)
+  return MapPathToSourceMapUrl.mapPathToSourceMapUrl(normalizedPath, rootPath, jsDebugVersion)
 }

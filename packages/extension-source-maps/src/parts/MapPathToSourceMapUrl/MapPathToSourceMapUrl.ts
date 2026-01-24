@@ -122,7 +122,7 @@ const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion?: str
   return extractCopilot(root, normalizedPath) || extractJsDebug(root, normalizedPath, jsDebugVersion)
 }
 
-export const mapPathToSourceMapUrl = (path: string, root: string, jsDebugVersion?: string): string => {
+export const mapPathToSourceMapUrl = (path: string, root: string, jsDebugVersion: string): string => {
   if (!path) {
     return ''
   }
