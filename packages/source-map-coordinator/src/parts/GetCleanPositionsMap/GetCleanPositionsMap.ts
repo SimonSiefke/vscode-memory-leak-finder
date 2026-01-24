@@ -1,8 +1,12 @@
+import { dirname, join, resolve } from 'path'
+import { fileURLToPath } from 'url'
 import { cleanSourceMapUrlMap } from '../CleanSourceMapUrlMap/CleanSourceMapUrlMap.ts'
 import * as GetCleanPosition from '../GetCleanPosition/GetCleanPosition.ts'
 import * as Hash from '../Hash/Hash.ts'
 import { launchSourceMapWorker } from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 import * as LoadSourceMap from '../LoadSourceMap/LoadSourceMap.ts'
+import { root } from '../Root/Root.ts'
+import { getOriginalPositions } from '../GetOriginalPositions/GetOriginalPositions.ts'
 
 interface SourceMapUrlMap {
   [key: string]: number[]
@@ -26,6 +30,20 @@ const reverseCleanSourceMapUrlMap = (cleanPositionsMap: any, reverseMap: any): a
   return result
 }
 
+const getExtensionSourceMapDir = (sourceMapUrl: string): string | null => {
+  if (!sourceMapUrl.includes('.extension-source-maps-cache')) {
+    return null
+  }
+  try {
+    const sourceMapPath = fileURLToPath(sourceMapUrl)
+    // Get the directory containing the source map file
+    // This allows relative paths in the source map to resolve correctly
+    return dirname(sourceMapPath)
+  } catch {
+    return null
+  }
+}
+
 export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, classNames: boolean): Promise<CleanPositionMap> => {
   const platform = process.platform
   const { cleanedSourceMapUrlMap, reverseMap } = await cleanSourceMapUrlMap(sourceMapUrlMap, platform)
@@ -36,10 +54,7 @@ export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, cla
       cleanPositionMap[key] = []
       continue
     }
-    const hash = Hash.hash(key)
-    const sourceMap = await LoadSourceMap.loadSourceMap(key, hash)
-    const originalPositions = await sourceMapWorker.invoke('SourceMap.getCleanPositionsMap2', sourceMap, value, classNames, hash, key)
-    const cleanPositions = originalPositions.map(GetCleanPosition.getCleanPosition)
+    const cleanPositions = await getOriginalPositions(sourceMapWorker, key, value, classNames)
     cleanPositionMap[key] = cleanPositions
   }
   const finalResult = reverseCleanSourceMapUrlMap(cleanPositionMap, reverseMap)
