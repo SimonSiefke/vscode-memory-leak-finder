@@ -41,7 +41,6 @@ const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: s
     return null
   }
   if (!jsDebugVersion) {
-    console.log('[extension-source-maps] jsDebugVersion not provided for js-debug extension')
     return null
   }
   const version = jsDebugVersion
@@ -68,12 +67,6 @@ const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion?: str
   const normalizedPathInput = normalizePathSeparators(normalize(path))
   const looksAbsolute = isAbsolute(path) || normalizedPathInput.startsWith('/')
 
-  console.log('[extension-source-maps] path:', path)
-  console.log('[extension-source-maps] root:', root)
-  console.log('[extension-source-maps] normalizedRoot:', normalizedRoot)
-  console.log('[extension-source-maps] normalizedPathInput:', normalizedPathInput)
-  console.log('[extension-source-maps] looksAbsolute:', looksAbsolute)
-
   let normalizedPath = path
   if (looksAbsolute) {
     // Normalize both paths for comparison (handle Windows backslashes and cross-platform roots)
@@ -98,7 +91,6 @@ const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion?: str
       } catch {
         normalizedPath = relativePathResult
       }
-      console.log('[extension-source-maps] normalizedPath:', normalizedPath)
       // Ensure it starts with .vscode-extensions or contains extensions/ms-vscode.js-debug
       if (
         !normalizedPath.startsWith('.vscode-extensions') &&
@@ -111,7 +103,6 @@ const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion?: str
         return null
       }
     } else {
-      console.log('[extension-source-maps] normalizedPathInput does not start with normalizedRoot')
       return null
     }
   } else {

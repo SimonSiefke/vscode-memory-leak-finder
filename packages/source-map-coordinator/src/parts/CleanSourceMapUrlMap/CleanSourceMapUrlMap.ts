@@ -35,6 +35,7 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap, pla
 
       const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', key, Root.root, configs)
 
+      console.log({ sourceMapUrl })
       if (sourceMapUrl) {
         cleanedSourceMapUrlMap[sourceMapUrl] = value
       } else {
