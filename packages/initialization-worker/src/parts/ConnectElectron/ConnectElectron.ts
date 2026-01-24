@@ -7,12 +7,8 @@ import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyP
 import * as MonkeyPatchElectronIpcMain from '../MonkeyPatchElectronScript/MonkeyPatchElectronIpcMain.ts'
 import { protocolInterceptorScript } from '../ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
 import { VError } from '../VError/VError.ts'
-
-interface RpcConnection {
-  dispose(): Promise<void>
-  invoke(method: string, params?: unknown): Promise<unknown>
-  once(event: string): Promise<{ params: { callFrames: Array<{ callFrameId: string }> } }>
-}
+import { applyMonkeyPatches } from '../ApplyMonkeyPatches/ApplyMonkeyPatches.ts'
+import { RpcConnection } from '../RpcConnection/RpcConnection.ts'
 
 const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {
   try {
@@ -59,61 +55,22 @@ export const connectElectron = async (
   const electronObjectId = electron.result.result.objectId
   const requireObjectId = require.result.result.objectId
 
-  // TODO headlessmode
-
-  const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
-    objectId: electronObjectId,
-  })
-
-  if (measureId && (measureId === 'ipcMessageCount' || measureId === 'ipcmessagecount')) {
-    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: MonkeyPatchElectronIpcMain.monkeyPatchElectronIpcMain,
-      objectId: electronObjectId,
-    })
-  }
-
-  if (headlessMode) {
-    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: monkeyPatchElectronHeadlessMode,
-      objectId: electronObjectId,
-    })
-  }
-
-  await Promise.all([
-    MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
-    MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
-  ])
-
-  if (trackFunctions) {
-    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: protocolInterceptorScript(port, preGeneratedWorkbenchPath),
-      objectId: electronObjectId,
-    })
-  }
-
-  if (openDevtools) {
-    const openDevtoolsScript = `(function () {
-      const electron = globalThis._____electron
-      const { BrowserWindow } = electron
-      const intervalId = setInterval(() => {
-        const focusedWindow = BrowserWindow.getFocusedWindow()
-        if (focusedWindow) {
-          clearInterval(intervalId)
-          focusedWindow.webContents.openDevTools()
-        }
-      }, 100)
-    })()`
-    await DevtoolsProtocolRuntime.evaluate(electronRpc, {
-      expression: openDevtoolsScript,
-      awaitPromise: false,
-    })
-  }
+  const monkeyPatchedElectronId = await applyMonkeyPatches(
+    electronRpc,
+    electronObjectId,
+    requireObjectId,
+    headlessMode,
+    trackFunctions,
+    openDevtools,
+    port,
+    preGeneratedWorkbenchPath,
+    measureId,
+  )
 
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
   return {
     electronObjectId,
-    monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
+    monkeyPatchedElectronId: monkeyPatchedElectronId,
   }
 }

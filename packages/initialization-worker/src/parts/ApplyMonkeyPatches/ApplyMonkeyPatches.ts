@@ -1,19 +1,12 @@
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
-import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally/MakeElectronAvailableGlobally.ts'
 import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
 import { monkeyPatchElectronHeadlessMode } from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.ts'
-import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import * as MonkeyPatchElectronIpcMain from '../MonkeyPatchElectronScript/MonkeyPatchElectronIpcMain.ts'
-import { protocolInterceptorScript } from '../ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
-import { VError } from '../VError/VError.ts'
+import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { openDevtoolsScript } from '../OpenDevtoolsScript/OpenDevtoolsScript.ts'
-
-interface RpcConnection {
-  dispose(): Promise<void>
-  invoke(method: string, params?: unknown): Promise<unknown>
-  once(event: string): Promise<{ params: { callFrames: Array<{ callFrameId: string }> } }>
-}
+import { protocolInterceptorScript } from '../ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
+import { RpcConnection } from '../RpcConnection/RpcConnection.ts'
 
 export const applyMonkeyPatches = async (
   electronRpc: RpcConnection,
@@ -25,7 +18,7 @@ export const applyMonkeyPatches = async (
   port: number,
   preGeneratedWorkbenchPath: string | null,
   measureId?: string,
-) => {
+): Promise<string> => {
   // TODO do this in parallel
 
   const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
@@ -66,10 +59,5 @@ export const applyMonkeyPatches = async (
     })
   }
 
-  await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
-
-  return {
-    electronObjectId,
-    monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
-  }
+  return monkeyPatchedElectron.objectId
 }
