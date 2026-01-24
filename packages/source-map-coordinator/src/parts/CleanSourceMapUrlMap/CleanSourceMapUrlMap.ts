@@ -32,7 +32,8 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Pr
       }
 
       // Get the source map URL from the extension source maps worker
-      const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.mapPathToSourceMapUrl', key, process.cwd())
+      // This will also extract the js-debug version and generate source maps if needed
+      const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', key, process.cwd())
 
       if (sourceMapUrl) {
         // Add the source map URL to the cleaned map

@@ -33,6 +33,7 @@ const extractCopilot = (root: string, normalizedPath: string) => {
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, relativePath + '.map')
   return sourceMapPath
 }
+
 const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: string) => {
   const extensionMatch = normalizedPath.match(JS_DEBUG_EXTENSION_PATH_REGEX)
   if (!extensionMatch) {
