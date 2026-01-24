@@ -1,64 +1,44 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
 
 const JS_DEBUG_EXTENSION_PATH_REGEX = /extensions\/ms-vscode\.js-debug\/(.+)$/
-const VERSION_REGEX = /^(\d+\.\d+\.\d+)/
-const DIRECTORY_VERSION_REGEX = /extensions\/ms-vscode\.js-debug-(\d+\.\d+\.\d+)/
 
 /**
  * Extract js-debug version from a path by reading package.json
  * Example: .vscode-extensions/ms-vscode.js-debug/dist/extension.js -> reads package.json to get version
  */
-export const extractJsDebugVersionFromPath = (path: string, vscodeInsidersPath?: string): string | null => {
+export const extractJsDebugVersionFromPath = (path: string): string | null => {
   const match = path.match(JS_DEBUG_EXTENSION_PATH_REGEX)
   if (!match) {
     return null
   }
 
-  // If we have a vscodeInsidersPath, read the package.json to get the version
-  if (vscodeInsidersPath) {
-    const packageJsonPath = join(vscodeInsidersPath, 'resources', 'app', 'extensions', 'ms-vscode.js-debug', 'package.json')
+  // Resolve package.json path from the given path
+  // The package.json should be in the ms-vscode.js-debug directory
+  const jsDebugDir = dirname(path)
+  const packageJsonPath = join(jsDebugDir, 'package.json')
 
-    if (!existsSync(packageJsonPath)) {
-      console.log(`[extractJsDebugVersion] Package.json not found at: ${packageJsonPath}`)
-      return null
+  if (!existsSync(packageJsonPath)) {
+    console.log(`[extractJsDebugVersion] Package.json not found at: ${packageJsonPath}`)
+    return null
+  }
+
+  try {
+    const packageJsonContent = readFileSync(packageJsonPath, 'utf-8')
+    const packageJson = JSON.parse(packageJsonContent)
+    const version = packageJson.version
+
+    if (version && typeof version === 'string') {
+      console.log(`[extractJsDebugVersion] Found version ${version} in package.json`)
+      return version
     }
 
-    try {
-      const packageJsonContent = readFileSync(packageJsonPath, 'utf-8')
-      const packageJson = JSON.parse(packageJsonContent)
-      const version = packageJson.version
-
-      if (version && typeof version === 'string') {
-        console.log(`[extractJsDebugVersion] Found version ${version} in package.json`)
-        return version
-      }
-
-      console.log(`[extractJsDebugVersion] No valid version found in package.json`)
-      return null
-    } catch (error) {
-      console.log(`[extractJsDebugVersion] Error reading package.json:`, error)
-      return null
-    }
+    console.log(`[extractJsDebugVersion] No valid version found in package.json`)
+    return null
+  } catch (error) {
+    console.log(`[extractJsDebugVersion] Error reading package.json:`, error)
+    return null
   }
-
-  // Fallback to extracting from path if no vscodeInsidersPath provided
-  const relativePath = match[1]
-
-  // Extract version from path like: 1.105.0/dist/extension.js
-  // or from directory name like: ms-vscode.js-debug-1.105.0/dist/extension.js
-  const versionMatch = relativePath.match(VERSION_REGEX)
-  if (versionMatch) {
-    return versionMatch[1]
-  }
-
-  // Try to extract from directory name pattern: ms-vscode.js-debug-1.105.0
-  const dirMatch = path.match(DIRECTORY_VERSION_REGEX)
-  if (dirMatch) {
-    return dirMatch[1]
-  }
-
-  return null
 }
 
 /**
