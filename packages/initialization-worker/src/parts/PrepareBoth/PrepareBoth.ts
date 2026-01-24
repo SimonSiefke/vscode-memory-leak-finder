@@ -62,8 +62,7 @@ export const prepareBoth = async (
   // Wait for the page to be created by the initialization worker's connectDevtools
   const { dispose, sessionId, targetId } = await connectDevtoolsPromise
 
-  // Dispose browserRpc from connectDevtools
-  await dispose()
+  await Promise.all([electronRpc.dispose(), dispose()])
 
   return {
     devtoolsWebSocketUrl,
