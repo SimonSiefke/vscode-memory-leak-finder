@@ -171,3 +171,12 @@ test('mapPathToSourceMapPath - returns null for js-debug path without .vscode-ex
   const result = MapPathToSourceMapPath.mapPathToSourceMapPath(path, root, '1.105.0')
   expect(result).toBeNull()
 })
+
+test('mapPathToSourceMapPath - maps absolute js-debug extension path from vscode-insiders', () => {
+  const root = '/test/.cache/repos/vscode-memory-leak-finder'
+  const absolutePath =
+    '/test/.cache/repos/vscode-memory-leak-finder/.vscode-insiders-versions/f3a7ce35470b1ae3fb47177d35e3964a24094372/VSCode-linux-x64/resources/app/extensions/ms-vscode.js-debug/src/extension.js.map'
+  const result = MapPathToSourceMapPath.mapPathToSourceMapPath(absolutePath, root, '1.105.0')
+  const expected = join(root, '.extension-source-maps-cache', 'vscode-js-debug-1.105.0', 'dist/src/extension.js.map')
+  expect(result).toBe(expected)
+})
