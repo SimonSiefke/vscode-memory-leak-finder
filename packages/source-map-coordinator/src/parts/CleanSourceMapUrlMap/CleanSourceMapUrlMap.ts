@@ -17,8 +17,6 @@ const isExtensionFile = (url: string): boolean => {
 export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Promise<SourceMapUrlMap> => {
   const cleanedSourceMapUrlMap: SourceMapUrlMap = Object.create(null)
 
-  // Launch workers based on the types of files we need to process
-  let sourceMapWorker: any = null
   let extensionSourceMapWorker: any = null
 
   for (const [key, value] of Object.entries(sourceMapUrlMap)) {
@@ -44,20 +42,11 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Pr
         cleanedSourceMapUrlMap[key] = value
       }
     } else {
-      // Use regular source-map-worker for normal files
-      if (!sourceMapWorker) {
-        sourceMapWorker = await launchSourceMapWorker()
-      }
-
       // For normal files, we keep the original key
       cleanedSourceMapUrlMap[key] = value
     }
   }
 
-  // Clean up workers
-  if (sourceMapWorker) {
-    await sourceMapWorker[Symbol.asyncDispose]()
-  }
   if (extensionSourceMapWorker) {
     await extensionSourceMapWorker[Symbol.asyncDispose]()
   }
