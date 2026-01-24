@@ -2,7 +2,7 @@ import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
-const extensionSourceMapWorkerPath = join(Root.root, 'packages', 'extension-source-maps', 'src', 'extensionSourceMapWorkerMain.ts')
+const extensionSourceMapWorkerPath = join(Root.root, 'packages', 'extension-source-maps', 'src', 'main.ts')
 
 export const launchExtensionSourceMapWorker = async () => {
   const rpc = await NodeWorkerRpcParent.create({
