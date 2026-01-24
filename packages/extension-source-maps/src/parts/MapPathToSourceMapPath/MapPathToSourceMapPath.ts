@@ -92,7 +92,7 @@ export const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersio
       }
       console.log('[extension-source-maps] normalizedPath:', normalizedPath)
       // Ensure it starts with .vscode-extensions
-      if (!normalizedPath.startsWith('.vscode-extensions')) {
+      if (!normalizedPath.startsWith('.vscode-extensions') && !normalizedPath.startsWith('extensions')) {
         console.log('[extension-source-maps] normalizedPath does not start with .vscode-extensions')
         return null
       }

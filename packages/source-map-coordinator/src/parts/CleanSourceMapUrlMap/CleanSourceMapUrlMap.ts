@@ -24,6 +24,7 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Pr
     extensionName: 'vscode-js-debug',
     repoUrl: 'git@github.com:microsoft/vscode-js-debug.git',
     cacheDir: join(Root.root, '.extension-source-maps-cache'),
+    buildScript: [`npm`, `run`, `package`],
   }
 
   for (const [key, value] of Object.entries(sourceMapUrlMap)) {

@@ -6,9 +6,10 @@ import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSource
 import * as Root from '../Root/Root.ts'
 
 interface ResolveExtensionSourceMapConfig {
-  extensionName: string
-  repoUrl: string
-  cacheDir: string
+  readonly extensionName: string
+  readonly repoUrl: string
+  readonly cacheDir: string
+  readonly buildScript: readonly string[]
 }
 
 /**
@@ -62,6 +63,7 @@ export const resolveExtensionSourceMap = async (
         extensionName: config.extensionName,
         repoUrl: config.repoUrl,
         version: jsDebugVersion,
+        buildScript: config.buildScript,
       })
     } catch (error) {
       console.log(`[resolveExtensionSourceMap] Failed to generate source maps for ${config.extensionName} ${jsDebugVersion}:`, error)
