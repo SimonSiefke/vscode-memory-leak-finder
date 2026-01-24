@@ -5,15 +5,7 @@ import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSource
 import * as ParseSourceLocation from '../ParseSourceLocation/ParseSourceLocation.ts'
 import * as ResolveOriginalPositions from '../ResolveOriginalPositions/ResolveOriginalPositions.ts'
 import * as Root from '../Root/Root.ts'
-
-interface ResolveResult {
-  originalUrl?: string | null
-  originalLine?: number | null
-  originalColumn?: number | null
-  originalName?: string | null
-  originalSource?: string | null
-  originalLocation?: string | null
-}
+import type { ResolveResult } from '../ResolveResult/ResolveResult.ts'
 
 export const resolveFromPath = async (uris: readonly string[]): Promise<readonly ResolveResult[]> => {
   const rootPath = Root.root

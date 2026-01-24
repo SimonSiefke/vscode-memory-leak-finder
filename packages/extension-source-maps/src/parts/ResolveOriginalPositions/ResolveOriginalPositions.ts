@@ -2,25 +2,17 @@ import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
 import * as ApplyOriginalPositions from '../ApplyOriginalPositions/ApplyOriginalPositions.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 import * as NormalizeSourcePath from '../NormalizeSourcePath/NormalizeSourcePath.ts'
+import type { ResolveResult } from '../ResolveResult/ResolveResult.ts'
 
 interface OriginalPosition {
-  column?: number | null
-  line?: number | null
-  name?: string | null
-  source?: string | null
+  readonly column?: number | null
+  readonly line?: number | null
+  readonly name?: string | null
+  readonly source?: string | null
 }
 
 interface CleanPositionMap {
   [key: string]: OriginalPosition[]
-}
-
-interface ResolveResult {
-  originalUrl?: string | null
-  originalLine?: number | null
-  originalColumn?: number | null
-  originalName?: string | null
-  originalSource?: string | null
-  originalLocation?: string | null
 }
 
 export const resolveOriginalPositions = async (
