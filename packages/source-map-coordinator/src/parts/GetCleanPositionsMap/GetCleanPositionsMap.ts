@@ -43,7 +43,5 @@ export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, cla
     cleanPositionMap[key] = cleanPositions
   }
   const finalResult = reverseCleanSourceMapUrlMap(cleanPositionMap, reverseMap)
-  console.log(reverseMap)
-  console.log(finalResult)
   return finalResult
 }
