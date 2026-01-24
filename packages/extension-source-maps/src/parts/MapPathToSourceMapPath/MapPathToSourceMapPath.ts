@@ -40,7 +40,7 @@ const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: s
     return null
   }
   if (!jsDebugVersion) {
-    console.log('[mapPathToSourceMapPath] jsDebugVersion not provided for js-debug extension')
+    console.log('[extension-source-maps] jsDebugVersion not provided for js-debug extension')
     return null
   }
   const version = jsDebugVersion
@@ -60,11 +60,11 @@ export const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersio
   const normalizedPathInput = normalizePathSeparators(normalize(path))
   const looksAbsolute = isAbsolute(path) || normalizedPathInput.startsWith('/')
 
-  console.log('[mapPathToSourceMapPath] path:', path)
-  console.log('[mapPathToSourceMapPath] root:', root)
-  console.log('[mapPathToSourceMapPath] normalizedRoot:', normalizedRoot)
-  console.log('[mapPathToSourceMapPath] normalizedPathInput:', normalizedPathInput)
-  console.log('[mapPathToSourceMapPath] looksAbsolute:', looksAbsolute)
+  console.log('[extension-source-maps] path:', path)
+  console.log('[extension-source-maps] root:', root)
+  console.log('[extension-source-maps] normalizedRoot:', normalizedRoot)
+  console.log('[extension-source-maps] normalizedPathInput:', normalizedPathInput)
+  console.log('[extension-source-maps] looksAbsolute:', looksAbsolute)
 
   let normalizedPath = path
   if (looksAbsolute) {
@@ -90,14 +90,14 @@ export const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersio
       } catch {
         normalizedPath = relativePathResult
       }
-      console.log('[mapPathToSourceMapPath] normalizedPath:', normalizedPath)
+      console.log('[extension-source-maps] normalizedPath:', normalizedPath)
       // Ensure it starts with .vscode-extensions
       if (!normalizedPath.startsWith('.vscode-extensions')) {
-        console.log('[mapPathToSourceMapPath] normalizedPath does not start with .vscode-extensions')
+        console.log('[extension-source-maps] normalizedPath does not start with .vscode-extensions')
         return null
       }
     } else {
-      console.log('[mapPathToSourceMapPath] normalizedPathInput does not start with normalizedRoot')
+      console.log('[extension-source-maps] normalizedPathInput does not start with normalizedRoot')
       return null
     }
   } else {
