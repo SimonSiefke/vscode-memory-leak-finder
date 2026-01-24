@@ -1,7 +1,7 @@
 import { isAbsolute, join, relative, normalize } from 'node:path'
 
 const COPILOT_EXTENSION_PATH_REGEX = /\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/
-const JS_DEBUG_EXTENSION_PATH_REGEX = /\/extensions\/ms-vscode\.js-debug\/(.+)$/
+const JS_DEBUG_EXTENSION_PATH_REGEX = /extensions\/ms-vscode\.js-debug\/(.+)$/
 const GITHUB_PREFIX_REGEX = /^github\./
 
 const normalizePathSeparators = (path: string): string => {
@@ -45,7 +45,7 @@ const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: s
   return sourceMapPath
 }
 
-export const mapPathToSourceMapPath = (path: string, root: string): string | null => {
+export const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion?: string): string | null => {
   if (!path) {
     return null
   }
@@ -100,5 +100,5 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
     normalizedPath = normalizePathSeparators(normalizedPath)
   }
 
-  return extractCopilot(root, normalizedPath) || extractJsDebug(root, normalizedPath)
+  return extractCopilot(root, normalizedPath) || extractJsDebug(root, normalizedPath, jsDebugVersion)
 }

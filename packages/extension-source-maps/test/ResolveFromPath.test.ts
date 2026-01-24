@@ -1,10 +1,15 @@
 import { expect, test, jest } from '@jest/globals'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import * as ResolveFromPath from '../src/parts/ResolveFromPath/ResolveFromPath.ts'
+
+// Mock the Root module before importing ResolveFromPath
+const mockRoot = tmpdir()
+jest.mock('../src/parts/Root/Root.ts', () => ({
+  root: mockRoot,
+}))
 
 // Mock the LaunchSourceMapWorker module
-const mockInvoke = jest.fn() as jest.Mock
+const mockInvoke = jest.fn()
 
 jest.mock('../src/parts/LaunchSourceMapWorker/LaunchSourceMapWorker.ts', () => ({
   launchSourceMapWorker: async () => ({
@@ -13,12 +18,13 @@ jest.mock('../src/parts/LaunchSourceMapWorker/LaunchSourceMapWorker.ts', () => (
   }),
 }))
 
+import * as ResolveFromPath from '../src/parts/ResolveFromPath/ResolveFromPath.ts'
+
 test('resolveFromPath - resolves single path', async () => {
-  const root = tmpdir()
-  const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
-  
+  const path = join(mockRoot, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
+
   // Mock the source map worker response
-  const sourceMapUrl = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
+  const sourceMapUrl = join(mockRoot, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   mockInvoke.mockResolvedValueOnce({
     [sourceMapUrl]: [
       {
@@ -47,13 +53,12 @@ test('resolveFromPath - resolves single path', async () => {
 })
 
 test('resolveFromPath - resolves multiple paths', async () => {
-  const root = tmpdir()
-  const path1 = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
-  const path2 = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/src/utils.ts:50:10')
-  
-  const sourceMapUrl1 = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
-  const sourceMapUrl2 = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'src/utils.ts.map')
-  
+  const path1 = join(mockRoot, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
+  const path2 = join(mockRoot, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/utils.js:30:5')
+
+  // Mock the source map worker response
+  const sourceMapUrl1 = join(mockRoot, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
+  const sourceMapUrl2 = join(mockRoot, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/utils.js.map')
   mockInvoke.mockResolvedValueOnce({
     [sourceMapUrl1]: [
       {
@@ -74,7 +79,7 @@ test('resolveFromPath - resolves multiple paths', async () => {
   })
 
   const result = await ResolveFromPath.resolveFromPath([path1, path2])
-  
+
   expect(result).toHaveLength(2)
   expect(result[0]).toEqual({
     originalUrl: 'src/extension.ts',
@@ -96,7 +101,7 @@ test('resolveFromPath - resolves multiple paths', async () => {
 
 test('resolveFromPath - returns empty object for invalid path', async () => {
   const result = await ResolveFromPath.resolveFromPath(['invalid-path'])
-  
+
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({})
 })
@@ -104,9 +109,9 @@ test('resolveFromPath - returns empty object for invalid path', async () => {
 test('resolveFromPath - returns empty object for path without source map', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/other-extension/dist/extension.js:917:1277')
-  
+
   const result = await ResolveFromPath.resolveFromPath([path])
-  
+
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({})
 })
@@ -114,7 +119,7 @@ test('resolveFromPath - returns empty object for path without source map', async
 test('resolveFromPath - handles js-debug extension path', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/ms-vscode.js-debug/src/extension.js:10:1268')
-  
+
   const sourceMapUrl = join(root, '.extension-source-maps-cache', 'vscode-js-debug-1.105.0', 'dist/src/extension.js.map')
   mockInvoke.mockResolvedValueOnce({
     [sourceMapUrl]: [
@@ -128,7 +133,7 @@ test('resolveFromPath - handles js-debug extension path', async () => {
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
-  
+
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
     originalUrl: 'src/extension.ts',
@@ -142,19 +147,19 @@ test('resolveFromPath - handles js-debug extension path', async () => {
 
 test('resolveFromPath - handles empty array', async () => {
   const result = await ResolveFromPath.resolveFromPath([])
-  
+
   expect(result).toHaveLength(0)
 })
 
 test('resolveFromPath - handles source map resolution error', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
-  
+
   // Mock the source map worker to throw an error
   mockInvoke.mockRejectedValueOnce(new Error('Source map resolution failed'))
 
   const result = await ResolveFromPath.resolveFromPath([path])
-  
+
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({})
 })
@@ -162,8 +167,13 @@ test('resolveFromPath - handles source map resolution error', async () => {
 test('resolveFromPath - handles paths with special characters', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/file-name_with.special-chars.js:100:50')
-  
-  const sourceMapUrl = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/file-name_with.special-chars.js.map')
+
+  const sourceMapUrl = join(
+    root,
+    '.extension-source-maps-cache',
+    'copilot-chat-0.36.2025121004',
+    'dist/file-name_with.special-chars.js.map',
+  )
   mockInvoke.mockResolvedValueOnce({
     [sourceMapUrl]: [
       {
@@ -176,7 +186,7 @@ test('resolveFromPath - handles paths with special characters', async () => {
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
-  
+
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
     originalUrl: 'src/file-name_with.special-chars.ts',
@@ -191,7 +201,7 @@ test('resolveFromPath - handles paths with special characters', async () => {
 test('resolveFromPath - handles paths with null original source', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
-  
+
   const sourceMapUrl = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   mockInvoke.mockResolvedValueOnce({
     [sourceMapUrl]: [
@@ -205,7 +215,7 @@ test('resolveFromPath - handles paths with null original source', async () => {
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
-  
+
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
     originalUrl: null,
@@ -220,7 +230,7 @@ test('resolveFromPath - handles paths with null original source', async () => {
 test('resolveFromPath - handles paths with null line or column', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
-  
+
   const sourceMapUrl = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   mockInvoke.mockResolvedValueOnce({
     [sourceMapUrl]: [
@@ -234,7 +244,7 @@ test('resolveFromPath - handles paths with null line or column', async () => {
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
-  
+
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
     originalUrl: 'src/extension.ts',
@@ -249,7 +259,7 @@ test('resolveFromPath - handles paths with null line or column', async () => {
 test('resolveFromPath - handles paths with ../ prefixes in source', async () => {
   const root = tmpdir()
   const path = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
-  
+
   const sourceMapUrl = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   mockInvoke.mockResolvedValueOnce({
     [sourceMapUrl]: [
@@ -263,7 +273,7 @@ test('resolveFromPath - handles paths with ../ prefixes in source', async () => 
   })
 
   const result = await ResolveFromPath.resolveFromPath([path])
-  
+
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
     originalUrl: 'src/extension.ts',
