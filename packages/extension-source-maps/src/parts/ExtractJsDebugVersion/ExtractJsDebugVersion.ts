@@ -14,9 +14,15 @@ export const extractJsDebugVersionFromPath = (path: string): string | null => {
   }
 
   // Resolve package.json path from the given path
-  // The package.json should be in the ms-vscode.js-debug directory
-  const jsDebugDir = dirname(path)
-  const packageJsonPath = join(jsDebugDir, 'package.json')
+  // The package.json should be in the ms-vscode.js-debug directory (the extension root)
+  // We need to find the ms-vscode.js-debug directory, not the subdirectory
+  const relativePath = match[1]
+  
+  // Find the ms-vscode.js-debug directory by going up from the current path
+  // The path structure is: .../extensions/ms-vscode.js-debug/<subpath>
+  // We need to find the package.json in the ms-vscode.js-debug directory
+  const jsDebugExtensionRoot = dirname(path).replace(/extensions\/ms-vscode\.js-debug\/.*/, 'extensions/ms-vscode.js-debug')
+  const packageJsonPath = join(jsDebugExtensionRoot, 'package.json')
 
   if (!existsSync(packageJsonPath)) {
     console.log(`[extractJsDebugVersion] Package.json not found at: ${packageJsonPath}`)
