@@ -3,4 +3,5 @@ import * as SourceMapWorkerCommandType from '../SourceMapWorkerCommandType/Sourc
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
   [SourceMapWorkerCommandType.GetCleanPositionsMap]: GetCleanPositionsMap.getCleanPositionsMap,
+  [SourceMapWorkerCommandType.GetCleanPositionsMap2]: GetCleanPositionsMap.getCleanPositionsMap2,
 }
