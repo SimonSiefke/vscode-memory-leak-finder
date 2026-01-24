@@ -7,7 +7,7 @@ import * as Root from '../Root/Root.ts'
 /**
  * Resolves an extension source map URL, handling js-debug version extraction
  * and source map generation if needed.
- * 
+ *
  * This function:
  * 1. Extracts the js-debug version from the path (if applicable)
  * 2. Generates source maps for that version if they don't exist
@@ -15,10 +15,10 @@ import * as Root from '../Root/Root.ts'
  */
 export const resolveExtensionSourceMap = async (path: string, root?: string): Promise<string | null> => {
   const rootPath = root || Root.root
-  
+
   // Extract js-debug version from the path
   const jsDebugVersion = ExtractJsDebugVersion.extractJsDebugVersion(path)
-  
+
   // Generate source maps if this is a js-debug extension and version was found
   if (jsDebugVersion) {
     const cacheDir = join(rootPath, '.extension-source-maps-cache')
@@ -35,7 +35,7 @@ export const resolveExtensionSourceMap = async (path: string, root?: string): Pr
       // Continue anyway - might have partial source maps
     }
   }
-  
+
   // Now resolve the source map URL with the version (if any)
   return MapPathToSourceMapUrl.mapPathToSourceMapUrl(path, rootPath, jsDebugVersion ?? undefined)
 }
