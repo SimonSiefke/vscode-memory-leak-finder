@@ -2,6 +2,8 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const JS_DEBUG_EXTENSION_PATH_REGEX = /\.vscode-extensions\/ms-vscode\.js-debug\/(.+)$/
+const VERSION_REGEX = /^(\d+\.\d+\.\d+)/
+const DIRECTORY_VERSION_REGEX = /extensions\/ms-vscode\.js-debug-(\d+\.\d+\.\d+)/
 
 /**
  * Extract js-debug version from a path
@@ -18,13 +20,13 @@ export const extractJsDebugVersionFromPath = (path: string): string | null => {
 
   // Extract version from path like: 1.105.0/dist/extension.js
   // or from directory name like: ms-vscode.js-debug-1.105.0/dist/extension.js
-  const versionMatch = relativePath.match(/^(\d+\.\d+\.\d+)/)
+  const versionMatch = relativePath.match(VERSION_REGEX)
   if (versionMatch) {
     return versionMatch[1]
   }
 
   // Try to extract from directory name pattern: ms-vscode.js-debug-1.105.0
-  const dirMatch = path.match(/\.vscode-extensions\/ms-vscode\.js-debug-(\d+\.\d+\.\d+)/)
+  const dirMatch = path.match(DIRECTORY_VERSION_REGEX)
   if (dirMatch) {
     return dirMatch[1]
   }

@@ -4,26 +4,21 @@ import { join } from 'node:path'
 
 // Mock the Root module before importing ResolveFromPath
 const mockRoot = tmpdir()
-jest.mock('../src/parts/Root/Root.ts', () => ({
+jest.unstable_mockModule('../src/parts/Root/Root.ts', () => ({
   root: mockRoot,
 }))
 
 // Mock the LaunchSourceMapWorker module
-const mockInvoke = jest.fn() as jest.Mock
-
-jest.mock('../src/parts/LaunchSourceMapWorker/LaunchSourceMapWorker.ts', () => ({
-  launchSourceMapWorker: async () => ({
-    invoke: mockInvoke,
-    [Symbol.asyncDispose]: async () => {},
-  }),
-}))
+const mockInvoke = jest.fn<Promise<Record<string, any[]>>, [string, ...any[]]>()
 
 // Mock the file system to always return true for existsSync
-jest.mock('node:fs', () => ({
+jest.unstable_mockModule('node:fs', () => ({
   existsSync: jest.fn(() => true),
+  readFileSync: jest.fn(() => '{}'),
 }))
 
-import * as ResolveFromPath from '../src/parts/ResolveFromPath/ResolveFromPath.ts'
+// Import the mocked modules
+const ResolveFromPath = await import('../src/parts/ResolveFromPath/ResolveFromPath.ts')
 
 test('resolveFromPath - resolves single path', async () => {
   const path = join(mockRoot, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js:917:1277')
