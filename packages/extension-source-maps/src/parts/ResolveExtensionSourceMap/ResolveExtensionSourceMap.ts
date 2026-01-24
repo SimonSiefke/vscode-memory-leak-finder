@@ -26,7 +26,7 @@ export const resolveExtensionSourceMap = async (
   path: string,
   root: string | undefined,
   configs: readonly ResolveExtensionSourceMapConfig[],
-): Promise<string | null> => {
+): Promise<string> => {
   const rootPath = root || Root.root
 
   // Convert file:// URLs to paths (but not filenames that happen to start with "file:")
@@ -59,7 +59,7 @@ export const resolveExtensionSourceMap = async (
     const config = configs.find((c) => c.extensionName === 'vscode-js-debug')
     if (!config) {
       console.log(`[resolveExtensionSourceMap] No configuration found for vscode-js-debug.`)
-      return null
+      return ''
     }
     const cacheDir = config.cacheDir
     console.log(`[resolveExtensionSourceMap] Generating source maps for ${config.extensionName} version ${jsDebugVersion}...`)
