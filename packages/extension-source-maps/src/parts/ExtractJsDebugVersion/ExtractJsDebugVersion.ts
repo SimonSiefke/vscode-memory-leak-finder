@@ -26,7 +26,7 @@ export const extractJsDebugVersionFromPath = (path: string): string | null => {
   try {
     const packageJsonContent = readFileSync(packageJsonPath, 'utf-8')
     const packageJson = JSON.parse(packageJsonContent)
-    const version = packageJson.version
+    const { version } = packageJson
 
     if (version && typeof version === 'string') {
       console.log(`[extractJsDebugVersion] Found version ${version} in package.json`)

@@ -23,13 +23,13 @@ export interface PrepareTestsOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly measureId: string
+  readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly timeouts: any
   readonly trackFunctions: boolean
-  readonly openDevtools: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -56,9 +56,9 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     measureId,
+    openDevtools,
     platform,
     trackFunctions,
-    openDevtools,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -89,9 +89,9 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       inspectSharedProcessPort,
       isFirstConnection,
       measureId,
+      openDevtools,
       platform,
       trackFunctions,
-      openDevtools,
       updateUrl,
       useProxyMock,
       vscodePath,

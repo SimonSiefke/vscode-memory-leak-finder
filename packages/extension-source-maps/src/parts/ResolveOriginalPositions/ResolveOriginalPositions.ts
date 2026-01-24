@@ -1,8 +1,8 @@
 import type { PositionPointer } from '../PositionPointer/PositionPointer.ts'
+import type { ResolveResult } from '../ResolveResult/ResolveResult.ts'
 import * as ApplyOriginalPositions from '../ApplyOriginalPositions/ApplyOriginalPositions.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 import * as NormalizeSourcePath from '../NormalizeSourcePath/NormalizeSourcePath.ts'
-import type { ResolveResult } from '../ResolveResult/ResolveResult.ts'
 
 interface OriginalPosition {
   readonly column?: number | null
@@ -58,15 +58,15 @@ export const resolveOriginalPositionsToResults = async (
       if (original) {
         const normalizedSource = NormalizeSourcePath.normalizeSourcePath(original.source ?? null)
         results[pointer.index] = {
-          originalUrl: normalizedSource,
-          originalLine: original.line ?? null,
           originalColumn: original.column ?? null,
-          originalName: original.name ?? null,
-          originalSource: normalizedSource,
+          originalLine: original.line ?? null,
           originalLocation:
             normalizedSource && original.line !== null && original.column !== null
               ? `${normalizedSource}:${original.line}:${original.column}`
               : null,
+          originalName: original.name ?? null,
+          originalSource: normalizedSource,
+          originalUrl: normalizedSource,
         }
       }
     }

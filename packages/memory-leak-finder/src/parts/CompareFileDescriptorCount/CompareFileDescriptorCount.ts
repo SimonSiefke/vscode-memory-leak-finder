@@ -20,9 +20,9 @@ export const compareFileDescriptorCount = (
     // Only include items with delta >= context.runs
     if (delta >= context.runs) {
       deltas.push({
-        name: item.name,
         count: item.fileDescriptorCount,
         delta,
+        name: item.name,
       })
     }
   }

@@ -4,9 +4,9 @@ import { platform } from 'node:os'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 
 export interface ProcessInfo {
-  readonly pid: number
-  readonly name: string
   readonly fileDescriptorCount: number
+  readonly name: string
+  readonly pid: number
 }
 
 const getFileDescriptorCount = async (pid: number): Promise<number> => {
@@ -36,18 +36,18 @@ const getProcessName = async (pid: number): Promise<string> => {
       // Handle VS Code processes
       if (firstArg.includes('code') || firstArg.includes('vscode')) {
         // Check for specific VS Code process types
-        const typeIndex = args.findIndex((arg) => arg === '--type')
-        if (typeIndex >= 0 && typeIndex + 1 < args.length) {
+        const typeIndex = args.indexOf('--type')
+        if (typeIndex !== -1 && typeIndex + 1 < args.length) {
           const processType = args[typeIndex + 1]
           // Map common VS Code process types to readable names
           const typeMap: Record<string, string> = {
-            utility: 'VS Code Utility',
             extensionHost: 'VS Code Extension Host',
-            'shared-process': 'VS Code Shared Process',
-            ptyHost: 'VS Code PTY Host',
             fileWatcher: 'VS Code File Watcher',
             'gpu-process': 'VS Code GPU Process',
+            ptyHost: 'VS Code PTY Host',
             renderer: 'VS Code Renderer',
+            'shared-process': 'VS Code Shared Process',
+            utility: 'VS Code Utility',
           }
           if (typeMap[processType]) {
             return typeMap[processType]
@@ -56,8 +56,8 @@ const getProcessName = async (pid: number): Promise<string> => {
         }
 
         // Check for utility-sub-type
-        const subTypeIndex = args.findIndex((arg) => arg === '--utility-sub-type')
-        if (subTypeIndex >= 0 && subTypeIndex + 1 < args.length) {
+        const subTypeIndex = args.indexOf('--utility-sub-type')
+        if (subTypeIndex !== -1 && subTypeIndex + 1 < args.length) {
           const subType = args[subTypeIndex + 1]
           if (subType.includes('node.mojom.NodeService')) {
             return 'VS Code Node Service'
@@ -87,7 +87,7 @@ const getProcessName = async (pid: number): Promise<string> => {
         }
         // Check for specific script names
         const scriptIndex = args.findIndex((arg) => arg.endsWith('.js') || arg.endsWith('.ts'))
-        if (scriptIndex >= 0) {
+        if (scriptIndex !== -1) {
           const scriptName = args[scriptIndex].split('/').pop() || 'script'
           return `Node.js ${scriptName}`
         }
@@ -105,7 +105,7 @@ const getProcessName = async (pid: number): Promise<string> => {
 
       // Return the base name of the first argument
       const baseName = firstArg.split('/').pop() || firstArg
-      return baseName.length > 50 ? `${baseName.substring(0, 47)}...` : baseName
+      return baseName.length > 50 ? `${baseName.slice(0, 47)}...` : baseName
     }
 
     // Fallback to using ps command
@@ -141,9 +141,9 @@ export const getFileDescriptorCountForProcess = async (pid: number | undefined):
       const [name, fdCount] = await Promise.all([getProcessName(processPid), getFileDescriptorCount(processPid)])
 
       processInfos.push({
-        pid: processPid,
-        name,
         fileDescriptorCount: fdCount,
+        name,
+        pid: processPid,
       })
     }
 

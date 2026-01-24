@@ -8,7 +8,7 @@ test('CompareIpcMessages should return empty added for empty inputs', () => {
 
 test('CompareIpcMessages should detect a single added message', () => {
   const before: any[] = []
-  const after: any[] = [{ channel: 'test', timestamp: 1, type: 'on', args: ['a'] }]
+  const after: any[] = [{ args: ['a'], channel: 'test', timestamp: 1, type: 'on' }]
   const result = CompareIpcMessages.compare(before, after)
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual(after[0])

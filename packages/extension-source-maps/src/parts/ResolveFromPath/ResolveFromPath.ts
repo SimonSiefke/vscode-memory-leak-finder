@@ -1,15 +1,16 @@
 import { join } from 'node:path'
+import type { ResolveResult } from '../ResolveResult/ResolveResult.ts'
 import * as ExtractJsDebugVersion from '../ExtractJsDebugVersion/ExtractJsDebugVersion.ts'
 import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
 import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSourceMapUrl.ts'
 import * as ParseSourceLocation from '../ParseSourceLocation/ParseSourceLocation.ts'
 import * as ResolveOriginalPositions from '../ResolveOriginalPositions/ResolveOriginalPositions.ts'
 import * as Root from '../Root/Root.ts'
-import type { ResolveResult } from '../ResolveResult/ResolveResult.ts'
 
 export const resolveFromPath = async (uris: readonly string[]): Promise<readonly ResolveResult[]> => {
   const rootPath = Root.root
-  const results: ResolveResult[] = new Array(uris.length).fill({})
+  // @ts-ignore
+  const results: ResolveResult[] = Array.from({ length: uris.length }).fill({})
 
   // Parse each URI and collect positions for source maps
   const sourceMapUrlToPositions: Record<string, number[]> = Object.create(null)

@@ -20,7 +20,7 @@ test('CleanIpcMessages should read a larger multi-byte integer', () => {
   // 0x81 0x80 0x01 = 129 + 128*128 = 16513
   const buffer = Buffer.from([0x81, 0x80, 0x01])
   const result = CleanIpcMessages.readIntVQL(buffer, 0)
-  expect(result.value).toBe(16385)
+  expect(result.value).toBe(16_385)
   expect(result.bytesRead).toBe(3)
 })
 
@@ -130,10 +130,10 @@ test('CleanIpcMessages should return empty array for empty input', () => {
 test('CleanIpcMessages should pass through messages without uint8array args', () => {
   const messages = [
     {
+      args: ['string', 123, { key: 'value' }],
       channel: 'test',
       timestamp: 123,
       type: 'on',
-      args: ['string', 123, { key: 'value' }],
     },
   ]
   const result = CleanIpcMessages.cleanMessages(messages)
@@ -149,16 +149,16 @@ test('CleanIpcMessages should deserialize uint8array args', () => {
 
   const messages = [
     {
+      args: [
+        {
+          content: binary.toString('utf8'),
+          length: binary.length,
+          type: 'uint8array',
+        },
+      ],
       channel: 'test',
       timestamp: 123,
       type: 'on',
-      args: [
-        {
-          type: 'uint8array',
-          length: binary.length,
-          content: binary.toString('utf8'),
-        },
-      ],
     },
   ]
 
@@ -169,16 +169,16 @@ test('CleanIpcMessages should deserialize uint8array args', () => {
 test('CleanIpcMessages should handle uint8array with invalid binary data', () => {
   const messages = [
     {
+      args: [
+        {
+          content: '\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF', // Invalid binary data
+          length: 10,
+          type: 'uint8array',
+        },
+      ],
       channel: 'test',
       timestamp: 123,
       type: 'on',
-      args: [
-        {
-          type: 'uint8array',
-          length: 10,
-          content: '\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF', // Invalid binary data
-        },
-      ],
     },
   ]
 
@@ -197,13 +197,13 @@ test('CleanIpcMessages should deserialize uint8array result', () => {
   const messages = [
     {
       channel: 'test',
+      result: {
+        content: binary.toString('utf8'),
+        length: binary.length,
+        type: 'uint8array',
+      },
       timestamp: 123,
       type: 'handle-response',
-      result: {
-        type: 'uint8array',
-        length: binary.length,
-        content: binary.toString('utf8'),
-      },
     },
   ]
 
@@ -214,16 +214,16 @@ test('CleanIpcMessages should deserialize uint8array result', () => {
 test('CleanIpcMessages should handle buffer type args', () => {
   const messages = [
     {
+      args: [
+        {
+          content: 'hello',
+          length: 5,
+          type: 'buffer',
+        },
+      ],
       channel: 'test',
       timestamp: 123,
       type: 'on',
-      args: [
-        {
-          type: 'buffer',
-          length: 5,
-          content: 'hello',
-        },
-      ],
     },
   ]
 
@@ -257,16 +257,16 @@ test('CleanIpcMessages should handle complex nested messages', () => {
 
   const messages = [
     {
-      channel: 'vscode:message',
-      timestamp: 1769120897696,
-      type: 'on',
       args: [
         {
-          type: 'uint8array',
-          length: binary.length,
           content: binary.toString('utf8'),
+          length: binary.length,
+          type: 'uint8array',
         },
       ],
+      channel: 'vscode:message',
+      timestamp: 1_769_120_897_696,
+      type: 'on',
     },
   ]
 
@@ -282,19 +282,19 @@ test('CleanIpcMessages should handle multiple args with mixed types', () => {
 
   const messages = [
     {
-      channel: 'test',
-      timestamp: 123,
-      type: 'on',
       args: [
         'regular string',
         {
-          type: 'uint8array',
-          length: binary.length,
           content: binary.toString('utf8'),
+          length: binary.length,
+          type: 'uint8array',
         },
         123,
         { key: 'value' },
       ],
+      channel: 'test',
+      timestamp: 123,
+      type: 'on',
     },
   ]
 
@@ -321,10 +321,10 @@ test('CleanIpcMessages should handle messages without args', () => {
 test('CleanIpcMessages should handle messages with empty args array', () => {
   const messages = [
     {
+      args: [],
       channel: 'test',
       timestamp: 123,
       type: 'on',
-      args: [],
     },
   ]
 
@@ -336,9 +336,9 @@ test('CleanIpcMessages should handle handle-error messages', () => {
   const messages = [
     {
       channel: 'test',
+      error: 'Something went wrong',
       timestamp: 123,
       type: 'handle-error',
-      error: 'Something went wrong',
     },
   ]
 
@@ -354,16 +354,16 @@ test.skip('CleanIpcMessages should handle handle-request messages with uint8arra
 
   const messages = [
     {
+      args: [
+        {
+          content: binary.toString('utf8'),
+          length: binary.length,
+          type: 'uint8array',
+        },
+      ],
       channel: 'test',
       timestamp: 123,
       type: 'handle-request',
-      args: [
-        {
-          type: 'uint8array',
-          length: binary.length,
-          content: binary.toString('utf8'),
-        },
-      ],
     },
   ]
 
@@ -375,11 +375,11 @@ test.skip('CleanIpcMessages should handle handle-request messages with uint8arra
 test('CleanIpcMessages should preserve all other message properties', () => {
   const messages = [
     {
+      args: ['arg1'],
       channel: 'test',
+      customProp: 'custom value',
       timestamp: 123,
       type: 'on',
-      customProp: 'custom value',
-      args: ['arg1'],
     },
   ]
 
@@ -393,17 +393,17 @@ test('CleanIpcMessages should preserve all other message properties', () => {
 
 test.skip('CleanIpcMessages should decode real-world uint8array with embedded JSON', () => {
   const rawMessage = {
-    channel: 'vscode:message',
-    timestamp: 1769124893541,
-    type: 'on',
     args: [
       {
-        type: 'uint8array',
-        length: 184,
         content:
-          '\u0004\u0004\u0006d\u0006\uFFFD\u0006\u0001\u000flocalFilesystem\u0001\u0004stat\u0004\u0001\u0005\uFFFD\u0001{"$mid":1,"path":"/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json","scheme":"file"}',
+          '\u0004\u0004\u0006d\u0006\uFFFD\u0006\u0001\u000FlocalFilesystem\u0001\u0004stat\u0004\u0001\u0005\uFFFD\u0001{"$mid":1,"path":"/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json","scheme":"file"}',
+        length: 184,
+        type: 'uint8array',
       },
     ],
+    channel: 'vscode:message',
+    timestamp: 1_769_124_893_541,
+    type: 'on',
   }
 
   const cleaned = CleanIpcMessages.cleanMessages([rawMessage])
@@ -412,7 +412,7 @@ test.skip('CleanIpcMessages should decode real-world uint8array with embedded JS
       args: [
         [
           100,
-          13590511,
+          13_590_511,
           'localFilesystem',
           'stat',
           {
@@ -423,7 +423,7 @@ test.skip('CleanIpcMessages should decode real-world uint8array with embedded JS
         ],
       ],
       channel: 'vscode:message',
-      timestamp: 1769124893541,
+      timestamp: 1_769_124_893_541,
       type: 'on',
     },
   ])

@@ -12,14 +12,14 @@ export const setup = async ({ Editor, Explorer, Terminal, Workspace }: TestConte
 }
 
 export const run = async ({
-  Panel,
   ActivityBar,
   Editor,
   Explorer,
-  Terminal,
-  Workspace,
+  Panel,
   SimpleBrowser,
   Task,
+  Terminal,
+  Workspace,
 }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Terminal.killAll()

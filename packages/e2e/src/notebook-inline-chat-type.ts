@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-export const setup = async ({ SideBar, Editor, Electron, Extensions, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Electron, Extensions, SideBar, Workspace }: TestContext): Promise<void> => {
   await SideBar.hide()
   await Electron.mockDialog({
     response: 1,
