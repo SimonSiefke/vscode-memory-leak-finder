@@ -52,6 +52,8 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Pr
     }
   }
 
+  // console.log({ cleanedSourceMapUrlMap })
+
   if (extensionSourceMapWorker) {
     await extensionSourceMapWorker[Symbol.asyncDispose]()
   }

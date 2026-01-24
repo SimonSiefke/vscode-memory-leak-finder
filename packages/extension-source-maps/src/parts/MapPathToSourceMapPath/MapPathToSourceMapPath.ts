@@ -47,7 +47,13 @@ const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: s
   const relativePath = extensionMatch[1]
   const cacheDirName = `vscode-js-debug-${version}`
   // If the path already ends with .map, don't add another .map extension
-  const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, 'dist', relativePath.endsWith('.map') ? relativePath : relativePath + '.map')
+  const sourceMapPath = join(
+    root,
+    '.extension-source-maps-cache',
+    cacheDirName,
+    'dist',
+    relativePath.endsWith('.map') ? relativePath : relativePath + '.map',
+  )
   return sourceMapPath
 }
 
@@ -98,7 +104,9 @@ export const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersio
         !normalizedPath.startsWith('extensions') &&
         !normalizedPath.includes('extensions/ms-vscode.js-debug')
       ) {
-        console.log('[extension-source-maps] normalizedPath does not start with .vscode-extensions or contain extensions/ms-vscode.js-debug')
+        console.log(
+          '[extension-source-maps] normalizedPath does not start with .vscode-extensions or contain extensions/ms-vscode.js-debug',
+        )
         return null
       }
     } else {
