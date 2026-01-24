@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
 import { root } from '../Root/Root.ts'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 interface ResolveExtensionSourceMapConfig {
   readonly extensionName: string
@@ -83,5 +83,6 @@ export const resolveExtensionSourceMap = async (
   if (!existsSync(finalPath)) {
     throw new Error(`Source map not found`)
   }
-  return finalPath
+  const finalUri = pathToFileURL(finalPath).toString()
+  return finalUri
 }
