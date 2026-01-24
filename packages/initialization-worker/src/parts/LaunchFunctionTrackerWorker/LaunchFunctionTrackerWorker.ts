@@ -5,7 +5,7 @@ export const launchFunctionTrackerWorker = async () => {
   const url = GetFunctionTrackerUrl.getFunctionTrackerUrl()
   const rpc = await NodeForkedProcessRpcParent.create({
     commandMap: {},
-    execArgv: [],
+    execArgv: ['--max-old-space-size=8192'],
     path: url,
     stdio: 'inherit',
   })
