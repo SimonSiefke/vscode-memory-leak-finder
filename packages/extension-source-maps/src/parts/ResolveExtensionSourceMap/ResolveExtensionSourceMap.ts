@@ -4,6 +4,12 @@ import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/Gen
 import * as MapPathToSourceMapUrl from '../MapPathToSourceMapUrl/MapPathToSourceMapUrl.ts'
 import * as Root from '../Root/Root.ts'
 
+interface ResolveExtensionSourceMapConfig {
+  extensionName: string
+  repoUrl: string
+  cacheDir?: string
+}
+
 /**
  * Resolves an extension source map URL, handling js-debug version extraction
  * and source map generation if needed.
@@ -13,7 +19,11 @@ import * as Root from '../Root/Root.ts'
  * 2. Generates source maps for that version if they don't exist
  * 3. Returns the source map URL
  */
-export const resolveExtensionSourceMap = async (path: string, root?: string): Promise<string | null> => {
+export const resolveExtensionSourceMap = async (
+  path: string,
+  root: string | undefined,
+  config: ResolveExtensionSourceMapConfig,
+): Promise<string | null> => {
   const rootPath = root || Root.root
 
   // Extract js-debug version from the path
@@ -21,17 +31,17 @@ export const resolveExtensionSourceMap = async (path: string, root?: string): Pr
 
   // Generate source maps if this is a js-debug extension and version was found
   if (jsDebugVersion) {
-    const cacheDir = join(rootPath, '.extension-source-maps-cache')
-    console.log(`[resolveExtensionSourceMap] Generating source maps for js-debug version ${jsDebugVersion}...`)
+    const cacheDir = config.cacheDir || join(rootPath, '.extension-source-maps-cache')
+    console.log(`[resolveExtensionSourceMap] Generating source maps for ${config.extensionName} version ${jsDebugVersion}...`)
     try {
       await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
         cacheDir,
-        extensionName: 'vscode-js-debug',
-        repoUrl: 'git@github.com:microsoft/vscode-js-debug.git',
+        extensionName: config.extensionName,
+        repoUrl: config.repoUrl,
         version: jsDebugVersion,
       })
     } catch (error) {
-      console.log(`[resolveExtensionSourceMap] Failed to generate source maps for js-debug ${jsDebugVersion}:`, error)
+      console.log(`[resolveExtensionSourceMap] Failed to generate source maps for ${config.extensionName} ${jsDebugVersion}:`, error)
       // Continue anyway - might have partial source maps
     }
   }
