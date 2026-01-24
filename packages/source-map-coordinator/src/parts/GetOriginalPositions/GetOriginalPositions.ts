@@ -25,29 +25,29 @@ export const getOriginalPositions = async (sourceMapWorker: any, key: string, va
   const extensionSourceMapDir = key ? getExtensionSourceMapDir(key) : null
 
   const originalPositions = await sourceMapWorker.invoke('SourceMap.getCleanPositionsMap2', sourceMap, value, classNames, hash, key)
-  const enhanced1 = originalPositions.map((originalPosition: any) => {
-    let codePath: string | null = null
-    if (classNames && originalPosition.source && originalPosition.line !== null && originalPosition.column !== null) {
-      const index: number = sourceMap.sources.indexOf(originalPosition.source)
-      if (index !== -1) {
-        const sourceFileRelativePath: string = sourceMap.sources[index]
-        if (extensionSourceMapDir) {
-          // For extension source maps, resolve relative to the source map file's directory
-          // This allows relative paths like ../src/... to resolve correctly
-          codePath = resolve(extensionSourceMapDir, sourceFileRelativePath)
-        } else {
-          // For regular VS Code source maps, use .vscode-sources
-          codePath = resolve(join(root, '.vscode-sources', hash, sourceFileRelativePath))
-        }
-      }
-    }
-    return {
-      ...originalPosition,
-      codePath,
-    }
-  })
+  // const enhanced1 = originalPositions.map((originalPosition: any) => {
+  //   let codePath: string | null = null
+  //   if (classNames && originalPosition.source && originalPosition.line !== null && originalPosition.column !== null) {
+  //     const index: number = sourceMap.sources.indexOf(originalPosition.source)
+  //     if (index !== -1) {
+  //       const sourceFileRelativePath: string = sourceMap.sources[index]
+  //       if (extensionSourceMapDir) {
+  //         // For extension source maps, resolve relative to the source map file's directory
+  //         // This allows relative paths like ../src/... to resolve correctly
+  //         codePath = resolve(extensionSourceMapDir, sourceFileRelativePath)
+  //       } else {
+  //         // For regular VS Code source maps, use .vscode-sources
+  //         codePath = resolve(join(root, '.vscode-sources', hash, sourceFileRelativePath))
+  //       }
+  //     }
+  //   }
+  //   return {
+  //     ...originalPosition,
+  //     codePath,
+  //   }
+  // })
 
-  // TODO add original sources
+  // TODO add original sources here instead of in sourceMapWorker
   const cleanPositions = originalPositions.map(GetCleanPosition.getCleanPosition)
   return cleanPositions
 }
