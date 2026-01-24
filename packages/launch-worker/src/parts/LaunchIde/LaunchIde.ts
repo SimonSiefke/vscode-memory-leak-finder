@@ -82,7 +82,7 @@ export const launchIde = async ({
   } else {
     versionToParse = vscodeVersion
   }
-  const { child, pid } = await LaunchVsCode.launchVsCode({
+  const { child, pid, binaryPath } = await LaunchVsCode.launchVsCode({
     addDisposable,
     arch,
     clearExtensions,
@@ -109,5 +109,6 @@ export const launchIde = async ({
     child,
     parsedVersion: ParseVersion.parseVersion(versionToParse),
     pid,
+    binaryPath,
   }
 }

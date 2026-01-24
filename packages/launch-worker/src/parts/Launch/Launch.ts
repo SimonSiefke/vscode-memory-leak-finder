@@ -64,7 +64,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   } = options
-  const { child, parsedVersion, pid } = await LaunchIde.launchIde({
+  const { child, parsedVersion, pid, binaryPath } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
     clearExtensions,
@@ -90,11 +90,8 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
 
-  // Compute binary path and pre-generated workbench path for function tracking
-  let binaryPath: string | null = null
   let preGeneratedWorkbenchPath: string | null = null
   if (trackFunctions) {
-    binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
     preGeneratedWorkbenchPath = join(Root.root, '.vscode-workbench-tracked', 'workbench.desktop.main.js')
   }
 
