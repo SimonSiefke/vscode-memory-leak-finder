@@ -32,29 +32,21 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap): Pr
     }
 
     if (isExtensionFile(key)) {
-      // Use extension-source-maps worker for extension files
       if (!extensionSourceMapWorker) {
         extensionSourceMapWorker = await launchExtensionSourceMapWorker()
       }
 
-      // Get the source map URL from the extension source maps worker
-      // This will also extract the js-debug version and generate source maps if needed
       const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', key, Root.root, configs)
 
       if (sourceMapUrl) {
-        // Add the source map URL to the cleaned map
         cleanedSourceMapUrlMap[sourceMapUrl] = value
       } else {
-        // If no source map URL is found, keep the original key
         cleanedSourceMapUrlMap[key] = value
       }
     } else {
-      // For normal files, we keep the original key
       cleanedSourceMapUrlMap[key] = value
     }
   }
-
-  // console.log({ cleanedSourceMapUrlMap })
 
   if (extensionSourceMapWorker) {
     await extensionSourceMapWorker[Symbol.asyncDispose]()
