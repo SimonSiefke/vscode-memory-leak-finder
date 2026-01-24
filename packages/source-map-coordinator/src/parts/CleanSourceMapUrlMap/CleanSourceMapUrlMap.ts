@@ -53,7 +53,6 @@ export const cleanSourceMapUrlMap = async (
       const uri = ensureUri(key) // TODO maybe caller should have alrady ensured uri
       const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', uri, Root.root, configs)
 
-      console.log({ sourceMapUrl })
       if (sourceMapUrl) {
         cleanedSourceMapUrlMap[sourceMapUrl] = value
         reverseMap[key] = sourceMapUrl
