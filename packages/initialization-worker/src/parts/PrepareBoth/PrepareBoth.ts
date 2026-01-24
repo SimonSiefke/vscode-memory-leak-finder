@@ -4,7 +4,6 @@ import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as ElectronRpcState from '../ElectronRpcState/ElectronRpcState.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
@@ -52,9 +51,6 @@ export const prepareBoth = async (
   if (headlessMode) {
     // TODO
   }
-
-  // Store electronRpc in state so ConnectFunctionTracker can access it when tracking
-  ElectronRpcState.setElectronRpc(electronRpc, monkeyPatchedElectronId)
 
   // Always undo monkey patch immediately to allow page creation
   // When tracking, we'll pause again after function-tracker is connected
