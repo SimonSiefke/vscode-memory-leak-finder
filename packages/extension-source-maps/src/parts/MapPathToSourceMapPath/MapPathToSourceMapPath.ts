@@ -33,12 +33,12 @@ const extractCopilot = (root: string, normalizedPath: string) => {
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, relativePath + '.map')
   return sourceMapPath
 }
-const extractJsDebug = (root: string, normalizedPath: string) => {
+const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion?: string) => {
   const extensionMatch = normalizedPath.match(JS_DEBUG_EXTENSION_PATH_REGEX)
   if (!extensionMatch) {
     return null
   }
-  const version = '1.105.0'
+  const version = jsDebugVersion || '1.105.0'
   const relativePath = extensionMatch[1]
   const cacheDirName = `vscode-js-debug-${version}`
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, 'dist', relativePath + '.map')
@@ -54,6 +54,12 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
   const normalizedRoot = normalizePathSeparators(normalize(root))
   const normalizedPathInput = normalizePathSeparators(normalize(path))
   const looksAbsolute = isAbsolute(path) || normalizedPathInput.startsWith('/')
+
+  console.log('[mapPathToSourceMapPath] path:', path)
+  console.log('[mapPathToSourceMapPath] root:', root)
+  console.log('[mapPathToSourceMapPath] normalizedRoot:', normalizedRoot)
+  console.log('[mapPathToSourceMapPath] normalizedPathInput:', normalizedPathInput)
+  console.log('[mapPathToSourceMapPath] looksAbsolute:', looksAbsolute)
 
   let normalizedPath = path
   if (looksAbsolute) {
@@ -79,11 +85,14 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
       } catch {
         normalizedPath = relativePathResult
       }
+      console.log('[mapPathToSourceMapPath] normalizedPath:', normalizedPath)
       // Ensure it starts with .vscode-extensions
       if (!normalizedPath.startsWith('.vscode-extensions')) {
+        console.log('[mapPathToSourceMapPath] normalizedPath does not start with .vscode-extensions')
         return null
       }
     } else {
+      console.log('[mapPathToSourceMapPath] normalizedPathInput does not start with normalizedRoot')
       return null
     }
   } else {
