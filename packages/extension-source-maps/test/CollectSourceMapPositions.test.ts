@@ -19,5 +19,3 @@ test.skip('collectSourceMapPositions - skips items without valid source map URL'
 test.skip('collectSourceMapPositions - skips items without line or column', () => {
   expect(true).toBe(true)
 })
-  expect(result.positionPointers).toHaveLength(0)
-})
