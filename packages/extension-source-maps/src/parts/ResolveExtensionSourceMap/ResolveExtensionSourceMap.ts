@@ -70,7 +70,6 @@ export const resolveExtensionSourceMap = async (
     if (!existsSync(finalPath)) {
       throw new Error(`Source map not found`)
     }
-    console.log({ finalPath })
     return finalPath
   }
   return ''
