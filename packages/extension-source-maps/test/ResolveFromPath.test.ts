@@ -1,7 +1,7 @@
 import { expect, test, jest } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { MockRpc } from '@lvce-editor/rpc'
 
 // Mock the Root module before importing ResolveFromPath
 const mockRoot = tmpdir()
@@ -37,10 +37,10 @@ test.skip('resolveFromPath - resolves single path', async () => {
         return {
           [sourceMapUrl]: [
             {
-              line: 100,
               column: 200,
-              source: 'src/extension.ts',
+              line: 100,
               name: 'activate',
+              source: 'src/extension.ts',
             },
           ],
         }
@@ -58,12 +58,12 @@ test.skip('resolveFromPath - resolves single path', async () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    originalUrl: 'src/extension.ts',
-    originalLine: 100,
     originalColumn: 200,
+    originalLine: 100,
+    originalLocation: 'src/extension.ts:100:200',
     originalName: 'activate',
     originalSource: 'src/extension.ts',
-    originalLocation: 'src/extension.ts:100:200',
+    originalUrl: 'src/extension.ts',
   })
 })
 
@@ -81,18 +81,18 @@ test.skip('resolveFromPath - resolves multiple paths', async () => {
         return {
           [sourceMapUrl1]: [
             {
-              line: 100,
               column: 200,
-              source: 'src/extension.ts',
+              line: 100,
               name: 'activate',
+              source: 'src/extension.ts',
             },
           ],
           [sourceMapUrl2]: [
             {
-              line: 30,
               column: 5,
-              source: 'src/utils.ts',
+              line: 30,
               name: 'helperFunction',
+              source: 'src/utils.ts',
             },
           ],
         }
@@ -110,20 +110,20 @@ test.skip('resolveFromPath - resolves multiple paths', async () => {
 
   expect(result).toHaveLength(2)
   expect(result[0]).toEqual({
-    originalUrl: 'src/extension.ts',
-    originalLine: 100,
     originalColumn: 200,
+    originalLine: 100,
+    originalLocation: 'src/extension.ts:100:200',
     originalName: 'activate',
     originalSource: 'src/extension.ts',
-    originalLocation: 'src/extension.ts:100:200',
+    originalUrl: 'src/extension.ts',
   })
   expect(result[1]).toEqual({
-    originalUrl: 'src/utils.ts',
-    originalLine: 30,
     originalColumn: 5,
+    originalLine: 30,
+    originalLocation: 'src/utils.ts:30:5',
     originalName: 'helperFunction',
     originalSource: 'src/utils.ts',
-    originalLocation: 'src/utils.ts:30:5',
+    originalUrl: 'src/utils.ts',
   })
 })
 
@@ -180,10 +180,10 @@ test.skip('resolveFromPath - handles js-debug extension path', async () => {
         return {
           [sourceMapUrl]: [
             {
-              line: 5,
               column: 100,
-              source: 'src/extension.ts',
+              line: 5,
               name: 'activate',
+              source: 'src/extension.ts',
             },
           ],
         }
@@ -201,12 +201,12 @@ test.skip('resolveFromPath - handles js-debug extension path', async () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    originalUrl: 'src/extension.ts',
-    originalLine: 5,
     originalColumn: 100,
+    originalLine: 5,
+    originalLocation: 'src/extension.ts:5:100',
     originalName: 'activate',
     originalSource: 'src/extension.ts',
-    originalLocation: 'src/extension.ts:5:100',
+    originalUrl: 'src/extension.ts',
   })
 })
 
@@ -268,10 +268,10 @@ test.skip('resolveFromPath - handles paths with special characters', async () =>
         return {
           [sourceMapUrl]: [
             {
-              line: 20,
               column: 30,
-              source: 'src/file-name_with.special-chars.ts',
+              line: 20,
               name: 'specialFunction',
+              source: 'src/file-name_with.special-chars.ts',
             },
           ],
         }
@@ -289,12 +289,12 @@ test.skip('resolveFromPath - handles paths with special characters', async () =>
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    originalUrl: 'src/file-name_with.special-chars.ts',
-    originalLine: 20,
     originalColumn: 30,
+    originalLine: 20,
+    originalLocation: 'src/file-name_with.special-chars.ts:20:30',
     originalName: 'specialFunction',
     originalSource: 'src/file-name_with.special-chars.ts',
-    originalLocation: 'src/file-name_with.special-chars.ts:20:30',
+    originalUrl: 'src/file-name_with.special-chars.ts',
   })
 })
 
@@ -310,10 +310,10 @@ test.skip('resolveFromPath - handles paths with null original source', async () 
         return {
           [sourceMapUrl]: [
             {
-              line: 100,
               column: 200,
-              source: null,
+              line: 100,
               name: null,
+              source: null,
             },
           ],
         }
@@ -331,12 +331,12 @@ test.skip('resolveFromPath - handles paths with null original source', async () 
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    originalUrl: null,
-    originalLine: 100,
     originalColumn: 200,
+    originalLine: 100,
+    originalLocation: null,
     originalName: null,
     originalSource: null,
-    originalLocation: null,
+    originalUrl: null,
   })
 })
 
@@ -352,10 +352,10 @@ test.skip('resolveFromPath - handles paths with null line or column', async () =
         return {
           [sourceMapUrl]: [
             {
-              line: null,
               column: null,
-              source: 'src/extension.ts',
+              line: null,
               name: 'activate',
+              source: 'src/extension.ts',
             },
           ],
         }
@@ -373,12 +373,12 @@ test.skip('resolveFromPath - handles paths with null line or column', async () =
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    originalUrl: 'src/extension.ts',
-    originalLine: null,
     originalColumn: null,
+    originalLine: null,
+    originalLocation: null,
     originalName: 'activate',
     originalSource: 'src/extension.ts',
-    originalLocation: null,
+    originalUrl: 'src/extension.ts',
   })
 })
 
@@ -394,10 +394,10 @@ test.skip('resolveFromPath - handles paths with ../ prefixes in source', async (
         return {
           [sourceMapUrl]: [
             {
-              line: 100,
               column: 200,
-              source: '../src/extension.ts',
+              line: 100,
               name: 'activate',
+              source: '../src/extension.ts',
             },
           ],
         }
@@ -415,11 +415,11 @@ test.skip('resolveFromPath - handles paths with ../ prefixes in source', async (
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    originalUrl: 'src/extension.ts',
-    originalLine: 100,
     originalColumn: 200,
+    originalLine: 100,
+    originalLocation: 'src/extension.ts:100:200',
     originalName: 'activate',
     originalSource: 'src/extension.ts',
-    originalLocation: 'src/extension.ts:100:200',
+    originalUrl: 'src/extension.ts',
   })
 })

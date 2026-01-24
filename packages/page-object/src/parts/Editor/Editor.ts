@@ -546,6 +546,23 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to hide debug hover`)
       }
     },
+    async hideInlineChat() {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const chat = page.locator('.chat-widget')
+        await expect(chat).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
+        await expect(chat).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide inline chat`)
+      }
+    },
     async hideMinimap() {
       try {
         const minimap = page.locator('.minimap')
@@ -1508,6 +1525,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open debug hover`)
       }
     },
+    async showInlineChat() {
+      try {
+        const editor = page.locator('.editor')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const chat = page.locator('.chat-widget')
+        await expect(chat).toBeHidden()
+        await page.waitForIdle()
+        await page.keyboard.press('Control+i')
+        await page.waitForIdle()
+        await expect(chat).toBeVisible()
+        const chatEditor = chat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(chatEditor).toBeVisible()
+        const editContext = chatEditor.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        await expect(editContext).toBeFocused()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show inline chat`)
+      }
+    },
     async showMinimap() {
       try {
         const minimap = page.locator('.minimap')
@@ -1753,45 +1792,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const img = subFrame.locator('img')
       await expect(img).toBeVisible()
       await subFrame.waitForIdle()
-    },
-    async hideInlineChat() {
-      try {
-        await page.waitForIdle()
-        const editor = page.locator('.editor')
-        await expect(editor).toBeVisible()
-        await page.waitForIdle()
-        const chat = page.locator('.chat-widget')
-        await expect(chat).toBeVisible()
-        await page.waitForIdle()
-        await page.keyboard.press('Escape')
-        await page.waitForIdle()
-        await expect(chat).toBeHidden()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to hide inline chat`)
-      }
-    },
-    async showInlineChat() {
-      try {
-        const editor = page.locator('.editor')
-        await expect(editor).toBeVisible()
-        await page.waitForIdle()
-        const chat = page.locator('.chat-widget')
-        await expect(chat).toBeHidden()
-        await page.waitForIdle()
-        await page.keyboard.press('Control+i')
-        await page.waitForIdle()
-        await expect(chat).toBeVisible()
-        const chatEditor = chat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
-        await expect(chatEditor).toBeVisible()
-        const editContext = chatEditor.locator('.native-edit-context')
-        await expect(editContext).toBeVisible()
-        await page.waitForIdle()
-        await expect(editContext).toBeFocused()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to show inline chat`)
-      }
     },
     async waitForNoteBookReady() {
       await page.waitForIdle()

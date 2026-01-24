@@ -30,7 +30,7 @@ export const run = async ({ ActivityBar, Explorer, RunAndDebug }: TestContext): 
   await Explorer.focus()
 }
 
-export const teardown = async ({ SideBar, Editor }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SideBar.hide()
 }

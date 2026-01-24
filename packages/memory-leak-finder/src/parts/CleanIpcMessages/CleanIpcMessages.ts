@@ -1,12 +1,12 @@
 // VSCode binary serialization format
 export const DataType = {
-  Undefined: 0,
-  String: 1,
-  Buffer: 2,
-  VSBuffer: 3,
   Array: 4,
-  Object: 5,
+  Buffer: 2,
   Int: 6,
+  Object: 5,
+  String: 1,
+  Undefined: 0,
+  VSBuffer: 3,
 }
 
 // Read variable-length quantity (VQL) integer
@@ -23,87 +23,87 @@ export function readIntVQL(buffer: Buffer, offset: number): { value: number; byt
     shift += 7
   }
 
-  return { value, bytesRead }
+  return { bytesRead, value }
 }
 
 // Deserialize VSCode binary format
 export function deserialize(buffer: Buffer, offset: number = 0): { value: any; bytesRead: number } {
   if (offset >= buffer.length) {
-    return { value: undefined, bytesRead: 0 }
+    return { bytesRead: 0, value: undefined }
   }
 
   const type = buffer[offset]
   offset++
 
   switch (type) {
-    case DataType.Undefined:
-      return { value: undefined, bytesRead: 1 }
-
-    case DataType.String: {
-      const { value: length, bytesRead: lengthBytes } = readIntVQL(buffer, offset)
-      offset += lengthBytes
-      const str = buffer.subarray(offset, offset + length).toString('utf8')
-      return { value: str, bytesRead: 1 + lengthBytes + length }
-    }
-
     case DataType.Buffer: {
-      const { value: length, bytesRead: lengthBytes } = readIntVQL(buffer, offset)
+      const { bytesRead: lengthBytes, value: length } = readIntVQL(buffer, offset)
       offset += lengthBytes
       const buf = buffer.subarray(offset, offset + length)
       // Try to parse buffer contents as UTF-8 JSON, fall back to raw buffer
       try {
         const str = buf.toString('utf8')
         const parsed = JSON.parse(str)
-        return { value: parsed, bytesRead: 1 + lengthBytes + length }
-      } catch (e) {
-        return { value: buf, bytesRead: 1 + lengthBytes + length }
+        return { bytesRead: 1 + lengthBytes + length, value: parsed }
+      } catch {
+        return { bytesRead: 1 + lengthBytes + length, value: buf }
       }
     }
 
     case DataType.VSBuffer: {
-      const { value: length, bytesRead: lengthBytes } = readIntVQL(buffer, offset)
+      const { bytesRead: lengthBytes, value: length } = readIntVQL(buffer, offset)
       offset += lengthBytes
       const buf = buffer.subarray(offset, offset + length)
       // Try to parse buffer contents as UTF-8 JSON, fall back to raw buffer
       try {
         const str = buf.toString('utf8')
         const parsed = JSON.parse(str)
-        return { value: parsed, bytesRead: 1 + lengthBytes + length }
-      } catch (e) {
-        return { value: buf, bytesRead: 1 + lengthBytes + length }
+        return { bytesRead: 1 + lengthBytes + length, value: parsed }
+      } catch {
+        return { bytesRead: 1 + lengthBytes + length, value: buf }
       }
     }
 
     case DataType.Array: {
-      const { value: length, bytesRead: lengthBytes } = readIntVQL(buffer, offset)
+      const { bytesRead: lengthBytes, value: length } = readIntVQL(buffer, offset)
       offset += lengthBytes
       const result: any[] = []
       let totalBytes = 1 + lengthBytes
 
       for (let i = 0; i < length; i++) {
-        const { value, bytesRead } = deserialize(buffer, offset)
+        const { bytesRead, value } = deserialize(buffer, offset)
         result.push(value)
         offset += bytesRead
         totalBytes += bytesRead
       }
 
-      return { value: result, bytesRead: totalBytes }
-    }
-
-    case DataType.Object: {
-      const { value: length, bytesRead: lengthBytes } = readIntVQL(buffer, offset)
-      offset += lengthBytes
-      const json = buffer.subarray(offset, offset + length).toString('utf8')
-      return { value: JSON.parse(json), bytesRead: 1 + lengthBytes + length }
+      return { bytesRead: totalBytes, value: result }
     }
 
     case DataType.Int: {
-      const { value, bytesRead } = readIntVQL(buffer, offset)
-      return { value, bytesRead: 1 + bytesRead }
+      const { bytesRead, value } = readIntVQL(buffer, offset)
+      return { bytesRead: 1 + bytesRead, value }
     }
 
+    case DataType.Object: {
+      const { bytesRead: lengthBytes, value: length } = readIntVQL(buffer, offset)
+      offset += lengthBytes
+      const json = buffer.subarray(offset, offset + length).toString('utf8')
+      return { bytesRead: 1 + lengthBytes + length, value: JSON.parse(json) }
+    }
+
+    case DataType.String: {
+      const { bytesRead: lengthBytes, value: length } = readIntVQL(buffer, offset)
+      offset += lengthBytes
+      const str = buffer.subarray(offset, offset + length).toString('utf8')
+      return { bytesRead: 1 + lengthBytes + length, value: str }
+    }
+
+    case DataType.Undefined:
+      return { bytesRead: 1, value: undefined }
+
     default:
-      return { value: undefined, bytesRead: 1 }
+      return { bytesRead: 1, value: undefined }
   }
 }
 
@@ -115,7 +115,7 @@ function bufferFromContent(content: string): Buffer {
   // deserialize we fall back to 'utf8'.
   try {
     return Buffer.from(content, 'latin1')
-  } catch (e) {
+  } catch {
     return Buffer.from(content, 'utf8')
   }
 }
@@ -133,7 +133,7 @@ export function cleanMessages(messages: any[]): any[] {
           // Convert the content string back to a buffer, prefer 'latin1' to preserve raw bytes
           try {
             const buffer = bufferFromContent(arg.content)
-            const { value, bytesRead } = deserialize(buffer)
+            const { bytesRead, value } = deserialize(buffer)
 
             if (bytesRead > 0 && value !== undefined) {
               return value
@@ -142,10 +142,10 @@ export function cleanMessages(messages: any[]): any[] {
             // Fallback: try to parse the raw content as JSON (utf8)
             try {
               return JSON.parse(buffer.toString('utf8'))
-            } catch (e) {
+            } catch {
               return arg
             }
-          } catch (e) {
+          } catch {
             return arg
           }
         }
@@ -154,7 +154,7 @@ export function cleanMessages(messages: any[]): any[] {
         if (typeof arg === 'string') {
           try {
             return JSON.parse(arg)
-          } catch (e) {
+          } catch {
             return arg
           }
         }
@@ -169,24 +169,24 @@ export function cleanMessages(messages: any[]): any[] {
       if (msg.result.type && (msg.result.type === 'uint8array' || msg.result.type === 'buffer') && msg.result.content) {
         try {
           const buffer = bufferFromContent(msg.result.content)
-          const { value, bytesRead } = deserialize(buffer)
+          const { bytesRead, value } = deserialize(buffer)
 
           if (bytesRead > 0 && value !== undefined) {
             cleanedMsg.result = value
           } else {
             try {
               cleanedMsg.result = JSON.parse(buffer.toString('utf8'))
-            } catch (e) {
+            } catch {
               // keep original
             }
           }
-        } catch (e) {
+        } catch {
           // keep original
         }
       } else if (typeof msg.result === 'string') {
         try {
           cleanedMsg.result = JSON.parse(msg.result)
-        } catch (e) {
+        } catch {
           // keep original
         }
       }

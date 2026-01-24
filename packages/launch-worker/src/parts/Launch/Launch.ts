@@ -26,9 +26,9 @@ export interface LaunchOptions {
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
   readonly measureId: string
+  readonly openDevtools: boolean
   readonly platform: string
   readonly trackFunctions: boolean
-  readonly openDevtools: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -55,15 +55,15 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     measureId,
+    openDevtools,
     platform,
     trackFunctions,
-    openDevtools,
     updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
   } = options
-  const { child, parsedVersion, pid, binaryPath } = await LaunchIde.launchIde({
+  const { binaryPath, child, parsedVersion, pid } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
     clearExtensions,

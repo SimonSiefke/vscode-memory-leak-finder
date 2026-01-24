@@ -1,7 +1,6 @@
 import { existsSync } from 'node:fs'
-import { join } from 'node:path'
-
 import { readdir } from 'node:fs/promises'
+import { join } from 'node:path'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
 export const getTrackedFunctionsData = async (basePath: string) => {
@@ -32,14 +31,14 @@ export const getTrackedFunctionsData = async (basePath: string) => {
         const uniqueName = currentCount === 0 ? displayName : `${displayName}${currentCount}`
 
         fileData.push({
-          name: uniqueName,
           count: count,
           delta: delta,
+          name: uniqueName,
         })
       }
       fileData.sort((a, b) => b.count - a.count)
       // Limit to top 100 functions for readability per file
-      const limitedData = fileData.slice(0, 10000)
+      const limitedData = fileData.slice(0, 10_000)
       // Add filename metadata to the data
       const dataWithFilename = {
         data: limitedData,

@@ -162,9 +162,9 @@ export const launchVsCode = async ({
       headlessMode,
     })
     return {
+      binaryPath,
       child,
       pid,
-      binaryPath,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch VSCode`)
