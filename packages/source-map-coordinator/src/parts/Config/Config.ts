@@ -10,8 +10,11 @@ interface IConfig {
   readonly extensionName: string
   readonly friendlyName: string
   readonly modifications: readonly any[]
+  readonly pathReplacements: readonly any[]
   readonly platform: string
   readonly repoUrl: string
+  readonly match: string
+  readonly resolveVersion: string
 }
 
 export const getConfigs = (platform: string): readonly IConfig[] => {
@@ -25,6 +28,14 @@ export const getConfigs = (platform: string): readonly IConfig[] => {
       modifications: [],
       platform,
       friendlyName: 'js-debug',
+      match: 'extensions/ms-vscode.js-debug/',
+      resolveVersion: 'packageJson',
+      pathReplacements: [
+        {
+          occurrence: /^src/,
+          replacement: 'dist/src',
+        },
+      ],
     },
     {
       friendlyName: 'github-copilot-chat',
@@ -41,6 +52,9 @@ export const getConfigs = (platform: string): readonly IConfig[] => {
         },
       ],
       platform,
+      match: 'extensions/ms-vscode.js-debug/',
+      resolveVersion: 'packageJson',
+      pathReplacements: [],
     },
   ]
 }

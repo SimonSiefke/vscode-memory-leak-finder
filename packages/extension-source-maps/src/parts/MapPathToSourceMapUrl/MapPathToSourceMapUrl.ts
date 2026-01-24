@@ -1,5 +1,6 @@
 import { isAbsolute, join, relative, normalize } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { root } from '../Root/Root.ts'
 
 const COPILOT_EXTENSION_PATH_REGEX = /\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/
 const JS_DEBUG_EXTENSION_PATH_REGEX = /extensions\/ms-vscode\.js-debug\/(.+)$/
@@ -57,17 +58,14 @@ const extractJsDebug = (root: string, normalizedPath: string, jsDebugVersion: st
   return sourceMapPath
 }
 
-const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion: string): string | null => {
-  if (!path) {
-    return null
+const mapPathToSourceMapPath = (uri: string, jsDebugVersion: string): string => {
+  if (!uri) {
+    return ''
   }
-  // Normalize absolute paths to relative paths
-  // Handle both true absolute paths and Unix-style paths on Windows
-  const normalizedRoot = normalizePathSeparators(normalize(root))
-  const normalizedPathInput = normalizePathSeparators(normalize(path))
-  const looksAbsolute = isAbsolute(path) || normalizedPathInput.startsWith('/')
 
-  let normalizedPath = path
+  const jsDebugMatch = extractJsDebug(root, uri, jsDebugVersion)
+
+  let normalizedPath = uri
   if (looksAbsolute) {
     // Normalize both paths for comparison (handle Windows backslashes and cross-platform roots)
 
@@ -82,7 +80,7 @@ const mapPathToSourceMapPath = (path: string, root: string, jsDebugVersion: stri
       }
       // Try native relative() as fallback, but prefer manual extraction for cross-platform compatibility
       try {
-        const nativeRelative = relative(root, path)
+        const nativeRelative = relative(root, uri)
         if (nativeRelative && !nativeRelative.startsWith('..')) {
           normalizedPath = normalizePathSeparators(nativeRelative)
         } else {

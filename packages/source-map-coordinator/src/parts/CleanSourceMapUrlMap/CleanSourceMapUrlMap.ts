@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import { getConfigs } from '../Config/Config.ts'
 import { launchExtensionSourceMapWorker } from '../LaunchExtensionSourceMapWorker/LaunchExtensionSourceMapWorker.ts'
 import * as Root from '../Root/Root.ts'
@@ -8,6 +9,13 @@ interface SourceMapUrlMap {
 
 const isExtensionFile = (url: string): boolean => {
   return url.includes('ms-vscode.js-debug')
+}
+
+const ensureUri = (file: string): string => {
+  if (file.startsWith('file://')) {
+    return file
+  }
+  return pathToFileURL(file).toString()
 }
 
 /**
@@ -33,7 +41,8 @@ export const cleanSourceMapUrlMap = async (sourceMapUrlMap: SourceMapUrlMap, pla
         extensionSourceMapWorker = await launchExtensionSourceMapWorker()
       }
 
-      const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', key, Root.root, configs)
+      const uri = ensureUri(key) // TODO maybe caller should have alrady ensured uri
+      const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', uri, Root.root, configs)
 
       console.log({ sourceMapUrl })
       if (sourceMapUrl) {
