@@ -42,6 +42,7 @@ export const runTests = async ({
   pageObjectPath,
   platform,
   recordVideo,
+  resolveExtensionSourceMaps,
   restartBetween,
   root,
   runMode,
