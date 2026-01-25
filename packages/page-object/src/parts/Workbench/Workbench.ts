@@ -44,7 +44,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         // Find the new window ID by comparing the lists
         const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
         if (newWindowId === undefined) {
-          throw new VError({}, `Could not identify the new window ID`)
+          throw new Error(`Could not identify the new window ID`)
         }
 
         // Return an object for manipulating the new window
