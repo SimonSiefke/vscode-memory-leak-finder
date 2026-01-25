@@ -26,7 +26,12 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
 
         // Wait for window count to increase
         let currentWindowCount = initialWindowCount
+        const maxDelay = 5000 // 5 seconds max wait time
+        const startTime = performance.now()
         while (currentWindowCount <= initialWindowCount) {
+          if (performance.now() - startTime > maxDelay) {
+            throw new VError({}, `New window did not appear within ${maxDelay}ms`)
+          }
           await new Promise((resolve) => setTimeout(resolve, 100))
           currentWindowCount = await electron.getWindowCount()
         }
