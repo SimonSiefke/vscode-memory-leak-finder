@@ -39,7 +39,7 @@ export const create = ({ electronApp, VError }: CreateParams) => {
           if (window && !window.isDestroyed()) {
             window.close()
           }
-        })()")
+        })()`)
       } catch (error) {
         throw new VError(error, `Failed to close window`)
       }
