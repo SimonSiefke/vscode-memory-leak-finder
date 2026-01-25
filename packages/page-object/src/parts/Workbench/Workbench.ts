@@ -12,7 +12,10 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
         const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
-        const initialWindowCount = await electron.getWindowCount()
+        
+        // Get window IDs before opening a new window
+        const windowIdsBefore = await electron.getWindowIds()
+        
         await page.waitForIdle()
         const quickPick = QuickPick.create({
           electronApp,
@@ -24,22 +27,25 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         })
         await quickPick.executeCommand(WellKnownCommands.NewWindow)
 
-        // Wait for window count to increase
-        let currentWindowCount = initialWindowCount
+        // Wait for a new window ID to appear
+        let windowIdsAfter = windowIdsBefore
         const maxDelay = 5000 // 5 seconds max wait time
         const startTime = performance.now()
-        while (currentWindowCount <= initialWindowCount) {
+        while (windowIdsAfter.length <= windowIdsBefore.length) {
           if (performance.now() - startTime > maxDelay) {
             throw new VError({}, `New window did not appear within ${maxDelay}ms`)
           }
           await new Promise((resolve) => setTimeout(resolve, 100))
-          currentWindowCount = await electron.getWindowCount()
+          windowIdsAfter = await electron.getWindowIds()
         }
 
         await page.waitForIdle()
 
-        // Get the new window ID
-        const newWindowId = await electron.getNewWindowId()
+        // Find the new window ID by comparing the lists
+        const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
+        if (newWindowId === undefined) {
+          throw new VError({}, `Could not identify the new window ID`)
+        }
 
         // Return an object for manipulating the new window
         return {
