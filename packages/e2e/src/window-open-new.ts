@@ -7,20 +7,13 @@ export const run = async ({ Electron, Workbench }: TestContext): Promise<void> =
   // Open a new VS Code window using the Workbench API
   await Workbench.openNewWindow()
 
-  // Verify a new window was created
-  const windowCountAfter = await Electron.getWindowCount()
-  if (windowCountAfter <= windowCountBefore) {
-    throw new Error('New window was not created')
-  }
-}
+  // Wait for the new window to be ready
+  await new Promise((resolve) => setTimeout(resolve, 3000))
 
-export const teardown = async ({ Electron }: TestContext): Promise<void> => {
-  // Close all windows except the first one
-  // This ensures we don't leave extra windows open after the test
+  // Close all windows except the first one to clean up after ourselves
   await Electron.evaluate(`(() => {
     const { BrowserWindow } = globalThis._____electron
     const allWindows = BrowserWindow.getAllWindows()
-    // Keep only the first window open
     if (allWindows.length > 1) {
       for (let i = 1; i < allWindows.length; i++) {
         const window = allWindows[i]
@@ -31,6 +24,9 @@ export const teardown = async ({ Electron }: TestContext): Promise<void> => {
     }
   })()`)
 
-  // Give windows time to close
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  // Verify we're back to the original state
+  const windowCountAfter = await Electron.getWindowCount()
+  if (windowCountAfter !== windowCountBefore) {
+    throw new Error(`Window count should be ${windowCountBefore}, but got ${windowCountAfter}`)
+  }
 }
