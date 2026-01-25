@@ -19,26 +19,31 @@ export const create = ({ electronApp, VError }: CreateParams) => {
     },
     async getWindowIds(): Promise<readonly number[]> {
       try {
-        return await this.evaluate(`(() => {
+        await this.evaluate(`(() => {
           const { BrowserWindow } = globalThis._____electron
           const allWindows = BrowserWindow.getAllWindows()
-          return allWindows.map(w => w.id)
+          globalThis._____windowIds = allWindows.map(w => w.id)
         })()`)
+        // Return the IDs that were stored in the global
+        return await this.evaluate(`globalThis._____windowIds`)
       } catch (error) {
         throw new VError(error, `Failed to get window IDs`)
       }
     },
     async getNewWindowId(): Promise<number | null> {
       try {
-        return await this.evaluate(`(() => {
+        await this.evaluate(`(() => {
           const { BrowserWindow } = globalThis._____electron
           const allWindows = BrowserWindow.getAllWindows()
-          // Return the ID of the last window (the one just created)
+          // Store the ID of the last window (the one just created)
           if (allWindows.length > 0) {
-            return allWindows[allWindows.length - 1].id
+            globalThis._____newWindowId = allWindows[allWindows.length - 1].id
+          } else {
+            globalThis._____newWindowId = null
           }
-          return null
         })()`)
+        // Return the ID that was stored in the global
+        return await this.evaluate(`globalThis._____newWindowId`)
       } catch (error) {
         throw new VError(error, `Failed to get new window ID`)
       }
