@@ -3,17 +3,17 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Electron from '../Electron/Electron.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
     async openNewWindow() {
       try {
-        const electron = Electron.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
         const initialWindowCount = await electron.getWindowCount()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
