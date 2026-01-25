@@ -34,15 +34,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         await page.waitForIdle()
 
         // Get the new window ID
-        const newWindowId = await electron.evaluate(`(() => {
-          const { BrowserWindow } = globalThis._____electron
-          const allWindows = BrowserWindow.getAllWindows()
-          // Return the ID of the last window (the one just created)
-          if (allWindows.length > 0) {
-            return allWindows[allWindows.length - 1].id
-          }
-          return null
-        })()`)
+        const newWindowId = await electron.getNewWindowId()
 
         // Return an object for manipulating the new window
         return {

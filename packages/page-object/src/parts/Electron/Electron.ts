@@ -17,6 +17,21 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get window count`)
       }
     },
+    async getNewWindowId() {
+      try {
+        return await this.evaluate(`(() => {
+          const { BrowserWindow } = globalThis._____electron
+          const allWindows = BrowserWindow.getAllWindows()
+          // Return the ID of the last window (the one just created)
+          if (allWindows.length > 0) {
+            return allWindows[allWindows.length - 1].id
+          }
+          return null
+        })()`)
+      } catch (error) {
+        throw new VError(error, `Failed to get new window ID`)
+      }
+    },
     async mockDialog(response: any) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
