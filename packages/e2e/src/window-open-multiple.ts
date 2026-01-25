@@ -14,35 +14,29 @@ export const run = async ({ Electron, Workbench }: TestContext): Promise<void> =
   const initialCount = await Electron.getWindowCount()
 
   // Open the first new window
-  await Workbench.openNewWindow()
+  const window1 = await Workbench.openNewWindow()
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
   // Open the second new window
-  await Workbench.openNewWindow()
+  const window2 = await Workbench.openNewWindow()
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
   // Verify both windows were created
-  const finalCount = await Electron.getWindowCount()
+  let finalCount = await Electron.getWindowCount()
   if (finalCount < initialCount + 2) {
     throw new Error(`Expected at least ${initialCount + 2} windows, got ${finalCount}`)
   }
-}
 
-export const teardown = async ({ Electron }: TestContext): Promise<void> => {
-  // Close all windows except the first one
-  // This ensures we don't leave extra windows open after the test
-  await Electron.evaluate(`(() => {
-    const { BrowserWindow } = globalThis._____electron
-    const allWindows = BrowserWindow.getAllWindows()
-    // Keep only the first window open
-    if (allWindows.length > 1) {
-      for (let i = 1; i < allWindows.length; i++) {
-        const window = allWindows[i]
-        if (window && !window.isDestroyed()) {
-          window.close()
-        }
-      }
-    }
-  })()`)
+  // Close both windows
+  await window1.close()
+  await window2.close()
 
   // Give windows time to close
   await new Promise((resolve) => setTimeout(resolve, 1000))
+
+  // Verify we're back to the initial state
+  finalCount = await Electron.getWindowCount()
+  if (finalCount !== initialCount) {
+    throw new Error(`Window count should be ${initialCount}, but got ${finalCount}`)
+  }
 }

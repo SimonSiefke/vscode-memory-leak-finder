@@ -28,6 +28,34 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         }
 
         await page.waitForIdle()
+
+        // Get the new window ID
+        const newWindowId = await electron.evaluate(`(() => {
+          const { BrowserWindow } = globalThis._____electron
+          const allWindows = BrowserWindow.getAllWindows()
+          // Return the ID of the last window (the one just created)
+          if (allWindows.length > 0) {
+            return allWindows[allWindows.length - 1].id
+          }
+          return null
+        })()`)
+
+        // Return an object for manipulating the new window
+        return {
+          async close() {
+            try {
+              await electron.evaluate(`(() => {
+                const { BrowserWindow } = globalThis._____electron
+                const window = BrowserWindow.fromId(${newWindowId})
+                if (window && !window.isDestroyed()) {
+                  window.close()
+                }
+              })()`)
+            } catch (error) {
+              throw new VError(error, `Failed to close new window`)
+            }
+          },
+        }
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
       }

@@ -589,7 +589,7 @@ export interface Window {
 }
 export interface Workbench {
   focusLeftEditorGroup(): Promise<void>
-  openNewWindow(): Promise<void>
+  openNewWindow(): Promise<{ close(): Promise<void> }>
   shouldBeVisible(): Promise<void>
   shouldHaveEditorBackground(color: any): Promise<void>
 }
