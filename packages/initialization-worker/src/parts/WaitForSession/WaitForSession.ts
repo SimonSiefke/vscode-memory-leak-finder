@@ -13,6 +13,24 @@ interface BrowserRpc {
 export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeout: number) => {
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
 
+  console.log('[WaitForSession] Registering Target.attachedToTarget listener')
+  // Listen for any NEW targets being attached (e.g., new windows created during testing) and automatically continue them
+  const handleNewTarget = (message: any): void => {
+    const { sessionId: newSessionId } = message.params
+    console.log(`[WaitForSession] New target attached: ${newSessionId}`)
+    const newSessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, newSessionId)
+    // Automatically continue any newly attached targets that are waiting for debugger
+    // Fire and forget - don't wait for this to complete
+    DevtoolsProtocolRuntime.runIfWaitingForDebugger(newSessionRpc).then(() => {
+      console.log(`[WaitForSession] Continued target: ${newSessionId}`)
+    }).catch((err: any) => {
+      // Silently ignore errors as the target might not be waiting
+      console.log(`[WaitForSession] Could not continue target ${newSessionId}: ${err.message}`)
+    })
+  }
+
+  browserRpc.on('Target.attachedToTarget', handleNewTarget)
+
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
     autoAttach: true,
     filter: [
@@ -28,36 +46,20 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
         exclude: false,
         type: 'page',
       },
-      {
-        exclude: false,
-        type: 'webview',
-      },
     ],
     flatten: true,
     waitForDebuggerOnStart: true,
   })
 
+  console.log('[WaitForSession] Waiting for initial page attachment...')
   const event = await eventPromise
 
   if (!event) {
     throw new Error(`Failed to attach to page`)
   }
+  console.log('[WaitForSession] Initial page attached')
   const { sessionId, targetInfo } = event.params
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-
-  // Listen for any NEW targets being attached (e.g., new windows created during testing) and automatically continue them
-  // This listener is registered AFTER we've gotten the initial page, so it won't interfere with initial setup
-  const handleNewTarget = (message: any): void => {
-    const { sessionId: newSessionId } = message.params
-    const newSessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, newSessionId)
-    // Automatically continue any newly attached targets that are waiting for debugger
-    // Fire and forget - don't wait for this to complete
-    DevtoolsProtocolRuntime.runIfWaitingForDebugger(newSessionRpc).catch(() => {
-      // Silently ignore errors as the target might not be waiting
-    })
-  }
-
-  browserRpc.on('Target.attachedToTarget', handleNewTarget)
 
   return {
     sessionId,
