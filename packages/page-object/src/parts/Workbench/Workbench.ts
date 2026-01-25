@@ -4,6 +4,23 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
+    async openNewWindow() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp: undefined,
+          expect,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand('New Window')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open new window`)
+      }
+    },
     async focusLeftEditorGroup() {
       await page.waitForIdle()
       const quickPick = QuickPick.create({

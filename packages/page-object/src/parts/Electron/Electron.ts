@@ -5,6 +5,18 @@ export const create = ({ electronApp, VError }: CreateParams) => {
     async evaluate(expression: string) {
       return await electronApp.evaluate(expression)
     },
+    async getWindowCount() {
+      try {
+        await this.evaluate(`(() => {
+  const { BrowserWindow } = globalThis._____electron
+  globalThis._____windowCount = BrowserWindow.getAllWindows().length
+})()`)
+        // Return the count that was stored in the global
+        return await this.evaluate(`globalThis._____windowCount`)
+      } catch (error) {
+        throw new VError(error, `Failed to get window count`)
+      }
+    },
     async mockDialog(response: any) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
