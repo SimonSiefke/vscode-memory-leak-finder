@@ -4,8 +4,9 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
-    async openNewWindow() {
+    async openNewWindow(electron: any) {
       try {
+        const initialWindowCount = await electron.getWindowCount()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
           electronApp: undefined,
@@ -16,6 +17,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           VError,
         })
         await quickPick.executeCommand('New Window')
+        
+        // Wait for window count to increase
+        let currentWindowCount = initialWindowCount
+        while (currentWindowCount <= initialWindowCount) {
+          await new Promise((resolve) => setTimeout(resolve, 100))
+          currentWindowCount = await electron.getWindowCount()
+        }
+        
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
