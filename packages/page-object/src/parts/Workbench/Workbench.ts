@@ -15,13 +15,13 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
       const startTime = performance.now()
       while (windowIdsAfter.length <= windowIdsBefore.length) {
         if (performance.now() - startTime > maxDelay) {
-          throw new VError({}, `New window did not appear within ${maxDelay}ms`)
+          throw new Error(`New window did not appear within ${maxDelay}ms`)
         }
         await new Promise((resolve) => setTimeout(resolve, 100))
         const ids = await electron.getWindowIds()
         windowIdsAfter = Array.isArray(ids) ? ids : []
       }
-      
+
       // Find the new window ID by comparing the lists
       const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
       if (newWindowId === undefined) {
@@ -49,15 +49,9 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         await quickPick.executeCommand(WellKnownCommands.NewWindow)
 
         // Wait for a new window ID to appear
-        let windowIdsAfter = await this.waitForWindowToShow(windowIdsBefore, electron)
+        const newWindowId = await this.waitForWindowToShow(windowIdsBefore, electron)
 
         await page.waitForIdle()
-
-        // Find the new window ID by comparing the lists
-        const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
-        if (newWindowId === undefined) {
-          throw new Error(`Could not identify the new window ID`)
-        }
 
         // Return an object for manipulating the new window
         return {
