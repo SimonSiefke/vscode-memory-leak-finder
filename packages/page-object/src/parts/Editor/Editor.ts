@@ -1862,24 +1862,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         })
         await quickPick.executeCommand(WellKnownCommands.MoveEditorToNewWindow)
 
-        // Wait for a new window ID to appear
-        let windowIdsAfter = windowIdsBefore
-        const maxDelay = 5000 // 5 seconds max wait time
-        const startTime = performance.now()
-        while (windowIdsAfter.length <= windowIdsBefore.length) {
-          if (performance.now() - startTime > maxDelay) {
-            throw new Error(`New window did not appear within ${maxDelay}ms`)
-          }
-          await new Promise((resolve) => setTimeout(resolve, 100))
-          const ids = await electron.getWindowIds()
-          windowIdsAfter = Array.isArray(ids) ? ids : []
-        }
-
-        // Find the new window ID by comparing the lists
-        const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
-        if (newWindowId === undefined) {
-          throw new Error(`Could not identify the new window ID`)
-        }
+        // Wait for a new window ID to appear using the same logic as Workbench.waitForWindowToShow
+        const newWindowId = await this.waitForNewWindow(windowIdsBefore, electron)
 
         await page.waitForIdle()
 
@@ -1896,6 +1880,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       } catch (error) {
         throw new VError(error, `Failed to move editor to new window`)
       }
+    },
+    async waitForNewWindow(windowIdsBefore: readonly number[], electron: ReturnType<typeof Electron.create>) {
+      let windowIdsAfter = windowIdsBefore
+      const maxDelay = 5000 // 5 seconds max wait time
+      const startTime = performance.now()
+      while (windowIdsAfter.length <= windowIdsBefore.length) {
+        if (performance.now() - startTime > maxDelay) {
+          throw new Error(`New window did not appear within ${maxDelay}ms`)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        const ids = await electron.getWindowIds()
+        windowIdsAfter = Array.isArray(ids) ? ids : []
+      }
+
+      // Find the new window ID by comparing the lists
+      const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
+      if (newWindowId === undefined) {
+        throw new Error(`Could not identify the new window ID`)
+      }
+      return newWindowId
     },
   }
 }
