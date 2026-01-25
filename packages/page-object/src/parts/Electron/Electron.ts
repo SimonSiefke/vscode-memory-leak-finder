@@ -5,7 +5,7 @@ export const create = ({ electronApp, VError }: CreateParams) => {
     async evaluate(expression: string) {
       return await electronApp.evaluate(expression)
     },
-    async getWindowCount() {
+    async getWindowCount(): Promise<number> {
       try {
         await this.evaluate(`(() => {
   const { BrowserWindow } = globalThis._____electron
@@ -17,7 +17,7 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get window count`)
       }
     },
-    async getWindowIds() {
+    async getWindowIds(): Promise<readonly number[]> {
       try {
         return await this.evaluate(`(() => {
           const { BrowserWindow } = globalThis._____electron
@@ -28,7 +28,7 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get window IDs`)
       }
     },
-    async getNewWindowId() {
+    async getNewWindowId(): Promise<number | null> {
       try {
         return await this.evaluate(`(() => {
           const { BrowserWindow } = globalThis._____electron
