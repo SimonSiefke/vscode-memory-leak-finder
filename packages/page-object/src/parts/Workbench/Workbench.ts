@@ -1,11 +1,13 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as Electron from '../Electron/Electron.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
-    async openNewWindow(electron: any) {
+    async openNewWindow() {
       try {
+        const electron = Electron.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
         const initialWindowCount = await electron.getWindowCount()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
@@ -17,14 +19,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           VError,
         })
         await quickPick.executeCommand('New Window')
-        
+
         // Wait for window count to increase
         let currentWindowCount = initialWindowCount
         while (currentWindowCount <= initialWindowCount) {
           await new Promise((resolve) => setTimeout(resolve, 100))
           currentWindowCount = await electron.getWindowCount()
         }
-        
+
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
