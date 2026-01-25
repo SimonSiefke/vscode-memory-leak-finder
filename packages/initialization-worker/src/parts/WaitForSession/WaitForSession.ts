@@ -1,5 +1,5 @@
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
 interface BrowserRpc {
@@ -12,6 +12,7 @@ interface BrowserRpc {
 
 export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeout: number) => {
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
+
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
     autoAttach: true,
     filter: [
@@ -39,6 +40,19 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
   }
   const { sessionId, targetInfo } = event.params
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+
+  // TODO maybe find a better place for this
+  const handleNewTarget = async (message: any): Promise<void> => {
+    const { sessionId } = message.params
+    const newSessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+    // Automatically continue any newly attached targets that are waiting for debugger
+    await DevtoolsProtocolRuntime.runIfWaitingForDebugger(newSessionRpc).catch((error) => {
+      // Silently ignore errors as the target might not be waiting
+      console.debug(`[WaitForSession] Could not continue target ${sessionId}:`, error.message)
+    })
+  }
+
+  browserRpc.on('Target.attachedToTarget', handleNewTarget)
 
   return {
     sessionId,
