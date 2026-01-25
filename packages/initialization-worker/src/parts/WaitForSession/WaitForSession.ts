@@ -28,6 +28,10 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
         exclude: false,
         type: 'page',
       },
+      {
+        exclude: false,
+        type: 'webview',
+      },
     ],
     flatten: true,
     waitForDebuggerOnStart: true,
@@ -41,14 +45,15 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
   const { sessionId, targetInfo } = event.params
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
-  // TODO maybe find a better place for this
-  const handleNewTarget = async (message: any): Promise<void> => {
-    const { sessionId } = message.params
-    const newSessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+  // Listen for any NEW targets being attached (e.g., new windows created during testing) and automatically continue them
+  // This listener is registered AFTER we've gotten the initial page, so it won't interfere with initial setup
+  const handleNewTarget = (message: any): void => {
+    const { sessionId: newSessionId } = message.params
+    const newSessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, newSessionId)
     // Automatically continue any newly attached targets that are waiting for debugger
-    await DevtoolsProtocolRuntime.runIfWaitingForDebugger(newSessionRpc).catch((error) => {
+    // Fire and forget - don't wait for this to complete
+    DevtoolsProtocolRuntime.runIfWaitingForDebugger(newSessionRpc).catch(() => {
       // Silently ignore errors as the target might not be waiting
-      console.debug(`[WaitForSession] Could not continue target ${sessionId}:`, error.message)
     })
   }
 
