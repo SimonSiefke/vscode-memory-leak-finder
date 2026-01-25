@@ -18,7 +18,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
           platform,
           VError,
         })
-        await quickPick.executeCommand('New Window')
+        await quickPick.executeCommand(WellKnownCommands.NewWindow)
 
         // Wait for window count to increase
         let currentWindowCount = initialWindowCount
