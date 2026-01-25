@@ -40,13 +40,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         return {
           async close() {
             try {
-              await electron.evaluate(`(() => {
-                const { BrowserWindow } = globalThis._____electron
-                const window = BrowserWindow.fromId(${newWindowId})
-                if (window && !window.isDestroyed()) {
-                  window.close()
-                }
-              })()`)
+              await electron.closeWindow(newWindowId)
             } catch (error) {
               throw new VError(error, `Failed to close new window`)
             }

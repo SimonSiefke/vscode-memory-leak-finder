@@ -31,8 +31,19 @@ export const create = ({ electronApp, VError }: CreateParams) => {
       } catch (error) {
         throw new VError(error, `Failed to get new window ID`)
       }
-    },
-    async mockDialog(response: any) {
+    },    async closeWindow(windowId: number) {
+      try {
+        await this.evaluate(`(() => {
+          const { BrowserWindow } = globalThis._____electron
+          const window = BrowserWindow.fromId(${windowId})
+          if (window && !window.isDestroyed()) {
+            window.close()
+          }
+        })()")
+      } catch (error) {
+        throw new VError(error, `Failed to close window`)
+      }
+    },    async mockDialog(response: any) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
         await this.mockElectron('dialog', 'showMessageBox', ` () => { return JSON.parse(${responseString}) }`)
