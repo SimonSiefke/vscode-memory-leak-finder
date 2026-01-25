@@ -193,6 +193,7 @@ export interface Editor {
   unfold(): Promise<void>
   unfoldAll(): Promise<void>
   unpin(): Promise<void>
+  moveToNewWindow(): Promise<{ close(): Promise<void> }>
 }
 export interface EditorFind {
   openReplace(): Promise<void>
