@@ -3,9 +3,13 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Electron from '../Electron/Electron.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+export interface ISimplifedWindow {
+  readonly close: () => Promise<void>
+}
+
 export const create = ({ electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
-    async openNewWindow() {
+    async openNewWindow(): Promise<ISimplifedWindow> {
       try {
         const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
         const initialWindowCount = await electron.getWindowCount()
