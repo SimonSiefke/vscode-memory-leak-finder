@@ -9,6 +9,7 @@ export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow,
     evaluate(expression) {
       return DevtoolsProtocolRuntime.evaluate(this.rpc, {
         expression,
+        returnByValue: true,
       })
     },
     firstWindow() {
