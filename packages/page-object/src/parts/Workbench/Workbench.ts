@@ -21,7 +21,13 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         const ids = await electron.getWindowIds()
         windowIdsAfter = Array.isArray(ids) ? ids : []
       }
-      return windowIdsAfter
+      
+      // Find the new window ID by comparing the lists
+      const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
+      if (newWindowId === undefined) {
+        throw new Error(`Could not identify the new window ID`)
+      }
+      return newWindowId
     },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
