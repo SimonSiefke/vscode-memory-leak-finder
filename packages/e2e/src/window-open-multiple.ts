@@ -15,11 +15,9 @@ export const run = async ({ Electron, Workbench }: TestContext): Promise<void> =
 
   // Open the first new window
   await Workbench.openNewWindow()
-  await new Promise((resolve) => setTimeout(resolve, 2000))
 
   // Open the second new window
   await Workbench.openNewWindow()
-  await new Promise((resolve) => setTimeout(resolve, 2000))
 
   // Verify both windows were created
   const finalCount = await Electron.getWindowCount()

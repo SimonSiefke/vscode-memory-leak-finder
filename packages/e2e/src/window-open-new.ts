@@ -7,9 +7,6 @@ export const run = async ({ Electron, Workbench }: TestContext): Promise<void> =
   // Open a new VS Code window using the Workbench API
   await Workbench.openNewWindow()
 
-  // Give the new window time to open
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-
   // Verify a new window was created
   const windowCountAfter = await Electron.getWindowCount()
   if (windowCountAfter <= windowCountBefore) {
