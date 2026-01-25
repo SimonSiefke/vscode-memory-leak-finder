@@ -70,6 +70,7 @@ export interface DebugHover {
 }
 export interface Developer {
   toggleScreenCastMode(): Promise<void>
+  toggleProcessExplorer(): Promise<void>
 }
 export interface DiffEditor {
   expectModified(text: any): Promise<void>

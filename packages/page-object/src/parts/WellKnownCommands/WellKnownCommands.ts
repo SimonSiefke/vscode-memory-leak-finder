@@ -112,6 +112,7 @@ export const TogglePrimarySideBarPosition = 'View: Toggle Primary Side Bar Posit
 export const TogglePrimarySideBarVisibility = 'View: Toggle Primary Side Bar Visibility'
 export const ToggleScreenCastMode = 'Developer: Toggle Screencast Mode'
 export const ToggleScreenReaderAccessibilityMode = 'Toggle Screen Reader Accessibility Mode'
+export const ToggleProcessExplorer = 'Developer: Toggle Process Explorer'
 export const ToggleZenMode = 'View: Toggle Zen Mode'
 export const TriggerSuggest = 'Trigger Suggest'
 export const TypeScriptGoToSourceDefinition = 'TypeScript: Go to Source Definition'
