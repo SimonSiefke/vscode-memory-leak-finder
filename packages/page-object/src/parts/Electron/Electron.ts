@@ -5,6 +5,62 @@ export const create = ({ electronApp, VError }: CreateParams) => {
     async evaluate(expression: string) {
       return await electronApp.evaluate(expression)
     },
+    async getWindowCount(): Promise<number> {
+      try {
+        await this.evaluate(`(() => {
+  const { BrowserWindow } = globalThis._____electron
+  globalThis._____windowCount = BrowserWindow.getAllWindows().length
+})()`)
+        // Return the count that was stored in the global
+        return await this.evaluate(`globalThis._____windowCount`)
+      } catch (error) {
+        throw new VError(error, `Failed to get window count`)
+      }
+    },
+    async getWindowIds(): Promise<readonly number[]> {
+      try {
+        await this.evaluate(`(() => {
+          const { BrowserWindow } = globalThis._____electron
+          const allWindows = BrowserWindow.getAllWindows()
+          globalThis._____windowIds = allWindows.map(w => w.id)
+        })()`)
+        // Return the IDs that were stored in the global
+        return await this.evaluate(`globalThis._____windowIds`)
+      } catch (error) {
+        throw new VError(error, `Failed to get window IDs`)
+      }
+    },
+    async getNewWindowId(): Promise<number | null> {
+      try {
+        await this.evaluate(`(() => {
+          const { BrowserWindow } = globalThis._____electron
+          const allWindows = BrowserWindow.getAllWindows()
+          // Store the ID of the last window (the one just created)
+          if (allWindows.length > 0) {
+            globalThis._____newWindowId = allWindows[allWindows.length - 1].id
+          } else {
+            globalThis._____newWindowId = null
+          }
+        })()`)
+        // Return the ID that was stored in the global
+        return await this.evaluate(`globalThis._____newWindowId`)
+      } catch (error) {
+        throw new VError(error, `Failed to get new window ID`)
+      }
+    },
+    async closeWindow(windowId: number) {
+      try {
+        await this.evaluate(`(() => {
+          const { BrowserWindow } = globalThis._____electron
+          const window = BrowserWindow.fromId(${windowId})
+          if (window && !window.isDestroyed()) {
+            window.close()
+          }
+        })()`)
+      } catch (error) {
+        throw new VError(error, `Failed to close window`)
+      }
+    },
     async mockDialog(response: any) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))

@@ -202,6 +202,7 @@ export interface EditorFind {
 }
 export interface Electron {
   evaluate(expression: any): Promise<void>
+  getWindowCount(): Promise<number>
   mockDialog(response: any): Promise<void>
   mockElectron(namespace: any, key: any, implementationCode: any): Promise<void>
   mockOpenDialog(response: any): Promise<void>
@@ -588,6 +589,7 @@ export interface Window {
 }
 export interface Workbench {
   focusLeftEditorGroup(): Promise<void>
+  openNewWindow(): Promise<{ close(): Promise<void> }>
   shouldBeVisible(): Promise<void>
   shouldHaveEditorBackground(color: any): Promise<void>
 }
