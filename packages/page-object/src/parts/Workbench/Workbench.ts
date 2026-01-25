@@ -8,22 +8,21 @@ export interface ISimplifedWindow {
 }
 
 export const create = ({ electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
-  const waitForWindowToShow = async (windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) => {
-    let windowIdsAfter = windowIdsBefore
-    const maxDelay = 5000 // 5 seconds max wait time
-    const startTime = performance.now()
-    while (windowIdsAfter.length <= windowIdsBefore.length) {
-      if (performance.now() - startTime > maxDelay) {
-        throw new VError({}, `New window did not appear within ${maxDelay}ms`)
-      }
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      const ids = await electron.getWindowIds()
-      windowIdsAfter = Array.isArray(ids) ? ids : []
-    }
-    return windowIdsAfter
-  }
-
   return {
+    async waitForWindowToShow(windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) {
+      let windowIdsAfter = windowIdsBefore
+      const maxDelay = 5000 // 5 seconds max wait time
+      const startTime = performance.now()
+      while (windowIdsAfter.length <= windowIdsBefore.length) {
+        if (performance.now() - startTime > maxDelay) {
+          throw new VError({}, `New window did not appear within ${maxDelay}ms`)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        const ids = await electron.getWindowIds()
+        windowIdsAfter = Array.isArray(ids) ? ids : []
+      }
+      return windowIdsAfter
+    },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
         const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
@@ -44,7 +43,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         await quickPick.executeCommand(WellKnownCommands.NewWindow)
 
         // Wait for a new window ID to appear
-        let windowIdsAfter = await waitForWindowToShow(windowIdsBefore, electron)
+        let windowIdsAfter = await this.waitForWindowToShow(windowIdsBefore, electron)
 
         await page.waitForIdle()
 
