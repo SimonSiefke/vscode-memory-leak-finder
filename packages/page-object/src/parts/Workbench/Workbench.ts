@@ -12,10 +12,10 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
         const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
-        
+
         // Get window IDs before opening a new window
         const windowIdsBefore = await electron.getWindowIds()
-        
+
         await page.waitForIdle()
         const quickPick = QuickPick.create({
           electronApp,
