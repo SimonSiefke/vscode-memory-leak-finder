@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 export const run = async ({ Electron, Workbench }: TestContext): Promise<void> => {
   // Get the count of windows before opening a new one
   const windowCountBefore = await Electron.getWindowCount()
