@@ -14,7 +14,8 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
 
         // Get window IDs before opening a new window
-        const windowIdsBefore = await electron.getWindowIds()
+        const windowIdsBeforeRaw = await electron.getWindowIds()
+        const windowIdsBefore = Array.isArray(windowIdsBeforeRaw) ? windowIdsBeforeRaw : []
 
         await page.waitForIdle()
         const quickPick = QuickPick.create({
@@ -36,7 +37,8 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
             throw new VError({}, `New window did not appear within ${maxDelay}ms`)
           }
           await new Promise((resolve) => setTimeout(resolve, 100))
-          windowIdsAfter = await electron.getWindowIds()
+          const ids = await electron.getWindowIds()
+          windowIdsAfter = Array.isArray(ids) ? ids : []
         }
 
         await page.waitForIdle()
