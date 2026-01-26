@@ -63,14 +63,11 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         })
         await quickPick.executeCommand(WellKnownCommands.NewWindow)
 
-        // Wait for the new window and session to be ready
-        let newWindowSessionRpc: any = undefined
         const sessionId = await Promise.race([newWindowPromise, rejectaftertimeout()])
-
-        // Create sessionRpc connection if sessionId was captured
-        if (sessionId) {
-          newWindowSessionRpc = createSessionRpcConnection(browserRpc, sessionId)
+        if (!sessionId) {
+          throw new Error(`Failed to wait for window`)
         }
+        const newWindowSessionRpc = createSessionRpcConnection(browserRpc, sessionId)
 
         await page.waitForIdle()
 
