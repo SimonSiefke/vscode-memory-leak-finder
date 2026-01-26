@@ -4,7 +4,6 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 // TODO use page object
 export const evaluateInUtilityContext = async (options: any, locator: any): Promise<any> => {
   const { rpc, utilityContext } = locator
-  console.log({ rpc, utilityContext })
   Assert.object(rpc)
   Assert.object(utilityContext)
   Assert.string(utilityContext.uniqueId)
