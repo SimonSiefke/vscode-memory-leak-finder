@@ -21,8 +21,11 @@ const createSessionRpcConnection = (rpc: any, sessionId: string) => {
   }
 }
 
-const rejectaftertimeout = () =>
-  new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000))
+const rejectaftertimeout = () => {
+  const { promise, reject } = Promise.withResolvers<never>()
+  setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000)
+  return promise
+}
 
 const createPageFromSessionRpc = (sessionRpc: any) => {
   return {
