@@ -43,6 +43,34 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
       }
       return newWindowId
     },
+    waitForNewWindow(windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) {
+      return new Promise<{ newWindowId: number; sessionId?: string }>((resolveMain) => {
+        let sessionId: string | undefined = undefined
+        let targetCaptured = false
+
+        // Set up listener for new target if browserRpc is available
+        if (browserRpc) {
+          const handleNewTarget = (message: any): void => {
+            if (targetCaptured) {
+              return
+            }
+            targetCaptured = true
+            sessionId = message.params.sessionId
+          }
+          browserRpc.on('Target.attachedToTarget', handleNewTarget)
+        }
+
+        // Poll for new window ID
+        ;(async () => {
+          try {
+            const newWindowId = await this.waitForWindowToShow(windowIdsBefore, electron)
+            resolveMain({ newWindowId, ...(sessionId ? { sessionId } : {}) })
+          } catch (error) {
+            throw new VError(error, `Failed to wait for new window`)
+          }
+        })()
+      })
+    },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
         const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
@@ -51,75 +79,52 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         const windowIdsBeforeRaw = await electron.getWindowIds()
         const windowIdsBefore = Array.isArray(windowIdsBeforeRaw) ? windowIdsBeforeRaw : []
 
-        // If browserRpc is available, set up listener for the new target BEFORE opening the window
-        let newWindowSessionRpc: any = undefined
-        let targetCaptured = false
-        if (browserRpc) {
-          try {
-            // Listen for the new target being attached
-            const targetPromise = new Promise<any>((resolve) => {
-              const handleNewTarget = (message: any): void => {
-                // Only capture the first target after opening the new window
-                if (targetCaptured) {
-                  return
-                }
-                targetCaptured = true
-                const { sessionId: newSessionId } = message.params
-                // Create sessionRpc for the new target
-                const sessionRpc = createSessionRpcConnection(browserRpc, newSessionId)
-                resolve(sessionRpc)
-              }
-              browserRpc.on('Target.attachedToTarget', handleNewTarget)
-            })
+        // Start waiting for new window (don't await yet)
+        const newWindowPromise = this.waitForNewWindow(windowIdsBefore, electron)
 
-            await page.waitForIdle()
-            const quickPick = QuickPick.create({
-              electronApp,
-              expect,
-              ideVersion,
-              page,
-              platform,
-              VError,
-            })
-            await quickPick.executeCommand(WellKnownCommands.NewWindow)
-
-            // Wait a bit for the target to be attached, with timeout
-            newWindowSessionRpc = await Promise.race([
-              targetPromise,
-              new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for target')), 5000)),
-            ])
-          } catch (error) {
-            // If sessionRpc capture fails, continue without it
-            console.warn('Failed to capture sessionRpc for new window:', error)
-          }
-        } else {
-          await page.waitForIdle()
-          const quickPick = QuickPick.create({
-            electronApp,
-            expect,
-            ideVersion,
-            page,
-            platform,
-            VError,
-          })
-          await quickPick.executeCommand(WellKnownCommands.NewWindow)
-        }
-
-        // Wait for a new window ID to appear
-        const newWindowId = await this.waitForWindowToShow(windowIdsBefore, electron)
-
+        // Run the quickpick command to open new window
         await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.NewWindow)
 
-        // Return an object for manipulating the new window
-        return {
-          async close() {
-            try {
-              await electron.closeWindow(newWindowId)
-            } catch (error) {
-              throw new VError(error, `Failed to close new window`)
-            }
-          },
-          sessionRpc: newWindowSessionRpc,
+        // Wait for the new window and session to be ready
+        let newWindowSessionRpc: any = undefined
+        try {
+          const { newWindowId, sessionId } = await Promise.race([
+            newWindowPromise,
+            new Promise<{ newWindowId: number; sessionId?: string }>((_, reject) =>
+              setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000),
+            ),
+          ])
+
+          // Create sessionRpc connection if sessionId was captured
+          if (sessionId && browserRpc) {
+            newWindowSessionRpc = createSessionRpcConnection(browserRpc, sessionId)
+          }
+
+          await page.waitForIdle()
+
+          // Return an object for manipulating the new window
+          return {
+            async close() {
+              try {
+                await electron.closeWindow(newWindowId)
+              } catch (error) {
+                throw new VError(error, `Failed to close new window`)
+              }
+            },
+            sessionRpc: newWindowSessionRpc,
+          }
+        } catch (error) {
+          console.warn('Failed to open new window:', error)
+          throw error
         }
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
