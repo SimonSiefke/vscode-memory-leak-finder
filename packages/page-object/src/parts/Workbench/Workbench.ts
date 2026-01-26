@@ -22,6 +22,11 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
     }
   }
 
+  const rejectaftertimeout = () =>
+    new Promise<{ sessionId?: string }>((_, reject) =>
+      setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000),
+    )
+
   return {
     async waitForWindowToShow(windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) {
       let windowIdsAfter = windowIdsBefore
