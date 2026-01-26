@@ -44,32 +44,33 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
       return newWindowId
     },
     waitForNewWindow(windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) {
-      return new Promise<{ newWindowId: number; sessionId?: string }>((resolveMain) => {
-        let sessionId: string | undefined = undefined
-        let targetCaptured = false
+      const { promise, resolve } = Promise.withResolvers<{ newWindowId: number; sessionId?: string }>()
+      let sessionId: string | undefined = undefined
+      let targetCaptured = false
 
-        // Set up listener for new target if browserRpc is available
-        if (browserRpc) {
-          const handleNewTarget = (message: any): void => {
-            if (targetCaptured) {
-              return
-            }
-            targetCaptured = true
-            sessionId = message.params.sessionId
+      // Set up listener for new target if browserRpc is available
+      if (browserRpc) {
+        const handleNewTarget = (message: any): void => {
+          if (targetCaptured) {
+            return
           }
-          browserRpc.on('Target.attachedToTarget', handleNewTarget)
+          targetCaptured = true
+          sessionId = message.params.sessionId
         }
+        browserRpc.on('Target.attachedToTarget', handleNewTarget)
+      }
 
-        // Poll for new window ID
-        ;(async () => {
-          try {
-            const newWindowId = await this.waitForWindowToShow(windowIdsBefore, electron)
-            resolveMain({ newWindowId, ...(sessionId ? { sessionId } : {}) })
-          } catch (error) {
-            throw new VError(error, `Failed to wait for new window`)
-          }
-        })()
-      })
+      // Poll for new window ID
+      ;(async () => {
+        try {
+          const newWindowId = await this.waitForWindowToShow(windowIdsBefore, electron)
+          resolve({ newWindowId, ...(sessionId ? { sessionId } : {}) })
+        } catch (error) {
+          throw new VError(error, `Failed to wait for new window`)
+        }
+      })()
+
+      return promise
     },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
