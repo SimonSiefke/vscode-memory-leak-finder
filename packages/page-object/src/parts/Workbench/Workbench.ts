@@ -95,9 +95,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         let newWindowSessionRpc: any = undefined
         const { sessionId } = await Promise.race([
           newWindowPromise,
-          new Promise<{ sessionId?: string }>((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000),
-          ),
+          new Promise<{ sessionId?: string }>((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000)),
         ])
 
         // Create sessionRpc connection if sessionId was captured
@@ -112,16 +110,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           async close() {
             try {
               if (newWindowSessionRpc) {
-                const windowQuickPick = QuickPick.create({
-                  electronApp,
-                  expect,
-                  ideVersion,
-                  page,
-                  platform,
-                  VError,
-                })
-                // Use the window's sessionRpc to close it
-                await windowQuickPick.executeCommand(WellKnownCommands.WindowClose, undefined, newWindowSessionRpc)
+                await newWindowSessionRpc.invoke('workbench.action.closeWindow')
               }
             } catch (error) {
               throw new VError(error, `Failed to close new window`)
