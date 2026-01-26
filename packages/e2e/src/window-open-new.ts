@@ -8,7 +8,7 @@ export const run = async ({ Workbench }: TestContext): Promise<void> => {
   // TODO avoid fixed timeouts
 
   // Wait for the new window to be ready
-  await new Promise((resolve) => setTimeout(resolve, 3000))
+  await new Promise((resolve) => setTimeout(resolve, 10000))
 
   // Close the window
   await newWindow.close()

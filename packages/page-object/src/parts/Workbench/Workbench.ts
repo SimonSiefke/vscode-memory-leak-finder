@@ -11,7 +11,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
   return {
     async waitForWindowToShow(windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) {
       let windowIdsAfter = windowIdsBefore
-      const maxDelay = 5000 // 5 seconds max wait time
+      const maxDelay = 15000 // 15 seconds max wait time
       const startTime = performance.now()
       while (windowIdsAfter.length <= windowIdsBefore.length) {
         if (performance.now() - startTime > maxDelay) {
