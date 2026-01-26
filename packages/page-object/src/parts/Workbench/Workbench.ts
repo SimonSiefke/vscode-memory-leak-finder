@@ -29,8 +29,19 @@ const rejectaftertimeout = () => {
 
 const createPageFromSessionRpc = (sessionRpc: any) => {
   return {
+    keyboard: {
+      press(key: string) {
+        return sessionRpc.invoke('keyboard.press', { key })
+      },
+      pressKeyExponential(options: any) {
+        return sessionRpc.invoke('keyboard.pressKeyExponential', options)
+      },
+    },
     locator(selector: string, options?: any) {
       return sessionRpc.invoke('locator', { selector, ...options })
+    },
+    pressKeyExponential(options: any) {
+      return sessionRpc.invoke('pressKeyExponential', options)
     },
     async waitForIdle() {
       return sessionRpc.invoke('waitForIdle')
