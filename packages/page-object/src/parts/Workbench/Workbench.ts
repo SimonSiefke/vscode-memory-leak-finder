@@ -74,7 +74,15 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         return {
           async close() {
             try {
-              await newWindowSessionRpc.invoke('workbench.action.closeWindow')
+              const quickPick = QuickPick.create({
+                electronApp,
+                expect,
+                ideVersion,
+                page,
+                platform,
+                VError,
+              })
+              await quickPick.executeCommand(WellKnownCommands.CloseWindow)
             } catch (error) {
               throw new VError(error, `Failed to close new window`)
             }
