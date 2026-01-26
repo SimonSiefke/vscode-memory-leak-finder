@@ -122,6 +122,17 @@ export const create = ({
         url,
       })
     },
+    waitForPage({ injectUtilityScript = true, sessionId }) {
+      return WaitForIframe.waitForPage({
+        browserRpc,
+        createPage: create,
+        electronObjectId,
+        electronRpc,
+        idleTimeout,
+        injectUtilityScript,
+        sessionId,
+      })
+    },
     waitForSubIframe({ injectUtilityScript = true, url }) {
       return waitForSubIframe({
         browserRpc,

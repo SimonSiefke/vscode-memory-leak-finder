@@ -1,24 +1,10 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as Electron from '../Electron/Electron.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
   readonly sessionRpc?: any
-}
-
-const createSessionRpcConnection = (rpc: any, sessionId: string) => {
-  return {
-    callbacks: rpc.callbacks,
-    invoke(method: string, params?: unknown) {
-      return rpc.invokeWithSession(sessionId, method, params)
-    },
-    listeners: rpc.listeners,
-    on: rpc.on,
-    once: rpc.once,
-    sessionId,
-  }
 }
 
 const rejectaftertimeout = () => {
@@ -38,29 +24,6 @@ const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: strin
     locator(subSelector: string) {
       return createLocatorProxy(sessionRpc, `${selector} ${subSelector}`, sessionId)
     },
-  }
-}
-
-const createPageFromSessionRpc = (sessionRpc: any, sessionId?: string) => {
-  return {
-    keyboard: {
-      press(key: string) {
-        return sessionRpc.invoke('keyboard.press', { key })
-      },
-      pressKeyExponential(options: any) {
-        return sessionRpc.invoke('keyboard.pressKeyExponential', options)
-      },
-    },
-    locator(selector: string) {
-      return createLocatorProxy(sessionRpc, selector, sessionId)
-    },
-    pressKeyExponential(options: any) {
-      return sessionRpc.invoke('pressKeyExponential', options)
-    },
-    async waitForIdle() {
-      return sessionRpc.invoke('waitForIdle')
-    },
-    sessionRpc,
   }
 }
 
@@ -109,8 +72,12 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         if (!sessionId) {
           throw new Error(`Failed to wait for window`)
         }
-        const newWindowSessionRpc = createSessionRpcConnection(browserRpc, sessionId)
-        const newWindowPage = createPageFromSessionRpc(newWindowSessionRpc, sessionId)
+
+        // Use electronApp.waitForPage to create the page with utility context
+        const newWindowPage = await electronApp.waitForPage({
+          injectUtilityScript: true,
+          sessionId,
+        })
 
         await page.waitForIdle()
 
@@ -130,7 +97,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
               throw new VError(error, `Failed to close new window`)
             }
           },
-          sessionRpc: newWindowSessionRpc,
+          sessionRpc: newWindowPage.sessionRpc,
         }
       } catch (error) {
         throw new VError(error, `Failed to open new window`)

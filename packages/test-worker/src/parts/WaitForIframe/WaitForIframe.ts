@@ -63,3 +63,40 @@ export const waitForIframe = async ({
   })
   return iframe
 }
+
+export const waitForPage = async ({
+  browserRpc,
+  createPage,
+  electronObjectId,
+  electronRpc,
+  idleTimeout,
+  injectUtilityScript,
+  sessionId,
+}) => {
+  // Wait for a newly created page/window
+  // Similar to waitForIframe but for a new page instead of an iframe
+  
+  const pageRpc = createSessionRpcConnection(browserRpc, sessionId)
+
+  let pageUtilityContext = undefined
+
+  const utilityExecutionContextName = 'utility'
+
+  if (injectUtilityScript) {
+    // For a page, we don't need to specify a frameId since there's a default main frame
+    pageUtilityContext = await addUtilityExecutionContext(pageRpc, utilityExecutionContextName, '')
+  }
+
+  const page = createPage({
+    browserRpc,
+    electronObjectId,
+    electronRpc,
+    idleTimeout,
+    rpc: pageRpc,
+    sessionId: pageRpc.sessionId,
+    sessionRpc: pageRpc,
+    targetId: '', // TODO: get the actual targetId if needed
+    utilityContext: pageUtilityContext,
+  })
+  return page
+}
