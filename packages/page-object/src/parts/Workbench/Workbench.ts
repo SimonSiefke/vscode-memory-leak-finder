@@ -61,6 +61,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
       }
 
       // Poll for new window ID
+      // TODO this code is ugly
       ;(async () => {
         try {
           const newWindowId = await this.waitForWindowToShow(windowIdsBefore, electron)
@@ -97,35 +98,30 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
 
         // Wait for the new window and session to be ready
         let newWindowSessionRpc: any = undefined
-        try {
-          const { newWindowId, sessionId } = await Promise.race([
-            newWindowPromise,
-            new Promise<{ newWindowId: number; sessionId?: string }>((_, reject) =>
-              setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000),
-            ),
-          ])
+        const { newWindowId, sessionId } = await Promise.race([
+          newWindowPromise,
+          new Promise<{ newWindowId: number; sessionId?: string }>((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000),
+          ),
+        ])
 
-          // Create sessionRpc connection if sessionId was captured
-          if (sessionId && browserRpc) {
-            newWindowSessionRpc = createSessionRpcConnection(browserRpc, sessionId)
-          }
+        // Create sessionRpc connection if sessionId was captured
+        if (sessionId && browserRpc) {
+          newWindowSessionRpc = createSessionRpcConnection(browserRpc, sessionId)
+        }
 
-          await page.waitForIdle()
+        await page.waitForIdle()
 
-          // Return an object for manipulating the new window
-          return {
-            async close() {
-              try {
-                await electron.closeWindow(newWindowId)
-              } catch (error) {
-                throw new VError(error, `Failed to close new window`)
-              }
-            },
-            sessionRpc: newWindowSessionRpc,
-          }
-        } catch (error) {
-          console.warn('Failed to open new window:', error)
-          throw error
+        // Return an object for manipulating the new window
+        return {
+          async close() {
+            try {
+              await electron.closeWindow(newWindowId)
+            } catch (error) {
+              throw new VError(error, `Failed to close new window`)
+            }
+          },
+          sessionRpc: newWindowSessionRpc,
         }
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
