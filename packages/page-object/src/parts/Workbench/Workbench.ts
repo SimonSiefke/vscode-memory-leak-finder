@@ -26,27 +26,7 @@ const rejectaftertimeout = () =>
 
 export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
-    async waitForWindowToShow(windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) {
-      let windowIdsAfter = windowIdsBefore
-      const maxDelay = 15000 // 15 seconds max wait time
-      const startTime = performance.now()
-      while (windowIdsAfter.length <= windowIdsBefore.length) {
-        if (performance.now() - startTime > maxDelay) {
-          throw new Error(`New window did not appear within ${maxDelay}ms`)
-        }
-        await new Promise((resolve) => setTimeout(resolve, 100))
-        const ids = await electron.getWindowIds()
-        windowIdsAfter = Array.isArray(ids) ? ids : []
-      }
-
-      // Find the new window ID by comparing the lists
-      const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
-      if (newWindowId === undefined) {
-        throw new Error(`Could not identify the new window ID`)
-      }
-      return newWindowId
-    },
-    waitForNewWindow(windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) {
+    async waitForNewWindow() {
       const { promise, resolve } = Promise.withResolvers<{ sessionId?: string }>()
       let sessionId: string | undefined = undefined
       let targetCaptured = false
@@ -58,30 +38,19 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
             return
           }
           targetCaptured = true
-          sessionId = message.params.sessionId
+          sessionId = message.params.sessionId as string
+          resolve({ sessionId })
         }
         browserRpc.on('Target.attachedToTarget', handleNewTarget)
       }
 
-      // Poll for new window to appear
-      ;(async () => {
-        try {
-          await this.waitForWindowToShow(windowIdsBefore, electron)
-          resolve({ ...(sessionId ? { sessionId } : {}) })
-        } catch (error) {
-          throw new VError(error, `Failed to wait for new window`)
-        }
-      })()
+      await promise
 
-      return promise
+      return sessionId
     },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
-        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
-        const windowIdsBeforeRaw = await electron.getWindowIds()
-        const windowIdsBefore = Array.isArray(windowIdsBeforeRaw) ? windowIdsBeforeRaw : []
-        const newWindowPromise = this.waitForNewWindow(windowIdsBefore, electron)
-
+        const newWindowPromise = this.waitForNewWindow()
         // Run the quickpick command to open new window
         await page.waitForIdle()
         const quickPick = QuickPick.create({
@@ -96,10 +65,10 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
 
         // Wait for the new window and session to be ready
         let newWindowSessionRpc: any = undefined
-        const { sessionId } = await Promise.race([newWindowPromise, rejectaftertimeout()])
+        const sessionId = await Promise.race([newWindowPromise, rejectaftertimeout()])
 
         // Create sessionRpc connection if sessionId was captured
-        if (sessionId && browserRpc) {
+        if (sessionId) {
           newWindowSessionRpc = createSessionRpcConnection(browserRpc, sessionId)
         }
 
