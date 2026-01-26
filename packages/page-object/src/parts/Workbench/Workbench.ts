@@ -22,7 +22,7 @@ const createSessionRpcConnection = (rpc: any, sessionId: string) => {
 }
 
 const rejectaftertimeout = () =>
-  new Promise<{ sessionId?: string }>((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000))
+  new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000))
 
 export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
