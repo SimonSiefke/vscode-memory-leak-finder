@@ -46,18 +46,19 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
       let sessionId: string | undefined = undefined
       let targetCaptured = false
 
-      // Set up listener for new target if browserRpc is available
-      if (browserRpc) {
-        const handleNewTarget = (message: any): void => {
-          if (targetCaptured) {
-            return
-          }
-          targetCaptured = true
-          sessionId = message.params.sessionId as string
-          resolve({ sessionId })
-        }
-        browserRpc.on('Target.attachedToTarget', handleNewTarget)
+      if (!browserRpc) {
+        throw new Error(`browser rpc is required`)
       }
+
+      const handleNewTarget = (message: any): void => {
+        if (targetCaptured) {
+          return
+        }
+        targetCaptured = true
+        sessionId = message.params.sessionId as string
+        resolve({ sessionId })
+      }
+      browserRpc.on('Target.attachedToTarget', handleNewTarget)
 
       await promise
 
