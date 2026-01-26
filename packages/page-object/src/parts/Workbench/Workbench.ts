@@ -46,6 +46,8 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
       let sessionId: string | undefined = undefined
       let targetCaptured = false
 
+      // TODO cleanup listener
+
       if (!browserRpc) {
         throw new Error(`browser rpc is required`)
       }
