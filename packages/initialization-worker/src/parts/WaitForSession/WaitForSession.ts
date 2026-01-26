@@ -1,5 +1,5 @@
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
 interface BrowserRpc {
@@ -12,6 +12,7 @@ interface BrowserRpc {
 
 export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeout: number) => {
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
+
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
     autoAttach: true,
     filter: [
@@ -39,6 +40,20 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
   }
   const { sessionId, targetInfo } = event.params
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+
+  // Listen for any NEW targets being attached (e.g., new windows created during testing) and automatically continue them
+  // Register AFTER we've gotten the initial page, so this only affects new windows/targets
+  const handleNewTarget = (message: any): void => {
+    const { sessionId: newSessionId } = message.params
+    const newSessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, newSessionId)
+    // Automatically continue any newly attached targets that are waiting for debugger
+    // Fire and forget - don't wait for this to complete
+    DevtoolsProtocolRuntime.runIfWaitingForDebugger(newSessionRpc).catch(() => {
+      // Silently ignore errors as the target might not be waiting
+    })
+  }
+
+  browserRpc.on('Target.attachedToTarget', handleNewTarget)
 
   return {
     sessionId,
