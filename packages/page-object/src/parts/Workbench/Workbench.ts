@@ -24,6 +24,18 @@ const createSessionRpcConnection = (rpc: any, sessionId: string) => {
 const rejectaftertimeout = () =>
   new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000))
 
+const createPageFromSessionRpc = (sessionRpc: any) => {
+  return {
+    locator(selector: string, options?: any) {
+      return sessionRpc.invoke('locator', { selector, ...options })
+    },
+    async waitForIdle() {
+      return sessionRpc.invoke('waitForIdle')
+    },
+    sessionRpc,
+  }
+}
+
 export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
     async waitForNewWindow() {
@@ -68,6 +80,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           throw new Error(`Failed to wait for window`)
         }
         const newWindowSessionRpc = createSessionRpcConnection(browserRpc, sessionId)
+        const newWindowPage = createPageFromSessionRpc(newWindowSessionRpc)
 
         await page.waitForIdle()
 
@@ -78,7 +91,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
                 electronApp,
                 expect,
                 ideVersion,
-                page,
+                page: newWindowPage,
                 platform,
                 VError,
               })
