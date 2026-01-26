@@ -8,25 +8,23 @@ export interface ISimplifedWindow {
   readonly sessionRpc?: any
 }
 
-export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
-  const createSessionRpcConnection = (rpc: any, sessionId: string) => {
-    return {
-      callbacks: rpc.callbacks,
-      invoke(method: string, params?: unknown) {
-        return rpc.invokeWithSession(sessionId, method, params)
-      },
-      listeners: rpc.listeners,
-      on: rpc.on,
-      once: rpc.once,
-      sessionId,
-    }
+const createSessionRpcConnection = (rpc: any, sessionId: string) => {
+  return {
+    callbacks: rpc.callbacks,
+    invoke(method: string, params?: unknown) {
+      return rpc.invokeWithSession(sessionId, method, params)
+    },
+    listeners: rpc.listeners,
+    on: rpc.on,
+    once: rpc.once,
+    sessionId,
   }
+}
 
-  const rejectaftertimeout = () =>
-    new Promise<{ sessionId?: string }>((_, reject) =>
-      setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000),
-    )
+const rejectaftertimeout = () =>
+  new Promise<{ sessionId?: string }>((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000))
 
+export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
     async waitForWindowToShow(windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) {
       let windowIdsAfter = windowIdsBefore
@@ -98,10 +96,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
 
         // Wait for the new window and session to be ready
         let newWindowSessionRpc: any = undefined
-        const { sessionId } = await Promise.race([
-          newWindowPromise,
-          new Promise<{ sessionId?: string }>((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000)),
-        ])
+        const { sessionId } = await Promise.race([newWindowPromise, rejectaftertimeout()])
 
         // Create sessionRpc connection if sessionId was captured
         if (sessionId && browserRpc) {
