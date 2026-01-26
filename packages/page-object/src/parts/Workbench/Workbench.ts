@@ -71,13 +71,10 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
 
         await page.waitForIdle()
 
-        // Return an object for manipulating the new window
         return {
           async close() {
             try {
-              if (newWindowSessionRpc) {
-                await newWindowSessionRpc.invoke('workbench.action.closeWindow')
-              }
+              await newWindowSessionRpc.invoke('workbench.action.closeWindow')
             } catch (error) {
               throw new VError(error, `Failed to close new window`)
             }
