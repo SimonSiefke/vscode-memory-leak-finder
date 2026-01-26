@@ -5,9 +5,23 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
+  readonly sessionRpc?: any
 }
 
-export const create = ({ electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
+export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
+  const createSessionRpcConnection = (rpc: any, sessionId: string) => {
+    return {
+      callbacks: rpc.callbacks,
+      invoke(method: string, params?: unknown) {
+        return rpc.invokeWithSession(sessionId, method, params)
+      },
+      listeners: rpc.listeners,
+      on: rpc.on,
+      once: rpc.once,
+      sessionId,
+    }
+  }
+
   return {
     async waitForWindowToShow(windowIdsBefore: number[], electron: ReturnType<typeof Electron.create>) {
       let windowIdsAfter = windowIdsBefore
@@ -53,6 +67,36 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
 
         await page.waitForIdle()
 
+        // If browserRpc is available, set up listener for the new target and capture its sessionRpc
+        let newWindowSessionRpc: any = undefined
+        if (browserRpc) {
+          try {
+            // Listen for the new target being attached
+            const targetPromise = new Promise<any>((resolve) => {
+              const handleNewTarget = (message: any): void => {
+                const { sessionId: newSessionId } = message.params
+                // Create sessionRpc for the new target
+                const sessionRpc = createSessionRpcConnection(browserRpc, newSessionId)
+                // Remove this listener after capturing the first target
+                browserRpc.off?.('Target.attachedToTarget', handleNewTarget)
+                resolve(sessionRpc)
+              }
+              browserRpc.on('Target.attachedToTarget', handleNewTarget)
+            })
+
+            // Wait a bit for the target to be attached, with timeout
+            newWindowSessionRpc = await Promise.race([
+              targetPromise,
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Timeout waiting for target')), 5000)
+              ),
+            ])
+          } catch (error) {
+            // If sessionRpc capture fails, continue without it
+            console.warn('Failed to capture sessionRpc for new window:', error)
+          }
+        }
+
         // Return an object for manipulating the new window
         return {
           async close() {
@@ -62,6 +106,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
               throw new VError(error, `Failed to close new window`)
             }
           },
+          sessionRpc: newWindowSessionRpc,
         }
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
