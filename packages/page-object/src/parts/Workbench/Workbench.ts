@@ -53,23 +53,20 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
 
         // If browserRpc is available, set up listener for the new target BEFORE opening the window
         let newWindowSessionRpc: any = undefined
-        let handleNewTarget: any = undefined
+        let targetCaptured = false
         if (browserRpc) {
           try {
             // Listen for the new target being attached
             const targetPromise = new Promise<any>((resolve) => {
-              handleNewTarget = (message: any): void => {
+              const handleNewTarget = (message: any): void => {
+                // Only capture the first target after opening the new window
+                if (targetCaptured) {
+                  return
+                }
+                targetCaptured = true
                 const { sessionId: newSessionId } = message.params
                 // Create sessionRpc for the new target
                 const sessionRpc = createSessionRpcConnection(browserRpc, newSessionId)
-                // Remove this listener after capturing the first target
-                if (browserRpc.listeners && browserRpc.listeners['Target.attachedToTarget']) {
-                  const listeners = browserRpc.listeners['Target.attachedToTarget']
-                  const index = listeners.indexOf(handleNewTarget)
-                  if (index > -1) {
-                    listeners.splice(index, 1)
-                  }
-                }
                 resolve(sessionRpc)
               }
               browserRpc.on('Target.attachedToTarget', handleNewTarget)
@@ -94,14 +91,6 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           } catch (error) {
             // If sessionRpc capture fails, continue without it
             console.warn('Failed to capture sessionRpc for new window:', error)
-            // Clean up the listener if it was added
-            if (handleNewTarget && browserRpc.listeners && browserRpc.listeners['Target.attachedToTarget']) {
-              const listeners = browserRpc.listeners['Target.attachedToTarget']
-              const index = listeners.indexOf(handleNewTarget)
-              if (index > -1) {
-                listeners.splice(index, 1)
-              }
-            }
           }
         } else {
           await page.waitForIdle()
