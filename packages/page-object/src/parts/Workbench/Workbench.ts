@@ -27,7 +27,21 @@ const rejectaftertimeout = () => {
   return promise
 }
 
-const createPageFromSessionRpc = (sessionRpc: any) => {
+const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: string) => {
+  return {
+    objectType: 'locator',
+    rpc: sessionRpc,
+    sessionRpc,
+    sessionId,
+    selector,
+    hasText: undefined,
+    locator(subSelector: string) {
+      return createLocatorProxy(sessionRpc, `${selector} ${subSelector}`, sessionId)
+    },
+  }
+}
+
+const createPageFromSessionRpc = (sessionRpc: any, sessionId?: string) => {
   return {
     keyboard: {
       press(key: string) {
@@ -37,8 +51,8 @@ const createPageFromSessionRpc = (sessionRpc: any) => {
         return sessionRpc.invoke('keyboard.pressKeyExponential', options)
       },
     },
-    locator(selector: string, options?: any) {
-      return sessionRpc.invoke('locator', { selector, ...options })
+    locator(selector: string) {
+      return createLocatorProxy(sessionRpc, selector, sessionId)
     },
     pressKeyExponential(options: any) {
       return sessionRpc.invoke('pressKeyExponential', options)
@@ -96,7 +110,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           throw new Error(`Failed to wait for window`)
         }
         const newWindowSessionRpc = createSessionRpcConnection(browserRpc, sessionId)
-        const newWindowPage = createPageFromSessionRpc(newWindowSessionRpc)
+        const newWindowPage = createPageFromSessionRpc(newWindowSessionRpc, sessionId)
 
         await page.waitForIdle()
 
