@@ -590,7 +590,7 @@ export interface Window {
 }
 export interface Workbench {
   focusLeftEditorGroup(): Promise<void>
-  openNewWindow(): Promise<{ close(): Promise<void>; sessionRpc?: any }>
+  openNewWindow(): Promise<{ close(): Promise<void>; sessionRpc?: any; locator?: (selector: string) => any; waitForIdle?: () => Promise<void> }>
   shouldBeVisible(): Promise<void>
   shouldHaveEditorBackground(color: any): Promise<void>
 }

@@ -5,6 +5,8 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
   readonly sessionRpc?: any
+  readonly locator?: (selector: string) => any
+  readonly waitForIdle?: () => Promise<void>
 }
 
 const rejectaftertimeout = () => {
@@ -97,7 +99,13 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
               throw new VError(error, `Failed to close new window`)
             }
           },
+          locator: newWindowPage.locator.bind(newWindowPage),
           sessionRpc: newWindowPage.sessionRpc,
+          waitForIdle: newWindowPage.waitForIdle.bind(newWindowPage),
+          async shouldBeVisible() {
+            const workbench = newWindowPage.locator('.monaco-workbench')
+            await expect(workbench).toBeVisible()
+          },
         }
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
