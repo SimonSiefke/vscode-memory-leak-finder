@@ -43,7 +43,6 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
   return {
     async waitForNewWindow() {
       const { promise, resolve } = Promise.withResolvers<string>()
-      let sessionId = ''
       let targetCaptured = false
 
       // TODO cleanup listener
@@ -57,12 +56,12 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           return
         }
         targetCaptured = true
-        sessionId = message.params.sessionId as string
+        const sessionId = message.params.sessionId as string
         resolve(sessionId)
       }
       browserRpc.on('Target.attachedToTarget', handleNewTarget)
 
-      await promise
+      const sessionId = await promise
 
       return sessionId
     },
