@@ -6,7 +6,8 @@ export interface ISimplifedWindow {
   readonly close: () => Promise<void>
   readonly sessionRpc?: any
   readonly locator?: (selector: string) => any
-  readonly waitForIdle?: () => Promise<void>
+  readonly waitForIdle: () => Promise<void>
+  readonly shouldBeVisible: () => Promise<void>
 }
 
 const rejectaftertimeout = () => {
@@ -99,9 +100,9 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
               throw new VError(error, `Failed to close new window`)
             }
           },
-          locator: newWindowPage.locator.bind(newWindowPage),
+          locator: (selector: string) => newWindowPage.locator(selector),
           sessionRpc: newWindowPage.sessionRpc,
-          waitForIdle: newWindowPage.waitForIdle.bind(newWindowPage),
+          waitForIdle: () => newWindowPage.waitForIdle(),
           async shouldBeVisible() {
             const workbench = newWindowPage.locator('.monaco-workbench')
             await expect(workbench).toBeVisible()
