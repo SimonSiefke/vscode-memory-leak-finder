@@ -51,38 +51,40 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         const windowIdsBeforeRaw = await electron.getWindowIds()
         const windowIdsBefore = Array.isArray(windowIdsBeforeRaw) ? windowIdsBeforeRaw : []
 
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.NewWindow)
-
-        // Wait for a new window ID to appear
-        const newWindowId = await this.waitForWindowToShow(windowIdsBefore, electron)
-
-        await page.waitForIdle()
-
-        // If browserRpc is available, set up listener for the new target and capture its sessionRpc
+        // If browserRpc is available, set up listener for the new target BEFORE opening the window
         let newWindowSessionRpc: any = undefined
+        let handleNewTarget: any = undefined
         if (browserRpc) {
           try {
             // Listen for the new target being attached
             const targetPromise = new Promise<any>((resolve) => {
-              const handleNewTarget = (message: any): void => {
+              handleNewTarget = (message: any): void => {
                 const { sessionId: newSessionId } = message.params
                 // Create sessionRpc for the new target
                 const sessionRpc = createSessionRpcConnection(browserRpc, newSessionId)
                 // Remove this listener after capturing the first target
-                browserRpc.off?.('Target.attachedToTarget', handleNewTarget)
+                if (browserRpc.listeners && browserRpc.listeners['Target.attachedToTarget']) {
+                  const listeners = browserRpc.listeners['Target.attachedToTarget']
+                  const index = listeners.indexOf(handleNewTarget)
+                  if (index > -1) {
+                    listeners.splice(index, 1)
+                  }
+                }
                 resolve(sessionRpc)
               }
               browserRpc.on('Target.attachedToTarget', handleNewTarget)
             })
+
+            await page.waitForIdle()
+            const quickPick = QuickPick.create({
+              electronApp,
+              expect,
+              ideVersion,
+              page,
+              platform,
+              VError,
+            })
+            await quickPick.executeCommand(WellKnownCommands.NewWindow)
 
             // Wait a bit for the target to be attached, with timeout
             newWindowSessionRpc = await Promise.race([
@@ -92,8 +94,32 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           } catch (error) {
             // If sessionRpc capture fails, continue without it
             console.warn('Failed to capture sessionRpc for new window:', error)
+            // Clean up the listener if it was added
+            if (handleNewTarget && browserRpc.listeners && browserRpc.listeners['Target.attachedToTarget']) {
+              const listeners = browserRpc.listeners['Target.attachedToTarget']
+              const index = listeners.indexOf(handleNewTarget)
+              if (index > -1) {
+                listeners.splice(index, 1)
+              }
+            }
           }
+        } else {
+          await page.waitForIdle()
+          const quickPick = QuickPick.create({
+            electronApp,
+            expect,
+            ideVersion,
+            page,
+            platform,
+            VError,
+          })
+          await quickPick.executeCommand(WellKnownCommands.NewWindow)
         }
+
+        // Wait for a new window ID to appear
+        const newWindowId = await this.waitForWindowToShow(windowIdsBefore, electron)
+
+        await page.waitForIdle()
 
         // Return an object for manipulating the new window
         return {
