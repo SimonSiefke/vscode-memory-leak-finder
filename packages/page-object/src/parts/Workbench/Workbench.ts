@@ -87,6 +87,8 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         return {
           async close() {
             try {
+              // Wait for the window to be fully idle before attempting to close
+              await newWindowPage.waitForIdle()
               const quickPick = QuickPick.create({
                 electronApp,
                 expect,
