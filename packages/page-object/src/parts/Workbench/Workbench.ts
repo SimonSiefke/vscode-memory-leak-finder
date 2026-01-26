@@ -87,9 +87,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
             // Wait a bit for the target to be attached, with timeout
             newWindowSessionRpc = await Promise.race([
               targetPromise,
-              new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Timeout waiting for target')), 5000)
-              ),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for target')), 5000)),
             ])
           } catch (error) {
             // If sessionRpc capture fails, continue without it
