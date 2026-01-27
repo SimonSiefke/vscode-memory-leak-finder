@@ -98,6 +98,7 @@ test('initialStart - watch mode - show details', async () => {
     vscodeVersion: '',
     watch: true,
     workers: false,
+    resolveExtensionSourceMaps: false,
   }
   // @ts-ignore
   WatchUsage.print.mockImplementation(async () => 'watch usage')
@@ -157,6 +158,7 @@ test('initialStart - watch mode - start running', async () => {
     vscodeVersion: '',
     watch: true,
     workers: false,
+    resolveExtensionSourceMaps: false,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
@@ -214,6 +216,7 @@ test('initialStart - start running', async () => {
     vscodeVersion: '',
     watch: false,
     workers: false,
+    resolveExtensionSourceMaps: false,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()

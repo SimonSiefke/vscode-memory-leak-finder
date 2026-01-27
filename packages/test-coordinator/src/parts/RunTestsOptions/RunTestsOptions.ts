@@ -30,6 +30,7 @@ export interface RunTestsOptions {
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
+  readonly resolveExtensionSourceMaps: boolean
   readonly restartBetween: boolean
   readonly root: string
   readonly runMode: number

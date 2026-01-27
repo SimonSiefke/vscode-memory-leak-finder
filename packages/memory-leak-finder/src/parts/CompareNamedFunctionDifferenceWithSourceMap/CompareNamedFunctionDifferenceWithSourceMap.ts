@@ -35,18 +35,18 @@ const finishBaseDifferenceItems = (baseDifferenceItemsWithStack) => {
   return baseDifferenceItemsWithStack.map(finishBaseDifferenceItem)
 }
 
-const addSourceMapsToFunctionDifference = async (baseDifference) => {
+const addSourceMapsToFunctionDifference = async (baseDifference, context) => {
   const prepared = prepareBaseDifference(baseDifference)
   const classNames = false
-  const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(prepared, classNames)
+  const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(prepared, classNames, context.connectionId)
   const finished = finishBaseDifferenceItems(withOriginalStack)
   return finished
 }
 
-export const compareFunctionDifference = async (before, after) => {
+export const compareFunctionDifference = async (before, after, context) => {
   Assert.array(before)
   Assert.array(after)
   const baseDifference = CompareFunctionDifference.compareFunctionDifference(before, after)
-  const difference = await addSourceMapsToFunctionDifference(baseDifference)
+  const difference = await addSourceMapsToFunctionDifference(baseDifference, context)
   return difference
 }

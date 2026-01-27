@@ -8,8 +8,7 @@ const getOriginalNames = async (items: readonly IntermediateItem[]): Promise<rea
   return originalNames
 }
 
-// TODO rename to addoriginalNames
-export const addOriginalPositions = async (intermediateItems: readonly IntermediateItem[]): Promise<readonly OriginalPosition[]> => {
+export const addOriginalNames = async (intermediateItems: readonly IntermediateItem[]): Promise<readonly OriginalPosition[]> => {
   const names = await getOriginalNames(intermediateItems)
   const finalResults: OriginalPosition[] = []
   for (let i = 0; i < intermediateItems.length; i++) {

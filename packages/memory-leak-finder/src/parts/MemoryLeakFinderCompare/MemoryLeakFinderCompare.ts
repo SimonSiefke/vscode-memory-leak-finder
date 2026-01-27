@@ -18,7 +18,7 @@ export const compare = async (connectionId: number, context: any, resultPath: st
   if (!after) {
     throw new Error(`after missing`)
   }
-  const result = await measure.compare(before, after, context)
+  const result = await measure.compare(before, after, { ...context, connectionId })
 
   await JsonFile.writeJson(resultPath, result)
   return {

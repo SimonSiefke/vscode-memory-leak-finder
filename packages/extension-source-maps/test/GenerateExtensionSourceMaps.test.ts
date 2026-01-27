@@ -24,6 +24,9 @@ test.skip('generateExtensionSourceMaps - skips when source maps already exist', 
     extensionName,
     repoUrl: 'git@github.com:test/repo.git',
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(existsSync(sourceMapsOutputPath)).toBe(true)
@@ -86,10 +89,6 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
     installDependencies: async () => {},
   }))
 
-  jest.unstable_mockModule('../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts', () => ({
-    modifyEsbuildConfig: async () => {},
-  }))
-
   jest.unstable_mockModule('../src/parts/BuildExtension/BuildExtension.ts', () => ({
     buildExtension: async () => {},
   }))
@@ -101,6 +100,9 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
     extensionName,
     repoUrl,
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(cloneCalled).toBe(true)
@@ -187,6 +189,9 @@ test.skip('generateExtensionSourceMaps - finds commit and checks out', async () 
     extensionName,
     repoUrl,
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(findCommitCalled).toBe(true)
@@ -242,6 +247,9 @@ test.skip('generateExtensionSourceMaps - throws error when checkout fails', asyn
       extensionName,
       repoUrl,
       version,
+      platform: 'linux',
+      buildScript: ['npm ci', 'npm run compile'],
+      modifications: [],
     }),
   ).rejects.toThrow('Failed to checkout commit abc123: checkout failed')
 
@@ -340,6 +348,9 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
     extensionName,
     repoUrl,
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(workflowCalls).toEqual([
@@ -425,6 +436,9 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
     extensionName,
     repoUrl,
     version,
+    platform: 'linux',
+    buildScript: ['npm ci', 'npm run compile'],
+    modifications: [],
   })
 
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Finding commit for version ${version}...`)
