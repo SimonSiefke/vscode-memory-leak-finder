@@ -57,6 +57,13 @@ Additionally there are some stylistic rules:
 6. Don't modify any comment
 7. Don't modify the type signature of any other types or functions when not needed. Only change them when necessary
 
+
+
+Additional information:
+- You can compile vscode by running \` npx gulp transpile-client-esbuild\`
+- You can run the measure by running \` xvfb-run -a node packages/cli/bin/test.js  --run-skipped-tests-anyway    --only window-open-new.ts    --runs 17 --measure named-function-count3 --check-leaks --measure-after  --enable-extensions --vscode-path "/home/simon/.cache/repos/vscode/scripts/code.sh" --measure-node\` in the vscode-memory-leak-finder repository at /home/simon/.cache/repos/vscode-memory-leak-finder
+- The measure results are in .vscode-memory-leak-finder-results/node/named-function-count-3/<testName>.json
+
 `
 
   return prompt
