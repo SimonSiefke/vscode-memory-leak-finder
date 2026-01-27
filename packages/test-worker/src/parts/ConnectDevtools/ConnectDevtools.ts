@@ -66,6 +66,7 @@ export const connectDevtools = async (
     sessionRpc,
   })
   const pageObjectContext = {
+    browserRpc,
     defaultContext: {
       callFunctionOn(options) {
         return DevtoolsProtocolRuntime.evaluate(sessionRpc, {

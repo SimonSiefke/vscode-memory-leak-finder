@@ -194,6 +194,7 @@ export interface Editor {
   unfold(): Promise<void>
   unfoldAll(): Promise<void>
   unpin(): Promise<void>
+  moveToNewWindow(): Promise<{ close(): Promise<void> }>
 }
 export interface EditorFind {
   openReplace(): Promise<void>
@@ -590,7 +591,13 @@ export interface Window {
 }
 export interface Workbench {
   focusLeftEditorGroup(): Promise<void>
-  openNewWindow(): Promise<{ close(): Promise<void> }>
+  openNewWindow(): Promise<{
+    close(): Promise<void>
+    sessionRpc?: any
+    locator?: (selector: string) => any
+    waitForIdle(): Promise<void>
+    shouldBeVisible(): Promise<void>
+  }>
   shouldBeVisible(): Promise<void>
   shouldHaveEditorBackground(color: any): Promise<void>
 }

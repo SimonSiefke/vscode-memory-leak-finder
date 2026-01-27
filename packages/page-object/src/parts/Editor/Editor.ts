@@ -5,6 +5,7 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as Electron from '../Electron/Electron.ts'
 
 const initialDiagnosticTimeout = 60_000
 
@@ -1841,6 +1842,64 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(pane).toBeVisible()
       const warningIcon = pane.locator('.codicon.codicon-warning')
       await expect(warningIcon).toBeVisible()
+    },
+    async moveToNewWindow() {
+      try {
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
+
+        // Get window IDs before moving editor to a new window
+        const windowIdsBeforeRaw = await electron.getWindowIds()
+        const windowIdsBefore = Array.isArray(windowIdsBeforeRaw) ? windowIdsBeforeRaw : []
+
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.MoveEditorToNewWindow)
+
+        // Wait for a new window ID to appear using the same logic as Workbench.waitForWindowToShow
+        const newWindowId = await this.waitForNewWindow(windowIdsBefore, electron)
+
+        await page.waitForIdle()
+
+        // Return an object for manipulating the new window
+        return {
+          async close() {
+            try {
+              await electron.closeWindow(newWindowId)
+            } catch (error) {
+              throw new VError(error, `Failed to close new window`)
+            }
+          },
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to move editor to new window`)
+      }
+    },
+    async waitForNewWindow(windowIdsBefore: readonly number[], electron: ReturnType<typeof Electron.create>) {
+      let windowIdsAfter = windowIdsBefore
+      const maxDelay = 5000 // 5 seconds max wait time
+      const startTime = performance.now()
+      while (windowIdsAfter.length <= windowIdsBefore.length) {
+        if (performance.now() - startTime > maxDelay) {
+          throw new Error(`New window did not appear within ${maxDelay}ms`)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        const ids = await electron.getWindowIds()
+        windowIdsAfter = Array.isArray(ids) ? ids : []
+      }
+
+      // Find the new window ID by comparing the lists
+      const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
+      if (newWindowId === undefined) {
+        throw new Error(`Could not identify the new window ID`)
+      }
+      return newWindowId
     },
   }
 }
