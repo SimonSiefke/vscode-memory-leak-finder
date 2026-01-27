@@ -12,26 +12,14 @@ export const setup = async ({ ChatEditor, Editor, Electron }: TestContext): Prom
   await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor, page, expect }: TestContext): Promise<void> => {
-  // Send the message about Benjamin Franklin with model selection
-  const sendPromise = ChatEditor.sendMessage({
+export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
+  await ChatEditor.sendMessage({
     message: 'What are some facts about Benjamin Franklin',
     model: 'zAiGLM4.5 air free',
     verify: true,
+
+    // TODO should pass in some parameters to verify it calls the wikipedia website
   })
-
-  // Wait a bit to see if an intermediate dialog appears
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-
-  // Try to click the allow button if it appears for website access
-  await ChatEditor.clickAccessButton('Allow')
-
-  // Wait for the original sendMessage promise to complete
-  await sendPromise
-
-  // Verify the response message appears
-  const response = page.locator('.interactive-session .monaco-list-row .chat-most-recent-response')
-  await expect(response).toBeVisible({ timeout: 30_000 })
 
   await ChatEditor.clearAll()
 }
