@@ -50,6 +50,34 @@ const getBeforeNodeMap = (before: DomNode[]): Record<string, DomNode> => {
   return beforeNodeMap
 }
 
+const getNodesWithDeltas = (
+  afterCountMap: Record<string, number>,
+  beforeCountMap: Record<string, number>,
+  beforeNodeMap: Record<string, DomNode>,
+  after: DomNode[],
+  runs: number,
+): NodeWithDelta[] => {
+  const afterWithDeltas: NodeWithDelta[] = []
+  for (const hash in afterCountMap) {
+    const afterCount = afterCountMap[hash]
+    const beforeCount = beforeCountMap[hash] || 0
+    const delta = afterCount - beforeCount
+    const node = beforeNodeMap[hash] || Array.from(after).find((n) => GetDomNodeHash.getDomNodeHash(n) === hash)
+
+    // Only include nodes with delta >= runs
+    if (delta >= runs && node) {
+      afterWithDeltas.push({
+        ...node,
+        count: afterCount,
+        delta,
+        beforeCount,
+        afterCount,
+      })
+    }
+  }
+  return afterWithDeltas
+}
+
 export const compareDetachedDomNodesWithStackTraces = (
   before: DomNode[],
   after: DomNode[],
