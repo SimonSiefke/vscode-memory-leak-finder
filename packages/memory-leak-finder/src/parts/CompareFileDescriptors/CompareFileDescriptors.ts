@@ -1,11 +1,61 @@
 import type { FileDescriptorInfo, ProcessInfoWithDescriptors } from '../GetFileDescriptors/GetFileDescriptors.ts'
 
+export interface FileDescriptorGroup {
+  target: string
+  count: number
+}
+
 export interface FileDescriptorDelta {
   name: string
   count: number
   delta: number
   pid: number
-  newFileDescriptors?: FileDescriptorInfo[]
+  newFileDescriptors?: FileDescriptorGroup[]
+}
+
+const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescriptorGroup[] => {
+  const groups = new Map<string, number>()
+
+  for (const fd of fileDescriptors) {
+    const { target } = fd
+    
+    // Normalize the target by removing unique identifiers
+    let groupKey: string
+    
+    if (target.startsWith('pipe:[')) {
+      groupKey = 'pipe'
+    } else if (target.startsWith('socket:[')) {
+      groupKey = 'socket'
+    } else if (target.startsWith('anon_inode:[')) {
+      // Keep the anon_inode type
+      groupKey = target
+    } else if (target.startsWith('/memfd:')) {
+      groupKey = 'memfd'
+    } else if (target.startsWith('/dmabuf')) {
+      groupKey = 'dmabuf'
+    } else if (target === '/dev/ptmx' || target === '/dev/udmabuf') {
+      groupKey = target
+    } else if (target.startsWith('/tmp/.org.chromium.Chromium.')) {
+      groupKey = '/tmp/.org.chromium.Chromium.* (deleted)'
+    } else if (target === '<unavailable>') {
+      groupKey = '<unavailable>'
+    } else {
+      // For regular files, keep the full path
+      groupKey = target
+    }
+
+    groups.set(groupKey, (groups.get(groupKey) || 0) + 1)
+  }
+
+  // Convert to array and sort by count (descending)
+  const result: FileDescriptorGroup[] = []
+  for (const [target, count] of groups.entries()) {
+    result.push({ target, count })
+  }
+  
+  result.sort((a, b) => b.count - a.count)
+  
+  return result
 }
 
 export const compareFileDescriptors = (
