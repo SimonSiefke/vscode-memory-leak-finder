@@ -1,6 +1,6 @@
 import { platform } from 'node:os'
-import { getAllDescendantPids } from '../../GetAllPids/GetAllPids.ts'
-import type { ProcessInfoWithDescriptors } from '../ProcessInfoWithDescriptors/ProcessInfoWithDescriptors.ts'
+import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
+import type { ProcessInfoWithDescriptors } from '../processInfoWithDescriptors/processInfoWithDescriptors.ts'
 import { getProcessName } from '../getProcessName/getProcessName.ts'
 import { getFileDescriptors } from '../getFileDescriptors/getFileDescriptors.ts'
 
