@@ -6,24 +6,38 @@ const CLOSING_BRACKET = 3
 const MINUS = 4
 const CHAR_0 = '0'.charCodeAt(0)
 
-const getDigitCount = (number) => {
+const getDigitCount = (number: number) => {
   if (number === 0) {
     return 1
   }
   return Math.floor(Math.log10(Math.abs(number))) + 1
 }
 
+interface ParseHeapSnapshotArrayResult {
+  readonly arrayIndex: number
+  readonly currentNumber: number
+  readonly dataIndex: number
+  readonly done: boolean
+  readonly hasDigits: boolean
+}
+
 /**
  * Parses comma-separated numbers from a Uint8Array buffer into a number array
  * @param {Uint8Array} data - The buffer containing comma-separated numbers
- * @param {any} array - The array to store parsed numbers
+ * @param {number[]} array - The array to store parsed numbers
  * @param {number} arrayIndex - The starting index in the array
  * @param {number} currentNumber - The current number being parsed (from previous chunk)
  * @param {boolean} hasDigits - Whether we have digits in the current number (from previous chunk)
- * @returns {{dataIndex: number, arrayIndex: number, done: boolean, currentNumber: number, hasDigits: boolean}} - The new data index, array index, completion status, and parsing state
+ * @returns {ParseHeapSnapshotArrayResult} - The new data index, array index, completion status, and parsing state
  * @throws {RangeError} When array index is out of bounds
  */
-export const parseHeapSnapshotArray = (data, array, arrayIndex, currentNumber = 0, hasDigits = false) => {
+export const parseHeapSnapshotArray = (
+  data: Uint8Array,
+  array: number[],
+  arrayIndex: number,
+  currentNumber = 0,
+  hasDigits = false,
+): ParseHeapSnapshotArrayResult => {
   const dataLength = data.length
 
   for (let i = 0; i < dataLength; i++) {
