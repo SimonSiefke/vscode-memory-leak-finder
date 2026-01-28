@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { getProcessName } from '../src/parts/GetFileDescriptors/getProcessName/getProcessName.ts'
+import { getProcessName } from '../src/parts/GetProcessName/GetProcessName.ts'
 
 test('getProcessName - current process returns a valid name', async () => {
   const pid = process.pid

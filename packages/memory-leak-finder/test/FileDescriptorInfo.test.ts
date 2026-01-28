@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import type { FileDescriptorInfo } from '../src/parts/GetFileDescriptors/FileDescriptorInfo/FileDescriptorInfo.ts'
+import type { FileDescriptorInfo } from '../src/parts/FileDescriptorInfo/FileDescriptorInfo.ts'
 
 test('FileDescriptorInfo - structure', () => {
   const descriptor: FileDescriptorInfo = {

@@ -1,6 +1,6 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
 import { platform } from 'node:os'
-import { getFileDescriptorsForProcess } from '../src/parts/GetFileDescriptors/getFileDescriptorsForProcess/getFileDescriptorsForProcess.ts'
+import { getFileDescriptorsForProcess } from '../src/parts/GetFileDescriptorsForProcess/GetFileDescriptorsForProcess.ts'
 
 // Mock the os module
 jest.mock('node:os', () => ({
@@ -12,11 +12,11 @@ jest.mock('../src/parts/GetAllPids/GetAllPids.ts', () => ({
   getAllDescendantPids: jest.fn(),
 }))
 
-jest.mock('../src/parts/GetFileDescriptors/getProcessName/getProcessName.ts', () => ({
+jest.mock('../src/parts/GetProcessName/GetProcessName.ts', () => ({
   getProcessName: jest.fn(),
 }))
 
-jest.mock('../src/parts/GetFileDescriptors/getFileDescriptors/getFileDescriptors.ts', () => ({
+jest.mock('../src/parts/GetFileDescriptors/GetFileDescriptors.ts', () => ({
   getFileDescriptors: jest.fn(),
 }))
 

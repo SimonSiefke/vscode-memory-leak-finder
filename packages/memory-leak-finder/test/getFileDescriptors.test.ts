@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { getFileDescriptors } from '../src/parts/GetFileDescriptors/getFileDescriptors/getFileDescriptors.ts'
+import { getFileDescriptors } from '../src/parts/GetFileDescriptors/GetFileDescriptors.ts'
 
 test('getFileDescriptors - returns empty array for non-existent PID', async () => {
   // Using a very large PID that likely doesn't exist

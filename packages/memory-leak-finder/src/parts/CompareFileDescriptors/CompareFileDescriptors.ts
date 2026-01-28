@@ -1,4 +1,5 @@
-import type { FileDescriptorInfo, ProcessInfoWithDescriptors } from '../GetFileDescriptors/GetFileDescriptors.ts'
+import type { FileDescriptorInfo } from '../FileDescriptorInfo/FileDescriptorInfo.ts'
+import type { ProcessInfoWithDescriptors } from '../ProcessInfoWithDescriptors/ProcessInfoWithDescriptors.ts'
 
 export interface FileDescriptorGroup {
   target: string

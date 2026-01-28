@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
-import type { ProcessInfoWithDescriptors } from '../src/parts/GetFileDescriptors/ProcessInfoWithDescriptors/ProcessInfoWithDescriptors.ts'
-import type { FileDescriptorInfo } from '../src/parts/GetFileDescriptors/FileDescriptorInfo/FileDescriptorInfo.ts'
+import type { ProcessInfoWithDescriptors } from '../src/parts/ProcessInfoWithDescriptors/ProcessInfoWithDescriptors.ts'
+import type { FileDescriptorInfo } from '../src/parts/FileDescriptorInfo/FileDescriptorInfo.ts'
 
 test('ProcessInfoWithDescriptors - structure', () => {
   const descriptors: FileDescriptorInfo[] = [
