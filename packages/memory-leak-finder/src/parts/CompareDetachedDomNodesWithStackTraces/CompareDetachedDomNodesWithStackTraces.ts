@@ -99,7 +99,7 @@ const getNodesWithDeltas = (
 }
 
 const formatOutput = (nodes: NodeWithDelta[]): FormattedNodeWithDelta[] => {
-  return nodes.map(({ type, subtype, objectId, beforeCount, afterCount, ...rest }) => rest as FormattedNodeWithDelta)
+  return nodes.map(({ type, subtype, objectId, beforeCount, afterCount, sourcesHash, ...rest }) => rest as FormattedNodeWithDelta)
 }
 
 export const compareDetachedDomNodesWithStackTraces = (
