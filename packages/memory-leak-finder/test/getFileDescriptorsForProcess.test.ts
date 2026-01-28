@@ -18,9 +18,7 @@ jest.unstable_mockModule('../src/parts/GetFileDescriptors/GetFileDescriptors.ts'
   getFileDescriptors: jest.fn(),
 }))
 
-const { getFileDescriptorsForProcess } = await import(
-  '../src/parts/GetFileDescriptorsForProcess/GetFileDescriptorsForProcess.ts'
-)
+const { getFileDescriptorsForProcess } = await import('../src/parts/GetFileDescriptorsForProcess/GetFileDescriptorsForProcess.ts')
 const { platform } = await import('node:os')
 const mockPlatform = platform as jest.MockedFunction<typeof platform>
 
