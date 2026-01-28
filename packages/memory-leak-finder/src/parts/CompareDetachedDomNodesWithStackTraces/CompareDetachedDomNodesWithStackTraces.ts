@@ -103,7 +103,7 @@ const formatOutput = (nodes: NodeWithDelta[]): FormattedNodeWithDelta[] => {
   return nodes.map(({ type, subtype, objectId, beforeCount, afterCount, ...rest }) => rest as FormattedNodeWithDelta)
 }
 
-export const compareDetachedDomNodesWithStackTraces = (before: DomNode[], after: DomNode[], context?: Context): readonly any[] => {
+export const compareDetachedDomNodesWithStackTraces = (before: DomNode[], after: DomNode[], context?: Context): readonly FormattedNodeWithDelta[] => {
   const runs = context?.runs || 1
 
   // Create maps for before and after nodes by hash and count occurrences
