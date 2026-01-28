@@ -21,6 +21,35 @@ const compareNode = (a: NodeWithDelta, b: NodeWithDelta): number => {
   return b.delta - a.delta
 }
 
+const getBeforeCountMap = (before: DomNode[]): Record<string, number> => {
+  const beforeCountMap: Record<string, number> = Object.create(null)
+  for (const node of before) {
+    const hash = GetDomNodeHash.getDomNodeHash(node)
+    beforeCountMap[hash] = (beforeCountMap[hash] || 0) + 1
+  }
+  return beforeCountMap
+}
+
+const getAfterCountMap = (after: DomNode[]): Record<string, number> => {
+  const afterCountMap: Record<string, number> = Object.create(null)
+  for (const node of after) {
+    const hash = GetDomNodeHash.getDomNodeHash(node)
+    afterCountMap[hash] = (afterCountMap[hash] || 0) + 1
+  }
+  return afterCountMap
+}
+
+const getBeforeNodeMap = (before: DomNode[]): Record<string, DomNode> => {
+  const beforeNodeMap: Record<string, DomNode> = Object.create(null)
+  for (const node of before) {
+    const hash = GetDomNodeHash.getDomNodeHash(node)
+    if (!(hash in beforeNodeMap)) {
+      beforeNodeMap[hash] = node
+    }
+  }
+  return beforeNodeMap
+}
+
 export const compareDetachedDomNodesWithStackTraces = (
   before: DomNode[],
   after: DomNode[],
@@ -29,24 +58,9 @@ export const compareDetachedDomNodesWithStackTraces = (
   const runs = context?.runs || 1
 
   // Create maps for before and after nodes by hash and count occurrences
-  const beforeCountMap: Record<string, number> = Object.create(null)
-  const afterCountMap: Record<string, number> = Object.create(null)
-  const beforeNodeMap: Record<string, DomNode> = Object.create(null)
-
-  // Process before nodes and count occurrences
-  for (const node of before) {
-    const hash = GetDomNodeHash.getDomNodeHash(node)
-    beforeCountMap[hash] = (beforeCountMap[hash] || 0) + 1
-    if (!(hash in beforeNodeMap)) {
-      beforeNodeMap[hash] = node
-    }
-  }
-
-  // Process after nodes and count occurrences
-  for (const node of after) {
-    const hash = GetDomNodeHash.getDomNodeHash(node)
-    afterCountMap[hash] = (afterCountMap[hash] || 0) + 1
-  }
+  const beforeCountMap = getBeforeCountMap(before)
+  const afterCountMap = getAfterCountMap(after)
+  const beforeNodeMap = getBeforeNodeMap(before)
 
   // Calculate deltas for nodes that exist in after
   const afterWithDeltas: NodeWithDelta[] = []
