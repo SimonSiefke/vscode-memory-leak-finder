@@ -1,16 +1,41 @@
 import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.ts'
 
-const compareNode = (a, b) => {
+interface DomNode {
+  className: string
+  description: string
+  [key: string]: any
+}
+
+interface NodeWithDelta extends DomNode {
+  count: number
+  delta: number
+  beforeCount: number
+  afterCount: number
+}
+
+interface Context {
+  runs?: number
+}
+
+interface Result {
+  after: NodeWithDelta[]
+}
+
+const compareNode = (a: NodeWithDelta, b: NodeWithDelta): number => {
   return b.delta - a.delta
 }
 
-export const compareDetachedDomNodesWithStackTraces = (before, after, context) => {
+export const compareDetachedDomNodesWithStackTraces = (
+  before: DomNode[],
+  after: DomNode[],
+  context?: Context
+): Result => {
   const runs = context?.runs || 1
   
   // Create maps for before and after nodes by hash and count occurrences
-  const beforeCountMap = new Map()
-  const afterCountMap = new Map()
-  const beforeNodeMap = new Map()
+  const beforeCountMap = new Map<string, number>()
+  const afterCountMap = new Map<string, number>()
+  const beforeNodeMap = new Map<string, DomNode>()
   
   // Process before nodes and count occurrences
   for (const node of before) {
@@ -28,7 +53,7 @@ export const compareDetachedDomNodesWithStackTraces = (before, after, context) =
   }
   
   // Calculate deltas for nodes that exist in after
-  const afterWithDeltas: any[] = []
+  const afterWithDeltas: NodeWithDelta[] = []
   for (const [hash, afterCount] of afterCountMap) {
     const beforeCount = beforeCountMap.get(hash) || 0
     const delta = afterCount - beforeCount
