@@ -1,24 +1,24 @@
 import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.ts'
 
 interface DomNode {
-  className: string
-  description: string
-  [key: string]: any
+  readonly className: string
+  readonly description: string
+  readonly [key: string]: any
 }
 
 interface NodeWithDelta extends DomNode {
-  count: number
-  delta: number
-  beforeCount: number
-  afterCount: number
+  readonly count: number
+  readonly delta: number
+  readonly beforeCount: number
+  readonly afterCount: number
 }
 
 interface Context {
-  runs?: number
+  readonly runs?: number
 }
 
 interface Result {
-  after: NodeWithDelta[]
+  readonly after: readonly NodeWithDelta[]
 }
 
 const compareNode = (a: NodeWithDelta, b: NodeWithDelta): number => {
