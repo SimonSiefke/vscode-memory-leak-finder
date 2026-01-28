@@ -83,6 +83,7 @@ export const compareDetachedDomNodesWithStackTraces = (
   after: DomNode[],
   context?: Context,
 ): readonly NodeWithDelta[] => {
+  console.log({ before, after })
   const runs = context?.runs || 1
 
   // Create maps for before and after nodes by hash and count occurrences
