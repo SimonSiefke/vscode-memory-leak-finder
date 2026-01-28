@@ -70,6 +70,18 @@ const getBeforeNodeMap = (before: DomNode[]): Record<string, DomNode> => {
   return beforeNodeMap
 }
 
+const findNode = (hash: string, after: DomNode[], beforeNodeMap: Record<string, DomNode>): DomNode | undefined => {
+  // Prefer a node from after with a stack trace, otherwise use any after node, otherwise use before node
+  let node = Array.from(after).find((n) => GetDomNodeHash.getDomNodeHash(n) === hash && n.stackTrace && n.stackTrace.length > 0)
+  if (!node) {
+    node = Array.from(after).find((n) => GetDomNodeHash.getDomNodeHash(n) === hash)
+  }
+  if (!node) {
+    node = beforeNodeMap[hash]
+  }
+  return node
+}
+
 const getNodesWithDeltas = (
   afterCountMap: Record<string, number>,
   beforeCountMap: Record<string, number>,
@@ -82,7 +94,8 @@ const getNodesWithDeltas = (
     const afterCount = afterCountMap[hash]
     const beforeCount = beforeCountMap[hash] || 0
     const delta = afterCount - beforeCount
-    const node = beforeNodeMap[hash] || Array.from(after).find((n) => GetDomNodeHash.getDomNodeHash(n) === hash)
+
+    const node = findNode(hash, after, beforeNodeMap)
 
     // Only include nodes with delta >= runs
     if (delta >= runs && node) {
