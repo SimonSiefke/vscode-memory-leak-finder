@@ -32,6 +32,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'position.ts',
       'range.ts',
       'ternarySearchTree.ts',
+      'storageMain.ts',
       'textResourceEditorInput.ts',
       'undoRedoService.ts',
       'uri.ts',
