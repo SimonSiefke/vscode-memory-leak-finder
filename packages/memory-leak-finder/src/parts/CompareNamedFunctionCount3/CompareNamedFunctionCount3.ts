@@ -37,6 +37,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'uri.ts',
       'uriIdentityService.ts',
       'cancellation.ts',
+      '^node:electron/js2c',
       '^webpack://xterm',
     ],
     minCount: threshold,
