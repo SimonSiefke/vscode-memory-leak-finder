@@ -4,7 +4,7 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 
-const createCountMap = (names: string[]) => {
+const createCountMap = (names: readonly string[]) => {
   const map = Object.create(null)
   for (const name of names) {
     map[name] ||= 0
@@ -55,7 +55,7 @@ export const getNamedArrayCountFromHeapSnapshot = async (
   const heapsnapshot = HeapSnapshotState.get(id)
 
   Assert.object(heapsnapshot)
-  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot!)
   const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
   const arrayNames = getArrayNames(nameMap)
   const countMap = createCountMap(arrayNames)

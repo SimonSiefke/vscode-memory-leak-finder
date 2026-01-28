@@ -41,13 +41,17 @@ interface ClosureWithContextCount extends NodeWithName {
 export const getNamedClosureCountFromHeapSnapshot = async (id: number): Promise<readonly ClosureWithContextCount[]> => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
-  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot!)
   const closures = parsedNodes.filter(isClosure)
-  const mapped = closures.map((node) => {
+  const mapped = closures.map((node): ClosureWithContextCount => {
     const edges = graph[node.id]
     const contextEdge = edges.find(isContext)
     if (!contextEdge) {
-      return node
+      return {
+        ...node,
+        contextNodeCount: 0,
+        name: node.name,
+      }
     }
     const contextNode = parsedNodes[contextEdge.index]
     const contextNodeEdges = graph[contextNode.id].filter(IsImportantEdge.isImportantEdge)

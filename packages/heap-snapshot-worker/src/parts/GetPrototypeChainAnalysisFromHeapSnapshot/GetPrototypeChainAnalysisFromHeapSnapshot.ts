@@ -94,8 +94,8 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (
   Assert.object(heapsnapshot)
 
   // Parse the heap snapshot to get both nodes and properly typed edges
-  const { edges, nodes, snapshot, strings } = heapsnapshot
-  const { meta } = snapshot
+  const { edges, nodes, snapshot, strings } = heapsnapshot!
+  const { meta } = snapshot!
   const { edge_fields, edge_types, node_fields, node_types } = meta
 
   const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(

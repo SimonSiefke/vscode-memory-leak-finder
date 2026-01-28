@@ -92,13 +92,16 @@ const compareCount = (a: any, b: any) => {
   return b.count - a.count
 }
 
-const cleanItem = (item: any) => {
+const cleanItem = (item: CompareResult): CompareResult => {
   return {
+    column: item.column,
     count: item.count,
     delta: item.delta,
+    line: item.line,
     name: item.name,
     originalLocation: item.originalLocation,
     originalName: item.originalName,
+    scriptId: item.scriptId,
     sourceLocation: item.sourceLocation,
   }
 }

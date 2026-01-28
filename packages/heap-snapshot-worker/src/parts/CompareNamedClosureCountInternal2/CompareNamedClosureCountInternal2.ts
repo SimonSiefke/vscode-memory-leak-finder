@@ -18,7 +18,7 @@ interface MatchingNode {
   readonly nodeName: string
 }
 
-type MatchingNodeMap = Record<string, readonly MatchingNode[]>
+type MatchingNodeMap = Record<string, MatchingNode[]>
 
 const getMatchingNodes = (snapshot: Snapshot, keyMap: Record<string, boolean>): MatchingNodeMap => {
   const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(

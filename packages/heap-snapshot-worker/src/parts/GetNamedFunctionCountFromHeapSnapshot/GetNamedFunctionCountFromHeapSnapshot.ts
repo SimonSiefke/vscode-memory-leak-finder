@@ -14,7 +14,7 @@ export const getNamedFunctionCountFromHeapSnapshot = async (
 ): Promise<readonly AggregatedFunction[]> => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
-  const { locations, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { locations, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot!)
   const functionsWithLocations = getFunctionsWithLocations(parsedNodes, locations, scriptMap)
   const normalized = normalizeFunctionObjects(functionsWithLocations as readonly FunctionObject[])
   const aggregated: readonly AggregatedFunction[] = aggregateFunctionObjects(normalized)

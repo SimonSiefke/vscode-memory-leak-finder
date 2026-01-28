@@ -1,5 +1,5 @@
-type NodeTypes = [readonly string[]]
-type EdgeTypes = [readonly string[]]
+type NodeTypes = [readonly string[]] | readonly [readonly string[]]
+type EdgeTypes = [readonly string[]] | readonly [readonly string[]]
 
 export const computeHeapSnapshotIndices = (node_types: NodeTypes, node_fields: readonly string[], edge_types: EdgeTypes, edge_fields: readonly string[]) => {
   // Type indices

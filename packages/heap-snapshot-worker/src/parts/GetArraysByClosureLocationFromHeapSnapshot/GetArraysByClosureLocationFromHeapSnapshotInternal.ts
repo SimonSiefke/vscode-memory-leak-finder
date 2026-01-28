@@ -130,7 +130,7 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
               const column = locations[locIndex + columnOffset]
               locationKey = getLocationKey(scriptId, line, column)
 
-              const script = scriptMap[scriptId]
+              const script = scriptMap[scriptId] as { readonly url?: string; readonly sourceMapUrl?: string } | undefined
               locationInfo = {
                 column,
                 line,

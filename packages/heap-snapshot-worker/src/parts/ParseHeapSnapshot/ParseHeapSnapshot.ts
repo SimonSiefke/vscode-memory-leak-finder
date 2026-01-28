@@ -12,7 +12,7 @@ interface HeapSnapshotInput {
 
 export const parseHeapSnapshot = (heapsnapshot: HeapSnapshotInput) => {
   const { edges, locations, nodes, snapshot, strings } = heapsnapshot
-  const meta = heapsnapshot.meta || snapshot.meta
+  const meta = heapsnapshot.meta || snapshot!.meta
   const { edge_fields, edge_types, location_fields, node_fields, node_types } = meta
   return ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
     nodes,

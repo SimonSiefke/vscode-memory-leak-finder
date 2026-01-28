@@ -61,7 +61,7 @@ export const getNamedConstructorCountFromHeapSnapshot = async (
   constructorName: string,
 ): Promise<readonly CountResult[]> => {
   Assert.object(heapsnapshot)
-  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot as any)
   const constructorNodes = GetConstructorNodes.getConstructorNodes(parsedNodes, constructorName)
   const { edgeMap, scopeMap } = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
   const constructorNodesWithInfo = constructorNodes.map((node) => {
