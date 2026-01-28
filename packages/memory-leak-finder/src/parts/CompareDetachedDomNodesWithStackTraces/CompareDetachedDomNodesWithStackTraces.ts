@@ -108,18 +108,11 @@ export const compareDetachedDomNodesWithStackTraces = (
   context?: Context,
 ): readonly FormattedNodeWithDelta[] => {
   const runs = context?.runs || 1
-
-  // Create maps for before and after nodes by hash and count occurrences
   const beforeCountMap = getBeforeCountMap(before)
   const afterCountMap = getAfterCountMap(after)
   const beforeNodeMap = getBeforeNodeMap(before)
-
-  // Calculate deltas for nodes that exist in after
   const afterWithDeltas = getNodesWithDeltas(afterCountMap, beforeCountMap, beforeNodeMap, after, runs)
-
-  // Sort by delta descending
   const sorted = afterWithDeltas.toSorted(compareNode)
-
   const formatted = formatOutput(sorted)
   return formatted
 }
