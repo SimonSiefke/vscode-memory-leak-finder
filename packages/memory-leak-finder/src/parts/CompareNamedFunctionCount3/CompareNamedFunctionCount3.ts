@@ -10,6 +10,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
   const threshold = getThreshold(context)
   const options = {
     excludeOriginalPaths: [
+      'map.ts',
       'async.ts',
       'cancellation.ts',
       'chatEditorInput.ts',
