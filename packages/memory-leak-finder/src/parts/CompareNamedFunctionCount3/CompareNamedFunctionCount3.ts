@@ -11,6 +11,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
   const options = {
     excludeOriginalPaths: [
       'async.ts',
+      'cancellation.ts',
       'chatEditorInput.ts',
       'commandsQuickAccess.ts',
       'contextKeyService.ts',
@@ -31,13 +32,12 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'numbers.ts',
       'position.ts',
       'range.ts',
-      'ternarySearchTree.ts',
       'storageMain.ts',
+      'ternarySearchTree.ts',
       'textResourceEditorInput.ts',
       'undoRedoService.ts',
       'uri.ts',
       'uriIdentityService.ts',
-      'cancellation.ts',
       '^node:electron/js2c',
       '^webpack://xterm',
     ],
