@@ -1,8 +1,18 @@
 import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.ts'
 
 interface DomNode {
+  readonly type: string
+  readonly subtype: string
   readonly className: string
   readonly description: string
+  readonly objectId: string
+  readonly stackTrace: string[]
+  readonly originalStack: string[]
+  readonly sourcesHash: string | null
+  readonly count?: number
+  readonly delta?: number
+  readonly beforeCount?: number
+  readonly afterCount?: number
   readonly [key: string]: any
 }
 
