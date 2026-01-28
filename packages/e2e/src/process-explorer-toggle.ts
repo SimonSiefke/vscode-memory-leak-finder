@@ -2,6 +2,8 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
+export const requiresNetwork = 1
+
 export const run = async ({ Developer, Electron }: TestContext): Promise<void> => {
   // Get window count before opening process explorer
   const windowCountBefore = await Electron.getWindowCount()
