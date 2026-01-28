@@ -4,6 +4,17 @@ import type { ProcessInfoWithDescriptors } from '../ProcessInfoWithDescriptors/P
 import { getProcessName } from '../getProcessName/getProcessName.ts'
 import { getFileDescriptors } from '../getFileDescriptors/getFileDescriptors.ts'
 
+const getProcessInfo = async (processPid: number): Promise<ProcessInfoWithDescriptors> => {
+  const [name, fileDescriptors] = await Promise.all([getProcessName(processPid), getFileDescriptors(processPid)])
+
+  return {
+    fileDescriptorCount: fileDescriptors.length,
+    fileDescriptors,
+    name,
+    pid: processPid,
+  }
+}
+
 export const getFileDescriptorsForProcess = async (pid: number | undefined): Promise<ProcessInfoWithDescriptors[]> => {
   if (pid === undefined) {
     console.log('[GetFileDescriptors] PID is undefined, returning empty array')
@@ -18,21 +29,12 @@ export const getFileDescriptorsForProcess = async (pid: number | undefined): Pro
     console.log(`[GetFileDescriptors] Found ${allPids.length} processes (including main process ${pid})`)
 
     // Process all PIDs in parallel
-    const processInfos = await Promise.all(
-      allPids.map(async (processPid) => {
-        const [name, fileDescriptors] = await Promise.all([getProcessName(processPid), getFileDescriptors(processPid)])
-
-        return {
-          fileDescriptorCount: fileDescriptors.length,
-          fileDescriptors,
-          name,
-          pid: processPid,
-        }
-      }),
+    let processInfos = await Promise.all(
+      allPids.map(getProcessInfo),
     )
 
     // Sort by file descriptor count descending
-    processInfos.sort((a, b) => b.fileDescriptorCount - a.fileDescriptorCount)
+    processInfos = processInfos.toSorted((a, b) => b.fileDescriptorCount - a.fileDescriptorCount)
 
     console.log(`[GetFileDescriptors] Returning ${processInfos.length} process infos`)
     return processInfos
