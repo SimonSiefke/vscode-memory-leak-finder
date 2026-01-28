@@ -14,11 +14,36 @@ export interface FileDescriptorDelta {
   newFileDescriptors?: FileDescriptorGroup[]
 }
 
+const isExcludedPath = (target: string): boolean => {
+  // Exclude irrelevant folders from measurement
+  const excludedPatterns = [
+    'Dictionaries',
+    'Local Storage',
+    'dmabuf',
+    'SharedStorage',
+    'nssdb',
+    'systemd',
+    'memfs',
+  ]
+
+  // Also exclude /dev paths except /dev/ptmx and /dev/udmabuf which are handled separately
+  if (target.startsWith('/dev/') && target !== '/dev/ptmx' && target !== '/dev/udmabuf') {
+    return true
+  }
+
+  return excludedPatterns.some((pattern) => target.includes(pattern))
+}
+
 const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescriptorGroup[] => {
   const groups = new Map<string, number>()
 
   for (const fd of fileDescriptors) {
     const { target } = fd
+
+    // Skip excluded paths
+    if (isExcludedPath(target)) {
+      continue
+    }
 
     // Normalize the target by removing unique identifiers
     let groupKey: string
