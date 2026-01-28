@@ -92,11 +92,7 @@ const formatOutput = (nodes: NodeWithDelta[]): any[] => {
   return nodes.map(({ type, subtype, objectId, beforeCount, afterCount, ...rest }) => rest)
 }
 
-export const compareDetachedDomNodesWithStackTraces = (
-  before: DomNode[],
-  after: DomNode[],
-  context?: Context,
-): { after: readonly any[] } => {
+export const compareDetachedDomNodesWithStackTraces = (before: DomNode[], after: DomNode[], context?: Context): readonly any[] => {
   const runs = context?.runs || 1
 
   // Create maps for before and after nodes by hash and count occurrences
@@ -110,7 +106,6 @@ export const compareDetachedDomNodesWithStackTraces = (
   // Sort by delta descending
   const sorted = afterWithDeltas.toSorted(compareNode)
 
-  return {
-    after: formatOutput(sorted),
-  }
+  const formatted = formatOutput(sorted)
+  return formatted
 }
