@@ -21,14 +21,14 @@ export const setup = async ({ ChatEditor, SideBar }: TestContext): Promise<void>
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: `Run echo hello world in terminal.`,
-    verify: true,
+    model: 'Xiaomi: MiMo-V2-Flash (free)',
     toolInvocations: [
       {
-        type: 'terminal',
         content: `echo hello world`,
+        type: 'terminal',
       },
     ],
-    model: 'Xiaomi: MiMo-V2-Flash (free)',
+    verify: true,
   })
   await ChatEditor.clearAll()
 }

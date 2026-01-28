@@ -27,6 +27,7 @@ export interface StartRunningOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly openDevtools: boolean
   readonly platform: string
   readonly recordVideo: boolean
   readonly restartBetween: boolean

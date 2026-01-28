@@ -23,6 +23,7 @@ export interface PrepareTestsOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly measureId: string
+  readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
@@ -55,6 +56,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     measureId,
+    openDevtools,
     platform,
     trackFunctions,
     updateUrl,
@@ -87,6 +89,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       inspectSharedProcessPort,
       isFirstConnection,
       measureId,
+      openDevtools,
       platform,
       trackFunctions,
       updateUrl,

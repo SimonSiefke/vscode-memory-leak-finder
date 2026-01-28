@@ -1,6 +1,6 @@
 import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUtilityExecutionContext.ts'
 import { createSessionRpcConnection } from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolTarget, DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 const findMatchingIframe = (targets, expectedUrl) => {
   for (const target of targets) {
@@ -62,4 +62,43 @@ export const waitForIframe = async ({
     utilityContext: iframeUtilityContext,
   })
   return iframe
+}
+
+export const waitForPage = async ({
+  browserRpc,
+  createPage,
+  electronObjectId,
+  electronRpc,
+  idleTimeout,
+  injectUtilityScript,
+  sessionId,
+}) => {
+  // Wait for a newly created page/window
+  // Similar to waitForIframe but for a new page instead of an iframe
+
+  const pageRpc = createSessionRpcConnection(browserRpc, sessionId)
+
+  let pageUtilityContext = undefined
+
+  const utilityExecutionContextName = 'utility'
+
+  if (injectUtilityScript) {
+    // Get the main frame ID from the frame tree
+    const frameTreeResult = await DevtoolsProtocolPage.getFrameTree(pageRpc)
+    const mainFrameId = frameTreeResult.frameTree.frame.id
+    pageUtilityContext = await addUtilityExecutionContext(pageRpc, utilityExecutionContextName, mainFrameId)
+  }
+
+  const page = createPage({
+    browserRpc,
+    electronObjectId,
+    electronRpc,
+    idleTimeout,
+    rpc: pageRpc,
+    sessionId: pageRpc.sessionId,
+    sessionRpc: pageRpc,
+    targetId: '', // TODO: get the actual targetId if needed
+    utilityContext: pageUtilityContext,
+  })
+  return page
 }

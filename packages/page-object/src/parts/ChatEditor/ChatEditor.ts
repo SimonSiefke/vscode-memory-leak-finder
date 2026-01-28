@@ -5,6 +5,13 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
+    async addAllProblemsAsContext() {
+      try {
+        await this.addContext('Problems...', 'All Problems', 'All Problems')
+      } catch (error) {
+        throw new VError(error, `Failed to set chat context`)
+      }
+    },
     async addContext(initialPrompt: string, secondPrompt: string, confirmText: string) {
       try {
         const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
@@ -41,13 +48,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to attach image`)
-      }
-    },
-    async addAllProblemsAsContext() {
-      try {
-        await this.addContext('Problems...', 'All Problems', 'All Problems')
-      } catch (error) {
-        throw new VError(error, `Failed to set chat context`)
       }
     },
     async clearAll() {
@@ -99,6 +99,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     isFirst: false,
+    async moveToEditor() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand('Chat: Move Chat into Editor Area')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to move chat`)
+      }
+    },
+    async moveToSideBar() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand('Chat: Move Chat into Side Bar')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to move chat`)
+      }
+    },
     async open() {
       try {
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
@@ -130,24 +148,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(hover).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to open finish setup`)
-      }
-    },
-    async moveToSideBar() {
-      try {
-        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand('Chat: Move Chat into Side Bar')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to move chat`)
-      }
-    },
-    async moveToEditor() {
-      try {
-        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand('Chat: Move Chat into Editor Area')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to move chat`)
       }
     },
     async selectModel(modelName: string, retry = true) {
@@ -188,15 +188,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async sendMessage({
       expectedResponse,
+      image = '',
       message,
+      model,
+      toolInvocations = [],
       validateRequest = {
         exists: [],
       },
       verify = false,
       viewLinesText = '',
-      image = '',
-      toolInvocations = [],
-      model,
     }: {
       expectedResponse?: string
       message: string
@@ -300,7 +300,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           for (const toolInvocation of toolInvocations) {
             const block = element.locator('.chat-terminal-command-block')
             await expect(block).toBeVisible({
-              timeout: 2_000,
+              timeout: 2000,
             })
             await expect(block).toHaveText(` ${toolInvocation.content}`)
             await page.waitForIdle()
@@ -378,6 +378,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(modeLabelElement).toHaveText(modeLabel)
       } catch (error) {
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
+      }
+    },
+    async clickAccessButton(buttonText: string = 'Allow') {
+      try {
+        const accessButton = page.locator(`button:has-text("${buttonText}")`)
+        const buttonCount = await accessButton.count()
+
+        if (buttonCount > 0) {
+          await expect(accessButton.first()).toBeVisible()
+          await accessButton.first().click()
+          await page.waitForIdle()
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to click access button with text "${buttonText}"`)
       }
     },
   }

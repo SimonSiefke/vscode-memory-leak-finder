@@ -27,6 +27,7 @@ export const connectDevtools = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
+  trackFunctions: boolean,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
@@ -65,6 +66,7 @@ export const connectDevtools = async (
     sessionRpc,
   })
   const pageObjectContext = {
+    browserRpc,
     defaultContext: {
       callFunctionOn(options) {
         return DevtoolsProtocolRuntime.evaluate(sessionRpc, {

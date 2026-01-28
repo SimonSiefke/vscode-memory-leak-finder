@@ -24,8 +24,8 @@ export const stop = async (session: Session, scriptHandler: IScriptHandler) => {
   const trackedFunctions = await GetTrackedFunctions.getTrackedFunctions(session)
   await scriptHandler.stop(session)
   return {
-    trackedFunctions,
     scriptMap: scriptHandler.scriptMap,
+    trackedFunctions,
   }
 }
 

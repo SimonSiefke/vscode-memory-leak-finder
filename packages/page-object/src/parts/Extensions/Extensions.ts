@@ -62,68 +62,6 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to clear`)
       }
     },
-    async moveScrollBar(y: number, expectedScrollBarTop: number) {
-      try {
-        await page.waitForIdle()
-        const extensions = page.locator(`[aria-label="Extensions"]`).first()
-        const scrollbar = extensions.locator('.scrollbar.vertical').first()
-        await page.waitForIdle()
-        await scrollbar.hover()
-        await page.waitForIdle()
-        const scrollBarVisible = extensions.locator('.scrollbar.visible.scrollbar.vertical')
-        await expect(scrollBarVisible).toBeVisible()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        const scrollbarSlider = scrollbar.locator('.slider')
-        await expect(scrollbarSlider).toBeVisible()
-        await page.waitForIdle()
-        const elementBox1 = await scrollbarSlider.boundingBox()
-        if (!elementBox1) {
-          throw new Error('Unable to find bounding box on element')
-        }
-
-        const elementCenterX = elementBox1.x + elementBox1.width / 2
-        const elementCenterY = elementBox1.y + elementBox1.height / 2
-
-        const xOffset = 0
-        const yOffset = y
-
-        await page.waitForIdle()
-        await scrollbarSlider.hover()
-        await page.waitForIdle()
-        await page.mouse.move(elementCenterX, elementCenterY)
-        await page.waitForIdle()
-        await page.mouse.down()
-        await page.waitForIdle()
-
-        await expect(scrollbarSlider).toHaveClass('slider active')
-        await page.waitForIdle()
-        await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
-        await page.waitForIdle()
-        await page.mouse.up()
-        await page.waitForIdle()
-        await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
-        await page.waitForIdle()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to scroll down`)
-      }
-    },
-    async scrollDown() {
-      try {
-        return this.moveScrollBar(200, 200)
-      } catch (error) {
-        throw new VError(error, `Failed to scroll down`)
-      }
-    },
-    async scrollUp() {
-      try {
-        return this.moveScrollBar(-200, 0)
-      } catch (error) {
-        throw new VError(error, `Failed to scroll up`)
-      }
-    },
     async closeSuggest() {
       try {
         // TODO scope selector to extensions view
@@ -237,6 +175,54 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         throw new VError(error, `Failed to install ${id}`)
       }
     },
+    async moveScrollBar(y: number, expectedScrollBarTop: number) {
+      try {
+        await page.waitForIdle()
+        const extensions = page.locator(`[aria-label="Extensions"]`).first()
+        const scrollbar = extensions.locator('.scrollbar.vertical').first()
+        await page.waitForIdle()
+        await scrollbar.hover()
+        await page.waitForIdle()
+        const scrollBarVisible = extensions.locator('.scrollbar.visible.scrollbar.vertical')
+        await expect(scrollBarVisible).toBeVisible()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        const scrollbarSlider = scrollbar.locator('.slider')
+        await expect(scrollbarSlider).toBeVisible()
+        await page.waitForIdle()
+        const elementBox1 = await scrollbarSlider.boundingBox()
+        if (!elementBox1) {
+          throw new Error('Unable to find bounding box on element')
+        }
+
+        const elementCenterX = elementBox1.x + elementBox1.width / 2
+        const elementCenterY = elementBox1.y + elementBox1.height / 2
+
+        const xOffset = 0
+        const yOffset = y
+
+        await page.waitForIdle()
+        await scrollbarSlider.hover()
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX, elementCenterY)
+        await page.waitForIdle()
+        await page.mouse.down()
+        await page.waitForIdle()
+
+        await expect(scrollbarSlider).toHaveClass('slider active')
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
+        await page.waitForIdle()
+        await page.mouse.up()
+        await page.waitForIdle()
+        await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
+        await page.waitForIdle()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down`)
+      }
+    },
     async open({ id, name }: { id: string; name: string }) {
       try {
         await this.show()
@@ -282,6 +268,20 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to restart extensions`)
+      }
+    },
+    async scrollDown() {
+      try {
+        return this.moveScrollBar(200, 200)
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down`)
+      }
+    },
+    async scrollUp() {
+      try {
+        return this.moveScrollBar(-200, 0)
+      } catch (error) {
+        throw new VError(error, `Failed to scroll up`)
       }
     },
     async search(value: string) {

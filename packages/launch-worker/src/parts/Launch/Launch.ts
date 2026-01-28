@@ -1,7 +1,9 @@
+import { join } from 'node:path'
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
+import * as Root from '../Root/Root.ts'
 
 export interface LaunchOptions {
   readonly arch: string
@@ -24,6 +26,7 @@ export interface LaunchOptions {
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
   readonly measureId: string
+  readonly openDevtools: boolean
   readonly platform: string
   readonly trackFunctions: boolean
   readonly updateUrl: string
@@ -52,6 +55,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     measureId,
+    openDevtools,
     platform,
     trackFunctions,
     updateUrl,
@@ -59,7 +63,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   } = options
-  const { child, parsedVersion, pid } = await LaunchIde.launchIde({
+  const { binaryPath, child, parsedVersion, pid } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
     clearExtensions,
@@ -84,26 +88,34 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   })
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
+
+  let preGeneratedWorkbenchPath: string | null = null
+  if (trackFunctions) {
+    preGeneratedWorkbenchPath = join(Root.root, '.vscode-workbench-tracked', 'workbench.desktop.main.js')
+  }
+
   await using rpc = await launchInitializationWorker()
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
-  const { devtoolsWebSocketUrl, electronObjectId, functionTrackerRpc, sessionId, targetId, utilityContext, webSocketUrl } =
-    await rpc.invokeAndTransfer(
-      'Initialize.prepare',
-      headlessMode,
-      attachedToPageTimeout,
-      port.port,
-      parsedVersion,
-      trackFunctions,
-      connectionId,
-      measureId,
-      pid,
-    )
+  const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
+    'Initialize.prepare',
+    headlessMode,
+    attachedToPageTimeout,
+    port.port,
+    parsedVersion,
+    trackFunctions,
+    openDevtools,
+    connectionId,
+    measureId,
+    pid,
+    preGeneratedWorkbenchPath,
+    binaryPath,
+  )
+
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
-    functionTrackerRpc,
     parsedVersion,
     pid,
     sessionId,

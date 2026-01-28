@@ -32,6 +32,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly inspectSharedProcessPort: number
   readonly measureId: string
   readonly measureNode: boolean
+  readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
@@ -69,6 +70,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectSharedProcessPort,
     measureId,
     measureNode,
+    openDevtools,
     pageObjectPath,
     platform,
     recordVideo,
@@ -104,6 +106,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       inspectSharedProcess,
       inspectSharedProcessPort,
       measureId,
+      openDevtools,
       pageObjectPath,
       platform,
       recordVideo,
@@ -156,6 +159,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    trackFunctions,
   )
   return {
     functionTrackerRpc,

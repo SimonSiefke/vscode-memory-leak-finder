@@ -22,6 +22,9 @@ export interface ActivityBar {
   showRunAndDebug(): Promise<void>
   showSearch(): Promise<void>
   showSourceControl(): Promise<void>
+  moveSearchToPanel(): Promise<void>
+  moveSourceControlToPanel(): Promise<void>
+  moveRunAndDebugToPanel(): Promise<void>
   moveExplorerToPanel(): Promise<void>
   moveExtensionsToPanel(): Promise<void>
   resetViewLocations(): Promise<void>
@@ -31,6 +34,7 @@ export interface ChatEditor {
   clearAll(): Promise<void>
   clearContext(contextName: any): Promise<void>
   closeFinishSetup(): Promise<void>
+  clickAccessButton(buttonText?: any): Promise<void>
   open(): Promise<void>
   openFinishSetup(): Promise<void>
   sendMessage(options?: any): Promise<void>
@@ -67,6 +71,7 @@ export interface DebugHover {
 }
 export interface Developer {
   toggleScreenCastMode(): Promise<void>
+  toggleProcessExplorer(): Promise<void>
 }
 export interface DiffEditor {
   expectModified(text: any): Promise<void>
@@ -190,6 +195,7 @@ export interface Editor {
   unfold(): Promise<void>
   unfoldAll(): Promise<void>
   unpin(): Promise<void>
+  moveToNewWindow(): Promise<{ close(): Promise<void> }>
 }
 export interface EditorFind {
   openReplace(): Promise<void>
@@ -199,6 +205,7 @@ export interface EditorFind {
 }
 export interface Electron {
   evaluate(expression: any): Promise<void>
+  getWindowCount(): Promise<number>
   mockDialog(response: any): Promise<void>
   mockElectron(namespace: any, key: any, implementationCode: any): Promise<void>
   mockOpenDialog(response: any): Promise<void>
@@ -327,6 +334,7 @@ export interface Output {
   clearFilter(): Promise<void>
   filter(filterValue: any): Promise<void>
   hide(): Promise<void>
+  moveOutputToSidebar(): Promise<void>
   openEditor(): Promise<void>
   select(channelName: any): Promise<void>
   show(): Promise<void>
@@ -349,6 +357,7 @@ export interface Problems {
   hide(): Promise<void>
   shouldHaveCount(count: any): Promise<void>
   show(): Promise<void>
+  moveProblemsToSidebar(): Promise<void>
   switchToTableView(): Promise<void>
   switchToTreeView(): Promise<void>
 }
@@ -583,6 +592,13 @@ export interface Window {
 }
 export interface Workbench {
   focusLeftEditorGroup(): Promise<void>
+  openNewWindow(): Promise<{
+    close(): Promise<void>
+    sessionRpc?: any
+    locator?: (selector: string) => any
+    waitForIdle(): Promise<void>
+    shouldBeVisible(): Promise<void>
+  }>
   shouldBeVisible(): Promise<void>
   shouldHaveEditorBackground(color: any): Promise<void>
 }

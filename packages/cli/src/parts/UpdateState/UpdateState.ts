@@ -55,6 +55,7 @@ export const updateState = async (newState: any): Promise<void> => {
       measure: state.measure,
       measureAfter: state.measureAfter,
       measureNode: false,
+      openDevtools: state.openDevtools,
       platform: state.platform,
       recordVideo: state.recordVideo,
       restartBetween: state.restartBetween,
