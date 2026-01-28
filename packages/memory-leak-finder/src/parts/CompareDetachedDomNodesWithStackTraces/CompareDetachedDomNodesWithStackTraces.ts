@@ -91,24 +91,7 @@ export const compareDetachedDomNodesWithStackTraces = (
   const beforeNodeMap = getBeforeNodeMap(before)
 
   // Calculate deltas for nodes that exist in after
-  const afterWithDeltas: NodeWithDelta[] = []
-  for (const hash in afterCountMap) {
-    const afterCount = afterCountMap[hash]
-    const beforeCount = beforeCountMap[hash] || 0
-    const delta = afterCount - beforeCount
-    const node = beforeNodeMap[hash] || Array.from(after).find((n) => GetDomNodeHash.getDomNodeHash(n) === hash)
-
-    // Only include nodes with delta >= runs
-    if (delta >= runs && node) {
-      afterWithDeltas.push({
-        ...node,
-        count: afterCount,
-        delta,
-        beforeCount,
-        afterCount,
-      })
-    }
-  }
+  const afterWithDeltas = getNodesWithDeltas(afterCountMap, beforeCountMap, beforeNodeMap, after, runs)
 
   // Sort by delta descending
   const sorted = afterWithDeltas.toSorted(compareNode)
