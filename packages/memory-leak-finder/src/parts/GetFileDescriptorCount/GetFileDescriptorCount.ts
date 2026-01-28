@@ -171,7 +171,10 @@ export const getProcessName = async (pid: number): Promise<string> => {
   }
 }
 
-export const getFileDescriptorCountForProcess = async (pid: number | undefined, platformName: string = platform()): Promise<ProcessInfo[]> => {
+export const getFileDescriptorCountForProcess = async (
+  pid: number | undefined,
+  platformName: string = platform(),
+): Promise<ProcessInfo[]> => {
   if (pid === undefined) {
     console.log('[GetFileDescriptorCount] PID is undefined, returning empty array')
     return []

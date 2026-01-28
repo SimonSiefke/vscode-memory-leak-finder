@@ -1,25 +1,25 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
-import { platform } from 'node:os'
 import { getFileDescriptorsForProcess } from '../src/parts/GetFileDescriptorsForProcess/GetFileDescriptorsForProcess.ts'
 
 // Mock the os module
-jest.mock('node:os', () => ({
+jest.unstable_mockModule('node:os', () => ({
   platform: jest.fn(),
 }))
 
 // Mock the dependencies
-jest.mock('../src/parts/GetAllPids/GetAllPids.ts', () => ({
+jest.unstable_mockModule('../src/parts/GetAllPids/GetAllPids.ts', () => ({
   getAllDescendantPids: jest.fn(),
 }))
 
-jest.mock('../src/parts/GetProcessName/GetProcessName.ts', () => ({
+jest.unstable_mockModule('../src/parts/GetProcessName/GetProcessName.ts', () => ({
   getProcessName: jest.fn(),
 }))
 
-jest.mock('../src/parts/GetFileDescriptors/GetFileDescriptors.ts', () => ({
+jest.unstable_mockModule('../src/parts/GetFileDescriptors/GetFileDescriptors.ts', () => ({
   getFileDescriptors: jest.fn(),
 }))
 
+const { platform } = await import('node:os')
 const mockPlatform = platform as jest.MockedFunction<typeof platform>
 
 beforeEach(() => {
