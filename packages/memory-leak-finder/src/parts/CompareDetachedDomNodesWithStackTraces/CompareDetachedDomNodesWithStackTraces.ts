@@ -21,13 +21,17 @@ const compareNode = (a: NodeWithDelta, b: NodeWithDelta): number => {
   return b.delta - a.delta
 }
 
-export const compareDetachedDomNodesWithStackTraces = (before: DomNode[], after: DomNode[], context?: Context): readonly NodeWithDelta[] => {
+export const compareDetachedDomNodesWithStackTraces = (
+  before: DomNode[],
+  after: DomNode[],
+  context?: Context,
+): readonly NodeWithDelta[] => {
   const runs = context?.runs || 1
 
   // Create maps for before and after nodes by hash and count occurrences
-  const beforeCountMap = Object.create(null) as Record<string, number>
-  const afterCountMap = Object.create(null) as Record<string, number>
-  const beforeNodeMap = Object.create(null) as Record<string, DomNode>
+  const beforeCountMap: Record<string, number> = Object.create(null)
+  const afterCountMap: Record<string, number> = Object.create(null)
+  const beforeNodeMap: Record<string, DomNode> = Object.create(null)
 
   // Process before nodes and count occurrences
   for (const node of before) {
@@ -67,7 +71,5 @@ export const compareDetachedDomNodesWithStackTraces = (before: DomNode[], after:
   // Sort by delta descending
   const sorted = afterWithDeltas.toSorted(compareNode)
 
-  return {
-    after: sorted,
-  }
+  return sorted
 }
