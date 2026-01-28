@@ -115,9 +115,7 @@ export const describeFd = (fd: string, target: string): string => {
 /**
  * Get detailed information about all file descriptors for a process
  */
-export const getDetailedFileDescriptors = async (
-  pid: number,
-): Promise<Array<{ description: string; fd: string; target: string }>> => {
+export const getDetailedFileDescriptors = async (pid: number): Promise<Array<{ description: string; fd: string; target: string }>> => {
   try {
     const fdDir = `/proc/${pid}/fd`
     const files = await readdir(fdDir)

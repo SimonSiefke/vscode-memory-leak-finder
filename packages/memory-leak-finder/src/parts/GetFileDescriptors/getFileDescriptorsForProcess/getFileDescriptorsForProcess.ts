@@ -28,7 +28,7 @@ export const getFileDescriptorsForProcess = async (pid: number | undefined): Pro
           name,
           pid: processPid,
         }
-      })
+      }),
     )
 
     // Sort by file descriptor count descending

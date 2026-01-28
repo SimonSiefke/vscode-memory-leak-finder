@@ -15,7 +15,7 @@ export const getFileDescriptors = async (pid: number): Promise<FileDescriptorInf
         const target = await readlink(fdPath)
         const description = GetFileDescriptorCount.describeFd(fd, target)
         return { description, fd, target }
-      })
+      }),
     )
 
     for (const result of results) {
