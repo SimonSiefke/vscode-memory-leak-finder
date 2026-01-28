@@ -1,5 +1,4 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
-import { getFileDescriptorsForProcess } from '../src/parts/GetFileDescriptorsForProcess/GetFileDescriptorsForProcess.ts'
 
 // Mock the os module
 jest.unstable_mockModule('node:os', () => ({
@@ -19,6 +18,9 @@ jest.unstable_mockModule('../src/parts/GetFileDescriptors/GetFileDescriptors.ts'
   getFileDescriptors: jest.fn(),
 }))
 
+const { getFileDescriptorsForProcess } = await import(
+  '../src/parts/GetFileDescriptorsForProcess/GetFileDescriptorsForProcess.ts'
+)
 const { platform } = await import('node:os')
 const mockPlatform = platform as jest.MockedFunction<typeof platform>
 
@@ -43,8 +45,8 @@ test('getFileDescriptorsForProcess - returns empty array for non-Linux platform'
 
 test('getFileDescriptorsForProcess - returns process info with descriptors', async () => {
   const { getAllDescendantPids } = await import('../src/parts/GetAllPids/GetAllPids.ts')
-  const { getProcessName } = await import('../src/parts/GetFileDescriptors/getProcessName/getProcessName.ts')
-  const { getFileDescriptors } = await import('../src/parts/GetFileDescriptors/getFileDescriptors/getFileDescriptors.ts')
+  const { getProcessName } = await import('../src/parts/GetProcessName/GetProcessName.ts')
+  const { getFileDescriptors } = await import('../src/parts/GetFileDescriptors/GetFileDescriptors.ts')
 
   const mockGetAllDescendantPids = getAllDescendantPids as jest.MockedFunction<typeof getAllDescendantPids>
   const mockGetProcessName = getProcessName as jest.MockedFunction<typeof getProcessName>
@@ -68,8 +70,8 @@ test('getFileDescriptorsForProcess - returns process info with descriptors', asy
 
 test('getFileDescriptorsForProcess - sorts by file descriptor count descending', async () => {
   const { getAllDescendantPids } = await import('../src/parts/GetAllPids/GetAllPids.ts')
-  const { getProcessName } = await import('../src/parts/GetFileDescriptors/getProcessName/getProcessName.ts')
-  const { getFileDescriptors } = await import('../src/parts/GetFileDescriptors/getFileDescriptors/getFileDescriptors.ts')
+  const { getProcessName } = await import('../src/parts/GetProcessName/GetProcessName.ts')
+  const { getFileDescriptors } = await import('../src/parts/GetFileDescriptors/GetFileDescriptors.ts')
 
   const mockGetAllDescendantPids = getAllDescendantPids as jest.MockedFunction<typeof getAllDescendantPids>
   const mockGetProcessName = getProcessName as jest.MockedFunction<typeof getProcessName>
@@ -119,8 +121,8 @@ test('getFileDescriptorsForProcess - handles errors gracefully', async () => {
 
 test('getFileDescriptorsForProcess - processes PIDs in parallel', async () => {
   const { getAllDescendantPids } = await import('../src/parts/GetAllPids/GetAllPids.ts')
-  const { getProcessName } = await import('../src/parts/GetFileDescriptors/getProcessName/getProcessName.ts')
-  const { getFileDescriptors } = await import('../src/parts/GetFileDescriptors/getFileDescriptors/getFileDescriptors.ts')
+  const { getProcessName } = await import('../src/parts/GetProcessName/GetProcessName.ts')
+  const { getFileDescriptors } = await import('../src/parts/GetFileDescriptors/GetFileDescriptors.ts')
 
   const mockGetAllDescendantPids = getAllDescendantPids as jest.MockedFunction<typeof getAllDescendantPids>
   const mockGetProcessName = getProcessName as jest.MockedFunction<typeof getProcessName>
