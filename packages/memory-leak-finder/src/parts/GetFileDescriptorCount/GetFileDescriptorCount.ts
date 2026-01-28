@@ -1,12 +1,60 @@
 import { execSync } from 'node:child_process'
-import { readFile, readdir } from 'node:fs/promises'
+import { readFile, readdir, readlink } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
+import { describeFdTarget } from './DescribeFdTarget.ts'
 
 export interface ProcessInfo {
   readonly fileDescriptorCount: number
   readonly name: string
   readonly pid: number
+}
+
+/**
+ * Get detailed information about a specific file descriptor
+ */
+export const describeFd = (fd: string, target: string): string => {
+  const description = describeFdTarget(target)
+
+  // Add special notes for standard file descriptors
+  if (fd === '0') {
+    return `stdin (${description})`
+  }
+  if (fd === '1') {
+    return `stdout (${description})`
+  }
+  if (fd === '2') {
+    return `stderr (${description})`
+  }
+
+  return description
+}
+
+/**
+ * Get detailed information about all file descriptors for a process
+ */
+export const getDetailedFileDescriptors = async (pid: number): Promise<Array<{ description: string; fd: string; target: string }>> => {
+  try {
+    const fdDir = `/proc/${pid}/fd`
+    const files = await readdir(fdDir)
+    const fdDetails: Array<{ description: string; fd: string; target: string }> = []
+
+    for (const fd of files) {
+      try {
+        const fdPath = `${fdDir}/${fd}`
+        const target = await readlink(fdPath)
+        const description = describeFd(fd, target)
+        fdDetails.push({ description, fd, target })
+      } catch {
+        // Ignore errors reading individual FDs (they may close between readdir and readlink)
+      }
+    }
+
+    return fdDetails
+  } catch (error) {
+    console.log(`[GetFileDescriptorCount] Error getting detailed FDs for ${pid}:`, error)
+    return []
+  }
 }
 
 const getFileDescriptorCount = async (pid: number): Promise<number> => {
@@ -20,7 +68,7 @@ const getFileDescriptorCount = async (pid: number): Promise<number> => {
   }
 }
 
-const getProcessName = async (pid: number): Promise<string> => {
+export const getProcessName = async (pid: number): Promise<string> => {
   try {
     // Try to read command line from /proc/[pid]/cmdline for more detailed info
     const cmdlinePath = `/proc/${pid}/cmdline`
@@ -123,13 +171,16 @@ const getProcessName = async (pid: number): Promise<string> => {
   }
 }
 
-export const getFileDescriptorCountForProcess = async (pid: number | undefined): Promise<ProcessInfo[]> => {
+export const getFileDescriptorCountForProcess = async (
+  pid: number | undefined,
+  platformName: string = platform(),
+): Promise<ProcessInfo[]> => {
   if (pid === undefined) {
     console.log('[GetFileDescriptorCount] PID is undefined, returning empty array')
     return []
   }
-  if (platform() !== 'linux') {
-    console.log(`[GetFileDescriptorCount] Platform is ${platform()}, not Linux, returning empty array`)
+  if (platformName !== 'linux') {
+    console.log(`[GetFileDescriptorCount] Platform is ${platformName}, not Linux, returning empty array`)
     return []
   }
   try {
