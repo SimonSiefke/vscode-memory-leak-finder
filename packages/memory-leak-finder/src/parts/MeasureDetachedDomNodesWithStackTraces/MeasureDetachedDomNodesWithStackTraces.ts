@@ -39,23 +39,6 @@ export const releaseResources = async (session: Session, objectGroup: string) =>
 
 export const compare = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces
 
-export const isLeak = ({ after }) => {
-  if (!after || !Array.isArray(after)) {
-    return false
-  }
+export const isLeak = (after: readonly any[]) => {
   return after.length > 0
-}
-
-export const summary = ({ after }) => {
-  if (!after || !Array.isArray(after)) {
-    return {
-      after: 0,
-      before: 0,
-    }
-  }
-  const totalDelta = after.reduce((sum, node) => sum + (node.delta || 0), 0)
-  return {
-    after: totalDelta,
-    before: 0,
-  }
 }

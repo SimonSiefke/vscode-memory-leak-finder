@@ -46,11 +46,7 @@ test('compareDetachedDomNodesWithStackTraces - node with delta less than runs', 
       description: 'div.container',
     },
   ]
-  const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(
-    before,
-    after,
-    { runs: 2 }
-  )
+  const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(before, after, { runs: 2 })
   expect(result).toEqual({
     after: [],
   })
@@ -134,7 +130,6 @@ test('compareDetachedDomNodesWithStackTraces - sorted by delta descending', () =
 })
 
 test('compareDetachedDomNodesWithStackTraces - with context runs', () => {
-  const before: any[] = []
   const after = [
     {
       className: 'HTMLDivElement',
