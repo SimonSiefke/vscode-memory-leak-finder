@@ -10,7 +10,7 @@ const callsites = () => {
 	const _prepareStackTrace = Error.prepareStackTrace;
 	Error.prepareStackTrace = (_, stack) => stack;
 	const stack = new Error().stack.slice(2);
-	Error.prepareStackTrace = _prepareStackTrace;
+Error.prepareStackTrace = _prepareStackTrace;
 	return stack.join('\\n')
 }
 
