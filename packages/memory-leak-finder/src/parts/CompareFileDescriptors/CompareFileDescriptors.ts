@@ -18,10 +18,10 @@ const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescri
 
   for (const fd of fileDescriptors) {
     const { target } = fd
-    
+
     // Normalize the target by removing unique identifiers
     let groupKey: string
-    
+
     if (target.startsWith('pipe:[')) {
       groupKey = 'pipe'
     } else if (target.startsWith('socket:[')) {
@@ -52,9 +52,9 @@ const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescri
   for (const [target, count] of groups.entries()) {
     result.push({ target, count })
   }
-  
+
   result.sort((a, b) => b.count - a.count)
-  
+
   return result
 }
 
@@ -90,11 +90,11 @@ export const compareFileDescriptors = (
         const beforeFdSet = new Set(beforeItem.fileDescriptors.map((fd) => fd.target))
         const newFds = item.fileDescriptors.filter((fd) => !beforeFdSet.has(fd.target))
         if (newFds.length > 0) {
-          result.newFileDescriptors = newFds
+          result.newFileDescriptors = groupFileDescriptors(newFds)
         }
       } else {
         // If there's no before state, all current FDs are "new"
-        result.newFileDescriptors = item.fileDescriptors
+        result.newFileDescriptors = groupFileDescriptors(item.fileDescriptors)
       }
 
       deltas.push(result)
