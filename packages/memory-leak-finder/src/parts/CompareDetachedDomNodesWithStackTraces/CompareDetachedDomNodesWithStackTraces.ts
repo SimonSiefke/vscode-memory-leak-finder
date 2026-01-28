@@ -78,12 +78,15 @@ const getNodesWithDeltas = (
   return afterWithDeltas
 }
 
+const formatOutput = (nodes: NodeWithDelta[]): any[] => {
+  return nodes.map(({ type, subtype, objectId, beforeCount, afterCount, ...rest }) => rest)
+}
+
 export const compareDetachedDomNodesWithStackTraces = (
   before: DomNode[],
   after: DomNode[],
   context?: Context,
-): readonly NodeWithDelta[] => {
-  console.log({ before, after })
+): { after: readonly any[] } => {
   const runs = context?.runs || 1
 
   // Create maps for before and after nodes by hash and count occurrences
@@ -97,5 +100,7 @@ export const compareDetachedDomNodesWithStackTraces = (
   // Sort by delta descending
   const sorted = afterWithDeltas.toSorted(compareNode)
 
-  return sorted
+  return {
+    after: formatOutput(sorted),
+  }
 }

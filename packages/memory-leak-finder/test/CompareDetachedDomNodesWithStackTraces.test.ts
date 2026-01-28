@@ -26,8 +26,6 @@ test('compareDetachedDomNodesWithStackTraces - single new node', () => {
         description: 'div.container',
         count: 1,
         delta: 1,
-        beforeCount: 0,
-        afterCount: 1,
       },
     ],
   })
@@ -88,8 +86,6 @@ test('compareDetachedDomNodesWithStackTraces - multiple nodes with different del
     description: 'div.container',
     count: 3,
     delta: 2,
-    beforeCount: 1,
-    afterCount: 3,
   })
 })
 
@@ -170,9 +166,6 @@ test('compareDetachedDomNodesWithStackTraces - preserves additional node propert
   expect(result.after[0]).toMatchObject({
     className: 'HTMLDivElement',
     description: 'div.container',
-    objectId: '123456.1',
-    subtype: 'node',
-    type: 'object',
     customProp: 'customValue',
     count: 1,
     delta: 1,
@@ -219,8 +212,6 @@ test('compareDetachedDomNodesWithStackTraces - complex scenario with multiple di
     description: 'div.container',
     count: 3,
     delta: 1,
-    beforeCount: 2,
-    afterCount: 3,
   })
 })
 
