@@ -23,6 +23,17 @@ interface NodeWithDelta extends DomNode {
   readonly afterCount: number
 }
 
+interface FormattedNodeWithDelta {
+  readonly className: string
+  readonly description: string
+  readonly stackTrace: string[]
+  readonly originalStack: string[]
+  readonly sourcesHash: string | null
+  readonly count: number
+  readonly delta: number
+  readonly [key: string]: any
+}
+
 interface Context {
   readonly runs?: number
 }
@@ -88,8 +99,8 @@ const getNodesWithDeltas = (
   return afterWithDeltas
 }
 
-const formatOutput = (nodes: NodeWithDelta[]): any[] => {
-  return nodes.map(({ type, subtype, objectId, beforeCount, afterCount, ...rest }) => rest)
+const formatOutput = (nodes: NodeWithDelta[]): FormattedNodeWithDelta[] => {
+  return nodes.map(({ type, subtype, objectId, beforeCount, afterCount, ...rest }) => rest as FormattedNodeWithDelta)
 }
 
 export const compareDetachedDomNodesWithStackTraces = (before: DomNode[], after: DomNode[], context?: Context): readonly any[] => {
