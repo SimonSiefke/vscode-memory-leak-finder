@@ -9,11 +9,11 @@ const root = join(dirname, '..', '..', '..')
 
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
-const relativePath = `/home/simon/Downloads/vscode-memory-leak-finder-results-linux/named-function-count3/move-explorer-to-panel.json`
+const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/detached-dom-nodes-with-stack-traces/settings-side-by-side.json`
 const ourPath = `/home/simon/.cache/repos/vscode-memory-leak-finder`
-const only = 'move-explorer'
-const runs = 17
-const measure = 'named-function-count3'
+const only = 'settings-side'
+const runs = 97
+const measure = 'detached-dom-nodes-with-stack-traces'
 
 const main = async () => {
   const absolutePath = isAbsolute(relativePath) ? relativePath : join(root, relativePath)
