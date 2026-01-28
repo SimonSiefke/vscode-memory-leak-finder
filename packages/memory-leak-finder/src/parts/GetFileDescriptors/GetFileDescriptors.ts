@@ -2,8 +2,10 @@ import { readFile, readdir, readlink } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { execSync } from 'node:child_process'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
+import * as GetFileDescriptorCount from '../GetFileDescriptorCount/GetFileDescriptorCount.ts'
 
 export interface FileDescriptorInfo {
+  readonly description: string
   readonly fd: string
   readonly target: string
 }
@@ -25,11 +27,12 @@ const getFileDescriptors = async (pid: number): Promise<FileDescriptorInfo[]> =>
       try {
         const fdPath = `${fdDir}/${fd}`
         const target = await readlink(fdPath)
-        descriptors.push({ fd, target })
+        const description = GetFileDescriptorCount.describeFd(fd, target)
+        descriptors.push({ description, fd, target })
       } catch (error) {
         // File descriptor might have been closed between listing and reading
         // This is normal, just skip it
-        descriptors.push({ fd, target: '<unavailable>' })
+        descriptors.push({ description: 'unavailable', fd, target: '<unavailable>' })
       }
     }
 

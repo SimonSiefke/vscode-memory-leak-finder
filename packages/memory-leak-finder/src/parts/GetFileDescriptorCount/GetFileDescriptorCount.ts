@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process'
-import { readFile, readdir } from 'node:fs/promises'
+import { readFile, readdir, readlink } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 
@@ -7,6 +7,138 @@ export interface ProcessInfo {
   readonly fileDescriptorCount: number
   readonly name: string
   readonly pid: number
+}
+
+/**
+ * Get a human-readable description for a file descriptor target
+ */
+const describeFdTarget = (target: string): string => {
+  // Standard streams
+  if (target.includes('/dev/pts/') || target.includes('/dev/tty')) {
+    return 'terminal/tty'
+  }
+  if (target.startsWith('pipe:[')) {
+    return 'pipe'
+  }
+  if (target.startsWith('socket:[')) {
+    return 'socket'
+  }
+  if (target.startsWith('anon_inode:[eventpoll]')) {
+    return 'epoll instance (event notification)'
+  }
+  if (target.startsWith('anon_inode:[eventfd]')) {
+    return 'eventfd (event signaling)'
+  }
+  if (target.startsWith('anon_inode:[io_uring]')) {
+    return 'io_uring (async I/O)'
+  }
+  if (target.startsWith('anon_inode:inotify')) {
+    return 'inotify (file system watcher)'
+  }
+  if (target.startsWith('anon_inode:[timerfd]')) {
+    return 'timerfd (timer)'
+  }
+  if (target.startsWith('anon_inode:[signalfd]')) {
+    return 'signalfd (signal handling)'
+  }
+  if (target.startsWith('anon_inode:')) {
+    return 'anonymous inode'
+  }
+  if (target.startsWith('/memfd:')) {
+    return 'memory-backed file'
+  }
+  if (target.startsWith('/dmabuf:')) {
+    return 'DMA buffer (GPU/hardware)'
+  }
+  if (target.startsWith('/dev/')) {
+    return 'device file'
+  }
+  if (target.includes('(deleted)')) {
+    return 'deleted file (still open)'
+  }
+  if (target.startsWith('/proc/')) {
+    return 'proc filesystem'
+  }
+  if (target.startsWith('/sys/')) {
+    return 'sys filesystem'
+  }
+  if (target.startsWith('/tmp/')) {
+    return 'temporary file'
+  }
+  if (target.includes('.log')) {
+    return 'log file'
+  }
+  if (target.includes('.db') || target.includes('leveldb') || target.includes('LOCK') || target.includes('MANIFEST')) {
+    return 'database file'
+  }
+  if (target.includes('.so') || target.includes('.so.')) {
+    return 'shared library'
+  }
+  if (target.includes('.ttf') || target.includes('.otf') || target.includes('fonts')) {
+    return 'font file'
+  }
+  if (target.includes('.js') || target.includes('.map')) {
+    return 'JavaScript/source file'
+  }
+  if (target.endsWith('.bdic')) {
+    return 'dictionary file'
+  }
+
+  // If it looks like a regular file path
+  if (target.startsWith('/')) {
+    return 'regular file'
+  }
+
+  return 'unknown'
+}
+
+/**
+ * Get detailed information about a specific file descriptor
+ */
+export const describeFd = (fd: string, target: string): string => {
+  const description = describeFdTarget(target)
+
+  // Add special notes for standard file descriptors
+  if (fd === '0') {
+    return `stdin (${description})`
+  }
+  if (fd === '1') {
+    return `stdout (${description})`
+  }
+  if (fd === '2') {
+    return `stderr (${description})`
+  }
+
+  return description
+}
+
+/**
+ * Get detailed information about all file descriptors for a process
+ */
+export const getDetailedFileDescriptors = async (
+  pid: number,
+): Promise<Array<{ description: string; fd: string; target: string }>> => {
+  try {
+    const fdDir = `/proc/${pid}/fd`
+    const files = await readdir(fdDir)
+    const fdDetails: Array<{ description: string; fd: string; target: string }> = []
+
+    for (const fd of files) {
+      try {
+        const fdPath = `${fdDir}/${fd}`
+        const target = await readlink(fdPath)
+        const description = describeFd(fd, target)
+        fdDetails.push({ description, fd, target })
+      } catch {
+        // Ignore errors reading individual FDs (they may close between readdir and readlink)
+      }
+    }
+
+    return fdDetails
+  } catch (error) {
+    console.log(`[GetFileDescriptorCount] Error getting detailed FDs for ${pid}:`, error)
+    return []
+  }
 }
 
 const getFileDescriptorCount = async (pid: number): Promise<number> => {
@@ -20,7 +152,7 @@ const getFileDescriptorCount = async (pid: number): Promise<number> => {
   }
 }
 
-const getProcessName = async (pid: number): Promise<string> => {
+export const getProcessName = async (pid: number): Promise<string> => {
   try {
     // Try to read command line from /proc/[pid]/cmdline for more detailed info
     const cmdlinePath = `/proc/${pid}/cmdline`
