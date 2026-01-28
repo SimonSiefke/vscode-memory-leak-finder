@@ -17,43 +17,40 @@ interface Context {
   readonly runs?: number
 }
 
-interface Result {
-  readonly after: readonly NodeWithDelta[]
-}
-
 const compareNode = (a: NodeWithDelta, b: NodeWithDelta): number => {
   return b.delta - a.delta
 }
 
-export const compareDetachedDomNodesWithStackTraces = (before: DomNode[], after: DomNode[], context?: Context): Result => {
+export const compareDetachedDomNodesWithStackTraces = (before: DomNode[], after: DomNode[], context?: Context): readonly NodeWithDelta[] => {
   const runs = context?.runs || 1
 
   // Create maps for before and after nodes by hash and count occurrences
-  const beforeCountMap = new Map<string, number>()
-  const afterCountMap = new Map<string, number>()
-  const beforeNodeMap = new Map<string, DomNode>()
+  const beforeCountMap = Object.create(null) as Record<string, number>
+  const afterCountMap = Object.create(null) as Record<string, number>
+  const beforeNodeMap = Object.create(null) as Record<string, DomNode>
 
   // Process before nodes and count occurrences
   for (const node of before) {
     const hash = GetDomNodeHash.getDomNodeHash(node)
-    beforeCountMap.set(hash, (beforeCountMap.get(hash) || 0) + 1)
-    if (!beforeNodeMap.has(hash)) {
-      beforeNodeMap.set(hash, node)
+    beforeCountMap[hash] = (beforeCountMap[hash] || 0) + 1
+    if (!(hash in beforeNodeMap)) {
+      beforeNodeMap[hash] = node
     }
   }
 
   // Process after nodes and count occurrences
   for (const node of after) {
     const hash = GetDomNodeHash.getDomNodeHash(node)
-    afterCountMap.set(hash, (afterCountMap.get(hash) || 0) + 1)
+    afterCountMap[hash] = (afterCountMap[hash] || 0) + 1
   }
 
   // Calculate deltas for nodes that exist in after
   const afterWithDeltas: NodeWithDelta[] = []
-  for (const [hash, afterCount] of afterCountMap) {
-    const beforeCount = beforeCountMap.get(hash) || 0
+  for (const hash in afterCountMap) {
+    const afterCount = afterCountMap[hash]
+    const beforeCount = beforeCountMap[hash] || 0
     const delta = afterCount - beforeCount
-    const node = beforeNodeMap.get(hash) || Array.from(after).find((n) => GetDomNodeHash.getDomNodeHash(n) === hash)
+    const node = beforeNodeMap[hash] || Array.from(after).find((n) => GetDomNodeHash.getDomNodeHash(n) === hash)
 
     // Only include nodes with delta >= runs
     if (delta >= runs && node) {
