@@ -294,6 +294,10 @@ const parseOpenDevtools = (argv: readonly string[]): boolean => {
   return argv.includes('--open-devtools')
 }
 
+const parseResolveExtensionSourceMaps = (argv: readonly string[]): boolean => {
+  return argv.includes('--resolve-extension-source-maps')
+}
+
 export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
   const platform = parsePlatform(processPlatform, argv)
   const pageObjectPath = parsePageObjectPath(argv)
@@ -334,6 +338,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const timeouts = parseTimeouts(argv)
   const trackFunctions = parseTrackFunctions(argv)
   const openDevtools = parseOpenDevtools(argv)
+  const resolveExtensionSourceMaps = parseResolveExtensionSourceMaps(argv)
   const useProxyMock = parseUseProxyMock(argv)
   const updateUrl = parseUpdateUrl(argv)
   const vscodePath = parseVscodePath(argv)
@@ -373,6 +378,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     pageObjectPath,
     platform,
     recordVideo,
+    resolveExtensionSourceMaps,
     restartBetween,
     runMode,
     runs,

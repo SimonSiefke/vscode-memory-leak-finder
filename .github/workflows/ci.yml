@@ -177,6 +177,8 @@ jobs:
             args: --measure detached-dom-nodes-with-stack-traces --runs 37 --restart-between --run-skipped-tests-anyway
           - name: file-descriptor-count
             args: --measure file-descriptor-count --runs 37 --restart-between --run-skipped-tests-anyway
+          - name: file-descriptors
+            args: --measure file-descriptors --runs 37 --restart-between --run-skipped-tests-anyway
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v6
@@ -460,6 +462,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-file-descriptor-count
           path: ./vscode-memory-leak-finder-results-linux-file-descriptor-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-file-descriptors
+          path: ./vscode-memory-leak-finder-results-linux-file-descriptors
       - name: Merge all measure results
         run: node packages/build/src/mergeArtifacts.ts
       - name: Upload merged artifact
@@ -514,6 +521,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-file-descriptor-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v5
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-file-descriptors
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v5
         continue-on-error: true

@@ -9,12 +9,23 @@ const root = join(dirname, '..', '..', '..')
 
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
-const relativePath = `/home/simon/Downloads/vscode-memory-leak-finder-results-linux/extension-host/named-function-count3/editor-cross-file-rename.json`
+const relativePath = `/home/simon/Downloads/vscode-memory-leak-finder-results-linux/named-function-count3/move-explorer-to-panel.json`
+const ourPath = `/home/simon/.cache/repos/vscode-memory-leak-finder`
+const only = 'move-explorer'
+const runs = 17
+const measure = 'named-function-count3'
 
 const main = async () => {
   const absolutePath = isAbsolute(relativePath) ? relativePath : join(root, relativePath)
   const content = await readFile(absolutePath, 'utf8')
-  const prompt = getPrompt(content, localVscodePath)
+  const prompt = getPrompt({
+    content,
+    localVscodePath,
+    only,
+    runs,
+    ourPath,
+    measure,
+  })
   await clipboard.write(prompt)
   process.stdout.write(prompt)
 }
