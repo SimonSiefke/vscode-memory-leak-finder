@@ -1,16 +1,24 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
-    async addContext(initialPrompt, secondPrompt, confirmText) {
+    async addAllProblemsAsContext() {
+      try {
+        await this.addContext('Problems...', 'All Problems', 'All Problems')
+      } catch (error) {
+        throw new VError(error, `Failed to set chat context`)
+      }
+    },
+    async addContext(initialPrompt: string, secondPrompt: string, confirmText: string) {
       try {
         const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
         await addContextButton.click()
         await page.waitForIdle()
 
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.select(initialPrompt, true)
         await quickPick.select(secondPrompt)
         await page.waitForIdle()
@@ -24,14 +32,32 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat context`)
       }
     },
+    async attachImage(file: string) {
+      try {
+        const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
+        await addContextButton.click()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.select('Files & Folders...', true)
+        await quickPick.type(file)
+        await quickPick.select(file)
+        await page.waitForIdle()
+        const attachedContext = page.locator('.chat-attached-context')
+        const attachedImage = attachedContext.locator(`[aria-label$="${file}"]`)
+        await expect(attachedImage).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to attach image`)
+      }
+    },
     async clearAll() {
       try {
-        const electron = Electron.create({ electronApp, VError })
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
         await using _mockDialog = await electron.mockDialog({
           response: 1,
         })
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
-        if (ideVersion && ideVersion.minor >= 108) {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
           // TODO
           // await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
@@ -46,7 +72,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to clear chat context`)
       }
     },
-    async clearContext(contextName) {
+    async clearContext(contextName: string) {
       try {
         const contextLabel = page.locator(`[aria-label="Attached context, ${contextName}"]`)
         await expect(contextLabel).toBeVisible()
@@ -73,10 +99,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     isFirst: false,
+    async moveToEditor() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand('Chat: Move Chat into Editor Area')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to move chat`)
+      }
+    },
+    async moveToSideBar() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand('Chat: Move Chat into Side Bar')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to move chat`)
+      }
+    },
     async open() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.NewChartEditor)
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.NewChatEditor)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
@@ -106,22 +150,77 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open finish setup`)
       }
     },
+    async selectModel(modelName: string, retry = true) {
+      try {
+        const modelPickerItem = page.locator('.chat-modelPicker-item').nth(1)
+        await expect(modelPickerItem).toBeVisible()
+        await page.waitForIdle()
+        const modelLocator = modelPickerItem.locator('.chat-model-label')
+        await expect(modelLocator).toBeVisible()
+        await page.waitForIdle()
+        const modelText = await modelLocator.textContent()
+        await page.waitForIdle()
+        if (modelText === modelName) {
+          return
+        }
+        await modelLocator.click()
+        await page.waitForIdle()
+        const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
+        await expect(item).toBeVisible()
+        await item.click()
+        await page.waitForIdle()
+        await expect(modelLocator).toHaveText(modelName)
+        // TODO for some reason, it can switch back
+        await new Promise((r) => {
+          setTimeout(r, 7000)
+        })
+        const modelText2 = await modelLocator.textContent()
+        if (modelText2 !== modelName) {
+          if (retry) {
+            this.selectModel(modelName, false)
+          } else {
+            throw new Error(`Model switch did not persist, expected ${modelName} but got ${modelText2}`)
+          }
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to select model ${modelName}`)
+      }
+    },
     async sendMessage({
       expectedResponse,
+      image = '',
       message,
+      model,
+      toolInvocations = [],
       validateRequest = {
         exists: [],
       },
       verify = false,
+      viewLinesText = '',
+    }: {
+      expectedResponse?: string
+      message: string
+      validateRequest?: { exists: readonly unknown[] }
+      verify?: boolean
+      viewLinesText?: string
+      image?: string
+      toolInvocations?: readonly any[]
+      model?: string
     }) {
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
         await page.waitForIdle()
+        if (model) {
+          await this.selectModel(model)
+        }
         const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
         await expect(editArea).toBeVisible()
         await page.waitForIdle()
+        if (image) {
+          await this.attachImage(image)
+        }
         const editContext = editArea.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
         await page.waitForIdle()
@@ -136,7 +235,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const nonBreakingSpace = String.fromCharCode(160)
         const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
-        await expect(lines).toHaveText(adjustedMessage)
+        await expect(lines).toHaveText(viewLinesText || adjustedMessage)
         await page.waitForIdle()
         const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
         await expect(interactiveInput).toBeVisible()
@@ -194,6 +293,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
         }
 
+        if (toolInvocations) {
+          const element = chatView.locator('.chat-tool-invocation-part')
+          await expect(element).toBeVisible({ timeout: 20_000 })
+          await page.waitForIdle()
+          for (const toolInvocation of toolInvocations) {
+            const block = element.locator('.chat-terminal-command-block')
+            await expect(block).toBeVisible({
+              timeout: 2000,
+            })
+            await expect(block).toHaveText(` ${toolInvocation.content}`)
+            await page.waitForIdle()
+          }
+        }
+
         if (expectedResponse) {
           const requestMessage = last
           await expect(requestMessage).toBeVisible()
@@ -221,7 +334,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async setMode(modeLabel: string) {
       try {
-        if (ideVersion.minor < 107) {
+        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor < 107) {
           await this.setModeLegacy(modeLabel)
           return
         }
@@ -265,6 +378,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(modeLabelElement).toHaveText(modeLabel)
       } catch (error) {
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
+      }
+    },
+    async clickAccessButton(buttonText: string = 'Allow') {
+      try {
+        const accessButton = page.locator(`button:has-text("${buttonText}")`)
+        const buttonCount = await accessButton.count()
+
+        if (buttonCount > 0) {
+          await expect(accessButton.first()).toBeVisible()
+          await accessButton.first().click()
+          await page.waitForIdle()
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to click access button with text "${buttonText}"`)
       }
     },
   }

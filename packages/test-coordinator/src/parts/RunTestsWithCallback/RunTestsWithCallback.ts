@@ -26,8 +26,8 @@ const emptyRpc = {
 }
 
 const disposeWorkers = async (workers) => {
-  const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
-  await Promise.all([memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
+  const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
+  await Promise.all([functionTrackerRpc.dispose(), memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()
 }
 
@@ -59,6 +59,8 @@ export const runTestsWithCallback = async ({
   measure,
   measureAfter,
   measureNode,
+  openDevtools,
+  pageObjectPath,
   platform,
   recordVideo,
   restartBetween,
@@ -70,6 +72,7 @@ export const runTestsWithCallback = async ({
   setupOnly,
   timeoutBetween,
   timeouts,
+  trackFunctions,
   updateUrl,
   useProxyMock,
   vscodePath,
@@ -100,7 +103,7 @@ export const runTestsWithCallback = async ({
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
-    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
+    const pageObjectPathResolved = GetPageObjectPath.getPageObjectPath(pageObjectPath)
 
     // TODO for each connection id, launch all needed workers
     // when a new connection id comes in, dispose them (even while running)
@@ -130,12 +133,14 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         measureId: measure,
         measureNode,
-        pageObjectPath,
+        openDevtools,
+        pageObjectPath: pageObjectPathResolved,
         platform,
         recordVideo,
         runMode,
         screencastQuality,
         timeouts,
+        trackFunctions,
         updateUrl,
         useProxyMock,
         vscodePath,
@@ -158,46 +163,50 @@ export const runTestsWithCallback = async ({
     }
 
     if (login) {
-      const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
-        arch,
-        attachedToPageTimeout,
-        clearExtensions,
-        commit,
-        compressVideo,
-        connectionId,
-        cwd,
-        enableExtensions,
-        enableProxy,
-        headlessMode,
-        ide,
-        ideVersion,
-        idleTimeout,
-        insidersCommit,
-        inspectExtensions,
-        inspectExtensionsPort,
-        inspectPtyHost,
-        inspectPtyHostPort,
-        inspectSharedProcess,
-        inspectSharedProcessPort,
-        measureId: measure,
-        measureNode,
-        pageObjectPath,
-        platform,
-        recordVideo,
-        runMode,
-        screencastQuality,
-        timeouts,
-        updateUrl,
-        useProxyMock,
-        vscodePath,
-        vscodeVersion,
-      })
+      const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
+        await PrepareTestsOrAttach.prepareTestsAndAttach({
+          arch,
+          attachedToPageTimeout,
+          clearExtensions,
+          commit,
+          compressVideo,
+          connectionId,
+          cwd,
+          enableExtensions,
+          enableProxy,
+          headlessMode,
+          ide,
+          ideVersion,
+          idleTimeout,
+          insidersCommit,
+          inspectExtensions,
+          inspectExtensionsPort,
+          inspectPtyHost,
+          inspectPtyHostPort,
+          inspectSharedProcess,
+          inspectSharedProcessPort,
+          measureId: measure,
+          measureNode,
+          openDevtools,
+          pageObjectPath: pageObjectPathResolved,
+          platform,
+          recordVideo,
+          runMode,
+          screencastQuality,
+          timeouts,
+          trackFunctions,
+          updateUrl,
+          useProxyMock,
+          vscodePath,
+          vscodeVersion,
+        })
       // Wait for user to interrupt (Ctrl+C) or terminate the process
       const { promise, resolve } = Promise.withResolvers<void>()
       const cleanup = async () => {
         await testWorkerRpc.dispose()
         await memoryRpc?.dispose()
         await videoRpc?.dispose()
+        await functionTrackerRpc?.dispose()
         if (initializationWorkerRpc) {
           await initializationWorkerRpc.dispose()
         }
@@ -258,6 +267,7 @@ export const runTestsWithCallback = async ({
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
     let workers = {
+      functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
       testWorkerRpc: emptyRpc,
@@ -274,41 +284,45 @@ export const runTestsWithCallback = async ({
       if (needsSetup) {
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
-        const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
-          arch,
-          attachedToPageTimeout,
-          clearExtensions,
-          commit,
-          compressVideo,
-          connectionId,
-          cwd,
-          enableExtensions,
-          enableProxy,
-          headlessMode,
-          ide,
-          ideVersion,
-          idleTimeout,
-          insidersCommit,
-          inspectExtensions,
-          inspectExtensionsPort,
-          inspectPtyHost,
-          inspectPtyHostPort,
-          inspectSharedProcess,
-          inspectSharedProcessPort,
-          measureId: measure,
-          measureNode,
-          pageObjectPath,
-          platform,
-          recordVideo,
-          runMode,
-          screencastQuality,
-          timeouts,
-          updateUrl,
-          useProxyMock,
-          vscodePath,
-          vscodeVersion,
-        })
+        const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
+          await PrepareTestsOrAttach.prepareTestsAndAttach({
+            arch,
+            attachedToPageTimeout,
+            clearExtensions,
+            commit,
+            compressVideo,
+            connectionId,
+            cwd,
+            enableExtensions,
+            enableProxy,
+            headlessMode,
+            ide,
+            ideVersion,
+            idleTimeout,
+            insidersCommit,
+            inspectExtensions,
+            inspectExtensionsPort,
+            inspectPtyHost,
+            inspectPtyHostPort,
+            inspectSharedProcess,
+            inspectSharedProcessPort,
+            measureId: measure,
+            measureNode,
+            openDevtools,
+            pageObjectPath: pageObjectPathResolved,
+            platform,
+            recordVideo,
+            runMode,
+            screencastQuality,
+            timeouts,
+            trackFunctions,
+            updateUrl,
+            useProxyMock,
+            vscodePath,
+            vscodeVersion,
+          })
         workers = {
+          functionTrackerRpc: functionTrackerRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
           // @ts-ignore
           memoryRpc: memoryRpc || emptyRpc,
@@ -429,6 +443,7 @@ export const runTestsWithCallback = async ({
     // TODO when in watch mode, dispose all workers except initialization worker to keep the application running
     await disposeWorkers(workers)
     workers = {
+      functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
       testWorkerRpc: emptyRpc,

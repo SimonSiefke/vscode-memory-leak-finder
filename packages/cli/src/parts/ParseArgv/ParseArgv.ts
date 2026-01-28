@@ -279,8 +279,28 @@ const parsePlatform = (platform: string, argv: readonly string[]): string => {
   return platform
 }
 
+const parsePageObjectPath = (argv: readonly string[]): string => {
+  if (argv.includes('--page-object-path')) {
+    return parseArgvString(argv, '--page-object-path')
+  }
+  return ''
+}
+
+const parseTrackFunctions = (argv: readonly string[]): boolean => {
+  return argv.includes('--track-functions') || parseMeasure(argv) === 'tracked-functions'
+}
+
+const parseOpenDevtools = (argv: readonly string[]): boolean => {
+  return argv.includes('--open-devtools')
+}
+
+const parseResolveExtensionSourceMaps = (argv: readonly string[]): boolean => {
+  return argv.includes('--resolve-extension-source-maps')
+}
+
 export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
   const platform = parsePlatform(processPlatform, argv)
+  const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const bisect = parseBisect(argv)
   const checkLeaks = parseCheckLeaks(argv)
@@ -316,6 +336,9 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const login = parseLogin(argv)
   const timeoutBetween = parseTimeoutBetween(argv)
   const timeouts = parseTimeouts(argv)
+  const trackFunctions = parseTrackFunctions(argv)
+  const openDevtools = parseOpenDevtools(argv)
+  const resolveExtensionSourceMaps = parseResolveExtensionSourceMaps(argv)
   const useProxyMock = parseUseProxyMock(argv)
   const updateUrl = parseUpdateUrl(argv)
   const vscodePath = parseVscodePath(argv)
@@ -351,8 +374,11 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     measure,
     measureAfter,
     measureNode,
+    openDevtools,
+    pageObjectPath,
     platform,
     recordVideo,
+    resolveExtensionSourceMaps,
     restartBetween,
     runMode,
     runs,
@@ -361,6 +387,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     setupOnly,
     timeoutBetween,
     timeouts,
+    trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,

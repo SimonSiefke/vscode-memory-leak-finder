@@ -42,6 +42,7 @@ cd packages/exec-worker && updateDependencies && cd ../../ &&
 cd packages/extension-source-maps && updateDependencies && cd ../../ &&
 cd packages/file-system-worker && updateDependencies && cd ../../ &&
 cd packages/file-watcher-worker && updateDependencies && cd ../../ &&
+cd packages/function-tracker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-parsing-worker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-worker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-worker-benchmarks && updateDependencies && cd ../../ &&
@@ -57,6 +58,7 @@ cd packages/prompts && updateDependencies && cd ../../ &&
 cd packages/proxy-worker && updateDependencies && cd ../../ &&
 cd packages/repository-worker && updateDependencies && cd ../../ &&
 cd packages/source-map-worker && updateDependencies && cd ../../ &&
+cd packages/source-map-coordinator && updateDependencies && cd ../../ &&
 cd packages/stdout-worker && updateDependencies && cd ../../ &&
 cd packages/storage-worker && updateDependencies && cd ../../ &&
 cd packages/test-coordinator && updateDependencies && cd ../../ &&

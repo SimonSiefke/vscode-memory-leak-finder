@@ -7,7 +7,7 @@ interface MockServer {
   [Symbol.asyncDispose]: () => Promise<void>
 }
 
-const createMockServer = async ({ port }): Promise<MockServer> => {
+const createMockServer = async ({ port }: { port: number }): Promise<MockServer> => {
   const server = createServer((req, res) => {
     if (req.url === '/page-b') {
       res.statusCode = 200
@@ -32,9 +32,11 @@ const createMockServer = async ({ port }): Promise<MockServer> => {
   }
 }
 
-export const create = ({ expect, page, platform, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
-    async addElementToChat({ selector }) {
+    async addElementToChat({ selector: _selector }: { selector: string }) {
       try {
         await page.waitForIdle()
         const add = page.locator('.element-selection-message')
@@ -47,91 +49,10 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to add element to chat`)
       }
     },
-    async createMockServer({ id, port }) {
+    async clickLink({ href }: { href: string }) {
       try {
         await page.waitForIdle()
-        const server = await createMockServer({ port })
-        this.mockServers[id] = server
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to create mock server`)
-      }
-    },
-    async disposeMockServer({ id }) {
-      try {
-        const server = this.mockServers[id]
-        await server[Symbol.asyncDispose]()
-        delete this.mockServers[id]
-      } catch (error) {
-        throw new VError(error, `Failed to dispose mock server`)
-      }
-    },
-    async mockElectronDebugger({ selector }) {
-      try {
-        await page.waitForIdle()
-        const add = page.locator('.element-selection-message')
-        await expect(add).toBeVisible()
-        const button = add.locator('[role="button"][aria-label="Click to select an element."]')
-        await expect(button).toBeVisible()
-        await button.click()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to add element to chat`)
-      }
-    },
-    mockServers: Object.create(null),
-    async show({ port }) {
-      try {
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
-          pressKeyOnce: true,
-          stayVisible: true,
-        })
-        await page.waitForIdle()
-        const message = page.locator('#quickInput_message')
-        await expect(message).toBeVisible()
-        await page.waitForIdle()
-        await expect(message).toHaveText(`Enter url to visit (Press 'Enter' to confirm or 'Escape' to cancel)`)
-        await page.waitForIdle()
-        await quickPick.type(`http://localhost:${port}`)
-        await page.waitForIdle()
-        await quickPick.pressEnter()
-        await page.waitForIdle()
-
-        const tab = page.locator('.tab', { hasText: `Simple Browser` })
-        await expect(tab).toBeVisible()
-        await page.waitForIdle()
-        await expect(tab).toHaveCount(1)
-        await page.waitForIdle()
-
-        const webView = WebView.create({ expect, page, VError })
-        const subFrame = await webView.shouldBeVisible2({
-          extensionId: 'vscode.simple-browser',
-          hasLineOfCodeCounter: false,
-        })
-        await subFrame.waitForIdle()
-        await page.waitForIdle()
-        const nav = subFrame.locator('nav.controls')
-        await expect(nav).toBeVisible()
-        await subFrame.waitForIdle()
-        const urlInput = subFrame.locator('.url-input')
-        await expect(urlInput).toBeVisible()
-        await subFrame.waitForIdle()
-        const subIframe = subFrame.locator('.content iframe')
-        await expect(subIframe).toBeVisible()
-        await page.waitForIdle()
-
-        // TODO check that inner iframe (x3) has expected content
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to open simple browser`)
-      }
-    },
-    async clickLink({ href }) {
-      try {
-        await page.waitForIdle()
-        const webView = WebView.create({ expect, page, VError })
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,
@@ -161,7 +82,40 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to click link ${href}`)
       }
     },
-    async shouldHaveTabTitle({ title }) {
+    async createMockServer({ id, port }: { id: string; port: number }) {
+      try {
+        await page.waitForIdle()
+        const server = await createMockServer({ port })
+        this.mockServers[id] = server
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to create mock server`)
+      }
+    },
+    async disposeMockServer({ id }: { id: string }) {
+      try {
+        const server = this.mockServers[id]
+        await server[Symbol.asyncDispose]()
+        delete this.mockServers[id]
+      } catch (error) {
+        throw new VError(error, `Failed to dispose mock server`)
+      }
+    },
+    async mockElectronDebugger({ selector: _selector }: { selector: string }) {
+      try {
+        await page.waitForIdle()
+        const add = page.locator('.element-selection-message')
+        await expect(add).toBeVisible()
+        const button = add.locator('[role="button"][aria-label="Click to select an element."]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add element to chat`)
+      }
+    },
+    mockServers: Object.create(null),
+    async shouldHaveTabTitle({ title }: { title: string }) {
       try {
         await page.waitForIdle()
         const tab = page.locator('.tab', { hasText: `Simple Browser` })
@@ -180,6 +134,54 @@ export const create = ({ expect, page, platform, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify tab title ${title}`)
+      }
+    },
+    async show({ port }: { port: number }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
+        await page.waitForIdle()
+        const message = page.locator('#quickInput_message')
+        await expect(message).toBeVisible()
+        await page.waitForIdle()
+        await expect(message).toHaveText(`Enter url to visit (Press 'Enter' to confirm or 'Escape' to cancel)`)
+        await page.waitForIdle()
+        await quickPick.type(`http://localhost:${port}`)
+        await page.waitForIdle()
+        await quickPick.pressEnter()
+        await page.waitForIdle()
+
+        const tab = page.locator('.tab', { hasText: `Simple Browser` })
+        await expect(tab).toBeVisible()
+        await page.waitForIdle()
+        await expect(tab).toHaveCount(1)
+        await page.waitForIdle()
+
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const subFrame = await webView.shouldBeVisible2({
+          extensionId: 'vscode.simple-browser',
+          hasLineOfCodeCounter: false,
+        })
+        await subFrame.waitForIdle()
+        await page.waitForIdle()
+        const nav = subFrame.locator('nav.controls')
+        await expect(nav).toBeVisible()
+        await subFrame.waitForIdle()
+        const urlInput = subFrame.locator('.url-input')
+        await expect(urlInput).toBeVisible()
+        await subFrame.waitForIdle()
+        const subIframe = subFrame.locator('.content iframe')
+        await expect(subIframe).toBeVisible()
+        await page.waitForIdle()
+
+        // TODO check that inner iframe (x3) has expected content
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open simple browser`)
       }
     },
   }

@@ -434,12 +434,13 @@ export const createHttpProxyServer = async (
   console.log(`[Proxy] Proxy URL: ${url}`)
 
   return {
+    port: actualPort,
     async [Symbol.asyncDispose]() {
       // Close all active connections first
       for (const socket of activeConnections) {
         try {
           socket.destroy()
-        } catch (error) {
+        } catch {
           // Ignore errors when destroying sockets
         }
       }
@@ -450,7 +451,6 @@ export const createHttpProxyServer = async (
       server.close(() => resolve())
       await promise
     },
-    port: actualPort,
     url,
   }
 }

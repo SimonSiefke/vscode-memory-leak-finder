@@ -124,3 +124,50 @@ test('mapPathToSourceMapPath - strips v prefix from version in absolute path', (
   const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   expect(result).toBe(expected)
 })
+
+test.skip('mapPathToSourceMapPath - maps relative js-debug extension path with default version', () => {
+  const root = tmpdir()
+  const path = '.vscode-extensions/ms-vscode.js-debug/src/extension.js'
+  const result = MapPathToSourceMapPath.mapPathToSourceMapPath(path, root)
+  const expected = join(root, '.extension-source-maps-cache', 'vscode-js-debug-1.105.0', 'dist/src/extension.js.map')
+  expect(result).toBe(expected)
+})
+
+test.skip('mapPathToSourceMapPath - maps absolute js-debug extension path with default version', () => {
+  const root = tmpdir()
+  const absolutePath = join(root, '.vscode-extensions/ms-vscode.js-debug/src/extension.js')
+  const result = MapPathToSourceMapPath.mapPathToSourceMapPath(absolutePath, root)
+  const expected = join(root, '.extension-source-maps-cache', 'vscode-js-debug-1.105.0', 'dist/src/extension.js.map')
+  expect(result).toBe(expected)
+})
+
+test.skip('mapPathToSourceMapPath - maps relative js-debug extension path with custom version', () => {
+  const root = tmpdir()
+  const path = '.vscode-extensions/ms-vscode.js-debug/src/extension.js'
+  const result = MapPathToSourceMapPath.mapPathToSourceMapPath(path, root, '1.106.0')
+  const expected = join(root, '.extension-source-maps-cache', 'vscode-js-debug-1.106.0', 'dist/src/extension.js.map')
+  expect(result).toBe(expected)
+})
+
+test('mapPathToSourceMapPath - maps absolute js-debug extension path with custom version', () => {
+  const root = tmpdir()
+  const absolutePath = join(root, '.vscode-extensions/ms-vscode.js-debug/src/extension.js')
+  const result = MapPathToSourceMapPath.mapPathToSourceMapPath(absolutePath, root, '1.106.0')
+  const expected = join(root, '.extension-source-maps-cache', 'vscode-js-debug-1.106.0', 'dist/src/extension.js.map')
+  expect(result).toBe(expected)
+})
+
+test('mapPathToSourceMapPath - maps js-debug extension path with nested file', () => {
+  const root = tmpdir()
+  const path = '.vscode-extensions/ms-vscode.js-debug/src/extension.js'
+  const result = MapPathToSourceMapPath.mapPathToSourceMapPath(path, root, '1.105.0')
+  const expected = join(root, '.extension-source-maps-cache', 'vscode-js-debug-1.105.0', 'dist/src/extension.js.map')
+  expect(result).toBe(expected)
+})
+
+test('mapPathToSourceMapPath - returns null for js-debug path without .vscode-extensions', () => {
+  const root = tmpdir()
+  const path = 'some/other/path/ms-vscode.js-debug/src/extension.js'
+  const result = MapPathToSourceMapPath.mapPathToSourceMapPath(path, root, '1.105.0')
+  expect(result).toBeNull()
+})

@@ -16,7 +16,9 @@ const getSelectAll = (platform: string): string => {
 const space = ' '
 const nonBreakingSpace = String.fromCharCode(160)
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async add({ expectedName, path }: { path: string; expectedName: string }) {
       try {
@@ -37,7 +39,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const nameLocator = firstExtension.locator('.name')
         await expect(nameLocator).toBeVisible()
         await expect(nameLocator).toHaveText(expectedName)
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
         await page.waitForIdle()
         await page.waitForIdle()
@@ -97,7 +99,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
           await page.waitForIdle()
           await expect(nameLocator).toHaveText(name)
           await page.waitForIdle()
-          const contextMenu = ContextMenu.create({ expect, page, VError })
+          const contextMenu = ContextMenu.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
           await contextMenu.open(firstExtension)
         } catch (error) {
           throw new VError(error, `Failed to open context menu`)
@@ -138,7 +140,9 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
         const quickPick = QuickPick.create({
+          electronApp: undefined,
           expect,
+          ideVersion,
           page,
           platform,
           VError,
@@ -155,15 +159,15 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         if (id.includes(' ')) {
           throw new Error(`id cannot contain spaces`)
         }
-        const editor = Editor.create({ expect, ideVersion, page, platform, VError })
+        const editor = Editor.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await this.show()
         await this.search(`@id:${id}`)
         await this.first.shouldBe(name)
         await this.first.click()
-        const extensionDetailView = ExtensionDetailView.create({ expect, page, VError })
+        const extensionDetailView = ExtensionDetailView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await extensionDetailView.installExtension()
-        const sideBar = SideBar.create({ expect, page, platform, VError })
+        const sideBar = SideBar.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await sideBar.hide()
         await editor.closeAll()
         await page.waitForIdle()
@@ -171,13 +175,61 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to install ${id}`)
       }
     },
-    async open({ id, name }) {
+    async moveScrollBar(y: number, expectedScrollBarTop: number) {
+      try {
+        await page.waitForIdle()
+        const extensions = page.locator(`[aria-label="Extensions"]`).first()
+        const scrollbar = extensions.locator('.scrollbar.vertical').first()
+        await page.waitForIdle()
+        await scrollbar.hover()
+        await page.waitForIdle()
+        const scrollBarVisible = extensions.locator('.scrollbar.visible.scrollbar.vertical')
+        await expect(scrollBarVisible).toBeVisible()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        const scrollbarSlider = scrollbar.locator('.slider')
+        await expect(scrollbarSlider).toBeVisible()
+        await page.waitForIdle()
+        const elementBox1 = await scrollbarSlider.boundingBox()
+        if (!elementBox1) {
+          throw new Error('Unable to find bounding box on element')
+        }
+
+        const elementCenterX = elementBox1.x + elementBox1.width / 2
+        const elementCenterY = elementBox1.y + elementBox1.height / 2
+
+        const xOffset = 0
+        const yOffset = y
+
+        await page.waitForIdle()
+        await scrollbarSlider.hover()
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX, elementCenterY)
+        await page.waitForIdle()
+        await page.mouse.down()
+        await page.waitForIdle()
+
+        await expect(scrollbarSlider).toHaveClass('slider active')
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
+        await page.waitForIdle()
+        await page.mouse.up()
+        await page.waitForIdle()
+        await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
+        await page.waitForIdle()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down`)
+      }
+    },
+    async open({ id, name }: { id: string; name: string }) {
       try {
         await this.show()
         await this.search(`@id:${id}`)
         await this.first.shouldBe(name)
         await this.first.click()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
       } catch (error) {
         throw new VError(error, `Failed to clear`)
@@ -211,11 +263,25 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     async restart() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to restart extensions`)
+      }
+    },
+    async scrollDown() {
+      try {
+        return this.moveScrollBar(200, 200)
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down`)
+      }
+    },
+    async scrollUp() {
+      try {
+        return this.moveScrollBar(-200, 0)
+      } catch (error) {
+        throw new VError(error, `Failed to scroll up`)
       }
     },
     async search(value: string) {
@@ -273,7 +339,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         await page.waitForIdle()
       },
     },
-    async selectMcpItem({ name }) {
+    async selectMcpItem({ name }: { name: string }) {
       try {
         const list = page.locator('.monaco-list[aria-label="MCP Servers"]')
         await expect(list).toBeVisible()
@@ -302,7 +368,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed select item ${name}`)
       }
     },
-    async shouldHaveMcpItem({ name }) {
+    async shouldHaveMcpItem({ name }: { name: string }) {
       try {
         const paneHeader = page.locator('[aria-label="MCP Servers - Installed Section"]')
         await expect(paneHeader).toBeVisible()
@@ -314,7 +380,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to verify that mcp item is visible ${name}`)
       }
     },
-    async shouldHaveMcpWelcomeHeading(expectedText) {
+    async shouldHaveMcpWelcomeHeading(expectedText: string) {
       try {
         const mcpWelcomeTitle = page.locator('.mcp-welcome-title')
         await expect(mcpWelcomeTitle).toBeVisible()
@@ -323,7 +389,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to check mcp welcome heading`)
       }
     },
-    async shouldHaveTitle(expectedTtitle) {
+    async shouldHaveTitle(expectedTtitle: string) {
       try {
         const title = page.locator('.sidebar .title-label h2')
         await expect(title).toBeVisible()
@@ -332,7 +398,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         throw new VError(error, `Failed to check extensions title`)
       }
     },
-    async shouldHaveValue(value) {
+    async shouldHaveValue(value: string) {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
@@ -350,7 +416,9 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const selected = await searchItem.getAttribute('aria-selected')
         if (selected !== 'true') {
           const quickPick = QuickPick.create({
+            electronApp: undefined,
             expect,
+            ideVersion,
             page,
             platform,
             VError,

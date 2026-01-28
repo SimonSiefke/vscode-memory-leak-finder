@@ -3,7 +3,7 @@
  * @param {string} edgeName
  * @returns {boolean}
  */
-export const isInternalMap = (edgeTypeName, edgeName) => {
+export const isInternalMap = (edgeTypeName: string, edgeName: string) => {
   return (
     edgeTypeName === 'property' &&
     edgeName !== 'constructor' &&

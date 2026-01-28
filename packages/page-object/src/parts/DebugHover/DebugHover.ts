@@ -1,6 +1,8 @@
-export const create = ({ expect, page, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async collapseProperty(name) {
+    async collapseProperty(name: string) {
       try {
         const hoverTree = page.locator('.debug-hover-tree')
         await expect(hoverTree).toBeVisible()
@@ -14,7 +16,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to collapse debug hover property`)
       }
     },
-    async expandProperty(name, childProperties) {
+    async expandProperty(name: string, childProperties: string[]) {
       try {
         const hoverTree = page.locator('.debug-hover-tree')
         await expect(hoverTree).toBeVisible()

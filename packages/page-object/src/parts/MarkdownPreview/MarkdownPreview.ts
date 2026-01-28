@@ -1,4 +1,6 @@
-export const create = ({ expect, page, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
     async shouldBeVisible() {
       try {
@@ -25,17 +27,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to check that markdown preview is visible`)
       }
     },
-    async shouldHaveHeading(subFrame, id) {
-      try {
-        await page.waitForIdle()
-        const heading = subFrame.locator(`#${id}`)
-        await expect(heading).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
-      }
-    },
-    async shouldHaveCodeBlocks(subFrame, count) {
+    async shouldHaveCodeBlocks(subFrame: any, count: number) {
       try {
         await page.waitForIdle()
         const codeBlocks = subFrame.locator('pre code')
@@ -45,7 +37,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to check that markdown preview has ${count} code blocks`)
       }
     },
-    async shouldHaveCodeBlockWithLanguage(subFrame, language) {
+    async shouldHaveCodeBlockWithLanguage(subFrame: any, language: string) {
       try {
         await page.waitForIdle()
         const codeBlock = subFrame.locator(`pre code.language-${language}`)
@@ -53,6 +45,16 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview has code block with language ${language}`)
+      }
+    },
+    async shouldHaveHeading(subFrame: any, id: string) {
+      try {
+        await page.waitForIdle()
+        const heading = subFrame.locator(`#${id}`)
+        await expect(heading).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
       }
     },
   }

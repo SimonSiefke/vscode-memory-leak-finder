@@ -27,6 +27,7 @@ export interface StartRunningOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly openDevtools: boolean
   readonly platform: string
   readonly recordVideo: boolean
   readonly restartBetween: boolean
@@ -37,6 +38,7 @@ export interface StartRunningOptions {
   readonly setupOnly: boolean
   readonly timeoutBetween: number
   readonly timeouts: boolean
+  readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string

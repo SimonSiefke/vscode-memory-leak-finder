@@ -2,6 +2,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 import * as Page from '../Page/Page.ts'
 import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
+import * as WaitForPage from '../WaitForIframe/WaitForIframe.ts'
 
 export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow, idleTimeout, sessionRpc }) => {
   return {
@@ -9,6 +10,7 @@ export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow,
     evaluate(expression) {
       return DevtoolsProtocolRuntime.evaluate(this.rpc, {
         expression,
+        returnByValue: true,
       })
     },
     firstWindow() {
@@ -26,6 +28,17 @@ export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow,
         injectUtilityScript,
         sessionRpc,
         url,
+      })
+    },
+    waitForPage({ injectUtilityScript = true, sessionId }) {
+      return WaitForPage.waitForPage({
+        browserRpc,
+        createPage: Page.create,
+        electronObjectId,
+        electronRpc,
+        idleTimeout,
+        injectUtilityScript,
+        sessionId,
       })
     },
     windows: [],

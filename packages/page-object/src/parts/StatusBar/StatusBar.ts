@@ -1,6 +1,8 @@
-export const create = ({ expect, page, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async click(label) {
+    async click(label: string) {
       try {
         const item = page.locator(`[aria-label="${label}"]`).first()
         await item.click()
@@ -8,11 +10,11 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to click status bar item ${label}`)
       }
     },
-    getSelector(id) {
+    getSelector(id: string) {
       const selector = `#${id.replaceAll('.', '\\.')}`
       return selector
     },
-    async hideItem(id) {
+    async hideItem(id: string) {
       try {
         await page.waitForIdle()
         const selector = this.getSelector(id)
@@ -42,7 +44,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide status bar item "${id}"`)
       }
     },
-    async selectItem(id) {
+    async selectItem(id: string) {
       try {
         const selector = this.getSelector(id)
         const item = page.locator(selector).first()
@@ -52,7 +54,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to select status bar item`)
       }
     },
-    async showItem(id) {
+    async showItem(id: string) {
       try {
         await page.waitForIdle()
         const selector = this.getSelector(id)

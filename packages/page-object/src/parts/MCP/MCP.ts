@@ -2,13 +2,14 @@ import assert from 'node:assert'
 import { rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import { root } from '../Root/Root.ts'
 import * as Server from '../Server/Server.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   const servers: Record<number, Server.ServerInfo> = Object.create(null)
   return {
     async addServer({ serverName }: { serverName: string }) {
@@ -19,7 +20,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
         const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.McpAddServer, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -80,9 +81,9 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
     },
     async createMCPServer(): Promise<Server.ServerInfo> {
       const path = '/mcp'
-      const server = Server.create({ VError })
+      const server = Server.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
       const requests: any[] = []
-      const requestHandler = (req, res) => {
+      const requestHandler = (req: any, res: any) => {
         requests.push({
           url: req.url,
         })
@@ -242,7 +243,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       try {
         for (const [key, value] of Object.entries(servers)) {
           await value.dispose()
-          delete servers[key]
+          delete servers[Number.parseInt(key)]
         }
         const storagePath = join(root, '.vscode-user-data-dir', 'User')
         const mcpPath = join(storagePath, 'mcp.json')
@@ -310,7 +311,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }) => {
       }
     },
 
-    async selectCommand(text, stayVisible = false) {
+    async selectCommand(text: string, stayVisible = false) {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()

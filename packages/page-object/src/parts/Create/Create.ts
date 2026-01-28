@@ -1,6 +1,6 @@
 import * as Parts from '../Parts/Parts.ts'
 
-export const create = async (context) => {
+export const create = async (context: any) => {
   const api = Object.create(null)
   for (const [key, value] of Object.entries(Parts)) {
     if (key === 'WellKnownCommands') {

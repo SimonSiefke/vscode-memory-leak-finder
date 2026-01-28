@@ -1,0 +1,24 @@
+{
+  "name": "@vscode-memory-leak-finder/function-tracker",
+  "version": "0.0.0-dev",
+  "description": "Function call tracking for VS Code performance analysis",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "transform": "node src/transform-script.js",
+    "track": "node src/devtools-injector.js",
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
+  "dependencies": {
+    "@babel/core": "^7.28.6",
+    "@babel/generator": "^7.28.6",
+    "@babel/parser": "^7.28.6",
+    "@babel/traverse": "^7.28.6",
+    "@babel/types": "^7.28.6",
+    "@lvce-editor/assert": "^1.5.1",
+    "@lvce-editor/rpc": "^5.4.0",
+    "@lvce-editor/verror": "^1.7.0"
+  }
+}

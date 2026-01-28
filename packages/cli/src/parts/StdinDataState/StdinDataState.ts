@@ -32,6 +32,8 @@ export interface StdinDataState {
   readonly measureAfter: boolean
   readonly measureNode?: boolean
   readonly mode: number
+  readonly openDevtools: boolean
+  readonly pageObjectPath: string
   readonly platform: string
   readonly previousFilters: string[]
   readonly recordVideo: boolean
@@ -43,6 +45,7 @@ export interface StdinDataState {
   readonly stdout: string[]
   readonly timeoutBetween: number
   readonly timeouts: boolean
+  readonly trackFunctions: boolean
   readonly useProxyMock: boolean
   readonly value: string
   readonly watch: boolean
@@ -77,6 +80,8 @@ let state: StdinDataState = {
   measure: Character.EmptyString,
   measureAfter: false,
   mode: ModeType.Waiting,
+  openDevtools: false,
+  pageObjectPath: '',
   platform: '',
   previousFilters: [],
   recordVideo: false,
@@ -88,6 +93,7 @@ let state: StdinDataState = {
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
+  trackFunctions: false,
   useProxyMock: false,
   value: Character.EmptyString,
   watch: false,
@@ -120,6 +126,7 @@ export const setState = (newState: StdinDataState): void => {
     measure: newState.measure,
     measureAfter: newState.measureAfter,
     mode: newState.mode,
+    pageObjectPath: newState.pageObjectPath,
     platform: newState.platform,
     previousFilters: newState.previousFilters,
     recordVideo: newState.recordVideo,
@@ -131,6 +138,7 @@ export const setState = (newState: StdinDataState): void => {
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
     timeouts: newState.timeouts,
+    trackFunctions: newState.trackFunctions,
     useProxyMock: newState.useProxyMock,
     value: newState.value,
     watch: newState.watch,

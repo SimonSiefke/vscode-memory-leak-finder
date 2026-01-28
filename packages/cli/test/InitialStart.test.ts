@@ -79,6 +79,8 @@ test('initialStart - watch mode - show details', async () => {
     measure: '',
     measureAfter: false,
     measureNode: false,
+    openDevtools: false,
+    pageObjectPath: '',
     platform: '',
     recordVideo: false,
     restartBetween: false,
@@ -89,12 +91,14 @@ test('initialStart - watch mode - show details', async () => {
     setupOnly: false,
     timeoutBetween: 0,
     timeouts: true,
+    trackFunctions: false,
     updateUrl: '',
     useProxyMock: false,
     vscodePath: '',
     vscodeVersion: '',
     watch: true,
     workers: false,
+    resolveExtensionSourceMaps: false,
   }
   // @ts-ignore
   WatchUsage.print.mockImplementation(async () => 'watch usage')
@@ -135,6 +139,8 @@ test('initialStart - watch mode - start running', async () => {
     measure: '',
     measureAfter: false,
     measureNode: false,
+    openDevtools: false,
+    pageObjectPath: '',
     platform: '',
     recordVideo: false,
     restartBetween: false,
@@ -145,12 +151,14 @@ test('initialStart - watch mode - start running', async () => {
     setupOnly: false,
     timeoutBetween: 0,
     timeouts: true,
+    trackFunctions: false,
     updateUrl: '',
     useProxyMock: false,
     vscodePath: '',
     vscodeVersion: '',
     watch: true,
     workers: false,
+    resolveExtensionSourceMaps: false,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
@@ -189,6 +197,8 @@ test('initialStart - start running', async () => {
     measure: '',
     measureAfter: false,
     measureNode: false,
+    openDevtools: false,
+    pageObjectPath: '',
     platform: '',
     recordVideo: false,
     restartBetween: false,
@@ -199,12 +209,14 @@ test('initialStart - start running', async () => {
     setupOnly: false,
     timeoutBetween: 0,
     timeouts: true,
+    trackFunctions: false,
     updateUrl: '',
     useProxyMock: false,
     vscodePath: '',
     vscodeVersion: '',
     watch: false,
     workers: false,
+    resolveExtensionSourceMaps: false,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()

@@ -162,6 +162,7 @@ export const launchVsCode = async ({
       headlessMode,
     })
     return {
+      binaryPath,
       child,
       pid,
     }

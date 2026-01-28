@@ -1,6 +1,4 @@
 export const ConnectDevtools = 'ConnectDevtools.connectDevtools'
-const PageObjectCreate = 'PageObject.create'
 export const RunTest = 'RunTest.runTest'
 export const SetupTest = 'Setuptest.setupTest'
 export const TearDownTest = 'TearDownTest.tearDownTest'
-const ImportPageObjectModule = 'TestWorker.importPageObjectModule'

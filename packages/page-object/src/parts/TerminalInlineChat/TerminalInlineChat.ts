@@ -1,4 +1,6 @@
-export const create = ({ expect, page, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
     async hide() {
       try {
@@ -23,7 +25,7 @@ export const create = ({ expect, page, VError }) => {
       }
     },
     isFirst: false,
-    async sendMessage({ message, verify = true }) {
+    async sendMessage({ message, verify = true }: { message: string; verify?: boolean }) {
       const terminal = page.locator('.terminal.xterm')
       await expect(terminal).toBeVisible()
       await page.waitForIdle()
