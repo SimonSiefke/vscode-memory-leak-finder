@@ -1,5 +1,5 @@
-import { resolveFromPath } from '../ResolveFromPath/ResolveFromPath.ts'
+import * as ResolveExtensionSourceMap from '../ResolveExtensionSourceMap/ResolveExtensionSourceMap.ts'
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
-  'ExtensionSourceMaps.resolve': resolveFromPath,
+  'ExtensionSourceMap.resolveExtensionSourceMap': ResolveExtensionSourceMap.resolveExtensionSourceMap,
 }
