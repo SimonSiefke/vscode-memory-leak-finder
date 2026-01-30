@@ -187,6 +187,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     },
     async refresh() {
       try {
+        await new Promise((r) => {})
         const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitRefresh)
       } catch (error) {
