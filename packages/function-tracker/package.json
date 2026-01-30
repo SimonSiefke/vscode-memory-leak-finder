@@ -18,7 +18,7 @@
     "@babel/traverse": "^7.28.6",
     "@babel/types": "^7.28.6",
     "@lvce-editor/assert": "^1.5.1",
-    "@lvce-editor/rpc": "^5.4.0",
+    "@lvce-editor/rpc": "^5.5.0",
     "@lvce-editor/verror": "^1.7.0"
   }
 }
