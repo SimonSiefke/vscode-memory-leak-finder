@@ -1,6 +1,6 @@
 import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.ts'
 
-interface DomNode {
+export interface DomNode {
   readonly type: string
   readonly subtype: string
   readonly className: string
@@ -16,14 +16,14 @@ interface DomNode {
   readonly [key: string]: any
 }
 
-interface NodeWithDelta extends DomNode {
+export interface NodeWithDelta extends DomNode {
   readonly count: number
   readonly delta: number
   readonly beforeCount: number
   readonly afterCount: number
 }
 
-interface FormattedNodeWithDelta {
+export interface FormattedNodeWithDelta {
   readonly className: string
   readonly description: string
   readonly stackTrace: string[]
@@ -33,7 +33,7 @@ interface FormattedNodeWithDelta {
   readonly [key: string]: any
 }
 
-interface Context {
+export interface Context {
   readonly runs?: number
 }
 
