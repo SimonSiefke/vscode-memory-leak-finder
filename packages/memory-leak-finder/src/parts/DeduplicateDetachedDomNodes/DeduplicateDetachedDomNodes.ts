@@ -11,7 +11,9 @@ export const deduplicatedDetachedDomNodes = (detachedDomNodes) => {
   for (const domNode of detachedDomNodes) {
     const hash = GetDomNodeHash.getDomNodeHash(domNode)
     detachedDomNodeMap[hash] = domNode
-    countMap[hash] = (countMap[hash] || 0) + 1
+    deduplicatedDetachedDomNodes[hash] = domNode
+    countMap[hash] ||= 0
+    countMap[hash]++
   }
   const deduplicated: any[] = []
   for (const [key, value] of Object.entries(detachedDomNodeMap)) {
