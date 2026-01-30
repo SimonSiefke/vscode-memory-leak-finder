@@ -604,16 +604,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to hide empty source action`)
       }
     },
-    async hover(text: string, hoverText: string) {
+    async hover(hoverText: string) {
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         await page.waitForIdle()
-        const startTag = editor.locator('[class^="mtk"]', { hasText: text }).first()
-        await expect(startTag).toBeVisible()
-        await page.waitForIdle()
-        await startTag.click()
+        // const startTag = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        // await expect(startTag).toBeVisible()
+        // await page.waitForIdle()
+        // await startTag.click()
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         const tooltip = editor.locator('.monaco-hover')

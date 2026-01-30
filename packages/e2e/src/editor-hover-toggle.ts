@@ -20,7 +20,8 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
 }
 
 export const run = async ({ Editor, Hover }: TestContext): Promise<void> => {
-  await Editor.hover('h1', /The h1 element represents a section heading/)
+  // @ts-ignore
+  await Editor.hover(/The h1 element represents a section heading/)
   await Hover.hide()
 }
 
