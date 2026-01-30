@@ -46,6 +46,9 @@ const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescri
       groupKey = '/tmp/.org.chromium.Chromium.* (deleted)'
     } else if (target === '<unavailable>') {
       groupKey = '<unavailable>'
+    } else if (target.includes('.vscode-user-data-dir/User/workspaceStorage/') && target.endsWith('/state.vscdb')) {
+      // Group all workspace storage state files together
+      groupKey = target.replace(/workspaceStorage\/\d+\/state\.vscdb/, 'workspaceStorage/[multiple]/state.vscdb')
     } else {
       // For regular files, keep the full path
       groupKey = target
