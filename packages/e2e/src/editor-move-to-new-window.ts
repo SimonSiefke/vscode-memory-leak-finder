@@ -2,6 +2,8 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
+export const requiresNetwork = 1
+
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -12,6 +14,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   await Editor.closeAll()
 }
 
+// TODO use new api that works better
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   // Step 1: Open the editor
   await Editor.open('file.txt')
