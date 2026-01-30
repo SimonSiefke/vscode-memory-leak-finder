@@ -1,7 +1,12 @@
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
-export const startTrackingDomNodeStackTraces = async (session: Session, objectGroup: string): Promise<void> => {
+/**
+ * @param {any} session
+ * @param {string} objectGroup
+ * @returns {Promise<any>}
+ */
+export const startTrackingDomNodeStackTraces = async (session: Session, objectGroup: string) => {
   await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 
@@ -10,7 +15,7 @@ const callsites = () => {
 	const _prepareStackTrace = Error.prepareStackTrace;
 	Error.prepareStackTrace = (_, stack) => stack;
 	const stack = new Error().stack.slice(2);
-Error.prepareStackTrace = _prepareStackTrace;
+	Error.prepareStackTrace = _prepareStackTrace;
 	return stack.join('\\n')
 }
 
