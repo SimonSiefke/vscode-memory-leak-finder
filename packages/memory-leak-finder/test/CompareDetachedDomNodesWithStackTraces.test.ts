@@ -5,9 +5,7 @@ test('compareDetachedDomNodesWithStackTraces - no nodes', () => {
   const before: any[] = []
   const after: any[] = []
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(before, after)
-  expect(result).toEqual({
-    after: [],
-  })
+  expect(result).toEqual([])
 })
 
 test('compareDetachedDomNodesWithStackTraces - single new node', () => {
@@ -19,16 +17,14 @@ test('compareDetachedDomNodesWithStackTraces - single new node', () => {
     },
   ]
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(before, after)
-  expect(result).toEqual({
-    after: [
-      {
-        className: 'HTMLDivElement',
-        description: 'div.container',
-        count: 1,
-        delta: 1,
-      },
-    ],
-  })
+  expect(result).toEqual([
+    {
+      className: 'HTMLDivElement',
+      description: 'div.container',
+      count: 1,
+      delta: 1,
+    },
+  ])
 })
 
 test('compareDetachedDomNodesWithStackTraces - node with delta less than runs', () => {
@@ -45,9 +41,7 @@ test('compareDetachedDomNodesWithStackTraces - node with delta less than runs', 
     },
   ]
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(before, after, { runs: 2 })
-  expect(result).toEqual({
-    after: [],
-  })
+  expect(result).toEqual([])
 })
 
 test('compareDetachedDomNodesWithStackTraces - multiple nodes with different deltas', () => {
@@ -80,8 +74,8 @@ test('compareDetachedDomNodesWithStackTraces - multiple nodes with different del
     },
   ]
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(before, after)
-  expect(result.after).toHaveLength(1)
-  expect(result.after[0]).toMatchObject({
+  expect(result).toHaveLength(1)
+  expect(result[0]).toMatchObject({
     className: 'HTMLDivElement',
     description: 'div.container',
     count: 3,
@@ -118,11 +112,11 @@ test('compareDetachedDomNodesWithStackTraces - sorted by delta descending', () =
     },
   ]
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(before, after)
-  expect(result.after).toHaveLength(3)
+  expect(result).toHaveLength(3)
   // Should be sorted by delta descending
-  expect(result.after[0].delta).toBe(3)
-  expect(result.after[1].delta).toBe(2)
-  expect(result.after[2].delta).toBe(1)
+  expect(result[0].delta).toBe(3)
+  expect(result[1].delta).toBe(2)
+  expect(result[2].delta).toBe(1)
 })
 
 test('compareDetachedDomNodesWithStackTraces - with context runs', () => {
@@ -147,7 +141,7 @@ test('compareDetachedDomNodesWithStackTraces - with context runs', () => {
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(after, after, {
     runs: 3,
   })
-  expect(result.after).toHaveLength(0)
+  expect(result).toHaveLength(0)
 })
 
 test('compareDetachedDomNodesWithStackTraces - preserves additional node properties', () => {
@@ -163,7 +157,7 @@ test('compareDetachedDomNodesWithStackTraces - preserves additional node propert
     },
   ]
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(before, after)
-  expect(result.after[0]).toMatchObject({
+  expect(result[0]).toMatchObject({
     className: 'HTMLDivElement',
     description: 'div.container',
     customProp: 'customValue',
@@ -206,8 +200,8 @@ test('compareDetachedDomNodesWithStackTraces - complex scenario with multiple di
     },
   ]
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(before, after)
-  expect(result.after).toHaveLength(1)
-  expect(result.after[0]).toMatchObject({
+  expect(result).toHaveLength(1)
+  expect(result[0]).toMatchObject({
     className: 'HTMLDivElement',
     description: 'div.container',
     count: 3,
@@ -223,6 +217,6 @@ test('compareDetachedDomNodesWithStackTraces - runs with default value of 1', ()
     },
   ]
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces([], after, {})
-  expect(result.after).toHaveLength(1)
-  expect(result.after[0].delta).toBe(1)
+  expect(result).toHaveLength(1)
+  expect(result[0].delta).toBe(1)
 })
