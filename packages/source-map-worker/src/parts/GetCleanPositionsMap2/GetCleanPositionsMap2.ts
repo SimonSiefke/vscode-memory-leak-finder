@@ -8,6 +8,7 @@ export const getCleanPositionsMap2 = async (
   hash: string,
   key: string,
 ): Promise<readonly any[]> => {
+  // TODO move original names to source map coordinator
   const originalPositions = await SourceMap.getOriginalPositions(sourceMap, value, classNames, hash, key)
   const cleanPositions = originalPositions.map(GetCleanPosition.getCleanPosition)
   return cleanPositions

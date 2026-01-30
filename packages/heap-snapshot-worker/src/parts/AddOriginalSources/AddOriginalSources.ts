@@ -109,7 +109,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
   }
 
   try {
-    await using rpc = await LaunchSourceMapWorker.launchSourceMapWorker()
+    await using rpc = await LaunchSourceMapWorker.launchSourceMapCoordinator()
     const extendedOriginalNames = true
     const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, extendedOriginalNames)
     const offsetMap: Record<string, number> = Object.create(null)
