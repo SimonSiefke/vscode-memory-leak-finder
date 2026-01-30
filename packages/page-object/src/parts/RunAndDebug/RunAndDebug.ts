@@ -2,7 +2,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
     async continue() {
       try {
@@ -138,14 +138,40 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await page.waitForIdle()
         const breakpoints = page.locator('.debug-breakpoints')
         await expect(breakpoints).toBeVisible()
-        const exception = breakpoints.locator('[aria-label="Caught Exceptions"] input[type="checkbox"]')
-        await expect(exception).toBeVisible()
-        const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] input[type="checkbox"]')
-        await expect(uncaughtException).toBeVisible()
-
-        await exception.setChecked(pauseOnExceptions)
-        await uncaughtException.setChecked(pauseOnCaughtExceptions)
         await page.waitForIdle()
+        // console.log({ ideVersion })
+        if (ideVersion.minor >= 108) {
+          const caughtException = breakpoints.locator('[aria-label="Caught Exceptions"] [role="checkbox"]')
+          await expect(caughtException).toBeVisible()
+          await page.waitForIdle()
+          const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] [role="checkbox"]')
+          await expect(uncaughtException).toBeVisible()
+          await page.waitForIdle()
+          const exceptionChecked = await caughtException.getAttribute('aria-checked')
+          const uncaughtExceptionChecked = await uncaughtException.getAttribute('aria-checked')
+          const sameExceptionChecked =
+            (exceptionChecked === 'true' && pauseOnCaughtExceptions) || (exceptionChecked === 'false' && !pauseOnCaughtExceptions)
+          const sameUncaughtExceptionChecked =
+            (uncaughtExceptionChecked === 'true' && pauseOnExceptions) || (uncaughtExceptionChecked === 'false' && !pauseOnExceptions)
+          if (!sameExceptionChecked) {
+            await caughtException.click()
+            await page.waitForIdle()
+          }
+          if (!sameUncaughtExceptionChecked) {
+            await uncaughtException.click()
+            await page.waitForIdle()
+          }
+        } else {
+          const exception = breakpoints.locator('[aria-label="Caught Exceptions"] input[type="checkbox"]')
+          await expect(exception).toBeVisible()
+          await page.waitForIdle()
+          const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] input[type="checkbox"]')
+          await expect(uncaughtException).toBeVisible()
+          await page.waitForIdle()
+          await exception.setChecked(pauseOnExceptions)
+          await uncaughtException.setChecked(pauseOnCaughtExceptions)
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to set pause on exceptions`)
       }
