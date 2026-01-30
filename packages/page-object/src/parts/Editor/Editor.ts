@@ -627,7 +627,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(tooltip).toHaveText(hoverText)
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to hover ${text}`)
+        throw new VError(error, `Failed to hover ${hoverText}`)
       }
     },
     async inspectTokens() {
@@ -996,7 +996,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to select ${text}`)
       }
     },
-    async selectAll({ viaKeyBoard = false }: { viaKeyBoard: boolean }) {
+    async selectAll({ viaKeyBoard = false }: { viaKeyBoard?: boolean } = {}) {
       try {
         if (viaKeyBoard) {
           await page.waitForIdle()
