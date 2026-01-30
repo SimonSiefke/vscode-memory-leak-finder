@@ -1,21 +1,23 @@
 import { readFile } from 'node:fs/promises'
 import { execSync } from 'node:child_process'
 
+const typeMap: Record<string, string> = {
+  extensionHost: 'VS Code Extension Host',
+  fileWatcher: 'VS Code File Watcher',
+  'gpu-process': 'VS Code GPU Process',
+  ptyHost: 'VS Code PTY Host',
+  renderer: 'VS Code Renderer',
+  'shared-process': 'VS Code Shared Process',
+  utility: 'VS Code Utility',
+}
+
 const getVSCodeProcessName = (args: string[]): string | null => {
   // Check for specific VS Code process types
   const typeIndex = args.indexOf('--type')
   if (typeIndex !== -1 && typeIndex + 1 < args.length) {
     const processType = args[typeIndex + 1]
     // Map common VS Code process types to readable names
-    const typeMap: Record<string, string> = {
-      extensionHost: 'VS Code Extension Host',
-      fileWatcher: 'VS Code File Watcher',
-      'gpu-process': 'VS Code GPU Process',
-      ptyHost: 'VS Code PTY Host',
-      renderer: 'VS Code Renderer',
-      'shared-process': 'VS Code Shared Process',
-      utility: 'VS Code Utility',
-    }
+
     if (typeMap[processType]) {
       return typeMap[processType]
     }
