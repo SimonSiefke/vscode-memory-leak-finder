@@ -200,8 +200,8 @@ test('describeFdTarget - case sensitivity', () => {
 })
 
 test('describeFdTarget - whitespace handling', () => {
-  // Note: includes() matches substring anywhere, so trailing whitespace doesn't prevent match
+  // Note: includes() matches substring anywhere, so leading/trailing whitespace doesn't prevent match
   expect(describeFdTarget('/dev/pts/0 ')).toBe('terminal/tty')
-  expect(describeFdTarget(' /dev/pts/0')).not.toBe('terminal/tty')
+  expect(describeFdTarget(' /dev/pts/0')).toBe('terminal/tty')
   expect(describeFdTarget('pipe:[123] extra')).toBe('pipe')
 })
