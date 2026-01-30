@@ -4,11 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { SourceMapConsumer } from 'source-map'
 import type { IntermediateItem } from '../IntermediateItem/IntermediateItem.ts'
 import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
-<<<<<<< HEAD
-import * as AddOriginalPositions from '../AddOriginalNames/AddOriginalNames.ts'
-=======
 import * as AddOriginalNames from '../AddOriginalNames/AddOriginalNames.ts'
->>>>>>> origin/main
 import * as Assert from '../Assert/Assert.ts'
 import { root } from '../Root/Root.ts'
 
@@ -72,11 +68,7 @@ export const getOriginalPositions = async (
     return intermediateItems
   })
 
-<<<<<<< HEAD
-  const finalResults: readonly OriginalPosition[] = await AddOriginalPositions.addOriginalNames(intermediateItems)
-=======
   const finalResults: readonly OriginalPosition[] = await AddOriginalNames.addOriginalNames(intermediateItems)
->>>>>>> origin/main
 
   return finalResults
 }
