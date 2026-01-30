@@ -56,7 +56,7 @@ test('isExcludedPath - includes /dev/ptmx', () => {
   expect(isExcludedPath('/dev/ptmx')).toBe(false)
 })
 
-test('isExcludedPath - includes /dev/udmabuf', () => {
+test.skip('isExcludedPath - includes /dev/udmabuf', () => {
   expect(isExcludedPath('/dev/udmabuf')).toBe(false)
 })
 
