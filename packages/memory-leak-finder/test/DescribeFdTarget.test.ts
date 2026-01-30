@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { describeFdTarget } from '../src/parts/GetFileDescriptorCount/DescribeFdTarget.ts'
+import { describeFdTarget } from '../src/parts/GetFileDescriptorCount/DescribeFdTarget/index.ts'
 
 test('describeFdTarget - terminal/tty with /dev/pts/', () => {
   expect(describeFdTarget('/dev/pts/0')).toBe('terminal/tty')

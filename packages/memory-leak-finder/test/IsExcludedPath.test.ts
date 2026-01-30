@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { isExcludedPath } from '../src/parts/IsExcludedPath/index.ts'
+import { isExcludedPath } from '../src/parts/IsExcludedPath/IsExcludedPath.ts'
 
 test('isExcludedPath - excludes Dictionaries pattern', () => {
   expect(isExcludedPath('/path/to/Dictionaries')).toBe(true)

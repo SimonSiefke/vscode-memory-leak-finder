@@ -1,6 +1,6 @@
 import type { FileDescriptorInfo } from '../FileDescriptorInfo/FileDescriptorInfo.ts'
 import type { ProcessInfoWithDescriptors } from '../ProcessInfoWithDescriptors/ProcessInfoWithDescriptors.ts'
-import { isExcludedPath } from '../IsExcludedPath/index.ts'
+import { isExcludedPath } from '../IsExcludedPath/IsExcludedPath.ts'
 
 export interface FileDescriptorGroup {
   target: string
