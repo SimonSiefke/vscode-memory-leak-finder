@@ -119,6 +119,10 @@ export const getProcessName = async (pid: number): Promise<string> => {
     // Fallback to using ps command
     return getProcessNameFromPs(pid)
   } catch (error) {
+    // Silently ignore ENOENT errors - the process was cleaned up/killed, which is fine
+    if (error instanceof Error && 'code' in error && (error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return getProcessNameFromPs(pid)
+    }
     console.log(`[GetFileDescriptors] Error getting process name for ${pid}:`, error)
     // Fallback to ps command
     return getProcessNameFromPs(pid)

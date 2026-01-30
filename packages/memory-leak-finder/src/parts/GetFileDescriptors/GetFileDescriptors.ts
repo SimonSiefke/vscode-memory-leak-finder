@@ -31,6 +31,10 @@ const getFileDescriptors = async (pid: number): Promise<FileDescriptorInfo[]> =>
 
     return descriptors
   } catch (error) {
+    // Silently ignore ENOENT errors - the process was cleaned up/killed, which is fine
+    if (error instanceof Error && 'code' in error && (error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return []
+    }
     console.log(`[GetFileDescriptors] Error getting file descriptors for ${pid}:`, error)
     return []
   }
