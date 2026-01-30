@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { execSync } from 'node:child_process'
+import { isEnoentError } from '../IsEnoentError/IsEnoentError.ts'
 
 const typeMap: Record<string, string> = {
   extensionHost: 'VS Code Extension Host',
