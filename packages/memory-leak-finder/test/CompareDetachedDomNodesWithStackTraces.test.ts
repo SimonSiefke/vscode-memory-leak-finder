@@ -12,7 +12,7 @@ test('compareDetachedDomNodesWithStackTraces - no nodes', () => {
 
 test('compareDetachedDomNodesWithStackTraces - single new node', () => {
   const before: any[] = []
-  const after = [
+  const after: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.container',
@@ -32,13 +32,13 @@ test('compareDetachedDomNodesWithStackTraces - single new node', () => {
 })
 
 test('compareDetachedDomNodesWithStackTraces - node with delta less than runs', () => {
-  const before = [
+  const before: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.container',
     },
   ]
-  const after = [
+  const after: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.container',
@@ -51,7 +51,7 @@ test('compareDetachedDomNodesWithStackTraces - node with delta less than runs', 
 })
 
 test('compareDetachedDomNodesWithStackTraces - multiple nodes with different deltas', () => {
-  const before = [
+  const before: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.container',
@@ -61,7 +61,7 @@ test('compareDetachedDomNodesWithStackTraces - multiple nodes with different del
       description: 'span.text',
     },
   ]
-  const after = [
+  const after: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.container',
@@ -91,7 +91,7 @@ test('compareDetachedDomNodesWithStackTraces - multiple nodes with different del
 
 test('compareDetachedDomNodesWithStackTraces - sorted by delta descending', () => {
   const before: any[] = []
-  const after = [
+  const after: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.a',
@@ -126,7 +126,7 @@ test('compareDetachedDomNodesWithStackTraces - sorted by delta descending', () =
 })
 
 test('compareDetachedDomNodesWithStackTraces - with context runs', () => {
-  const after = [
+  const after: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.a',
@@ -152,7 +152,7 @@ test('compareDetachedDomNodesWithStackTraces - with context runs', () => {
 
 test('compareDetachedDomNodesWithStackTraces - preserves additional node properties', () => {
   const before: any[] = []
-  const after = [
+  const after: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.container',
@@ -173,7 +173,7 @@ test('compareDetachedDomNodesWithStackTraces - preserves additional node propert
 })
 
 test('compareDetachedDomNodesWithStackTraces - complex scenario with multiple differences', () => {
-  const before = [
+  const before: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.container',
@@ -187,7 +187,7 @@ test('compareDetachedDomNodesWithStackTraces - complex scenario with multiple di
       description: 'span.text',
     },
   ]
-  const after = [
+  const after: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.container',
@@ -216,7 +216,7 @@ test('compareDetachedDomNodesWithStackTraces - complex scenario with multiple di
 })
 
 test('compareDetachedDomNodesWithStackTraces - runs with default value of 1', () => {
-  const after = [
+  const after: any[] = [
     {
       className: 'HTMLDivElement',
       description: 'div.container',
