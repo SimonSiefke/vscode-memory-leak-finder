@@ -1,8 +1,7 @@
 import { execSync } from 'node:child_process'
-import { readFile, readdir, readlink } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
-import { describeFdTarget } from './DescribeFdTarget/index.ts'
 
 export interface ProcessInfo {
   readonly fileDescriptorCount: number
