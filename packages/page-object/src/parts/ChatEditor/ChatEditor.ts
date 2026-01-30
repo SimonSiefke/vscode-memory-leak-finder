@@ -380,5 +380,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
       }
     },
+    async clickAccessButton(buttonText: string = 'Allow') {
+      try {
+        const accessButton = page.locator(`button:has-text("${buttonText}")`)
+        const buttonCount = await accessButton.count()
+
+        if (buttonCount > 0) {
+          await expect(accessButton.first()).toBeVisible()
+          await accessButton.first().click()
+          await page.waitForIdle()
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to click access button with text "${buttonText}"`)
+      }
+    },
   }
 }

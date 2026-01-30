@@ -14,7 +14,3 @@ export const evaluateInUtilityContext = async (options: any, locator: any): Prom
   })
   return result
 }
-
-const evaluateInDefaultContext = async (options: any, sessionId: any = ''): Promise<any> => {
-  throw new Error(`not implemented`)
-}

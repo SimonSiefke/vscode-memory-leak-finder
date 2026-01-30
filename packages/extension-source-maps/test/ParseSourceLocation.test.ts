@@ -45,7 +45,11 @@ test('parseSourceLocation - handles paths with colons in filename', () => {
   })
 })
 
+<<<<<<< HEAD
 test('parseSourceLocation - handles file:/ URLs', () => {
+=======
+test.skip('parseSourceLocation - handles file:/ URLs', () => {
+>>>>>>> origin/main
   const result = ParseSourceLocation.parseSourceLocation('file:/home/simon/test.js:10:20')
   expect(result).toEqual({
     column: 20,
@@ -54,7 +58,11 @@ test('parseSourceLocation - handles file:/ URLs', () => {
   })
 })
 
+<<<<<<< HEAD
 test('parseSourceLocation - handles file:/// URLs', () => {
+=======
+test.skip('parseSourceLocation - handles file:/// URLs', () => {
+>>>>>>> origin/main
   const result = ParseSourceLocation.parseSourceLocation('file:///home/simon/test.js:10:20')
   expect(result).toEqual({
     column: 20,
