@@ -1,4 +1,6 @@
-import type { FileDescriptorInfo, ProcessInfoWithDescriptors } from '../GetFileDescriptors/GetFileDescriptors.ts'
+import type { FileDescriptorInfo } from '../FileDescriptorInfo/FileDescriptorInfo.ts'
+import type { ProcessInfoWithDescriptors } from '../ProcessInfoWithDescriptors/ProcessInfoWithDescriptors.ts'
+import { isExcludedPath } from '../IsExcludedPath/IsExcludedPath.ts'
 
 export interface FileDescriptorGroup {
   target: string
@@ -18,6 +20,11 @@ const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescri
 
   for (const fd of fileDescriptors) {
     const { target } = fd
+
+    // Skip excluded paths
+    if (isExcludedPath(target)) {
+      continue
+    }
 
     // Normalize the target by removing unique identifiers
     let groupKey: string
@@ -39,6 +46,9 @@ const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescri
       groupKey = '/tmp/.org.chromium.Chromium.* (deleted)'
     } else if (target === '<unavailable>') {
       groupKey = '<unavailable>'
+    } else if (target.includes('.vscode-user-data-dir/User/workspaceStorage/') && target.endsWith('/state.vscdb')) {
+      // Group all workspace storage state files together
+      groupKey = target.replace(/workspaceStorage\/\d+\/state\.vscdb/, 'workspaceStorage/[multiple]/state.vscdb')
     } else {
       // For regular files, keep the full path
       groupKey = target

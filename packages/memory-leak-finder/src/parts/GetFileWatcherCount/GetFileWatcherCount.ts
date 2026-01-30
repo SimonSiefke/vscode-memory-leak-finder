@@ -1,27 +1,6 @@
-import { readdir, readFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
-
-const countInotifyWatchers = async (pid: number): Promise<number> => {
-  try {
-    const fdDir = `/proc/${pid}/fdinfo`
-    const files = await readdir(fdDir)
-    let count = 0
-    for (const file of files) {
-      try {
-        const content = await readFile(`${fdDir}/${file}`, 'utf8')
-        if (content.includes('inotify')) {
-          count++
-        }
-      } catch {
-        // ignore errors reading individual files
-      }
-    }
-    return count
-  } catch {
-    return 0
-  }
-}
+import { countInotifyWatchers } from '../CountInotifyWatchers/CountInotifyWatchers.ts'
 
 export const getFileWatcherCount = async (pid: number | undefined): Promise<number> => {
   console.log({ pid })

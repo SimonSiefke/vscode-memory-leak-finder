@@ -23,6 +23,7 @@ abc
 }`)
   await Editor.shouldHaveSquigglyError()
 
+  // TODO use setCursor instead, then open hover
   await Editor.hover('}', /colon expected/)
   await Hover.hide()
   await Editor.setCursor(2, 1)
