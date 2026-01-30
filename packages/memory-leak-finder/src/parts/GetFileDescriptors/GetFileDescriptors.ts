@@ -1,6 +1,7 @@
 import { readdir, readlink } from 'node:fs/promises'
 import type { FileDescriptorInfo } from '../FileDescriptorInfo/FileDescriptorInfo.ts'
 import * as GetFileDescriptorCount from '../GetFileDescriptorCount/GetFileDescriptorCount.ts'
+import { isEnoentError } from '../IsEnoentError/IsEnoentError.ts'
 
 const getFileDescriptors = async (pid: number): Promise<FileDescriptorInfo[]> => {
   try {
