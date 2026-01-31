@@ -14,7 +14,7 @@ const getKeybindingButtonsText = (keyBinding: string, platform: string) => {
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async searchFor(searchValue: string) {
       try {
