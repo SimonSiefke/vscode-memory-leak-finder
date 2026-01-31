@@ -61,7 +61,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async addCursorBelow() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.AddCursorBelow)
         await page.waitForIdle()
       } catch (error) {
@@ -71,7 +71,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async autoFix({ hasFixes }: { hasFixes: boolean }) {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
           ideVersion,
           page,
@@ -130,7 +130,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           return
         }
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors)
         await expect(tabs).toHaveCount(0, {
           timeout: 4000,
@@ -143,7 +143,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async closeAllEditorGroups() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.CloseAllEditorGroups)
         await page.waitForIdle()
       } catch (error) {
@@ -153,7 +153,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async closeAutoFix() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.show()
         await quickPick.hide()
         const overlayMessage = page.locator('.monaco-editor-overlaymessage')
@@ -254,7 +254,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async disableReadonly() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DisableReadonly)
         await page.waitForIdle()
       } catch (error) {
@@ -269,7 +269,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (count === 0) {
           return
         }
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
         await expect(stickyWidget).toBeHidden()
         await page.waitForIdle()
@@ -293,7 +293,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async duplicateSelection() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DuplicateSelection)
       } catch (error) {
         throw new VError(error, `Failed to duplicate selection`)
@@ -302,7 +302,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async enable2x2GridView() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.EditorGridLayout)
         await page.waitForIdle()
       } catch (error) {
@@ -312,7 +312,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async enableReadonly() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.EnableReadonly)
         await page.waitForIdle()
       } catch (error) {
@@ -328,7 +328,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           return
         }
         await expect(stickyWidget).toBeHidden()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
         await expect(stickyWidget).toHaveCount(count + 1)
         await page.waitForIdle()
@@ -354,7 +354,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async expandSelection() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ExpandSelection)
         await page.waitForIdle()
         await page.keyboard.press('Control+L')
@@ -365,7 +365,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async findAllReferences() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.FindAllReferences)
       } catch (error) {
         throw new VError(error, `Failed to find all references`)
@@ -386,7 +386,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async focusBottomEditorGroup() {
       try {
-        const quickpick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickpick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickpick.executeCommand(WellKnownCommands.FocusBelowEditorGroup)
       } catch (error) {
         throw new VError(error, `Failed to focus bottom editor group`)
@@ -394,7 +394,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async focusLeftEditorGroup() {
       try {
-        const quickpick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickpick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickpick.executeCommand(WellKnownCommands.FocusLeftEditorGroup)
       } catch (error) {
         throw new VError(error, `Failed to focus left editor group`)
@@ -402,7 +402,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async focusRightEditorGroup() {
       try {
-        const quickpick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickpick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickpick.executeCommand(WellKnownCommands.FocusRightEditorGroup)
       } catch (error) {
         throw new VError(error, `Failed to focus right editor group`)
@@ -410,7 +410,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async focusTopEditorGroup() {
       try {
-        const quickpick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickpick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickpick.executeCommand(WellKnownCommands.FocusAboveEditorGroup)
       } catch (error) {
         throw new VError(error, `Failed to focus top editor group`)
@@ -442,7 +442,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async foldAll() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand('Fold All')
         await page.waitForIdle()
       } catch (error) {
@@ -451,7 +451,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async format() {
       try {
-        const quickpick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickpick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickpick.executeCommand(WellKnownCommands.FormatDocument)
       } catch (error) {
         throw new VError(error, `Failed to format file`)
@@ -460,7 +460,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async goToDefinition() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GoToDefintiion)
       } catch (error) {
         throw new VError(error, `Failed to go to definition`)
@@ -478,7 +478,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async goToFile({ column, file, line }: { column: number; file: string; line: number }) {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GoToFile, {
           stayVisible: true,
         })
@@ -491,7 +491,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async goToSourceDefinition({ hasDefinition }: { hasDefinition: boolean }) {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TypeScriptGoToSourceDefinition)
         if (hasDefinition) {
           // TODO
@@ -512,7 +512,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           return
         }
         await expect(breadcrumbs).toBeVisible()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleBreadCrumbs)
         await expect(breadcrumbs).toBeHidden()
         await page.waitForIdle()
@@ -568,7 +568,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const minimap = page.locator('.minimap')
         await expect(minimap).toBeVisible()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleMinimap)
         await expect(minimap).toBeHidden()
       } catch (error) {
@@ -610,7 +610,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         const tooltip = editor.locator('.monaco-hover')
         await expect(tooltip).toBeHidden()
         await page.waitForIdle()
@@ -628,7 +628,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async inspectTokens() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DeveloperInspectTokensAndScopes)
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
@@ -675,24 +675,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     async newEditorGroupBottom() {
-      const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+      const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       await quickPick.executeCommand(WellKnownCommands.NewEditorGroupBottom)
     },
     async newEditorGroupLeft() {
-      const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+      const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       await quickPick.executeCommand(WellKnownCommands.NewEditorGroupLeft)
     },
     async newEditorGroupRight() {
-      const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+      const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       await quickPick.executeCommand(WellKnownCommands.NewEditorGroupRight)
     },
     async newEditorGroupTop() {
-      const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+      const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       await quickPick.executeCommand(WellKnownCommands.NewEditorGroupTop)
     },
     async newTextFile() {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.NewUntitledTextFile)
         const tab = page.locator('[role="tab"][data-resource-name="Untitled-1"]')
         await expect(tab).toBeVisible()
@@ -703,7 +703,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async open(fileName: string, options?: any) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.openFile(fileName)
         const tab = page.locator('.tab', { hasText: fileName })
         await expect(tab).toBeVisible()
@@ -738,7 +738,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await expect(findWidget).toHaveAttribute('aria-hidden', 'true')
         }
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.Find)
         await page.waitForIdle()
         await expect(findWidget).toBeVisible()
@@ -750,7 +750,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async openSettingsJson() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand('Preferences: Open User Settings (JSON)')
         await this.switchToTab('settings.json')
       } catch (error) {
@@ -759,7 +759,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async peekDefinition({ itemCount }: { itemCount: number }) {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.PeekDefinition)
         const widget = page.locator('.peekview-widget')
         await expect(widget).toBeVisible()
@@ -778,7 +778,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(tabsContainer).toBeVisible()
         const activeTab = tabsContainer.locator('.tab.active')
         await expect(activeTab).notToHaveClass('sticky-normal')
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.PinEditor)
         await page.waitForIdle()
         await expect(activeTab).toHaveClass('sticky-normal')
@@ -798,7 +798,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async reloadWebViews({ expectViews }: { expectViews: readonly string[] }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ReloadWebViews)
         await page.waitForIdle()
         // TODO need to wait for subframe to be
@@ -830,7 +830,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async removeAllBreakpoints() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RemoveAllBreakpoints)
         await page.waitForIdle()
       } catch (error) {
@@ -843,7 +843,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
         await expect(lineNumberElement).toBeVisible()
-        const contextMenu = ContextMenu.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
         await contextMenu.open(lineNumberElement)
         await page.waitForIdle()
         await contextMenu.select('Remove Breakpoint')
@@ -854,7 +854,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async rename(newText: string) {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
         await expect(renameInput).toBeVisible()
@@ -868,7 +868,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async renameCancel(newText: string) {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
         await expect(renameInput).toBeVisible()
@@ -882,7 +882,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async renameWithPreview(newText: string) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
         await page.waitForIdle()
@@ -908,7 +908,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async replaceText({ newText }: { newText: string }) {
       try {
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
         await expect(renameInput).toBeVisible()
@@ -930,7 +930,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await expect(dirtyTabs).toHaveCount(0)
           await page.waitForIdle()
         } else {
-          const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+          const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
           await quickPick.executeCommand(WellKnownCommands.FileSave)
           await page.waitForIdle()
         }
@@ -941,7 +941,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async saveAll() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.FileSaveAll)
         await page.waitForIdle()
         const dirtyTabs = page.locator('.tab.dirty')
@@ -1000,7 +1000,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           return
         }
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectAll)
         await page.waitForIdle()
       } catch (error) {
@@ -1062,7 +1062,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
         await expect(lineNumberElement).toBeVisible()
-        const contextMenu = ContextMenu.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
         await contextMenu.open(lineNumberElement)
         await contextMenu.select('Add Breakpoint')
       } catch (error) {
@@ -1072,7 +1072,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async setCursor(line: number, column: number) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.show({
           pressKeyOnce: true,
         })
@@ -1093,7 +1093,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async setLanguageMode(languageId: string) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ChangeLanguageMode, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -1114,7 +1114,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
         await expect(lineNumberElement).toBeVisible()
-        const contextMenu = ContextMenu.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
         await contextMenu.open(lineNumberElement)
         await page.waitForIdle()
         await contextMenu.select('Add Logpoint...')
@@ -1482,7 +1482,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           return
         }
         await expect(breadcrumbs).toBeHidden()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleBreadCrumbs)
         await expect(breadcrumbs).toBeVisible()
         await page.waitForIdle()
@@ -1496,7 +1496,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const colorPicker = page.locator('.standalone-colorpicker-body')
         await expect(colorPicker).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker, { pressKeyOnce: true })
         await page.waitForIdle()
         await expect(colorPicker).toBeVisible()
@@ -1511,7 +1511,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async showDebugHover({ expectedTitle }: { expectedTitle: string }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.DebugShowHover)
         const debugHover = page.locator('.debug-hover-widget')
         await expect(debugHover).toBeVisible()
@@ -1547,7 +1547,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const minimap = page.locator('.minimap')
         await expect(minimap).toBeHidden()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleMinimap)
         await expect(minimap).toBeVisible()
       } catch (error) {
@@ -1560,7 +1560,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const refactorWidget = page.locator('[aria-label="Action Widget"]')
         await expect(refactorWidget).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.Refactor)
         await page.waitForIdle()
         await expect(refactorWidget).toBeVisible({
@@ -1579,7 +1579,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const sourceAction = page.locator('.context-view [aria-label="Action Widget"]')
         await expect(sourceAction).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SourceAction)
         await page.waitForIdle()
         await expect(sourceAction).toBeVisible()
@@ -1596,7 +1596,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const overlayMessage = page.locator('.monaco-editor-overlaymessage')
         await expect(overlayMessage).toBeHidden()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SourceAction)
         await page.waitForIdle()
         await expect(overlayMessage).toBeVisible()
@@ -1614,7 +1614,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (currentCount === 0 && groupCount !== 0) {
           throw new Error('no open editor found')
         }
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(command)
         if (groupCount === 0) {
           // TODO maybe check that new group was created
@@ -1655,7 +1655,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async threeColumnsLayout() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ThreeColumnLayout)
         await page.waitForIdle()
         const main = page.locator('[role="main"]')
@@ -1673,7 +1673,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const breakpoints = glyphMarginWidgets.locator('.codicon-debug-breakpoint')
         const breakpointCount = await breakpoints.count()
         const newBreakpointCount = breakpointCount === 0 ? 1 : 0
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleBreakpoint)
         await page.waitForIdle()
         await expect(breakpoints).toHaveCount(newBreakpointCount)
@@ -1684,7 +1684,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async toggleScreenReaderAccessibilityMode() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleScreenReaderAccessibilityMode)
         await page.waitForIdle()
       } catch (error) {
@@ -1708,7 +1708,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           return
         }
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.Undo)
       } catch (error) {
         throw new VError(error, `Failed to undo`)
@@ -1737,7 +1737,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async unfoldAll() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand('Unfold All')
         await page.waitForIdle()
       } catch (error) {
@@ -1750,7 +1750,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(tabsContainer).toBeVisible()
         const activeTab = tabsContainer.locator('.tab.active')
         await expect(activeTab).toHaveClass('sticky-normal')
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.UnPinEditor)
         await page.waitForIdle()
         await expect(activeTab).notToHaveClass('sticky-normal')
@@ -1762,7 +1762,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       // const placeholder = page.locator('.monaco-editor-pane-placeholder')
       // await expect(placeholder).toBeVisible()
       await page.waitForIdle()
-      const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+      const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       await quickPick.executeCommand(WellKnownCommands.ReopenEditorWith, {
         pressKeyOnce: true,
         stayVisible: true,

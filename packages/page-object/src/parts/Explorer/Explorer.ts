@@ -33,7 +33,7 @@ const getListId = (classNameString: string) => {
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async cancel() {
       try {
@@ -73,9 +73,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     async collapseAll() {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -99,7 +99,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     },
     async delete(item: string) {
       try {
-        const electron = Electron.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
         await electron.mockShellTrashItem()
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -117,7 +117,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     },
     async executeContextMenuCommand(locator: any, option: string) {
       await page.waitForIdle()
-      const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+      const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
       await page.waitForIdle()
       await contextMenu.open(locator)
       await page.waitForIdle()
@@ -145,7 +145,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         const quickPick = QuickPick.create({
           electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -235,7 +235,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         const contextMenu = ContextMenu.create({
           electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -243,9 +243,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await contextMenu.select('Open to the Side')
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -307,7 +307,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     },
     async refresh() {
       try {
-        const electron = Electron.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
         await electron.mockShellTrashItem()
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')

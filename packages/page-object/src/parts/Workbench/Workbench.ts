@@ -119,9 +119,9 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
     async focusLeftEditorGroup() {
       await page.waitForIdle()
       const quickPick = QuickPick.create({
-        electronApp: undefined,
+        electronApp,
         expect,
-        ideVersion: { major: 0, minor: 0, patch: 0 },
+        ideVersion,
         page,
         platform,
         VError,

@@ -18,7 +18,7 @@ const nonBreakingSpace = String.fromCharCode(160)
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async add({ expectedName, path }: { path: string; expectedName: string }) {
       try {
@@ -39,7 +39,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const nameLocator = firstExtension.locator('.name')
         await expect(nameLocator).toBeVisible()
         await expect(nameLocator).toHaveText(expectedName)
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
         await page.waitForIdle()
         await page.waitForIdle()
@@ -99,7 +99,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
           await page.waitForIdle()
           await expect(nameLocator).toHaveText(name)
           await page.waitForIdle()
-          const contextMenu = ContextMenu.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+          const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
           await contextMenu.open(firstExtension)
         } catch (error) {
           throw new VError(error, `Failed to open context menu`)
@@ -140,7 +140,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
           ideVersion,
           page,
@@ -159,15 +159,15 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         if (id.includes(' ')) {
           throw new Error(`id cannot contain spaces`)
         }
-        const editor = Editor.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const editor = Editor.create({ electronApp, expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await this.show()
         await this.search(`@id:${id}`)
         await this.first.shouldBe(name)
         await this.first.click()
-        const extensionDetailView = ExtensionDetailView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const extensionDetailView = ExtensionDetailView.create({ electronApp, expect, ideVersion, page, platform, VError })
         await extensionDetailView.installExtension()
-        const sideBar = SideBar.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const sideBar = SideBar.create({ electronApp, expect, ideVersion, page, platform, VError })
         await sideBar.hide()
         await editor.closeAll()
         await page.waitForIdle()
@@ -229,7 +229,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         await this.search(`@id:${id}`)
         await this.first.shouldBe(name)
         await this.first.click()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
       } catch (error) {
         throw new VError(error, `Failed to clear`)
@@ -263,7 +263,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     async restart() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
         await page.waitForIdle()
       } catch (error) {
@@ -416,7 +416,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const selected = await searchItem.getAttribute('aria-selected')
         if (selected !== 'true') {
           const quickPick = QuickPick.create({
-            electronApp: undefined,
+            electronApp,
             expect,
             ideVersion,
             page,

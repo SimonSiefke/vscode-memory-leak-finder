@@ -34,7 +34,7 @@ const createMockServer = async ({ port }: { port: number }): Promise<MockServer>
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async addElementToChat({ selector: _selector }: { selector: string }) {
       try {
@@ -52,7 +52,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     async clickLink({ href }: { href: string }) {
       try {
         await page.waitForIdle()
-        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,
@@ -139,7 +139,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     async show({ port }: { port: number }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -161,7 +161,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         await expect(tab).toHaveCount(1)
         await page.waitForIdle()
 
-        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,

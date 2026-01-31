@@ -9,7 +9,7 @@ import { root } from '../Root/Root.ts'
 import * as Server from '../Server/Server.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const servers: Record<number, Server.ServerInfo> = Object.create(null)
   return {
     async addServer({ serverName }: { serverName: string }) {
@@ -20,7 +20,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.McpAddServer, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -81,7 +81,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     },
     async createMCPServer(): Promise<Server.ServerInfo> {
       const path = '/mcp'
-      const server = Server.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+      const server = Server.create({ electronApp, expect, ideVersion, page, platform, VError })
       const requests: any[] = []
       const requestHandler = (req: any, res: any) => {
         requests.push({

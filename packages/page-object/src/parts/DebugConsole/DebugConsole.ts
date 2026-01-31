@@ -3,7 +3,7 @@ import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async clear() {
       try {
@@ -17,9 +17,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     async clearInput() {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -98,7 +98,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       try {
         const repl = page.locator('.repl')
         await expect(repl).toBeVisible()
-        const panel = Panel.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const panel = Panel.create({ electronApp, expect, ideVersion, page, platform, VError })
         await panel.hide()
         await expect(repl).toBeHidden()
         await page.waitForIdle()
@@ -112,9 +112,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const count = await completions.count()
         if (count === 0) {
           const quickPick = QuickPick.create({
-            electronApp: undefined,
+            electronApp,
             expect,
-            ideVersion: { major: 0, minor: 0, patch: 0 },
+            ideVersion,
             page,
             platform,
             VError,
@@ -154,9 +154,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const repl = page.locator('.repl')
         await expect(repl).toBeHidden()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -171,9 +171,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,

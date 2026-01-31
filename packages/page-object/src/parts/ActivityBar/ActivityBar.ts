@@ -4,16 +4,16 @@ import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async hide() {
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -48,9 +48,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const ariaLabel = 'Explorer'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
         const contextMenu = ContextMenu.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -69,9 +69,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const ariaLabel = 'Extensions'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
         const contextMenu = ContextMenu.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -90,9 +90,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const ariaLabel = 'Run and Debug'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
         const contextMenu = ContextMenu.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -111,9 +111,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const ariaLabel = 'Search'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
         const contextMenu = ContextMenu.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -132,9 +132,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const ariaLabel = 'Source Control'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
         const contextMenu = ContextMenu.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -149,9 +149,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     async resetViewLocations() {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -171,9 +171,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeHidden()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,

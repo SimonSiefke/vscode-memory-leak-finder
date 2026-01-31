@@ -1,7 +1,7 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, page, VError, ideVersion }: CreateParams) => {
   return {
     async select({ filterName, filterText }: { filterName: string; filterText: string }) {
       try {
@@ -23,9 +23,9 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await page.waitForIdle()
         await expect(menu).toBeHidden()
         const settingsEditorInput = SettingsEditorInput.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform: '',
           VError,
