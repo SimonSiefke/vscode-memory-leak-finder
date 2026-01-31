@@ -18,9 +18,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async clearAllOutputs() {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -59,9 +59,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
         if (kernelSource) {
           const quickPick = QuickPick.create({
-            electronApp: undefined,
+            electronApp,
             expect,
-            ideVersion: { major: 0, minor: 0, patch: 0 },
+            ideVersion,
             page,
             platform,
             VError,
@@ -110,9 +110,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await cell.click()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -168,9 +168,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await cell.click()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
