@@ -1,6 +1,6 @@
-import type { ProcessInfoWithDescriptors } from '../GetFileDescriptors/GetFileDescriptors.ts'
+import type { ProcessInfoWithDescriptors } from '../ProcessInfoWithDescriptors/ProcessInfoWithDescriptors.ts'
 import * as CompareFileDescriptors from '../CompareFileDescriptors/CompareFileDescriptors.ts'
-import * as GetFileDescriptors from '../GetFileDescriptors/GetFileDescriptors.ts'
+import { getFileDescriptorsForProcess } from '../GetFileDescriptorsForProcess/GetFileDescriptorsForProcess.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 export const id = MeasureId.FileDescriptors
@@ -14,11 +14,11 @@ export const create = ({ pid }: { pid: number }) => {
 }
 
 export const start = async (pid: number): Promise<ProcessInfoWithDescriptors[]> => {
-  return await GetFileDescriptors.getFileDescriptorsForProcess(pid)
+  return await getFileDescriptorsForProcess(pid)
 }
 
 export const stop = async (pid: number): Promise<ProcessInfoWithDescriptors[]> => {
-  return await GetFileDescriptors.getFileDescriptorsForProcess(pid)
+  return await getFileDescriptorsForProcess(pid)
 }
 
 export const compare = CompareFileDescriptors.compareFileDescriptors
