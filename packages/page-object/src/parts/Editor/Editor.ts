@@ -610,7 +610,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         const tooltip = editor.locator('.monaco-hover')
         await expect(tooltip).toBeHidden()
         await page.waitForIdle()
