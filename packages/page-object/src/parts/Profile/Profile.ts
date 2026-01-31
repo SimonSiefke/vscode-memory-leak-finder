@@ -8,7 +8,7 @@ interface ProfileCreateInfo {
   readonly removeOthers?: boolean
 }
 
-export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async create(info: ProfileCreateInfo) {
       try {
