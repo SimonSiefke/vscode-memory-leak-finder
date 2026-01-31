@@ -332,7 +332,7 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
         const name = await nameLocator.textContent()
         await expect(nameLocator).toHaveText(name)
         await secondExtension.click()
-        const extensionEditor = page.locator('.extension-editor')
+        const extensionEditor = page.locator('.active .extension-editor')
         await expect(extensionEditor).toBeVisible()
         const heading = extensionEditor.locator('.name').first()
         await expect(heading).toHaveText(name)

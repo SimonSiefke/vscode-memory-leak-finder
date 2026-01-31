@@ -318,7 +318,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to remove item`)
       }
     },
-    async search({ resultCount, value }: { resultCount: number; value: string }) {
+    async search({ resultCount, value }: { resultCount: number | 'many'; value: string }) {
       try {
         await page.waitForIdle()
         const searchInput = page.locator('.search-container [role="textbox"]')
@@ -331,7 +331,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const searchCount = page.locator('.settings-count-widget')
         await expect(searchCount).toBeVisible()
         await page.waitForIdle()
-        if (resultCount > 1) {
+        if (resultCount === 'many' || resultCount > 1) {
           await expect(searchCount).toHaveText(new RegExp(`\\d+ Settings Found`))
         } else {
           const word = resultCount === 1 ? 'Setting' : 'Settings'

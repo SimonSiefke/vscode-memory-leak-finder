@@ -20,11 +20,6 @@ export const run = async ({ Editor, ExtensionDetailView, Extensions }: TestConte
   await Editor.focusRightEditorGroup()
   // @ts-ignore
   await Extensions.second.click()
-  // await SideBar.hide()
-  // await Extensions.show()
-  // await Extensions.search('@builtin typescript')
-  // await Extensions.first.shouldBe('TypeScript Language Basics')
-  // TODO second editor
-  await ExtensionDetailView.shouldHaveHeading('TypeScript Language Basics')
+  await ExtensionDetailView.shouldHaveHeading('C# Language Basics')
   await Editor.closeAll()
 }

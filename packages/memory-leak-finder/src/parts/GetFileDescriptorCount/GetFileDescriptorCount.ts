@@ -2,11 +2,32 @@ import { execSync } from 'node:child_process'
 import { readFile, readdir } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
+import { describeFdTarget } from '../DescribeFdTarget/DescribeFdTarget.ts'
 
 export interface ProcessInfo {
   readonly fileDescriptorCount: number
   readonly name: string
   readonly pid: number
+}
+
+/**
+ * Get detailed information about a specific file descriptor
+ */
+export const describeFd = (fd: string, target: string): string => {
+  const description = describeFdTarget(target)
+
+  // Add special notes for standard file descriptors
+  if (fd === '0') {
+    return `stdin (${description})`
+  }
+  if (fd === '1') {
+    return `stdout (${description})`
+  }
+  if (fd === '2') {
+    return `stderr (${description})`
+  }
+
+  return description
 }
 
 const getFileDescriptorCount = async (pid: number): Promise<number> => {
@@ -20,7 +41,7 @@ const getFileDescriptorCount = async (pid: number): Promise<number> => {
   }
 }
 
-const getProcessName = async (pid: number): Promise<string> => {
+export const getProcessName = async (pid: number): Promise<string> => {
   try {
     // Try to read command line from /proc/[pid]/cmdline for more detailed info
     const cmdlinePath = `/proc/${pid}/cmdline`
@@ -123,13 +144,16 @@ const getProcessName = async (pid: number): Promise<string> => {
   }
 }
 
-export const getFileDescriptorCountForProcess = async (pid: number | undefined): Promise<ProcessInfo[]> => {
+export const getFileDescriptorCountForProcess = async (
+  pid: number | undefined,
+  platformName: string = platform(),
+): Promise<ProcessInfo[]> => {
   if (pid === undefined) {
     console.log('[GetFileDescriptorCount] PID is undefined, returning empty array')
     return []
   }
-  if (platform() !== 'linux') {
-    console.log(`[GetFileDescriptorCount] Platform is ${platform()}, not Linux, returning empty array`)
+  if (platformName !== 'linux') {
+    console.log(`[GetFileDescriptorCount] Platform is ${platformName}, not Linux, returning empty array`)
     return []
   }
   try {
