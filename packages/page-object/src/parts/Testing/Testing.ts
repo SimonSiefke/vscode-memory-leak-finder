@@ -7,9 +7,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     async focusOnTestExplorerView() {
       try {
         const quickPick = QuickPick.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,
@@ -27,9 +27,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,
@@ -61,9 +61,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,

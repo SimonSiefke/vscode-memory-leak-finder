@@ -19,9 +19,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await expect(tab).toBeVisible({ timeout: 15_000 })
         await page.waitForIdle()
         const webView = WebView.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform: '',
           VError,
@@ -45,9 +45,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     async focusView() {
       try {
         const quickPick = QuickPick.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,

@@ -52,7 +52,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async clickLink({ href }: { href: string }) {
       try {
         await page.waitForIdle()
-        const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,
@@ -139,7 +139,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async show({ port }: { port: number }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        const quickPick = QuickPick.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -161,7 +161,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(tab).toHaveCount(1)
         await page.waitForIdle()
 
-        const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
+        const webView = WebView.create({ electronApp: undefined, expect, ideVersion, page, platform, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,

@@ -18,9 +18,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     async clearAllOutputs() {
       try {
         const quickPick = QuickPick.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,
@@ -59,9 +59,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
 
         if (kernelSource) {
           const quickPick = QuickPick.create({
-            electronApp,
+            electronApp: undefined,
             expect,
-            ideVersion,
+            ideVersion: { major: 0, minor: 0, patch: 0 },
             page,
             platform,
             VError,
@@ -71,9 +71,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         }
         if (expectedOutput) {
           const webView = WebView.create({
-            electronApp,
+            electronApp: undefined,
             expect,
-            ideVersion,
+            ideVersion: { major: 0, minor: 0, patch: 0 },
             page,
             platform: '',
             VError,
@@ -110,9 +110,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await cell.click()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,
@@ -168,9 +168,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         await cell.click()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,

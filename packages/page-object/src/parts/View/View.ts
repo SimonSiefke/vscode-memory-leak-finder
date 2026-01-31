@@ -9,9 +9,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         const indicator = page.locator(`.nostatusbar.fullscreen`)
         await expect(indicator).toBeHidden()
         const quickPick = QuickPick.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,
@@ -27,9 +27,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
         const indicator = page.locator(`.nostatusbar.fullscreen`)
         await expect(indicator).toBeVisible()
         const quickPick = QuickPick.create({
-          electronApp,
+          electronApp: undefined,
           expect,
-          ideVersion,
+          ideVersion: { major: 0, minor: 0, patch: 0 },
           page,
           platform,
           VError,
