@@ -23,14 +23,9 @@ abc
 }`)
   await Editor.shouldHaveSquigglyError()
 
-  // TODO use setCursor instead, then open hover
-<<<<<<< HEAD
   await Editor.setCursor(3, 1)
   // @ts-ignore
   await Editor.hover(/colon expected/)
-=======
-  await Editor.hover('}', /colon expected/)
->>>>>>> origin/main
   await Hover.hide()
   await Editor.setCursor(2, 1)
   await Editor.deleteCharactersRight({ count: 3 })
