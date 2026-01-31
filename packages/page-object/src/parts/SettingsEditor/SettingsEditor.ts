@@ -3,7 +3,7 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
   return {
     async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {
@@ -47,9 +47,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await settingsFilter.click()
         await page.waitForIdle()
         const contextMenu = ContextMenu.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -147,9 +147,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       // create random quickpick to avoid race condition
       await page.waitForIdle()
       const quickPick = QuickPick.create({
-        electronApp: undefined,
+        electronApp,
         expect,
-        ideVersion: { major: 0, minor: 0, patch: 0 },
+        ideVersion,
         page,
         platform,
         VError,
@@ -239,9 +239,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,

@@ -18,7 +18,7 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
     },
     async addExtension(name: string) {
       try {
-        const electron = Electron.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
         const extensionsFolder = join(Root.root, '.vscode-extensions-source', name)
         await electron.mockOpenDialog({
           bookmarks: [],
@@ -26,9 +26,9 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
           filePaths: [extensionsFolder],
         })
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,

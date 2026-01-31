@@ -8,7 +8,7 @@ const isNoteBook = (file: string) => {
   return file.endsWith('.ipynb')
 }
 
-export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async expectModified(text: string) {
       try {
@@ -42,16 +42,16 @@ export const create = ({ electronApp, expect, page, platform, VError }: CreatePa
       cell1Content: string
     }) {
       try {
-        const explorer = Explorer.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const explorer = Explorer.create({ electronApp, expect, ideVersion, page, platform, VError })
         const contextMenu = ContextMenu.create({
           electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
         })
-        const sideBar = SideBar.create({ electronApp, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const sideBar = SideBar.create({ electronApp, expect, ideVersion, page, platform, VError })
         await explorer.focus()
         await explorer.openContextMenu(file1)
         await contextMenu.select('Select for Compare')

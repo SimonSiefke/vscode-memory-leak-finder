@@ -10,7 +10,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeVisible()
-        const panel = Panel.create({ electronApp: undefined, expect, ideVersion: { major: 0, minor: 0, patch: 0 }, page, platform, VError })
+        const panel = Panel.create({ electronApp, expect, ideVersion, page, platform, VError })
         await panel.hide()
         await expect(markersPanel).toBeHidden()
       } catch (error) {
@@ -50,9 +50,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeHidden()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,

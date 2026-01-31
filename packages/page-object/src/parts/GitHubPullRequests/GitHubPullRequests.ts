@@ -5,7 +5,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const indexDelta = 5
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
     async checkoutIndex(index: number): Promise<void> {
       try {
@@ -19,9 +19,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await expect(tab).toBeVisible({ timeout: 15_000 })
         await page.waitForIdle()
         const webView = WebView.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform: '',
           VError,
@@ -45,9 +45,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     async focusView() {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,

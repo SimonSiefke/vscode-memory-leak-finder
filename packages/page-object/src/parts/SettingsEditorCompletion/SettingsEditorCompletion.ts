@@ -2,7 +2,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Character from '../Character/Character.ts'
 import * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, page, VError, platform, ideVersion }: CreateParams) => {
   return {
     async select({ completionName, completionText }: { completionName: string; completionText: string }) {
       try {
@@ -18,9 +18,9 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await page.waitForIdle()
         await expect(suggest).toBeHidden()
         const settingsEditorInput = SettingsEditorInput.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform: '',
           VError,

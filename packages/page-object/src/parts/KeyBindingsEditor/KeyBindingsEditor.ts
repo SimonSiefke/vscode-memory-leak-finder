@@ -14,7 +14,7 @@ const getKeybindingButtonsText = (keyBinding: string, platform: string) => {
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   return {
     async searchFor(searchValue: string) {
       try {
@@ -54,9 +54,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     async show() {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,

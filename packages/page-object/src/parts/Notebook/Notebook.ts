@@ -5,7 +5,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WebView from '../WebView/WebView.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
 
   return {
@@ -18,9 +18,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     async clearAllOutputs() {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -59,9 +59,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
 
         if (kernelSource) {
           const quickPick = QuickPick.create({
-            electronApp: undefined,
+            electronApp,
             expect,
-            ideVersion: { major: 0, minor: 0, patch: 0 },
+            ideVersion,
             page,
             platform,
             VError,
@@ -71,9 +71,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         }
         if (expectedOutput) {
           const webView = WebView.create({
-            electronApp: undefined,
+            electronApp,
             expect,
-            ideVersion: { major: 0, minor: 0, patch: 0 },
+            ideVersion,
             page,
             platform: '',
             VError,
@@ -110,9 +110,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await cell.click()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -168,9 +168,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await cell.click()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,

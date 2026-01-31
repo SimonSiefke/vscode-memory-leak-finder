@@ -2,7 +2,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError, ideVersion }: CreateParams) => {
+export const create = ({ electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
     async continue() {
       try {
@@ -24,9 +24,9 @@ export const create = ({ expect, page, platform, VError, ideVersion }: CreatePar
         await expect(pauseButton).toBeVisible()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -45,9 +45,9 @@ export const create = ({ expect, page, platform, VError, ideVersion }: CreatePar
     async removeAllBreakpoints() {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -68,9 +68,9 @@ export const create = ({ expect, page, platform, VError, ideVersion }: CreatePar
     }) {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -107,9 +107,9 @@ export const create = ({ expect, page, platform, VError, ideVersion }: CreatePar
     }) {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -252,9 +252,9 @@ export const create = ({ expect, page, platform, VError, ideVersion }: CreatePar
 
           if (debugConfiguration) {
             const quickPick = QuickPick.create({
-              electronApp: undefined,
+              electronApp,
               expect,
-              ideVersion: { major: 0, minor: 0, patch: 0 },
+              ideVersion,
               page,
               platform,
               VError,
@@ -285,9 +285,9 @@ export const create = ({ expect, page, platform, VError, ideVersion }: CreatePar
     }) {
       try {
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -318,9 +318,9 @@ export const create = ({ expect, page, platform, VError, ideVersion }: CreatePar
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -354,9 +354,9 @@ export const create = ({ expect, page, platform, VError, ideVersion }: CreatePar
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
@@ -386,9 +386,9 @@ export const create = ({ expect, page, platform, VError, ideVersion }: CreatePar
         await expect(stopButton).toBeVisible()
         await page.waitForIdle()
         const quickPick = QuickPick.create({
-          electronApp: undefined,
+          electronApp,
           expect,
-          ideVersion: { major: 0, minor: 0, patch: 0 },
+          ideVersion,
           page,
           platform,
           VError,
