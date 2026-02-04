@@ -52,10 +52,14 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       cachePath: VscodeTestCachePath.vscodeTestCachePath,
       version: vscodeVersion,
     })
-    const productPath = GetProductJsonPath.getProductJsonPath(platform, path)
-    const productJson = await JsonFile.readJson(productPath)
-    const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
-    await JsonFile.writeJson(productPath, newProductJson)
+    try {
+      const productPath = GetProductJsonPath.getProductJsonPath(platform, path)
+      const productJson = await JsonFile.readJson(productPath)
+      const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
+      await JsonFile.writeJson(productPath, newProductJson)
+    } catch {
+      // ignore
+    }
     await RemoveUnusedFiles.removeUnusedFiles(platform, path)
     if (automaticallyDownloadSourceMaps) {
       const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
