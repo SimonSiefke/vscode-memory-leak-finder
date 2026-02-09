@@ -540,8 +540,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async clickAccessButton(buttonText: string = 'Allow') {
       try {
-        const accessButton = page.locator(`button:has-text("${buttonText}")`)
-        await expect(accessButton.first()).toBeVisible({ timeout: 60_000 })
+        const chatView = page.locator('.interactive-session')
+        const confirmation = chatView.locator('.chat-confirmation-widget-container')
+        await expect(confirmation).toBeVisible({ timeout: 120_000 })
+        await page.waitForIdle()
+        const accessButton = confirmation.locator(`.chat-buttons button:has-text("${buttonText}")`)
+        await expect(accessButton.first()).toBeVisible({ timeout: 10_000 })
         await accessButton.first().click()
         await page.waitForIdle()
       } catch (error) {

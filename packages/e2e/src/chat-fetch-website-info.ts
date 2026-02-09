@@ -19,7 +19,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     model: 'NVIDIA: Nemotron 3 Nano 30B A3B (free)',
   })
 
-  await ChatEditor.clickAccessButton('Allow and Review')
+  await ChatEditor.clickAccessButton('Allow')
 
   await ChatEditor.verifyResponseMessage()
 }
