@@ -497,6 +497,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
                 await expect(response).toBeVisible({ timeout: 20_000 })
                 await page.waitForIdle()
+                const retryButton = chatView.locator('.chat-footer-toolbar [aria-label="Retry"]')
+                await expect(retryButton).toBeVisible({ timeout: 20_000 })
+                await page.waitForIdle()
               }
             }
             else {
