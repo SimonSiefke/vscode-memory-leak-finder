@@ -14,6 +14,7 @@ const performSelectionBugWorkaround = async (): Promise<void> => {
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     isFirst: true,
+    isFirstRequest: true,
     async addAllProblemsAsContext() {
       try {
         await this.addContext('Problems...', 'All Problems', 'All Problems')
@@ -402,8 +403,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await expect(sendButton).toBeFocused()
         await page.waitForIdle()
-        if (this.isFirst) {
-          this.isFirst = false
+        if (this.isFirstRequest) {
+          this.isFirstRequest = false
           // TODO get rid of timeout
           await new Promise((r) => {
             setTimeout(r, 1000)
