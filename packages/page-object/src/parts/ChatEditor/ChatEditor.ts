@@ -150,6 +150,44 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open finish setup`)
       }
     },
+    async getAvailableModelNames() {
+      const modelPickerItem = page.locator('.chat-input-picker-item').nth(2)
+      await expect(modelPickerItem).toBeVisible()
+      const modelLocator = modelPickerItem.locator('.chat-input-picker-label')
+      await expect(modelLocator).toBeVisible()
+      await modelLocator.click()
+      await page.waitForIdle()
+      const list = page.locator('.context-view .monaco-list')
+      await expect(list).toBeVisible()
+      await page.waitForIdle()
+
+      const modelNames: string[] = []
+      const maxAttempts = 150
+      for (let i = 0; i < maxAttempts; i++) {
+        await page.keyboard.press('ArrowDown')
+        await page.waitForIdle()
+        const focusedRow = list.locator('.monaco-list-row.focused')
+        const count = await focusedRow.count()
+        if (count === 0) {
+          continue
+        }
+        const label = await focusedRow.getAttribute('aria-label')
+        if (!label) {
+          continue
+        }
+        if (modelNames.length > 0 && label === modelNames[0]) {
+          // Wrapped around to the beginning
+          break
+        }
+        if (!modelNames.includes(label)) {
+          modelNames.push(label)
+        }
+      }
+      // Close the picker
+      await page.keyboard.press('Escape')
+      await page.waitForIdle()
+      return modelNames
+    },
     async selectModel(modelName: string, retry = true) {
       try {
         await page.waitForIdle()
@@ -176,6 +214,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         // Press ArrowDown first to ensure a row gets focused.
         const maxAttempts = 150
         let found = false
+        const seenLabels: string[] = []
         for (let i = 0; i < maxAttempts; i++) {
           await page.keyboard.press('ArrowDown')
           await page.waitForIdle()
@@ -190,9 +229,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             found = true
             break
           }
+          if (label) {
+            if (seenLabels.length > 0 && label === seenLabels[0]) {
+              // Wrapped around — model is not in the list
+              break
+            }
+            if (!seenLabels.includes(label)) {
+              seenLabels.push(label)
+            }
+          }
         }
         if (!found) {
-          throw new Error(`Could not find model "${modelName}" in the model picker after ${maxAttempts} attempts`)
+          const availableModels = seenLabels.length > 0
+            ? `Available models: ${seenLabels.join(', ')}`
+            : 'No models found in the picker'
+          throw new Error(`Could not find model "${modelName}" in the model picker. ${availableModels}`)
         }
         await page.waitForIdle()
         await expect(modelLocator).toHaveText(modelName, { timeout: 5_000 })
