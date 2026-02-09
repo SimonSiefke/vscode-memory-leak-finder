@@ -74,16 +74,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
         }
         await page.waitForIdle()
-        // Select the first matching result regardless of exact command name
-        await page.keyboard.press('Enter')
-        await page.waitForIdle()
-        // Handle any in-app confirmation dialog
-        const confirmButton = page.locator('.dialog-buttons-row .dialog-button-primary, button:has-text("Delete")')
-        const confirmCount = await confirmButton.count()
-        if (confirmCount > 0) {
-          await confirmButton.first().click()
-          await page.waitForIdle()
-        }
+
         const requestOne = page.locator('.monaco-list-row.request').first()
         await expect(requestOne).toBeHidden({ timeout: 15_000 })
         await page.waitForIdle()
