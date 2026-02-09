@@ -177,7 +177,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const modelNames: string[] = []
       const maxAttempts = 150
       for (let i = 0; i < maxAttempts; i++) {
-        await page.keyboard.press('ArrowDown')
+        await page.waitForIdle()
+        await page.keyboard.press('End')
         await page.waitForIdle()
         const focusedRow = list.locator('.monaco-list-row.focused')
         const count = await focusedRow.count()
