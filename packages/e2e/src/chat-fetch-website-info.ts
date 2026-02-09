@@ -16,7 +16,7 @@ export const setup = async ({ ChatEditor, Editor, Electron, SideBar }: TestConte
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: 'What are some facts about Benjamin Franklin',
-    model: 'nvidia/nemotron-3-nano-30b-a3b:free',
+    model: 'NVIDIA: Nemotron 3 Nano 30B A3B (free)',
     verify: true,
 
     // TODO should pass in some parameters to verify it calls the wikipedia website
