@@ -494,6 +494,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 await page.waitForIdle()
                 await allowButton.click()
                 await page.waitForIdle()
+                const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+                await expect(response).toBeVisible({ timeout: 20_000 })
+                await page.waitForIdle()
               }
             }
             else {
