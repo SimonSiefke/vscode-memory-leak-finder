@@ -5,6 +5,12 @@ import * as RunningExtensions from '../RunningExtensions/RunningExtensions.ts'
 import * as Editor from '../Editor/Editor.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+const performSelectionBugWorkaround = async (): Promise<void> => {
+  await new Promise((r) => {
+    setTimeout(r, 7000)
+  })
+}
+
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async addAllProblemsAsContext() {
@@ -321,9 +327,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(modelLocator).toHaveText(modelName, { timeout: 5_000 })
 
         // Verify the selection persists
-        await new Promise((r) => {
-          setTimeout(r, 7000)
-        })
+        await performSelectionBugWorkaround()
         const modelText2 = await modelLocator.textContent()
         if (modelText2 !== modelName) {
           if (retry) {
