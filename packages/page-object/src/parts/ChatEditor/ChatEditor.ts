@@ -13,6 +13,7 @@ const performSelectionBugWorkaround = async (): Promise<void> => {
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
+    isFirst: true,
     async addAllProblemsAsContext() {
       try {
         await this.addContext('Problems...', 'All Problems', 'All Problems')
@@ -111,7 +112,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to close finish setup`)
       }
     },
-    isFirst: false,
     async moveToEditor() {
       try {
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
@@ -279,6 +279,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const modelLocator = modelPickerItem.locator('.chat-input-picker-label')
         await expect(modelLocator).toBeVisible()
         await page.waitForIdle()
+        if (this.isFirst) {
+          this.isFirst = false
+          await performSelectionBugWorkaround()
+        }
         const modelText = await modelLocator.textContent()
         await page.waitForIdle()
         if (modelText === modelName) {
