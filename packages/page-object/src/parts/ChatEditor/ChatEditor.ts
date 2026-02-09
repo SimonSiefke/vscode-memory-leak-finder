@@ -202,42 +202,58 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (modelText === modelName) {
           return
         }
-        await modelLocator.click()
-        await page.waitForIdle()
-        const list = page.locator('.context-view .monaco-list')
-        await expect(list).toBeVisible()
-        await page.waitForIdle()
 
-        // Use keyboard navigation to scroll through the virtualized list.
-        // Arrow keys cause Monaco to bring the focused item into view,
-        // which avoids issues with scrollDown() on virtualized lists.
-        // Press ArrowDown first to ensure a row gets focused.
-        const maxAttempts = 150
+        // OpenRouter models may load asynchronously after built-in models.
+        // Retry the full scan several times with delays to give them time to appear.
+        const maxRetries = 5
         let found = false
-        const seenLabels: string[] = []
-        for (let i = 0; i < maxAttempts; i++) {
-          await page.keyboard.press('ArrowDown')
+        let seenLabels: string[] = []
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+          await modelLocator.click()
           await page.waitForIdle()
-          const focusedRow = list.locator('.monaco-list-row.focused')
-          const count = await focusedRow.count()
-          if (count === 0) {
-            continue
+          const list = page.locator('.context-view .monaco-list')
+          await expect(list).toBeVisible()
+          await page.waitForIdle()
+
+          // Wait progressively longer for external models to load
+          if (attempt > 0) {
+            await new Promise((r) => setTimeout(r, 3000 * attempt))
+            await page.waitForIdle()
           }
-          const label = await focusedRow.getAttribute('aria-label')
-          if (label && label.startsWith(modelName)) {
-            await page.keyboard.press('Enter')
-            found = true
-            break
-          }
-          if (label) {
-            if (seenLabels.length > 0 && label === seenLabels[0]) {
-              // Wrapped around — model is not in the list
+
+          // Use keyboard navigation to scroll through the virtualized list.
+          const maxArrowPresses = 150
+          seenLabels = []
+          for (let i = 0; i < maxArrowPresses; i++) {
+            await page.keyboard.press('ArrowDown')
+            await page.waitForIdle()
+            const focusedRow = list.locator('.monaco-list-row.focused')
+            const count = await focusedRow.count()
+            if (count === 0) {
+              continue
+            }
+            const label = await focusedRow.getAttribute('aria-label')
+            if (label && label.startsWith(modelName)) {
+              await page.keyboard.press('Enter')
+              found = true
               break
             }
-            if (!seenLabels.includes(label)) {
-              seenLabels.push(label)
+            if (label) {
+              if (seenLabels.length > 0 && label === seenLabels[0]) {
+                // Wrapped around — model is not in the list yet
+                break
+              }
+              if (!seenLabels.includes(label)) {
+                seenLabels.push(label)
+              }
             }
           }
+          if (found) {
+            break
+          }
+          // Close the picker before retrying
+          await page.keyboard.press('Escape')
+          await page.waitForIdle()
         }
         if (!found) {
           const availableModels = seenLabels.length > 0
