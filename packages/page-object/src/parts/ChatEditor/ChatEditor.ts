@@ -266,7 +266,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
         // Verify the selection persists
         await new Promise((r) => {
-          setTimeout(r, 2000)
+          setTimeout(r, 7000)
         })
         const modelText2 = await modelLocator.textContent()
         if (modelText2 !== modelName) {
