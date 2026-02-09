@@ -152,7 +152,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async selectModel(modelName: string, retry = true) {
       try {
-
         await page.waitForIdle()
         const modelPickerItem = page.locator('.chat-input-picker-item').nth(2)
         await expect(modelPickerItem).toBeVisible()
@@ -167,30 +166,35 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         await modelLocator.click()
         await page.waitForIdle()
-        const scrollContainer = page.locator('.context-view .monaco-scrollable-element')
-        await expect(scrollContainer).toBeVisible()
+        const list = page.locator('.context-view .monaco-list')
+        await expect(list).toBeVisible()
         await page.waitForIdle()
-        await new Promise(r => {
-          setTimeout(r, 2000)
-        })
-        await scrollContainer.scrollDown()
-        console.log('scrolled')
-        // TODO need to scroll list....
+
+        // Use keyboard navigation to scroll through the virtualized list.
+        // Arrow keys cause Monaco to bring the focused item into view,
+        // which avoids issues with scrollDown() on virtualized lists.
+        const maxAttempts = 50
+        for (let i = 0; i < maxAttempts; i++) {
+          const focusedRow = list.locator('.monaco-list-row.focused')
+          const label = await focusedRow.getAttribute('aria-label')
+          if (label && label.startsWith(modelName)) {
+            await page.keyboard.press('Enter')
+            break
+          }
+          await page.keyboard.press('ArrowDown')
+          await page.waitForIdle()
+        }
         await page.waitForIdle()
-        await new Promise(r => { })
-        const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
-        await expect(item).toBeVisible()
-        await item.click()
-        await page.waitForIdle()
-        await expect(modelLocator).toHaveText(modelName)
-        // TODO for some reason, it can switch back
+        await expect(modelLocator).toHaveText(modelName, { timeout: 5_000 })
+
+        // Verify the selection persists
         await new Promise((r) => {
-          setTimeout(r, 7000)
+          setTimeout(r, 2000)
         })
         const modelText2 = await modelLocator.textContent()
         if (modelText2 !== modelName) {
           if (retry) {
-            this.selectModel(modelName, false)
+            await this.selectModel(modelName, false)
           } else {
             throw new Error(`Model switch did not persist, expected ${modelName} but got ${modelText2}`)
           }
