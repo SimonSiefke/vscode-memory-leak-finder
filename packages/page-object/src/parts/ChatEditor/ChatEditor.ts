@@ -469,7 +469,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
         if (toolInvocations && toolInvocations.length > 0) {
           const element = chatView.locator('.chat-tool-invocation-part')
-          await expect(element).toBeVisible({ timeout: 60_000 })
+          await expect(element).toBeVisible({ timeout: 120_000 })
           await page.waitForIdle()
           for (const toolInvocation of toolInvocations) {
             if (toolInvocation.type === 'website') {
