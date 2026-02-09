@@ -15,7 +15,7 @@ export const setup = async ({ ChatEditor, Editor, Electron, SideBar }: TestConte
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
-    message: 'What are some facts about Benjamin Franklin',
+    message: 'What are some facts about Benjamin Franklin? Use wikipedia as a source.',
     model: 'NVIDIA: Nemotron 3 Nano 30B A3B (free)',
     verify: true,
 
