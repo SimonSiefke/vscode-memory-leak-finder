@@ -59,16 +59,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           response: 1,
         })
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
-          // TODO
-          // await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
-          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
-        } else {
-          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
-        }
+        await quickPick.showCommands()
+        await quickPick.type('Chat: Delete All')
         await page.waitForIdle()
+        // Select the first matching result regardless of exact command name
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+        // Handle any in-app confirmation dialog
+        const confirmButton = page.locator('.dialog-buttons-row .dialog-button-primary, button:has-text("Delete")')
+        const confirmCount = await confirmButton.count()
+        if (confirmCount > 0) {
+          await confirmButton.first().click()
+          await page.waitForIdle()
+        }
         const requestOne = page.locator('.monaco-list-row.request').first()
-        await expect(requestOne).toBeHidden({ timeout: 10_000 })
+        await expect(requestOne).toBeHidden({ timeout: 15_000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear chat context`)
@@ -175,14 +180,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(list).toBeVisible()
       await page.waitForIdle()
 
-      const modelNames = await this.collectModelListItems(contextView, list)
+      const { labels } = await this.collectModelListItems(contextView, list)
 
       // Close the picker
       await page.keyboard.press('Escape')
       await page.waitForIdle()
-      return modelNames
+      return labels
     },
-    async collectModelListItems(contextView: any, list: any, targetModelName?: string): Promise<string[]> {
+    async collectModelListItems(contextView: any, list: any, targetModelName?: string): Promise<{ labels: string[]; clicked: boolean }> {
       // Collect all items by dragging the scrollbar down through the virtualized list.
       // This is needed because Monaco virtualizes list rows and ArrowDown doesn't
       // reliably scroll items into the DOM.
@@ -207,22 +212,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
       const seenLabels: string[] = []
 
-      // Helper to collect all currently visible rows
-      const collectVisibleRows = async () => {
+      // Helper to collect visible rows and optionally click the target
+      const collectAndMaybeClick = async (): Promise<boolean> => {
         const rows = list.locator('.monaco-list-row')
         const count = await rows.count()
         for (let i = 0; i < count; i++) {
-          const label = await rows.nth(i).getAttribute('aria-label')
+          const row = rows.nth(i)
+          const label = await row.getAttribute('aria-label')
           if (label && !seenLabels.includes(label)) {
             seenLabels.push(label)
           }
+          if (targetModelName && label && label.startsWith(targetModelName)) {
+            await row.click()
+            return true
+          }
         }
+        return false
       }
 
       // Collect items visible at the top
-      await collectVisibleRows()
-      if (targetModelName && seenLabels.some((l) => l.startsWith(targetModelName))) {
-        return seenLabels
+      const clickedAtTop = await collectAndMaybeClick()
+      if (clickedAtTop) {
+        return { labels: seenLabels, clicked: true }
       }
 
       // Drag the scrollbar down in increments to reveal all items
@@ -245,13 +256,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.mouse.up()
         await page.waitForIdle()
 
-        await collectVisibleRows()
-        if (targetModelName && seenLabels.some((l) => l.startsWith(targetModelName))) {
-          return seenLabels
+        const clicked = await collectAndMaybeClick()
+        if (clicked) {
+          return { labels: seenLabels, clicked: true }
         }
       }
 
-      return seenLabels
+      return { labels: seenLabels, clicked: false }
     },
     async selectModel(modelName: string, retry = true) {
       try {
@@ -287,16 +298,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             await page.waitForIdle()
           }
 
-          // Scroll through the list by dragging the scrollbar and collect all items
-          seenLabels = await this.collectModelListItems(contextView, list, modelName)
-
-          // Check if we found the target model
-          const targetLabel = seenLabels.find((l) => l.startsWith(modelName))
-          if (targetLabel) {
-            // Click the item directly
-            const item = list.locator(`.monaco-list-row[aria-label="${targetLabel}"]`)
-            await expect(item).toBeVisible()
-            await item.click()
+          // Scroll through the list by dragging the scrollbar, collect items,
+          // and click the target model immediately when found (while still in view)
+          const result = await this.collectModelListItems(contextView, list, modelName)
+          seenLabels = result.labels
+          if (result.clicked) {
             found = true
             break
           }
@@ -316,7 +322,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
         // Verify the selection persists
         await new Promise((r) => {
-          setTimeout(r, 7000)
+          setTimeout(r, 2000)
         })
         const modelText2 = await modelLocator.textContent()
         if (modelText2 !== modelName) {

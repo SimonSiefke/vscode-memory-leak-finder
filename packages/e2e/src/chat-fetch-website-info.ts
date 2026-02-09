@@ -22,6 +22,8 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     // TODO should pass in some parameters to verify it calls the wikipedia website
   })
 
+  await ChatEditor.clickAccessButton('Allow')
+
   await ChatEditor.clearAll()
 }
 
