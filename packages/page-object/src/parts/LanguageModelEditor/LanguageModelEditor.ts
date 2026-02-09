@@ -49,9 +49,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async open() {
       try {
-
         const r = RunningExtensions.create({
-          electronApp, expect, ideVersion, page, platform, VError
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
         })
         await r.showAndWaitFor('GitHub Copilot Chat')
         const editor = Editor.create({ page, electronApp, expect, ideVersion, platform, VError })
