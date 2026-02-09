@@ -442,11 +442,31 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await expect(row).toBeVisible()
           await page.waitForIdle()
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
-          await expect(response).toBeVisible({ timeout: 60_000 })
-          await page.waitForIdle()
+          const confirmation = chatView.locator('.chat-confirmation-widget-container .chat-buttons button')
           const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timeout: 45_000 })
-          await page.waitForIdle()
+          // Auto-approve any confirmation dialogs (e.g. fetch web page) while waiting for response
+          const deadline = Date.now() + 120_000
+          while (Date.now() < deadline) {
+            await page.waitForIdle()
+            const confirmCount = await confirmation.count()
+            if (confirmCount > 0) {
+              const btn = confirmation.first()
+              const isVisible = await btn.isVisible()
+              if (isVisible) {
+                await btn.click()
+                await page.waitForIdle()
+                continue
+              }
+            }
+            const progressVisible = await progress.isVisible()
+            if (!progressVisible) {
+              const responseVisible = await response.isVisible()
+              if (responseVisible) {
+                break
+              }
+            }
+            await new Promise((r) => setTimeout(r, 500))
+          }
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
         }

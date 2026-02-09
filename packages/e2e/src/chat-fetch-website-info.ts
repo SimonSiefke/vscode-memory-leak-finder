@@ -17,11 +17,8 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: 'What are some facts about Benjamin Franklin? Use wikipedia as a source.',
     model: 'NVIDIA: Nemotron 3 Nano 30B A3B (free)',
+    verify: true,
   })
-
-  await ChatEditor.clickAccessButton('Allow')
-
-  await ChatEditor.verifyResponseMessage()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
