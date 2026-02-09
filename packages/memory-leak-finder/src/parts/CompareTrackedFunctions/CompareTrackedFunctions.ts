@@ -248,6 +248,7 @@ export const compareTrackedFunctions = async (
         readonly scriptMap?: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>
       },
   _context: Session,
+  connectionId: number,
 ): Promise<readonly TrackedFunctionResult[]> => {
   // Handle both old format (Record<string, number>) and new format (object with trackedFunctions and scriptMap)
   const beforeFunctions = typeof before === 'object' && before !== null && 'trackedFunctions' in before ? before.trackedFunctions : before
@@ -382,7 +383,7 @@ export const compareTrackedFunctions = async (
     if (sourceMapUrls.length > 0) {
       try {
         const classNames = true
-        const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlToPositions, classNames)
+        const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlToPositions, classNames, connectionId)
         const offsetMap: Record<string, number> = Object.create(null)
 
         for (const pointer of positionPointers) {

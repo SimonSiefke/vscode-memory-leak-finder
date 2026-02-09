@@ -30,6 +30,7 @@ export const connectWorkers = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   trackFunctions: boolean,
+  resolveExtensionSourceMaps: boolean,
 ) => {
   const promises: Promise<any>[] = []
   if (recordVideo) {
@@ -79,6 +80,7 @@ export const connectWorkers = async (
     inspectSharedProcessPort,
     inspectExtensionsPort,
     pid,
+    resolveExtensionSourceMaps,
   )
 
   return {

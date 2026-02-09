@@ -1,7 +1,7 @@
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.ts'
 
-const addSourceLocations = async (functionObjects, scriptMap) => {
+const addSourceLocations = async (functionObjects, scriptMap, connectionId) => {
   const classNames = true
   const requests = functionObjects.map((item) => {
     const script = scriptMap[item.scriptId]
@@ -14,7 +14,11 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
       url: url,
     }
   })
-  const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(requests, classNames)
+  const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(
+    requests,
+    classNames,
+    connectionId,
+  )
   const normalized = withOriginalStack.map((item) => {
     const { count, delta, name, originalName, originalStack, stack } = item
 
@@ -28,7 +32,7 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
   return normalized
 }
 
-export const compareNamedFunctionCount2 = async (beforePath, after, useParallel = true) => {
+export const compareNamedFunctionCount2 = async (beforePath, after, useParallel = true, connectionId) => {
   // TODO ask heapsnapshot worker to compare functions
   // TODO then for the leaked functions, add sourcemap info
   const afterPath = after.heapSnapshotPath
@@ -38,7 +42,7 @@ export const compareNamedFunctionCount2 = async (beforePath, after, useParallel 
   const leaked = await HeapSnapshotFunctions.compareHeapSnapshotFunctions(beforePath, afterPath, useParallel)
   console.timeEnd('check')
   console.time('sourcemap')
-  const withSourceLocations = await addSourceLocations(leaked, scriptMap)
+  const withSourceLocations = await addSourceLocations(leaked, scriptMap, connectionId)
   console.timeEnd('sourcemap')
   return withSourceLocations
 }
