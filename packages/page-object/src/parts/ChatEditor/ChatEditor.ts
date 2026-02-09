@@ -459,11 +459,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
               }
             }
             const progressVisible = await progress.isVisible()
-            if (!progressVisible) {
-              const responseVisible = await response.isVisible()
-              if (responseVisible) {
-                break
-              }
+            const responseVisible = await response.isVisible()
+            const hasConfirmation = confirmCount > 0
+            if (responseVisible && !progressVisible && !hasConfirmation) {
+              break
             }
             await new Promise((r) => setTimeout(r, 500))
           }
