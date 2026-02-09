@@ -119,6 +119,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async open() {
       try {
+        const r = RunningExtensions.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await r.showAndWaitFor('GitHub Copilot Chat')
+        const editor = Editor.create({ page, electronApp, expect, ideVersion, platform, VError })
+        await editor.closeAll()
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.NewChatEditor)
         await page.waitForIdle()
