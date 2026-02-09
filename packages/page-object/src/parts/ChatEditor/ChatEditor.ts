@@ -170,37 +170,88 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(modelLocator).toBeVisible()
       await modelLocator.click()
       await page.waitForIdle()
-      const list = page.locator('.context-view .monaco-list')
+      const contextView = page.locator('.context-view')
+      const list = contextView.locator('.monaco-list')
       await expect(list).toBeVisible()
       await page.waitForIdle()
 
-      const modelNames: string[] = []
-      const maxAttempts = 150
-      for (let i = 0; i < maxAttempts; i++) {
-        await page.waitForIdle()
-        await page.keyboard.press('End')
-        await page.waitForIdle()
-        const focusedRow = list.locator('.monaco-list-row.focused')
-        const count = await focusedRow.count()
-        if (count === 0) {
-          continue
-        }
-        const label = await focusedRow.getAttribute('aria-label')
-        if (!label) {
-          continue
-        }
-        if (modelNames.length > 0 && label === modelNames[0]) {
-          // Wrapped around to the beginning
-          break
-        }
-        if (!modelNames.includes(label)) {
-          modelNames.push(label)
-        }
-      }
+      const modelNames = await this.collectModelListItems(contextView, list)
+
       // Close the picker
       await page.keyboard.press('Escape')
       await page.waitForIdle()
       return modelNames
+    },
+    async collectModelListItems(contextView: any, list: any, targetModelName?: string): Promise<string[]> {
+      // Collect all items by dragging the scrollbar down through the virtualized list.
+      // This is needed because Monaco virtualizes list rows and ArrowDown doesn't
+      // reliably scroll items into the DOM.
+      const scrollbar = contextView.locator('.scrollbar.vertical').first()
+      await scrollbar.hover()
+      await page.waitForIdle()
+
+      const scrollbarSlider = scrollbar.locator('.slider')
+      await expect(scrollbarSlider).toBeVisible()
+      await page.waitForIdle()
+
+      // Get the scrollbar track height and slider dimensions for calculating drag distance
+      const scrollbarBox = await scrollbar.boundingBox()
+      const sliderBox = await scrollbarSlider.boundingBox()
+      if (!scrollbarBox || !sliderBox) {
+        throw new Error('Unable to get scrollbar bounding box')
+      }
+
+      const trackHeight = scrollbarBox.height
+      const sliderHeight = sliderBox.height
+      const maxDragDistance = trackHeight - sliderHeight
+
+      const seenLabels: string[] = []
+
+      // Helper to collect all currently visible rows
+      const collectVisibleRows = async () => {
+        const rows = list.locator('.monaco-list-row')
+        const count = await rows.count()
+        for (let i = 0; i < count; i++) {
+          const label = await rows.nth(i).getAttribute('aria-label')
+          if (label && !seenLabels.includes(label)) {
+            seenLabels.push(label)
+          }
+        }
+      }
+
+      // Collect items visible at the top
+      await collectVisibleRows()
+      if (targetModelName && seenLabels.some((l) => l.startsWith(targetModelName))) {
+        return seenLabels
+      }
+
+      // Drag the scrollbar down in increments to reveal all items
+      const steps = 10
+      const stepSize = maxDragDistance / steps
+      for (let step = 1; step <= steps; step++) {
+        const currentSliderBox = await scrollbarSlider.boundingBox()
+        if (!currentSliderBox) {
+          break
+        }
+        const sliderCenterX = currentSliderBox.x + currentSliderBox.width / 2
+        const sliderCenterY = currentSliderBox.y + currentSliderBox.height / 2
+        const targetY = scrollbarBox.y + stepSize * step + sliderHeight / 2
+
+        await page.mouse.move(sliderCenterX, sliderCenterY)
+        await page.mouse.down()
+        await page.waitForIdle()
+        await page.mouse.move(sliderCenterX, targetY)
+        await page.waitForIdle()
+        await page.mouse.up()
+        await page.waitForIdle()
+
+        await collectVisibleRows()
+        if (targetModelName && seenLabels.some((l) => l.startsWith(targetModelName))) {
+          return seenLabels
+        }
+      }
+
+      return seenLabels
     },
     async selectModel(modelName: string, retry = true) {
       try {
@@ -225,7 +276,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         for (let attempt = 0; attempt < maxRetries; attempt++) {
           await modelLocator.click()
           await page.waitForIdle()
-          const list = page.locator('.context-view .monaco-list')
+          const contextView = page.locator('.context-view')
+          const list = contextView.locator('.monaco-list')
           await expect(list).toBeVisible()
           await page.waitForIdle()
 
@@ -235,36 +287,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             await page.waitForIdle()
           }
 
-          // Use keyboard navigation to scroll through the virtualized list.
-          const maxArrowPresses = 150
-          seenLabels = []
-          for (let i = 0; i < maxArrowPresses; i++) {
-            await page.keyboard.press('ArrowDown')
-            await page.waitForIdle()
-            const focusedRow = list.locator('.monaco-list-row.focused')
-            const count = await focusedRow.count()
-            if (count === 0) {
-              continue
-            }
-            const label = await focusedRow.getAttribute('aria-label')
-            if (label && label.startsWith(modelName)) {
-              await page.keyboard.press('Enter')
-              found = true
-              break
-            }
-            if (label) {
-              if (seenLabels.length > 0 && label === seenLabels[0]) {
-                // Wrapped around — model is not in the list yet
-                break
-              }
-              if (!seenLabels.includes(label)) {
-                seenLabels.push(label)
-              }
-            }
-          }
-          if (found) {
+          // Scroll through the list by dragging the scrollbar and collect all items
+          seenLabels = await this.collectModelListItems(contextView, list, modelName)
+
+          // Check if we found the target model
+          const targetLabel = seenLabels.find((l) => l.startsWith(modelName))
+          if (targetLabel) {
+            // Click the item directly
+            const item = list.locator(`.monaco-list-row[aria-label="${targetLabel}"]`)
+            await expect(item).toBeVisible()
+            await item.click()
+            found = true
             break
           }
+
           // Close the picker before retrying
           await page.keyboard.press('Escape')
           await page.waitForIdle()
