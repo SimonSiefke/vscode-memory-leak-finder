@@ -27,6 +27,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     ],
     expectedResponse: ''
   })
+  await ChatEditor.clearAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
