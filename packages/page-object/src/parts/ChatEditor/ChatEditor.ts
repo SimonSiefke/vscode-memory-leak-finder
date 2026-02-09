@@ -475,14 +475,38 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await expect(element).toBeVisible({ timeout: 20_000 })
           await page.waitForIdle()
           for (const toolInvocation of toolInvocations) {
-            const block = element.locator('.chat-terminal-command-block')
-            await expect(block).toBeVisible({
-              timeout: 2000,
-            })
-            await expect(block).toHaveText(` ${toolInvocation.content}`)
-            await page.waitForIdle()
+            if (toolInvocation.type === 'website') {
+              const link = element.locator(`a:has-text("${toolInvocation.url}")`)
+              await expect(link).toBeVisible({
+                timeout: 2000,
+              })
+              await page.waitForIdle()
+              const confirmbutton = chatView.locator('.chat-confirmation-widget-buttons [aria-label^="Allow"]')
+              const count = await confirmbutton.count()
+              if (count > 0) {
+                await confirmbutton.first().click()
+                await page.waitForIdle()
+                const approveToolResult = chatView.locator('[aria-label^="Chat Confirmation Dialog Approve Tool Result "]')
+                await expect(approveToolResult).toBeVisible({ timeout: 20_000 })
+                await page.waitForIdle()
+                const allowButton = chatView.locator('.chat-confirmation-widget-buttons [aria-label="Allow"]')
+                await expect(allowButton).toBeVisible()
+                await page.waitForIdle()
+                await allowButton.click()
+                await page.waitForIdle()
+              }
+            }
+            else {
+              const block = element.locator('.chat-terminal-command-block')
+              await expect(block).toBeVisible({
+                timeout: 2000,
+              })
+              await expect(block).toHaveText(` ${toolInvocation.content}`)
+              await page.waitForIdle()
+            }
           }
         }
+
 
         if (expectedResponse) {
           const requestMessage = last
