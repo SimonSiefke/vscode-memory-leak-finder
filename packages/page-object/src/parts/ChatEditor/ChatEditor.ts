@@ -152,10 +152,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async selectModel(modelName: string, retry = true) {
       try {
-        const modelPickerItem = page.locator('.chat-modelPicker-item').nth(1)
+
+        await page.waitForIdle()
+        const modelPickerItem = page.locator('.chat-input-picker-item').nth(2)
         await expect(modelPickerItem).toBeVisible()
         await page.waitForIdle()
-        const modelLocator = modelPickerItem.locator('.chat-model-label')
+        const modelLocator = modelPickerItem.locator('.chat-input-picker-label')
         await expect(modelLocator).toBeVisible()
         await page.waitForIdle()
         const modelText = await modelLocator.textContent()
@@ -165,6 +167,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         await modelLocator.click()
         await page.waitForIdle()
+        const scrollContainer = page.locator('.context-view .monaco-scrollable-element')
+        await expect(scrollContainer).toBeVisible()
+        await page.waitForIdle()
+        await new Promise(r => {
+          setTimeout(r, 2000)
+        })
+        await scrollContainer.scrollDown()
+        console.log('scrolled')
+        // TODO need to scroll list....
+        await page.waitForIdle()
+        await new Promise(r => { })
         const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
         await expect(item).toBeVisible()
         await item.click()
