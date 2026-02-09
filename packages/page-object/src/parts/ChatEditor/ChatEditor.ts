@@ -331,7 +331,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(modelLocator).toHaveText(modelName, { timeout: 5_000 })
 
         // Verify the selection persists
-        await performSelectionBugWorkaround()
+        // await performSelectionBugWorkaround()
         const modelText2 = await modelLocator.textContent()
         if (modelText2 !== modelName) {
           if (retry) {
@@ -541,15 +541,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async clickAccessButton(buttonText: string = 'Allow') {
       try {
         const accessButton = page.locator(`button:has-text("${buttonText}")`)
-        const buttonCount = await accessButton.count()
-
-        if (buttonCount > 0) {
-          await expect(accessButton.first()).toBeVisible()
-          await accessButton.first().click()
-          await page.waitForIdle()
-        }
+        await expect(accessButton.first()).toBeVisible({ timeout: 60_000 })
+        await accessButton.first().click()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to click access button with text "${buttonText}"`)
+      }
+    },
+    async verifyResponseMessage() {
+      try {
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        await page.waitForIdle()
+        const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+        await expect(response).toBeVisible({ timeout: 120_000 })
+        await page.waitForIdle()
+        const progress = chatView.locator('.rendered-markdown.progress-step')
+        await expect(progress).toBeHidden({ timeout: 120_000 })
+        await page.waitForIdle()
+        await expect(response).toBeVisible({ timeout: 30_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify response message`)
       }
     },
   }
