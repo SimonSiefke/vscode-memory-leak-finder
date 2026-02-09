@@ -597,22 +597,5 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to click access button with text "${buttonText}"`)
       }
     },
-    async verifyResponseMessage() {
-      try {
-        const chatView = page.locator('.interactive-session')
-        await expect(chatView).toBeVisible()
-        await page.waitForIdle()
-        const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
-        await expect(response).toBeVisible({ timeout: 120_000 })
-        await page.waitForIdle()
-        const progress = chatView.locator('.rendered-markdown.progress-step')
-        await expect(progress).toBeHidden({ timeout: 120_000 })
-        await page.waitForIdle()
-        await expect(response).toBeVisible({ timeout: 30_000 })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to verify response message`)
-      }
-    },
   }
 }
