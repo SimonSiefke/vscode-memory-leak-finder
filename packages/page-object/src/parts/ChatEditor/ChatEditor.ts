@@ -66,8 +66,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           response: 1,
         })
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.showCommands()
-        await quickPick.type('Chat: Delete All')
+        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
+          // TODO
+          // await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
+        } else {
+          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
+        }
         await page.waitForIdle()
         // Select the first matching result regardless of exact command name
         await page.keyboard.press('Enter')
