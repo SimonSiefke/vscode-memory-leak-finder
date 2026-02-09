@@ -173,17 +173,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         // Use keyboard navigation to scroll through the virtualized list.
         // Arrow keys cause Monaco to bring the focused item into view,
         // which avoids issues with scrollDown() on virtualized lists.
+        // Press ArrowDown first to ensure a row gets focused.
         const maxAttempts = 150
+        let found = false
         for (let i = 0; i < maxAttempts; i++) {
+          await page.keyboard.press('ArrowDown')
           await page.waitForIdle()
           const focusedRow = list.locator('.monaco-list-row.focused')
+          const count = await focusedRow.count()
+          if (count === 0) {
+            continue
+          }
           const label = await focusedRow.getAttribute('aria-label')
           if (label && label.startsWith(modelName)) {
             await page.keyboard.press('Enter')
+            found = true
             break
           }
-          await page.keyboard.press('ArrowDown')
-          await page.waitForIdle()
+        }
+        if (!found) {
+          throw new Error(`Could not find model "${modelName}" in the model picker after ${maxAttempts} attempts`)
         }
         await page.waitForIdle()
         await expect(modelLocator).toHaveText(modelName, { timeout: 5_000 })
