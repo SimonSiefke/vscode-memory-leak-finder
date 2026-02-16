@@ -2,25 +2,18 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const beforeSetup = async ({ join, tmpDir, writeFile }: any) => {
-  await writeFile(
-    join(tmpDir, 'index.css'),
-    `h1 {
+export const setup = async ({ Editor, Problems, Workspace }: TestContext): Promise<void> => {
+  await Workspace.setFiles([
+    {
+      content: `h1 {
   abc
 }`,
-  )
-}
-
-// @ts-ignore
-export const setup = async ({ Editor, expect, page, Problems, StatusBar }: TestContext): Promise<void> => {
+      name: 'index.css',
+    },
+  ])
   await Editor.open('index.css')
   await Editor.shouldHaveSquigglyError()
-
-  // @ts-ignore
-  const problemsButton = await StatusBar.item('status.problems')
-  await problemsButton.click()
-  const panel = page.locator('.part.panel.bottom')
-  await expect(panel).toBeVisible()
+  await Problems.show()
   await Editor.focus()
   await Problems.shouldHaveCount(2)
 }
