@@ -60,6 +60,7 @@ setInterval(() => {
 
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('index.js')
   await RunAndDebug.removeAllBreakpoints()
 }
