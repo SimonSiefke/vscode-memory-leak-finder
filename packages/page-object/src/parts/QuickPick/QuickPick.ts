@@ -67,6 +67,21 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to get visible commands`)
       }
     },
+    async getFocusedItemLabel() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const focusedItemLabel = quickPick.locator('.monaco-list-row.focused .label-name').first()
+        await expect(focusedItemLabel).toBeVisible()
+        const text = await focusedItemLabel.textContent()
+        if (!text) {
+          throw new Error(`Focused quick pick item has no text`)
+        }
+        return text
+      } catch (error) {
+        throw new VError(error, `Failed to get focused quick pick item label`)
+      }
+    },
     async hide() {
       try {
         const quickPick = page.locator('.quick-input-widget')
@@ -176,6 +191,15 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         })
       } catch (error) {
         throw new VError(error, `Failed to show quick pick color theme`)
+      }
+    },
+    async showFileIconTheme() {
+      try {
+        await this.executeCommand(WellKnownCommands.SelectFileIconTheme, {
+          stayVisible: true,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to show quick pick file icon theme`)
       }
     },
     async showCommands({ pressKeyOnce = false } = {}) {
