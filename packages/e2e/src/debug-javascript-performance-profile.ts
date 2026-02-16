@@ -70,12 +70,12 @@ export const run = async ({ Editor, Explorer, QuickPick, RunAndDebug, WellKnownC
   await Editor.setBreakpoint(4)
 
   await RunAndDebug.runAndWaitForPaused({
-    callStackSize: 11,
+    callStackSize: 6,
     file: 'index.js',
     line: 4,
   })
 
-  await QuickPick.executeCommand('Debug: Create Performance Profile')
+  await QuickPick.executeCommand('Debug: Take Performance Profile')
   await QuickPick.executeCommand(WellKnownCommands.FileSave)
   await Explorer.shouldHaveItem('debug-performance-profile.cpuprofile')
 
