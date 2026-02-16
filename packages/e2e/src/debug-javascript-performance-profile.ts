@@ -69,6 +69,7 @@ setInterval(() => {
     callStackSize: 6,
     file: 'index.js',
     line: 4,
+    viaIcon: true,
   })
 }
 

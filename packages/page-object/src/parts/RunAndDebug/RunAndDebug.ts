@@ -433,15 +433,19 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         })
         await quickPick.select('CPU Profile', true)
         await page.waitForIdle()
-        await quickPick.select('Duration', true)
+        await quickPick.select('Manual', false)
         await page.waitForIdle()
-        await quickPick.type(`${seconds}`)
-        await page.waitForIdle()
-        await quickPick.pressEnter()
+        await new Promise((r) => {
+          setTimeout(r, seconds * 1000)
+        })
+        await quickPick.executeCommand('Debug: Stop Performance Profile', {
+          pressKeyOnce: true,
+          stayVisible: false,
+        })
         await page.waitForIdle()
         const decoration = page.locator('.monaco-editor .codelens-decoration', {})
         await expect(decoration).toBeVisible({
-          timeout: seconds * 1000 + 5_000,
+          timeout: 5_000,
         })
         await page.waitForIdle()
         await expect(decoration).toHaveText(/Self Time/)
