@@ -65,7 +65,7 @@ setInterval(() => {
   await RunAndDebug.removeAllBreakpoints()
 }
 
-export const run = async ({ Editor, QuickPick, RunAndDebug }: TestContext): Promise<void> => {
+export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await Editor.open('index.js')
   await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused({
