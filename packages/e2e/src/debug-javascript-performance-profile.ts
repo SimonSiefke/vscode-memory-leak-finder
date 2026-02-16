@@ -63,9 +63,6 @@ setInterval(() => {
   await Explorer.refresh()
   await Explorer.shouldHaveItem('index.js')
   await RunAndDebug.removeAllBreakpoints()
-}
-
-export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await Editor.open('index.js')
   await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused({
@@ -73,9 +70,14 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
     file: 'index.js',
     line: 4,
   })
+}
+
+export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
   // @ts-ignore
   await RunAndDebug.takeCpuProfile({ seconds: 3 })
+}
 
+export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
   // TODO need to call continue
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
