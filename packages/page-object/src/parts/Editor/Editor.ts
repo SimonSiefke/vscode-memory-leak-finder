@@ -140,6 +140,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to close all editors`)
       }
     },
+    async closeOthers() {
+      try {
+        await page.waitForIdle()
+        const main = page.locator('[role="main"]')
+        const tabs = main.locator('[role="tab"]')
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewCloseOtherEditors)
+        await expect(tabs).toHaveCount(1, {
+          timeout: 4000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close other editors`)
+      }
+    },
     async closeAllEditorGroups() {
       try {
         await page.waitForIdle()
