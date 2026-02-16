@@ -68,14 +68,15 @@ setInterval(() => {
 export const run = async ({ Editor, QuickPick, RunAndDebug }: TestContext): Promise<void> => {
   await Editor.open('index.js')
   await Editor.setBreakpoint(4)
-
   await RunAndDebug.runAndWaitForPaused({
     callStackSize: 6,
     file: 'index.js',
     line: 4,
   })
+  // @ts-ignore
+  await RunAndDebug.takeCpuProfile({ seconds: 3 })
 
-  await QuickPick.executeCommand('Debug: Take Performance Profile')
+  // TODO need to call continue
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()

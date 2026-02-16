@@ -438,8 +438,13 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         await quickPick.type(`${seconds}`)
         await page.waitForIdle()
         await quickPick.pressEnter()
-        console.log('ALL DONE')
-        await new Promise((r) => {})
+        await page.waitForIdle()
+        const decoration = page.locator('.monaco-editor .codelens-decoration', {})
+        await expect(decoration).toBeVisible({
+          timeout: seconds * 1000 + 5_000,
+        })
+        await page.waitForIdle()
+        await expect(decoration).toHaveText(/Self Time/)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to take performance profile`)
