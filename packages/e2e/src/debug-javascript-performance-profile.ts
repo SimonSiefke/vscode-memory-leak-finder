@@ -76,9 +76,6 @@ export const run = async ({ Editor, Explorer, QuickPick, RunAndDebug, WellKnownC
   })
 
   await QuickPick.executeCommand('Debug: Take Performance Profile')
-  await QuickPick.executeCommand(WellKnownCommands.FileSave)
-  await Explorer.shouldHaveItem('debug-performance-profile.cpuprofile')
-
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()

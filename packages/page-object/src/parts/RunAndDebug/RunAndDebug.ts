@@ -416,6 +416,35 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         throw new VError(error, `Failed to wait for debug console output`)
       }
     },
+    async takeCpuProfile({ seconds }: { seconds: number }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand('Debug: Take Performance Profile', {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
+        await quickPick.select('CPU Profile', true)
+        await page.waitForIdle()
+        await quickPick.select('Duration', true)
+        await page.waitForIdle()
+        await quickPick.type(`${seconds}`)
+        await page.waitForIdle()
+        await quickPick.pressEnter()
+        console.log('ALL DONE')
+        await new Promise((r) => {})
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to take performance profile`)
+      }
+    },
     async waitForPaused({
       callStackSize,
       file,
