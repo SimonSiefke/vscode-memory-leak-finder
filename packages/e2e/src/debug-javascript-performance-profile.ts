@@ -73,9 +73,11 @@ setInterval(() => {
   })
 }
 
-export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
+export const run = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
   // @ts-ignore
   await RunAndDebug.takeCpuProfile({ seconds: 3 })
+  // @ts-ignore
+  await Editor.closeOthers()
 }
 
 export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
