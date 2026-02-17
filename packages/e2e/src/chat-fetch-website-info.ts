@@ -22,10 +22,10 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
       {
         type: 'website',
         url: 'https://en.wikipedia.org/wiki/Benjamin_Franklin',
-        approve: true
-      }
+        approve: true,
+      },
     ],
-    expectedResponse: ''
+    expectedResponse: '',
   })
   await ChatEditor.clearAll()
 }
