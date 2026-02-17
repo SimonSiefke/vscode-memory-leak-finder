@@ -10,6 +10,10 @@ const callback = async (method, ...params) => {
   await CliProcess.invoke(method, ...params)
 }
 
+const getTimeStamp = () => {
+  return performance.now()
+}
+
 export const runTests = async ({
   arch,
   bisect,
@@ -167,5 +171,6 @@ export const runTests = async ({
     useProxyMock,
     vscodePath,
     vscodeVersion,
+    getTimeStamp,
   })
 }
