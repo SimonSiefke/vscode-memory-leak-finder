@@ -1,4 +1,4 @@
-import { Rpc } from '@lvce-editor/rpc'
+import type { Rpc } from '@lvce-editor/rpc'
 
 export const emptyRpc: Rpc = {
   async invokeAndTransfer() {},

@@ -17,7 +17,7 @@ import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
-import { Rpc } from '@lvce-editor/rpc'
+import type { Rpc } from '@lvce-editor/rpc'
 import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
 
 interface WorkerMap {
