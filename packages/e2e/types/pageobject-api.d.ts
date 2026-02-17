@@ -373,6 +373,7 @@ export interface QuickPick {
   executeCommand(command: any, options?: any): Promise<void>
   focusNext(): Promise<void>
   focusPrevious(): Promise<void>
+  getFocusedItemLabel(): Promise<string>
   getInputValue(): Promise<string>
   getVisibleCommands(): Promise<string[]>
   hide(): Promise<void>
@@ -381,6 +382,7 @@ export interface QuickPick {
   select(text: any, stayVisible?: any): Promise<void>
   show(options?: any): Promise<void>
   showColorTheme(): Promise<void>
+  showFileIconTheme(): Promise<void>
   showCommands(options?: any): Promise<void>
   type(value: any): Promise<void>
 }

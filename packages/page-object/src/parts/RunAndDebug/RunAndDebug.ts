@@ -416,6 +416,44 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         throw new VError(error, `Failed to wait for debug console output`)
       }
     },
+    async takeCpuProfile({ seconds }: { seconds: number }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand('Debug: Take Performance Profile', {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
+        await quickPick.select('CPU Profile', true)
+        await page.waitForIdle()
+        await quickPick.select('Manual', false)
+        await page.waitForIdle()
+        await new Promise((r) => {
+          setTimeout(r, seconds * 1000)
+        })
+        await quickPick.executeCommand('Debug: Stop Performance Profile', {
+          pressKeyOnce: true,
+          stayVisible: false,
+        })
+        await page.waitForIdle()
+        const decoration = page.locator('.monaco-editor .codelens-decoration', {})
+        await expect(decoration).toBeVisible({
+          timeout: 5_000,
+        })
+        await page.waitForIdle()
+        await expect(decoration).toHaveText(/Self Time/)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to take performance profile`)
+      }
+    },
     async waitForPaused({
       callStackSize,
       file,
