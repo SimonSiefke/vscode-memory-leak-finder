@@ -16,6 +16,8 @@ const getRenderedLineCount = (value: string): number => {
   return newLineCount + 1
 }
 
+const minimumInitializationRowsToClear = 20
+
 // TODO use functional approach returning new stdout state property without side effects
 export const handleInitialized = async (time: number): Promise<void> => {
   if (StdinDataState.isGithubActions()) {
@@ -29,7 +31,8 @@ export const handleInitialized = async (time: number): Promise<void> => {
     const initializingMessage = await getInitializingMessage()
     const initializationBlock = initializingMessage + capturedOutput
     const renderedLines = getRenderedLineCount(initializationBlock)
-    const linesToMoveUp = initializationBlock.endsWith('\n') ? renderedLines : Math.max(renderedLines - 1, 0)
+    const estimatedRows = initializationBlock.endsWith('\n') ? renderedLines : Math.max(renderedLines - 1, 0)
+    const linesToMoveUp = Math.max(estimatedRows, minimumInitializationRowsToClear)
     if (linesToMoveUp > 0) {
       fullMessage += await AnsiEscapes.cursorUp(linesToMoveUp)
     }
