@@ -17,16 +17,19 @@ import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
+import type { Rpc } from '@lvce-editor/rpc'
+import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
 import { doLogin } from '../DoLogin/DoLogin.ts'
 
-const emptyRpc = {
-  async dispose() {},
-  invoke() {
-    throw new Error(`not implemented`)
-  },
+interface WorkerMap {
+  readonly functionTrackerRpc: Rpc
+  readonly initializationWorkerRpc: Rpc
+  readonly memoryRpc: Rpc
+  readonly testWorkerRpc: Rpc
+  readonly videoRpc: Rpc
 }
 
-const disposeWorkers = async (workers) => {
+const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
   const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
   await Promise.all([functionTrackerRpc.dispose(), memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()
@@ -241,7 +244,7 @@ export const runTestsWithCallback = async ({
     await callback(TestWorkerEventType.TestsStarting, total)
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
-    let workers = {
+    let workers: WorkerMap = {
       functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
@@ -299,7 +302,6 @@ export const runTestsWithCallback = async ({
         workers = {
           functionTrackerRpc: functionTrackerRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
-          // @ts-ignore
           memoryRpc: memoryRpc || emptyRpc,
           testWorkerRpc: testWorkerRpc || emptyRpc,
           videoRpc: videoRpc || emptyRpc,
