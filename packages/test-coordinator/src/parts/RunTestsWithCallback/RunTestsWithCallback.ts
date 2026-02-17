@@ -17,8 +17,12 @@ import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
+<<<<<<< HEAD
 import type { Rpc } from '@lvce-editor/rpc'
 import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
+=======
+import { doLogin } from '../DoLogin/DoLogin.ts'
+>>>>>>> origin/main
 
 interface WorkerMap {
   readonly functionTrackerRpc: Rpc
@@ -166,70 +170,43 @@ export const runTestsWithCallback = async ({
     }
 
     if (login) {
-      const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
-        await PrepareTestsOrAttach.prepareTestsAndAttach({
-          arch,
-          attachedToPageTimeout,
-          clearExtensions,
-          commit,
-          compressVideo,
-          connectionId,
-          cwd,
-          enableExtensions,
-          enableProxy,
-          headlessMode,
-          ide,
-          ideVersion,
-          idleTimeout,
-          insidersCommit,
-          inspectExtensions,
-          inspectExtensionsPort,
-          inspectPtyHost,
-          inspectPtyHostPort,
-          inspectSharedProcess,
-          inspectSharedProcessPort,
-          measureId: measure,
-          measureNode,
-          openDevtools,
-          pageObjectPath: pageObjectPathResolved,
-          platform,
-          recordVideo,
-          runMode,
-          screencastQuality,
-          timeouts,
-          trackFunctions,
-          updateUrl,
-          useProxyMock,
-          vscodePath,
-          vscodeVersion,
-        })
-      // Wait for user to interrupt (Ctrl+C) or terminate the process
-      const { promise, resolve } = Promise.withResolvers<void>()
-      const cleanup = async () => {
-        await testWorkerRpc.dispose()
-        await memoryRpc?.dispose()
-        await videoRpc?.dispose()
-        await functionTrackerRpc?.dispose()
-        if (initializationWorkerRpc) {
-          await initializationWorkerRpc.dispose()
-        }
-        resolve()
-      }
-      process.once('SIGINT', cleanup)
-      process.once('SIGTERM', cleanup)
-      // The IDE is now running. User can login manually and then press Ctrl+C when done
-      await promise
-      return {
-        duration: 0,
-        failed: 0,
+      return await doLogin({
+        arch,
+        attachedToPageTimeout,
+        clearExtensions,
+        commit,
+        compressVideo,
+        connectionId,
+        cwd,
+        enableExtensions,
+        enableProxy,
         filterValue,
-        leaked: 0,
-        passed: 0,
-        skipped: 0,
-        skippedFailed: 0,
-        total: 0,
-        type: 'success',
-      }
+        headlessMode,
+        ide,
+        ideVersion,
+        idleTimeout,
+        insidersCommit,
+        inspectExtensions,
+        inspectExtensionsPort,
+        inspectPtyHost,
+        inspectPtyHostPort,
+        inspectSharedProcess,
+        inspectSharedProcessPort,
+        measure,
+        measureNode,
+        openDevtools,
+        pageObjectPathResolved,
+        platform,
+        recordVideo,
+        runMode,
+        screencastQuality,
+        timeouts,
+        trackFunctions,
+        updateUrl,
+        useProxyMock,
+        vscodePath,
+        vscodeVersion,
+      })
     }
 
     let passed = 0
