@@ -4,9 +4,11 @@ import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
 export const handleStdoutData = async (data: Buffer): Promise<void> => {
   const buffering = StdinDataState.isBuffering()
+  const captureInitializationOutput = StdinDataState.shouldCaptureInitializationOutput()
   if (!buffering) {
     await Stdout.write(data.toString())
-    return
   }
-  TestStateOutput.addStdout(data)
+  if (buffering || captureInitializationOutput) {
+    TestStateOutput.addStdout(data)
+  }
 }

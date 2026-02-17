@@ -10,6 +10,7 @@ export interface StdinDataState {
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
   readonly compressVideo: boolean
+  readonly captureInitializationOutput: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -59,6 +60,7 @@ let state: StdinDataState = {
   checkLeaks: false,
   clearExtensions: true,
   compressVideo: false,
+  captureInitializationOutput: false,
   continueValue: '',
   cwd: Character.EmptyString,
   enableExtensions: false,
@@ -153,6 +155,13 @@ export const setBuffering = (value: boolean): void => {
   }
 }
 
+export const setCaptureInitializationOutput = (value: boolean): void => {
+  state = {
+    ...state,
+    captureInitializationOutput: value,
+  }
+}
+
 export const setTestSetup = (): void => {
   state = {
     ...state,
@@ -176,6 +185,10 @@ export const setTestStateChange = (): void => {
 
 export const isBuffering = (): boolean => {
   return state.buffering
+}
+
+export const shouldCaptureInitializationOutput = (): boolean => {
+  return state.captureInitializationOutput
 }
 
 export const isWatchMode = (): boolean => {
