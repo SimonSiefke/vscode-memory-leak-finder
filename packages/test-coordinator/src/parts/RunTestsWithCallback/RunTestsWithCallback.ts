@@ -225,7 +225,6 @@ export const runTestsWithCallback = async ({
       }
     }
     const initialStart = Time.now()
-    const first = formattedPaths[0]
     const showInitializingMessage = await ShouldShowInitializingMessage.shouldShowInitializingMessage({
       arch,
       commit,
@@ -240,9 +239,7 @@ export const runTestsWithCallback = async ({
       runs,
     }
 
-    const testStart = performance.now()
-    await callback(TestWorkerEventType.TestsStarting, total)
-    await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
+    let testStart = 0
 
     let workers = {
       functionTrackerRpc: emptyRpc,
@@ -321,10 +318,13 @@ export const runTestsWithCallback = async ({
 
       const { memoryRpc, testWorkerRpc, videoRpc } = workers
 
-      let wasOriginallySkipped = false
-      if (i !== 0) {
-        await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
+      if (i === 0) {
+        testStart = performance.now()
+        await callback(TestWorkerEventType.TestsStarting, total)
       }
+      await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, i === 0)
+
+      let wasOriginallySkipped = false
 
       try {
         const start = i === 0 ? initialStart : Time.now()
