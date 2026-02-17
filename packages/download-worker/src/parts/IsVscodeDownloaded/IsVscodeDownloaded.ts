@@ -11,12 +11,13 @@ export const isVscodeDownloaded = async (
   if (vscodePath) {
     return true
   }
-  if (commit) {
-    return false
-  }
   if (Env.env.VSCODE_PATH) {
     return true
   }
-  const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(vscodeVersion, platform, arch)
+  const cacheKey = commit || vscodeVersion
+  if (!cacheKey) {
+    return false
+  }
+  const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(cacheKey, platform, arch)
   return cachedPath !== ''
 }
