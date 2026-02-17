@@ -3,8 +3,10 @@ import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
 export const handleStderrData = async (data: Buffer): Promise<void> => {
-  if (!StdinDataState.isBuffering()) {
+  const buffering = StdinDataState.isBuffering()
+  if (!buffering) {
     await Stdout.write(data.toString()) // TODO use stderr
+    return
   }
   TestStateOutput.addStdErr(data)
 }
