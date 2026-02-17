@@ -2,7 +2,7 @@ import * as DeduplicateEventListeners from '../DeduplicateEventListeners/Dedupli
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
-export const compareEventListenersWithStackTraces = async (before, after) => {
+export const compareEventListenersWithStackTraces = async (before, after, context) => {
   const map = Object.create(null)
   for (const listener of before) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
@@ -23,6 +23,7 @@ export const compareEventListenersWithStackTraces = async (before, after) => {
   const cleanLeakedEventListeners = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(
     deduplicatedEventListeners,
     classNames,
+    context.connectionId,
   )
   return cleanLeakedEventListeners
 }

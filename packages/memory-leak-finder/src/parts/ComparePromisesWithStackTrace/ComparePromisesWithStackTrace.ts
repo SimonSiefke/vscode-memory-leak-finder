@@ -134,7 +134,11 @@ export const comparePromisesWithStackTrace = async (before, after, context = {})
   if (scriptMap) {
     const stackTraces = filtered.map((item) => item.stackTrace)
     const fullQuery = GetEventListenersQuery.getEventListenerQuery(stackTraces, scriptMap)
-    const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
+    const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(
+      fullQuery,
+      false,
+      context.connectionId,
+    )
     const sortedWithOriginal = mergeOriginal(filtered, cleanInstances)
     return sortedWithOriginal
   }

@@ -1,0 +1,72 @@
+import { pathToFileURL } from 'node:url'
+import { getConfigs } from '../Config/Config.ts'
+import { launchExtensionSourceMapWorker } from '../LaunchExtensionSourceMapWorker/LaunchExtensionSourceMapWorker.ts'
+import * as Root from '../Root/Root.ts'
+
+interface SourceMapUrlMap {
+  [key: string]: number[]
+}
+
+const isExtensionFile = (url: string): boolean => {
+  return url.includes('ms-vscode.js-debug')
+}
+
+const ensureUri = (file: string): string => {
+  if (file.startsWith('file://')) {
+    return file
+  }
+  return pathToFileURL(file).toString()
+}
+
+/**
+ * Cleans the source map URL map by handling extension files separately.
+ * Extension files (containing ms-vscode.js-debug) are processed by the extension-source-maps worker,
+ * while normal files are processed by the regular source-map-worker.
+ */
+export const cleanSourceMapUrlMap = async (
+  sourceMapUrlMap: SourceMapUrlMap,
+  platform: string,
+): Promise<{
+  cleanedSourceMapUrlMap: SourceMapUrlMap
+  reverseMap: Record<string, string>
+}> => {
+  const cleanedSourceMapUrlMap: SourceMapUrlMap = Object.create(null)
+
+  const reverseMap: Record<string, string> = Object.create(null)
+  let extensionSourceMapWorker: any = null
+
+  const configs = getConfigs(platform)
+
+  for (const [key, value] of Object.entries(sourceMapUrlMap)) {
+    if (!key) {
+      cleanedSourceMapUrlMap[key] = value
+      continue
+    }
+
+    reverseMap[key] = key
+
+    if (isExtensionFile(key)) {
+      if (!extensionSourceMapWorker) {
+        extensionSourceMapWorker = await launchExtensionSourceMapWorker()
+      }
+
+      const uri = ensureUri(key) // TODO maybe caller should have alrady ensured uri
+      const sourceMapUrl = await extensionSourceMapWorker.invoke('ExtensionSourceMap.resolveExtensionSourceMap', uri, Root.root, configs)
+
+      if (sourceMapUrl) {
+        cleanedSourceMapUrlMap[sourceMapUrl] = value
+        reverseMap[sourceMapUrl] = key
+      } else {
+        cleanedSourceMapUrlMap[key] = value
+      }
+    } else {
+      cleanedSourceMapUrlMap[key] = value
+    }
+  }
+
+  if (extensionSourceMapWorker) {
+    await extensionSourceMapWorker[Symbol.asyncDispose]()
+  }
+
+  return { cleanedSourceMapUrlMap, reverseMap }
+}

@@ -10,6 +10,7 @@ export const compareHeapSnapshotFunctions2 = async (
   pathB: string,
   options: CompareFunctionsOptions,
 ): Promise<readonly CompareResult[]> => {
+  console.time('parse')
   const [snapshotA, snapshotB] = await Promise.all([
     prepareHeapSnapshot(pathA, {
       parseStrings: true,
@@ -18,6 +19,7 @@ export const compareHeapSnapshotFunctions2 = async (
       parseStrings: true,
     }),
   ])
+  console.timeEnd('parse')
   const result = await compareHeapSnapshotFunctionsInternal2(snapshotA, snapshotB, options)
   return result
 }

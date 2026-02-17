@@ -31,10 +31,14 @@ const mergeOriginal = (nodes, cleanInstances) => {
   return merged
 }
 
-export const cleanDetachedDomNodesWithStackTraces = async (nodes, scriptMap) => {
+export const cleanDetachedDomNodesWithStackTraces = async (nodes, scriptMap, context) => {
   const stackTraces = nodes.map((node) => node.stackTrace)
   const fullQuery = GetEventListenersQuery.getEventListenerQuery(stackTraces, scriptMap)
-  const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
+  const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(
+    fullQuery,
+    false,
+    context.connectionId,
+  )
   const sorted = mergeOriginal(nodes, cleanInstances)
   return sorted
 }
