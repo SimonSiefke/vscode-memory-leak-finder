@@ -67,10 +67,13 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     useProxyMock,
     vscodePath,
     vscodeVersion,
+    watch,
     workers,
   } = options
-  const clear = await AnsiEscapes.clear(isWindows)
-  await Stdout.write(clear)
+  if (watch) {
+    const clear = await AnsiEscapes.clear(isWindows)
+    await Stdout.write(clear)
+  }
   const rpc = await RunTest.prepare()
   const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
     arch,

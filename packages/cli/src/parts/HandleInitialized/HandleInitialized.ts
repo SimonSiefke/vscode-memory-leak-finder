@@ -1,7 +1,6 @@
 import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import { getInitializedMessage } from '../GetInitializedMessage/GetInitializedMessage.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
-import { isWindows } from '../StdinDataState/StdinDataState.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
@@ -12,7 +11,9 @@ export const handleInitialized = async (time: number): Promise<void> => {
   }
   const message = await getInitializedMessage(time)
   let fullMessage = ''
-  fullMessage += await AnsiEscapes.clear(isWindows())
+  if (StdinDataState.isWatchMode()) {
+    fullMessage += await AnsiEscapes.clear(StdinDataState.isWindows())
+  }
   fullMessage += message
   fullMessage += TestStateOutput.clearPending()
   await Stdout.write(fullMessage)

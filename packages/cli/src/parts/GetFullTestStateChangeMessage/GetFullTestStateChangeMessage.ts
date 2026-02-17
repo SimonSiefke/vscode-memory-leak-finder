@@ -7,14 +7,15 @@ export const getFullMessage = async (
   isGithubActions: boolean,
   isBuffering: boolean,
   isWindows: boolean,
+  isWatchMode: boolean,
 ): Promise<string> => {
-  const clearMessage = await GetTestClearMessage.getTestClearMessage()
   let fullMessage = ''
-  if (!isGithubActions) {
+  if (isWatchMode && !isGithubActions) {
+    const clearMessage = await GetTestClearMessage.getTestClearMessage()
     fullMessage += clearMessage
   }
   fullMessage += message
-  if (!isGithubActions && !isBuffering) {
+  if (isWatchMode && !isGithubActions && !isBuffering) {
     const clear = await AnsiEscapes.clear(isWindows)
     fullMessage = clear + fullMessage
   }

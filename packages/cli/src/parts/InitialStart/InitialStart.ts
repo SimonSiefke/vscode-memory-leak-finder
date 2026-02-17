@@ -57,6 +57,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     useProxyMock: options.useProxyMock,
     vscodePath: options.vscodePath,
     vscodeVersion: options.vscodeVersion,
+    watch: options.watch,
     workers: options.workers,
   })
 }

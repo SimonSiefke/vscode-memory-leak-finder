@@ -43,5 +43,6 @@ export interface StartRunningOptions {
   readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
+  readonly watch: boolean
   readonly workers: boolean
 }

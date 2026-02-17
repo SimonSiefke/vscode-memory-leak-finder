@@ -71,6 +71,7 @@ export const updateState = async (newState: any): Promise<void> => {
       useProxyMock: state.useProxyMock,
       vscodePath: '',
       vscodeVersion: VsCodeVersion.vscodeVersion,
+      watch: state.watch,
       workers: state.workers,
     })
   }

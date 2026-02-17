@@ -8,6 +8,7 @@ export const handleTestStateChange = async (message: string): Promise<void> => {
     StdinDataState.isGithubActions(),
     StdinDataState.isBuffering(),
     StdinDataState.isWindows(),
+    StdinDataState.isWatchMode(),
   )
   await Stdout.write(fullMessage)
 }
