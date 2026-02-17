@@ -8,7 +8,8 @@ export const main = async (): Promise<void> => {
     const majorVersion = Number.parseInt(nodeVersion.split('.')[0] || '0', 10)
     if (majorVersion < 24) {
       console.error('Error: Node.js 24 or later is required')
-      process.exit(1)
+      process.exitCode = 1
+      return
     }
   }
   const relevantArgv: string[] = argv.slice(2)
