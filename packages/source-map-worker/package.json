@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.5.1",
-    "@lvce-editor/rpc": "^5.5.0",
+    "@lvce-editor/rpc": "^6.1.0",
     "@lvce-editor/verror": "^1.7.0",
     "source-map": "^0.7.6"
   }
