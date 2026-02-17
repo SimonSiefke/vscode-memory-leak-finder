@@ -50,4 +50,5 @@ export interface RunTestsWithCallbackOptions extends RunTestsOptions {
   readonly addDisposable: (fn: () => Promise<void>) => void
   readonly callback: (...param: readonly any[]) => Promise<void>
   readonly clearDisposables: () => Promise<void>
+  readonly getTimeStamp: () => number
 }

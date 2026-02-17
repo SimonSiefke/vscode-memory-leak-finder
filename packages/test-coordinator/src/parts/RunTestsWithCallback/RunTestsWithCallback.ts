@@ -35,6 +35,7 @@ const disposeWorkers = async (workers) => {
 export const runTestsWithCallback = async ({
   arch,
   callback,
+  getTimeStamp,
   checkLeaks,
   clearExtensions,
   color,
@@ -231,12 +232,12 @@ export const runTestsWithCallback = async ({
       runs,
     }
 
-    const intializeEnd = performance.now()
+    const intializeEnd = getTimeStamp()
     const intializeTime = intializeEnd - initialStart
 
     await callback(TestWorkerEventType.HandleInitialized, intializeTime)
 
-    const testStart = performance.now()
+    const testStart = getTimeStamp()
     await callback(TestWorkerEventType.TestsStarting, total)
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
