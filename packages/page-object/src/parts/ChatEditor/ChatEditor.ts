@@ -69,12 +69,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 109) {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions2)
-        } else
-          if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
-            await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
-          } else {
-            await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
-          }
+        } else if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
+          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
+        } else {
+          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
+        }
         await page.waitForIdle()
 
         const requestOne = page.locator('.monaco-list-row.request').first()
@@ -320,9 +319,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
         }
         if (!found) {
-          const availableModels = seenLabels.length > 0
-            ? `Available models: ${seenLabels.join(', ')}`
-            : 'No models found in the picker'
+          const availableModels = seenLabels.length > 0 ? `Available models: ${seenLabels.join(', ')}` : 'No models found in the picker'
           throw new Error(`Could not find model "${modelName}" in the model picker. ${availableModels}`)
         }
         await page.waitForIdle()
@@ -499,8 +496,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 await expect(retryButton).toBeVisible({ timeout: 20_000 })
                 await page.waitForIdle()
               }
-            }
-            else {
+            } else {
               const block = element.locator('.chat-terminal-command-block')
               await expect(block).toBeVisible({
                 timeout: 2000,
@@ -510,7 +506,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             }
           }
         }
-
 
         if (expectedResponse) {
           const requestMessage = last
