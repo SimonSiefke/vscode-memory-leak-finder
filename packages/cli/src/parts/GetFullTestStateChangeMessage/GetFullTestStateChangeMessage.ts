@@ -13,6 +13,8 @@ export const getFullMessage = async (
   if (isWatchMode && !isGithubActions) {
     const clearMessage = await GetTestClearMessage.getTestClearMessage()
     fullMessage += clearMessage
+  } else if (!isGithubActions) {
+    fullMessage += '\r\u001B[K'
   }
   fullMessage += message
   if (isWatchMode && !isGithubActions && !isBuffering) {
