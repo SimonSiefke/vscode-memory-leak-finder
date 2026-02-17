@@ -20,7 +20,6 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
       await Stdout.write(`\nBisect didn't find a matching commit introducing the regression.\n`)
       process.exit(1)
     }
-    return
   }
   const {
     arch,
