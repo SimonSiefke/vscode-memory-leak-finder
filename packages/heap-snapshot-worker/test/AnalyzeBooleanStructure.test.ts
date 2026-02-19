@@ -35,7 +35,7 @@ const analyzeBooleanStructure = (snapshot: any, sourceNodeId: number, propertyNa
   const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
   // Find all edges related to the property (both direct property and internal edges)
-  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
+  const propertyNameIndex = strings.findIndex((str: string) => str === propertyName)
   const relatedEdges: any[] = []
 
   // Get edge type names

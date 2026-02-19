@@ -11,7 +11,7 @@ export interface CompareResult {
   readonly originalSource?: string | null
   readonly originalUrl?: string | null
   readonly scriptId: number
-  readonly sourceLocation?: string
-  readonly sourceMapUrl?: string
-  readonly url?: string
+  sourceLocation?: string
+  sourceMapUrl?: string
+  url?: string
 }

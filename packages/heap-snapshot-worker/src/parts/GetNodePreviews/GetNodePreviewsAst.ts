@@ -1,4 +1,4 @@
-import type { ArrayNode, AstNode, ObjectNode, PropertyEntry } from '../AstNode/AstNode.ts'
+import type { ArrayNode, AstNode, CodeNode, ObjectNode, PropertyEntry, UnknownNode } from '../AstNode/AstNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
@@ -38,7 +38,7 @@ export const buildAstForNode = (
   if (!node) return null
   const nodeTypeName = getNodeTypeName(node, nodeTypes) || 'unknown'
   const name = getNodeName(node, strings)
-  const { id } = node
+  const id = node.id as number
 
   if (visited.has(id)) {
     return createUnknown(id, name, `[Circular ${id}]`)
@@ -166,7 +166,26 @@ export const buildAstForNode = (
         }
       }
     }
-    return { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: nodeTypeName as any }
+    if (nodeTypeName === 'code') {
+      const codeNode: CodeNode = {
+        id,
+        name,
+        type: 'code',
+        ...(columnValue !== undefined && { column: columnValue }),
+        ...(lineValue !== undefined && { line: lineValue }),
+        ...(scriptIdValue !== undefined && { scriptId: scriptIdValue }),
+      }
+      return codeNode
+    }
+    const closureNode: CodeNode = {
+      id,
+      name,
+      type: 'closure',
+      ...(columnValue !== undefined && { column: columnValue }),
+      ...(lineValue !== undefined && { line: lineValue }),
+      ...(scriptIdValue !== undefined && { scriptId: scriptIdValue }),
+    }
+    return closureNode
   }
 
   return createUnknown(id, name, `[${nodeTypeName} ${id}]`)
