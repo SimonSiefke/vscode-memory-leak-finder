@@ -2,34 +2,33 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const rejectaftertimeout = () => {
-  const { promise, reject } = Promise.withResolvers<never>()
-  setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000)
-  return promise
-}
-
 // @ts-ignore
 export const create = ({ expect, page, platform, VError, electronApp, ideVersion, browserRpc, sessionRpc }: CreateParams) => {
   return {
-    async waitForNewWindow() {
+    async waitForNewWindow({ timeout }: { timeout: number }) {
       const { promise, resolve } = Promise.withResolvers<string>()
-      let targetCaptured = false
-
-      // TODO cleanup listener
 
       if (!browserRpc) {
         throw new Error(`browser rpc is required`)
       }
 
+      const cleanup = (value: string) => {
+        browserRpc.off('Target.attachedToTarget', handleNewTarget)
+        clearTimeout(timeoutRef)
+        resolve(value)
+      }
+
+      const handleTimeout = () => {
+        cleanup('')
+      }
+
       const handleNewTarget = (message: any): void => {
-        if (targetCaptured) {
-          return
-        }
-        targetCaptured = true
+        console.log('attached to target', message)
         const sessionId = message.params.sessionId as string
-        resolve(sessionId)
+        cleanup(sessionId)
       }
       browserRpc.on('Target.attachedToTarget', handleNewTarget)
+      const timeoutRef = setTimeout(handleTimeout, timeout)
 
       const sessionId = await promise
 
@@ -37,7 +36,7 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
     },
     async show() {
       try {
-        const newWindowPromise = this.waitForNewWindow()
+        const newWindowPromise = this.waitForNewWindow({ timeout: 10_000 })
         const quickPick = QuickPick.create({
           electronApp,
           expect,
@@ -50,27 +49,27 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
           pressKeyOnce: true,
           stayVisible: false,
         })
-        const sessionId = await Promise.race([newWindowPromise, rejectaftertimeout()])
-
-        await sessionRpc.invoke('Runtime.runIfWaitingForDebugger')
-
-        await execPromise
+        const sessionId = await newWindowPromise
 
         if (!sessionId) {
           throw new Error(`Failed to wait for window`)
         }
 
-        const newWindowPage = await electronApp.waitForPage({
+        const newWindowPagePromise = electronApp.waitForPage({
           injectUtilityScript: true,
           sessionId,
         })
+        const newWindowPage = await newWindowPagePromise
+        // await sessionRpc.invoke('Runtime.runIfWaitingForDebugger')
+
+        await execPromise
 
         return {
           async close() {
             try {
-              // await new Promise((r) => {
-              //   setTimeout(r, 2000)
-              // })
+              await new Promise((r) => {
+                setTimeout(r, 2000)
+              })
               // Wait for the window to be fully idle before attempting to close
               await newWindowPage.waitForIdle()
               const quickPick = QuickPick.create({
@@ -83,7 +82,10 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
               })
               await quickPick.executeCommand(WellKnownCommands.CloseWindow, {
                 pressKeyOnce: true,
-                stayVisible: false,
+                stayVisible: 'dont-care',
+              })
+              await new Promise((r) => {
+                setTimeout(r, 2000)
               })
               // TODO wait for window to be closed
             } catch (error) {

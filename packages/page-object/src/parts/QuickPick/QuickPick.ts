@@ -11,7 +11,10 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to close quick pick`)
       }
     },
-    async executeCommand(command: string, { pressKeyOnce = false, stayVisible = false } = {}) {
+    async executeCommand(
+      command: string,
+      { pressKeyOnce = false, stayVisible = false }: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' } = {},
+    ) {
       try {
         await page.waitForIdle()
         await this.showCommands({ pressKeyOnce })
@@ -131,7 +134,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to press Enter`)
       }
     },
-    async select(text: string | RegExp, stayVisible = false) {
+    async select(text: string | RegExp, stayVisible: boolean | 'dont-care' = false) {
       try {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
