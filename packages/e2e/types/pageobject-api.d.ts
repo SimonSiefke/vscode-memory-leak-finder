@@ -615,6 +615,7 @@ export interface Workspace {
 
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
+  readonly ProcessExplorer: any
   readonly ChatEditor: ChatEditor
   readonly Colors: any
   readonly ContextMenu: ContextMenu
