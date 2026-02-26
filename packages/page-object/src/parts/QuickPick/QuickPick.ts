@@ -143,6 +143,8 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           const option = quickPick.locator('.label-name', {
             hasExactText: text,
           })
+          await expect(option).toBeVisible()
+          await page.waitForIdle()
           await option.click()
         } else {
           const normal = `${text}`.slice(1, -1)

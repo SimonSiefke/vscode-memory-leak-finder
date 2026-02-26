@@ -45,33 +45,32 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
           platform,
           VError,
         })
-        const execPromise = quickPick.executeCommand(WellKnownCommands.OpenProcessExplorer, {
-          pressKeyOnce: true,
-          stayVisible: false,
-        })
+        await quickPick.showCommands({ pressKeyOnce: true })
+        await quickPick.type(WellKnownCommands.OpenProcessExplorer)
+        const selectPromise = quickPick.select(WellKnownCommands.OpenProcessExplorer, 'dont-care')
         const sessionId = await newWindowPromise
 
         if (!sessionId) {
           throw new Error(`Failed to wait for window`)
         }
 
-        const newWindowPagePromise = electronApp.waitForPage({
+        const newWindowPage = await electronApp.waitForPage({
           injectUtilityScript: true,
           sessionId,
         })
-        const newWindowPage = await newWindowPagePromise
 
-        await sessionRpc.invoke('Runtime.runIfWaitingForDebugger')
-        // await execPromise
+        // TODO need to wait for debugger to be paused?
+        await page.waitForIdle()
+        await newWindowPage.waitForIdle()
+
+        await selectPromise
 
         return {
           async close() {
             try {
-              await new Promise((r) => {
-                setTimeout(r, 2000)
-              })
               // Wait for the window to be fully idle before attempting to close
               await newWindowPage.waitForIdle()
+              await page.waitForIdle()
               const quickPick = QuickPick.create({
                 electronApp,
                 expect,
@@ -80,13 +79,17 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
                 platform,
                 VError,
               })
-              await quickPick.executeCommand(WellKnownCommands.CloseWindow, {
-                pressKeyOnce: true,
-                stayVisible: 'dont-care',
-              })
-              await new Promise((r) => {
-                setTimeout(r, 2000)
-              })
+              // TODO this tries to avoid race condtion, but is ugly
+              for (let i = 0; i < 2; i++) {
+                await quickPick.show()
+                await quickPick.hide()
+              }
+              await quickPick.showCommands({ pressKeyOnce: true })
+              await quickPick.type(WellKnownCommands.CloseWindow)
+              await page.waitForIdle()
+              await newWindowPage.waitForIdle()
+              await quickPick.pressEnter()
+              await page.waitForIdle()
               // TODO wait for window to be closed
             } catch (error) {
               throw new VError(error, `Failed to hide process explorer`)
