@@ -61,13 +61,16 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
         }
 
         const newWindowPage = await electronApp.waitForPage({
-          injectUtilityScript: false,
+          injectUtilityScript: true,
           sessionId,
         })
 
         return {
           async close() {
             try {
+              // await new Promise((r) => {
+              //   setTimeout(r, 2000)
+              // })
               // Wait for the window to be fully idle before attempting to close
               await newWindowPage.waitForIdle()
               const quickPick = QuickPick.create({
@@ -78,7 +81,11 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
                 platform,
                 VError,
               })
-              await quickPick.executeCommand(WellKnownCommands.HideProcessExplorer)
+              await quickPick.executeCommand(WellKnownCommands.CloseWindow, {
+                pressKeyOnce: true,
+                stayVisible: false,
+              })
+              // TODO wait for window to be closed
             } catch (error) {
               throw new VError(error, `Failed to hide process explorer`)
             }
