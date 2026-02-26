@@ -23,7 +23,6 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
       }
 
       const handleNewTarget = (message: any): void => {
-        console.log('attached to target', message)
         const sessionId = message.params.sessionId as string
         cleanup(sessionId)
       }
@@ -80,10 +79,10 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
                 VError,
               })
               // TODO this tries to avoid race condtion, but is ugly
-              for (let i = 0; i < 2; i++) {
-                await quickPick.show()
-                await quickPick.hide()
-              }
+              // for (let i = 0; i < 2; i++) {
+              //   await quickPick.show()
+              //   await quickPick.hide()
+              // }
               await quickPick.showCommands({ pressKeyOnce: true })
               await quickPick.type(WellKnownCommands.CloseWindow)
               await page.waitForIdle()
