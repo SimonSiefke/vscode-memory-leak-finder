@@ -2,11 +2,42 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
+const rejectaftertimeout = () => {
+  const { promise, reject } = Promise.withResolvers<never>()
+  setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000)
+  return promise
+}
+
+// @ts-ignore
+export const create = ({ expect, page, platform, VError, electronApp, ideVersion, browserRpc, sessionRpc }: CreateParams) => {
   return {
-    async toggle() {
+    async waitForNewWindow() {
+      const { promise, resolve } = Promise.withResolvers<string>()
+      let targetCaptured = false
+
+      // TODO cleanup listener
+
+      if (!browserRpc) {
+        throw new Error(`browser rpc is required`)
+      }
+
+      const handleNewTarget = (message: any): void => {
+        if (targetCaptured) {
+          return
+        }
+        targetCaptured = true
+        const sessionId = message.params.sessionId as string
+        resolve(sessionId)
+      }
+      browserRpc.on('Target.attachedToTarget', handleNewTarget)
+
+      const sessionId = await promise
+
+      return sessionId
+    },
+    async show() {
       try {
-        await page.waitForIdle()
+        const newWindowPromise = this.waitForNewWindow()
         const quickPick = QuickPick.create({
           electronApp,
           expect,
@@ -15,25 +46,55 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
           platform,
           VError,
         })
-        await quickPick.executeCommand(WellKnownCommands.ToggleProcessExplorer)
-        // TODO verify window is visible and shows process explorer results
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to toggle process explorer`)
-      }
-    },
-    async show() {
-      try {
-        await this.toggle()
+        const execPromise = quickPick.executeCommand(WellKnownCommands.OpenProcessExplorer, {
+          pressKeyOnce: true,
+          stayVisible: false,
+        })
+        const sessionId = await Promise.race([newWindowPromise, rejectaftertimeout()])
+
+        await sessionRpc.invoke('Runtime.runIfWaitingForDebugger')
+
+        await execPromise
+
+        if (!sessionId) {
+          throw new Error(`Failed to wait for window`)
+        }
+
+        const newWindowPage = await electronApp.waitForPage({
+          injectUtilityScript: false,
+          sessionId,
+        })
+
+        return {
+          async close() {
+            try {
+              // Wait for the window to be fully idle before attempting to close
+              await newWindowPage.waitForIdle()
+              const quickPick = QuickPick.create({
+                electronApp,
+                expect,
+                ideVersion,
+                page: newWindowPage,
+                platform,
+                VError,
+              })
+              await quickPick.executeCommand(WellKnownCommands.HideProcessExplorer)
+            } catch (error) {
+              throw new VError(error, `Failed to hide process explorer`)
+            }
+          },
+          locator: (selector: string) => newWindowPage.locator(selector),
+          sessionRpc: newWindowPage.sessionRpc,
+          waitForIdle: () => newWindowPage.waitForIdle(),
+          async shouldBeVisible() {
+            await newWindowPage.waitForIdle()
+            const processExplorer = newWindowPage.locator('#process-explorer')
+            await expect(processExplorer).toBeVisible({ timeout: 10_000 })
+            await newWindowPage.waitForIdle()
+          },
+        }
       } catch (error) {
         throw new VError(error, `Failed to show process explorer`)
-      }
-    },
-    async hide() {
-      try {
-        await this.toggle()
-      } catch (error) {
-        throw new VError(error, `Failed to hide process explorer`)
       }
     },
   }
