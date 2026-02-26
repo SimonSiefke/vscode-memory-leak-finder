@@ -60,9 +60,9 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
           sessionId,
         })
         const newWindowPage = await newWindowPagePromise
-        // await sessionRpc.invoke('Runtime.runIfWaitingForDebugger')
 
-        await execPromise
+        await sessionRpc.invoke('Runtime.runIfWaitingForDebugger')
+        // await execPromise
 
         return {
           async close() {
