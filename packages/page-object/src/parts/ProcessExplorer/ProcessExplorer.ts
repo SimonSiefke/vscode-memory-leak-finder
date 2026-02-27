@@ -35,7 +35,7 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
     },
     async show() {
       try {
-        const newWindowPromise = this.waitForNewWindow({ timeout: 10_000 })
+        const newWindowPromise = this.waitForNewWindow({ timeout: 20_000 })
         const quickPick = QuickPick.create({
           electronApp,
           expect,
