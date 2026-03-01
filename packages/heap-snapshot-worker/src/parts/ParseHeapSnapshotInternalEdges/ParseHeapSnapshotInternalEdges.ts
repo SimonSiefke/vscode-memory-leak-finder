@@ -1,7 +1,13 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as ParseHeapSnapshotInternalObjects from '../ParseHeapSnapshotInternalObjects/ParseHeapSnapshotInternalObjects.ts'
 
-export const parseHeapSnapshotInternalEdges = (edges, edgeFields, edgeTypes, nodeFieldCount, strings) => {
+export const parseHeapSnapshotInternalEdges = (
+  edges: Uint32Array,
+  edgeFields: readonly string[],
+  edgeTypes: readonly string[],
+  nodeFieldCount: number,
+  strings: readonly string[],
+) => {
   // Assert.array(edges)
   Assert.array(edgeFields)
   Assert.array(edgeTypes)

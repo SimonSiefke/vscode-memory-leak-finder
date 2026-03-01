@@ -171,23 +171,38 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
   return sorted
 }
 
-const compareItem = (a, b) => {
+interface CountItem {
+  readonly count: number
+}
+
+const compareItem = (a: CountItem, b: CountItem): number => {
   return b.count - a.count
 }
 
-const sortByCounts = (items: readonly any[]) => {
+const sortByCounts = <T extends CountItem>(items: readonly T[]): readonly T[] => {
   Assert.array(items)
   const sorted = items.toSorted(compareItem)
   return sorted
 }
 
-const compareCounts = (before, after) => {
-  const beforeMap = Object.create(null)
+interface ArrayCountItem extends CountItem {
+  readonly name: string
+}
+
+interface LeakedArrayItem extends ArrayCountItem {
+  readonly delta: number
+}
+
+const compareCounts = (
+  before: readonly ArrayCountItem[],
+  after: readonly ArrayCountItem[],
+): readonly LeakedArrayItem[] => {
+  const beforeMap: Record<string, number> = Object.create(null)
   for (const item of before) {
     beforeMap[item.name] ||= 0
     beforeMap[item.name] += item.count
   }
-  const leaked: any[] = []
+  const leaked: LeakedArrayItem[] = []
   for (const item of after) {
     const oldCount = beforeMap[item.name] || 0
     const afterCount = item.count

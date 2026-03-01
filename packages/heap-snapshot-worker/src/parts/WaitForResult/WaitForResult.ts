@@ -6,6 +6,11 @@ interface WorkerMessage {
   readonly result?: unknown
 }
 
+interface WorkerMessage {
+  readonly error?: string
+  readonly result?: unknown
+}
+
 /**
  * Waits for a result from the worker, either a message or exit event
  * @param {Worker} worker - The worker to wait for

@@ -1,5 +1,9 @@
 import * as IgnoredConstructorScopeEdges from '../IgnoredConstructorScopeEdges/IgnoredConstructorScopeEdges.ts'
 
-export const isIgnoredConstructorScopeEdge = (edge) => {
+interface EdgeWithName {
+  readonly name: string
+}
+
+export const isIgnoredConstructorScopeEdge = (edge: EdgeWithName): boolean => {
   return IgnoredConstructorScopeEdges.ignoredConstructorScopeEdges.includes(edge.name)
 }
