@@ -90,7 +90,7 @@ export const getLargestArraysFromHeapSnapshot = async (id: number): Promise<Arra
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const minLength = 1
-  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot!)
   const arrayNodes = parsedNodes.filter(isArray)
   const arraysWithLength = getArraysWithCount(parsedNodes, graph, arrayNodes)
   const filtered = filterByMinLength(arraysWithLength, minLength)
