@@ -136,10 +136,10 @@ test('should handle arrays without trace_node_id', () => {
     0, // Array with trace_node_id = 0 (no location)
   ]
 
-  const edges = []
+  const edges: any[] = []
   const parsedNodes = [{ type: 'object', name: 'Array', id: 1, selfSize: 100, edgeCount: 0, traceNodeId: 0, detachedness: 0 }]
 
-  const locations = []
+  const locations: any[] = []
   const scriptMap = {}
 
   const locationFields = ['object_index', 'script_id', 'line', 'column']

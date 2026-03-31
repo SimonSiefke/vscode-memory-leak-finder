@@ -10,7 +10,7 @@ export interface ScriptInfo {
   readonly url?: string
 }
 
-const isRelativeSourceMap = (sourceMapUrl) => {
+const isRelativeSourceMap = (sourceMapUrl: string) => {
   if (sourceMapUrl.startsWith('file://')) {
     return false
   }
@@ -41,7 +41,7 @@ const getSourceMapUrl = (script: ScriptInfo): string => {
   return sourceMapUrl
 }
 
-export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly any[]> => {
+export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly CompareResult[]> => {
   let scriptMap: Record<number, ScriptInfo> | undefined
   // Always attempt to load script maps from disk
   try {
@@ -84,7 +84,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
   const positionPointers: { index: number; sourceMapUrl: string }[] = []
 
   for (let i = 0; i < enriched.length; i++) {
-    const item = enriched[i] as any
+    const item = enriched[i]
     const script = scriptMap[item.scriptId]
     if (script) {
       item.url = script.url
