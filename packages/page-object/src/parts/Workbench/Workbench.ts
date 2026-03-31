@@ -2,6 +2,8 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
   readonly sessionRpc?: any
@@ -133,10 +135,11 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
       const workbench = page.locator('.monaco-workbench')
       await expect(workbench).toBeVisible()
     },
-    async shouldHaveEditorBackground(color: string) {
+    async shouldHaveEditorBackground(color: string | readonly string[]) {
       try {
         const workbench = page.locator('.monaco-workbench')
-        await expect(workbench).toHaveCss('--vscode-editor-background', color, {
+        const expectedColor = Array.isArray(color) ? new RegExp(`^(${color.map(escapeRegExp).join('|')})$`) : color
+        await expect(workbench).toHaveCss('--vscode-editor-background', expectedColor, {
           timeout: 1000,
         })
       } catch (error) {
