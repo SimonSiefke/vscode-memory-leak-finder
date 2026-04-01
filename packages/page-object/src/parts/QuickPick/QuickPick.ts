@@ -2,6 +2,18 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+const showQuickPickWithFallback = async ({ page, quickPick, key }: { page: any; quickPick: any; key: string }) => {
+  await page.keyboard.press(key)
+  const isVisible = await quickPick.isVisible()
+  if (isVisible) {
+    return
+  }
+  await page.pressKeyExponential({
+    key,
+    waitFor: quickPick,
+  })
+}
+
 export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
     async close() {
@@ -167,16 +179,18 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       try {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
-        // TODO there might be a conflict here when pressing the keyboard shortcut
-        // too often, the quickpick opens, making the next statement pass
-        // but then the keyboard shortcut is still processing, making the quickpick close again
-        if (pressKeyOnce) {
-          await page.keyboard.press(key)
-        } else {
-          await page.pressKeyExponential({
-            key: key,
-            waitFor: quickPick,
-          })
+        const isVisible = await quickPick.isVisible()
+        if (!isVisible) {
+          // Repeatedly pressing the command-palette shortcut can toggle it closed again.
+          if (pressKeyOnce) {
+            await page.keyboard.press(key)
+          } else {
+            await showQuickPickWithFallback({
+              key,
+              page,
+              quickPick,
+            })
+          }
         }
         await expect(quickPick).toBeVisible({
           timeout: 10_000,
