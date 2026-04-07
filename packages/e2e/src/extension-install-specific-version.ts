@@ -7,13 +7,13 @@ export const requiresNetwork = true
 export const setup = async ({ Editor, Extensions }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
-  await Extensions.search('prettier')
+  await Extensions.search('esbenp.prettier-vscode')
   await Extensions.first.shouldBe('Prettier - Code formatter')
 }
 
 export const run = async ({ ContextMenu, Extensions, QuickPick }: TestContext): Promise<void> => {
   await Extensions.first.openContextMenu()
-  await ContextMenu.select('Install Specific Version')
+  await ContextMenu.select('Install Specific Version...')
 
   const quickPickItems = await QuickPick.getVisibleCommands()
   if (quickPickItems.length < 2) {
