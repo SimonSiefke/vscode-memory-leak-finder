@@ -2,16 +2,48 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const showQuickPickWithFallback = async ({ page, quickPick, key }: { page: any; quickPick: any; key: string }) => {
+const tryShowQuickPick = async ({ page, quickPick, key, repeatKey }: { page: any; quickPick: any; key: string; repeatKey: boolean }) => {
   await page.keyboard.press(key)
   const isVisible = await quickPick.isVisible()
-  if (isVisible) {
-    return
+  if (isVisible || !repeatKey) {
+    return isVisible
   }
-  await page.pressKeyExponential({
-    key,
-    waitFor: quickPick,
-  })
+  try {
+    await page.pressKeyExponential({
+      key,
+      waitFor: quickPick,
+    })
+    return true
+  } catch {
+    return false
+  }
+}
+
+const showQuickPickWithFallback = async ({
+  fallbackKey,
+  page,
+  pressKeyOnce,
+  quickPick,
+  key,
+}: {
+  fallbackKey: string | undefined
+  page: any
+  pressKeyOnce: boolean
+  quickPick: any
+  key: string
+}) => {
+  const keys = fallbackKey ? [key, fallbackKey] : [key]
+  for (const currentKey of keys) {
+    const isVisible = await tryShowQuickPick({
+      key: currentKey,
+      page,
+      quickPick,
+      repeatKey: !pressKeyOnce,
+    })
+    if (isVisible) {
+      return
+    }
+  }
 }
 
 export const create = ({ expect, page, platform, VError }: CreateParams) => {
@@ -175,22 +207,23 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to select "${text}"`)
       }
     },
-    async show({ key = KeyBindings.getOpenQuickPickFiles(platform), pressKeyOnce = false } = {}) {
+    async show({
+      key = KeyBindings.getOpenQuickPickFiles(platform),
+      fallbackKey,
+      pressKeyOnce = false,
+    }: { key?: string; fallbackKey?: string; pressKeyOnce?: boolean } = {}) {
       try {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         const isVisible = await quickPick.isVisible()
         if (!isVisible) {
-          // Repeatedly pressing the command-palette shortcut can toggle it closed again.
-          if (pressKeyOnce) {
-            await page.keyboard.press(key)
-          } else {
-            await showQuickPickWithFallback({
-              key,
-              page,
-              quickPick,
-            })
-          }
+          await showQuickPickWithFallback({
+            fallbackKey,
+            key,
+            page,
+            pressKeyOnce,
+            quickPick,
+          })
         }
         await expect(quickPick).toBeVisible({
           timeout: 10_000,
@@ -223,7 +256,11 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async showCommands({ pressKeyOnce = false } = {}) {
       try {
-        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform || ''), pressKeyOnce })
+        return this.show({
+          fallbackKey: KeyBindings.F1,
+          key: KeyBindings.getOpenQuickPickCommands(platform || ''),
+          pressKeyOnce,
+        })
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }
