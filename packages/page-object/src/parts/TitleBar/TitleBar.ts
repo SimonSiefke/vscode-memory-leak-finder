@@ -7,7 +7,6 @@ const TitleBarMenuItems = {
   View: 'View',
 }
 
-import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams) => {
@@ -62,12 +61,24 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         if (labels.length === 0) {
           throw new Error('menu path must not be empty')
         }
-        const contextMenu = ContextMenu.create({ expect, page, VError } as CreateParams)
         await this.showMenu(menu)
+        let menuContainer = page.locator('.monaco-menu .actions-container').first()
+        await expect(menuContainer).toBeVisible()
+        await expect(menuContainer).toBeFocused()
         for (const label of labels.slice(0, -1)) {
-          await contextMenu.openSubMenu(label, false)
+          const menuItem = menuContainer.locator(`.action-item .action-label[aria-label="${label}"]`)
+          await expect(menuItem).toBeVisible()
+          await menuItem.click()
+          const subMenu = page.locator('.monaco-submenu').first()
+          await expect(subMenu).toBeVisible()
+          menuContainer = subMenu.locator('.actions-container')
+          await expect(menuContainer).toBeVisible()
         }
-        await contextMenu.select(labels[labels.length - 1], false)
+        const finalItem = menuContainer.locator('.action-item', {
+          hasText: labels[labels.length - 1],
+        })
+        await expect(finalItem).toBeVisible()
+        await finalItem.click()
       } catch (error) {
         throw new VError(error, `Failed to select title bar menu item`)
       }
