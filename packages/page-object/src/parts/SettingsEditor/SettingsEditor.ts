@@ -1,7 +1,7 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as TitleBar from '../TitleBar/TitleBar.ts'
 
 export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
   return {
@@ -238,15 +238,8 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
+        const titleBar = TitleBar.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await titleBar.selectFileMenuItem(['Preferences', 'Settings'])
         await page.waitForIdle()
         const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
         await expect(settingsSwitcher).toBeVisible()

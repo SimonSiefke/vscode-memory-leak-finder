@@ -142,16 +142,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async focus() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.FocusExplorer)
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const explorerActivityBarItem = activityBar.locator('.action-item:has(.action-label[aria-label^="Explorer"])')
+        await expect(explorerActivityBarItem).toBeVisible()
+        const expanded = await explorerActivityBarItem.getAttribute('aria-expanded')
+        if (expanded === 'false') {
+          await explorerActivityBarItem.click()
+        }
         const explorer = page.locator('.explorer-folders-view .monaco-list')
+        await explorer.click()
         await expect(explorer).toBeFocused()
         await page.waitForIdle()
       } catch (error) {

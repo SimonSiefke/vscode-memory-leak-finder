@@ -7,6 +7,7 @@ const TitleBarMenuItems = {
   View: 'View',
 }
 
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams) => {
@@ -52,6 +53,30 @@ export const create = ({ expect, page, VError }: CreateParams) => {
     },
     async showMenuFile() {
       return this.showMenu(TitleBarMenuItems.File)
+    },
+    async showMenuView() {
+      return this.showMenu(TitleBarMenuItems.View)
+    },
+    async selectMenuItem(menu: string, labels: readonly string[]) {
+      try {
+        if (labels.length === 0) {
+          throw new Error('menu path must not be empty')
+        }
+        const contextMenu = ContextMenu.create({ expect, page, VError } as CreateParams)
+        await this.showMenu(menu)
+        for (const label of labels.slice(0, -1)) {
+          await contextMenu.openSubMenu(label, false)
+        }
+        await contextMenu.select(labels[labels.length - 1], false)
+      } catch (error) {
+        throw new VError(error, `Failed to select title bar menu item`)
+      }
+    },
+    async selectFileMenuItem(labels: readonly string[]) {
+      return this.selectMenuItem(TitleBarMenuItems.File, labels)
+    },
+    async selectViewMenuItem(labels: readonly string[]) {
+      return this.selectMenuItem(TitleBarMenuItems.View, labels)
     },
   }
 }

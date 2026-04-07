@@ -1,5 +1,6 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as TitleBar from '../TitleBar/TitleBar.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
@@ -75,29 +76,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async toggle() {
       try {
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
+        const titleBar = TitleBar.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await titleBar.selectViewMenuItem(['Appearance', 'Primary Side Bar'])
       } catch (error) {
         throw new VError(error, `Failed to toggle side bar`)
       }
     },
     async togglePosition() {
-      const quickPick = QuickPick.create({
-        electronApp,
-        expect,
-        ideVersion,
-        page,
-        platform,
-        VError,
-      })
-      await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarPosition)
+      const sideBar = page.locator('.part.sidebar')
+      const className = await sideBar.getAttribute('class')
+      const targetLabel = className.includes('left') ? 'Move Primary Side Bar Right' : 'Move Primary Side Bar Left'
+      const titleBar = TitleBar.create({ electronApp, expect, ideVersion, page, platform, VError })
+      await titleBar.selectViewMenuItem(['Appearance', targetLabel])
     },
   }
 }
