@@ -44,20 +44,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async moveLeft() {
       try {
+        await page.waitForIdle()
         const sideBar = page.locator('.part.sidebar')
         await expect(sideBar).toHaveClass('right')
         await this.togglePosition()
         await expect(sideBar).toHaveClass('left')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to move side bar left`)
       }
     },
     async moveRight() {
       try {
+        await page.waitForIdle()
         const sideBar = page.locator('.part.sidebar')
         await expect(sideBar).toHaveClass('left')
         await this.togglePosition()
         await expect(sideBar).toHaveClass('right')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to move side bar right`)
       }
