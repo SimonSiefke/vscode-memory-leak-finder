@@ -136,50 +136,75 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify tab title ${title}`)
       }
     },
+    async showLegacy({ port }: { port: number }) {
+      const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+
+      await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
+        pressKeyOnce: true,
+        stayVisible: true,
+      })
+      await page.waitForIdle()
+      const message = page.locator('#quickInput_message')
+      await expect(message).toBeVisible()
+      await page.waitForIdle()
+      await expect(message).toHaveText(`Enter url to visit (Press 'Enter' to confirm or 'Escape' to cancel)`)
+      await page.waitForIdle()
+      await quickPick.type(`http://localhost:${port}`)
+      await page.waitForIdle()
+      await quickPick.pressEnter()
+      await page.waitForIdle()
+
+      const tab = page.locator('.tab', { hasText: `Simple Browser` })
+      await expect(tab).toBeVisible()
+      await page.waitForIdle()
+      await expect(tab).toHaveCount(1)
+      await page.waitForIdle()
+
+      const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
+      const subFrame = await webView.shouldBeVisible2({
+        extensionId: 'vscode.simple-browser',
+        hasLineOfCodeCounter: false,
+      })
+      await subFrame.waitForIdle()
+      await page.waitForIdle()
+      const nav = subFrame.locator('nav.controls')
+      await expect(nav).toBeVisible()
+      await subFrame.waitForIdle()
+      const urlInput = subFrame.locator('.url-input')
+      await expect(urlInput).toBeVisible()
+      await subFrame.waitForIdle()
+      const subIframe = subFrame.locator('.content iframe')
+      await expect(subIframe).toBeVisible()
+      await page.waitForIdle()
+    },
+    async showModern({ port }: { port: number }) {
+      const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+
+      await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
+        pressKeyOnce: true,
+      })
+      await page.waitForIdle()
+      await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
+        pressKeyOnce: true,
+      })
+      await page.waitForIdle()
+      const urlInput = page.locator('.browser-url-input')
+      await expect(urlInput).toBeVisible()
+      await page.waitForIdle()
+      await urlInput.type(`http://localhost:${port}`)
+      await page.waitForIdle()
+      await urlInput.press('Enter')
+      await page.waitForIdle()
+
+      // TODO verify content is visible
+    },
     async show({ port }: { port: number }) {
       try {
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
-          pressKeyOnce: true,
-          stayVisible: true,
-        })
-        await page.waitForIdle()
-        const message = page.locator('#quickInput_message')
-        await expect(message).toBeVisible()
-        await page.waitForIdle()
-        await expect(message).toHaveText(`Enter url to visit (Press 'Enter' to confirm or 'Escape' to cancel)`)
-        await page.waitForIdle()
-        await quickPick.type(`http://localhost:${port}`)
-        await page.waitForIdle()
-        await quickPick.pressEnter()
-        await page.waitForIdle()
-
-        const tab = page.locator('.tab', { hasText: `Simple Browser` })
-        await expect(tab).toBeVisible()
-        await page.waitForIdle()
-        await expect(tab).toHaveCount(1)
-        await page.waitForIdle()
-
-        const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
-        const subFrame = await webView.shouldBeVisible2({
-          extensionId: 'vscode.simple-browser',
-          hasLineOfCodeCounter: false,
-        })
-        await subFrame.waitForIdle()
-        await page.waitForIdle()
-        const nav = subFrame.locator('nav.controls')
-        await expect(nav).toBeVisible()
-        await subFrame.waitForIdle()
-        const urlInput = subFrame.locator('.url-input')
-        await expect(urlInput).toBeVisible()
-        await subFrame.waitForIdle()
-        const subIframe = subFrame.locator('.content iframe')
-        await expect(subIframe).toBeVisible()
-        await page.waitForIdle()
-
-        // TODO check that inner iframe (x3) has expected content
-        await page.waitForIdle()
+        if (ideVersion.minor >= 113) {
+          await this.showModern({ port })
+        } else {
+          await this.showLegacy({ port })
+        }
       } catch (error) {
         throw new VError(error, `Failed to open simple browser`)
       }
