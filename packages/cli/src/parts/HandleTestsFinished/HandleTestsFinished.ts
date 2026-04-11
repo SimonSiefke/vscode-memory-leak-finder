@@ -45,6 +45,6 @@ export const handleTestsFinished = async (
     if (failed) {
       process.exitCode = ExitCode.Error
     }
-    HandleExit.handleExit()
+    await HandleExit.handleExit()
   }
 }
