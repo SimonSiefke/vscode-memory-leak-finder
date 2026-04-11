@@ -1,6 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as ImportTest from '../ImportTest/ImportTest.ts'
 import * as TestStage from '../TestStage/TestStage.ts'
+import * as WrapTestStageError from '../WrapTestStageError/WrapTestStageError.ts'
 
 // @ts-ignore
 export const setupTestWithCallback = async (pageObject, file, forceRun, isGithubActions) => {
@@ -22,7 +23,6 @@ export const setupTestWithCallback = async (pageObject, file, forceRun, isGithub
     await TestStage.setup(module, pageObject)
     return { error: null, skipped: false, wasOriginallySkipped }
   } catch (error) {
-    // If setup fails, return the error information instead of throwing
-    return { error: error, skipped: false, wasOriginallySkipped }
+    return { error: WrapTestStageError.wrapTestStageError(error, 'set up', file), skipped: false, wasOriginallySkipped }
   }
 }

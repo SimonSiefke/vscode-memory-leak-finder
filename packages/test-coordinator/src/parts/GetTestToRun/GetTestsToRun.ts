@@ -4,6 +4,7 @@ import * as FileSystem from '../FileSystem/FileSystem.ts'
 import * as FormatPaths from '../FormatPaths/FormatPaths.ts'
 import * as GetMatchingFiles from '../GetMatchingFiles/GetMatchingFiles.ts'
 import * as Path from '../Path/Path.ts'
+import * as SortTests from '../SortTests/SortTests.ts'
 import { VError } from '../VError/VError.ts'
 
 export const getTestsToRun = async (root, cwd, filterValue, continueValue) => {
@@ -17,7 +18,8 @@ export const getTestsToRun = async (root, cwd, filterValue, continueValue) => {
     }
     const testDirents = await FileSystem.readDir(testsPath)
     const matchingDirents = GetMatchingFiles.getMatchingFiles(testDirents, filterValue)
-    let formattedPaths = FormatPaths.formatPaths(cwd, testsPath, matchingDirents)
+    const sortedDirents = SortTests.sortTests(matchingDirents)
+    let formattedPaths = FormatPaths.formatPaths(cwd, testsPath, sortedDirents)
     if (continueValue) {
       formattedPaths = formattedPaths.filter((formattedPath) => {
         return formattedPath.dirent >= continueValue
