@@ -74,9 +74,13 @@ jobs:
       - run: npm run build
       - run: npm test
       - name: Run headless test
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e
+      - name: Run headless test (macOS)
+        if: matrix.os == 'macos-26'
+        run: bash scripts/run-macos-e2e-with-diagnostics.sh npm run e2e
       - name: Run headless test (check leaks)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1

@@ -58,9 +58,13 @@ jobs:
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
       - name: Run headless test
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e
+      - name: Run headless test (macOS)
+        if: matrix.os == 'macos-26'
+        run: bash scripts/run-macos-e2e-with-diagnostics.sh npm run e2e
       - name: Run headless test (flakyness check)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
@@ -83,6 +87,13 @@ jobs:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
       - name: Generate charts
         run: node packages/charts/src/main.ts
+      - uses: actions/upload-artifact@v6
+        if: always() && matrix.os == 'macos-26'
+        with:
+          name: vscode-macos-diagnostics-${{ github.job }}
+          path: ./.github-artifacts/macos-e2e
+          if-no-files-found: ignore
+          include-hidden-files: true
       - uses: actions/upload-artifact@v6
         if: always()
         with:
