@@ -1,9 +1,7 @@
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 
-export const F1 = 'F1'
-
 export const getOpenQuickPickCommands = (platform: string): string => {
-  return IsMacos.isMacos(platform) ? F1 : 'Control+Shift+P'
+  return IsMacos.isMacos(platform) ? 'Meta+Shift+P' : 'Control+Shift+P'
 }
 
 export const getOpenQuickPickFiles = (platform: string): string => {
