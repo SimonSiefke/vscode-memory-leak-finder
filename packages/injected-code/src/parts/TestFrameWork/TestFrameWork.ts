@@ -172,6 +172,10 @@ export const pressKeyExponential = async ({ key, timeout = maxTimeout, waitFor }
   let current = 1
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
   while (currentTime < endTime) {
+    const visibleBeforePress = QuerySelector.querySelector(locator.selector)
+    if (visibleBeforePress && toBeVisible(visibleBeforePress, {} as any)) {
+      return
+    }
     KeyBoardActions.press(keyboardEventOptions)
     const element = QuerySelector.querySelector(locator.selector)
     if (element && toBeVisible(element, {} as any)) {
@@ -179,6 +183,10 @@ export const pressKeyExponential = async ({ key, timeout = maxTimeout, waitFor }
     }
     current *= exponentialFactor
     await Timeout.waitForMutation(document.body, current)
+    const visibleAfterWait = QuerySelector.querySelector(locator.selector)
+    if (visibleAfterWait && toBeVisible(visibleAfterWait, {} as any)) {
+      return
+    }
     currentTime = Time.getTimeStamp()
   }
   const message = `expected locator "${locator.selector}" to be visible when pressing "${key}"`
