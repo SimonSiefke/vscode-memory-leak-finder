@@ -31,6 +31,7 @@ export const createDefaultState = (): StdinDataState => ({
   measure: '',
   measureAfter: false,
   measureNode: false,
+  measureNodeSubprocess: false,
   mode: ModeType.Waiting,
   openDevtools: false,
   pageObjectPath: '',

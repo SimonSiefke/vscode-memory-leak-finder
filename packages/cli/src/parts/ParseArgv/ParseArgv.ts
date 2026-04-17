@@ -130,6 +130,10 @@ const parseMeasureNode = (argv: readonly string[]): boolean => {
   return argv.includes('--measure-node')
 }
 
+const parseMeasureNodeSubprocess = (argv: readonly string[]): boolean => {
+  return argv.includes('--measure-node-subprocess')
+}
+
 const parseTimeouts = (argv: readonly string[]): boolean => {
   if (argv.includes('--disable-timeouts')) {
     return false
@@ -325,6 +329,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  const measureNodeSubprocess = parseMeasureNodeSubprocess(argv)
   const recordVideo = parseRecordVideo(argv)
   const compressVideo = parseCompressVideo(argv)
   const restartBetween = parseRestartBetween(argv)
@@ -374,6 +379,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     measure,
     measureAfter,
     measureNode,
+    measureNodeSubprocess,
     openDevtools,
     pageObjectPath,
     platform,

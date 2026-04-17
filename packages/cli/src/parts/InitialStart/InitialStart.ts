@@ -41,6 +41,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     measure: options.measure,
     measureAfter: options.measureAfter,
     measureNode: options.measureNode,
+    measureNodeSubprocess: options.measureNodeSubprocess,
     openDevtools: options.openDevtools,
     platform: options.platform,
     recordVideo: options.recordVideo,

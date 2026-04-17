@@ -44,6 +44,7 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       measure: options.measure,
       measureAfter: options.measureAfter,
       measureNode: options.measureNode,
+      measureNodeSubprocess: options.measureNodeSubprocess,
       recordVideo: options.recordVideo,
       restartBetween: options.restartBetween,
       root: options.cwd,

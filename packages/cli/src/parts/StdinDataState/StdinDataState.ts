@@ -31,6 +31,7 @@ export interface StdinDataState {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode?: boolean
+  readonly measureNodeSubprocess?: boolean
   readonly mode: number
   readonly openDevtools: boolean
   readonly pageObjectPath: string
@@ -79,6 +80,7 @@ let state: StdinDataState = {
   isWindows: false,
   measure: Character.EmptyString,
   measureAfter: false,
+  measureNodeSubprocess: false,
   mode: ModeType.Waiting,
   openDevtools: false,
   pageObjectPath: '',
@@ -125,6 +127,7 @@ export const setState = (newState: StdinDataState): void => {
     isWindows: newState.isWindows,
     measure: newState.measure,
     measureAfter: newState.measureAfter,
+    measureNodeSubprocess: newState.measureNodeSubprocess,
     mode: newState.mode,
     pageObjectPath: newState.pageObjectPath,
     platform: newState.platform,

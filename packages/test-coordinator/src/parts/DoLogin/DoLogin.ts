@@ -25,6 +25,7 @@ export interface LoginOptions {
   readonly inspectSharedProcessPort: number
   readonly measure: string
   readonly measureNode: boolean
+  readonly measureNodeSubprocess: boolean
   readonly openDevtools: boolean
   readonly pageObjectPathResolved: string
   readonly platform: string
@@ -63,6 +64,7 @@ export const doLogin = async ({
   inspectSharedProcessPort,
   measure,
   measureNode,
+  measureNodeSubprocess,
   openDevtools,
   pageObjectPathResolved,
   platform,
@@ -100,6 +102,7 @@ export const doLogin = async ({
       inspectSharedProcessPort,
       measureId: measure,
       measureNode,
+      measureNodeSubprocess,
       openDevtools,
       pageObjectPath: pageObjectPathResolved,
       platform,
