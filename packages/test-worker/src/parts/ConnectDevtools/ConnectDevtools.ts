@@ -27,6 +27,9 @@ export const connectDevtools = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
+  _inspectPtyHostPort: number,
+  _inspectSharedProcessPort: number,
+  _inspectExtensionsPort: number,
   trackFunctions: boolean,
   externalInspectPort: number,
 ) => {

@@ -42,6 +42,7 @@ export const startWorker = async (
     inspectExtensionsPort,
     pid,
     externalInspectPort || undefined,
+    measureNodeSubprocess,
   )
   return rpc
 }
