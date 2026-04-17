@@ -62,6 +62,7 @@ export interface ExternalRuntimeHandle {
   readonly serverPort: number
   dispose(): Promise<void>
   evaluate(expression: string): Promise<unknown>
+  getRuntimeName(): Promise<RuntimeName>
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: string, init?: RequestInit): Promise<Response>
   takeSnapshot(name: string): Promise<string>
@@ -474,6 +475,9 @@ export const create = ({
           >
           return result
         },
+        async getRuntimeName() {
+          return runtimeName
+        },
         request(path: string, init: RequestInit = {}) {
           const url = new URL(path, `http://127.0.0.1:${serverPort}`)
           return fetch(url, init)
@@ -501,6 +505,9 @@ export const create = ({
     },
     evaluate(expression: string): Promise<unknown> {
       return getActiveRuntime().evaluate(expression)
+    },
+    getRuntimeName(): Promise<RuntimeName> {
+      return getActiveRuntime().getRuntimeName()
     },
     getNamedArrayCount(): Promise<Record<string, number>> {
       return getActiveRuntime().getNamedArrayCount()

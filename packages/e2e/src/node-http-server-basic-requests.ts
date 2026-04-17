@@ -55,7 +55,7 @@ export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
     throw new Error(`Expected /data to respond with 200 but received ${response.status}`)
   }
   const body = (await response.json()) as DataResponse
-  const runtime = await ExternalRuntime.evaluate(`typeof Bun !== 'undefined' ? 'bun' : 'node'`)
+  const runtime = await ExternalRuntime.getRuntimeName()
   if (body.runtime !== runtime) {
     throw new Error(`Expected runtime response to be ${runtime} but received ${body.runtime}`)
   }

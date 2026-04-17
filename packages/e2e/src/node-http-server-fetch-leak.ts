@@ -9,17 +9,17 @@ const host = '127.0.0.1'
 const port = Number(process.env.MEMORY_LEAK_FINDER_SERVER_PORT)
 
 const listen = (server, port) => {
-  return new Promise((resolve, reject) => {
-    const handleError = (error) => {
-      server.off('error', handleError)
-      reject(error)
-    }
-    server.once('error', handleError)
-    server.listen(port, host, () => {
-      server.off('error', handleError)
-      resolve()
-    })
+  const { promise, reject, resolve } = Promise.withResolvers()
+  const handleError = (error) => {
+    server.off('error', handleError)
+    reject(error)
+  }
+  server.once('error', handleError)
+  server.listen(port, host, () => {
+    server.off('error', handleError)
+    resolve()
   })
+  return promise
 }
 
 const helloWorldServer = http.createServer((request, response) => {
