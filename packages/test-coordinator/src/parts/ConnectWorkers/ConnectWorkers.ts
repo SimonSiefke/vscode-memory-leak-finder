@@ -22,6 +22,7 @@ export const connectWorkers = async (
   utilityContext: any,
   runMode: number,
   measureNode: boolean,
+  measureNodeSubprocess: boolean,
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
@@ -30,6 +31,7 @@ export const connectWorkers = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   trackFunctions: boolean,
+  externalInspectPort: number,
 ) => {
   const promises: Promise<any>[] = []
   if (recordVideo) {
@@ -61,6 +63,7 @@ export const connectWorkers = async (
       inspectSharedProcessPort,
       inspectExtensionsPort,
       trackFunctions,
+      externalInspectPort,
     ),
   )
   const [videoRpc, testWorkerRpc] = await Promise.all(promises)
@@ -72,6 +75,7 @@ export const connectWorkers = async (
     measureId,
     attachedToPageTimeout,
     measureNode,
+    measureNodeSubprocess,
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
@@ -79,6 +83,7 @@ export const connectWorkers = async (
     inspectSharedProcessPort,
     inspectExtensionsPort,
     pid,
+    externalInspectPort,
   )
 
   return {

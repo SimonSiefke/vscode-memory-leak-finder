@@ -10,6 +10,7 @@ export const startWorker = async (
   measureId: string,
   attachedToPageTimeout: number,
   measureNode: boolean,
+  measureNodeSubprocess: boolean,
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
@@ -17,6 +18,7 @@ export const startWorker = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   pid: number,
+  externalInspectPort: number,
 ) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await NodeWorkerRpcParent.create({
@@ -31,7 +33,7 @@ export const startWorker = async (
     connectionId,
     measureId,
     attachedToPageTimeout,
-    measureNode,
+    measureNode || measureNodeSubprocess,
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
@@ -39,6 +41,7 @@ export const startWorker = async (
     inspectSharedProcessPort,
     inspectExtensionsPort,
     pid,
+    externalInspectPort || undefined,
   )
   return rpc
 }

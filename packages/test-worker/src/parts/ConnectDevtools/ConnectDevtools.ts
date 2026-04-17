@@ -28,6 +28,7 @@ export const connectDevtools = async (
   inspectPtyHost: boolean,
   enableExtensions: boolean,
   trackFunctions: boolean,
+  externalInspectPort: number,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
@@ -76,6 +77,7 @@ export const connectDevtools = async (
       },
     },
     electronApp,
+    externalInspectPort,
     evaluateInDefaultContext(item) {
       throw new Error(`not implemented`)
     },

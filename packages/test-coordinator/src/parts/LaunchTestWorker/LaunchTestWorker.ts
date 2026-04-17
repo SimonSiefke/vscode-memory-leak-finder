@@ -35,6 +35,7 @@ export const launchTestWorker = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   trackFunctions: boolean,
+  externalInspectPort: number,
 ) => {
   try {
     const url = GetTestWorkerUrl.getTestWorkerUrl()
@@ -65,6 +66,7 @@ export const launchTestWorker = async (
       inspectSharedProcessPort,
       inspectExtensionsPort,
       trackFunctions,
+      externalInspectPort,
     )
     return rpc
   } catch (error) {
