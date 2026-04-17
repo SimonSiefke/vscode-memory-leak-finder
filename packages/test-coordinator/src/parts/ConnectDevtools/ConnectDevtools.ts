@@ -23,6 +23,7 @@ export const connectDevtools = (
   inspectExtensionsPort: number,
   trackFunctions: boolean,
   externalInspectPort: number,
+  subprocessRuntime: 'bun' | 'node',
 ) => {
   Assert.object(rpc)
   Assert.string(platform)
@@ -50,5 +51,6 @@ export const connectDevtools = (
     inspectExtensionsPort,
     trackFunctions,
     externalInspectPort,
+    subprocessRuntime,
   )
 }

@@ -11,6 +11,7 @@ const createServerSource = () => {
   return `import http from 'node:http'
 
 const port = Number(process.env.MEMORY_LEAK_FINDER_SERVER_PORT)
+const runtime = typeof Bun !== 'undefined' ? 'bun' : 'node'
 
 const server = http.createServer((request, response) => {
   if (request.url === '/health') {
@@ -21,7 +22,7 @@ const server = http.createServer((request, response) => {
 
   if (request.url === '/data') {
     response.writeHead(200, { 'content-type': 'application/json' })
-    response.end(JSON.stringify({ ok: true, runtime: 'node' }))
+    response.end(JSON.stringify({ ok: true, runtime }))
     return
   }
 
@@ -44,7 +45,6 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
     entryFile: 'server.js',
     entrySource: createServerSource(),
     inspectPort,
-    runtimeName: 'node',
     serverPort,
   })
 }
@@ -55,8 +55,9 @@ export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
     throw new Error(`Expected /data to respond with 200 but received ${response.status}`)
   }
   const body = (await response.json()) as DataResponse
-  if (body.runtime !== 'node') {
-    throw new Error(`Expected runtime response to be node but received ${body.runtime}`)
+  const runtime = await ExternalRuntime.evaluate(`typeof Bun !== 'undefined' ? 'bun' : 'node'`)
+  if (body.runtime !== runtime) {
+    throw new Error(`Expected runtime response to be ${runtime} but received ${body.runtime}`)
   }
 }
 

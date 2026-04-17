@@ -32,6 +32,7 @@ export const connectDevtools = async (
   _inspectExtensionsPort: number,
   trackFunctions: boolean,
   externalInspectPort: number,
+  subprocessRuntime: 'bun' | 'node',
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
@@ -90,6 +91,7 @@ export const connectDevtools = async (
     page: firstWindow,
     platform,
     sessionRpc,
+    subprocessRuntime,
     utilityContext: {
       callFunctionOn(options) {
         return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {

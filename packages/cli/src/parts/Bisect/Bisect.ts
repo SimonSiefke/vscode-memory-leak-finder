@@ -52,6 +52,7 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       runs: options.runs,
       runSkippedTestsAnyway: options.runSkippedTestsAnyway,
       setupOnly: options.setupOnly,
+      subprocessRuntime: options.subprocessRuntime,
       timeoutBetween: options.timeoutBetween,
       timeouts: options.timeouts,
       updateUrl: options.updateUrl,

@@ -36,6 +36,7 @@ export const launchTestWorker = async (
   inspectExtensionsPort: number,
   trackFunctions: boolean,
   externalInspectPort: number,
+  subprocessRuntime: 'bun' | 'node',
 ) => {
   try {
     const url = GetTestWorkerUrl.getTestWorkerUrl()
@@ -67,6 +68,7 @@ export const launchTestWorker = async (
       inspectExtensionsPort,
       trackFunctions,
       externalInspectPort,
+      subprocessRuntime,
     )
     return rpc
   } catch (error) {

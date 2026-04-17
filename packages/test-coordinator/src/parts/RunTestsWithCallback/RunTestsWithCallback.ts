@@ -76,6 +76,7 @@ export const runTestsWithCallback = async ({
   runSkippedTestsAnyway,
   screencastQuality,
   setupOnly,
+  subprocessRuntime,
   timeoutBetween,
   timeouts,
   trackFunctions,
@@ -106,6 +107,7 @@ export const runTestsWithCallback = async ({
     Assert.boolean(setupOnly)
     Assert.boolean(login)
     Assert.boolean(enableExtensions)
+    Assert.string(subprocessRuntime)
 
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
@@ -147,6 +149,7 @@ export const runTestsWithCallback = async ({
         recordVideo,
         runMode,
         screencastQuality,
+        subprocessRuntime,
         timeouts,
         trackFunctions,
         updateUrl,
@@ -202,6 +205,7 @@ export const runTestsWithCallback = async ({
         recordVideo,
         runMode,
         screencastQuality,
+        subprocessRuntime,
         timeouts,
         trackFunctions,
         updateUrl,
@@ -297,6 +301,7 @@ export const runTestsWithCallback = async ({
             recordVideo,
             runMode,
             screencastQuality,
+            subprocessRuntime,
             timeouts,
             trackFunctions,
             updateUrl,

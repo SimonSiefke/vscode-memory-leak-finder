@@ -38,6 +38,7 @@ export interface RunTestsOptions {
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
   readonly setupOnly: boolean
+  readonly subprocessRuntime: 'bun' | 'node'
   readonly timeoutBetween: number
   readonly timeouts: any
   readonly trackFunctions: boolean

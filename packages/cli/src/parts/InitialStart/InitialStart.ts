@@ -51,6 +51,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     screencastQuality: options.screencastQuality,
     setupOnly: options.setupOnly,
+    subprocessRuntime: options.subprocessRuntime,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
     trackFunctions: options.trackFunctions,

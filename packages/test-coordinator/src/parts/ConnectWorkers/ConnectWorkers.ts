@@ -32,6 +32,7 @@ export const connectWorkers = async (
   inspectExtensionsPort: number,
   trackFunctions: boolean,
   externalInspectPort: number,
+  subprocessRuntime: 'bun' | 'node',
 ) => {
   const promises: Promise<any>[] = []
   if (recordVideo) {
@@ -64,6 +65,7 @@ export const connectWorkers = async (
       inspectExtensionsPort,
       trackFunctions,
       externalInspectPort,
+      subprocessRuntime,
     ),
   )
   const [videoRpc, testWorkerRpc] = await Promise.all(promises)

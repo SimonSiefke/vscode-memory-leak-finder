@@ -49,6 +49,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     setupOnly: options.setupOnly,
+    subprocessRuntime: options.subprocessRuntime,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
     trackFunctions: options.trackFunctions,

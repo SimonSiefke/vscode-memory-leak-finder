@@ -40,6 +40,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
+  readonly subprocessRuntime: 'bun' | 'node'
   readonly timeouts: any
   readonly trackFunctions: boolean
   readonly updateUrl: string
@@ -112,6 +113,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     recordVideo,
     runMode,
     screencastQuality,
+    subprocessRuntime,
     timeouts,
     trackFunctions,
     updateUrl,
@@ -199,6 +201,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectExtensionsPort,
     trackFunctions,
     externalInspectPort,
+    subprocessRuntime,
   )
   return {
     functionTrackerRpc,
