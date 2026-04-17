@@ -109,6 +109,12 @@ export const runTestsWithCallback = async ({
     Assert.boolean(enableExtensions)
     Assert.string(subprocessRuntime)
 
+    if (checkLeaks && measureNodeSubprocess && subprocessRuntime === 'bun') {
+      throw new Error(
+        'Bun subprocess leak measurement is not supported yet because Bun inspector does not provide the HeapProfiler domain used by current measures',
+      )
+    }
+
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
