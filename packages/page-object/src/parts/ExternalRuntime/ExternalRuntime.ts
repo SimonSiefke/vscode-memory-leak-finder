@@ -58,6 +58,7 @@ interface StartExternalRuntimeOptions {
   readonly command?: string
   readonly args?: readonly string[]
   readonly setupCommands?: readonly SetupCommand[]
+  readonly setupFiles?: readonly SetupFile[]
   readonly entryFile?: string
   readonly entrySource?: string
 }
@@ -66,6 +67,11 @@ interface SetupCommand {
   readonly command: string
   readonly args?: readonly string[]
   readonly cwd?: string
+}
+
+interface SetupFile {
+  readonly name: string
+  readonly content: string
 }
 
 export interface ExternalRuntimeHandle {
@@ -429,6 +435,7 @@ export const create = ({
       runtimeName = subprocessRuntime,
       serverPort,
       setupCommands = [],
+      setupFiles = [],
     }: StartExternalRuntimeOptions): Promise<void> {
       if (activeRuntime) {
         await activeRuntime.dispose()
@@ -478,6 +485,13 @@ export const create = ({
           env: runtimeEnv,
           stderr,
           stdout,
+        })
+      }
+
+      for (const setupFile of setupFiles) {
+        await workspace.add({
+          content: setupFile.content,
+          name: setupFile.name,
         })
       }
 
