@@ -1,7 +1,7 @@
 const getConstructorNameFunction = 'function(){ return this && this.constructor ? this.constructor.name : "" }'
 
 interface SyntheticQueryObject {
-  readonly constructorName: string
+  readonly expression: string
   readonly objectGroup?: string
 }
 
@@ -58,6 +58,15 @@ const createSyntheticRemoteObject = (objectId: string) => {
   }
 }
 
+const createCallFunctionOnEnvelope = (objectId: string) => {
+  return createResultEnvelope({
+    result: {
+      ...createSyntheticRemoteObject(objectId),
+    },
+    wasThrown: false,
+  })
+}
+
 const queryInstancesExpression = (constructorName: string): string => {
   return `queryInstances(globalThis[${JSON.stringify(constructorName)}])`
 }
@@ -81,7 +90,7 @@ const invokeQueryObjects = async (
   const constructorName = await getConstructorNameFromPrototype(rpc, params.prototypeObjectId)
   const syntheticObjectId = getSyntheticObjectId()
   syntheticObjects.set(syntheticObjectId, {
-    constructorName,
+    expression: queryInstancesExpression(constructorName),
     objectGroup: params.objectGroup,
   })
   return createResultEnvelope({
@@ -91,13 +100,23 @@ const invokeQueryObjects = async (
 
 const invokeSyntheticQueryObjectsFunction = async (
   rpc: any,
+  syntheticObjects: Map<string, SyntheticQueryObject>,
   value: SyntheticQueryObject,
   params: { awaitPromise?: boolean; functionDeclaration: string; objectGroup?: string; returnByValue?: boolean },
 ) => {
+  const expression = `(${params.functionDeclaration}).call(${value.expression})`
+  if (!params.returnByValue) {
+    const syntheticObjectId = getSyntheticObjectId()
+    syntheticObjects.set(syntheticObjectId, {
+      expression,
+      objectGroup: params.objectGroup,
+    })
+    return createCallFunctionOnEnvelope(syntheticObjectId)
+  }
   return rpc.invoke('Runtime.evaluate', {
     awaitPromise: params.awaitPromise,
     doNotPauseOnExceptionsAndMuteConsole: true,
-    expression: `(${params.functionDeclaration}).call(${queryInstancesExpression(value.constructorName)})`,
+    expression,
     includeCommandLineAPI: true,
     objectGroup: params.objectGroup,
     returnByValue: params.returnByValue,
@@ -120,7 +139,7 @@ export const createBunWebkitRpc = async (rpc: any): Promise<any> => {
         case 'Runtime.callFunctionOn': {
           const syntheticObject = syntheticObjects.get(params.objectId)
           if (syntheticObject) {
-            return invokeSyntheticQueryObjectsFunction(rpc, syntheticObject, params)
+            return invokeSyntheticQueryObjectsFunction(rpc, syntheticObjects, syntheticObject, params)
           }
           return rpc.invoke(method, params)
         }

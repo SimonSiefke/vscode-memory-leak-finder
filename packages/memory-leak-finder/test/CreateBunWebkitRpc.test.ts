@@ -140,7 +140,7 @@ test('createBunWebkitRpc - returns a synthetic object for runtime queryObjects',
   ])
 })
 
-test('createBunWebkitRpc - evaluates callFunctionOn against synthetic queryObjects', async () => {
+test('createBunWebkitRpc - returns a synthetic object for callFunctionOn against synthetic queryObjects', async () => {
   const rpc = createFakeRpc()
   rpc.enqueue('Inspector.enable', { result: {} })
   rpc.enqueue('Runtime.enable', { result: {} })
@@ -155,19 +155,6 @@ test('createBunWebkitRpc - evaluates callFunctionOn against synthetic queryObjec
       wasThrown: false,
     },
   })
-  rpc.enqueue('Runtime.evaluate', {
-    result: {
-      result: {
-        className: 'Array',
-        description: 'Array',
-        objectId: 'bun-array-1',
-        subtype: 'array',
-        type: 'object',
-      },
-      wasThrown: false,
-    },
-  })
-
   const bunRpc = await CreateBunWebkitRpc.createBunWebkitRpc(rpc)
   await bunRpc.invoke('Runtime.queryObjects', {
     objectGroup: 'group-1',
@@ -185,9 +172,85 @@ test('createBunWebkitRpc - evaluates callFunctionOn against synthetic queryObjec
       result: {
         className: 'Array',
         description: 'Array',
-        objectId: 'bun-array-1',
+        objectId: 'bun-query-objects-2',
         subtype: 'array',
         type: 'object',
+      },
+      wasThrown: false,
+    },
+  })
+  expect(rpc.invocations).toEqual([
+    { method: 'Inspector.enable', params: {} },
+    { method: 'Runtime.enable', params: {} },
+    { method: 'Console.enable', params: {} },
+    { method: 'Inspector.initialized', params: {} },
+    {
+      method: 'Runtime.callFunctionOn',
+      params: {
+        functionDeclaration: 'function(){ return this && this.constructor ? this.constructor.name : "" }',
+        objectId: 'prototype-1',
+        returnByValue: true,
+      },
+    },
+    {
+      method: 'Runtime.callFunctionOn',
+      params: {
+        functionDeclaration: 'function(){ return this && this.constructor ? this.constructor.name : "" }',
+        objectId: 'prototype-1',
+        returnByValue: true,
+      },
+    },
+  ])
+})
+
+test('createBunWebkitRpc - evaluates by-value callFunctionOn against a synthetic object expression', async () => {
+  const rpc = createFakeRpc()
+  rpc.enqueue('Inspector.enable', { result: {} })
+  rpc.enqueue('Runtime.enable', { result: {} })
+  rpc.enqueue('Console.enable', { result: {} })
+  rpc.enqueue('Inspector.initialized', { result: {} })
+  rpc.enqueue('Runtime.callFunctionOn', {
+    result: {
+      result: {
+        type: 'string',
+        value: 'Object',
+      },
+      wasThrown: false,
+    },
+  })
+  rpc.enqueue('Runtime.evaluate', {
+    result: {
+      result: {
+        type: 'number',
+        value: 1,
+      },
+      wasThrown: false,
+    },
+  })
+
+  const bunRpc = await CreateBunWebkitRpc.createBunWebkitRpc(rpc)
+  await bunRpc.invoke('Runtime.queryObjects', {
+    objectGroup: 'group-1',
+    prototypeObjectId: 'prototype-1',
+  })
+  await bunRpc.invoke('Runtime.callFunctionOn', {
+    functionDeclaration: 'function (){ return this.filter(Boolean) }',
+    objectGroup: 'group-1',
+    objectId: 'bun-query-objects-3',
+    returnByValue: false,
+  })
+  const result = await bunRpc.invoke('Runtime.callFunctionOn', {
+    functionDeclaration: 'function (){ return this.length }',
+    objectGroup: 'group-1',
+    objectId: 'bun-query-objects-4',
+    returnByValue: true,
+  })
+
+  expect(result).toEqual({
+    result: {
+      result: {
+        type: 'number',
+        value: 1,
       },
       wasThrown: false,
     },
@@ -210,7 +273,7 @@ test('createBunWebkitRpc - evaluates callFunctionOn against synthetic queryObjec
       params: {
         awaitPromise: undefined,
         doNotPauseOnExceptionsAndMuteConsole: true,
-        expression: '(function (){ return this.length }).call(queryInstances(globalThis["Object"]))',
+        expression: '(function (){ return this.length }).call((function (){ return this.filter(Boolean) }).call(queryInstances(globalThis["Object"])))',
         includeCommandLineAPI: true,
         objectGroup: 'group-1',
         returnByValue: true,
