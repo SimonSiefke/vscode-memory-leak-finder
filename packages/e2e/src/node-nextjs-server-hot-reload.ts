@@ -313,6 +313,7 @@ require('next/dist/bin/next')
 }
 
 export const run = async ({ ExternalRuntime, Workspace }: TestContext): Promise<void> => {
+  await updatePhase(Workspace, phases[0])
   await assertPhase(ExternalRuntime, phases[0])
 
   for (const phase of phases.slice(1)) {
