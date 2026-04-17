@@ -69,12 +69,12 @@ export interface ExternalRuntimeHandle {
 const workspacePath = join(Root.root, '.vscode-test-workspace')
 
 const listen = async (server: ReturnType<typeof createServer>): Promise<number> => {
-  await new Promise<void>((resolve, reject) => {
-    server.once('error', reject)
-    server.listen(0, '127.0.0.1', () => {
-      resolve()
-    })
+  const { promise, reject, resolve } = Promise.withResolvers<void>()
+  server.once('error', reject)
+  server.listen(0, '127.0.0.1', () => {
+    resolve()
   })
+  await promise
   const address = server.address()
   if (!address || typeof address === 'string') {
     throw new Error('Failed to determine ephemeral port')
@@ -83,15 +83,15 @@ const listen = async (server: ReturnType<typeof createServer>): Promise<number> 
 }
 
 const closeServer = async (server: ReturnType<typeof createServer>): Promise<void> => {
-  await new Promise<void>((resolve, reject) => {
-    server.close((error) => {
-      if (error) {
-        reject(error)
-        return
-      }
-      resolve()
-    })
+  const { promise, reject, resolve } = Promise.withResolvers<void>()
+  server.close((error) => {
+    if (error) {
+      reject(error)
+      return
+    }
+    resolve()
   })
+  await promise
 }
 
 const getRandomPort = async (): Promise<number> => {
@@ -167,22 +167,22 @@ const getJson = async (port: number): Promise<readonly InspectorTarget[]> => {
 
 const connectWebSocket = async (webSocketUrl: string): Promise<WebSocket> => {
   const webSocket = new WebSocket(webSocketUrl)
-  await new Promise<void>((resolve, reject) => {
-    const handleOpen = () => {
-      cleanup()
-      resolve()
-    }
-    const handleError = (event: Event) => {
-      cleanup()
-      reject(new Error(`Failed to open inspector websocket for ${webSocketUrl}: ${event.type}`))
-    }
-    const cleanup = () => {
-      webSocket.removeEventListener('open', handleOpen)
-      webSocket.removeEventListener('error', handleError)
-    }
-    webSocket.addEventListener('open', handleOpen)
-    webSocket.addEventListener('error', handleError)
-  })
+  const { promise, reject, resolve } = Promise.withResolvers<void>()
+  const handleOpen = () => {
+    cleanup()
+    resolve()
+  }
+  const handleError = (event: Event) => {
+    cleanup()
+    reject(new Error(`Failed to open inspector websocket for ${webSocketUrl}: ${event.type}`))
+  }
+  const cleanup = () => {
+    webSocket.removeEventListener('open', handleOpen)
+    webSocket.removeEventListener('error', handleError)
+  }
+  webSocket.addEventListener('open', handleOpen)
+  webSocket.addEventListener('error', handleError)
+  await promise
   return webSocket
 }
 
@@ -222,16 +222,16 @@ const createRpc = (webSocket: WebSocket): RuntimeRpc => {
     },
     invoke<T>(method: string, params: Record<string, unknown>) {
       const requestId = id++
-      return new Promise<T>((resolve, reject) => {
-        pending.set(requestId, { reject, resolve })
-        webSocket.send(
-          JSON.stringify({
-            id: requestId,
-            method,
-            params,
-          }),
-        )
-      })
+      const deferred = Promise.withResolvers<T>()
+      pending.set(requestId, deferred)
+      webSocket.send(
+        JSON.stringify({
+          id: requestId,
+          method,
+          params,
+        }),
+      )
+      return deferred.promise
     },
     off(event: string, listener: (message: InspectorEvent) => void) {
       const eventListeners = listeners.get(event)
@@ -407,15 +407,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           } finally {
             runtimeRpc.off('HeapProfiler.addHeapSnapshotChunk', chunkListener)
           }
-          await new Promise<void>((resolve, reject) => {
-            writeStream.end((error?: Error | null) => {
-              if (error) {
-                reject(error)
-                return
-              }
-              resolve()
-            })
+          const { promise, reject, resolve } = Promise.withResolvers<void>()
+          writeStream.end((error?: Error | null) => {
+            if (error) {
+              reject(error)
+              return
+            }
+            resolve()
           })
+          await promise
           await access(outFile)
           return outFile
         },
