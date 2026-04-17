@@ -1,5 +1,12 @@
 const getConstructorNameFunction = 'function(){ return this && this.constructor ? this.constructor.name : "" }'
 
+interface SyntheticQueryObject {
+  readonly constructorName: string
+  readonly objectGroup?: string
+}
+
+let nextSyntheticObjectId = 0
+
 const createResultEnvelope = (result: any) => {
   return { result }
 }
@@ -35,34 +42,71 @@ const getConstructorNameFromPrototype = async (rpc: any, prototypeObjectId: stri
   return constructorName
 }
 
+const getSyntheticObjectId = (): string => {
+  const value = nextSyntheticObjectId
+  nextSyntheticObjectId++
+  return `bun-query-objects-${value}`
+}
+
+const createSyntheticRemoteObject = (objectId: string) => {
+  return {
+    className: 'Array',
+    description: 'Array',
+    objectId,
+    subtype: 'array',
+    type: 'object',
+  }
+}
+
 const queryInstancesExpression = (constructorName: string): string => {
   return `queryInstances(globalThis[${JSON.stringify(constructorName)}])`
 }
 
-const invokeQueryObjects = async (rpc: any, params: { objectGroup?: string; prototypeObjectId: string }) => {
+const removeSyntheticObjectGroup = (syntheticObjects: Map<string, SyntheticQueryObject>, objectGroup: string | undefined): void => {
+  if (!objectGroup) {
+    return
+  }
+  for (const [objectId, value] of syntheticObjects) {
+    if (value.objectGroup === objectGroup) {
+      syntheticObjects.delete(objectId)
+    }
+  }
+}
+
+const invokeQueryObjects = async (
+  rpc: any,
+  syntheticObjects: Map<string, SyntheticQueryObject>,
+  params: { objectGroup?: string; prototypeObjectId: string },
+) => {
   const constructorName = await getConstructorNameFromPrototype(rpc, params.prototypeObjectId)
-  const rawResult = await rpc.invoke('Runtime.evaluate', {
+  const syntheticObjectId = getSyntheticObjectId()
+  syntheticObjects.set(syntheticObjectId, {
+    constructorName,
+    objectGroup: params.objectGroup,
+  })
+  return createResultEnvelope({
+    objects: createSyntheticRemoteObject(syntheticObjectId),
+  })
+}
+
+const invokeSyntheticQueryObjectsFunction = async (
+  rpc: any,
+  value: SyntheticQueryObject,
+  params: { awaitPromise?: boolean; functionDeclaration: string; objectGroup?: string; returnByValue?: boolean },
+) => {
+  return rpc.invoke('Runtime.evaluate', {
+    awaitPromise: params.awaitPromise,
     doNotPauseOnExceptionsAndMuteConsole: true,
-    expression: queryInstancesExpression(constructorName),
+    expression: `(${params.functionDeclaration}).call(${queryInstancesExpression(value.constructorName)})`,
     includeCommandLineAPI: true,
     objectGroup: params.objectGroup,
-    returnByValue: false,
-  })
-  if (rawResult?.result?.wasThrown) {
-    const description = rawResult?.result?.result?.description || `queryInstances failed for ${constructorName}`
-    throw new Error(description)
-  }
-  const remoteObject = getRemoteObject(rawResult)
-  if (!remoteObject) {
-    throw new Error(`Failed to query Bun instances for ${constructorName}`)
-  }
-  return createResultEnvelope({
-    objects: remoteObject,
+    returnByValue: params.returnByValue,
   })
 }
 
 export const createBunWebkitRpc = async (rpc: any): Promise<any> => {
   await initializeBunInspector(rpc)
+  const syntheticObjects = new Map<string, SyntheticQueryObject>()
   return {
     ...rpc,
     invoke(method: string, params: any) {
@@ -71,7 +115,18 @@ export const createBunWebkitRpc = async (rpc: any): Promise<any> => {
           return Promise.resolve(createResultEnvelope({}))
         }
         case 'Runtime.queryObjects': {
-          return invokeQueryObjects(rpc, params)
+          return invokeQueryObjects(rpc, syntheticObjects, params)
+        }
+        case 'Runtime.callFunctionOn': {
+          const syntheticObject = syntheticObjects.get(params.objectId)
+          if (syntheticObject) {
+            return invokeSyntheticQueryObjectsFunction(rpc, syntheticObject, params)
+          }
+          return rpc.invoke(method, params)
+        }
+        case 'Runtime.releaseObjectGroup': {
+          removeSyntheticObjectGroup(syntheticObjects, params?.objectGroup)
+          return rpc.invoke(method, params)
         }
         default: {
           return rpc.invoke(method, params)
