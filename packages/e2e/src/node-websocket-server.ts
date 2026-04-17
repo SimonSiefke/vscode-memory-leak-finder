@@ -249,7 +249,7 @@ const waitForWebSocketMessage = async (webSocket: WebSocket): Promise<string> =>
   }
   webSocket.addEventListener('message', handleMessage)
   webSocket.addEventListener('error', handleError)
-  await promise
+  return promise
 }
 
 const waitForResult = async (ExternalRuntime: TestContext['ExternalRuntime']): Promise<string> => {
