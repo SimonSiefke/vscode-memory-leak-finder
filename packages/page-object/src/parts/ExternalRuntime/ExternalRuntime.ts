@@ -273,7 +273,16 @@ const connectToInspector = async (inspectPort: number): Promise<RuntimeRpc> => {
   return createRpc(webSocket)
 }
 
-export const create = ({ electronApp, expect, externalInspectPort, ideVersion, page, platform, subprocessRuntime = 'node', VError }: CreateParams) => {
+export const create = ({
+  electronApp,
+  expect,
+  externalInspectPort,
+  ideVersion,
+  page,
+  platform,
+  subprocessRuntime = 'node',
+  VError,
+}: CreateParams) => {
   const workspace = Workspace.create({ electronApp, expect, ideVersion, page, platform, VError })
   let activeRuntime: ExternalRuntimeHandle | undefined
 
