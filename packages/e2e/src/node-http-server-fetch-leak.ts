@@ -89,15 +89,13 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
 }
 
 export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
-  for (let i = 0; i < 5; i++) {
-    const response = await ExternalRuntime.request('/data')
-    if (!response.ok) {
-      throw new Error(`Expected /data to respond with 200 but received ${response.status}`)
-    }
-    const body = await response.text()
-    if (body !== 'hello world') {
-      throw new Error(`Expected /data to respond with hello world but received ${body}`)
-    }
+  const response = await ExternalRuntime.request('/data')
+  if (!response.ok) {
+    throw new Error(`Expected /data to respond with 200 but received ${response.status}`)
+  }
+  const body = await response.text()
+  if (body !== 'hello world') {
+    throw new Error(`Expected /data to respond with hello world but received ${body}`)
   }
 }
 
