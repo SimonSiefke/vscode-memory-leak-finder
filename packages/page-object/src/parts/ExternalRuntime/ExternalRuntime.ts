@@ -57,8 +57,15 @@ interface StartExternalRuntimeOptions {
   readonly env?: Record<string, string>
   readonly command?: string
   readonly args?: readonly string[]
+  readonly setupCommands?: readonly SetupCommand[]
   readonly entryFile?: string
   readonly entrySource?: string
+}
+
+interface SetupCommand {
+  readonly command: string
+  readonly args?: readonly string[]
+  readonly cwd?: string
 }
 
 export interface ExternalRuntimeHandle {
@@ -183,6 +190,50 @@ const waitForExit = async (childProcess: ReturnType<typeof spawn>, timeout: numb
       throw new Error('Timed out waiting for external runtime to exit')
     }
     await delay(25)
+  }
+}
+
+const runSetupCommand = async ({
+  command,
+  args = [],
+  cwd,
+  env,
+  stderr,
+  stdout,
+}: {
+  readonly command: string
+  readonly args: readonly string[] | undefined
+  readonly cwd: string | undefined
+  readonly env: Record<string, string>
+  readonly stderr: string[]
+  readonly stdout: string[]
+}): Promise<void> => {
+  const childProcess = spawn(command, args, {
+    cwd: cwd ? join(workspacePath, cwd) : workspacePath,
+    env: {
+      ...process.env,
+      ...env,
+    },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
+
+  if (!childProcess.stdout || !childProcess.stderr) {
+    throw new Error(`Expected stdout and stderr for setup command ${command}`)
+  }
+
+  childProcess.stdout.setEncoding('utf8')
+  childProcess.stderr.setEncoding('utf8')
+  childProcess.stdout.on('data', (value: string) => {
+    stdout.push(value)
+  })
+  childProcess.stderr.on('data', (value: string) => {
+    stderr.push(value)
+  })
+
+  await waitForExit(childProcess, 10 * 60_000)
+
+  if (childProcess.exitCode !== 0) {
+    throw new Error(`Setup command failed: ${command} ${args.join(' ')}`)
   }
 }
 
@@ -377,6 +428,7 @@ export const create = ({
       moduleType = 'module',
       runtimeName = subprocessRuntime,
       serverPort,
+      setupCommands = [],
     }: StartExternalRuntimeOptions): Promise<void> {
       if (activeRuntime) {
         await activeRuntime.dispose()
@@ -413,12 +465,27 @@ export const create = ({
       })
       const stdout: string[] = []
       const stderr: string[] = []
+      const runtimeEnv = {
+        MEMORY_LEAK_FINDER_SERVER_PORT: String(serverPort),
+        ...env,
+      }
+
+      for (const setupCommand of setupCommands) {
+        await runSetupCommand({
+          args: setupCommand.args,
+          command: setupCommand.command,
+          cwd: setupCommand.cwd,
+          env: runtimeEnv,
+          stderr,
+          stdout,
+        })
+      }
+
       const childProcess = spawn(launch.command, launch.args, {
         cwd: cwd ? join(workspacePath, cwd) : workspacePath,
         env: {
           ...process.env,
-          MEMORY_LEAK_FINDER_SERVER_PORT: String(serverPort),
-          ...env,
+          ...runtimeEnv,
         },
         stdio: ['ignore', 'pipe', 'pipe'],
       })

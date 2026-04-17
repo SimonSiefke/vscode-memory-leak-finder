@@ -42,10 +42,7 @@ require('next/dist/bin/next')
 `,
   })
 
-  await Terminal.execute('cd next-app && npm install --package-lock-only', {
-    waitForFile: 'next-app/package-lock.json',
-  })
-  await Terminal.execute('cd next-app && npm ci', {
+  await Terminal.execute('cd next-app && nvm use 24 && npm install', {
     waitForFile: 'next-app/node_modules/next/package.json',
   })
 
