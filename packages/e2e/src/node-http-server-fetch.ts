@@ -1,4 +1,4 @@
-import type { TestContext } from '../types.ts'
+import type { TestContext } from '../types.js'
 
 export const skip = false
 
