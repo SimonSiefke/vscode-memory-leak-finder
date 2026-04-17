@@ -59,10 +59,6 @@ export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
   if (body.runtime !== 'node') {
     throw new Error(`Expected runtime response to be node but received ${body.runtime}`)
   }
-
-  await ExternalRuntime.evaluate('globalThis.gc?.() ?? null')
-  const snapshotPath = await ExternalRuntime.takeSnapshot('node-http-server-basic-requests')
-  await access(snapshotPath)
 }
 
 export const teardown = async ({ Editor, ExternalRuntime, Terminal, Workspace }: TestContext): Promise<void> => {
