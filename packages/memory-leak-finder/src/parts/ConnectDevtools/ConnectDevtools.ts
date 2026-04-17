@@ -19,6 +19,7 @@ export const connectDevtools = async (
   inspectExtensionsPort: number,
   pid: number,
   externalInspectPort?: number,
+  externalInspectRuntime: 'bun' | 'node' = 'node',
   deferConnect = false,
 ): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
@@ -33,6 +34,7 @@ export const connectDevtools = async (
       devtoolsWebSocketUrl,
       electronWebSocketUrl,
       externalInspectPort,
+      externalInspectRuntime,
       inspectExtensions,
       inspectExtensionsPort,
       inspectPtyHost,
@@ -58,6 +60,7 @@ export const connectDevtools = async (
     inspectSharedProcessPort,
     inspectExtensionsPort,
     externalInspectPort,
+    externalInspectRuntime,
   )
 
   const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid)

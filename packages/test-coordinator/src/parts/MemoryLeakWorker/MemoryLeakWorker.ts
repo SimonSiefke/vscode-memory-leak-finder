@@ -19,6 +19,7 @@ export const startWorker = async (
   inspectExtensionsPort: number,
   pid: number,
   externalInspectPort: number,
+  subprocessRuntime: 'bun' | 'node',
 ) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await NodeWorkerRpcParent.create({
@@ -42,6 +43,7 @@ export const startWorker = async (
     inspectExtensionsPort,
     pid,
     externalInspectPort || undefined,
+    subprocessRuntime,
     measureNodeSubprocess,
   )
   return rpc

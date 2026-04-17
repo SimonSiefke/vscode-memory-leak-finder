@@ -72,6 +72,7 @@ const memoryLeakWorkerUrl = join(Root.root, 'packages', 'memory-leak-finder', 'b
 const connectDevtoolsCommand = 'ConnectDevtools.connectDevtools'
 const getHeapSnapshotForConnectionCommand = 'GetHeapSnapshotForConnection.getHeapSnapshotForConnection'
 const getNamedArrayCountForConnectionCommand = 'GetNamedArrayCountForConnection.getNamedArrayCountForConnection'
+const bunInspectorPath = '/memory-leak-finder'
 const defaultMeasureId = 'string-count'
 
 let nextConnectionId = 1
@@ -113,7 +114,7 @@ const getRandomPort = async (): Promise<number> => {
 const getRuntimeCommand = (runtimeName: RuntimeName, inspectPort: number, entryFile: string) => {
   if (runtimeName === 'bun') {
     return {
-      args: [`--inspect=127.0.0.1:${inspectPort}`, entryFile],
+      args: [`--inspect=127.0.0.1:${inspectPort}${bunInspectorPath}`, entryFile],
       command: 'bun',
     }
   }
@@ -174,6 +175,22 @@ const getJson = async (port: number): Promise<readonly InspectorTarget[]> => {
   throw new Error(`Timed out waiting for inspector endpoint on port ${port}`)
 }
 
+const getBunInspectorWebSocketUrl = (inspectPort: number): string => {
+  return `ws://127.0.0.1:${inspectPort}${bunInspectorPath}`
+}
+
+const getNodeInspectorWebSocketUrl = async (inspectPort: number): Promise<string> => {
+  const targets = await getJson(inspectPort)
+  if (targets.length !== 1) {
+    throw new Error(`Expected one inspector target on port ${inspectPort} but found ${targets.length}`)
+  }
+  const target = targets[0]
+  if (!target.webSocketDebuggerUrl) {
+    throw new Error(`Expected inspector target on port ${inspectPort} to expose a websocket debugger URL`)
+  }
+  return target.webSocketDebuggerUrl
+}
+
 const connectWebSocket = async (webSocketUrl: string): Promise<WebSocket> => {
   const webSocket = new WebSocket(webSocketUrl)
   const { promise, reject, resolve } = Promise.withResolvers<void>()
@@ -193,6 +210,24 @@ const connectWebSocket = async (webSocketUrl: string): Promise<WebSocket> => {
   webSocket.addEventListener('error', handleError)
   await promise
   return webSocket
+}
+
+const waitForInspector = async (runtimeName: RuntimeName, inspectPort: number): Promise<void> => {
+  for (let attempt = 0; attempt < 200; attempt++) {
+    try {
+      if (runtimeName === 'bun') {
+        const webSocket = await connectWebSocket(getBunInspectorWebSocketUrl(inspectPort))
+        webSocket.close()
+        return
+      }
+      await getNodeInspectorWebSocketUrl(inspectPort)
+      return
+    } catch {
+      // Ignore transient failures while the inspector is starting.
+    }
+    await delay(50)
+  }
+  throw new Error(`Timed out waiting for ${runtimeName} inspector endpoint on port ${inspectPort}`)
 }
 
 const createRpc = (webSocket: WebSocket): RuntimeRpc => {
@@ -260,16 +295,9 @@ const createRpc = (webSocket: WebSocket): RuntimeRpc => {
   }
 }
 
-const connectToInspector = async (inspectPort: number): Promise<RuntimeRpc> => {
-  const targets = await getJson(inspectPort)
-  if (targets.length !== 1) {
-    throw new Error(`Expected one inspector target on port ${inspectPort} but found ${targets.length}`)
-  }
-  const target = targets[0]
-  if (!target.webSocketDebuggerUrl) {
-    throw new Error(`Expected inspector target on port ${inspectPort} to expose a websocket debugger URL`)
-  }
-  const webSocket = await connectWebSocket(target.webSocketDebuggerUrl)
+const connectToInspector = async (runtimeName: RuntimeName, inspectPort: number): Promise<RuntimeRpc> => {
+  const webSocketUrl = runtimeName === 'bun' ? getBunInspectorWebSocketUrl(inspectPort) : await getNodeInspectorWebSocketUrl(inspectPort)
+  const webSocket = await connectWebSocket(webSocketUrl)
   return createRpc(webSocket)
 }
 
@@ -371,7 +399,7 @@ export const create = ({
         getOutput,
         () => childProcess.exitCode !== null || childProcess.signalCode !== null,
       )
-      await getJson(inspectPort)
+      await waitForInspector(runtimeName, inspectPort)
 
       let rpc: RuntimeRpc | undefined
       const memoryRpc = await NodeWorkerRpcParent.create({
@@ -398,11 +426,12 @@ export const create = ({
         0,
         childProcess.pid ?? 0,
         inspectPort,
+        runtimeName,
       )
 
       const connect = async () => {
         if (!rpc) {
-          rpc = await connectToInspector(inspectPort)
+          rpc = await connectToInspector(runtimeName, inspectPort)
         }
         return rpc
       }

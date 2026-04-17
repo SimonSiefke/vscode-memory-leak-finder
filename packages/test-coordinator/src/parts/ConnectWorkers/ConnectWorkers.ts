@@ -86,6 +86,7 @@ export const connectWorkers = async (
     inspectExtensionsPort,
     pid,
     externalInspectPort,
+    subprocessRuntime,
   )
 
   return {

@@ -23,6 +23,7 @@ const doStart = async (connectionId: number): Promise<any> => {
         pending.inspectExtensionsPort,
         pending.pid,
         pending.externalInspectPort,
+        pending.externalInspectRuntime,
       )
       state = MemoryLeakFinderState.get(connectionId)
     }

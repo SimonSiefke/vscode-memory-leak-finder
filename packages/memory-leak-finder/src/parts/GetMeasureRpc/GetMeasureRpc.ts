@@ -15,9 +15,10 @@ export const getMeasureRpc = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   externalInspectPort?: number,
+  externalInspectRuntime: 'bun' | 'node' = 'node',
 ): Promise<any> => {
   if (externalInspectPort) {
-    return connectToDevtoolsWithJsonUrl(externalInspectPort)
+    return connectToDevtoolsWithJsonUrl(externalInspectPort, externalInspectRuntime)
   }
 
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
