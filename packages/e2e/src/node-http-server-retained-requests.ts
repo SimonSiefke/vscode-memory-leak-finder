@@ -2,8 +2,6 @@ import type { TestContext } from '../types.ts'
 
 export const skip = false
 
-let runtime: TestContext['ExternalRuntime'] extends { startExternalRuntime(options: any): Promise<infer T> } ? T | undefined : undefined
-
 const createLeakingServerSource = () => {
   return `import http from 'node:http'
 
@@ -48,7 +46,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
   await Explorer.focus()
 
   const { inspectPort, serverPort } = await ExternalRuntime.createPorts()
-  runtime = await ExternalRuntime.startExternalRuntime({
+  await ExternalRuntime.startExternalRuntime({
     entryFile: 'server.js',
     entrySource: createLeakingServerSource(),
     inspectPort,
@@ -57,16 +55,12 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
   })
 }
 
-export const run = async (): Promise<void> => {
-  if (!runtime) {
-    throw new Error('Expected Node runtime to be started in setup')
-  }
-
+export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
   const requestCount = 12
   const payload = 'memory-leak-finder-request-'.repeat(256)
 
   for (let index = 0; index < requestCount; index++) {
-    const response = await runtime.request('/leak', {
+    const response = await ExternalRuntime.request('/leak', {
       body: `${payload}${index}`,
       headers: {
         'content-type': 'text/plain',
@@ -78,24 +72,21 @@ export const run = async (): Promise<void> => {
     }
   }
 
-  const leakedRequestLength = await runtime.evaluate('globalThis.__memoryLeakFinderLeakedRequests.length')
+  const leakedRequestLength = await ExternalRuntime.evaluate('globalThis.__memoryLeakFinderLeakedRequests.length')
   if (leakedRequestLength !== requestCount) {
     throw new Error(`Expected leaked request count to be ${requestCount} but received ${String(leakedRequestLength)}`)
   }
 
-  await runtime.evaluate('globalThis.gc?.() ?? null')
-  const namedArrayCount = await runtime.getNamedArrayCount()
+  await ExternalRuntime.evaluate('globalThis.gc?.() ?? null')
+  const namedArrayCount = await ExternalRuntime.getNamedArrayCount()
   const leakedRequestArrayCount = namedArrayCount.__memoryLeakFinderLeakedRequests || 0
   if (leakedRequestArrayCount < requestCount) {
     throw new Error(`Expected named leaked request array count to be at least ${requestCount} but received ${leakedRequestArrayCount}`)
   }
 }
 
-export const teardown = async ({ Editor, Terminal, Workspace }: TestContext): Promise<void> => {
-  if (runtime) {
-    await runtime.dispose()
-    runtime = undefined
-  }
+export const teardown = async ({ Editor, ExternalRuntime, Terminal, Workspace }: TestContext): Promise<void> => {
+  await ExternalRuntime.dispose()
   await Terminal.killAll()
   await Editor.closeAll()
   await Workspace.setFiles([])

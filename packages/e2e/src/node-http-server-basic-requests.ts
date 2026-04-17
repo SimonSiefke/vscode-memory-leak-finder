@@ -8,8 +8,6 @@ interface DataResponse {
 
 export const skip = false
 
-let runtime: TestContext['ExternalRuntime'] extends { startExternalRuntime(options: any): Promise<infer T> } ? T | undefined : undefined
-
 const createServerSource = () => {
   return `import http from 'node:http'
 
@@ -43,7 +41,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
   await Explorer.focus()
 
   const { inspectPort, serverPort } = await ExternalRuntime.createPorts()
-  runtime = await ExternalRuntime.startExternalRuntime({
+  await ExternalRuntime.startExternalRuntime({
     entryFile: 'server.js',
     entrySource: createServerSource(),
     inspectPort,
@@ -52,11 +50,8 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
   })
 }
 
-export const run = async (): Promise<void> => {
-  if (!runtime) {
-    throw new Error('Expected Node runtime to be started in setup')
-  }
-  const response = await runtime.request('/data')
+export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
+  const response = await ExternalRuntime.request('/data')
   if (!response.ok) {
     throw new Error(`Expected /data to respond with 200 but received ${response.status}`)
   }
@@ -65,16 +60,13 @@ export const run = async (): Promise<void> => {
     throw new Error(`Expected runtime response to be node but received ${body.runtime}`)
   }
 
-  await runtime.evaluate('globalThis.gc?.() ?? null')
-  const snapshotPath = await runtime.takeSnapshot('node-http-server-basic-requests')
+  await ExternalRuntime.evaluate('globalThis.gc?.() ?? null')
+  const snapshotPath = await ExternalRuntime.takeSnapshot('node-http-server-basic-requests')
   await access(snapshotPath)
 }
 
-export const teardown = async ({ Editor, Terminal, Workspace }: TestContext): Promise<void> => {
-  if (runtime) {
-    await runtime.dispose()
-    runtime = undefined
-  }
+export const teardown = async ({ Editor, ExternalRuntime, Terminal, Workspace }: TestContext): Promise<void> => {
+  await ExternalRuntime.dispose()
   await Terminal.killAll()
   await Editor.closeAll()
   await Workspace.setFiles([])

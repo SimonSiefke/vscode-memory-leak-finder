@@ -227,7 +227,12 @@ export interface ExternalRuntime {
     inspectPort: number
     serverPort: number
   }>
-  startExternalRuntime(options: any): Promise<ExternalRuntimeHandle>
+  dispose(): Promise<void>
+  evaluate(expression: any): Promise<unknown>
+  getNamedArrayCount(): Promise<Record<string, number>>
+  request(path: any, init?: any): Promise<Response>
+  startExternalRuntime(options: any): Promise<void>
+  takeSnapshot(name: any): Promise<string>
 }
 export interface Explorer {
   cancel(): Promise<void>

@@ -275,6 +275,14 @@ const connectToInspector = async (inspectPort: number): Promise<RuntimeRpc> => {
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const workspace = Workspace.create({ electronApp, expect, ideVersion, page, platform, VError })
+  let activeRuntime: ExternalRuntimeHandle | undefined
+
+  const getActiveRuntime = (): ExternalRuntimeHandle => {
+    if (!activeRuntime) {
+      throw new Error('Expected an external runtime to be started')
+    }
+    return activeRuntime
+  }
 
   return {
     async createPorts(): Promise<{ inspectPort: number; serverPort: number }> {
@@ -294,7 +302,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       moduleType = 'module',
       runtimeName,
       serverPort,
-    }: StartExternalRuntimeOptions): Promise<ExternalRuntimeHandle> {
+    }: StartExternalRuntimeOptions): Promise<void> {
+      if (activeRuntime) {
+        await activeRuntime.dispose()
+        activeRuntime = undefined
+      }
       if (moduleType === 'module') {
         await workspace.add({
           content: JSON.stringify(
@@ -385,7 +397,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         return rpc
       }
 
-      return {
+      activeRuntime = {
         inspectPort,
         runtimeName,
         serverPort,
@@ -437,6 +449,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           return outFile
         },
       } satisfies ExternalRuntimeHandle
+
+      return
+    },
+    async dispose(): Promise<void> {
+      if (!activeRuntime) {
+        return
+      }
+      const runtime = activeRuntime
+      activeRuntime = undefined
+      await runtime.dispose()
+    },
+    evaluate(expression: string): Promise<unknown> {
+      return getActiveRuntime().evaluate(expression)
+    },
+    getNamedArrayCount(): Promise<Record<string, number>> {
+      return getActiveRuntime().getNamedArrayCount()
+    },
+    request(path: string, init?: RequestInit): Promise<Response> {
+      return getActiveRuntime().request(path, init)
+    },
+    takeSnapshot(name: string): Promise<string> {
+      return getActiveRuntime().takeSnapshot(name)
     },
   }
 }
