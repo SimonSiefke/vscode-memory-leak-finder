@@ -16,13 +16,17 @@ test('assertSupportedSubprocessMeasure - allows bun when subprocess measurement 
 test('assertSupportedSubprocessMeasure - emitter-count throws queryObjects error for bun', () => {
   expect(() => {
     AssertSupportedSubprocessMeasure.assertSupportedSubprocessMeasure(true, 'emitter-count', true, 'bun')
-  }).toThrow('Bun subprocess leak measurement is not supported yet because Bun inspector does not implement Runtime.queryObjects, which is required for emitter-count')
+  }).toThrow(
+    'Bun subprocess leak measurement is not supported yet because Bun inspector does not implement Runtime.queryObjects, which is required for emitter-count',
+  )
 })
 
 test('assertSupportedSubprocessMeasure - named-emitter-count throws heap profiler error for bun', () => {
   expect(() => {
     AssertSupportedSubprocessMeasure.assertSupportedSubprocessMeasure(true, 'named-emitter-count', true, 'bun')
-  }).toThrow('Bun subprocess leak measurement is not supported yet because Bun inspector does not implement the HeapProfiler domain, which is required for named-emitter-count')
+  }).toThrow(
+    'Bun subprocess leak measurement is not supported yet because Bun inspector does not implement the HeapProfiler domain, which is required for named-emitter-count',
+  )
 })
 
 test('assertSupportedSubprocessMeasure - unknown measure throws generic bun capability error', () => {

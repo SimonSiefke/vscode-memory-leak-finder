@@ -11,11 +11,15 @@ export const assertSupportedSubprocessMeasure = (
   }
 
   if (measure === 'emitter-count') {
-    throw new Error(`${defaultErrorPrefix} because Bun inspector does not implement Runtime.queryObjects, which is required for emitter-count`)
+    throw new Error(
+      `${defaultErrorPrefix} because Bun inspector does not implement Runtime.queryObjects, which is required for emitter-count`,
+    )
   }
 
   if (measure === 'named-emitter-count') {
-    throw new Error(`${defaultErrorPrefix} because Bun inspector does not implement the HeapProfiler domain, which is required for named-emitter-count`)
+    throw new Error(
+      `${defaultErrorPrefix} because Bun inspector does not implement the HeapProfiler domain, which is required for named-emitter-count`,
+    )
   }
 
   throw new Error(
