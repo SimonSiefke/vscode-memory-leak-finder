@@ -11,7 +11,9 @@ export const assertSupportedSubprocessMeasure = (
   }
 
   if (measure === 'emitter-count') {
-    return
+    throw new Error(
+      `${defaultErrorPrefix} because Bun queryInstances cannot be called with Object or Function, which blocks constructor discovery for emitter-count`,
+    )
   }
 
   if (measure === 'named-emitter-count') {

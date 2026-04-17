@@ -71,6 +71,43 @@ const queryInstancesExpression = (constructorName: string): string => {
   return `queryInstances(globalThis[${JSON.stringify(constructorName)}])`
 }
 
+const getConstructorNameMatch = (functionDeclaration: string): string | undefined => {
+  const match = functionDeclaration.match(/const constructorName = ['"]([^'"]+)['"]/)
+  return match?.[1]
+}
+
+const getAllowFunctions = (functionDeclaration: string): boolean => {
+  const match = functionDeclaration.match(/const allowFunctions = (true|false)/)
+  return match?.[1] === 'true'
+}
+
+const isConstructorInstancesFunction = (functionDeclaration: string): boolean => {
+  return functionDeclaration.includes('possibleConstructors') && functionDeclaration.includes('widgetConstructor')
+}
+
+const createConstructorInstancesExpression = (constructorName: string, allowFunctions: boolean): string => {
+  return `(() => {
+  const constructorName = ${JSON.stringify(constructorName)}
+  const allowFunctions = ${allowFunctions}
+  const isClass = (object) => {
+    return object.toString().startsWith('class ')
+  }
+  const isFunction = object => {
+    return object && typeof object === 'function'
+  }
+  const isPossibleWidgetConstructor = (object) => {
+    return object.name === constructorName;
+  }
+  const functions = queryInstances(Function).filter(isFunction)
+  const possibleConstructors = functions.filter(isPossibleWidgetConstructor)
+  const widgetConstructor = allowFunctions ? possibleConstructors[0] : possibleConstructors.find(isClass)
+  if(!widgetConstructor){
+    throw new Error('no ${constructorName} constructor found')
+  }
+  return queryInstances(widgetConstructor)
+})()`
+}
+
 const removeSyntheticObjectGroup = (syntheticObjects: Map<string, SyntheticQueryObject>, objectGroup: string | undefined): void => {
   if (!objectGroup) {
     return
@@ -104,7 +141,12 @@ const invokeSyntheticQueryObjectsFunction = async (
   value: SyntheticQueryObject,
   params: { awaitPromise?: boolean; functionDeclaration: string; objectGroup?: string; returnByValue?: boolean },
 ) => {
-  const expression = `(${params.functionDeclaration}).call(${value.expression})`
+  const constructorName = getConstructorNameMatch(params.functionDeclaration)
+  const allowFunctions = getAllowFunctions(params.functionDeclaration)
+  const expression =
+    value.expression === queryInstancesExpression('Object') && constructorName && isConstructorInstancesFunction(params.functionDeclaration)
+      ? createConstructorInstancesExpression(constructorName, allowFunctions)
+      : `(${params.functionDeclaration}).call(${value.expression})`
   if (!params.returnByValue) {
     const syntheticObjectId = getSyntheticObjectId()
     syntheticObjects.set(syntheticObjectId, {

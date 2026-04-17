@@ -127,16 +127,6 @@ test('createBunWebkitRpc - returns a synthetic object for runtime queryObjects',
         returnByValue: true,
       },
     },
-    {
-      method: 'Runtime.evaluate',
-      params: {
-        doNotPauseOnExceptionsAndMuteConsole: true,
-        expression: 'queryInstances(globalThis["Object"])',
-        includeCommandLineAPI: true,
-        objectGroup: 'group-1',
-        returnByValue: false,
-      },
-    },
   ])
 })
 
@@ -161,10 +151,22 @@ test('createBunWebkitRpc - returns a synthetic object for callFunctionOn against
     prototypeObjectId: 'prototype-1',
   })
   const result = await bunRpc.invoke('Runtime.callFunctionOn', {
-    functionDeclaration: 'function (){ return this.length }',
+    functionDeclaration: `function(){
+  const objects = this;
+  const constructorName = 'EventEmitter'
+  const allowFunctions = true
+  const isClass = (object) => object.toString().startsWith('class ')
+  const isFunction = object => object && typeof object === 'function'
+  const isPossibleWidgetConstructor = (object) => object.name === constructorName;
+  const functions = objects.filter(isFunction);
+  const possibleConstructors = functions.filter(isPossibleWidgetConstructor);
+  const widgetConstructor = allowFunctions ? possibleConstructors[0] : possibleConstructors.find(isClass)
+  if(!widgetConstructor){ throw new Error('no EventEmitter constructor found') }
+  return objects.filter(object => object && object instanceof widgetConstructor)
+}`,
     objectGroup: 'group-1',
     objectId: 'bun-query-objects-1',
-    returnByValue: true,
+    returnByValue: false,
   })
 
   expect(result).toEqual({
@@ -184,14 +186,6 @@ test('createBunWebkitRpc - returns a synthetic object for callFunctionOn against
     { method: 'Runtime.enable', params: {} },
     { method: 'Console.enable', params: {} },
     { method: 'Inspector.initialized', params: {} },
-    {
-      method: 'Runtime.callFunctionOn',
-      params: {
-        functionDeclaration: 'function(){ return this && this.constructor ? this.constructor.name : "" }',
-        objectId: 'prototype-1',
-        returnByValue: true,
-      },
-    },
     {
       method: 'Runtime.callFunctionOn',
       params: {
@@ -234,7 +228,19 @@ test('createBunWebkitRpc - evaluates by-value callFunctionOn against a synthetic
     prototypeObjectId: 'prototype-1',
   })
   await bunRpc.invoke('Runtime.callFunctionOn', {
-    functionDeclaration: 'function (){ return this.filter(Boolean) }',
+    functionDeclaration: `function(){
+  const objects = this;
+  const constructorName = 'EventEmitter'
+  const allowFunctions = true
+  const isClass = (object) => object.toString().startsWith('class ')
+  const isFunction = object => object && typeof object === 'function'
+  const isPossibleWidgetConstructor = (object) => object.name === constructorName;
+  const functions = objects.filter(isFunction);
+  const possibleConstructors = functions.filter(isPossibleWidgetConstructor);
+  const widgetConstructor = allowFunctions ? possibleConstructors[0] : possibleConstructors.find(isClass)
+  if(!widgetConstructor){ throw new Error('no EventEmitter constructor found') }
+  return objects.filter(object => object && object instanceof widgetConstructor)
+}`,
     objectGroup: 'group-1',
     objectId: 'bun-query-objects-3',
     returnByValue: false,
@@ -255,6 +261,26 @@ test('createBunWebkitRpc - evaluates by-value callFunctionOn against a synthetic
       wasThrown: false,
     },
   })
+  const expectedExpression = `(function (){ return this.length }).call((() => {
+  const constructorName = "EventEmitter"
+  const allowFunctions = true
+  const isClass = (object) => {
+    return object.toString().startsWith('class ')
+  }
+  const isFunction = object => {
+    return object && typeof object === 'function'
+  }
+  const isPossibleWidgetConstructor = (object) => {
+    return object.name === constructorName;
+  }
+  const functions = queryInstances(Function).filter(isFunction)
+  const possibleConstructors = functions.filter(isPossibleWidgetConstructor)
+  const widgetConstructor = allowFunctions ? possibleConstructors[0] : possibleConstructors.find(isClass)
+  if(!widgetConstructor){
+    throw new Error('no EventEmitter constructor found')
+  }
+  return queryInstances(widgetConstructor)
+})())`
   expect(rpc.invocations).toEqual([
     { method: 'Inspector.enable', params: {} },
     { method: 'Runtime.enable', params: {} },
@@ -273,8 +299,7 @@ test('createBunWebkitRpc - evaluates by-value callFunctionOn against a synthetic
       params: {
         awaitPromise: undefined,
         doNotPauseOnExceptionsAndMuteConsole: true,
-        expression:
-          '(function (){ return this.length }).call((function (){ return this.filter(Boolean) }).call(queryInstances(globalThis["Object"])))',
+        expression: expectedExpression,
         includeCommandLineAPI: true,
         objectGroup: 'group-1',
         returnByValue: true,

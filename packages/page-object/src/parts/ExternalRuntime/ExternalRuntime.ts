@@ -48,12 +48,17 @@ interface RuntimeRpc {
 }
 
 interface StartExternalRuntimeOptions {
-  readonly entryFile: string
-  readonly entrySource: string
   readonly inspectPort: number
   readonly moduleType?: 'commonjs' | 'module'
   readonly runtimeName?: RuntimeName
   readonly serverPort: number
+  readonly healthPath?: string
+  readonly cwd?: string
+  readonly env?: Record<string, string>
+  readonly command?: string
+  readonly args?: readonly string[]
+  readonly entryFile?: string
+  readonly entrySource?: string
 }
 
 export interface ExternalRuntimeHandle {
@@ -124,6 +129,31 @@ const getRuntimeCommand = (runtimeName: RuntimeName, inspectPort: number, entryF
     args: [`--inspect=${inspectPort}`, '--expose-gc', entryFile],
     command: process.execPath,
   }
+}
+
+const getExternalRuntimeLaunch = ({
+  args,
+  command,
+  entryFile,
+  inspectPort,
+  runtimeName,
+}: {
+  readonly args: readonly string[] | undefined
+  readonly command: string | undefined
+  readonly entryFile: string | undefined
+  readonly inspectPort: number
+  readonly runtimeName: RuntimeName
+}) => {
+  if (command) {
+    return {
+      args: [...(args ?? [])],
+      command,
+    }
+  }
+  if (!entryFile) {
+    throw new Error('Expected either command or entryFile to be provided')
+  }
+  return getRuntimeCommand(runtimeName, inspectPort, entryFile)
 }
 
 const waitForHttpServer = async (url: string, getOutput: () => string, hasExited: () => boolean): Promise<void> => {
@@ -336,8 +366,13 @@ export const create = ({
       }
     },
     async startExternalRuntime({
+      args,
+      command,
+      cwd,
       entryFile,
       entrySource,
+      env,
+      healthPath = '/health',
       inspectPort,
       moduleType = 'module',
       runtimeName = subprocessRuntime,
@@ -347,7 +382,7 @@ export const create = ({
         await activeRuntime.dispose()
         activeRuntime = undefined
       }
-      if (moduleType === 'module') {
+      if (entrySource && moduleType === 'module') {
         await workspace.add({
           content: JSON.stringify(
             {
@@ -362,19 +397,28 @@ export const create = ({
         })
       }
 
-      await workspace.add({
-        content: entrySource,
-        name: entryFile,
-      })
+      if (entryFile && entrySource) {
+        await workspace.add({
+          content: entrySource,
+          name: entryFile,
+        })
+      }
 
-      const { args, command } = getRuntimeCommand(runtimeName, inspectPort, entryFile)
+      const launch = getExternalRuntimeLaunch({
+        args,
+        command,
+        entryFile,
+        inspectPort,
+        runtimeName,
+      })
       const stdout: string[] = []
       const stderr: string[] = []
-      const childProcess = spawn(command, args, {
-        cwd: workspacePath,
+      const childProcess = spawn(launch.command, launch.args, {
+        cwd: cwd ? join(workspacePath, cwd) : workspacePath,
         env: {
           ...process.env,
           MEMORY_LEAK_FINDER_SERVER_PORT: String(serverPort),
+          ...env,
         },
         stdio: ['ignore', 'pipe', 'pipe'],
       })
@@ -397,7 +441,7 @@ export const create = ({
       }
 
       await waitForHttpServer(
-        `http://127.0.0.1:${serverPort}/health`,
+        `http://127.0.0.1:${serverPort}${healthPath}`,
         getOutput,
         () => childProcess.exitCode !== null || childProcess.signalCode !== null,
       )
