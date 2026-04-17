@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
+import * as AssertSupportedSubprocessMeasure from '../AssertSupportedSubprocessMeasure/AssertSupportedSubprocessMeasure.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
@@ -109,11 +110,7 @@ export const runTestsWithCallback = async ({
     Assert.boolean(enableExtensions)
     Assert.string(subprocessRuntime)
 
-    if (checkLeaks && measureNodeSubprocess && subprocessRuntime === 'bun') {
-      throw new Error(
-        'Bun subprocess leak measurement is not supported yet because Bun inspector does not provide the HeapProfiler domain used by current measures',
-      )
-    }
+    AssertSupportedSubprocessMeasure.assertSupportedSubprocessMeasure(checkLeaks, measure, measureNodeSubprocess, subprocessRuntime)
 
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
