@@ -25,7 +25,7 @@ const getMetricRows = (phase: number): string => {
     weight: ${weight},
     detail: 'trace-${phase}-${index}-${weight}',
   }`
-  }).join('\n,')
+  }).join(',\n')
 }
 
 const getMetricsContent = (phase: number): string => {
@@ -117,14 +117,14 @@ export default App
 }
 
 const getMainContent = (): string => {
-  return `import React from 'react'
+  return `import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+  <StrictMode>
     <App />
-  </React.StrictMode>,
+  </StrictMode>,
 )
 `
 }
