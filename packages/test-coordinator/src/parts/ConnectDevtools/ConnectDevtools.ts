@@ -22,6 +22,7 @@ export const connectDevtools = (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   trackFunctions: boolean,
+  externalInspectPort: number,
 ) => {
   Assert.object(rpc)
   Assert.string(platform)
@@ -48,5 +49,6 @@ export const connectDevtools = (
     inspectSharedProcessPort,
     inspectExtensionsPort,
     trackFunctions,
+    externalInspectPort,
   )
 }
