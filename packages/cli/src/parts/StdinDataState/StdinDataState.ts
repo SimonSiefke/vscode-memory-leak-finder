@@ -31,7 +31,7 @@ export interface StdinDataState {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode?: boolean
-  readonly measureNodeSubprocess?: boolean
+  readonly measureNodeSubprocess: boolean
   readonly mode: number
   readonly openDevtools: boolean
   readonly pageObjectPath: string

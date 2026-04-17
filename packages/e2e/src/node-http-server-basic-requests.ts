@@ -1,4 +1,3 @@
-import { access } from 'node:fs/promises'
 import type { TestContext } from '../types.ts'
 
 interface DataResponse {
