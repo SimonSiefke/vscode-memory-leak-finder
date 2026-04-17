@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import type { TestContext } from '../types.ts'
 
 interface DataResponse {
@@ -50,15 +51,9 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
 }
 
 export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
-  const response = await ExternalRuntime.request('/data')
-  if (!response.ok) {
-    throw new Error(`Expected /data to respond with 200 but received ${response.status}`)
-  }
-  const body = (await response.json()) as DataResponse
   const runtime = await ExternalRuntime.getRuntimeName()
-  if (body.runtime !== runtime) {
-    throw new Error(`Expected runtime response to be ${runtime} but received ${body.runtime}`)
-  }
+  const body = (await ExternalRuntime.getJson('/data')) as DataResponse
+  assert.deepStrictEqual(body, { ok: true, runtime })
 }
 
 export const teardown = async ({ Editor, ExternalRuntime, Terminal, Workspace }: TestContext): Promise<void> => {

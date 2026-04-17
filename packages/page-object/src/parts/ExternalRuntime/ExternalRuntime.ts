@@ -62,6 +62,7 @@ export interface ExternalRuntimeHandle {
   readonly serverPort: number
   dispose(): Promise<void>
   evaluate(expression: string): Promise<unknown>
+  getJson<T>(path: string, init?: RequestInit): Promise<T>
   getRuntimeName(): Promise<RuntimeName>
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: string, init?: RequestInit): Promise<Response>
@@ -467,6 +468,13 @@ export const create = ({
           })
           return result.result?.result?.value
         },
+        async getJson<T>(path: string, init: RequestInit = {}) {
+          const response = await this.request(path, init)
+          if (!response.ok) {
+            throw new Error(`Expected ${path} to respond with 200 but received ${response.status}`)
+          }
+          return (await response.json()) as T
+        },
         async getNamedArrayCount() {
           const snapshotId = nextSnapshotId++
           const result = (await memoryRpc.invoke(getNamedArrayCountForConnectionCommand, memoryConnectionId, '', snapshotId)) as Record<
@@ -505,6 +513,9 @@ export const create = ({
     },
     evaluate(expression: string): Promise<unknown> {
       return getActiveRuntime().evaluate(expression)
+    },
+    getJson<T>(path: string, init?: RequestInit): Promise<T> {
+      return getActiveRuntime().getJson<T>(path, init)
     },
     getRuntimeName(): Promise<RuntimeName> {
       return getActiveRuntime().getRuntimeName()

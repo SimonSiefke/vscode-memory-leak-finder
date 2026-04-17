@@ -218,6 +218,7 @@ export interface ExternalRuntimeHandle {
   readonly serverPort: number
   dispose(): Promise<void>
   evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
   getRuntimeName(): Promise<'bun' | 'node'>
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: any, init?: any): Promise<Response>
@@ -230,6 +231,7 @@ export interface ExternalRuntime {
   }>
   dispose(): Promise<void>
   evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
   getRuntimeName(): Promise<'bun' | 'node'>
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: any, init?: any): Promise<Response>
