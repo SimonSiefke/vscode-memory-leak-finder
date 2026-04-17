@@ -1,13 +1,13 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
+import { createHash } from 'node:crypto'
 import { spawn } from 'node:child_process'
-import { access, copyFile, mkdir } from 'node:fs/promises'
+import { access, copyFile, cp, mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:net'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { setTimeout as delay } from 'node:timers/promises'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Root from '../Root/Root.ts'
-import * as Workspace from '../Workspace/Workspace.ts'
 
 type RuntimeName = 'bun' | 'node'
 
@@ -88,6 +88,7 @@ export interface ExternalRuntimeHandle {
 }
 
 const workspacePath = join(Root.root, '.vscode-test-workspace')
+const projectCachePath = join(Root.root, '.vscode-project-cache')
 const memoryLeakWorkerUrl = join(Root.root, 'packages', 'memory-leak-finder', 'bin', 'memory-leak-worker.ts')
 const connectDevtoolsCommand = 'ConnectDevtools.connectDevtools'
 const getHeapSnapshotForConnectionCommand = 'GetHeapSnapshotForConnection.getHeapSnapshotForConnection'
@@ -199,11 +200,79 @@ const waitForExit = async (childProcess: ReturnType<typeof spawn>, timeout: numb
   }
 }
 
+const exists = async (path: string): Promise<boolean> => {
+  try {
+    await access(path)
+    return true
+  } catch {
+    return false
+  }
+}
+
+const writeProjectFile = async ({
+  content,
+  name,
+  projectPath,
+}: {
+  readonly content: string
+  readonly name: string
+  readonly projectPath: string
+}): Promise<void> => {
+  const absolutePath = join(projectPath, name)
+  await mkdir(dirname(absolutePath), { recursive: true })
+  await writeFile(absolutePath, content)
+}
+
+const sortRecord = (record: Record<string, string> | undefined): Record<string, string> | undefined => {
+  if (!record) {
+    return undefined
+  }
+  return Object.fromEntries(Object.entries(record).sort(([a], [b]) => a.localeCompare(b)))
+}
+
+const getProjectSetupHash = ({
+  entryFile,
+  entrySource,
+  env,
+  moduleType,
+  setupCommands,
+  setupFiles,
+}: {
+  readonly entryFile: string | undefined
+  readonly entrySource: string | undefined
+  readonly env: Record<string, string> | undefined
+  readonly moduleType: 'commonjs' | 'module'
+  readonly setupCommands: readonly SetupCommand[]
+  readonly setupFiles: readonly SetupFile[]
+}): string => {
+  return createHash('sha256')
+    .update(
+      JSON.stringify({
+        entryFile,
+        entrySource,
+        env: sortRecord(env),
+        moduleType,
+        setupCommands,
+        setupFiles,
+      }),
+    )
+    .digest('hex')
+}
+
+const copyDirectoryContents = async (sourcePath: string, destinationPath: string): Promise<void> => {
+  await mkdir(destinationPath, { recursive: true })
+  const dirents = await readdir(sourcePath)
+  for (const dirent of dirents) {
+    await cp(join(sourcePath, dirent), join(destinationPath, dirent), { force: true, recursive: true })
+  }
+}
+
 const runSetupCommand = async ({
   command,
   args = [],
   cwd,
   env,
+  projectPath,
   stderr,
   stdout,
 }: {
@@ -211,11 +280,12 @@ const runSetupCommand = async ({
   readonly args: readonly string[] | undefined
   readonly cwd: string | undefined
   readonly env: Record<string, string>
+  readonly projectPath: string
   readonly stderr: string[]
   readonly stdout: string[]
 }): Promise<void> => {
   const childProcess = spawn(command, args, {
-    cwd: cwd ? join(workspacePath, cwd) : workspacePath,
+    cwd: cwd ? join(projectPath, cwd) : projectPath,
     env: {
       ...process.env,
       ...env,
@@ -240,6 +310,143 @@ const runSetupCommand = async ({
 
   if (childProcess.exitCode !== 0) {
     throw new Error(`Setup command failed: ${command} ${args.join(' ')}`)
+  }
+}
+
+const populateProjectSetup = async ({
+  entryFile,
+  entrySource,
+  env,
+  moduleType,
+  projectPath,
+  setupCommands,
+  setupFiles,
+  stderr,
+  stdout,
+}: {
+  readonly entryFile: string | undefined
+  readonly entrySource: string | undefined
+  readonly env: Record<string, string>
+  readonly moduleType: 'commonjs' | 'module'
+  readonly projectPath: string
+  readonly setupCommands: readonly SetupCommand[]
+  readonly setupFiles: readonly SetupFile[]
+  readonly stderr: string[]
+  readonly stdout: string[]
+}): Promise<void> => {
+  if (entrySource && moduleType === 'module') {
+    await writeProjectFile({
+      content: JSON.stringify(
+        {
+          name: 'external-runtime-fixture',
+          private: true,
+          type: 'module',
+        },
+        null,
+        2,
+      ),
+      name: 'package.json',
+      projectPath,
+    })
+  }
+
+  if (entryFile && entrySource) {
+    await writeProjectFile({
+      content: entrySource,
+      name: entryFile,
+      projectPath,
+    })
+  }
+
+  for (const setupCommand of setupCommands) {
+    await runSetupCommand({
+      args: setupCommand.args,
+      command: setupCommand.command,
+      cwd: setupCommand.cwd,
+      env,
+      projectPath,
+      stderr,
+      stdout,
+    })
+  }
+
+  for (const setupFile of setupFiles) {
+    await writeProjectFile({
+      content: setupFile.content,
+      name: setupFile.name,
+      projectPath,
+    })
+  }
+}
+
+const prepareProjectSetup = async ({
+  entryFile,
+  entrySource,
+  env,
+  moduleType,
+  setupCommands,
+  setupFiles,
+  stderr,
+  stdout,
+}: {
+  readonly entryFile: string | undefined
+  readonly entrySource: string | undefined
+  readonly env: Record<string, string>
+  readonly moduleType: 'commonjs' | 'module'
+  readonly setupCommands: readonly SetupCommand[]
+  readonly setupFiles: readonly SetupFile[]
+  readonly stderr: string[]
+  readonly stdout: string[]
+}): Promise<void> => {
+  const shouldUseCache = !!entrySource || setupCommands.length > 0 || setupFiles.length > 0
+  if (!shouldUseCache) {
+    return
+  }
+
+  await mkdir(projectCachePath, { recursive: true })
+  const setupHash = getProjectSetupHash({
+    entryFile,
+    entrySource,
+    env,
+    moduleType,
+    setupCommands,
+    setupFiles,
+  })
+  const cachePath = join(projectCachePath, setupHash)
+  const pendingCachePath = `${cachePath}--pending`
+
+  if (await exists(cachePath)) {
+    await copyDirectoryContents(cachePath, workspacePath)
+    return
+  }
+
+  await rm(pendingCachePath, { force: true, recursive: true })
+  await mkdir(pendingCachePath, { recursive: true })
+
+  try {
+    await populateProjectSetup({
+      entryFile,
+      entrySource,
+      env,
+      moduleType,
+      projectPath: pendingCachePath,
+      setupCommands,
+      setupFiles,
+      stderr,
+      stdout,
+    })
+    try {
+      await rename(pendingCachePath, cachePath)
+    } catch {
+      if (!(await exists(cachePath))) {
+        throw new Error(`Failed to finalize project setup cache ${cachePath}`)
+      }
+      await rm(pendingCachePath, { force: true, recursive: true })
+    }
+    await copyDirectoryContents(cachePath, workspacePath)
+  } catch (error) {
+    await rm(pendingCachePath, { force: true, recursive: true })
+    throw error
   }
 }
 
@@ -390,17 +597,7 @@ const connectToInspector = async (runtimeName: RuntimeName, inspectPort: number)
   return createRpc(webSocket)
 }
 
-export const create = ({
-  electronApp,
-  expect,
-  externalInspectPort,
-  ideVersion,
-  page,
-  platform,
-  subprocessRuntime = 'node',
-  VError,
-}: CreateParams) => {
-  const workspace = Workspace.create({ electronApp, expect, ideVersion, page, platform, VError })
+export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: CreateParams) => {
   let activeRuntime: ExternalRuntimeHandle | undefined
 
   const getActiveRuntime = (): ExternalRuntimeHandle => {
@@ -441,28 +638,6 @@ export const create = ({
         await activeRuntime.dispose()
         activeRuntime = undefined
       }
-      if (entrySource && moduleType === 'module') {
-        await workspace.add({
-          content: JSON.stringify(
-            {
-              name: 'external-runtime-fixture',
-              private: true,
-              type: 'module',
-            },
-            null,
-            2,
-          ),
-          name: 'package.json',
-        })
-      }
-
-      if (entryFile && entrySource) {
-        await workspace.add({
-          content: entrySource,
-          name: entryFile,
-        })
-      }
-
       const launch = getExternalRuntimeLaunch({
         args,
         command,
@@ -477,23 +652,16 @@ export const create = ({
         ...env,
       }
 
-      for (const setupCommand of setupCommands) {
-        await runSetupCommand({
-          args: setupCommand.args,
-          command: setupCommand.command,
-          cwd: setupCommand.cwd,
-          env: runtimeEnv,
-          stderr,
-          stdout,
-        })
-      }
-
-      for (const setupFile of setupFiles) {
-        await workspace.add({
-          content: setupFile.content,
-          name: setupFile.name,
-        })
-      }
+      await prepareProjectSetup({
+        entryFile,
+        entrySource,
+        env: runtimeEnv,
+        moduleType,
+        setupCommands,
+        setupFiles,
+        stderr,
+        stdout,
+      })
 
       const childProcess = spawn(launch.command, launch.args, {
         cwd: cwd ? join(workspacePath, cwd) : workspacePath,

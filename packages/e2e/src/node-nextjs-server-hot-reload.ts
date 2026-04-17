@@ -15,11 +15,11 @@ const updatedPageContent = `export default function Page() {
 }
 `
 
-const updatePageContent = async (Editor: TestContext['Editor'], content: string): Promise<void> => {
-  await Editor.open('page.js')
-  await Editor.deleteAll()
-  await Editor.type(content)
-  await Editor.save({ viaKeyBoard: true })
+const updatePageContent = async (Workspace: TestContext['Workspace'], content: string): Promise<void> => {
+  await Workspace.add({
+    name: 'next-app/app/page.js',
+    content,
+  })
 }
 
 const assertBodyContains = async (ExternalRuntime: TestContext['ExternalRuntime'], expectedText: string): Promise<void> => {
@@ -34,7 +34,9 @@ const assertBodyContains = async (ExternalRuntime: TestContext['ExternalRuntime'
     }
     await new Promise((resolve) => setTimeout(resolve, 250))
   }
-  assert.fail(`Timed out waiting for page body to contain ${JSON.stringify(expectedText)}. Last status: ${lastStatus}. Last body: ${lastBody}`)
+  assert.fail(
+    `Timed out waiting for page body to contain ${JSON.stringify(expectedText)}. Last status: ${lastStatus}. Last body: ${lastBody}`,
+  )
 }
 
 export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: TestContext): Promise<void> => {
@@ -102,13 +104,13 @@ require('next/dist/bin/next')
   })
 }
 
-export const run = async ({ Editor, ExternalRuntime }: TestContext): Promise<void> => {
+export const run = async ({ ExternalRuntime, Workspace }: TestContext): Promise<void> => {
   await assertBodyContains(ExternalRuntime, 'next fixture works')
 
-  await updatePageContent(Editor, updatedPageContent)
+  await updatePageContent(Workspace, updatedPageContent)
   await assertBodyContains(ExternalRuntime, 'next fixture updated')
 
-  await updatePageContent(Editor, originalPageContent)
+  await updatePageContent(Workspace, originalPageContent)
   await assertBodyContains(ExternalRuntime, 'next fixture works')
 }
 
