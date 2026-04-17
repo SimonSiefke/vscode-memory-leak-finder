@@ -379,7 +379,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             expression,
             returnByValue: true,
           })
-          return result.result?.value
+          return result.result?.result?.value
         },
         request(path: string, init: RequestInit = {}) {
           const url = new URL(path, `http://127.0.0.1:${serverPort}`)
@@ -408,7 +408,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             runtimeRpc.off('HeapProfiler.addHeapSnapshotChunk', chunkListener)
           }
           await new Promise<void>((resolve, reject) => {
-            writeStream.end((error) => {
+            writeStream.end((error?: Error | null) => {
               if (error) {
                 reject(error)
                 return
