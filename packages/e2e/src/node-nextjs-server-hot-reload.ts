@@ -19,6 +19,13 @@ const waitForHotReload = async (): Promise<void> => {
   await new Promise((resolve) => setTimeout(resolve, 3000))
 }
 
+const updatePageContent = async (Editor: TestContext['Editor'], content: string): Promise<void> => {
+  await Editor.open('page.js')
+  await Editor.deleteAll()
+  await Editor.type(content)
+  await Editor.save({ viaKeyBoard: true })
+}
+
 const assertBodyContains = async (ExternalRuntime: TestContext['ExternalRuntime'], expectedText: string): Promise<void> => {
   const response = await ExternalRuntime.request('/')
   assert.strictEqual(response.ok, true)
@@ -92,23 +99,15 @@ require('next/dist/bin/next')
   })
 }
 
-export const run = async ({ ExternalRuntime, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ Editor, ExternalRuntime }: TestContext): Promise<void> => {
   await assertBodyContains(ExternalRuntime, 'next fixture works')
 
-  await Workspace.remove('next-app/app/page.js')
-  await Workspace.add({
-    content: updatedPageContent,
-    name: 'next-app/app/page.js',
-  })
+  await updatePageContent(Editor, updatedPageContent)
 
   await waitForHotReload()
   await assertBodyContains(ExternalRuntime, 'next fixture updated')
 
-  await Workspace.remove('next-app/app/page.js')
-  await Workspace.add({
-    content: originalPageContent,
-    name: 'next-app/app/page.js',
-  })
+  await updatePageContent(Editor, originalPageContent)
 
   await waitForHotReload()
   await assertBodyContains(ExternalRuntime, 'next fixture works')
