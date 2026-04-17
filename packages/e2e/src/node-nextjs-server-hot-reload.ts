@@ -15,10 +15,6 @@ const updatedPageContent = `export default function Page() {
 }
 `
 
-const waitForHotReload = async (): Promise<void> => {
-  await new Promise((resolve) => setTimeout(resolve, 3000))
-}
-
 const updatePageContent = async (Editor: TestContext['Editor'], content: string): Promise<void> => {
   await Editor.open('page.js')
   await Editor.deleteAll()
@@ -27,11 +23,18 @@ const updatePageContent = async (Editor: TestContext['Editor'], content: string)
 }
 
 const assertBodyContains = async (ExternalRuntime: TestContext['ExternalRuntime'], expectedText: string): Promise<void> => {
-  const response = await ExternalRuntime.request('/')
-  assert.strictEqual(response.ok, true)
-
-  const body = await response.text()
-  assert.match(body, new RegExp(expectedText))
+  let lastStatus = 0
+  let lastBody = ''
+  for (let attempt = 0; attempt < 120; attempt++) {
+    const response = await ExternalRuntime.request('/')
+    lastStatus = response.status
+    lastBody = await response.text()
+    if (response.ok && lastBody.includes(expectedText)) {
+      return
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250))
+  }
+  assert.fail(`Timed out waiting for page body to contain ${JSON.stringify(expectedText)}. Last status: ${lastStatus}. Last body: ${lastBody}`)
 }
 
 export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: TestContext): Promise<void> => {
@@ -103,13 +106,9 @@ export const run = async ({ Editor, ExternalRuntime }: TestContext): Promise<voi
   await assertBodyContains(ExternalRuntime, 'next fixture works')
 
   await updatePageContent(Editor, updatedPageContent)
-
-  await waitForHotReload()
   await assertBodyContains(ExternalRuntime, 'next fixture updated')
 
   await updatePageContent(Editor, originalPageContent)
-
-  await waitForHotReload()
   await assertBodyContains(ExternalRuntime, 'next fixture works')
 }
 
