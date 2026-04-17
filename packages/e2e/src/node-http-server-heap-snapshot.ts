@@ -1,6 +1,5 @@
 import { access } from 'node:fs/promises'
 import type { TestContext } from '../types.ts'
-import { createPorts, startExternalRuntime, type ExternalRuntimeHandle } from './parts/ExternalRuntime/ExternalRuntime.ts'
 
 interface DataResponse {
   readonly ok: boolean
@@ -9,7 +8,7 @@ interface DataResponse {
 
 export const skip = false
 
-let runtime: ExternalRuntimeHandle | undefined
+let runtime: TestContext['ExternalRuntime'] extends { startExternalRuntime(options: any): Promise<infer T> } ? T | undefined : undefined
 
 const createServerSource = () => {
   return `import http from 'node:http'
@@ -37,16 +36,15 @@ server.listen(port, '127.0.0.1')
 `
 }
 
-export const setup = async ({ Editor, Explorer, Terminal, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Workspace }: TestContext): Promise<void> => {
   await Terminal.killAll()
   await Editor.closeAll()
   await Workspace.setFiles([])
   await Explorer.focus()
 
-  const { inspectPort, serverPort } = await createPorts()
-  runtime = await startExternalRuntime({
-    Workspace,
-    entryFile: 'server.mjs',
+  const { inspectPort, serverPort } = await ExternalRuntime.createPorts()
+  runtime = await ExternalRuntime.startExternalRuntime({
+    entryFile: 'server.js',
     entrySource: createServerSource(),
     inspectPort,
     runtimeName: 'node',

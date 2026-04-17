@@ -5,29 +5,34 @@ import { createServer } from 'node:net'
 import { join } from 'node:path'
 import process from 'node:process'
 import { setTimeout as delay } from 'node:timers/promises'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as Root from '../Root/Root.ts'
+import * as Workspace from '../Workspace/Workspace.ts'
 
 type RuntimeName = 'bun' | 'node'
 
-interface WorkspaceLike {
-  add(file: { name: string; content: string }): Promise<void>
-}
-
-interface StartExternalRuntimeOptions {
-  readonly Workspace: WorkspaceLike
-  readonly entryFile: string
-  readonly entrySource: string
-  readonly inspectPort: number
-  readonly runtimeName: RuntimeName
-  readonly serverPort: number
+interface InspectorEvent {
+  readonly method: string
+  readonly params?: {
+    readonly chunk?: string
+  }
 }
 
 interface InspectorTarget {
   readonly webSocketDebuggerUrl?: string
 }
 
+interface RpcResponse<T> {
+  readonly error?: unknown
+  readonly id: number
+  readonly result?: T
+}
+
 interface RpcResultEnvelope<T> {
   readonly result: T
 }
+
+type RpcIncomingMessage<T> = InspectorEvent | RpcResponse<T>
 
 interface RuntimeEvaluateResult {
   readonly result?: {
@@ -42,23 +47,26 @@ interface RuntimeRpc {
   on(event: string, listener: (message: InspectorEvent) => void): void
 }
 
-interface RpcResponse<T> {
-  readonly error?: unknown
-  readonly id: number
-  readonly result?: T
+interface StartExternalRuntimeOptions {
+  readonly entryFile: string
+  readonly entrySource: string
+  readonly inspectPort: number
+  readonly moduleType?: 'commonjs' | 'module'
+  readonly runtimeName: RuntimeName
+  readonly serverPort: number
 }
 
-interface InspectorEvent {
-  readonly method: string
-  readonly params?: {
-    readonly chunk?: string
-  }
+export interface ExternalRuntimeHandle {
+  readonly inspectPort: number
+  readonly runtimeName: RuntimeName
+  readonly serverPort: number
+  dispose(): Promise<void>
+  evaluate(expression: string): Promise<unknown>
+  request(path: string, init?: RequestInit): Promise<Response>
+  takeSnapshot(name: string): Promise<string>
 }
 
-type RpcIncomingMessage<T> = InspectorEvent | RpcResponse<T>
-
-const root = join(import.meta.dirname, '../../../../../')
-const workspacePath = join(root, '.vscode-test-workspace')
+const workspacePath = join(Root.root, '.vscode-test-workspace')
 
 const listen = async (server: ReturnType<typeof createServer>): Promise<number> => {
   await new Promise<void>((resolve, reject) => {
@@ -93,17 +101,6 @@ const getRandomPort = async (): Promise<number> => {
   return port
 }
 
-export const createPorts = async (): Promise<{ inspectPort: number; serverPort: number }> => {
-  const [inspectPort, serverPort] = await Promise.all([getRandomPort(), getRandomPort()])
-  if (inspectPort === serverPort) {
-    return createPorts()
-  }
-  return {
-    inspectPort,
-    serverPort,
-  }
-}
-
 const getRuntimeCommand = (runtimeName: RuntimeName, inspectPort: number, entryFile: string) => {
   if (runtimeName === 'bun') {
     return {
@@ -129,7 +126,9 @@ const waitForHttpServer = async (url: string, getOutput: () => string, hasExited
       if (response.ok) {
         return
       }
-    } catch {}
+    } catch {
+      // Ignore transient connection failures while the runtime is starting.
+    }
     await delay(50)
   }
   throw new Error(`Timed out waiting for HTTP server ${url}\n${getOutput()}`)
@@ -145,16 +144,6 @@ const waitForExit = async (childProcess: ReturnType<typeof spawn>, timeout: numb
   }
 }
 
-export interface ExternalRuntimeHandle {
-  readonly inspectPort: number
-  readonly runtimeName: RuntimeName
-  readonly serverPort: number
-  dispose(): Promise<void>
-  evaluate(expression: string): Promise<unknown>
-  request(path: string, init?: RequestInit): Promise<Response>
-  takeSnapshot(name: string): Promise<string>
-}
-
 const getJson = async (port: number): Promise<readonly InspectorTarget[]> => {
   for (let attempt = 0; attempt < 200; attempt++) {
     try {
@@ -168,7 +157,9 @@ const getJson = async (port: number): Promise<readonly InspectorTarget[]> => {
         }
         return value as readonly InspectorTarget[]
       }
-    } catch {}
+    } catch {
+      // Ignore transient failures while the inspector is starting.
+    }
     await delay(50)
   }
   throw new Error(`Timed out waiting for inspector endpoint on port ${port}`)
@@ -273,130 +264,162 @@ const connectToInspector = async (inspectPort: number): Promise<RuntimeRpc> => {
   return createRpc(webSocket)
 }
 
-export const startExternalRuntime = async ({
-  Workspace,
-  entryFile,
-  entrySource,
-  inspectPort,
-  runtimeName,
-  serverPort,
-}: StartExternalRuntimeOptions) => {
-  await Workspace.add({
-    content: entrySource,
-    name: entryFile,
-  })
-
-  const { args, command } = getRuntimeCommand(runtimeName, inspectPort, entryFile)
-  const stdout: string[] = []
-  const stderr: string[] = []
-  const childProcess = spawn(command, args, {
-    cwd: workspacePath,
-    env: {
-      ...process.env,
-      MEMORY_LEAK_FINDER_SERVER_PORT: String(serverPort),
-    },
-    stdio: ['ignore', 'pipe', 'pipe'],
-  })
-
-  childProcess.stdout.setEncoding('utf8')
-  childProcess.stderr.setEncoding('utf8')
-  childProcess.stdout.on('data', (value: string) => {
-    stdout.push(value)
-  })
-  childProcess.stderr.on('data', (value: string) => {
-    stderr.push(value)
-  })
-
-  const getOutput = () => {
-    return `stdout:\n${stdout.join('')}\nstderr:\n${stderr.join('')}`
-  }
-
-  await waitForHttpServer(
-    `http://127.0.0.1:${serverPort}/health`,
-    getOutput,
-    () => childProcess.exitCode !== null || childProcess.signalCode !== null,
-  )
-  await getJson(inspectPort)
-
-  let rpc: RuntimeRpc | undefined
-  let disposed = false
-
-  const connect = async () => {
-    if (!rpc) {
-      rpc = await connectToInspector(inspectPort)
-    }
-    return rpc
-  }
-
-  const dispose = async () => {
-    if (disposed) {
-      return
-    }
-    disposed = true
-    if (rpc) {
-      await rpc.dispose()
-    }
-    if (childProcess.exitCode === null && childProcess.signalCode === null) {
-      childProcess.kill('SIGTERM')
-      try {
-        await waitForExit(childProcess, 2_000)
-      } catch {
-        childProcess.kill('SIGKILL')
-        await waitForExit(childProcess, 2_000)
-      }
-    }
-  }
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const workspace = Workspace.create({ electronApp, expect, ideVersion, page, platform, VError })
 
   return {
-    inspectPort,
-    runtimeName,
-    serverPort,
-    async dispose() {
-      await dispose()
-    },
-    async evaluate(expression: string) {
-      const runtimeRpc = await connect()
-      const result = await runtimeRpc.invoke<RpcResultEnvelope<RuntimeEvaluateResult>>('Runtime.evaluate', {
-        awaitPromise: true,
-        expression,
-        returnByValue: true,
-      })
-      return result.result?.value
-    },
-    request(path: string, init: RequestInit = {}) {
-      const url = new URL(path, `http://127.0.0.1:${serverPort}`)
-      return fetch(url, init)
-    },
-    async takeSnapshot(name: string) {
-      const runtimeRpc = await connect()
-      const outputDirectory = join(workspacePath, '.external-runtime')
-      const outFile = join(outputDirectory, `${name}.json`)
-      await mkdir(outputDirectory, { recursive: true })
-      const writeStream = createWriteStream(outFile)
-      const chunkListener = (message: InspectorEvent) => {
-        const chunk = message.params?.chunk
-        if (typeof chunk === 'string') {
-          writeStream.write(chunk)
-        }
+    async createPorts(): Promise<{ inspectPort: number; serverPort: number }> {
+      const [inspectPort, serverPort] = await Promise.all([getRandomPort(), getRandomPort()])
+      if (inspectPort === serverPort) {
+        return this.createPorts()
       }
-      runtimeRpc.on('HeapProfiler.addHeapSnapshotChunk', chunkListener)
-      await runtimeRpc.invoke('HeapProfiler.takeHeapSnapshot', {
-        captureNumericValues: true,
-        exposeInternals: false,
-        reportProgress: true,
+      return {
+        inspectPort,
+        serverPort,
+      }
+    },
+    async startExternalRuntime({
+      entryFile,
+      entrySource,
+      inspectPort,
+      moduleType = 'module',
+      runtimeName,
+      serverPort,
+    }: StartExternalRuntimeOptions): Promise<ExternalRuntimeHandle> {
+      if (moduleType === 'module') {
+        await workspace.add({
+          content: JSON.stringify(
+            {
+              name: 'external-runtime-fixture',
+              private: true,
+              type: 'module',
+            },
+            null,
+            2,
+          ),
+          name: 'package.json',
+        })
+      }
+
+      await workspace.add({
+        content: entrySource,
+        name: entryFile,
       })
-      runtimeRpc.off('HeapProfiler.addHeapSnapshotChunk', chunkListener)
-      await new Promise<void>((resolve, reject) => {
-        writeStream.end((error) => {
-          if (error) {
-            reject(error)
+
+      const { args, command } = getRuntimeCommand(runtimeName, inspectPort, entryFile)
+      const stdout: string[] = []
+      const stderr: string[] = []
+      const childProcess = spawn(command, args, {
+        cwd: workspacePath,
+        env: {
+          ...process.env,
+          MEMORY_LEAK_FINDER_SERVER_PORT: String(serverPort),
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+
+      if (!childProcess.stdout || !childProcess.stderr) {
+        throw new Error('Expected child process stdout and stderr to be available')
+      }
+
+      childProcess.stdout.setEncoding('utf8')
+      childProcess.stderr.setEncoding('utf8')
+      childProcess.stdout.on('data', (value: string) => {
+        stdout.push(value)
+      })
+      childProcess.stderr.on('data', (value: string) => {
+        stderr.push(value)
+      })
+
+      const getOutput = () => {
+        return `stdout:\n${stdout.join('')}\nstderr:\n${stderr.join('')}`
+      }
+
+      await waitForHttpServer(
+        `http://127.0.0.1:${serverPort}/health`,
+        getOutput,
+        () => childProcess.exitCode !== null || childProcess.signalCode !== null,
+      )
+      await getJson(inspectPort)
+
+      let rpc: RuntimeRpc | undefined
+      let disposed = false
+
+      const connect = async () => {
+        if (!rpc) {
+          rpc = await connectToInspector(inspectPort)
+        }
+        return rpc
+      }
+
+      return {
+        inspectPort,
+        runtimeName,
+        serverPort,
+        async dispose() {
+          if (disposed) {
             return
           }
-          resolve()
-        })
-      })
-      await access(outFile)
-      return outFile
+          disposed = true
+          rpc?.dispose()
+          if (childProcess.exitCode === null && childProcess.signalCode === null) {
+            childProcess.kill('SIGTERM')
+            try {
+              await waitForExit(childProcess, 2_000)
+            } catch {
+              childProcess.kill('SIGKILL')
+              await waitForExit(childProcess, 2_000)
+            }
+          }
+        },
+        async evaluate(expression: string) {
+          const runtimeRpc = await connect()
+          const result = await runtimeRpc.invoke<RpcResultEnvelope<RuntimeEvaluateResult>>('Runtime.evaluate', {
+            awaitPromise: true,
+            expression,
+            returnByValue: true,
+          })
+          return result.result?.value
+        },
+        request(path: string, init: RequestInit = {}) {
+          const url = new URL(path, `http://127.0.0.1:${serverPort}`)
+          return fetch(url, init)
+        },
+        async takeSnapshot(name: string) {
+          const runtimeRpc = await connect()
+          const outputDirectory = join(workspacePath, '.external-runtime')
+          const outFile = join(outputDirectory, `${name}.json`)
+          await mkdir(outputDirectory, { recursive: true })
+          const writeStream = createWriteStream(outFile)
+          const chunkListener = (message: InspectorEvent) => {
+            const chunk = message.params?.chunk
+            if (typeof chunk === 'string') {
+              writeStream.write(chunk)
+            }
+          }
+          runtimeRpc.on('HeapProfiler.addHeapSnapshotChunk', chunkListener)
+          try {
+            await runtimeRpc.invoke('HeapProfiler.takeHeapSnapshot', {
+              captureNumericValues: true,
+              exposeInternals: false,
+              reportProgress: true,
+            })
+          } finally {
+            runtimeRpc.off('HeapProfiler.addHeapSnapshotChunk', chunkListener)
+          }
+          await new Promise<void>((resolve, reject) => {
+            writeStream.end((error) => {
+              if (error) {
+                reject(error)
+                return
+              }
+              resolve()
+            })
+          })
+          await access(outFile)
+          return outFile
+        },
+      } satisfies ExternalRuntimeHandle
     },
-  } satisfies ExternalRuntimeHandle
+  }
 }
