@@ -5,25 +5,163 @@ export const skip = false
 
 export const requiresNetwork = true
 
-const originalAppContent = `function App() {
-  return <main>vite fixture works</main>
+const componentCount = 10
+const phases = [1, 2, 3, 4]
+
+const getPhaseLabel = (phase: number): string => `vite phase ${phase}`
+
+const getChecksum = (phase: number): string => `vite-phase-${phase}-checksum`
+
+const getComponentName = (index: number): string => `Segment${index}`
+
+const getComponentPath = (index: number): string => `vite-app/src/generated/components/${getComponentName(index)}.tsx`
+
+const getMetricRows = (phase: number): string => {
+  return Array.from({ length: componentCount }, (_, index) => {
+    const weight = phase * 100 + index * 7
+    return `  {
+    id: 'segment-${index}',
+    label: 'vite-phase-${phase}-row-${index}',
+    weight: ${weight},
+    detail: 'trace-${phase}-${index}-${weight}',
+  }`
+  }).join('\n,')
+}
+
+const getMetricsContent = (phase: number): string => {
+  return `export const phaseLabel = '${getPhaseLabel(phase)}'
+export const phaseChecksum = '${getChecksum(phase)}'
+export const metricRows = [
+${getMetricRows(phase)}
+]
+export const metricTotal = ${phase * 1000 + componentCount * 17}
+`
+}
+
+const getComponentContent = (phase: number, index: number): string => {
+  return `import { metricRows, metricTotal, phaseChecksum, phaseLabel } from '../metrics'
+
+export const ${getComponentName(index)} = () => {
+  const row = metricRows[${index}]
+
+  return (
+    <article data-segment="${index}">
+      <h2>vite-phase-${phase}-segment-${index}</h2>
+      <p>{phaseLabel}</p>
+      <p>{row.label}</p>
+      <p>{row.detail}</p>
+      <p>{phaseChecksum}</p>
+      <p>{metricTotal}</p>
+    </article>
+  )
+}
+`
+}
+
+const getComponentIndexContent = (phase: number): string => {
+  const imports = Array.from({ length: componentCount }, (_, index) => {
+    const componentName = getComponentName(index)
+    return `import { ${componentName} } from './${componentName}'`
+  }).join('\n')
+  const componentList = Array.from({ length: componentCount }, (_, index) => getComponentName(index)).join(', ')
+  const labels = Array.from({ length: componentCount }, (_, index) => `'vite-phase-${phase}-segment-${index}'`).join(', ')
+  return `${imports}
+
+export const segmentComponents = [${componentList}]
+export const segmentLabels = [${labels}]
+`
+}
+
+const getCssContent = (phase: number): string => {
+  return `/* vite-phase-${phase}-css */
+:root {
+  color-scheme: light;
+  --phase-accent: hsl(${phase * 35}deg 70% 45%);
+  --phase-border: hsl(${phase * 35 + 20}deg 35% 72%);
+}
+
+body {
+  margin: 0;
+}
+
+.app-shell {
+  padding: 24px;
+  border: 4px solid var(--phase-border);
+}
+`
+}
+
+const getAppContent = (phase: number): string => {
+  return `import './generated/root.css'
+import { segmentComponents, segmentLabels } from './generated/components'
+import { phaseChecksum, phaseLabel } from './generated/metrics'
+
+function App() {
+  return (
+    <main className="app-shell">
+      <h1>{phaseLabel}</h1>
+      <p>${getPhaseLabel(phase)}</p>
+      <p>{phaseChecksum}</p>
+      <p>{segmentLabels.join(' | ')}</p>
+      <section>
+        {segmentComponents.map((SegmentComponent, index) => (
+          <SegmentComponent key={index} />
+        ))}
+      </section>
+    </main>
+  )
 }
 
 export default App
 `
-
-const updatedAppContent = `function App() {
-  return <main>vite fixture updated</main>
 }
 
-export default App
-`
+const getMainContent = (): string => {
+  return `import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
 
-const updateAppContent = async (Workspace: TestContext['Workspace'], content: string): Promise<void> => {
-  await Workspace.add({
-    name: 'vite-app/src/App.tsx',
-    content,
-  })
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+`
+}
+
+const getFilesForPhase = (phase: number): ReadonlyArray<{ name: string; content: string }> => {
+  return [
+    {
+      name: 'vite-app/src/main.tsx',
+      content: getMainContent(),
+    },
+    {
+      name: 'vite-app/src/App.tsx',
+      content: getAppContent(phase),
+    },
+    {
+      name: 'vite-app/src/generated/metrics.ts',
+      content: getMetricsContent(phase),
+    },
+    {
+      name: 'vite-app/src/generated/components/index.ts',
+      content: getComponentIndexContent(phase),
+    },
+    {
+      name: 'vite-app/src/generated/root.css',
+      content: getCssContent(phase),
+    },
+    ...Array.from({ length: componentCount }, (_, index) => ({
+      name: getComponentPath(index),
+      content: getComponentContent(phase, index),
+    })),
+  ]
+}
+
+const updatePhase = async (Workspace: TestContext['Workspace'], phase: number): Promise<void> => {
+  for (const file of getFilesForPhase(phase)) {
+    await Workspace.add(file)
+  }
 }
 
 const assertResponseContains = async (
@@ -47,6 +185,21 @@ const assertResponseContains = async (
   assert.fail(
     `Timed out waiting for ${JSON.stringify(path)} body to contain ${JSON.stringify(expectedText)}. Last status: ${lastStatus}. Last body: ${lastBody}`,
   )
+}
+
+const assertPhase = async (ExternalRuntime: TestContext['ExternalRuntime'], phase: number): Promise<void> => {
+  await assertResponseContains(ExternalRuntime, '/src/main.tsx', "createRoot(document.getElementById('root')!)")
+  await assertResponseContains(ExternalRuntime, '/src/App.tsx', getPhaseLabel(phase))
+  await assertResponseContains(ExternalRuntime, '/src/generated/metrics.ts', getChecksum(phase))
+  await assertResponseContains(ExternalRuntime, '/src/generated/components/index.ts', `vite-phase-${phase}-segment-${componentCount - 1}`)
+  await assertResponseContains(ExternalRuntime, '/src/generated/root.css', `vite-phase-${phase}-css`)
+  for (let index = 0; index < componentCount; index++) {
+    await assertResponseContains(
+      ExternalRuntime,
+      `/src/generated/components/${getComponentName(index)}.tsx`,
+      `vite-phase-${phase}-segment-${index}`,
+    )
+  }
 }
 
 export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: TestContext): Promise<void> => {
@@ -85,10 +238,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
       },
     ],
     setupFiles: [
-      {
-        name: 'vite-app/src/App.tsx',
-        content: originalAppContent,
-      },
+      ...getFilesForPhase(phases[0]),
       {
         name: 'vite-app/public/health.txt',
         content: 'ok\n',
@@ -101,13 +251,12 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
 }
 
 export const run = async ({ ExternalRuntime, Workspace }: TestContext): Promise<void> => {
-  await assertResponseContains(ExternalRuntime, '/src/App.tsx', 'vite fixture works')
+  await assertPhase(ExternalRuntime, phases[0])
 
-  await updateAppContent(Workspace, updatedAppContent)
-  await assertResponseContains(ExternalRuntime, '/src/App.tsx', 'vite fixture updated')
-
-  await updateAppContent(Workspace, originalAppContent)
-  await assertResponseContains(ExternalRuntime, '/src/App.tsx', 'vite fixture works')
+  for (const phase of phases.slice(1)) {
+    await updatePhase(Workspace, phase)
+    await assertPhase(ExternalRuntime, phase)
+  }
 }
 
 export const teardown = async ({ Editor, ExternalRuntime, Workspace }: TestContext): Promise<void> => {
