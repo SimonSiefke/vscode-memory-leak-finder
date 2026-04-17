@@ -233,14 +233,12 @@ const sortRecord = (record: Record<string, string> | undefined): Record<string, 
 const getProjectSetupHash = ({
   entryFile,
   entrySource,
-  env,
   moduleType,
   setupCommands,
   setupFiles,
 }: {
   readonly entryFile: string | undefined
   readonly entrySource: string | undefined
-  readonly env: Record<string, string> | undefined
   readonly moduleType: 'commonjs' | 'module'
   readonly setupCommands: readonly SetupCommand[]
   readonly setupFiles: readonly SetupFile[]
@@ -250,7 +248,6 @@ const getProjectSetupHash = ({
       JSON.stringify({
         entryFile,
         entrySource,
-        env: sortRecord(env),
         moduleType,
         setupCommands,
         setupFiles,
@@ -407,7 +404,6 @@ const prepareProjectSetup = async ({
   const setupHash = getProjectSetupHash({
     entryFile,
     entrySource,
-    env,
     moduleType,
     setupCommands,
     setupFiles,
