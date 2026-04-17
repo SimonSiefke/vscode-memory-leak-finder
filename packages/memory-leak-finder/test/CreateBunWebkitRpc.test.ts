@@ -273,7 +273,8 @@ test('createBunWebkitRpc - evaluates by-value callFunctionOn against a synthetic
       params: {
         awaitPromise: undefined,
         doNotPauseOnExceptionsAndMuteConsole: true,
-        expression: '(function (){ return this.length }).call((function (){ return this.filter(Boolean) }).call(queryInstances(globalThis["Object"])))',
+        expression:
+          '(function (){ return this.length }).call((function (){ return this.filter(Boolean) }).call(queryInstances(globalThis["Object"])))',
         includeCommandLineAPI: true,
         objectGroup: 'group-1',
         returnByValue: true,
