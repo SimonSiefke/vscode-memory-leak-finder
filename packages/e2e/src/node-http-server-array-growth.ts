@@ -1,4 +1,3 @@
-import { readFile } from 'node:fs/promises'
 import type { TestContext } from '../types.ts'
 
 export const skip = false
@@ -85,10 +84,10 @@ export const run = async (): Promise<void> => {
   }
 
   await runtime.evaluate('globalThis.gc?.() ?? null')
-  const snapshotPath = await runtime.takeSnapshot('node-http-server-array-growth')
-  const snapshotText = await readFile(snapshotPath, 'utf8')
-  if (!snapshotText.includes('__memoryLeakFinderLeakedRequests')) {
-    throw new Error('Expected heap snapshot to contain the named leaked request array')
+  const namedArrayCount = await runtime.getNamedArrayCount()
+  const leakedRequestArrayCount = namedArrayCount.__memoryLeakFinderLeakedRequests || 0
+  if (leakedRequestArrayCount < requestCount) {
+    throw new Error(`Expected named leaked request array count to be at least ${requestCount} but received ${leakedRequestArrayCount}`)
   }
 }
 

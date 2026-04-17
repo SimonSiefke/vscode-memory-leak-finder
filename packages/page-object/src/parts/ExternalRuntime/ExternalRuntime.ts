@@ -1,6 +1,6 @@
+import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { spawn } from 'node:child_process'
-import { createWriteStream } from 'node:fs'
-import { access, mkdir } from 'node:fs/promises'
+import { access, copyFile, mkdir } from 'node:fs/promises'
 import { createServer } from 'node:net'
 import { join } from 'node:path'
 import process from 'node:process'
@@ -62,11 +62,20 @@ export interface ExternalRuntimeHandle {
   readonly serverPort: number
   dispose(): Promise<void>
   evaluate(expression: string): Promise<unknown>
+  getNamedArrayCount(): Promise<Record<string, number>>
   request(path: string, init?: RequestInit): Promise<Response>
   takeSnapshot(name: string): Promise<string>
 }
 
 const workspacePath = join(Root.root, '.vscode-test-workspace')
+const memoryLeakWorkerUrl = join(Root.root, 'packages', 'memory-leak-finder', 'bin', 'memory-leak-worker.ts')
+const connectDevtoolsCommand = 'ConnectDevtools.connectDevtools'
+const getHeapSnapshotForConnectionCommand = 'GetHeapSnapshotForConnection.getHeapSnapshotForConnection'
+const getNamedArrayCountForConnectionCommand = 'GetNamedArrayCountForConnection.getNamedArrayCountForConnection'
+const defaultMeasureId = 'string-count'
+
+let nextConnectionId = 1
+let nextSnapshotId = 1
 
 const listen = async (server: ReturnType<typeof createServer>): Promise<number> => {
   const { promise, reject, resolve } = Promise.withResolvers<void>()
@@ -343,7 +352,31 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await getJson(inspectPort)
 
       let rpc: RuntimeRpc | undefined
+      const memoryRpc = await NodeWorkerRpcParent.create({
+        commandMap: {},
+        path: memoryLeakWorkerUrl,
+        stdio: 'inherit',
+      })
+      const memoryConnectionId = nextConnectionId++
       let disposed = false
+
+      await memoryRpc.invoke(
+        connectDevtoolsCommand,
+        '',
+        '',
+        memoryConnectionId,
+        defaultMeasureId,
+        30_000,
+        false,
+        false,
+        false,
+        false,
+        0,
+        0,
+        0,
+        childProcess.pid ?? 0,
+        inspectPort,
+      )
 
       const connect = async () => {
         if (!rpc) {
@@ -362,6 +395,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
           disposed = true
           rpc?.dispose()
+          await memoryRpc.dispose()
           if (childProcess.exitCode === null && childProcess.signalCode === null) {
             childProcess.kill('SIGTERM')
             try {
@@ -381,41 +415,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           })
           return result.result?.result?.value
         },
+        async getNamedArrayCount() {
+          const snapshotId = nextSnapshotId++
+          const result = (await memoryRpc.invoke(getNamedArrayCountForConnectionCommand, memoryConnectionId, '', snapshotId)) as Record<
+            string,
+            number
+          >
+          return result
+        },
         request(path: string, init: RequestInit = {}) {
           const url = new URL(path, `http://127.0.0.1:${serverPort}`)
           return fetch(url, init)
         },
         async takeSnapshot(name: string) {
-          const runtimeRpc = await connect()
-          const outputDirectory = join(workspacePath, '.external-runtime')
-          const outFile = join(outputDirectory, `${name}.json`)
-          await mkdir(outputDirectory, { recursive: true })
-          const writeStream = createWriteStream(outFile)
-          const chunkListener = (message: InspectorEvent) => {
-            const chunk = message.params?.chunk
-            if (typeof chunk === 'string') {
-              writeStream.write(chunk)
-            }
-          }
-          runtimeRpc.on('HeapProfiler.addHeapSnapshotChunk', chunkListener)
-          try {
-            await runtimeRpc.invoke('HeapProfiler.takeHeapSnapshot', {
-              captureNumericValues: true,
-              exposeInternals: false,
-              reportProgress: true,
-            })
-          } finally {
-            runtimeRpc.off('HeapProfiler.addHeapSnapshotChunk', chunkListener)
-          }
-          const { promise, reject, resolve } = Promise.withResolvers<void>()
-          writeStream.end((error?: Error | null) => {
-            if (error) {
-              reject(error)
-              return
-            }
-            resolve()
-          })
-          await promise
+          const snapshotId = nextSnapshotId++
+          const sourcePath = (await memoryRpc.invoke(getHeapSnapshotForConnectionCommand, memoryConnectionId, snapshotId)) as string
+          const outFile = join(workspacePath, '.external-runtime', `${name}.json`)
+          await mkdir(join(workspacePath, '.external-runtime'), { recursive: true })
+          await copyFile(sourcePath, outFile)
           await access(outFile)
           return outFile
         },
