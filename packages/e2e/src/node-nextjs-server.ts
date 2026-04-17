@@ -18,7 +18,18 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
     setupCommands: [
       {
         command: 'npx',
-        args: ['--yes', 'create-next-app@latest', 'next-app', '--yes', '--use-npm', '--js', '--app', '--eslint', '--no-tailwind', '--skip-install'],
+        args: [
+          '--yes',
+          'create-next-app@latest',
+          'next-app',
+          '--yes',
+          '--use-npm',
+          '--js',
+          '--app',
+          '--eslint',
+          '--no-tailwind',
+          '--skip-install',
+        ],
       },
       {
         command: 'npm',
