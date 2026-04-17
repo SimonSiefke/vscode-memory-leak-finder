@@ -34,7 +34,9 @@ const assertResponseContains = async (
   let lastStatus = 0
   let lastBody = ''
   for (let attempt = 0; attempt < 120; attempt++) {
-    const response = await ExternalRuntime.request(path)
+    const separator = path.includes('?') ? '&' : '?'
+    const requestPath = `${path}${separator}test=${Date.now()}-${attempt}`
+    const response = await ExternalRuntime.request(requestPath)
     lastStatus = response.status
     lastBody = await response.text()
     if (response.ok && lastBody.includes(expectedText)) {
