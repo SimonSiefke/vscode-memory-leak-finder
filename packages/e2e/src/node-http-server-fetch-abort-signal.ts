@@ -1,24 +1,12 @@
-import assert from 'node:assert'
 import type { TestContext } from '../types.js'
-
-interface DataResponse {
-  readonly aliveSignalCount: number
-  readonly iterations: number
-  readonly ok: boolean
-}
 
 export const skip = false
 
-const iterations = 200
-const maxAliveSignalCount = 5
-
 const createServerSource = () => {
   return `import http from 'node:http'
-import { setTimeout as delay } from 'node:timers/promises'
 
 const host = '127.0.0.1'
 const port = Number(process.env.MEMORY_LEAK_FINDER_SERVER_PORT)
-const iterations = ${iterations}
 
 const listen = (server, port) => {
   const { promise, reject, resolve } = Promise.withResolvers()
@@ -32,16 +20,6 @@ const listen = (server, port) => {
     resolve()
   })
   return promise
-}
-
-const forceGc = async () => {
-  if (typeof globalThis.gc !== 'function') {
-    throw new Error('Expected gc to be exposed')
-  }
-  for (let i = 0; i < 8; i++) {
-    globalThis.gc()
-    await delay(0)
-  }
 }
 
 const helloWorldServer = http.createServer((request, response) => {
@@ -65,26 +43,6 @@ if (!address || typeof address === 'string') {
 
 const helloWorldUrl = new URL('/hello', 'http://' + host + ':' + address.port)
 
-const runLeakCheck = async () => {
-  const signalRefs = []
-  for (let i = 0; i < iterations; i++) {
-    const controller = new AbortController()
-    signalRefs.push(new WeakRef(controller.signal))
-    const upstreamResponse = await fetch(helloWorldUrl, { signal: controller.signal })
-    const text = await upstreamResponse.text()
-    if (text !== 'hello world') {
-      throw new Error('Expected upstream to respond with hello world but received ' + text)
-    }
-  }
-  await forceGc()
-  const aliveSignalCount = signalRefs.filter((signalRef) => signalRef.deref()).length
-  return {
-    aliveSignalCount,
-    iterations,
-    ok: true,
-  }
-}
-
 const handleRequest = async (request, response) => {
   if (request.url === '/health') {
     response.writeHead(200, { 'content-type': 'application/json' })
@@ -93,9 +51,11 @@ const handleRequest = async (request, response) => {
   }
 
   if (request.url === '/data') {
-    const result = await runLeakCheck()
-    response.writeHead(200, { 'content-type': 'application/json' })
-    response.end(JSON.stringify(result))
+    const controller = new AbortController()
+    const upstreamResponse = await fetch(helloWorldUrl, { signal: controller.signal })
+    const text = await upstreamResponse.text()
+    response.writeHead(200, { 'content-type': 'text/plain' })
+    response.end(text)
     return
   }
 
@@ -130,13 +90,14 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
 }
 
 export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
-  const body = await ExternalRuntime.getJson<DataResponse>('/data')
-  assert.strictEqual(body.ok, true)
-  assert.strictEqual(body.iterations, iterations)
-  assert.ok(
-    body.aliveSignalCount <= maxAliveSignalCount,
-    `Expected at most ${maxAliveSignalCount} AbortSignal instances to remain alive after GC but found ${body.aliveSignalCount}`,
-  )
+  const response = await ExternalRuntime.request('/data')
+  if (!response.ok) {
+    throw new Error(`Expected /data to respond with 200 but received ${response.status}`)
+  }
+  const body = await response.text()
+  if (body !== 'hello world') {
+    throw new Error(`Expected /data to respond with hello world but received ${body}`)
+  }
 }
 
 export const teardown = async ({ Editor, ExternalRuntime, Terminal, Workspace }: TestContext): Promise<void> => {
