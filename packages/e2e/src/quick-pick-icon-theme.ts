@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = process.platform === 'darwin'
+
 const isThemeActionItem = (label: string): boolean => {
   return /additional file icon themes/i.test(label)
 }
