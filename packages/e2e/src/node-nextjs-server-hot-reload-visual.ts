@@ -1,6 +1,19 @@
 import assert from 'node:assert'
 import type { TestContext } from '../types.js'
 
+type VisualEditor = TestContext['Editor'] & {
+  shouldHaveText(text: string, fileName?: string, groupId?: number): Promise<void>
+}
+
+type VisualTerminal = TestContext['Terminal'] & {
+  pressEnter(): Promise<void>
+}
+
+type VisualTestContext = Omit<TestContext, 'Editor' | 'Terminal'> & {
+  Editor: VisualEditor
+  Terminal: VisualTerminal
+}
+
 export const skip = false
 
 export const requiresNetwork = true
@@ -10,8 +23,7 @@ const updatedHeading = 'next visual hot reload phase 2'
 const appDir = 'next-app'
 const pagePath = `${appDir}/app/page.js`
 
-const createNextAppCommand =
-  'npx --yes create-next-app@latest next-app --yes --use-npm --js --app --eslint --no-tailwind --skip-install'
+const createNextAppCommand = 'npx --yes create-next-app@latest next-app --yes --use-npm --js --app --eslint --no-tailwind --skip-install'
 
 const getLayoutContent = (): string => {
   return `export const metadata = {
@@ -48,7 +60,7 @@ export const setup = async ({ Editor, Explorer, Terminal, Workspace }: TestConte
   await Explorer.focus()
 }
 
-export const run = async ({ Editor, ExternalRuntime, Panel, SimpleBrowser, Terminal, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ Editor, ExternalRuntime, Panel, SimpleBrowser, Terminal, Workspace }: VisualTestContext): Promise<void> => {
   const { serverPort } = await ExternalRuntime.createPorts()
 
   await Terminal.show({

@@ -170,7 +170,7 @@ export interface Editor {
   shouldHaveSemanticToken(type: any): Promise<void>
   shouldHaveSpark(): Promise<void>
   shouldHaveSquigglyError(): Promise<void>
-  shouldHaveText(text: any, fileName?: any): Promise<void>
+  shouldHaveText(text: any, fileName?: any, groupId?: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
   shouldNotHaveSemanticToken(type: any): Promise<void>
   shouldNotHaveSquigglyError(): Promise<void>
@@ -548,7 +548,6 @@ export interface Task {
   run(taskName: any): Promise<void>
   runError(taskName: any): Promise<void>
   selectQuickPickItem(options: any): Promise<void>
-  pressEnter(): Promise<void>
   unpin(name: any): Promise<void>
 }
 export interface Terminal {
@@ -565,6 +564,7 @@ export interface Terminal {
   moveToEditorArea(): Promise<void>
   moveToPanelArea(): Promise<void>
   openFind(): Promise<void>
+  pressEnter(): Promise<void>
   restartPtyHost(): Promise<void>
   scrollToBottom(): Promise<void>
   scrollToTop(): Promise<void>
