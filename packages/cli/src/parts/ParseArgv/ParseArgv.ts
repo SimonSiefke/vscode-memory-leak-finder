@@ -31,6 +31,8 @@ interface ParsedVscodeVersion {
   readonly vscodeVersion: string
 }
 
+type SubprocessRuntime = 'bun' | 'node'
+
 const parseVscodeVersion = (defaultVersionValue: string, argv: readonly string[]): ParsedVscodeVersion => {
   if (argv.includes('--vscode-version')) {
     const vscodeVersionValue = parseArgvString(argv, '--vscode-version')
@@ -128,6 +130,21 @@ const parseMeasureAfter = (argv: readonly string[]): boolean => {
 
 const parseMeasureNode = (argv: readonly string[]): boolean => {
   return argv.includes('--measure-node')
+}
+
+const parseMeasureNodeSubprocess = (argv: readonly string[]): boolean => {
+  return argv.includes('--measure-node-subprocess')
+}
+
+const parseSubprocessRuntime = (argv: readonly string[]): SubprocessRuntime => {
+  if (!argv.includes('--subprocess-runtime')) {
+    return 'node'
+  }
+  const value = parseArgvString(argv, '--subprocess-runtime')
+  if (value === 'bun' || value === 'node') {
+    return value
+  }
+  throw new Error(`Expected --subprocess-runtime to be one of bun or node but received ${value || '<empty>'}`)
 }
 
 const parseTimeouts = (argv: readonly string[]): boolean => {
@@ -325,12 +342,14 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  const measureNodeSubprocess = parseMeasureNodeSubprocess(argv)
   const recordVideo = parseRecordVideo(argv)
   const compressVideo = parseCompressVideo(argv)
   const restartBetween = parseRestartBetween(argv)
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
+  const subprocessRuntime = parseSubprocessRuntime(argv)
   const screencastQuality = parseScreencastQuality(argv)
   const setupOnly = parseSetupOnly(argv)
   const login = parseLogin(argv)
@@ -374,6 +393,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     measure,
     measureAfter,
     measureNode,
+    measureNodeSubprocess,
     openDevtools,
     pageObjectPath,
     platform,
@@ -385,6 +405,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     runSkippedTestsAnyway,
     screencastQuality,
     setupOnly,
+    subprocessRuntime,
     timeoutBetween,
     timeouts,
     trackFunctions,

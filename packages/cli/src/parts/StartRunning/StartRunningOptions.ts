@@ -27,6 +27,7 @@ export interface StartRunningOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly measureNodeSubprocess: boolean
   readonly openDevtools: boolean
   readonly platform: string
   readonly recordVideo: boolean
@@ -36,6 +37,7 @@ export interface StartRunningOptions {
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
   readonly setupOnly: boolean
+  readonly subprocessRuntime: 'bun' | 'node'
   readonly timeoutBetween: number
   readonly timeouts: boolean
   readonly trackFunctions: boolean
