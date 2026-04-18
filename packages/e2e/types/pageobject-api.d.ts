@@ -212,6 +212,32 @@ export interface Electron {
   mockSaveDialog(response: any): Promise<void>
   mockShellTrashItem(): Promise<void>
 }
+export interface ExternalRuntimeHandle {
+  readonly inspectPort: number
+  readonly runtimeName: 'bun' | 'node'
+  readonly serverPort: number
+  dispose(): Promise<void>
+  evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeName(): Promise<'bun' | 'node'>
+  getNamedArrayCount(): Promise<Record<string, number>>
+  request(path: any, init?: any): Promise<Response>
+  takeSnapshot(name: any): Promise<string>
+}
+export interface ExternalRuntime {
+  createPorts(): Promise<{
+    inspectPort: number
+    serverPort: number
+  }>
+  dispose(): Promise<void>
+  evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeName(): Promise<'bun' | 'node'>
+  getNamedArrayCount(): Promise<Record<string, number>>
+  request(path: any, init?: any): Promise<Response>
+  startExternalRuntime(options: any): Promise<void>
+  takeSnapshot(name: any): Promise<string>
+}
 export interface Explorer {
   cancel(): Promise<void>
   click(): Promise<void>
@@ -628,6 +654,7 @@ export interface PageObjectApi {
   readonly Editor: Editor
   readonly EditorFind: EditorFind
   readonly Electron: Electron
+  readonly ExternalRuntime: ExternalRuntime
   readonly Explorer: Explorer
   readonly Extensions: Extensions
   readonly ExtensionDetailView: ExtensionDetailView
