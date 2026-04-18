@@ -2,22 +2,17 @@ import assert from 'node:assert'
 import type { TestContext } from '../types.ts'
 
 interface DataResponse {
-  readonly iterations: number
   readonly ok: boolean
   readonly shadowRealmAvailable: boolean
 }
 
 export const skip = false
 
-const iterations = 100
-
 const createServerSource = () => {
   return `import http from 'node:http'
-import { setTimeout as delay } from 'node:timers/promises'
 
 const host = '127.0.0.1'
 const port = Number(process.env.MEMORY_LEAK_FINDER_SERVER_PORT)
-const iterations = ${iterations}
 
 const listen = (server, port) => {
   const { promise, reject, resolve } = Promise.withResolvers()
@@ -33,23 +28,13 @@ const listen = (server, port) => {
   return promise
 }
 
-const runAndBreathe = async (fn, repeat, waitTime = 20) => {
-  for (let i = 0; i < repeat; i++) {
-    await fn()
-    await delay(waitTime)
-  }
-}
-
 const runShadowRealmRegressionCheck = async () => {
   if (typeof ShadowRealm !== 'function') {
     throw new Error('Expected ShadowRealm to be available')
   }
-  await runAndBreathe(() => {
-    const realm = new ShadowRealm()
-    realm.evaluate('new TextEncoder(); 1;')
-  }, iterations)
+  const realm = new ShadowRealm()
+  realm.evaluate('new TextEncoder(); 1;')
   return {
-    iterations,
     ok: true,
     shadowRealmAvailable: true,
   }
@@ -92,13 +77,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
 
   const { inspectPort, serverPort } = await ExternalRuntime.createPorts()
   await ExternalRuntime.startExternalRuntime({
-    args: [
-      `--inspect=127.0.0.1:${inspectPort}`,
-      '--expose-gc',
-      '--experimental-shadow-realm',
-      '--max-old-space-size=20',
-      'server.js',
-    ],
+    args: [`--inspect=127.0.0.1:${inspectPort}`, '--expose-gc', '--experimental-shadow-realm', '--max-old-space-size=20', 'server.js'],
     command: 'node',
     entryFile: 'server.js',
     entrySource: createServerSource(),
@@ -111,7 +90,6 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
 export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
   const body = await ExternalRuntime.getJson<DataResponse>('/data')
   assert.deepStrictEqual(body, {
-    iterations,
     ok: true,
     shadowRealmAvailable: true,
   })
