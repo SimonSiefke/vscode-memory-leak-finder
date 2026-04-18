@@ -4,7 +4,7 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 
-const createCountMap = (names) => {
+const createCountMap = (names: readonly string[]) => {
   const map = Object.create(null)
   for (const name of names) {
     map[name] ||= 0
@@ -13,22 +13,32 @@ const createCountMap = (names) => {
   return map
 }
 
-const filterByArray = (value) => {
+interface NameMapValue {
+  readonly nodeName: string
+  readonly edgeName?: string
+}
+
+const filterByArray = (value: NameMapValue): boolean => {
   return value.nodeName === 'Array'
 }
 
-const getValueName = (value) => {
+const getValueName = (value: NameMapValue): string => {
   return value.edgeName || value.nodeName
 }
 
-const getArrayNames = (nameMap) => {
+const getArrayNames = (nameMap: Record<string, NameMapValue>): readonly string[] => {
   const values = Object.values(nameMap)
   const filtered = values.filter(filterByArray)
   const mapped = filtered.map(getValueName)
   return mapped
 }
 
-const getArrayNamesWithCount = (countMap) => {
+interface CountResult {
+  readonly count: number
+  readonly name: string
+}
+
+const getArrayNamesWithCount = (countMap: Record<string, number>): readonly CountResult[] => {
   const arrayNamesWithCount = Object.entries(countMap).map(([key, value]) => {
     return {
       count: value,
@@ -38,11 +48,14 @@ const getArrayNamesWithCount = (countMap) => {
   return arrayNamesWithCount
 }
 
-export const getNamedArrayCountFromHeapSnapshot = async (id, scriptMap = {}) => {
+export const getNamedArrayCountFromHeapSnapshot = async (
+  id: number,
+  scriptMap: Record<string, unknown> = {},
+): Promise<readonly CountResult[]> => {
   const heapsnapshot = HeapSnapshotState.get(id)
 
   Assert.object(heapsnapshot)
-  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot!)
   const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
   const arrayNames = getArrayNames(nameMap)
   const countMap = createCountMap(arrayNames)
