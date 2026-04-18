@@ -170,7 +170,7 @@ export interface Editor {
   shouldHaveSemanticToken(type: any): Promise<void>
   shouldHaveSpark(): Promise<void>
   shouldHaveSquigglyError(): Promise<void>
-  shouldHaveText(text: any, fileName?: any): Promise<void>
+  shouldHaveText(text: any, fileName?: any, groupId?: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
   shouldNotHaveSemanticToken(type: any): Promise<void>
   shouldNotHaveSquigglyError(): Promise<void>
@@ -501,6 +501,7 @@ export interface SimpleBrowser {
   addElementToChat(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+  shouldHaveText(options: any): Promise<void>
   shouldHaveTabTitle(options: any): Promise<void>
 }
 export interface SourceControl {
@@ -563,6 +564,7 @@ export interface Terminal {
   moveToEditorArea(): Promise<void>
   moveToPanelArea(): Promise<void>
   openFind(): Promise<void>
+  pressEnter(): Promise<void>
   restartPtyHost(): Promise<void>
   scrollToBottom(): Promise<void>
   scrollToTop(): Promise<void>
@@ -636,7 +638,7 @@ export interface Workspace {
   initializeGitRepository(): Promise<void>
   remove(file: any): Promise<void>
   setFiles(files: any): Promise<void>
-  waitForFile(fileName: any): Promise<void>
+  waitForFile(fileName: any): Promise<boolean>
 }
 
 export interface PageObjectApi {

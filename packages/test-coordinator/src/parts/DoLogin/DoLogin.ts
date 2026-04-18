@@ -25,12 +25,14 @@ export interface LoginOptions {
   readonly inspectSharedProcessPort: number
   readonly measure: string
   readonly measureNode: boolean
+  readonly measureNodeSubprocess: boolean
   readonly openDevtools: boolean
   readonly pageObjectPathResolved: string
   readonly platform: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
+  readonly subprocessRuntime: 'bun' | 'node'
   readonly timeouts: any
   readonly trackFunctions: boolean
   readonly updateUrl: string
@@ -63,12 +65,14 @@ export const doLogin = async ({
   inspectSharedProcessPort,
   measure,
   measureNode,
+  measureNodeSubprocess,
   openDevtools,
   pageObjectPathResolved,
   platform,
   recordVideo,
   runMode,
   screencastQuality,
+  subprocessRuntime,
   timeouts,
   trackFunctions,
   updateUrl,
@@ -100,12 +104,14 @@ export const doLogin = async ({
       inspectSharedProcessPort,
       measureId: measure,
       measureNode,
+      measureNodeSubprocess,
       openDevtools,
       pageObjectPath: pageObjectPathResolved,
       platform,
       recordVideo,
       runMode,
       screencastQuality,
+      subprocessRuntime,
       timeouts,
       trackFunctions,
       updateUrl,

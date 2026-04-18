@@ -9,6 +9,7 @@ export const getRemoteObjectLength = async (session: Session, objectId: string, 
 }`,
     objectGroup,
     objectId,
+    returnByValue: true,
   })
   return fnResult1
 }

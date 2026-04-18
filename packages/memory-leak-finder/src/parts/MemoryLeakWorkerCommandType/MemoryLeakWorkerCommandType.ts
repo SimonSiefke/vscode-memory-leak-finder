@@ -1,4 +1,6 @@
 export const ConnectDevtools = 'ConnectDevtools.connectDevtools'
+export const GetHeapSnapshotForConnection = 'GetHeapSnapshotForConnection.getHeapSnapshotForConnection'
+export const GetNamedArrayCountForConnection = 'GetNamedArrayCountForConnection.getNamedArrayCountForConnection'
 export const MemoryLeakFinderSetup = 'MemoryLeakFinderSetup.setup'
 export const MemoryLeakFinderStart = 'MemoryLeakFinderStart.start'
 export const MemoryLeakFinderStop = 'MemoryLeakFinderStop.stop'

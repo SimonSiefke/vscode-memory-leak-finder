@@ -1,3 +1,4 @@
+import { createServer } from 'node:net'
 import { connectWorkers } from '../ConnectWorkers/ConnectWorkers.ts'
 import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
 
@@ -32,18 +33,53 @@ export interface PrepareTestsAndAttachOptions {
   readonly inspectSharedProcessPort: number
   readonly measureId: string
   readonly measureNode: boolean
+  readonly measureNodeSubprocess: boolean
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
+  readonly subprocessRuntime: 'bun' | 'node'
   readonly timeouts: any
   readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
+}
+
+const listen = async (server: ReturnType<typeof createServer>): Promise<number> => {
+  const { promise, reject, resolve } = Promise.withResolvers<void>()
+  server.once('error', reject)
+  server.listen(0, '127.0.0.1', () => {
+    resolve()
+  })
+  await promise
+  const address = server.address()
+  if (!address || typeof address === 'string') {
+    throw new Error('Failed to determine ephemeral port')
+  }
+  return address.port
+}
+
+const closeServer = async (server: ReturnType<typeof createServer>): Promise<void> => {
+  const { promise, reject, resolve } = Promise.withResolvers<void>()
+  server.close((error) => {
+    if (error) {
+      reject(error)
+      return
+    }
+    resolve()
+  })
+  await promise
+}
+
+const getRandomPort = async (): Promise<number> => {
+  const server = createServer()
+  const port = await listen(server)
+  await closeServer(server)
+  return port
 }
 
 export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOptions) => {
@@ -70,12 +106,14 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectSharedProcessPort,
     measureId,
     measureNode,
+    measureNodeSubprocess,
     openDevtools,
     pageObjectPath,
     platform,
     recordVideo,
     runMode,
     screencastQuality,
+    subprocessRuntime,
     timeouts,
     trackFunctions,
     updateUrl,
@@ -120,6 +158,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     })
   }
   const result = await state.promise
+  const externalInspectPort = measureNodeSubprocess ? await getRandomPort() : 0
 
   const {
     devtoolsWebSocketUrl,
@@ -152,6 +191,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     utilityContext,
     runMode,
     measureNode,
+    measureNodeSubprocess,
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
@@ -160,6 +200,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectSharedProcessPort,
     inspectExtensionsPort,
     trackFunctions,
+    externalInspectPort,
+    subprocessRuntime,
   )
   return {
     functionTrackerRpc,
