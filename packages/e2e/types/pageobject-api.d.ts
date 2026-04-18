@@ -501,6 +501,7 @@ export interface SimpleBrowser {
   addElementToChat(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+  shouldHaveText(options: any): Promise<void>
   shouldHaveTabTitle(options: any): Promise<void>
 }
 export interface SourceControl {
@@ -547,6 +548,7 @@ export interface Task {
   run(taskName: any): Promise<void>
   runError(taskName: any): Promise<void>
   selectQuickPickItem(options: any): Promise<void>
+  pressEnter(): Promise<void>
   unpin(name: any): Promise<void>
 }
 export interface Terminal {
@@ -636,7 +638,7 @@ export interface Workspace {
   initializeGitRepository(): Promise<void>
   remove(file: any): Promise<void>
   setFiles(files: any): Promise<void>
-  waitForFile(fileName: any): Promise<void>
+  waitForFile(fileName: any): Promise<boolean>
 }
 
 export interface PageObjectApi {
