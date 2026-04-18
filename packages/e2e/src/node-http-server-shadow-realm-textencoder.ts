@@ -77,7 +77,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
 
   const { inspectPort, serverPort } = await ExternalRuntime.createPorts()
   await ExternalRuntime.startExternalRuntime({
-    args: [`--inspect=127.0.0.1:${inspectPort}`, '--expose-gc', '--experimental-shadow-realm', '--max-old-space-size=20', 'server.js'],
+    args: [`--inspect=127.0.0.1:${inspectPort}`, '--expose-gc', '--experimental-shadow-realm', 'server.js'],
     command: 'node',
     entryFile: 'server.js',
     entrySource: createServerSource(),
