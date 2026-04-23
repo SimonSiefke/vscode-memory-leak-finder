@@ -37,7 +37,9 @@ export const setup = async ({ Editor, SourceControl, Workspace }: TestContext): 
     },
   ])
   await Workspace.initializeGitRepository()
+  // @ts-ignore
   await Workspace.gitAdd()
+  // @ts-ignore
   await Workspace.gitCommit('initial commit')
   await Workspace.add({
     content: modifiedContent,
@@ -49,13 +51,21 @@ export const setup = async ({ Editor, SourceControl, Workspace }: TestContext): 
 export const run = async ({ DiffEditor, Git, SourceControl }: TestContext): Promise<void> => {
   await SourceControl.shouldHaveUnstagedFile('file.txt')
   await SourceControl.openChange('file.txt')
+  // @ts-ignore
   await DiffEditor.stageChange('alpha changed')
+  // @ts-ignore
   await Git.shouldHaveStagedDiffContaining('file.txt', '+alpha changed')
+  // @ts-ignore
   await Git.shouldNotHaveStagedDiffContaining('file.txt', '+omega changed')
+  // @ts-ignore
   await Git.shouldHaveWorkingTreeDiffContaining('file.txt', '+omega changed')
+  // @ts-ignore
   await Git.shouldNotHaveWorkingTreeDiffContaining('file.txt', '+alpha changed')
   await SourceControl.unstageAllChanges()
+  // @ts-ignore
   await Git.shouldHaveNoStagedDiff('file.txt')
+  // @ts-ignore
   await Git.shouldHaveWorkingTreeDiffContaining('file.txt', '+alpha changed')
+  // @ts-ignore
   await Git.shouldHaveWorkingTreeDiffContaining('file.txt', '+omega changed')
 }
