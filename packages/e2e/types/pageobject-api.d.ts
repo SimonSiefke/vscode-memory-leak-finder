@@ -36,6 +36,7 @@ export interface ChatEditor {
   closeFinishSetup(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
   open(): Promise<void>
+  openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
