@@ -1,10 +1,38 @@
+import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
+import { extname, join } from 'node:path'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as Root from '../Root/Root.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 interface MockServer {
   [Symbol.asyncDispose]: () => Promise<void>
+}
+
+const workspacePath = join(Root.root, '.vscode-test-workspace')
+
+const escapeRegExp = (value: string): string => {
+  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const getContentType = (filePath: string): string => {
+  switch (extname(filePath)) {
+    case '.css':
+      return 'text/css; charset=utf-8'
+    case '.html':
+      return 'text/html; charset=utf-8'
+    case '.js':
+      return 'text/javascript; charset=utf-8'
+    case '.json':
+      return 'application/json; charset=utf-8'
+    case '.svg':
+      return 'image/svg+xml; charset=utf-8'
+    case '.txt':
+      return 'text/plain; charset=utf-8'
+    default:
+      return 'application/octet-stream'
+  }
 }
 
 const createMockServer = async ({ port }: { port: number }): Promise<MockServer> => {
@@ -32,9 +60,65 @@ const createMockServer = async ({ port }: { port: number }): Promise<MockServer>
   }
 }
 
+const createWorkspaceFileServer = async ({ port, relativePath }: { port: number; relativePath: string }): Promise<MockServer> => {
+  const absolutePath = join(workspacePath, relativePath)
+  const server = createServer(async (_req, res) => {
+    try {
+      const content = await readFile(absolutePath)
+      res.statusCode = 200
+      res.setHeader('Content-Type', getContentType(absolutePath))
+      res.end(content)
+    } catch {
+      res.statusCode = 404
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+      res.end(`File not found: ${relativePath}`)
+    }
+  })
+  const { promise, resolve } = Promise.withResolvers()
+  server.once('listening', resolve)
+  server.listen(port)
+  await promise
+  return {
+    async [Symbol.asyncDispose]() {
+      const { promise, resolve } = Promise.withResolvers()
+      server.close(resolve)
+      await promise
+    },
+  }
+}
+
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const getUrl = ({ path = '', port, url }: { path?: string; port: number | undefined; url: string | undefined }): string => {
+    if (url) {
+      return url
+    }
+    if (typeof port !== 'number') {
+      throw new Error(`port or url is required`)
+    }
+    return `http://localhost:${port}${path}`
+  }
+
+  const getContentFrame = async ({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) => {
+    const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
+    const subFrame = await webView.shouldBeVisible2({
+      extensionId: 'vscode.simple-browser',
+      hasLineOfCodeCounter: false,
+    })
+    await subFrame.waitForIdle()
+    await page.waitForIdle()
+    const subIframe = subFrame.locator('.content iframe')
+    await expect(subIframe).toBeVisible()
+    await page.waitForIdle()
+    const innerFrame = await subFrame.waitForSubIframe({
+      injectUtilityScript: false,
+      url: urlPattern,
+    })
+    await innerFrame.waitForIdle()
+    return innerFrame
+  }
+
   return {
     async addElementToChat({ selector: _selector }: { selector: string }) {
       try {
@@ -52,30 +136,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async clickLink({ href }: { href: string }) {
       try {
         await page.waitForIdle()
-        const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
-        const subFrame = await webView.shouldBeVisible2({
-          extensionId: 'vscode.simple-browser',
-          hasLineOfCodeCounter: false,
-        })
-        await subFrame.waitForIdle()
-        await page.waitForIdle()
-        const subIframe = subFrame.locator('.content iframe')
-        await expect(subIframe).toBeVisible()
-        await page.waitForIdle()
-        const innerFrame = await subFrame.waitForSubIframe({
-          injectUtilityScript: false,
-          url: /http:\/\/localhost/,
-        })
+        const innerFrame = await getContentFrame()
         await innerFrame.waitForIdle()
         const link = innerFrame.locator(`a[href="${href}"]`)
         await expect(link).toBeVisible()
         await link.click()
         await innerFrame.waitForIdle()
         await page.waitForIdle()
-        // Wait for navigation to complete
-        await subFrame.waitForSubIframe({
-          injectUtilityScript: false,
-          url: new RegExp(href),
+        await getContentFrame({
+          urlPattern: new RegExp(escapeRegExp(href)),
         })
         await page.waitForIdle()
       } catch (error) {
@@ -90,6 +159,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to create mock server`)
+      }
+    },
+    async createWorkspaceFileServer({ id, port, relativePath }: { id: string; port: number; relativePath: string }) {
+      try {
+        await page.waitForIdle()
+        const server = await createWorkspaceFileServer({ port, relativePath })
+        this.mockServers[id] = server
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to create workspace file server`)
       }
     },
     async disposeMockServer({ id }: { id: string }) {
@@ -115,6 +194,37 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     mockServers: Object.create(null),
+    async reload({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      try {
+        await page.waitForIdle()
+        const innerFrame = await getContentFrame({ urlPattern })
+        await innerFrame.reload()
+        await innerFrame.waitForIdle()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to reload simple browser`)
+      }
+    },
+    async shouldHaveText({
+      selector = 'body',
+      text,
+      urlPattern = /http:\/\/localhost/,
+    }: {
+      selector?: string
+      text: string
+      urlPattern?: RegExp
+    }) {
+      try {
+        await page.waitForIdle()
+        const innerFrame = await getContentFrame({ urlPattern })
+        const locator = innerFrame.locator(selector)
+        await expect(locator).toContainText(text)
+        await innerFrame.waitForIdle()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify simple browser text ${text}`)
+      }
+    },
     async shouldHaveTabTitle({ title }: { title: string }) {
       try {
         await page.waitForIdle()
@@ -136,7 +246,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify tab title ${title}`)
       }
     },
-    async showLegacy({ port }: { port: number }) {
+    async showLegacy({ url }: { url: string }) {
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
 
       await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
@@ -149,7 +259,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await page.waitForIdle()
       await expect(message).toHaveText(`Enter url to visit (Press 'Enter' to confirm or 'Escape' to cancel)`)
       await page.waitForIdle()
-      await quickPick.type(`http://localhost:${port}`)
+      await quickPick.type(url)
       await page.waitForIdle()
       await quickPick.pressEnter()
       await page.waitForIdle()
@@ -159,25 +269,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await page.waitForIdle()
       await expect(tab).toHaveCount(1)
       await page.waitForIdle()
-
-      const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
-      const subFrame = await webView.shouldBeVisible2({
-        extensionId: 'vscode.simple-browser',
-        hasLineOfCodeCounter: false,
+      await getContentFrame({
+        urlPattern: new RegExp(escapeRegExp(url)),
       })
-      await subFrame.waitForIdle()
-      await page.waitForIdle()
-      const nav = subFrame.locator('nav.controls')
-      await expect(nav).toBeVisible()
-      await subFrame.waitForIdle()
-      const urlInput = subFrame.locator('.url-input')
-      await expect(urlInput).toBeVisible()
-      await subFrame.waitForIdle()
-      const subIframe = subFrame.locator('.content iframe')
-      await expect(subIframe).toBeVisible()
-      await page.waitForIdle()
     },
-    async showModern({ port }: { port: number }) {
+    async showModern({ url }: { url: string }) {
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
 
       await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
@@ -191,19 +287,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const urlInput = page.locator('.browser-url-input')
       await expect(urlInput).toBeVisible()
       await page.waitForIdle()
-      await urlInput.type(`http://localhost:${port}`)
+      await urlInput.type(url)
       await page.waitForIdle()
       await urlInput.press('Enter')
       await page.waitForIdle()
-
-      // TODO verify content is visible
+      await getContentFrame({
+        urlPattern: new RegExp(escapeRegExp(url)),
+      })
     },
-    async show({ port }: { port: number }) {
+    async show({ path = '', port, url }: { path?: string; port?: number; url?: string }) {
       try {
+        const browserUrl = getUrl({ path, port, url })
         if (ideVersion.minor >= 113) {
-          await this.showModern({ port })
+          await this.showModern({ url: browserUrl })
         } else {
-          await this.showLegacy({ port })
+          await this.showLegacy({ url: browserUrl })
         }
       } catch (error) {
         throw new VError(error, `Failed to open simple browser`)
