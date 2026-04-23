@@ -171,6 +171,7 @@ export interface Editor {
   shouldHaveSemanticToken(type: any): Promise<void>
   shouldHaveSpark(): Promise<void>
   shouldHaveSquigglyError(): Promise<void>
+  shouldHaveControlCharacterHighlight(): Promise<void>
   shouldHaveText(text: any, fileName?: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
   shouldNotHaveSemanticToken(type: any): Promise<void>
