@@ -38,6 +38,7 @@ export const setup = async ({ Editor, Explorer, SimpleBrowser, Workspace }: Test
   await Explorer.focus()
   await Explorer.refresh()
   await Explorer.shouldHaveItem('index.html')
+  // @ts-ignore
   await SimpleBrowser.createWorkspaceFileServer({
     id: testId,
     port: 3001,
@@ -49,6 +50,7 @@ export const run = async ({ Editor, SimpleBrowser }: TestContext): Promise<void>
   await SimpleBrowser.show({
     url: testUrl,
   })
+  // @ts-ignore
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
     text: 'Initial Content',
@@ -61,7 +63,11 @@ export const run = async ({ Editor, SimpleBrowser }: TestContext): Promise<void>
     viaKeyBoard: true,
   })
 
+  // @ts-ignore
+
   await SimpleBrowser.reload()
+  // @ts-ignore
+
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
     text: 'Updated Content',
