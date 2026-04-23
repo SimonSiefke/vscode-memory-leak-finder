@@ -223,6 +223,7 @@ const writeProjectFile = async ({
   await writeFile(absolutePath, content)
 }
 
+// @ts-ignore
 const sortRecord = (record: Record<string, string> | undefined): Record<string, string> | undefined => {
   if (!record) {
     return undefined
