@@ -11,6 +11,7 @@ export * as DropDownContextMenu from '../DropDownContextMenu/DropDownContextMenu
 export * as Editor from '../Editor/Editor.ts'
 export * as EditorFind from '../EditorFind/EditorFind.ts'
 export * as Electron from '../Electron/Electron.ts'
+export * as ExternalRuntime from '../ExternalRuntime/ExternalRuntime.ts'
 export * as Explorer from '../Explorer/Explorer.ts'
 export * as Extensions from '../Extensions/Extensions.ts'
 export * as ExtensionDetailView from '../ExtensionsDetailView/ExtensionsDetailView.ts'
