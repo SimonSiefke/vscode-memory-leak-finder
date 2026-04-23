@@ -36,6 +36,7 @@ export interface ChatEditor {
   closeFinishSetup(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
   open(): Promise<void>
+  openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
@@ -170,6 +171,7 @@ export interface Editor {
   shouldHaveSemanticToken(type: any): Promise<void>
   shouldHaveSpark(): Promise<void>
   shouldHaveSquigglyError(): Promise<void>
+  shouldHaveControlCharacterHighlight(): Promise<void>
   shouldHaveText(text: any, fileName?: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
   shouldNotHaveSemanticToken(type: any): Promise<void>
@@ -380,7 +382,11 @@ export interface PortsView {
   unforwardAllPorts(port: any): Promise<void>
 }
 export interface Problems {
+  clearFilter(): Promise<void>
+  filter(filterValue: any): Promise<void>
   hide(): Promise<void>
+  shouldHaveVisibleCount(count: any): Promise<void>
+  shouldHaveVisibleTextCount(text: any, count: any): Promise<void>
   shouldHaveCount(count: any): Promise<void>
   show(): Promise<void>
   moveProblemsToSidebar(): Promise<void>
@@ -510,15 +516,18 @@ export interface SourceControl {
   enableInlineBlame(options: any): Promise<void>
   hideBranchPicker(): Promise<void>
   hideGraph(): Promise<void>
+  openChange(name: any): Promise<void>
   showGraph(): Promise<void>
   refresh(): Promise<void>
   selectBranch(branchName: any): Promise<void>
+  show(): Promise<void>
   shouldHaveHistoryItem(name: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
   shouldNotHaveHistoryItem(name: any): Promise<void>
   showBranchPicker(): Promise<void>
   stageFile(name: any, parentFolder?: any): Promise<void>
   undoLastCommit(): Promise<void>
+  unstageAllChanges(): Promise<void>
   unstageFile(name: any): Promise<void>
   viewAsList(): Promise<void>
   viewAsTree(): Promise<void>
@@ -636,6 +645,7 @@ export interface Workspace {
   initializeGitRepository(): Promise<void>
   remove(file: any): Promise<void>
   setFiles(files: any): Promise<void>
+  setFilesWithoutWaiting(files: any): Promise<void>
   waitForFile(fileName: any): Promise<void>
 }
 

@@ -1427,6 +1427,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify squiggly error`)
       }
     },
+    async shouldHaveControlCharacterHighlight() {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const controlCharacter = editor.locator('.mtkcontrol').first()
+        await expect(controlCharacter).toBeVisible({
+          timeout: 5_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify control character highlighting`)
+      }
+    },
     async shouldHaveText(text: string, fileName?: string, groupId?: number) {
       try {
         await page.waitForIdle()
