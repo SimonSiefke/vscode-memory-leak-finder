@@ -382,7 +382,11 @@ export interface PortsView {
   unforwardAllPorts(port: any): Promise<void>
 }
 export interface Problems {
+  clearFilter(): Promise<void>
+  filter(filterValue: any): Promise<void>
   hide(): Promise<void>
+  shouldHaveVisibleCount(count: any): Promise<void>
+  shouldHaveVisibleTextCount(text: any, count: any): Promise<void>
   shouldHaveCount(count: any): Promise<void>
   show(): Promise<void>
   moveProblemsToSidebar(): Promise<void>
