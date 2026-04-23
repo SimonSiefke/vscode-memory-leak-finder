@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const skip = true
+// export const skip = true
 
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
@@ -20,12 +20,12 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.shouldHaveItem('folder')
+  await Explorer.focus()
 }
 
-export const run = async ({ ContextMenu, Explorer, Notification }: TestContext): Promise<void> => {
-  await Explorer.focus()
+export const run = async ({ ContextMenu, Explorer, ImagesPreview }: TestContext): Promise<void> => {
   await Explorer.openContextMenu('folder')
   await ContextMenu.select('Open in Images Preview')
-  await Notification.shouldHaveItem('No images are found in this folder')
-  await Notification.closeAll()
+  await ImagesPreview.shouldHaveImage('file.svg')
+  await ImagesPreview.close()
 }

@@ -651,7 +651,6 @@ export interface Workspace {
 
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
-  readonly ProcessExplorer: any
   readonly ChatEditor: ChatEditor
   readonly Colors: any
   readonly ContextMenu: ContextMenu
@@ -664,13 +663,14 @@ export interface PageObjectApi {
   readonly Editor: Editor
   readonly EditorFind: EditorFind
   readonly Electron: Electron
-  readonly ExternalRuntime: ExternalRuntime
   readonly Explorer: Explorer
-  readonly Extensions: Extensions
   readonly ExtensionDetailView: ExtensionDetailView
+  readonly Extensions: Extensions
+  readonly ExternalRuntime: ExternalRuntime
   readonly Git: Git
   readonly GitHubPullRequests: GitHubPullRequests
   readonly Hover: Hover
+  readonly ImagesPreview: any
   readonly KeyBindingsEditor: KeyBindingsEditor
   readonly LanguageModelEditor: LanguageModelEditor
   readonly MarkdownPreview: MarkdownPreview
@@ -683,6 +683,7 @@ export interface PageObjectApi {
   readonly Panel: Panel
   readonly PortsView: PortsView
   readonly Problems: Problems
+  readonly ProcessExplorer: any
   readonly Profile: Profile
   readonly QuickPick: QuickPick
   readonly References: References
