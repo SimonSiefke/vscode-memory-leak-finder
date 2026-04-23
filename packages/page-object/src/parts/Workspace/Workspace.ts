@@ -51,6 +51,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
       await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
     },
+    async gitAdd() {
+      await Exec.exec('git', ['add', '-f', '.'], { cwd: workspace })
+    },
+    async gitCommit(message: string) {
+      await Exec.exec('git', ['commit', '-m', message], { cwd: workspace })
+    },
     async remove(file: string) {
       const absolutePath = join(workspace, file)
       await rm(absolutePath, { force: true, recursive: true })
@@ -68,6 +74,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await writeFile(absolutePath, file.content)
       }
       await page.waitForIdle()
+    },
+    async setFilesWithoutWaiting(files: Array<{ name: string; content: string }>) {
+      const dirents = await readdir(workspace).catch(() => [])
+      for (const dirent of dirents) {
+        const absolutePath = join(workspace, dirent)
+        await rm(absolutePath, { force: true, recursive: true })
+      }
+      for (const file of files) {
+        const absolutePath = join(workspace, file.name)
+        await mkdir(dirname(absolutePath), { recursive: true })
+        await writeFile(absolutePath, file.content)
+      }
     },
     async waitForFile(fileName: string): Promise<boolean> {
       const absolutePath = join(workspace, fileName)
