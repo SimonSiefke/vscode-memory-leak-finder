@@ -36,6 +36,7 @@ export interface ChatEditor {
   closeFinishSetup(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
   open(): Promise<void>
+  openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
@@ -170,6 +171,7 @@ export interface Editor {
   shouldHaveSemanticToken(type: any): Promise<void>
   shouldHaveSpark(): Promise<void>
   shouldHaveSquigglyError(): Promise<void>
+  shouldHaveControlCharacterHighlight(): Promise<void>
   shouldHaveText(text: any, fileName?: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
   shouldNotHaveSemanticToken(type: any): Promise<void>
@@ -380,7 +382,11 @@ export interface PortsView {
   unforwardAllPorts(port: any): Promise<void>
 }
 export interface Problems {
+  clearFilter(): Promise<void>
+  filter(filterValue: any): Promise<void>
   hide(): Promise<void>
+  shouldHaveVisibleCount(count: any): Promise<void>
+  shouldHaveVisibleTextCount(text: any, count: any): Promise<void>
   shouldHaveCount(count: any): Promise<void>
   show(): Promise<void>
   moveProblemsToSidebar(): Promise<void>

@@ -43,9 +43,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async getInputValue() {
       try {
-        const quickPick = page.locator('.quick-input-widget')
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
+        const quickPickInput = await this.waitForInputVisible()
         return (await quickPickInput.getAttribute('value')) || ''
       } catch (error) {
         throw new VError(error, `Failed to get input value`)
@@ -107,9 +105,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform || '') })
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+        const quickPickInput = await this.waitForInputVisible()
         const option = quickPick.locator('.label-name', {
           hasText: fileName,
         })
@@ -123,10 +119,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async pressEnter() {
       try {
-        const quickPick = page.locator('.quick-input-widget')
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+        const quickPickInput = await this.waitForInputVisible()
         await page.waitForIdle()
         await quickPickInput.press('Enter')
         await page.waitForIdle()
@@ -182,9 +175,8 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           timeout: 10_000,
         })
         await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused()
+        await page.waitForIdle()
+        await this.waitForInputVisible()
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }
@@ -214,12 +206,16 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to show quick pick`)
       }
     },
+    async waitForInputVisible() {
+      const quickPick = page.locator('.quick-input-widget')
+      const quickPickInput = quickPick.locator('.ibwrapper .input')
+      await expect(quickPickInput).toBeVisible()
+      await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+      return quickPickInput
+    },
     async type(value: string) {
       try {
-        const quickPick = page.locator('.quick-input-widget')
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+        const quickPickInput = await this.waitForInputVisible()
         await quickPickInput.type(value)
         await page.waitForIdle()
       } catch (error) {
