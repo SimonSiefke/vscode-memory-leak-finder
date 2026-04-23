@@ -36,6 +36,26 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
+    async getInnerFrame() {
+      try {
+        await page.waitForIdle()
+        const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
+        const subFrame = await webView.shouldBeVisible2({
+          extensionId: 'vscode.simple-browser',
+          hasLineOfCodeCounter: false,
+        })
+        await subFrame.waitForIdle()
+        const innerFrame = await subFrame.waitForSubIframe({
+          injectUtilityScript: false,
+          url: /https?:\/\/(127\.0\.0\.1|localhost)/,
+        })
+        await innerFrame.waitForIdle()
+        await page.waitForIdle()
+        return innerFrame
+      } catch (error) {
+        throw new VError(error, `Failed to get simple browser frame`)
+      }
+    },
     async addElementToChat({ selector: _selector }: { selector: string }) {
       try {
         await page.waitForIdle()
@@ -52,31 +72,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async clickLink({ href }: { href: string }) {
       try {
         await page.waitForIdle()
-        const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
-        const subFrame = await webView.shouldBeVisible2({
-          extensionId: 'vscode.simple-browser',
-          hasLineOfCodeCounter: false,
-        })
-        await subFrame.waitForIdle()
-        await page.waitForIdle()
-        const subIframe = subFrame.locator('.content iframe')
-        await expect(subIframe).toBeVisible()
-        await page.waitForIdle()
-        const innerFrame = await subFrame.waitForSubIframe({
-          injectUtilityScript: false,
-          url: /http:\/\/localhost/,
-        })
+        const innerFrame = await this.getInnerFrame()
         await innerFrame.waitForIdle()
         const link = innerFrame.locator(`a[href="${href}"]`)
         await expect(link).toBeVisible()
         await link.click()
         await innerFrame.waitForIdle()
-        await page.waitForIdle()
-        // Wait for navigation to complete
-        await subFrame.waitForSubIframe({
-          injectUtilityScript: false,
-          url: new RegExp(href),
-        })
+        const navigatedFrame = await this.getInnerFrame()
+        await navigatedFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to click link ${href}`)
@@ -195,8 +198,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await page.waitForIdle()
       await urlInput.press('Enter')
       await page.waitForIdle()
-
-      // TODO verify content is visible
+      await this.getInnerFrame()
+    },
+    async shouldHaveText({ text }: { text: string }) {
+      try {
+        const innerFrame = await this.getInnerFrame()
+        const body = innerFrame.locator('body')
+        await expect(body).toContainText(text, {
+          timeout: 30_000,
+        })
+        await innerFrame.waitForIdle()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify simple browser text ${text}`)
+      }
     },
     async show({ port }: { port: number }) {
       try {

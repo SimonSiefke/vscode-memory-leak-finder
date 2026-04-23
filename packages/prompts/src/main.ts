@@ -7,13 +7,13 @@ const { dirname } = import.meta
 
 const root = join(dirname, '..', '..', '..')
 
-const localVscodePath = '/home/simon/.cache/repos/vscode'
+const localVscodePath = `/home/simon/.cache/repos/vite`
 
-const relativePath = `/home/simon/Downloads/vscode-memory-leak-finder-results-linux/named-function-count3/move-explorer-to-panel.json`
-const ourPath = `/home/simon/.cache/repos/vscode-memory-leak-finder`
-const only = 'move-explorer'
-const runs = 17
-const measure = 'named-function-count3'
+const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/node-subprocess/instance-counts-difference/node-vite-server-hot-reload.json`
+const ourPath = `/home/simon/.cache/repos/vite`
+const only = 'node-vite-server-hot-reload'
+const runs = 197
+const measure = 'instance-count-differences'
 
 const main = async () => {
   const absolutePath = isAbsolute(relativePath) ? relativePath : join(root, relativePath)

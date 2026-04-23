@@ -27,7 +27,12 @@ export const connectDevtools = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
+  _inspectPtyHostPort: number,
+  _inspectSharedProcessPort: number,
+  _inspectExtensionsPort: number,
   trackFunctions: boolean,
+  externalInspectPort: number,
+  subprocessRuntime: 'bun' | 'node',
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
@@ -76,6 +81,7 @@ export const connectDevtools = async (
       },
     },
     electronApp,
+    externalInspectPort,
     evaluateInDefaultContext(item) {
       throw new Error(`not implemented`)
     },
@@ -85,6 +91,7 @@ export const connectDevtools = async (
     page: firstWindow,
     platform,
     sessionRpc,
+    subprocessRuntime,
     utilityContext: {
       callFunctionOn(options) {
         return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {

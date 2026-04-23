@@ -14,7 +14,13 @@ export const getMeasureRpc = async (
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
+  externalInspectPort?: number,
+  externalInspectRuntime: 'bun' | 'node' = 'node',
 ): Promise<any> => {
+  if (externalInspectPort) {
+    return connectToDevtoolsWithJsonUrl(externalInspectPort, externalInspectRuntime)
+  }
+
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
 

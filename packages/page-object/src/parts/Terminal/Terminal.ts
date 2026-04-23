@@ -87,8 +87,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         await page.waitForIdle()
         await this.type(command)
-        await page.keyboard.press('Enter')
-        await page.waitForIdle()
+        await this.pressEnter()
         if (waitForFile) {
           const workspace = Workspace.create({ electronApp, expect, ideVersion, page, platform, VError })
           const exists = await workspace.waitForFile(waitForFile)
@@ -98,6 +97,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to execute terminal command`)
+      }
+    },
+    async pressEnter() {
+      try {
+        await page.waitForIdle()
+        const terminal = page.locator('.terminal')
+        const textarea = terminal.locator('.xterm-helper-textarea')
+        await expect(textarea).toBeFocused()
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to press Enter in terminal`)
       }
     },
     async focusHover() {

@@ -9,10 +9,14 @@ export const createRpc = (ipc: any) => {
   const callbacks = Object.create(null)
   const handleMessage = (message: any) => {
     if ('id' in message) {
+      const callback = callbacks[message.id]
+      if (!callback) {
+        return
+      }
       if ('result' in message) {
-        callbacks[message.id].resolve(message)
+        callback.resolve(message)
       } else if ('error' in message) {
-        callbacks[message.id].resolve(message)
+        callback.resolve(message)
       }
       delete callbacks[message.id]
     } else {

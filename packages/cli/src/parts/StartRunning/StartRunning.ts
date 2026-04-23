@@ -20,7 +20,6 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
       await Stdout.write(`\nBisect didn't find a matching commit introducing the regression.\n`)
       process.exit(1)
     }
-    return
   }
   const {
     arch,
@@ -51,6 +50,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     measure,
     measureAfter,
     measureNode,
+    measureNodeSubprocess,
     openDevtools,
     platform,
     recordVideo,
@@ -60,6 +60,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     runSkippedTestsAnyway,
     screencastQuality,
     setupOnly,
+    subprocessRuntime,
     timeoutBetween,
     timeouts,
     trackFunctions,
@@ -100,6 +101,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     measure,
     measureAfter,
     measureNode,
+    measureNodeSubprocess,
     openDevtools,
     platform,
     recordVideo,
@@ -110,6 +112,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     runSkippedTestsAnyway,
     screencastQuality,
     setupOnly,
+    subprocessRuntime,
     timeoutBetween,
     timeouts,
     trackFunctions,

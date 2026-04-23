@@ -26,6 +26,7 @@ export interface RunTestsOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly measureNodeSubprocess: boolean
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
@@ -37,6 +38,7 @@ export interface RunTestsOptions {
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
   readonly setupOnly: boolean
+  readonly subprocessRuntime: 'bun' | 'node'
   readonly timeoutBetween: number
   readonly timeouts: any
   readonly trackFunctions: boolean

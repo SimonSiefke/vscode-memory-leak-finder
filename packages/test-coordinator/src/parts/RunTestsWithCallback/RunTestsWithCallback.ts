@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
+import * as AssertSupportedSubprocessMeasure from '../AssertSupportedSubprocessMeasure/AssertSupportedSubprocessMeasure.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
@@ -64,6 +65,7 @@ export const runTestsWithCallback = async ({
   measure,
   measureAfter,
   measureNode,
+  measureNodeSubprocess,
   openDevtools,
   pageObjectPath,
   platform,
@@ -75,6 +77,7 @@ export const runTestsWithCallback = async ({
   runSkippedTestsAnyway,
   screencastQuality,
   setupOnly,
+  subprocessRuntime,
   timeoutBetween,
   timeouts,
   trackFunctions,
@@ -95,6 +98,7 @@ export const runTestsWithCallback = async ({
     Assert.string(measure)
     Assert.boolean(measureAfter)
     Assert.boolean(measureNode)
+    Assert.boolean(measureNodeSubprocess)
     Assert.boolean(timeouts)
     Assert.number(timeoutBetween)
     Assert.number(runMode)
@@ -104,6 +108,9 @@ export const runTestsWithCallback = async ({
     Assert.boolean(setupOnly)
     Assert.boolean(login)
     Assert.boolean(enableExtensions)
+    Assert.string(subprocessRuntime)
+
+    AssertSupportedSubprocessMeasure.assertSupportedSubprocessMeasure(checkLeaks, measure, measureNodeSubprocess, subprocessRuntime)
 
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
@@ -138,12 +145,14 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         measureId: measure,
         measureNode,
+        measureNodeSubprocess,
         openDevtools,
         pageObjectPath: pageObjectPathResolved,
         platform,
         recordVideo,
         runMode,
         screencastQuality,
+        subprocessRuntime,
         timeouts,
         trackFunctions,
         updateUrl,
@@ -192,12 +201,14 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         measure,
         measureNode,
+        measureNodeSubprocess,
         openDevtools,
         pageObjectPathResolved,
         platform,
         recordVideo,
         runMode,
         screencastQuality,
+        subprocessRuntime,
         timeouts,
         trackFunctions,
         updateUrl,
@@ -286,12 +297,14 @@ export const runTestsWithCallback = async ({
             inspectSharedProcessPort,
             measureId: measure,
             measureNode,
+            measureNodeSubprocess,
             openDevtools,
             pageObjectPath: pageObjectPathResolved,
             platform,
             recordVideo,
             runMode,
             screencastQuality,
+            subprocessRuntime,
             timeouts,
             trackFunctions,
             updateUrl,
@@ -362,7 +375,9 @@ export const runTestsWithCallback = async ({
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const testName = fileName.replace('.json', '')
             let resultPath
-            if (measureNode) {
+            if (measureNodeSubprocess) {
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node-subprocess', measure, testName + '.json')
+            } else if (measureNode) {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, testName + '.json')
             } else if (inspectSharedProcess) {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'shared-process', measure, fileName)
