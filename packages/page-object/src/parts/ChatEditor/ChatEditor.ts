@@ -137,6 +137,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open chat editor`)
       }
     },
+    async openAgentDebugLogs() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.OpenAgentDebugLogs)
+        await page.waitForIdle()
+        const tab = page.locator('[role="tab"][data-resource-name="Agent Debug Logs"], [role="tab"][aria-label^="Agent Debug Logs"]')
+        await expect(tab.first()).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open agent debug logs`)
+      }
+    },
     async openFinishSetup() {
       try {
         const statusBarItem = page.locator('#chat\\.statusBarEntry .statusbar-item-label')
