@@ -66,5 +66,55 @@ export const create = ({ page, VError }: CreateParams) => {
         throw new VError(error, `Failed to init`)
       }
     },
+    async shouldHaveNoStagedDiff(fileName: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--cached', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (result.stdout !== '') {
+          throw new Error(`expected no staged diff for ${fileName} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check staged diff for ${fileName}`)
+      }
+    },
+    async shouldHaveStagedDiffContaining(fileName: string, text: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--cached', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (!result.stdout.includes(text)) {
+          throw new Error(`expected staged diff for ${fileName} to include ${text} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check staged diff contents for ${fileName}`)
+      }
+    },
+    async shouldHaveWorkingTreeDiffContaining(fileName: string, text: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (!result.stdout.includes(text)) {
+          throw new Error(`expected working tree diff for ${fileName} to include ${text} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check working tree diff contents for ${fileName}`)
+      }
+    },
+    async shouldNotHaveStagedDiffContaining(fileName: string, text: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--cached', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (result.stdout.includes(text)) {
+          throw new Error(`expected staged diff for ${fileName} not to include ${text} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check staged diff contents for ${fileName}`)
+      }
+    },
+    async shouldNotHaveWorkingTreeDiffContaining(fileName: string, text: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (result.stdout.includes(text)) {
+          throw new Error(`expected working tree diff for ${fileName} not to include ${text} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check working tree diff contents for ${fileName}`)
+      }
+    },
   }
 }

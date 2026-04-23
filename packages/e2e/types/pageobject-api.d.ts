@@ -510,15 +510,18 @@ export interface SourceControl {
   enableInlineBlame(options: any): Promise<void>
   hideBranchPicker(): Promise<void>
   hideGraph(): Promise<void>
+  openChange(name: any): Promise<void>
   showGraph(): Promise<void>
   refresh(): Promise<void>
   selectBranch(branchName: any): Promise<void>
+  show(): Promise<void>
   shouldHaveHistoryItem(name: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
   shouldNotHaveHistoryItem(name: any): Promise<void>
   showBranchPicker(): Promise<void>
   stageFile(name: any, parentFolder?: any): Promise<void>
   undoLastCommit(): Promise<void>
+  unstageAllChanges(): Promise<void>
   unstageFile(name: any): Promise<void>
   viewAsList(): Promise<void>
   viewAsTree(): Promise<void>
@@ -636,6 +639,7 @@ export interface Workspace {
   initializeGitRepository(): Promise<void>
   remove(file: any): Promise<void>
   setFiles(files: any): Promise<void>
+  setFilesWithoutWaiting(files: any): Promise<void>
   waitForFile(fileName: any): Promise<void>
 }
 

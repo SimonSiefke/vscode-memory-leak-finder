@@ -208,6 +208,54 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to select branch "${branchName}"`)
       }
     },
+    async openChange(name: string) {
+      try {
+        const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
+        await expect(file).toBeVisible()
+        const diffEditor = page.locator('.monaco-diff-editor')
+        const open = async (fn: () => Promise<void>) => {
+          await fn()
+          try {
+            await expect(diffEditor).toBeVisible({
+              timeout: 5000,
+            })
+            return true
+          } catch {
+            return false
+          }
+        }
+        if (await open(() => file.click())) {
+          return
+        }
+        if (await open(() => file.dblclick())) {
+          return
+        }
+        await file.click()
+        if (await open(() => page.keyboard.press('Enter'))) {
+          return
+        }
+        throw new Error(`diff editor did not open`)
+      } catch (error) {
+        throw new VError(error, `Failed to open change "${name}"`)
+      }
+    },
+    async show() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="Source Control"])`)
+        await expect(activityBarItem).toBeVisible()
+        const expanded = await activityBarItem.getAttribute('aria-expanded')
+        if (expanded === 'false') {
+          await activityBarItem.click()
+        }
+        const sideBar = page.locator('.sidebar')
+        const title = sideBar.locator('.composite.title')
+        await expect(title).toHaveText('Source Control')
+      } catch (error) {
+        throw new VError(error, `Failed to show source control`)
+      }
+    },
     async shouldHaveHistoryItem(name: string) {
       try {
         const history = page.locator('[aria-label="Source Control History"]')
@@ -321,6 +369,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await quickPick.executeCommand(WellKnownCommands.UndoLastCommit)
       } catch (error) {
         throw new VError(error, `Failed to undo last commit`)
+      }
+    },
+    async unstageAllChanges() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitUnstageAllChanges)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to unstage all changes`)
       }
     },
     async unstageFile(name: string) {
