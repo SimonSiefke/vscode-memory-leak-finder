@@ -33,5 +33,33 @@ export const create = ({ page, VError, expect }: CreateParams) => {
         throw new VError(error, `Failed to hide images preview`)
       }
     },
+    async next() {
+      try {
+        await page.waitForIdle()
+        const preview = page.locator('.image-carousel-editor')
+        await expect(preview).toBeVisible()
+        const nextButton = preview.locator('[aria-label="Next image"]')
+        await expect(nextButton).toBeVisible()
+        await page.waitForIdle()
+        await nextButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to click next`)
+      }
+    },
+    async previous() {
+      try {
+        await page.waitForIdle()
+        const preview = page.locator('.image-carousel-editor')
+        await expect(preview).toBeVisible()
+        const nextButton = preview.locator('[aria-label="Previous image"]')
+        await expect(nextButton).toBeVisible()
+        await page.waitForIdle()
+        await nextButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to click previous`)
+      }
+    },
   }
 }
