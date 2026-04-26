@@ -271,8 +271,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           button: 'right',
         })
         const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
+        await page.waitForIdle()
         await expect(contextMenu).toBeVisible()
+        await page.waitForIdle()
         await expect(contextMenu).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open context menu for "${dirent}"`)
       }
