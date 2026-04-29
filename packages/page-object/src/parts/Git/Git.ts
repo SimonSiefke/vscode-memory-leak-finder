@@ -66,6 +66,18 @@ export const create = ({ page, VError }: CreateParams) => {
         throw new VError(error, `Failed to init`)
       }
     },
+    async initRepository(relativePath: string) {
+      try {
+        const repositoryPath = join(workspace, relativePath)
+        await mkdir(repositoryPath, { recursive: true })
+        await Exec.exec('git', ['init', '-b', 'main'], { cwd: repositoryPath, env: { ...process.env } })
+        await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: repositoryPath, env: { ...process.env } })
+        await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: repositoryPath, env: { ...process.env } })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to init repository at ${relativePath}`)
+      }
+    },
     async shouldHaveNoStagedDiff(fileName: string) {
       try {
         const result = await Exec.exec('git', ['diff', '--cached', '--', fileName], { cwd: workspace, env: { ...process.env } })

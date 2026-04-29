@@ -266,6 +266,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify history item`)
       }
     },
+    async shouldHaveRepositoryCount(count: number) {
+      try {
+        const repositoryInputs = page.locator('.sidebar .scm-input')
+        await expect(repositoryInputs).toHaveCount(count)
+      } catch (error) {
+        throw new VError(error, `Failed to verify repository count ${count}`)
+      }
+    },
     async shouldHaveUnstagedFile(name: string) {
       try {
         const changesPart = page.locator('[role="treeitem"][aria-label="Changes"]')

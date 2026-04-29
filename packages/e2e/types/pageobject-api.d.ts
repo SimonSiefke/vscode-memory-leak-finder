@@ -312,6 +312,7 @@ export interface Git {
   commit(message: any): Promise<void>
   createBranch(branchName: any): Promise<void>
   init(): Promise<void>
+  initRepository(relativePath: any): Promise<void>
 }
 export interface GitHubPullRequests {
   checkoutIndex(index: any): Promise<void>
@@ -544,6 +545,7 @@ export interface SourceControl {
   selectBranch(branchName: any): Promise<void>
   show(): Promise<void>
   shouldHaveHistoryItem(name: any): Promise<void>
+  shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
   shouldNotHaveHistoryItem(name: any): Promise<void>
   showBranchPicker(): Promise<void>
