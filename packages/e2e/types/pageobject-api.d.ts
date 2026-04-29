@@ -475,7 +475,7 @@ export interface QuickPick {
   focusPrevious(): Promise<void>
   getInputValue(): Promise<string>
   getVisibleCommands(): Promise<string[]>
-  getFocusedItemLabel(): Promise<void>
+  getFocusedItemLabel(): Promise<any>
   hide(): Promise<void>
   openFile(fileName: any): Promise<void>
   pressEnter(): Promise<void>
