@@ -30,6 +30,9 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
     },
     async startTracing() {
       await executeDeveloperCommand(WellKnownCommands.StartTracing, `Failed to start tracing`)
+      const statusBarItem = page.locator('[aria-label^="Recording performance trace."]')
+      await expect(statusBarItem).toBeVisible()
+      await page.waitForIdle()
     },
     async stopTracing() {
       await executeDeveloperCommand(WellKnownCommands.StopTracing, `Failed to stop tracing`)
