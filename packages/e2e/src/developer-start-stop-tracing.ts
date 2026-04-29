@@ -8,13 +8,19 @@ export const setup = async ({ Electron }: TestContext): Promise<void> => {
 }
 
 export const run = async ({ Developer }: TestContext): Promise<void> => {
+  // @ts-ignore
   await Developer.startTracing()
+  // @ts-ignore
   await Developer.stopTracing()
 }
 
 export const teardown = async ({ Electron }: TestContext): Promise<void> => {
+  // @ts-ignore
   await Electron.unmockElectron('contentTracing', 'startRecording')
+  // @ts-ignore
   await Electron.unmockElectron('contentTracing', 'stopRecording')
+  // @ts-ignore
   await Electron.unmockElectron('shell', 'showItemInFolder')
+  // @ts-ignore
   await Electron.unmockElectron('dialog', 'showMessageBox')
 }
