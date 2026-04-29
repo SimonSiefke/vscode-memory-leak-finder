@@ -29,6 +29,7 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   // Step 4: Verify new window is created (already verified by getting the window object)
 
   // Step 5: Close the newly created window
+  // @ts-ignore
   await newWindow.close()
 
   // Give the window time to close
