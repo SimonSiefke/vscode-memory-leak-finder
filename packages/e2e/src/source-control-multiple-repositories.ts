@@ -24,10 +24,8 @@ export const run = async ({ Git, SourceControl, Workspace }: TestContext): Promi
   })
   await Git.initRepository('nested-repo')
   await Git.openRepository('nested-repo')
-  await SourceControl.refresh()
   await SourceControl.shouldHaveRepositoryCount(2)
 
   await Workspace.remove('nested-repo')
-  await SourceControl.refresh()
   await SourceControl.shouldHaveRepositoryCount(1)
 }
