@@ -46,14 +46,11 @@ export interface ChatEditor {
   selectModel(modelName: any, retry?: any): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
-<<<<<<< HEAD
   setModeLegacy(modeLabel: any): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
   waitForNewWindow(options: any, electron: any): Promise<void>
   waitForWindowCount(electron: any, expectedCount: any): Promise<void>
-=======
   shouldHaveAttachedContextHoverText(text: any): Promise<void>
->>>>>>> origin/main
 }
 export interface ContextMenu {
   check(name: any): Promise<void>
@@ -275,9 +272,7 @@ export interface Electron {
   mockOpenDialog(response: any): Promise<void>
   mockSaveDialog(response: any): Promise<void>
   mockShellTrashItem(): Promise<void>
-<<<<<<< HEAD
   unmockElectron(namespace: any, key: any): Promise<void>
-=======
   waitForWindowCount(expectedCount: any): Promise<void>
   waitForWindowVisible(windowId: any): Promise<void>
 }
@@ -306,7 +301,6 @@ export interface ExternalRuntime {
   request(path: any, init?: any): Promise<Response>
   startExternalRuntime(options: any): Promise<void>
   takeSnapshot(name: any): Promise<string>
->>>>>>> origin/main
 }
 export interface Explorer {
   cancel(): Promise<void>
@@ -615,8 +609,6 @@ export interface SideBar {
   togglePosition(): Promise<void>
 }
 export interface SimpleBrowser {
-<<<<<<< HEAD
-=======
   addConsoleLogsToChat(): Promise<void>
   createDeferredMockServer(options: any): Promise<void>
   createMockServer(options: any): Promise<void>
@@ -625,17 +617,13 @@ export interface SimpleBrowser {
   openDevtools(): Promise<number>
   show(options: any): Promise<void>
   showLoadError(options: any): Promise<void>
->>>>>>> origin/main
   addElementToChat(options: any): Promise<void>
   clickLink(options: any): Promise<void>
-<<<<<<< HEAD
   createMockServer(options: any): Promise<void>
   createWorkspaceFileServer(options: any): Promise<void>
   disposeMockServer(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
   reload(options?: any): Promise<void>
-  shouldHaveText(options?: any): Promise<void>
-=======
   back(options?: any): Promise<void>
   forward(options?: any): Promise<void>
   openMoreActions(): Promise<void>
@@ -645,7 +633,6 @@ export interface SimpleBrowser {
   shouldHaveLoadError(options: any): Promise<void>
   shouldHaveTabLoadingSpinner(): Promise<void>
   shouldNotHaveTabLoadingSpinner(): Promise<void>
->>>>>>> origin/main
   shouldHaveTabTitle(options: any): Promise<void>
   showLegacy(options: any): Promise<void>
   showModern(options: any): Promise<void>
