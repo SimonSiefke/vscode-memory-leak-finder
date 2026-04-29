@@ -35,6 +35,7 @@ export interface ChatEditor {
   clearContext(contextName: any): Promise<void>
   closeFinishSetup(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
+  moveToNewWindow(): Promise<{ close(): Promise<void> }>
   open(): Promise<void>
   openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
