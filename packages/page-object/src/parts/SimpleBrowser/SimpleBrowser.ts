@@ -100,6 +100,43 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     return `http://localhost:${port}${path}`
   }
 
+  const getBrowserUrlInput = () => {
+    return page.locator('.browser-url-input')
+  }
+
+  const openIntegratedBrowser = async () => {
+    const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+
+    await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
+      pressKeyOnce: true,
+    })
+    await page.waitForIdle()
+    await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
+      pressKeyOnce: true,
+    })
+    await page.waitForIdle()
+    const urlInput = getBrowserUrlInput()
+    await expect(urlInput).toBeVisible()
+    await page.waitForIdle()
+    return urlInput
+  }
+
+  const navigateIntegratedBrowser = async ({ url, waitForContentFrame }: { url: string; waitForContentFrame: boolean }) => {
+    const urlInput = getBrowserUrlInput()
+    await expect(urlInput).toBeVisible()
+    await urlInput.fill('')
+    await page.waitForIdle()
+    await urlInput.type(url)
+    await page.waitForIdle()
+    await urlInput.press('Enter')
+    await page.waitForIdle()
+    if (waitForContentFrame) {
+      await getContentFrame({
+        urlPattern: new RegExp(escapeRegExp(url)),
+      })
+    }
+  }
+
   const getContentFrame = async ({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) => {
     const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
     const subFrame = await webView.shouldBeVisible2({
@@ -120,7 +157,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
   }
 
   return {
-    async addElementToChat({ selector: _selector }: { selector: string }) {
+    async addElementToChat({ selector }: { selector: string }) {
       try {
         await page.waitForIdle()
         const add = page.locator('.element-selection-message')
@@ -128,6 +165,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const button = add.locator('[role="button"][aria-label="Click to select an element."]')
         await expect(button).toBeVisible()
         await button.click()
+        await page.waitForIdle()
+        const innerFrame = await getContentFrame({
+          urlPattern: /^https?:\/\//,
+        })
+        const element = innerFrame.locator(selector)
+        await expect(element).toBeVisible()
+        await element.click()
+        await innerFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to add element to chat`)
@@ -246,6 +291,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify tab title ${title}`)
       }
     },
+    async shouldHaveElementScreenshotInChat() {
+      try {
+        await page.waitForIdle()
+        const attachedContext = page.locator('.chat-attached-context')
+        await expect(attachedContext.first()).toBeVisible({ timeout: 15_000 })
+        await page.waitForIdle()
+        const preview = attachedContext.locator('img, canvas, [aria-label*=".png"], [aria-label*="image" i]')
+        await expect(preview.first()).toBeVisible({ timeout: 15_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify element screenshot in chat`)
+      }
+    },
     async showLegacy({ url }: { url: string }) {
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
 
@@ -274,26 +332,25 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       })
     },
     async showModern({ url }: { url: string }) {
-      const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-
-      await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
-        pressKeyOnce: true,
+      await openIntegratedBrowser()
+      await navigateIntegratedBrowser({
+        url,
+        waitForContentFrame: true,
       })
-      await page.waitForIdle()
-      await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
-        pressKeyOnce: true,
-      })
-      await page.waitForIdle()
-      const urlInput = page.locator('.browser-url-input')
-      await expect(urlInput).toBeVisible()
-      await page.waitForIdle()
-      await urlInput.type(url)
-      await page.waitForIdle()
-      await urlInput.press('Enter')
-      await page.waitForIdle()
-      await getContentFrame({
-        urlPattern: new RegExp(escapeRegExp(url)),
-      })
+    },
+    async showLoadError({ url }: { url: string }) {
+      try {
+        if (ideVersion.minor < 113) {
+          throw new Error('Integrated browser is not available in this IDE version')
+        }
+        await openIntegratedBrowser()
+        await navigateIntegratedBrowser({
+          url,
+          waitForContentFrame: false,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to open simple browser load error page`)
+      }
     },
     async show({ path = '', port, url }: { path?: string; port?: number; url?: string }) {
       try {
@@ -305,6 +362,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to open simple browser`)
+      }
+    },
+    async shouldHaveLoadError({ title, text }: { title: string; text: string }) {
+      try {
+        await page.waitForIdle()
+        const errorTitle = page.locator('.browser-error-title')
+        await expect(errorTitle).toBeVisible()
+        await expect(errorTitle).toContainText(new RegExp(escapeRegExp(title), 'i'))
+        const errorDetail = page.locator('.browser-error-detail')
+        await expect(errorDetail).toBeVisible()
+        await expect(errorDetail).toContainText(new RegExp(escapeRegExp(text), 'i'))
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify simple browser load error ${title}: ${text}`)
       }
     },
   }

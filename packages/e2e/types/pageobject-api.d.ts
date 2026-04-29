@@ -206,7 +206,9 @@ export interface EditorFind {
   setSearchValue(value: any): Promise<void>
 }
 export interface Electron {
+  closeWindow(windowId: any): Promise<void>
   evaluate(expression: any): Promise<void>
+  getNewWindowId(): Promise<number | null>
   getWindowCount(): Promise<number>
   mockDialog(response: any): Promise<void>
   mockElectron(namespace: any, key: any, implementationCode: any): Promise<void>
@@ -504,9 +506,13 @@ export interface SimpleBrowser {
   createMockServer(options: any): Promise<void>
   disposeMockServer(options: any): Promise<void>
   show(options: any): Promise<void>
+  showLoadError(options: any): Promise<void>
   addElementToChat(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+  shouldHaveElementScreenshotInChat(): Promise<void>
+  shouldHaveText(options: any): Promise<void>
+  shouldHaveLoadError(options: any): Promise<void>
   shouldHaveTabTitle(options: any): Promise<void>
 }
 export interface SourceControl {

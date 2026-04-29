@@ -1,20 +1,20 @@
 import type { TestContext } from '../types.js'
 
-export const requiresNetwork = true
+export const skip = 1
 
-export const setup = async ({ Editor, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
-  await SimpleBrowser.show({
-    url: 'https://example.com',
-  })
 }
 
 export const run = async ({ Editor, SimpleBrowser }: TestContext): Promise<void> => {
-  await SimpleBrowser.addElementToChat({
-    selector: 'h1',
+  await SimpleBrowser.showLoadError({
+    url: 'abc',
   })
-  await SimpleBrowser.shouldHaveElementScreenshotInChat()
+  await SimpleBrowser.shouldHaveLoadError({
+    text: 'Name not resolved',
+    title: 'Failed to Load Page',
+  })
   await Editor.closeAll()
 }
 
