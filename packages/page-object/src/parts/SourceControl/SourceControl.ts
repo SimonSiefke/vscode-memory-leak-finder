@@ -67,6 +67,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to checkout branch "${branchName}"`)
       }
     },
+    async closeRepository(name: string) {
+      try {
+        const repository = page.locator(`.sidebar .scm-repositories-view [role="treeitem"][aria-label^="${name}"]`)
+        await expect(repository).toBeVisible()
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(repository)
+        await contextMenu.shouldHaveItem('Close Repository')
+        await contextMenu.select('Close Repository')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close repository "${name}"`)
+      }
+    },
     async disableInlineBlame() {
       try {
         const decoration = page.locator('[class^="ced-1-TextEditorDecorationType"]').nth(1)

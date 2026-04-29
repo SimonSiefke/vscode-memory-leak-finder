@@ -534,6 +534,7 @@ export interface SimpleBrowser {
   shouldHaveTabTitle(options: any): Promise<void>
 }
 export interface SourceControl {
+  closeRepository(name: any): Promise<void>
   checkoutBranch(branchName: any): Promise<void>
   disableInlineBlame(): Promise<void>
   doMoreAction(name: any): Promise<void>

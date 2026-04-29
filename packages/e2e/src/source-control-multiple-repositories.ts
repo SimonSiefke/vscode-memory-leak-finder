@@ -16,6 +16,10 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestCo
 }
 
 export const run = async ({ Git, SourceControl, Workspace }: TestContext): Promise<void> => {
+  const git = Git as typeof Git & {
+    openRepository(relativePath: string): Promise<void>
+  }
+
   await SourceControl.shouldHaveRepositoryCount(1)
 
   await Workspace.add({
@@ -23,9 +27,10 @@ export const run = async ({ Git, SourceControl, Workspace }: TestContext): Promi
     name: 'nested-repo/README.md',
   })
   await Git.initRepository('nested-repo')
-  await Git.openRepository('nested-repo')
+  await git.openRepository('nested-repo')
   await SourceControl.shouldHaveRepositoryCount(2)
 
   await Workspace.remove('nested-repo')
+  await SourceControl.closeRepository('nested-repo')
   await SourceControl.shouldHaveRepositoryCount(1)
 }
