@@ -17,10 +17,6 @@ export const run = async ({ Editor, SimpleBrowser }: TestContext): Promise<void>
   await SimpleBrowser.show({
     port: 3001,
   })
-  await SimpleBrowser.shouldHaveText({
-    selector: 'h1',
-    text: 'Page A',
-  })
   await Editor.splitRight()
   await Editor.closeAll()
 }

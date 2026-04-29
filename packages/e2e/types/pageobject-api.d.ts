@@ -510,6 +510,8 @@ export interface SimpleBrowser {
   addElementToChat(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+  back(options?: any): Promise<void>
+  forward(options?: any): Promise<void>
   shouldHaveElementScreenshotInChat(): Promise<void>
   shouldHaveText(options: any): Promise<void>
   shouldHaveLoadError(options: any): Promise<void>

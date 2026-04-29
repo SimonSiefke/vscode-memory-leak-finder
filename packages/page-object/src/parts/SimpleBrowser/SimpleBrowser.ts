@@ -104,13 +104,33 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     return page.locator('.browser-url-input')
   }
 
+  const getBrowserNavigationButton = async ({ names }: { names: readonly string[] }) => {
+    for (const name of names) {
+      const button = page.getByRole('button', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }).first()
+      if (await button.isVisible().catch(() => false)) {
+        return button
+      }
+    }
+    for (const name of names) {
+      const button = page.locator(`[aria-label="${name}"], [title="${name}"]`).first()
+      if (await button.isVisible().catch(() => false)) {
+        return button
+      }
+    }
+    throw new Error(`Browser navigation button not found: ${names.join(', ')}`)
+  }
+
   const openIntegratedBrowser = async () => {
     const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
 
-    await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
-      pressKeyOnce: true,
-    })
-    await page.waitForIdle()
+    try {
+      await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
+        pressKeyOnce: true,
+      })
+      await page.waitForIdle()
+    } catch {
+      // Notifications are not always present, and failing to clear them should not block browser tests.
+    }
     await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
       pressKeyOnce: true,
     })
@@ -196,6 +216,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to click link ${href}`)
       }
     },
+    async back({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      try {
+        await page.waitForIdle()
+        const button = await getBrowserNavigationButton({
+          names: ['Go Back', 'Back', 'Navigate Back'],
+        })
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+        await getContentFrame({ urlPattern })
+      } catch (error) {
+        throw new VError(error, `Failed to navigate simple browser back`)
+      }
+    },
     async createMockServer({ id, port }: { id: string; port: number }) {
       try {
         await page.waitForIdle()
@@ -239,6 +273,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     mockServers: Object.create(null),
+    async forward({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      try {
+        await page.waitForIdle()
+        const button = await getBrowserNavigationButton({
+          names: ['Go Forward', 'Forward', 'Navigate Forward'],
+        })
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+        await getContentFrame({ urlPattern })
+      } catch (error) {
+        throw new VError(error, `Failed to navigate simple browser forward`)
+      }
+    },
     async reload({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       try {
         await page.waitForIdle()
