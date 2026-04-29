@@ -40,6 +40,7 @@ export interface ChatEditor {
   openFinishSetup(): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
+  shouldHaveAttachedContextHoverText(text: any): Promise<void>
 }
 export interface ContextMenu {
   close(): Promise<void>
@@ -87,6 +88,7 @@ export interface DiffEditor {
 }
 export interface DropDownContextMenu {
   close(): Promise<void>
+  select(option: any): Promise<void>
   shouldHaveItem(option: any): Promise<void>
 }
 export interface Editor {
@@ -503,6 +505,7 @@ export interface SideBar {
   togglePosition(): Promise<void>
 }
 export interface SimpleBrowser {
+  addConsoleLogsToChat(): Promise<void>
   createMockServer(options: any): Promise<void>
   disposeMockServer(options: any): Promise<void>
   show(options: any): Promise<void>
@@ -512,7 +515,9 @@ export interface SimpleBrowser {
   clickLink(options: any): Promise<void>
   back(options?: any): Promise<void>
   forward(options?: any): Promise<void>
+  openMoreActions(): Promise<void>
   shouldHaveElementScreenshotInChat(): Promise<void>
+  shouldHaveFindWidget(): Promise<void>
   shouldHaveText(options: any): Promise<void>
   shouldHaveLoadError(options: any): Promise<void>
   shouldHaveTabTitle(options: any): Promise<void>

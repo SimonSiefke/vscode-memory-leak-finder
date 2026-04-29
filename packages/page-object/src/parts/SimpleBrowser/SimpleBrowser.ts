@@ -104,6 +104,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     return page.locator('.browser-url-input')
   }
 
+  const getBrowserFindWidget = () => {
+    return page.locator('.browser-find-widget-wrapper .find-widget')
+  }
+
   const getBrowserNavigationButton = async ({ names }: { names: readonly string[] }) => {
     for (const name of names) {
       const button = page.getByRole('button', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }).first()
@@ -176,7 +180,73 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     return innerFrame
   }
 
+  const tryClickFirstVisible = async (locators: readonly any[]): Promise<boolean> => {
+    for (const locator of locators) {
+      try {
+        if (await locator.isVisible()) {
+          await locator.click()
+          await page.waitForIdle()
+          return true
+        }
+      } catch {
+        // Ignore selector mismatches and keep trying fallbacks.
+      }
+    }
+    return false
+  }
+
   return {
+    async addConsoleLogsToChat() {
+      try {
+        await page.waitForIdle()
+        const directActionCandidates = [
+          page.locator('[role="button"][aria-label*="Add Console Logs to Chat"]'),
+          page.locator('[role="button"][aria-label*="Add console logs to chat"]'),
+          page.locator('[role="button"][aria-label*="Console Logs"]'),
+          page.locator('[role="button"]', {
+            hasText: 'Console Logs',
+          }),
+        ]
+        const moreActionsCandidates = [
+          page.locator('[role="button"][aria-label^="More Actions"]'),
+          page.locator('[aria-label="More Actions..."]'),
+          page.locator('.monaco-toolbar .toolbar-toggle-more'),
+          page.locator('.monaco-toolbar [class*="toolbar-more"]'),
+        ]
+        const menuActionCandidates = [
+          page.locator('.context-view.monaco-menu-container .actions-container .action-item', {
+            hasText: 'Add Console Logs to Chat',
+          }),
+          page.locator('.context-view.monaco-menu-container .actions-container .action-item', {
+            hasText: 'Add console logs to chat',
+          }),
+          page.locator('.context-view.monaco-menu-container .actions-container .action-item', {
+            hasText: 'Console Logs',
+          }),
+        ]
+
+        const maxAttempts = 20
+        for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+          if (await tryClickFirstVisible(directActionCandidates)) {
+            return
+          }
+          if (await tryClickFirstVisible(moreActionsCandidates)) {
+            if (await tryClickFirstVisible(menuActionCandidates)) {
+              return
+            }
+            await page.keyboard.press('Escape')
+            await page.waitForIdle()
+          }
+          await new Promise((resolve) => {
+            setTimeout(resolve, 200)
+          })
+        }
+
+        throw new Error('Could not find the simple browser action for adding console logs to chat')
+      } catch (error) {
+        throw new VError(error, `Failed to add console logs to chat`)
+      }
+    },
     async addElementToChat({ selector }: { selector: string }) {
       try {
         await page.waitForIdle()
@@ -273,6 +343,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     mockServers: Object.create(null),
+    async openMoreActions() {
+      try {
+        await page.waitForIdle()
+        const urlInput = getBrowserUrlInput()
+        await expect(urlInput).toBeVisible()
+        const moreActions = page.locator('.part.editor [aria-label="More Actions..."], .part.editor [aria-label^="More Actions"]').last()
+        await expect(moreActions).toBeVisible()
+        await moreActions.focus()
+        await expect(moreActions).toBeFocused()
+        await moreActions.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open simple browser more actions`)
+      }
+    },
     async forward({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       try {
         await page.waitForIdle()
@@ -350,6 +435,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify element screenshot in chat`)
+      }
+    },
+    async shouldHaveFindWidget() {
+      try {
+        await page.waitForIdle()
+        const findWidget = getBrowserFindWidget()
+        await expect(findWidget).toBeVisible()
+        const findInput = findWidget.locator('.monaco-findInput textarea[aria-label="Find"]')
+        await expect(findInput).toBeVisible()
+        await expect(findInput).toBeFocused()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify simple browser find widget`)
       }
     },
     async showLegacy({ url }: { url: string }) {
