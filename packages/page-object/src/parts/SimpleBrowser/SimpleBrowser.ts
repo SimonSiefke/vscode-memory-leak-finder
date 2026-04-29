@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
+import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WebView from '../WebView/WebView.ts'
@@ -8,6 +9,10 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 interface MockServer {
   [Symbol.asyncDispose]: () => Promise<void>
+}
+
+interface DeferredMockServer extends MockServer {
+  finishResponse: () => void
 }
 
 const workspacePath = join(Root.root, '.vscode-test-workspace')
@@ -60,6 +65,38 @@ const createMockServer = async ({ port }: { port: number }): Promise<MockServer>
   }
 }
 
+const createDeferredMockServer = async ({ port }: { port: number }): Promise<DeferredMockServer> => {
+  const response = Promise.withResolvers<void>()
+  const server = createServer(async (req, res) => {
+    if (req.url === '/page-b') {
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'text/html')
+      res.end('<html><head><title>Page B</title></head><body><h1>Page B</h1></body></html>')
+      return
+    }
+    await response.promise
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'text/html')
+    res.end('<html><head><title>Page A</title></head><body><h1>Page A</h1><a href="/page-b">Go to Page B</a></body></html>')
+  })
+  const { promise, resolve } = Promise.withResolvers<void>()
+  server.once('listening', resolve)
+  server.listen(port)
+  await promise
+  return {
+    finishResponse() {
+      response.resolve()
+    },
+    async [Symbol.asyncDispose]() {
+      const { promise, resolve } = Promise.withResolvers<void>()
+      server.close(() => {
+        resolve()
+      })
+      await promise
+    },
+  }
+}
+
 const createWorkspaceFileServer = async ({ port, relativePath }: { port: number; relativePath: string }): Promise<MockServer> => {
   const absolutePath = join(workspacePath, relativePath)
   const server = createServer(async (_req, res) => {
@@ -106,6 +143,51 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
   const getBrowserFindWidget = () => {
     return page.locator('.browser-find-widget-wrapper .find-widget')
+  }
+
+  const getSimpleBrowserTab = () => {
+    return page.locator('.tab', { hasText: 'Simple Browser' }).first()
+  }
+
+  const waitForCondition = async ({
+    condition,
+    timeout = 10_000,
+  }: {
+    condition: () => Promise<boolean>
+    timeout?: number
+  }): Promise<void> => {
+    const start = Date.now()
+    while (Date.now() - start < timeout) {
+      if (await condition()) {
+        return
+      }
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+    }
+    throw new Error('Timed out waiting for condition')
+  }
+
+  const isSimpleBrowserTabLoading = async (): Promise<boolean> => {
+    const tab = getSimpleBrowserTab()
+    if (!(await tab.isVisible().catch(() => false))) {
+      return false
+    }
+    const className = (await tab.getAttribute('class')) || ''
+    if (/\bloading\b|\bbusy\b/.test(className)) {
+      return true
+    }
+    const ariaLabel = (await tab.getAttribute('aria-label')) || ''
+    if (/loading/i.test(ariaLabel)) {
+      return true
+    }
+    const spinner = tab.locator(
+      '.codicon-loading, .codicon[class*="spin"], .codicon[class*="loading"], .tab-actions [class*="loading"], .monaco-progress-container',
+    )
+    return spinner
+      .first()
+      .isVisible()
+      .catch(() => false)
   }
 
   const getBrowserNavigationButton = async ({ names }: { names: readonly string[] }) => {
@@ -310,6 +392,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to create mock server`)
       }
     },
+    async createDeferredMockServer({ id, port }: { id: string; port: number }) {
+      try {
+        await page.waitForIdle()
+        const server = await createDeferredMockServer({ port })
+        this.mockServers[id] = server
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to create deferred mock server`)
+      }
+    },
     async createWorkspaceFileServer({ id, port, relativePath }: { id: string; port: number; relativePath: string }) {
       try {
         await page.waitForIdle()
@@ -327,6 +419,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         delete this.mockServers[id]
       } catch (error) {
         throw new VError(error, `Failed to dispose mock server`)
+      }
+    },
+    async finishMockServerResponse({ id }: { id: string }) {
+      try {
+        const server = this.mockServers[id] as DeferredMockServer
+        server.finishResponse()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to finish mock server response`)
       }
     },
     async mockElectronDebugger({ selector: _selector }: { selector: string }) {
@@ -356,6 +457,30 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open simple browser more actions`)
+      }
+    },
+    async openDevtools() {
+      try {
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
+        const initialWindowCount = await electron.getWindowCount()
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+
+        await quickPick.executeCommand(WellKnownCommands.DeveloperOpenWebviewDeveloperTools, {
+          pressKeyOnce: true,
+        })
+
+        await electron.waitForWindowCount(initialWindowCount + 1)
+
+        const devtoolsWindowId = await electron.getNewWindowId()
+        if (!devtoolsWindowId) {
+          throw new Error('Expected devtools window to open')
+        }
+
+        await electron.waitForWindowVisible(devtoolsWindowId)
+
+        return devtoolsWindowId
+      } catch (error) {
+        throw new VError(error, `Failed to open simple browser devtools`)
       }
     },
     async forward({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
@@ -406,7 +531,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveTabTitle({ title }: { title: string }) {
       try {
         await page.waitForIdle()
-        const tab = page.locator('.tab', { hasText: `Simple Browser` })
+        const tab = getSimpleBrowserTab()
         await expect(tab).toBeVisible()
         await page.waitForIdle()
         // Check both tab-label text and aria-label
@@ -422,6 +547,29 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify tab title ${title}`)
+      }
+    },
+    async shouldHaveTabLoadingSpinner() {
+      try {
+        await page.waitForIdle()
+        await waitForCondition({
+          condition: isSimpleBrowserTabLoading,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify simple browser tab loading spinner`)
+      }
+    },
+    async shouldNotHaveTabLoadingSpinner() {
+      try {
+        await waitForCondition({
+          condition: async () => {
+            return !(await isSimpleBrowserTabLoading())
+          },
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify simple browser tab loading spinner is hidden`)
       }
     },
     async shouldHaveElementScreenshotInChat() {
@@ -468,7 +616,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await quickPick.pressEnter()
       await page.waitForIdle()
 
-      const tab = page.locator('.tab', { hasText: `Simple Browser` })
+      const tab = getSimpleBrowserTab()
       await expect(tab).toBeVisible()
       await page.waitForIdle()
       await expect(tab).toHaveCount(1)
