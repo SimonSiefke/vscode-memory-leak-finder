@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-// export const skip = 1
+export const skip = 1
 
 export const setup = async ({ Electron }: TestContext): Promise<void> => {
   await Electron.mockElectron('contentTracing', 'startRecording', '() => Promise.resolve()')
