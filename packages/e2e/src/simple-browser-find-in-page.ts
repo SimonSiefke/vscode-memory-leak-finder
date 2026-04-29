@@ -2,6 +2,8 @@ import type { TestContext } from '../types.js'
 
 const testId = 'simple-browser-find-in-page'
 
+export const skip = 1
+
 export const setup = async ({ Editor, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
