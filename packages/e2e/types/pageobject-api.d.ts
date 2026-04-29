@@ -346,6 +346,7 @@ export interface MCP {
   listServers(): Promise<void>
   openConfiguration(): Promise<void>
   removeAllServers(): Promise<void>
+  openRepository(relativePath: any): Promise<void>
   removeServer(serverName: any): Promise<void>
   selectCommand(text: any, stayVisible?: any): Promise<void>
 }

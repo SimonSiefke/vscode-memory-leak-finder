@@ -269,7 +269,29 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveRepositoryCount(count: number) {
       try {
         const repositoryInputs = page.locator('.sidebar .scm-input')
-        await expect(repositoryInputs).toHaveCount(count)
+        const repositoryRows = page.locator('.sidebar .scm-repositories-view .monaco-list-row')
+        const getRepositoryCount = async () => {
+          const repositoryRowCount = await repositoryRows.count()
+          if (repositoryRowCount > 0) {
+            return repositoryRowCount
+          }
+          return repositoryInputs.count()
+        }
+        const timeout = 10_000
+        const startTime = Date.now()
+        while (Date.now() - startTime < timeout) {
+          const actualCount = await getRepositoryCount()
+          if (actualCount === count) {
+            return
+          }
+          await (() => {
+            const { promise, resolve } = Promise.withResolvers<void>()
+            setTimeout(resolve, 100)
+            return promise
+          })()
+        }
+        const actualCount = await getRepositoryCount()
+        throw new Error(`expected repository count ${count} but got ${actualCount}`)
       } catch (error) {
         throw new VError(error, `Failed to verify repository count ${count}`)
       }
