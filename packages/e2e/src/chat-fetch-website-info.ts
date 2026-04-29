@@ -15,13 +15,18 @@ export const setup = async ({ ChatEditor, Editor, Electron, SideBar }: TestConte
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
-    message: 'What are some facts about Benjamin Franklin',
-    model: 'zAiGLM4.5 air free',
-    verify: true,
-
-    // TODO should pass in some parameters to verify it calls the wikipedia website
+    message: 'What are some facts about Benjamin Franklin? Use wikipedia as a source.',
+    model: 'NVIDIA: Nemotron 3 Nano 30B A3B (free)',
+    verify: false,
+    toolInvocations: [
+      {
+        type: 'website',
+        url: 'https://en.wikipedia.org/wiki/Benjamin_Franklin',
+        approve: true,
+      },
+    ],
+    expectedResponse: '',
   })
-
   await ChatEditor.clearAll()
 }
 

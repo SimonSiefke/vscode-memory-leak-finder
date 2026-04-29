@@ -41,6 +41,7 @@ export interface ChatEditor {
   openFinishSetup(): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
+  verifyResponseMessage(): Promise<void>
 }
 export interface ContextMenu {
   close(): Promise<void>
