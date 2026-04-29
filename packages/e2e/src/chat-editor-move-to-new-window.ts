@@ -12,6 +12,7 @@ export const setup = async ({ ChatEditor, Editor }: TestContext): Promise<void> 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   const newWindow = await ChatEditor.moveToNewWindow()
 
+  // @ts-ignore
   await newWindow.close()
 }
 
