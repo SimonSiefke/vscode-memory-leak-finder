@@ -23,7 +23,7 @@ const errorPageHtml = `<!doctype html>
   </body>
 </html>`
 
-export const setup = async ({ ChatEditor, Editor, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: errorPageHtml,
