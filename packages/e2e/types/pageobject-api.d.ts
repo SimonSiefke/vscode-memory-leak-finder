@@ -46,10 +46,14 @@ export interface ChatEditor {
   selectModel(modelName: any, retry?: any): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
+<<<<<<< HEAD
   setModeLegacy(modeLabel: any): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
   waitForNewWindow(options: any, electron: any): Promise<void>
   waitForWindowCount(electron: any, expectedCount: any): Promise<void>
+=======
+  shouldHaveAttachedContextHoverText(text: any): Promise<void>
+>>>>>>> origin/main
 }
 export interface ContextMenu {
   check(name: any): Promise<void>
@@ -103,6 +107,7 @@ export interface DiffEditor {
 }
 export interface DropDownContextMenu {
   close(): Promise<void>
+  select(option: any): Promise<void>
   shouldHaveItem(option: any): Promise<void>
 }
 export interface Editor {
@@ -256,7 +261,10 @@ export interface EditorFind {
   setSearchValue(value: any): Promise<void>
 }
 export interface Electron {
+  closeWindow(windowId: any): Promise<void>
   evaluate(expression: any): Promise<void>
+  getNewWindowId(): Promise<number | null>
+  getWindowIsVisible(windowId: any): Promise<boolean>
   getWindowCount(): Promise<number>
   getWindowIds(): Promise<readonly number[]>
   getNewWindowId(): Promise<number | null>
@@ -267,7 +275,38 @@ export interface Electron {
   mockOpenDialog(response: any): Promise<void>
   mockSaveDialog(response: any): Promise<void>
   mockShellTrashItem(): Promise<void>
+<<<<<<< HEAD
   unmockElectron(namespace: any, key: any): Promise<void>
+=======
+  waitForWindowCount(expectedCount: any): Promise<void>
+  waitForWindowVisible(windowId: any): Promise<void>
+}
+export interface ExternalRuntimeHandle {
+  readonly inspectPort: number
+  readonly runtimeName: 'bun' | 'node'
+  readonly serverPort: number
+  dispose(): Promise<void>
+  evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeName(): Promise<'bun' | 'node'>
+  getNamedArrayCount(): Promise<Record<string, number>>
+  request(path: any, init?: any): Promise<Response>
+  takeSnapshot(name: any): Promise<string>
+}
+export interface ExternalRuntime {
+  createPorts(): Promise<{
+    inspectPort: number
+    serverPort: number
+  }>
+  dispose(): Promise<void>
+  evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeName(): Promise<'bun' | 'node'>
+  getNamedArrayCount(): Promise<Record<string, number>>
+  request(path: any, init?: any): Promise<Response>
+  startExternalRuntime(options: any): Promise<void>
+  takeSnapshot(name: any): Promise<string>
+>>>>>>> origin/main
 }
 export interface Explorer {
   cancel(): Promise<void>
@@ -576,14 +615,37 @@ export interface SideBar {
   togglePosition(): Promise<void>
 }
 export interface SimpleBrowser {
+<<<<<<< HEAD
+=======
+  addConsoleLogsToChat(): Promise<void>
+  createDeferredMockServer(options: any): Promise<void>
+  createMockServer(options: any): Promise<void>
+  disposeMockServer(options: any): Promise<void>
+  finishMockServerResponse(options: any): Promise<void>
+  openDevtools(): Promise<number>
+  show(options: any): Promise<void>
+  showLoadError(options: any): Promise<void>
+>>>>>>> origin/main
   addElementToChat(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+<<<<<<< HEAD
   createMockServer(options: any): Promise<void>
   createWorkspaceFileServer(options: any): Promise<void>
   disposeMockServer(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
   reload(options?: any): Promise<void>
   shouldHaveText(options?: any): Promise<void>
+=======
+  back(options?: any): Promise<void>
+  forward(options?: any): Promise<void>
+  openMoreActions(): Promise<void>
+  shouldHaveElementScreenshotInChat(): Promise<void>
+  shouldHaveFindWidget(): Promise<void>
+  shouldHaveText(options: any): Promise<void>
+  shouldHaveLoadError(options: any): Promise<void>
+  shouldHaveTabLoadingSpinner(): Promise<void>
+  shouldNotHaveTabLoadingSpinner(): Promise<void>
+>>>>>>> origin/main
   shouldHaveTabTitle(options: any): Promise<void>
   showLegacy(options: any): Promise<void>
   showModern(options: any): Promise<void>

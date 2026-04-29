@@ -84,6 +84,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to clear chat context`)
       }
     },
+    async shouldHaveAttachedContextHoverText(text: string) {
+      try {
+        const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
+        await expect(contextLabel).toBeVisible()
+        await contextLabel.hover()
+        await page.waitForIdle()
+        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
+        await expect(hover).toBeVisible()
+        await expect(hover).toContainText(text)
+      } catch (error) {
+        throw new VError(error, `Failed to verify attached chat context hover text ${text}`)
+      }
+    },
     async closeFinishSetup() {
       try {
         const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
