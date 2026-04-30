@@ -4,6 +4,14 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const getChatPickerItem = (chatView: ReturnType<typeof page.locator>, index: number) => {
+    return chatView.locator('.chat-modelPicker-item, .chat-input-picker-item').nth(index)
+  }
+
+  const getChatPickerLabel = (pickerItem: ReturnType<typeof page.locator>) => {
+    return pickerItem.locator('.chat-model-label, .action-label, [role="button"], button').first()
+  }
+
   return {
     async addAllProblemsAsContext() {
       try {
@@ -209,15 +217,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async selectModel(modelName: string, retry = true) {
       try {
-        const modelPickerItem = page.locator('.chat-modelPicker-item').nth(1)
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const modelPickerItem = getChatPickerItem(chatView, 1)
         await expect(modelPickerItem).toBeVisible()
         await page.waitForIdle()
-        const modelLocator = modelPickerItem.locator('.chat-model-label')
+        const modelLocator = getChatPickerLabel(modelPickerItem)
         await expect(modelLocator).toBeVisible()
         await page.waitForIdle()
-        const modelText = await modelLocator.textContent()
+        const modelText = (await modelLocator.textContent()) || ''
         await page.waitForIdle()
-        if (modelText === modelName) {
+        if (modelText.includes(modelName)) {
           return
         }
         await modelLocator.click()
@@ -226,15 +236,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(item).toBeVisible()
         await item.click()
         await page.waitForIdle()
-        await expect(modelLocator).toHaveText(modelName)
+        await expect(modelLocator).toContainText(modelName)
         // TODO for some reason, it can switch back
         await new Promise((r) => {
           setTimeout(r, 7000)
         })
-        const modelText2 = await modelLocator.textContent()
-        if (modelText2 !== modelName) {
+        const modelText2 = (await modelLocator.textContent()) || ''
+        if (!modelText2.includes(modelName)) {
           if (retry) {
-            this.selectModel(modelName, false)
+            await this.selectModel(modelName, false)
           } else {
             throw new Error(`Model switch did not persist, expected ${modelName} but got ${modelText2}`)
           }
@@ -350,7 +360,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
         }
 
-        if (toolInvocations) {
+        if (toolInvocations.length > 0) {
           const element = chatView.locator('.chat-tool-invocation-part')
           await expect(element).toBeVisible({ timeout: 20_000 })
           await page.waitForIdle()
@@ -396,7 +406,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           return
         }
         const chatView = page.locator('.interactive-session')
-        const setModeButton = chatView.locator('.chat-modelPicker-item .action-label')
+        const setModeButton = getChatPickerLabel(getChatPickerItem(chatView, 0))
         await expect(setModeButton).toBeVisible()
         await setModeButton.click()
         await page.waitForIdle()
@@ -410,8 +420,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await option.click()
         await page.waitForIdle()
         await expect(actionWidget).toBeHidden()
-        const modeLabelElement = chatView.locator('.chat-model-label')
-        await expect(modeLabelElement).toHaveText(modeLabel)
+        const modeLabelElement = getChatPickerLabel(getChatPickerItem(chatView, 0))
+        await expect(modeLabelElement).toContainText(modeLabel)
       } catch (error) {
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
       }
@@ -431,8 +441,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await option.click()
         await page.waitForIdle()
         await expect(actionWidget).toBeHidden()
-        const modeLabelElement = chatView.locator('.chat-model-label')
-        await expect(modeLabelElement).toHaveText(modeLabel)
+        const modeLabelElement = getChatPickerLabel(getChatPickerItem(chatView, 0))
+        await expect(modeLabelElement).toContainText(modeLabel)
       } catch (error) {
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
       }

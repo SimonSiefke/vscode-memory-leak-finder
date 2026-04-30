@@ -3,6 +3,16 @@ import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams) => {
+  const getQuickPick = () => {
+    return page.locator('.quick-input-widget, [role="dialog"]:has(.quick-input-box), [role="dialog"]:has(.quick-input-list)')
+  }
+
+  const getQuickPickInput = () => {
+    return page.locator(
+      '.quick-input-widget .quick-input-box .input, .quick-input-widget .ibwrapper .input, [role="dialog"] .quick-input-box .input, [role="dialog"] .ibwrapper .input',
+    )
+  }
+
   return {
     async close() {
       try {
@@ -19,7 +29,10 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await page.waitForIdle()
         await this.showCommands({ pressKeyOnce })
         await this.type(command)
-        await this.select(command, stayVisible)
+        await this.pressEnter()
+        if (!stayVisible) {
+          await expect(getQuickPick()).toBeHidden()
+        }
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to execute command "${command}"`)
@@ -51,7 +64,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async getVisibleCommands() {
       try {
-        const quickPick = page.locator('.quick-input-widget')
+        const quickPick = getQuickPick()
         await expect(quickPick).toBeVisible()
         const commandElements = quickPick.locator('.monaco-list-row .label-name')
         const count = await commandElements.count()
@@ -70,7 +83,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async getFocusedItemLabel() {
       try {
-        const quickPick = page.locator('.quick-input-widget')
+        const quickPick = getQuickPick()
         await expect(quickPick).toBeVisible()
         const focusedItemLabel = quickPick.locator('.monaco-list-row.focused .label-name').first()
         await expect(focusedItemLabel).toBeVisible()
@@ -85,7 +98,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async hide() {
       try {
-        const quickPick = page.locator('.quick-input-widget')
+        const quickPick = getQuickPick()
         await expect(quickPick).toBeVisible()
         await page.keyboard.press(KeyBindings.Escape)
         await expect(quickPick).toBeHidden()
@@ -103,7 +116,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       try {
         await page.waitForIdle()
         await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform || '') })
-        const quickPick = page.locator('.quick-input-widget')
+        const quickPick = getQuickPick()
         await expect(quickPick).toBeVisible()
         const quickPickInput = await this.waitForInputVisible()
         const option = quickPick.locator('.label-name', {
@@ -130,15 +143,22 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     async select(text: string | RegExp, stayVisible: boolean | 'dont-care' = false) {
       try {
         await page.waitForIdle()
-        const quickPick = page.locator('.quick-input-widget')
+        const quickPick = getQuickPick()
         await expect(quickPick).toBeVisible()
         if (typeof text === 'string') {
           const option = quickPick.locator('.label-name', {
             hasExactText: text,
           })
-          await expect(option).toBeVisible()
-          await page.waitForIdle()
-          await option.click()
+          if ((await option.count()) > 0) {
+            await expect(option.first()).toBeVisible()
+            await page.waitForIdle()
+            await option.first().click()
+          } else {
+            const optionRow = quickPick.locator(`.monaco-list-row[aria-label="${text}"], .monaco-list-row[aria-label^="${text}"]`).first()
+            await expect(optionRow).toBeVisible()
+            await page.waitForIdle()
+            await optionRow.click()
+          }
         } else {
           const normal = `${text}`.slice(1, -1)
           const item = quickPick.locator(`.monaco-list-row[aria-label*="${normal}"]`)
@@ -159,7 +179,8 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     async show({ key = KeyBindings.getOpenQuickPickFiles(platform), pressKeyOnce = false } = {}) {
       try {
         await page.waitForIdle()
-        const quickPick = page.locator('.quick-input-widget')
+        const quickPick = getQuickPick()
+        const quickPickInput = getQuickPickInput().first()
         // TODO there might be a conflict here when pressing the keyboard shortcut
         // too often, the quickpick opens, making the next statement pass
         // but then the keyboard shortcut is still processing, making the quickpick close again
@@ -168,10 +189,10 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         } else {
           await page.pressKeyExponential({
             key: key,
-            waitFor: quickPick,
+            waitFor: quickPickInput,
           })
         }
-        await expect(quickPick).toBeVisible({
+        await expect(quickPickInput).toBeVisible({
           timeout: 10_000,
         })
         await expect(quickPick).toBeVisible()
@@ -201,14 +222,18 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async showCommands({ pressKeyOnce = false } = {}) {
       try {
-        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform || ''), pressKeyOnce })
+        try {
+          return await this.show({ key: KeyBindings.getOpenQuickPickCommands(platform || ''), pressKeyOnce })
+        } catch (error) {
+          return this.show({ key: KeyBindings.F1, pressKeyOnce: true })
+        }
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }
     },
     async waitForInputVisible() {
-      const quickPick = page.locator('.quick-input-widget')
-      const quickPickInput = quickPick.locator('.ibwrapper .input')
+      const quickPick = getQuickPick()
+      const quickPickInput = getQuickPickInput().first()
       await expect(quickPickInput).toBeVisible()
       await expect(quickPickInput).toBeFocused({ timeout: 3000 })
       return quickPickInput
