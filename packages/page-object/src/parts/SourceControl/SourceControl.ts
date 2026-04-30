@@ -69,11 +69,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async closeRepository(name: string) {
       try {
-        const repository = page
+        const repositoryRows = page.locator('.sidebar .scm-repositories-view .monaco-list-row')
+        const namedRepository = page
           .locator(
             `.sidebar .scm-repositories-view .monaco-list-row[aria-label*="${name}"], .sidebar .scm-repositories-view .monaco-list-row:has-text("${name}")`,
           )
           .first()
+        const repositoryProviders = page.locator('.sidebar .scm-provider')
+        const repository = (await repositoryRows.count()) > 0 ? namedRepository : repositoryProviders.nth(1)
         await expect(repository).toBeVisible()
         const contextMenu = ContextMenu.create({
           electronApp,
