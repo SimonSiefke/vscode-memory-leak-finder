@@ -17,6 +17,18 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get window count`)
       }
     },
+    async getWindowIsVisible(windowId: number): Promise<boolean> {
+      try {
+        await this.evaluate(`(() => {
+          const { BrowserWindow } = globalThis._____electron
+          const window = BrowserWindow.fromId(${windowId})
+          globalThis._____windowIsVisible = Boolean(window) && !window.isDestroyed() && window.isVisible()
+        })()`)
+        return await this.evaluate(`globalThis._____windowIsVisible`)
+      } catch (error) {
+        throw new VError(error, `Failed to get window visibility`)
+      }
+    },
     async getWindowIds(): Promise<readonly number[]> {
       try {
         await this.evaluate(`(() => {
@@ -28,6 +40,23 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         return await this.evaluate(`globalThis._____windowIds`)
       } catch (error) {
         throw new VError(error, `Failed to get window IDs`)
+      }
+    },
+    async waitForWindowCount(expectedCount: number, timeout = 5000): Promise<void> {
+      try {
+        const startTime = performance.now()
+        while (true) {
+          const actualCount = await this.getWindowCount()
+          if (actualCount === expectedCount) {
+            return
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error(`Expected ${expectedCount} windows but got ${actualCount}`)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 200))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for window count ${expectedCount}`)
       }
     },
     async getNewWindowId(): Promise<number | null> {
@@ -46,6 +75,24 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         return await this.evaluate(`globalThis._____newWindowId`)
       } catch (error) {
         throw new VError(error, `Failed to get new window ID`)
+      }
+    },
+    async waitForWindowVisible(windowId: number) {
+      try {
+        const maxDelay = 5000
+        const startTime = performance.now()
+        while (true) {
+          const isVisible = await this.getWindowIsVisible(windowId)
+          if (isVisible) {
+            return
+          }
+          if (performance.now() - startTime > maxDelay) {
+            throw new Error(`Window ${windowId} did not become visible within ${maxDelay}ms`)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 200))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for window visibility`)
       }
     },
     async closeWindow(windowId: number) {

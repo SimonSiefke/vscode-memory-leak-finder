@@ -231,6 +231,7 @@ jobs:
   ci-linux-charts:
     runs-on: ubuntu-24.04
     needs: ci-linux-measures
+    if: always()
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6

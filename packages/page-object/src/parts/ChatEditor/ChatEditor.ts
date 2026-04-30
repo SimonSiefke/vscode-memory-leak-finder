@@ -84,6 +84,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to clear chat context`)
       }
     },
+    async shouldHaveAttachedContextHoverText(text: string) {
+      try {
+        const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
+        await expect(contextLabel).toBeVisible()
+        await contextLabel.hover()
+        await page.waitForIdle()
+        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
+        await expect(hover).toBeVisible()
+        await expect(hover).toContainText(text)
+      } catch (error) {
+        throw new VError(error, `Failed to verify attached chat context hover text ${text}`)
+      }
+    },
     async closeFinishSetup() {
       try {
         const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
@@ -106,6 +119,38 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to move chat`)
+      }
+    },
+    async moveToNewWindow() {
+      try {
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
+        const windowCountBefore = await electron.getWindowCount()
+        const windowIdsBeforeRaw = await electron.getWindowIds()
+        const windowIdsBefore = Array.isArray(windowIdsBeforeRaw) ? windowIdsBeforeRaw : []
+        const waitForWindowCount = this.waitForWindowCount.bind(this)
+
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.MoveEditorToNewWindow)
+
+        await waitForWindowCount(electron, windowCountBefore + 1)
+        const newWindowId = await this.waitForNewWindow(windowIdsBefore, electron)
+
+        await page.waitForIdle()
+
+        return {
+          async close() {
+            try {
+              const windowCountBeforeClose = await electron.getWindowCount()
+              await electron.closeWindow(newWindowId)
+              await waitForWindowCount(electron, windowCountBeforeClose - 1)
+            } catch (error) {
+              throw new VError(error, `Failed to close new window`)
+            }
+          },
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to move chat to new window`)
       }
     },
     async moveToSideBar() {
@@ -135,6 +180,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open chat editor`)
+      }
+    },
+    async openAgentDebugLogs() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.OpenAgentDebugLogs)
+        await page.waitForIdle()
+        const tab = page.locator('[role="tab"][data-resource-name="Agent Debug Logs"], [role="tab"][aria-label^="Agent Debug Logs"]')
+        await expect(tab.first()).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open agent debug logs`)
       }
     },
     async openFinishSetup() {
@@ -392,6 +449,39 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to click access button with text "${buttonText}"`)
+      }
+    },
+    async waitForNewWindow(windowIdsBefore: readonly number[], electron: ReturnType<typeof Electron.create>) {
+      let windowIdsAfter = windowIdsBefore
+      const maxDelay = 5000
+      const startTime = performance.now()
+      while (windowIdsAfter.length <= windowIdsBefore.length) {
+        if (performance.now() - startTime > maxDelay) {
+          throw new Error(`New window did not appear within ${maxDelay}ms`)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 200))
+        const ids = await electron.getWindowIds()
+        windowIdsAfter = Array.isArray(ids) ? ids : []
+      }
+
+      const newWindowId = windowIdsAfter.find((id) => !windowIdsBefore.includes(id))
+      if (!newWindowId) {
+        throw new Error(`Could not identify the new window ID`)
+      }
+      return newWindowId
+    },
+    async waitForWindowCount(electron: ReturnType<typeof Electron.create>, expectedCount: number) {
+      const maxDelay = 5000
+      const startTime = performance.now()
+      while (true) {
+        const actualCount = await electron.getWindowCount()
+        if (actualCount === expectedCount) {
+          return
+        }
+        if (performance.now() - startTime > maxDelay) {
+          throw new Error(`Expected ${expectedCount} windows but got ${actualCount}`)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 200))
       }
     },
   }

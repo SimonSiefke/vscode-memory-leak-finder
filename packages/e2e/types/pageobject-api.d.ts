@@ -35,10 +35,13 @@ export interface ChatEditor {
   clearContext(contextName: any): Promise<void>
   closeFinishSetup(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
+  moveToNewWindow(): Promise<{ close(): Promise<void> }>
   open(): Promise<void>
+  openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
+  shouldHaveAttachedContextHoverText(text: any): Promise<void>
 }
 export interface ContextMenu {
   close(): Promise<void>
@@ -86,6 +89,7 @@ export interface DiffEditor {
 }
 export interface DropDownContextMenu {
   close(): Promise<void>
+  select(option: any): Promise<void>
   shouldHaveItem(option: any): Promise<void>
 }
 export interface Editor {
@@ -170,6 +174,7 @@ export interface Editor {
   shouldHaveSemanticToken(type: any): Promise<void>
   shouldHaveSpark(): Promise<void>
   shouldHaveSquigglyError(): Promise<void>
+  shouldHaveControlCharacterHighlight(): Promise<void>
   shouldHaveText(text: any, fileName?: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
   shouldNotHaveSemanticToken(type: any): Promise<void>
@@ -204,13 +209,44 @@ export interface EditorFind {
   setSearchValue(value: any): Promise<void>
 }
 export interface Electron {
+  closeWindow(windowId: any): Promise<void>
   evaluate(expression: any): Promise<void>
+  getNewWindowId(): Promise<number | null>
+  getWindowIsVisible(windowId: any): Promise<boolean>
   getWindowCount(): Promise<number>
   mockDialog(response: any): Promise<void>
   mockElectron(namespace: any, key: any, implementationCode: any): Promise<void>
   mockOpenDialog(response: any): Promise<void>
   mockSaveDialog(response: any): Promise<void>
   mockShellTrashItem(): Promise<void>
+  waitForWindowCount(expectedCount: any): Promise<void>
+  waitForWindowVisible(windowId: any): Promise<void>
+}
+export interface ExternalRuntimeHandle {
+  readonly inspectPort: number
+  readonly runtimeName: 'bun' | 'node'
+  readonly serverPort: number
+  dispose(): Promise<void>
+  evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeName(): Promise<'bun' | 'node'>
+  getNamedArrayCount(): Promise<Record<string, number>>
+  request(path: any, init?: any): Promise<Response>
+  takeSnapshot(name: any): Promise<string>
+}
+export interface ExternalRuntime {
+  createPorts(): Promise<{
+    inspectPort: number
+    serverPort: number
+  }>
+  dispose(): Promise<void>
+  evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeName(): Promise<'bun' | 'node'>
+  getNamedArrayCount(): Promise<Record<string, number>>
+  request(path: any, init?: any): Promise<Response>
+  startExternalRuntime(options: any): Promise<void>
+  takeSnapshot(name: any): Promise<string>
 }
 export interface ExternalRuntimeHandle {
   readonly inspectPort: number
@@ -302,6 +338,7 @@ export interface Git {
   commit(message: any): Promise<void>
   createBranch(branchName: any): Promise<void>
   init(): Promise<void>
+  initRepository(relativePath: any): Promise<void>
 }
 export interface GitHubPullRequests {
   checkoutIndex(index: any): Promise<void>
@@ -335,6 +372,7 @@ export interface MCP {
   listServers(): Promise<void>
   openConfiguration(): Promise<void>
   removeAllServers(): Promise<void>
+  openRepository(relativePath: any): Promise<void>
   removeServer(serverName: any): Promise<void>
   selectCommand(text: any, stayVisible?: any): Promise<void>
 }
@@ -380,7 +418,11 @@ export interface PortsView {
   unforwardAllPorts(port: any): Promise<void>
 }
 export interface Problems {
+  clearFilter(): Promise<void>
+  filter(filterValue: any): Promise<void>
   hide(): Promise<void>
+  shouldHaveVisibleCount(count: any): Promise<void>
+  shouldHaveVisibleTextCount(text: any, count: any): Promise<void>
   shouldHaveCount(count: any): Promise<void>
   show(): Promise<void>
   moveProblemsToSidebar(): Promise<void>
@@ -495,30 +537,49 @@ export interface SideBar {
   togglePosition(): Promise<void>
 }
 export interface SimpleBrowser {
+  addConsoleLogsToChat(): Promise<void>
+  createDeferredMockServer(options: any): Promise<void>
   createMockServer(options: any): Promise<void>
   disposeMockServer(options: any): Promise<void>
+  finishMockServerResponse(options: any): Promise<void>
+  openDevtools(): Promise<number>
   show(options: any): Promise<void>
+  showLoadError(options: any): Promise<void>
   addElementToChat(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+  back(options?: any): Promise<void>
+  forward(options?: any): Promise<void>
+  openMoreActions(): Promise<void>
+  shouldHaveElementScreenshotInChat(): Promise<void>
+  shouldHaveFindWidget(): Promise<void>
+  shouldHaveText(options: any): Promise<void>
+  shouldHaveLoadError(options: any): Promise<void>
+  shouldHaveTabLoadingSpinner(): Promise<void>
+  shouldNotHaveTabLoadingSpinner(): Promise<void>
   shouldHaveTabTitle(options: any): Promise<void>
 }
 export interface SourceControl {
+  closeRepository(name: any): Promise<void>
   checkoutBranch(branchName: any): Promise<void>
   disableInlineBlame(): Promise<void>
   doMoreAction(name: any): Promise<void>
   enableInlineBlame(options: any): Promise<void>
   hideBranchPicker(): Promise<void>
   hideGraph(): Promise<void>
+  openChange(name: any): Promise<void>
   showGraph(): Promise<void>
   refresh(): Promise<void>
   selectBranch(branchName: any): Promise<void>
+  show(): Promise<void>
   shouldHaveHistoryItem(name: any): Promise<void>
+  shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
   shouldNotHaveHistoryItem(name: any): Promise<void>
   showBranchPicker(): Promise<void>
   stageFile(name: any, parentFolder?: any): Promise<void>
   undoLastCommit(): Promise<void>
+  unstageAllChanges(): Promise<void>
   unstageFile(name: any): Promise<void>
   viewAsList(): Promise<void>
   viewAsTree(): Promise<void>
@@ -636,12 +697,12 @@ export interface Workspace {
   initializeGitRepository(): Promise<void>
   remove(file: any): Promise<void>
   setFiles(files: any): Promise<void>
+  setFilesWithoutWaiting(files: any): Promise<void>
   waitForFile(fileName: any): Promise<void>
 }
 
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
-  readonly ProcessExplorer: any
   readonly ChatEditor: ChatEditor
   readonly Colors: any
   readonly ContextMenu: ContextMenu
@@ -656,11 +717,13 @@ export interface PageObjectApi {
   readonly Electron: Electron
   readonly ExternalRuntime: ExternalRuntime
   readonly Explorer: Explorer
-  readonly Extensions: Extensions
   readonly ExtensionDetailView: ExtensionDetailView
+  readonly Extensions: Extensions
+  readonly ExternalRuntime: ExternalRuntime
   readonly Git: Git
   readonly GitHubPullRequests: GitHubPullRequests
   readonly Hover: Hover
+  readonly ImagesPreview: any
   readonly KeyBindingsEditor: KeyBindingsEditor
   readonly LanguageModelEditor: LanguageModelEditor
   readonly MarkdownPreview: MarkdownPreview
@@ -673,6 +736,7 @@ export interface PageObjectApi {
   readonly Panel: Panel
   readonly PortsView: PortsView
   readonly Problems: Problems
+  readonly ProcessExplorer: any
   readonly Profile: Profile
   readonly QuickPick: QuickPick
   readonly References: References
