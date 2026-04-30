@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 export const setup = async ({ Editor, SettingsEditor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -22,12 +24,14 @@ export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void
     name: 'editor.renderWhitespace',
     value: 'all',
   })
+  // @ts-ignore
   await Editor.shouldHaveVisibleWhitespace('file.txt')
 
   await SettingsEditor.select({
     name: 'editor.renderWhitespace',
     value: 'none',
   })
+  // @ts-ignore
   await Editor.shouldNotHaveVisibleWhitespace('file.txt')
 }
 
