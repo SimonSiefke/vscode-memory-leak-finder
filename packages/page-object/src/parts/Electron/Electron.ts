@@ -77,24 +77,6 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get new window ID`)
       }
     },
-    async waitForWindowCount(expectedCount: number) {
-      try {
-        const maxDelay = 5000
-        const startTime = performance.now()
-        while (true) {
-          const actualCount = await this.getWindowCount()
-          if (actualCount === expectedCount) {
-            return
-          }
-          if (performance.now() - startTime > maxDelay) {
-            throw new Error(`Expected ${expectedCount} windows but got ${actualCount}`)
-          }
-          await new Promise((resolve) => setTimeout(resolve, 200))
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to wait for window count`)
-      }
-    },
     async waitForWindowVisible(windowId: number) {
       try {
         const maxDelay = 5000
