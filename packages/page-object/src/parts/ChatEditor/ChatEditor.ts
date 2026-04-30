@@ -3,15 +3,15 @@ import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+const getChatPickerItem = (chatView: any, index: number) => {
+  return chatView.locator('.chat-modelPicker-item, .chat-input-picker-item').nth(index)
+}
+
+const getChatPickerLabel = (pickerItem: any) => {
+  return pickerItem.locator('.chat-model-label, .action-label, [role="button"], button').first()
+}
+
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
-  const getChatPickerItem = (chatView: ReturnType<typeof page.locator>, index: number) => {
-    return chatView.locator('.chat-modelPicker-item, .chat-input-picker-item').nth(index)
-  }
-
-  const getChatPickerLabel = (pickerItem: ReturnType<typeof page.locator>) => {
-    return pickerItem.locator('.chat-model-label, .action-label, [role="button"], button').first()
-  }
-
   return {
     async addAllProblemsAsContext() {
       try {
