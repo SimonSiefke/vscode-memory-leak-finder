@@ -7,6 +7,7 @@ export const run = async ({ Electron, QuickPick, TitleBar, WellKnownCommands, Wi
   await Electron.waitForWindowCount(1)
 
   await TitleBar.showMenuFile()
+  // @ts-ignore
   await TitleBar.selectMenuItem(WellKnownCommands.NewWindow)
 
   await Electron.waitForWindowCount(2)
