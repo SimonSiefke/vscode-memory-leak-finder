@@ -295,9 +295,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async shouldHaveRepositoryCount(count: number) {
       try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="Source Control"])`)
+        await expect(activityBarItem).toBeVisible()
+        const expanded = await activityBarItem.getAttribute('aria-expanded')
+        if (expanded === 'false') {
+          await activityBarItem.click()
+        }
+        const sideBar = page.locator('.sidebar')
+        const title = sideBar.locator('.composite.title')
+        await expect(title).toHaveText('Source Control')
         const repositoryRows = page.locator('.sidebar .scm-repositories-view .monaco-list-row')
         const repositoryProviders = page.locator('.sidebar .scm-provider')
         const repositoryInputs = page.locator('.sidebar .scm-input')
+        const sourceControlManagement = page.locator('.sidebar [aria-label="Source Control Management"]')
+        const sourceControlActions = page.locator('.sidebar [aria-label="Source Control actions"]')
         const getRepositoryCount = async () => {
           const repositoryRowCount = await repositoryRows.count()
           if (repositoryRowCount > 0) {
@@ -307,7 +320,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           if (repositoryProviderCount > 0) {
             return repositoryProviderCount
           }
-          return repositoryInputs.count()
+          const repositoryInputCount = await repositoryInputs.count()
+          if (repositoryInputCount > 0) {
+            return repositoryInputCount
+          }
+          if (count === 1) {
+            const sourceControlManagementCount = await sourceControlManagement.count()
+            if (sourceControlManagementCount > 0) {
+              return 1
+            }
+            const sourceControlActionsCount = await sourceControlActions.count()
+            if (sourceControlActionsCount > 0) {
+              return 1
+            }
+          }
+          return 0
         }
         const timeout = 10_000
         const startTime = Date.now()
