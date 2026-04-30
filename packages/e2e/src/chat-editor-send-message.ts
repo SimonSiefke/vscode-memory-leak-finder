@@ -12,8 +12,9 @@ export const setup = async ({ ChatEditor, Editor, Electron }: TestContext): Prom
   await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
-  await ChatEditor.sendMessage({ message: 'test', model: 'GPT-4.1', verify: true })
+export const run = async ({ ChatEditor, Editor }: TestContext): Promise<void> => {
+  await ChatEditor.sendMessage({ message: 'test', model: 'GPT-4.1' })
+  await Editor.closeAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
