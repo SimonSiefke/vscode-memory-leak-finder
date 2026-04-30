@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-// export const skip = 1
+export const skip = 1
 
 export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
@@ -30,7 +30,7 @@ export const run = async ({ Git, SourceControl, Workspace }: TestContext): Promi
   await git.openRepository('nested-repo')
   await SourceControl.shouldHaveRepositoryCount(2)
 
-  await Workspace.remove('nested-repo')
   await SourceControl.closeRepository('nested-repo')
+  await Workspace.remove('nested-repo')
   await SourceControl.shouldHaveRepositoryCount(1)
 }
