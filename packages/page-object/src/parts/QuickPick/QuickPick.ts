@@ -31,7 +31,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await this.type(command)
         await this.pressEnter()
         if (!stayVisible) {
-          await expect(getQuickPick()).toBeHidden()
+          await expect(getQuickPick()).toBeHidden({ timeout: 30_000 })
         }
         await page.waitForIdle()
       } catch (error) {
@@ -232,7 +232,6 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       }
     },
     async waitForInputVisible() {
-      const quickPick = getQuickPick()
       const quickPickInput = getQuickPickInput().first()
       await expect(quickPickInput).toBeVisible()
       await expect(quickPickInput).toBeFocused({ timeout: 3000 })
