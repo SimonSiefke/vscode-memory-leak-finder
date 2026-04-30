@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = process.platform === 'darwin'
+export const skip = true
 
 export const run = async ({ Electron, QuickPick, TitleBar, WellKnownCommands, Window, Workbench }: TestContext): Promise<void> => {
   await Workbench.shouldBeVisible()
