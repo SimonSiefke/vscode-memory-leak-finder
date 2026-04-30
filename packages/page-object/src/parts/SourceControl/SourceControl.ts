@@ -67,6 +67,33 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to checkout branch "${branchName}"`)
       }
     },
+    async closeRepository(name: string) {
+      try {
+        const repositoryRows = page.locator('.sidebar .scm-repositories-view .monaco-list-row')
+        const namedRepository = page
+          .locator(
+            `.sidebar .scm-repositories-view .monaco-list-row[aria-label*="${name}"], .sidebar .scm-repositories-view .monaco-list-row:has-text("${name}")`,
+          )
+          .first()
+        const repositoryProviders = page.locator('.sidebar .scm-provider')
+        const repository = (await repositoryRows.count()) > 0 ? namedRepository : repositoryProviders.nth(1)
+        await expect(repository).toBeVisible()
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(repository)
+        await contextMenu.shouldHaveItem('Close Repository')
+        await contextMenu.select('Close Repository')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close repository "${name}"`)
+      }
+    },
     async disableInlineBlame() {
       try {
         const decoration = page.locator('[class^="ced-1-TextEditorDecorationType"]').nth(1)
@@ -264,6 +291,68 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(item).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to verify history item`)
+      }
+    },
+    async shouldHaveRepositoryCount(count: number) {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="Source Control"])`)
+        await expect(activityBarItem).toBeVisible()
+        const expanded = await activityBarItem.getAttribute('aria-expanded')
+        if (expanded === 'false') {
+          await activityBarItem.click()
+        }
+        const sideBar = page.locator('.sidebar')
+        const title = sideBar.locator('.composite.title')
+        await expect(title).toHaveText('Source Control')
+        const repositoryRows = page.locator('.sidebar .scm-repositories-view .monaco-list-row')
+        const repositoryProviders = page.locator('.sidebar .scm-provider')
+        const repositoryInputs = page.locator('.sidebar .scm-input')
+        const sourceControlManagement = page.locator('.sidebar [aria-label="Source Control Management"]')
+        const sourceControlActions = page.locator('.sidebar [aria-label="Source Control actions"]')
+        const getRepositoryCount = async () => {
+          const repositoryRowCount = await repositoryRows.count()
+          if (repositoryRowCount > 0) {
+            return repositoryRowCount
+          }
+          const repositoryProviderCount = await repositoryProviders.count()
+          if (repositoryProviderCount > 0) {
+            return repositoryProviderCount
+          }
+          const repositoryInputCount = await repositoryInputs.count()
+          if (repositoryInputCount > 0) {
+            return repositoryInputCount
+          }
+          if (count === 1) {
+            const sourceControlManagementCount = await sourceControlManagement.count()
+            if (sourceControlManagementCount > 0) {
+              return 1
+            }
+            const sourceControlActionsCount = await sourceControlActions.count()
+            if (sourceControlActionsCount > 0) {
+              return 1
+            }
+          }
+          return 0
+        }
+        const timeout = 10_000
+        const startTime = Date.now()
+        while (Date.now() - startTime < timeout) {
+          const actualCount = await getRepositoryCount()
+          if (actualCount === count) {
+            return
+          }
+          await (() => {
+            const { promise, resolve } = Promise.withResolvers<void>()
+            setTimeout(resolve, 100)
+            return promise
+          })()
+        }
+        const actualCount = await getRepositoryCount()
+        throw new Error(`expected repository count ${count} but got ${actualCount}`)
+      } catch (error) {
+        throw new VError(error, `Failed to verify repository count ${count}`)
       }
     },
     async shouldHaveUnstagedFile(name: string) {

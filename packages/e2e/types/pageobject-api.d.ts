@@ -312,6 +312,7 @@ export interface Git {
   commit(message: any): Promise<void>
   createBranch(branchName: any): Promise<void>
   init(): Promise<void>
+  initRepository(relativePath: any): Promise<void>
 }
 export interface GitHubPullRequests {
   checkoutIndex(index: any): Promise<void>
@@ -345,6 +346,7 @@ export interface MCP {
   listServers(): Promise<void>
   openConfiguration(): Promise<void>
   removeAllServers(): Promise<void>
+  openRepository(relativePath: any): Promise<void>
   removeServer(serverName: any): Promise<void>
   selectCommand(text: any, stayVisible?: any): Promise<void>
 }
@@ -532,6 +534,7 @@ export interface SimpleBrowser {
   shouldHaveTabTitle(options: any): Promise<void>
 }
 export interface SourceControl {
+  closeRepository(name: any): Promise<void>
   checkoutBranch(branchName: any): Promise<void>
   disableInlineBlame(): Promise<void>
   doMoreAction(name: any): Promise<void>
@@ -544,6 +547,7 @@ export interface SourceControl {
   selectBranch(branchName: any): Promise<void>
   show(): Promise<void>
   shouldHaveHistoryItem(name: any): Promise<void>
+  shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
   shouldNotHaveHistoryItem(name: any): Promise<void>
   showBranchPicker(): Promise<void>
