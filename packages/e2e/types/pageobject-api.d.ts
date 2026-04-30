@@ -41,6 +41,7 @@ export interface ChatEditor {
   openFinishSetup(): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
+  shouldHaveAttachedContextHoverText(text: any): Promise<void>
 }
 export interface ContextMenu {
   close(): Promise<void>
@@ -88,6 +89,7 @@ export interface DiffEditor {
 }
 export interface DropDownContextMenu {
   close(): Promise<void>
+  select(option: any): Promise<void>
   shouldHaveItem(option: any): Promise<void>
 }
 export interface Editor {
@@ -207,13 +209,18 @@ export interface EditorFind {
   setSearchValue(value: any): Promise<void>
 }
 export interface Electron {
+  closeWindow(windowId: any): Promise<void>
   evaluate(expression: any): Promise<void>
+  getNewWindowId(): Promise<number | null>
+  getWindowIsVisible(windowId: any): Promise<boolean>
   getWindowCount(): Promise<number>
   mockDialog(response: any): Promise<void>
   mockElectron(namespace: any, key: any, implementationCode: any): Promise<void>
   mockOpenDialog(response: any): Promise<void>
   mockSaveDialog(response: any): Promise<void>
   mockShellTrashItem(): Promise<void>
+  waitForWindowCount(expectedCount: any): Promise<void>
+  waitForWindowVisible(windowId: any): Promise<void>
 }
 export interface ExternalRuntimeHandle {
   readonly inspectPort: number
@@ -502,12 +509,26 @@ export interface SideBar {
   togglePosition(): Promise<void>
 }
 export interface SimpleBrowser {
+  addConsoleLogsToChat(): Promise<void>
+  createDeferredMockServer(options: any): Promise<void>
   createMockServer(options: any): Promise<void>
   disposeMockServer(options: any): Promise<void>
+  finishMockServerResponse(options: any): Promise<void>
+  openDevtools(): Promise<number>
   show(options: any): Promise<void>
+  showLoadError(options: any): Promise<void>
   addElementToChat(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+  back(options?: any): Promise<void>
+  forward(options?: any): Promise<void>
+  openMoreActions(): Promise<void>
+  shouldHaveElementScreenshotInChat(): Promise<void>
+  shouldHaveFindWidget(): Promise<void>
+  shouldHaveText(options: any): Promise<void>
+  shouldHaveLoadError(options: any): Promise<void>
+  shouldHaveTabLoadingSpinner(): Promise<void>
+  shouldNotHaveTabLoadingSpinner(): Promise<void>
   shouldHaveTabTitle(options: any): Promise<void>
 }
 export interface SourceControl {
