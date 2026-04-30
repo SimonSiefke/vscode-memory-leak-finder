@@ -10,12 +10,6 @@ export interface ISimplifedWindow {
   readonly shouldBeVisible: () => Promise<void>
 }
 
-const rejectaftertimeout = () => {
-  const { promise, reject } = Promise.withResolvers<never>()
-  setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000)
-  return promise
-}
-
 const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: string) => {
   return {
     objectType: 'locator',
@@ -32,14 +26,23 @@ const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: strin
 
 export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
-    async waitForNewWindow() {
+    async waitForNewWindow({ timeout }: { timeout: number }) {
       const { promise, resolve } = Promise.withResolvers<string>()
-      let targetCaptured = false
-
-      // TODO cleanup listener
 
       if (!browserRpc) {
         throw new Error(`browser rpc is required`)
+      }
+
+      let targetCaptured = false
+
+      const cleanup = () => {
+        browserRpc.off('Target.attachedToTarget', handleNewTarget)
+        clearTimeout(timeoutRef)
+      }
+
+      const handleTimeout = () => {
+        cleanup()
+        resolve('')
       }
 
       const handleNewTarget = (message: any): void => {
@@ -47,10 +50,12 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           return
         }
         targetCaptured = true
+        cleanup()
         const sessionId = message.params.sessionId as string
         resolve(sessionId)
       }
       browserRpc.on('Target.attachedToTarget', handleNewTarget)
+      const timeoutRef = setTimeout(handleTimeout, timeout)
 
       const sessionId = await promise
 
@@ -58,7 +63,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
     },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
-        const newWindowPromise = this.waitForNewWindow()
+        const newWindowPromise = this.waitForNewWindow({ timeout: 5000 })
         // Run the quickpick command to open new window
         await page.waitForIdle()
         const quickPick = QuickPick.create({
@@ -71,7 +76,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         })
         await quickPick.executeCommand(WellKnownCommands.NewWindow)
 
-        const sessionId = await Promise.race([newWindowPromise, rejectaftertimeout()])
+        const sessionId = await newWindowPromise
         if (!sessionId) {
           throw new Error(`Failed to wait for window`)
         }
