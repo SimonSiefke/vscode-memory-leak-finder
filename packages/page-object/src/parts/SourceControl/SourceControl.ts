@@ -295,12 +295,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async shouldHaveRepositoryCount(count: number) {
       try {
-        const repositoryInputs = page.locator('.sidebar .scm-input')
         const repositoryRows = page.locator('.sidebar .scm-repositories-view .monaco-list-row')
+        const repositoryProviders = page.locator('.sidebar .scm-provider')
+        const repositoryInputs = page.locator('.sidebar .scm-input')
         const getRepositoryCount = async () => {
           const repositoryRowCount = await repositoryRows.count()
           if (repositoryRowCount > 0) {
             return repositoryRowCount
+          }
+          const repositoryProviderCount = await repositoryProviders.count()
+          if (repositoryProviderCount > 0) {
+            return repositoryProviderCount
           }
           return repositoryInputs.count()
         }
