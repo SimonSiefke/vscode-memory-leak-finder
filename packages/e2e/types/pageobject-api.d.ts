@@ -613,6 +613,9 @@ export interface TerminalInlineChat {
   sendMessage(options?: any): Promise<void>
   show(): Promise<void>
 }
+export interface Timeout {
+  waitMinutes(minutes: any): Promise<void>
+}
 export interface NotebookInlineChat {
   hide(): Promise<void>
   show(): Promise<void>
@@ -731,6 +734,7 @@ export interface PageObjectApi {
   readonly Terminal: Terminal
   readonly TerminalInlineChat: TerminalInlineChat
   readonly Testing: Testing
+  readonly Timeout: Timeout
   readonly TitleBar: TitleBar
   readonly View: View
   readonly WaitForApplicationToBeReady: WaitForApplicationToBeReady
