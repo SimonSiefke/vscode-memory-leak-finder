@@ -18,7 +18,6 @@ export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestCont
       name: 'image.svg',
     },
   ])
-  // TODO create an svg file, attach it as image
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
