@@ -85,12 +85,6 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   })
 
   await waitForFixedTest(ChatEditor)
-
-  // await Terminal.show({
-  //   waitForReady: true,
-  // })
-  // await Terminal.execute('node --test')
-  // await Terminal.shouldHaveSuccessDecoration()
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
