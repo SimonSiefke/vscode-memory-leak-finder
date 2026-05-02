@@ -495,7 +495,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           return
         } catch {
-          const confirmation = page.locator('.monaco-list-row[aria-label^="Chat confirmation required:"]').last()
+          const confirmation = page.locator('.monaco-list-row[aria-label^="Chat confirmation required:"]').first()
           try {
             await expect(confirmation).toBeVisible({ timeout: 2_000 })
           } catch {
