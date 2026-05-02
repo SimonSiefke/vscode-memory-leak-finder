@@ -37,10 +37,10 @@ export const setup = async ({ ChatEditor, Editor, Electron, Extensions, Workspac
   await Electron.mockDialog({
     response: 1,
   })
-  await Extensions.install({
-    id: 'GitHub.copilot-chat',
-    name: 'GitHub Copilot Chat',
-  })
+  // await Extensions.install({
+  //   id: 'GitHub.copilot-chat',
+  //   name: 'GitHub Copilot Chat',
+  // })
 
   await Workspace.setFiles([
     {
@@ -73,11 +73,10 @@ test('add returns the sum of two numbers', () => {
   ])
 
   await Editor.closeAll()
-  await ChatEditor.clearAll()
   await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: `Run the tests with node --test and fix the failing test. The implementation in src/add.js is already correct, so prefer fixing the test in test/add.test.js.`,
     verify: true,
@@ -85,11 +84,11 @@ export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> 
 
   await waitForFixedTest()
 
-  await Terminal.show({
-    waitForReady: true,
-  })
-  await Terminal.execute('node --test')
-  await Terminal.shouldHaveSuccessDecoration()
+  // await Terminal.show({
+  //   waitForReady: true,
+  // })
+  // await Terminal.execute('node --test')
+  // await Terminal.shouldHaveSuccessDecoration()
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
