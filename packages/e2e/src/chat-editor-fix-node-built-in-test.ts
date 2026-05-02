@@ -24,9 +24,8 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-const waitForFixedTest = async (): Promise<void> => {
-  const maxWaitTime = 10_000
-  const pollInterval = 50
+const waitForFixedTest = async (ChatEditor: TestContext['ChatEditor']): Promise<void> => {
+  const maxWaitTime = 90_000
   const startTime = performance.now()
 
   while (performance.now() - startTime < maxWaitTime) {
@@ -36,7 +35,8 @@ const waitForFixedTest = async (): Promise<void> => {
       return
     }
 
-    await new Promise((resolve) => setTimeout(resolve, pollInterval))
+    await ChatEditor.clickAccessButton()
+    await ChatEditor.waitForMutation(2_000)
   }
 
   throw new Error('Timed out waiting for the test file to be fixed')
@@ -88,7 +88,7 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
     model: 'GPT-4.1',
   })
 
-  await waitForFixedTest()
+  await waitForFixedTest(ChatEditor)
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {

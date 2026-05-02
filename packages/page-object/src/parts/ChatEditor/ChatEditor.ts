@@ -477,7 +477,23 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
 
         const shouldApproveToolCalls = Boolean(approveToolCalls || approveCommand)
-        const shouldWaitForChatToSettle = shouldApproveToolCalls || verify || Boolean(expectedResponse)
+
+        if (shouldApproveToolCalls) {
+          const approvalStartTime = performance.now()
+          while (performance.now() - approvalStartTime < 10_000) {
+            const state = await this.getChatUiState()
+            if (state.hasAllowButton || state.hasChatConfirmation || state.hasKeepAllEditsButton) {
+              await this.clickAccessButton()
+              break
+            }
+            if (state.nonRequestRowCount > 0) {
+              break
+            }
+            await this.waitForMutation(500)
+          }
+        }
+
+        const shouldWaitForChatToSettle = verify || Boolean(expectedResponse)
 
         if (shouldWaitForChatToSettle) {
           await this.waitForChatToSettle({
@@ -585,12 +601,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async clickAccessButton(buttonText: string = 'Allow') {
       try {
-        const keepAllEditsButton = page.locator('button:has-text("Keep All Edits")').first()
+        const accessButton = page.locator(`button:has-text("${buttonText}")`).first()
         try {
-          await expect(keepAllEditsButton).toBeVisible({ timeout: 100 })
-          await keepAllEditsButton.focus()
-          await page.waitForIdle()
-          await page.keyboard.press('Control+Enter')
+          await expect(accessButton).toBeVisible({ timeout: 100 })
+          await accessButton.click()
           await page.waitForIdle()
           return
         } catch {}
@@ -605,16 +619,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           return
         } catch {}
 
-        const accessButton = page.locator(`button:has-text("${buttonText}")`).first()
+        const keepAllEditsButton = page.locator('button:has-text("Keep All Edits")').first()
         try {
-          await expect(accessButton).toBeVisible({ timeout: 100 })
-          await accessButton.focus()
-          await page.waitForIdle()
-          if (buttonText === 'Allow') {
-            await page.keyboard.press('Control+Enter')
-          } else {
-            await accessButton.click()
-          }
+          await expect(keepAllEditsButton).toBeVisible({ timeout: 100 })
+          await keepAllEditsButton.click()
           await page.waitForIdle()
           return
         } catch {
