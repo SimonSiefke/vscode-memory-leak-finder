@@ -65,9 +65,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           response: 1,
         })
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
-          // TODO
-          // await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+        if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 118) {
+          await this.sendMessage({
+            message: '/clear',
+          })
+        } else if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
         } else {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
