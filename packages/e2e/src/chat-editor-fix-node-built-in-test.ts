@@ -9,6 +9,15 @@ const testFilePath = join(workspacePath, 'test', 'add.test.js')
 const sourceFileContent = `export const add = (a, b) => a + b
 `
 
+const testFileContent = `import assert from 'node:assert/strict'
+import test from 'node:test'
+import { add } from '../src/add.js'
+
+test('add returns the sum of two numbers', () => {
+  assert.equal(add(1, 2), 4)
+})
+`
+
 const incorrectAssertion = 'assert.equal(add(1, 2), 4)'
 
 export const skip = 1
@@ -35,7 +44,7 @@ const waitForFixedTest = async (ChatEditor: TestContext['ChatEditor']): Promise<
   throw new Error('Timed out waiting for the test file to be fixed')
 }
 
-export const setup = async ({ ChatEditor, Editor, Electron, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, Electron }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
   })
@@ -44,6 +53,11 @@ export const setup = async ({ ChatEditor, Editor, Electron, Workspace }: TestCon
   //   name: 'GitHub Copilot Chat',
   // })
 
+  await Editor.closeAll()
+  await ChatEditor.open()
+}
+
+export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'package.json',
@@ -63,22 +77,12 @@ export const setup = async ({ ChatEditor, Editor, Electron, Workspace }: TestCon
     },
     {
       name: 'test/add.test.js',
-      content: `import assert from 'node:assert/strict'
-import test from 'node:test'
-import { add } from '../src/add.js'
-
-test('add returns the sum of two numbers', () => {
-  assert.equal(add(1, 2), 4)
-})
-`,
+      content: testFileContent,
     },
   ])
 
-  await Editor.closeAll()
-  await ChatEditor.open()
-}
+  await ChatEditor.clearAll()
 
-export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     approveToolCalls: true,
     message: `Run the tests with node --test and fix the failing test. The implementation in src/add.js is already correct, so prefer fixing the test in test/add.test.js.`,

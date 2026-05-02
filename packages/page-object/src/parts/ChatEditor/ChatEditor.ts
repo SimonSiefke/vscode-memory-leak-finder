@@ -60,6 +60,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async clearAll() {
       try {
+        const requests = page.locator('.monaco-list-row.request')
+        const requestCount = await requests.count()
+        if (requestCount === 0) {
+          await page.waitForIdle()
+          return
+        }
+
         const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
         await using _mockDialog = await electron.mockDialog({
           response: 1,
@@ -75,7 +82,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
         }
         await page.waitForIdle()
-        const requestOne = page.locator('.monaco-list-row.request').first()
+        const requestOne = requests.first()
         await expect(requestOne).toBeHidden({ timeout: 10_000 })
         await page.waitForIdle()
       } catch (error) {
