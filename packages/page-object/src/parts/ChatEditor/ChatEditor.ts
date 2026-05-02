@@ -13,6 +13,101 @@ const getChatPickerLabel = (pickerItem: any) => {
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
+    async getChatUiState() {
+      try {
+        return await page.evaluate({
+          awaitPromise: false,
+          expression: `(() => {
+  const isVisible = (element) => {
+    if (!element) {
+      return false
+    }
+    const style = window.getComputedStyle(element)
+    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+      return false
+    }
+    return element.getClientRects().length > 0
+  }
+
+  const buttons = Array.from(document.querySelectorAll('button'))
+  const rows = Array.from(document.querySelectorAll('.interactive-session .monaco-list-row'))
+  const nonRequestRows = rows.filter((row) => !row.classList.contains('request'))
+
+  return {
+    hasAllowButton: buttons.some((button) => isVisible(button) && button.textContent && button.textContent.includes('Allow')),
+    hasChatConfirmation: Array.from(document.querySelectorAll('.monaco-list-row[aria-label^="Chat confirmation required:"]')).some(isVisible),
+    hasKeepAllEditsButton: buttons.some((button) => isVisible(button) && button.textContent && button.textContent.includes('Keep All Edits')),
+    hasProgressStep: Array.from(document.querySelectorAll('.rendered-markdown.progress-step')).some(isVisible),
+    nonRequestRowCount: nonRequestRows.length,
+  }
+})()`,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to get chat ui state`)
+      }
+    },
+    async waitForMutation(maxTimeout: number = 2_000) {
+      try {
+        return await page.evaluate({
+          awaitPromise: true,
+          expression: `(() => new Promise((resolve) => {
+  const target = document.querySelector('.interactive-session') || document.body
+  let settled = false
+  const done = (value) => {
+    if (settled) {
+      return
+    }
+    settled = true
+    observer.disconnect()
+    clearTimeout(timer)
+    resolve(value)
+  }
+  const observer = new MutationObserver(() => {
+    done('mutation')
+  })
+  observer.observe(target, {
+    attributes: true,
+    characterData: true,
+    childList: true,
+    subtree: true,
+  })
+  const timer = setTimeout(() => {
+    done('timeout')
+  }, ${Math.min(maxTimeout, 2_500)})
+}))()`,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed waiting for chat mutation`)
+      }
+    },
+    async waitForChatToSettle({ approveToolCalls = false, maxTimeout = 90_000 }: { approveToolCalls?: boolean; maxTimeout?: number }) {
+      try {
+        const startTime = performance.now()
+
+        while (performance.now() - startTime < maxTimeout) {
+          const state = await this.getChatUiState()
+          if (approveToolCalls && (state.hasAllowButton || state.hasChatConfirmation || state.hasKeepAllEditsButton)) {
+            await this.clickAccessButton()
+            continue
+          }
+
+          if (state.nonRequestRowCount > 0 && !state.hasChatConfirmation && !state.hasKeepAllEditsButton && !state.hasProgressStep) {
+            return
+          }
+
+          const remainingTime = maxTimeout - (performance.now() - startTime)
+          if (remainingTime <= 0) {
+            break
+          }
+
+          await this.waitForMutation(Math.min(2_000, remainingTime))
+        }
+
+        throw new Error(`Chat did not settle within ${maxTimeout}ms`)
+      } catch (error) {
+        throw new VError(error, `Failed waiting for chat to settle`)
+      }
+    },
     async addAllProblemsAsContext() {
       try {
         await this.addContext('Problems...', 'All Problems', 'All Problems')
@@ -381,8 +476,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
         }
 
-        if (approveToolCalls || approveCommand) {
-          await this.clickAccessButton()
+        const shouldApproveToolCalls = Boolean(approveToolCalls || approveCommand)
+        const shouldWaitForChatToSettle = shouldApproveToolCalls || verify || Boolean(expectedResponse)
+
+        if (shouldWaitForChatToSettle) {
+          await this.waitForChatToSettle({
+            approveToolCalls: shouldApproveToolCalls,
+          })
         }
 
         if (verify) {
@@ -391,9 +491,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
           await expect(response).toBeVisible({ timeout: 60_000 })
-          await page.waitForIdle()
-          const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timeout: 45_000 })
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
@@ -426,9 +523,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
           await expect(response).toBeVisible({ timeout: 60_000 })
-          await page.waitForIdle()
-          const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timeout: 45_000 })
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
@@ -491,9 +585,29 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async clickAccessButton(buttonText: string = 'Allow') {
       try {
+        const keepAllEditsButton = page.locator('button:has-text("Keep All Edits")').first()
+        try {
+          await expect(keepAllEditsButton).toBeVisible({ timeout: 100 })
+          await keepAllEditsButton.focus()
+          await page.waitForIdle()
+          await page.keyboard.press('Control+Enter')
+          await page.waitForIdle()
+          return
+        } catch {}
+
+        const confirmation = page.locator('.monaco-list-row[aria-label^="Chat confirmation required:"]').first()
+        try {
+          await expect(confirmation).toBeVisible({ timeout: 100 })
+          await confirmation.focus()
+          await page.waitForIdle()
+          await page.keyboard.press('Control+Enter')
+          await page.waitForIdle()
+          return
+        } catch {}
+
         const accessButton = page.locator(`button:has-text("${buttonText}")`).first()
         try {
-          await expect(accessButton).toBeVisible({ timeout: 10_000 })
+          await expect(accessButton).toBeVisible({ timeout: 100 })
           await accessButton.focus()
           await page.waitForIdle()
           if (buttonText === 'Allow') {
@@ -504,27 +618,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           return
         } catch {
-          const confirmation = page.locator('.monaco-list-row[aria-label^="Chat confirmation required:"]').first()
-          try {
-            await expect(confirmation).toBeVisible({ timeout: 2_000 })
-            await confirmation.focus()
-            await page.waitForIdle()
-            await page.keyboard.press('Control+Enter')
-            await page.waitForIdle()
-            return
-          } catch {
-            const keepAllEditsButton = page.locator('button:has-text("Keep All Edits")').first()
-            try {
-              await expect(keepAllEditsButton).toBeVisible({ timeout: 2_000 })
-              await keepAllEditsButton.focus()
-              await page.waitForIdle()
-              await page.keyboard.press('Control+Enter')
-              await page.waitForIdle()
-              return
-            } catch {
-              return
-            }
-          }
+          return
         }
       } catch (error) {
         throw new VError(error, `Failed to click access button with text "${buttonText}"`)

@@ -24,14 +24,12 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-const waitForFixedTest = async (ChatEditor: TestContext['ChatEditor']): Promise<void> => {
-  const maxWaitTime = 90_000
-  const pollInterval = 1_000
+const waitForFixedTest = async (): Promise<void> => {
+  const maxWaitTime = 10_000
+  const pollInterval = 50
   const startTime = performance.now()
 
   while (performance.now() - startTime < maxWaitTime) {
-    await ChatEditor.clickAccessButton()
-
     const [sourceContent, testContent] = await Promise.all([readFile(sourceFilePath, 'utf8'), readFile(testFilePath, 'utf8')])
 
     if (sourceContent === sourceFileContent && !testContent.includes(incorrectAssertion)) {
@@ -90,7 +88,7 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
     model: 'GPT-4.1',
   })
 
-  await waitForFixedTest(ChatEditor)
+  await waitForFixedTest()
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
