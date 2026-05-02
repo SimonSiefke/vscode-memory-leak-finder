@@ -322,7 +322,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await page.waitForIdle()
     },
     async sendMessage({
-      approveCommand = false,
+      approveCommand,
+      approveToolCalls = false,
       expectedResponse,
       image = '',
       message,
@@ -335,6 +336,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       viewLinesText = '',
     }: {
       approveCommand?: boolean
+      approveToolCalls?: boolean
       expectedResponse?: string
       message: string
       validateRequest?: { exists: readonly unknown[] }
@@ -372,7 +374,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
         }
 
-        if (approveCommand) {
+        if (approveToolCalls || approveCommand) {
           await this.clickAccessButton()
         }
 

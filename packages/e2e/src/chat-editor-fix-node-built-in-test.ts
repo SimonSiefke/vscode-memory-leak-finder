@@ -80,7 +80,7 @@ test('add returns the sum of two numbers', () => {
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
-    approveCommand: true,
+    approveToolCalls: true,
     message: `Run the tests with node --test and fix the failing test. The implementation in src/add.js is already correct, so prefer fixing the test in test/add.test.js.`,
   })
 
