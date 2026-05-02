@@ -15,12 +15,14 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-const waitForFixedTest = async (): Promise<void> => {
+const waitForFixedTest = async (ChatEditor: TestContext['ChatEditor']): Promise<void> => {
   const maxWaitTime = 90_000
   const pollInterval = 1_000
   const startTime = performance.now()
 
   while (performance.now() - startTime < maxWaitTime) {
+    await ChatEditor.clickAccessButton()
+
     const [sourceContent, testContent] = await Promise.all([readFile(sourceFilePath, 'utf8'), readFile(testFilePath, 'utf8')])
 
     if (sourceContent === sourceFileContent && !testContent.includes(incorrectAssertion)) {
@@ -33,7 +35,7 @@ const waitForFixedTest = async (): Promise<void> => {
   throw new Error('Timed out waiting for the test file to be fixed')
 }
 
-export const setup = async ({ ChatEditor, Editor, Electron, Extensions, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, Electron, Workspace }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
   })
@@ -78,11 +80,11 @@ test('add returns the sum of two numbers', () => {
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
+    approveCommand: true,
     message: `Run the tests with node --test and fix the failing test. The implementation in src/add.js is already correct, so prefer fixing the test in test/add.test.js.`,
-    verify: true,
   })
 
-  await waitForFixedTest()
+  await waitForFixedTest(ChatEditor)
 
   // await Terminal.show({
   //   waitForReady: true,

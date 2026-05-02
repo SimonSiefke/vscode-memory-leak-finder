@@ -322,6 +322,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await page.waitForIdle()
     },
     async sendMessage({
+      approveCommand = false,
       expectedResponse,
       image = '',
       message,
@@ -333,6 +334,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       verify = false,
       viewLinesText = '',
     }: {
+      approveCommand?: boolean
       expectedResponse?: string
       message: string
       validateRequest?: { exists: readonly unknown[] }
@@ -368,6 +370,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             const locator = requestMessage.locator(selector)
             await expect(locator).toBeVisible()
           }
+        }
+
+        if (approveCommand) {
+          await this.clickAccessButton()
         }
 
         if (verify) {
@@ -476,13 +482,30 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async clickAccessButton(buttonText: string = 'Allow') {
       try {
-        const accessButton = page.locator(`button:has-text("${buttonText}")`)
-        const buttonCount = await accessButton.count()
-
-        if (buttonCount > 0) {
-          await expect(accessButton.first()).toBeVisible()
-          await accessButton.first().click()
+        const accessButton = page.locator(`button:has-text("${buttonText}")`).first()
+        try {
+          await expect(accessButton).toBeVisible({ timeout: 10_000 })
+          await accessButton.focus()
           await page.waitForIdle()
+          if (buttonText === 'Allow') {
+            await page.keyboard.press('Control+Enter')
+          } else {
+            await accessButton.click()
+          }
+          await page.waitForIdle()
+          return
+        } catch {
+          const confirmation = page.locator('.monaco-list-row[aria-label^="Chat confirmation required:"]').last()
+          try {
+            await expect(confirmation).toBeVisible({ timeout: 2_000 })
+          } catch {
+            return
+          }
+          await confirmation.focus()
+          await page.waitForIdle()
+          await page.keyboard.press('Control+Enter')
+          await page.waitForIdle()
+          return
         }
       } catch (error) {
         throw new VError(error, `Failed to click access button with text "${buttonText}"`)
