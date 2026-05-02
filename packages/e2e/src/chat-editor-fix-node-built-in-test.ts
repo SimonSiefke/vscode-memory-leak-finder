@@ -81,11 +81,13 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
     },
   ])
 
+  await ChatEditor.open()
   await ChatEditor.clearAll()
 
   await ChatEditor.sendMessage({
     approveToolCalls: true,
     message: `Run the tests with node --test and fix the failing test. The implementation in src/add.js is already correct, so prefer fixing the test in test/add.test.js.`,
+    model: 'GPT-4.1',
   })
 
   await waitForFixedTest(ChatEditor)

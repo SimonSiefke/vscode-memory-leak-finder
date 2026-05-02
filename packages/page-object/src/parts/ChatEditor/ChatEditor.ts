@@ -507,14 +507,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           const confirmation = page.locator('.monaco-list-row[aria-label^="Chat confirmation required:"]').first()
           try {
             await expect(confirmation).toBeVisible({ timeout: 2_000 })
-          } catch {
+            await confirmation.focus()
+            await page.waitForIdle()
+            await page.keyboard.press('Control+Enter')
+            await page.waitForIdle()
             return
+          } catch {
+            const keepAllEditsButton = page.locator('button:has-text("Keep All Edits")').first()
+            try {
+              await expect(keepAllEditsButton).toBeVisible({ timeout: 2_000 })
+              await keepAllEditsButton.focus()
+              await page.waitForIdle()
+              await page.keyboard.press('Control+Enter')
+              await page.waitForIdle()
+              return
+            } catch {
+              return
+            }
           }
-          await confirmation.focus()
-          await page.waitForIdle()
-          await page.keyboard.press('Control+Enter')
-          await page.waitForIdle()
-          return
         }
       } catch (error) {
         throw new VError(error, `Failed to click access button with text "${buttonText}"`)
