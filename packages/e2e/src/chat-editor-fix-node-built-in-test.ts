@@ -19,13 +19,13 @@ test('add returns the sum of two numbers', () => {
 `
 
 const incorrectAssertion = 'assert.equal(add(1, 2), 4)'
+const maxWaitTime = 300_000
 
 export const skip = 1
 
 export const requiresNetwork = true
 
 const waitForFixedTest = async (ChatEditor: TestContext['ChatEditor']): Promise<void> => {
-  const maxWaitTime = 90_000
   const startTime = performance.now()
 
   while (performance.now() - startTime < maxWaitTime) {
@@ -39,7 +39,7 @@ const waitForFixedTest = async (ChatEditor: TestContext['ChatEditor']): Promise<
     await ChatEditor.waitForMutation(2_000)
   }
 
-  throw new Error('Timed out waiting for the test file to be fixed')
+  throw new Error(`Timed out waiting for the test file to be fixed after ${maxWaitTime}ms`)
 }
 
 export const setup = async ({ ChatEditor, Editor, Electron }: TestContext): Promise<void> => {
