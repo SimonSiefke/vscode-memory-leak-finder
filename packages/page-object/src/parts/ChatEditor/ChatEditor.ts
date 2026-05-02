@@ -255,6 +255,72 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to select model ${modelName}`)
       }
     },
+    async sendPart1({
+      image = '',
+      message,
+      model,
+      viewLinesText = '',
+    }: {
+      message: string
+      viewLinesText?: string | undefined
+      image?: string | undefined
+      model?: string | undefined
+    }) {
+      await page.waitForIdle()
+      const chatView = page.locator('.interactive-session')
+      await expect(chatView).toBeVisible()
+      await page.waitForIdle()
+      if (model) {
+        await this.selectModel(model)
+      }
+      const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+      await expect(editArea).toBeVisible()
+      await page.waitForIdle()
+      if (image) {
+        await this.attachImage(image)
+      }
+      const editContext = editArea.locator('.native-edit-context')
+      await expect(editContext).toBeVisible()
+      await page.waitForIdle()
+      await editContext.focus()
+      await page.waitForIdle()
+      await expect(editContext).toBeFocused()
+      await page.waitForIdle()
+      await editContext.type(message)
+      await page.waitForIdle()
+      const lines = editArea.locator('.view-lines')
+      await expect(lines).toBeVisible()
+      await page.waitForIdle()
+      const nonBreakingSpace = String.fromCharCode(160)
+      const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
+      await expect(lines).toHaveText(viewLinesText || adjustedMessage)
+      await page.waitForIdle()
+      const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
+      await expect(interactiveInput).toBeVisible()
+      await page.waitForIdle()
+      const sendButtonAny = interactiveInput.locator('.action-item .action-label[aria-label^="Send"]').first()
+      await expect(sendButtonAny).toBeVisible({ timeout: 30_000 })
+      await page.waitForIdle()
+      const sendButton = interactiveInput.locator('.action-item .action-label:not(.disabled)[aria-label^="Send"]').first()
+      await expect(sendButton).toBeVisible({ timeout: 30_000 })
+      await page.waitForIdle()
+      await sendButton.focus()
+      await page.waitForIdle()
+      await expect(sendButton).toBeFocused()
+      await page.waitForIdle()
+      if (this.isFirst) {
+        this.isFirst = false
+        // TODO get rid of timeout
+        await new Promise((r) => {
+          setTimeout(r, 1000)
+        })
+      }
+      await page.waitForIdle()
+      await sendButton.click()
+      await page.waitForIdle()
+      await expect(lines).toHaveText('')
+      await page.waitForIdle()
+    },
     async sendMessage({
       expectedResponse,
       image = '',
@@ -277,62 +343,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       model?: string
     }) {
       try {
-        await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
-        await expect(chatView).toBeVisible()
-        await page.waitForIdle()
-        if (model) {
-          await this.selectModel(model)
-        }
-        const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
-        await expect(editArea).toBeVisible()
-        await page.waitForIdle()
-        if (image) {
-          await this.attachImage(image)
-        }
-        const editContext = editArea.locator('.native-edit-context')
-        await expect(editContext).toBeVisible()
-        await page.waitForIdle()
-        await editContext.focus()
-        await page.waitForIdle()
-        await expect(editContext).toBeFocused()
-        await page.waitForIdle()
-        await editContext.type(message)
-        await page.waitForIdle()
-        const lines = editArea.locator('.view-lines')
-        await expect(lines).toBeVisible()
-        await page.waitForIdle()
-        const nonBreakingSpace = String.fromCharCode(160)
-        const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
-        await expect(lines).toHaveText(viewLinesText || adjustedMessage)
-        await page.waitForIdle()
-        const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
-        await expect(interactiveInput).toBeVisible()
-        await page.waitForIdle()
-        const sendButtonAny = interactiveInput.locator('.action-item .action-label[aria-label^="Send"]').first()
-        await expect(sendButtonAny).toBeVisible({ timeout: 30_000 })
-        await page.waitForIdle()
-        const sendButton = interactiveInput.locator('.action-item .action-label:not(.disabled)[aria-label^="Send"]').first()
-        await expect(sendButton).toBeVisible({ timeout: 30_000 })
-        await page.waitForIdle()
-        await sendButton.focus()
-        await page.waitForIdle()
-        await expect(sendButton).toBeFocused()
-        await page.waitForIdle()
-        if (this.isFirst) {
-          this.isFirst = false
-          // TODO get rid of timeout
-          await new Promise((r) => {
-            setTimeout(r, 1000)
-          })
-        }
         const requests = chatView.locator('.monaco-list-row.request')
         const count = await requests.count()
-        await page.waitForIdle()
-        await sendButton.click()
-        await page.waitForIdle()
-        await expect(lines).toHaveText('')
-        await page.waitForIdle()
+        await this.sendPart1({
+          message,
+          image,
+          model,
+          viewLinesText,
+        })
         await expect(requests).toHaveCount(count + 1, { timeout: 90_000 })
         const last = requests.nth(count)
         if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
@@ -378,6 +397,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             await page.waitForIdle()
           }
         }
+
+        const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        const lines = editArea.locator('.view-lines')
 
         if (expectedResponse) {
           const requestMessage = last
