@@ -39,9 +39,12 @@ export interface ChatEditor {
   open(): Promise<void>
   openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
+  scrollToBottom(): Promise<void>
+  scrollToTop(): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
   shouldHaveAttachedContextHoverText(text: any): Promise<void>
+  shouldHaveCodeBlockWithLanguage(language: any): Promise<void>
 }
 export interface ContextMenu {
   close(): Promise<void>
@@ -110,6 +113,7 @@ export interface Editor {
   disableStickyScroll(): Promise<void>
   disableVersionLens(): Promise<void>
   duplicateSelection(): Promise<void>
+  shouldContainText(text: any, timeout?: any): Promise<void>
   enable2x2GridView(): Promise<void>
   enableReadonly(): Promise<void>
   enableStickyScroll(): Promise<void>
@@ -515,6 +519,7 @@ export interface SimpleBrowser {
   createDeferredMockServer(options: any): Promise<void>
   createMockServer(options: any): Promise<void>
   disposeMockServer(options: any): Promise<void>
+  executeJavaScript(options: any): Promise<void>
   finishMockServerResponse(options: any): Promise<void>
   openDevtools(): Promise<number>
   show(options: any): Promise<void>
