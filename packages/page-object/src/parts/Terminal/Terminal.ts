@@ -306,6 +306,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify terminal success decoration`)
       }
     },
+    async shouldContainText(text: string, timeout = 30_000) {
+      try {
+        await page.waitForIdle()
+        const terminal = page.locator('.terminal.xterm')
+        await expect(terminal).toBeVisible()
+        const rows = terminal.locator('.xterm-rows')
+        await expect(rows).toBeVisible()
+        await expect(rows).toContainText(text, { timeout })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify terminal contains text ${text}`)
+      }
+    },
     async show({ waitForReady = false } = {}) {
       try {
         await page.waitForIdle()
