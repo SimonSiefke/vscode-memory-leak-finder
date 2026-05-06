@@ -11,7 +11,57 @@ const getChatPickerLabel = (pickerItem: any) => {
   return pickerItem.locator('.chat-model-label, .action-label, [role="button"], button').first()
 }
 
+const escapeForRegExp = (value: string) => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const getLastRenderedLocator = async (locator: any, timeout: number) => {
+    await expect(locator.first()).toBeVisible({ timeout })
+    const count = await locator.count()
+    if (count < 1) {
+      throw new Error('Expected at least one rendered chat row')
+    }
+    return locator.nth(count - 1)
+  }
+
+  const getLatestRequestMessage = async (chatView: any) => {
+    const requests = chatView.locator('.monaco-list-row.request')
+    return getLastRenderedLocator(requests, 90_000)
+  }
+
+  const getLatestResponseContent = async (chatView: any) => {
+    const responses = chatView.locator('.monaco-list-row .chat-most-recent-response')
+    return getLastRenderedLocator(responses, 60_000)
+  }
+
+  const waitForLatestExchange = async (chatView: any, message: string) => {
+    const requestMessage = await getLatestRequestMessage(chatView)
+    await expect(requestMessage).toBeVisible({ timeout: 90_000 })
+    await expect(requestMessage).toHaveAttribute('aria-label', new RegExp(`^${escapeForRegExp(message)}$`), { timeout: 90_000 })
+    await page.waitForIdle()
+    const response = await getLatestResponseContent(chatView)
+    await expect(response).toBeVisible({ timeout: 60_000 })
+    await page.waitForIdle()
+    const progress = chatView.locator('.rendered-markdown.progress-step')
+    await expect(progress).toBeHidden({ timeout: 45_000 })
+    await page.waitForIdle()
+    await expect(response).toBeVisible({ timeout: 30_000 })
+    await page.waitForIdle()
+    const requestBox = await requestMessage.boundingBox()
+    const responseBox = await response.boundingBox()
+    if (!requestBox || !responseBox) {
+      throw new Error('Failed to determine latest chat exchange positions')
+    }
+    if (responseBox.y < requestBox.y) {
+      throw new Error(`Expected latest response to be displayed below the request "${message}"`)
+    }
+    return {
+      requestMessage,
+      response,
+    }
+  }
+
   return {
     async addAllProblemsAsContext() {
       try {
@@ -386,25 +436,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }) {
       try {
         const chatView = page.locator('.interactive-session')
-        const requests = chatView.locator('.monaco-list-row.request')
-        const count = await requests.count()
         await this.sendPart1({
           message,
           image,
           model,
           viewLinesText,
         })
-        await expect(requests).toHaveCount(count + 1, { timeout: 90_000 })
-        const last = requests.nth(count)
+        const { requestMessage, response } = await waitForLatestExchange(chatView, message)
         if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
-          const ariaLabel = await last.getAttribute('aria-label')
+          const ariaLabel = await requestMessage.getAttribute('aria-label')
           if (ariaLabel !== message) {
             throw new Error(`unexpected aria label: ${ariaLabel}`)
           }
         }
 
         if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
-          const requestMessage = last
           await expect(requestMessage).toBeVisible()
           for (const selector of validateRequest.exists) {
             const locator = requestMessage.locator(selector)
@@ -413,17 +459,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
 
         if (verify) {
-          const row = last
-          await expect(row).toBeVisible()
-          await page.waitForIdle()
-          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
-          await expect(response).toBeVisible({ timeout: 60_000 })
-          await page.waitForIdle()
-          const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timeout: 45_000 })
-          await page.waitForIdle()
-          await expect(response).toBeVisible({ timeout: 30_000 })
-          await page.waitForIdle()
+          await expect(requestMessage).toBeVisible()
+          await expect(response).toBeVisible()
         }
 
         if (toolInvocations.length > 0) {
@@ -444,25 +481,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const lines = editArea.locator('.view-lines')
 
         if (expectedResponse) {
-          const requestMessage = last
           await expect(requestMessage).toBeVisible()
           await page.waitForIdle()
           await expect(lines).toHaveText('')
-          const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
-          await expect(row).toBeVisible()
+          await expect(response).toBeVisible()
           await page.waitForIdle()
-          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
-          await expect(response).toBeVisible({ timeout: 60_000 })
-          await page.waitForIdle()
-          const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timeout: 45_000 })
-          await page.waitForIdle()
-          await expect(response).toBeVisible({ timeout: 30_000 })
-          await page.waitForIdle()
-          const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
-          await expect(responseMessage).toBeVisible()
-          await page.waitForIdle()
-          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
+          await expect(response).toContainText(expectedResponse, {
+            timeout: 120_000,
+          })
         }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)
