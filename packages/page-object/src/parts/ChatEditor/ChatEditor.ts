@@ -213,11 +213,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(chatView).toBeVisible()
         const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
         await expect(scrollContainer).toBeVisible()
+<<<<<<< HEAD
         const metrics = await getChatScrollMetrics()
         if (!metrics) {
           throw new Error('Chat scroll container not found')
         }
         await setChatScrollTop(metrics.scrollHeight)
+=======
+        await scrollContainer.evaluate((element: any) => {
+          element.scrollTop = element.scrollHeight
+        })
+>>>>>>> origin/main
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll chat editor to bottom`)
@@ -230,7 +236,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(chatView).toBeVisible()
         const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
         await expect(scrollContainer).toBeVisible()
+<<<<<<< HEAD
         await setChatScrollTop(0)
+=======
+        await scrollContainer.evaluate((element: any) => {
+          element.scrollTop = 0
+        })
+>>>>>>> origin/main
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll chat editor to top`)
@@ -241,6 +253,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
+<<<<<<< HEAD
         const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
         await expect(scrollContainer).toBeVisible()
         const codeBlocks = chatView.locator(`.interactive-result-editor[data-mode-id="${language}"]`)
@@ -269,10 +282,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
         }
         throw new Error(`Timed out waiting for chat code block with language ${language}`)
+=======
+        const codeBlock = chatView.locator(`.interactive-result-editor[data-mode-id="${language}"]`).first()
+        await expect(codeBlock).toBeVisible({ timeout: 60_000 })
+        await page.waitForIdle()
+>>>>>>> origin/main
       } catch (error) {
         throw new VError(error, `Failed to find chat code block with language ${language}`)
       }
     },
+<<<<<<< HEAD
     async shouldHaveLatestResponseCodeBlockWithLanguage(language: string) {
       try {
         await page.waitForIdle()
@@ -287,6 +306,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to find latest response code block with language ${language}`)
       }
     },
+=======
+>>>>>>> origin/main
     isFirst: false,
     async moveToEditor() {
       try {
