@@ -542,7 +542,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await expect(lines).toHaveText('')
           await expect(response).toBeVisible()
           await page.waitForIdle()
-          await expect(response).toContainText(expectedResponse, {
+          await expect(response).toHaveText(new RegExp(escapeForRegExp(expectedResponse)), {
             timeout: 120_000,
           })
         }
