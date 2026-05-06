@@ -67,10 +67,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
   const getChatScrollMetrics = async () => {
     return page.evaluate({
       expression: `(() => {
-  const element = document.querySelector('${chatScrollSelector}')
-  if (!element) {
+  const elements = Array.from(document.querySelectorAll('${chatScrollSelector}'))
+  if (elements.length === 0) {
     return null
   }
+  const element = elements.sort((a, b) => b.scrollHeight - a.scrollHeight)[0]
   return {
     clientHeight: element.clientHeight,
     scrollHeight: element.scrollHeight,
@@ -84,11 +85,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
   const setChatScrollTop = async (scrollTop: number) => {
     await page.evaluate({
       expression: `((nextScrollTop) => {
-  const element = document.querySelector('${chatScrollSelector}')
-  if (!element) {
+  const elements = Array.from(document.querySelectorAll('${chatScrollSelector}'))
+  if (elements.length === 0) {
     throw new Error('Chat scroll container not found')
   }
-  element.scrollTop = nextScrollTop
+  for (const element of elements) {
+    element.scrollTo({ top: nextScrollTop })
+    element.scrollTop = nextScrollTop
+  }
 })(${JSON.stringify(scrollTop)})`,
     })
   }
@@ -267,6 +271,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new Error(`Timed out waiting for chat code block with language ${language}`)
       } catch (error) {
         throw new VError(error, `Failed to find chat code block with language ${language}`)
+      }
+    },
+    async shouldHaveLatestResponseCodeBlockWithLanguage(language: string) {
+      try {
+        await page.waitForIdle()
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const response = await getLatestResponseContent(chatView)
+        await expect(response).toBeVisible({ timeout: 60_000 })
+        const codeBlock = response.locator(`.interactive-result-editor[data-mode-id="${language}"]`).first()
+        await expect(codeBlock).toBeVisible({ timeout: 60_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to find latest response code block with language ${language}`)
       }
     },
     isFirst: false,

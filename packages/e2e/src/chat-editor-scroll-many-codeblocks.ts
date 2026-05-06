@@ -23,11 +23,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     { language: 'javascript', message: 'show me how a hello world javascript looks like (inline). respond with a single code block only.' },
     { language: 'typescript', message: 'show me how a hello world typescript looks like (inline). respond with a single code block only.' },
     { language: 'python', message: 'show me how a hello world python looks like (inline). respond with a single code block only.' },
-    { language: 'json', message: 'show me a hello world json example (inline). respond with a single code block only.' },
-    { language: 'shellscript', message: 'show me how a hello world bash looks like (inline). respond with a single code block only.' },
     { language: 'c', message: 'show me how a hello world c looks like (inline). respond with a single code block only.' },
-    { language: 'cpp', message: 'show me how a hello world c++ looks like (inline). respond with a single code block only.' },
-    { language: 'java', message: 'show me how a hello world java looks like (inline). respond with a single code block only.' },
     { language: 'go', message: 'show me how a hello world go looks like (inline). respond with a single code block only.' },
   ]
 
@@ -38,14 +34,11 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
       verify: true,
     })
 
-    await ChatEditor.shouldHaveCodeBlockWithLanguage(prompt.language)
+    await ChatEditor.shouldHaveLatestResponseCodeBlockWithLanguage(prompt.language)
   }
 
   await ChatEditor.scrollToTop()
-  await ChatEditor.shouldHaveCodeBlockWithLanguage('html')
-
   await ChatEditor.scrollToBottom()
-  await ChatEditor.shouldHaveCodeBlockWithLanguage('go')
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {

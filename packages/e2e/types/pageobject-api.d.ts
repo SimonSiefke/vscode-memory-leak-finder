@@ -45,6 +45,7 @@ export interface ChatEditor {
   setMode(modeLabel: any): Promise<void>
   shouldHaveAttachedContextHoverText(text: any): Promise<void>
   shouldHaveCodeBlockWithLanguage(language: any): Promise<void>
+  shouldHaveLatestResponseCodeBlockWithLanguage(language: any): Promise<void>
 }
 export interface ContextMenu {
   close(): Promise<void>
