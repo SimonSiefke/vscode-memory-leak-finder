@@ -243,22 +243,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const timeout = 60_000
         const startTime = Date.now()
         while (Date.now() - startTime < timeout) {
-          const metrics = await scrollContainer.evaluate((element: any) => {
-            return {
-              clientHeight: element.clientHeight,
-              scrollHeight: element.scrollHeight,
-              scrollTop: element.scrollTop,
-            }
-          })
+          const metrics = await getChatScrollMetrics()
+          if (!metrics) {
+            throw new Error('Chat scroll container not found')
+          }
           const stepSize = Math.max(metrics.clientHeight - 40, 200)
           const positions = new Set<number>([metrics.scrollTop, 0, Math.max(metrics.scrollHeight - metrics.clientHeight, 0)])
           for (let offset = 0; offset <= metrics.scrollHeight; offset += stepSize) {
             positions.add(offset)
           }
           for (const position of positions) {
-            await scrollContainer.evaluate((element: any, nextScrollTop: number) => {
-              element.scrollTop = nextScrollTop
-            }, position)
+            await setChatScrollTop(position)
             await page.waitForIdle()
             const count = await codeBlocks.count()
             if (count > 0) {
