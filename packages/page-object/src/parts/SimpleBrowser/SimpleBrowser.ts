@@ -129,6 +129,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const api = {
     mockServers: Object.create(null) as Record<string, MockServer>,
+    modernBrowserWebContentsId: undefined as number | undefined,
     getUrl({ path = '', port, url }: { path?: string; port: number | undefined; url: string | undefined }): string {
       if (url) {
         return url
@@ -146,6 +147,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     getSimpleBrowserTab() {
       return page.locator('.tab', { hasText: 'Simple Browser' }).first()
+    },
+    getElectron() {
+      return Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
     },
     async waitForCondition({ condition, timeout = 10_000 }: { condition: () => Promise<boolean>; timeout?: number }): Promise<void> {
       const start = Date.now()
@@ -197,6 +201,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async openIntegratedBrowser() {
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+      const electron = this.getElectron()
+      const existingWebContentsIds = ideVersion.minor >= 118 ? (await electron.getAllWebContents()).map((entry) => entry.id) : []
+      console.log('openIntegratedBrowser:start', { existingWebContentsIds })
 
       try {
         await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
@@ -213,6 +220,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const urlInput = this.getBrowserUrlInput()
       await expect(urlInput).toBeVisible()
       await page.waitForIdle()
+      if (ideVersion.minor >= 118) {
+        const entry = await electron.waitForNewWebContentsView({
+          existingIds: existingWebContentsIds,
+        })
+        this.modernBrowserWebContentsId = entry.id
+        console.log('openIntegratedBrowser:tracked', entry)
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      }
       return urlInput
     },
     async navigateIntegratedBrowser({ url, waitForContentFrame }: { url: string; waitForContentFrame: boolean }) {
@@ -224,13 +239,66 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await page.waitForIdle()
       await urlInput.press('Enter')
       await page.waitForIdle()
+      console.log('navigateIntegratedBrowser:submitted', { url, webContentsId: this.modernBrowserWebContentsId })
       if (waitForContentFrame) {
-        await this.getContentFrame({
-          urlPattern: new RegExp(escapeRegExp(url)),
-        })
+        if (ideVersion.minor >= 118) {
+          await this.waitForContentFrameModern({
+            urlPattern: new RegExp(escapeRegExp(url)),
+          })
+        } else {
+          await this.getContentFrame({
+            urlPattern: new RegExp(escapeRegExp(url)),
+          })
+        }
       }
     },
-    async getContentFrame({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+    async waitForContentFrameModern({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      const electron = this.getElectron()
+      console.log('waitForContentFrameModern:start', { urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
+      if (this.modernBrowserWebContentsId) {
+        await electron.waitForWebContentsUrl({
+          urlPattern,
+          webContentsId: this.modernBrowserWebContentsId,
+        })
+      } else {
+        await electron.waitForWebContentsView({
+          urlPattern,
+        })
+      }
+      console.log('waitForContentFrameModern:done', { urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
+      await page.waitForIdle()
+    },
+    async activateModernBrowserEditor() {
+      const electron = this.getElectron()
+      const entry = this.modernBrowserWebContentsId
+        ? await electron.waitForWebContentsUrl({
+            urlPattern: /^https?:\/\//,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
+        : await electron.waitForWebContentsView({
+            urlPattern: /^https?:\/\//,
+          })
+      const candidates = []
+      if (entry.title) {
+        candidates.push(page.locator('.tab', { hasText: entry.title }).first())
+        candidates.push(page.locator(`[role="tab"][data-resource-name="${entry.title}"]`).first())
+      }
+      candidates.push(this.getSimpleBrowserTab())
+      if (await this.tryClickFirstVisible(candidates)) {
+        await page.waitForIdle()
+      }
+    },
+    async activateChatEditorForBrowserContext() {
+      const candidates = [
+        page.locator('[role="tab"][aria-label^="Chat, Editor Group 2"]').first(),
+        page.locator('[role="tab"][data-resource-name^="chat-"]').first(),
+        page.locator('.tab', { hasText: 'Chat' }),
+      ]
+      if (await this.tryClickFirstVisible(candidates)) {
+        await page.waitForIdle()
+      }
+    },
+    async getContentFrameLegacy({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
       const subFrame = await webView.shouldBeVisible2({
         extensionId: 'vscode.simple-browser',
@@ -248,13 +316,54 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await innerFrame.waitForIdle()
       return innerFrame
     },
+    async getContentFrameModern({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      await this.waitForContentFrameModern({ urlPattern })
+      throw new Error('Simple Browser WebContentsView does not expose a Playwright frame in this IDE version')
+    },
+    async getContentFrame({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      if (ideVersion.minor >= 118) {
+        // TODO
+        return this.getContentFrameModern({ urlPattern })
+      }
+      return this.getContentFrameLegacy({ urlPattern })
+    },
+    async executeJavaScript({ expression }: { expression: string }) {
+      try {
+        if (ideVersion.minor >= 118) {
+          const electron = this.getElectron()
+          if (!this.modernBrowserWebContentsId) {
+            throw new Error('No tracked browser web contents available')
+          }
+          await electron.executeJavaScriptInWebContents({
+            expression,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
+          await page.waitForIdle()
+          return
+        }
+        const innerFrame = await this.getContentFrame()
+        await innerFrame.evaluate({
+          awaitPromise: true,
+          expression,
+        })
+        await innerFrame.waitForIdle()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to execute JavaScript in simple browser`)
+      }
+    },
     async tryClickFirstVisible(locators: readonly any[]): Promise<boolean> {
       for (const locator of locators) {
         try {
-          if (await locator.isVisible()) {
-            await locator.click()
-            await page.waitForIdle()
-            return true
+          const count = await locator.count().catch(() => 1)
+          const maxCount = Math.max(1, count)
+          for (let i = 0; i < maxCount; i += 1) {
+            const candidate = count > 1 ? locator.nth(i) : locator
+            if (await candidate.isVisible().catch(() => false)) {
+              await candidate.click()
+              await page.waitForIdle()
+              return true
+            }
           }
         } catch {
           // Ignore selector mismatches and keep trying fallbacks.
@@ -262,12 +371,131 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
       return false
     },
+    async hasAttachedChatContext(): Promise<boolean> {
+      const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
+      return contextLabel.isVisible().catch(() => false)
+    },
+    async getAttachedChatContextCounts() {
+      return page.evaluate({
+        expression: `(() => {
+  const elements = Array.from(document.querySelectorAll('.chat-attached-context [aria-label^="Attached context,"]'))
+  let visible = 0
+  for (const element of elements) {
+    const style = window.getComputedStyle(element)
+    const rect = element.getBoundingClientRect()
+    if (style.display !== 'none' && style.visibility !== 'hidden' && rect.width && rect.height) {
+      visible += 1
+    }
+  }
+  return {
+    total: elements.length,
+    visible,
+  }
+})()`,
+        returnByValue: true,
+      })
+    },
+    async executeWorkbenchCommand(commandId: string): Promise<boolean> {
+      const result = await page.evaluate({
+        awaitPromise: true,
+        expression: `((async () => {
+  const candidates = [
+    ['workbench', globalThis.workbench?.commands],
+    ['vscode', globalThis.vscode?.commands],
+    ['monaco', globalThis.monaco?.commands],
+    ['mainWindow', globalThis.mainWindow?.commands],
+  ]
+  for (const [source, commands] of candidates) {
+    if (commands && typeof commands.executeCommand === 'function') {
+      try {
+        await commands.executeCommand(${JSON.stringify(commandId)})
+        return { ok: true, source }
+      } catch (error) {
+        return {
+          ok: false,
+          source,
+          error: String(error && error.message ? error.message : error),
+        }
+      }
+    }
+  }
+  return {
+    ok: false,
+    globals: Object.keys(globalThis).filter((key) => /workbench|vscode|command|monaco/i.test(key)).slice(0, 50),
+  }
+})())`,
+        returnByValue: true,
+      })
+      if (result?.ok) {
+        return true
+      }
+      return false
+    },
+    async getVisibleTabAndActionLabels() {
+      const result = await page.evaluate({
+        expression: `(() => {
+  const collect = (selector) => {
+    return Array.from(document.querySelectorAll(selector))
+      .map((element) => {
+        const style = window.getComputedStyle(element)
+        if (style.display === 'none' || style.visibility === 'hidden') {
+          return ''
+        }
+        const rect = element.getBoundingClientRect()
+        if (!rect.width || !rect.height) {
+          return ''
+        }
+        return [
+          element.getAttribute('aria-label') || '',
+          element.getAttribute('data-resource-name') || '',
+          element.getAttribute('title') || '',
+          element.textContent || '',
+        ]
+          .map((value) => value.trim())
+          .filter((value) => value.length > 0)
+          .join(' | ')
+      })
+      .filter((value) => value.length > 0)
+    }
+  return {
+    actions: collect('.part.editor [role="button"], .part.editor button, .context-view.monaco-menu-container .action-item'),
+    tabs: collect('[role="tab"]'),
+  }
+})()`,
+        returnByValue: true,
+      })
+      return result
+    },
     async addConsoleLogsToChat() {
       try {
         await page.waitForIdle()
+        console.log('addConsoleLogsToChat:start', { webContentsId: this.modernBrowserWebContentsId })
+        if (ideVersion.minor >= 118) {
+          const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+          await quickPick.executeCommand(WellKnownCommands.FocusRightEditorGroup)
+          await this.activateModernBrowserEditor()
+        }
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         const directActionCandidates = [
+          page.locator('.part.editor .action-item', {
+            hasText: 'Add Console Logs to Chat',
+          }),
+          page.locator('.part.editor .action-label', {
+            hasText: 'Add Console Logs to Chat',
+          }),
+          page.locator('.monaco-toolbar .action-item', {
+            hasText: 'Add Console Logs to Chat',
+          }),
+          page.locator('.monaco-toolbar .action-label', {
+            hasText: 'Add Console Logs to Chat',
+          }),
           page.locator('[role="button"][aria-label*="Add Console Logs to Chat"]'),
           page.locator('[role="button"][aria-label*="Add console logs to chat"]'),
+          page.locator('[aria-label*="Add Console Logs to Chat"]'),
+          page.locator('[aria-label*="Add console logs to chat"]'),
+          page.locator('[title*="Add Console Logs to Chat"]'),
+          page.locator('[title*="Add console logs to chat"]'),
+          page.locator('.monaco-toolbar [aria-label*="Add Console Logs to Chat"], .monaco-toolbar [title*="Add Console Logs to Chat"]'),
           page.locator('[role="button"][aria-label*="Console Logs"]'),
           page.locator('[role="button"]', {
             hasText: 'Console Logs',
@@ -289,16 +517,52 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           page.locator('.context-view.monaco-menu-container .actions-container .action-item', {
             hasText: 'Console Logs',
           }),
+          page.locator(
+            '.context-view.monaco-menu-container [aria-label*="Add Console Logs to Chat"], .context-view.monaco-menu-container [title*="Add Console Logs to Chat"]',
+          ),
         ]
 
         const maxAttempts = 20
         for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
           if (await this.tryClickFirstVisible(directActionCandidates)) {
-            return
+            console.log('addConsoleLogsToChat:clickedDirectAction', { attempt })
+            await this.activateChatEditorForBrowserContext()
+            const attached = await this.waitForCondition({
+              condition: () => this.hasAttachedChatContext(),
+              timeout: 2_000,
+            }).then(
+              () => true,
+              () => false,
+            )
+            console.log('addConsoleLogsToChat:directActionAttached', {
+              attempt,
+              attached,
+              counts: await this.getAttachedChatContextCounts(),
+            })
+            if (attached) {
+              return
+            }
           }
           if (await this.tryClickFirstVisible(moreActionsCandidates)) {
+            console.log('addConsoleLogsToChat:openedMoreActions', { attempt })
             if (await this.tryClickFirstVisible(menuActionCandidates)) {
-              return
+              console.log('addConsoleLogsToChat:clickedMenuAction', { attempt })
+              await this.activateChatEditorForBrowserContext()
+              const attached = await this.waitForCondition({
+                condition: () => this.hasAttachedChatContext(),
+                timeout: 2_000,
+              }).then(
+                () => true,
+                () => false,
+              )
+              console.log('addConsoleLogsToChat:menuActionAttached', {
+                attempt,
+                attached,
+                counts: await this.getAttachedChatContextCounts(),
+              })
+              if (attached) {
+                return
+              }
             }
             await page.keyboard.press('Escape')
             await page.waitForIdle()
@@ -308,7 +572,31 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           })
         }
 
-        throw new Error('Could not find the simple browser action for adding console logs to chat')
+        if (ideVersion.minor >= 118) {
+          await this.activateModernBrowserEditor()
+        }
+        await page.waitForIdle()
+        if (await this.executeWorkbenchCommand('workbench.action.browser.addConsoleLogsToChat')) {
+          console.log('addConsoleLogsToChat:executedWorkbenchCommand')
+          await this.activateChatEditorForBrowserContext()
+          await this.waitForCondition({
+            condition: () => this.hasAttachedChatContext(),
+            timeout: 10_000,
+          })
+          return
+        }
+        try {
+          await quickPick.executeCommand(WellKnownCommands.BrowserAddConsoleLogsToChat)
+        } catch (error) {
+          const debug = await this.getVisibleTabAndActionLabels()
+          throw new Error(
+            `Command palette fallback failed. Tabs: ${JSON.stringify(debug?.tabs || [])}. Actions: ${JSON.stringify(debug?.actions || [])}. ${error}`,
+          )
+        }
+        await this.waitForCondition({
+          condition: () => this.hasAttachedChatContext(),
+          timeout: 10_000,
+        })
       } catch (error) {
         throw new VError(error, `Failed to add console logs to chat`)
       }
@@ -502,6 +790,36 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }) {
       try {
         await page.waitForIdle()
+        if (ideVersion.minor >= 118) {
+          const electron = this.getElectron()
+          console.log('shouldHaveText:modern:start', {
+            selector,
+            text,
+            urlPattern: `${urlPattern}`,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
+          const webContentsTextOptions = this.modernBrowserWebContentsId
+            ? {
+                selector,
+                text,
+                urlPattern,
+                webContentsId: this.modernBrowserWebContentsId,
+              }
+            : {
+                selector,
+                text,
+                urlPattern,
+              }
+          await electron.waitForWebContentsText(webContentsTextOptions)
+          console.log('shouldHaveText:modern:done', {
+            selector,
+            text,
+            urlPattern: `${urlPattern}`,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
+          await page.waitForIdle()
+          return
+        }
         const innerFrame = await this.getContentFrame({ urlPattern })
         const locator = innerFrame.locator(selector)
         await expect(locator).toContainText(text)
