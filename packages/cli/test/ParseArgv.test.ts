@@ -50,6 +50,13 @@ test('parseArgv - record video', () => {
   })
 })
 
+test('parseArgv - convert requests to mocks', () => {
+  const argv = ['--convert-requests-to-mocks']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    convertRequestsToMocks: true,
+  })
+})
+
 test('parseArgv - cwd', () => {
   const argv = ['--cwd', '/test']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({

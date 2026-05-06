@@ -1,5 +1,11 @@
 [
   {
+    "filename": "api_github_com_copilot_internal_org_custom_instructions_SimonSiefke_get.json",
+    "hostname": "api.github.com",
+    "method": "GET",
+    "pathname": "/copilot_internal/org_custom_instructions/SimonSiefke"
+  },
+  {
     "hostname": "api.github.com",
     "pathname": "/copilot_internal/subscribe_limited_user",
     "method": "OPTIONS",
@@ -54,16 +60,40 @@
     "filename": "api_github_com_embeddings_models_get.json"
   },
   {
+    "filename": "api_github_com_orgs_SimonSiefke_repos_get.json",
+    "hostname": "api.github.com",
+    "method": "GET",
+    "pathname": "/orgs/SimonSiefke/repos"
+  },
+  {
     "hostname": "api.github.com",
     "pathname": "/user",
     "method": "*",
     "filename": "api_github_com_user.json"
   },
   {
+    "filename": "api_github_com_users_SimonSiefke_events_get.json",
+    "hostname": "api.github.com",
+    "method": "GET",
+    "pathname": "/users/SimonSiefke/events"
+  },
+  {
+    "filename": "api_githubcopilot_com_agents_swe_models_get.json",
+    "hostname": "api.githubcopilot.com",
+    "method": "GET",
+    "pathname": "/agents/swe/models"
+  },
+  {
     "hostname": "api.individual.githubcopilot.com",
     "pathname": "/agents",
     "method": "*",
     "filename": "api_individual_githubcopilot_com_agents.json"
+  },
+  {
+    "filename": "api_individual_githubcopilot_com_agents_swe_models_get.json",
+    "hostname": "api.individual.githubcopilot.com",
+    "method": "GET",
+    "pathname": "/agents/swe/models"
   },
   {
     "hostname": "api.individual.githubcopilot.com",
@@ -496,6 +526,12 @@
     "hostname": "main.vscode-cdn.net",
     "method": "GET",
     "pathname": "/core/insiders.json"
+  },
+  {
+    "filename": "main_vscode_cdn_net_core_stable_json_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/core/stable.json"
   },
   {
     "hostname": "main.vscode-cdn.net",

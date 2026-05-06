@@ -250,6 +250,10 @@ const parseUseProxyMock = (argv: readonly string[]): boolean => {
   return argv.includes('--use-proxy-mock')
 }
 
+const parseConvertRequestsToMocks = (argv: readonly string[]): boolean => {
+  return argv.includes('--convert-requests-to-mocks')
+}
+
 const parseBisect = (argv: readonly string[]): boolean => {
   return argv.includes('--bisect')
 }
@@ -307,6 +311,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const clearExtensions = parseClearExtensions(argv)
   const color = true
   const commit = parseCommit(argv)
+  const convertRequestsToMocks = parseConvertRequestsToMocks(argv)
   const continueValue = parseContinueValue(argv)
   const cwd = parseCwd(process.cwd(), argv)
   const enableExtensions = parseEnableExtensions(argv)
@@ -354,6 +359,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     color,
     commit,
     compressVideo,
+    convertRequestsToMocks,
     continueValue,
     cwd,
     enableExtensions,
