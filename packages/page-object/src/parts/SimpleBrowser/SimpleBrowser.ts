@@ -127,157 +127,141 @@ const createWorkspaceFileServer = async ({ port, relativePath }: { port: number;
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
-  const getUrl = ({ path = '', port, url }: { path?: string; port: number | undefined; url: string | undefined }): string => {
-    if (url) {
-      return url
-    }
-    if (typeof port !== 'number') {
-      throw new Error(`port or url is required`)
-    }
-    return `http://localhost:${port}${path}`
-  }
-
-  const getBrowserUrlInput = () => {
-    return page.locator('.browser-url-input')
-  }
-
-  const getBrowserFindWidget = () => {
-    return page.locator('.browser-find-widget-wrapper .find-widget')
-  }
-
-  const getSimpleBrowserTab = () => {
-    return page.locator('.tab', { hasText: 'Simple Browser' }).first()
-  }
-
-  const waitForCondition = async ({
-    condition,
-    timeout = 10_000,
-  }: {
-    condition: () => Promise<boolean>
-    timeout?: number
-  }): Promise<void> => {
-    const start = Date.now()
-    while (Date.now() - start < timeout) {
-      if (await condition()) {
-        return
+  const api = {
+    mockServers: Object.create(null) as Record<string, MockServer>,
+    getUrl({ path = '', port, url }: { path?: string; port: number | undefined; url: string | undefined }): string {
+      if (url) {
+        return url
       }
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-    }
-    throw new Error('Timed out waiting for condition')
-  }
-
-  const isSimpleBrowserTabLoading = async (): Promise<boolean> => {
-    const tab = getSimpleBrowserTab()
-    if (!(await tab.isVisible().catch(() => false))) {
-      return false
-    }
-    const className = (await tab.getAttribute('class')) || ''
-    if (/\bloading\b|\bbusy\b/.test(className)) {
-      return true
-    }
-    const ariaLabel = (await tab.getAttribute('aria-label')) || ''
-    if (/loading/i.test(ariaLabel)) {
-      return true
-    }
-    const spinner = tab.locator(
-      '.codicon-loading, .codicon[class*="spin"], .codicon[class*="loading"], .tab-actions [class*="loading"], .monaco-progress-container',
-    )
-    return spinner
-      .first()
-      .isVisible()
-      .catch(() => false)
-  }
-
-  const getBrowserNavigationButton = async ({ names }: { names: readonly string[] }) => {
-    for (const name of names) {
-      const button = page.getByRole('button', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }).first()
-      if (await button.isVisible().catch(() => false)) {
-        return button
+      if (typeof port !== 'number') {
+        throw new Error(`port or url is required`)
       }
-    }
-    for (const name of names) {
-      const button = page.locator(`[aria-label="${name}"], [title="${name}"]`).first()
-      if (await button.isVisible().catch(() => false)) {
-        return button
+      return `http://localhost:${port}${path}`
+    },
+    getBrowserUrlInput() {
+      return page.locator('.browser-url-input')
+    },
+    getBrowserFindWidget() {
+      return page.locator('.browser-find-widget-wrapper .find-widget')
+    },
+    getSimpleBrowserTab() {
+      return page.locator('.tab', { hasText: 'Simple Browser' }).first()
+    },
+    async waitForCondition({ condition, timeout = 10_000 }: { condition: () => Promise<boolean>; timeout?: number }): Promise<void> {
+      const start = Date.now()
+      while (Date.now() - start < timeout) {
+        if (await condition()) {
+          return
+        }
+        await new Promise((resolve) => {
+          setTimeout(resolve, 100)
+        })
       }
-    }
-    throw new Error(`Browser navigation button not found: ${names.join(', ')}`)
-  }
+      throw new Error('Timed out waiting for condition')
+    },
+    async isSimpleBrowserTabLoading(): Promise<boolean> {
+      const tab = this.getSimpleBrowserTab()
+      if (!(await tab.isVisible().catch(() => false))) {
+        return false
+      }
+      const className = (await tab.getAttribute('class')) || ''
+      if (/\bloading\b|\bbusy\b/.test(className)) {
+        return true
+      }
+      const ariaLabel = (await tab.getAttribute('aria-label')) || ''
+      if (/loading/i.test(ariaLabel)) {
+        return true
+      }
+      const spinner = tab.locator(
+        '.codicon-loading, .codicon[class*="spin"], .codicon[class*="loading"], .tab-actions [class*="loading"], .monaco-progress-container',
+      )
+      return spinner
+        .first()
+        .isVisible()
+        .catch(() => false)
+    },
+    async getBrowserNavigationButton({ names }: { names: readonly string[] }) {
+      for (const name of names) {
+        const button = page.getByRole('button', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }).first()
+        if (await button.isVisible().catch(() => false)) {
+          return button
+        }
+      }
+      for (const name of names) {
+        const button = page.locator(`[aria-label="${name}"], [title="${name}"]`).first()
+        if (await button.isVisible().catch(() => false)) {
+          return button
+        }
+      }
+      throw new Error(`Browser navigation button not found: ${names.join(', ')}`)
+    },
+    async openIntegratedBrowser() {
+      const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
 
-  const openIntegratedBrowser = async () => {
-    const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-
-    try {
-      await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
+      try {
+        await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
+          pressKeyOnce: true,
+        })
+        await page.waitForIdle()
+      } catch {
+        // Notifications are not always present, and failing to clear them should not block browser tests.
+      }
+      await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
         pressKeyOnce: true,
       })
       await page.waitForIdle()
-    } catch {
-      // Notifications are not always present, and failing to clear them should not block browser tests.
-    }
-    await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
-      pressKeyOnce: true,
-    })
-    await page.waitForIdle()
-    const urlInput = getBrowserUrlInput()
-    await expect(urlInput).toBeVisible()
-    await page.waitForIdle()
-    return urlInput
-  }
-
-  const navigateIntegratedBrowser = async ({ url, waitForContentFrame }: { url: string; waitForContentFrame: boolean }) => {
-    const urlInput = getBrowserUrlInput()
-    await expect(urlInput).toBeVisible()
-    await urlInput.fill('')
-    await page.waitForIdle()
-    await urlInput.type(url)
-    await page.waitForIdle()
-    await urlInput.press('Enter')
-    await page.waitForIdle()
-    if (waitForContentFrame) {
-      await getContentFrame({
-        urlPattern: new RegExp(escapeRegExp(url)),
-      })
-    }
-  }
-
-  const getContentFrame = async ({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) => {
-    const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
-    const subFrame = await webView.shouldBeVisible2({
-      extensionId: 'vscode.simple-browser',
-      hasLineOfCodeCounter: false,
-    })
-    await subFrame.waitForIdle()
-    await page.waitForIdle()
-    const subIframe = subFrame.locator('.content iframe')
-    await expect(subIframe).toBeVisible()
-    await page.waitForIdle()
-    const innerFrame = await subFrame.waitForSubIframe({
-      injectUtilityScript: false,
-      url: urlPattern,
-    })
-    await innerFrame.waitForIdle()
-    return innerFrame
-  }
-
-  const tryClickFirstVisible = async (locators: readonly any[]): Promise<boolean> => {
-    for (const locator of locators) {
-      try {
-        if (await locator.isVisible()) {
-          await locator.click()
-          await page.waitForIdle()
-          return true
-        }
-      } catch {
-        // Ignore selector mismatches and keep trying fallbacks.
+      const urlInput = this.getBrowserUrlInput()
+      await expect(urlInput).toBeVisible()
+      await page.waitForIdle()
+      return urlInput
+    },
+    async navigateIntegratedBrowser({ url, waitForContentFrame }: { url: string; waitForContentFrame: boolean }) {
+      const urlInput = this.getBrowserUrlInput()
+      await expect(urlInput).toBeVisible()
+      await urlInput.fill('')
+      await page.waitForIdle()
+      await urlInput.type(url)
+      await page.waitForIdle()
+      await urlInput.press('Enter')
+      await page.waitForIdle()
+      if (waitForContentFrame) {
+        await this.getContentFrame({
+          urlPattern: new RegExp(escapeRegExp(url)),
+        })
       }
-    }
-    return false
-  }
-
-  return {
+    },
+    async getContentFrame({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
+      const subFrame = await webView.shouldBeVisible2({
+        extensionId: 'vscode.simple-browser',
+        hasLineOfCodeCounter: false,
+      })
+      await subFrame.waitForIdle()
+      await page.waitForIdle()
+      const subIframe = subFrame.locator('.content iframe')
+      await expect(subIframe).toBeVisible()
+      await page.waitForIdle()
+      const innerFrame = await subFrame.waitForSubIframe({
+        injectUtilityScript: false,
+        url: urlPattern,
+      })
+      await innerFrame.waitForIdle()
+      return innerFrame
+    },
+    async tryClickFirstVisible(locators: readonly any[]): Promise<boolean> {
+      for (const locator of locators) {
+        try {
+          if (await locator.isVisible()) {
+            await locator.click()
+            await page.waitForIdle()
+            return true
+          }
+        } catch {
+          // Ignore selector mismatches and keep trying fallbacks.
+        }
+      }
+      return false
+    },
     async addConsoleLogsToChat() {
       try {
         await page.waitForIdle()
@@ -309,11 +293,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
         const maxAttempts = 20
         for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-          if (await tryClickFirstVisible(directActionCandidates)) {
+          if (await this.tryClickFirstVisible(directActionCandidates)) {
             return
           }
-          if (await tryClickFirstVisible(moreActionsCandidates)) {
-            if (await tryClickFirstVisible(menuActionCandidates)) {
+          if (await this.tryClickFirstVisible(moreActionsCandidates)) {
+            if (await this.tryClickFirstVisible(menuActionCandidates)) {
               return
             }
             await page.keyboard.press('Escape')
@@ -338,7 +322,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(button).toBeVisible()
         await button.click()
         await page.waitForIdle()
-        const innerFrame = await getContentFrame({
+        const innerFrame = await this.getContentFrame({
           urlPattern: /^https?:\/\//,
         })
         const element = innerFrame.locator(selector)
@@ -353,14 +337,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async clickLink({ href }: { href: string }) {
       try {
         await page.waitForIdle()
-        const innerFrame = await getContentFrame()
+        const innerFrame = await this.getContentFrame()
         await innerFrame.waitForIdle()
         const link = innerFrame.locator(`a[href="${href}"]`)
         await expect(link).toBeVisible()
         await link.click()
         await innerFrame.waitForIdle()
         await page.waitForIdle()
-        await getContentFrame({
+        await this.getContentFrame({
           urlPattern: new RegExp(escapeRegExp(href)),
         })
         await page.waitForIdle()
@@ -371,13 +355,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async back({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       try {
         await page.waitForIdle()
-        const button = await getBrowserNavigationButton({
+        const button = await this.getBrowserNavigationButton({
           names: ['Go Back', 'Back', 'Navigate Back'],
         })
         await expect(button).toBeVisible()
         await button.click()
         await page.waitForIdle()
-        await getContentFrame({ urlPattern })
+        await this.getContentFrame({ urlPattern })
       } catch (error) {
         throw new VError(error, `Failed to navigate simple browser back`)
       }
@@ -443,11 +427,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to add element to chat`)
       }
     },
-    mockServers: Object.create(null),
     async openMoreActions() {
       try {
         await page.waitForIdle()
-        const urlInput = getBrowserUrlInput()
+        const urlInput = this.getBrowserUrlInput()
         await expect(urlInput).toBeVisible()
         const moreActions = page.locator('.part.editor [aria-label="More Actions..."], .part.editor [aria-label^="More Actions"]').last()
         await expect(moreActions).toBeVisible()
@@ -486,13 +469,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async forward({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       try {
         await page.waitForIdle()
-        const button = await getBrowserNavigationButton({
+        const button = await this.getBrowserNavigationButton({
           names: ['Go Forward', 'Forward', 'Navigate Forward'],
         })
         await expect(button).toBeVisible()
         await button.click()
         await page.waitForIdle()
-        await getContentFrame({ urlPattern })
+        await this.getContentFrame({ urlPattern })
       } catch (error) {
         throw new VError(error, `Failed to navigate simple browser forward`)
       }
@@ -500,7 +483,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async reload({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       try {
         await page.waitForIdle()
-        const innerFrame = await getContentFrame({ urlPattern })
+        const innerFrame = await this.getContentFrame({ urlPattern })
         await innerFrame.reload()
         await innerFrame.waitForIdle()
         await page.waitForIdle()
@@ -519,7 +502,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }) {
       try {
         await page.waitForIdle()
-        const innerFrame = await getContentFrame({ urlPattern })
+        const innerFrame = await this.getContentFrame({ urlPattern })
         const locator = innerFrame.locator(selector)
         await expect(locator).toContainText(text)
         await innerFrame.waitForIdle()
@@ -531,7 +514,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveTabTitle({ title }: { title: string }) {
       try {
         await page.waitForIdle()
-        const tab = getSimpleBrowserTab()
+        const tab = this.getSimpleBrowserTab()
         await expect(tab).toBeVisible()
         await page.waitForIdle()
         // Check both tab-label text and aria-label
@@ -552,8 +535,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveTabLoadingSpinner() {
       try {
         await page.waitForIdle()
-        await waitForCondition({
-          condition: isSimpleBrowserTabLoading,
+        await this.waitForCondition({
+          condition: () => this.isSimpleBrowserTabLoading(),
         })
         await page.waitForIdle()
       } catch (error) {
@@ -562,9 +545,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async shouldNotHaveTabLoadingSpinner() {
       try {
-        await waitForCondition({
+        await this.waitForCondition({
           condition: async () => {
-            return !(await isSimpleBrowserTabLoading())
+            return !(await this.isSimpleBrowserTabLoading())
           },
         })
         await page.waitForIdle()
@@ -588,7 +571,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveFindWidget() {
       try {
         await page.waitForIdle()
-        const findWidget = getBrowserFindWidget()
+        const findWidget = this.getBrowserFindWidget()
         await expect(findWidget).toBeVisible()
         const findInput = findWidget.locator('.monaco-findInput textarea[aria-label="Find"]')
         await expect(findInput).toBeVisible()
@@ -616,18 +599,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await quickPick.pressEnter()
       await page.waitForIdle()
 
-      const tab = getSimpleBrowserTab()
+      const tab = this.getSimpleBrowserTab()
       await expect(tab).toBeVisible()
       await page.waitForIdle()
       await expect(tab).toHaveCount(1)
       await page.waitForIdle()
-      await getContentFrame({
+      await this.getContentFrame({
         urlPattern: new RegExp(escapeRegExp(url)),
       })
     },
     async showModern({ url }: { url: string }) {
-      await openIntegratedBrowser()
-      await navigateIntegratedBrowser({
+      await this.openIntegratedBrowser()
+      await this.navigateIntegratedBrowser({
         url,
         waitForContentFrame: true,
       })
@@ -637,8 +620,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (ideVersion.minor < 113) {
           throw new Error('Integrated browser is not available in this IDE version')
         }
-        await openIntegratedBrowser()
-        await navigateIntegratedBrowser({
+        await this.openIntegratedBrowser()
+        await this.navigateIntegratedBrowser({
           url,
           waitForContentFrame: false,
         })
@@ -648,7 +631,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async show({ path = '', port, url }: { path?: string; port?: number; url?: string }) {
       try {
-        const browserUrl = getUrl({ path, port, url })
+        const browserUrl = this.getUrl({ path, port, url })
         if (ideVersion.minor >= 113) {
           await this.showModern({ url: browserUrl })
         } else {
@@ -673,4 +656,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
   }
+
+  return api
 }
