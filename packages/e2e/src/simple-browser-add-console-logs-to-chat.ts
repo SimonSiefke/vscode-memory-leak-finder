@@ -15,10 +15,12 @@ const errorPageHtml = `<!doctype html>
   <body>
     <h1>Console Error Page</h1>
     <script>
-      console.error('${consoleErrorText}')
+      setTimeout(() => {
+        console.error('${consoleErrorText}')
+      }, 1000)
       setTimeout(() => {
         throw new Error('Simple browser uncaught error for chat context')
-      }, 0)
+      }, 1500)
     </script>
   </body>
 </html>`

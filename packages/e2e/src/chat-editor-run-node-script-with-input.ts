@@ -50,7 +50,11 @@ await writeFile('completed.txt', 'done\n')
 console.log('Script finished successfully')
 `
 
-export const setup = async ({ ChatEditor, Editor, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, Electron, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
+  await Electron.mockDialog({
+    response: 1,
+  })
+
   await Workspace.setFiles([
     {
       name: 'package.json',
@@ -77,6 +81,7 @@ export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> 
   await ChatEditor.sendMessage({
     message:
       'Run node confirm.js in the terminal. The script will pause briefly before it asks for confirmation. If it needs input, answer y and wait until it finishes successfully.',
+    model: 'GPT-4.1',
     verify: true,
   })
 

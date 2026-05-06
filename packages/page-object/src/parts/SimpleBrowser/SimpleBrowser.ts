@@ -327,6 +327,31 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
       return this.getContentFrameLegacy({ urlPattern })
     },
+    async executeJavaScript({ expression }: { expression: string }) {
+      try {
+        if (ideVersion.minor >= 118) {
+          const electron = this.getElectron()
+          if (!this.modernBrowserWebContentsId) {
+            throw new Error('No tracked browser web contents available')
+          }
+          await electron.executeJavaScriptInWebContents({
+            expression,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
+          await page.waitForIdle()
+          return
+        }
+        const innerFrame = await this.getContentFrame()
+        await innerFrame.evaluate({
+          awaitPromise: true,
+          expression,
+        })
+        await innerFrame.waitForIdle()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to execute JavaScript in simple browser`)
+      }
+    },
     async tryClickFirstVisible(locators: readonly any[]): Promise<boolean> {
       for (const locator of locators) {
         try {
@@ -349,6 +374,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async hasAttachedChatContext(): Promise<boolean> {
       const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
       return contextLabel.isVisible().catch(() => false)
+    },
+    async getAttachedChatContextCounts() {
+      return page.evaluate({
+        expression: `(() => {
+  const elements = Array.from(document.querySelectorAll('.chat-attached-context [aria-label^="Attached context,"]'))
+  let visible = 0
+  for (const element of elements) {
+    const style = window.getComputedStyle(element)
+    const rect = element.getBoundingClientRect()
+    if (style.display !== 'none' && style.visibility !== 'hidden' && rect.width && rect.height) {
+      visible += 1
+    }
+  }
+  return {
+    total: elements.length,
+    visible,
+  }
+})()`,
+        returnByValue: true,
+      })
     },
     async executeWorkbenchCommand(commandId: string): Promise<boolean> {
       const result = await page.evaluate({
@@ -489,7 +534,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
               () => true,
               () => false,
             )
-            console.log('addConsoleLogsToChat:directActionAttached', { attempt, attached })
+            console.log('addConsoleLogsToChat:directActionAttached', {
+              attempt,
+              attached,
+              counts: await this.getAttachedChatContextCounts(),
+            })
             if (attached) {
               return
             }
@@ -506,7 +555,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 () => true,
                 () => false,
               )
-              console.log('addConsoleLogsToChat:menuActionAttached', { attempt, attached })
+              console.log('addConsoleLogsToChat:menuActionAttached', {
+                attempt,
+                attached,
+                counts: await this.getAttachedChatContextCounts(),
+              })
               if (attached) {
                 return
               }

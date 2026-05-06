@@ -516,6 +516,7 @@ export interface SimpleBrowser {
   createDeferredMockServer(options: any): Promise<void>
   createMockServer(options: any): Promise<void>
   disposeMockServer(options: any): Promise<void>
+  executeJavaScript(options: any): Promise<void>
   finishMockServerResponse(options: any): Promise<void>
   openDevtools(): Promise<number>
   show(options: any): Promise<void>
