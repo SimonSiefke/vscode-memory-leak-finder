@@ -81,6 +81,35 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get all web contents`)
       }
     },
+    async getWebContents(webContentsId: number): Promise<WebContentsEntry | undefined> {
+      try {
+        const entries = await this.getAllWebContents()
+        return entries.find((entry) => entry.id === webContentsId)
+      } catch (error) {
+        throw new VError(error, `Failed to get web contents ${webContentsId}`)
+      }
+    },
+    async waitForNewWebContentsView({ existingIds, timeout = 10_000 }: { existingIds: readonly number[]; timeout?: number }): Promise<WebContentsEntry> {
+      try {
+        const existingIdSet = new Set(existingIds)
+        const startTime = performance.now()
+        while (true) {
+          const entries = await this.getAllWebContents()
+          const match = entries.find((entry) => {
+            return !existingIdSet.has(entry.id) && entry.ownerWindowVisible !== false && !entry.url.startsWith('devtools://')
+          })
+          if (match) {
+            return match
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error(`No new visible web contents found. Existing ids: ${existingIds.join(', ')}. Found: ${getWebContentsSummary(entries)}`)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for new web contents view`)
+      }
+    },
     async waitForWebContentsView({ timeout = 10_000, urlPattern }: { timeout?: number; urlPattern: RegExp }): Promise<WebContentsEntry> {
       try {
         const startTime = performance.now()
@@ -99,6 +128,23 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         }
       } catch (error) {
         throw new VError(error, `Failed to wait for web contents view`)
+      }
+    },
+    async waitForWebContentsUrl({ timeout = 10_000, urlPattern, webContentsId }: { timeout?: number; urlPattern: RegExp; webContentsId: number }): Promise<WebContentsEntry> {
+      try {
+        const startTime = performance.now()
+        while (true) {
+          const entry = await this.getWebContents(webContentsId)
+          if (entry && urlPattern.test(entry.url) && entry.ownerWindowVisible !== false) {
+            return entry
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error(`Web contents ${webContentsId} did not match ${urlPattern}`)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for web contents url ${webContentsId}`)
       }
     },
     async executeJavaScriptInWebContents({ expression, timeout = 10_000, webContentsId }: { expression: string; timeout?: number; webContentsId: number }) {
@@ -150,20 +196,27 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to execute JavaScript in web contents ${webContentsId}`)
       }
     },
-    async waitForWebContentsText({ selector, text, timeout = 10_000, urlPattern }: { selector: string; text: string; timeout?: number; urlPattern: RegExp }) {
+    async waitForWebContentsText({ selector, text, timeout = 10_000, urlPattern, webContentsId }: { selector: string; text: string; timeout?: number; urlPattern: RegExp; webContentsId?: number }) {
       try {
         const startTime = performance.now()
         while (true) {
-          const entry = await this.waitForWebContentsView({
-            timeout: Math.max(100, timeout - (performance.now() - startTime)),
-            urlPattern,
-          })
+          const remainingTimeout = Math.max(100, timeout - (performance.now() - startTime))
+          const entry = webContentsId
+            ? await this.waitForWebContentsUrl({
+                timeout: remainingTimeout,
+                urlPattern,
+                webContentsId,
+              })
+            : await this.waitForWebContentsView({
+                timeout: remainingTimeout,
+                urlPattern,
+              })
           const selectorText = await this.executeJavaScriptInWebContents({
             expression: `(() => {
   const element = document.querySelector(${JSON.stringify(selector)})
   return element ? element.textContent || '' : ''
 })()`,
-            timeout: Math.max(100, timeout - (performance.now() - startTime)),
+            timeout: remainingTimeout,
             webContentsId: entry.id,
           })
           if (typeof selectorText === 'string' && selectorText.includes(text)) {

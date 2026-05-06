@@ -129,6 +129,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const api = {
     mockServers: Object.create(null) as Record<string, MockServer>,
+    modernBrowserWebContentsId: undefined as number | undefined,
     getUrl({ path = '', port, url }: { path?: string; port: number | undefined; url: string | undefined }): string {
       if (url) {
         return url
@@ -200,6 +201,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async openIntegratedBrowser() {
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+      const electron = this.getElectron()
+      const existingWebContentsIds = ideVersion.minor >= 118 ? (await electron.getAllWebContents()).map((entry) => entry.id) : []
 
       try {
         await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
@@ -216,6 +219,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const urlInput = this.getBrowserUrlInput()
       await expect(urlInput).toBeVisible()
       await page.waitForIdle()
+      if (ideVersion.minor >= 118) {
+        const entry = await electron.waitForNewWebContentsView({
+          existingIds: existingWebContentsIds,
+        })
+        this.modernBrowserWebContentsId = entry.id
+      }
       return urlInput
     },
     async navigateIntegratedBrowser({ url, waitForContentFrame }: { url: string; waitForContentFrame: boolean }) {
@@ -241,16 +250,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async waitForContentFrameModern({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       const electron = this.getElectron()
-      await electron.waitForWebContentsView({
-        urlPattern,
-      })
+      if (this.modernBrowserWebContentsId) {
+        await electron.waitForWebContentsUrl({
+          urlPattern,
+          webContentsId: this.modernBrowserWebContentsId,
+        })
+      } else {
+        await electron.waitForWebContentsView({
+          urlPattern,
+        })
+      }
       await page.waitForIdle()
     },
     async activateModernBrowserEditor() {
       const electron = this.getElectron()
-      const entry = await electron.waitForWebContentsView({
-        urlPattern: /^https?:\/\//,
-      })
+      const entry = this.modernBrowserWebContentsId
+        ? await electron.waitForWebContentsUrl({
+            urlPattern: /^https?:\/\//,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
+        : await electron.waitForWebContentsView({
+            urlPattern: /^https?:\/\//,
+          })
       const candidates = []
       if (entry.title) {
         candidates.push(page.locator('.tab', { hasText: entry.title }).first())
@@ -434,7 +455,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           page.locator('.context-view.monaco-menu-container .actions-container .action-item', {
             hasText: 'Console Logs',
           }),
-          page.locator('.context-view.monaco-menu-container [aria-label*="Add Console Logs to Chat"], .context-view.monaco-menu-container [title*="Add Console Logs to Chat"]'),
+          page.locator(
+            '.context-view.monaco-menu-container [aria-label*="Add Console Logs to Chat"], .context-view.monaco-menu-container [title*="Add Console Logs to Chat"]',
+          ),
         ]
 
         const maxAttempts = 20
@@ -690,11 +713,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         if (ideVersion.minor >= 118) {
           const electron = this.getElectron()
-          await electron.waitForWebContentsText({
-            selector,
-            text,
-            urlPattern,
-          })
+          const webContentsTextOptions = this.modernBrowserWebContentsId
+            ? {
+                selector,
+                text,
+                urlPattern,
+                webContentsId: this.modernBrowserWebContentsId,
+              }
+            : {
+                selector,
+                text,
+                urlPattern,
+              }
+          await electron.waitForWebContentsText(webContentsTextOptions)
           await page.waitForIdle()
           return
         }
