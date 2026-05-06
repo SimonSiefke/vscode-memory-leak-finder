@@ -16,6 +16,8 @@ const escapeForRegExp = (value: string) => {
 }
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const chatScrollSelector = '.interactive-session .monaco-list .monaco-scrollable-element'
+
   const getLastRenderedLocator = async (locator: any, timeout: number) => {
     await expect(locator.first()).toBeVisible({ timeout })
     const count = await locator.count()
@@ -60,6 +62,35 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       requestMessage,
       response,
     }
+  }
+
+  const getChatScrollMetrics = async () => {
+    return page.evaluate({
+      expression: `(() => {
+  const element = document.querySelector('${chatScrollSelector}')
+  if (!element) {
+    return null
+  }
+  return {
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+    scrollTop: element.scrollTop,
+  }
+})()`,
+      returnByValue: true,
+    })
+  }
+
+  const setChatScrollTop = async (scrollTop: number) => {
+    await page.evaluate({
+      expression: `((nextScrollTop) => {
+  const element = document.querySelector('${chatScrollSelector}')
+  if (!element) {
+    throw new Error('Chat scroll container not found')
+  }
+  element.scrollTop = nextScrollTop
+})(${JSON.stringify(scrollTop)})`,
+    })
   }
 
   return {
@@ -178,9 +209,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(chatView).toBeVisible()
         const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
         await expect(scrollContainer).toBeVisible()
-        await scrollContainer.evaluate((element: any) => {
-          element.scrollTop = element.scrollHeight
-        })
+        const metrics = await getChatScrollMetrics()
+        if (!metrics) {
+          throw new Error('Chat scroll container not found')
+        }
+        await setChatScrollTop(metrics.scrollHeight)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll chat editor to bottom`)
@@ -193,9 +226,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(chatView).toBeVisible()
         const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
         await expect(scrollContainer).toBeVisible()
-        await scrollContainer.evaluate((element: any) => {
-          element.scrollTop = 0
-        })
+        await setChatScrollTop(0)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll chat editor to top`)
@@ -225,12 +256,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             positions.add(offset)
           }
           for (const position of positions) {
-            await scrollContainer.evaluate(
-              (element: any, nextScrollTop: number) => {
-                element.scrollTop = nextScrollTop
-              },
-              position,
-            )
+            await scrollContainer.evaluate((element: any, nextScrollTop: number) => {
+              element.scrollTop = nextScrollTop
+            }, position)
             await page.waitForIdle()
             const count = await codeBlocks.count()
             if (count > 0) {
