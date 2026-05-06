@@ -147,13 +147,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     getSimpleBrowserTab() {
       return page.locator('.tab', { hasText: 'Simple Browser' }).first()
     },
-    async waitForCondition({
-      condition,
-      timeout = 10_000,
-    }: {
-      condition: () => Promise<boolean>
-      timeout?: number
-    }): Promise<void> {
+    async waitForCondition({ condition, timeout = 10_000 }: { condition: () => Promise<boolean>; timeout?: number }): Promise<void> {
       const start = Date.now()
       while (Date.now() - start < timeout) {
         if (await condition()) {
