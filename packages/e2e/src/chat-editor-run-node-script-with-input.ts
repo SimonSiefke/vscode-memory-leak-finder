@@ -1,8 +1,28 @@
 import type { TestContext } from '../types.js'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 
 export const skip = false
 
 export const requiresNetwork = true
+
+const workspacePath = join(import.meta.dirname, '..', '..', '..', '.vscode-test-workspace')
+const completedFilePath = join(workspacePath, 'completed.txt')
+
+const waitForCompletedFile = async (): Promise<void> => {
+  const maxWaitTime = 90_000
+  const pollInterval = 1_000
+  const startTime = performance.now()
+
+  while (performance.now() - startTime < maxWaitTime) {
+    if (existsSync(completedFilePath)) {
+      return
+    }
+    await new Promise((resolve) => setTimeout(resolve, pollInterval))
+  }
+
+  throw new Error('Timed out waiting for completed.txt to be created')
+}
 
 const scriptContent = `import { writeFile } from 'node:fs/promises'
 import { stdin as input, stdout as output } from 'node:process'
@@ -30,15 +50,7 @@ await writeFile('completed.txt', 'done\n')
 console.log('Script finished successfully')
 `
 
-export const setup = async ({ ChatEditor, Editor, Electron, Extensions, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
-  await Electron.mockDialog({
-    response: 1,
-  })
-  await Extensions.install({
-    id: 'GitHub.copilot-chat',
-    name: 'GitHub Copilot Chat',
-  })
-
+export const setup = async ({ ChatEditor, Editor, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'package.json',
@@ -58,30 +70,29 @@ export const setup = async ({ ChatEditor, Editor, Electron, Extensions, SideBar,
   await Terminal.killAll()
   await SideBar.hide()
   await Editor.closeAll()
-  await ChatEditor.clearAll()
   await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor, Terminal, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message:
       'Run node confirm.js in the terminal. The script will pause briefly before it asks for confirmation. If it needs input, answer y and wait until it finishes successfully.',
     verify: true,
   })
 
-  const completed = await Workspace.waitForFile('completed.txt')
-  if (!completed) {
-    throw new Error('Timed out waiting for completed.txt to be created')
+  await waitForCompletedFile()
+
+  const terminalWithText = Terminal as TestContext['Terminal'] & {
+    shouldContainText(text: string, timeout?: number): Promise<void>
   }
 
   await Terminal.show()
-  await Terminal.shouldContainText('Continue? (y/n)')
-  await Terminal.shouldContainText('Script finished successfully')
+  await terminalWithText.shouldContainText('Continue? (y/n)')
+  await terminalWithText.shouldContainText('Script finished successfully')
   await Terminal.shouldHaveSuccessDecoration()
 }
 
-export const teardown = async ({ ChatEditor, Editor, Terminal, Workspace }: TestContext): Promise<void> => {
-  await ChatEditor.clearAll()
+export const teardown = async ({ Editor, Terminal, Workspace }: TestContext): Promise<void> => {
   await Terminal.killAll()
   await Editor.closeAll()
   await Workspace.setFiles([])

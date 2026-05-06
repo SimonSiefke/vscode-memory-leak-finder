@@ -110,6 +110,7 @@ export interface Editor {
   disableStickyScroll(): Promise<void>
   disableVersionLens(): Promise<void>
   duplicateSelection(): Promise<void>
+  shouldContainText(text: any, timeout?: any): Promise<void>
   enable2x2GridView(): Promise<void>
   enableReadonly(): Promise<void>
   enableStickyScroll(): Promise<void>

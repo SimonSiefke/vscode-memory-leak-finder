@@ -226,6 +226,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         })
         this.modernBrowserWebContentsId = entry.id
         console.log('openIntegratedBrowser:tracked', entry)
+        await new Promise((resolve) => setTimeout(resolve, 1000))
       }
       return urlInput
     },
@@ -283,6 +284,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         candidates.push(page.locator(`[role="tab"][data-resource-name="${entry.title}"]`).first())
       }
       candidates.push(this.getSimpleBrowserTab())
+      if (await this.tryClickFirstVisible(candidates)) {
+        await page.waitForIdle()
+      }
+    },
+    async activateChatEditorForBrowserContext() {
+      const candidates = [
+        page.locator('[role="tab"][aria-label^="Chat, Editor Group 2"]').first(),
+        page.locator('[role="tab"][data-resource-name^="chat-"]').first(),
+        page.locator('.tab', { hasText: 'Chat' }),
+      ]
       if (await this.tryClickFirstVisible(candidates)) {
         await page.waitForIdle()
       }
@@ -413,6 +424,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async addConsoleLogsToChat() {
       try {
         await page.waitForIdle()
+        console.log('addConsoleLogsToChat:start', { webContentsId: this.modernBrowserWebContentsId })
         if (ideVersion.minor >= 118) {
           const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
           await quickPick.executeCommand(WellKnownCommands.FocusRightEditorGroup)
@@ -468,6 +480,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const maxAttempts = 20
         for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
           if (await this.tryClickFirstVisible(directActionCandidates)) {
+            console.log('addConsoleLogsToChat:clickedDirectAction', { attempt })
+            await this.activateChatEditorForBrowserContext()
             const attached = await this.waitForCondition({
               condition: () => this.hasAttachedChatContext(),
               timeout: 2_000,
@@ -475,12 +489,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
               () => true,
               () => false,
             )
+            console.log('addConsoleLogsToChat:directActionAttached', { attempt, attached })
             if (attached) {
               return
             }
           }
           if (await this.tryClickFirstVisible(moreActionsCandidates)) {
+            console.log('addConsoleLogsToChat:openedMoreActions', { attempt })
             if (await this.tryClickFirstVisible(menuActionCandidates)) {
+              console.log('addConsoleLogsToChat:clickedMenuAction', { attempt })
+              await this.activateChatEditorForBrowserContext()
               const attached = await this.waitForCondition({
                 condition: () => this.hasAttachedChatContext(),
                 timeout: 2_000,
@@ -488,6 +506,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 () => true,
                 () => false,
               )
+              console.log('addConsoleLogsToChat:menuActionAttached', { attempt, attached })
               if (attached) {
                 return
               }
@@ -505,6 +524,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         await page.waitForIdle()
         if (await this.executeWorkbenchCommand('workbench.action.browser.addConsoleLogsToChat')) {
+          console.log('addConsoleLogsToChat:executedWorkbenchCommand')
+          await this.activateChatEditorForBrowserContext()
           await this.waitForCondition({
             condition: () => this.hasAttachedChatContext(),
             timeout: 10_000,
@@ -718,7 +739,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         if (ideVersion.minor >= 118) {
           const electron = this.getElectron()
-          console.log('shouldHaveText:modern:start', { selector, text, urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
+          console.log('shouldHaveText:modern:start', {
+            selector,
+            text,
+            urlPattern: `${urlPattern}`,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
           const webContentsTextOptions = this.modernBrowserWebContentsId
             ? {
                 selector,
@@ -732,7 +758,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 urlPattern,
               }
           await electron.waitForWebContentsText(webContentsTextOptions)
-          console.log('shouldHaveText:modern:done', { selector, text, urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
+          console.log('shouldHaveText:modern:done', {
+            selector,
+            text,
+            urlPattern: `${urlPattern}`,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
           await page.waitForIdle()
           return
         }
