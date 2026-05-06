@@ -394,6 +394,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         const directActionCandidates = [
+          page.locator('.part.editor .action-item', {
+            hasText: 'Add Console Logs to Chat',
+          }),
+          page.locator('.part.editor .action-label', {
+            hasText: 'Add Console Logs to Chat',
+          }),
+          page.locator('.monaco-toolbar .action-item', {
+            hasText: 'Add Console Logs to Chat',
+          }),
+          page.locator('.monaco-toolbar .action-label', {
+            hasText: 'Add Console Logs to Chat',
+          }),
           page.locator('[role="button"][aria-label*="Add Console Logs to Chat"]'),
           page.locator('[role="button"][aria-label*="Add console logs to chat"]'),
           page.locator('[aria-label*="Add Console Logs to Chat"]'),
@@ -404,9 +416,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           page.locator('[role="button"][aria-label*="Console Logs"]'),
           page.locator('[role="button"]', {
             hasText: 'Console Logs',
-          }),
-          page.locator('.part.editor', {
-            hasText: 'Add Console Logs to Chat',
           }),
         ]
         const moreActionsCandidates = [
