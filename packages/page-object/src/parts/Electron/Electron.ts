@@ -10,9 +10,7 @@ type WebContentsEntry = {
 }
 
 const getWebContentsSummary = (entries: readonly WebContentsEntry[]): string => {
-  return entries
-    .map((entry) => `${entry.id}:${entry.type}:${entry.url || '<empty>'}`)
-    .join(', ')
+  return entries.map((entry) => `${entry.id}:${entry.type}:${entry.url || '<empty>'}`).join(', ')
 }
 
 export const create = ({ electronApp, VError }: CreateParams) => {
@@ -89,7 +87,13 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get web contents ${webContentsId}`)
       }
     },
-    async waitForNewWebContentsView({ existingIds, timeout = 10_000 }: { existingIds: readonly number[]; timeout?: number }): Promise<WebContentsEntry> {
+    async waitForNewWebContentsView({
+      existingIds,
+      timeout = 10_000,
+    }: {
+      existingIds: readonly number[]
+      timeout?: number
+    }): Promise<WebContentsEntry> {
       try {
         const existingIdSet = new Set(existingIds)
         const startTime = performance.now()
@@ -102,7 +106,9 @@ export const create = ({ electronApp, VError }: CreateParams) => {
             return match
           }
           if (performance.now() - startTime > timeout) {
-            throw new Error(`No new visible web contents found. Existing ids: ${existingIds.join(', ')}. Found: ${getWebContentsSummary(entries)}`)
+            throw new Error(
+              `No new visible web contents found. Existing ids: ${existingIds.join(', ')}. Found: ${getWebContentsSummary(entries)}`,
+            )
           }
           await new Promise((resolve) => setTimeout(resolve, 100))
         }
@@ -130,7 +136,15 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to wait for web contents view`)
       }
     },
-    async waitForWebContentsUrl({ timeout = 10_000, urlPattern, webContentsId }: { timeout?: number; urlPattern: RegExp; webContentsId: number }): Promise<WebContentsEntry> {
+    async waitForWebContentsUrl({
+      timeout = 10_000,
+      urlPattern,
+      webContentsId,
+    }: {
+      timeout?: number
+      urlPattern: RegExp
+      webContentsId: number
+    }): Promise<WebContentsEntry> {
       try {
         const startTime = performance.now()
         while (true) {
@@ -147,7 +161,15 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to wait for web contents url ${webContentsId}`)
       }
     },
-    async executeJavaScriptInWebContents({ expression, timeout = 10_000, webContentsId }: { expression: string; timeout?: number; webContentsId: number }) {
+    async executeJavaScriptInWebContents({
+      expression,
+      timeout = 10_000,
+      webContentsId,
+    }: {
+      expression: string
+      timeout?: number
+      webContentsId: number
+    }) {
       try {
         await this.evaluate(`(() => {
   const { webContents } = globalThis._____electron
@@ -196,7 +218,19 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to execute JavaScript in web contents ${webContentsId}`)
       }
     },
-    async waitForWebContentsText({ selector, text, timeout = 10_000, urlPattern, webContentsId }: { selector: string; text: string; timeout?: number; urlPattern: RegExp; webContentsId?: number }) {
+    async waitForWebContentsText({
+      selector,
+      text,
+      timeout = 10_000,
+      urlPattern,
+      webContentsId,
+    }: {
+      selector: string
+      text: string
+      timeout?: number
+      urlPattern: RegExp
+      webContentsId?: number
+    }) {
       try {
         const startTime = performance.now()
         while (true) {
