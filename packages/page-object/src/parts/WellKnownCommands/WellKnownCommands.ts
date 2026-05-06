@@ -1,4 +1,5 @@
 export const AddCursorBelow = 'Add Cursor Below'
+export const BrowserAddConsoleLogsToChat = 'Browser: Add Console Logs to Chat'
 export const AutoFix = 'Auto Fix...'
 export const ChangeLanguageMode = 'Change Language Mode'
 export const ClearAllNotifications = 'Notifications: Clear All Notifications'

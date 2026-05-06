@@ -147,6 +147,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     getSimpleBrowserTab() {
       return page.locator('.tab', { hasText: 'Simple Browser' }).first()
     },
+    getElectron() {
+      return Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
+    },
     async waitForCondition({ condition, timeout = 10_000 }: { condition: () => Promise<boolean>; timeout?: number }): Promise<void> {
       const start = Date.now()
       while (Date.now() - start < timeout) {
@@ -225,12 +228,40 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await urlInput.press('Enter')
       await page.waitForIdle()
       if (waitForContentFrame) {
-        await this.getContentFrame({
-          urlPattern: new RegExp(escapeRegExp(url)),
-        })
+        if (ideVersion.minor >= 118) {
+          await this.waitForContentFrameModern({
+            urlPattern: new RegExp(escapeRegExp(url)),
+          })
+        } else {
+          await this.getContentFrame({
+            urlPattern: new RegExp(escapeRegExp(url)),
+          })
+        }
       }
     },
-    async getContentFrame({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+    async waitForContentFrameModern({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      const electron = this.getElectron()
+      await electron.waitForWebContentsView({
+        urlPattern,
+      })
+      await page.waitForIdle()
+    },
+    async activateModernBrowserEditor() {
+      const electron = this.getElectron()
+      const entry = await electron.waitForWebContentsView({
+        urlPattern: /^https?:\/\//,
+      })
+      const candidates = []
+      if (entry.title) {
+        candidates.push(page.locator('.tab', { hasText: entry.title }).first())
+        candidates.push(page.locator(`[role="tab"][data-resource-name="${entry.title}"]`).first())
+      }
+      candidates.push(this.getSimpleBrowserTab())
+      if (await this.tryClickFirstVisible(candidates)) {
+        await page.waitForIdle()
+      }
+    },
+    async getContentFrameLegacy({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
       const subFrame = await webView.shouldBeVisible2({
         extensionId: 'vscode.simple-browser',
@@ -248,6 +279,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await innerFrame.waitForIdle()
       return innerFrame
     },
+    async getContentFrameModern({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      await this.waitForContentFrameModern({ urlPattern })
+      throw new Error('Simple Browser WebContentsView does not expose a Playwright frame in this IDE version')
+    },
+    async getContentFrame({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+      if (ideVersion.minor >= 118) {
+        // TODO
+        return this.getContentFrameModern({ urlPattern })
+      }
+      return this.getContentFrameLegacy({ urlPattern })
+    },
     async tryClickFirstVisible(locators: readonly any[]): Promise<boolean> {
       for (const locator of locators) {
         try {
@@ -262,9 +304,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
       return false
     },
+    async hasAttachedChatContext(): Promise<boolean> {
+      const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
+      return contextLabel.isVisible().catch(() => false)
+    },
     async addConsoleLogsToChat() {
       try {
         await page.waitForIdle()
+        if (ideVersion.minor >= 118) {
+          const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+          await quickPick.executeCommand(WellKnownCommands.FocusRightEditorGroup)
+          await this.activateModernBrowserEditor()
+        }
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         const directActionCandidates = [
           page.locator('[role="button"][aria-label*="Add Console Logs to Chat"]'),
           page.locator('[role="button"][aria-label*="Add console logs to chat"]'),
@@ -294,11 +346,29 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const maxAttempts = 20
         for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
           if (await this.tryClickFirstVisible(directActionCandidates)) {
-            return
+            const attached = await this.waitForCondition({
+              condition: () => this.hasAttachedChatContext(),
+              timeout: 2_000,
+            }).then(
+              () => true,
+              () => false,
+            )
+            if (attached) {
+              return
+            }
           }
           if (await this.tryClickFirstVisible(moreActionsCandidates)) {
             if (await this.tryClickFirstVisible(menuActionCandidates)) {
-              return
+              const attached = await this.waitForCondition({
+                condition: () => this.hasAttachedChatContext(),
+                timeout: 2_000,
+              }).then(
+                () => true,
+                () => false,
+              )
+              if (attached) {
+                return
+              }
             }
             await page.keyboard.press('Escape')
             await page.waitForIdle()
@@ -308,7 +378,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           })
         }
 
-        throw new Error('Could not find the simple browser action for adding console logs to chat')
+        if (ideVersion.minor >= 118) {
+          await this.activateModernBrowserEditor()
+        }
+        await page.waitForIdle()
+        await quickPick.executeCommand(WellKnownCommands.BrowserAddConsoleLogsToChat)
+        await this.waitForCondition({
+          condition: () => this.hasAttachedChatContext(),
+          timeout: 10_000,
+        })
       } catch (error) {
         throw new VError(error, `Failed to add console logs to chat`)
       }
@@ -502,6 +580,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }) {
       try {
         await page.waitForIdle()
+        if (ideVersion.minor >= 118) {
+          const electron = this.getElectron()
+          await electron.waitForWebContentsText({
+            selector,
+            text,
+            urlPattern,
+          })
+          await page.waitForIdle()
+          return
+        }
         const innerFrame = await this.getContentFrame({ urlPattern })
         const locator = innerFrame.locator(selector)
         await expect(locator).toContainText(text)

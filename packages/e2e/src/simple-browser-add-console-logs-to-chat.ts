@@ -23,13 +23,14 @@ const errorPageHtml = `<!doctype html>
   </body>
 </html>`
 
-export const setup = async ({ ChatEditor, SimpleBrowser, Workspace, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ SideBar, ChatEditor, SimpleBrowser, Workspace, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: errorPageHtml,
       name: 'console-errors.html',
     },
   ])
+  await SideBar.hide()
   await ChatEditor.open()
   await Editor.splitRight()
   // @ts-ignore
@@ -41,6 +42,9 @@ export const setup = async ({ ChatEditor, SimpleBrowser, Workspace, Editor }: Te
   await SimpleBrowser.show({
     url: testUrl,
   })
+  // TODO
+  // @ts-ignore
+  // await Editor.closeOthers()
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
     text: 'Console Error Page',
