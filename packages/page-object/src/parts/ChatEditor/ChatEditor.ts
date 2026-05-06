@@ -11,7 +11,92 @@ const getChatPickerLabel = (pickerItem: any) => {
   return pickerItem.locator('.chat-model-label, .action-label, [role="button"], button').first()
 }
 
+const escapeForRegExp = (value: string) => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const chatScrollSelector = '.interactive-session .monaco-list .monaco-scrollable-element'
+
+  const getLastRenderedLocator = async (locator: any, timeout: number) => {
+    await expect(locator.first()).toBeVisible({ timeout })
+    const count = await locator.count()
+    if (count < 1) {
+      throw new Error('Expected at least one rendered chat row')
+    }
+    return locator.nth(count - 1)
+  }
+
+  const getLatestRequestMessage = async (chatView: any) => {
+    const requests = chatView.locator('.monaco-list-row.request')
+    return getLastRenderedLocator(requests, 90_000)
+  }
+
+  const getLatestResponseContent = async (chatView: any) => {
+    const responses = chatView.locator('.monaco-list-row .chat-most-recent-response')
+    return getLastRenderedLocator(responses, 60_000)
+  }
+
+  const waitForLatestExchange = async (chatView: any, message: string) => {
+    const requestMessage = await getLatestRequestMessage(chatView)
+    await expect(requestMessage).toBeVisible({ timeout: 90_000 })
+    await expect(requestMessage).toHaveAttribute('aria-label', new RegExp(`^${escapeForRegExp(message)}$`), { timeout: 90_000 })
+    await page.waitForIdle()
+    const response = await getLatestResponseContent(chatView)
+    await expect(response).toBeVisible({ timeout: 60_000 })
+    await page.waitForIdle()
+    const progress = chatView.locator('.rendered-markdown.progress-step')
+    await expect(progress).toBeHidden({ timeout: 45_000 })
+    await page.waitForIdle()
+    await expect(response).toBeVisible({ timeout: 30_000 })
+    await page.waitForIdle()
+    const requestBox = await requestMessage.boundingBox()
+    const responseBox = await response.boundingBox()
+    if (!requestBox || !responseBox) {
+      throw new Error('Failed to determine latest chat exchange positions')
+    }
+    if (responseBox.y < requestBox.y) {
+      throw new Error(`Expected latest response to be displayed below the request "${message}"`)
+    }
+    return {
+      requestMessage,
+      response,
+    }
+  }
+
+  const getChatScrollMetrics = async () => {
+    return page.evaluate({
+      expression: `(() => {
+  const elements = Array.from(document.querySelectorAll('${chatScrollSelector}'))
+  if (elements.length === 0) {
+    return null
+  }
+  const element = elements.sort((a, b) => b.scrollHeight - a.scrollHeight)[0]
+  return {
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+    scrollTop: element.scrollTop,
+  }
+})()`,
+      returnByValue: true,
+    })
+  }
+
+  const setChatScrollTop = async (scrollTop: number) => {
+    await page.evaluate({
+      expression: `((nextScrollTop) => {
+  const elements = Array.from(document.querySelectorAll('${chatScrollSelector}'))
+  if (elements.length === 0) {
+    throw new Error('Chat scroll container not found')
+  }
+  for (const element of elements) {
+    element.scrollTo({ top: nextScrollTop })
+    element.scrollTop = nextScrollTop
+  }
+})(${JSON.stringify(scrollTop)})`,
+    })
+  }
+
   return {
     async addAllProblemsAsContext() {
       try {
@@ -66,7 +151,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         })
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 118) {
-          await this.sendMessage({
+          await this.sendPart1({
             message: '/clear',
           })
         } else if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
@@ -128,9 +213,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(chatView).toBeVisible()
         const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
         await expect(scrollContainer).toBeVisible()
-        await scrollContainer.evaluate((element: any) => {
-          element.scrollTop = element.scrollHeight
-        })
+        const metrics = await getChatScrollMetrics()
+        if (!metrics) {
+          throw new Error('Chat scroll container not found')
+        }
+        await setChatScrollTop(metrics.scrollHeight)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll chat editor to bottom`)
@@ -143,9 +230,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(chatView).toBeVisible()
         const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
         await expect(scrollContainer).toBeVisible()
-        await scrollContainer.evaluate((element: any) => {
-          element.scrollTop = 0
-        })
+        await setChatScrollTop(0)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll chat editor to top`)
@@ -156,11 +241,50 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
-        const codeBlock = chatView.locator(`.interactive-result-editor[data-mode-id="${language}"]`).first()
+        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
+        await expect(scrollContainer).toBeVisible()
+        const codeBlocks = chatView.locator(`.interactive-result-editor[data-mode-id="${language}"]`)
+        const timeout = 60_000
+        const startTime = Date.now()
+        while (Date.now() - startTime < timeout) {
+          const metrics = await getChatScrollMetrics()
+          if (!metrics) {
+            throw new Error('Chat scroll container not found')
+          }
+          const stepSize = Math.max(metrics.clientHeight - 40, 200)
+          const positions = new Set<number>([metrics.scrollTop, 0, Math.max(metrics.scrollHeight - metrics.clientHeight, 0)])
+          for (let offset = 0; offset <= metrics.scrollHeight; offset += stepSize) {
+            positions.add(offset)
+          }
+          for (const position of positions) {
+            await setChatScrollTop(position)
+            await page.waitForIdle()
+            const count = await codeBlocks.count()
+            if (count > 0) {
+              const codeBlock = codeBlocks.first()
+              await expect(codeBlock).toBeVisible({ timeout: 5_000 })
+              await page.waitForIdle()
+              return
+            }
+          }
+        }
+        throw new Error(`Timed out waiting for chat code block with language ${language}`)
+      } catch (error) {
+        throw new VError(error, `Failed to find chat code block with language ${language}`)
+      }
+    },
+    async shouldHaveLatestResponseCodeBlockWithLanguage(language: string) {
+      try {
+        await page.waitForIdle()
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const response = await getLatestResponseContent(chatView)
+        await expect(response).toBeVisible({ timeout: 60_000 })
+        const codeBlock = response.locator(`.interactive-result-editor[data-mode-id="${language}"]`).first()
         await expect(codeBlock).toBeVisible({ timeout: 60_000 })
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to find chat code block with language ${language}`)
+        throw new VError(error, `Failed to find latest response code block with language ${language}`)
       }
     },
     isFirst: false,
@@ -386,25 +510,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }) {
       try {
         const chatView = page.locator('.interactive-session')
-        const requests = chatView.locator('.monaco-list-row.request')
-        const count = await requests.count()
         await this.sendPart1({
           message,
           image,
           model,
           viewLinesText,
         })
-        await expect(requests).toHaveCount(count + 1, { timeout: 90_000 })
-        const last = requests.nth(count)
+        const { requestMessage, response } = await waitForLatestExchange(chatView, message)
         if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
-          const ariaLabel = await last.getAttribute('aria-label')
+          const ariaLabel = await requestMessage.getAttribute('aria-label')
           if (ariaLabel !== message) {
             throw new Error(`unexpected aria label: ${ariaLabel}`)
           }
         }
 
         if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
-          const requestMessage = last
           await expect(requestMessage).toBeVisible()
           for (const selector of validateRequest.exists) {
             const locator = requestMessage.locator(selector)
@@ -413,17 +533,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
 
         if (verify) {
-          const row = last
-          await expect(row).toBeVisible()
-          await page.waitForIdle()
-          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
-          await expect(response).toBeVisible({ timeout: 60_000 })
-          await page.waitForIdle()
-          const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timeout: 45_000 })
-          await page.waitForIdle()
-          await expect(response).toBeVisible({ timeout: 30_000 })
-          await page.waitForIdle()
+          await expect(requestMessage).toBeVisible()
+          await expect(response).toBeVisible()
         }
 
         if (toolInvocations.length > 0) {
@@ -444,25 +555,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const lines = editArea.locator('.view-lines')
 
         if (expectedResponse) {
-          const requestMessage = last
           await expect(requestMessage).toBeVisible()
           await page.waitForIdle()
           await expect(lines).toHaveText('')
-          const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
-          await expect(row).toBeVisible()
+          await expect(response).toBeVisible()
           await page.waitForIdle()
-          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
-          await expect(response).toBeVisible({ timeout: 60_000 })
-          await page.waitForIdle()
-          const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timeout: 45_000 })
-          await page.waitForIdle()
-          await expect(response).toBeVisible({ timeout: 30_000 })
-          await page.waitForIdle()
-          const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
-          await expect(responseMessage).toBeVisible()
-          await page.waitForIdle()
-          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
+          await expect(response).toHaveText(new RegExp(escapeForRegExp(expectedResponse)), {
+            timeout: 120_000,
+          })
         }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)
