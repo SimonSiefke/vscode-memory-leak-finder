@@ -121,6 +121,48 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to close finish setup`)
       }
     },
+    async scrollToBottom() {
+      try {
+        await page.waitForIdle()
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
+        await expect(scrollContainer).toBeVisible()
+        await scrollContainer.evaluate((element: any) => {
+          element.scrollTop = element.scrollHeight
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll chat editor to bottom`)
+      }
+    },
+    async scrollToTop() {
+      try {
+        await page.waitForIdle()
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
+        await expect(scrollContainer).toBeVisible()
+        await scrollContainer.evaluate((element: any) => {
+          element.scrollTop = 0
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll chat editor to top`)
+      }
+    },
+    async shouldHaveCodeBlockWithLanguage(language: string) {
+      try {
+        await page.waitForIdle()
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const codeBlock = chatView.locator(`.interactive-result-editor[data-mode-id="${language}"]`).first()
+        await expect(codeBlock).toBeVisible({ timeout: 60_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to find chat code block with language ${language}`)
+      }
+    },
     isFirst: false,
     async moveToEditor() {
       try {
