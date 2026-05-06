@@ -1,10 +1,15 @@
 import type * as ParseArgv from '../ParseArgv/ParseArgv.ts'
+import * as ConvertProxyRequestsToMocks from '../ConvertProxyRequestsToMocks/ConvertProxyRequestsToMocks.ts'
 import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
 import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
 export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArgv> & { isGithubActions: boolean }): Promise<void> => {
+  if (options.convertRequestsToMocks) {
+    await ConvertProxyRequestsToMocks.convertProxyRequestsToMocks()
+    return
+  }
   if (options.watch) {
     await SpecialStdin.start()
   }

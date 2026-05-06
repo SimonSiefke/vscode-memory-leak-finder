@@ -43,7 +43,14 @@ jest.unstable_mockModule('../src/parts/StartRunning/StartRunning.ts', () => {
   }
 })
 
+jest.unstable_mockModule('../src/parts/ConvertProxyRequestsToMocks/ConvertProxyRequestsToMocks.ts', () => {
+  return {
+    convertProxyRequestsToMocks: jest.fn(),
+  }
+})
+
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
+const ConvertProxyRequestsToMocks = await import('../src/parts/ConvertProxyRequestsToMocks/ConvertProxyRequestsToMocks.ts')
 const InitialStart = await import('../src/parts/InitialStart/InitialStart.ts')
 const SpecialStdin = await import('../src/parts/SpecialStdin/SpecialStdin.ts')
 const StartRunning = await import('../src/parts/StartRunning/StartRunning.ts')
@@ -58,6 +65,7 @@ test('initialStart - watch mode - show details', async () => {
     color: true,
     commit: '',
     compressVideo: false,
+    convertRequestsToMocks: false,
     continueValue: '',
     cwd: '',
     enableExtensions: false,
@@ -118,6 +126,7 @@ test('initialStart - watch mode - start running', async () => {
     color: true,
     commit: '',
     compressVideo: false,
+    convertRequestsToMocks: false,
     continueValue: '',
     cwd: '',
     enableExtensions: false,
@@ -176,6 +185,7 @@ test('initialStart - start running', async () => {
     color: true,
     commit: '',
     compressVideo: false,
+    convertRequestsToMocks: false,
     continueValue: '',
     cwd: '',
     enableExtensions: false,
@@ -223,4 +233,63 @@ test('initialStart - start running', async () => {
   expect(Stdout.write).not.toHaveBeenCalled()
   expect(StartRunning.startRunning).toHaveBeenCalledTimes(1)
   expect(StartRunning.startRunning).toHaveBeenCalledWith(expect.objectContaining({ filterValue: 'a' }))
+})
+
+test('initialStart - convert requests to mocks', async () => {
+  const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
+    arch: '',
+    bisect: false,
+    checkLeaks: false,
+    clearExtensions: true,
+    color: true,
+    commit: '',
+    compressVideo: false,
+    convertRequestsToMocks: true,
+    continueValue: '',
+    cwd: '',
+    enableExtensions: false,
+    enableProxy: false,
+    filter: 'a',
+    headless: false,
+    ide: '',
+    ideVersion: '',
+    insidersCommit: '',
+    inspectExtensions: false,
+    inspectExtensionsPort: 0,
+    inspectPtyHost: false,
+    inspectPtyHostPort: 0,
+    inspectSharedProcess: false,
+    inspectSharedProcessPort: 0,
+    isGithubActions: false,
+    isWindows: false,
+    login: false,
+    measure: '',
+    measureAfter: false,
+    measureNode: false,
+    openDevtools: false,
+    pageObjectPath: '',
+    platform: '',
+    recordVideo: false,
+    restartBetween: false,
+    runMode: 0,
+    runs: 1,
+    runSkippedTestsAnyway: false,
+    screencastQuality: 90,
+    setupOnly: false,
+    timeoutBetween: 0,
+    timeouts: true,
+    trackFunctions: false,
+    updateUrl: '',
+    useProxyMock: false,
+    vscodePath: '',
+    vscodeVersion: '',
+    watch: false,
+    workers: false,
+    resolveExtensionSourceMaps: false,
+  }
+  await InitialStart.initialStart(options)
+  expect(ConvertProxyRequestsToMocks.convertProxyRequestsToMocks).toHaveBeenCalledTimes(1)
+  expect(SpecialStdin.start).not.toHaveBeenCalled()
+  expect(Stdout.write).not.toHaveBeenCalled()
+  expect(StartRunning.startRunning).not.toHaveBeenCalled()
 })
