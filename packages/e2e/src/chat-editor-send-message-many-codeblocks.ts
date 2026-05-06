@@ -19,15 +19,15 @@ export const setup = async ({ ChatEditor, Editor, Electron, Extensions }: TestCo
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   const prompts = [
     { language: 'html', message: 'show me how a hello world html looks like (inline). respond with a single code block only.' },
+    { language: 'css', message: 'show me how a hello world css snippet looks like (inline). respond with a single code block only.' },
+    { language: 'javascript', message: 'show me how a hello world javascript looks like (inline). respond with a single code block only.' },
+    { language: 'typescript', message: 'show me how a hello world typescript looks like (inline). respond with a single code block only.' },
     { language: 'python', message: 'show me how a hello world python looks like (inline). respond with a single code block only.' },
+    { language: 'json', message: 'show me a hello world json example (inline). respond with a single code block only.' },
+    { language: 'shellscript', message: 'show me how a hello world bash looks like (inline). respond with a single code block only.' },
     { language: 'c', message: 'show me how a hello world c looks like (inline). respond with a single code block only.' },
     { language: 'cpp', message: 'show me how a hello world c++ looks like (inline). respond with a single code block only.' },
     { language: 'java', message: 'show me how a hello world java looks like (inline). respond with a single code block only.' },
-    { language: 'erlang', message: 'show me how a hello world erlang looks like (inline). respond with a single code block only.' },
-    { language: 'elixir', message: 'show me how a hello world elixir looks like (inline). respond with a single code block only.' },
-    { language: 'scala', message: 'show me how a hello world scala looks like (inline). respond with a single code block only.' },
-    { language: 'ruby', message: 'show me how a hello world ruby looks like (inline). respond with a single code block only.' },
-    { language: 'php', message: 'show me how a hello world php looks like (inline). respond with a single code block only.' },
     { language: 'go', message: 'show me how a hello world go looks like (inline). respond with a single code block only.' },
   ]
 
