@@ -293,10 +293,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async tryClickFirstVisible(locators: readonly any[]): Promise<boolean> {
       for (const locator of locators) {
         try {
-          if (await locator.isVisible()) {
-            await locator.click()
-            await page.waitForIdle()
-            return true
+          const count = await locator.count().catch(() => 1)
+          const maxCount = Math.max(1, count)
+          for (let i = 0; i < maxCount; i += 1) {
+            const candidate = count > 1 ? locator.nth(i) : locator
+            if (await candidate.isVisible().catch(() => false)) {
+              await candidate.click()
+              await page.waitForIdle()
+              return true
+            }
           }
         } catch {
           // Ignore selector mismatches and keep trying fallbacks.
@@ -391,9 +396,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const directActionCandidates = [
           page.locator('[role="button"][aria-label*="Add Console Logs to Chat"]'),
           page.locator('[role="button"][aria-label*="Add console logs to chat"]'),
+          page.locator('[aria-label*="Add Console Logs to Chat"]'),
+          page.locator('[aria-label*="Add console logs to chat"]'),
+          page.locator('[title*="Add Console Logs to Chat"]'),
+          page.locator('[title*="Add console logs to chat"]'),
+          page.locator('.monaco-toolbar [aria-label*="Add Console Logs to Chat"], .monaco-toolbar [title*="Add Console Logs to Chat"]'),
           page.locator('[role="button"][aria-label*="Console Logs"]'),
           page.locator('[role="button"]', {
             hasText: 'Console Logs',
+          }),
+          page.locator('.part.editor', {
+            hasText: 'Add Console Logs to Chat',
           }),
         ]
         const moreActionsCandidates = [
@@ -412,6 +425,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           page.locator('.context-view.monaco-menu-container .actions-container .action-item', {
             hasText: 'Console Logs',
           }),
+          page.locator('.context-view.monaco-menu-container [aria-label*="Add Console Logs to Chat"], .context-view.monaco-menu-container [title*="Add Console Logs to Chat"]'),
         ]
 
         const maxAttempts = 20
