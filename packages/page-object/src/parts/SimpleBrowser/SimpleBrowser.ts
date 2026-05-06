@@ -308,6 +308,77 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
       return contextLabel.isVisible().catch(() => false)
     },
+    async executeWorkbenchCommand(commandId: string): Promise<boolean> {
+      const result = await page.evaluate({
+        awaitPromise: true,
+        expression: `((async () => {
+  const candidates = [
+    ['workbench', globalThis.workbench?.commands],
+    ['vscode', globalThis.vscode?.commands],
+    ['monaco', globalThis.monaco?.commands],
+    ['mainWindow', globalThis.mainWindow?.commands],
+  ]
+  for (const [source, commands] of candidates) {
+    if (commands && typeof commands.executeCommand === 'function') {
+      try {
+        await commands.executeCommand(${JSON.stringify(commandId)})
+        return { ok: true, source }
+      } catch (error) {
+        return {
+          ok: false,
+          source,
+          error: String(error && error.message ? error.message : error),
+        }
+      }
+    }
+  }
+  return {
+    ok: false,
+    globals: Object.keys(globalThis).filter((key) => /workbench|vscode|command|monaco/i.test(key)).slice(0, 50),
+  }
+})())`,
+        returnByValue: true,
+      })
+      if (result?.ok) {
+        return true
+      }
+      return false
+    },
+    async getVisibleTabAndActionLabels() {
+      const result = await page.evaluate({
+        expression: `(() => {
+  const collect = (selector) => {
+    return Array.from(document.querySelectorAll(selector))
+      .map((element) => {
+        const style = window.getComputedStyle(element)
+        if (style.display === 'none' || style.visibility === 'hidden') {
+          return ''
+        }
+        const rect = element.getBoundingClientRect()
+        if (!rect.width || !rect.height) {
+          return ''
+        }
+        return [
+          element.getAttribute('aria-label') || '',
+          element.getAttribute('data-resource-name') || '',
+          element.getAttribute('title') || '',
+          element.textContent || '',
+        ]
+          .map((value) => value.trim())
+          .filter((value) => value.length > 0)
+          .join(' | ')
+      })
+      .filter((value) => value.length > 0)
+    }
+  return {
+    actions: collect('.part.editor [role="button"], .part.editor button, .context-view.monaco-menu-container .action-item'),
+    tabs: collect('[role="tab"]'),
+  }
+})()`,
+        returnByValue: true,
+      })
+      return result
+    },
     async addConsoleLogsToChat() {
       try {
         await page.waitForIdle()
@@ -382,7 +453,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await this.activateModernBrowserEditor()
         }
         await page.waitForIdle()
-        await quickPick.executeCommand(WellKnownCommands.BrowserAddConsoleLogsToChat)
+        if (await this.executeWorkbenchCommand('workbench.action.browser.addConsoleLogsToChat')) {
+          await this.waitForCondition({
+            condition: () => this.hasAttachedChatContext(),
+            timeout: 10_000,
+          })
+          return
+        }
+        try {
+          await quickPick.executeCommand(WellKnownCommands.BrowserAddConsoleLogsToChat)
+        } catch (error) {
+          const debug = await this.getVisibleTabAndActionLabels()
+          throw new Error(
+            `Command palette fallback failed. Tabs: ${JSON.stringify(debug?.tabs || [])}. Actions: ${JSON.stringify(debug?.actions || [])}. ${error}`,
+          )
+        }
         await this.waitForCondition({
           condition: () => this.hasAttachedChatContext(),
           timeout: 10_000,
