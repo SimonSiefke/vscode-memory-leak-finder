@@ -34,7 +34,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   for (const prompt of prompts) {
     await ChatEditor.sendMessage({
       message: prompt.message,
-      model: 'GPT-4.1 mini',
+      model: 'GPT-4.1',
       verify: true,
     })
 
