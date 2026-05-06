@@ -8,15 +8,8 @@ export const setup = async ({ ChatEditor, Editor, Electron }: TestContext): Prom
   await Electron.mockDialog({
     response: 1,
   })
-  // await Extensions.install({
-  //   id: 'GitHub.copilot-chat',
-  //   name: 'GitHub Copilot Chat',
-  // })
   await Editor.closeAll()
   await ChatEditor.open()
-}
-
-export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   const prompts = [
     { language: 'html', message: 'show me how a hello world html looks like (inline). respond with a single code block only.' },
     { language: 'css', message: 'show me how a hello world css snippet looks like (inline). respond with a single code block only.' },
@@ -26,7 +19,6 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     { language: 'c', message: 'show me how a hello world c looks like (inline). respond with a single code block only.' },
     { language: 'go', message: 'show me how a hello world go looks like (inline). respond with a single code block only.' },
   ]
-
   for (const prompt of prompts) {
     await ChatEditor.sendMessage({
       message: prompt.message,
@@ -36,7 +28,9 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
 
     await ChatEditor.shouldHaveLatestResponseCodeBlockWithLanguage(prompt.language)
   }
+}
 
+export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.scrollToTop()
   await ChatEditor.scrollToBottom()
 }
