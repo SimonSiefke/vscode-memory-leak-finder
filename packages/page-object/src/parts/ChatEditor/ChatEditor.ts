@@ -206,9 +206,42 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
-        const codeBlock = chatView.locator(`.interactive-result-editor[data-mode-id="${language}"]`).first()
-        await expect(codeBlock).toBeVisible({ timeout: 60_000 })
-        await page.waitForIdle()
+        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
+        await expect(scrollContainer).toBeVisible()
+        const codeBlocks = chatView.locator(`.interactive-result-editor[data-mode-id="${language}"]`)
+        const timeout = 60_000
+        const startTime = Date.now()
+        while (Date.now() - startTime < timeout) {
+          const metrics = await scrollContainer.evaluate((element: any) => {
+            return {
+              clientHeight: element.clientHeight,
+              scrollHeight: element.scrollHeight,
+              scrollTop: element.scrollTop,
+            }
+          })
+          const stepSize = Math.max(metrics.clientHeight - 40, 200)
+          const positions = new Set<number>([metrics.scrollTop, 0, Math.max(metrics.scrollHeight - metrics.clientHeight, 0)])
+          for (let offset = 0; offset <= metrics.scrollHeight; offset += stepSize) {
+            positions.add(offset)
+          }
+          for (const position of positions) {
+            await scrollContainer.evaluate(
+              (element: any, nextScrollTop: number) => {
+                element.scrollTop = nextScrollTop
+              },
+              position,
+            )
+            await page.waitForIdle()
+            const count = await codeBlocks.count()
+            if (count > 0) {
+              const codeBlock = codeBlocks.first()
+              await expect(codeBlock).toBeVisible({ timeout: 5_000 })
+              await page.waitForIdle()
+              return
+            }
+          }
+        }
+        throw new Error(`Timed out waiting for chat code block with language ${language}`)
       } catch (error) {
         throw new VError(error, `Failed to find chat code block with language ${language}`)
       }
