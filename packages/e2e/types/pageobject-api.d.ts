@@ -653,10 +653,15 @@ export interface WebView {
   shouldBeVisible2(options?: any): Promise<void>
 }
 export interface WelcomePage {
+  checkStepByIndex(index: any): Promise<void>
+  collapseStepByIndex(index: any): Promise<void>
   expandStep(name: any): Promise<void>
+  expandStepByIndex(index: any): Promise<void>
+  getFundamentalsStepCount(): Promise<number>
   hide(): Promise<void>
   show(): Promise<void>
   showFundamentals(): Promise<void>
+  uncheckStepByIndex(index: any): Promise<void>
 }
 export interface Window {
   blur(): Promise<void>
