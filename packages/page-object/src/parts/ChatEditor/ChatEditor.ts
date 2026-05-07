@@ -12,7 +12,9 @@ const getChatPickerLabel = (pickerItem: any) => {
 }
 
 const getAccessButtons = (page: any, buttonText: string) => {
-  return page.locator(`button:has-text("${buttonText}"), [role="button"]:has-text("${buttonText}")`)
+  return page.locator(
+    `button:has-text("${buttonText}"), [role="button"]:has-text("${buttonText}"), .action-label:has-text("${buttonText}")`,
+  )
 }
 
 const escapeForRegExp = (value: string) => {

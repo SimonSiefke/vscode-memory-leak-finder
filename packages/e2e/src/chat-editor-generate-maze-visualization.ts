@@ -9,7 +9,7 @@ export const requiresNetwork = true
 const workspacePath = join(import.meta.dirname, '..', '..', '..', '.vscode-test-workspace')
 const generatedFiles = ['index.html', 'index.css', 'index.js'] as const
 
-const prompt = `Inspect the current workspace first, then create a browser-based maze visualization with A* path finding. Use exactly these file names: index.html, index.css, and index.js. Write the files into the workspace instead of replying with code blocks. The page should render a maze, visualize the search, and let the user start or restart the path finding.`
+const prompt = `Inspect the current workspace first and then use workspace file tools to create a browser-based maze visualization with A* path finding. Use exactly these file names: index.html, index.css, and index.js. Do not reply with code blocks. Write the files into the workspace, asking for approval when needed, and finish by replying with exactly done.`
 
 const allFilesExist = () => {
   return generatedFiles.every((fileName) => existsSync(join(workspacePath, fileName)))
@@ -42,7 +42,11 @@ export const setup = async ({ ChatEditor, Editor, Electron, Workspace }: TestCon
 }
 
 export const run = async ({ ChatEditor, Editor, Workspace }: TestContext): Promise<void> => {
-  await ChatEditor.setMode('Edit')
+  try {
+    await ChatEditor.setMode('Agent')
+  } catch {
+  }
+
   await ChatEditor.send({
     message: prompt,
     model: 'GPT-4.1',
