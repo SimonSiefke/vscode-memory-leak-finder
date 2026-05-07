@@ -11,6 +11,10 @@ const getChatPickerLabel = (pickerItem: any) => {
   return pickerItem.locator('.chat-model-label, .action-label, [role="button"], button').first()
 }
 
+const getAccessButtons = (page: any, buttonText: string) => {
+  return page.locator(`button:has-text("${buttonText}"), [role="button"]:has-text("${buttonText}")`)
+}
+
 const escapeForRegExp = (value: string) => {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -640,7 +644,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async clickAccessButton(buttonText: string = 'Allow') {
       try {
-        const accessButton = page.locator(`button:has-text("${buttonText}")`)
+        const accessButton = getAccessButtons(page, buttonText)
         const buttonCount = await accessButton.count()
 
         if (buttonCount > 0) {
@@ -664,7 +668,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         while (clickCount < maxClicks) {
           let clicked = false
           for (const buttonText of buttonTexts) {
-            const accessButton = page.locator(`button:has-text("${buttonText}")`).first()
+            const accessButton = getAccessButtons(page, buttonText).first()
             if ((await accessButton.count()) === 0) {
               continue
             }

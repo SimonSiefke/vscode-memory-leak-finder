@@ -42,6 +42,7 @@ export const setup = async ({ ChatEditor, Editor, Electron, Workspace }: TestCon
 }
 
 export const run = async ({ ChatEditor, Editor, Workspace }: TestContext): Promise<void> => {
+  await ChatEditor.setMode('Edit')
   await ChatEditor.send({
     message: prompt,
     model: 'GPT-4.1',
