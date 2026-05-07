@@ -487,6 +487,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(lines).toHaveText('')
       await page.waitForIdle()
     },
+    async send({
+      image = '',
+      message,
+      model,
+      viewLinesText = '',
+    }: {
+      message: string
+      viewLinesText?: string
+      image?: string
+      model?: string
+    }) {
+      try {
+        await this.sendPart1({
+          message,
+          image,
+          model,
+          viewLinesText,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to send chat message without waiting`)
+      }
+    },
     async sendMessage({
       expectedResponse,
       image = '',
@@ -628,6 +650,49 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to click access button with text "${buttonText}"`)
+      }
+    },
+    async approveAllAccessRequests({
+      buttonTexts = ['Allow', 'Continue'],
+      maxClicks = 12,
+    }: {
+      buttonTexts?: readonly string[]
+      maxClicks?: number
+    } = {}) {
+      try {
+        let clickCount = 0
+        while (clickCount < maxClicks) {
+          let clicked = false
+          for (const buttonText of buttonTexts) {
+            const accessButton = page.locator(`button:has-text("${buttonText}")`).first()
+            if ((await accessButton.count()) === 0) {
+              continue
+            }
+            const isVisible = await accessButton.isVisible().catch(() => false)
+            if (!isVisible) {
+              continue
+            }
+            await accessButton.click()
+            await page.waitForIdle()
+            clickCount++
+            clicked = true
+            break
+          }
+          if (!clicked) {
+            break
+          }
+        }
+        return clickCount
+      } catch (error) {
+        throw new VError(error, `Failed to approve access requests`)
+      }
+    },
+    async waitForLatestExchange(message: string) {
+      try {
+        const chatView = page.locator('.interactive-session')
+        await waitForLatestExchange(chatView, message)
+      } catch (error) {
+        throw new VError(error, `Failed to wait for latest chat exchange`)
       }
     },
     async waitForNewWindow(windowIdsBefore: readonly number[], electron: ReturnType<typeof Electron.create>) {
