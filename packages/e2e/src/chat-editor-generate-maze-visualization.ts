@@ -44,8 +44,7 @@ export const setup = async ({ ChatEditor, Editor, Electron, Workspace }: TestCon
 export const run = async ({ ChatEditor, Editor, Workspace }: TestContext): Promise<void> => {
   try {
     await ChatEditor.setMode('Agent')
-  } catch {
-  }
+  } catch {}
 
   await ChatEditor.send({
     message: prompt,
