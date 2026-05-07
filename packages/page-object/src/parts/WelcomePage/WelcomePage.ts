@@ -130,7 +130,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
         }
         await expect(heading).toBeVisible()
+        await page.waitForIdle()
         await expect(heading).toHaveText(/Learn the Fundamentals/i)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to fundamentals page`)
       }
@@ -148,6 +150,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
         }
         await expect(checkbox).toHaveAttribute('aria-checked', 'false')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to uncheck step at index ${index}`)
       }
