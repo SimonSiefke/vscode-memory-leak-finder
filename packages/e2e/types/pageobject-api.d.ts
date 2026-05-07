@@ -14,6 +14,8 @@ export interface PageObjectContext {
 export interface ActivityBar {
   hide(): Promise<void>
   hideTooltip(): Promise<void>
+  shouldBeHidden(): Promise<void>
+  shouldBeVisible(): Promise<void>
   show(): Promise<void>
   showTooltipExplorer(): Promise<void>
   showView(options?: any): Promise<void>
@@ -165,6 +167,7 @@ export interface Editor {
   setLogpoint(lineNumber: any, logMessage: any): Promise<void>
   shouldHaveActiveLineNumber(value: any): Promise<void>
   shouldHaveBreadCrumb(text: any): Promise<void>
+  shouldHaveBreadCrumbs(): Promise<void>
   shouldHaveCodeLens(options: any): Promise<void>
   shouldHaveCodeLensWithVersion(options: any): Promise<void>
   shouldHaveCursor(estimate: any): Promise<void>
@@ -180,8 +183,11 @@ export interface Editor {
   shouldHaveSpark(): Promise<void>
   shouldHaveSquigglyError(): Promise<void>
   shouldHaveControlCharacterHighlight(): Promise<void>
+  shouldHaveMinimap(): Promise<void>
   shouldHaveText(text: any, fileName?: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
+  shouldNotHaveBreadCrumbs(): Promise<void>
+  shouldNotHaveMinimap(): Promise<void>
   shouldNotHaveSemanticToken(type: any): Promise<void>
   shouldNotHaveSquigglyError(): Promise<void>
   showBreadCrumbs(): Promise<void>
@@ -273,6 +279,7 @@ export interface Explorer {
   refresh(): Promise<void>
   removeCurrent(): Promise<void>
   rename(oldDirentName: any, newDirentName: any): Promise<void>
+  selectItem(direntName: any): Promise<void>
   shouldHaveFocusedItem(direntName: any): Promise<void>
   shouldHaveItem(direntName: any): Promise<void>
   toHaveItem(direntName: any): Promise<void>
@@ -511,6 +518,10 @@ export interface SideBar {
   hide(): Promise<void>
   moveLeft(): Promise<void>
   moveRight(): Promise<void>
+  shouldBeHidden(): Promise<void>
+  shouldBeLeft(): Promise<void>
+  shouldBeRight(): Promise<void>
+  shouldBeVisible(): Promise<void>
   show(): Promise<void>
   toggle(): Promise<void>
   togglePosition(): Promise<void>
@@ -677,11 +688,16 @@ export interface Workbench {
 export interface Workspace {
   add(file: any): Promise<void>
   addExtension(name: any): Promise<void>
+  getWorkspaceSettingsPath(): any
   initializeGitRepository(): Promise<void>
+  readWorkspaceSettings(): Promise<Record<string, unknown>>
   remove(file: any): Promise<void>
   setFiles(files: any): Promise<void>
   setFilesWithoutWaiting(files: any): Promise<void>
+  updateWorkspaceSettings(settings: any): Promise<void>
   waitForFile(fileName: any): Promise<void>
+  writeFile(relativePath: any, content: any): Promise<void>
+  writeWorkspaceSettings(settings: any): Promise<void>
 }
 
 export interface PageObjectApi {

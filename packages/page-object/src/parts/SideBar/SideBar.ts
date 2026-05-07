@@ -103,5 +103,37 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       })
       await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarPosition)
     },
+    async shouldBeHidden() {
+      try {
+        const sideBar = page.locator('.part.sidebar')
+        await expect(sideBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that side bar is hidden`)
+      }
+    },
+    async shouldBeLeft() {
+      try {
+        const sideBar = page.locator('.part.sidebar')
+        await expect(sideBar).toHaveClass(/left/)
+      } catch (error) {
+        throw new VError(error, `Failed to verify that side bar is on the left`)
+      }
+    },
+    async shouldBeRight() {
+      try {
+        const sideBar = page.locator('.part.sidebar')
+        await expect(sideBar).toHaveClass(/right/)
+      } catch (error) {
+        throw new VError(error, `Failed to verify that side bar is on the right`)
+      }
+    },
+    async shouldBeVisible() {
+      try {
+        const sideBar = page.locator('.part.sidebar')
+        await expect(sideBar).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that side bar is visible`)
+      }
+    },
   }
 }
