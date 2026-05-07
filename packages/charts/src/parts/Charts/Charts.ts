@@ -11,6 +11,7 @@ export * as EditContextCount from '../CreateEditContextCountChart/CreateEditCont
 export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChart.ts'
 export * as ErrorCount from '../CreateErrorCountChart/CreateErrorCountChart.ts'
 export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEventListenerCountChart.ts'
+export * as FileDescriptorCount from '../CreateFileDescriptorCountChart/CreateFileDescriptorCountChart.ts'
 export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountChart.ts'
 export * as GpuCanvasContextCount from '../CreateGpuCanvasContextCountChart/CreateGpuCanvasContextCountChart.ts'
 export * as IframeCount from '../CreateIframeCountChart/CreateIframeCountChart.ts'
