@@ -4,28 +4,24 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
-  const getAllSteps = () => {
-    return page.locator('.getting-started-step')
-  }
-
-  const getStepByIndex = (index: number) => {
-    return getAllSteps().nth(index)
-  }
-
-  const getStepByName = (name: string) => {
-    return page.locator(`.getting-started-step[data-step-id="${name}"]`)
-  }
-
-  const getStepCheckbox = (step: ReturnType<typeof getStepByIndex>) => {
-    return step.locator('.monaco-custom-toggle, [role="checkbox"][aria-checked]').first()
-  }
-
-  return {
+  const welcomePage = {
+    getAllSteps() {
+      return page.locator('.getting-started-step')
+    },
+    getStepByIndex(index: number) {
+      return this.getAllSteps().nth(index)
+    },
+    getStepByName(name: string) {
+      return page.locator(`.getting-started-step[data-step-id="${name}"]`)
+    },
+    getStepCheckbox(step: ReturnType<typeof page.locator>) {
+      return step.locator('.monaco-custom-toggle, [role="checkbox"][aria-checked]').first()
+    },
     async checkStepByIndex(index: number) {
       try {
-        const step = getStepByIndex(index)
+        const step = this.getStepByIndex(index)
         await expect(step).toBeVisible()
-        const checkbox = getStepCheckbox(step)
+        const checkbox = this.getStepCheckbox(step)
         await expect(checkbox).toBeVisible()
         await page.waitForIdle()
         const checkedValue = await checkbox.getAttribute('aria-checked')
@@ -40,7 +36,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async collapseStepByIndex(index: number) {
       try {
-        const step = getStepByIndex(index)
+        const step = this.getStepByIndex(index)
         await expect(step).toBeVisible()
         const expanded = await step.getAttribute('aria-expanded')
         if (expanded !== 'false') {
@@ -54,7 +50,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async expandStep(name: string) {
       try {
-        const step = getStepByName(name)
+        const step = this.getStepByName(name)
         const expanded = await step.getAttribute('aria-expanded')
         if (expanded !== 'true') {
           await step.click()
@@ -67,7 +63,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async expandStepByIndex(index: number) {
       try {
-        const step = getStepByIndex(index)
+        const step = this.getStepByIndex(index)
         await expect(step).toBeVisible()
         const expanded = await step.getAttribute('aria-expanded')
         if (expanded !== 'true') {
@@ -81,7 +77,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async getFundamentalsStepCount() {
       try {
-        const steps = getAllSteps()
+        const steps = this.getAllSteps()
         await expect(steps.first()).toBeVisible()
         return steps.count()
       } catch (error) {
@@ -141,9 +137,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async uncheckStepByIndex(index: number) {
       try {
-        const step = getStepByIndex(index)
+        const step = this.getStepByIndex(index)
         await expect(step).toBeVisible()
-        const checkbox = getStepCheckbox(step)
+        const checkbox = this.getStepCheckbox(step)
         await expect(checkbox).toBeVisible()
         await page.waitForIdle()
         const checkedValue = await checkbox.getAttribute('aria-checked')
@@ -157,4 +153,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
   }
+
+  return welcomePage
 }
