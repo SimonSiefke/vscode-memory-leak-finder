@@ -14,7 +14,6 @@ const writeSettings = async (Workspace: TestContext['Workspace'], settings: Reco
 
 export const skip = 1
 
-
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
