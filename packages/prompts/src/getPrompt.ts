@@ -75,9 +75,14 @@ Additionally there are some stylistic rules:
 
 Additional information:
 - You can compile vscode by running \` npx gulp transpile-client-esbuild\`
-- You can run the measure by running \` xvfb-run -a node packages/cli/bin/test.js  --run-skipped-tests-anyway    --only ${only}    --runs ${runs} --measure ${measure} --check-leaks --measure-after  --enable-extensions --vscode-path "${localVscodePath}/scripts/code.sh" --measure-node\` in the vscode-memory-leak-finder repository at ${ourPath}
+- You can run the measure by running \` xvfb-run -a node packages/cli/bin/test.js  --run-skipped-tests-anyway    --only ${only}    --runs ${runs} --measure ${measure} --check-leaks --measure-after  --enable-extensions --vscode-path "${localVscodePath}/scripts/code.sh"\` in the vscode-memory-leak-finder repository at ${ourPath}
 - The measure results are in .vscode-memory-leak-finder-results/${measure}/<testName>.json
 
+
+IMPORT:
+- you are allowed and encouraged to run a vscode transpile build, which is fast and uses few resources. By using npx gulp transpile-client-esbuild
+- you are also allowed and encouraged to run the measure by using xvfb-run -a node packages/cli/bin/test.js  --run-skipped-tests-anyway    --only ${only}    --runs ${runs} --measure ${measure} --check-leaks --measure-after  --enable-extensions --vscode-path "${localVscodePath}/scripts/code.sh" --measure-node in the vscode-memory-leak-finder repository at ${ourPath}
+- YOU ARE NOT ALLOWED TO RUN UNIT TESTS, ESLINT, HYGIENE, TYPECHECKING, ONLY TRANSPILE-CLIENT-ESBUILD AND THE E2E TEST FROM ABOVE
 `
 
   return prompt
