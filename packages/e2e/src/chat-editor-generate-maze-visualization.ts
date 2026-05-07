@@ -16,7 +16,7 @@ const allFilesExist = () => {
 }
 
 const waitForGeneratedFiles = async (ChatEditor: TestContext['ChatEditor']): Promise<void> => {
-  const maxWaitTime = 180_000
+  const maxWaitTime = 90_000
   const pollInterval = 500
   const startTime = performance.now()
 
@@ -28,7 +28,9 @@ const waitForGeneratedFiles = async (ChatEditor: TestContext['ChatEditor']): Pro
     await new Promise((resolve) => setTimeout(resolve, pollInterval))
   }
 
-  throw new Error(`Timed out waiting for ${generatedFiles.join(', ')} to be created`)
+  const latestResponse = await ChatEditor.getLatestResponseText().catch(() => '')
+  const responseSuffix = latestResponse ? ` Latest response: ${latestResponse}` : ''
+  throw new Error(`Timed out waiting for ${generatedFiles.join(', ')} to be created.${responseSuffix}`)
 }
 
 export const setup = async ({ ChatEditor, Editor, Electron, Workspace }: TestContext): Promise<void> => {

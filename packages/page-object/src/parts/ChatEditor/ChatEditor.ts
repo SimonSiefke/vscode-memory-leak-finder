@@ -185,6 +185,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to clear chat context`)
       }
     },
+    async getLatestResponseText() {
+      try {
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const response = await getLatestResponseContent(chatView)
+        await expect(response).toBeVisible({ timeout: 60_000 })
+        const text = (await response.textContent()) || ''
+        return text.trim()
+      } catch (error) {
+        throw new VError(error, `Failed to get latest chat response text`)
+      }
+    },
     async shouldHaveAttachedContextHoverText(text: string) {
       try {
         const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
