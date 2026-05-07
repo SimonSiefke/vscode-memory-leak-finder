@@ -8,10 +8,7 @@ const updatedSettings = {
   'workbench.statusBar.visible': false,
 }
 
-const writeSettings = async (
-  Workspace: TestContext['Workspace'],
-  settings: Record<string, unknown>,
-): Promise<void> => {
+const writeSettings = async (Workspace: TestContext['Workspace'], settings: Record<string, unknown>): Promise<void> => {
   await Workspace.writeFile('.vscode/settings.json', JSON.stringify(settings, null, 2) + '\n')
 }
 
