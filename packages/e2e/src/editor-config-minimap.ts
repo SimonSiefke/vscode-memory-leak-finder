@@ -26,11 +26,13 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
     },
   ])
   await Editor.closeAll()
-  await Editor.closeAllEditorGroups()
 }
 
-export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
-  await Editor.open('file.txt')
+export const run = async ({ Editor, Explorer, SideBar, Workspace }: TestContext): Promise<void> => {
+  await SideBar.show()
+  await Explorer.refresh()
+  await Explorer.shouldHaveItem('file.txt')
+  await Explorer.openItem('file.txt')
   await Editor.shouldHaveMinimap()
   await writeSettings(Workspace, updatedSettings)
   await Editor.shouldNotHaveMinimap()
@@ -40,6 +42,5 @@ export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => 
 
 export const teardown = async ({ Editor, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  await Editor.closeAllEditorGroups()
   await SideBar.hide()
 }

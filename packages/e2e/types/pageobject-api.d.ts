@@ -275,6 +275,7 @@ export interface Explorer {
   toHaveItem(direntName: any): Promise<void>
   openAllFiles(): Promise<void>
   openContextMenu(dirent: any, select?: any): Promise<void>
+  openItem(direntName: any): Promise<void>
   paste(options?: any): Promise<void>
   refresh(): Promise<void>
   removeCurrent(): Promise<void>
@@ -579,6 +580,8 @@ export interface StatusBar {
   click(label: any): Promise<void>
   hideItem(id: any): Promise<void>
   selectItem(id: any): Promise<void>
+  shouldBeHidden(): Promise<void>
+  shouldBeVisible(): Promise<void>
   showItem(id: any): Promise<void>
 }
 export interface Suggest {

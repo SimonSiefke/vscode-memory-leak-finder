@@ -28,11 +28,10 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
     },
   ])
   await Editor.closeAll()
-  await Editor.closeAllEditorGroups()
 }
 
-export const run = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
-  await Explorer.focus()
+export const run = async ({ Editor, Explorer, SideBar, Workspace }: TestContext): Promise<void> => {
+  await SideBar.show()
   await Explorer.refresh()
   await Explorer.shouldHaveItem('a.txt')
   await Explorer.shouldHaveItem('b.txt')
@@ -50,6 +49,5 @@ export const run = async ({ Editor, Explorer, Workspace }: TestContext): Promise
 
 export const teardown = async ({ Editor, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  await Editor.closeAllEditorGroups()
   await SideBar.hide()
 }

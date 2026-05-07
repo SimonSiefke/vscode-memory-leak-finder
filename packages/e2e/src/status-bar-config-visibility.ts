@@ -1,21 +1,24 @@
 import type { TestContext } from '../types.ts'
 
 const initialSettings = {
-  'workbench.sideBar.location': 'left',
+  'workbench.statusBar.visible': true,
 }
 
 const updatedSettings = {
-  'workbench.sideBar.location': 'right',
+  'workbench.statusBar.visible': false,
 }
 
-const writeSettings = async (Workspace: TestContext['Workspace'], settings: Record<string, unknown>): Promise<void> => {
+const writeSettings = async (
+  Workspace: TestContext['Workspace'],
+  settings: Record<string, unknown>,
+): Promise<void> => {
   await Workspace.writeFile('.vscode/settings.json', JSON.stringify(settings, null, 2) + '\n')
 }
 
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      content: 'side bar position test\n',
+      content: 'status bar visibility test\n',
       name: 'file.txt',
     },
     {
@@ -24,21 +27,17 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
     },
   ])
   await Editor.closeAll()
-  await Editor.closeAllEditorGroups()
 }
 
-export const run = async ({ Explorer, SideBar, Workspace }: TestContext): Promise<void> => {
-  await Explorer.focus()
-  await SideBar.shouldBeVisible()
-  await SideBar.shouldBeLeft()
+export const run = async ({ StatusBar, Workspace }: TestContext): Promise<void> => {
+  await StatusBar.shouldBeVisible()
   await writeSettings(Workspace, updatedSettings)
-  await SideBar.shouldBeRight()
+  await StatusBar.shouldBeHidden()
   await writeSettings(Workspace, initialSettings)
-  await SideBar.shouldBeLeft()
+  await StatusBar.shouldBeVisible()
 }
 
 export const teardown = async ({ Editor, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  await Editor.closeAllEditorGroups()
   await SideBar.hide()
 }

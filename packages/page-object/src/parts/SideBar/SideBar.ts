@@ -69,6 +69,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async show() {
       try {
         const sideBar = page.locator('.part.sidebar')
+        const isVisible = await sideBar.isVisible()
+        if (isVisible) {
+          await expect(sideBar).toBeVisible()
+          await page.waitForIdle()
+          return
+        }
         await expect(sideBar).toBeHidden()
         await this.toggle()
         await expect(sideBar).toBeVisible()
@@ -114,7 +120,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldBeLeft() {
       try {
         const sideBar = page.locator('.part.sidebar')
-        await expect(sideBar).toHaveClass(/left/)
+        const className = await sideBar.getAttribute('class')
+        if (!className || !className.includes('left')) {
+          throw new Error(`Expected side bar to be on the left but got class "${className}"`)
+        }
       } catch (error) {
         throw new VError(error, `Failed to verify that side bar is on the left`)
       }
@@ -122,7 +131,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldBeRight() {
       try {
         const sideBar = page.locator('.part.sidebar')
-        await expect(sideBar).toHaveClass(/right/)
+        const className = await sideBar.getAttribute('class')
+        if (!className || !className.includes('right')) {
+          throw new Error(`Expected side bar to be on the right but got class "${className}"`)
+        }
       } catch (error) {
         throw new VError(error, `Failed to verify that side bar is on the right`)
       }
