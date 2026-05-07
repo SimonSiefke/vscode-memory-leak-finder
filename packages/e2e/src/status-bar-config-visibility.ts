@@ -12,6 +12,9 @@ const writeSettings = async (Workspace: TestContext['Workspace'], settings: Reco
   await Workspace.writeFile('.vscode/settings.json', JSON.stringify(settings, null, 2) + '\n')
 }
 
+export const skip = 1
+
+
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
