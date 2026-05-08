@@ -115,5 +115,28 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
         throw new VError(error, `Failed to connect to ssh server`)
       }
     },
+    async openFolder(): Promise<void> {
+      try {
+        const folderPath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace` // TODO
+        const button = page.locator('.monaco-button.monaco-text-button', {
+          hasText: 'Open Folder',
+        })
+        await expect(button).toBeVisible()
+        await page.waitForIdle()
+        await button.click()
+        await page.waitForIdle()
+        const input = page.locator(`[aria-label="Folder path - Open Folder"]`)
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        await expect(input).toBeFocused()
+        await page.waitForIdle()
+        await input.fill(folderPath)
+        await page.waitForIdle()
+        await input.press('Enter')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open folder`)
+      }
+    },
   }
 }

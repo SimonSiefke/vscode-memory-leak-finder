@@ -23,7 +23,8 @@ export const setup = async ({
   const connection = await SshServer.launch()
   await SshClient.connectToSsh(connection)
   await ActivityBar.showExplorer()
-
+  // @ts-ignore
+  await SshClient.openFolder()
   console.log('idle')
   await new Promise((r) => {})
   // TODO fix explorer
