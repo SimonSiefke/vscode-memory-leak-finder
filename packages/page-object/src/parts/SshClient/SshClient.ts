@@ -118,6 +118,7 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
     async openFolder(): Promise<void> {
       try {
         const folderPath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace` // TODO
+        const defaultValue = '/home/simon'
         const button = page.locator('.monaco-button.monaco-text-button', {
           hasText: 'Open Folder',
         })
@@ -130,9 +131,8 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
         await page.waitForIdle()
         await expect(input).toBeFocused()
         await page.waitForIdle()
-        await new Promise((r) => {
-          setTimeout(r, 300)
-        })
+        await expect(input).toHaveValue(defaultValue)
+        await page.waitForIdle()
         await input.clear()
         await page.waitForIdle()
         await expect(input).toHaveValue('')
