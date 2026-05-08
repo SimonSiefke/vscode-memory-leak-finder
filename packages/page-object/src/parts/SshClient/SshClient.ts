@@ -66,65 +66,21 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, reconn
   )
 }
 
-export const createWithDependencies = (
-  { browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams,
-  dependencies: SshClientDependencies,
-) => {
-  const openSshRemoteInCurrentWindow = async (target: string): Promise<boolean> => {
-    return page.evaluate({
-      awaitPromise: true,
-      expression: `((async () => {
-  const candidates = [
-    globalThis.workbench?.commands,
-    globalThis.vscode?.commands,
-    globalThis.monaco?.commands,
-    globalThis.mainWindow?.commands,
-  ]
-  for (const commands of candidates) {
-    if (!commands || typeof commands.executeCommand !== 'function') {
-      continue
-    }
-    try {
-      await commands.executeCommand('vscode.newWindow', {
-        remoteAuthority: ${JSON.stringify(`ssh-remote+${target}`)},
-        reuseWindow: true,
-      })
-      return true
-    } catch {
-    }
-  }
-  return false
-})())`,
-    })
-  }
-
-  const selectRemoteHostPlatform = async (): Promise<void> => {
-    const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
-    for (let attempt = 0; attempt < 10; attempt++) {
-      if (await input.isVisible()) {
-        await expect(input).toBeVisible()
-        await expect(input).toBeFocused()
-        const quickPick = dependencies.createQuickPick()
-        await quickPick.select('Linux')
-        await page.waitForIdle()
-        return
-      }
-      await dependencies.sleep(1000)
-    }
-  }
-
+export const createWithDependencies = ({ expect, page, VError }: CreateParams, dependencies: SshClientDependencies) => {
   return {
-    async connectToSsh(options: ConnectToSshOptions): Promise<void> {
+    async connectToSshPart1(options: ConnectToSshOptions): Promise<void> {
       try {
         const target = resolveSshTarget(options)
         const quickPick = dependencies.createQuickPick()
-        const refreshPromise = page.waitForRefresh()
         await page.waitForIdle()
         await quickPick.executeCommand(WellKnownCommands.RemoteSshConnectCurrentWindowToHost, {
           stayVisible: true,
           pressKeyOnce: true,
         })
-        for (let attempt = 0; attempt < 10; attempt++) {
+        await page.waitForIdle()
+        const refreshPromise = page.waitForRefresh()
+        const maxAttempts = 10
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
           try {
             await quickPick.select(new RegExp(target))
             break
@@ -132,27 +88,29 @@ export const createWithDependencies = (
             await dependencies.sleep(1000)
           }
         }
-        if (await openSshRemoteInCurrentWindow(target)) {
-          return
-        }
         await refreshPromise
-        await dependencies.sleep(3000)
-        const refreshedPage = await page.refresh()
-        await page.rebind(refreshedPage)
-        await selectRemoteHostPlatform()
-        await this.waitForConnectionReady(options)
       } catch (error) {
         throw new VError(error, `Failed to connect to ssh server`)
       }
     },
-    async waitForConnectionReady(options: ConnectToSshOptions): Promise<void> {
+
+    async connectToSshPart2(options: ConnectToSshOptions): Promise<void> {
       try {
         await page.waitForIdle()
         const statusBarItemFinished = page.locator(getSshStatusBarSelector(resolveSshTarget(options)))
         await expect(statusBarItemFinished).toBeVisible({ timeout: 60_000 })
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to verify ssh connection is ready`)
+        throw new VError(error, `Failed to connect to ssh server`)
+      }
+    },
+
+    async connectToSsh(options: ConnectToSshOptions): Promise<void> {
+      try {
+        await this.connectToSshPart1(options)
+        await this.connectToSshPart2(options)
+      } catch (error) {
+        throw new VError(error, `Failed to connect to ssh server`)
       }
     },
   }
