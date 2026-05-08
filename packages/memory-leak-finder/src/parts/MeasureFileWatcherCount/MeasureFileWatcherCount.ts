@@ -7,16 +7,16 @@ export const id = MeasureId.FileWatcherCount
 
 export const targets: readonly any[] = []
 
-export const create = ({ pid }: { pid: number }) => {
-  return [pid]
+export const create = ({ pid, processRootStrategy }: { pid: number; processRootStrategy: string }) => {
+  return [pid, processRootStrategy]
 }
 
-export const start = async (pid: number): Promise<number> => {
-  return await GetFileWatcherCount.getFileWatcherCount(pid)
+export const start = async (pid: number, processRootStrategy: string): Promise<number> => {
+  return await GetFileWatcherCount.getFileWatcherCount(pid, processRootStrategy)
 }
 
-export const stop = async (pid: number): Promise<number> => {
-  return await GetFileWatcherCount.getFileWatcherCount(pid)
+export const stop = async (pid: number, processRootStrategy: string): Promise<number> => {
+  return await GetFileWatcherCount.getFileWatcherCount(pid, processRootStrategy)
 }
 
 export const compare = CompareCount.compareCount
