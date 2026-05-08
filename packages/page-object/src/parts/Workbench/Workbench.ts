@@ -162,14 +162,21 @@ export const createWithDependencies = (
         await quickPick.type(WellKnownCommands.RemoteSshConnectCurrentWindowToHost)
         await quickPick.pressEnter()
         await quickPick.type(target)
-        try {
-          await quickPick.pressEnter()
-        } catch (error) {
-          if (!isReloadTransitionError(error)) {
-            throw error
-          }
-        }
-        await waitForSshConnection({ page, reconnectDevtools }, dependencies, url)
+        await page.waitForIdle()
+        await quickPick.pressEnter()
+        await page.waitForIdle()
+        // try {
+        await new Promise((r) => {})
+        await quickPick.pressEnter()
+        await page.waitForIdle()
+
+        // TODO
+        // } catch (error) {
+        //   if (!isReloadTransitionError(error)) {
+        //     throw error
+        //   }
+        // }
+        // await waitForSshConnection({ page, reconnectDevtools }, dependencies, url)
       } catch (error) {
         const message = options.url || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`
         throw new VError(error, message)
