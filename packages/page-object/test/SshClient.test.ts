@@ -108,7 +108,9 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     'expect:toBeFocused',
     'select:Linux',
     'waitForIdle',
+    'waitForIdle',
     'expect:toBeVisible:{"timeout":60000}',
+    'waitForIdle',
   ])
 
   dateNowSpy.mockRestore()
