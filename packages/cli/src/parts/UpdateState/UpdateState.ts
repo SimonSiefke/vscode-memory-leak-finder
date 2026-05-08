@@ -54,7 +54,7 @@ export const updateState = async (newState: any): Promise<void> => {
       login: false,
       measure: state.measure,
       measureAfter: state.measureAfter,
-      measureNode: false,
+      measureNode: state.measureNode || false,
       processRootStrategy: state.processRootStrategy,
       openDevtools: state.openDevtools,
       platform: state.platform,
