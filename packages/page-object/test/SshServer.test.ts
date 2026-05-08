@@ -23,7 +23,6 @@ test('launch starts sshd, writes repo-local config, and waits for ssh probe', as
   const calls: string[] = []
   const writtenFiles = new Map<string, string>()
   const rootDir = '/repo'
-  const userDataDir = '/repo/.vscode-user-data-dir'
   const sshDir = '/repo/.vscode-user-data-dir/remote-ssh'
   const clientKeyPath = '/repo/.vscode-user-data-dir/remote-ssh/id_ed25519'
   const sshConfigPath = '/repo/.vscode-user-data-dir/remote-ssh/config'
@@ -71,19 +70,17 @@ test('launch starts sshd, writes repo-local config, and waits for ssh probe', as
         }
         if (command === '/usr/bin/ssh') {
           sshChecks += 1
-          return sshChecks === 1
-            ? { exitCode: 255, stderr: 'connection refused', stdout: '' }
-            : { exitCode: 0, stderr: '', stdout: '' }
+          return sshChecks === 1 ? { exitCode: 255, stderr: 'connection refused', stdout: '' } : { exitCode: 0, stderr: '', stdout: '' }
         }
         throw new Error(`unexpected command: ${command}`)
       },
       sleep: async () => {
         calls.push('sleep')
       },
-      spawnProcess: (command: string, args: readonly string[]) => {
+      spawnProcess: ((command: string, args: readonly string[]) => {
         calls.push(`spawn:${command}:${args.join(' ')}`)
         return childProcess as any
-      },
+      }) as any,
       writeTextFile: async (path: string, content: string) => {
         calls.push(`writeTextFile:${path}`)
         writtenFiles.set(path, content)
@@ -179,7 +176,7 @@ test('launch fails with a helpful error on unsupported platforms', async () => {
       removeDirectory: async () => {},
       runProcess: async () => ({ exitCode: 0, stderr: '', stdout: '' }),
       sleep: async () => {},
-      spawnProcess: () => new MockChildProcess() as any,
+      spawnProcess: (() => new MockChildProcess() as any) as any,
       writeTextFile: async () => {},
     },
   )
@@ -212,7 +209,7 @@ test('launch fails with a helpful error when sshd is missing', async () => {
       removeDirectory: async () => {},
       runProcess: async () => ({ exitCode: 0, stderr: '', stdout: '' }),
       sleep: async () => {},
-      spawnProcess: () => new MockChildProcess() as any,
+      spawnProcess: (() => new MockChildProcess() as any) as any,
       writeTextFile: async () => {},
     },
   )

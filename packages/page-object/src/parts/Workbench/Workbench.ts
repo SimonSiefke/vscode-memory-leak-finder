@@ -3,9 +3,10 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 type ConnectToSshOptions = {
+  readonly alias?: string
   readonly host?: string
   readonly port?: number
-  readonly url?: string
+  readonly user?: string
 }
 
 type QuickPickApi = {
@@ -51,25 +52,14 @@ const isReloadTransitionError = (error: unknown): boolean => {
   )
 }
 
-const resolveSshUrl = ({ host = '127.0.0.1', port, url }: ConnectToSshOptions): string => {
-  if (url) {
-    return url
+const resolveSshTarget = ({ alias, host = '127.0.0.1', port, user }: ConnectToSshOptions): string => {
+  if (alias) {
+    return alias
   }
   if (typeof port === 'number') {
-    return `http://${host}:${port}/`
+    return user ? `${user}@${host}:${port}` : `${host}:${port}`
   }
-  throw new Error(`url or port is required`)
-}
-
-const resolveSshTarget = ({ host = '127.0.0.1', port, url }: ConnectToSshOptions): string => {
-  if (typeof port === 'number') {
-    return `${host}:${port}`
-  }
-  if (url) {
-    const parsedUrl = new URL(url)
-    return parsedUrl.port ? `${parsedUrl.hostname}:${parsedUrl.port}` : parsedUrl.hostname
-  }
-  throw new Error(`url or port is required`)
+  throw new Error(`alias or port is required`)
 }
 
 const sleep = async (milliseconds: number): Promise<void> => {
@@ -87,7 +77,6 @@ const waitForSshConnection = async (
     reconnectDevtools: (() => Promise<void>) | undefined
   },
   dependencies: WorkbenchDependencies,
-  url: string,
 ) => {
   const reconnectPromise = reconnectDevtools
     ? reconnectDevtools().then(
@@ -107,24 +96,19 @@ const waitForSshConnection = async (
   const start = Date.now()
   while (Date.now() - start < 30_000) {
     try {
-      const href = await page.evaluate({
-        expression: `(() => globalThis.location?.href || '')()`,
-        returnByValue: true,
-      })
-      if (String(href).startsWith(url)) {
-        await page.waitForIdle()
-        return
-      }
+      await page.waitForIdle()
+      return
     } catch (error) {
       if (!recoveredFromTransitionError && isReloadTransitionError(error)) {
         const refreshedPage = await page.refresh()
         await page.rebind(refreshedPage)
         recoveredFromTransitionError = true
+        continue
       }
     }
     await dependencies.sleep(250)
   }
-  throw new Error(`Timed out waiting to navigate to ${url}`)
+  throw new Error(`Timed out waiting for Remote - SSH connection to settle`)
 }
 
 export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
@@ -154,7 +138,6 @@ export const createWithDependencies = (
   return {
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {
-        const url = resolveSshUrl(options)
         const target = resolveSshTarget(options)
         const quickPick = dependencies.createQuickPick()
         await page.waitForIdle()
@@ -164,21 +147,10 @@ export const createWithDependencies = (
         await quickPick.type(target)
         await page.waitForIdle()
         await quickPick.pressEnter()
-        await page.waitForIdle()
-        // try {
-        await new Promise((r) => {})
-        await quickPick.pressEnter()
-        await page.waitForIdle()
-
-        // TODO
-        // } catch (error) {
-        //   if (!isReloadTransitionError(error)) {
-        //     throw error
-        //   }
-        // }
-        // await waitForSshConnection({ page, reconnectDevtools }, dependencies, url)
+        await waitForSshConnection({ page, reconnectDevtools }, dependencies)
       } catch (error) {
-        const message = options.url || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`
+        const message =
+          options.alias || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`
         throw new VError(error, message)
       }
     },

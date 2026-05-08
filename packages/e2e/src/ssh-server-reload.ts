@@ -9,12 +9,10 @@ export const setup = async ({ SshServer, Workbench, Extensions, Electron }: Test
     name: 'Remote - SSH',
   })
   const connection = await SshServer.launch()
-  // console.log('did launch')
-  // await Workbench.connectToSsh(connection)
-  await new Promise((r) => {})
+  await Workbench.connectToSsh(connection)
 }
 
-export const run = async ({ Workbench }: TestContext): Promise<void> => {
+export const run = async ({}: TestContext): Promise<void> => {
   // await Workbench.reload()
 }
 

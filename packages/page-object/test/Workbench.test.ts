@@ -61,6 +61,7 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     `type:${WellKnownCommands.RemoteSshConnectCurrentWindowToHost}`,
     'pressEnter',
     'type:local-test',
+    'waitForIdle',
     'pressEnter',
     'refresh',
     'rebind',
