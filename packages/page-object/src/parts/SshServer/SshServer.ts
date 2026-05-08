@@ -61,6 +61,11 @@ const waitForExit = async (childProcess: any, milliseconds: number): Promise<voi
   ])
 }
 
+const isNavigationTransitionError = (error: unknown): boolean => {
+  const message = String(error && (error as Error).message ? (error as Error).message : error)
+  return message.includes('Execution context was destroyed') || message.includes('Cannot find context with specified id') || message.includes('uniqueContextId not found')
+}
+
 export const create = ({ electronApp, page, VError }: CreateParams) => {
   const state: ServerState = {
     output: [],
@@ -109,17 +114,33 @@ export const create = ({ electronApp, page, VError }: CreateParams) => {
     },
     async connect({ url = defaultUrl } = {}): Promise<void> {
       try {
-        await electronApp.evaluate(`(async () => {
-  const { BrowserWindow } = require('electron')
-  const browserWindow = BrowserWindow.getAllWindows()[0]
-  if (!browserWindow) {
-    throw new Error('No browser window found')
-  }
-  await browserWindow.loadURL(${JSON.stringify(url)})
-})()`)
-        const refreshedPage = await page.refresh()
-        await page.rebind(refreshedPage)
-        await page.waitForIdle()
+        await electronApp.loadUrl(url)
+      } catch (error) {
+        if (!isNavigationTransitionError(error)) {
+          throw error
+        }
+      }
+
+      try {
+        const start = Date.now()
+        while (Date.now() - start < 30_000) {
+          try {
+            const refreshedPage = await page.refresh()
+            await page.rebind(refreshedPage)
+            const href = await page.evaluate({
+              expression: `(() => globalThis.location?.href || '')()`,
+              returnByValue: true,
+            })
+            if (String(href).startsWith(url)) {
+              await page.waitForIdle()
+              return
+            }
+          } catch {
+            // Keep polling until the navigation settles.
+          }
+          await sleep(250)
+        }
+        throw new Error(`Timed out waiting to navigate to ${url}`)
       } catch (error) {
         throw new VError(error, `Failed to connect to SSH server ${url}`)
       }
