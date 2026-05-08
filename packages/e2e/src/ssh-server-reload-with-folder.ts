@@ -25,7 +25,6 @@ export const setup = async ({
   await ActivityBar.showExplorer()
   // @ts-ignore
   await SshClient.openFolder(connection)
-  await Explorer.openFolder()
   await SideBar.hide()
   await Panel.hide()
 }
