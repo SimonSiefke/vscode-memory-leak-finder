@@ -262,9 +262,10 @@ export const createWithDependencies = (
       const target = resolveSshTarget(options)
       const quickPick = dependencies.createQuickPick()
       await page.waitForIdle()
-      await quickPick.showCommands({ pressKeyOnce: true })
-      await quickPick.type(WellKnownCommands.RemoteSshConnectCurrentWindowToHost)
-      await quickPick.pressEnter()
+      await quickPick.executeCommand(WellKnownCommands.RemoteSshConnectCurrentWindowToHost, {
+        stayVisible: true,
+        pressKeyOnce: true,
+      })
       await quickPick.type(target)
       await page.waitForIdle()
       await quickPick.pressEnter()
@@ -281,6 +282,8 @@ export const createWithDependencies = (
       try {
         await this.connectToSshPart1(options)
         await this.connectToSshPart2(options)
+        console.log('did reload')
+        await new Promise((r) => {})
         await this.connectToSshPart3(options)
       } catch (error) {
         throw new VError(error, `Failed to connect to ssh server`)
