@@ -32,6 +32,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly inspectSharedProcessPort: number
   readonly measureId: string
   readonly measureNode: boolean
+  readonly processRootStrategy: string
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
@@ -70,6 +71,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectSharedProcessPort,
     measureId,
     measureNode,
+    processRootStrategy,
     openDevtools,
     pageObjectPath,
     platform,
@@ -152,6 +154,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     utilityContext,
     runMode,
     measureNode,
+    processRootStrategy,
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
