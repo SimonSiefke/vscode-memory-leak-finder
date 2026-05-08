@@ -89,6 +89,8 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     'refresh',
     'rebind',
     'waitForIdle',
+    'waitForIdle',
+    'waitForIdle',
   ])
 
   dateNowSpy.mockRestore()

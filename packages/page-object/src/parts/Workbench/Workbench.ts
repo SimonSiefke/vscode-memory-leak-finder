@@ -103,10 +103,7 @@ const isQuickPickVisible = async (page: any): Promise<boolean> => {
   }
 }
 
-const maybeSelectRemoteHostPlatform = async (
-  quickPick: QuickPickApi,
-  platform: string,
-): Promise<boolean> => {
+const maybeSelectRemoteHostPlatform = async (quickPick: QuickPickApi, platform: string): Promise<boolean> => {
   const expectedPlatform = getRemoteHostPlatformLabel(platform)
   const platformOptions = ['Linux', 'Windows', 'macOS']
   const visibleCommands = await getVisibleCommandsIfAny(quickPick)
@@ -144,7 +141,7 @@ const waitForQuickPickToStayHidden = async (
     }
     return false
   }
-  return true
+  throw new Error(`Timed out waiting for Remote - SSH connection to settle`)
 }
 
 const refreshPage = async (page: any): Promise<void> => {
