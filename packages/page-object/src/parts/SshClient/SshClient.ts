@@ -99,7 +99,6 @@ export const createWithDependencies = (
         throw new VError(error, `Failed to connect to ssh server`)
       }
     },
-
     async connectToSshPart2(options: ConnectToSshOptions): Promise<void> {
       try {
         await page.waitForIdle()
