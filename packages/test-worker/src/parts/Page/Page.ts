@@ -117,24 +117,22 @@ export const create = ({
     },
     async waitForRefresh() {
       // TODO find a better way to do this
-      const current = await this.getFrameId()
+      const current = await this.getFrame()
       const maxDelay = 20_000
       const waiIntInterval = 100
       const start = Date.now()
       while (Date.now() - start < maxDelay) {
         await new Promise((r) => setTimeout(r, waiIntInterval))
-        const next = await this.getFrameId()
-
-        console.log({ current, next })
-        if (current !== next) {
+        const next = await this.getFrame()
+        if (current.id !== next.id || current.loaderId !== next.loaderId) {
           return
         }
       }
     },
-    async getFrameId() {
+    async getFrame() {
       const { frameTree } = await DevtoolsProtocolPage.getFrameTree(this.sessionRpc)
       console.log({ frameTree })
-      return frameTree.frame.id
+      return frameTree.frame
     },
     async reload() {
       return PageReload.reload(this.rpc)
