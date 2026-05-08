@@ -15,6 +15,18 @@ type ServerState = {
   signalCode?: NodeJS.Signals | null
 }
 
+type WaitForPortOptions = {
+  readonly host?: string
+  readonly port?: number
+  readonly timeout?: number
+}
+
+type SshServerDependencies = {
+  readonly spawnProcess: typeof spawn
+  readonly isPortOpen: (port: number, host: string) => Promise<boolean>
+  readonly sleep: (milliseconds: number) => Promise<void>
+}
+
 const appendOutput = (state: ServerState, chunk: unknown): void => {
   const text = String(chunk || '')
   if (!text) {
@@ -68,7 +80,35 @@ const isNavigationTransitionError = (error: unknown): boolean => {
   )
 }
 
+const waitForPortInternal = async (
+  state: ServerState,
+  dependencies: SshServerDependencies,
+  { host = defaultHost, port = defaultPort, timeout = defaultTimeout }: WaitForPortOptions = {},
+): Promise<void> => {
+  const start = Date.now()
+  while (Date.now() - start < timeout) {
+    if (await dependencies.isPortOpen(port, host)) {
+      return
+    }
+    if (state.childProcess && state.childProcess.exitCode !== null) {
+      throw new Error(`SSH server exited early with code ${state.childProcess.exitCode}\n${getOutput(state)}`)
+    }
+    if (state.childProcess && state.childProcess.signalCode !== null) {
+      throw new Error(`SSH server exited early with signal ${state.childProcess.signalCode}\n${getOutput(state)}`)
+    }
+    await dependencies.sleep(250)
+  }
+  throw new Error(`Timed out waiting for ${host}:${port} to accept connections\n${getOutput(state)}`)
+}
+
 export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateParams) => {
+  return createWithDependencies({ electronApp, page, reconnectDevtools, VError }, { spawnProcess: spawn, isPortOpen, sleep })
+}
+
+export const createWithDependencies = (
+  { electronApp, page, reconnectDevtools, VError }: Pick<CreateParams, 'electronApp' | 'page' | 'reconnectDevtools' | 'VError'>,
+  dependencies: SshServerDependencies,
+) => {
   const state: ServerState = {
     output: [],
   }
@@ -76,40 +116,27 @@ export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateP
   return {
     async launch(): Promise<void> {
       try {
-        if (state.childProcess && state.childProcess.exitCode === null && state.childProcess.signalCode === null) {
-          return
+        if (!state.childProcess || state.childProcess.exitCode !== null || state.childProcess.signalCode !== null) {
+          const childProcess = dependencies.spawnProcess(defaultScriptPath, ['--without-connection-token'], {
+            detached: true,
+            stdio: ['ignore', 'pipe', 'pipe'],
+          })
+          state.childProcess = childProcess
+          childProcess.stdout.on('data', (chunk: unknown) => appendOutput(state, chunk))
+          childProcess.stderr.on('data', (chunk: unknown) => appendOutput(state, chunk))
+          childProcess.once('exit', (exitCode: number | null, signalCode: NodeJS.Signals | null) => {
+            state.exitCode = exitCode
+            state.signalCode = signalCode
+          })
         }
-        const childProcess = spawn(defaultScriptPath, ['--without-connection-token'], {
-          detached: true,
-          stdio: ['ignore', 'pipe', 'pipe'],
-        })
-        state.childProcess = childProcess
-        childProcess.stdout.on('data', (chunk: unknown) => appendOutput(state, chunk))
-        childProcess.stderr.on('data', (chunk: unknown) => appendOutput(state, chunk))
-        childProcess.once('exit', (exitCode: number | null, signalCode: NodeJS.Signals | null) => {
-          state.exitCode = exitCode
-          state.signalCode = signalCode
-        })
+        await waitForPortInternal(state, dependencies)
       } catch (error) {
         throw new VError(error, `Failed to launch SSH server`)
       }
     },
     async waitForPort({ host = defaultHost, port = defaultPort, timeout = defaultTimeout } = {}): Promise<void> {
       try {
-        const start = Date.now()
-        while (Date.now() - start < timeout) {
-          if (await isPortOpen(port, host)) {
-            return
-          }
-          if (state.childProcess && state.childProcess.exitCode !== null) {
-            throw new Error(`SSH server exited early with code ${state.childProcess.exitCode}\n${getOutput(state)}`)
-          }
-          if (state.childProcess && state.childProcess.signalCode !== null) {
-            throw new Error(`SSH server exited early with signal ${state.childProcess.signalCode}\n${getOutput(state)}`)
-          }
-          await sleep(250)
-        }
-        throw new Error(`Timed out waiting for ${host}:${port} to accept connections\n${getOutput(state)}`)
+        await waitForPortInternal(state, dependencies, { host, port, timeout })
       } catch (error) {
         throw new VError(error, `Failed to wait for SSH server port ${host}:${port}`)
       }
