@@ -91,7 +91,7 @@ export const setup = async ({
   await SideBar.hide()
 }
 
-export const run = async ({ SshClient, Explorer, Editor, SideBar, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ SshClient, Explorer, Editor, Workspace }: TestContext): Promise<void> => {
   const uuid = crypto.randomUUID()
   // @ts-ignore
   await SshClient.openFolder({
@@ -110,7 +110,6 @@ export const run = async ({ SshClient, Explorer, Editor, SideBar, Workspace }: T
   await Explorer.selectItem('error.ts')
   await Editor.shouldHaveText(`let x:string = 1`)
   await Editor.shouldHaveSquigglyError()
-  await SideBar.hide()
 }
 
 export const teardown = async ({ SshServer }: TestContext): Promise<void> => {
