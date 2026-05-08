@@ -273,14 +273,14 @@ export const createWithDependencies = (
     async connectToSshPart2(options: ConnectToSshOptions): Promise<void> {
       const refreshedPage = await page.refresh()
       await page.rebind(refreshedPage)
-      console.log('did dbing')
+      return refreshedPage
     },
-    async connectToSshPart3(options: ConnectToSshOptions): Promise<void> {
-      const statusBarItem = page.locator('.statusbar-item-label[aria-label="Opening Remote..."]')
-      await page.waitForIdle()
+    async connectToSshPart3(options: ConnectToSshOptions, page2: any): Promise<void> {
+      const statusBarItem = page2.locator('.statusbar-item-label[aria-label="Opening Remote..."]')
+      await page2.waitForIdle()
       await expect(statusBarItem).toBeVisible()
-      await page.waitForIdle()
-      const input = page.locator(`[aria-label="Select the platform of the remote host 'local-test'"]`)
+      await page2.waitForIdle()
+      const input = page2.locator(`[aria-label="Select the platform of the remote host 'local-test'"]`)
       await expect(input).toBeVisible()
       await expect(input).toBeFocused()
       console.log('input...')
@@ -294,8 +294,8 @@ export const createWithDependencies = (
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {
         await this.connectToSshPart1(options)
-        await this.connectToSshPart2(options)
-        await this.connectToSshPart3(options)
+        const page2 = await this.connectToSshPart2(options)
+        await this.connectToSshPart3(options, page2)
       } catch (error) {
         throw new VError(error, `Failed to connect to ssh server`)
       }
