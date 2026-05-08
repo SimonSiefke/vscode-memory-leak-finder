@@ -131,7 +131,6 @@ export const create = ({
     },
     async getFrame() {
       const { frameTree } = await DevtoolsProtocolPage.getFrameTree(this.sessionRpc)
-      console.log({ frameTree })
       return frameTree.frame
     },
     async reload() {
