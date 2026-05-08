@@ -66,6 +66,7 @@ export const setup = async ({
   ActivityBar,
   Workspace,
   Editor,
+  Explorer,
 }: TestContext): Promise<void> => {
   await Workspace.setFiles(initialFiles)
   await Electron.mockOpenDialog({
@@ -82,6 +83,9 @@ export const setup = async ({
   await ActivityBar.showExplorer()
   // @ts-ignore
   await SshClient.openFolder(connection)
+  await Explorer.refresh()
+  await Explorer.shouldHaveItem('error.ts')
+  await Explorer.selectItem('error.ts')
   await Editor.open('error.ts')
   await SideBar.hide()
   await Panel.hide()
