@@ -120,6 +120,14 @@ export const createWithDependencies = (
         stayVisible: true,
         pressKeyOnce: true,
       })
+      for (let attempt = 0; attempt < 10; attempt++) {
+        try {
+          await quickPick.select(new RegExp(target))
+          return
+        } catch {
+          await dependencies.sleep(1000)
+        }
+      }
       await quickPick.type(target)
       await page.waitForIdle()
       await quickPick.pressEnter()

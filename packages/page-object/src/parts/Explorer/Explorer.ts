@@ -283,13 +283,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async openFolder() {
       try {
         await page.waitForIdle()
-        const explorerView = page.locator('.explorer-folders-view')
-        await expect(explorerView).toBeVisible()
-        const openFolderButton = explorerView.locator('[role="button"], .monaco-button', {
-          hasText: /^Open Folder(?:\.\.\.|…)?$/,
+        const sideBar = page.locator('.sidebar')
+        await expect(sideBar).toBeVisible()
+        const openFolderButton = sideBar.locator('[role="button"], .monaco-button, a', {
+          hasText: 'Open Folder',
         })
         await expect(openFolderButton).toBeVisible({ timeout: 10_000 })
-        await openFolderButton.click()
+        await openFolderButton.first().click()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open folder from explorer`)
