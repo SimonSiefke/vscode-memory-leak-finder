@@ -116,12 +116,13 @@ export const connectDevtools = async (
     ideVersion: parsedIdeVersion,
     page: undefined,
     platform,
+    reconnectDevtools: undefined,
     sessionRpc,
     utilityContext: createUtilityContext(sessionRpc, utilityContext),
     VError,
   }
 
-  const livePage = LivePage.create({
+  const livePage: any = LivePage.create({
     onRebind: async (nextPage) => {
       pageObjectContext.defaultContext = createDefaultContext(nextPage.sessionRpc, nextPage.utilityContext)
       pageObjectContext.page = livePage
@@ -141,6 +142,28 @@ export const connectDevtools = async (
     sessionRpc,
   })
   pageObjectContext.electronApp = electronApp
+  pageObjectContext.reconnectDevtools = async () => {
+    const reconnectTimeout = Math.min(attachedToPageTimeout, 5_000)
+    const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, reconnectTimeout)
+    const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
+    const utilityContext = await addUtilityExecutionContext(sessionRpc, utilityExecutionContextName, frameTree.frame.id)
+    const nextPage = Page.create({
+      browserRpc,
+      electronObjectId,
+      electronRpc,
+      idleTimeout,
+      rpc: sessionRpc,
+      sessionId,
+      sessionRpc,
+      targetId,
+      utilityContext,
+    })
+    await livePage.rebind(nextPage)
+    electronApp.rebind({
+      firstWindow: livePage,
+      sessionRpc,
+    })
+  }
 
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)
   const pageObject = await pageObjectModule.create(pageObjectContext)

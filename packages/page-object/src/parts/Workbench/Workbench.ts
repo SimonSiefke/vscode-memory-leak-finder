@@ -24,7 +24,16 @@ const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: strin
   }
 }
 
-export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
+const isReloadTransitionError = (error: unknown): boolean => {
+  const message = String((error as any)?.message || error || '')
+  return (
+    message.includes('Execution context was destroyed') ||
+    message.includes('uniqueContextId not found') ||
+    message.includes('Cannot find context with specified id')
+  )
+}
+
+export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
   return {
     async waitForNewWindow({ timeout }: { timeout: number }) {
       const { promise, resolve } = Promise.withResolvers<string>()
@@ -124,9 +133,56 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
     async reload(): Promise<void> {
       try {
         await page.waitForIdle()
-        await page.reload()
-        const refreshedPage = await page.refresh()
-        await page.rebind(refreshedPage)
+
+        const reconnectPromise = reconnectDevtools
+          ? reconnectDevtools().then(
+              () => true,
+              () => false,
+            )
+          : undefined
+        const commandResult = await page.evaluate({
+          expression: `(() => {
+  const commandId = 'workbench.action.reloadWindow'
+  const candidates = [
+    globalThis.workbench?.commands,
+    globalThis.vscode?.commands,
+    globalThis.monaco?.commands,
+    globalThis.mainWindow?.commands,
+  ]
+  for (const commands of candidates) {
+    if (commands && typeof commands.executeCommand === 'function') {
+      commands.executeCommand(commandId)
+      return true
+    }
+  }
+  return false
+})()`,
+          returnByValue: true,
+        })
+
+        if (!commandResult) {
+          const quickPick = QuickPick.create({
+            electronApp,
+            expect,
+            ideVersion,
+            page,
+            platform,
+            VError,
+          })
+          try {
+            await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
+          } catch (error) {
+            if (!isReloadTransitionError(error)) {
+              throw error
+            }
+          }
+        }
+
+        const reconnected = reconnectPromise ? await reconnectPromise : false
+        if (!reconnected) {
+          const refreshedPage = await page.refresh()
+          await page.rebind(refreshedPage)
+        }
 
         try {
           await page.waitForIdle()

@@ -37,6 +37,7 @@ const getMatchingContext = (contexts: Record<string, any>, utilityExecutionConte
 
 export const addUtilityExecutionContext = async (rpc, utilityExecutionContextName, frameId) => {
   const contexts = Object.create(null)
+  const utilityScript = await UtilityScript.getUtilityScript()
 
   const executionContextPromise = waitForUtilityExecutionContext(rpc, utilityExecutionContextName, contexts)
 
@@ -54,6 +55,11 @@ export const addUtilityExecutionContext = async (rpc, utilityExecutionContextNam
     worldName: utilityExecutionContextName,
   })
 
+  await DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(rpc, {
+    source: utilityScript,
+    worldName: utilityExecutionContextName,
+  })
+
   const createdExecutionContext = await waitForContextWithTimeout(executionContextPromise, 5000)
   const utilityContext =
     createdExecutionContext ||
@@ -65,7 +71,6 @@ export const addUtilityExecutionContext = async (rpc, utilityExecutionContextNam
       : await executionContextPromise)
   await DevtoolsProtocolRuntime.disable(rpc)
 
-  const utilityScript = await UtilityScript.getUtilityScript()
   await DevtoolsProtocolRuntime.evaluate(rpc, {
     expression: utilityScript,
     ...getEvaluateContextOptions(utilityContext),

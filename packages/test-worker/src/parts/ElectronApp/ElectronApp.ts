@@ -5,6 +5,9 @@ import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
 import * as WaitForPage from '../WaitForIframe/WaitForIframe.ts'
 
 export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow, idleTimeout, sessionRpc }) => {
+  let currentFirstWindow = firstWindow
+  let currentSessionRpc = sessionRpc
+
   return {
     electronObjectId,
     evaluate(expression) {
@@ -14,9 +17,13 @@ export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow,
       })
     },
     firstWindow() {
-      return firstWindow
+      return currentFirstWindow
     },
     objectType: ObjectType.ElectronApp,
+    rebind({ firstWindow, sessionRpc }) {
+      currentFirstWindow = firstWindow
+      currentSessionRpc = sessionRpc
+    },
     rpc: electronRpc,
     waitForIframe({ injectUtilityScript = true, url }) {
       return WaitForIframe.waitForIframe({
@@ -26,7 +33,7 @@ export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow,
         electronRpc,
         idleTimeout,
         injectUtilityScript,
-        sessionRpc,
+        sessionRpc: currentSessionRpc,
         url,
       })
     },
