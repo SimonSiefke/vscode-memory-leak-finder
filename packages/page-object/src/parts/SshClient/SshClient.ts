@@ -147,6 +147,10 @@ export const createWithDependencies = (
         await page.waitForIdle()
         await input.type(folderPath)
         await page.waitForIdle()
+        await input.clear()
+        await page.waitForIdle()
+        await input.type(folderPath)
+        await page.waitForIdle()
         const okButton = page.locator('.quick-input-action .monaco-button.monaco-text-button', {
           hasText: 'OK',
         })
