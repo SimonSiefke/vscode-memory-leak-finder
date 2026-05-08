@@ -53,14 +53,14 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     },
   )
 
-  await workbench.connectToSsh({ port: 9888 })
+  await workbench.connectToSsh({ alias: 'local-test' })
 
   expect(calls).toEqual([
     'waitForIdle',
     'showCommands:{"pressKeyOnce":true}',
     `type:${WellKnownCommands.RemoteSshConnectCurrentWindowToHost}`,
     'pressEnter',
-    'type:127.0.0.1:9888',
+    'type:local-test',
     'pressEnter',
     'refresh',
     'rebind',
