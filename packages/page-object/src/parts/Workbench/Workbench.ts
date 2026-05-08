@@ -299,86 +299,24 @@ export const createWithDependencies = (
       try {
         await page.waitForIdle()
 
-        const reconnectPromise = reconnectDevtools
-          ? reconnectDevtools().then(
-              () => true,
-              () => false,
-            )
-          : undefined
-        let reloadTriggered = false
-        try {
-          const commandResult = await page.evaluate({
-            expression: `(() => {
-  const commandId = 'workbench.action.reloadWindow'
-  const candidates = [
-    globalThis.workbench?.commands,
-    globalThis.vscode?.commands,
-    globalThis.monaco?.commands,
-    globalThis.mainWindow?.commands,
-  ]
-  for (const commands of candidates) {
-    if (commands && typeof commands.executeCommand === 'function') {
-      commands.executeCommand(commandId)
-      return { ok: true, strategy: 'command' }
-    }
-  }
-  if (globalThis.location && typeof globalThis.location.reload === 'function') {
-    globalThis.location.reload()
-    return { ok: true, strategy: 'location' }
-  }
-  return { ok: false, strategy: 'none' }
-})()`,
-            returnByValue: true,
-          })
-          reloadTriggered = !!commandResult?.ok
-        } catch (error) {
-          if (isReloadTransitionError(error)) {
-            reloadTriggered = true
-          } else {
-            throw error
-          }
-        }
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
 
-        if (!reloadTriggered) {
-          const quickPick = QuickPick.create({
-            electronApp,
-            expect,
-            ideVersion,
-            page,
-            platform,
-            VError,
-          })
-          try {
-            await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
-          } catch (error) {
-            if (!isReloadTransitionError(error)) {
-              throw error
-            }
-          }
-        }
-
-        const reconnected = reconnectPromise ? await reconnectPromise : false
-        if (!reconnected) {
-          const refreshedPage = await page.refresh()
-          await page.rebind(refreshedPage)
-        }
-
+        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
         try {
           await page.waitForIdle()
         } catch {
           // The renderer can be in flux immediately after reload. Visibility check below is the real readiness gate.
         }
-        try {
-          await this.shouldBeVisible()
-        } catch (error) {
-          const href = await page.evaluate({
-            expression: `(() => globalThis.location?.href || '')()`,
-            returnByValue: true,
-          })
-          if (!String(href).startsWith('http://') && !String(href).startsWith('https://')) {
-            throw error
-          }
-        }
+        await this.shouldBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to reload window`)
       }
