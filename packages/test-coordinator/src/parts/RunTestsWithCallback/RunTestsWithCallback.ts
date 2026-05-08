@@ -290,6 +290,7 @@ export const runTestsWithCallback = async ({
             inspectSharedProcessPort,
             measureId: measure,
             measureNode,
+            processRootStrategy,
             openDevtools,
             pageObjectPath: pageObjectPathResolved,
             platform,

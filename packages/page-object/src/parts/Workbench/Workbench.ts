@@ -58,6 +58,10 @@ const resolveSshTarget = ({ alias, host = '127.0.0.1', port, user }: ConnectToSs
   throw new Error(`alias or port is required`)
 }
 
+const getSshStatusBarSelector = (target: string): string => {
+  return `.statusbar-item-label[aria-label*="SSH: ${target}"]`
+}
+
 const sleep = async (milliseconds: number): Promise<void> => {
   const { promise, resolve } = Promise.withResolvers<void>()
   setTimeout(resolve, milliseconds)
@@ -88,6 +92,21 @@ export const createWithDependencies = (
   { browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams,
   dependencies: WorkbenchDependencies,
 ) => {
+  const selectRemoteHostPlatform = async (): Promise<void> => {
+    const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
+    for (let attempt = 0; attempt < 10; attempt++) {
+      if (await input.isVisible()) {
+        await expect(input).toBeVisible()
+        await expect(input).toBeFocused()
+        const quickPick = dependencies.createQuickPick()
+        await quickPick.select('Linux')
+        await page.waitForIdle()
+        return
+      }
+      await dependencies.sleep(1000)
+    }
+  }
+
   return {
     async connectToSshPart1(options: ConnectToSshOptions): Promise<void> {
       const target = resolveSshTarget(options)
@@ -111,15 +130,10 @@ export const createWithDependencies = (
       await page.rebind(refreshedPage)
       return refreshedPage
     },
-    async connectToSshPart3(_options: ConnectToSshOptions): Promise<void> {
-      // await page.waitForIdle()
-      // const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
-      // await expect(input).toBeVisible()
-      // await expect(input).toBeFocused()
-      // const quickPick = dependencies.createQuickPick()
-      // await quickPick.select('Linux') // TODO choose users platform
+    async connectToSshPart3(options: ConnectToSshOptions): Promise<void> {
+      await selectRemoteHostPlatform()
       await page.waitForIdle()
-      const statusBarItemFinished = page.locator('.statusbar-item-label[aria-label="remote  SSH: local-test"]')
+      const statusBarItemFinished = page.locator(getSshStatusBarSelector(resolveSshTarget(options)))
       await expect(statusBarItemFinished).toBeVisible({ timeout: 60_000 })
     },
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
@@ -246,7 +260,7 @@ export const createWithDependencies = (
 
         if (isSsh) {
           await page.waitForIdle()
-          const statusBarItemFinished = page.locator('.statusbar-item-label[aria-label="remote  SSH: local-test"]')
+          const statusBarItemFinished = page.locator(getSshStatusBarSelector('local-test'))
           await expect(statusBarItemFinished).toBeVisible({ timeout: 60_000 })
           await page.waitForIdle()
         }

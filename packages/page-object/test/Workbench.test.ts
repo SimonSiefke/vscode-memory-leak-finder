@@ -101,7 +101,6 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     'pressEnter',
     'refresh',
     'rebind',
-    'waitForIdle',
     'expect:toBeVisible:undefined',
     'expect:toBeFocused',
     'select:Linux',
@@ -269,8 +268,11 @@ test('reload waits for refresh before rebinding the page', async () => {
     'waitForRefresh',
     'refresh',
     'rebind:true',
+    'waitForIdle',
     'locator:.monaco-workbench',
     'expect:workbench',
     'toBeVisible',
+    'waitForIdle',
+    'waitForIdle',
   ])
 })
