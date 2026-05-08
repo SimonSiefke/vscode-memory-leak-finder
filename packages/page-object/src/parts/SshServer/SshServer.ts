@@ -1,6 +1,8 @@
 import { spawn } from 'node:child_process'
 import { createConnection } from 'node:net'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const defaultHost = '127.0.0.1'
 const defaultPort = 9888
@@ -22,6 +24,11 @@ type WaitForPortOptions = {
 }
 
 type SshServerDependencies = {
+  readonly createQuickPick: () => {
+    executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
+    pressEnter: () => Promise<void>
+    type: (value: string) => Promise<void>
+  }
   readonly spawnProcess: typeof spawn
   readonly isPortOpen: (port: number, host: string) => Promise<boolean>
   readonly sleep: (milliseconds: number) => Promise<void>
@@ -29,7 +36,10 @@ type SshServerDependencies = {
 
 type SshServerCreateParams = {
   readonly electronApp: any
+  readonly expect?: any
+  readonly ideVersion?: CreateParams['ideVersion']
   readonly page: any
+  readonly platform?: string
   readonly reconnectDevtools?: () => Promise<void>
   readonly VError: any
 }
@@ -108,18 +118,66 @@ const waitForPortInternal = async (
   throw new Error(`Timed out waiting for ${host}:${port} to accept connections\n${getOutput(state)}`)
 }
 
-export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateParams) => {
-  return createWithDependencies(reconnectDevtools ? { electronApp, page, reconnectDevtools, VError } : { electronApp, page, VError }, {
-    spawnProcess: spawn,
-    isPortOpen,
-    sleep,
-  })
+const waitForConnection = async (
+  page: any,
+  dependencies: SshServerDependencies,
+  url: string,
+  reconnectPromise?: Promise<boolean>,
+): Promise<void> => {
+  const reconnected = reconnectPromise ? await reconnectPromise : false
+  let recoveredFromTransitionError = false
+
+  if (!reconnected) {
+    const refreshedPage = await page.refresh()
+    await page.rebind(refreshedPage)
+  }
+
+  const start = Date.now()
+  while (Date.now() - start < 30_000) {
+    try {
+      const href = await page.evaluate({
+        expression: `(() => globalThis.location?.href || '')()`,
+        returnByValue: true,
+      })
+      if (String(href).startsWith(url)) {
+        await page.waitForIdle()
+        return
+      }
+    } catch (error) {
+      if (!recoveredFromTransitionError && isNavigationTransitionError(error)) {
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
+        recoveredFromTransitionError = true
+      }
+    }
+    await dependencies.sleep(250)
+  }
+  throw new Error(`Timed out waiting to navigate to ${url}`)
 }
 
-export const createWithDependencies = (
-  { electronApp, page, reconnectDevtools, VError }: SshServerCreateParams,
-  dependencies: SshServerDependencies,
-) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }: CreateParams) => {
+  return createWithDependencies(
+    reconnectDevtools
+      ? { electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }
+      : { electronApp, expect, ideVersion, page, platform, VError },
+    {
+      createQuickPick: () =>
+        QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        }),
+      spawnProcess: spawn,
+      isPortOpen,
+      sleep,
+    },
+  )
+}
+
+export const createWithDependencies = ({ page, reconnectDevtools, VError }: SshServerCreateParams, dependencies: SshServerDependencies) => {
   const state: ServerState = {
     output: [],
   }
@@ -154,6 +212,7 @@ export const createWithDependencies = (
     },
     async connect({ url = defaultUrl } = {}): Promise<void> {
       try {
+        const quickPick = dependencies.createQuickPick()
         const reconnectPromise = reconnectDevtools
           ? reconnectDevtools().then(
               () => true,
@@ -161,52 +220,19 @@ export const createWithDependencies = (
             )
           : undefined
 
+        await page.waitForIdle()
+        await quickPick.executeCommand(WellKnownCommands.RemoteSshConnectCurrentWindowToHost, {
+          stayVisible: true,
+        })
+        await quickPick.type(url)
         try {
-          await electronApp.evaluate(`(() => {
-  const electron = globalThis._____electron
-  const { BrowserWindow } = electron
-  const browserWindow = BrowserWindow.getAllWindows()[0]
-  if (!browserWindow) {
-    throw new Error('no browser window found')
-  }
-  browserWindow.loadURL(${JSON.stringify(url)})
-  return true
-})()`)
+          await quickPick.pressEnter()
         } catch (error) {
           if (!isNavigationTransitionError(error)) {
             throw error
           }
         }
-
-        const reconnected = reconnectPromise ? await reconnectPromise : false
-        let recoveredFromTransitionError = false
-
-        if (!reconnected) {
-          const refreshedPage = await page.refresh()
-          await page.rebind(refreshedPage)
-        }
-
-        const start = Date.now()
-        while (Date.now() - start < 30_000) {
-          try {
-            const href = await page.evaluate({
-              expression: `(() => globalThis.location?.href || '')()`,
-              returnByValue: true,
-            })
-            if (String(href).startsWith(url)) {
-              await page.waitForIdle()
-              return
-            }
-          } catch (error) {
-            if (!recoveredFromTransitionError && isNavigationTransitionError(error)) {
-              const refreshedPage = await page.refresh()
-              await page.rebind(refreshedPage)
-              recoveredFromTransitionError = true
-            }
-          }
-          await sleep(250)
-        }
-        throw new Error(`Timed out waiting to navigate to ${url}`)
+        await waitForConnection(page, dependencies, url, reconnectPromise)
       } catch (error) {
         throw new VError(error, `Failed to connect to SSH server ${url}`)
       }
