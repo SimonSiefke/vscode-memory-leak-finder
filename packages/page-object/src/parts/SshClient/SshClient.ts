@@ -89,6 +89,7 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
           }
         }
         await refreshPromise
+        await page.refresh()
       } catch (error) {
         throw new VError(error, `Failed to connect to ssh server`)
       }
