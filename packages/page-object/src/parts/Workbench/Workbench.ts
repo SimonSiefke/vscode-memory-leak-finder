@@ -28,8 +28,10 @@ type WorkbenchDependencies = {
 
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
+  readonly openFolderFromExplorer: () => Promise<void>
   readonly sessionRpc?: any
   readonly locator?: (selector: string) => any
+  readonly shouldHaveExplorerItem: (direntName: string) => Promise<void>
   readonly waitForIdle: () => Promise<void>
   readonly shouldBeVisible: () => Promise<void>
 }
@@ -230,7 +232,45 @@ export const createWithDependencies = (
             }
           },
           locator: (selector: string) => newWindowPage.locator(selector),
+          async openFolderFromExplorer() {
+            try {
+              await newWindowPage.waitForIdle()
+              const quickPick = QuickPick.create({
+                electronApp,
+                expect,
+                ideVersion,
+                page: newWindowPage,
+                platform,
+                VError,
+              })
+              await quickPick.executeCommand(WellKnownCommands.FocusExplorer)
+              await newWindowPage.waitForIdle()
+              const sideBar = newWindowPage.locator('.sidebar')
+              await expect(sideBar).toBeVisible()
+              const openFolderButton = sideBar.locator('[role="button"], .monaco-button', {
+                hasText: /^Open Folder(?:\.\.\.|…)?$/,
+              })
+              await expect(openFolderButton).toBeVisible({ timeout: 10_000 })
+              await openFolderButton.click()
+              await newWindowPage.waitForIdle()
+            } catch (error) {
+              throw new VError(error, `Failed to open folder from explorer in new window`)
+            }
+          },
           sessionRpc: newWindowPage.sessionRpc,
+          async shouldHaveExplorerItem(direntName: string) {
+            try {
+              await newWindowPage.waitForIdle()
+              const explorer = newWindowPage.locator('.explorer-folders-view .monaco-list')
+              const dirent = explorer.locator('.monaco-list-row', {
+                hasText: direntName,
+              })
+              await expect(dirent).toBeVisible({ timeout: 10_000 })
+              await newWindowPage.waitForIdle()
+            } catch (error) {
+              throw new VError(error, `Failed to verify explorer item "${direntName}" in new window`)
+            }
+          },
           waitForIdle: () => newWindowPage.waitForIdle(),
           async shouldBeVisible() {
             await newWindowPage.waitForIdle()
