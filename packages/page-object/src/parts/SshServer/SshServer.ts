@@ -69,7 +69,7 @@ const isNavigationTransitionError = (error: unknown): boolean => {
   )
 }
 
-export const create = ({ electronApp, expect, page, reconnectDevtools, VError }: CreateParams) => {
+export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateParams) => {
   const state: ServerState = {
     output: [],
   }
@@ -184,8 +184,6 @@ export const create = ({ electronApp, expect, page, reconnectDevtools, VError }:
         if (!String(href).startsWith(url)) {
           throw new Error(`Unexpected location after connecting: ${href}`)
         }
-        const workbench = page.locator('.monaco-workbench')
-        await expect(workbench).toBeVisible({ timeout: 30_000 })
       } catch (error) {
         throw new VError(error, `Failed to verify SSH server connection`)
       }

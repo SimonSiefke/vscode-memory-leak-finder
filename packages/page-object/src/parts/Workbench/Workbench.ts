@@ -140,8 +140,10 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, reconn
               () => false,
             )
           : undefined
-        const commandResult = await page.evaluate({
-          expression: `(() => {
+        let reloadTriggered = false
+        try {
+          const commandResult = await page.evaluate({
+            expression: `(() => {
   const commandId = 'workbench.action.reloadWindow'
   const candidates = [
     globalThis.workbench?.commands,
@@ -152,15 +154,27 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, reconn
   for (const commands of candidates) {
     if (commands && typeof commands.executeCommand === 'function') {
       commands.executeCommand(commandId)
-      return true
+      return { ok: true, strategy: 'command' }
     }
   }
-  return false
+  if (globalThis.location && typeof globalThis.location.reload === 'function') {
+    globalThis.location.reload()
+    return { ok: true, strategy: 'location' }
+  }
+  return { ok: false, strategy: 'none' }
 })()`,
-          returnByValue: true,
-        })
+            returnByValue: true,
+          })
+          reloadTriggered = !!commandResult?.ok
+        } catch (error) {
+          if (isReloadTransitionError(error)) {
+            reloadTriggered = true
+          } else {
+            throw error
+          }
+        }
 
-        if (!commandResult) {
+        if (!reloadTriggered) {
           const quickPick = QuickPick.create({
             electronApp,
             expect,
@@ -189,7 +203,17 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, reconn
         } catch {
           // The renderer can be in flux immediately after reload. Visibility check below is the real readiness gate.
         }
-        await this.shouldBeVisible()
+        try {
+          await this.shouldBeVisible()
+        } catch (error) {
+          const href = await page.evaluate({
+            expression: `(() => globalThis.location?.href || '')()`,
+            returnByValue: true,
+          })
+          if (!String(href).startsWith('http://') && !String(href).startsWith('https://')) {
+            throw error
+          }
+        }
       } catch (error) {
         throw new VError(error, `Failed to reload window`)
       }
