@@ -141,7 +141,7 @@ const waitForQuickPickToStayHidden = async (
     }
     return false
   }
-  throw new Error(`Timed out waiting for Remote - SSH connection to settle`)
+  return true
 }
 
 const refreshPage = async (page: any): Promise<void> => {
@@ -217,7 +217,7 @@ const waitForSshConnection = async (
     }
     await dependencies.sleep(250)
   }
-  return true
+  throw new Error(`Timed out waiting for Remote - SSH connection to settle`)
 }
 
 export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
