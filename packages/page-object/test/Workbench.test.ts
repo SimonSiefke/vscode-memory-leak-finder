@@ -12,36 +12,10 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
   const calls: string[] = []
   let now = 0
   let platformSelected = false
-  let connected = false
   const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
   const page = {
     evaluate: async () => 'http://127.0.0.1:9888/',
-    locator: (selector: string) => {
-      if (selector === '.part.statusbar .left-items .statusbar-item') {
-        return {
-          count: async () => {
-            calls.push('statusBarCount')
-            return connected ? 1 : 0
-          },
-          nth: () => ({
-            getAttribute: async (name: string) => {
-              if (name === 'aria-label') {
-                calls.push('statusBarAriaLabel')
-                return connected ? 'SSH: local-test' : ''
-              }
-              return ''
-            },
-            isVisible: async () => {
-              calls.push('statusBarVisible')
-              return connected
-            },
-            textContent: async () => {
-              calls.push('statusBarText')
-              return connected ? 'SSH: local-test' : ''
-            },
-          }),
-        }
-      }
+    locator: () => {
       return {
         isVisible: async () => !platformSelected,
       }
@@ -53,14 +27,17 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
       calls.push('refresh')
       return page
     },
+    waitForRefresh: async () => {
+      calls.push('waitForRefresh')
+    },
     waitForIdle: async () => {
       calls.push('waitForIdle')
     },
   }
 
   const quickPick = {
-    executeCommand: async () => {
-      throw new Error('executeCommand should not be used for SSH connect')
+    executeCommand: async (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => {
+      calls.push(`executeCommand:${command}:${JSON.stringify(options)}`)
     },
     getVisibleCommands: async () => {
       calls.push('getVisibleCommands')
@@ -74,7 +51,6 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     },
     select: async (value: string | RegExp) => {
       platformSelected = true
-      connected = true
       calls.push(`select:${value}`)
     },
     showCommands: async (options?: { pressKeyOnce?: boolean }) => {
@@ -89,7 +65,15 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     {
       browserRpc: undefined,
       electronApp: {},
-      expect: {},
+      expect: () => ({
+        toBeFocused: async () => {
+          calls.push('expect:toBeFocused')
+        },
+        toBeHidden: async () => undefined,
+        toBeVisible: async (options?: { timeout?: number }) => {
+          calls.push(`expect:toBeVisible:${JSON.stringify(options)}`)
+        },
+      }),
       ideVersion: { major: 1, minor: 0, patch: 0 },
       page,
       platform: 'linux',
@@ -106,22 +90,23 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
   await workbench.connectToSsh({ alias: 'local-test' })
 
   expect(calls).toEqual([
+    'waitForRefresh',
     'waitForIdle',
-    'showCommands:{"pressKeyOnce":true}',
-    `type:${WellKnownCommands.RemoteSshConnectCurrentWindowToHost}`,
-    'pressEnter',
+    `executeCommand:${WellKnownCommands.RemoteSshConnectCurrentWindowToHost}:${JSON.stringify({
+      stayVisible: true,
+      pressKeyOnce: true,
+    })}`,
     'type:local-test',
     'waitForIdle',
     'pressEnter',
     'refresh',
     'rebind',
-    'getVisibleCommands',
+    'waitForIdle',
+    'expect:toBeVisible:undefined',
+    'expect:toBeFocused',
     'select:Linux',
     'waitForIdle',
-    'statusBarCount',
-    'statusBarVisible',
-    'statusBarText',
-    'statusBarAriaLabel',
+    'expect:toBeVisible:{"timeout":60000}',
   ])
 
   dateNowSpy.mockRestore()
@@ -131,26 +116,10 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
   const calls: string[] = []
   let now = 0
   let selected = false
-  let connected = false
   const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
 
   const page = {
-    locator: (selector: string) => {
-      if (selector === '.part.statusbar .left-items .statusbar-item') {
-        return {
-          count: async () => (connected ? 1 : 0),
-          nth: () => ({
-            getAttribute: async (name: string) => {
-              if (name === 'aria-label') {
-                return connected ? 'SSH: local-test' : ''
-              }
-              return ''
-            },
-            isVisible: async () => connected,
-            textContent: async () => (connected ? 'SSH: local-test' : ''),
-          }),
-        }
-      }
+    locator: () => {
       return {
         isVisible: async () => now >= 6_000 && !selected,
       }
@@ -158,6 +127,9 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
     refresh: async () => {
       calls.push('refresh')
       return page
+    },
+    waitForRefresh: async () => {
+      calls.push('waitForRefresh')
     },
     rebind: async () => {
       calls.push('rebind')
@@ -168,8 +140,8 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
   }
 
   const quickPick = {
-    executeCommand: async () => {
-      throw new Error('executeCommand should not be used for SSH connect')
+    executeCommand: async (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => {
+      calls.push(`executeCommand:${command}:${JSON.stringify(options)}`)
     },
     getVisibleCommands: async () => {
       calls.push('getVisibleCommands')
@@ -183,7 +155,6 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
     },
     select: async (value: string | RegExp) => {
       selected = true
-      connected = true
       calls.push(`select:${value}`)
     },
     showCommands: async (options?: { pressKeyOnce?: boolean }) => {
@@ -198,7 +169,11 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
     {
       browserRpc: undefined,
       electronApp: {},
-      expect: {},
+      expect: () => ({
+        toBeFocused: async () => undefined,
+        toBeHidden: async () => undefined,
+        toBeVisible: async () => undefined,
+      }),
       ideVersion: { major: 1, minor: 0, patch: 0 },
       page,
       platform: 'linux',
@@ -214,7 +189,88 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
 
   await workbench.connectToSsh({ alias: 'local-test' })
 
+  expect(calls[0]).toBe('waitForRefresh')
   expect(calls.indexOf('refresh')).toBeLessThan(calls.indexOf('select:Linux'))
   expect(calls).toContain('select:Linux')
   dateNowSpy.mockRestore()
+})
+
+test('reload waits for refresh before rebinding the page', async () => {
+  const calls: string[] = []
+  const refreshedPage = {
+    id: 'refreshed-page',
+  }
+  const workbenchElement = {
+    id: 'workbench',
+  }
+  const page = {
+    locator: (selector: string) => {
+      calls.push(`locator:${selector}`)
+      return workbenchElement
+    },
+    rebind: async (nextPage: unknown) => {
+      calls.push(`rebind:${nextPage === refreshedPage}`)
+    },
+    refresh: async () => {
+      calls.push('refresh')
+      return refreshedPage
+    },
+    waitForIdle: async () => {
+      calls.push('waitForIdle')
+    },
+    waitForRefresh: async () => {
+      calls.push('waitForRefresh')
+    },
+  }
+  const quickPick = {
+    executeCommand: async (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => {
+      calls.push(`executeCommand:${command}:${JSON.stringify(options)}`)
+    },
+    getVisibleCommands: async () => [],
+    pressEnter: async () => undefined,
+    select: async () => undefined,
+    showCommands: async () => undefined,
+    type: async () => undefined,
+  }
+  const expectMock = (value: unknown) => {
+    calls.push(`expect:${value === workbenchElement ? 'workbench' : 'value'}`)
+    return {
+      toBeVisible: async () => {
+        calls.push('toBeVisible')
+      },
+    }
+  }
+
+  const workbench = createWithDependencies(
+    {
+      browserRpc: undefined,
+      electronApp: {},
+      expect: expectMock,
+      ideVersion: { major: 1, minor: 0, patch: 0 },
+      page,
+      platform: 'linux',
+      VError: createMockVError,
+    } as any,
+    {
+      createQuickPick: () => quickPick as any,
+      sleep: async () => undefined,
+    },
+  )
+
+  await workbench.reload()
+
+  expect(calls).toEqual([
+    'waitForIdle',
+    `executeCommand:${WellKnownCommands.DeveloperReloadWindow}:${JSON.stringify({
+      stayVisible: true,
+      pressKeyOnce: true,
+      stopsApplication: true,
+    })}`,
+    'waitForRefresh',
+    'refresh',
+    'rebind:true',
+    'locator:.monaco-workbench',
+    'expect:workbench',
+    'toBeVisible',
+  ])
 })

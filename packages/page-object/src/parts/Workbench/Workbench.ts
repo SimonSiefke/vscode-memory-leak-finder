@@ -10,7 +10,10 @@ type ConnectToSshOptions = {
 }
 
 type QuickPickApi = {
-  executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
+  executeCommand: (
+    command: string,
+    options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care'; stopsApplication?: boolean },
+  ) => Promise<void>
   getVisibleCommands: () => Promise<string[]>
   pressEnter: () => Promise<void>
   select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<void>
@@ -45,15 +48,6 @@ const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: strin
   }
 }
 
-const isReloadTransitionError = (error: unknown): boolean => {
-  const message = String((error as any)?.message || error || '')
-  return (
-    message.includes('Execution context was destroyed') ||
-    message.includes('uniqueContextId not found') ||
-    message.includes('Cannot find context with specified id')
-  )
-}
-
 const resolveSshTarget = ({ alias, host = '127.0.0.1', port, user }: ConnectToSshOptions): string => {
   if (alias) {
     return alias
@@ -68,169 +62,6 @@ const sleep = async (milliseconds: number): Promise<void> => {
   const { promise, resolve } = Promise.withResolvers<void>()
   setTimeout(resolve, milliseconds)
   await promise
-}
-
-const getRemoteHostPlatformLabel = (platform: string): string => {
-  switch (platform) {
-    case 'linux':
-      return 'Linux'
-    case 'win32':
-      return 'Windows'
-    case 'darwin':
-      return 'macOS'
-    default:
-      throw new Error(`Unsupported platform for Remote - SSH host selection: ${platform}`)
-  }
-}
-
-const normalizeText = (value: string): string => {
-  return value.toLowerCase().replace(/\s+/g, ' ').trim()
-}
-
-const getRemoteIndicatorNeedles = ({ alias, host = '127.0.0.1', user }: ConnectToSshOptions): string[] => {
-  if (alias) {
-    return [alias]
-  }
-  if (user) {
-    return [`${user}@${host}`, host]
-  }
-  return [host]
-}
-
-const getVisibleCommandsIfAny = async (quickPick: QuickPickApi): Promise<string[] | undefined> => {
-  try {
-    return await quickPick.getVisibleCommands()
-  } catch (error) {
-    const message = String((error as any)?.message || error || '')
-    if (message.includes('Failed to get visible commands')) {
-      return undefined
-    }
-    throw error
-  }
-}
-
-const maybeSelectRemoteHostPlatform = async (quickPick: QuickPickApi, platform: string): Promise<boolean> => {
-  const expectedPlatform = getRemoteHostPlatformLabel(platform)
-  const platformOptions = ['Linux', 'Windows', 'macOS']
-  const visibleCommands = await getVisibleCommandsIfAny(quickPick)
-  if (!visibleCommands) {
-    return false
-  }
-  if (visibleCommands.includes(expectedPlatform)) {
-    await quickPick.select(expectedPlatform)
-    return true
-  }
-  if (visibleCommands.some((item) => platformOptions.includes(item))) {
-    throw new Error(
-      `Remote - SSH asked for the remote host platform, but the expected option "${expectedPlatform}" was not available. Visible options: ${visibleCommands.join(', ')}`,
-    )
-  }
-  return false
-}
-
-const waitForRemoteHostPlatformPrompt = async (
-  quickPick: QuickPickApi,
-  dependencies: WorkbenchDependencies,
-  platform: string,
-  timeout = 30_000,
-): Promise<void> => {
-  const expectedPlatform = getRemoteHostPlatformLabel(platform)
-  const start = Date.now()
-  let lastVisibleCommands: string[] | undefined
-  while (Date.now() - start < timeout) {
-    const selected = await maybeSelectRemoteHostPlatform(quickPick, platform)
-    if (selected) {
-      return
-    }
-    const visibleCommands = await getVisibleCommandsIfAny(quickPick)
-    if (visibleCommands) {
-      lastVisibleCommands = visibleCommands
-    }
-    await dependencies.sleep(250)
-  }
-  const details = lastVisibleCommands
-    ? ` Last visible options: ${lastVisibleCommands.join(', ')}`
-    : ' The platform picker never became visible after the window reloaded.'
-  throw new Error(`Timed out waiting for Remote - SSH host platform prompt for "${expectedPlatform}".${details}`)
-}
-
-const refreshPage = async (page: any): Promise<void> => {
-  const refreshedPage = await page.refresh()
-  await page.rebind(refreshedPage)
-}
-
-const waitForReloadAndRebind = async ({
-  page,
-  reconnectDevtools,
-}: {
-  page: any
-  reconnectDevtools: (() => Promise<void>) | undefined
-}): Promise<void> => {
-  if (reconnectDevtools) {
-    try {
-      await reconnectDevtools()
-      return
-    } catch {
-      // Fall back to refresh/rebind when reconnecting devtools loses the page during reload.
-    }
-  }
-  // await refreshPage(page)
-}
-
-const hasFinishedRemoteConnection = async (page: any, options: ConnectToSshOptions): Promise<boolean> => {
-  const items = page.locator('.part.statusbar .left-items .statusbar-item')
-  const count = await items.count()
-  const needles = getRemoteIndicatorNeedles(options).map(normalizeText)
-  for (let i = 0; i < count; i++) {
-    const item = items.nth(i)
-    if (!(await item.isVisible())) {
-      continue
-    }
-    const text = [await item.textContent(), await item.getAttribute('aria-label'), await item.getAttribute('title')]
-      .filter(Boolean)
-      .join(' ')
-    const normalized = normalizeText(text)
-    if (!normalized.includes('ssh')) {
-      continue
-    }
-    if (needles.some((needle) => normalized.includes(needle))) {
-      return true
-    }
-  }
-  return false
-}
-
-const waitForSshConnection = async (
-  {
-    page,
-    reconnectDevtools,
-    options,
-  }: {
-    page: any
-    reconnectDevtools: (() => Promise<void>) | undefined
-    options: ConnectToSshOptions
-  },
-  dependencies: WorkbenchDependencies,
-) => {
-  let recoveredFromTransitionError = false
-
-  const start = Date.now()
-  while (Date.now() - start < 30_000) {
-    try {
-      await page.waitForIdle()
-      if (await hasFinishedRemoteConnection(page, options)) {
-        return
-      }
-    } catch (error) {
-      if (!recoveredFromTransitionError && isReloadTransitionError(error)) {
-        await waitForReloadAndRebind({ page, reconnectDevtools })
-        recoveredFromTransitionError = true
-        continue
-      }
-    }
-    await dependencies.sleep(250)
-  }
-  throw new Error(`Timed out waiting for Remote - SSH connection to settle`)
 }
 
 export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
@@ -254,7 +85,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, reconn
 }
 
 export const createWithDependencies = (
-  { browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams,
+  { browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams,
   dependencies: WorkbenchDependencies,
 ) => {
   return {
@@ -270,7 +101,7 @@ export const createWithDependencies = (
       await page.waitForIdle()
       await quickPick.pressEnter()
     },
-    async connectToSshPart2(options: ConnectToSshOptions): Promise<void> {
+    async connectToSshPart2(_options: ConnectToSshOptions): Promise<void> {
       // TODO avoid hardcoded timeout
       // would need to wait dynamically for page created/reloaded event
       await new Promise((r) => {
@@ -280,10 +111,7 @@ export const createWithDependencies = (
       await page.rebind(refreshedPage)
       return refreshedPage
     },
-    async connectToSshPart3(options: ConnectToSshOptions): Promise<void> {
-      const statusBarItem = page.locator('.statusbar-item-label[aria-label="Opening Remote..."]')
-      await page.waitForIdle()
-      await expect(statusBarItem).toBeVisible()
+    async connectToSshPart3(_options: ConnectToSshOptions): Promise<void> {
       await page.waitForIdle()
       const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
       await expect(input).toBeVisible()
@@ -291,12 +119,8 @@ export const createWithDependencies = (
       const quickPick = dependencies.createQuickPick()
       await quickPick.select('Linux') // TODO choose users platform
       await page.waitForIdle()
-      await expect(statusBarItem).toBeHidden({ timeout: 60_000 })
-      await page.waitForIdle()
       const statusBarItemFinished = page.locator('.statusbar-item-label[aria-label="remote  SSH: local-test"]')
-      await expect(statusBarItemFinished).toBeVisible()
-      await page.waitForIdle()
-      await expect(statusBarItemFinished).toBeVisible()
+      await expect(statusBarItemFinished).toBeVisible({ timeout: 60_000 })
     },
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {
@@ -409,20 +233,14 @@ export const createWithDependencies = (
       try {
         await page.waitForIdle()
 
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
+        const quickPick = dependencies.createQuickPick()
 
         await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow, {
           stayVisible: true,
           pressKeyOnce: true,
           stopsApplication: true,
         })
+        await page.waitForRefresh()
         const refreshedPage = await page.refresh()
         await page.rebind(refreshedPage)
         // await refreshedPage.waitForIdle()

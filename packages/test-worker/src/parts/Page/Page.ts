@@ -52,6 +52,22 @@ const createMouse = (rpc, utilityContext) => {
   }
 }
 
+const createPageWithFreshUtilityContext = async (page, { browserRpc, electronObjectId, electronRpc, idleTimeout }) => {
+  const { frameTree } = await DevtoolsProtocolPage.getFrameTree(page.sessionRpc)
+  const nextUtilityContext = await addUtilityExecutionContext(page.sessionRpc, 'utility', frameTree.frame.id)
+  return create({
+    browserRpc,
+    electronObjectId,
+    electronRpc,
+    idleTimeout,
+    rpc: page.rpc,
+    sessionId: page.sessionId,
+    sessionRpc: page.sessionRpc,
+    targetId: page.targetId,
+    utilityContext: nextUtilityContext,
+  })
+}
+
 export const create = ({
   browserRpc,
   electronObjectId,
@@ -101,18 +117,11 @@ export const create = ({
       return PageKeyBoard.pressKeyExponential(this.sessionRpc, utilityContext, options)
     },
     async refresh() {
-      const { frameTree } = await DevtoolsProtocolPage.getFrameTree(this.sessionRpc)
-      const nextUtilityContext = await addUtilityExecutionContext(this.sessionRpc, 'utility', frameTree.frame.id)
-      return create({
+      return createPageWithFreshUtilityContext(this, {
         browserRpc,
         electronObjectId,
         electronRpc,
         idleTimeout,
-        rpc: this.rpc,
-        sessionId: this.sessionId,
-        sessionRpc: this.sessionRpc,
-        targetId: this.targetId,
-        utilityContext: nextUtilityContext,
       })
     },
     async waitForRefresh() {
@@ -135,9 +144,14 @@ export const create = ({
     },
     async reload() {
       const refreshPromise = this.waitForRefresh()
-      const result = await PageReload.reload(this.rpc)
+      await PageReload.reload(this.rpc)
       await refreshPromise
-      return result
+      return createPageWithFreshUtilityContext(this, {
+        browserRpc,
+        electronObjectId,
+        electronRpc,
+        idleTimeout,
+      })
     },
     rpc,
     sessionId,
