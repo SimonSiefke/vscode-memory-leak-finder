@@ -72,7 +72,10 @@ export const createWithDependencies = (
   { expect, page, VError, electronApp, ideVersion, platform }: CreateParams,
   dependencies: SshClientDependencies,
 ) => {
+  const defaultValue = '/home/simon/'
+
   return {
+    lastValue: defaultValue,
     async connectToSshPart1(options: ConnectToSshOptions): Promise<void> {
       try {
         const target = resolveSshTarget(options)
@@ -122,7 +125,6 @@ export const createWithDependencies = (
     async openFolder(options: ConnectToSshOptions): Promise<void> {
       try {
         const folderPath = options.workspacePath || `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace` // TODO
-        const defaultValue = '/home/simon/'
         const quickPick = dependencies.createQuickPick()
         quickPick.executeCommand(WellKnownCommands.OpenFolder, {
           stayVisible: true,
@@ -133,7 +135,7 @@ export const createWithDependencies = (
         await page.waitForIdle()
         await expect(input).toBeFocused()
         await page.waitForIdle()
-        await expect(input).toHaveValue(defaultValue)
+        await expect(input).toHaveValue(this.lastValue)
         await page.waitForIdle()
         await input.clear()
         await page.waitForIdle()
