@@ -63,10 +63,14 @@ const waitForExit = async (childProcess: any, milliseconds: number): Promise<voi
 
 const isNavigationTransitionError = (error: unknown): boolean => {
   const message = String(error && (error as Error).message ? (error as Error).message : error)
-  return message.includes('Execution context was destroyed') || message.includes('Cannot find context with specified id') || message.includes('uniqueContextId not found')
+  return (
+    message.includes('Execution context was destroyed') ||
+    message.includes('Cannot find context with specified id') ||
+    message.includes('uniqueContextId not found')
+  )
 }
 
-export const create = ({ electronApp, page, VError }: CreateParams) => {
+export const create = ({ page, reconnectDevtools, VError }: CreateParams) => {
   const state: ServerState = {
     output: [],
   }
@@ -114,19 +118,33 @@ export const create = ({ electronApp, page, VError }: CreateParams) => {
     },
     async connect({ url = defaultUrl } = {}): Promise<void> {
       try {
-        await electronApp.loadUrl(url)
-      } catch (error) {
-        if (!isNavigationTransitionError(error)) {
-          throw error
-        }
-      }
+        const reconnectPromise = reconnectDevtools
+          ? reconnectDevtools().then(
+              () => true,
+              () => false,
+            )
+          : undefined
 
-      try {
+        try {
+          await page.evaluate({
+            expression: `(() => {
+  globalThis.location.href = ${JSON.stringify(url)}
+})()`,
+          })
+        } catch (error) {
+          if (!isNavigationTransitionError(error)) {
+            throw error
+          }
+        }
+
+        const reconnected = reconnectPromise ? await reconnectPromise : false
         const start = Date.now()
         while (Date.now() - start < 30_000) {
           try {
-            const refreshedPage = await page.refresh()
-            await page.rebind(refreshedPage)
+            if (!reconnected) {
+              const refreshedPage = await page.refresh()
+              await page.rebind(refreshedPage)
+            }
             const href = await page.evaluate({
               expression: `(() => globalThis.location?.href || '')()`,
               returnByValue: true,
