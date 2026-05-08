@@ -70,7 +70,7 @@ const isNavigationTransitionError = (error: unknown): boolean => {
   )
 }
 
-export const create = ({ page, reconnectDevtools, VError }: CreateParams) => {
+export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateParams) => {
   const state: ServerState = {
     output: [],
   }
@@ -126,11 +126,17 @@ export const create = ({ page, reconnectDevtools, VError }: CreateParams) => {
           : undefined
 
         try {
-          await page.evaluate({
-            expression: `(() => {
-  globalThis.location.href = ${JSON.stringify(url)}
+          await electronApp.evaluate(`(() => {
+  const electron = globalThis._____electron
+  const { BrowserWindow } = electron
+  const browserWindow = BrowserWindow.getAllWindows()[0]
+  if (!browserWindow) {
+    throw new Error('no browser window found')
+  }
+  browserWindow.loadURL(${JSON.stringify(url)})
+  return true
 })()`,
-          })
+          )
         } catch (error) {
           if (!isNavigationTransitionError(error)) {
             throw error
