@@ -12,6 +12,7 @@ type Dependencies = {
 
 export const createGetFileWatcherCount = (dependencies: Dependencies) => {
   return async (pid: number | undefined, processRootStrategy: string): Promise<number> => {
+    console.log({ processRootStrategy })
     if (pid === undefined) {
       return 0
     }
