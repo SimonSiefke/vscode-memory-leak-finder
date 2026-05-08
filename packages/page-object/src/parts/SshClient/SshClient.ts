@@ -1,6 +1,7 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as Electron from '../Electron/Electron.ts'
 
 export type ConnectToSshOptions = {
   readonly alias?: string
@@ -66,7 +67,10 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, reconn
   )
 }
 
-export const createWithDependencies = ({ expect, page, VError }: CreateParams, dependencies: SshClientDependencies) => {
+export const createWithDependencies = (
+  { expect, page, VError, electronApp, ideVersion, platform }: CreateParams,
+  dependencies: SshClientDependencies,
+) => {
   return {
     async connectToSshPart1(options: ConnectToSshOptions): Promise<void> {
       try {
@@ -148,10 +152,20 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
         await page.waitForIdle()
         await expect(okButton).toBeFocused()
         await page.waitForIdle()
-        // await okButton.click()
-        // await page.waitForIdle()
+        const electron = Electron.create({
+          page,
+          expect,
+          VError,
+          electronApp,
+          ideVersion,
+          platform,
+        })
+        // TODO why sometimes popup comes?
+        await electron.mockDialog({
+          response: 0,
+        })
         await page.keyboard.press('Enter')
-        // await page.waitForIdle()
+        // TODO wait for window loaded
       } catch (error) {
         throw new VError(error, `Failed to open folder`)
       }
