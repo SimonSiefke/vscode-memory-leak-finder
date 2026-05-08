@@ -296,7 +296,7 @@ export const createWithDependencies = (
       try {
         await this.connectToSshPart1(options)
         const page2 = await this.connectToSshPart2(options)
-        await this.connectToSshPart3(options, page2)
+        await this.connectToSshPart3(options)
       } catch (error) {
         throw new VError(error, `Failed to connect to ssh server`)
       }
