@@ -56,10 +56,7 @@ const waitForExit = async (childProcess: any, milliseconds: number): Promise<voi
   }
   const { promise, resolve } = Promise.withResolvers<void>()
   childProcess.once('exit', () => resolve())
-  await Promise.race([
-    promise,
-    sleep(milliseconds),
-  ])
+  await Promise.race([promise, sleep(milliseconds)])
 }
 
 const isNavigationTransitionError = (error: unknown): boolean => {
