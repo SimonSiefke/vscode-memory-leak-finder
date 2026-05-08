@@ -89,7 +89,11 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
           }
         }
         await refreshPromise
-        await page.refresh()
+        const newPage = await page.refresh()
+        // TODO avoid fixed timeout
+        await new Promise((r) => {
+          setTimeout(r, 5000)
+        })
       } catch (error) {
         throw new VError(error, `Failed to connect to ssh server`)
       }
