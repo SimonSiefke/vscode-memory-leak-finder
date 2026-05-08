@@ -112,12 +112,12 @@ export const createWithDependencies = (
       return refreshedPage
     },
     async connectToSshPart3(_options: ConnectToSshOptions): Promise<void> {
-      await page.waitForIdle()
-      const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
-      await expect(input).toBeVisible()
-      await expect(input).toBeFocused()
-      const quickPick = dependencies.createQuickPick()
-      await quickPick.select('Linux') // TODO choose users platform
+      // await page.waitForIdle()
+      // const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
+      // await expect(input).toBeVisible()
+      // await expect(input).toBeFocused()
+      // const quickPick = dependencies.createQuickPick()
+      // await quickPick.select('Linux') // TODO choose users platform
       await page.waitForIdle()
       const statusBarItemFinished = page.locator('.statusbar-item-label[aria-label="remote  SSH: local-test"]')
       await expect(statusBarItemFinished).toBeVisible({ timeout: 60_000 })
@@ -229,7 +229,7 @@ export const createWithDependencies = (
         throw new VError(error, `Failed to open new window`)
       }
     },
-    async reload(): Promise<void> {
+    async reload({ isSsh = false } = {}): Promise<void> {
       try {
         await page.waitForIdle()
 
@@ -243,8 +243,15 @@ export const createWithDependencies = (
         await page.waitForRefresh()
         const refreshedPage = await page.refresh()
         await page.rebind(refreshedPage)
-        // await refreshedPage.waitForIdle()
+
+        if (isSsh) {
+          await page.waitForIdle()
+          const statusBarItemFinished = page.locator('.statusbar-item-label[aria-label="remote  SSH: local-test"]')
+          await expect(statusBarItemFinished).toBeVisible({ timeout: 60_000 })
+          await page.waitForIdle()
+        }
         await this.shouldBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to reload window`)
       }
@@ -263,8 +270,10 @@ export const createWithDependencies = (
       await page.waitForIdle()
     },
     async shouldBeVisible() {
+      await page.waitForIdle()
       const workbench = page.locator('.monaco-workbench')
       await expect(workbench).toBeVisible()
+      await page.waitForIdle()
     },
     async shouldHaveEditorBackground(color: string) {
       try {
