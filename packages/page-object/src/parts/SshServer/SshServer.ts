@@ -135,8 +135,7 @@ export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateP
   }
   browserWindow.loadURL(${JSON.stringify(url)})
   return true
-})()`,
-          )
+})()`)
         } catch (error) {
           if (!isNavigationTransitionError(error)) {
             throw error
