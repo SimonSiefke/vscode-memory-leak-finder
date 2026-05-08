@@ -694,6 +694,7 @@ export interface Workbench {
     waitForIdle(): Promise<void>
     shouldBeVisible(): Promise<void>
   }>
+  reload(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldHaveEditorBackground(color: any): Promise<void>
 }

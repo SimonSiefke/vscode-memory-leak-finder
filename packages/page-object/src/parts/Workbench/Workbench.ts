@@ -1,4 +1,5 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
@@ -119,6 +120,45 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
+      }
+    },
+    async reload(): Promise<void> {
+      try {
+        const reloadWindowPromise = this.waitForNewWindow({ timeout: 10_000 })
+        await page.waitForIdle()
+
+        const quickPick = page.locator('.quick-input-widget')
+        await page.pressKeyExponential({
+          key: KeyBindings.getOpenQuickPickCommands(platform || ''),
+          waitFor: quickPick,
+        })
+        await expect(quickPick).toBeVisible({ timeout: 10_000 })
+
+        const quickPickInput = quickPick.locator('.ibwrapper .input')
+        await expect(quickPickInput).toBeVisible()
+        await expect(quickPickInput).toBeFocused({ timeout: 3_000 })
+        await quickPickInput.type(WellKnownCommands.DeveloperReloadWindow)
+
+        const reloadOption = quickPick.locator('.label-name', {
+          hasExactText: WellKnownCommands.DeveloperReloadWindow,
+        })
+        await expect(reloadOption).toBeVisible()
+        await reloadOption.click()
+
+        const sessionId = await reloadWindowPromise
+        if (!sessionId) {
+          throw new Error(`Failed to wait for reloaded window`)
+        }
+
+        const reloadedPage = await electronApp.waitForPage({
+          injectUtilityScript: true,
+          sessionId,
+        })
+        await page.rebind(reloadedPage)
+        await page.waitForIdle()
+        await this.shouldBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to reload window`)
       }
     },
     async focusLeftEditorGroup() {

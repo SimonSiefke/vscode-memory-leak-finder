@@ -26,6 +26,7 @@ export const DeleteAllWorkspaceChatSessions = 'Chat: Delete All Local Workspace 
 export const DeleteAllWorkspaceChatSessions2 = 'Chat Agent Sessions: Delete All Local Workspace Chat Sessions'
 export const DeveloperInspectTokensAndScopes = 'Developer: Inspect Editor Tokens and Scopes'
 export const DeveloperOpenWebviewDeveloperTools = 'Developer: Open Webview Developer Tools'
+export const DeveloperReloadWindow = 'Developer: Reload Window'
 export const DisableReadonly = 'File: Reset Active Editor Read-only in Session'
 export const DuplicateSelection = 'Duplicate Selection'
 export const EditorGridLayout = 'View: Grid Editor Layout (2x2)'
