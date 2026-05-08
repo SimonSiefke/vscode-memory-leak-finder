@@ -90,3 +90,51 @@ test('reload waits for refresh before rebinding the page', async () => {
     'waitForIdle',
   ])
 })
+
+test('close runs the close window command without waiting for a refresh', async () => {
+  const calls: string[] = []
+  const page = {
+    waitForIdle: async () => {
+      calls.push('waitForIdle')
+    },
+  }
+  const quickPick = {
+    executeCommand: async (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => {
+      calls.push(`executeCommand:${command}:${JSON.stringify(options)}`)
+    },
+    getVisibleCommands: async () => [],
+    pressEnter: async () => undefined,
+    select: async () => undefined,
+    showCommands: async () => undefined,
+    type: async () => undefined,
+  }
+
+  const workbench = createWithDependencies(
+    {
+      browserRpc: undefined,
+      electronApp: {},
+      expect: () => ({
+        toBeVisible: async () => undefined,
+      }),
+      ideVersion: { major: 1, minor: 0, patch: 0 },
+      page,
+      platform: 'linux',
+      VError: createMockVError,
+    } as any,
+    {
+      createQuickPick: () => quickPick as any,
+      sleep: async () => undefined,
+    },
+  )
+
+  await workbench.close()
+
+  expect(calls).toEqual([
+    'waitForIdle',
+    `executeCommand:${WellKnownCommands.CloseWindow}:${JSON.stringify({
+      stayVisible: true,
+      pressKeyOnce: true,
+      stopsApplication: true,
+    })}`,
+  ])
+})

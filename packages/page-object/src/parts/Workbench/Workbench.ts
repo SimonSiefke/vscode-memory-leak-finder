@@ -291,6 +291,21 @@ export const createWithDependencies = (
         throw new VError(error, `Failed to reload window`)
       }
     },
+    async close(): Promise<void> {
+      try {
+        await page.waitForIdle()
+
+        const quickPick = dependencies.createQuickPick()
+
+        await quickPick.executeCommand(WellKnownCommands.CloseWindow, {
+          stayVisible: true,
+          pressKeyOnce: true,
+          stopsApplication: true,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to close window`)
+      }
+    },
     async focusLeftEditorGroup() {
       await page.waitForIdle()
       const quickPick = QuickPick.create({
