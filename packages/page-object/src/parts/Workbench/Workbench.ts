@@ -1,4 +1,5 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
@@ -32,6 +33,7 @@ export interface ISimplifedWindow {
   readonly sessionRpc?: any
   readonly locator?: (selector: string) => any
   readonly shouldHaveExplorerItem: (direntName: string) => Promise<void>
+  readonly shouldHaveTitleContaining: (value: string) => Promise<void>
   readonly waitForIdle: () => Promise<void>
   readonly shouldBeVisible: () => Promise<void>
 }
@@ -150,6 +152,24 @@ export const createWithDependencies = (
         throw new VError(error, `Failed to connect to ssh server`)
       }
     },
+    async openFolder(): Promise<void> {
+      try {
+        await page.waitForIdle()
+        const quickPick = dependencies.createQuickPick()
+        const refreshPromise = page.waitForRefresh()
+        await quickPick.executeCommand('File: Open Folder...', {
+          pressKeyOnce: true,
+          stopsApplication: true,
+        })
+        await refreshPromise
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
+        await this.shouldBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open folder`)
+      }
+    },
     async waitForNewWindow({ timeout }: { timeout: number }) {
       const { promise, resolve } = Promise.withResolvers<string>()
 
@@ -187,6 +207,7 @@ export const createWithDependencies = (
     },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
         const newWindowPromise = this.waitForNewWindow({ timeout: 20_000 })
         // Run the quickpick command to open new window
         await page.waitForIdle()
@@ -211,23 +232,17 @@ export const createWithDependencies = (
           sessionId,
         })
         let currentNewWindowPage = newWindowPage
+        const newWindowId = await electron.getNewWindowId()
+        if (!newWindowId) {
+          throw new Error(`Failed to determine new window id`)
+        }
 
         await page.waitForIdle()
 
         return {
           async close() {
             try {
-              // Wait for the window to be fully idle before attempting to close
-              await currentNewWindowPage.waitForIdle()
-              const quickPick = QuickPick.create({
-                electronApp,
-                expect,
-                ideVersion,
-                page: currentNewWindowPage,
-                platform,
-                VError,
-              })
-              await quickPick.executeCommand(WellKnownCommands.CloseWindow)
+              await electron.closeWindow(newWindowId)
             } catch (error) {
               throw new VError(error, `Failed to close new window`)
             }
@@ -289,6 +304,26 @@ export const createWithDependencies = (
               await currentNewWindowPage.waitForIdle()
             } catch (error) {
               throw new VError(error, `Failed to verify explorer item "${direntName}" in new window`)
+            }
+          },
+          async shouldHaveTitleContaining(value: string) {
+            try {
+              const start = performance.now()
+              const timeout = 20_000
+              while (performance.now() - start < timeout) {
+                const title = (await electron.evaluate(`(() => {
+  const { BrowserWindow } = globalThis._____electron
+  const window = BrowserWindow.fromId(${newWindowId})
+  return window && !window.isDestroyed() ? window.getTitle() : ''
+})()`) as unknown) as string
+                if (title.includes(value)) {
+                  return
+                }
+                await new Promise((resolve) => setTimeout(resolve, 200))
+              }
+              throw new Error(`Expected window title to include ${value}`)
+            } catch (error) {
+              throw new VError(error, `Failed to verify new window title`)
             }
           },
           waitForIdle: () => currentNewWindowPage.waitForIdle(),

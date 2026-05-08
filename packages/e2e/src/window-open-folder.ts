@@ -10,16 +10,13 @@ export const setup = async (): Promise<void> => {
   await writeFile(join(folderPath, 'opened-file.txt'), 'content')
 }
 
-export const run = async ({ Electron, Workbench }: TestContext): Promise<void> => {
+export const run = async ({ Electron, Explorer, Workbench }: TestContext): Promise<void> => {
   await Electron.mockOpenDialog({
     canceled: false,
     filePaths: [folderPath],
   })
-  const newWindow = await Workbench.openNewWindow()
-  await newWindow.shouldBeVisible()
-  await newWindow.openFolderFromExplorer()
-  await newWindow.shouldHaveExplorerItem('opened-file.txt')
-  await newWindow.close()
+  await Workbench.openFolder()
+  await Explorer.shouldHaveItem('opened-file.txt')
 }
 
 export const teardown = async (): Promise<void> => {

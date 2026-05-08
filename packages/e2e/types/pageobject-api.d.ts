@@ -701,12 +701,14 @@ export interface Window {
 export interface Workbench {
   connectToSsh(options: { alias?: string; host?: string; port?: number; user?: string }): Promise<void>
   focusLeftEditorGroup(): Promise<void>
+  openFolder(): Promise<void>
   openNewWindow(): Promise<{
     close(): Promise<void>
     openFolderFromExplorer(): Promise<void>
     sessionRpc?: any
     locator?: (selector: string) => any
     shouldHaveExplorerItem(direntName: any): Promise<void>
+    shouldHaveTitleContaining(value: any): Promise<void>
     waitForIdle(): Promise<void>
     shouldBeVisible(): Promise<void>
   }>
