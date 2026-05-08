@@ -134,9 +134,9 @@ export const create = ({
       return frameTree.frame
     },
     async reload() {
-      const refreshPromise = await this.waitForRefresh()
+      const refreshPromise = this.waitForRefresh()
       const result = await PageReload.reload(this.rpc)
-      await this.refeshPromise()
+      await refreshPromise
       return result
     },
     rpc,
