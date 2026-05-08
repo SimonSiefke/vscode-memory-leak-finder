@@ -2,6 +2,8 @@ import type { TestContext } from '../types.js'
 
 const folderPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace'
 
+let _options = {}
+
 export const setup = async ({
   SshServer,
   SshClient,
@@ -21,6 +23,7 @@ export const setup = async ({
     name: 'Remote - SSH',
   })
   const connection = await SshServer.launch()
+  _options = connection
   await SshClient.connectToSsh(connection)
   await ActivityBar.showExplorer()
   // @ts-ignore
@@ -31,7 +34,8 @@ export const setup = async ({
 
 export const run = async ({ Workbench, SshClient }: TestContext): Promise<void> => {
   await Workbench.reload()
-  await SshClient.waitForConnectionReady({ alias: 'local-test' })
+  // @ts-ignore
+  await SshClient.connectToSshPart2(_options)
 }
 
 export const teardown = async ({ SshServer }: TestContext): Promise<void> => {
