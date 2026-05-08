@@ -82,7 +82,7 @@ export const setup = async ({
   await ActivityBar.showExplorer()
   // @ts-ignore
   await SshClient.openFolder(connection)
-  await Editor.open('a.ts')
+  await Editor.open('error.ts')
   await SideBar.hide()
   await Panel.hide()
 }

@@ -171,6 +171,7 @@ export const createWithDependencies = (
         const newPage = await page.refresh()
         await page.rebind(newPage)
         await this.connectToSshPart2(options)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open folder`)
       }
