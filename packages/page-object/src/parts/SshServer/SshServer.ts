@@ -27,6 +27,13 @@ type SshServerDependencies = {
   readonly sleep: (milliseconds: number) => Promise<void>
 }
 
+type SshServerCreateParams = {
+  readonly electronApp: any
+  readonly page: any
+  readonly reconnectDevtools?: () => Promise<void>
+  readonly VError: any
+}
+
 const appendOutput = (state: ServerState, chunk: unknown): void => {
   const text = String(chunk || '')
   if (!text) {
@@ -106,7 +113,7 @@ export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateP
 }
 
 export const createWithDependencies = (
-  { electronApp, page, reconnectDevtools, VError }: Pick<CreateParams, 'electronApp' | 'page' | 'reconnectDevtools' | 'VError'>,
+  { electronApp, page, reconnectDevtools, VError }: SshServerCreateParams,
   dependencies: SshServerDependencies,
 ) => {
   const state: ServerState = {
