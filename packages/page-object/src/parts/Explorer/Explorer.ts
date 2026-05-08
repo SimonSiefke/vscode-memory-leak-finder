@@ -286,7 +286,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const explorerView = page.locator('.explorer-folders-view')
         await expect(explorerView).toBeVisible()
         const openFolderButton = explorerView.locator('[role="button"], .monaco-button', {
-          hasText: /^Open Folder(?:\.\.\.)?$/,
+          hasText: /^Open Folder(?:\.\.\.|…)?$/,
         })
         await expect(openFolderButton).toBeVisible({ timeout: 10_000 })
         await openFolderButton.click()
