@@ -125,6 +125,7 @@ export const createWithDependencies = (
         const button = page.locator('.monaco-button.monaco-text-button', {
           hasText: 'Open Folder',
         })
+        await page.waitForIdle()
         await expect(button).toBeVisible()
         await page.waitForIdle()
         await button.click()
