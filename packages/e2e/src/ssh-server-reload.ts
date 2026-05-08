@@ -14,8 +14,8 @@ export const setup = async ({ SshServer, Workbench, Extensions, Electron, SideBa
   await Panel.hide()
 }
 
-export const run = async ({}: TestContext): Promise<void> => {
-  // await Workbench.reload()
+export const run = async ({ Workbench }: TestContext): Promise<void> => {
+  await Workbench.reload()
 }
 
 export const teardown = async ({ SshServer }: TestContext): Promise<void> => {
