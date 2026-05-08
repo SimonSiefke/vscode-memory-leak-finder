@@ -289,11 +289,19 @@ export const createWithDependencies = (
       await expect(input).toBeFocused()
       const quickPick = dependencies.createQuickPick()
       await quickPick.select('Linux') // TODO choose users platform
+      await page.waitForIdle()
+      await expect(statusBarItem).toBeHidden({ timeout: 60_000 })
+      await page.waitForIdle()
+      const statusBarItemFinished = page.locator('.statusbar-item-label[aria-label="remote  SSH: local-test"]')
+      await expect(statusBarItemFinished).toBeVisible()
+      await page.waitForIdle()
+      await expect(statusBarItemFinished).toBeVisible()
+      await new Promise((r) => {})
     },
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {
         await this.connectToSshPart1(options)
-        const page2 = await this.connectToSshPart2(options)
+        await this.connectToSshPart2(options)
         await this.connectToSshPart3(options)
       } catch (error) {
         throw new VError(error, `Failed to connect to ssh server`)
