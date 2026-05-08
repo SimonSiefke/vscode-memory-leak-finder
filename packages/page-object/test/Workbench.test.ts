@@ -10,8 +10,14 @@ const createMockVError = class MockVError extends Error {
 
 test('connectToSsh uses quick pick to connect current window to host', async () => {
   const calls: string[] = []
+  let now = 0
+  let platformSelected = false
+  const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
   const page = {
     evaluate: async () => 'http://127.0.0.1:9888/',
+    locator: () => ({
+      isVisible: async () => !platformSelected,
+    }),
     rebind: async () => {
       calls.push('rebind')
     },
@@ -30,12 +36,16 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     },
     getVisibleCommands: async () => {
       calls.push('getVisibleCommands')
+      if (platformSelected) {
+        throw new createMockVError(new Error('widget hidden'), 'Failed to get visible commands')
+      }
       return ['Linux', 'Windows', 'macOS']
     },
     pressEnter: async () => {
       calls.push('pressEnter')
     },
     select: async (value: string | RegExp) => {
+      platformSelected = true
       calls.push(`select:${value}`)
     },
     showCommands: async (options?: { pressKeyOnce?: boolean }) => {
@@ -58,7 +68,9 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     } as any,
     {
       createQuickPick: () => quickPick,
-      sleep: async () => {},
+      sleep: async (milliseconds: number) => {
+        now += milliseconds
+      },
     },
   )
 
@@ -78,6 +90,8 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     'rebind',
     'waitForIdle',
   ])
+
+  dateNowSpy.mockRestore()
 })
 
 test('connectToSsh waits for a delayed remote host platform prompt', async () => {

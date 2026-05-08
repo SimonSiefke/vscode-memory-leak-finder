@@ -83,77 +83,144 @@ const getRemoteHostPlatformLabel = (platform: string): string => {
   }
 }
 
+const getVisibleCommandsIfAny = async (quickPick: QuickPickApi): Promise<string[] | undefined> => {
+  try {
+    return await quickPick.getVisibleCommands()
+  } catch (error) {
+    const message = String((error as any)?.message || error || '')
+    if (message.includes('Failed to get visible commands')) {
+      return undefined
+    }
+    throw error
+  }
+}
+
+const isQuickPickVisible = async (page: any): Promise<boolean> => {
+  try {
+    return await page.locator('.quick-input-widget').isVisible()
+  } catch {
+    return false
+  }
+}
+
 const maybeSelectRemoteHostPlatform = async (
+  quickPick: QuickPickApi,
+  platform: string,
+): Promise<boolean> => {
+  const expectedPlatform = getRemoteHostPlatformLabel(platform)
+  const platformOptions = ['Linux', 'Windows', 'macOS']
+  const visibleCommands = await getVisibleCommandsIfAny(quickPick)
+  if (!visibleCommands) {
+    return false
+  }
+  if (visibleCommands.includes(expectedPlatform)) {
+    await quickPick.select(expectedPlatform)
+    return true
+  }
+  if (visibleCommands.some((item) => platformOptions.includes(item))) {
+    throw new Error(
+      `Remote - SSH asked for the remote host platform, but the expected option "${expectedPlatform}" was not available. Visible options: ${visibleCommands.join(', ')}`,
+    )
+  }
+  return false
+}
+
+const waitForQuickPickToStayHidden = async (
+  page: any,
   quickPick: QuickPickApi,
   dependencies: WorkbenchDependencies,
   platform: string,
-): Promise<void> => {
-  const expectedPlatform = getRemoteHostPlatformLabel(platform)
-  const platformOptions = ['Linux', 'Windows', 'macOS']
+  timeout = 10_000,
+): Promise<boolean> => {
   const start = Date.now()
-  while (Date.now() - start < 5_000) {
-    try {
-      const visibleCommands = await quickPick.getVisibleCommands()
-      if (visibleCommands.includes(expectedPlatform)) {
-        await quickPick.select(expectedPlatform)
-        return
-      }
-      if (visibleCommands.some((item) => platformOptions.includes(item))) {
-        throw new Error(
-          `Remote - SSH asked for the remote host platform, but the expected option "${expectedPlatform}" was not available. Visible options: ${visibleCommands.join(', ')}`,
-        )
-      }
-    } catch (error) {
-      const message = String((error as any)?.message || error || '')
-      if (!message.includes('Failed to get visible commands')) {
-        throw error
-      }
+  while (Date.now() - start < timeout) {
+    if (!(await isQuickPickVisible(page))) {
+      await dependencies.sleep(250)
+      continue
     }
-    await dependencies.sleep(250)
+    const selectedPlatform = await maybeSelectRemoteHostPlatform(quickPick, platform)
+    if (selectedPlatform) {
+      return false
+    }
+    return false
   }
+  return true
+}
+
+const refreshPage = async (page: any): Promise<void> => {
+  const refreshedPage = await page.refresh()
+  await page.rebind(refreshedPage)
 }
 
 const waitForSshConnection = async (
   {
     page,
+    platform,
+    quickPick,
     reconnectDevtools,
   }: {
     page: any
+    platform: string
+    quickPick: QuickPickApi
     reconnectDevtools: (() => Promise<void>) | undefined
   },
   dependencies: WorkbenchDependencies,
 ) => {
+  if (!reconnectDevtools) {
+    await refreshPage(page)
+  }
+
+  const reconnectState: {
+    value: 'pending' | 'resolved' | 'rejected' | 'not-supported'
+  } = {
+    value: reconnectDevtools ? 'pending' : 'not-supported',
+  }
   const reconnectPromise = reconnectDevtools
     ? reconnectDevtools().then(
-        () => true,
-        () => false,
+        () => {
+          reconnectState.value = 'resolved'
+        },
+        () => {
+          reconnectState.value = 'rejected'
+        },
       )
     : undefined
-
-  const reconnected = reconnectPromise ? await reconnectPromise : false
   let recoveredFromTransitionError = false
-
-  if (!reconnected) {
-    const refreshedPage = await page.refresh()
-    await page.rebind(refreshedPage)
-  }
+  let refreshedAfterReconnectRejection = false
 
   const start = Date.now()
   while (Date.now() - start < 30_000) {
+    if (await isQuickPickVisible(page)) {
+      await maybeSelectRemoteHostPlatform(quickPick, platform)
+    }
+
+    if (reconnectState.value === 'rejected' && !refreshedAfterReconnectRejection) {
+      await refreshPage(page)
+      refreshedAfterReconnectRejection = true
+    }
+
     try {
       await page.waitForIdle()
+      const hiddenLongEnough = await waitForQuickPickToStayHidden(page, quickPick, dependencies, platform)
+      if (!hiddenLongEnough) {
+        continue
+      }
+      if (reconnectState.value === 'pending') {
+        await dependencies.sleep(250)
+        continue
+      }
+      await reconnectPromise
       return
     } catch (error) {
       if (!recoveredFromTransitionError && isReloadTransitionError(error)) {
-        const refreshedPage = await page.refresh()
-        await page.rebind(refreshedPage)
+        await refreshPage(page)
         recoveredFromTransitionError = true
         continue
       }
     }
     await dependencies.sleep(250)
   }
-  throw new Error(`Timed out waiting for Remote - SSH connection to settle`)
+  return true
 }
 
 export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
@@ -192,8 +259,8 @@ export const createWithDependencies = (
         await quickPick.type(target)
         await page.waitForIdle()
         await quickPick.pressEnter()
-        await maybeSelectRemoteHostPlatform(quickPick, dependencies, platform)
-        await waitForSshConnection({ page, reconnectDevtools }, dependencies)
+        await maybeSelectRemoteHostPlatform(quickPick, platform)
+        await waitForSshConnection({ page, platform, quickPick, reconnectDevtools }, dependencies)
       } catch (error) {
         const message =
           options.alias || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`
