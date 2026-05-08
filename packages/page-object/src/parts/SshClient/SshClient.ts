@@ -130,7 +130,12 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
         await page.waitForIdle()
         await expect(input).toBeFocused()
         await page.waitForIdle()
+        await new Promise((r) => {
+          setTimeout(r, 300)
+        })
         await input.clear()
+        await page.waitForIdle()
+        await expect(input).toHaveValue('')
         await page.waitForIdle()
         await input.type(folderPath)
         await page.waitForIdle()
@@ -138,6 +143,10 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
           hasText: 'OK',
         })
         await expect(okButton).toBeVisible()
+        await page.waitForIdle()
+        await okButton.focus()
+        await page.waitForIdle()
+        await expect(okButton).toBeFocused()
         await page.waitForIdle()
         await okButton.click()
         await page.waitForIdle()
