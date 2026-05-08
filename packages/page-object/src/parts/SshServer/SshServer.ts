@@ -428,7 +428,7 @@ const resolveRequiredBinaries = async (dependencies: SshServerDependencies): Pro
     sshdPath: await requireBinary(
       dependencies,
       'sshd',
-      'OpenSSH binary "sshd" was not found in PATH. Install the Linux OpenSSH server to run a real Remote - SSH repro.',
+      'OpenSSH binary "sshd" was not found in PATH. Install the Linux OpenSSH server to run a real Remote - SSH repro. On Ubuntu: sudo apt update && sudo apt install openssh-server',
     ),
   }
 }

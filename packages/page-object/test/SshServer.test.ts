@@ -215,6 +215,6 @@ test('launch fails with a helpful error when sshd is missing', async () => {
   )
 
   await expect(sshServer.launch()).rejects.toThrow(
-    'Failed to launch SSH server: OpenSSH binary "sshd" was not found in PATH. Install the Linux OpenSSH server to run a real Remote - SSH repro.',
+    'Failed to launch SSH server: OpenSSH binary "sshd" was not found in PATH. Install the Linux OpenSSH server to run a real Remote - SSH repro. On Ubuntu: sudo apt update && sudo apt install openssh-server',
   )
 })
