@@ -425,6 +425,7 @@ export const createWithDependencies = (
         })
         const refreshedPage = await page.refresh()
         await page.rebind(refreshedPage)
+        // await refreshedPage.waitForIdle()
         await this.shouldBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to reload window`)
