@@ -6,8 +6,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
   return {
     async hide() {
       try {
+        await page.waitForIdle()
         const sideBar = page.locator('.part.sidebar')
         const isVisible = await sideBar.isVisible()
+        await page.waitForIdle()
         if (!isVisible) {
           return
         }

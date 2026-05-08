@@ -86,7 +86,8 @@ export const setup = async ({
   await Explorer.refresh()
   await Explorer.shouldHaveItem('error.ts')
   await Explorer.selectItem('error.ts')
-  await Editor.open('error.ts')
+  await Editor.shouldHaveText(`let x:string = 1`)
+  await Editor.shouldHaveSquigglyError()
   await SideBar.hide()
   await Panel.hide()
 }
