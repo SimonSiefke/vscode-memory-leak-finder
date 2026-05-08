@@ -31,31 +31,33 @@ const getOutput = (state: ServerState): string => {
 }
 
 const isPortOpen = async (port: number, host: string): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const socket = createConnection({ host, port })
-    const finish = (value: boolean) => {
-      socket.removeAllListeners()
-      socket.destroy()
-      resolve(value)
-    }
-    socket.once('connect', () => finish(true))
-    socket.once('error', () => finish(false))
-    socket.setTimeout(500, () => finish(false))
-  })
+  const { promise, resolve } = Promise.withResolvers<boolean>()
+  const socket = createConnection({ host, port })
+  const finish = (value: boolean) => {
+    socket.removeAllListeners()
+    socket.destroy()
+    resolve(value)
+  }
+  socket.once('connect', () => finish(true))
+  socket.once('error', () => finish(false))
+  socket.setTimeout(500, () => finish(false))
+  return promise
 }
 
 const sleep = async (milliseconds: number): Promise<void> => {
-  await new Promise((resolve) => setTimeout(resolve, milliseconds))
+  const { promise, resolve } = Promise.withResolvers<void>()
+  setTimeout(resolve, milliseconds)
+  await promise
 }
 
 const waitForExit = async (childProcess: any, milliseconds: number): Promise<void> => {
   if (!childProcess || childProcess.exitCode !== null || childProcess.signalCode !== null) {
     return
   }
+  const { promise, resolve } = Promise.withResolvers<void>()
+  childProcess.once('exit', () => resolve())
   await Promise.race([
-    new Promise<void>((resolve) => {
-      childProcess.once('exit', () => resolve())
-    }),
+    promise,
     sleep(milliseconds),
   ])
 }
