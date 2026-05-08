@@ -592,6 +592,13 @@ export interface Suggest {
   close(): Promise<void>
   open(expectedItem: any): Promise<void>
 }
+export interface SshServer {
+  connect(options?: any): Promise<void>
+  dispose(): Promise<void>
+  launch(): Promise<void>
+  shouldBeConnected(options?: any): Promise<void>
+  waitForPort(options?: any): Promise<void>
+}
 export interface Tab {
   openContextMenu(label: any): Promise<void>
 }
@@ -764,6 +771,7 @@ export interface PageObjectApi {
   readonly SourceControl: SourceControl
   readonly StatusBar: StatusBar
   readonly Suggest: Suggest
+  readonly SshServer: SshServer
   readonly Tab: Tab
   readonly Task: Task
   readonly Terminal: Terminal
