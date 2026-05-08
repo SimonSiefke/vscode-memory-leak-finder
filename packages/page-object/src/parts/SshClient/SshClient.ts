@@ -118,7 +118,7 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
     async openFolder(): Promise<void> {
       try {
         const folderPath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace` // TODO
-        const defaultValue = '/home/simon'
+        const defaultValue = '/home/simon/'
         const button = page.locator('.monaco-button.monaco-text-button', {
           hasText: 'Open Folder',
         })
