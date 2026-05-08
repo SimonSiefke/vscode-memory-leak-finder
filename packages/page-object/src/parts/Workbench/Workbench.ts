@@ -418,9 +418,14 @@ export const createWithDependencies = (
           VError,
         })
 
-        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
+        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow, {
+          stayVisible: true,
+          pressKeyOnce: true,
+          stopsApplication: true,
+        })
         const refreshedPage = await page.refresh()
         await page.rebind(refreshedPage)
+        await expect(refreshedPage).toBeLoaded()
         await this.shouldBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to reload window`)

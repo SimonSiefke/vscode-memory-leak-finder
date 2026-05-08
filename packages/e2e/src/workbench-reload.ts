@@ -12,6 +12,7 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem(fileName)
   await Editor.open(fileName)
 }
