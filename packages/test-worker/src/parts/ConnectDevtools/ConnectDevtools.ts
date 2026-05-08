@@ -17,7 +17,13 @@ const createDefaultContext = (sessionRpc, utilityContext) => {
     callFunctionOn(options) {
       return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
         ...options,
-        uniqueContextId: utilityContext.uniqueId,
+        ...(utilityContext.uniqueId
+          ? {
+              uniqueContextId: utilityContext.uniqueId,
+            }
+          : {
+              contextId: utilityContext.id,
+            }),
       })
     },
   }
@@ -28,13 +34,25 @@ const createUtilityContext = (sessionRpc, utilityContext) => {
     callFunctionOn(options) {
       return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {
         ...options,
-        uniqueContextId: utilityContext.uniqueId,
+        ...(utilityContext.uniqueId
+          ? {
+              uniqueContextId: utilityContext.uniqueId,
+            }
+          : {
+              executionContextId: utilityContext.id,
+            }),
       })
     },
     evaluate(options) {
       return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
         ...options,
-        uniqueContextId: utilityContext.uniqueId,
+        ...(utilityContext.uniqueId
+          ? {
+              uniqueContextId: utilityContext.uniqueId,
+            }
+          : {
+              contextId: utilityContext.id,
+            }),
       })
     },
   }
@@ -86,7 +104,7 @@ export const connectDevtools = async (
     utilityContext,
   })
 
-  const pageObjectContext = {
+  const pageObjectContext: any = {
     browserRpc,
     defaultContext: createDefaultContext(sessionRpc, utilityContext),
     electronApp: undefined,

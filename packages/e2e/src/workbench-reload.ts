@@ -18,10 +18,10 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
 
 export const run = async ({ Editor, Workbench }: TestContext): Promise<void> => {
   await Workbench.shouldBeVisible()
-  await Editor.shouldContainText(fileContent)
+  await Editor.shouldHaveText(fileContent)
   await Workbench.reload()
   await Workbench.shouldBeVisible()
-  await Editor.shouldContainText(fileContent)
+  await Editor.shouldHaveText(fileContent)
   await Workbench.focusLeftEditorGroup()
 }
 

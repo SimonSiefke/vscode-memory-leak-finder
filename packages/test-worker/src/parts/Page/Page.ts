@@ -1,3 +1,5 @@
+import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUtilityExecutionContext.ts'
+import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
 import * as Locator from '../Locator/Locator.ts'
 import * as PageBlur from '../PageBlur/PageBlur.ts'
@@ -97,6 +99,21 @@ export const create = ({
     objectType: DevtoolsTargetType.Page,
     pressKeyExponential(options) {
       return PageKeyBoard.pressKeyExponential(this.sessionRpc, utilityContext, options)
+    },
+    async refresh() {
+      const { frameTree } = await DevtoolsProtocolPage.getFrameTree(this.sessionRpc)
+      const nextUtilityContext = await addUtilityExecutionContext(this.sessionRpc, 'utility', frameTree.frame.id)
+      return create({
+        browserRpc,
+        electronObjectId,
+        electronRpc,
+        idleTimeout,
+        rpc: this.rpc,
+        sessionId: this.sessionId,
+        sessionRpc: this.sessionRpc,
+        targetId: this.targetId,
+        utilityContext: nextUtilityContext,
+      })
     },
     async reload() {
       return PageReload.reload(this.rpc)

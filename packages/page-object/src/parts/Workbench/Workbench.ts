@@ -1,5 +1,4 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
-import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
@@ -124,38 +123,16 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
     },
     async reload(): Promise<void> {
       try {
-        const reloadWindowPromise = this.waitForNewWindow({ timeout: 10_000 })
         await page.waitForIdle()
+        await page.reload()
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
 
-        const quickPick = page.locator('.quick-input-widget')
-        await page.pressKeyExponential({
-          key: KeyBindings.getOpenQuickPickCommands(platform || ''),
-          waitFor: quickPick,
-        })
-        await expect(quickPick).toBeVisible({ timeout: 10_000 })
-
-        const quickPickInput = quickPick.locator('.ibwrapper .input')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused({ timeout: 3_000 })
-        await quickPickInput.type(WellKnownCommands.DeveloperReloadWindow)
-
-        const reloadOption = quickPick.locator('.label-name', {
-          hasExactText: WellKnownCommands.DeveloperReloadWindow,
-        })
-        await expect(reloadOption).toBeVisible()
-        await reloadOption.click()
-
-        const sessionId = await reloadWindowPromise
-        if (!sessionId) {
-          throw new Error(`Failed to wait for reloaded window`)
+        try {
+          await page.waitForIdle()
+        } catch {
+          // The renderer can be in flux immediately after reload. Visibility check below is the real readiness gate.
         }
-
-        const reloadedPage = await electronApp.waitForPage({
-          injectUtilityScript: true,
-          sessionId,
-        })
-        await page.rebind(reloadedPage)
-        await page.waitForIdle()
         await this.shouldBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to reload window`)
