@@ -278,6 +278,10 @@ export const createWithDependencies = (
       await page.waitForIdle()
       await expect(statusBarItem).toBeVisible()
       await page.waitForIdle()
+      const input = page.locator(`[aria-label="Select the platform of the remote host 'local-test'"]`)
+      await expect(input).toBeVisible()
+      await expect(input).toBeFocused()
+      console.log('input...')
       const quickPick = dependencies.createQuickPick()
 
       await new Promise((r) => {})
