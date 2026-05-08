@@ -271,6 +271,8 @@ export const createWithDependencies = (
       await quickPick.pressEnter()
     },
     async connectToSshPart2(options: ConnectToSshOptions): Promise<void> {
+      // TODO avoid hardcoded timeout
+      // would need to wait dynamically for page created/reloaded event
       await new Promise((r) => {
         setTimeout(r, 3000)
       })
