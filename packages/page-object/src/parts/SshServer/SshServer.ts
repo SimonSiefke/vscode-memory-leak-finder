@@ -2,7 +2,6 @@ import { spawn } from 'node:child_process'
 import { createConnection } from 'node:net'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-const defaultAddress = '127.0.0.1:9888'
 const defaultHost = '127.0.0.1'
 const defaultPort = 9888
 const defaultScriptPath = '/home/simon/.cache/repos/vscode/scripts/code-server.sh'
@@ -70,7 +69,7 @@ const isNavigationTransitionError = (error: unknown): boolean => {
   )
 }
 
-export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, page, reconnectDevtools, VError }: CreateParams) => {
   const state: ServerState = {
     output: [],
   }
@@ -143,13 +142,16 @@ export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateP
         }
 
         const reconnected = reconnectPromise ? await reconnectPromise : false
+        let recoveredFromTransitionError = false
+
+        if (!reconnected) {
+          const refreshedPage = await page.refresh()
+          await page.rebind(refreshedPage)
+        }
+
         const start = Date.now()
         while (Date.now() - start < 30_000) {
           try {
-            if (!reconnected) {
-              const refreshedPage = await page.refresh()
-              await page.rebind(refreshedPage)
-            }
             const href = await page.evaluate({
               expression: `(() => globalThis.location?.href || '')()`,
               returnByValue: true,
@@ -158,8 +160,12 @@ export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateP
               await page.waitForIdle()
               return
             }
-          } catch {
-            // Keep polling until the navigation settles.
+          } catch (error) {
+            if (!recoveredFromTransitionError && isNavigationTransitionError(error)) {
+              const refreshedPage = await page.refresh()
+              await page.rebind(refreshedPage)
+              recoveredFromTransitionError = true
+            }
           }
           await sleep(250)
         }
@@ -168,7 +174,7 @@ export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateP
         throw new VError(error, `Failed to connect to SSH server ${url}`)
       }
     },
-    async shouldBeConnected({ address = defaultAddress, url = defaultUrl } = {}): Promise<void> {
+    async shouldBeConnected({ url = defaultUrl } = {}): Promise<void> {
       try {
         await page.waitForIdle()
         const href = await page.evaluate({
@@ -178,16 +184,8 @@ export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateP
         if (!String(href).startsWith(url)) {
           throw new Error(`Unexpected location after connecting: ${href}`)
         }
-        const bodyText = (await page.locator('body').textContent()) || ''
-        if (!bodyText.includes('Visual Studio Code') && !bodyText.includes(address)) {
-          const title = await page.evaluate({
-            expression: `(() => document.title || '')()`,
-            returnByValue: true,
-          })
-          if (!String(title).includes('Visual Studio Code') && !String(title).includes(address)) {
-            throw new Error(`Connected page did not look like code-server. href=${href} title=${title}`)
-          }
-        }
+        const workbench = page.locator('.monaco-workbench')
+        await expect(workbench).toBeVisible({ timeout: 30_000 })
       } catch (error) {
         throw new VError(error, `Failed to verify SSH server connection`)
       }
