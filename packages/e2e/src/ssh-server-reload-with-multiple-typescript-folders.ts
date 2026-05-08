@@ -101,7 +101,7 @@ export const run = async ({ SshClient, Explorer, Editor, SideBar, Workspace }: T
   await Explorer.refresh()
   for (const item of initialFiles) {
     await Workspace.add({
-      name: item.name,
+      name: `${uuid}/${item.name}`,
       content: item.content,
     })
   }
