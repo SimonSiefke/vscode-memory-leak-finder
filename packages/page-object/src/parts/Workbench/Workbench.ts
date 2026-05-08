@@ -159,15 +159,13 @@ const refreshPage = async (page: any): Promise<void> => {
   await page.rebind(refreshedPage)
 }
 
-const waitForReloadAndRebind = async (
-  {
-    page,
-    reconnectDevtools,
-  }: {
-    page: any
-    reconnectDevtools: (() => Promise<void>) | undefined
-  },
-): Promise<void> => {
+const waitForReloadAndRebind = async ({
+  page,
+  reconnectDevtools,
+}: {
+  page: any
+  reconnectDevtools: (() => Promise<void>) | undefined
+}): Promise<void> => {
   if (reconnectDevtools) {
     try {
       await reconnectDevtools()
@@ -225,7 +223,7 @@ const waitForSshConnection = async (
       }
     } catch (error) {
       if (!recoveredFromTransitionError && isReloadTransitionError(error)) {
-        await waitForReloadAndRebind({ page, reconnectDevtools },)
+        await waitForReloadAndRebind({ page, reconnectDevtools })
         recoveredFromTransitionError = true
         continue
       }
