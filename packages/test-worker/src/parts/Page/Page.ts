@@ -103,6 +103,7 @@ export const create = ({
     async refresh() {
       const { frameTree } = await DevtoolsProtocolPage.getFrameTree(this.sessionRpc)
       const nextUtilityContext = await addUtilityExecutionContext(this.sessionRpc, 'utility', frameTree.frame.id)
+      console.log({ frameTree, nextUtilityContext })
       return create({
         browserRpc,
         electronObjectId,

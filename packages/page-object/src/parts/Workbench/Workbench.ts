@@ -271,6 +271,9 @@ export const createWithDependencies = (
       await quickPick.pressEnter()
     },
     async connectToSshPart2(options: ConnectToSshOptions): Promise<void> {
+      await new Promise((r) => {
+        setTimeout(r, 3000)
+      })
       const refreshedPage = await page.refresh()
       await page.rebind(refreshedPage)
       return refreshedPage
@@ -281,7 +284,7 @@ export const createWithDependencies = (
       await page.waitForIdle()
       await expect(statusBarItem).toBeVisible()
       await page.waitForIdle()
-      const input = page.locator(`[aria-label="Select the platform of the remote host 'local-test'"]`)
+      const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
       await expect(input).toBeVisible()
       await expect(input).toBeFocused()
       console.log('input...')
