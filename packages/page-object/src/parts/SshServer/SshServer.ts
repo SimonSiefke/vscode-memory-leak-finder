@@ -4,7 +4,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 const defaultHost = '127.0.0.1'
 const defaultPort = 9888
-const defaultScriptPath = '/home/simon/.cache/repos/vscode/scripts/code-server.sh'
+const defaultScriptPath = '/home/simon/.cache/repos/vscode/scripts/code-server.sh' // TODO make this configurable
 const defaultTimeout = 120_000
 const defaultUrl = 'http://127.0.0.1:9888/'
 
