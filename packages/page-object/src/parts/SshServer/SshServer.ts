@@ -109,7 +109,11 @@ const waitForPortInternal = async (
 }
 
 export const create = ({ electronApp, page, reconnectDevtools, VError }: CreateParams) => {
-  return createWithDependencies({ electronApp, page, reconnectDevtools, VError }, { spawnProcess: spawn, isPortOpen, sleep })
+  return createWithDependencies(reconnectDevtools ? { electronApp, page, reconnectDevtools, VError } : { electronApp, page, VError }, {
+    spawnProcess: spawn,
+    isPortOpen,
+    sleep,
+  })
 }
 
 export const createWithDependencies = (

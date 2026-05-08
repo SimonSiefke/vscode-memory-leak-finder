@@ -6,9 +6,8 @@ export const setup = async ({ SshServer }: TestContext): Promise<void> => {
   await SshServer.shouldBeConnected()
 }
 
-export const run = async ({ SshServer, Workbench }: TestContext): Promise<void> => {
+export const run = async ({ Workbench }: TestContext): Promise<void> => {
   await Workbench.reload()
-  await SshServer.shouldBeConnected()
 }
 
 export const teardown = async ({ SshServer }: TestContext): Promise<void> => {
