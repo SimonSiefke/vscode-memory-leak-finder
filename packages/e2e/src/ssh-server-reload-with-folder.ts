@@ -23,7 +23,7 @@ const waitForFolderTitle = async (Electron: TestContext['Electron']): Promise<vo
 
 export const setup = async ({
   SshServer,
-  Workbench,
+  SshClient,
   Extensions,
   Electron,
   SideBar,
@@ -40,7 +40,7 @@ export const setup = async ({
     name: 'Remote - SSH',
   })
   const connection = await SshServer.launch()
-  await Workbench.connectToSsh(connection)
+  await SshClient.connectToSsh(connection)
   await ActivityBar.showExplorer()
   await Explorer.openFolder()
   await waitForFolderTitle(Electron)
@@ -48,11 +48,9 @@ export const setup = async ({
   await Panel.hide()
 }
 
-export const run = async ({ Workbench }: TestContext): Promise<void> => {
-  // @ts-ignore
-  await Workbench.reload({
-    isSsh: true,
-  })
+export const run = async ({ Workbench, SshClient }: TestContext): Promise<void> => {
+  await Workbench.reload()
+  await SshClient.waitForConnectionReady({ alias: 'local-test' })
 }
 
 export const teardown = async ({ SshServer }: TestContext): Promise<void> => {

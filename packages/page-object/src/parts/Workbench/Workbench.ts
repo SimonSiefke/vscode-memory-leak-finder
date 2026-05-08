@@ -3,13 +3,6 @@ import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-type ConnectToSshOptions = {
-  readonly alias?: string
-  readonly host?: string
-  readonly port?: number
-  readonly user?: string
-}
-
 type QuickPickApi = {
   executeCommand: (
     command: string,
@@ -52,20 +45,6 @@ const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: strin
   }
 }
 
-const resolveSshTarget = ({ alias, host = '127.0.0.1', port, user }: ConnectToSshOptions): string => {
-  if (alias) {
-    return alias
-  }
-  if (typeof port === 'number') {
-    return user ? `${user}@${host}:${port}` : `${host}:${port}`
-  }
-  throw new Error(`alias or port is required`)
-}
-
-const getSshStatusBarSelector = (target: string): string => {
-  return `.statusbar-item-label[aria-label*="SSH: ${target}"]`
-}
-
 const sleep = async (milliseconds: number): Promise<void> => {
   const { promise, resolve } = Promise.withResolvers<void>()
   setTimeout(resolve, milliseconds)
@@ -96,98 +75,7 @@ export const createWithDependencies = (
   { browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams,
   dependencies: WorkbenchDependencies,
 ) => {
-  const openSshRemoteInCurrentWindow = async (target: string): Promise<boolean> => {
-    return page.evaluate({
-      awaitPromise: true,
-      expression: `((async () => {
-  const candidates = [
-    globalThis.workbench?.commands,
-    globalThis.vscode?.commands,
-    globalThis.monaco?.commands,
-    globalThis.mainWindow?.commands,
-  ]
-  for (const commands of candidates) {
-    if (!commands || typeof commands.executeCommand !== 'function') {
-      continue
-    }
-    try {
-      await commands.executeCommand('vscode.newWindow', {
-        remoteAuthority: ${JSON.stringify(`ssh-remote+${target}`)},
-        reuseWindow: true,
-      })
-      return true
-    } catch {
-    }
-  }
-  return false
-})())`,
-    })
-  }
-
-  const selectRemoteHostPlatform = async (): Promise<void> => {
-    const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
-    for (let attempt = 0; attempt < 10; attempt++) {
-      if (await input.isVisible()) {
-        await expect(input).toBeVisible()
-        await expect(input).toBeFocused()
-        const quickPick = dependencies.createQuickPick()
-        await quickPick.select('Linux')
-        await page.waitForIdle()
-        return
-      }
-      await dependencies.sleep(1000)
-    }
-  }
-
   return {
-    async connectToSshPart1(options: ConnectToSshOptions): Promise<void> {
-      const target = resolveSshTarget(options)
-      const quickPick = dependencies.createQuickPick()
-      await page.waitForIdle()
-      await quickPick.executeCommand(WellKnownCommands.RemoteSshConnectCurrentWindowToHost, {
-        stayVisible: true,
-        pressKeyOnce: true,
-      })
-      for (let attempt = 0; attempt < 10; attempt++) {
-        try {
-          await quickPick.select(new RegExp(target))
-          return
-        } catch {
-          await dependencies.sleep(1000)
-        }
-      }
-      if (await openSshRemoteInCurrentWindow(target)) {
-        return
-      }
-    },
-    async connectToSshPart2(_options: ConnectToSshOptions): Promise<void> {
-      // TODO avoid hardcoded timeout
-      // would need to wait dynamically for page created/reloaded event
-      await new Promise((r) => {
-        setTimeout(r, 3000)
-      })
-      const refreshedPage = await page.refresh()
-      await page.rebind(refreshedPage)
-      return refreshedPage
-    },
-    async connectToSshPart3(options: ConnectToSshOptions): Promise<void> {
-      await selectRemoteHostPlatform()
-      await page.waitForIdle()
-      const statusBarItemFinished = page.locator(getSshStatusBarSelector(resolveSshTarget(options)))
-      await expect(statusBarItemFinished).toBeVisible({ timeout: 60_000 })
-    },
-    async connectToSsh(options: ConnectToSshOptions): Promise<void> {
-      try {
-        // TODO this is probably a race condition and bad
-        const refreshPromise = page.waitForRefresh()
-        await this.connectToSshPart1(options)
-        await refreshPromise
-        await this.connectToSshPart2(options)
-        await this.connectToSshPart3(options)
-      } catch (error) {
-        throw new VError(error, `Failed to connect to ssh server`)
-      }
-    },
     async openFolder(): Promise<void> {
       try {
         await page.waitForIdle()
@@ -383,7 +271,7 @@ export const createWithDependencies = (
         throw new VError(error, `Failed to open new window`)
       }
     },
-    async reload({ isSsh = false } = {}): Promise<void> {
+    async reload(): Promise<void> {
       try {
         await page.waitForIdle()
 
@@ -397,13 +285,6 @@ export const createWithDependencies = (
         await page.waitForRefresh()
         const refreshedPage = await page.refresh()
         await page.rebind(refreshedPage)
-
-        if (isSsh) {
-          await page.waitForIdle()
-          const statusBarItemFinished = page.locator(getSshStatusBarSelector('local-test'))
-          await expect(statusBarItemFinished).toBeVisible({ timeout: 60_000 })
-          await page.waitForIdle()
-        }
         await this.shouldBeVisible()
         await page.waitForIdle()
       } catch (error) {
