@@ -13,6 +13,19 @@ const getEvaluateContextOptions = (utilityContext: { id?: number; uniqueId?: str
   }
 }
 
+const waitForContextWithTimeout = async (promise: Promise<any>, timeout: number) => {
+  const { promise: timeoutPromise, resolve } = Promise.withResolvers<undefined>()
+  const timeoutRef = setTimeout(() => {
+    resolve(undefined)
+  }, timeout)
+  try {
+    const result = await Promise.race([promise, timeoutPromise])
+    return result
+  } finally {
+    clearTimeout(timeoutRef)
+  }
+}
+
 const getMatchingContext = (contexts: Record<string, any>, utilityExecutionContextName: string) => {
   for (const value of Object.values(contexts)) {
     if (value.name === utilityExecutionContextName) {
@@ -41,13 +54,15 @@ export const addUtilityExecutionContext = async (rpc, utilityExecutionContextNam
     worldName: utilityExecutionContextName,
   })
 
+  const createdExecutionContext = await waitForContextWithTimeout(executionContextPromise, 5000)
   const utilityContext =
-    typeof createIsolatedWorldResult?.executionContextId === 'number'
+    createdExecutionContext ||
+    (typeof createIsolatedWorldResult?.executionContextId === 'number'
       ? {
           id: createIsolatedWorldResult.executionContextId,
           name: utilityExecutionContextName,
         }
-      : await executionContextPromise
+      : await executionContextPromise)
   await DevtoolsProtocolRuntime.disable(rpc)
 
   const utilityScript = await UtilityScript.getUtilityScript()
@@ -55,5 +70,22 @@ export const addUtilityExecutionContext = async (rpc, utilityExecutionContextNam
     expression: utilityScript,
     ...getEvaluateContextOptions(utilityContext),
   })
+
+  const testType = await DevtoolsProtocolRuntime.evaluate(rpc, {
+    expression: 'typeof test',
+    returnByValue: true,
+    ...getEvaluateContextOptions(utilityContext),
+  })
+
+  if (testType !== 'object' && !utilityContext.uniqueId) {
+    const contextFromEvent = await waitForContextWithTimeout(executionContextPromise, 5000)
+    if (contextFromEvent) {
+      await DevtoolsProtocolRuntime.evaluate(rpc, {
+        expression: utilityScript,
+        ...getEvaluateContextOptions(contextFromEvent),
+      })
+      return contextFromEvent
+    }
+  }
   return utilityContext
 }
