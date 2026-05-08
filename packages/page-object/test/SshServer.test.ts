@@ -21,7 +21,6 @@ test('launch waits for port to be ready before resolving', async () => {
     {
       electronApp: {},
       page: {},
-      reconnectDevtools: undefined,
       VError: class MockVError extends Error {
         constructor(error: unknown, message: string) {
           super(`${message}: ${error instanceof Error ? error.message : String(error)}`)
