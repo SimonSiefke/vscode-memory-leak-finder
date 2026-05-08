@@ -162,10 +162,19 @@ export const createWithDependencies = (
           stopsApplication: true,
         })
         await refreshPromise
-        const refreshedPage = await page.refresh()
-        await page.rebind(refreshedPage)
-        await this.shouldBeVisible()
-        await page.waitForIdle()
+        for (let attempt = 0; attempt < 10; attempt++) {
+          const refreshedPage = await page.refresh()
+          await page.rebind(refreshedPage)
+          try {
+            const workbench = page.locator('.monaco-workbench')
+            await expect(workbench).toBeVisible({ timeout: 1000 })
+            await page.waitForIdle()
+            return
+          } catch {
+            await dependencies.sleep(1000)
+          }
+        }
+        throw new Error('Timed out waiting for workbench after opening folder')
       } catch (error) {
         throw new VError(error, `Failed to open folder`)
       }
@@ -315,7 +324,7 @@ export const createWithDependencies = (
   const { BrowserWindow } = globalThis._____electron
   const window = BrowserWindow.fromId(${newWindowId})
   return window && !window.isDestroyed() ? window.getTitle() : ''
-})()`) as unknown) as string
+})()`)) as unknown as string
                 if (title.includes(value)) {
                   return
                 }
