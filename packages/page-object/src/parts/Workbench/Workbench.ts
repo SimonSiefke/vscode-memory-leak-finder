@@ -296,7 +296,6 @@ export const createWithDependencies = (
       await expect(statusBarItemFinished).toBeVisible()
       await page.waitForIdle()
       await expect(statusBarItemFinished).toBeVisible()
-      await new Promise((r) => {})
     },
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {

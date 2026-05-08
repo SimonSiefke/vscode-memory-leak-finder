@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ SshServer, Workbench, Extensions, Electron }: TestContext): Promise<void> => {
+export const setup = async ({ SshServer, Workbench, Extensions, Electron, SideBar, Panel }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
   })
@@ -10,6 +10,8 @@ export const setup = async ({ SshServer, Workbench, Extensions, Electron }: Test
   })
   const connection = await SshServer.launch()
   await Workbench.connectToSsh(connection)
+  await SideBar.hide()
+  await Panel.hide()
 }
 
 export const run = async ({}: TestContext): Promise<void> => {
