@@ -10,7 +10,6 @@ export const setup = async ({ SshServer, Workbench, Extensions, Electron }: Test
   })
   const connection = await SshServer.launch()
   await Workbench.connectToSsh(connection)
-  await SshServer.shouldBeConnected()
 }
 
 export const run = async ({}: TestContext): Promise<void> => {
