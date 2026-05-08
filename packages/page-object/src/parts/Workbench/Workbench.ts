@@ -274,7 +274,14 @@ export const createWithDependencies = (
       await waitForReloadAndRebind({ page, reconnectDevtools })
     },
     async connectToSshPart3(options: ConnectToSshOptions): Promise<void> {
+      const statusBarItem = page.locator('.statusbar-item-label[aria-label="Opening Remote..."]')
+      await page.waitForIdle()
+      await expect(statusBarItem).toBeVisible()
+      await page.waitForIdle()
       const quickPick = dependencies.createQuickPick()
+
+      await new Promise((r) => {})
+
       await waitForRemoteHostPlatformPrompt(quickPick, dependencies, platform)
       await waitForSshConnection({ page, reconnectDevtools, options }, dependencies)
     },
@@ -282,8 +289,6 @@ export const createWithDependencies = (
       try {
         await this.connectToSshPart1(options)
         await this.connectToSshPart2(options)
-        console.log('did reload')
-        await new Promise((r) => {})
         await this.connectToSshPart3(options)
       } catch (error) {
         throw new VError(error, `Failed to connect to ssh server`)
