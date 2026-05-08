@@ -10,7 +10,7 @@ const waitForFolderTitle = async (Electron: TestContext['Electron']): Promise<vo
       const { BrowserWindow } = globalThis._____electron
       const window = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows()[0]
       return window ? window.getTitle() : ''
-    })()`) as unknown) as string
+    })()`)) as unknown as string
     if (title.includes('.vscode-test-workspace')) {
       return
     }
