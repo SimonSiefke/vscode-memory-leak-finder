@@ -118,7 +118,7 @@ export const createWithDependencies = (
         throw new VError(error, `Failed to connect to ssh server`)
       }
     },
-    async openFolder(): Promise<void> {
+    async openFolder(options: ConnectToSshOptions): Promise<void> {
       try {
         const folderPath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace` // TODO
         const defaultValue = '/home/simon/'
@@ -169,7 +169,7 @@ export const createWithDependencies = (
         await refreshPromise
         const newPage = await page.refresh()
         await page.rebind(newPage)
-        await this.connectToSshPart2({})
+        await this.connectToSshPart2(options)
       } catch (error) {
         throw new VError(error, `Failed to open folder`)
       }
