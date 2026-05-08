@@ -301,7 +301,7 @@ export const createWithDependencies = (
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {
         // TODO this is probably a race condition and bad
-        const refreshPromise = await page.waitForRefresh()
+        const refreshPromise = page.waitForRefresh()
         await this.connectToSshPart1(options)
         await refreshPromise
         await this.connectToSshPart2(options)
