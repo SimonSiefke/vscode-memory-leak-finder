@@ -1,14 +1,18 @@
 import { spawn } from 'node:child_process'
 import { createConnection } from 'node:net'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
-import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const defaultHost = '127.0.0.1'
 const defaultPort = 9888
 const defaultScriptPath = '/home/simon/.cache/repos/vscode/scripts/code-server.sh' // TODO make this configurable
 const defaultTimeout = 120_000
 const defaultUrl = 'http://127.0.0.1:9888/'
+
+export type SshServerConnection = {
+  readonly host: string
+  readonly port: number
+  readonly url: string
+}
 
 type ServerState = {
   readonly output: string[]
@@ -24,23 +28,13 @@ type WaitForPortOptions = {
 }
 
 type SshServerDependencies = {
-  readonly createQuickPick: () => {
-    executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
-    pressEnter: () => Promise<void>
-    type: (value: string) => Promise<void>
-  }
   readonly spawnProcess: typeof spawn
   readonly isPortOpen: (port: number, host: string) => Promise<boolean>
   readonly sleep: (milliseconds: number) => Promise<void>
 }
 
 type SshServerCreateParams = {
-  readonly electronApp: any
-  readonly expect?: any
-  readonly ideVersion?: CreateParams['ideVersion']
   readonly page: any
-  readonly platform?: string
-  readonly reconnectDevtools?: () => Promise<void>
   readonly VError: any
 }
 
@@ -118,58 +112,10 @@ const waitForPortInternal = async (
   throw new Error(`Timed out waiting for ${host}:${port} to accept connections\n${getOutput(state)}`)
 }
 
-const waitForConnection = async (
-  page: any,
-  dependencies: SshServerDependencies,
-  url: string,
-  reconnectPromise?: Promise<boolean>,
-): Promise<void> => {
-  const reconnected = reconnectPromise ? await reconnectPromise : false
-  let recoveredFromTransitionError = false
-
-  if (!reconnected) {
-    const refreshedPage = await page.refresh()
-    await page.rebind(refreshedPage)
-  }
-
-  const start = Date.now()
-  while (Date.now() - start < 30_000) {
-    try {
-      const href = await page.evaluate({
-        expression: `(() => globalThis.location?.href || '')()`,
-        returnByValue: true,
-      })
-      if (String(href).startsWith(url)) {
-        await page.waitForIdle()
-        return
-      }
-    } catch (error) {
-      if (!recoveredFromTransitionError && isNavigationTransitionError(error)) {
-        const refreshedPage = await page.refresh()
-        await page.rebind(refreshedPage)
-        recoveredFromTransitionError = true
-      }
-    }
-    await dependencies.sleep(250)
-  }
-  throw new Error(`Timed out waiting to navigate to ${url}`)
-}
-
 export const create = ({ electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }: CreateParams) => {
   return createWithDependencies(
-    reconnectDevtools
-      ? { electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }
-      : { electronApp, expect, ideVersion, page, platform, VError },
+    { page, VError },
     {
-      createQuickPick: () =>
-        QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        }),
       spawnProcess: spawn,
       isPortOpen,
       sleep,
@@ -177,13 +123,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, reconn
   )
 }
 
-export const createWithDependencies = ({ page, reconnectDevtools, VError }: SshServerCreateParams, dependencies: SshServerDependencies) => {
+export const createWithDependencies = ({ page, VError }: SshServerCreateParams, dependencies: SshServerDependencies) => {
   const state: ServerState = {
     output: [],
   }
 
+  const getConnection = (): SshServerConnection => {
+    return {
+      host: defaultHost,
+      port: defaultPort,
+      url: defaultUrl,
+    }
+  }
+
   return {
-    async launch(): Promise<void> {
+    async launch(): Promise<SshServerConnection> {
       try {
         if (!state.childProcess || state.childProcess.exitCode !== null || state.childProcess.signalCode !== null) {
           const childProcess = dependencies.spawnProcess(defaultScriptPath, ['--without-connection-token'], {
@@ -199,6 +153,7 @@ export const createWithDependencies = ({ page, reconnectDevtools, VError }: SshS
           })
         }
         await waitForPortInternal(state, dependencies)
+        return getConnection()
       } catch (error) {
         throw new VError(error, `Failed to launch SSH server`)
       }
@@ -208,33 +163,6 @@ export const createWithDependencies = ({ page, reconnectDevtools, VError }: SshS
         await waitForPortInternal(state, dependencies, { host, port, timeout })
       } catch (error) {
         throw new VError(error, `Failed to wait for SSH server port ${host}:${port}`)
-      }
-    },
-    async connect({ url = defaultUrl } = {}): Promise<void> {
-      try {
-        const quickPick = dependencies.createQuickPick()
-        const reconnectPromise = reconnectDevtools
-          ? reconnectDevtools().then(
-              () => true,
-              () => false,
-            )
-          : undefined
-
-        await page.waitForIdle()
-        await quickPick.executeCommand(WellKnownCommands.RemoteSshConnectCurrentWindowToHost, {
-          stayVisible: true,
-        })
-        await quickPick.type(url)
-        try {
-          await quickPick.pressEnter()
-        } catch (error) {
-          if (!isNavigationTransitionError(error)) {
-            throw error
-          }
-        }
-        await waitForConnection(page, dependencies, url, reconnectPromise)
-      } catch (error) {
-        throw new VError(error, `Failed to connect to SSH server ${url}`)
       }
     },
     async shouldBeConnected({ url = defaultUrl } = {}): Promise<void> {

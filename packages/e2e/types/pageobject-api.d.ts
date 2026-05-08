@@ -593,9 +593,12 @@ export interface Suggest {
   open(expectedItem: any): Promise<void>
 }
 export interface SshServer {
-  connect(options?: any): Promise<void>
   dispose(): Promise<void>
-  launch(): Promise<void>
+  launch(): Promise<{
+    host: string
+    port: number
+    url: string
+  }>
   shouldBeConnected(options?: any): Promise<void>
   waitForPort(options?: any): Promise<void>
 }
@@ -693,6 +696,11 @@ export interface Window {
   focus(): Promise<void>
 }
 export interface Workbench {
+  connectToSsh(options: {
+    host?: string
+    port?: number
+    url?: string
+  }): Promise<void>
   focusLeftEditorGroup(): Promise<void>
   openNewWindow(): Promise<{
     close(): Promise<void>

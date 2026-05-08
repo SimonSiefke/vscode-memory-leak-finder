@@ -2,6 +2,12 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+type ConnectToSshOptions = {
+  readonly host?: string
+  readonly port?: number
+  readonly url?: string
+}
+
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
   readonly sessionRpc?: any
@@ -33,8 +39,90 @@ const isReloadTransitionError = (error: unknown): boolean => {
   )
 }
 
+const resolveSshUrl = ({ host = '127.0.0.1', port, url }: ConnectToSshOptions): string => {
+  if (url) {
+    return url
+  }
+  if (typeof port === 'number') {
+    return `http://${host}:${port}/`
+  }
+  throw new Error(`url or port is required`)
+}
+
+const waitForSshConnection = async ({ page, reconnectDevtools }: { page: any; reconnectDevtools?: () => Promise<void> }, url: string) => {
+  const reconnectPromise = reconnectDevtools
+    ? reconnectDevtools().then(
+        () => true,
+        () => false,
+      )
+    : undefined
+
+  const reconnected = reconnectPromise ? await reconnectPromise : false
+  let recoveredFromTransitionError = false
+
+  if (!reconnected) {
+    const refreshedPage = await page.refresh()
+    await page.rebind(refreshedPage)
+  }
+
+  const start = Date.now()
+  while (Date.now() - start < 30_000) {
+    try {
+      const href = await page.evaluate({
+        expression: `(() => globalThis.location?.href || '')()`,
+        returnByValue: true,
+      })
+      if (String(href).startsWith(url)) {
+        await page.waitForIdle()
+        return
+      }
+    } catch (error) {
+      if (!recoveredFromTransitionError && isReloadTransitionError(error)) {
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
+        recoveredFromTransitionError = true
+      }
+    }
+      await (() => {
+        const { promise, resolve } = Promise.withResolvers<void>()
+        setTimeout(resolve, 250)
+        return promise
+      })()
+  }
+  throw new Error(`Timed out waiting to navigate to ${url}`)
+}
+
 export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
   return {
+    async connectToSsh(options: ConnectToSshOptions): Promise<void> {
+      try {
+        const url = resolveSshUrl(options)
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await page.waitForIdle()
+        await quickPick.executeCommand(WellKnownCommands.RemoteSshConnectCurrentWindowToHost, {
+          stayVisible: true,
+        })
+        await quickPick.type(url)
+        try {
+          await quickPick.pressEnter()
+        } catch (error) {
+          if (!isReloadTransitionError(error)) {
+            throw error
+          }
+        }
+        await waitForSshConnection({ page, reconnectDevtools }, url)
+      } catch (error) {
+        const message = options.url || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`
+        throw new VError(error, message)
+      }
+    },
     async waitForNewWindow({ timeout }: { timeout: number }) {
       const { promise, resolve } = Promise.withResolvers<string>()
 
