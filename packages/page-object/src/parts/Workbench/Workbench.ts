@@ -174,7 +174,7 @@ const waitForReloadAndRebind = async ({
       // Fall back to refresh/rebind when reconnecting devtools loses the page during reload.
     }
   }
-  await refreshPage(page)
+  // await refreshPage(page)
 }
 
 const hasFinishedRemoteConnection = async (page: any, options: ConnectToSshOptions): Promise<boolean> => {
@@ -271,7 +271,9 @@ export const createWithDependencies = (
       await quickPick.pressEnter()
     },
     async connectToSshPart2(options: ConnectToSshOptions): Promise<void> {
-      await waitForReloadAndRebind({ page, reconnectDevtools })
+      const refreshedPage = await page.refresh()
+      await page.rebind(refreshedPage)
+      console.log('did dbing')
     },
     async connectToSshPart3(options: ConnectToSshOptions): Promise<void> {
       const statusBarItem = page.locator('.statusbar-item-label[aria-label="Opening Remote..."]')
