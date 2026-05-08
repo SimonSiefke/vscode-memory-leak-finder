@@ -279,6 +279,7 @@ export interface Explorer {
   toHaveItem(direntName: any): Promise<void>
   openAllFiles(): Promise<void>
   openContextMenu(dirent: any, select?: any): Promise<void>
+  openFolder(): Promise<void>
   openItem(direntName: any): Promise<void>
   paste(options?: any): Promise<void>
   refresh(): Promise<void>
