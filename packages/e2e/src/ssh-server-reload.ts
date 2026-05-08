@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ SshServer, Workbench }: TestContext): Promise<void> => {
+export const setup = async ({ SshServer }: TestContext): Promise<void> => {
   await SshServer.launch()
   await SshServer.waitForPort()
   await SshServer.connect()
