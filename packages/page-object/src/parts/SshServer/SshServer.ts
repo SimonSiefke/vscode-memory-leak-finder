@@ -1,16 +1,13 @@
 import { spawn } from 'node:child_process'
 import { createConnection } from 'node:net'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
-import * as QuickPick from '../QuickPick/QuickPick.ts'
 
 const defaultAddress = '127.0.0.1:9888'
 const defaultHost = '127.0.0.1'
-const defaultName = 'Local SSH Server'
 const defaultPort = 9888
 const defaultScriptPath = '/home/simon/.cache/repos/vscode/scripts/code-server.sh'
 const defaultTimeout = 120_000
-const directAddRemoteAgentHostCommandId = 'sessions.remoteAgentHost.add'
-const addRemoteAgentHostCommandLabel = 'Add Remote Agent Host...'
+const defaultUrl = 'http://127.0.0.1:9888/'
 
 type ServerState = {
   readonly output: string[]
@@ -64,7 +61,7 @@ const waitForExit = async (childProcess: any, milliseconds: number): Promise<voi
   ])
 }
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, page, VError }: CreateParams) => {
   const state: ServerState = {
     output: [],
   }
@@ -80,8 +77,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           stdio: ['ignore', 'pipe', 'pipe'],
         })
         state.childProcess = childProcess
-        state.exitCode = undefined
-        state.signalCode = undefined
         childProcess.stdout.on('data', (chunk: unknown) => appendOutput(state, chunk))
         childProcess.stderr.on('data', (chunk: unknown) => appendOutput(state, chunk))
         childProcess.once('exit', (exitCode: number | null, signalCode: NodeJS.Signals | null) => {
@@ -112,67 +107,41 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to wait for SSH server port ${host}:${port}`)
       }
     },
-    async connect({ address = defaultAddress, name = defaultName } = {}): Promise<void> {
+    async connect({ url = defaultUrl } = {}): Promise<void> {
       try {
-        await page.waitForIdle()
-        const commandResult = await page.evaluate({
-          awaitPromise: true,
-          expression: `((async () => {
-  const commandId = ${JSON.stringify(directAddRemoteAgentHostCommandId)}
-  const candidates = [
-    globalThis.workbench?.commands,
-    globalThis.vscode?.commands,
-    globalThis.monaco?.commands,
-    globalThis.mainWindow?.commands,
-  ]
-  for (const commands of candidates) {
-    if (commands && typeof commands.executeCommand === 'function') {
-      try {
-        await commands.executeCommand(commandId)
-        return true
-      } catch {
-        return false
-      }
-    }
+        await electronApp.evaluate(`(async () => {
+  const { BrowserWindow } = require('electron')
+  const browserWindow = BrowserWindow.getAllWindows()[0]
+  if (!browserWindow) {
+    throw new Error('No browser window found')
   }
-  return false
-})())`,
-          returnByValue: true,
-        })
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        if (!commandResult) {
-          await quickPick.executeCommand(addRemoteAgentHostCommandLabel, {
-            pressKeyOnce: true,
-            stayVisible: true,
-          })
-        }
-        await quickPick.type(address)
-        await quickPick.pressEnter()
-        await quickPick.type(name)
-        await quickPick.pressEnter()
+  await browserWindow.loadURL(${JSON.stringify(url)})
+})()`)
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to connect to SSH server ${address}`)
+        throw new VError(error, `Failed to connect to SSH server ${url}`)
       }
     },
-    async shouldBeConnected({ address = defaultAddress, name = defaultName } = {}): Promise<void> {
+    async shouldBeConnected({ address = defaultAddress, url = defaultUrl } = {}): Promise<void> {
       try {
         await page.waitForIdle()
-        const remoteIndicator = page.locator('#status\\.host').first()
-        await expect(remoteIndicator).toBeVisible({ timeout: 30_000 })
-        const text = ((await remoteIndicator.textContent()) || '').trim()
-        const ariaLabel = (await remoteIndicator.getAttribute('aria-label')) || ''
-        if (text.includes('Open a Remote Window') || ariaLabel.includes('Open a Remote Window')) {
-          const bodyText = (await page.locator('body').textContent()) || ''
-          if (!bodyText.includes(name) && !bodyText.includes(address)) {
-            throw new Error(`Remote indicator did not change after connecting. text=${text} ariaLabel=${ariaLabel}`)
+        const href = await page.evaluate({
+          expression: `(() => globalThis.location?.href || '')()`,
+          returnByValue: true,
+        })
+        if (!String(href).startsWith(url)) {
+          throw new Error(`Unexpected location after connecting: ${href}`)
+        }
+        const bodyText = (await page.locator('body').textContent()) || ''
+        if (!bodyText.includes('Visual Studio Code') && !bodyText.includes(address)) {
+          const title = await page.evaluate({
+            expression: `(() => document.title || '')()`,
+            returnByValue: true,
+          })
+          if (!String(title).includes('Visual Studio Code') && !String(title).includes(address)) {
+            throw new Error(`Connected page did not look like code-server. href=${href} title=${title}`)
           }
         }
       } catch (error) {
