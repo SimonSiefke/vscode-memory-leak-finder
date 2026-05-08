@@ -218,7 +218,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async waitForInputVisible() {
       const quickPick = page.locator('.quick-input-widget')
-      const quickPickInput = quickPick.locator('.quick-input-filter .monaco-inputbox input, .quick-input-filter .ibwrapper .input, .ibwrapper .input, input').first()
+      const quickPickInput = quickPick
+        .locator('.quick-input-filter .monaco-inputbox input, .quick-input-filter .ibwrapper .input, .ibwrapper .input, input')
+        .first()
       await expect(quickPickInput).toBeVisible()
       await expect(quickPickInput).toBeFocused({ timeout: 3000 })
       return quickPickInput

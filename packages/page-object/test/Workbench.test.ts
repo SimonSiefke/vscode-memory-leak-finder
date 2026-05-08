@@ -11,13 +11,14 @@ const createMockVError = class MockVError extends Error {
 test('connectToSsh uses quick pick to connect current window to host', async () => {
   const calls: string[] = []
   let now = 0
+  let hostSelected = false
   let platformSelected = false
   const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
   const page = {
-    evaluate: async () => 'http://127.0.0.1:9888/',
+    evaluate: async () => false,
     locator: () => {
       return {
-        isVisible: async () => !platformSelected,
+        isVisible: async () => hostSelected && !platformSelected,
       }
     },
     rebind: async () => {
@@ -50,7 +51,11 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
       calls.push('pressEnter')
     },
     select: async (value: string | RegExp) => {
-      platformSelected = true
+      if (value instanceof RegExp) {
+        hostSelected = true
+      } else {
+        platformSelected = true
+      }
       calls.push(`select:${value}`)
     },
     showCommands: async (options?: { pressKeyOnce?: boolean }) => {
@@ -96,9 +101,7 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
       stayVisible: true,
       pressKeyOnce: true,
     })}`,
-    'type:local-test',
-    'waitForIdle',
-    'pressEnter',
+    'select:/local-test/',
     'refresh',
     'rebind',
     'expect:toBeVisible:undefined',
@@ -114,13 +117,15 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
 test('connectToSsh waits for a delayed remote host platform prompt', async () => {
   const calls: string[] = []
   let now = 0
-  let selected = false
+  let hostSelected = false
+  let platformSelected = false
   const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
 
   const page = {
+    evaluate: async () => false,
     locator: () => {
       return {
-        isVisible: async () => now >= 6_000 && !selected,
+        isVisible: async () => hostSelected && now >= 6_000 && !platformSelected,
       }
     },
     refresh: async () => {
@@ -144,7 +149,7 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
     },
     getVisibleCommands: async () => {
       calls.push('getVisibleCommands')
-      if (now < 6_000 || selected) {
+      if (now < 6_000 || platformSelected) {
         throw new createMockVError(new Error('widget hidden'), 'Failed to get visible commands')
       }
       return ['Linux', 'Windows', 'macOS']
@@ -153,7 +158,14 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
       calls.push('pressEnter')
     },
     select: async (value: string | RegExp) => {
-      selected = true
+      if (value instanceof RegExp) {
+        if (now < 6_000) {
+          throw new createMockVError(new Error('host not visible yet'), 'Failed to select host')
+        }
+        hostSelected = true
+      } else {
+        platformSelected = true
+      }
       calls.push(`select:${value}`)
     },
     showCommands: async (options?: { pressKeyOnce?: boolean }) => {

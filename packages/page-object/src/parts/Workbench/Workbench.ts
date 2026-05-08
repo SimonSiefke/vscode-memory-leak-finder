@@ -96,6 +96,34 @@ export const createWithDependencies = (
   { browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams,
   dependencies: WorkbenchDependencies,
 ) => {
+  const openSshRemoteInCurrentWindow = async (target: string): Promise<boolean> => {
+    return page.evaluate({
+      awaitPromise: true,
+      expression: `((async () => {
+  const candidates = [
+    globalThis.workbench?.commands,
+    globalThis.vscode?.commands,
+    globalThis.monaco?.commands,
+    globalThis.mainWindow?.commands,
+  ]
+  for (const commands of candidates) {
+    if (!commands || typeof commands.executeCommand !== 'function') {
+      continue
+    }
+    try {
+      await commands.executeCommand('vscode.newWindow', {
+        remoteAuthority: ${JSON.stringify(`ssh-remote+${target}`)},
+        reuseWindow: true,
+      })
+      return true
+    } catch {
+    }
+  }
+  return false
+})())`,
+    })
+  }
+
   const selectRemoteHostPlatform = async (): Promise<void> => {
     const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
     for (let attempt = 0; attempt < 10; attempt++) {
@@ -128,9 +156,9 @@ export const createWithDependencies = (
           await dependencies.sleep(1000)
         }
       }
-      await quickPick.type(target)
-      await page.waitForIdle()
-      await quickPick.pressEnter()
+      if (await openSshRemoteInCurrentWindow(target)) {
+        return
+      }
     },
     async connectToSshPart2(_options: ConnectToSshOptions): Promise<void> {
       // TODO avoid hardcoded timeout
