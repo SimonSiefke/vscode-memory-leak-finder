@@ -2,6 +2,8 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as Electron from '../Electron/Electron.ts'
+import { dirname } from 'node:path'
+import { mkdir } from 'node:fs/promises'
 
 export type ConnectToSshOptions = {
   readonly alias?: string
@@ -125,6 +127,7 @@ export const createWithDependencies = (
     async openFolder(options: ConnectToSshOptions): Promise<void> {
       try {
         const folderPath = options.workspacePath || `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace` // TODO
+        await mkdir(folderPath, { recursive: true })
         const quickPick = dependencies.createQuickPick()
         quickPick.executeCommand(WellKnownCommands.OpenFolder, {
           stayVisible: true,
@@ -136,7 +139,13 @@ export const createWithDependencies = (
         await expect(input).toBeFocused()
         await page.waitForIdle()
         await expect(input).toHaveValue(this.lastValue)
-        this.lastValue = folderPath + '/'
+        if (this.lastValue === defaultValue) {
+          this.lastValue = dirname(folderPath) + '/'
+        } else {
+          // makes no sense...
+          this.lastValue = dirname(folderPath) + '/'
+        }
+        // this.lastValue = folderPath + '/'
         await page.waitForIdle()
         await input.clear()
         await page.waitForIdle()
