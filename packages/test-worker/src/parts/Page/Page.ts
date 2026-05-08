@@ -124,6 +124,8 @@ export const create = ({
       while (Date.now() - start < maxDelay) {
         await new Promise((r) => setTimeout(r, waiIntInterval))
         const next = await this.getFrameId()
+
+        console.log({ current, next })
         if (current !== next) {
           return
         }
@@ -131,6 +133,7 @@ export const create = ({
     },
     async getFrameId() {
       const { frameTree } = await DevtoolsProtocolPage.getFrameTree(this.sessionRpc)
+      console.log({ frameTree })
       return frameTree.frame.id
     },
     async reload() {
