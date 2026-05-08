@@ -164,8 +164,13 @@ export const createWithDependencies = (
         await electron.mockDialog({
           response: 0,
         })
+
+        const refreshPromise = page.waitForRefresh()
         await page.keyboard.press('Enter')
-        // TODO wait for window loaded
+        await refreshPromise
+        const newPage = await page.refresh()
+        await page.rebind(newPage)
+        await this.connectToSshPart2({})
       } catch (error) {
         throw new VError(error, `Failed to open folder`)
       }
