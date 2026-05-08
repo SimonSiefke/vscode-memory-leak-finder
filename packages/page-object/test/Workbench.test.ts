@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { create } from '../src/parts/Workbench/Workbench.ts'
+import { createWithDependencies } from '../src/parts/Workbench/Workbench.ts'
 import * as WellKnownCommands from '../src/parts/WellKnownCommands/WellKnownCommands.ts'
 
 test('connectToSsh uses quick pick to connect current window to host', async () => {
@@ -30,11 +30,8 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     },
   }
 
-  const originalCreate = (await import('../src/parts/QuickPick/QuickPick.ts')).create
-  ;(await import('../src/parts/QuickPick/QuickPick.ts')).create = (() => quickPick) as any
-
-  try {
-    const workbench = create({
+  const workbench = createWithDependencies(
+    {
       browserRpc: undefined,
       electronApp: {},
       expect: {},
@@ -46,12 +43,14 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
           super(`${message}: ${error instanceof Error ? error.message : String(error)}`)
         }
       },
-    } as any)
+    } as any,
+    {
+      createQuickPick: () => quickPick,
+      sleep: async () => {},
+    },
+  )
 
-    await workbench.connectToSsh({ port: 9888 })
-  } finally {
-    ;(await import('../src/parts/QuickPick/QuickPick.ts')).create = originalCreate
-  }
+  await workbench.connectToSsh({ port: 9888 })
 
   expect(calls).toEqual([
     'waitForIdle',

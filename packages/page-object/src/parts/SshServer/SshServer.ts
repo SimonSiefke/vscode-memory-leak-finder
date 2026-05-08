@@ -82,15 +82,6 @@ const waitForExit = async (childProcess: any, milliseconds: number): Promise<voi
   await Promise.race([promise, sleep(milliseconds)])
 }
 
-const isNavigationTransitionError = (error: unknown): boolean => {
-  const message = String(error && (error as Error).message ? (error as Error).message : error)
-  return (
-    message.includes('Execution context was destroyed') ||
-    message.includes('Cannot find context with specified id') ||
-    message.includes('uniqueContextId not found')
-  )
-}
-
 const waitForPortInternal = async (
   state: ServerState,
   dependencies: SshServerDependencies,
@@ -112,7 +103,7 @@ const waitForPortInternal = async (
   throw new Error(`Timed out waiting for ${host}:${port} to accept connections\n${getOutput(state)}`)
 }
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }: CreateParams) => {
+export const create = ({ page, VError }: CreateParams) => {
   return createWithDependencies(
     { page, VError },
     {

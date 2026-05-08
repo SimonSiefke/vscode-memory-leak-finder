@@ -696,11 +696,7 @@ export interface Window {
   focus(): Promise<void>
 }
 export interface Workbench {
-  connectToSsh(options: {
-    host?: string
-    port?: number
-    url?: string
-  }): Promise<void>
+  connectToSsh(options: { host?: string; port?: number; url?: string }): Promise<void>
   focusLeftEditorGroup(): Promise<void>
   openNewWindow(): Promise<{
     close(): Promise<void>

@@ -8,6 +8,17 @@ type ConnectToSshOptions = {
   readonly url?: string
 }
 
+type QuickPickApi = {
+  executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
+  pressEnter: () => Promise<void>
+  type: (value: string) => Promise<void>
+}
+
+type WorkbenchDependencies = {
+  readonly createQuickPick: () => QuickPickApi
+  readonly sleep: (milliseconds: number) => Promise<void>
+}
+
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
   readonly sessionRpc?: any
@@ -49,7 +60,23 @@ const resolveSshUrl = ({ host = '127.0.0.1', port, url }: ConnectToSshOptions): 
   throw new Error(`url or port is required`)
 }
 
-const waitForSshConnection = async ({ page, reconnectDevtools }: { page: any; reconnectDevtools?: () => Promise<void> }, url: string) => {
+const sleep = async (milliseconds: number): Promise<void> => {
+  const { promise, resolve } = Promise.withResolvers<void>()
+  setTimeout(resolve, milliseconds)
+  await promise
+}
+
+const waitForSshConnection = async (
+  {
+    page,
+    reconnectDevtools,
+  }: {
+    page: any
+    reconnectDevtools: (() => Promise<void>) | undefined
+  },
+  dependencies: WorkbenchDependencies,
+  url: string,
+) => {
   const reconnectPromise = reconnectDevtools
     ? reconnectDevtools().then(
         () => true,
@@ -83,28 +110,40 @@ const waitForSshConnection = async ({ page, reconnectDevtools }: { page: any; re
         recoveredFromTransitionError = true
       }
     }
-      await (() => {
-        const { promise, resolve } = Promise.withResolvers<void>()
-        setTimeout(resolve, 250)
-        return promise
-      })()
+    await dependencies.sleep(250)
   }
   throw new Error(`Timed out waiting to navigate to ${url}`)
 }
 
 export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
-  return {
-    async connectToSsh(options: ConnectToSshOptions): Promise<void> {
-      try {
-        const url = resolveSshUrl(options)
-        const quickPick = QuickPick.create({
+  return createWithDependencies(
+    reconnectDevtools
+      ? { browserRpc, electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }
+      : { browserRpc, electronApp, expect, ideVersion, page, platform, VError },
+    {
+      createQuickPick: () =>
+        QuickPick.create({
           electronApp,
           expect,
           ideVersion,
           page,
           platform,
           VError,
-        })
+        }),
+      sleep,
+    },
+  )
+}
+
+export const createWithDependencies = (
+  { browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams,
+  dependencies: WorkbenchDependencies,
+) => {
+  return {
+    async connectToSsh(options: ConnectToSshOptions): Promise<void> {
+      try {
+        const url = resolveSshUrl(options)
+        const quickPick = dependencies.createQuickPick()
         await page.waitForIdle()
         await quickPick.executeCommand(WellKnownCommands.RemoteSshConnectCurrentWindowToHost, {
           stayVisible: true,
@@ -117,7 +156,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, reconn
             throw error
           }
         }
-        await waitForSshConnection({ page, reconnectDevtools }, url)
+        await waitForSshConnection({ page, reconnectDevtools }, dependencies, url)
       } catch (error) {
         const message = options.url || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`
         throw new VError(error, message)
