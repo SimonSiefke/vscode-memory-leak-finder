@@ -8,6 +8,7 @@ export type ConnectToSshOptions = {
   readonly host?: string
   readonly port?: number
   readonly user?: string
+  readonly workspacePath?: string
 }
 
 type QuickPickApi = {
@@ -120,7 +121,7 @@ export const createWithDependencies = (
     },
     async openFolder(options: ConnectToSshOptions): Promise<void> {
       try {
-        const folderPath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace` // TODO
+        const folderPath = options.workspacePath || `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace` // TODO
         const defaultValue = '/home/simon/'
         const button = page.locator('.monaco-button.monaco-text-button', {
           hasText: 'Open Folder',
