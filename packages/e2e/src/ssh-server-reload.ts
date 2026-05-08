@@ -12,9 +12,10 @@ export const setup = async ({ SshServer, Workbench, Extensions, Electron }: Test
   // console.log({ connection })
   // await new Promise((r) => {})
   await Workbench.connectToSsh(connection)
+  await SshServer.shouldBeConnected()
 }
 
-export const run = async ({ Workbench }: TestContext): Promise<void> => {
+export const run = async ({}: TestContext): Promise<void> => {
   // await Workbench.reload()
 }
 

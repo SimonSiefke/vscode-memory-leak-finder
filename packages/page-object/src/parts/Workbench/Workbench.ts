@@ -83,6 +83,20 @@ const getRemoteHostPlatformLabel = (platform: string): string => {
   }
 }
 
+const normalizeText = (value: string): string => {
+  return value.toLowerCase().replace(/\s+/g, ' ').trim()
+}
+
+const getRemoteIndicatorNeedles = ({ alias, host = '127.0.0.1', user }: ConnectToSshOptions): string[] => {
+  if (alias) {
+    return [alias]
+  }
+  if (user) {
+    return [`${user}@${host}`, host]
+  }
+  return [host]
+}
+
 const getVisibleCommandsIfAny = async (quickPick: QuickPickApi): Promise<string[] | undefined> => {
   try {
     return await quickPick.getVisibleCommands()
@@ -92,14 +106,6 @@ const getVisibleCommandsIfAny = async (quickPick: QuickPickApi): Promise<string[
       return undefined
     }
     throw error
-  }
-}
-
-const isQuickPickVisible = async (page: any): Promise<boolean> => {
-  try {
-    return await page.locator('.quick-input-widget').isVisible()
-  } catch {
-    return false
   }
 }
 
@@ -122,26 +128,30 @@ const maybeSelectRemoteHostPlatform = async (quickPick: QuickPickApi, platform: 
   return false
 }
 
-const waitForQuickPickToStayHidden = async (
-  page: any,
+const waitForRemoteHostPlatformPrompt = async (
   quickPick: QuickPickApi,
   dependencies: WorkbenchDependencies,
   platform: string,
-  timeout = 10_000,
-): Promise<boolean> => {
+  timeout = 30_000,
+): Promise<void> => {
+  const expectedPlatform = getRemoteHostPlatformLabel(platform)
   const start = Date.now()
+  let lastVisibleCommands: string[] | undefined
   while (Date.now() - start < timeout) {
-    if (!(await isQuickPickVisible(page))) {
-      await dependencies.sleep(250)
-      continue
+    const selected = await maybeSelectRemoteHostPlatform(quickPick, platform)
+    if (selected) {
+      return
     }
-    const selectedPlatform = await maybeSelectRemoteHostPlatform(quickPick, platform)
-    if (selectedPlatform) {
-      return false
+    const visibleCommands = await getVisibleCommandsIfAny(quickPick)
+    if (visibleCommands) {
+      lastVisibleCommands = visibleCommands
     }
-    return false
+    await dependencies.sleep(250)
   }
-  return true
+  const details = lastVisibleCommands
+    ? ` Last visible options: ${lastVisibleCommands.join(', ')}`
+    : ' The platform picker never became visible after the window reloaded.'
+  throw new Error(`Timed out waiting for Remote - SSH host platform prompt for "${expectedPlatform}".${details}`)
 }
 
 const refreshPage = async (page: any): Promise<void> => {
@@ -149,68 +159,73 @@ const refreshPage = async (page: any): Promise<void> => {
   await page.rebind(refreshedPage)
 }
 
-const waitForSshConnection = async (
+const waitForReloadAndRebind = async (
   {
     page,
-    platform,
-    quickPick,
     reconnectDevtools,
   }: {
     page: any
-    platform: string
-    quickPick: QuickPickApi
     reconnectDevtools: (() => Promise<void>) | undefined
+  },
+): Promise<void> => {
+  if (reconnectDevtools) {
+    try {
+      await reconnectDevtools()
+      return
+    } catch {
+      // Fall back to refresh/rebind when reconnecting devtools loses the page during reload.
+    }
+  }
+  await refreshPage(page)
+}
+
+const hasFinishedRemoteConnection = async (page: any, options: ConnectToSshOptions): Promise<boolean> => {
+  const items = page.locator('.part.statusbar .left-items .statusbar-item')
+  const count = await items.count()
+  const needles = getRemoteIndicatorNeedles(options).map(normalizeText)
+  for (let i = 0; i < count; i++) {
+    const item = items.nth(i)
+    if (!(await item.isVisible())) {
+      continue
+    }
+    const text = [await item.textContent(), await item.getAttribute('aria-label'), await item.getAttribute('title')]
+      .filter(Boolean)
+      .join(' ')
+    const normalized = normalizeText(text)
+    if (!normalized.includes('ssh')) {
+      continue
+    }
+    if (needles.some((needle) => normalized.includes(needle))) {
+      return true
+    }
+  }
+  return false
+}
+
+const waitForSshConnection = async (
+  {
+    page,
+    reconnectDevtools,
+    options,
+  }: {
+    page: any
+    reconnectDevtools: (() => Promise<void>) | undefined
+    options: ConnectToSshOptions
   },
   dependencies: WorkbenchDependencies,
 ) => {
-  if (!reconnectDevtools) {
-    await refreshPage(page)
-  }
-
-  const reconnectState: {
-    value: 'pending' | 'resolved' | 'rejected' | 'not-supported'
-  } = {
-    value: reconnectDevtools ? 'pending' : 'not-supported',
-  }
-  const reconnectPromise = reconnectDevtools
-    ? reconnectDevtools().then(
-        () => {
-          reconnectState.value = 'resolved'
-        },
-        () => {
-          reconnectState.value = 'rejected'
-        },
-      )
-    : undefined
   let recoveredFromTransitionError = false
-  let refreshedAfterReconnectRejection = false
 
   const start = Date.now()
   while (Date.now() - start < 30_000) {
-    if (await isQuickPickVisible(page)) {
-      await maybeSelectRemoteHostPlatform(quickPick, platform)
-    }
-
-    if (reconnectState.value === 'rejected' && !refreshedAfterReconnectRejection) {
-      await refreshPage(page)
-      refreshedAfterReconnectRejection = true
-    }
-
     try {
       await page.waitForIdle()
-      const hiddenLongEnough = await waitForQuickPickToStayHidden(page, quickPick, dependencies, platform)
-      if (!hiddenLongEnough) {
-        continue
+      if (await hasFinishedRemoteConnection(page, options)) {
+        return
       }
-      if (reconnectState.value === 'pending') {
-        await dependencies.sleep(250)
-        continue
-      }
-      await reconnectPromise
-      return
     } catch (error) {
       if (!recoveredFromTransitionError && isReloadTransitionError(error)) {
-        await refreshPage(page)
+        await waitForReloadAndRebind({ page, reconnectDevtools },)
         recoveredFromTransitionError = true
         continue
       }
@@ -256,8 +271,9 @@ export const createWithDependencies = (
         await quickPick.type(target)
         await page.waitForIdle()
         await quickPick.pressEnter()
-        await maybeSelectRemoteHostPlatform(quickPick, platform)
-        await waitForSshConnection({ page, platform, quickPick, reconnectDevtools }, dependencies)
+        await waitForReloadAndRebind({ page, reconnectDevtools })
+        await waitForRemoteHostPlatformPrompt(quickPick, dependencies, platform)
+        await waitForSshConnection({ page, reconnectDevtools, options }, dependencies)
       } catch (error) {
         const message =
           options.alias || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`

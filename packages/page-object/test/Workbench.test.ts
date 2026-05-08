@@ -12,12 +12,40 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
   const calls: string[] = []
   let now = 0
   let platformSelected = false
+  let connected = false
   const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
   const page = {
     evaluate: async () => 'http://127.0.0.1:9888/',
-    locator: () => ({
-      isVisible: async () => !platformSelected,
-    }),
+    locator: (selector: string) => {
+      if (selector === '.part.statusbar .left-items .statusbar-item') {
+        return {
+          count: async () => {
+            calls.push('statusBarCount')
+            return connected ? 1 : 0
+          },
+          nth: () => ({
+            getAttribute: async (name: string) => {
+              if (name === 'aria-label') {
+                calls.push('statusBarAriaLabel')
+                return connected ? 'SSH: local-test' : ''
+              }
+              return ''
+            },
+            isVisible: async () => {
+              calls.push('statusBarVisible')
+              return connected
+            },
+            textContent: async () => {
+              calls.push('statusBarText')
+              return connected ? 'SSH: local-test' : ''
+            },
+          }),
+        }
+      }
+      return {
+        isVisible: async () => !platformSelected,
+      }
+    },
     rebind: async () => {
       calls.push('rebind')
     },
@@ -46,6 +74,7 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     },
     select: async (value: string | RegExp) => {
       platformSelected = true
+      connected = true
       calls.push(`select:${value}`)
     },
     showCommands: async (options?: { pressKeyOnce?: boolean }) => {
@@ -84,11 +113,15 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     'type:local-test',
     'waitForIdle',
     'pressEnter',
-    'getVisibleCommands',
-    'select:Linux',
     'refresh',
     'rebind',
+    'getVisibleCommands',
+    'select:Linux',
     'waitForIdle',
+    'statusBarCount',
+    'statusBarVisible',
+    'statusBarText',
+    'statusBarAriaLabel',
   ])
 
   dateNowSpy.mockRestore()
@@ -98,12 +131,30 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
   const calls: string[] = []
   let now = 0
   let selected = false
+  let connected = false
   const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
 
   const page = {
-    locator: () => ({
-      isVisible: async () => now >= 6_000 && !selected,
-    }),
+    locator: (selector: string) => {
+      if (selector === '.part.statusbar .left-items .statusbar-item') {
+        return {
+          count: async () => (connected ? 1 : 0),
+          nth: () => ({
+            getAttribute: async (name: string) => {
+              if (name === 'aria-label') {
+                return connected ? 'SSH: local-test' : ''
+              }
+              return ''
+            },
+            isVisible: async () => connected,
+            textContent: async () => (connected ? 'SSH: local-test' : ''),
+          }),
+        }
+      }
+      return {
+        isVisible: async () => now >= 6_000 && !selected,
+      }
+    },
     refresh: async () => {
       calls.push('refresh')
       return page
@@ -132,6 +183,7 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
     },
     select: async (value: string | RegExp) => {
       selected = true
+      connected = true
       calls.push(`select:${value}`)
     },
     showCommands: async (options?: { pressKeyOnce?: boolean }) => {
@@ -162,6 +214,7 @@ test('connectToSsh waits for a delayed remote host platform prompt', async () =>
 
   await workbench.connectToSsh({ alias: 'local-test' })
 
+  expect(calls.indexOf('refresh')).toBeLessThan(calls.indexOf('select:Linux'))
   expect(calls).toContain('select:Linux')
   dateNowSpy.mockRestore()
 })
