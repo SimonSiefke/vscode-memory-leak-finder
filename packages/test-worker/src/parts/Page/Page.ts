@@ -103,7 +103,6 @@ export const create = ({
     async refresh() {
       const { frameTree } = await DevtoolsProtocolPage.getFrameTree(this.sessionRpc)
       const nextUtilityContext = await addUtilityExecutionContext(this.sessionRpc, 'utility', frameTree.frame.id)
-      console.log({ frameTree, nextUtilityContext })
       return create({
         browserRpc,
         electronObjectId,
@@ -115,6 +114,24 @@ export const create = ({
         targetId: this.targetId,
         utilityContext: nextUtilityContext,
       })
+    },
+    async waitForRefresh() {
+      // TODO find a better way to do this
+      const current = await this.getFrameId()
+      const maxDelay = 20_000
+      const waiIntInterval = 100
+      const start = Date.now()
+      while (Date.now() - start < maxDelay) {
+        await new Promise((r) => setTimeout(r, waiIntInterval))
+        const next = await this.getFrameId()
+        if (current !== next) {
+          return
+        }
+      }
+    },
+    async getFrameId() {
+      const { frameTree } = await DevtoolsProtocolPage.getFrameTree(this.sessionRpc)
+      return frameTree.frame.id
     },
     async reload() {
       return PageReload.reload(this.rpc)

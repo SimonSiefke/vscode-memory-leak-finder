@@ -281,7 +281,6 @@ export const createWithDependencies = (
       return refreshedPage
     },
     async connectToSshPart3(options: ConnectToSshOptions): Promise<void> {
-      console.log('before statusbar')
       const statusBarItem = page.locator('.statusbar-item-label[aria-label="Opening Remote..."]')
       await page.waitForIdle()
       await expect(statusBarItem).toBeVisible()
@@ -301,7 +300,10 @@ export const createWithDependencies = (
     },
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {
+        // TODO this is probably a race condition and bad
+        const refreshPromise = await page.waitForRefresh()
         await this.connectToSshPart1(options)
+        await refreshPromise
         await this.connectToSshPart2(options)
         await this.connectToSshPart3(options)
       } catch (error) {
