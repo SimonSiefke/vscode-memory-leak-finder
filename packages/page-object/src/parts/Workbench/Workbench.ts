@@ -287,13 +287,8 @@ export const createWithDependencies = (
       const input = page.locator(`[aria-label^="Select the platform of the remote host"]`)
       await expect(input).toBeVisible()
       await expect(input).toBeFocused()
-      console.log('input...')
       const quickPick = dependencies.createQuickPick()
-
-      await new Promise((r) => {})
-
-      await waitForRemoteHostPlatformPrompt(quickPick, dependencies, platform)
-      await waitForSshConnection({ page, reconnectDevtools, options }, dependencies)
+      await quickPick.select('Linux') // TODO choose users platform
     },
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {
