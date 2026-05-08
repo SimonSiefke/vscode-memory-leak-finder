@@ -258,24 +258,32 @@ export const createWithDependencies = (
   dependencies: WorkbenchDependencies,
 ) => {
   return {
+    async connectToSshPart1(options: ConnectToSshOptions): Promise<void> {
+      const target = resolveSshTarget(options)
+      const quickPick = dependencies.createQuickPick()
+      await page.waitForIdle()
+      await quickPick.showCommands({ pressKeyOnce: true })
+      await quickPick.type(WellKnownCommands.RemoteSshConnectCurrentWindowToHost)
+      await quickPick.pressEnter()
+      await quickPick.type(target)
+      await page.waitForIdle()
+      await quickPick.pressEnter()
+    },
+    async connectToSshPart2(options: ConnectToSshOptions): Promise<void> {
+      await waitForReloadAndRebind({ page, reconnectDevtools })
+    },
+    async connectToSshPart3(options: ConnectToSshOptions): Promise<void> {
+      const quickPick = dependencies.createQuickPick()
+      await waitForRemoteHostPlatformPrompt(quickPick, dependencies, platform)
+      await waitForSshConnection({ page, reconnectDevtools, options }, dependencies)
+    },
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {
-        const target = resolveSshTarget(options)
-        const quickPick = dependencies.createQuickPick()
-        await page.waitForIdle()
-        await quickPick.showCommands({ pressKeyOnce: true })
-        await quickPick.type(WellKnownCommands.RemoteSshConnectCurrentWindowToHost)
-        await quickPick.pressEnter()
-        await quickPick.type(target)
-        await page.waitForIdle()
-        await quickPick.pressEnter()
-        await waitForReloadAndRebind({ page, reconnectDevtools })
-        await waitForRemoteHostPlatformPrompt(quickPick, dependencies, platform)
-        await waitForSshConnection({ page, reconnectDevtools, options }, dependencies)
+        await this.connectToSshPart1(options)
+        await this.connectToSshPart2(options)
+        await this.connectToSshPart3(options)
       } catch (error) {
-        const message =
-          options.alias || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`
-        throw new VError(error, message)
+        throw new VError(error, `Failed to connect to ssh server`)
       }
     },
     async waitForNewWindow({ timeout }: { timeout: number }) {
