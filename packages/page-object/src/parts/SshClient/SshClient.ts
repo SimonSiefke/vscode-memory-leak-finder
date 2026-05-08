@@ -123,14 +123,11 @@ export const createWithDependencies = (
       try {
         const folderPath = options.workspacePath || `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace` // TODO
         const defaultValue = '/home/simon/'
-        const button = page.locator('.monaco-button.monaco-text-button', {
-          hasText: 'Open Folder',
+        const quickPick = dependencies.createQuickPick()
+        quickPick.executeCommand(WellKnownCommands.OpenFolder, {
+          stayVisible: true,
+          pressKeyOnce: true,
         })
-        await page.waitForIdle()
-        await expect(button).toBeVisible()
-        await page.waitForIdle()
-        await button.click()
-        await page.waitForIdle()
         const input = page.locator(`[aria-label="Folder path - Open Folder"]`)
         await expect(input).toBeVisible()
         await page.waitForIdle()
