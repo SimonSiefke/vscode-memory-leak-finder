@@ -11,7 +11,9 @@ type ConnectToSshOptions = {
 
 type QuickPickApi = {
   executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
+  getVisibleCommands: () => Promise<string[]>
   pressEnter: () => Promise<void>
+  select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<void>
   showCommands: (options?: { pressKeyOnce?: boolean }) => Promise<void>
   type: (value: string) => Promise<void>
 }
@@ -66,6 +68,49 @@ const sleep = async (milliseconds: number): Promise<void> => {
   const { promise, resolve } = Promise.withResolvers<void>()
   setTimeout(resolve, milliseconds)
   await promise
+}
+
+const getRemoteHostPlatformLabel = (platform: string): string => {
+  switch (platform) {
+    case 'linux':
+      return 'Linux'
+    case 'win32':
+      return 'Windows'
+    case 'darwin':
+      return 'macOS'
+    default:
+      throw new Error(`Unsupported platform for Remote - SSH host selection: ${platform}`)
+  }
+}
+
+const maybeSelectRemoteHostPlatform = async (
+  quickPick: QuickPickApi,
+  dependencies: WorkbenchDependencies,
+  platform: string,
+): Promise<void> => {
+  const expectedPlatform = getRemoteHostPlatformLabel(platform)
+  const platformOptions = ['Linux', 'Windows', 'macOS']
+  const start = Date.now()
+  while (Date.now() - start < 5_000) {
+    try {
+      const visibleCommands = await quickPick.getVisibleCommands()
+      if (visibleCommands.includes(expectedPlatform)) {
+        await quickPick.select(expectedPlatform)
+        return
+      }
+      if (visibleCommands.some((item) => platformOptions.includes(item))) {
+        throw new Error(
+          `Remote - SSH asked for the remote host platform, but the expected option "${expectedPlatform}" was not available. Visible options: ${visibleCommands.join(', ')}`,
+        )
+      }
+    } catch (error) {
+      const message = String((error as any)?.message || error || '')
+      if (!message.includes('Failed to get visible commands')) {
+        throw error
+      }
+    }
+    await dependencies.sleep(250)
+  }
 }
 
 const waitForSshConnection = async (
@@ -147,6 +192,7 @@ export const createWithDependencies = (
         await quickPick.type(target)
         await page.waitForIdle()
         await quickPick.pressEnter()
+        await maybeSelectRemoteHostPlatform(quickPick, dependencies, platform)
         await waitForSshConnection({ page, reconnectDevtools }, dependencies)
       } catch (error) {
         const message =

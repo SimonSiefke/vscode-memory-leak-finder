@@ -22,8 +22,15 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     executeCommand: async () => {
       throw new Error('executeCommand should not be used for SSH connect')
     },
+    getVisibleCommands: async () => {
+      calls.push('getVisibleCommands')
+      return ['Linux', 'Windows', 'macOS']
+    },
     pressEnter: async () => {
       calls.push('pressEnter')
+    },
+    select: async (value: string | RegExp) => {
+      calls.push(`select:${value}`)
     },
     showCommands: async (options?: { pressKeyOnce?: boolean }) => {
       calls.push(`showCommands:${JSON.stringify(options)}`)
@@ -63,6 +70,8 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
     'type:local-test',
     'waitForIdle',
     'pressEnter',
+    'getVisibleCommands',
+    'select:Linux',
     'refresh',
     'rebind',
     'waitForIdle',
