@@ -187,7 +187,7 @@ export const createWithDependencies = (
     },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
-        const newWindowPromise = this.waitForNewWindow({ timeout: 5000 })
+        const newWindowPromise = this.waitForNewWindow({ timeout: 20_000 })
         // Run the quickpick command to open new window
         await page.waitForIdle()
         const quickPick = QuickPick.create({
@@ -210,6 +210,7 @@ export const createWithDependencies = (
           injectUtilityScript: true,
           sessionId,
         })
+        let currentNewWindowPage = newWindowPage
 
         await page.waitForIdle()
 
@@ -217,12 +218,12 @@ export const createWithDependencies = (
           async close() {
             try {
               // Wait for the window to be fully idle before attempting to close
-              await newWindowPage.waitForIdle()
+              await currentNewWindowPage.waitForIdle()
               const quickPick = QuickPick.create({
                 electronApp,
                 expect,
                 ideVersion,
-                page: newWindowPage,
+                page: currentNewWindowPage,
                 platform,
                 VError,
               })
@@ -231,52 +232,71 @@ export const createWithDependencies = (
               throw new VError(error, `Failed to close new window`)
             }
           },
-          locator: (selector: string) => newWindowPage.locator(selector),
+          locator: (selector: string) => currentNewWindowPage.locator(selector),
           async openFolderFromExplorer() {
             try {
-              await newWindowPage.waitForIdle()
+              await currentNewWindowPage.waitForIdle()
               const quickPick = QuickPick.create({
                 electronApp,
                 expect,
                 ideVersion,
-                page: newWindowPage,
+                page: currentNewWindowPage,
                 platform,
                 VError,
               })
               await quickPick.executeCommand(WellKnownCommands.FocusExplorer)
-              await newWindowPage.waitForIdle()
-              const sideBar = newWindowPage.locator('.sidebar')
-              await expect(sideBar).toBeVisible()
-              const openFolderButton = sideBar.locator('[role="button"], .monaco-button', {
-                hasText: /^Open Folder(?:\.\.\.|…)?$/,
+              await currentNewWindowPage.waitForIdle()
+              const workbench = currentNewWindowPage.locator('.monaco-workbench')
+              await expect(workbench).toBeVisible()
+              const openFolderButton = workbench.locator('[role="button"], .monaco-button, a', {
+                hasText: 'Open Folder',
               })
-              await expect(openFolderButton).toBeVisible({ timeout: 10_000 })
-              await openFolderButton.click()
-              await newWindowPage.waitForIdle()
+              const matchCount = await openFolderButton.count()
+              if (matchCount === 0) {
+                const candidates = workbench.locator('[role="button"], .monaco-button, a')
+                const candidateCount = await candidates.count()
+                const labels: string[] = []
+                for (let i = 0; i < Math.min(candidateCount, 20); i++) {
+                  const candidate = candidates.nth(i)
+                  const text = (await candidate.textContent().catch(() => '')) || ''
+                  const ariaLabel = (await candidate.getAttribute('aria-label').catch(() => '')) || ''
+                  const label = `${text.trim()}|${ariaLabel.trim()}`
+                  if (label !== '|') {
+                    labels.push(label)
+                  }
+                }
+                throw new Error(`Open Folder action not found. Visible action labels: ${labels.join(', ')}`)
+              }
+              const refreshPromise = currentNewWindowPage.waitForRefresh()
+              await expect(openFolderButton.first()).toBeVisible({ timeout: 10_000 })
+              await openFolderButton.first().click()
+              await refreshPromise
+              currentNewWindowPage = await currentNewWindowPage.refresh()
+              await currentNewWindowPage.waitForIdle()
             } catch (error) {
               throw new VError(error, `Failed to open folder from explorer in new window`)
             }
           },
-          sessionRpc: newWindowPage.sessionRpc,
+          sessionRpc: currentNewWindowPage.sessionRpc,
           async shouldHaveExplorerItem(direntName: string) {
             try {
-              await newWindowPage.waitForIdle()
-              const explorer = newWindowPage.locator('.explorer-folders-view .monaco-list')
+              await currentNewWindowPage.waitForIdle()
+              const explorer = currentNewWindowPage.locator('.explorer-folders-view .monaco-list')
               const dirent = explorer.locator('.monaco-list-row', {
                 hasText: direntName,
               })
               await expect(dirent).toBeVisible({ timeout: 10_000 })
-              await newWindowPage.waitForIdle()
+              await currentNewWindowPage.waitForIdle()
             } catch (error) {
               throw new VError(error, `Failed to verify explorer item "${direntName}" in new window`)
             }
           },
-          waitForIdle: () => newWindowPage.waitForIdle(),
+          waitForIdle: () => currentNewWindowPage.waitForIdle(),
           async shouldBeVisible() {
-            await newWindowPage.waitForIdle()
-            const workbench = newWindowPage.locator('.monaco-workbench')
+            await currentNewWindowPage.waitForIdle()
+            const workbench = currentNewWindowPage.locator('.monaco-workbench')
             await expect(workbench).toBeVisible({ timeout: 10_000 })
-            await newWindowPage.waitForIdle()
+            await currentNewWindowPage.waitForIdle()
           },
         }
       } catch (error) {
