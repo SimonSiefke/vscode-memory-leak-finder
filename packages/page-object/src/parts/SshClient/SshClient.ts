@@ -134,8 +134,12 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
         await page.waitForIdle()
         await input.type(folderPath)
         await page.waitForIdle()
-        await page.keyboard.press('Enter')
-        console.log('after enter')
+        const okButton = page.locator('.quick-input-action .monaco-button.monaco-text-button', {
+          hasText: 'OK',
+        })
+        await expect(okButton).toBeVisible()
+        await page.waitForIdle()
+        await okButton.click()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open folder`)
