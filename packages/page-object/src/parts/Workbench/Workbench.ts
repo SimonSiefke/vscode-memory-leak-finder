@@ -11,6 +11,7 @@ type ConnectToSshOptions = {
 type QuickPickApi = {
   executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
   pressEnter: () => Promise<void>
+  showCommands: (options?: { pressKeyOnce?: boolean }) => Promise<void>
   type: (value: string) => Promise<void>
 }
 
@@ -56,6 +57,17 @@ const resolveSshUrl = ({ host = '127.0.0.1', port, url }: ConnectToSshOptions): 
   }
   if (typeof port === 'number') {
     return `http://${host}:${port}/`
+  }
+  throw new Error(`url or port is required`)
+}
+
+const resolveSshTarget = ({ host = '127.0.0.1', port, url }: ConnectToSshOptions): string => {
+  if (typeof port === 'number') {
+    return `${host}:${port}`
+  }
+  if (url) {
+    const parsedUrl = new URL(url)
+    return parsedUrl.port ? `${parsedUrl.hostname}:${parsedUrl.port}` : parsedUrl.hostname
   }
   throw new Error(`url or port is required`)
 }
@@ -143,12 +155,13 @@ export const createWithDependencies = (
     async connectToSsh(options: ConnectToSshOptions): Promise<void> {
       try {
         const url = resolveSshUrl(options)
+        const target = resolveSshTarget(options)
         const quickPick = dependencies.createQuickPick()
         await page.waitForIdle()
-        await quickPick.executeCommand(WellKnownCommands.RemoteSshConnectCurrentWindowToHost, {
-          stayVisible: true,
-        })
-        await quickPick.type(url)
+        await quickPick.showCommands({ pressKeyOnce: true })
+        await quickPick.type(WellKnownCommands.RemoteSshConnectCurrentWindowToHost)
+        await quickPick.pressEnter()
+        await quickPick.type(target)
         try {
           await quickPick.pressEnter()
         } catch (error) {

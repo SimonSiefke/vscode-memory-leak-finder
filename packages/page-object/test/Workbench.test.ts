@@ -19,11 +19,14 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
   }
 
   const quickPick = {
-    executeCommand: async (command: string, options?: { stayVisible?: boolean | 'dont-care' }) => {
-      calls.push(`executeCommand:${command}:${JSON.stringify(options)}`)
+    executeCommand: async () => {
+      throw new Error('executeCommand should not be used for SSH connect')
     },
     pressEnter: async () => {
       calls.push('pressEnter')
+    },
+    showCommands: async (options?: { pressKeyOnce?: boolean }) => {
+      calls.push(`showCommands:${JSON.stringify(options)}`)
     },
     type: async (value: string) => {
       calls.push(`type:${value}`)
@@ -54,8 +57,10 @@ test('connectToSsh uses quick pick to connect current window to host', async () 
 
   expect(calls).toEqual([
     'waitForIdle',
-    `executeCommand:${WellKnownCommands.RemoteSshConnectCurrentWindowToHost}:{"stayVisible":true}`,
-    'type:http://127.0.0.1:9888/',
+    'showCommands:{"pressKeyOnce":true}',
+    `type:${WellKnownCommands.RemoteSshConnectCurrentWindowToHost}`,
+    'pressEnter',
+    'type:127.0.0.1:9888',
     'pressEnter',
     'refresh',
     'rebind',
