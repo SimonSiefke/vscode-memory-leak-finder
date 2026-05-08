@@ -2,18 +2,10 @@ import type { TestContext } from '../types.js'
 
 const folderPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test-workspace'
 
+// global variable is bad code
 let _options = {}
 
-export const setup = async ({
-  SshServer,
-  SshClient,
-  Extensions,
-  Electron,
-  SideBar,
-  Panel,
-  ActivityBar,
-  Explorer,
-}: TestContext): Promise<void> => {
+export const setup = async ({ SshServer, SshClient, Extensions, Electron, SideBar, Panel, ActivityBar }: TestContext): Promise<void> => {
   await Electron.mockOpenDialog({
     canceled: false,
     filePaths: [folderPath],
