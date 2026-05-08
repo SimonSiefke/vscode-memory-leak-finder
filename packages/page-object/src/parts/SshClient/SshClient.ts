@@ -139,13 +139,7 @@ export const createWithDependencies = (
         await expect(input).toBeFocused()
         await page.waitForIdle()
         await expect(input).toHaveValue(this.lastValue)
-        if (this.lastValue === defaultValue) {
-          this.lastValue = dirname(folderPath) + '/'
-        } else {
-          // makes no sense...
-          this.lastValue = dirname(folderPath) + '/'
-        }
-        // this.lastValue = folderPath + '/'
+        this.lastValue = dirname(folderPath) + '/'
         await page.waitForIdle()
         await input.clear()
         await page.waitForIdle()
