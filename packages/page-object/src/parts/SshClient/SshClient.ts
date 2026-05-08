@@ -148,8 +148,10 @@ export const createWithDependencies = ({ expect, page, VError }: CreateParams, d
         await page.waitForIdle()
         await expect(okButton).toBeFocused()
         await page.waitForIdle()
-        await okButton.click()
-        await page.waitForIdle()
+        // await okButton.click()
+        // await page.waitForIdle()
+        await page.keyboard.press('Enter')
+        // await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open folder`)
       }
