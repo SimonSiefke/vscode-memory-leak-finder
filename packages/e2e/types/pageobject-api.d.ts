@@ -33,21 +33,25 @@ export interface ActivityBar {
 }
 export interface ChatEditor {
   addContext(initialPrompt: any, secondPrompt: any, confirmText: any): Promise<void>
+  approveAllAccessRequests(options?: any): Promise<any>
   clearAll(): Promise<void>
   clearContext(contextName: any): Promise<void>
   closeFinishSetup(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
+  getLatestResponseText(): Promise<string>
   moveToNewWindow(): Promise<{ close(): Promise<void> }>
   open(): Promise<void>
   openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
   scrollToBottom(): Promise<void>
   scrollToTop(): Promise<void>
+  send(options?: any): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
   shouldHaveAttachedContextHoverText(text: any): Promise<void>
   shouldHaveCodeBlockWithLanguage(language: any): Promise<void>
   shouldHaveLatestResponseCodeBlockWithLanguage(language: any): Promise<void>
+  waitForLatestExchange(message: any): Promise<void>
 }
 export interface ContextMenu {
   close(): Promise<void>

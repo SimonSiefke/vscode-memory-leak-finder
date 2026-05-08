@@ -11,6 +11,12 @@ const getChatPickerLabel = (pickerItem: any) => {
   return pickerItem.locator('.chat-model-label, .action-label, [role="button"], button').first()
 }
 
+const getAccessButtons = (page: any, buttonText: string) => {
+  return page.locator(
+    `button:has-text("${buttonText}"), [role="button"]:has-text("${buttonText}"), .action-label:has-text("${buttonText}")`,
+  )
+}
+
 const escapeForRegExp = (value: string) => {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -177,6 +183,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear chat context`)
+      }
+    },
+    async getLatestResponseText() {
+      try {
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const response = await getLatestResponseContent(chatView)
+        await expect(response).toBeVisible({ timeout: 60_000 })
+        const text = (await response.textContent()) || ''
+        return text.trim()
+      } catch (error) {
+        throw new VError(error, `Failed to get latest chat response text`)
       }
     },
     async shouldHaveAttachedContextHoverText(text: string) {
@@ -487,6 +505,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(lines).toHaveText('')
       await page.waitForIdle()
     },
+    async send({
+      image = '',
+      message,
+      model,
+      viewLinesText = '',
+    }: {
+      message: string
+      viewLinesText?: string
+      image?: string
+      model?: string
+    }) {
+      try {
+        await this.sendPart1({
+          message,
+          image,
+          model,
+          viewLinesText,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to send chat message without waiting`)
+      }
+    },
     async sendMessage({
       expectedResponse,
       image = '',
@@ -618,7 +658,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async clickAccessButton(buttonText: string = 'Allow') {
       try {
-        const accessButton = page.locator(`button:has-text("${buttonText}")`)
+        const accessButton = getAccessButtons(page, buttonText)
         const buttonCount = await accessButton.count()
 
         if (buttonCount > 0) {
@@ -628,6 +668,49 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to click access button with text "${buttonText}"`)
+      }
+    },
+    async approveAllAccessRequests({
+      buttonTexts = ['Allow', 'Continue'],
+      maxClicks = 12,
+    }: {
+      buttonTexts?: readonly string[]
+      maxClicks?: number
+    } = {}) {
+      try {
+        let clickCount = 0
+        while (clickCount < maxClicks) {
+          let clicked = false
+          for (const buttonText of buttonTexts) {
+            const accessButton = getAccessButtons(page, buttonText).first()
+            if ((await accessButton.count()) === 0) {
+              continue
+            }
+            const isVisible = await accessButton.isVisible().catch(() => false)
+            if (!isVisible) {
+              continue
+            }
+            await accessButton.click()
+            await page.waitForIdle()
+            clickCount++
+            clicked = true
+            break
+          }
+          if (!clicked) {
+            break
+          }
+        }
+        return clickCount
+      } catch (error) {
+        throw new VError(error, `Failed to approve access requests`)
+      }
+    },
+    async waitForLatestExchange(message: string) {
+      try {
+        const chatView = page.locator('.interactive-session')
+        await waitForLatestExchange(chatView, message)
+      } catch (error) {
+        throw new VError(error, `Failed to wait for latest chat exchange`)
       }
     },
     async waitForNewWindow(windowIdsBefore: readonly number[], electron: ReturnType<typeof Electron.create>) {
