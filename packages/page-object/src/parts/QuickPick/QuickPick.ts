@@ -217,12 +217,15 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       }
     },
     async waitForInputVisible() {
+      await page.waitForIdle()
       const quickPick = page.locator('.quick-input-widget')
-      const quickPickInput = quickPick
-        .locator('.quick-input-filter .monaco-inputbox input, .quick-input-filter .ibwrapper .input, .ibwrapper .input, input')
-        .first()
+      await expect(quickPick).toBeVisible()
+      await page.waitForIdle()
+      const quickPickInput = quickPick.locator('.quick-input-filter .input').first()
       await expect(quickPickInput).toBeVisible()
+      await page.waitForIdle()
       await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+      await page.waitForIdle()
       return quickPickInput
     },
     async type(value: string) {

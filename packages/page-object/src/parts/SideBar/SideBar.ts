@@ -95,7 +95,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           platform,
           VError,
         })
-        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
+        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility, {
+          pressKeyOnce: true,
+        })
       } catch (error) {
         throw new VError(error, `Failed to toggle side bar`)
       }

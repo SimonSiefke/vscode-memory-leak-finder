@@ -89,7 +89,6 @@ export const setup = async ({
   await Editor.shouldHaveText(`let x:string = 1`)
   await Editor.shouldHaveSquigglyError()
   await SideBar.hide()
-  await Panel.hide()
 }
 
 export const run = async ({ Workbench, SshClient }: TestContext): Promise<void> => {
