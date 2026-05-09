@@ -18,11 +18,18 @@ const cleanup = async ({ page, row1 }: { page: any; row1: any }) => {
 const waitForTerminalReady = async ({ page, row1 }: { page: any; row1: any }): Promise<boolean> => {
   for (let i = 0; i < 50; i++) {
     await page.waitForIdle()
+    const text = await row1.textContent()
+    if (text.endsWith('$ ')) {
+      return true
+    }
     await page.keyboard.press('a')
     await page.waitForIdle()
-    const text = await row1.textContent()
-    if (text.includes('aaaaa')) {
+    const updatedText = await row1.textContent()
+    if (updatedText.includes('aaaaa')) {
       await cleanup({ page, row1 })
+      return true
+    }
+    if (updatedText.endsWith('$ ')) {
       return true
     }
   }
