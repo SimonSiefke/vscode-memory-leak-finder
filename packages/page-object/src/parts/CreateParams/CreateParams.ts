@@ -12,6 +12,7 @@ export type CreateParams = {
   readonly ideVersion: IdeVersion
   readonly page: any
   readonly platform: string
+  readonly reconnectDevtools?: () => Promise<void>
   readonly subprocessRuntime?: 'bun' | 'node'
   readonly VError: any
 }

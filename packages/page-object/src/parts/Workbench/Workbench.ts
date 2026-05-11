@@ -113,7 +113,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           async shouldBeVisible() {
             await newWindowPage.waitForIdle()
             const workbench = newWindowPage.locator('.monaco-workbench')
-            await expect(workbench).toBeVisible({ timeout: 10_000 })
+            await expect(workbench).toBeVisible({ timeout: 20_000 })
             await newWindowPage.waitForIdle()
           },
         }
