@@ -15,6 +15,7 @@ export const run = async ({ Electron, Explorer, Workbench }: TestContext): Promi
     canceled: false,
     filePaths: [folderPath],
   })
+  // @ts-ignore
   await Workbench.openFolder()
   await Explorer.shouldHaveItem('opened-file.txt')
 }
