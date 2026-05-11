@@ -31,6 +31,7 @@ export interface StdinDataState {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode?: boolean
+  readonly measureNodeSubprocess: boolean
   readonly mode: number
   readonly openDevtools: boolean
   readonly pageObjectPath: string
@@ -42,6 +43,7 @@ export interface StdinDataState {
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
+  readonly subprocessRuntime: 'bun' | 'node'
   readonly stdout: string[]
   readonly timeoutBetween: number
   readonly timeouts: boolean
@@ -79,6 +81,7 @@ let state: StdinDataState = {
   isWindows: false,
   measure: Character.EmptyString,
   measureAfter: false,
+  measureNodeSubprocess: false,
   mode: ModeType.Waiting,
   openDevtools: false,
   pageObjectPath: '',
@@ -90,6 +93,7 @@ let state: StdinDataState = {
   runs: 1,
   runSkippedTestsAnyway: false,
   screencastQuality: 90,
+  subprocessRuntime: 'node',
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
@@ -125,6 +129,7 @@ export const setState = (newState: StdinDataState): void => {
     isWindows: newState.isWindows,
     measure: newState.measure,
     measureAfter: newState.measureAfter,
+    measureNodeSubprocess: newState.measureNodeSubprocess,
     mode: newState.mode,
     pageObjectPath: newState.pageObjectPath,
     platform: newState.platform,
@@ -135,6 +140,7 @@ export const setState = (newState: StdinDataState): void => {
     runs: newState.runs,
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
     screencastQuality: newState.screencastQuality,
+    subprocessRuntime: newState.subprocessRuntime,
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
     timeouts: newState.timeouts,
