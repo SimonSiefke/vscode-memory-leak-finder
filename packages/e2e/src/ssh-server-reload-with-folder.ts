@@ -40,8 +40,10 @@ export const setup = async ({
     name: 'Remote - SSH',
   })
   const connection = await SshServer.launch()
+  // @ts-ignore
   await Workbench.connectToSsh(connection)
   await ActivityBar.showExplorer()
+  // @ts-ignore
   await Explorer.openFolder()
   await waitForFolderTitle(Electron)
   await SideBar.hide()
