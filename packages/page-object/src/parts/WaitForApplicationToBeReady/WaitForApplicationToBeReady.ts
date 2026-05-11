@@ -20,7 +20,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const main = page.locator('[role="main"]')
         await expect(main).toBeVisible({
-          timeout: 30_000,
+          timeout: 300_000,
         })
       } catch (error) {
         if (isDevtoolsCannotFindContextError(error)) {

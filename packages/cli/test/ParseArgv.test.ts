@@ -124,6 +124,18 @@ test('parseArgv - measure-node flag', () => {
   expect(options.measureNode).toBe(true)
 })
 
+test('parseArgv - process-root-strategy flag', () => {
+  const argv = ['--process-root-strategy', 'ssh-remote-server']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.processRootStrategy).toBe('ssh-remote-server')
+})
+
+test('parseArgv - process-root-strategy defaults to launch-pid', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.processRootStrategy).toBe('launch-pid')
+})
+
 test('parseArgv - inspect-shared-process flag', () => {
   const argv = ['--inspect-shared-process']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)

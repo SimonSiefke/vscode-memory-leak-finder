@@ -1462,6 +1462,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           timeout: initialDiagnosticTimeout,
         })
         await page.waitForIdle()
+        await page.waitForIdle()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify squiggly error`)
       }

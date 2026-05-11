@@ -26,6 +26,7 @@ export interface RunTestsOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly processRootStrategy: string
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string

@@ -10,6 +10,7 @@ export const connectDevtools = async (
   measureId: string,
   attachedToPageTimeout: number,
   measureNode: boolean,
+  processRootStrategy: string,
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
@@ -23,6 +24,7 @@ export const connectDevtools = async (
   Assert.number(connectionId)
   Assert.string(measureId)
   Assert.number(attachedToPageTimeout)
+  Assert.string(processRootStrategy)
 
   const measureRpc = await GetMeasureRpc.getMeasureRpc(
     devtoolsWebSocketUrl,
@@ -37,6 +39,6 @@ export const connectDevtools = async (
     inspectExtensionsPort,
   )
 
-  const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid)
+  const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid, processRootStrategy)
   MemoryLeakFinderState.set(connectionId, { measure, pid, rpc: measureRpc })
 }

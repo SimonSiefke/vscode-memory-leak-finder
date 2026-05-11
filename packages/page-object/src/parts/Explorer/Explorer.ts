@@ -280,6 +280,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open context menu for "${dirent}"`)
       }
     },
+    async openFolder() {
+      try {
+        await page.waitForIdle()
+        const sideBar = page.locator('.sidebar')
+        await expect(sideBar).toBeVisible()
+        const openFolderButton = sideBar.locator('[role="button"], .monaco-button, a', {
+          hasText: 'Open Folder',
+        })
+        await expect(openFolderButton).toBeVisible({ timeout: 10_000 })
+        await openFolderButton.first().click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open folder from explorer`)
+      }
+    },
     async openItem(direntName: string) {
       try {
         await page.waitForIdle()

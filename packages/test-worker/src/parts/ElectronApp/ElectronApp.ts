@@ -4,17 +4,6 @@ import * as Page from '../Page/Page.ts'
 import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
 import * as WaitForPage from '../WaitForIframe/WaitForIframe.ts'
 
-const loadUrlScript = `function (url) {
-  const electron = this
-  const { BrowserWindow } = electron
-  const browserWindows = BrowserWindow.getAllWindows()
-  const browserWindow = browserWindows[0]
-  if (!browserWindow) {
-    throw new Error('no browser window found')
-  }
-  browserWindow.loadURL(url)
-}`
-
 export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow, idleTimeout, sessionRpc }) => {
   let currentFirstWindow = firstWindow
   let currentSessionRpc = sessionRpc
@@ -29,17 +18,6 @@ export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow,
     },
     firstWindow() {
       return currentFirstWindow
-    },
-    loadUrl(url) {
-      return DevtoolsProtocolRuntime.callFunctionOn(this.rpc, {
-        arguments: [
-          {
-            value: url,
-          },
-        ],
-        functionDeclaration: loadUrlScript,
-        objectId: this.electronObjectId,
-      })
     },
     objectType: ObjectType.ElectronApp,
     rebind({ firstWindow, sessionRpc }) {

@@ -1,11 +1,32 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+type QuickPickApi = {
+  executeCommand: (
+    command: string,
+    options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care'; stopsApplication?: boolean },
+  ) => Promise<void>
+  getVisibleCommands: () => Promise<string[]>
+  pressEnter: () => Promise<void>
+  select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<void>
+  showCommands: (options?: { pressKeyOnce?: boolean }) => Promise<void>
+  type: (value: string) => Promise<void>
+}
+
+type WorkbenchDependencies = {
+  readonly createQuickPick: () => QuickPickApi
+  readonly sleep: (milliseconds: number) => Promise<void>
+}
+
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
+  readonly openFolderFromExplorer: () => Promise<void>
   readonly sessionRpc?: any
   readonly locator?: (selector: string) => any
+  readonly shouldHaveExplorerItem: (direntName: string) => Promise<void>
+  readonly shouldHaveTitleContaining: (value: string) => Promise<void>
   readonly waitForIdle: () => Promise<void>
   readonly shouldBeVisible: () => Promise<void>
 }
@@ -24,8 +45,64 @@ const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: strin
   }
 }
 
-export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
+const sleep = async (milliseconds: number): Promise<void> => {
+  const { promise, resolve } = Promise.withResolvers<void>()
+  setTimeout(resolve, milliseconds)
+  await promise
+}
+
+export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
+  return createWithDependencies(
+    reconnectDevtools
+      ? { browserRpc, electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }
+      : { browserRpc, electronApp, expect, ideVersion, page, platform, VError },
+    {
+      createQuickPick: () =>
+        QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        }),
+      sleep,
+    },
+  )
+}
+
+export const createWithDependencies = (
+  { browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams,
+  dependencies: WorkbenchDependencies,
+) => {
   return {
+    async openFolder(): Promise<void> {
+      try {
+        await page.waitForIdle()
+        const quickPick = dependencies.createQuickPick()
+        const refreshPromise = page.waitForRefresh()
+        await quickPick.executeCommand('File: Open Folder...', {
+          pressKeyOnce: true,
+          stopsApplication: true,
+        })
+        await refreshPromise
+        for (let attempt = 0; attempt < 10; attempt++) {
+          const refreshedPage = await page.refresh()
+          await page.rebind(refreshedPage)
+          try {
+            const workbench = page.locator('.monaco-workbench')
+            await expect(workbench).toBeVisible({ timeout: 1000 })
+            await page.waitForIdle()
+            return
+          } catch {
+            await dependencies.sleep(1000)
+          }
+        }
+        throw new Error('Timed out waiting for workbench after opening folder')
+      } catch (error) {
+        throw new VError(error, `Failed to open folder`)
+      }
+    },
     async waitForNewWindow({ timeout }: { timeout: number }) {
       const { promise, resolve } = Promise.withResolvers<string>()
 
@@ -63,7 +140,8 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
     },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
-        const newWindowPromise = this.waitForNewWindow({ timeout: 5000 })
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
+        const newWindowPromise = this.waitForNewWindow({ timeout: 20_000 })
         // Run the quickpick command to open new window
         await page.waitForIdle()
         const quickPick = QuickPick.create({
@@ -86,39 +164,146 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           injectUtilityScript: true,
           sessionId,
         })
+        let currentNewWindowPage = newWindowPage
+        const newWindowId = await electron.getNewWindowId()
+        if (!newWindowId) {
+          throw new Error(`Failed to determine new window id`)
+        }
 
         await page.waitForIdle()
 
         return {
           async close() {
             try {
-              // Wait for the window to be fully idle before attempting to close
-              await newWindowPage.waitForIdle()
-              const quickPick = QuickPick.create({
-                electronApp,
-                expect,
-                ideVersion,
-                page: newWindowPage,
-                platform,
-                VError,
-              })
-              await quickPick.executeCommand(WellKnownCommands.CloseWindow)
+              await electron.closeWindow(newWindowId)
             } catch (error) {
               throw new VError(error, `Failed to close new window`)
             }
           },
-          locator: (selector: string) => newWindowPage.locator(selector),
-          sessionRpc: newWindowPage.sessionRpc,
-          waitForIdle: () => newWindowPage.waitForIdle(),
+          locator: (selector: string) => currentNewWindowPage.locator(selector),
+          async openFolderFromExplorer() {
+            try {
+              await currentNewWindowPage.waitForIdle()
+              const quickPick = QuickPick.create({
+                electronApp,
+                expect,
+                ideVersion,
+                page: currentNewWindowPage,
+                platform,
+                VError,
+              })
+              await quickPick.executeCommand(WellKnownCommands.FocusExplorer)
+              await currentNewWindowPage.waitForIdle()
+              const workbench = currentNewWindowPage.locator('.monaco-workbench')
+              await expect(workbench).toBeVisible()
+              const openFolderButton = workbench.locator('[role="button"], .monaco-button, a', {
+                hasText: 'Open Folder',
+              })
+              const matchCount = await openFolderButton.count()
+              if (matchCount === 0) {
+                const candidates = workbench.locator('[role="button"], .monaco-button, a')
+                const candidateCount = await candidates.count()
+                const labels: string[] = []
+                for (let i = 0; i < Math.min(candidateCount, 20); i++) {
+                  const candidate = candidates.nth(i)
+                  const text = (await candidate.textContent().catch(() => '')) || ''
+                  const ariaLabel = (await candidate.getAttribute('aria-label').catch(() => '')) || ''
+                  const label = `${text.trim()}|${ariaLabel.trim()}`
+                  if (label !== '|') {
+                    labels.push(label)
+                  }
+                }
+                throw new Error(`Open Folder action not found. Visible action labels: ${labels.join(', ')}`)
+              }
+              const refreshPromise = currentNewWindowPage.waitForRefresh()
+              await expect(openFolderButton.first()).toBeVisible({ timeout: 10_000 })
+              await openFolderButton.first().click()
+              await refreshPromise
+              currentNewWindowPage = await currentNewWindowPage.refresh()
+              await currentNewWindowPage.waitForIdle()
+            } catch (error) {
+              throw new VError(error, `Failed to open folder from explorer in new window`)
+            }
+          },
+          sessionRpc: currentNewWindowPage.sessionRpc,
+          async shouldHaveExplorerItem(direntName: string) {
+            try {
+              await currentNewWindowPage.waitForIdle()
+              const explorer = currentNewWindowPage.locator('.explorer-folders-view .monaco-list')
+              const dirent = explorer.locator('.monaco-list-row', {
+                hasText: direntName,
+              })
+              await expect(dirent).toBeVisible({ timeout: 10_000 })
+              await currentNewWindowPage.waitForIdle()
+            } catch (error) {
+              throw new VError(error, `Failed to verify explorer item "${direntName}" in new window`)
+            }
+          },
+          async shouldHaveTitleContaining(value: string) {
+            try {
+              const start = performance.now()
+              const timeout = 20_000
+              while (performance.now() - start < timeout) {
+                const title = (await electron.evaluate(`(() => {
+  const { BrowserWindow } = globalThis._____electron
+  const window = BrowserWindow.fromId(${newWindowId})
+  return window && !window.isDestroyed() ? window.getTitle() : ''
+})()`)) as unknown as string
+                if (title.includes(value)) {
+                  return
+                }
+                await new Promise((resolve) => setTimeout(resolve, 200))
+              }
+              throw new Error(`Expected window title to include ${value}`)
+            } catch (error) {
+              throw new VError(error, `Failed to verify new window title`)
+            }
+          },
+          waitForIdle: () => currentNewWindowPage.waitForIdle(),
           async shouldBeVisible() {
-            await newWindowPage.waitForIdle()
-            const workbench = newWindowPage.locator('.monaco-workbench')
+            await currentNewWindowPage.waitForIdle()
+            const workbench = currentNewWindowPage.locator('.monaco-workbench')
             await expect(workbench).toBeVisible({ timeout: 10_000 })
-            await newWindowPage.waitForIdle()
+            await currentNewWindowPage.waitForIdle()
           },
         }
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
+      }
+    },
+    async reload(): Promise<void> {
+      try {
+        await page.waitForIdle()
+
+        const quickPick = dependencies.createQuickPick()
+
+        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow, {
+          stayVisible: true,
+          pressKeyOnce: true,
+          stopsApplication: true,
+        })
+        await page.waitForRefresh()
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
+        await this.shouldBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to reload window`)
+      }
+    },
+    async close(): Promise<void> {
+      try {
+        await page.waitForIdle()
+
+        const quickPick = dependencies.createQuickPick()
+
+        await quickPick.executeCommand(WellKnownCommands.CloseWindow, {
+          stayVisible: true,
+          pressKeyOnce: true,
+          stopsApplication: true,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to close window`)
       }
     },
     async focusLeftEditorGroup() {
@@ -135,8 +320,10 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
       await page.waitForIdle()
     },
     async shouldBeVisible() {
+      await page.waitForIdle()
       const workbench = page.locator('.monaco-workbench')
       await expect(workbench).toBeVisible()
+      await page.waitForIdle()
     },
     async shouldHaveEditorBackground(color: string) {
       try {

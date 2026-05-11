@@ -1,9 +1,9 @@
 import * as CompareCount from '../CompareCount/CompareCount.ts'
-import * as GetFileWatcherCount from '../GetFileWatcherCount/GetFileWatcherCount.ts'
+import * as GetProcessCount from '../GetProcessCount/GetProcessCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 
-export const id = MeasureId.FileWatcherCount
+export const id = MeasureId.ProcessCount
 
 export const targets: readonly any[] = []
 
@@ -12,11 +12,11 @@ export const create = ({ pid, processRootStrategy }: { pid: number; processRootS
 }
 
 export const start = async (pid: number, processRootStrategy: string): Promise<number> => {
-  return await GetFileWatcherCount.getFileWatcherCount(pid, processRootStrategy)
+  return await GetProcessCount.getProcessCount(pid, processRootStrategy)
 }
 
 export const stop = async (pid: number, processRootStrategy: string): Promise<number> => {
-  return await GetFileWatcherCount.getFileWatcherCount(pid, processRootStrategy)
+  return await GetProcessCount.getProcessCount(pid, processRootStrategy)
 }
 
 export const compare = CompareCount.compareCount

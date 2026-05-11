@@ -31,6 +31,7 @@ export const createDefaultState = (): StdinDataState => ({
   measure: '',
   measureAfter: false,
   measureNode: false,
+  processRootStrategy: 'launch-pid',
   mode: ModeType.Waiting,
   openDevtools: false,
   pageObjectPath: '',

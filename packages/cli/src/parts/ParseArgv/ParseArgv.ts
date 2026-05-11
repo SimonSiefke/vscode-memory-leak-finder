@@ -130,6 +130,13 @@ const parseMeasureNode = (argv: readonly string[]): boolean => {
   return argv.includes('--measure-node')
 }
 
+const parseProcessRootStrategy = (argv: readonly string[]): string => {
+  if (argv.includes('--process-root-strategy')) {
+    return parseArgvString(argv, '--process-root-strategy')
+  }
+  return 'launch-pid'
+}
+
 const parseTimeouts = (argv: readonly string[]): boolean => {
   if (argv.includes('--disable-timeouts')) {
     return false
@@ -330,6 +337,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  const processRootStrategy = parseProcessRootStrategy(argv)
   const recordVideo = parseRecordVideo(argv)
   const compressVideo = parseCompressVideo(argv)
   const restartBetween = parseRestartBetween(argv)
@@ -380,6 +388,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     measure,
     measureAfter,
     measureNode,
+    processRootStrategy,
     openDevtools,
     pageObjectPath,
     platform,
