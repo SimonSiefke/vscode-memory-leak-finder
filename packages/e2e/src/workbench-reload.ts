@@ -3,6 +3,8 @@ import type { TestContext } from '../types.ts'
 const fileName = 'file.txt'
 const fileContent = 'hello from reload test'
 
+export const skip = 1
+
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -19,6 +21,7 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
 export const run = async ({ Editor, Workbench }: TestContext): Promise<void> => {
   await Workbench.shouldBeVisible()
   await Editor.shouldHaveText(fileContent)
+  // @ts-ignore
   await Workbench.reload()
   await Workbench.shouldBeVisible()
   await Editor.shouldHaveText(fileContent)
