@@ -678,6 +678,32 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
       }
     },
+    async retryLastMessage() {
+      try {
+        const chatView = page.locator('.interactive-session')
+        const lastResponse = chatView.locator('.interactive-response.chat-most-recent-response')
+        await expect(lastResponse).toBeVisible()
+        await page.waitForIdle()
+        const refreshButton = lastResponse.locator('[aria-label="Retry"]')
+        await expect(refreshButton).toBeVisible()
+        await page.waitForIdle()
+        await refreshButton.focus()
+        await page.waitForIdle()
+        await expect(refreshButton).toBeFocused()
+        await page.waitForIdle()
+        const loadingResponse = page.locator('.chat-response-loading')
+        await expect(loadingResponse).toBeHidden()
+        await refreshButton.click()
+        await page.waitForIdle()
+        await expect(loadingResponse).toBeVisible({ timeout: 30_000 })
+        await expect(loadingResponse).toBeHidden({ timeout: 120_000 })
+        await page.waitForIdle()
+        await expect(lastResponse).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to retry last chat message`)
+      }
+    },
     async clickAccessButton(buttonText: string = 'Allow') {
       try {
         const accessButton = getAccessButtons(page, buttonText)
