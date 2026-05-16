@@ -2,6 +2,7 @@ import type { IncomingMessage } from 'node:http'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
+import * as ParseRequestBody from '../ParseRequestBody/ParseRequestBody.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
@@ -16,6 +17,7 @@ export const saveRequest = async (
   statusMessage: string | undefined,
   responseHeaders: Record<string, string | string[]>,
   responseData: Buffer,
+  requestBody?: Buffer,
 ): Promise<void> => {
   try {
     await mkdir(REQUESTS_DIR, { recursive: true })
@@ -124,6 +126,7 @@ export const saveRequest = async (
         timestamp,
       },
       request: {
+        body: ParseRequestBody.parseRequestBody(req.headers, requestBody),
         headers: req.headers,
         method: req.method,
         url: req.url,

@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { URL } from 'node:url'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
 import * as Root from '../Root/Root.ts'
 
@@ -20,11 +21,12 @@ interface RecordedRequestFile {
     timestamp: number
   }
   request: {
+    body?: unknown
     headers: Record<string, string | string[]>
     method: string
     url: string
   }
-  response: {
+  response?: {
     statusCode: number
     statusMessage?: string
     headers: Record<string, string | string[]>
@@ -34,9 +36,10 @@ interface RecordedRequestFile {
 }
 
 interface RecordedRequest {
+  body?: unknown
   headers: Record<string, string | string[]>
   method: string
-  response: {
+  response?: {
     statusCode: number
     statusMessage?: string
     headers: Record<string, string | string[]>
@@ -45,6 +48,44 @@ interface RecordedRequest {
   }
   timestamp: number
   url: string
+}
+
+const getUrlMethodKey = (method: string, url: string): string => {
+  return `${method}:${url}`
+}
+
+const getHeaderValue = (headers: Record<string, string | string[]>, name: string): string | undefined => {
+  const directValue = headers[name]
+  if (typeof directValue === 'string') {
+    return directValue
+  }
+  if (Array.isArray(directValue)) {
+    return directValue[0]
+  }
+
+  const matchingEntry = Object.entries(headers).find(([key]) => key.toLowerCase() === name.toLowerCase())
+  if (!matchingEntry) {
+    return undefined
+  }
+  const [, value] = matchingEntry
+  if (typeof value === 'string') {
+    return value
+  }
+  return value[0]
+}
+
+const getCorrelationKey = (request: RecordedRequest): string => {
+  const requestId = getHeaderValue(request.headers, 'x-request-id')
+  if (requestId) {
+    return `request-id:${requestId}`
+  }
+
+  const agentTaskId = getHeaderValue(request.headers, 'x-agent-task-id')
+  if (agentTaskId) {
+    return `agent-task-id:${agentTaskId}`
+  }
+
+  return getUrlMethodKey(request.method, request.url)
 }
 
 const loadMockConfig = async (): Promise<MockConfigEntry[]> => {
@@ -100,12 +141,13 @@ const convertRequestsToMocks = async (): Promise<void> => {
 
     // Read all files from requests directory
     const files = await readdir(REQUESTS_DIR)
-    const jsonFiles = files.filter((file) => file.endsWith('.json'))
+    const jsonFiles = files.filter((file) => file.endsWith('.json')).sort()
 
     console.log(`Found ${jsonFiles.length} request files to process`)
 
     // Map to store latest request for each URL+method combination
     const latestRequests = new Map<string, RecordedRequest>()
+    const pendingRequestBodies = new Map<string, RecordedRequest[]>()
 
     // Process each file
     for (const file of jsonFiles) {
@@ -116,6 +158,7 @@ const convertRequestsToMocks = async (): Promise<void> => {
 
         // Transform nested structure to flat structure
         const request: RecordedRequest = {
+          body: fileData.request.body,
           headers: fileData.request.headers,
           method: fileData.request.method,
           response: fileData.response,
@@ -123,14 +166,39 @@ const convertRequestsToMocks = async (): Promise<void> => {
           url: fileData.request.url,
         }
 
-        // Create a key from URL and method
-        const key = `${request.method}:${request.url}`
+        const hasResponse = request.response && request.response.statusCode !== undefined
+        const hasRequestBody = request.body !== undefined
+        const correlationKey = getCorrelationKey(request)
 
-        // Check if we already have a request for this key
+        if (hasRequestBody && !hasResponse) {
+          const pendingBodies = pendingRequestBodies.get(correlationKey) || []
+          pendingBodies.push(request)
+          pendingRequestBodies.set(correlationKey, pendingBodies)
+          continue
+        }
+
+        let mergedRequest = request
+        if (hasResponse && !hasRequestBody) {
+          const pendingBodies = pendingRequestBodies.get(correlationKey)
+          const nearestPendingBody = pendingBodies?.pop()
+          if (nearestPendingBody) {
+            mergedRequest = {
+              ...request,
+              body: nearestPendingBody.body,
+              headers: nearestPendingBody.headers,
+            }
+          }
+          if (pendingBodies && pendingBodies.length > 0) {
+            pendingRequestBodies.set(correlationKey, pendingBodies)
+          } else {
+            pendingRequestBodies.delete(correlationKey)
+          }
+        }
+
+        const key = RequestMockKey.getRequestIdentityKey(mergedRequest.method, mergedRequest.url, mergedRequest.body)
         const existing = latestRequests.get(key)
-        if (!existing || request.timestamp > existing.timestamp) {
-          // Keep the latest one
-          latestRequests.set(key, request)
+        if (!existing || mergedRequest.timestamp > existing.timestamp) {
+          latestRequests.set(key, mergedRequest)
         }
       } catch (error) {
         console.error(`Error processing file ${file}:`, error)
@@ -168,7 +236,7 @@ const convertRequestsToMocks = async (): Promise<void> => {
         const { hostname, pathname } = parsedUrl
 
         // Generate mock filename using the same logic as GetMockFileName
-        const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
+        const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method, request.body)
         const mockFilePath = join(MOCK_REQUESTS_DIR, mockFileName)
 
         // Replace JWT tokens in response body with new tokens that expire in 1 year
@@ -176,6 +244,11 @@ const convertRequestsToMocks = async (): Promise<void> => {
 
         // Create mock data structure matching what GetMockResponse expects
         const mockData = {
+          request: {
+            body: request.body,
+            method: request.method,
+            url: request.url,
+          },
           response: {
             body: processedBody,
             headers: request.response.headers || {},
