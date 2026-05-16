@@ -121,7 +121,12 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
         const lowerCaseHeaders: Set<string> = new Set()
         for (const [key, value] of Object.entries(proxyRes.headers)) {
           const lowerKey = key.toLowerCase()
-          if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection' && lowerKey !== 'content-length' && !lowerCaseHeaders.has(lowerKey)) {
+          if (
+            lowerKey !== 'transfer-encoding' &&
+            lowerKey !== 'connection' &&
+            lowerKey !== 'content-length' &&
+            !lowerCaseHeaders.has(lowerKey)
+          ) {
             responseHeaders[key] = Array.isArray(value) ? value.join(', ') : String(value)
             lowerCaseHeaders.add(lowerKey)
           }
@@ -163,11 +168,16 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
           })
         }
 
-        SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeadersForSave, responseData, requestBody).catch(
-          (error) => {
-            console.error('[Proxy] Error saving request:', error)
-          },
-        )
+        SaveRequest.saveRequest(
+          req,
+          proxyRes.statusCode || 200,
+          proxyRes.statusMessage,
+          responseHeadersForSave,
+          responseData,
+          requestBody,
+        ).catch((error) => {
+          console.error('[Proxy] Error saving request:', error)
+        })
       }
 
       proxyRes.on('error', (error) => {

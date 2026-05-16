@@ -223,12 +223,7 @@ test('getMockFileName adds Copilot request key suffix', async () => {
     ],
   }
 
-  const fileName = await GetMockFileName.getMockFileName(
-    'api.individual.githubcopilot.com',
-    '/chat/completions',
-    'POST',
-    requestBody,
-  )
+  const fileName = await GetMockFileName.getMockFileName('api.individual.githubcopilot.com', '/chat/completions', 'POST', requestBody)
 
   expect(fileName).toMatch(/^api_individual_githubcopilot_com_chat_completions_post_[a-f0-9]{16}\.json$/)
 })
