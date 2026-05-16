@@ -28,6 +28,7 @@ export interface LoginOptions {
   readonly openDevtools: boolean
   readonly pageObjectPathResolved: string
   readonly platform: string
+  readonly proxyTestFolderName: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
@@ -66,6 +67,7 @@ export const doLogin = async ({
   openDevtools,
   pageObjectPathResolved,
   platform,
+  proxyTestFolderName,
   recordVideo,
   runMode,
   screencastQuality,
@@ -103,6 +105,7 @@ export const doLogin = async ({
       openDevtools,
       pageObjectPath: pageObjectPathResolved,
       platform,
+      proxyTestFolderName,
       recordVideo,
       runMode,
       screencastQuality,

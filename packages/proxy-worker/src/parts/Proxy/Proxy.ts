@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { getCACertPath as getCACertPathImpl } from '../GetCACertPath/GetCACertPath.ts'
 import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
+import * as ProxyState from '../ProxyState/ProxyState.ts'
 
 let proxyServerInstance: { port: number; url: string; [Symbol.asyncDispose]: () => Promise<void> } | null = null
 
@@ -41,7 +42,9 @@ export const setupProxy = async (
   port: number | undefined,
   useProxyMock: boolean | undefined,
   settingsPath: string | null,
+  testFolderName?: string,
 ): Promise<{ port: number; url: string }> => {
+  ProxyState.setTestFolderName(testFolderName)
   console.log('[Proxy] Creating proxy server...')
   const proxyServer = await createHttpProxyServer(port, useProxyMock)
   console.log(`[Proxy] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
@@ -62,6 +65,10 @@ export const setupProxy = async (
   }
 
   return proxyServer
+}
+
+export const setTestFolderName = async (testFolderName: string): Promise<void> => {
+  ProxyState.setTestFolderName(testFolderName)
 }
 
 export { getProxyEnvVars } from '../GetProxyEnvVars/GetProxyEnvVars.ts'

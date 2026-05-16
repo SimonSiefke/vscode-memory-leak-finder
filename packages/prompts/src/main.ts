@@ -9,12 +9,12 @@ const root = join(dirname, '..', '..', '..')
 
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
-const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/node/named-function-count3/window-open-new.1.json`
+const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/named-function-count3/chat-editor-send-message-and-retry.json`
 const ourPath = `/home/simon/.cache/repos/vscode-memory-leak-finder`
-const only = 'window-open-new'
+const only = 'chat-editor-send-message-and-retry'
 const runs = 17
 const measure = 'named-function-count3'
-const extraArgs = '--measure-node'
+const extraArgs = ''
 
 const main = async () => {
   const absolutePath = isAbsolute(relativePath) ? relativePath : join(root, relativePath)
