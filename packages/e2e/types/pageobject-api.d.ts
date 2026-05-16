@@ -638,6 +638,7 @@ export interface Terminal {
   scrollToBottom(): Promise<void>
   scrollToTop(): Promise<void>
   setFindInput(value: any): Promise<void>
+  shouldContainText(text: any, timeout?: any): Promise<void>
   shouldHaveSuccessDecoration(): Promise<void>
   show(options?: any): Promise<void>
   split(): Promise<void>
