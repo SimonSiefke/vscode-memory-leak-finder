@@ -147,6 +147,29 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     await expect(progress).toBeHidden({ timeout: 1_000 })
   }
 
+  const WaitResult = {
+    ChatDone: 1,
+    ChatError: 2,
+    ToolDone: 3,
+    ToolError: 4,
+  }
+
+  const waitForDoneOrToolApproval = async (expect: any, chatView: any, response: any, timeout: number) => {
+    const loading = chatView.locator('.chat-response-loading')
+
+    const toolApprovalSection = chatView.locator('.chat-confirmation-widget2')
+    const donePromise = expect(loading)
+      .toBeHidden({ timeout: 30_000 })
+      .then(() => WaitResult.ChatDone)
+      .catch(() => WaitResult.ChatError)
+    const toolApprovalPromise = expect(toolApprovalSection)
+      .toBeVisible({ timeout: 30_000 })
+      .then(() => WaitResult.ToolDone)
+      .catch(() => WaitResult.ToolError)
+    const first = await Promise.race([donePromise, toolApprovalPromise])
+    return first
+  }
+
   const waitForLatestExchange = async (chatView: any, message: string) => {
     const requestMessage = await getLatestRequestMessage(chatView)
     await expect(requestMessage).toBeVisible({ timeout: 90_000 })
@@ -658,6 +681,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       image = '',
       message,
       model,
+      approveToolCalls = false,
       toolInvocations = [],
       validateRequest = {
         exists: [],
@@ -683,6 +707,37 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           viewLinesText,
         })
         const { requestMessage, response } = await waitForLatestExchange(chatView, message)
+
+        await page.waitForIdle()
+        const maxToolCalls = 15
+        for (let i = 0; i < maxToolCalls; i++) {
+          const result = await waitForDoneOrToolApproval(expect, chatView, response, 90_000)
+          if (result === WaitResult.ChatDone) {
+            break
+          }
+          if (result === WaitResult.ChatError) {
+            throw new Error('Chat response loading did not complete in time')
+          }
+          if (result === WaitResult.ToolDone) {
+            if (!approveToolCalls) {
+              throw new Error('Unexpected tool approval request')
+            }
+            const allowButton = page.locator('.monaco-button[aria-label^="Allow"]')
+            await expect(allowButton).toBeVisible()
+            await allowButton.focus()
+            await page.waitForIdle()
+            await expect(allowButton).toBeFocused()
+            await page.waitForIdle()
+            await allowButton.click()
+            await page.waitForIdle()
+            await clickVisibleAccessButton(page, 'Allow')
+            await page.waitForIdle()
+          }
+          if (result === WaitResult.ToolError) {
+            throw new Error('Tool approval did not appear in time')
+          }
+        }
+
         if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
           const ariaLabel = await requestMessage.getAttribute('aria-label')
           if (ariaLabel !== message) {

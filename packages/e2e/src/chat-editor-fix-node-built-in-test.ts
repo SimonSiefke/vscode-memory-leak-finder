@@ -56,10 +56,13 @@ export const setup = async ({ ChatEditor, Editor, Workspace, SideBar }: TestCont
 }
 
 export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void> => {
+  const prompt = `Run the tests with node --test and fix the failing test. The implementation in src/add.js is already correct, so prefer fixing the test in test/add.test.js.`
   await ChatEditor.sendMessage({
-    message: `Run the tests with node --test and fix the failing test. The implementation in src/add.js is already correct, so prefer fixing the test in test/add.test.js.`,
+    message: prompt,
     verify: true,
+    approveToolCalls: true,
   })
+
   // @ts-ignore
   const workspacePath = Workspace.getPath()
   await waitForFixedTest(workspacePath)
