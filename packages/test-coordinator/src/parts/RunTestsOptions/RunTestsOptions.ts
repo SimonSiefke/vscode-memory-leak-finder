@@ -52,3 +52,7 @@ export interface RunTestsWithCallbackOptions extends RunTestsOptions {
   readonly clearDisposables: () => Promise<void>
   readonly getTimeStamp: () => number
 }
+
+export interface ProxyTestFolderOptions {
+  readonly proxyTestFolderName: string
+}

@@ -7,5 +7,6 @@ export const commandMap = {
   'Proxy.disposeProxyServer': Proxy.disposeProxyServer,
   'Proxy.getCACertPath': Proxy.getCACertPath,
   'Proxy.getProxyEnvVars': Proxy.getProxyEnvVars,
+  'Proxy.setTestFolderName': Proxy.setTestFolderName,
   'Proxy.setupProxy': Proxy.setupProxy,
 }

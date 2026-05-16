@@ -1,13 +1,11 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
-import * as Root from '../Root/Root.ts'
+import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
-
-const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
 export const savePostBody = async (
   method: string,
@@ -26,10 +24,11 @@ export const savePostBody = async (
   }
 
   try {
-    await mkdir(REQUESTS_DIR, { recursive: true })
+    const requestsDir = GetProxyPaths.getRequestsDir()
+    await mkdir(requestsDir, { recursive: true })
     const timestamp = Date.now()
     const filename = `${timestamp}_POST_${SanitizeFilename.sanitizeFilename(url)}.json`
-    const filepath = join(REQUESTS_DIR, filename)
+    const filepath = join(requestsDir, filename)
 
     const contentType = headers['content-type'] || headers['Content-Type'] || ''
     const contentTypeLower = contentType.toLowerCase()

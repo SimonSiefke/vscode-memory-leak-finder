@@ -4,6 +4,7 @@ import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
+import * as GetProxyTestFolderName from '../GetProxyTestFolderName/GetProxyTestFolderName.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
@@ -141,6 +142,7 @@ export const runTestsWithCallback = async ({
         openDevtools,
         pageObjectPath: pageObjectPathResolved,
         platform,
+        proxyTestFolderName: '',
         recordVideo,
         runMode,
         screencastQuality,
@@ -195,6 +197,7 @@ export const runTestsWithCallback = async ({
         openDevtools,
         pageObjectPathResolved,
         platform,
+        proxyTestFolderName: '',
         recordVideo,
         runMode,
         screencastQuality,
@@ -255,6 +258,7 @@ export const runTestsWithCallback = async ({
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
+      const proxyTestFolderName = GetProxyTestFolderName.getProxyTestFolderName(absolutePath)
       const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
 
       const needsSetup = i === 0 || restartBetween
@@ -289,6 +293,7 @@ export const runTestsWithCallback = async ({
             openDevtools,
             pageObjectPath: pageObjectPathResolved,
             platform,
+            proxyTestFolderName,
             recordVideo,
             runMode,
             screencastQuality,
@@ -306,6 +311,10 @@ export const runTestsWithCallback = async ({
           testWorkerRpc: testWorkerRpc || emptyRpc,
           videoRpc: videoRpc || emptyRpc,
         }
+      }
+
+      if (enableProxy) {
+        await workers.initializationWorkerRpc.invoke('Launch.setProxyTestFolderName', proxyTestFolderName)
       }
 
       const { memoryRpc, testWorkerRpc, videoRpc } = workers
