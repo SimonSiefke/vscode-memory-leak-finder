@@ -17,6 +17,20 @@ const getAccessButtons = (page: any, buttonText: string) => {
   )
 }
 
+const clickVisibleAccessButton = async (page: any, buttonText: string) => {
+  const accessButton = getAccessButtons(page, buttonText).first()
+  if ((await accessButton.count()) === 0) {
+    return false
+  }
+  const isVisible = await accessButton.isVisible().catch(() => false)
+  if (!isVisible) {
+    return false
+  }
+  await accessButton.click()
+  await page.waitForIdle()
+  return true
+}
+
 const escapeForRegExp = (value: string) => {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -43,6 +57,33 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     return getLastRenderedLocator(responses, 60_000)
   }
 
+  const waitForToolApprovalToFinish = async (chatView: any) => {
+    const progress = chatView.locator('.rendered-markdown.progress-step')
+    const timeout = 45_000
+    const startTime = performance.now()
+
+    while (performance.now() - startTime < timeout) {
+      const progressCount = await progress.count().catch(() => 0)
+      if (progressCount === 0) {
+        return
+      }
+      const isVisible = await progress
+        .first()
+        .isVisible()
+        .catch(() => false)
+      if (!isVisible) {
+        return
+      }
+      const clicked = await clickVisibleAccessButton(page, 'Allow')
+      if (!clicked) {
+        await new Promise((resolve) => setTimeout(resolve, 200))
+      }
+      await page.waitForIdle()
+    }
+
+    await expect(progress).toBeHidden({ timeout: 1_000 })
+  }
+
   const waitForLatestExchange = async (chatView: any, message: string) => {
     const requestMessage = await getLatestRequestMessage(chatView)
     await expect(requestMessage).toBeVisible({ timeout: 90_000 })
@@ -51,8 +92,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     const response = await getLatestResponseContent(chatView)
     await expect(response).toBeVisible({ timeout: 60_000 })
     await page.waitForIdle()
-    const progress = chatView.locator('.rendered-markdown.progress-step')
-    await expect(progress).toBeHidden({ timeout: 45_000 })
+    await waitForToolApprovalToFinish(chatView)
     await page.waitForIdle()
     await expect(response).toBeVisible({ timeout: 30_000 })
     await page.waitForIdle()
@@ -358,6 +398,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async open() {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.NewChatEditor)
         await page.waitForIdle()

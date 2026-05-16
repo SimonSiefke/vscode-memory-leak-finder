@@ -47,11 +47,11 @@ test('add returns the sum of two numbers', () => {
   },
 ]
 
-export const setup = async ({ ChatEditor, Editor, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, Workspace, SideBar }: TestContext): Promise<void> => {
+  await SideBar.hide()
   await Workspace.setFiles(initialFiles)
-
   await Editor.closeAll()
-  await ChatEditor.clearAll()
+  // await ChatEditor.clearAll()
   await ChatEditor.open()
 }
 
