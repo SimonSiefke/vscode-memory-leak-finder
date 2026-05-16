@@ -31,6 +31,33 @@ const clickVisibleAccessButton = async (page: any, buttonText: string) => {
   return true
 }
 
+const hasVisibleAccessButton = async (page: any, buttonText: string) => {
+  const accessButton = getAccessButtons(page, buttonText).first()
+  if ((await accessButton.count().catch(() => 0)) === 0) {
+    return false
+  }
+  return accessButton.isVisible().catch(() => false)
+}
+
+const waitForLocatorVisibleWithToolApproval = async (page: any, expect: any, locator: any, timeout: number) => {
+  const startTime = performance.now()
+  while (performance.now() - startTime < timeout) {
+    const count = await locator.count().catch(() => 0)
+    if (count > 0) {
+      const isVisible = await locator.first().isVisible().catch(() => false)
+      if (isVisible) {
+        return
+      }
+    }
+    const clicked = await clickVisibleAccessButton(page, 'Allow')
+    if (!clicked) {
+      await new Promise((resolve) => setTimeout(resolve, 200))
+    }
+    await page.waitForIdle()
+  }
+  await expect(locator.first()).toBeVisible({ timeout: 1_000 })
+}
+
 const escapeForRegExp = (value: string) => {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -38,8 +65,12 @@ const escapeForRegExp = (value: string) => {
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const chatScrollSelector = '.interactive-session .monaco-list .monaco-scrollable-element'
 
-  const getLastRenderedLocator = async (locator: any, timeout: number) => {
-    await expect(locator.first()).toBeVisible({ timeout })
+  const getLastRenderedLocator = async (locator: any, timeout: number, allowToolApproval: boolean = false) => {
+    if (allowToolApproval) {
+      await waitForLocatorVisibleWithToolApproval(page, expect, locator, timeout)
+    } else {
+      await expect(locator.first()).toBeVisible({ timeout })
+    }
     const count = await locator.count()
     if (count < 1) {
       throw new Error('Expected at least one rendered chat row')
@@ -54,30 +85,57 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
   const getLatestResponseContent = async (chatView: any) => {
     const responses = chatView.locator('.monaco-list-row .chat-most-recent-response')
-    return getLastRenderedLocator(responses, 60_000)
+    return getLastRenderedLocator(responses, 60_000, true)
   }
 
-  const waitForToolApprovalToFinish = async (chatView: any) => {
+  const waitForToolApprovalToFinish = async (chatView: any, response: any) => {
     const progress = chatView.locator('.rendered-markdown.progress-step')
-    const timeout = 45_000
+    const timeout = 90_000
+    const settleTime = 1_500
+    const settleTimeAfterApproval = 4_000
     const startTime = performance.now()
+    let settledSince = 0
+    let lastResponseText = ''
+    let waitingForPostApprovalProgress = false
+    let sawApproval = false
 
     while (performance.now() - startTime < timeout) {
       const progressCount = await progress.count().catch(() => 0)
-      if (progressCount === 0) {
-        return
-      }
-      const isVisible = await progress
+      const isProgressVisible = progressCount > 0 && (await progress
         .first()
         .isVisible()
-        .catch(() => false)
-      if (!isVisible) {
-        return
+        .catch(() => false))
+      const hasAllowButton = await hasVisibleAccessButton(page, 'Allow')
+      if (hasAllowButton) {
+        await clickVisibleAccessButton(page, 'Allow')
+        settledSince = 0
+        lastResponseText = ''
+        waitingForPostApprovalProgress = true
+        sawApproval = true
+        continue
       }
-      const clicked = await clickVisibleAccessButton(page, 'Allow')
-      if (!clicked) {
-        await new Promise((resolve) => setTimeout(resolve, 200))
+
+      const responseText = ((await response.textContent().catch(() => '')) || '').trim()
+      const responseChanged = responseText !== lastResponseText
+      lastResponseText = responseText
+
+      if (waitingForPostApprovalProgress && (isProgressVisible || responseChanged)) {
+        waitingForPostApprovalProgress = false
       }
+
+      if (!waitingForPostApprovalProgress && !isProgressVisible && !responseChanged) {
+        if (settledSince === 0) {
+          settledSince = performance.now()
+        }
+        const requiredSettleTime = sawApproval ? settleTimeAfterApproval : settleTime
+        if (performance.now() - settledSince >= requiredSettleTime) {
+          return
+        }
+      } else {
+        settledSince = 0
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 200))
       await page.waitForIdle()
     }
 
@@ -92,7 +150,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     const response = await getLatestResponseContent(chatView)
     await expect(response).toBeVisible({ timeout: 60_000 })
     await page.waitForIdle()
-    await waitForToolApprovalToFinish(chatView)
+    await waitForToolApprovalToFinish(chatView, response)
     await page.waitForIdle()
     await expect(response).toBeVisible({ timeout: 30_000 })
     await page.waitForIdle()
