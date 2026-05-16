@@ -44,7 +44,10 @@ const waitForLocatorVisibleWithToolApproval = async (page: any, expect: any, loc
   while (performance.now() - startTime < timeout) {
     const count = await locator.count().catch(() => 0)
     if (count > 0) {
-      const isVisible = await locator.first().isVisible().catch(() => false)
+      const isVisible = await locator
+        .first()
+        .isVisible()
+        .catch(() => false)
       if (isVisible) {
         return
       }
@@ -101,10 +104,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
     while (performance.now() - startTime < timeout) {
       const progressCount = await progress.count().catch(() => 0)
-      const isProgressVisible = progressCount > 0 && (await progress
-        .first()
-        .isVisible()
-        .catch(() => false))
+      const isProgressVisible =
+        progressCount > 0 &&
+        (await progress
+          .first()
+          .isVisible()
+          .catch(() => false))
       const hasAllowButton = await hasVisibleAccessButton(page, 'Allow')
       if (hasAllowButton) {
         await clickVisibleAccessButton(page, 'Allow')
