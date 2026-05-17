@@ -24,9 +24,7 @@ test('replaceJwtTokensInValue - refreshes copilot token timestamps and related f
 test('replaceJwtTokensInValue - preserves bearer prefix when refreshing copilot token timestamps', async () => {
   jest.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000)
 
-  const result = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(
-    'Bearer tid=abc;exp=789;iat=111;sku=plus_monthly_subscriber_quota',
-  )
+  const result = await ReplaceJwtTokensInValue.replaceJwtTokensInValue('Bearer tid=abc;exp=789;iat=111;sku=plus_monthly_subscriber_quota')
 
   expect(result).toBe('Bearer tid=abc;exp=1831536000;iat=1800000000;sku=plus_monthly_subscriber_quota')
 })
