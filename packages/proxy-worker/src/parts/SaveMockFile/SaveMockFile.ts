@@ -1,8 +1,10 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
 
 interface SaveMockFileOptions {
@@ -27,6 +29,14 @@ export const saveMockFile = async (options: SaveMockFileOptions): Promise<string
 
   const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, options.method, options.requestBody)
   const mockFilePath = join(mockRequestsDir, mockFileName)
+
+  if (IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(options.response) && existsSync(mockFilePath)) {
+    const existingMock = JSON.parse(await readFile(mockFilePath, 'utf8'))
+    if (!IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(existingMock.response)) {
+      return mockFilePath
+    }
+  }
+
   const processedBody = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(options.response.body)
 
   const mockData = {

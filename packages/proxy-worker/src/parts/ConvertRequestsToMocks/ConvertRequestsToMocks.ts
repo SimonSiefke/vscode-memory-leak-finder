@@ -4,6 +4,7 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
 import * as Root from '../Root/Root.ts'
@@ -85,6 +86,21 @@ const getCorrelationKey = (request: RecordedRequest): string => {
   return getUrlMethodKey(request.method, request.url)
 }
 
+const shouldReplaceRecordedRequest = (existing: RecordedRequest | undefined, next: RecordedRequest): boolean => {
+  if (!existing) {
+    return true
+  }
+
+  const existingExpiredTokenError = IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(existing.response)
+  const nextExpiredTokenError = IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(next.response)
+
+  if (existingExpiredTokenError !== nextExpiredTokenError) {
+    return !nextExpiredTokenError
+  }
+
+  return next.timestamp > existing.timestamp
+}
+
 const getRequestDirectories = async (): Promise<readonly { requestsDir: string; mockRequestsDir: string }[]> => {
   if (!existsSync(REQUESTS_ROOT_DIR)) {
     return []
@@ -164,7 +180,7 @@ const convertRequestDirectoryToMocks = async (
 
       const key = RequestMockKey.getRequestIdentityKey(mergedRequest.method, mergedRequest.url, mergedRequest.body)
       const existing = latestRequests.get(key)
-      if (!existing || mergedRequest.timestamp > existing.timestamp) {
+      if (shouldReplaceRecordedRequest(existing, mergedRequest)) {
         latestRequests.set(key, mergedRequest)
       }
     } catch (error) {

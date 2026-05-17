@@ -54,3 +54,58 @@ test('saveMockFile - writes the mock into the active test folder', async () => {
     },
   })
 })
+
+test('saveMockFile - keeps an existing successful mock when a later expired-token 401 is recorded', async () => {
+  ProxyState.setTestFolderName(testFolderName)
+  const requestBody = { prompt: 'hello' }
+
+  await SaveMockFile.saveMockFile({
+    method: 'POST',
+    requestBody,
+    response: {
+      body: { ok: true },
+      headers: { 'content-type': 'application/json' },
+      statusCode: 200,
+      statusMessage: 'OK',
+    },
+    responseType: 'json',
+    timestamp: 123,
+    url: 'https://api.individual.githubcopilot.com/chat/completions',
+  })
+
+  await SaveMockFile.saveMockFile({
+    method: 'POST',
+    requestBody,
+    response: {
+      body: 'IDE token expired: unauthorized: token expired\n',
+      headers: { 'content-type': 'text/plain' },
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
+    },
+    responseType: 'text',
+    timestamp: 456,
+    url: 'https://api.individual.githubcopilot.com/chat/completions',
+  })
+
+  const mockFileName = await GetMockFileName.getMockFileName('api.individual.githubcopilot.com', '/chat/completions', 'POST', requestBody)
+  const content = await readFile(join(scopedMockDir, mockFileName), 'utf8')
+
+  expect(JSON.parse(content)).toEqual({
+    metadata: {
+      responseType: 'json',
+      timestamp: 123,
+    },
+    request: {
+      body: requestBody,
+      method: 'POST',
+      url: 'https://api.individual.githubcopilot.com/chat/completions',
+    },
+    response: {
+      body: { ok: true },
+      headers: { 'content-type': 'application/json' },
+      statusCode: 200,
+      statusMessage: 'OK',
+      wasCompressed: undefined,
+    },
+  })
+})
