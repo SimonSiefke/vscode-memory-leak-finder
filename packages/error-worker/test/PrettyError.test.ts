@@ -68,6 +68,26 @@ test('prepare - with root option', async () => {
   expect(prettyError.stack).not.toContain('/test/e2e')
 })
 
+test('prepare - resolves relative stack paths against root when generating code frames', async () => {
+  // @ts-ignore
+  FileSystem.readFileSync.mockImplementation(() => {
+    return `import test from 'node:test'
+
+test('example', () => {
+  throw new Error('boom')
+})
+`
+  })
+  const error = new ExpectError('test error')
+  error.stack = `ExpectError: test error
+    at Object.<anonymous> (/test/e2e/test/add.test.js:3:3)`
+
+  const prettyError = await PrettyError.prepare(error, { color: false, root: '/test/e2e' })
+
+  expect(prettyError.codeFrame).toContain("throw new Error('boom')")
+  expect(FileSystem.readFileSync).toHaveBeenCalledWith('/test/e2e/test/add.test.js', 'utf8')
+})
+
 test('prepare - module not found error', async () => {
   mockReadFileSync.mockImplementation(() => {
     return `import { test } from 'missing-package'
