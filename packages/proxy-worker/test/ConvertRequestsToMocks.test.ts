@@ -252,12 +252,7 @@ test('convertRequestsToMocksMain - prefers a successful response over a later ex
 
   await ConvertRequestsToMocks.convertRequestsToMocksMain()
 
-  const mockFileName = await GetMockFileName.getMockFileName(
-    'api.individual.githubcopilot.com',
-    '/chat/completions',
-    'POST',
-    requestBody,
-  )
+  const mockFileName = await GetMockFileName.getMockFileName('api.individual.githubcopilot.com', '/chat/completions', 'POST', requestBody)
   const mockContent = await readFile(join(mocksRootDir, expiredTokenTestFolderName, mockFileName), 'utf8')
 
   expect(JSON.parse(mockContent)).toEqual({
