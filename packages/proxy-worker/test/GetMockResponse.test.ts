@@ -36,7 +36,7 @@ test('getMockResponse - returns mock from active test folder', async () => {
   })
 })
 
-test('getMockResponse - does not fall back to shared root mock files', async () => {
+test('getMockResponse - falls back to shared root mock files when scoped mock is missing', async () => {
   ProxyState.setTestFolderName(testFolderName)
   await mkdir(mockRootDir, { recursive: true })
   const mockFileName = await GetMockFileName.getMockFileName('example.com', '/api/data', 'GET')
@@ -48,5 +48,9 @@ test('getMockResponse - does not fall back to shared root mock files', async () 
 
   const result = await GetMockResponse.getMockResponse('GET', 'https://example.com/api/data')
 
-  expect(result).toBeNull()
+  expect(result).toEqual({
+    body: 'root-body',
+    headers: { 'content-type': 'text/plain' },
+    statusCode: 200,
+  })
 })

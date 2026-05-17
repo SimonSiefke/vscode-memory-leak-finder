@@ -18,6 +18,10 @@ export const getMockRequestsDir = (): string => {
   return getScopedDir('.vscode-mock-requests')
 }
 
+export const getSharedMockRequestsDir = (): string => {
+  return join(Root.root, '.vscode-mock-requests')
+}
+
 export const getZipDataDir = (): string => {
   return getScopedDir('.vscode-zip-data')
 }

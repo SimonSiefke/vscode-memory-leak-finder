@@ -230,18 +230,23 @@ const findCompatibleCopilotMockFile = async (
 
 export const getMockResponse = async (method: string, url: string, requestBody?: unknown): Promise<MockResponse | null> => {
   try {
-    const mockRequestsDir = GetProxyPaths.getMockRequestsDir()
+    const scopedMockRequestsDir = GetProxyPaths.getMockRequestsDir()
+    const sharedMockRequestsDir = GetProxyPaths.getSharedMockRequestsDir()
+    const mockRequestsDirs =
+      scopedMockRequestsDir === sharedMockRequestsDir ? [scopedMockRequestsDir] : [scopedMockRequestsDir, sharedMockRequestsDir]
     const parsedUrl = new URL(url)
     const { hostname, pathname } = parsedUrl
 
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {
       const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-      const mockFile = join(mockRequestsDir, mockFileName)
-      const mockResponse = await loadMockResponse(mockFile)
+      for (const mockRequestsDir of mockRequestsDirs) {
+        const mockFile = join(mockRequestsDir, mockFileName)
+        const mockResponse = await loadMockResponse(mockFile)
 
-      if (mockResponse) {
-        return mockResponse
+        if (mockResponse) {
+          return mockResponse
+        }
       }
 
       // If no OPTIONS mock exists, create a default preflight response
@@ -263,46 +268,48 @@ export const getMockResponse = async (method: string, url: string, requestBody?:
     if (pathname === '/chat/completions') {
       console.log(`[Proxy] Requested mock file ${mockFileName} for ${method} ${pathname}`)
     }
-    const mockFile = join(mockRequestsDir, mockFileName)
-    const mockResponse = await loadMockResponse(mockFile)
+    for (const mockRequestsDir of mockRequestsDirs) {
+      const mockFile = join(mockRequestsDir, mockFileName)
+      const mockResponse = await loadMockResponse(mockFile)
 
-    if (mockResponse) {
-      console.log(`[Proxy] Loaded mock file ${mockFileName} for ${method} ${pathname}`)
-      return mockResponse
+      if (mockResponse) {
+        console.log(`[Proxy] Loaded mock file ${mockFileName} for ${method} ${pathname}`)
+        return mockResponse
+      }
+
+      if (requestBody !== undefined) {
+        const fallbackMockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
+        const compatibleMockFileName = await findCompatibleCopilotMockFile(
+          mockRequestsDir,
+          hostname,
+          pathname,
+          method,
+          requestBody,
+          fallbackMockFileName,
+        )
+        if (compatibleMockFileName) {
+          const compatibleMockFile = join(mockRequestsDir, compatibleMockFileName)
+          const compatibleMockResponse = await loadMockResponse(compatibleMockFile)
+          if (compatibleMockResponse) {
+            console.log(`[Proxy] Loaded compatible mock file ${compatibleMockFileName} for ${method} ${pathname}`)
+            return compatibleMockResponse
+          }
+        }
+
+        if (!isCopilotMockKeyedRequest(hostname, pathname, method) && fallbackMockFileName !== mockFileName) {
+          const fallbackMockFile = join(mockRequestsDir, fallbackMockFileName)
+          const fallbackMockResponse = await loadMockResponse(fallbackMockFile)
+          if (fallbackMockResponse) {
+            console.log(`[Proxy] Loaded fallback mock file ${fallbackMockFileName} for ${method} ${pathname}`)
+            return fallbackMockResponse
+          }
+        }
+      }
     }
 
-    if (requestBody !== undefined) {
-      const fallbackMockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-      const compatibleMockFileName = await findCompatibleCopilotMockFile(
-        mockRequestsDir,
-        hostname,
-        pathname,
-        method,
-        requestBody,
-        fallbackMockFileName,
-      )
-      if (compatibleMockFileName) {
-        const compatibleMockFile = join(mockRequestsDir, compatibleMockFileName)
-        const compatibleMockResponse = await loadMockResponse(compatibleMockFile)
-        if (compatibleMockResponse) {
-          console.log(`[Proxy] Loaded compatible mock file ${compatibleMockFileName} for ${method} ${pathname}`)
-          return compatibleMockResponse
-        }
-      }
-
-      if (isCopilotMockKeyedRequest(hostname, pathname, method)) {
-        console.log(`[Proxy] No compatible keyed mock file found for ${method} ${pathname}; skipping generic fallback`)
-        return null
-      }
-
-      if (fallbackMockFileName !== mockFileName) {
-        const fallbackMockFile = join(mockRequestsDir, fallbackMockFileName)
-        const fallbackMockResponse = await loadMockResponse(fallbackMockFile)
-        if (fallbackMockResponse) {
-          console.log(`[Proxy] Loaded fallback mock file ${fallbackMockFileName} for ${method} ${pathname}`)
-          return fallbackMockResponse
-        }
-      }
+    if (requestBody !== undefined && isCopilotMockKeyedRequest(hostname, pathname, method)) {
+      console.log(`[Proxy] No compatible keyed mock file found for ${method} ${pathname}; skipping generic fallback`)
+      return null
     }
 
     return null // No mock found, pass through
