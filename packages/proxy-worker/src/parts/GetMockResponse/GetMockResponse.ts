@@ -22,6 +22,34 @@ const isCopilotMockKeyedRequest = (hostname: string, pathname: string, method: s
   return hostname === 'api.githubcopilot.com' || hostname === 'api.individual.githubcopilot.com'
 }
 
+const getSignedCopilotTokenExpiration = (token: string): number | undefined => {
+  const normalizedToken = token.startsWith('Bearer ') ? token.slice('Bearer '.length) : token
+  if (!normalizedToken.startsWith('tid=')) {
+    return undefined
+  }
+  const expirationPart = normalizedToken.split(';').find((part) => part.startsWith('exp='))
+  if (!expirationPart) {
+    return undefined
+  }
+  const expiration = Number(expirationPart.slice('exp='.length))
+  return Number.isFinite(expiration) ? expiration : undefined
+}
+
+const isExpiredSignedCopilotTokenPayload = (body: unknown): boolean => {
+  if (!body || typeof body !== 'object') {
+    return false
+  }
+  const token = (body as { token?: unknown }).token
+  const expiresAt = (body as { expires_at?: unknown }).expires_at
+  const expiration = typeof token === 'string' ? getSignedCopilotTokenExpiration(token) : undefined
+  const fallbackExpiration = typeof expiresAt === 'number' ? expiresAt : undefined
+  const effectiveExpiration = expiration ?? fallbackExpiration
+  if (effectiveExpiration === undefined) {
+    return false
+  }
+  return effectiveExpiration <= Math.floor(Date.now() / 1000)
+}
+
 const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> => {
   try {
     if (!existsSync(mockFile)) {
@@ -47,6 +75,10 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
     }
 
     if (IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(response)) {
+      return null
+    }
+
+    if (isExpiredSignedCopilotTokenPayload(response.body)) {
       return null
     }
 

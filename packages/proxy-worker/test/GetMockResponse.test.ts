@@ -64,8 +64,7 @@ test('getMockResponse - falls back to shared root mock files when scoped mock is
   })
 })
 
-test('getMockResponse - refreshes copilot token timestamps for existing json mocks', async () => {
-  jest.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000)
+test('getMockResponse - preserves signed copilot token payloads for existing json mocks', async () => {
   ProxyState.setTestFolderName(testFolderName)
   await mkdir(scopedMockDir, { recursive: true })
   const mockFileName = await GetMockFileName.getMockFileName('example.com', '/api/data', 'GET')
@@ -75,9 +74,9 @@ test('getMockResponse - refreshes copilot token timestamps for existing json moc
       metadata: { responseType: 'json' },
       response: {
         body: {
-          expires_at: 1_700_000_123,
-          iat: 1_700_000_456,
-          token: 'tid=abc;exp=789;iat=111;sku=plus_monthly_subscriber_quota',
+          expires_at: 1_831_536_000,
+          iat: 1_800_000_000,
+          token: 'tid=abc;exp=1831536000;iat=1800000000;sku=plus_monthly_subscriber_quota',
         },
         headers: { 'content-type': 'application/json' },
         statusCode: 200,
@@ -97,6 +96,33 @@ test('getMockResponse - refreshes copilot token timestamps for existing json moc
     headers: { 'content-type': 'application/json' },
     statusCode: 200,
   })
+})
+
+test('getMockResponse - skips expired signed copilot token payloads', async () => {
+  jest.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000)
+  ProxyState.setTestFolderName(testFolderName)
+  await mkdir(scopedMockDir, { recursive: true })
+  const mockFileName = await GetMockFileName.getMockFileName('example.com', '/api/data', 'GET')
+  await writeFile(
+    join(scopedMockDir, mockFileName),
+    JSON.stringify({
+      metadata: { responseType: 'json' },
+      response: {
+        body: {
+          expires_at: 1_700_000_123,
+          iat: 1_700_000_456,
+          token: 'tid=abc;exp=1700000123;iat=1700000456;sku=plus_monthly_subscriber_quota',
+        },
+        headers: { 'content-type': 'application/json' },
+        statusCode: 200,
+      },
+    }),
+    'utf8',
+  )
+
+  const result = await GetMockResponse.getMockResponse('GET', 'https://example.com/api/data')
+
+  expect(result).toBeNull()
 })
 
 test('getMockResponse - skips poisoned keyed copilot mocks and falls back to a valid shared mock', async () => {

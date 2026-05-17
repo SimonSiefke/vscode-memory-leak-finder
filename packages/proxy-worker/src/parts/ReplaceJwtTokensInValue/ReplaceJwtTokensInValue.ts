@@ -15,41 +15,16 @@ const isIssuedAtProperty = (key: string): boolean => {
   return /^(iat|issued_at|issuedAt)$/i.test(key)
 }
 
-const replaceCopilotTokenTimestamps = (value: string): string => {
-  const prefix = value.startsWith('Bearer ') ? 'Bearer ' : ''
-  const token = prefix ? value.slice(prefix.length) : value
+const isSignedCopilotToken = (value: string): boolean => {
+  return value.startsWith('tid=') || value.startsWith('Bearer tid=')
+}
 
-  if (!token.startsWith('tid=')) {
-    return value
+const isSignedCopilotTokenPayload = (value: unknown): value is { token: string } => {
+  if (!value || typeof value !== 'object') {
+    return false
   }
-
-  const currentTimestamp = getCurrentTimestamp()
-  const oneYearFromNow = getOneYearFromNow()
-  let hasTokenId = false
-  let hasExp = false
-  let hasIat = false
-
-  const updatedParts = token.split(';').map((part) => {
-    if (part.startsWith('tid=')) {
-      hasTokenId = true
-      return part
-    }
-    if (/^exp=\d+$/.test(part)) {
-      hasExp = true
-      return `exp=${oneYearFromNow}`
-    }
-    if (/^iat=\d+$/.test(part)) {
-      hasIat = true
-      return `iat=${currentTimestamp}`
-    }
-    return part
-  })
-
-  if (!hasTokenId || (!hasExp && !hasIat)) {
-    return value
-  }
-
-  return prefix + updatedParts.join(';')
+  const token = (value as { token?: unknown }).token
+  return typeof token === 'string' && isSignedCopilotToken(token)
 }
 
 export const replaceJwtTokensInValue = async (value: any, parentKey?: string): Promise<any> => {
@@ -65,10 +40,6 @@ export const replaceJwtTokensInValue = async (value: any, parentKey?: string): P
       if (IsJwtToken.isJwtToken(token)) {
         return prefix + (await ReplaceJwtToken.replaceJwtToken(token))
       }
-    }
-    const replacedCopilotToken = replaceCopilotTokenTimestamps(value)
-    if (replacedCopilotToken !== value) {
-      return replacedCopilotToken
     }
     return value
   }
@@ -87,6 +58,10 @@ export const replaceJwtTokensInValue = async (value: any, parentKey?: string): P
   }
 
   if (value !== null && typeof value === 'object') {
+    if (isSignedCopilotTokenPayload(value)) {
+      return value
+    }
+
     const result: Record<string, any> = {}
     for (const [key, val] of Object.entries(value)) {
       result[key] = await replaceJwtTokensInValue(val, key)
