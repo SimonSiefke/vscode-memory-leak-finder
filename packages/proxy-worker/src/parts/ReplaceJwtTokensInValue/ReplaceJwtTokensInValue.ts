@@ -3,6 +3,55 @@ import * as IsJwtToken from '../IsJwtToken/IsJwtToken.ts'
 import * as IsUnixTimestamp from '../IsUnixTimestamp/IsUnixTimestamp.ts'
 import * as ReplaceJwtToken from '../ReplaceJwtToken/ReplaceJwtToken.ts'
 
+const getCurrentTimestamp = (): number => {
+  return Math.floor(Date.now() / 1000)
+}
+
+const getOneYearFromNow = (): number => {
+  return getCurrentTimestamp() + 365 * 24 * 60 * 60
+}
+
+const isIssuedAtProperty = (key: string): boolean => {
+  return /^(iat|issued_at|issuedAt)$/i.test(key)
+}
+
+const replaceCopilotTokenTimestamps = (value: string): string => {
+  const prefix = value.startsWith('Bearer ') ? 'Bearer ' : ''
+  const token = prefix ? value.slice(prefix.length) : value
+
+  if (!token.startsWith('tid=')) {
+    return value
+  }
+
+  const currentTimestamp = getCurrentTimestamp()
+  const oneYearFromNow = getOneYearFromNow()
+  let hasTokenId = false
+  let hasExp = false
+  let hasIat = false
+
+  const updatedParts = token.split(';').map((part) => {
+    if (part.startsWith('tid=')) {
+      hasTokenId = true
+      return part
+    }
+    if (/^exp=\d+$/.test(part)) {
+      hasExp = true
+      return `exp=${oneYearFromNow}`
+    }
+    if (/^iat=\d+$/.test(part)) {
+      hasIat = true
+      return `iat=${currentTimestamp}`
+    }
+    return part
+  })
+
+  if (!hasTokenId || (!hasExp && !hasIat)) {
+    return value
+  }
+
+  return prefix + updatedParts.join(';')
+}
+
 export const replaceJwtTokensInValue = async (value: any, parentKey?: string): Promise<any> => {
   if (typeof value === 'string') {
     if (IsJwtToken.isJwtToken(value)) {
@@ -17,13 +66,20 @@ export const replaceJwtTokensInValue = async (value: any, parentKey?: string): P
         return prefix + (await ReplaceJwtToken.replaceJwtToken(token))
       }
     }
+    const replacedCopilotToken = replaceCopilotTokenTimestamps(value)
+    if (replacedCopilotToken !== value) {
+      return replacedCopilotToken
+    }
     return value
   }
 
   // Check if this is an expiration timestamp property
   if (parentKey && IsExpirationProperty.isExpirationProperty(parentKey) && IsUnixTimestamp.isUnixTimestamp(value)) {
-    const oneYearFromNow = Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60
-    return oneYearFromNow
+    return getOneYearFromNow()
+  }
+
+  if (parentKey && isIssuedAtProperty(parentKey) && IsUnixTimestamp.isUnixTimestamp(value)) {
+    return getCurrentTimestamp()
   }
 
   if (Array.isArray(value)) {
