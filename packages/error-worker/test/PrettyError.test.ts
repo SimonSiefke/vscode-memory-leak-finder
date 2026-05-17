@@ -1,10 +1,13 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
 
 const mockReadFileSync = jest.fn()
+const mockExistsSync = jest.fn()
 
 beforeEach(() => {
   jest.resetModules()
   mockReadFileSync.mockClear()
+  mockExistsSync.mockClear()
+  mockExistsSync.mockReturnValue(false)
 })
 
 jest.unstable_mockModule('node:fs', () => {
@@ -15,6 +18,7 @@ jest.unstable_mockModule('node:fs', () => {
 
 jest.unstable_mockModule('../src/parts/FileSystem/FileSystem.ts', () => {
   return {
+    existsSync: mockExistsSync,
     readFileSync: jest.fn(() => {
       throw new Error('not implemented')
     }),
@@ -78,14 +82,18 @@ test('example', () => {
 })
 `
   })
+  // @ts-ignore
+  FileSystem.existsSync.mockImplementation((path: string) => {
+    return path === '/repo/.vscode-test-workspace/test/add.test.js'
+  })
   const error = new ExpectError('test error')
   error.stack = `ExpectError: test error
-    at Object.<anonymous> (/test/e2e/test/add.test.js:3:3)`
+    at Object.<anonymous> (test/add.test.js:3:3)`
 
-  const prettyError = await PrettyError.prepare(error, { color: false, root: '/test/e2e' })
+  const prettyError = await PrettyError.prepare(error, { color: false, root: '/repo/packages/e2e' })
 
   expect(prettyError.codeFrame).toContain("throw new Error('boom')")
-  expect(FileSystem.readFileSync).toHaveBeenCalledWith('/test/e2e/test/add.test.js', 'utf8')
+  expect(FileSystem.readFileSync).toHaveBeenCalledWith('/repo/.vscode-test-workspace/test/add.test.js', 'utf8')
 })
 
 test('prepare - module not found error', async () => {

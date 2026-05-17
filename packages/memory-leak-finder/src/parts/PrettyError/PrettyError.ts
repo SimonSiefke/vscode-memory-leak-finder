@@ -1,6 +1,6 @@
 import { codeFrameColumns } from '@babel/code-frame'
 import { readFileSync } from 'node:fs'
-import { isAbsolute, join } from 'node:path'
+import { dirname, isAbsolute, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as CleanStack from '../CleanStack/CleanStack.ts'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
@@ -19,7 +19,25 @@ const getReadablePath = (filePath, root) => {
   if (!root || isAbsolute(actualPath)) {
     return actualPath
   }
-  return join(root, actualPath)
+  const directCandidate = join(root, actualPath)
+  if (FileSystem.existsSync(directCandidate)) {
+    return directCandidate
+  }
+
+  let currentRoot = root
+  for (let i = 0; i < 5; i++) {
+    const workspaceCandidate = join(currentRoot, '.vscode-test-workspace', actualPath)
+    if (FileSystem.existsSync(workspaceCandidate)) {
+      return workspaceCandidate
+    }
+    const parent = dirname(currentRoot)
+    if (parent === currentRoot) {
+      break
+    }
+    currentRoot = parent
+  }
+
+  return directCandidate
 }
 
 const RE_MODULE_NOT_FOUND_STACK = /Cannot find package '([^']+)' imported from (.+)$/
@@ -138,7 +156,7 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
   }
   const cleanedStack = CleanStack.cleanStack(error.stack, { root })
   const lines = SplitLines.splitLines(cleanedStack)
-  const codeFrame = getCodeFrame(cleanedStack, { color, root })
+  const codeFrame = getCodeFrame(error.stack, { color, root })
   const relevantStack = lines.join('\n')
   return {
     codeFrame,
