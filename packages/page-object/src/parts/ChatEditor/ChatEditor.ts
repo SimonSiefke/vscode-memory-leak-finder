@@ -154,7 +154,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     ToolError: 4,
   }
 
-  const waitForDoneOrToolApproval = async (expect: any, chatView: any, response: any, timeout: number) => {
+  const waitForDoneOrToolApproval = async (expect: any, chatView: any) => {
     const loading = chatView.locator('.chat-response-loading')
 
     const toolApprovalSection = chatView.locator('.chat-confirmation-widget2')
@@ -691,6 +691,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }: {
       expectedResponse?: string
       message: string
+      approveToolCalls?: boolean
       validateRequest?: { exists: readonly unknown[] }
       verify?: boolean
       viewLinesText?: string
@@ -711,7 +712,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const maxToolCalls = 15
         for (let i = 0; i < maxToolCalls; i++) {
-          const result = await waitForDoneOrToolApproval(expect, chatView, response, 90_000)
+          const result = await waitForDoneOrToolApproval(expect, chatView)
           if (result === WaitResult.ChatDone) {
             break
           }
