@@ -3,6 +3,8 @@ interface ResponseLike {
   readonly statusCode: number
 }
 
+const authErrorMarkers = ['token expired', 'invalid token', 'cannot validate hmac', 'authentication failed']
+
 export const isExpiredTokenErrorResponse = (response: ResponseLike | undefined): boolean => {
   if (!response || response.statusCode !== 401) {
     return false
@@ -10,5 +12,6 @@ export const isExpiredTokenErrorResponse = (response: ResponseLike | undefined):
   if (typeof response.body !== 'string') {
     return false
   }
-  return response.body.toLowerCase().includes('token expired')
+  const normalizedBody = response.body.toLowerCase()
+  return authErrorMarkers.some((marker) => normalizedBody.includes(marker))
 }

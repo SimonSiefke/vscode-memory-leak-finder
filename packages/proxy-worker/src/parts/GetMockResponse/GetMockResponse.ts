@@ -4,6 +4,7 @@ import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import type { MockResponse } from '../MockResponse/MockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
@@ -43,6 +44,10 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
     } else {
       // Fallback: assume old format structure
       response = mockData
+    }
+
+    if (IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(response)) {
+      return null
     }
 
     // Handle OPTIONS requests specially - they might have empty body
@@ -208,6 +213,9 @@ const findCompatibleCopilotMockFile = async (
     try {
       const candidatePath = join(mockRequestsDir, candidateFile)
       const mockData = JSON.parse(await readFile(candidatePath, 'utf8'))
+      if (IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(mockData.response)) {
+        continue
+      }
       const candidateRequestBody = mockData.request?.body
       const candidateMockKey = RequestMockKey.getRequestMockKey(hostname, pathname, method, candidateRequestBody)
       if (requestedMockKey && candidateMockKey === requestedMockKey) {
@@ -222,6 +230,9 @@ const findCompatibleCopilotMockFile = async (
     try {
       const candidatePath = join(mockRequestsDir, candidateFile)
       const mockData = JSON.parse(await readFile(candidatePath, 'utf8'))
+      if (IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(mockData.response)) {
+        continue
+      }
       const candidateRequestBody = mockData.request?.body
       const candidateRelaxedMockKey = RequestMockKey.getRelaxedRequestMockKey(hostname, pathname, method, candidateRequestBody)
       if (requestedRelaxedMockKey && candidateRelaxedMockKey === requestedRelaxedMockKey) {
