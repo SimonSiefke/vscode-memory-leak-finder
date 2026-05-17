@@ -7,6 +7,7 @@ import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import type { MockResponse } from '../MockResponse/MockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
+import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
 import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
 
 const isCopilotMockKeyedRequest = (hostname: string, pathname: string, method: string): boolean => {
@@ -99,7 +100,13 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
           }
         }
       }
-    } else if (responseType === 'json' && typeof body === 'object') {
+    }
+
+    if (!Buffer.isBuffer(body)) {
+      body = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(body)
+    }
+
+    if (responseType === 'json' && typeof body === 'object') {
       // If responseType is json and body is already an object, stringify it
       body = JSON.stringify(body)
     } else
