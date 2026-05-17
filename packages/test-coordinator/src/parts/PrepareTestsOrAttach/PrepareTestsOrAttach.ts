@@ -35,6 +35,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
+  readonly proxyTestFolderName: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
@@ -73,6 +74,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     openDevtools,
     pageObjectPath,
     platform,
+    proxyTestFolderName,
     recordVideo,
     runMode,
     screencastQuality,
@@ -109,6 +111,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       openDevtools,
       pageObjectPath,
       platform,
+      proxyTestFolderName,
       recordVideo,
       runMode,
       timeouts,

@@ -35,6 +35,7 @@ export interface PrepareBothOptions {
   readonly measureId: string
   readonly openDevtools: boolean
   readonly platform: string
+  readonly proxyTestFolderName: string
   readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
@@ -66,6 +67,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     measureId,
     openDevtools,
     platform,
+    proxyTestFolderName,
     trackFunctions,
     updateUrl,
     useProxyMock,
@@ -96,6 +98,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     measureId,
     openDevtools,
     platform,
+    proxyTestFolderName,
     trackFunctions,
     updateUrl,
     useProxyMock,

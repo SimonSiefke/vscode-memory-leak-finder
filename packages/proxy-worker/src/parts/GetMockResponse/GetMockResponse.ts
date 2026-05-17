@@ -3,12 +3,10 @@ import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
+import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import type { MockResponse } from '../MockResponse/MockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
-import * as Root from '../Root/Root.ts'
-
-const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
 
 const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> => {
   try {
@@ -165,13 +163,14 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
 
 export const getMockResponse = async (method: string, url: string): Promise<MockResponse | null> => {
   try {
+    const mockRequestsDir = GetProxyPaths.getMockRequestsDir()
     const parsedUrl = new URL(url)
     const { hostname, pathname } = parsedUrl
 
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {
       const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-      const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
+      const mockFile = join(mockRequestsDir, mockFileName)
       const mockResponse = await loadMockResponse(mockFile)
 
       if (mockResponse) {
@@ -194,7 +193,7 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
 
     // Try to load mock from file
     const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-    const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
+    const mockFile = join(mockRequestsDir, mockFileName)
     const mockResponse = await loadMockResponse(mockFile)
 
     if (mockResponse) {
