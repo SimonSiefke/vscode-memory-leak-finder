@@ -146,8 +146,7 @@ test('getRequestMockKey normalizes tool call metadata and timing-only tool outpu
       },
       {
         role: 'tool',
-        content:
-          '✖ add returns the sum of two numbers (2.098225ms)\nℹ duration_ms 127.696059\nTime:        23.468 s',
+        content: '✖ add returns the sum of two numbers (2.098225ms)\nℹ duration_ms 127.696059\nTime:        23.468 s',
       },
     ],
   }
@@ -172,8 +171,7 @@ test('getRequestMockKey normalizes tool call metadata and timing-only tool outpu
       },
       {
         role: 'tool',
-        content:
-          '✖ add returns the sum of two numbers (1.878015ms)\nℹ duration_ms 105.086936\nTime:        18.102 s',
+        content: '✖ add returns the sum of two numbers (1.878015ms)\nℹ duration_ms 105.086936\nTime:        18.102 s',
       },
     ],
   }
