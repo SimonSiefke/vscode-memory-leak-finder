@@ -20,8 +20,14 @@ const LONG_HEX_REGEX = /\b[0-9a-f]{32,}\b/gi
 const TIMESTAMP_REGEX = /\b\d{13,}\b/g
 const SESSION_CALL_ID_REGEX = /call_[A-Za-z0-9]+__vscode-\d+/g
 const LOCALHOST_URL_WITH_PORT_REGEX = /https?:\/\/(?:localhost|127\.0\.0\.1):\d+/gi
+const JSON_META_FIELD_REGEX = /"(description|explanation|goal|reason)"\s*:\s*"(?:[^"\\]|\\.)*"/gi
+const JSON_TIMEOUT_FIELD_REGEX = /"timeout"\s*:\s*\d+/gi
+const DURATION_MS_FIELD_REGEX = /\bduration_ms\s+\d+(?:\.\d+)?\b/gi
+const MILLIS_DURATION_REGEX = /\b\d+(?:\.\d+)?ms\b/gi
+const SECONDS_DURATION_REGEX = /\b\d+(?:\.\d+)?\s*s\b/gi
 const MULTI_WHITESPACE_REGEX = /\s+/g
 const COPILOT_EPHEMERAL_KEYS = new Set(['copilot_cache_control', 'id', 'tool_call_id'])
+const TOOL_CALL_EPHEMERAL_ARGUMENT_KEYS = new Set(['description', 'explanation', 'goal', 'reason', 'timeout'])
 
 const isCopilotRequest = (hostname: string, pathname: string, method: string): boolean => {
   return method.toUpperCase() === 'POST' && COPILOT_HOSTNAMES.has(hostname) && COPILOT_PATHNAMES.has(pathname)
@@ -41,10 +47,112 @@ const extractUserRequests = (value: string): readonly string[] => {
   return Array.from(matches, (match) => match[1]?.trim() || '').filter(Boolean)
 }
 
-const normalizeText = (value: string): string => {
+const stripToolCallEphemeralArgumentKeys = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(stripToolCallEphemeralArgumentKeys)
+  }
+
+  if (!value || typeof value !== 'object') {
+    return value
+  }
+
+  const normalizedObject: Record<string, unknown> = {}
+  for (const key of Object.keys(value as Record<string, unknown>).sort()) {
+    if (TOOL_CALL_EPHEMERAL_ARGUMENT_KEYS.has(key)) {
+      continue
+    }
+    normalizedObject[key] = stripToolCallEphemeralArgumentKeys((value as Record<string, unknown>)[key])
+  }
+  return normalizedObject
+}
+
+const getJsonObjectEnd = (value: string, startIndex: number): number => {
+  let depth = 0
+  let inString = false
+  let escaped = false
+
+  for (let index = startIndex; index < value.length; index++) {
+    const character = value[index]
+    if (escaped) {
+      escaped = false
+      continue
+    }
+    if (character === '\\') {
+      escaped = true
+      continue
+    }
+    if (character === '"') {
+      inString = !inString
+      continue
+    }
+    if (inString) {
+      continue
+    }
+    if (character === '{') {
+      depth++
+      continue
+    }
+    if (character === '}') {
+      depth--
+      if (depth === 0) {
+        return index
+      }
+    }
+  }
+
+  return -1
+}
+
+const normalizeEmbeddedArgumentsJson = (value: string): string => {
+  const marker = 'Arguments (JSON):'
+  let result = ''
+  let searchStart = 0
+
+  while (searchStart < value.length) {
+    const markerIndex = value.indexOf(marker, searchStart)
+    if (markerIndex === -1) {
+      result += value.slice(searchStart)
+      break
+    }
+
+    result += value.slice(searchStart, markerIndex + marker.length)
+    let jsonStart = markerIndex + marker.length
+    while (jsonStart < value.length && /\s/.test(value[jsonStart])) {
+      result += value[jsonStart]
+      jsonStart++
+    }
+
+    if (value[jsonStart] !== '{') {
+      searchStart = jsonStart
+      continue
+    }
+
+    const jsonEnd = getJsonObjectEnd(value, jsonStart)
+    if (jsonEnd === -1) {
+      result += value.slice(jsonStart)
+      break
+    }
+
+    const jsonText = value.slice(jsonStart, jsonEnd + 1)
+    try {
+      const parsedValue = JSON.parse(jsonText)
+      const normalizedJson = JSON.stringify(stripToolCallEphemeralArgumentKeys(parsedValue))
+      result += normalizedJson
+    } catch {
+      result += jsonText
+    }
+
+    searchStart = jsonEnd + 1
+  }
+
+  return result
+}
+
+const normalizeText = (value: string, role?: string): string => {
   const userRequests = extractUserRequests(value)
   const relevantText = userRequests.length > 0 ? userRequests.join('\n') : stripTaggedBlocks(value)
-  return relevantText
+  const textWithNormalizedArguments = normalizeEmbeddedArgumentsJson(relevantText)
+  let normalizedValue = textWithNormalizedArguments
     .replace(ISO_DATE_REGEX, '<date>')
     .replace(MONTH_DATE_REGEX, '<date>')
     .replace(UUID_REGEX, '<uuid>')
@@ -52,17 +160,26 @@ const normalizeText = (value: string): string => {
     .replace(TIMESTAMP_REGEX, '<timestamp>')
     .replace(SESSION_CALL_ID_REGEX, '<session-call-id>')
     .replace(LOCALHOST_URL_WITH_PORT_REGEX, 'http://localhost:<port>')
-    .replace(MULTI_WHITESPACE_REGEX, ' ')
-    .trim()
+    .replace(JSON_META_FIELD_REGEX, (_match, key: string) => `"${key}":"<meta>"`)
+    .replace(JSON_TIMEOUT_FIELD_REGEX, '"timeout":<number>')
+
+  if (role === 'tool') {
+    normalizedValue = normalizedValue
+      .replace(DURATION_MS_FIELD_REGEX, 'duration_ms <duration>')
+      .replace(MILLIS_DURATION_REGEX, '<duration-ms>')
+      .replace(SECONDS_DURATION_REGEX, '<duration-s>')
+  }
+
+  return normalizedValue.replace(MULTI_WHITESPACE_REGEX, ' ').trim()
 }
 
-const normalizeValue = (value: unknown): unknown => {
+const normalizeValue = (value: unknown, role?: string): unknown => {
   if (typeof value === 'string') {
-    return normalizeText(value)
+    return normalizeText(value, role)
   }
 
   if (Array.isArray(value)) {
-    return value.map(normalizeValue)
+    return value.map((item) => normalizeValue(item, role))
   }
 
   if (!value || typeof value !== 'object') {
@@ -80,12 +197,44 @@ const normalizeValue = (value: unknown): unknown => {
     if (COPILOT_EPHEMERAL_KEYS.has(key)) {
       continue
     }
-    const normalizedEntry = normalizeValue(objectValue[key])
+    const normalizedEntry = normalizeValue(objectValue[key], role)
     if (normalizedEntry !== undefined) {
       normalizedObject[key] = normalizedEntry
     }
   }
   return normalizedObject
+}
+
+const normalizeToolCallArguments = (toolName: unknown, argumentsValue: unknown): Record<string, unknown> => {
+  if (typeof argumentsValue !== 'string') {
+    return {
+      arguments: normalizeValue(argumentsValue, 'assistant'),
+      name: toolName,
+    }
+  }
+
+  try {
+    const parsedArguments = JSON.parse(argumentsValue) as Record<string, unknown>
+    const normalizedArguments: Record<string, unknown> = {}
+    for (const key of Object.keys(parsedArguments).sort()) {
+      if (TOOL_CALL_EPHEMERAL_ARGUMENT_KEYS.has(key)) {
+        continue
+      }
+      const normalizedEntry = normalizeValue(parsedArguments[key], 'assistant')
+      if (normalizedEntry !== undefined && normalizedEntry !== '') {
+        normalizedArguments[key] = normalizedEntry
+      }
+    }
+    return {
+      arguments: normalizedArguments,
+      name: toolName,
+    }
+  } catch {
+    return {
+      arguments: normalizeText(argumentsValue, 'assistant'),
+      name: toolName,
+    }
+  }
 }
 
 const normalizeMessage = (message: Record<string, unknown>): Record<string, unknown> => {
@@ -98,7 +247,26 @@ const normalizeMessage = (message: Record<string, unknown>): Record<string, unkn
     if (key === 'role' || key === 'copilot_cache_control' || key === 'id' || key === 'tool_call_id') {
       continue
     }
-    const normalizedEntry = normalizeValue(message[key])
+    if (key === 'tool_calls' && Array.isArray(message[key])) {
+      normalizedMessage.tool_calls = message[key].map((toolCall) => {
+        if (!toolCall || typeof toolCall !== 'object') {
+          return normalizeValue(toolCall, 'assistant')
+        }
+
+        const toolCallRecord = toolCall as Record<string, unknown>
+        const functionRecord =
+          toolCallRecord.function && typeof toolCallRecord.function === 'object'
+            ? (toolCallRecord.function as Record<string, unknown>)
+            : undefined
+
+        return {
+          function: normalizeToolCallArguments(functionRecord?.name, functionRecord?.arguments),
+          type: toolCallRecord.type,
+        }
+      })
+      continue
+    }
+    const normalizedEntry = normalizeValue(message[key], typeof role === 'string' ? role : undefined)
     if (normalizedEntry !== undefined && normalizedEntry !== '') {
       normalizedMessage[key] = normalizedEntry
     }

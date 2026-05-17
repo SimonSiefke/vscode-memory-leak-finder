@@ -96,6 +96,96 @@ test('getRequestMockKey normalizes dynamic session call IDs and localhost ports'
   expect(firstKey).toBe(secondKey)
 })
 
+test('getRequestMockKey normalizes embedded tool metadata in prompt text', () => {
+  const firstRequest = {
+    messages: [
+      {
+        role: 'user',
+        content:
+          'Arguments (JSON): {"command":"node --test","explanation":"Run Node.js tests using the built-in test runner to identify any failing tests.","goal":"Run all tests and identify failures in the project","mode":"sync"}',
+      },
+    ],
+  }
+  const secondRequest = {
+    messages: [
+      {
+        role: 'user',
+        content:
+          'Arguments (JSON): {"command":"node --test","explanation":"Run Node.js tests using the built-in test runner to identify any failing tests.","goal":"Run all tests and identify failures in the test suite.","mode":"sync","timeout":120000}',
+      },
+    ],
+  }
+
+  const firstKey = RequestMockKey.getRequestMockKey('api.individual.githubcopilot.com', '/chat/completions', 'POST', firstRequest)
+  const secondKey = RequestMockKey.getRequestMockKey('api.individual.githubcopilot.com', '/chat/completions', 'POST', secondRequest)
+
+  expect(firstKey).toBeDefined()
+  expect(secondKey).toBeDefined()
+  expect(firstKey).toBe(secondKey)
+})
+
+test('getRequestMockKey normalizes tool call metadata and timing-only tool output noise', () => {
+  const firstRequest = {
+    messages: [
+      {
+        role: 'user',
+        content: '<userRequest>Fix the failing test</userRequest>',
+      },
+      {
+        role: 'assistant',
+        tool_calls: [
+          {
+            function: {
+              arguments:
+                '{"command":"node --test","explanation":"Run tests","goal":"Run all tests and identify failures in the project","mode":"sync"}',
+              name: 'run_in_terminal',
+            },
+            type: 'function',
+          },
+        ],
+      },
+      {
+        role: 'tool',
+        content:
+          '✖ add returns the sum of two numbers (2.098225ms)\nℹ duration_ms 127.696059\nTime:        23.468 s',
+      },
+    ],
+  }
+  const secondRequest = {
+    messages: [
+      {
+        role: 'user',
+        content: '<userRequest>Fix the failing test</userRequest>',
+      },
+      {
+        role: 'assistant',
+        tool_calls: [
+          {
+            function: {
+              arguments:
+                '{"command":"node --test","explanation":"Run tests","goal":"Run all tests and identify failures in the test suite.","mode":"sync","timeout":120000}',
+              name: 'run_in_terminal',
+            },
+            type: 'function',
+          },
+        ],
+      },
+      {
+        role: 'tool',
+        content:
+          '✖ add returns the sum of two numbers (1.878015ms)\nℹ duration_ms 105.086936\nTime:        18.102 s',
+      },
+    ],
+  }
+
+  const firstKey = RequestMockKey.getRequestMockKey('api.individual.githubcopilot.com', '/chat/completions', 'POST', firstRequest)
+  const secondKey = RequestMockKey.getRequestMockKey('api.individual.githubcopilot.com', '/chat/completions', 'POST', secondRequest)
+
+  expect(firstKey).toBeDefined()
+  expect(secondKey).toBeDefined()
+  expect(firstKey).toBe(secondKey)
+})
+
 test('getRequestMockKey differentiates later turns in the same Copilot conversation', () => {
   const firstTurn = {
     messages: [
