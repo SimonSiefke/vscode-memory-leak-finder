@@ -2,6 +2,7 @@ import { getCACertPath } from '../GetCACertPath/GetCACertPath.ts'
 
 export const getProxyEnvVars = async (proxyUrl: string | null): Promise<Record<string, string>> => {
   const envVars: Record<string, string> = {}
+  const noProxy = 'localhost,127.0.0.1,0.0.0.0,::1'
 
   if (proxyUrl) {
     envVars.HTTP_PROXY = proxyUrl
@@ -9,8 +10,8 @@ export const getProxyEnvVars = async (proxyUrl: string | null): Promise<Record<s
     envVars.http_proxy = proxyUrl
     envVars.https_proxy = proxyUrl
     // Don't proxy localhost connections
-    envVars.NO_PROXY = 'localhost,127.0.0.1,0.0.0.0'
-    envVars.no_proxy = 'localhost,127.0.0.1,0.0.0.0'
+    envVars.NO_PROXY = noProxy
+    envVars.no_proxy = noProxy
 
     // Set NODE_EXTRA_CA_CERTS to trust our MITM proxy CA certificate
     const caCertPath = getCACertPath()
