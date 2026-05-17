@@ -54,21 +54,35 @@ test('convertRequestsToMocksMain - converts each test folder independently', asy
   const secondMockContent = await readFile(join(mocksRootDir, secondTestFolderName, mockFileName), 'utf8')
 
   expect(JSON.parse(firstMockContent)).toEqual({
+    metadata: {
+      responseType: 'text',
+      timestamp: 1,
+    },
+    request: {
+      method: 'GET',
+      url: 'https://example.com/api/data',
+    },
     response: {
       body: 'body-a',
       headers: { 'content-type': 'text/plain' },
       statusCode: 200,
       statusMessage: 'OK',
-      wasCompressed: undefined,
     },
   })
   expect(JSON.parse(secondMockContent)).toEqual({
+    metadata: {
+      responseType: 'text',
+      timestamp: 2,
+    },
+    request: {
+      method: 'GET',
+      url: 'https://example.com/api/data',
+    },
     response: {
       body: 'body-b',
       headers: { 'content-type': 'text/plain' },
       statusCode: 200,
       statusMessage: 'OK',
-      wasCompressed: undefined,
     },
   })
 })
