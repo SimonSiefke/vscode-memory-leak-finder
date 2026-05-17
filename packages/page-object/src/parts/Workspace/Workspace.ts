@@ -11,6 +11,9 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
   return {
+    getPath() {
+      return workspace
+    },
     async add(file: { name: string; content: string }) {
       const absolutePath = join(workspace, file.name)
       await mkdir(dirname(absolutePath), { recursive: true })
