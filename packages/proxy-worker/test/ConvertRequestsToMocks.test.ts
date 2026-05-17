@@ -9,6 +9,7 @@ const requestsRootDir = join(Root.root, '.vscode-requests')
 const mocksRootDir = join(Root.root, '.vscode-mock-requests')
 const firstTestFolderName = 'proxy-test-convert-a'
 const secondTestFolderName = 'proxy-test-convert-b'
+const tokenTestFolderName = 'proxy-test-convert-token'
 
 const writeRecordedRequest = async (testFolderName: string, body: string, timestamp: number): Promise<void> => {
   const requestsDir = join(requestsRootDir, testFolderName)
@@ -39,8 +40,10 @@ const writeRecordedRequest = async (testFolderName: string, body: string, timest
 afterEach(async () => {
   await rm(join(requestsRootDir, firstTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, secondTestFolderName), { force: true, recursive: true })
+  await rm(join(requestsRootDir, tokenTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, firstTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, secondTestFolderName), { force: true, recursive: true })
+  await rm(join(mocksRootDir, tokenTestFolderName), { force: true, recursive: true })
 })
 
 test('convertRequestsToMocksMain - converts each test folder independently', async () => {
@@ -83,6 +86,105 @@ test('convertRequestsToMocksMain - converts each test folder independently', asy
       headers: { 'content-type': 'text/plain' },
       statusCode: 200,
       statusMessage: 'OK',
+    },
+  })
+})
+
+test('convertRequestsToMocksMain - keeps GET and OPTIONS token mocks separate', async () => {
+  const requestsDir = join(requestsRootDir, tokenTestFolderName)
+  await mkdir(requestsDir, { recursive: true })
+
+  await writeFile(
+    join(requestsDir, '1_https___api_github_com_copilot_internal_v2_token.json'),
+    JSON.stringify({
+      metadata: {
+        responseType: 'json',
+        timestamp: 1,
+      },
+      request: {
+        headers: {},
+        method: 'GET',
+        url: 'https://api.github.com/copilot_internal/v2/token',
+      },
+      response: {
+        body: {
+          token: 'tid=abc;exp=1700000100;iat=1700000000',
+        },
+        headers: { 'content-type': 'application/json' },
+        statusCode: 200,
+        statusMessage: 'OK',
+      },
+    }),
+    'utf8',
+  )
+
+  await writeFile(
+    join(requestsDir, '2_https___api_github_com_copilot_internal_v2_token.json'),
+    JSON.stringify({
+      metadata: {
+        responseType: 'text',
+        timestamp: 2,
+      },
+      request: {
+        headers: {},
+        method: 'OPTIONS',
+        url: 'https://api.github.com/copilot_internal/v2/token',
+      },
+      response: {
+        body: '',
+        headers: {},
+        statusCode: 204,
+        statusMessage: 'No Content',
+      },
+    }),
+    'utf8',
+  )
+
+  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+
+  const getMockFileName = await GetMockFileName.getMockFileName('api.github.com', '/copilot_internal/v2/token', 'GET')
+  const optionsMockFileName = await GetMockFileName.getMockFileName('api.github.com', '/copilot_internal/v2/token', 'OPTIONS')
+
+  const getMockContent = await readFile(join(mocksRootDir, tokenTestFolderName, getMockFileName), 'utf8')
+  const optionsMockContent = await readFile(join(mocksRootDir, tokenTestFolderName, optionsMockFileName), 'utf8')
+
+  expect(JSON.parse(getMockContent)).toEqual({
+    metadata: {
+      responseType: 'json',
+      timestamp: 1,
+    },
+    request: {
+      body: undefined,
+      method: 'GET',
+      url: 'https://api.github.com/copilot_internal/v2/token',
+    },
+    response: {
+      body: {
+        token: expect.stringContaining('tid=abc;exp='),
+      },
+      headers: { 'content-type': 'application/json' },
+      statusCode: 200,
+      statusMessage: 'OK',
+      wasCompressed: undefined,
+    },
+  })
+
+  expect(JSON.parse(optionsMockContent)).toEqual({
+    metadata: {
+      responseType: 'text',
+      timestamp: 2,
+    },
+    request: {
+      body: undefined,
+      method: 'OPTIONS',
+      url: 'https://api.github.com/copilot_internal/v2/token',
+    },
+    response: {
+      body: '',
+      headers: {},
+      statusCode: 204,
+      statusMessage: 'No Content',
+      wasCompressed: undefined,
     },
   })
 })

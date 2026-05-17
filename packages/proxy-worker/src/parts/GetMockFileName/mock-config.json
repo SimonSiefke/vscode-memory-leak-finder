@@ -32,8 +32,14 @@
   {
     "hostname": "api.github.com",
     "pathname": "/copilot_internal/v2/token",
-    "method": "*",
-    "filename": "api_github_com_copilot_internal_v2_token.json"
+    "method": "GET",
+    "filename": "api_github_com_copilot_internal_v2_token_get.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/v2/token",
+    "method": "OPTIONS",
+    "filename": "api_github_com_copilot_internal_v2_token_options.json"
   },
   {
     "hostname": "api.github.com",

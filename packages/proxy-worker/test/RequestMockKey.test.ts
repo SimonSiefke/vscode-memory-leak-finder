@@ -315,3 +315,11 @@ test('getMockFileName adds Copilot request key suffix', async () => {
 
   expect(fileName).toMatch(/^api_individual_githubcopilot_com_chat_completions_post_[a-f0-9]{16}\.json$/)
 })
+
+test('getMockFileName separates GET and OPTIONS token mocks', async () => {
+  const getFileName = await GetMockFileName.getMockFileName('api.github.com', '/copilot_internal/v2/token', 'GET')
+  const optionsFileName = await GetMockFileName.getMockFileName('api.github.com', '/copilot_internal/v2/token', 'OPTIONS')
+
+  expect(getFileName).toBe('api_github_com_copilot_internal_v2_token_get.json')
+  expect(optionsFileName).toBe('api_github_com_copilot_internal_v2_token_options.json')
+})
