@@ -4,6 +4,7 @@ import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
+import * as SaveMockFile from '../SaveMockFile/SaveMockFile.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
@@ -175,6 +176,23 @@ export const savePostBody = async (
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
     console.log(`[Proxy] Saved POST body to ${filepath}`)
+
+    if (responseData) {
+      const mockFilePath = await SaveMockFile.saveMockFile({
+        method,
+        requestBody: requestBodyData,
+        response: {
+          body: responseBodyData,
+          headers: responseData.responseHeaders,
+          statusCode: responseData.statusCode,
+          statusMessage: responseData.statusMessage,
+        },
+        responseType: responseType || 'text',
+        timestamp,
+        url,
+      })
+      console.log(`[Proxy] Saved mock file to ${mockFilePath}`)
+    }
   } catch (error) {
     console.error('[Proxy] Failed to save POST body:', error)
   }

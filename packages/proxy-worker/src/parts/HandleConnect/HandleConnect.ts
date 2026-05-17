@@ -11,6 +11,7 @@ import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import * as ParseRequestBody from '../ParseRequestBody/ParseRequestBody.ts'
 import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
+import * as SaveMockFile from '../SaveMockFile/SaveMockFile.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
@@ -146,6 +147,20 @@ const saveInterceptedRequest = async (
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
     console.log(`[Proxy] Saved intercepted HTTPS request to ${filepath}`)
+
+    const mockFilePath = await SaveMockFile.saveMockFile({
+      method,
+      requestBody: requestData.request.body,
+      response: {
+        body: responseBodyData,
+        headers: responseHeaders,
+        statusCode,
+      },
+      responseType,
+      timestamp,
+      url,
+    })
+    console.log(`[Proxy] Saved mock file to ${mockFilePath}`)
   } catch (error) {
     console.error('[Proxy] Failed to save intercepted request:', error)
   }
