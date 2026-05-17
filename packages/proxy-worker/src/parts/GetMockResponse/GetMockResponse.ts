@@ -3,13 +3,17 @@ import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
+import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import type { MockResponse } from '../MockResponse/MockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
+<<<<<<< HEAD
 import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
 import * as Root from '../Root/Root.ts'
 
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
+=======
+>>>>>>> origin/main
 
 const isCopilotMockKeyedRequest = (hostname: string, pathname: string, method: string): boolean => {
   const normalizedMethod = method.toUpperCase()
@@ -227,13 +231,14 @@ const findCompatibleCopilotMockFile = async (
 
 export const getMockResponse = async (method: string, url: string, requestBody?: unknown): Promise<MockResponse | null> => {
   try {
+    const mockRequestsDir = GetProxyPaths.getMockRequestsDir()
     const parsedUrl = new URL(url)
     const { hostname, pathname } = parsedUrl
 
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {
       const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-      const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
+      const mockFile = join(mockRequestsDir, mockFileName)
       const mockResponse = await loadMockResponse(mockFile)
 
       if (mockResponse) {
@@ -255,11 +260,16 @@ export const getMockResponse = async (method: string, url: string, requestBody?:
     }
 
     // Try to load mock from file
+<<<<<<< HEAD
     const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method, requestBody)
     if (pathname === '/chat/completions') {
       console.log(`[Proxy] Requested mock file ${mockFileName} for ${method} ${pathname}`)
     }
     const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
+=======
+    const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
+    const mockFile = join(mockRequestsDir, mockFileName)
+>>>>>>> origin/main
     const mockResponse = await loadMockResponse(mockFile)
 
     if (mockResponse) {
