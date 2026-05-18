@@ -1,0 +1,14 @@
+default_events:
+  - issue_comment
+  - workflow_run
+
+default_permissions:
+  actions: write
+  issues: write
+  metadata: read
+  pull_requests: read
+
+name: VS Code Memory Leak Finder Bot
+url: https://github.com/SimonSiefke/vscode-memory-leak-finder
+description: GitHub App bot for on-demand VS Code memory leak measurements.
+public: false

@@ -38,6 +38,8 @@ When an allowed user posts a supported command, the bot dispatches the configure
 
 ## GitHub App Setup
 
+If you run Probot setup flows locally, you can use [packages/bot/app.yml](packages/bot/app.yml) as the app manifest instead of entering the GitHub App metadata manually.
+
 1. Create a new GitHub App at `https://github.com/settings/apps/new`.
 2. Set a homepage URL. The repository URL is fine.
 3. Set a webhook URL pointing at the deployed bot. With the default Probot server, the webhook path is `/api/github/webhooks`.
