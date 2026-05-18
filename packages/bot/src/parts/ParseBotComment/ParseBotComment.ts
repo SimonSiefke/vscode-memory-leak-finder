@@ -36,6 +36,10 @@ type ParseBotCommentSuccess = {
 
 export type ParseBotCommentResult = ParseBotCommentIgnore | ParseBotCommentError | ParseBotCommentSuccess
 
+type MutableParsedCommandFlags = {
+  -readonly [Property in keyof ParsedCommandFlags]: ParsedCommandFlags[Property]
+}
+
 const createSyntaxError = (reason: string): ParseBotCommentError => {
   return {
     type: 'error',
@@ -65,7 +69,7 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
   }
 
   const cliArgs: string[] = []
-  const flags: ParsedCommandFlags = {
+  const flags: MutableParsedCommandFlags = {
     inspectExtensions: false,
     inspectPtyHost: false,
     inspectSharedProcess: false,

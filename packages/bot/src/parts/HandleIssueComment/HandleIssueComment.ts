@@ -29,12 +29,12 @@ type IssueCommentPayload = {
     readonly id: number
     readonly user: {
       readonly login: string
-    }
+    } | null
   }
   readonly issue: {
     readonly number: number
     readonly pull_request?: {
-      readonly url: string
+      readonly url?: string
     }
   }
   readonly repository: {
@@ -78,6 +78,10 @@ type HandleIssueCommentOptions = {
 }
 
 export const handleIssueComment = async ({ env, octokit, payload }: HandleIssueCommentOptions): Promise<void> => {
+  if (!payload.comment.user) {
+    return
+  }
+
   const actorLogin = payload.comment.user.login
   if (!isAuthorizedLogin(env.allowedLogins, actorLogin)) {
     return
