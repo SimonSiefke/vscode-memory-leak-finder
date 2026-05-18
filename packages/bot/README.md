@@ -36,9 +36,20 @@ When an allowed user posts a supported command, the bot dispatches the configure
 
 4. If you want to receive webhook events from GitHub on your local machine, set `WEBHOOK_PROXY_URL` to a Smee channel URL.
 
+If you want to use the Probot manifest setup flow at `http://localhost:3000`, set `WEBHOOK_PROXY_URL` before you open the setup page. GitHub rejects manifest webhook URLs that point to `localhost`.
+
 ## GitHub App Setup
 
 If you run Probot setup flows locally, you can use [packages/bot/app.yml](packages/bot/app.yml) as the app manifest instead of entering the GitHub App metadata manually.
+
+For local setup, the easiest path is:
+
+1. Create a Smee channel at `https://smee.io/new`.
+2. Set `WEBHOOK_PROXY_URL` in `packages/bot/.env` to that Smee URL.
+3. Start the bot with `npm --prefix packages/bot start`.
+4. Open `http://localhost:3000` and use the Probot setup flow.
+
+Without a public webhook URL, GitHub will reject the manifest because `localhost` is not reachable from the public internet.
 
 1. Create a new GitHub App at `https://github.com/settings/apps/new`.
 2. Set a homepage URL. The repository URL is fine.
