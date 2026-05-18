@@ -180,8 +180,8 @@ jobs:
             --cwd packages/e2e
             --check-leaks
             --measure-after
-            --commit "$BASE_COMMIT"
-            $CLI_ARGS
+            --commit "${{ env.BASE_COMMIT }}"
+            ${{ env.CLI_ARGS }}
 
       - name: Preserve base results
         if: always() && steps.baseMeasure.outcome == 'success'
@@ -201,8 +201,8 @@ jobs:
             --cwd packages/e2e
             --check-leaks
             --measure-after
-            --commit "$CANDIDATE_REF"
-            $CLI_ARGS
+            --commit "${{ env.CANDIDATE_REF }}"
+            ${{ env.CLI_ARGS }}
 
       - name: Preserve candidate results
         if: always() && steps.candidateMeasure.outcome == 'success'
