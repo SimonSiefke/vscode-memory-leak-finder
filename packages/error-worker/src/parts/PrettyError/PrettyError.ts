@@ -1,12 +1,16 @@
 import { codeFrameColumns } from '@babel/code-frame'
 import { readFileSync } from 'node:fs'
-import { dirname, isAbsolute, join } from 'node:path'
+import { isAbsolute, posix } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as CleanStack from '../CleanStack/CleanStack.ts'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
 import * as FileSystem from '../FileSystem/FileSystem.ts'
 import * as PrettyStack from '../PrettyStack/PrettyStack.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
+
+const normalizeSlashes = (path: string): string => {
+  return path.replaceAll('\\', '/')
+}
 
 const getActualPath = (fileUri: string): string => {
   if (fileUri.startsWith('file://')) {
@@ -20,18 +24,20 @@ const getReadablePath = (filePath: string, root: string): string => {
   if (!root || isAbsolute(actualPath)) {
     return actualPath
   }
-  const directCandidate = join(root, actualPath)
+  const normalizedRoot = normalizeSlashes(root)
+  const normalizedPath = normalizeSlashes(actualPath)
+  const directCandidate = posix.join(normalizedRoot, normalizedPath)
   if (FileSystem.existsSync(directCandidate)) {
     return directCandidate
   }
 
-  let currentRoot = root
+  let currentRoot = normalizedRoot
   for (let i = 0; i < 5; i++) {
-    const workspaceCandidate = join(currentRoot, '.vscode-test-workspace', actualPath)
+    const workspaceCandidate = posix.join(currentRoot, '.vscode-test-workspace', normalizedPath)
     if (FileSystem.existsSync(workspaceCandidate)) {
       return workspaceCandidate
     }
-    const parent = dirname(currentRoot)
+    const parent = posix.dirname(currentRoot)
     if (parent === currentRoot) {
       break
     }

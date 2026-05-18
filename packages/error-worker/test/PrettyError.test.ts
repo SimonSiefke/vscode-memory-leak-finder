@@ -96,6 +96,30 @@ test('example', () => {
   expect(FileSystem.readFileSync).toHaveBeenCalledWith('/repo/.vscode-test-workspace/test/add.test.js', 'utf8')
 })
 
+test('prepare - resolves Windows-style relative stack paths against root when generating code frames', async () => {
+  // @ts-ignore
+  FileSystem.readFileSync.mockImplementation(() => {
+    return `import test from 'node:test'
+
+test('example', () => {
+  throw new Error('boom')
+})
+`
+  })
+  // @ts-ignore
+  FileSystem.existsSync.mockImplementation((path: string) => {
+    return path === 'C:/repo/.vscode-test-workspace/test/add.test.js'
+  })
+  const error = new ExpectError('test error')
+  error.stack = `ExpectError: test error
+    at Object.<anonymous> (test\\add.test.js:3:3)`
+
+  const prettyError = await PrettyError.prepare(error, { color: false, root: 'C:\\repo\\packages\\e2e' })
+
+  expect(prettyError.codeFrame).toContain("throw new Error('boom')")
+  expect(FileSystem.readFileSync).toHaveBeenCalledWith('C:/repo/.vscode-test-workspace/test/add.test.js', 'utf8')
+})
+
 test('prepare - module not found error', async () => {
   mockReadFileSync.mockImplementation(() => {
     return `import { test } from 'missing-package'
