@@ -3,6 +3,7 @@
   "include": [],
   "references": [
     { "path": "./packages/build" },
+    { "path": "./packages/bot" },
     { "path": "./packages/chart-worker" },
     { "path": "./packages/charts" },
     { "path": "./packages/cli" },
