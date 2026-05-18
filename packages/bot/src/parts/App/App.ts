@@ -2,10 +2,13 @@ import type { Probot } from 'probot'
 import type { BotEnv } from '../Env/Env.ts'
 import { getEnv } from '../Env/Env.ts'
 import { handleIssueComment } from '../HandleIssueComment/HandleIssueComment.ts'
+import { handleHomePageRequest } from '../HomePage/HomePage.ts'
 import { handleWorkflowRunCompleted } from '../HandleWorkflowRunCompleted/HandleWorkflowRunCompleted.ts'
 
 export const createApp = (env: BotEnv) => {
-  return (app: Probot): void => {
+  return (app: Probot, { addHandler }: { addHandler: (handler: typeof handleHomePageRequest) => void }): void => {
+    addHandler(handleHomePageRequest)
+
     app.on('issue_comment.created', async (context) => {
       await handleIssueComment({
         env,

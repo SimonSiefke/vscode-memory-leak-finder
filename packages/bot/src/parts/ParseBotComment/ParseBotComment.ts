@@ -6,6 +6,7 @@ export type ParsedCommandFlags = {
   readonly inspectSharedProcess: boolean
   readonly measure: string
   readonly measureNode: boolean
+  readonly only: string
   readonly processRootStrategy?: string
   readonly restartBetween: boolean
   readonly runSkippedTestsAnyway: boolean
@@ -70,6 +71,7 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
     inspectSharedProcess: false,
     measure: '',
     measureNode: false,
+    only: '',
     restartBetween: false,
     runSkippedTestsAnyway: false,
   }
@@ -120,6 +122,9 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
       case '--measure':
         flags.measure = value
         break
+      case '--only':
+        flags.only = value
+        break
       case '--runs': {
         const parsedRuns = Number.parseInt(value, 10)
         if (!Number.isInteger(parsedRuns) || parsedRuns < 1) {
@@ -139,6 +144,10 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
 
   if (!flags.measure) {
     return createSyntaxError('Missing required flag "--measure"')
+  }
+
+  if (!flags.only) {
+    return createSyntaxError('Missing required flag "--only"')
   }
 
   return {
