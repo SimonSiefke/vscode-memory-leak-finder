@@ -13,7 +13,7 @@
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "devDependencies": {
-    "nock": "^14.0.4",
+    "nock": "^14.0.15",
     "smee-client": "^5.0.0"
   },
   "dependencies": {
@@ -21,8 +21,8 @@
     "@lvce-editor/rpc": "^6.4.0",
     "@lvce-editor/verror": "^1.7.0",
     "@vscode/test-electron": "^2.5.2",
-    "dotenv": "^16.6.1",
+    "dotenv": "^17.4.2",
     "jszip": "^3.10.1",
-    "probot": "^14.0.2"
+    "probot": "^14.3.2"
   }
 }

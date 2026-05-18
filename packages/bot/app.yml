@@ -6,7 +6,7 @@ default_permissions:
   actions: write
   issues: write
   metadata: read
-  pull_requests: read
+  pull_requests: write
 
 name: VS Code Memory Leak Finder Bot
 url: https://github.com/SimonSiefke/vscode-memory-leak-finder

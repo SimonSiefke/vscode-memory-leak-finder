@@ -24,7 +24,7 @@ test('renderCompletionComment renders success with artifacts and details', () =>
       },
       baseCommit: '0123456789abcdef0123456789abcdef01234567',
       candidateRef: 'SimonSiefke/fix-memory-leak',
-      cliArgs: ['--measure', 'named-function-count3', '--inspect-extensions'],
+      cliArgs: ['--measure', 'named-function-count3', '--only', 'chat-editor-fix', '--inspect-extensions'],
       conclusion: 'success',
       issueNumber: 123,
       measure: 'named-function-count3',
@@ -64,7 +64,7 @@ test('renderCompletionComment renders failure details', () => {
       },
       baseCommit: '0123456789abcdef0123456789abcdef01234567',
       candidateRef: 'SimonSiefke/fix-memory-leak',
-      cliArgs: ['--measure', 'named-function-count3'],
+      cliArgs: ['--measure', 'named-function-count3', '--only', 'chat-editor-fix'],
       conclusion: 'failure',
       error: {
         message: 'candidate measure failed',
