@@ -1,5 +1,6 @@
 import { codeFrameColumns } from '@babel/code-frame'
 import { readFileSync } from 'node:fs'
+import { isAbsolute, posix } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as CleanStack from '../CleanStack/CleanStack.ts'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
@@ -7,11 +8,43 @@ import * as FileSystem from '../FileSystem/FileSystem.ts'
 import * as PrettyStack from '../PrettyStack/PrettyStack.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
 
+const normalizeSlashes = (path: string): string => {
+  return path.replaceAll('\\', '/')
+}
+
 const getActualPath = (fileUri: string): string => {
   if (fileUri.startsWith('file://')) {
     return fileURLToPath(fileUri)
   }
   return fileUri
+}
+
+const getReadablePath = (filePath: string, root: string): string => {
+  const actualPath = getActualPath(filePath)
+  if (!root || isAbsolute(actualPath)) {
+    return actualPath
+  }
+  const normalizedRoot = normalizeSlashes(root)
+  const normalizedPath = normalizeSlashes(actualPath)
+  const directCandidate = posix.join(normalizedRoot, normalizedPath)
+  if (FileSystem.existsSync(directCandidate)) {
+    return directCandidate
+  }
+
+  let currentRoot = normalizedRoot
+  for (let i = 0; i < 5; i++) {
+    const workspaceCandidate = posix.join(currentRoot, '.vscode-test-workspace', normalizedPath)
+    if (FileSystem.existsSync(workspaceCandidate)) {
+      return workspaceCandidate
+    }
+    const parent = posix.dirname(currentRoot)
+    if (parent === currentRoot) {
+      break
+    }
+    currentRoot = parent
+  }
+
+  return directCandidate
 }
 
 const RE_MODULE_NOT_FOUND_STACK = /Cannot find package '([^']+)' imported from (.+)$/
@@ -83,7 +116,7 @@ const getPathDetails = (lines: string[]): { column: number; line: number; path: 
   return undefined
 }
 
-const getCodeFrame = (cleanedStack: string, { color }: { color: boolean }): string => {
+const getCodeFrame = (cleanedStack: string, { color, root }: { color: boolean; root: string }): string => {
   try {
     const lines = SplitLines.splitLines(cleanedStack)
     const pathDetails = getPathDetails(lines)
@@ -91,7 +124,7 @@ const getCodeFrame = (cleanedStack: string, { color }: { color: boolean }): stri
       return ''
     }
     const { column, line, path } = pathDetails
-    const actualPath = getActualPath(path)
+    const actualPath = getReadablePath(path, root)
     const rawLines = FileSystem.readFileSync(actualPath, 'utf8')
     const location = {
       start: {
@@ -145,7 +178,7 @@ export const prepare = async (error: Error, { color = true, root = '' }: Prepare
   }
   const cleanedStack = CleanStack.cleanStack(currentError.stack || '', { root })
   const lines = SplitLines.splitLines(cleanedStack)
-  const codeFrame = getCodeFrame(cleanedStack, { color })
+  const codeFrame = getCodeFrame(currentError.stack || '', { color, root })
   const prettyStack = PrettyStack.prettyStack(lines, root)
   const relevantStack = prettyStack.join('\n')
   return {
