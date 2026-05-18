@@ -19,7 +19,6 @@ type WorkflowRunPayload = {
     readonly conclusion: string | null
     readonly id: number
     readonly html_url: string
-    readonly name: string
     readonly path?: string
   }
 }

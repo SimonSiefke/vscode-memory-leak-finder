@@ -135,6 +135,16 @@ const createIssueCommentPayload = (body: string) => {
   }
 }
 
+const createIssueCommentPayloadWithAnonymousUser = (body: string) => {
+  return {
+    ...createIssueCommentPayload(body),
+    comment: {
+      ...createIssueCommentPayload(body).comment,
+      user: null,
+    },
+  }
+}
+
 beforeEach(() => {
   nock.disableNetConnect()
   nock.enableNetConnect('127.0.0.1')
@@ -174,6 +184,29 @@ test('app posts a syntax error comment for invalid run commands', async () => {
     expect(createdCommentBody).toContain('Unable to start a measure run.')
     expect(createdCommentBody).toContain('Invalid command syntax.')
     expect(githubApi.isDone()).toBe(true)
+  } finally {
+    await server.close()
+  }
+})
+
+test('app ignores issue comments without a user', async () => {
+  const server = await createTestServer()
+
+  nock('https://api.github.com').persist().post('/app/installations/1/access_tokens').reply(201, {
+    expires_at: '2099-01-01T00:00:00Z',
+    permissions: {},
+    repository_selection: 'selected',
+    token: 'test-installation-token',
+  })
+
+  try {
+    const response = await sendWebhook(
+      server.url,
+      'issue_comment',
+      createIssueCommentPayloadWithAnonymousUser('@vscode-memory-leak-finder run --measure named-function-count3'),
+    )
+
+    expect(response.status).toBe(200)
   } finally {
     await server.close()
   }
@@ -240,6 +273,7 @@ test('app dispatches a workflow for valid run commands', async () => {
     expect(updatedCommentBody).toContain('## Measure run started')
     expect(updatedCommentBody).toContain('0123456789abcdef0123456789abcdef01234567')
     expect(updatedCommentBody).toContain('SimonSiefke/feature/bot')
+    expect(updatedCommentBody).not.toContain('https://github.com/SimonSiefke/vscode-memory-leak-finder/pull/2846')
     expect(workflowDispatchInputs).toEqual({
       base_commit: '0123456789abcdef0123456789abcdef01234567',
       candidate_ref: 'SimonSiefke/feature/bot',
