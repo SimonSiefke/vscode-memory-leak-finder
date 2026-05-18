@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "repo lint clean",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"--prefix",
+				"/home/simon/.cache/repos/vscode-memory-leak-finder",
+				"run",
+				"lint"
+			],
+			"isBackground": false
+		}
+	]
+}

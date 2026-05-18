@@ -151,15 +151,12 @@ test('app posts a syntax error comment for invalid run commands', async () => {
   const server = await createTestServer()
   let createdCommentBody = ''
 
-  nock('https://api.github.com')
-    .persist()
-    .post('/app/installations/1/access_tokens')
-    .reply(201, {
-      expires_at: '2099-01-01T00:00:00Z',
-      permissions: {},
-      repository_selection: 'selected',
-      token: 'test-installation-token',
-    })
+  nock('https://api.github.com').persist().post('/app/installations/1/access_tokens').reply(201, {
+    expires_at: '2099-01-01T00:00:00Z',
+    permissions: {},
+    repository_selection: 'selected',
+    token: 'test-installation-token',
+  })
 
   const githubApi = nock('https://api.github.com')
     .post('/repos/SimonSiefke/vscode-memory-leak-finder/issues/2846/comments', (requestBody) => {
@@ -173,11 +170,7 @@ test('app posts a syntax error comment for invalid run commands', async () => {
     })
 
   try {
-    const response = await sendWebhook(
-      server.url,
-      'issue_comment',
-      createIssueCommentPayload('@vscode-memory-leak-finder run --bad-flag'),
-    )
+    const response = await sendWebhook(server.url, 'issue_comment', createIssueCommentPayload('@vscode-memory-leak-finder run --bad-flag'))
 
     expect(response.status).toBe(200)
     expect(createdCommentBody).toContain('Unable to start a measure run.')
@@ -193,15 +186,12 @@ test('app dispatches a workflow for valid run commands', async () => {
   let updatedCommentBody = ''
   let workflowDispatchInputs: Record<string, string> | undefined
 
-  nock('https://api.github.com')
-    .persist()
-    .post('/app/installations/1/access_tokens')
-    .reply(201, {
-      expires_at: '2099-01-01T00:00:00Z',
-      permissions: {},
-      repository_selection: 'selected',
-      token: 'test-installation-token',
-    })
+  nock('https://api.github.com').persist().post('/app/installations/1/access_tokens').reply(201, {
+    expires_at: '2099-01-01T00:00:00Z',
+    permissions: {},
+    repository_selection: 'selected',
+    token: 'test-installation-token',
+  })
 
   const githubApi = nock('https://api.github.com')
     .get('/repos/SimonSiefke/vscode-memory-leak-finder/pulls/2846')
