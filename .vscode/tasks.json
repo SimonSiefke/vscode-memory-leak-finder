@@ -1,0 +1,24 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "bot deps sync dotenv",
+      "type": "shell",
+      "command": "pushd /home/simon/.cache/repos/vscode-memory-leak-finder/packages/bot >/dev/null && npm install --package-lock-only && npm ci && popd >/dev/null",
+      "isBackground": false
+    },
+    {
+      "label": "bot test dotenv",
+      "type": "shell",
+      "command": "npm",
+      "args": ["--prefix", "/home/simon/.cache/repos/vscode-memory-leak-finder/packages/bot", "test"],
+      "isBackground": false
+    },
+    {
+      "label": "repo quality dotenv",
+      "type": "shell",
+      "command": "npx prettier --write /home/simon/.cache/repos/vscode-memory-leak-finder/.vscode/tasks.json && npm --prefix /home/simon/.cache/repos/vscode-memory-leak-finder run format && npm --prefix /home/simon/.cache/repos/vscode-memory-leak-finder run lint && npm --prefix /home/simon/.cache/repos/vscode-memory-leak-finder run type-check && rm -f /home/simon/.cache/repos/vscode-memory-leak-finder/.vscode/tasks.json",
+      "isBackground": false
+    }
+  ]
+}
