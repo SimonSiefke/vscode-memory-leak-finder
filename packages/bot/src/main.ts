@@ -1,3 +1,5 @@
-import * as Main from './parts/Main/Main.ts'
+await import('dotenv/config')
 
-Main.main()
+const Main = await import('./parts/Main/Main.ts')
+
+await Main.main()

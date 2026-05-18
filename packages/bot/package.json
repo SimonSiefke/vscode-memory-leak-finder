@@ -20,6 +20,7 @@
     "@lvce-editor/rpc": "^6.4.0",
     "@lvce-editor/verror": "^1.7.0",
     "@vscode/test-electron": "^2.5.2",
+    "dotenv": "^16.6.1",
     "jszip": "^3.10.1",
     "probot": "^14.0.2"
   }
