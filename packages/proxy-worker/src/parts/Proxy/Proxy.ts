@@ -56,6 +56,7 @@ export const setupProxy = async (
       const settings = JSON.parse(settingsContent)
       settings['http.proxy'] = proxyServer.url
       settings['http.proxyStrictSSL'] = false
+      settings['http.noProxy'] = ['localhost', '127.0.0.1', '0.0.0.0', '::1']
       await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
       console.log(`[Proxy] Proxy configured in settings: ${proxyServer.url}`)
     } catch (error) {

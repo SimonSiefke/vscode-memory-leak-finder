@@ -25,6 +25,7 @@ export const getVscodeArgs = ({
   inspectSharedProcessPort: number
   userDataDir: string
 }): string[] => {
+  const proxyBypassList = '<-loopback>;localhost;127.0.0.1;0.0.0.0;::1'
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
@@ -44,6 +45,7 @@ export const getVscodeArgs = ({
   // Ignore certificate errors when proxy is enabled (for MITM proxy)
   if (enableProxy) {
     args.push('--ignore-certificate-errors')
+    args.push(`--proxy-bypass-list=${proxyBypassList}`)
   }
 
   if (!enableExtensions) {
