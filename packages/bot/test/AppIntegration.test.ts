@@ -67,25 +67,23 @@ const createTestServer = async (): Promise<TestServer> => {
     })
   })
 
-  await new Promise<void>((resolve) => {
-    server.listen(0, '127.0.0.1', () => {
-      resolve()
-    })
-  })
+  const listenPromise = Promise.withResolvers<void>()
+  server.listen(0, '127.0.0.1', listenPromise.resolve)
+  await listenPromise.promise
 
   const { port } = server.address() as AddressInfo
 
   return {
     close: async () => {
-      await new Promise<void>((resolve, reject) => {
-        server.close((error) => {
-          if (error) {
-            reject(error)
-            return
-          }
-          resolve()
-        })
+      const closePromise = Promise.withResolvers<void>()
+      server.close((error) => {
+        if (error) {
+          closePromise.reject(error)
+          return
+        }
+        closePromise.resolve()
       })
+      await closePromise.promise
     },
     url: `http://127.0.0.1:${port}`,
   }
