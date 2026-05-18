@@ -13,7 +13,8 @@
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "devDependencies": {
-    "nock": "^14.0.4"
+    "nock": "^14.0.4",
+    "smee-client": "^5.0.0"
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.5.1",
