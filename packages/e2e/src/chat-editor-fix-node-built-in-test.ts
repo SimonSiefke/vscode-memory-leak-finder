@@ -67,6 +67,10 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
   const workspacePath = Workspace.getPath()
   await waitForFixedTest(workspacePath)
   await Workspace.setFiles(initialFiles)
+<<<<<<< HEAD
+=======
+  await ChatEditor.clearAll()
+>>>>>>> origin/main
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {

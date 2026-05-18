@@ -152,11 +152,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     ChatError: 2,
     ToolDone: 3,
     ToolError: 4,
+<<<<<<< HEAD
+=======
+    ToolDone2: 5,
+    ToolError2: 6,
+>>>>>>> origin/main
   }
 
   const waitForDoneOrToolApproval = async (expect: any, chatView: any) => {
     const loading = chatView.locator('.chat-response-loading')
 
+<<<<<<< HEAD
     const toolApprovalSection = chatView.locator('.chat-confirmation-widget2')
     const donePromise = expect(loading)
       .toBeHidden({ timeout: 30_000 })
@@ -167,6 +173,25 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       .then(() => WaitResult.ToolDone)
       .catch(() => WaitResult.ToolError)
     const first = await Promise.race([donePromise, toolApprovalPromise])
+=======
+    console.log('wating...')
+    const toolApprovalSection = chatView.locator('.chat-confirmation-widget2')
+    const toolApprovalSection2 = chatView.locator('.chat-tool-confirmation-carousel .chat-confirmation-widget2')
+    const maxWaitTime = 45_0000
+    const donePromise = expect(loading)
+      .toBeHidden({ timeout: maxWaitTime })
+      .then(() => WaitResult.ChatDone)
+      .catch(() => WaitResult.ChatError)
+    const toolApprovalPromise = expect(toolApprovalSection)
+      .toBeVisible({ timeout: maxWaitTime })
+      .then(() => WaitResult.ToolDone)
+      .catch(() => WaitResult.ToolError)
+    const toolApproval2Promise = expect(toolApprovalSection2)
+      .toBeVisible({ timeout: maxWaitTime })
+      .then(() => WaitResult.ToolDone2)
+      .catch(() => WaitResult.ToolError2)
+    const first = await Promise.race([donePromise, toolApprovalPromise, toolApproval2Promise])
+>>>>>>> origin/main
     return first
   }
 
@@ -707,8 +732,55 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           model,
           viewLinesText,
         })
+
+        await page.waitForIdle()
+        const maxToolCalls = 15
+        for (let i = 0; i < maxToolCalls; i++) {
+          const result = await waitForDoneOrToolApproval(expect, chatView)
+          if (result === WaitResult.ChatDone) {
+            break
+          }
+          if (result === WaitResult.ChatError) {
+            throw new Error('Chat response loading did not complete in time')
+          }
+          if (result === WaitResult.ToolDone) {
+            if (!approveToolCalls) {
+              throw new Error('Unexpected tool approval request')
+            }
+            const allowButton = page.locator('.monaco-button[aria-label^="Allow"]')
+            await expect(allowButton).toBeVisible()
+            await allowButton.focus()
+            await page.waitForIdle()
+            await expect(allowButton).toBeFocused()
+            await page.waitForIdle()
+            await allowButton.click()
+            await page.waitForIdle()
+            await clickVisibleAccessButton(page, 'Allow')
+            await page.waitForIdle()
+          }
+          if (result === WaitResult.ToolDone2) {
+            if (!approveToolCalls) {
+              throw new Error('Unexpected tool approval request')
+            }
+            const allowButton = page.locator('.chat-tool-confirmation-carousel .monaco-button[aria-label^="Allow"]')
+            await expect(allowButton).toBeVisible()
+            await allowButton.focus()
+            await page.waitForIdle()
+            await expect(allowButton).toBeFocused()
+            await page.waitForIdle()
+            await allowButton.click()
+            await page.waitForIdle()
+            await clickVisibleAccessButton(page, 'Allow')
+            await page.waitForIdle()
+          }
+          if (result === WaitResult.ToolError || result === WaitResult.ToolError2) {
+            throw new Error('Tool approval did not appear in time')
+          }
+        }
+
         const { requestMessage, response } = await waitForLatestExchange(chatView, message)
 
+<<<<<<< HEAD
         await page.waitForIdle()
         const maxToolCalls = 15
         for (let i = 0; i < maxToolCalls; i++) {
@@ -739,6 +811,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
         }
 
+=======
+>>>>>>> origin/main
         if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
           const ariaLabel = await requestMessage.getAttribute('aria-label')
           if (ariaLabel !== message) {

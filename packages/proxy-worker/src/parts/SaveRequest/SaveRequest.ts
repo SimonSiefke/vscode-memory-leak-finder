@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as ParseRequestBody from '../ParseRequestBody/ParseRequestBody.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
@@ -14,6 +15,7 @@ export const saveRequest = async (
   statusMessage: string | undefined,
   responseHeaders: Record<string, string | string[]>,
   responseData: Buffer,
+  requestBody?: Buffer,
 ): Promise<void> => {
   try {
     const requestsDir = GetProxyPaths.getRequestsDir()
@@ -123,6 +125,7 @@ export const saveRequest = async (
         timestamp,
       },
       request: {
+        body: ParseRequestBody.parseRequestBody(req.headers, requestBody),
         headers: req.headers,
         method: req.method,
         url: req.url,

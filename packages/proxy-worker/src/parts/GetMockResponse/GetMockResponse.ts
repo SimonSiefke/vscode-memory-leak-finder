@@ -1,12 +1,54 @@
 import type { ServerResponse } from 'node:http'
 import { existsSync } from 'node:fs'
-import { readFile } from 'node:fs/promises'
+import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import type { MockResponse } from '../MockResponse/MockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
+import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
+import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
+
+const isCopilotMockKeyedRequest = (hostname: string, pathname: string, method: string): boolean => {
+  const normalizedMethod = method.toUpperCase()
+  if (normalizedMethod !== 'POST') {
+    return false
+  }
+  if (pathname !== '/chat/completions' && pathname !== '/responses') {
+    return false
+  }
+  return hostname === 'api.githubcopilot.com' || hostname === 'api.individual.githubcopilot.com'
+}
+
+const getSignedCopilotTokenExpiration = (token: string): number | undefined => {
+  const normalizedToken = token.startsWith('Bearer ') ? token.slice('Bearer '.length) : token
+  if (!normalizedToken.startsWith('tid=')) {
+    return undefined
+  }
+  const expirationPart = normalizedToken.split(';').find((part) => part.startsWith('exp='))
+  if (!expirationPart) {
+    return undefined
+  }
+  const expiration = Number(expirationPart.slice('exp='.length))
+  return Number.isFinite(expiration) ? expiration : undefined
+}
+
+const isExpiredSignedCopilotTokenPayload = (body: unknown): boolean => {
+  if (!body || typeof body !== 'object') {
+    return false
+  }
+  const token = (body as { token?: unknown }).token
+  const expiresAt = (body as { expires_at?: unknown }).expires_at
+  const expiration = typeof token === 'string' ? getSignedCopilotTokenExpiration(token) : undefined
+  const fallbackExpiration = typeof expiresAt === 'number' ? expiresAt : undefined
+  const effectiveExpiration = expiration ?? fallbackExpiration
+  if (effectiveExpiration === undefined) {
+    return false
+  }
+  return effectiveExpiration <= Math.floor(Date.now() / 1000)
+}
 
 const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> => {
   try {
@@ -30,6 +72,14 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
     } else {
       // Fallback: assume old format structure
       response = mockData
+    }
+
+    if (IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(response)) {
+      return null
+    }
+
+    if (isExpiredSignedCopilotTokenPayload(response.body)) {
+      return null
     }
 
     // Handle OPTIONS requests specially - they might have empty body
@@ -87,7 +137,13 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
           }
         }
       }
-    } else if (responseType === 'json' && typeof body === 'object') {
+    }
+
+    if (!Buffer.isBuffer(body)) {
+      body = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(body)
+    }
+
+    if (responseType === 'json' && typeof body === 'object') {
       // If responseType is json and body is already an object, stringify it
       body = JSON.stringify(body)
     } else
@@ -161,20 +217,86 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
   }
 }
 
-export const getMockResponse = async (method: string, url: string): Promise<MockResponse | null> => {
+const findCompatibleCopilotMockFile = async (
+  mockRequestsDir: string,
+  hostname: string,
+  pathname: string,
+  method: string,
+  requestBody: unknown,
+  baseMockFileName: string,
+): Promise<string | null> => {
+  if (!existsSync(mockRequestsDir)) {
+    return null
+  }
+
+  const requestedMockKey = RequestMockKey.getRequestMockKey(hostname, pathname, method, requestBody)
+  const requestedRelaxedMockKey = RequestMockKey.getRelaxedRequestMockKey(hostname, pathname, method, requestBody)
+  if (!requestedMockKey && !requestedRelaxedMockKey) {
+    return null
+  }
+
+  const basePrefix = baseMockFileName.replace(/\.json$/, '')
+  const files = await readdir(mockRequestsDir)
+  const candidateFiles = files
+    .filter((file) => file.startsWith(`${basePrefix}_`) && file.endsWith('.json'))
+    .sort((first, second) => first.localeCompare(second))
+
+  for (const candidateFile of candidateFiles) {
+    try {
+      const candidatePath = join(mockRequestsDir, candidateFile)
+      const mockData = JSON.parse(await readFile(candidatePath, 'utf8'))
+      if (IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(mockData.response)) {
+        continue
+      }
+      const candidateRequestBody = mockData.request?.body
+      const candidateMockKey = RequestMockKey.getRequestMockKey(hostname, pathname, method, candidateRequestBody)
+      if (requestedMockKey && candidateMockKey === requestedMockKey) {
+        return candidateFile
+      }
+    } catch (error) {
+      console.error(`[Proxy] Error checking compatible mock file ${candidateFile}:`, error)
+    }
+  }
+
+  for (const candidateFile of candidateFiles) {
+    try {
+      const candidatePath = join(mockRequestsDir, candidateFile)
+      const mockData = JSON.parse(await readFile(candidatePath, 'utf8'))
+      if (IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse(mockData.response)) {
+        continue
+      }
+      const candidateRequestBody = mockData.request?.body
+      const candidateRelaxedMockKey = RequestMockKey.getRelaxedRequestMockKey(hostname, pathname, method, candidateRequestBody)
+      if (requestedRelaxedMockKey && candidateRelaxedMockKey === requestedRelaxedMockKey) {
+        return candidateFile
+      }
+    } catch (error) {
+      console.error(`[Proxy] Error checking compatible mock file ${candidateFile}:`, error)
+    }
+  }
+
+  return null
+}
+
+export const getMockResponse = async (method: string, url: string, requestBody?: unknown): Promise<MockResponse | null> => {
   try {
-    const mockRequestsDir = GetProxyPaths.getMockRequestsDir()
+    const scopedMockRequestsDir = GetProxyPaths.getMockRequestsDir()
+    const sharedMockRequestsDir = GetProxyPaths.getSharedMockRequestsDir()
+    const mockRequestsDirs =
+      scopedMockRequestsDir === sharedMockRequestsDir ? [scopedMockRequestsDir] : [scopedMockRequestsDir, sharedMockRequestsDir]
     const parsedUrl = new URL(url)
     const { hostname, pathname } = parsedUrl
 
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {
       const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-      const mockFile = join(mockRequestsDir, mockFileName)
-      const mockResponse = await loadMockResponse(mockFile)
+      for (const mockRequestsDir of mockRequestsDirs) {
+        const mockFile = join(mockRequestsDir, mockFileName)
+        const mockResponse = await loadMockResponse(mockFile)
 
-      if (mockResponse) {
-        return mockResponse
+        if (mockResponse) {
+          return mockResponse
+        }
       }
 
       // If no OPTIONS mock exists, create a default preflight response
@@ -192,12 +314,52 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
     }
 
     // Try to load mock from file
-    const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-    const mockFile = join(mockRequestsDir, mockFileName)
-    const mockResponse = await loadMockResponse(mockFile)
+    const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method, requestBody)
+    if (pathname === '/chat/completions') {
+      console.log(`[Proxy] Requested mock file ${mockFileName} for ${method} ${pathname}`)
+    }
+    for (const mockRequestsDir of mockRequestsDirs) {
+      const mockFile = join(mockRequestsDir, mockFileName)
+      const mockResponse = await loadMockResponse(mockFile)
 
-    if (mockResponse) {
-      return mockResponse
+      if (mockResponse) {
+        console.log(`[Proxy] Loaded mock file ${mockFileName} for ${method} ${pathname}`)
+        return mockResponse
+      }
+
+      if (requestBody !== undefined) {
+        const fallbackMockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
+        const compatibleMockFileName = await findCompatibleCopilotMockFile(
+          mockRequestsDir,
+          hostname,
+          pathname,
+          method,
+          requestBody,
+          fallbackMockFileName,
+        )
+        if (compatibleMockFileName) {
+          const compatibleMockFile = join(mockRequestsDir, compatibleMockFileName)
+          const compatibleMockResponse = await loadMockResponse(compatibleMockFile)
+          if (compatibleMockResponse) {
+            console.log(`[Proxy] Loaded compatible mock file ${compatibleMockFileName} for ${method} ${pathname}`)
+            return compatibleMockResponse
+          }
+        }
+
+        if (!isCopilotMockKeyedRequest(hostname, pathname, method) && fallbackMockFileName !== mockFileName) {
+          const fallbackMockFile = join(mockRequestsDir, fallbackMockFileName)
+          const fallbackMockResponse = await loadMockResponse(fallbackMockFile)
+          if (fallbackMockResponse) {
+            console.log(`[Proxy] Loaded fallback mock file ${fallbackMockFileName} for ${method} ${pathname}`)
+            return fallbackMockResponse
+          }
+        }
+      }
+    }
+
+    if (requestBody !== undefined && isCopilotMockKeyedRequest(hostname, pathname, method)) {
+      console.log(`[Proxy] No compatible keyed mock file found for ${method} ${pathname}; skipping generic fallback`)
+      return null
     }
 
     return null // No mock found, pass through
