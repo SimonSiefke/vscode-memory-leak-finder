@@ -1,4 +1,9 @@
-export const mentionAliases = ['@vscode-memory-leak-finder', '@vscode-memory-leak-finder-bot'] as const
+export const mentionAliases = [
+  '@vscode-memory-leak-finder',
+  '@vscode-memory-leak-finder-bot',
+  '@vs-code-memory-leak-finder-bot'
+
+] as const
 
 export const booleanFlags = [
   '--inspect-extensions',
