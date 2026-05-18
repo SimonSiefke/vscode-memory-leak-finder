@@ -66,7 +66,7 @@ Configure the app with these repository permissions:
 
 - `Actions`: Read and write
 - `Issues`: Read and write
-- `Pull requests`: Read-only
+- `Pull requests`: Read and write
 - `Metadata`: Read-only
 
 ### Subscribed Events
