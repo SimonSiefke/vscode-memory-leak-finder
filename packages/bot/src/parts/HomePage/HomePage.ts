@@ -100,7 +100,15 @@ const homePageHtml = `<!doctype html>
       </div>
       <div class="panel">
         <p>Example command:</p>
+<<<<<<< HEAD
         <p><code>@vscode-memory-leak-finder run --measure named-function-count3 --inspect-extensions</code></p>
+=======
+<<<<<<< HEAD
+        <p><code>@vscode-memory-leak-finder run --measure named-function-count3 --only chat-editor-fix --inspect-extensions</code></p>
+=======
+        <p><code>@vscode-memory-leak-finder run --measure named-function-count3 --inspect-extensions</code></p>
+>>>>>>> feature/homepage
+>>>>>>> origin/main
       </div>
     </main>
   </body>
@@ -120,4 +128,8 @@ export const handleHomePageRequest = (request: IncomingMessage, response: Server
   })
   response.end(homePageHtml)
   return true
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/main

@@ -31,6 +31,7 @@ export const dispatchMeasureWorkflow = async (
       candidate_ref: request.candidateRef,
       cli_args: request.cliArgs.join(' '),
       measure: request.measure,
+      only: request.only,
       request_id: request.requestId,
       source_actor: request.actorLogin,
       source_comment_id: String(request.commentId),

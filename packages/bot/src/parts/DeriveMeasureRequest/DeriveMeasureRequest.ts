@@ -27,6 +27,7 @@ export type MeasureRequest = {
   readonly commentId: number
   readonly issueNumber: number
   readonly measure: string
+  readonly only: string
   readonly pullRequestHtmlUrl: string
   readonly requestId: string
   readonly sourceRepository: {
@@ -46,6 +47,7 @@ export const deriveMeasureRequest = (options: DeriveMeasureRequestOptions): Meas
     commentId,
     issueNumber,
     measure: command.flags.measure,
+    only: command.flags.only,
     pullRequestHtmlUrl: pullRequest.htmlUrl,
     requestId: createRequestId(issueNumber, commentId),
     sourceRepository,

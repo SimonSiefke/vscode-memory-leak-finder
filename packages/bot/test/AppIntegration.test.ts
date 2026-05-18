@@ -67,25 +67,23 @@ const createTestServer = async (): Promise<TestServer> => {
     })
   })
 
-  await new Promise<void>((resolve) => {
-    server.listen(0, '127.0.0.1', () => {
-      resolve()
-    })
-  })
+  const listenPromise = Promise.withResolvers<void>()
+  server.listen(0, '127.0.0.1', listenPromise.resolve)
+  await listenPromise.promise
 
   const { port } = server.address() as AddressInfo
 
   return {
     close: async () => {
-      await new Promise<void>((resolve, reject) => {
-        server.close((error) => {
-          if (error) {
-            reject(error)
-            return
-          }
-          resolve()
-        })
+      const closePromise = Promise.withResolvers<void>()
+      server.close((error) => {
+        if (error) {
+          closePromise.reject(error)
+          return
+        }
+        closePromise.resolve()
       })
+      await closePromise.promise
     },
     url: `http://127.0.0.1:${port}`,
   }
@@ -233,7 +231,9 @@ test('app dispatches a workflow for valid run commands', async () => {
     const response = await sendWebhook(
       server.url,
       'issue_comment',
-      createIssueCommentPayload('@vscode-memory-leak-finder run --measure named-function-count3 --inspect-extensions'),
+      createIssueCommentPayload(
+        '@vscode-memory-leak-finder run --measure named-function-count3 --only chat-editor-fix --inspect-extensions',
+      ),
     )
 
     expect(response.status).toBe(200)
@@ -243,8 +243,9 @@ test('app dispatches a workflow for valid run commands', async () => {
     expect(workflowDispatchInputs).toEqual({
       base_commit: '0123456789abcdef0123456789abcdef01234567',
       candidate_ref: 'SimonSiefke/feature/bot',
-      cli_args: '--measure named-function-count3 --inspect-extensions',
+      cli_args: '--measure named-function-count3 --only chat-editor-fix --inspect-extensions',
       measure: 'named-function-count3',
+      only: 'chat-editor-fix',
       request_id: 'measure-run-2846-456',
       source_actor: 'SimonSiefke',
       source_comment_id: '456',

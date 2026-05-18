@@ -11,8 +11,12 @@ on:
         description: Measure name
         required: true
         type: string
+      only:
+        description: Test filter passed to --only
+        required: true
+        type: string
       cli_args:
-        description: Allowed CLI arguments beginning with --measure
+        description: Allowed CLI arguments including --measure and --only
         required: true
         type: string
       base_commit:
@@ -71,6 +75,7 @@ jobs:
       ALLOWED_TRIGGER_LOGIN: SimonSiefke
       REQUEST_ID: ${{ inputs.request_id }}
       MEASURE_NAME: ${{ inputs.measure }}
+      ONLY: ${{ inputs.only }}
       CLI_ARGS: ${{ inputs.cli_args }}
       BASE_COMMIT: ${{ inputs.base_commit }}
       CANDIDATE_REF: ${{ inputs.candidate_ref }}
@@ -87,6 +92,35 @@ jobs:
         run: |
           if [[ "$SOURCE_ACTOR" != "$ALLOWED_TRIGGER_LOGIN" ]]; then
             echo "Only $ALLOWED_TRIGGER_LOGIN may trigger this workflow"
+            exit 1
+          fi
+
+      - name: Validate required CLI flags
+        run: |
+          has_flag_with_value() {
+            local flag="$1"
+            local expected="$2"
+            local previous=''
+            for token in $CLI_ARGS; do
+              if [[ "$previous" == "$flag" ]]; then
+                if [[ "$token" == "$expected" ]]; then
+                  return 0
+                fi
+                previous=''
+                continue
+              fi
+              previous="$token"
+            done
+            return 1
+          }
+
+          if ! has_flag_with_value '--measure' "$MEASURE_NAME"; then
+            echo "cli_args must include --measure $MEASURE_NAME"
+            exit 1
+          fi
+
+          if ! has_flag_with_value '--only' "$ONLY"; then
+            echo "cli_args must include --only $ONLY"
             exit 1
           fi
 
