@@ -5,7 +5,7 @@ GitHub App bot for on-demand memory leak measurements.
 The bot listens for pull request comments such as:
 
 ```text
-@vscode-memory-leak-finder run --measure named-function-count3 --inspect-extensions
+@vscode-memory-leak-finder run --measure named-function-count3 --only chat-editor-fix --inspect-extensions
 ```
 
 When an allowed user posts a supported command, the bot dispatches the configured GitHub Actions workflow, posts a status comment on the pull request, and updates that comment when the workflow finishes.
@@ -118,6 +118,7 @@ The bot currently accepts mentions using either alias below followed by `run` an
 Supported flags:
 
 - `--measure <value>`
+- `--only <value>`
 - `--inspect-extensions`
 - `--inspect-shared-process`
 - `--inspect-ptyhost`
@@ -130,5 +131,5 @@ Supported flags:
 Example:
 
 ```text
-@vscode-memory-leak-finder run --measure named-function-count3 --inspect-extensions
+@vscode-memory-leak-finder run --measure named-function-count3 --only chat-editor-fix --inspect-extensions
 ```

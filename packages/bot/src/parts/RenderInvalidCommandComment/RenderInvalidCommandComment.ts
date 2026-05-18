@@ -5,5 +5,5 @@ ${message}
 
 Example:
 
-\`@vscode-memory-leak-finder run --measure named-function-count3 --inspect-extensions\``
+\`@vscode-memory-leak-finder run --measure named-function-count3 --only chat-editor-fix --inspect-extensions\``
 }
