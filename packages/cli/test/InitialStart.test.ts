@@ -58,6 +58,7 @@ const WatchUsage = await import('../src/parts/WatchUsage/WatchUsage.ts')
 
 test('initialStart - watch mode - show details', async () => {
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
+    allowCopilotAuthInCi: false,
     arch: '',
     bisect: false,
     checkLeaks: false,
@@ -68,6 +69,8 @@ test('initialStart - watch mode - show details', async () => {
     convertRequestsToMocks: false,
     continueValue: '',
     cwd: '',
+    downloadUserDataZipFileToken: '',
+    downloadUserDataZipFileUrl: '',
     enableExtensions: false,
     enableProxy: false,
     filter: '',
@@ -120,6 +123,7 @@ test('initialStart - watch mode - show details', async () => {
 
 test('initialStart - watch mode - start running', async () => {
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
+    allowCopilotAuthInCi: false,
     arch: '',
     bisect: false,
     checkLeaks: false,
@@ -130,6 +134,8 @@ test('initialStart - watch mode - start running', async () => {
     convertRequestsToMocks: false,
     continueValue: '',
     cwd: '',
+    downloadUserDataZipFileToken: '',
+    downloadUserDataZipFileUrl: '',
     enableExtensions: false,
     enableProxy: false,
     filter: 'a',
@@ -180,6 +186,7 @@ test('initialStart - watch mode - start running', async () => {
 
 test('initialStart - start running', async () => {
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
+    allowCopilotAuthInCi: false,
     arch: '',
     bisect: false,
     checkLeaks: false,
@@ -190,6 +197,8 @@ test('initialStart - start running', async () => {
     convertRequestsToMocks: false,
     continueValue: '',
     cwd: '',
+    downloadUserDataZipFileToken: '',
+    downloadUserDataZipFileUrl: '',
     enableExtensions: false,
     enableProxy: false,
     filter: 'a',
@@ -240,6 +249,7 @@ test('initialStart - start running', async () => {
 
 test('initialStart - convert requests to mocks', async () => {
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
+    allowCopilotAuthInCi: false,
     arch: '',
     bisect: false,
     checkLeaks: false,
@@ -250,6 +260,8 @@ test('initialStart - convert requests to mocks', async () => {
     convertRequestsToMocks: true,
     continueValue: '',
     cwd: '',
+    downloadUserDataZipFileToken: '',
+    downloadUserDataZipFileUrl: '',
     enableExtensions: false,
     enableProxy: false,
     filter: 'a',

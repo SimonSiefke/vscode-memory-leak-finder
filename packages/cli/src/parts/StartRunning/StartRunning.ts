@@ -23,6 +23,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     return
   }
   const {
+    allowCopilotAuthInCi,
     arch,
     bisect,
     checkLeaks,
@@ -32,6 +33,8 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     compressVideo,
     continueValue,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     filterValue,
@@ -74,6 +77,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   await Stdout.write(clear)
   const rpc = await RunTest.prepare()
   const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
+    allowCopilotAuthInCi,
     arch,
     bisect,
     checkLeaks,
@@ -83,6 +87,8 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     compressVideo,
     continueValue,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     filterValue,

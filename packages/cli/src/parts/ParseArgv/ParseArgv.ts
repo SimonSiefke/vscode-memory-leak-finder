@@ -81,6 +81,24 @@ const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-skipped-tests-anyway')
 }
 
+const parseAllowCopilotAuthInCi = (argv: readonly string[]): boolean => {
+  return argv.includes('--allow-copilot-auth-in-ci')
+}
+
+const parseDownloadUserDataZipFileUrl = (argv: readonly string[]): string => {
+  if (argv.includes('--download-user-data-zip-file-url')) {
+    return parseArgvString(argv, '--download-user-data-zip-file-url')
+  }
+  return ''
+}
+
+const parseDownloadUserDataZipFileToken = (argv: readonly string[]): string => {
+  if (argv.includes('--download-user-data-zip-file-token')) {
+    return parseArgvString(argv, '--download-user-data-zip-file-token')
+  }
+  return ''
+}
+
 const parseRecordVideo = (argv: readonly string[]): boolean => {
   return argv.includes('--record-video')
 }
@@ -321,6 +339,8 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const convertRequestsToMocks = parseConvertRequestsToMocks(argv)
   const continueValue = parseContinueValue(argv)
   const cwd = parseCwd(process.cwd(), argv)
+  const downloadUserDataZipFileToken = parseDownloadUserDataZipFileToken(argv)
+  const downloadUserDataZipFileUrl = parseDownloadUserDataZipFileUrl(argv)
   const enableExtensions = parseEnableExtensions(argv)
   const enableProxy = parseEnableProxy(argv)
   const filter = parseFilter(argv)
@@ -344,6 +364,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
+  const allowCopilotAuthInCi = parseAllowCopilotAuthInCi(argv)
   const screencastQuality = parseScreencastQuality(argv)
   const setupOnly = parseSetupOnly(argv)
   const login = parseLogin(argv)
@@ -370,6 +391,8 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     convertRequestsToMocks,
     continueValue,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     filter,
@@ -398,6 +421,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     runMode,
     runs,
     runSkippedTestsAnyway,
+    allowCopilotAuthInCi,
     screencastQuality,
     setupOnly,
     timeoutBetween,
