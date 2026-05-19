@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { dirname } from 'node:path'
+import { delimiter, dirname } from 'node:path'
 import { exec } from '../Exec/Exec.ts'
 import * as GetNpmPathFromNvmrc from '../GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
 
@@ -7,7 +7,7 @@ const doInstallDependencies = async (cwd: string, useNice: boolean) => {
   const npmPath = await GetNpmPathFromNvmrc.getNpmPathFromNvmrc(cwd)
   const binDirname = dirname(npmPath)
   const oldPath = process.env.PATH
-  const newPath = `${binDirname}:${oldPath}`
+  const newPath = oldPath ? `${binDirname}${delimiter}${oldPath}` : binDirname
   if (useNice) {
     return exec('nice', ['-n', '10', npmPath, 'ci'], {
       cwd,
