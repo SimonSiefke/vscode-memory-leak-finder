@@ -1,0 +1,100 @@
+:root {
+  color-scheme: light;
+  font-family: Georgia, 'Times New Roman', serif;
+  background: #f7f1e3;
+  color: #18230f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(201, 167, 92, 0.3), transparent 30%), linear-gradient(180deg, #f7f1e3 0%, #efe6d3 100%);
+}
+
+main {
+  max-width: 720px;
+  width: 100%;
+  padding: 32px;
+  border: 1px solid rgba(24, 35, 15, 0.12);
+  border-radius: 20px;
+  background: rgba(255, 251, 243, 0.94);
+  box-shadow: 0 20px 60px rgba(24, 35, 15, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+p,
+label {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+p {
+  margin: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+input[type='password'],
+input[type='file'] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(24, 35, 15, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  color: inherit;
+  font: inherit;
+}
+
+button {
+  width: fit-content;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #6b4f1d;
+  color: #fffdf8;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+pre {
+  margin: 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(24, 35, 15, 0.06);
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+code {
+  font-family: 'Courier New', monospace;
+}

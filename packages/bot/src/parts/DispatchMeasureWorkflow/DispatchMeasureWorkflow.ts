@@ -1,5 +1,6 @@
 import type { MeasureRequest } from '../DeriveMeasureRequest/DeriveMeasureRequest.ts'
 import type { BotEnv } from '../Env/Env.ts'
+import { getUserDataDownloadInfo } from '../UserDataSnapshot/UserDataSnapshot.ts'
 
 export type WorkflowDispatchOctokit = {
   readonly rest: {
@@ -21,6 +22,7 @@ export const dispatchMeasureWorkflow = async (
   request: MeasureRequest,
   statusCommentId: number,
 ): Promise<void> => {
+  const { downloadUserDataZipFileToken, downloadUserDataZipFileUrl } = await getUserDataDownloadInfo(env)
   await octokit.rest.actions.createWorkflowDispatch({
     owner: env.workflowOwner,
     repo: env.workflowRepo,
@@ -30,6 +32,8 @@ export const dispatchMeasureWorkflow = async (
       base_commit: request.baseCommit,
       candidate_ref: request.candidateRef,
       cli_args: request.cliArgs.join(' '),
+      download_user_data_zip_file_token: downloadUserDataZipFileToken,
+      download_user_data_zip_file_url: downloadUserDataZipFileUrl,
       measure: request.measure,
       only: request.only,
       request_id: request.requestId,
