@@ -34,9 +34,11 @@ When an allowed user posts a supported command, the bot dispatches the configure
    npm --prefix packages/bot start
    ```
 
-4. If you want to receive webhook events from GitHub on your local machine, set `WEBHOOK_PROXY_URL` to a Smee channel URL.
+4. If you want to receive webhook events from GitHub on your local machine, set `WEBHOOK_PROXY_URL` to a public URL that forwards requests to your local bot.
 
 If you want to use the Probot manifest setup flow at `http://localhost:3000`, set `WEBHOOK_PROXY_URL` before you open the setup page. GitHub rejects manifest webhook URLs that point to `localhost`.
+
+If you only need webhook delivery forwarding, a Smee channel works. If the measure workflow also needs to download the uploaded user-data zip from your local bot, use a real HTTP tunnel such as Cloudflare Tunnel or ngrok instead. The bot uses `BOT_PUBLIC_BASE_URL` when set, and otherwise falls back to `WEBHOOK_PROXY_URL` for generated download URLs.
 
 ## GitHub App Setup
 
@@ -50,6 +52,8 @@ For local setup, the easiest path is:
 4. Open `http://localhost:3000` and use the Probot setup flow.
 
 Without a public webhook URL, GitHub will reject the manifest because `localhost` is not reachable from the public internet.
+
+If you want to trigger measure workflows against a locally running bot and still allow the workflow runner to download `/api/user-data/download`, use a public tunnel URL instead of Smee. For example, expose `http://localhost:3000` through Cloudflare Tunnel and set either `BOT_PUBLIC_BASE_URL` or `WEBHOOK_PROXY_URL` to that tunnel URL.
 
 1. Create a new GitHub App at `https://github.com/settings/apps/new`.
 2. Set a homepage URL. The repository URL is fine.
@@ -97,14 +101,16 @@ These variables should be configured in production.
 
 These variables control which users can trigger the bot and which workflow gets dispatched.
 
-| Variable                 | Required | Default                     | Description                                                               |
-| ------------------------ | -------- | --------------------------- | ------------------------------------------------------------------------- |
-| `BOT_ALLOWED_LOGINS`     | No       | `SimonSiefke`               | Comma-separated list of GitHub logins allowed to trigger runs.            |
-| `BOT_WORKFLOW_FILE_NAME` | No       | `measure-on-demand.yml`     | Workflow file name passed to the GitHub Actions dispatch API.             |
-| `BOT_WORKFLOW_OWNER`     | No       | `SimonSiefke`               | Owner of the repository that contains the measure workflow.               |
-| `BOT_WORKFLOW_REPO`      | No       | `vscode-memory-leak-finder` | Repository that contains the measure workflow.                            |
-| `BOT_WORKFLOW_REF`       | No       | `main`                      | Branch or ref used when dispatching the workflow.                         |
-| `WEBHOOK_PROXY_URL`      | No       | unset                       | Optional local-development webhook forwarding URL, for example from Smee. |
+| Variable                     | Required | Default                     | Description                                                                                               |
+| ---------------------------- | -------- | --------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `BOT_ALLOWED_LOGINS`         | No       | `SimonSiefke`               | Comma-separated list of GitHub logins allowed to trigger runs.                                            |
+| `BOT_USER_DATA_UPLOAD_TOKEN` | No       | unset                       | Shared secret required for `/api/user-data/upload` and `/upload-user-data-dir`.                           |
+| `BOT_PUBLIC_BASE_URL`        | No       | unset                       | Public base URL used for generated workflow callback and user-data download URLs.                         |
+| `BOT_WORKFLOW_FILE_NAME`     | No       | `measure-on-demand.yml`     | Workflow file name passed to the GitHub Actions dispatch API.                                             |
+| `BOT_WORKFLOW_OWNER`         | No       | `SimonSiefke`               | Owner of the repository that contains the measure workflow.                                               |
+| `BOT_WORKFLOW_REPO`          | No       | `vscode-memory-leak-finder` | Repository that contains the measure workflow.                                                            |
+| `BOT_WORKFLOW_REF`           | No       | `main`                      | Branch or ref used when dispatching the workflow.                                                         |
+| `WEBHOOK_PROXY_URL`          | No       | unset                       | Optional public webhook URL. Also used as a fallback public base URL when `BOT_PUBLIC_BASE_URL` is unset. |
 
 See `packages/bot/.env.sample` for a concrete example.
 

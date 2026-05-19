@@ -27,6 +27,14 @@ on:
         description: Candidate VS Code ref in owner/ref or commit format
         required: true
         type: string
+      download_user_data_zip_file_url:
+        description: Authenticated download URL for the uploaded vscode-user-data-dir zip
+        required: true
+        type: string
+      download_user_data_zip_file_token:
+        description: Bearer token for the uploaded vscode-user-data-dir zip
+        required: true
+        type: string
       source_actor:
         description: Login that triggered the workflow
         required: true
@@ -68,9 +76,12 @@ permissions:
   contents: read
 
 jobs:
-  measure:
+  measure-base:
     runs-on: ubuntu-24.04
     timeout-minutes: 360
+    outputs:
+      measureOutcome: ${{ steps.baseMeasure.outcome == 'success' && 'success' || 'failure' }}
+      chartsOutcome: ${{ steps.baseCharts.outcome == 'success' && 'success' || (steps.baseCharts.outcome == 'failure' && 'failure' || 'skipped') }}
     env:
       ALLOWED_TRIGGER_LOGIN: SimonSiefke
       REQUEST_ID: ${{ inputs.request_id }}
@@ -79,6 +90,8 @@ jobs:
       CLI_ARGS: ${{ inputs.cli_args }}
       BASE_COMMIT: ${{ inputs.base_commit }}
       CANDIDATE_REF: ${{ inputs.candidate_ref }}
+      DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN: ${{ inputs.download_user_data_zip_file_token }}
+      DOWNLOAD_USER_DATA_ZIP_FILE_URL: ${{ inputs.download_user_data_zip_file_url }}
       SOURCE_ACTOR: ${{ inputs.source_actor }}
       SOURCE_OWNER: ${{ inputs.source_owner }}
       SOURCE_REPO: ${{ inputs.source_repo }}
@@ -130,6 +143,9 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config xvfb x11-xserver-utils
+
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> "$GITHUB_OUTPUT"
@@ -170,43 +186,40 @@ jobs:
           rm -rf .measure-runs .vscode-memory-leak-finder-results .vscode-charts
           mkdir -p .measure-runs
 
+      - name: Setup base revision
+        run: |
+          xvfb-run --auto-servernum node packages/cli/bin/test.js \
+            --cwd packages/e2e \
+            --download-user-data-zip-file-url "${DOWNLOAD_USER_DATA_ZIP_FILE_URL}" \
+            --download-user-data-zip-file-token "${DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN}" \
+            --run-skipped-tests-anyway \
+            --commit "${{ env.BASE_COMMIT }}" \
+            --setup-only \
+            ${{ env.CLI_ARGS }}
+
       - name: Measure base revision
         id: baseMeasure
         continue-on-error: true
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: >-
-            node packages/cli/bin/test.js
-            --cwd packages/e2e
-            --check-leaks
-            --measure-after
-            --commit "$BASE_COMMIT"
-            $CLI_ARGS
+        run: |
+          xvfb-run --auto-servernum node packages/cli/bin/test.js \
+            --cwd packages/e2e \
+            --check-leaks \
+            --download-user-data-zip-file-url "${DOWNLOAD_USER_DATA_ZIP_FILE_URL}" \
+            --download-user-data-zip-file-token "${DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN}" \
+            --measure-after \
+            --run-skipped-tests-anyway \
+            --commit "${{ env.BASE_COMMIT }}" \
+            ${{ env.CLI_ARGS }}
+
+          if [[ ! -d .vscode-memory-leak-finder-results ]]; then
+            echo "Measure completed without writing .vscode-memory-leak-finder-results"
+            echo "The selected test likely did not execute or did not produce measure output"
+            exit 1
+          fi
 
       - name: Preserve base results
         if: always() && steps.baseMeasure.outcome == 'success'
         run: mv .vscode-memory-leak-finder-results .measure-runs/base-results
-
-      - name: Reset result directories after base
-        if: always()
-        run: rm -rf .vscode-memory-leak-finder-results .vscode-charts
-
-      - name: Measure candidate revision
-        id: candidateMeasure
-        continue-on-error: true
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: >-
-            node packages/cli/bin/test.js
-            --cwd packages/e2e
-            --check-leaks
-            --measure-after
-            --commit "$CANDIDATE_REF"
-            $CLI_ARGS
-
-      - name: Preserve candidate results
-        if: always() && steps.candidateMeasure.outcome == 'success'
-        run: mv .vscode-memory-leak-finder-results .measure-runs/candidate-results
 
       - name: Generate base charts
         id: baseCharts
@@ -217,6 +230,179 @@ jobs:
           cp -R .measure-runs/base-results .vscode-memory-leak-finder-results
           node packages/charts/src/main.ts
           mv .vscode-charts .measure-runs/base-charts
+
+      - name: Package result archives
+        if: always()
+        run: |
+          if [[ -d .measure-runs/base-results ]]; then
+            (cd .measure-runs && zip -rq "$REQUEST_ID-base-results.zip" base-results)
+          fi
+          if [[ -d .measure-runs/base-charts ]]; then
+            (cd .measure-runs && zip -rq "$REQUEST_ID-base-charts-part.zip" base-charts)
+          fi
+
+      - name: Upload base results artifact
+        if: always() && hashFiles('.measure-runs/*-base-results.zip') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.request_id }}-base-results
+          path: .measure-runs/${{ inputs.request_id }}-base-results.zip
+
+      - name: Upload base charts partial artifact
+        if: always() && hashFiles('.measure-runs/*-base-charts-part.zip') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.request_id }}-base-charts-part
+          path: .measure-runs/${{ inputs.request_id }}-base-charts-part.zip
+
+      - name: Fail job when the base measurement or charts failed
+        if: always() && (steps.baseMeasure.outcome != 'success' || steps.baseCharts.outcome == 'failure')
+        run: exit 1
+
+  measure-candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    outputs:
+      measureOutcome: ${{ steps.candidateMeasure.outcome == 'success' && 'success' || 'failure' }}
+      chartsOutcome: ${{ steps.candidateCharts.outcome == 'success' && 'success' || (steps.candidateCharts.outcome == 'failure' && 'failure' || 'skipped') }}
+    env:
+      ALLOWED_TRIGGER_LOGIN: SimonSiefke
+      REQUEST_ID: ${{ inputs.request_id }}
+      MEASURE_NAME: ${{ inputs.measure }}
+      ONLY: ${{ inputs.only }}
+      CLI_ARGS: ${{ inputs.cli_args }}
+      BASE_COMMIT: ${{ inputs.base_commit }}
+      CANDIDATE_REF: ${{ inputs.candidate_ref }}
+      DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN: ${{ inputs.download_user_data_zip_file_token }}
+      DOWNLOAD_USER_DATA_ZIP_FILE_URL: ${{ inputs.download_user_data_zip_file_url }}
+      SOURCE_ACTOR: ${{ inputs.source_actor }}
+      SOURCE_OWNER: ${{ inputs.source_owner }}
+      SOURCE_REPO: ${{ inputs.source_repo }}
+      SOURCE_ISSUE_NUMBER: ${{ inputs.source_issue_number }}
+      SOURCE_COMMENT_ID: ${{ inputs.source_comment_id }}
+      STATUS_COMMENT_ID: ${{ inputs.status_comment_id }}
+      SOURCE_PULL_REQUEST_URL: ${{ inputs.source_pull_request_url }}
+      TARGET_BASE_REF: ${{ inputs.target_base_ref }}
+    steps:
+      - name: Validate trigger actor
+        run: |
+          if [[ "$SOURCE_ACTOR" != "$ALLOWED_TRIGGER_LOGIN" ]]; then
+            echo "Only $ALLOWED_TRIGGER_LOGIN may trigger this workflow"
+            exit 1
+          fi
+
+      - name: Validate required CLI flags
+        run: |
+          has_flag_with_value() {
+            local flag="$1"
+            local expected="$2"
+            local previous=''
+            for token in $CLI_ARGS; do
+              if [[ "$previous" == "$flag" ]]; then
+                if [[ "$token" == "$expected" ]]; then
+                  return 0
+                fi
+                previous=''
+                continue
+              fi
+              previous="$token"
+            done
+            return 1
+          }
+
+          if ! has_flag_with_value '--measure' "$MEASURE_NAME"; then
+            echo "cli_args must include --measure $MEASURE_NAME"
+            exit 1
+          fi
+
+          if ! has_flag_with_value '--only' "$ONLY"; then
+            echo "cli_args must include --only $ONLY"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config xvfb x11-xserver-utils
+
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v5
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-insiders-versions
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v5
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
+
+      - name: npm ci
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci --ignore-scripts && npm run postinstall
+
+      - name: Build workspace
+        run: npm run build
+
+      - name: Prepare output folders
+        run: |
+          rm -rf .measure-runs .vscode-memory-leak-finder-results .vscode-charts
+          mkdir -p .measure-runs
+
+      - name: Setup candidate revision
+        run: |
+          xvfb-run --auto-servernum node packages/cli/bin/test.js \
+            --cwd packages/e2e \
+            --download-user-data-zip-file-url "${DOWNLOAD_USER_DATA_ZIP_FILE_URL}" \
+            --download-user-data-zip-file-token "${DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN}" \
+            --run-skipped-tests-anyway \
+            --commit "${{ env.CANDIDATE_REF }}" \
+            --setup-only \
+            ${{ env.CLI_ARGS }}
+
+      - name: Measure candidate revision
+        id: candidateMeasure
+        continue-on-error: true
+        run: |
+          xvfb-run --auto-servernum node packages/cli/bin/test.js \
+            --cwd packages/e2e \
+            --check-leaks \
+            --download-user-data-zip-file-url "${DOWNLOAD_USER_DATA_ZIP_FILE_URL}" \
+            --download-user-data-zip-file-token "${DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN}" \
+            --measure-after \
+            --run-skipped-tests-anyway \
+            --commit "${{ env.CANDIDATE_REF }}" \
+            ${{ env.CLI_ARGS }}
+
+          if [[ ! -d .vscode-memory-leak-finder-results ]]; then
+            echo "Measure completed without writing .vscode-memory-leak-finder-results"
+            echo "The selected test likely did not execute or did not produce measure output"
+            exit 1
+          fi
+
+      - name: Preserve candidate results
+        if: always() && steps.candidateMeasure.outcome == 'success'
+        run: mv .vscode-memory-leak-finder-results .measure-runs/candidate-results
 
       - name: Generate candidate charts
         id: candidateCharts
@@ -231,11 +417,72 @@ jobs:
       - name: Package result archives
         if: always()
         run: |
-          if [[ -d .measure-runs/base-results ]]; then
-            (cd .measure-runs && zip -rq "$REQUEST_ID-base-results.zip" base-results)
-          fi
           if [[ -d .measure-runs/candidate-results ]]; then
             (cd .measure-runs && zip -rq "$REQUEST_ID-candidate-results.zip" candidate-results)
+          fi
+          if [[ -d .measure-runs/candidate-charts ]]; then
+            (cd .measure-runs && zip -rq "$REQUEST_ID-candidate-charts-part.zip" candidate-charts)
+          fi
+
+      - name: Upload candidate results artifact
+        if: always() && hashFiles('.measure-runs/*-candidate-results.zip') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.request_id }}-candidate-results
+          path: .measure-runs/${{ inputs.request_id }}-candidate-results.zip
+
+      - name: Upload candidate charts partial artifact
+        if: always() && hashFiles('.measure-runs/*-candidate-charts-part.zip') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.request_id }}-candidate-charts-part
+          path: .measure-runs/${{ inputs.request_id }}-candidate-charts-part.zip
+
+      - name: Fail job when the candidate measurement or charts failed
+        if: always() && (steps.candidateMeasure.outcome != 'success' || steps.candidateCharts.outcome == 'failure')
+        run: exit 1
+
+  finalize:
+    if: always()
+    needs: [measure-base, measure-candidate]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      REQUEST_ID: ${{ inputs.request_id }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Prepare output folders
+        run: |
+          rm -rf .measure-runs
+          mkdir -p .measure-runs/summary
+
+      - name: Download base charts partial artifact
+        if: needs.measure-base.outputs.chartsOutcome == 'success'
+        uses: actions/download-artifact@v6
+        with:
+          name: ${{ inputs.request_id }}-base-charts-part
+          path: .measure-runs/downloaded-base-charts
+
+      - name: Download candidate charts partial artifact
+        if: needs.measure-candidate.outputs.chartsOutcome == 'success'
+        uses: actions/download-artifact@v6
+        with:
+          name: ${{ inputs.request_id }}-candidate-charts-part
+          path: .measure-runs/downloaded-candidate-charts
+
+      - name: Package charts artifact
+        if: always()
+        run: |
+          if [[ -f .measure-runs/downloaded-base-charts/${REQUEST_ID}-base-charts-part.zip ]]; then
+            unzip -q .measure-runs/downloaded-base-charts/${REQUEST_ID}-base-charts-part.zip -d .measure-runs
+          fi
+          if [[ -f .measure-runs/downloaded-candidate-charts/${REQUEST_ID}-candidate-charts-part.zip ]]; then
+            unzip -q .measure-runs/downloaded-candidate-charts/${REQUEST_ID}-candidate-charts-part.zip -d .measure-runs
           fi
           if [[ -d .measure-runs/base-charts || -d .measure-runs/candidate-charts ]]; then
             (cd .measure-runs && zip -rq "$REQUEST_ID-charts.zip" base-charts candidate-charts)
@@ -250,9 +497,9 @@ jobs:
           MEASURE_BASE_COMMIT: ${{ inputs.base_commit }}
           MEASURE_CANDIDATE_REF: ${{ inputs.candidate_ref }}
           MEASURE_CLI_ARGS: ${{ inputs.cli_args }}
-          MEASURE_CONCLUSION: ${{ steps.baseMeasure.outcome == 'success' && steps.candidateMeasure.outcome == 'success' && (steps.baseCharts.outcome == 'success' || steps.baseCharts.outcome == '') && (steps.candidateCharts.outcome == 'success' || steps.candidateCharts.outcome == '') && 'success' || 'failure' }}
+          MEASURE_CONCLUSION: ${{ needs.measure-base.outputs.measureOutcome == 'success' && needs.measure-candidate.outputs.measureOutcome == 'success' && needs.measure-base.outputs.chartsOutcome != 'failure' && needs.measure-candidate.outputs.chartsOutcome != 'failure' && 'success' || 'failure' }}
           MEASURE_ERROR_JSON: >-
-            ${{ (steps.baseMeasure.outcome != 'success' || steps.candidateMeasure.outcome != 'success' || steps.baseCharts.outcome == 'failure' || steps.candidateCharts.outcome == 'failure') && '{"message":"One or more measure workflow steps failed. See the workflow logs and step outcomes."}' || '' }}
+            ${{ (needs.measure-base.outputs.measureOutcome != 'success' || needs.measure-candidate.outputs.measureOutcome != 'success' || needs.measure-base.outputs.chartsOutcome == 'failure' || needs.measure-candidate.outputs.chartsOutcome == 'failure') && '{"message":"One or more measure workflow steps failed. See the workflow logs and step outcomes."}' || '' }}
           MEASURE_ISSUE_NUMBER: ${{ inputs.source_issue_number }}
           MEASURE_NAME: ${{ inputs.measure }}
           MEASURE_REQUEST_ID: ${{ inputs.request_id }}
@@ -260,26 +507,10 @@ jobs:
           MEASURE_SOURCE_REPO: ${{ inputs.source_repo }}
           MEASURE_STATUS_COMMENT_ID: ${{ inputs.status_comment_id }}
           MEASURE_STEP_OUTCOMES: >-
-            {"baseMeasure":"${{ steps.baseMeasure.outcome == 'success' && 'success' || 'failure' }}","candidateMeasure":"${{ steps.candidateMeasure.outcome == 'success' && 'success' || 'failure' }}","charts":"${{ (steps.baseCharts.outcome == 'failure' || steps.candidateCharts.outcome == 'failure') && 'failure' || ((steps.baseCharts.outcome == 'success' || steps.candidateCharts.outcome == 'success') && 'success' || 'skipped') }}"}
+            {"baseMeasure":"${{ needs.measure-base.outputs.measureOutcome }}","candidateMeasure":"${{ needs.measure-candidate.outputs.measureOutcome }}","charts":"${{ (needs.measure-base.outputs.chartsOutcome == 'failure' || needs.measure-candidate.outputs.chartsOutcome == 'failure') && 'failure' || ((needs.measure-base.outputs.chartsOutcome == 'success' || needs.measure-candidate.outputs.chartsOutcome == 'success') && 'success' || 'skipped') }}"}
           MEASURE_WORKFLOW_RUN_ID: ${{ github.run_id }}
           MEASURE_WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          mkdir -p .measure-runs/summary
-          node packages/build/src/createMeasureWorkflowSummary.ts .measure-runs/summary/summary.json
-
-      - name: Upload base results artifact
-        if: always() && hashFiles('.measure-runs/*-base-results.zip') != ''
-        uses: actions/upload-artifact@v6
-        with:
-          name: ${{ inputs.request_id }}-base-results
-          path: .measure-runs/${{ inputs.request_id }}-base-results.zip
-
-      - name: Upload candidate results artifact
-        if: always() && hashFiles('.measure-runs/*-candidate-results.zip') != ''
-        uses: actions/upload-artifact@v6
-        with:
-          name: ${{ inputs.request_id }}-candidate-results
-          path: .measure-runs/${{ inputs.request_id }}-candidate-results.zip
+        run: node packages/build/src/createMeasureWorkflowSummary.ts .measure-runs/summary/summary.json
 
       - name: Upload charts artifact
         if: always() && hashFiles('.measure-runs/*-charts.zip') != ''
@@ -296,5 +527,5 @@ jobs:
           path: .measure-runs/summary/summary.json
 
       - name: Fail workflow when one or more steps failed
-        if: always() && (steps.baseMeasure.outcome != 'success' || steps.candidateMeasure.outcome != 'success' || steps.baseCharts.outcome == 'failure' || steps.candidateCharts.outcome == 'failure')
+        if: always() && (needs.measure-base.outputs.measureOutcome != 'success' || needs.measure-candidate.outputs.measureOutcome != 'success' || needs.measure-base.outputs.chartsOutcome == 'failure' || needs.measure-candidate.outputs.chartsOutcome == 'failure')
         run: exit 1

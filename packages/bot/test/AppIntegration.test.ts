@@ -1,10 +1,17 @@
 import { createHmac } from 'node:crypto'
+import { mkdtemp, rm } from 'node:fs/promises'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { AddressInfo } from 'node:net'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { afterEach, beforeEach, expect, test } from '@jest/globals'
+import JSZip from 'jszip'
 import nock from 'nock'
 import { createNodeMiddleware, Probot } from 'probot'
 import { createApp } from '../src/parts/App/App.ts'
+import type { BotEnv } from '../src/parts/Env/Env.ts'
+import { handleIssueComment } from '../src/parts/HandleIssueComment/HandleIssueComment.ts'
+import { saveUserDataSnapshot } from '../src/parts/UserDataSnapshot/UserDataSnapshot.ts'
 
 const webhookSecret = 'test-webhook-secret'
 
@@ -42,14 +49,18 @@ type TestServer = {
   readonly url: string
 }
 
-const createTestServer = async (): Promise<TestServer> => {
+const createTestServer = async (envOverrides: Partial<BotEnv> = {}): Promise<TestServer> => {
   const middleware = await createNodeMiddleware(
     createApp({
       allowedLogins: ['SimonSiefke'],
+      publicBaseUrl: '',
+      userDataStoragePath: '.bot-user-data',
+      userDataUploadToken: 'shared-upload-token',
       workflowFileName: 'measure-on-demand.yml',
       workflowOwner: 'SimonSiefke',
       workflowRef: 'main',
       workflowRepo: 'vscode-memory-leak-finder',
+      ...envOverrides,
     }),
     {
       probot: new Probot({
@@ -135,6 +146,16 @@ const createIssueCommentPayload = (body: string) => {
   }
 }
 
+const createIssueCommentPayloadWithAnonymousUser = (body: string) => {
+  return {
+    ...createIssueCommentPayload(body),
+    comment: {
+      ...createIssueCommentPayload(body).comment,
+      user: null,
+    },
+  }
+}
+
 beforeEach(() => {
   nock.disableNetConnect()
   nock.enableNetConnect('127.0.0.1')
@@ -179,8 +200,39 @@ test('app posts a syntax error comment for invalid run commands', async () => {
   }
 })
 
-test('app dispatches a workflow for valid run commands', async () => {
+test('app ignores issue comments without a user', async () => {
   const server = await createTestServer()
+
+  nock('https://api.github.com').persist().post('/app/installations/1/access_tokens').reply(201, {
+    expires_at: '2099-01-01T00:00:00Z',
+    permissions: {},
+    repository_selection: 'selected',
+    token: 'test-installation-token',
+  })
+
+  try {
+    const response = await sendWebhook(
+      server.url,
+      'issue_comment',
+      createIssueCommentPayloadWithAnonymousUser('@vscode-memory-leak-finder run --measure named-function-count3'),
+    )
+
+    expect(response.status).toBe(200)
+  } finally {
+    await server.close()
+  }
+})
+
+test('app dispatches a workflow for valid run commands', async () => {
+  const storagePath = await mkdtemp(join(tmpdir(), 'bot-user-data-'))
+  const zip = new JSZip()
+  zip.file('User/settings.json', '{"chat.allowAnonymousAccess":true}')
+  const zipContent = await zip.generateAsync({ type: 'nodebuffer' })
+  const snapshot = await saveUserDataSnapshot(storagePath, zipContent, 'SimonSiefke')
+  const server = await createTestServer({
+    publicBaseUrl: 'https://bot.example.com',
+    userDataStoragePath: storagePath,
+  })
   let updatedCommentBody = ''
   let workflowDispatchInputs: Record<string, string> | undefined
 
@@ -240,10 +292,13 @@ test('app dispatches a workflow for valid run commands', async () => {
     expect(updatedCommentBody).toContain('## Measure run started')
     expect(updatedCommentBody).toContain('0123456789abcdef0123456789abcdef01234567')
     expect(updatedCommentBody).toContain('SimonSiefke/feature/bot')
+    expect(updatedCommentBody).not.toContain('https://github.com/SimonSiefke/vscode-memory-leak-finder/pull/2846')
     expect(workflowDispatchInputs).toEqual({
       base_commit: '0123456789abcdef0123456789abcdef01234567',
       candidate_ref: 'SimonSiefke/feature/bot',
       cli_args: '--measure named-function-count3 --only chat-editor-fix --inspect-extensions',
+      download_user_data_zip_file_token: snapshot.downloadToken,
+      download_user_data_zip_file_url: 'https://bot.example.com/api/user-data/download',
       measure: 'named-function-count3',
       only: 'chat-editor-fix',
       request_id: 'measure-run-2846-456',
@@ -259,5 +314,79 @@ test('app dispatches a workflow for valid run commands', async () => {
     expect(githubApi.isDone()).toBe(true)
   } finally {
     await server.close()
+    await rm(storagePath, { force: true, recursive: true })
+  }
+})
+
+test('app posts a helpful error comment when no user data snapshot was uploaded yet', async () => {
+  const storagePath = await mkdtemp(join(tmpdir(), 'bot-user-data-'))
+  const env: BotEnv = {
+    allowedLogins: ['SimonSiefke'],
+    publicBaseUrl: 'https://bot.example.com',
+    userDataStoragePath: storagePath,
+    userDataUploadToken: 'shared-upload-token',
+    workflowFileName: 'measure-on-demand.yml',
+    workflowOwner: 'SimonSiefke',
+    workflowRef: 'main',
+    workflowRepo: 'vscode-memory-leak-finder',
+  }
+  const updatedCommentBodies: string[] = []
+  const octokit = {
+    rest: {
+      actions: {
+        createWorkflowDispatch: async () => {
+          throw new Error('workflow dispatch should not be called when no snapshot is uploaded')
+        },
+      },
+      issues: {
+        createComment: async () => {
+          return {
+            data: {
+              id: 9003,
+            },
+          }
+        },
+        updateComment: async (options: { owner: string; repo: string; comment_id: number; body: string }) => {
+          updatedCommentBodies.push(options.body)
+          return {}
+        },
+      },
+      pulls: {
+        get: async () => {
+          return {
+            data: {
+              base: {
+                ref: 'main',
+                sha: '0123456789abcdef0123456789abcdef01234567',
+              },
+              head: {
+                ref: 'feature/bot',
+                repo: {
+                  owner: {
+                    login: 'SimonSiefke',
+                  },
+                },
+              },
+              html_url: 'https://github.com/SimonSiefke/vscode-memory-leak-finder/pull/2846',
+            },
+          }
+        },
+      },
+    },
+  }
+
+  try {
+    await handleIssueComment({
+      env,
+      octokit,
+      payload: createIssueCommentPayload('@vscode-memory-leak-finder run --measure named-function-count3 --only chat-editor-fix'),
+    })
+
+    expect(updatedCommentBodies).toHaveLength(2)
+    expect(updatedCommentBodies[1]).toContain('## Measure run failed to start')
+    expect(updatedCommentBodies[1]).toContain('No uploaded vscode-user-data-dir snapshot is available yet.')
+    expect(updatedCommentBodies[1]).toContain('/upload-user-data-dir')
+  } finally {
+    await rm(storagePath, { force: true, recursive: true })
   }
 })
