@@ -31,7 +31,6 @@ const homePageHtml = `<!doctype html>
       }
 
       main {
-        contain: strict;
         max-width: 720px;
         width: 100%;
         padding: 32px;
@@ -71,6 +70,25 @@ const homePageHtml = `<!doctype html>
         font-size: 0.95em;
       }
 
+      a {
+        color: inherit;
+      }
+
+      .endpoint-link {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border: 1px solid rgba(107, 79, 29, 0.24);
+        border-radius: 999px;
+        background: rgba(107, 79, 29, 0.12);
+        color: #6b4f1d;
+        font-family: 'Courier New', monospace;
+        font-size: 0.95em;
+        font-weight: 700;
+        text-decoration: underline;
+        text-underline-offset: 0.16em;
+      }
+
       .eyebrow {
         font-size: 0.82rem;
         font-weight: 700;
@@ -96,15 +114,13 @@ const homePageHtml = `<!doctype html>
       <p>GitHub App bot for on-demand memory leak measurements.</p>
       <div class="panel">
         <p>The bot watches pull request comments for supported commands, starts the configured measurement workflow, and updates the pull request with progress and results.</p>
-        <p>Webhook endpoint: <code>/api/github/webhooks</code></p>
+        <p>Webhook endpoint: <a class="endpoint-link" href="/api/github/webhooks">/api/github/webhooks</a></p>
+        <p>Upload user data dir: <a class="endpoint-link" href="/api/user-data/upload">/api/user-data/upload</a></p>
+        <p>Upload page: <a class="endpoint-link" href="/upload-user-data-dir">/upload-user-data-dir</a></p>
       </div>
       <div class="panel">
         <p>Example command:</p>
-<<<<<<< HEAD
         <p><code>@vscode-memory-leak-finder run --measure named-function-count3 --only chat-editor-fix --inspect-extensions</code></p>
-=======
-        <p><code>@vscode-memory-leak-finder run --measure named-function-count3 --inspect-extensions</code></p>
->>>>>>> feature/homepage
       </div>
     </main>
   </body>

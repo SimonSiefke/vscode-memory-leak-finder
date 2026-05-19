@@ -62,4 +62,6 @@ test('homepage handler serves an html overview at root', async () => {
   expect(text).toContain('<title>VS Code Memory Leak Finder Bot</title>')
   expect(text).toContain('GitHub App bot for on-demand memory leak measurements')
   expect(text).toContain('/api/github/webhooks')
+  expect(text).toContain('/api/user-data/upload')
+  expect(text).toContain('/upload-user-data-dir')
 })
