@@ -1,0 +1,88 @@
+import { homedir } from 'node:os'
+import { expect, test } from '@jest/globals'
+import { createMockRpc } from '@lvce-editor/rpc'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { getNpmPathFromNvmrc } from '../src/parts/GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
+
+test('getNpmPathFromNvmrc - returns installed npm path from nvm', async () => {
+  const repoPath = '/test/repo'
+  const homeDir = homedir()
+  const oldNvmDir = process.env.NVM_DIR
+  const nvmDir = `${homeDir}/.nvm`
+  const npmPath = `${nvmDir}/versions/node/v22.22.1/bin/npm`
+  const nodePath = `${nvmDir}/versions/node/v22.22.1/bin/node`
+
+  process.env.NVM_DIR = nvmDir
+
+  const mockRpc = createMockRpc({
+    commandMap: {
+      'FileSystem.readFileContent': () => '22.22.1',
+      'FileSystem.exists': (path: string) => path === nodePath || path === npmPath,
+      'FileSystem.exec': () => {
+        throw new Error('unexpected exec')
+      },
+    },
+  })
+  try {
+    FileSystemWorker.set(mockRpc)
+
+    const result = await getNpmPathFromNvmrc(repoPath)
+
+    expect(result).toBe(npmPath)
+    expect(mockRpc.invocations).toEqual([
+      ['FileSystem.readFileContent', `${repoPath}/.nvmrc`],
+      ['FileSystem.exists', nodePath],
+      ['FileSystem.exists', npmPath],
+    ])
+  } finally {
+    process.env.NVM_DIR = oldNvmDir
+  }
+})
+
+test('getNpmPathFromNvmrc - installs missing node version and resolves npm path', async () => {
+  const repoPath = '/test/repo'
+  const homeDir = homedir()
+  const oldNvmDir = process.env.NVM_DIR
+  const nvmDir = `${homeDir}/.nvm`
+  const configNvmNodePath = `${homeDir}/.config/nvm/versions/node/v22.22.1/bin/node`
+  const npmPath = `${nvmDir}/versions/node/v22.22.1/bin/npm`
+  const nodePath = `${nvmDir}/versions/node/v22.22.1/bin/node`
+  let installed = false
+
+  process.env.NVM_DIR = nvmDir
+
+  const mockRpc = createMockRpc({
+    commandMap: {
+      'FileSystem.readFileContent': () => 'v22.22.1',
+      'FileSystem.exists': (path: string) => {
+        if (path === nodePath || path === npmPath) {
+          return installed
+        }
+        return false
+      },
+      'FileSystem.exec': (command: string, args: readonly string[]) => {
+        expect(command).toBe('bash')
+        expect(args).toEqual(['-c', expect.stringContaining('nvm install 22.22.1')])
+        installed = true
+        return { exitCode: 0, stderr: '', stdout: '' }
+      },
+    },
+  })
+  try {
+    FileSystemWorker.set(mockRpc)
+
+    const result = await getNpmPathFromNvmrc(repoPath)
+
+    expect(result).toBe(npmPath)
+    expect(mockRpc.invocations).toEqual([
+      ['FileSystem.readFileContent', `${repoPath}/.nvmrc`],
+      ['FileSystem.exists', nodePath],
+      ['FileSystem.exists', configNvmNodePath],
+      ['FileSystem.exec', 'bash', ['-c', expect.stringContaining('nvm install 22.22.1')], {}],
+      ['FileSystem.exists', nodePath],
+      ['FileSystem.exists', npmPath],
+    ])
+  } finally {
+    process.env.NVM_DIR = oldNvmDir
+  }
+})
