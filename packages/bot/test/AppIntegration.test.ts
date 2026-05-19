@@ -296,9 +296,9 @@ test('app dispatches a workflow for valid run commands', async () => {
     expect(workflowDispatchInputs).toEqual({
       base_commit: '0123456789abcdef0123456789abcdef01234567',
       candidate_ref: 'SimonSiefke/feature/bot',
-      cli_args: '--measure named-function-count3 --only chat-editor-fix --inspect-extensions',
+      cli_args:
+        '--measure named-function-count3 --only chat-editor-fix --inspect-extensions --download-user-data-zip-file-url https://bot.example.com/api/user-data/download',
       download_user_data_zip_file_token: snapshot.downloadToken,
-      download_user_data_zip_file_url: 'https://bot.example.com/api/user-data/download',
       measure: 'named-function-count3',
       only: 'chat-editor-fix',
       request_id: 'measure-run-2846-456',
@@ -311,6 +311,8 @@ test('app dispatches a workflow for valid run commands', async () => {
       status_comment_id: '9002',
       target_base_ref: 'main',
     })
+    expect(workflowDispatchInputs?.cli_args).not.toContain('--download-user-data-zip-file-token')
+    expect(workflowDispatchInputs?.cli_args).not.toContain(snapshot.downloadToken)
     expect(githubApi.isDone()).toBe(true)
   } finally {
     await server.close()

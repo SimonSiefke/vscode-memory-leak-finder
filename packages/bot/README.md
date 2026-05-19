@@ -55,6 +55,8 @@ Without a public webhook URL, GitHub will reject the manifest because `localhost
 
 If you want to trigger measure workflows against a locally running bot and still allow the workflow runner to download `/api/user-data/download`, use a public tunnel URL instead of Smee. For example, expose `http://localhost:3000` through Cloudflare Tunnel and set either `BOT_PUBLIC_BASE_URL` or `WEBHOOK_PROXY_URL` to that tunnel URL.
 
+If the measure workflow downloads uploaded user data, also configure `BOT_USER_DATA_UPLOAD_TOKEN` as a GitHub Actions secret in the workflow repository. The workflow reads that secret from the runner environment instead of passing it through `cli_args`, which keeps it out of public logs.
+
 1. Create a new GitHub App at `https://github.com/settings/apps/new`.
 2. Set a homepage URL. The repository URL is fine.
 3. Set a webhook URL pointing at the deployed bot. With the default Probot server, the webhook path is `/api/github/webhooks`.
@@ -113,6 +115,8 @@ These variables control which users can trigger the bot and which workflow gets 
 | `WEBHOOK_PROXY_URL`          | No       | unset                       | Optional public webhook URL. Also used as a fallback public base URL when `BOT_PUBLIC_BASE_URL` is unset. |
 
 See `packages/bot/.env.sample` for a concrete example.
+
+When the measure workflow runs in GitHub Actions, set a repository or environment secret named `BOT_USER_DATA_UPLOAD_TOKEN` with the same value as the bot environment variable.
 
 ## Supported Command Shape
 

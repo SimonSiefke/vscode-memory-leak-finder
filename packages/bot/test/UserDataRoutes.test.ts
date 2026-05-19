@@ -232,3 +232,30 @@ test('download route rejects invalid bearer token', async () => {
     await rm(storagePath, { force: true, recursive: true })
   }
 })
+
+test('download route accepts the shared upload token', async () => {
+  const storagePath = await mkdtemp(join(tmpdir(), 'bot-user-data-'))
+  const server = await createTestServer(storagePath)
+  const zip = await createZip()
+
+  try {
+    const uploadResponse = await fetch(`${server.url}/api/user-data/upload`, {
+      method: 'POST',
+      headers: {
+        authorization: 'Bearer shared-upload-token',
+        'content-type': 'application/zip',
+      },
+      body: zip,
+    })
+    expect(uploadResponse.status).toBe(201)
+
+    const downloadResponse = await fetch(`${server.url}/api/user-data/download`, {
+      headers: {
+        authorization: 'Bearer shared-upload-token',
+      },
+    })
+    expect(downloadResponse.status).toBe(200)
+  } finally {
+    await rm(storagePath, { force: true, recursive: true })
+  }
+})

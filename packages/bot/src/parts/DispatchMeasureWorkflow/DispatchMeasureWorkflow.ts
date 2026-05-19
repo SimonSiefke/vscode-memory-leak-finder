@@ -23,6 +23,7 @@ export const dispatchMeasureWorkflow = async (
   statusCommentId: number,
 ): Promise<void> => {
   const { downloadUserDataZipFileToken, downloadUserDataZipFileUrl } = await getUserDataDownloadInfo(env)
+  const cliArgs = [...request.cliArgs, '--download-user-data-zip-file-url', downloadUserDataZipFileUrl]
   await octokit.rest.actions.createWorkflowDispatch({
     owner: env.workflowOwner,
     repo: env.workflowRepo,
@@ -31,9 +32,8 @@ export const dispatchMeasureWorkflow = async (
     inputs: {
       base_commit: request.baseCommit,
       candidate_ref: request.candidateRef,
-      cli_args: request.cliArgs.join(' '),
+      cli_args: cliArgs.join(' '),
       download_user_data_zip_file_token: downloadUserDataZipFileToken,
-      download_user_data_zip_file_url: downloadUserDataZipFileUrl,
       measure: request.measure,
       only: request.only,
       request_id: request.requestId,
