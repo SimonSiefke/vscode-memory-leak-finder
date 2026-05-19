@@ -28,17 +28,13 @@ const getNvmDirectories = (): readonly string[] => {
   return [...new Set(candidates.filter((value): value is string => Boolean(value)))]
 }
 
-const getNodeAndNpmPaths = (nvmDirectory: string, nodeVersion: string): readonly { nodePath: string; npmPath: string }[] => {
+const getNodeAndNpmPaths = (nvmDirectory: string, nodeVersion: string): readonly { nodePath: string; npmPaths: readonly string[] }[] => {
   if (process.platform === 'win32') {
     const versionDirectory = Path.join(nvmDirectory, `v${nodeVersion}`)
     return [
       {
         nodePath: Path.join(versionDirectory, 'node.exe'),
-        npmPath: Path.join(versionDirectory, 'npm.cmd'),
-      },
-      {
-        nodePath: Path.join(versionDirectory, 'node.exe'),
-        npmPath: Path.join(versionDirectory, 'npm'),
+        npmPaths: [Path.join(versionDirectory, 'npm.cmd'), Path.join(versionDirectory, 'npm')],
       },
     ]
   }
@@ -46,16 +42,21 @@ const getNodeAndNpmPaths = (nvmDirectory: string, nodeVersion: string): readonly
   return [
     {
       nodePath: Path.join(binDirectory, 'node'),
-      npmPath: Path.join(binDirectory, 'npm'),
+      npmPaths: [Path.join(binDirectory, 'npm')],
     },
   ]
 }
 
 const findNpmPathInNvm = async (nodeVersion: string): Promise<string | undefined> => {
   for (const nvmDirectory of getNvmDirectories()) {
-    for (const { nodePath, npmPath } of getNodeAndNpmPaths(nvmDirectory, nodeVersion)) {
-      if ((await FileSystemWorker.pathExists(nodePath)) && (await FileSystemWorker.pathExists(npmPath))) {
-        return npmPath
+    for (const { nodePath, npmPaths } of getNodeAndNpmPaths(nvmDirectory, nodeVersion)) {
+      if (!(await FileSystemWorker.pathExists(nodePath))) {
+        continue
+      }
+      for (const npmPath of npmPaths) {
+        if (await FileSystemWorker.pathExists(npmPath)) {
+          return npmPath
+        }
       }
     }
   }
