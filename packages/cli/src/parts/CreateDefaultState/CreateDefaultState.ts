@@ -4,6 +4,7 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export const createDefaultState = (): StdinDataState => ({
+  allowCopilotAuthInCi: false,
   arch: '',
   bisect: false,
   buffering: false,
@@ -12,6 +13,8 @@ export const createDefaultState = (): StdinDataState => ({
   compressVideo: false,
   continueValue: '',
   cwd: '',
+  downloadUserDataZipFileToken: '',
+  downloadUserDataZipFileUrl: '',
   enableExtensions: false,
   enableProxy: false,
   exitCode: 0,

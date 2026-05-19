@@ -4,6 +4,7 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export interface StdinDataState {
+  readonly allowCopilotAuthInCi: boolean
   readonly arch: string
   readonly bisect: boolean
   readonly buffering: boolean
@@ -12,6 +13,8 @@ export interface StdinDataState {
   readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly exitCode: number
@@ -54,6 +57,7 @@ export interface StdinDataState {
 }
 
 let state: StdinDataState = {
+  allowCopilotAuthInCi: false,
   arch: '',
   bisect: false,
   buffering: false,
@@ -62,6 +66,8 @@ let state: StdinDataState = {
   compressVideo: false,
   continueValue: '',
   cwd: Character.EmptyString,
+  downloadUserDataZipFileToken: '',
+  downloadUserDataZipFileUrl: '',
   enableExtensions: false,
   enableProxy: false,
   exitCode: 0,
@@ -106,12 +112,15 @@ let state: StdinDataState = {
 export const setState = (newState: StdinDataState): void => {
   state = {
     ...state,
+    allowCopilotAuthInCi: newState.allowCopilotAuthInCi,
     arch: newState.arch,
     bisect: newState.bisect,
     checkLeaks: newState.checkLeaks,
     compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,
     cwd: newState.cwd,
+    downloadUserDataZipFileToken: newState.downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl: newState.downloadUserDataZipFileUrl,
     enableExtensions: newState.enableExtensions,
     enableProxy: newState.enableProxy,
     headless: newState.headless,
