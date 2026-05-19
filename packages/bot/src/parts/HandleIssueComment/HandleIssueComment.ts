@@ -6,6 +6,7 @@ import { isAuthorizedLogin } from '../IsAuthorizedLogin/IsAuthorizedLogin.ts'
 import { parseBotComment } from '../ParseBotComment/ParseBotComment.ts'
 import { renderInvalidCommandComment } from '../RenderInvalidCommandComment/RenderInvalidCommandComment.ts'
 import { renderStartedComment } from '../RenderStartedComment/RenderStartedComment.ts'
+import { userDataSnapshotUnavailableMessage } from '../UserDataSnapshot/UserDataSnapshot.ts'
 
 type PullRequestData = {
   readonly base: {
@@ -75,6 +76,23 @@ type HandleIssueCommentOptions = {
   readonly env: BotEnv
   readonly octokit: IssueCommentOctokit
   readonly payload: IssueCommentPayload
+}
+
+const renderWorkflowStartFailureComment = (marker: string, errorMessage: string): string => {
+  if (errorMessage === userDataSnapshotUnavailableMessage) {
+    return `${marker}
+## Measure run failed to start
+
+No uploaded vscode-user-data-dir snapshot is available yet.
+
+Upload a snapshot at /upload-user-data-dir and then retry the command.`
+  }
+  return `${marker}
+## Measure run failed to start
+
+\`\`\`text
+${errorMessage}
+\`\`\``
 }
 
 export const handleIssueComment = async ({ env, octokit, payload }: HandleIssueCommentOptions): Promise<void> => {
@@ -168,12 +186,7 @@ export const handleIssueComment = async ({ env, octokit, payload }: HandleIssueC
       owner,
       repo,
       comment_id: placeholderComment.data.id,
-      body: `${marker}
-## Measure run failed to start
-
-\`\`\`text
-${errorMessage}
-\`\`\``,
+      body: renderWorkflowStartFailureComment(marker, errorMessage),
     })
   }
 }

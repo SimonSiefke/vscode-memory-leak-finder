@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Upload VS Code User Data Dir</title>
+    <link rel="stylesheet" href="/upload-user-data-dir/upload.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Upload VS Code User Data Dir</h1>
+      <p>
+        Select the zipped <code>.vscode-user-data-dir</code> snapshot and provide the shared upload token configured in
+        <code>BOT_USER_DATA_UPLOAD_TOKEN</code>. The browser sends the file to <code>/api/user-data/upload</code> as the raw request body.
+      </p>
+      <form id="upload-form" method="post" enctype="multipart/form-data" action="/api/user-data/upload">
+        <div class="field">
+          <label for="upload-token">Upload token</label>
+          <input id="upload-token" name="upload-token" type="password" autocomplete="off" required />
+        </div>
+        <div class="field">
+          <label for="zip-file">Zip file</label>
+          <input id="zip-file" name="zip-file" type="file" accept=".zip,application/zip" required />
+        </div>
+        <button type="submit">Upload snapshot</button>
+      </form>
+      <pre id="result" aria-live="polite">No upload started.</pre>
+    </main>
+    <script type="module" src="/upload-user-data-dir/upload.js"></script>
+  </body>
+</html>
