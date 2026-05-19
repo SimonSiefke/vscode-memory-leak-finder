@@ -18,6 +18,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     return
   }
   await StartRunning.startRunning({
+    allowCopilotAuthInCi: options.allowCopilotAuthInCi,
     arch: options.arch,
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
@@ -27,6 +28,8 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     compressVideo: options.compressVideo,
     continueValue: options.continueValue,
     cwd: options.cwd,
+    downloadUserDataZipFileToken: options.downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl: options.downloadUserDataZipFileUrl,
     enableExtensions: options.enableExtensions,
     enableProxy: options.enableProxy,
     filterValue: options.filter,

@@ -29,6 +29,27 @@ test('parseArgv - run skipped tests anyway', () => {
   })
 })
 
+test('parseArgv - allow copilot auth in ci', () => {
+  const argv = ['--allow-copilot-auth-in-ci']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    allowCopilotAuthInCi: true,
+  })
+})
+
+test('parseArgv - download user data zip file url', () => {
+  const argv = ['--download-user-data-zip-file-url', 'https://bot.example.com/api/user-data/download']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    downloadUserDataZipFileUrl: 'https://bot.example.com/api/user-data/download',
+  })
+})
+
+test('parseArgv - download user data zip file token', () => {
+  const argv = ['--download-user-data-zip-file-token', 'download-token']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    downloadUserDataZipFileToken: 'download-token',
+  })
+})
+
 test('parseArgv - runs', () => {
   const argv = ['--runs', '4']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
