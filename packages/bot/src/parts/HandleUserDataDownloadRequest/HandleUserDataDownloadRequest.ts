@@ -39,7 +39,9 @@ export const createHandleUserDataDownloadRequest = (env: BotEnv) => {
       return true
     }
     const downloadToken = getBearerToken(request)
-    if (!downloadToken || downloadToken !== metadata.downloadToken) {
+    const isSnapshotToken = downloadToken === metadata.downloadToken
+    const isSharedUploadToken = !!env.userDataUploadToken && downloadToken === env.userDataUploadToken
+    if (!downloadToken || (!isSnapshotToken && !isSharedUploadToken)) {
       writeJson(response, 401, { error: 'Unauthorized' })
       return true
     }
