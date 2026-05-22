@@ -17,7 +17,6 @@ export const run = async (platform: string, arch: string, argv: readonly string[
 
   StdinDataState.setState({
     ...StdinDataState.getState(),
-    allowCopilotAuthInCi: options.allowCopilotAuthInCi,
     arch: options.arch,
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
@@ -25,8 +24,6 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     commit: options.commit,
     continueValue: options.continueValue,
     cwd: options.cwd,
-    downloadUserDataZipFileToken: options.downloadUserDataZipFileToken,
-    downloadUserDataZipFileUrl: options.downloadUserDataZipFileUrl,
     enableExtensions: options.enableExtensions,
     headless: options.headless,
     ide: options.ide,

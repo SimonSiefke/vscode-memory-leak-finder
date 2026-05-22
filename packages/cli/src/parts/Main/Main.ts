@@ -1,4 +1,5 @@
 import * as Cli from '../Cli/Cli.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const main = async (): Promise<void> => {
   const { arch, argv, env, platform, versions } = process
@@ -13,5 +14,9 @@ export const main = async (): Promise<void> => {
     }
   }
   const relevantArgv: string[] = argv.slice(2)
-  await Cli.run(platform, arch, relevantArgv, env)
+  try {
+    await Cli.run(platform, arch, relevantArgv, env)
+  } finally {
+    await StdoutWorker.cleanup()
+  }
 }
