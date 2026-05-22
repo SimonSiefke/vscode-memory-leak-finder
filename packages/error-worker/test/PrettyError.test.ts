@@ -2,11 +2,13 @@ import { test, expect, jest, beforeEach } from '@jest/globals'
 
 const mockReadFileSync = jest.fn()
 const mockExistsSync = jest.fn()
+const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
 
 beforeEach(() => {
   jest.resetModules()
   mockReadFileSync.mockClear()
   mockExistsSync.mockClear()
+  warnSpy.mockClear()
   mockExistsSync.mockReturnValue(false)
 })
 
@@ -94,6 +96,29 @@ test('example', () => {
 
   expect(prettyError.codeFrame).toContain("throw new Error('boom')")
   expect(FileSystem.readFileSync).toHaveBeenCalledWith('/repo/.vscode-test-workspace/test/add.test.js', 'utf8')
+})
+
+test('prepare - ignores node internal undici stack frame for code frame path resolution', async () => {
+  // @ts-ignore
+  FileSystem.readFileSync.mockImplementation(() => {
+    return `export const read = () => {
+  throw new Error('boom')
+}
+`
+  })
+  const error = new ExpectError('test error')
+  error.stack = `ExpectError: test error
+    at getResponse (node:internal/deps/undici/undici:321:109)
+    at Object.<anonymous> (/repo/packages/launch-worker/src/parts/RestoreUserDataDir/RestoreUserDataDir.ts:2:9)`
+
+  const prettyError = await PrettyError.prepare(error, { color: false })
+
+  expect(prettyError.codeFrame).toContain("throw new Error('boom')")
+  expect(FileSystem.readFileSync).toHaveBeenCalledWith(
+    '/repo/packages/launch-worker/src/parts/RestoreUserDataDir/RestoreUserDataDir.ts',
+    'utf8',
+  )
+  expect(warnSpy).not.toHaveBeenCalled()
 })
 
 test('prepare - resolves Windows-style relative stack paths against root when generating code frames', async () => {
