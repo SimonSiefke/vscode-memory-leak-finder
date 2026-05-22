@@ -47,11 +47,13 @@ test('renderCompletionComment renders success with artifacts and details', () =>
   })
 
   expect(result).toContain('Measure run completed')
+  expect(result).toContain('### Artifacts')
   expect(result).toContain('named-function-count3')
   expect(result).toContain('https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/1')
   expect(result).toContain('<details>')
   expect(result).toContain('measure-run-123-456-base-results')
   expect(result).toContain('```json')
+  expect(result).not.toContain('### Failure videos')
 })
 
 test('renderCompletionComment renders failure details', () => {
@@ -60,6 +62,7 @@ test('renderCompletionComment renders failure details', () => {
     summary: {
       actorLogin: 'SimonSiefke',
       artifacts: {
+        baseVideo: 'measure-run-123-456-base-video',
         summary: 'measure-run-123-456-summary',
       },
       baseCommit: '0123456789abcdef0123456789abcdef01234567',
@@ -86,8 +89,20 @@ test('renderCompletionComment renders failure details', () => {
         url: 'https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/1',
       },
     },
+    videoEmbeds: [
+      {
+        label: 'Base revision video',
+        name: 'base-video.webm',
+        url: 'https://github.com/user-attachments/assets/100b6d26-4252-47f5-831e-15c65eb52045',
+      },
+    ],
   })
 
   expect(result).toContain('Measure run failed')
   expect(result).toContain('candidate measure failed')
+  expect(result).toContain('### Failure videos')
+  expect(result).toContain('Base revision video')
+  expect(result).toContain('[base-video.webm](https://github.com/user-attachments/assets/100b6d26-4252-47f5-831e-15c65eb52045)')
+  expect(result).not.toContain('### Artifacts')
+  expect(result).not.toContain('No downloadable artifacts were found for this run.')
 })

@@ -1,8 +1,10 @@
 export type WorkflowArtifactNames = {
   readonly baseCharts?: string
   readonly baseResults?: string
+  readonly baseVideo?: string
   readonly candidateCharts?: string
   readonly candidateResults?: string
+  readonly candidateVideo?: string
   readonly summary: string
 }
 
@@ -36,6 +38,12 @@ export type MeasureWorkflowSummary = {
 }
 
 export type CommentArtifactLink = {
+  readonly name: string
+  readonly url: string
+}
+
+export type CommentVideoEmbed = {
+  readonly label: string
   readonly name: string
   readonly url: string
 }

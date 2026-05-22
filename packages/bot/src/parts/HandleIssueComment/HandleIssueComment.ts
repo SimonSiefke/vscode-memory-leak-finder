@@ -56,6 +56,21 @@ type IssueCommentOctokit = {
         ref: string
         inputs: Record<string, string>
       }) => Promise<unknown>
+      readonly listWorkflowRuns: (options: {
+        owner: string
+        repo: string
+        workflow_id: string
+        branch: string
+        event: string
+        per_page: number
+      }) => Promise<{
+        data: {
+          workflow_runs: {
+            readonly html_url: string
+            readonly name?: string | null
+          }[]
+        }
+      }>
     }
     readonly issues: {
       readonly createComment: (options: {
@@ -171,15 +186,10 @@ export const handleIssueComment = async ({ env, octokit, payload }: HandleIssueC
     statusCommentId: placeholderComment.data.id,
   })
 
-  await octokit.rest.issues.updateComment({
-    owner,
-    repo,
-    comment_id: placeholderComment.data.id,
-    body: renderStartedComment(marker, request),
-  })
+  let workflowRunUrl = ''
 
   try {
-    await dispatchMeasureWorkflow(octokit, env, request, placeholderComment.data.id)
+    workflowRunUrl = await dispatchMeasureWorkflow(octokit, env, request, placeholderComment.data.id)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     await octokit.rest.issues.updateComment({
@@ -188,5 +198,13 @@ export const handleIssueComment = async ({ env, octokit, payload }: HandleIssueC
       comment_id: placeholderComment.data.id,
       body: renderWorkflowStartFailureComment(marker, errorMessage),
     })
+    return
   }
+
+  await octokit.rest.issues.updateComment({
+    owner,
+    repo,
+    comment_id: placeholderComment.data.id,
+    body: renderStartedComment(marker, request, workflowRunUrl),
+  })
 }

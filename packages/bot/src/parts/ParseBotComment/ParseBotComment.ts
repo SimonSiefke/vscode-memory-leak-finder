@@ -36,6 +36,10 @@ type ParseBotCommentSuccess = {
 
 export type ParseBotCommentResult = ParseBotCommentIgnore | ParseBotCommentError | ParseBotCommentSuccess
 
+type MutableParsedCommandFlags = {
+  -readonly [Property in keyof ParsedCommandFlags]: ParsedCommandFlags[Property]
+}
+
 const createSyntaxError = (reason: string): ParseBotCommentError => {
   return {
     type: 'error',
@@ -65,16 +69,16 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
   }
 
   const cliArgs: string[] = []
-  let inspectExtensions = false
-  let inspectPtyHost = false
-  let inspectSharedProcess = false
-  let measure = ''
-  let measureNode = false
-  let only = ''
-  let restartBetween = false
-  let runSkippedTestsAnyway = false
-  let runs: number | undefined
-  let processRootStrategy: string | undefined
+  const flags: MutableParsedCommandFlags = {
+    inspectExtensions: false,
+    inspectPtyHost: false,
+    inspectSharedProcess: false,
+    measure: '',
+    measureNode: false,
+    only: '',
+    restartBetween: false,
+    runSkippedTestsAnyway: false,
+  }
 
   for (let i = 2; i < tokens.length; i++) {
     const token = tokens[i]
@@ -86,22 +90,22 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
       cliArgs.push(token)
       switch (token) {
         case '--inspect-extensions':
-          inspectExtensions = true
+          flags.inspectExtensions = true
           break
         case '--inspect-shared-process':
-          inspectSharedProcess = true
+          flags.inspectSharedProcess = true
           break
         case '--inspect-ptyhost':
-          inspectPtyHost = true
+          flags.inspectPtyHost = true
           break
         case '--measure-node':
-          measureNode = true
+          flags.measureNode = true
           break
         case '--restart-between':
-          restartBetween = true
+          flags.restartBetween = true
           break
         case '--run-skipped-tests-anyway':
-          runSkippedTestsAnyway = true
+          flags.runSkippedTestsAnyway = true
           break
       }
       continue
@@ -120,47 +124,34 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
 
     switch (token) {
       case '--measure':
-        measure = value
+        flags.measure = value
         break
       case '--only':
-        only = value
+        flags.only = value
         break
       case '--runs': {
         const parsedRuns = Number.parseInt(value, 10)
         if (!Number.isInteger(parsedRuns) || parsedRuns < 1) {
           return createSyntaxError('Expected "--runs" to be a positive integer')
         }
-        runs = parsedRuns
+        flags.runs = parsedRuns
         break
       }
       case '--process-root-strategy':
         if (value !== 'launch-pid' && value !== 'ssh-remote-server') {
           return createSyntaxError('Expected "--process-root-strategy" to be one of: launch-pid, ssh-remote-server')
         }
-        processRootStrategy = value
+        flags.processRootStrategy = value
         break
     }
   }
 
-  if (!measure) {
+  if (!flags.measure) {
     return createSyntaxError('Missing required flag "--measure"')
   }
 
-  if (!only) {
+  if (!flags.only) {
     return createSyntaxError('Missing required flag "--only"')
-  }
-
-  const flags: ParsedCommandFlags = {
-    inspectExtensions,
-    inspectPtyHost,
-    inspectSharedProcess,
-    measure,
-    measureNode,
-    only,
-    restartBetween,
-    runSkippedTestsAnyway,
-    ...(typeof runs === 'number' ? { runs } : {}),
-    ...(processRootStrategy ? { processRootStrategy } : {}),
   }
 
   return {

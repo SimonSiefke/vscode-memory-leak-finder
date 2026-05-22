@@ -11,6 +11,14 @@ export interface UserDataSnapshotMetadata {
 }
 
 export const userDataSnapshotUnavailableMessage = 'No uploaded vscode-user-data-dir snapshot is available'
+export const vscodeMockRequestsSnapshotUnavailableMessage = 'No uploaded .vscode-mock-requests snapshot is available'
+export const vscodeProxyCertsSnapshotUnavailableMessage = 'No uploaded .vscode-proxy-certs snapshot is available'
+export const vscodeRequestsSnapshotUnavailableMessage = 'No uploaded .vscode-requests snapshot is available'
+
+export const userDataDownloadPath = '/api/user-data/download'
+export const vscodeMockRequestsDownloadPath = '/api/vscode-mock-requests/download'
+export const vscodeProxyCertsDownloadPath = '/api/vscode-proxy-certs/download'
+export const vscodeRequestsDownloadPath = '/api/vscode-requests/download'
 
 const metadataFileName = 'active-user-data-snapshot.json'
 const zipFileName = 'active-user-data-snapshot.zip'
@@ -109,8 +117,39 @@ export const readUserDataSnapshotZip = async (storagePath: string): Promise<Buff
   }
 }
 
+const getDownloadUrl = (baseUrl: string, path: string): string => {
+  return `${baseUrl.replace(/\/$/, '')}${path}`
+}
+
 export const getUserDataDownloadUrl = (baseUrl: string): string => {
-  return `${baseUrl.replace(/\/$/, '')}/api/user-data/download`
+  return getDownloadUrl(baseUrl, userDataDownloadPath)
+}
+
+export const getVscodeMockRequestsDownloadUrl = (baseUrl: string): string => {
+  return getDownloadUrl(baseUrl, vscodeMockRequestsDownloadPath)
+}
+
+export const getVscodeProxyCertsDownloadUrl = (baseUrl: string): string => {
+  return getDownloadUrl(baseUrl, vscodeProxyCertsDownloadPath)
+}
+
+export const getVscodeRequestsDownloadUrl = (baseUrl: string): string => {
+  return getDownloadUrl(baseUrl, vscodeRequestsDownloadPath)
+}
+
+export const hasAnyR2Config = (env: BotEnv): boolean => {
+  return !!env.userDataR2AccessKeyId || !!env.userDataR2AccountId || !!env.userDataR2Bucket || !!env.userDataR2SecretAccessKey
+}
+
+export const getMissingR2Config = (env: BotEnv): readonly string[] => {
+  return [
+    ['BOT_USER_DATA_R2_ACCESS_KEY_ID', env.userDataR2AccessKeyId],
+    ['BOT_USER_DATA_R2_ACCOUNT_ID', env.userDataR2AccountId],
+    ['BOT_USER_DATA_R2_BUCKET', env.userDataR2Bucket],
+    ['BOT_USER_DATA_R2_SECRET_ACCESS_KEY', env.userDataR2SecretAccessKey],
+  ]
+    .filter(([, value]) => !value)
+    .map(([name]) => name)
 }
 
 export const getUserDataDownloadInfo = async (
@@ -118,7 +157,38 @@ export const getUserDataDownloadInfo = async (
 ): Promise<{
   readonly downloadUserDataZipFileToken: string
   readonly downloadUserDataZipFileUrl: string
+  readonly downloadVscodeMockRequestsZipFileUrl: string
+  readonly downloadVscodeProxyCertsZipFileUrl: string
+  readonly downloadVscodeRequestsZipFileUrl: string
 }> => {
+  if (hasAnyR2Config(env)) {
+    const missing = getMissingR2Config(env)
+    if (missing.length > 0) {
+      throw new Error(`Incomplete R2 snapshot configuration. Missing: ${missing.join(', ')}`)
+    }
+    if (!env.publicBaseUrl) {
+      throw new Error('BOT_PUBLIC_BASE_URL must be configured before starting measure workflows with private R2 snapshots')
+    }
+    if (!env.userDataUploadToken) {
+      throw new Error('BOT_USER_DATA_UPLOAD_TOKEN must be configured before starting measure workflows with private R2 snapshots')
+    }
+    return {
+      downloadUserDataZipFileToken: env.userDataUploadToken,
+      downloadUserDataZipFileUrl: getUserDataDownloadUrl(env.publicBaseUrl),
+      downloadVscodeMockRequestsZipFileUrl: getVscodeMockRequestsDownloadUrl(env.publicBaseUrl),
+      downloadVscodeProxyCertsZipFileUrl: getVscodeProxyCertsDownloadUrl(env.publicBaseUrl),
+      downloadVscodeRequestsZipFileUrl: getVscodeRequestsDownloadUrl(env.publicBaseUrl),
+    }
+  }
+  if (env.userDataSnapshotUrl) {
+    return {
+      downloadUserDataZipFileToken: env.userDataSnapshotToken,
+      downloadUserDataZipFileUrl: env.userDataSnapshotUrl,
+      downloadVscodeMockRequestsZipFileUrl: '',
+      downloadVscodeProxyCertsZipFileUrl: '',
+      downloadVscodeRequestsZipFileUrl: '',
+    }
+  }
   if (!env.publicBaseUrl) {
     throw new Error('BOT_PUBLIC_BASE_URL must be configured before starting measure workflows')
   }
@@ -130,5 +200,8 @@ export const getUserDataDownloadInfo = async (
   return {
     downloadUserDataZipFileToken: metadata.downloadToken,
     downloadUserDataZipFileUrl: getUserDataDownloadUrl(env.publicBaseUrl),
+    downloadVscodeMockRequestsZipFileUrl: '',
+    downloadVscodeProxyCertsZipFileUrl: '',
+    downloadVscodeRequestsZipFileUrl: '',
   }
 }

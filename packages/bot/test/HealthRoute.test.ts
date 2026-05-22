@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { AddressInfo } from 'node:net'
 import { afterEach, expect, test } from '@jest/globals'
-import { handleHomePageRequest } from '../src/parts/HomePage/HomePage.ts'
+import { handleHealthRequest } from '../src/parts/HandleHealthRequest/HandleHealthRequest.ts'
 
 type TestServer = {
   readonly close: () => Promise<void>
@@ -12,7 +12,7 @@ const servers: TestServer[] = []
 
 const createTestServer = async (): Promise<TestServer> => {
   const server = createServer((request: IncomingMessage, response: ServerResponse) => {
-    const handled = handleHomePageRequest(request, response)
+    const handled = handleHealthRequest(request, response)
     if (!handled) {
       response.writeHead(404)
       response.end()
@@ -51,28 +51,34 @@ afterEach(async () => {
   }
 })
 
-test('homepage handler serves an html overview at root', async () => {
+test('health handler serves a json response at /health', async () => {
   const server = await createTestServer()
 
-  const response = await fetch(server.url)
-  const text = await response.text()
+  const response = await fetch(`${server.url}/health`)
+  const body = (await response.json()) as { readonly ok: boolean }
 
   expect(response.status).toBe(200)
-  expect(response.headers.get('content-type')).toContain('text/html')
-  expect(text).toContain('<title>VS Code Memory Leak Finder Bot</title>')
-  expect(text).toContain('GitHub App bot for on-demand memory leak measurements')
-  expect(text).toContain('/api/github/webhooks')
-  expect(text).toContain('/api/user-data/upload')
-  expect(text).toContain('/upload-user-data-dir')
+  expect(response.headers.get('content-type')).toContain('application/json')
+  expect(body).toEqual({ ok: true })
 })
 
-test('homepage handler responds to head requests at root', async () => {
+test('health handler ignores unsupported methods', async () => {
   const server = await createTestServer()
 
-  const response = await fetch(server.url, {
+  const response = await fetch(`${server.url}/health`, {
+    method: 'POST',
+  })
+
+  expect(response.status).toBe(404)
+})
+
+test('health handler responds to head requests', async () => {
+  const server = await createTestServer()
+
+  const response = await fetch(`${server.url}/health`, {
     method: 'HEAD',
   })
 
   expect(response.status).toBe(200)
-  expect(response.headers.get('content-type')).toContain('text/html')
+  expect(response.headers.get('content-type')).toContain('application/json')
 })

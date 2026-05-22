@@ -1,8 +1,9 @@
-import type { CommentArtifactLink, MeasureWorkflowSummary } from '../MeasureWorkflowSummary/MeasureWorkflowSummary.ts'
+import type { CommentArtifactLink, CommentVideoEmbed, MeasureWorkflowSummary } from '../MeasureWorkflowSummary/MeasureWorkflowSummary.ts'
 
 type RenderCompletionCommentOptions = {
   readonly artifacts: readonly CommentArtifactLink[]
   readonly summary: MeasureWorkflowSummary
+  readonly videoEmbeds?: readonly CommentVideoEmbed[]
 }
 
 const renderArtifacts = (artifacts: readonly CommentArtifactLink[]): string => {
@@ -12,12 +13,29 @@ const renderArtifacts = (artifacts: readonly CommentArtifactLink[]): string => {
   return artifacts.map((artifact) => `- [${artifact.name}](${artifact.url})`).join('\n')
 }
 
-export const renderCompletionComment = ({ artifacts, summary }: RenderCompletionCommentOptions): string => {
+const renderFailureVideos = (summary: MeasureWorkflowSummary, videoEmbeds: readonly CommentVideoEmbed[]): string => {
+  if (summary.conclusion !== 'failure' || videoEmbeds.length === 0) {
+    return ''
+  }
+  const renderedVideos = videoEmbeds.map((video) => `- ${video.label}: [${video.name}](${video.url})`).join('\n')
+  return `\n### Failure videos\n\n${renderedVideos}\n`
+}
+
+export const renderCompletionComment = ({ artifacts, summary, videoEmbeds = [] }: RenderCompletionCommentOptions): string => {
   const heading = summary.conclusion === 'success' ? '## Measure run completed' : '## Measure run failed'
+  const artifactsBlock =
+    summary.conclusion === 'success'
+      ? `
+### Artifacts
+
+${renderArtifacts(artifacts)}
+`
+      : ''
   const errorBlock =
     summary.error === undefined
       ? ''
       : `\n<details>\n<summary>Error details</summary>\n\n\`\`\`json\n${JSON.stringify(summary.error, null, 2)}\n\`\`\`\n</details>\n`
+  const failureVideosBlock = renderFailureVideos(summary, videoEmbeds)
 
   return `${heading}
 
@@ -25,10 +43,8 @@ export const renderCompletionComment = ({ artifacts, summary }: RenderCompletion
 - Base commit: ${summary.baseCommit}
 - Candidate ref: ${summary.candidateRef}
 - Workflow: ${summary.workflowRun.url}
-
-### Artifacts
-
-${renderArtifacts(artifacts)}
+${failureVideosBlock}
+${artifactsBlock}
 
 <details>
 <summary>Summary JSON</summary>
