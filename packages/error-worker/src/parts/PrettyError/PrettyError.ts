@@ -19,6 +19,10 @@ const getActualPath = (fileUri: string): string => {
   return fileUri
 }
 
+const isSyntheticRuntimePath = (path: string): boolean => {
+  return path.startsWith('node:') || path.startsWith('node:internal/')
+}
+
 const getReadablePath = (filePath: string, root: string): string => {
   const actualPath = getActualPath(filePath)
   if (!root || isAbsolute(actualPath)) {
@@ -101,7 +105,7 @@ const getPathDetails = (lines: string[]): { column: number; line: number; path: 
       }
       if (match) {
         const [_, path, line, column] = match
-        if (path === '<anonymous>' || path === 'debugger eval code') {
+        if (path === '<anonymous>' || path === 'debugger eval code' || isSyntheticRuntimePath(path)) {
           continue
         }
         const actualPath = getActualPath(path)
