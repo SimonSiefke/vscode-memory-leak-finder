@@ -17,6 +17,41 @@ const visitors = Object.values(Charts).map((value) => {
   }
 })
 
+const getComparisonBasePath = (highlightChangesPath: string | undefined, basePathInfo: { readonly processType: string }): string | undefined => {
+  if (!highlightChangesPath) {
+    return undefined
+  }
+  if (basePathInfo.processType === 'main') {
+    return highlightChangesPath
+  }
+  return join(highlightChangesPath, basePathInfo.processType)
+}
+
+const getComparisonData = async (visitor: any, comparisonBasePath: string | undefined): Promise<any[]> => {
+  if (!comparisonBasePath) {
+    return []
+  }
+  return visitor.getData(comparisonBasePath)
+}
+
+const getComparisonDataByFilename = (comparisonData: readonly any[]): Map<string, readonly any[]> => {
+  const comparisonDataByFilename = new Map<string, readonly any[]>()
+  for (const item of comparisonData) {
+    if (item.filename && item.data) {
+      comparisonDataByFilename.set(item.filename, item.data)
+    }
+  }
+  return comparisonDataByFilename
+}
+
+const getHighlightLabels = (data: readonly any[], comparisonData: readonly any[], shouldHighlightChanges: boolean): string[] => {
+  if (!shouldHighlightChanges) {
+    return []
+  }
+  const comparisonNames = new Set(comparisonData.map((item) => item.name))
+  return data.filter((item) => !comparisonNames.has(item.name)).map((item) => item.name)
+}
+
 export const generateCharts = async () => {
   await using rpc = await launchChartWorker()
   const config = GetChartConfig.getChartConfig()
@@ -40,18 +75,27 @@ export const generateCharts = async () => {
       if (data.length === 0) {
         continue
       }
+      const comparisonBasePath = getComparisonBasePath(config.highlightChangesPath, basePathInfo)
+      const shouldHighlightChanges = Boolean(comparisonBasePath)
+      const comparisonData = await getComparisonData(visitor, comparisonBasePath)
 
       const chartMetaData = visitor.fn()
       // @ts-ignore
       if (visitor.multiple) {
+        const comparisonDataByFilename = getComparisonDataByFilename(comparisonData)
         for (let i = 0; i < data.length; i++) {
           const item = data[i]
           // Check if item has filename metadata (new structure) or is just data array (old structure)
           const chartData = item.data || item
           const filename = item.filename || i.toString()
+          const comparisonChartData = comparisonDataByFilename.get(filename) || []
 
           if (chartData.length > 0) {
-            const svg = await rpc.invoke('Chart.create', chartData, { ...chartMetaData, compress: config.compress })
+            const svg = await rpc.invoke('Chart.create', chartData, {
+              ...chartMetaData,
+              compress: config.compress,
+              highlightLabels: getHighlightLabels(chartData, comparisonChartData, shouldHighlightChanges),
+            })
             let outPath
             if (basePathInfo.isNode) {
               if (visitor.name === 'named-function-count-3') {
@@ -69,7 +113,11 @@ export const generateCharts = async () => {
           }
         }
       } else {
-        const svg = await rpc.invoke('Chart.create', data, { ...chartMetaData, compress: config.compress })
+        const svg = await rpc.invoke('Chart.create', data, {
+          ...chartMetaData,
+          compress: config.compress,
+          highlightLabels: getHighlightLabels(data, comparisonData, shouldHighlightChanges),
+        })
         let outPath
         if (basePathInfo.isNode) {
           outPath = join(Root.root, '.vscode-charts', 'node', `${visitor.name}.svg`)
