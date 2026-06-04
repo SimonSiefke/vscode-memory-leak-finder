@@ -3,6 +3,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally/MakeElectronAvailableGlobally.ts'
 import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
 import { monkeyPatchElectronHeadlessMode } from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.ts'
+import { getMonkeyPatchElectronSafeStorageScript } from '../MonkeyPatchElectronSafeStorageScript/MonkeyPatchElectronSafeStorageScript.ts'
 import * as MonkeyPatchElectronIpcMain from '../MonkeyPatchElectronScript/MonkeyPatchElectronIpcMain.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { openDevtoolsScript } from '../OpenDevtoolsScript/OpenDevtoolsScript.ts'
@@ -12,6 +13,7 @@ export const applyMonkeyPatches = async (
   electronRpc: RpcConnection,
   electronObjectId: string,
   requireObjectId: string,
+  secretsPath: string,
   headlessMode: boolean,
   trackFunctions: boolean,
   openDevtools: boolean,
@@ -44,6 +46,12 @@ export const applyMonkeyPatches = async (
     MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
+
+  // TODO only do this if secretspath is set
+  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    functionDeclaration: getMonkeyPatchElectronSafeStorageScript({ secretsPath }),
+    objectId: electronObjectId,
+  })
 
   if (trackFunctions) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
