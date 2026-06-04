@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { LeakedClosureWithReferences } from './LeakedClosureWithReferences.ts'
 import { collectLeakedNodeByteOffsets } from '../CollectLeakedNodeByteOffsets/CollectLeakedNodeByteOffsets.ts'

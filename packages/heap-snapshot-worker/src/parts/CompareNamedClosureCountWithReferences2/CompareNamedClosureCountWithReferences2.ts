@@ -13,6 +13,10 @@ export interface ReferencePathWithCount extends ReferencePath {
   readonly count: number
 }
 
+export interface ReferencePathWithCount extends ReferencePath {
+  readonly count: number
+}
+
 export interface LeakedClosureWithReferences {
   readonly count: number
   readonly nodeName: string
@@ -28,7 +32,6 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   pathA: string,
   pathB: string,
   scriptMapPath: string,
-
   options: CompareClosuresOptions = {},
 ): Promise<readonly LocationWithReferences[]> => {
   const [snapshotA, snapshotB] = await Promise.all([
