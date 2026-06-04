@@ -47,11 +47,12 @@ export const applyMonkeyPatches = async (
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
 
-  // TODO only do this if secretspath is set
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: getMonkeyPatchElectronSafeStorageScript({ secretsPath }),
-    objectId: electronObjectId,
-  })
+  if (secretsPath) {
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: getMonkeyPatchElectronSafeStorageScript({ secretsPath }),
+      objectId: electronObjectId,
+    })
+  }
 
   if (trackFunctions) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
