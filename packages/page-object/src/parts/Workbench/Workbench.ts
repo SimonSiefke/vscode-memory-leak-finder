@@ -179,21 +179,18 @@ export const create = ({
     ...(createPageObject ? { createPageObject } : {}),
     ...(reconnectDevtools ? { reconnectDevtools } : {}),
   }
-  return createWithDependencies(
-    workbenchContext,
-    {
-      createQuickPick: () =>
-        QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        }),
-      sleep,
-    },
-  )
+  return createWithDependencies(workbenchContext, {
+    createQuickPick: () =>
+      QuickPick.create({
+        electronApp,
+        expect,
+        ideVersion,
+        page,
+        platform,
+        VError,
+      }),
+    sleep,
+  })
 }
 
 export const createWithDependencies = (

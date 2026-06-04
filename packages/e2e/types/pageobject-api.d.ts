@@ -12,6 +12,17 @@ export interface PageObjectContext {
   readonly electronApp?: any
 }
 
+export interface NewWindowHandle {
+  close(): Promise<void>
+}
+
+export interface PageObjectWindowHandle extends NewWindowHandle {
+  sessionRpc?: any
+  locator?: (selector: string) => any
+  waitForIdle(): Promise<void>
+  shouldBeVisible(): Promise<void>
+}
+
 export interface ActivityBar {
   hide(): Promise<void>
   hideTooltip(): Promise<void>
@@ -38,7 +49,7 @@ export interface ChatEditor {
   attachImage(file: any): Promise<void>
   clearAll(): Promise<void>
   clearContext(contextName: any): Promise<void>
-  getLatestResponseText(): Promise<void>
+  getLatestResponseText(): Promise<string>
   shouldHaveAttachedContextHoverText(text: any): Promise<void>
   closeFinishSetup(): Promise<void>
   scrollToBottom(): Promise<void>
@@ -46,7 +57,7 @@ export interface ChatEditor {
   shouldHaveCodeBlockWithLanguage(language: any): Promise<void>
   shouldHaveLatestResponseCodeBlockWithLanguage(language: any): Promise<void>
   moveToEditor(): Promise<void>
-  moveToNewWindow(): Promise<void>
+  moveToNewWindow(): Promise<NewWindowHandle>
   close(): Promise<void>
   moveToSideBar(): Promise<void>
   open(): Promise<void>
@@ -62,7 +73,7 @@ export interface ChatEditor {
   clickAccessButton(buttonText?: any): Promise<void>
   approveAllAccessRequests(options?: any): Promise<void>
   waitForLatestExchange(message: any): Promise<void>
-  waitForNewWindow(options: any, electron: any): Promise<void>
+  waitForNewWindow(options: any, electron: any): Promise<number>
   waitForWindowCount(electron: any, expectedCount: any): Promise<void>
 }
 export interface ColorPicker {
@@ -271,9 +282,9 @@ export interface Editor {
   waitforTextFileReady(fileName: any): Promise<void>
   waitForVideoReady(hasError: any): Promise<void>
   waitForWarning(): Promise<void>
-  moveToNewWindow(): Promise<void>
+  moveToNewWindow(): Promise<NewWindowHandle>
   close(): Promise<void>
-  waitForNewWindow(options: any, electron: any): Promise<void>
+  waitForNewWindow(options: any, electron: any): Promise<number>
 }
 export interface EditorFind {
   openReplace(): Promise<void>
@@ -498,8 +509,8 @@ export interface Problems {
   switchToTreeView(): Promise<void>
 }
 export interface ProcessExplorer {
-  waitForNewWindow(options: any): Promise<void>
-  show(): Promise<void>
+  waitForNewWindow(options: any): Promise<string>
+  show(): Promise<PageObjectWindowHandle>
   close(): Promise<void>
   shouldBeVisible(): Promise<void>
 }
@@ -516,11 +527,12 @@ export interface QuickPick {
   focusPrevious(): Promise<void>
   getInputValue(): Promise<string>
   getVisibleCommands(): Promise<string[]>
-  getFocusedItemLabel(): Promise<void>
+  getFocusedItemLabel(): Promise<string>
   hide(): Promise<void>
   openFile(fileName: any): Promise<void>
   pressEnter(): Promise<void>
   select(text: any, stayVisible?: any, stopsApplication?: any): Promise<void>
+  show(options?: any): Promise<void>
   showColorTheme(): Promise<void>
   showFileIconTheme(): Promise<void>
   showCommands(options?: any): Promise<void>
@@ -796,7 +808,7 @@ export interface WelcomePage {
   collapseStepByIndex(index: any): Promise<void>
   expandStep(name: any): Promise<void>
   expandStepByIndex(index: any): Promise<void>
-  getFundamentalsStepCount(): Promise<void>
+  getFundamentalsStepCount(): Promise<number>
   hide(): Promise<void>
   show(): Promise<void>
   showFundamentals(): Promise<void>
@@ -810,7 +822,9 @@ export interface Window {
 export interface Workbench {
   connectToSsh(options: any): Promise<void>
   waitForNewWindow(options: any): Promise<void>
-  openNewWindow(): Promise<PageObjectApi & { close(): Promise<void>; sessionRpc?: any; locator?: (selector: string) => any; waitForIdle(): Promise<void>; shouldBeVisible(): Promise<void> }>
+  openNewWindow(): Promise<
+    PageObjectApi & PageObjectWindowHandle
+  >
   close(): Promise<void>
   shouldBeVisible(): Promise<void>
   reload(): Promise<void>
