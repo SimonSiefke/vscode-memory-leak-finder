@@ -65,6 +65,7 @@ export const runTestsWithCallback = async ({
   measure,
   measureAfter,
   measureNode,
+  processRootStrategy,
   openDevtools,
   pageObjectPath,
   platform,
@@ -96,6 +97,7 @@ export const runTestsWithCallback = async ({
     Assert.string(measure)
     Assert.boolean(measureAfter)
     Assert.boolean(measureNode)
+    Assert.string(processRootStrategy)
     Assert.boolean(timeouts)
     Assert.number(timeoutBetween)
     Assert.number(runMode)
@@ -139,6 +141,7 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         measureId: measure,
         measureNode,
+        processRootStrategy,
         openDevtools,
         pageObjectPath: pageObjectPathResolved,
         platform,
@@ -194,6 +197,7 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         measure,
         measureNode,
+        processRootStrategy,
         openDevtools,
         pageObjectPathResolved,
         platform,
@@ -290,6 +294,7 @@ export const runTestsWithCallback = async ({
             inspectSharedProcessPort,
             measureId: measure,
             measureNode,
+            processRootStrategy,
             openDevtools,
             pageObjectPath: pageObjectPathResolved,
             platform,
