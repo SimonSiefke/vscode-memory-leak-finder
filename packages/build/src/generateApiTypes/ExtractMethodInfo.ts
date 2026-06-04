@@ -4,6 +4,7 @@ import { extractReturnType } from './ExtractReturnType.ts'
 
 export const extractMethodInfo = (content: string): MethodInfo[] => {
   const methods: MethodInfo[] = []
+  const ignoredMethodNames = new Set(['for', 'if', 'switch', 'while'])
 
   // Match async method definitions
   const asyncMethodRegex = /async\s+(\w+)\s*\(([^)]*)\)\s*(?::\s*([^{]+))?\s*{/g
@@ -14,6 +15,10 @@ export const extractMethodInfo = (content: string): MethodInfo[] => {
     const paramString = match[2] || ''
     const explicitReturnType = match[3]?.trim()
     const methodStartIndex = match.index
+
+    if (ignoredMethodNames.has(methodName)) {
+      continue
+    }
 
     const parameters = extractParameterInfo(paramString)
 
@@ -57,6 +62,10 @@ export const extractMethodInfo = (content: string): MethodInfo[] => {
     const paramString = match[2] || ''
     const explicitReturnType = match[3]?.trim()
     const methodStartIndex = match.index
+
+    if (ignoredMethodNames.has(methodName)) {
+      continue
+    }
 
     // Skip if this method was already captured as async
     if (methods.some((m) => m.name === methodName && m.isAsync)) {
