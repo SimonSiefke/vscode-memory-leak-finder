@@ -28,7 +28,8 @@ test('launch uses repository worker bin path', async () => {
   expect(mockCreate).toHaveBeenCalledTimes(1)
   const options = mockCreate.mock.calls[0]?.[0]
   expect(options).toBeDefined()
-  expect(options?.path).toContain('/packages/repository-worker/bin/repository-worker.js')
+  const normalizedPath = options?.path.replaceAll('\\', '/')
+  expect(normalizedPath).toContain('/packages/repository-worker/bin/repository-worker.js')
   expect(options?.path.startsWith('file://')).toBe(false)
   expect(rpc).toBeDefined()
 })
