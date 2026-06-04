@@ -730,6 +730,7 @@ export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
   readonly ChatEditor: ChatEditor
   readonly Colors: any
+  readonly SshServer: any
   readonly ContextMenu: ContextMenu
   readonly CursorChat: CursorChat
   readonly DebugConsole: DebugConsole
