@@ -202,7 +202,11 @@ const fetchAllSearchItems = async (octokit: Octokit, query: string): Promise<{ d
   return { data: items, remaining }
 }
 
-const fetchOpenPullRequestDetails = async (octokit: Octokit, owner: string, repo: string): Promise<{ data: PullRequestDetails[]; remaining: string | null }> => {
+const fetchOpenPullRequestDetails = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+): Promise<{ data: PullRequestDetails[]; remaining: string | null }> => {
   const data: PullRequestDetails[] = []
   let remaining: string | null = null
 
@@ -228,7 +232,10 @@ export const isGitHubRateLimitError = (error: unknown): boolean => {
   return error instanceof Error && /rate limit/i.test(error.message)
 }
 
-const getDashboardStatus = (issue: SearchIssue, pullRequest: PullRequestDetails | undefined): { status: DashboardStatus; label: string } => {
+const getDashboardStatus = (
+  issue: SearchIssue,
+  pullRequest: PullRequestDetails | undefined,
+): { status: DashboardStatus; label: string } => {
   if (issue.pull_request.merged_at) {
     return { status: 'merged', label: 'Merged' }
   }
@@ -321,7 +328,11 @@ export const fetchDashboardData = async (token: string): Promise<DashboardData> 
       }
     }
 
-    pullRequests.push(...searchItems.map((issue) => toDashboardPullRequest(issue, detailsByNumber.get(issue.number), endpoint.repoKey, endpoint.repoFullName)))
+    pullRequests.push(
+      ...searchItems.map((issue) =>
+        toDashboardPullRequest(issue, detailsByNumber.get(issue.number), endpoint.repoKey, endpoint.repoFullName),
+      ),
+    )
   }
 
   pullRequests.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
@@ -474,7 +485,13 @@ const parseUnifiedDiff = (diff: string): DiffFile[] => {
       continue
     }
 
-    if (!currentFile.path || line.startsWith('--- ') || line.startsWith('index ') || line.startsWith('new file ') || line.startsWith('deleted file ')) {
+    if (
+      !currentFile.path ||
+      line.startsWith('--- ') ||
+      line.startsWith('index ') ||
+      line.startsWith('new file ') ||
+      line.startsWith('deleted file ')
+    ) {
       continue
     }
 
@@ -492,7 +509,12 @@ const parseUnifiedDiff = (diff: string): DiffFile[] => {
       continue
     }
 
-    currentFile.lines.push({ kind: 'context', oldLineNumber: oldLine, newLineNumber: newLine, content: line.startsWith(' ') ? line.slice(1) : line })
+    currentFile.lines.push({
+      kind: 'context',
+      oldLineNumber: oldLine,
+      newLineNumber: newLine,
+      content: line.startsWith(' ') ? line.slice(1) : line,
+    })
     oldLine++
     newLine++
   }
@@ -525,7 +547,9 @@ const getNearbyText = (body: string, index: number): string => {
   return body.slice(Math.max(0, index - 160), Math.min(body.length, index + 160))
 }
 
-const pickBeforeAfterImages = (images: PullRequestImage[]): { beforeImage: PullRequestImage | null; afterImage: PullRequestImage | null } => {
+const pickBeforeAfterImages = (
+  images: PullRequestImage[],
+): { beforeImage: PullRequestImage | null; afterImage: PullRequestImage | null } => {
   const sorted = [...images].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
   const beforeImage = [...sorted].reverse().find((image) => /before/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-2) ?? null
   const afterImage = [...sorted].reverse().find((image) => /after/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-1) ?? null

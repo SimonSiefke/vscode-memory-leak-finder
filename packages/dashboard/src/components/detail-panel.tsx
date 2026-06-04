@@ -103,7 +103,9 @@ export const DetailPanel = ({ pullRequest, token }: DetailPanelProps) => {
         <div className="mt-4 flex flex-wrap gap-2 text-xs">
           <span className="rounded-md bg-primary px-2 py-1 font-medium text-primary-foreground">{pullRequest.statusLabel}</span>
           <span className="rounded-md bg-muted px-2 py-1 text-muted-foreground">Updated {formatDateTime(pullRequest.updatedAt)}</span>
-          {pullRequest.mergedAt && <span className="rounded-md bg-emerald-100 px-2 py-1 text-emerald-800">Merged {formatDateTime(pullRequest.mergedAt)}</span>}
+          {pullRequest.mergedAt && (
+            <span className="rounded-md bg-emerald-100 px-2 py-1 text-emerald-800">Merged {formatDateTime(pullRequest.mergedAt)}</span>
+          )}
         </div>
       </div>
 
@@ -119,8 +121,8 @@ export const DetailPanel = ({ pullRequest, token }: DetailPanelProps) => {
 
         <section>
           <SectionTitle>Comments</SectionTitle>
-          {inspection && (
-            comments.length > 0 ? (
+          {inspection &&
+            (comments.length > 0 ? (
               <div className="mt-2 grid gap-3">
                 {comments.map((comment) => (
                   <CommentView key={comment.id} comment={comment} />
@@ -128,8 +130,7 @@ export const DetailPanel = ({ pullRequest, token }: DetailPanelProps) => {
               </div>
             ) : (
               <div className="mt-2 rounded-lg border bg-background p-3 text-sm text-muted-foreground">No comments yet.</div>
-            )
-          )}
+            ))}
         </section>
 
         <section>
@@ -217,7 +218,12 @@ const ImageSection = ({ title, image }: ImageSectionProps) => {
     <section>
       <SectionTitle>{title}</SectionTitle>
       {image ? (
-        <a href={image.url} target="_blank" rel="noreferrer" className="mt-2 block overflow-hidden rounded-lg border bg-background transition hover:border-primary">
+        <a
+          href={image.url}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 block overflow-hidden rounded-lg border bg-background transition hover:border-primary"
+        >
           <img className="max-h-72 w-full object-contain" src={image.url} alt={image.alt || title} />
           <div className="flex items-center gap-2 border-t px-3 py-2 text-xs text-muted-foreground">
             <ImageIcon className="size-3.5" />
@@ -248,7 +254,7 @@ const extensionLanguageMap: Record<string, string> = {
 
 const getLanguageFromPath = (path: string): string | null => {
   const extension = path.split('.').pop()?.toLowerCase()
-  return extension ? extensionLanguageMap[extension] ?? null : null
+  return extension ? (extensionLanguageMap[extension] ?? null) : null
 }
 
 const DiffFileView = ({ file }: { file: DiffFile }) => {
@@ -311,7 +317,7 @@ const DiffRow = ({ line, language }: { line: DiffLine; language: string | null }
       <code className="whitespace-pre px-2">
         {line.kind === 'add' && <span className="text-emerald-700">+ </span>}
         {line.kind === 'remove' && <span className="text-rose-700">- </span>}
-        {line.kind === 'context' && <span className="text-muted-foreground">  </span>}
+        {line.kind === 'context' && <span className="text-muted-foreground"> </span>}
         {line.content ? <HighlightedCode code={line.content} language={line.kind === 'meta' ? null : language} /> : ' '}
       </code>
     </div>

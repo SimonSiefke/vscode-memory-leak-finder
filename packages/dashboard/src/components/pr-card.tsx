@@ -30,8 +30,7 @@ export const PullRequestCard = ({ pullRequest, selected, onSelect }: PullRequest
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 font-medium text-foreground">
-              <GitPullRequestArrow className="size-3" />
-              #{pullRequest.number}
+              <GitPullRequestArrow className="size-3" />#{pullRequest.number}
             </span>
             <span>{repoLabels[pullRequest.repoKey]}</span>
             <span className="inline-flex min-w-0 items-center gap-1">
@@ -58,10 +57,30 @@ export const PullRequestCard = ({ pullRequest, selected, onSelect }: PullRequest
       )}
 
       <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
-        <MetricPill className="bg-sky-50 text-sky-800" title="Changed files" icon={<FileDiff className="size-3.5" />} value={formatMetric(pullRequest.changedFiles)} />
-        <MetricPill className="bg-emerald-50 text-emerald-800" title="Added lines" icon={<Plus className="size-3.5" />} value={formatMetric(pullRequest.additions)} />
-        <MetricPill className="bg-rose-50 text-rose-800" title="Removed lines" icon={<Trash2 className="size-3.5" />} value={formatMetric(pullRequest.deletions)} />
-        <MetricPill className="bg-muted text-muted-foreground" title="Comments" icon={<MessageSquare className="size-3.5" />} value={pullRequest.comments.toLocaleString()} />
+        <MetricPill
+          className="bg-sky-50 text-sky-800"
+          title="Changed files"
+          icon={<FileDiff className="size-3.5" />}
+          value={formatMetric(pullRequest.changedFiles)}
+        />
+        <MetricPill
+          className="bg-emerald-50 text-emerald-800"
+          title="Added lines"
+          icon={<Plus className="size-3.5" />}
+          value={formatMetric(pullRequest.additions)}
+        />
+        <MetricPill
+          className="bg-rose-50 text-rose-800"
+          title="Removed lines"
+          icon={<Trash2 className="size-3.5" />}
+          value={formatMetric(pullRequest.deletions)}
+        />
+        <MetricPill
+          className="bg-muted text-muted-foreground"
+          title="Comments"
+          icon={<MessageSquare className="size-3.5" />}
+          value={pullRequest.comments.toLocaleString()}
+        />
       </div>
     </button>
   )

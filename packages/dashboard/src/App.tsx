@@ -1,4 +1,17 @@
-import { AlertCircle, ArrowLeft, CheckCircle2, Filter, GitPullRequest, KeyRound, Loader2, RefreshCw, Save, Search, SlidersHorizontal, Trash2 } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Filter,
+  GitPullRequest,
+  KeyRound,
+  Loader2,
+  RefreshCw,
+  Save,
+  Search,
+  SlidersHorizontal,
+  Trash2,
+} from 'lucide-react'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import { BoardColumn } from './components/board-column'
@@ -7,15 +20,30 @@ import type { DashboardPullRequest, RepoKey } from './lib/github'
 import { fetchDashboardData, isGitHubRateLimitError, readCachedDashboardData, writeCachedDashboardData } from './lib/github'
 import { cn, formatDateTime, formatRelativeTime } from './lib/utils'
 
-const statusColumns: Array<{ id: 'draft' | 'review' | 'merged'; title: string; description: string; matches: (pullRequest: DashboardPullRequest) => boolean }> = [
-  { id: 'draft', title: 'Draft', description: 'Still being shaped before review.', matches: (pullRequest) => pullRequest.status === 'draft' },
+const statusColumns: Array<{
+  id: 'draft' | 'review' | 'merged'
+  title: string
+  description: string
+  matches: (pullRequest: DashboardPullRequest) => boolean
+}> = [
+  {
+    id: 'draft',
+    title: 'Draft',
+    description: 'Still being shaped before review.',
+    matches: (pullRequest) => pullRequest.status === 'draft',
+  },
   {
     id: 'review',
     title: 'In review',
     description: 'Open PRs that are ready, waiting, or need updates.',
     matches: (pullRequest) => pullRequest.state === 'open' && pullRequest.status !== 'draft',
   },
-  { id: 'merged', title: 'Merged', description: 'Landed upstream or in the fork.', matches: (pullRequest) => pullRequest.status === 'merged' },
+  {
+    id: 'merged',
+    title: 'Merged',
+    description: 'Landed upstream or in the fork.',
+    matches: (pullRequest) => pullRequest.status === 'merged',
+  },
 ]
 
 const repoFilters: Array<{ value: 'all' | RepoKey; label: string }> = [
@@ -183,7 +211,9 @@ export const App = () => {
               <StatusPill icon={<CheckCircle2 className="size-4" />} label={`${totals.open} open`} />
               <StatusPill icon={<GitPullRequest className="size-4" />} label={`${totals.upstream} upstream`} />
               {fetchedAt && <StatusPill icon={<RefreshCw className="size-4" />} label={formatRelativeTime(fetchedAt)} />}
-              {rateLimitRemaining && <StatusPill icon={<SlidersHorizontal className="size-4" />} label={`${rateLimitRemaining} API calls left`} />}
+              {rateLimitRemaining && (
+                <StatusPill icon={<SlidersHorizontal className="size-4" />} label={`${rateLimitRemaining} API calls left`} />
+              )}
               <button
                 type="button"
                 onClick={() => navigate('/token')}
@@ -245,11 +275,7 @@ export const App = () => {
             </div>
           )}
 
-          {cacheNotice && (
-            <div className="rounded-lg border bg-background p-3 text-sm text-muted-foreground">
-              {cacheNotice}
-            </div>
-          )}
+          {cacheNotice && <div className="rounded-lg border bg-background p-3 text-sm text-muted-foreground">{cacheNotice}</div>}
         </div>
       </div>
 
