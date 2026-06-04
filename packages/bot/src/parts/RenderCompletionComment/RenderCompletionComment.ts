@@ -60,10 +60,7 @@ const renderCharts = (summary: MeasureWorkflowSummary, chartEmbeds: readonly Com
   const fixedFunctionsSummary = renderFixedFunctionsSummary(summary)
   const beforeChart = chartEmbeds.find((chart) => chart.label === 'Before')
   const afterChart = chartEmbeds.find((chart) => chart.label === 'After')
-  const beforeContent = [
-    fixedFunctionsSummary,
-    beforeChart ? `<img alt="${beforeChart.alt}" src="${beforeChart.url}" />` : '',
-  ]
+  const beforeContent = [fixedFunctionsSummary, beforeChart ? `<img alt="${beforeChart.alt}" src="${beforeChart.url}" />` : '']
     .filter(Boolean)
     .join('\n\n')
   const afterContent = afterChart

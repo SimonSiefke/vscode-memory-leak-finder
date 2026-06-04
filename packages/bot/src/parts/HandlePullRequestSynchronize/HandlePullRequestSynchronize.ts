@@ -30,13 +30,7 @@ type PullRequestSynchronizePayload = {
 type PullRequestSynchronizeOctokit = StartMeasureRunOctokit & {
   readonly rest: StartMeasureRunOctokit['rest'] & {
     readonly issues: StartMeasureRunOctokit['rest']['issues'] & {
-      readonly listComments: (options: {
-        owner: string
-        repo: string
-        issue_number: number
-        page?: number
-        per_page: number
-      }) => Promise<{
+      readonly listComments: (options: { owner: string; repo: string; issue_number: number; page?: number; per_page: number }) => Promise<{
         data: {
           readonly body?: string
           readonly id: number
@@ -97,10 +91,7 @@ const listAllComments = async (
   }
 }
 
-const findPreviousCommand = (
-  comments: readonly IssueComment[],
-  allowedLogins: readonly string[],
-): PreviousCommand | undefined => {
+const findPreviousCommand = (comments: readonly IssueComment[], allowedLogins: readonly string[]): PreviousCommand | undefined => {
   for (let i = comments.length - 1; i >= 0; i--) {
     const comment = comments[i]
     const actorLogin = comment.user?.login
@@ -172,6 +163,7 @@ export const handlePullRequestSynchronize = async ({ env, octokit, payload }: Ha
       owner,
       repo,
     },
-    startedCommentIntro: 'The bot found a previous measure command from an allowed user after the branch was updated and dispatched it again.',
+    startedCommentIntro:
+      'The bot found a previous measure command from an allowed user after the branch was updated and dispatched it again.',
   })
 }
