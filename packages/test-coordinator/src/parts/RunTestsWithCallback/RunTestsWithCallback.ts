@@ -37,6 +37,7 @@ const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
 }
 
 export const runTestsWithCallback = async ({
+  allowCopilotAuthInCi,
   arch,
   callback,
   getTimeStamp,
@@ -333,6 +334,7 @@ export const runTestsWithCallback = async ({
           forceRun,
           timeouts,
           isGithubActions,
+          allowCopilotAuthInCi,
         )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped

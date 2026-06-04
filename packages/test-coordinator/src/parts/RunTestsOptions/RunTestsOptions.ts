@@ -1,4 +1,5 @@
 export interface RunTestsOptions {
+  readonly allowCopilotAuthInCi?: boolean
   readonly arch: string
   readonly bisect?: boolean
   readonly checkLeaks: boolean

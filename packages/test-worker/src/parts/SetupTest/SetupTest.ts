@@ -7,7 +7,6 @@ export const setupTest = async (connectionId, absolutePath, forceRun, timeouts, 
   Assert.string(absolutePath)
   Assert.boolean(forceRun)
   Assert.boolean(isGithubActions)
-  Assert.boolean(allowCopilotAuthInCi)
   const pageObject = PageObjectState.getPageObject(connectionId)
   const result = await SetupTestWithCallback.setupTestWithCallback(
     pageObject,
