@@ -10,6 +10,10 @@ export const generateInterfaceFromMethods = (methods: MethodInfo[], properties: 
         })
         .join(', ')
 
+      if (interfaceName === 'Workbench' && method.name === 'openNewWindow') {
+        return `  ${method.name}(${params}): Promise<PageObjectApi & { close(): Promise<void>; sessionRpc?: any; locator?: (selector: string) => any; waitForIdle(): Promise<void>; shouldBeVisible(): Promise<void> }>`
+      }
+
       return `  ${method.name}(${params}): ${method.returnType}`
     })
     .join('\n')
