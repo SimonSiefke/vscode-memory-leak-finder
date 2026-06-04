@@ -4,7 +4,7 @@ import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationF
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
 
-const createKeyMap = (keys) => {
+const createKeyMap = (keys: string[]) => {
   const map = Object.create(null)
   for (const key of keys) {
     map[key] = true
@@ -12,7 +12,15 @@ const createKeyMap = (keys) => {
   return map
 }
 
-const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
+interface MatchingNode {
+  readonly nodeId: number
+  readonly nodeIndex: number
+  readonly nodeName: string
+}
+
+type MatchingNodeMap = Record<string, MatchingNode[]>
+
+const getMatchingNodes = (snapshot: Snapshot, keyMap: Record<string, boolean>): MatchingNodeMap => {
   const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(
     snapshot.meta.location_fields,
   )
@@ -46,11 +54,11 @@ const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
   return matchingNodeMap
 }
 
-const getNodeHash = (node) => {
+const getNodeHash = (node: MatchingNode): string => {
   return `${node.nodeName}:${node.nodeId}`
 }
 
-const getLeaked = (oldNodeMap, newNodeMap) => {
+const getLeaked = (oldNodeMap: any, newNodeMap: any) => {
   const leakedMap = Object.create(null)
   const keys = Object.keys(oldNodeMap)
   for (const key of keys) {
@@ -81,9 +89,9 @@ export interface CompareClosuresOptions {
 export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
-  scriptMap: any,
+  scriptMap: Record<string, unknown>,
   options: CompareClosuresOptions = {},
-): Promise<any> => {
+): Promise<MatchingNodeMap> => {
   const minCount = options.minCount ?? 1
   const map1 = getUniqueLocationMap2(snapshotA)
   const map2 = getUniqueLocationMap2(snapshotB)

@@ -18,7 +18,7 @@ export interface NodeExaminationResult {
       readonly type: string | null
     }
   }>
-  readonly node: any
+  readonly node: ReturnType<typeof parseNode>
   readonly nodeId: number
   readonly nodeIndex: number
   readonly nodeName: string | null
@@ -223,9 +223,7 @@ export const analyzeNodeFromFile = async (filePath: string, nodeId: number): Pro
   const { prepareHeapSnapshot } = await import('../PrepareHeapSnapshot/PrepareHeapSnapshot.ts')
 
   try {
-    // @ts-ignore minimal typing for migration
-    const snapshot: any = await prepareHeapSnapshot(filePath, { parseStrings: true })
-    // @ts-ignore minimal typing for migration
+    const snapshot = await prepareHeapSnapshot(filePath, { parseStrings: true })
     return examineNodeById(nodeId, snapshot)
   } catch (error) {
     console.error(`Error loading heap snapshot from ${filePath}:`, error)

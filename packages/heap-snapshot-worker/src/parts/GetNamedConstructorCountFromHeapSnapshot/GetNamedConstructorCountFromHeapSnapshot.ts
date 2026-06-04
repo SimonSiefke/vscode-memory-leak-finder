@@ -4,7 +4,16 @@ import * as GetConstructorScope from '../GetConstructorScope/GetConstructorScope
 import * as GetConstructorScopeMap from '../GetConstructorScopeMap/GetConstructorScopeMap.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
-const createCounts = (constructorNodesWithInfo) => {
+interface ConstructorNodeWithInfo {
+  readonly name: string
+}
+
+interface CountResult {
+  readonly count: number
+  readonly name: string
+}
+
+const createCounts = (constructorNodesWithInfo: readonly ConstructorNodeWithInfo[]): readonly CountResult[] => {
   const map = Object.create(null)
   for (const node of constructorNodesWithInfo) {
     map[node.name] ||= 0
@@ -12,14 +21,14 @@ const createCounts = (constructorNodesWithInfo) => {
   }
   const array = Object.entries(map).map(([key, value]) => {
     return {
-      count: value,
+      count: value as number,
       name: key,
     }
   })
   return array
 }
 
-const isImportantScopeName = (name) => {
+const isImportantScopeName = (name: string) => {
   switch (name) {
     case '':
     case '(object properties)':
@@ -32,7 +41,7 @@ const isImportantScopeName = (name) => {
   }
 }
 
-const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
+const getDetailedNodeInfo = (parsedNodes: any[], scopeMap: any, edgeMap: any, node: any) => {
   const { scopeEdge, scopeNode } = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, node)
   const parentScope = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, scopeNode)
   if (isImportantScopeName(parentScope.scopeNode.name)) {
@@ -47,9 +56,12 @@ const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
   }
 }
 
-export const getNamedConstructorCountFromHeapSnapshot = async (heapsnapshot, constructorName) => {
+export const getNamedConstructorCountFromHeapSnapshot = async (
+  heapsnapshot: unknown,
+  constructorName: string,
+): Promise<readonly CountResult[]> => {
   Assert.object(heapsnapshot)
-  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot as any)
   const constructorNodes = GetConstructorNodes.getConstructorNodes(parsedNodes, constructorName)
   const { edgeMap, scopeMap } = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
   const constructorNodesWithInfo = constructorNodes.map((node) => {
