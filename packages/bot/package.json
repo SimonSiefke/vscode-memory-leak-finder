@@ -21,7 +21,6 @@
     "@lvce-editor/assert": "^1.5.1",
     "@lvce-editor/rpc": "^6.4.0",
     "@lvce-editor/verror": "^1.7.0",
-    "@vscode/test-electron": "^2.5.2",
     "dotenv": "^17.4.2",
     "jszip": "^3.10.1",
     "probot": "^14.3.2"
