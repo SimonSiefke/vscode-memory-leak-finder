@@ -1,5 +1,9 @@
 export interface RunTestsOptions {
+<<<<<<< HEAD
   readonly allowCopilotAuthInCi?: boolean
+=======
+  readonly allowCopilotAuthInCi: boolean
+>>>>>>> origin/main
   readonly arch: string
   readonly bisect?: boolean
   readonly checkLeaks: boolean
@@ -9,6 +13,8 @@ export interface RunTestsOptions {
   readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly filterValue: string

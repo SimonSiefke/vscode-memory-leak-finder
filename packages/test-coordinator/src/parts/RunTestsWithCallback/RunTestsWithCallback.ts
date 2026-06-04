@@ -17,6 +17,7 @@ import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTea
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 import type { Rpc } from '@lvce-editor/rpc'
 import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
@@ -48,6 +49,8 @@ export const runTestsWithCallback = async ({
   compressVideo,
   continueValue,
   cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
   filterValue,
@@ -117,20 +120,16 @@ export const runTestsWithCallback = async ({
     // Then recreate the workers, ensuring a clean state
 
     if (setupOnly && commit) {
-      const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+      await SetupOnly.setupOnly({
         arch,
-        attachedToPageTimeout,
         clearExtensions,
         commit,
-        compressVideo,
-        connectionId,
         cwd,
+        downloadUserDataZipFileToken,
+        downloadUserDataZipFileUrl,
         enableExtensions,
         enableProxy,
-        headlessMode,
         ide,
-        ideVersion,
-        idleTimeout,
         insidersCommit,
         inspectExtensions,
         inspectExtensionsPort,
@@ -138,25 +137,12 @@ export const runTestsWithCallback = async ({
         inspectPtyHostPort,
         inspectSharedProcess,
         inspectSharedProcessPort,
-        measureId: measure,
-        measureNode,
-        openDevtools,
-        pageObjectPath: pageObjectPathResolved,
         platform,
-        proxyTestFolderName: '',
-        recordVideo,
-        runMode,
-        screencastQuality,
-        timeouts,
-        trackFunctions,
         updateUrl,
         useProxyMock,
         vscodePath,
         vscodeVersion,
       })
-      await testWorkerRpc.dispose()
-      await memoryRpc?.dispose()
-      await videoRpc?.dispose()
       return {
         duration: 0,
         failed: 0,
@@ -179,6 +165,8 @@ export const runTestsWithCallback = async ({
         compressVideo,
         connectionId,
         cwd,
+        downloadUserDataZipFileToken,
+        downloadUserDataZipFileUrl,
         enableExtensions,
         enableProxy,
         filterValue,
@@ -276,6 +264,8 @@ export const runTestsWithCallback = async ({
             compressVideo,
             connectionId,
             cwd,
+            downloadUserDataZipFileToken,
+            downloadUserDataZipFileUrl,
             enableExtensions,
             enableProxy,
             headlessMode,

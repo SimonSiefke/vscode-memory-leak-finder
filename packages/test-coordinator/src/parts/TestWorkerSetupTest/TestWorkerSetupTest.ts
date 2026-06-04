@@ -5,5 +5,9 @@ export const testWorkerSetupTest = (rpc, connectionId, absolutePath, forceRun, t
   Assert.object(rpc)
   Assert.string(absolutePath)
   Assert.boolean(isGithubActions)
+<<<<<<< HEAD
+=======
+  Assert.boolean(allowCopilotAuthInCi)
+>>>>>>> origin/main
   return rpc.invoke(TestWorkerCommandType.SetupTest, connectionId, absolutePath, forceRun, timeouts, isGithubActions, allowCopilotAuthInCi)
 }

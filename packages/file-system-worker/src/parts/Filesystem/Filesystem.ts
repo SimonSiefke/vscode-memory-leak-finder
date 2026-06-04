@@ -41,7 +41,7 @@ export const writeFileContent = async (path: string, content: string, encoding: 
   await writeFile(path, content, { encoding })
 }
 
-export const findFiles = async (pattern: string, options: GlobOptions = {}): Promise<readonly string[]> => {
+export const findFiles = async (pattern: string | readonly string[], options: GlobOptions = {}): Promise<readonly string[]> => {
   const globIterator = glob(pattern, options)
   return await Array.fromAsync(globIterator)
 }

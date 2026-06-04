@@ -17,6 +17,8 @@ export interface PrepareTestsAndAttachOptions {
   readonly compressVideo: boolean
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly headlessMode: boolean
@@ -56,6 +58,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     compressVideo,
     connectionId,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -94,6 +98,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       commit,
       connectionId,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       headlessMode,
