@@ -17,7 +17,10 @@ const visitors = Object.values(Charts).map((value) => {
   }
 })
 
-const getComparisonBasePath = (highlightChangesPath: string | undefined, basePathInfo: { readonly processType: string }): string | undefined => {
+const getComparisonBasePath = (
+  highlightChangesPath: string | undefined,
+  basePathInfo: { readonly processType: string },
+): string | undefined => {
   if (!highlightChangesPath) {
     return undefined
   }
