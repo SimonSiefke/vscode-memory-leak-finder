@@ -51,20 +51,23 @@ export const setup = async ({ ChatEditor, Editor, Workspace, SideBar }: TestCont
   await SideBar.hide()
   await Workspace.setFiles(initialFiles)
   await Editor.closeAll()
-  // await ChatEditor.clearAll()
   await ChatEditor.open()
+  // @ts-ignore
+  await ChatEditor.selectModel('GPT-5 mini')
 }
 
 export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void> => {
-  const prompt = `Run the tests with node --test and fix the failing test. The implementation in src/add.js is already correct, so prefer fixing the test in test/add.test.js.`
+  // @ts-ignore
+  const workspacePath = Workspace.getPath()
+  const prompt = `Run the tests with node --test and fix the failing test in this workspace: ${workspacePath}. The implementation in ${workspacePath}/src/add.js is already correct, so prefer fixing ${workspacePath}/test/add.test.js. When you use file tools, pass absolute paths under ${workspacePath}, not relative paths.`
   await ChatEditor.sendMessage({
     message: prompt,
     verify: true,
     approveToolCalls: true,
+    waitForFileChanges: ['test/add.test.js'],
+    model: 'GPT-5 mini',
   })
 
-  // @ts-ignore
-  const workspacePath = Workspace.getPath()
   await waitForFixedTest(workspacePath)
   await Workspace.setFiles(initialFiles)
   await ChatEditor.clearAll()

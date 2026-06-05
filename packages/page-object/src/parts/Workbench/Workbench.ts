@@ -25,6 +25,7 @@ type WorkbenchDependencies = {
 
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
+  readonly Workbench?: any
   readonly sessionRpc?: any
   readonly locator?: (selector: string) => any
   readonly waitForIdle: () => Promise<void>
@@ -156,28 +157,44 @@ const waitForSshConnection = async (
   throw new Error(`Timed out waiting for Remote - SSH connection to settle`)
 }
 
-export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
-  return createWithDependencies(
-    reconnectDevtools
-      ? { browserRpc, electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }
-      : { browserRpc, electronApp, expect, ideVersion, page, platform, VError },
-    {
-      createQuickPick: () =>
-        QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        }),
-      sleep,
-    },
-  )
+export const create = ({
+  browserRpc,
+  createPageObject,
+  electronApp,
+  expect,
+  page,
+  platform,
+  reconnectDevtools,
+  VError,
+  ideVersion,
+}: CreateParams) => {
+  const workbenchContext = {
+    browserRpc,
+    electronApp,
+    expect,
+    ideVersion,
+    page,
+    platform,
+    VError,
+    ...(createPageObject ? { createPageObject } : {}),
+    ...(reconnectDevtools ? { reconnectDevtools } : {}),
+  }
+  return createWithDependencies(workbenchContext, {
+    createQuickPick: () =>
+      QuickPick.create({
+        electronApp,
+        expect,
+        ideVersion,
+        page,
+        platform,
+        VError,
+      }),
+    sleep,
+  })
 }
 
 export const createWithDependencies = (
-  { browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams,
+  { browserRpc, createPageObject, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams,
   dependencies: WorkbenchDependencies,
 ) => {
   return {
@@ -263,34 +280,31 @@ export const createWithDependencies = (
 
         await page.waitForIdle()
 
-        return {
+        const newWindow = createPageObject ? await createPageObject(newWindowPage) : Object.create(null)
+        const getNewWindowPage = () => newWindow.__page || newWindowPage
+
+        return Object.assign(newWindow, {
           async close() {
             try {
               // Wait for the window to be fully idle before attempting to close
-              await newWindowPage.waitForIdle()
-              const quickPick = QuickPick.create({
-                electronApp,
-                expect,
-                ideVersion,
-                page: newWindowPage,
-                platform,
-                VError,
-              })
-              await quickPick.executeCommand(WellKnownCommands.CloseWindow)
+              const page = getNewWindowPage()
+              await page.waitForIdle()
+              await page.close()
             } catch (error) {
               throw new VError(error, `Failed to close new window`)
             }
           },
-          locator: (selector: string) => newWindowPage.locator(selector),
+          locator: (selector: string) => getNewWindowPage().locator(selector),
           sessionRpc: newWindowPage.sessionRpc,
-          waitForIdle: () => newWindowPage.waitForIdle(),
+          waitForIdle: () => getNewWindowPage().waitForIdle(),
           async shouldBeVisible() {
-            await newWindowPage.waitForIdle()
-            const workbench = newWindowPage.locator('.monaco-workbench')
+            const page = getNewWindowPage()
+            await page.waitForIdle()
+            const workbench = page.locator('.monaco-workbench')
             await expect(workbench).toBeVisible({ timeout: 20_000 })
-            await newWindowPage.waitForIdle()
+            await page.waitForIdle()
           },
-        }
+        })
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
       }
