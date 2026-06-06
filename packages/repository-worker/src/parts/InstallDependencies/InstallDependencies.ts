@@ -1,15 +1,19 @@
 import { VError } from '@lvce-editor/verror'
-import { delimiter, dirname } from 'node:path'
+import { dirname as getDirname } from 'node:path'
 import { exec } from '../Exec/Exec.ts'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
+import { findPackageLockFiles } from '../FindPackageLockFiles/FindPackageLockFiles.ts'
 import * as GetNpmPathFromNvmrc from '../GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
+import { hasCompleteTopLevelNodeModules } from '../HasCompleteTopLevelNodeModules/HasCompleteTopLevelNodeModules.ts'
+import * as Path from '../Path/Path.ts'
 
-const doInstallDependencies = async (cwd: string, useNice: boolean) => {
+const doNpmCommand = async (cwd: string, useNice: boolean, args: readonly string[]) => {
   const npmPath = await GetNpmPathFromNvmrc.getNpmPathFromNvmrc(cwd)
-  const binDirname = dirname(npmPath)
+  const binDirname = getDirname(npmPath)
   const oldPath = process.env.PATH
-  const newPath = oldPath ? `${binDirname}${delimiter}${oldPath}` : binDirname
+  const newPath = `${binDirname}:${oldPath}`
   if (useNice) {
-    return exec('nice', ['-n', '10', npmPath, 'ci'], {
+    return exec('nice', ['-n', '10', npmPath, ...args], {
       cwd,
       env: {
         ...process.env,
@@ -18,14 +22,54 @@ const doInstallDependencies = async (cwd: string, useNice: boolean) => {
       stdio: 'inherit',
     })
   }
-  return exec(npmPath, ['ci'], { cwd, env: { ...process.env, PATH: newPath }, stdio: 'inherit' })
+  return exec(npmPath, [...args], { cwd, env: { ...process.env, PATH: newPath }, stdio: 'inherit' })
 }
 
-export const installDependencies = async (cwd: string, useNice: boolean): Promise<void> => {
+const getInstallArgs = (cwd: string): readonly string[] => {
+  if (cwd.endsWith('/extensions/copilot/chat-lib') || cwd.endsWith('\\extensions\\copilot\\chat-lib')) {
+    return ['ci', '--ignore-scripts']
+  }
+  return ['ci']
+}
+
+const installDependenciesInDirectory = async (cwd: string, useNice: boolean): Promise<void> => {
   try {
-    const child = doInstallDependencies(cwd, useNice)
-    await child
+    await doNpmCommand(cwd, useNice, getInstallArgs(cwd))
   } catch (error) {
     throw new VError(error, `Failed to install dependencies in directory '${cwd}'`)
   }
+}
+
+const getNestedPackageDirectories = async (cwd: string): Promise<readonly string[]> => {
+  const packageLockPaths = await findPackageLockFiles(cwd)
+  const packageDirectories = packageLockPaths
+    .map((packageLockPath) => getDirname(packageLockPath))
+    .filter((packageDirectory) => packageDirectory !== cwd)
+    .sort()
+  return [...new Set(packageDirectories)]
+}
+
+export const ensureNestedDependencies = async (cwd: string, useNice: boolean): Promise<number> => {
+  const packageDirectories = await getNestedPackageDirectories(cwd)
+  let installedCount = 0
+  for (const packageDirectory of packageDirectories) {
+    const packageJsonPath = Path.join(packageDirectory, 'package.json')
+    const nodeModulesPath = Path.join(packageDirectory, 'node_modules')
+    const hasPackageJson = await FileSystemWorker.pathExists(packageJsonPath)
+    if (!hasPackageJson) {
+      continue
+    }
+    const hasNodeModules = await FileSystemWorker.pathExists(nodeModulesPath)
+    if (hasNodeModules && (await hasCompleteTopLevelNodeModules(packageDirectory))) {
+      continue
+    }
+    await installDependenciesInDirectory(packageDirectory, useNice)
+    installedCount++
+  }
+  return installedCount
+}
+
+export const installDependencies = async (cwd: string, useNice: boolean): Promise<void> => {
+  await installDependenciesInDirectory(cwd, useNice)
+  await ensureNestedDependencies(cwd, useNice)
 }
