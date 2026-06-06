@@ -9,6 +9,7 @@ import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertifica
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import * as ParseRequestBody from '../ParseRequestBody/ParseRequestBody.ts'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveMockFile from '../SaveMockFile/SaveMockFile.ts'
@@ -133,13 +134,13 @@ const saveInterceptedRequest = async (
         timestamp,
       },
       request: {
-        body: ParseRequestBody.parseRequestBody(requestHeaders, requestBody),
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(ParseRequestBody.parseRequestBody(requestHeaders, requestBody)),
         headers: requestHeaders,
         method,
         url,
       },
       response: {
-        body: responseBodyData,
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(responseBodyData),
         headers: responseHeaders,
         statusCode,
       },
