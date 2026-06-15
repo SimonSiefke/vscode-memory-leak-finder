@@ -45,5 +45,6 @@
   "security.workspace.trust.enabled": false,
   "remote.SSH.remotePlatform": {
     "*": "linux"
-  }
+  },
+  "chat.allowAnonymousAccess": true
 }

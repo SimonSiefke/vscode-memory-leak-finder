@@ -63,3 +63,11 @@ test('parseBotComment ignores unrelated comments', () => {
     type: 'ignore',
   })
 })
+
+test('parseBotComment ignores upstream slash command', () => {
+  const result = parseBotComment('/upstream')
+
+  expect(result).toEqual({
+    type: 'ignore',
+  })
+})
