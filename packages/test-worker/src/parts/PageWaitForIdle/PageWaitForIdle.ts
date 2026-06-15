@@ -27,6 +27,10 @@ const waitRpcIdle = (pageObject, canUseIdleCallback) => {
   })
 }
 
+const isIdleTimeoutError = (error, idleTimeout) => {
+  return error && error.message === `timeout of ${idleTimeout}ms reached`
+}
+
 export const waitForIdle = async (rpc, canUseIdleCallback, idleTimeout) => {
   try {
     const connectionId = 1
@@ -40,6 +44,9 @@ export const waitForIdle = async (rpc, canUseIdleCallback, idleTimeout) => {
     // @ts-ignore
     if (error && error.message === 'uniqueContextId not found') {
       throw new ExpectError(`Please wait for window to be loaded before evaluating, e.g. await expect(window).toBeLoaded()`)
+    }
+    if (isIdleTimeoutError(error, idleTimeout)) {
+      return
     }
     throw new VError(error, `Failed to check that page is idle`)
   }

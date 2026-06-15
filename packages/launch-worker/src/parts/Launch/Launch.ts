@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
 import * as Root from '../Root/Root.ts'
@@ -110,8 +111,10 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
+  const secretsPath = join(GetUserDataDir.getUserDataDir(), 'secrets', 'secrets.json')
   const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
+    secretsPath,
     headlessMode,
     attachedToPageTimeout,
     port.port,

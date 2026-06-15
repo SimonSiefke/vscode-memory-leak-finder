@@ -5,9 +5,11 @@ import { join } from 'node:path'
 import { URL } from 'node:url'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
 import * as Root from '../Root/Root.ts'
+import * as SanitizeMockData from '../SanitizeMockData/SanitizeMockData.ts'
 
 const REQUESTS_ROOT_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_ROOT_DIR = join(Root.root, '.vscode-mock-requests')
@@ -213,7 +215,11 @@ const convertRequestDirectoryToMocks = async (
       const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method, request.body)
       const mockFilePath = join(mockRequestsDir, mockFileName)
 
-      const processedBody = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)
+      const processedRequestBody = PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(request.body)
+      const processedBody = PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(
+        SanitizeMockData.sanitizeMockBody(await ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)),
+      )
+      const processedHeaders = SanitizeMockData.sanitizeMockHeaders(request.response.headers || {})
 
       const mockData = {
         metadata: {
@@ -221,13 +227,13 @@ const convertRequestDirectoryToMocks = async (
           timestamp: request.timestamp,
         },
         request: {
-          body: request.body,
+          body: processedRequestBody,
           method: request.method,
           url: request.url,
         },
         response: {
           body: processedBody,
-          headers: request.response.headers || {},
+          headers: processedHeaders,
           statusCode: request.response.statusCode,
           statusMessage: request.response.statusMessage,
           wasCompressed: request.response.wasCompressed,
