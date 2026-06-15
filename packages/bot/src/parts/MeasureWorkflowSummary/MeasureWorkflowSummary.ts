@@ -1,8 +1,10 @@
 export type WorkflowArtifactNames = {
   readonly baseCharts?: string
   readonly baseResults?: string
+  readonly baseVideo?: string
   readonly candidateCharts?: string
   readonly candidateResults?: string
+  readonly candidateVideo?: string
   readonly summary: string
 }
 
@@ -17,9 +19,14 @@ export type MeasureWorkflowSummary = {
   readonly artifacts: WorkflowArtifactNames
   readonly baseCommit: string
   readonly candidateRef: string
+  readonly chartPaths?: {
+    readonly base?: string
+    readonly candidate?: string
+  }
   readonly cliArgs: readonly string[]
   readonly conclusion: 'success' | 'failure'
   readonly error?: unknown
+  readonly fixedFunctionNames?: readonly string[]
   readonly issueNumber: number
   readonly measure: string
   readonly requestId: string
@@ -36,6 +43,18 @@ export type MeasureWorkflowSummary = {
 }
 
 export type CommentArtifactLink = {
+  readonly name: string
+  readonly url: string
+}
+
+export type CommentChartEmbed = {
+  readonly alt: string
+  readonly label: string
+  readonly url: string
+}
+
+export type CommentVideoEmbed = {
+  readonly label: string
   readonly name: string
   readonly url: string
 }

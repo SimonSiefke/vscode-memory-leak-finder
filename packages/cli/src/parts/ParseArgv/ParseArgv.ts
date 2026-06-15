@@ -89,18 +89,38 @@ const parseDownloadUserDataZipFileUrl = (argv: readonly string[]): string => {
   if (argv.includes('--download-user-data-zip-file-url')) {
     return parseArgvString(argv, '--download-user-data-zip-file-url')
   }
-  return ''
+  return process.env.DOWNLOAD_USER_DATA_ZIP_FILE_URL || ''
 }
 
 const parseDownloadUserDataZipFileToken = (argv: readonly string[]): string => {
   if (argv.includes('--download-user-data-zip-file-token')) {
     return parseArgvString(argv, '--download-user-data-zip-file-token')
   }
-  return ''
+  return process.env.DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN || ''
 }
 
 const parseRecordVideo = (argv: readonly string[]): boolean => {
   return argv.includes('--record-video')
+}
+
+const parseDisableVscodeNodeModulesCache = (argv: readonly string[]): boolean => {
+  return argv.includes('--disable-vscode-node-modules-cache')
+}
+
+const parseUseStableVscodeRepoPath = (argv: readonly string[]): boolean => {
+  return argv.includes('--use-stable-vscode-repo-path')
+}
+
+const parseComputeVscodeNodeModulesCacheKey = (argv: readonly string[]): boolean => {
+  return argv.includes('--compute-vscode-node-modules-cache-key')
+}
+
+const parseResolveVscodeCommitHash = (argv: readonly string[]): boolean => {
+  return argv.includes('--resolve-vscode-commit-hash')
+}
+
+const parseVerbose = (argv: readonly string[]): boolean => {
+  return argv.includes('--verbose')
 }
 
 const parseCompressVideo = (argv: readonly string[]): boolean => {
@@ -279,6 +299,10 @@ const parseConvertRequestsToMocks = (argv: readonly string[]): boolean => {
   return argv.includes('--convert-requests-to-mocks')
 }
 
+const parseCreateAllMockDataZip = (argv: readonly string[]): boolean => {
+  return argv.includes('--create-all-mock-data-zip')
+}
+
 const parseBisect = (argv: readonly string[]): boolean => {
   return argv.includes('--bisect')
 }
@@ -337,8 +361,13 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const color = true
   const commit = parseCommit(argv)
   const convertRequestsToMocks = parseConvertRequestsToMocks(argv)
+  const createAllMockDataZip = parseCreateAllMockDataZip(argv)
   const continueValue = parseContinueValue(argv)
   const cwd = parseCwd(process.cwd(), argv)
+  const computeVscodeNodeModulesCacheKey = parseComputeVscodeNodeModulesCacheKey(argv)
+  const resolveVscodeCommitHash = parseResolveVscodeCommitHash(argv)
+  const disableVscodeNodeModulesCache = parseDisableVscodeNodeModulesCache(argv)
+  const useStableVscodeRepoPath = parseUseStableVscodeRepoPath(argv)
   const downloadUserDataZipFileToken = parseDownloadUserDataZipFileToken(argv)
   const downloadUserDataZipFileUrl = parseDownloadUserDataZipFileUrl(argv)
   const enableExtensions = parseEnableExtensions(argv)
@@ -375,6 +404,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const resolveExtensionSourceMaps = parseResolveExtensionSourceMaps(argv)
   const useProxyMock = parseUseProxyMock(argv)
   const updateUrl = parseUpdateUrl(argv)
+  const verbose = parseVerbose(argv)
   const vscodePath = parseVscodePath(argv)
   const { vscodeVersion } = parsedVersion
   const watch = parseWatch(argv)
@@ -387,10 +417,13 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     clearExtensions,
     color,
     commit,
+    computeVscodeNodeModulesCacheKey,
     compressVideo,
     convertRequestsToMocks,
+    createAllMockDataZip,
     continueValue,
     cwd,
+    disableVscodeNodeModulesCache,
     downloadUserDataZipFileToken,
     downloadUserDataZipFileUrl,
     enableExtensions,
@@ -416,6 +449,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     pageObjectPath,
     platform,
     recordVideo,
+    resolveVscodeCommitHash,
     resolveExtensionSourceMaps,
     restartBetween,
     runMode,
@@ -428,7 +462,9 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     timeouts,
     trackFunctions,
     updateUrl,
+    useStableVscodeRepoPath,
     useProxyMock,
+    verbose,
     vscodePath,
     vscodeVersion,
     watch,

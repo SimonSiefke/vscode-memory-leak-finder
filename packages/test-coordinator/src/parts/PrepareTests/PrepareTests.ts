@@ -9,6 +9,8 @@ export interface PrepareTestsOptions {
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly headlessMode: boolean
@@ -45,6 +47,8 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     commit,
     connectionId,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -78,6 +82,8 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       commit,
       connectionId,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       headlessMode,
