@@ -11,6 +11,10 @@ export interface UserDataSnapshotMetadata {
 }
 
 export const userDataSnapshotUnavailableMessage = 'No uploaded vscode-user-data-dir snapshot is available'
+export const allMockDataSnapshotUnavailableMessage = 'No uploaded all-mock-data snapshot is available'
+
+export const userDataDownloadPath = '/api/user-data/download'
+export const allMockDataDownloadPath = '/api/all-mock-data/download'
 
 const metadataFileName = 'active-user-data-snapshot.json'
 const zipFileName = 'active-user-data-snapshot.zip'
@@ -109,8 +113,31 @@ export const readUserDataSnapshotZip = async (storagePath: string): Promise<Buff
   }
 }
 
+const getDownloadUrl = (baseUrl: string, path: string): string => {
+  return `${baseUrl.replace(/\/$/, '')}${path}`
+}
+
 export const getUserDataDownloadUrl = (baseUrl: string): string => {
-  return `${baseUrl.replace(/\/$/, '')}/api/user-data/download`
+  return getDownloadUrl(baseUrl, userDataDownloadPath)
+}
+
+export const getAllMockDataDownloadUrl = (baseUrl: string): string => {
+  return getDownloadUrl(baseUrl, allMockDataDownloadPath)
+}
+
+export const hasAnyR2Config = (env: BotEnv): boolean => {
+  return !!env.userDataR2AccessKeyId || !!env.userDataR2AccountId || !!env.userDataR2Bucket || !!env.userDataR2SecretAccessKey
+}
+
+export const getMissingR2Config = (env: BotEnv): readonly string[] => {
+  return [
+    ['BOT_USER_DATA_R2_ACCESS_KEY_ID', env.userDataR2AccessKeyId],
+    ['BOT_USER_DATA_R2_ACCOUNT_ID', env.userDataR2AccountId],
+    ['BOT_USER_DATA_R2_BUCKET', env.userDataR2Bucket],
+    ['BOT_USER_DATA_R2_SECRET_ACCESS_KEY', env.userDataR2SecretAccessKey],
+  ]
+    .filter(([, value]) => !value)
+    .map(([name]) => name)
 }
 
 export const getUserDataDownloadInfo = async (
@@ -118,7 +145,32 @@ export const getUserDataDownloadInfo = async (
 ): Promise<{
   readonly downloadUserDataZipFileToken: string
   readonly downloadUserDataZipFileUrl: string
+  readonly downloadAllMockDataZipFileUrl: string
 }> => {
+  if (hasAnyR2Config(env)) {
+    const missing = getMissingR2Config(env)
+    if (missing.length > 0) {
+      throw new Error(`Incomplete R2 snapshot configuration. Missing: ${missing.join(', ')}`)
+    }
+    if (!env.publicBaseUrl) {
+      throw new Error('BOT_PUBLIC_BASE_URL must be configured before starting measure workflows with private R2 snapshots')
+    }
+    if (!env.userDataUploadToken) {
+      throw new Error('BOT_USER_DATA_UPLOAD_TOKEN must be configured before starting measure workflows with private R2 snapshots')
+    }
+    return {
+      downloadUserDataZipFileToken: env.userDataUploadToken,
+      downloadUserDataZipFileUrl: '',
+      downloadAllMockDataZipFileUrl: getAllMockDataDownloadUrl(env.publicBaseUrl),
+    }
+  }
+  if (env.userDataSnapshotUrl) {
+    return {
+      downloadUserDataZipFileToken: env.userDataSnapshotToken,
+      downloadUserDataZipFileUrl: env.userDataSnapshotUrl,
+      downloadAllMockDataZipFileUrl: '',
+    }
+  }
   if (!env.publicBaseUrl) {
     throw new Error('BOT_PUBLIC_BASE_URL must be configured before starting measure workflows')
   }
@@ -130,5 +182,6 @@ export const getUserDataDownloadInfo = async (
   return {
     downloadUserDataZipFileToken: metadata.downloadToken,
     downloadUserDataZipFileUrl: getUserDataDownloadUrl(env.publicBaseUrl),
+    downloadAllMockDataZipFileUrl: '',
   }
 }

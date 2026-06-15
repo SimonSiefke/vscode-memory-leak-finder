@@ -1,5 +1,6 @@
 import * as CommandMap from '../CommandMap/CommandMap.ts'
 import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
+import * as CreateAllMockDataZip from '../CreateAllMockDataZip/CreateAllMockDataZip.ts'
 import * as InitialStart from '../InitialStart/InitialStart.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
 import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
@@ -9,6 +10,10 @@ import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 export const run = async (platform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
   await StdoutWorker.initialize()
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
+  if (argv.includes('--create-all-mock-data-zip')) {
+    await CreateAllMockDataZip.createAllMockDataZip()
+    return
+  }
   const options = ParseArgv.parseArgv(platform, arch, argv)
 
   // Parse isGithubActions once at startup
@@ -17,7 +22,6 @@ export const run = async (platform: string, arch: string, argv: readonly string[
 
   StdinDataState.setState({
     ...StdinDataState.getState(),
-    allowCopilotAuthInCi: options.allowCopilotAuthInCi,
     arch: options.arch,
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
@@ -25,8 +29,6 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     commit: options.commit,
     continueValue: options.continueValue,
     cwd: options.cwd,
-    downloadUserDataZipFileToken: options.downloadUserDataZipFileToken,
-    downloadUserDataZipFileUrl: options.downloadUserDataZipFileUrl,
     enableExtensions: options.enableExtensions,
     headless: options.headless,
     ide: options.ide,
