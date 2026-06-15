@@ -63,7 +63,9 @@ export const createRpc = (ipc: any) => {
     listeners,
     objectType: ObjectType.Rpc,
     off(event: string, listener: any) {
-      delete listener[event]
+      if (listeners[event] === listener) {
+        delete listeners[event]
+      }
     },
     on(event: string, listener: any) {
       listeners[event] = listener
