@@ -1,9 +1,5 @@
 export interface RunTestsOptions {
-<<<<<<< HEAD
-  readonly allowCopilotAuthInCi?: boolean
-=======
   readonly allowCopilotAuthInCi: boolean
->>>>>>> origin/main
   readonly arch: string
   readonly bisect?: boolean
   readonly checkLeaks: boolean
