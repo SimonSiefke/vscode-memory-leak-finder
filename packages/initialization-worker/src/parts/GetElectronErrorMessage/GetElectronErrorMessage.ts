@@ -56,39 +56,39 @@ const removeListener = <T extends 'data' | 'end' | 'close' | 'error'>(
 }
 
 const waitForNextData = (stream: ReadableStreamLike): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      cleanup()
-      resolve('')
-    }, APP_LOAD_ERROR_TIMEOUT)
-    timeout.unref?.()
+  const { promise, resolve, reject } = Promise.withResolvers<string>()
+  const timeout = setTimeout(() => {
+    cleanup()
+    resolve('')
+  }, APP_LOAD_ERROR_TIMEOUT)
+  timeout.unref?.()
 
-    const cleanup = (): void => {
-      clearTimeout(timeout)
-      removeListener(stream, 'data', handleData)
-      removeListener(stream, 'end', handleEnd)
-      removeListener(stream, 'close', handleEnd)
-      removeListener(stream, 'error', handleError)
-    }
+  const cleanup = (): void => {
+    clearTimeout(timeout)
+    removeListener(stream, 'data', handleData)
+    removeListener(stream, 'end', handleEnd)
+    removeListener(stream, 'close', handleEnd)
+    removeListener(stream, 'error', handleError)
+  }
 
-    const handleData = (data: string | Buffer): void => {
-      cleanup()
-      resolve(String(data))
-    }
-    const handleEnd = (): void => {
-      cleanup()
-      resolve('')
-    }
-    const handleError = (error: unknown): void => {
-      cleanup()
-      reject(error instanceof Error ? error : new Error(String(error)))
-    }
+  const handleData = (data: string | Buffer): void => {
+    cleanup()
+    resolve(String(data))
+  }
+  const handleEnd = (): void => {
+    cleanup()
+    resolve('')
+  }
+  const handleError = (error: unknown): void => {
+    cleanup()
+    reject(error instanceof Error ? error : new Error(String(error)))
+  }
 
-    stream.on('data', handleData)
-    stream.on('end', handleEnd)
-    stream.on('close', handleEnd)
-    stream.on('error', handleError)
-  })
+  stream.on('data', handleData)
+  stream.on('end', handleEnd)
+  stream.on('close', handleEnd)
+  stream.on('error', handleError)
+  return promise
 }
 
 const getInlineAppLoadErrorData = (firstData: string): string => {
