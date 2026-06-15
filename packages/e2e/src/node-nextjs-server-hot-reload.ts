@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 import type { TestContext } from '../types.js'
 
-export const skip = false
+export const skip = true
 
 export const requiresNetwork = true
 

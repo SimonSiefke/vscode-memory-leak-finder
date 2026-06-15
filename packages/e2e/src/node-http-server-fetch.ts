@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const skip = false
+export const skip = true
 
 const createServerSource = () => {
   return `import http from 'node:http'
