@@ -2,16 +2,30 @@ import * as Assert from '../Assert/Assert.ts'
 import * as ImportTest from '../ImportTest/ImportTest.ts'
 import * as TestStage from '../TestStage/TestStage.ts'
 
+const hasChatTestFileName = (file: string): boolean => {
+  return (
+    file.includes('/chat-') ||
+    file.includes('\\chat-') ||
+    file.includes('/terminal-inline-chat-') ||
+    file.includes('\\terminal-inline-chat-')
+  )
+}
+
 // @ts-ignore
-export const setupTestWithCallback = async (pageObject, file, forceRun, isGithubActions) => {
+export const setupTestWithCallback = async (pageObject, file, forceRun, isGithubActions, allowCopilotAuthInCi) => {
   Assert.object(pageObject)
   Assert.string(file)
   Assert.boolean(forceRun)
   Assert.boolean(isGithubActions)
+  // Assert.boolean(allowCopilotAuthInCi)
   const module = await ImportTest.importTest(file)
   const wasOriginallySkipped = Boolean(module.skip)
   const isCi = isGithubActions
-  if (module.requiresNetwork && isCi) {
+  const requiresCopilotAuth = Boolean(module.requiresCopilotAuth) || hasChatTestFileName(file)
+  if (requiresCopilotAuth && isCi && !allowCopilotAuthInCi) {
+    return { error: null, skipped: true, wasOriginallySkipped }
+  }
+  if (module.requiresNetwork && isCi && !forceRun) {
     return { error: null, skipped: true, wasOriginallySkipped }
   }
   if (module.skip && !forceRun) {
