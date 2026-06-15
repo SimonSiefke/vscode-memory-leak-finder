@@ -848,9 +848,7 @@ export interface Window {
 export interface Workbench {
   connectToSsh(options: any): Promise<void>
   waitForNewWindow(options: any): Promise<void>
-  openNewWindow(): Promise<
-    PageObjectApi & PageObjectWindowHandle
-  >
+  openNewWindow(): Promise<PageObjectApi & PageObjectWindowHandle>
   close(): Promise<void>
   shouldBeVisible(): Promise<void>
   reload(): Promise<void>
