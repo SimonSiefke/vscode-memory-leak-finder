@@ -15,6 +15,7 @@ const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {
 
 export const connectElectron = async (
   electronRpc: RpcConnection,
+  secretsPath: string,
   headlessMode: boolean,
   trackFunctions: boolean,
   openDevtools: boolean,
@@ -53,6 +54,7 @@ export const connectElectron = async (
     electronRpc,
     electronObjectId,
     requireObjectId,
+    secretsPath,
     headlessMode,
     trackFunctions,
     openDevtools,
