@@ -9,6 +9,8 @@ export interface LoginOptions {
   readonly compressVideo: boolean
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly filterValue: string
@@ -48,6 +50,8 @@ export const doLogin = async ({
   compressVideo,
   connectionId,
   cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
   filterValue,
@@ -87,6 +91,8 @@ export const doLogin = async ({
       compressVideo,
       connectionId,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       headlessMode,

@@ -1,5 +1,6 @@
 default_events:
   - issue_comment
+  - pull_request
   - workflow_run
 
 default_permissions:

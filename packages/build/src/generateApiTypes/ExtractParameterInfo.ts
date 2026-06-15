@@ -11,16 +11,19 @@ export const extractParameterInfo = (paramString: string): ParameterInfo[] => {
   // But be careful with destructuring - need to handle nested braces/brackets
   const paramList: string[] = []
   let currentParam = ''
+  let angleDepth = 0
   let braceDepth = 0
   let bracketDepth = 0
 
   for (let i = 0; i < paramString.length; i++) {
     const char = paramString[i]
-    if (char === '{') braceDepth++
+    if (char === '<') angleDepth++
+    else if (char === '>') angleDepth--
+    else if (char === '{') braceDepth++
     else if (char === '}') braceDepth--
     else if (char === '[') bracketDepth++
     else if (char === ']') bracketDepth--
-    else if (char === ',' && braceDepth === 0 && bracketDepth === 0) {
+    else if (char === ',' && angleDepth === 0 && braceDepth === 0 && bracketDepth === 0) {
       paramList.push(currentParam.trim())
       currentParam = ''
       continue

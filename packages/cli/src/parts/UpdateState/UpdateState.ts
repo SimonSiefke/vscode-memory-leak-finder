@@ -27,7 +27,6 @@ export const updateState = async (newState: any): Promise<void> => {
   StdinDataState.setState({ ...newState, previousFilters: [], stdout: [] })
   if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {
     await StartRunning.startRunning({
-      allowCopilotAuthInCi: state.allowCopilotAuthInCi,
       arch: state.arch,
       bisect: state.bisect,
       checkLeaks: state.checkLeaks,
@@ -37,8 +36,8 @@ export const updateState = async (newState: any): Promise<void> => {
       compressVideo: state.compressVideo,
       continueValue: state.continueValue,
       cwd: state.cwd,
-      downloadUserDataZipFileToken: state.downloadUserDataZipFileToken,
-      downloadUserDataZipFileUrl: state.downloadUserDataZipFileUrl,
+      downloadUserDataZipFileToken: '',
+      downloadUserDataZipFileUrl: '',
       enableExtensions: state.enableExtensions,
       enableProxy: state.enableProxy,
       filterValue: state.value,
@@ -66,6 +65,7 @@ export const updateState = async (newState: any): Promise<void> => {
       runMode: state.runMode,
       runs: state.runs,
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
+      allowCopilotAuthInCi: false,
       screencastQuality: state.screencastQuality,
       setupOnly: false,
       timeoutBetween: state.timeoutBetween,
