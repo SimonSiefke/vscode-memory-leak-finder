@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import * as ParseRequestBody from '../ParseRequestBody/ParseRequestBody.ts'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
@@ -125,13 +126,13 @@ export const saveRequest = async (
         timestamp,
       },
       request: {
-        body: ParseRequestBody.parseRequestBody(req.headers, requestBody),
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(ParseRequestBody.parseRequestBody(req.headers, requestBody)),
         headers: req.headers,
         method: req.method,
         url: req.url,
       },
       response: {
-        body: responseBodyData,
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(responseBodyData),
         headers: responseHeaders,
         statusCode,
         statusMessage,

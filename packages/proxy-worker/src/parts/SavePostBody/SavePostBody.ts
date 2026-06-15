@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveMockFile from '../SaveMockFile/SaveMockFile.ts'
@@ -159,14 +160,14 @@ export const savePostBody = async (
         timestamp,
       },
       request: {
-        body: requestBodyData,
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(requestBodyData),
         headers,
         method,
         url,
       },
       response: responseData
         ? {
-            body: responseBodyData,
+            body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(responseBodyData),
             headers: responseData.responseHeaders,
             statusCode: responseData.statusCode,
             statusMessage: responseData.statusMessage,
