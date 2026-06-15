@@ -3,10 +3,11 @@ interface ResponseLike {
   readonly statusCode: number
 }
 
-const authErrorMarkers = ['token expired', 'invalid token', 'cannot validate hmac', 'authentication failed']
+const authErrorStatusCodes = new Set([400, 401])
+const authErrorMarkers = ['token expired', 'invalid token', 'cannot validate hmac', 'cannot decode hmac', 'authentication failed']
 
 export const isExpiredTokenErrorResponse = (response: ResponseLike | undefined): boolean => {
-  if (!response || response.statusCode !== 401) {
+  if (!response || !authErrorStatusCodes.has(response.statusCode)) {
     return false
   }
   if (typeof response.body !== 'string') {

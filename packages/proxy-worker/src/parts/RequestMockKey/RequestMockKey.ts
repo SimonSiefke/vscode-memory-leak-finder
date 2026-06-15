@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 
 const COPILOT_HOSTNAMES = new Set(['api.githubcopilot.com', 'api.individual.githubcopilot.com'])
 const COPILOT_PATHNAMES = new Set(['/chat/completions', '/responses'])
@@ -25,9 +26,11 @@ const JSON_TIMEOUT_FIELD_REGEX = /"timeout"\s*:\s*\d+/gi
 const DURATION_MS_FIELD_REGEX = /\bduration_ms\s+\d+(?:\.\d+)?\b/gi
 const MILLIS_DURATION_REGEX = /\b\d+(?:\.\d+)?ms\b/gi
 const SECONDS_DURATION_REGEX = /\b\d+(?:\.\d+)?\s*s\b/gi
+const SHELL_PROMPT_DIRTY_BRANCH_REGEX = /\(([^()\n]+?) \*\)/g
 const MULTI_WHITESPACE_REGEX = /\s+/g
-const COPILOT_EPHEMERAL_KEYS = new Set(['copilot_cache_control', 'id', 'tool_call_id'])
+const COPILOT_EPHEMERAL_KEYS = new Set(['call_id', 'copilot_cache_control', 'encrypted_content', 'id', 'summary', 'tool_call_id'])
 const TOOL_CALL_EPHEMERAL_ARGUMENT_KEYS = new Set(['description', 'explanation', 'goal', 'reason', 'timeout'])
+const CHAT_SESSION_RESOURCE_PATH_SEGMENTS = ['/GitHub.copilot-chat/chat-session-resources/', '/GitHub.copilot-chat/debug-logs/']
 
 const isCopilotRequest = (hostname: string, pathname: string, method: string): boolean => {
   return method.toUpperCase() === 'POST' && COPILOT_HOSTNAMES.has(hostname) && COPILOT_PATHNAMES.has(pathname)
@@ -149,8 +152,9 @@ const normalizeEmbeddedArgumentsJson = (value: string): string => {
 }
 
 const normalizeText = (value: string, role?: string): string => {
-  const userRequests = extractUserRequests(value)
-  const relevantText = userRequests.length > 0 ? userRequests.join('\n') : stripTaggedBlocks(value)
+  const placeholderNormalizedValue = PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInText(value)
+  const userRequests = extractUserRequests(placeholderNormalizedValue)
+  const relevantText = userRequests.length > 0 ? userRequests.join('\n') : stripTaggedBlocks(placeholderNormalizedValue)
   const textWithNormalizedArguments = normalizeEmbeddedArgumentsJson(relevantText)
   let normalizedValue = textWithNormalizedArguments
     .replace(ISO_DATE_REGEX, '<date>')
@@ -168,6 +172,7 @@ const normalizeText = (value: string, role?: string): string => {
       .replace(DURATION_MS_FIELD_REGEX, 'duration_ms <duration>')
       .replace(MILLIS_DURATION_REGEX, '<duration-ms>')
       .replace(SECONDS_DURATION_REGEX, '<duration-s>')
+      .replace(SHELL_PROMPT_DIRTY_BRANCH_REGEX, '($1)')
   }
 
   return normalizedValue.replace(MULTI_WHITESPACE_REGEX, ' ').trim()
@@ -216,8 +221,17 @@ const normalizeToolCallArguments = (toolName: unknown, argumentsValue: unknown):
   try {
     const parsedArguments = JSON.parse(argumentsValue) as Record<string, unknown>
     const normalizedArguments: Record<string, unknown> = {}
+    const filePath = typeof parsedArguments.filePath === 'string' ? parsedArguments.filePath : undefined
+    const isEphemeralChatSessionRead =
+      toolName === 'read_file' &&
+      filePath !== undefined &&
+      CHAT_SESSION_RESOURCE_PATH_SEGMENTS.some((segment) => filePath.includes(segment))
+
     for (const key of Object.keys(parsedArguments).sort()) {
       if (TOOL_CALL_EPHEMERAL_ARGUMENT_KEYS.has(key)) {
+        continue
+      }
+      if (isEphemeralChatSessionRead && (key === 'startLine' || key === 'endLine')) {
         continue
       }
       const normalizedEntry = normalizeValue(parsedArguments[key], 'assistant')
@@ -274,6 +288,37 @@ const normalizeMessage = (message: Record<string, unknown>): Record<string, unkn
   return normalizedMessage
 }
 
+const normalizeResponsesInputItem = (item: unknown): unknown => {
+  if (!item || typeof item !== 'object') {
+    return normalizeValue(item)
+  }
+
+  const itemRecord = item as Record<string, unknown>
+  if (itemRecord.role === 'system') {
+    return undefined
+  }
+
+  if (itemRecord.type === 'function_call_output') {
+    const normalizedItem: Record<string, unknown> = {}
+    for (const key of Object.keys(itemRecord).sort()) {
+      if (COPILOT_EPHEMERAL_KEYS.has(key)) {
+        continue
+      }
+      const normalizedEntry = key === 'output' ? normalizeValue(itemRecord[key], 'tool') : normalizeValue(itemRecord[key])
+      if (normalizedEntry !== undefined && normalizedEntry !== '') {
+        normalizedItem[key] = normalizedEntry
+      }
+    }
+    return normalizedItem
+  }
+
+  return normalizeValue(item)
+}
+
+const normalizeResponsesInput = (input: readonly unknown[]): readonly unknown[] => {
+  return input.map((item) => normalizeResponsesInputItem(item)).filter((item) => item !== undefined)
+}
+
 const normalizeMessages = (messages: readonly unknown[]): readonly unknown[] => {
   return messages
     .filter((message) => typeof message === 'object' && message !== null && (message as Record<string, unknown>).role !== 'system')
@@ -321,7 +366,9 @@ const getCopilotCorePayload = (requestBody: unknown, includeAssistantTurns: bool
 
   if ('input' in requestBodyObject) {
     return {
-      input: normalizeValue(requestBodyObject.input),
+      input: Array.isArray(requestBodyObject.input)
+        ? normalizeResponsesInput(requestBodyObject.input)
+        : normalizeValue(requestBodyObject.input),
     }
   }
 
@@ -354,12 +401,42 @@ const getRequestMockKeyInternal = (
   return createHash('sha256').update(normalizedPayload).digest('hex').slice(0, 16)
 }
 
+const collectUserRequests = (value: unknown): readonly string[] => {
+  if (typeof value === 'string') {
+    const placeholderNormalizedValue = PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInText(value)
+    return extractUserRequests(placeholderNormalizedValue).map((request) => normalizeText(request))
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => collectUserRequests(item))
+  }
+
+  if (!value || typeof value !== 'object') {
+    return []
+  }
+
+  return Object.values(value as Record<string, unknown>).flatMap((item) => collectUserRequests(item))
+}
+
 export const getRequestMockKey = (hostname: string, pathname: string, method: string, requestBody?: unknown): string | undefined => {
   return getRequestMockKeyInternal(hostname, pathname, method, requestBody, true)
 }
 
 export const getRelaxedRequestMockKey = (hostname: string, pathname: string, method: string, requestBody?: unknown): string | undefined => {
   return getRequestMockKeyInternal(hostname, pathname, method, requestBody, false)
+}
+
+export const getUserRequestMockKey = (hostname: string, pathname: string, method: string, requestBody?: unknown): string | undefined => {
+  if (!isCopilotRequest(hostname, pathname, method) || requestBody === undefined) {
+    return undefined
+  }
+
+  const userRequests = collectUserRequests(requestBody)
+  if (userRequests.length === 0) {
+    return undefined
+  }
+
+  return createHash('sha256').update(JSON.stringify(userRequests)).digest('hex').slice(0, 16)
 }
 
 export const appendRequestMockKey = (fileName: string, requestMockKey: string | undefined): string => {
