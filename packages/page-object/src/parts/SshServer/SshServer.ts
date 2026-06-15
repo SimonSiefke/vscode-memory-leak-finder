@@ -494,6 +494,7 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
             stdio: ['ignore', 'pipe', 'pipe'],
           })
           state.childProcess = childProcess
+          await dependencies.writeTextFile(paths.sshdPidPath, `${childProcess.pid}\n`)
           childProcess.stdout.on('data', (chunk: unknown) => appendOutput(state, chunk))
           childProcess.stderr.on('data', (chunk: unknown) => appendOutput(state, chunk))
           childProcess.once('exit', (exitCode: number | null, signalCode: NodeJS.Signals | null) => {
