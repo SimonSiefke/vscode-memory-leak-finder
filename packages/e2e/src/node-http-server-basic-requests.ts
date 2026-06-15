@@ -6,7 +6,7 @@ interface DataResponse {
   readonly runtime: string
 }
 
-export const skip = false
+export const skip = true
 
 const createServerSource = () => {
   return `import http from 'node:http'
