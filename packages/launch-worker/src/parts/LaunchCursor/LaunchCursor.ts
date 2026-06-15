@@ -28,6 +28,7 @@ export const launchCursor = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  proxyTestFolderName: _proxyTestFolderName,
   useProxyMock,
   vscodePath,
 }: {
@@ -44,6 +45,7 @@ export const launchCursor = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  proxyTestFolderName?: string
   useProxyMock: boolean
   vscodePath?: string
 }) => {

@@ -280,6 +280,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open context menu for "${dirent}"`)
       }
     },
+    async openItem(direntName: string) {
+      try {
+        await page.waitForIdle()
+        const explorer = page.locator('.explorer-folders-view .monaco-list')
+        const dirent = explorer.locator('.monaco-list-row', {
+          hasText: direntName,
+        })
+        await expect(dirent).toBeVisible()
+        await dirent.dblclick()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open explorer item "${direntName}"`)
+      }
+    },
     async paste({ waitForItem = '' } = {}) {
       try {
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -383,6 +397,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to verify that explorer has focused dirent "${direntName}"`)
+      }
+    },
+    async selectItem(direntName: string) {
+      try {
+        await page.waitForIdle()
+        const explorer = page.locator('.explorer-folders-view .monaco-list')
+        const dirent = explorer.locator('.monaco-list-row', {
+          hasText: direntName,
+        })
+        await expect(dirent).toBeVisible()
+        await dirent.click()
+        await page.waitForIdle()
+        await this.shouldHaveFocusedItem(direntName)
+      } catch (error) {
+        throw new VError(error, `Failed to select explorer item "${direntName}"`)
       }
     },
     async shouldHaveItem(direntName: string) {

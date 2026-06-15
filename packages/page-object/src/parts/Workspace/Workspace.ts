@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Electron from '../Electron/Electron.ts'
@@ -11,6 +11,9 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
   return {
+    getPath() {
+      return workspace
+    },
     async add(file: { name: string; content: string }) {
       const absolutePath = join(workspace, file.name)
       await mkdir(dirname(absolutePath), { recursive: true })
@@ -45,6 +48,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     getWorkspacePath() {
       return workspace
+    },
+    getWorkspaceSettingsPath() {
+      return join(workspace, '.vscode', 'settings.json')
     },
     async initializeGitRepository() {
       await Exec.exec('git', ['init'], { cwd: workspace })
@@ -86,6 +92,37 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await mkdir(dirname(absolutePath), { recursive: true })
         await writeFile(absolutePath, file.content)
       }
+    },
+    async readWorkspaceSettings(): Promise<Record<string, unknown>> {
+      const settingsPath = this.getWorkspaceSettingsPath()
+      const content = await readFile(settingsPath, 'utf8').catch(() => '')
+      if (!content) {
+        return {}
+      }
+      return JSON.parse(content)
+    },
+    async updateWorkspaceSettings(settings: Record<string, unknown>): Promise<void> {
+      const currentSettings = await this.readWorkspaceSettings()
+      const nextSettings: Record<string, unknown> = {
+        ...currentSettings,
+      }
+      for (const [key, value] of Object.entries(settings)) {
+        if (value === undefined) {
+          delete nextSettings[key]
+        } else {
+          nextSettings[key] = value
+        }
+      }
+      await this.writeWorkspaceSettings(nextSettings)
+    },
+    async writeFile(relativePath: string, content: string): Promise<void> {
+      const absolutePath = join(workspace, relativePath)
+      await mkdir(dirname(absolutePath), { recursive: true })
+      await writeFile(absolutePath, content)
+      await page.waitForIdle()
+    },
+    async writeWorkspaceSettings(settings: Record<string, unknown>): Promise<void> {
+      await this.writeFile('.vscode/settings.json', JSON.stringify(settings, null, 2) + '\n')
     },
     async waitForFile(fileName: string): Promise<boolean> {
       const absolutePath = join(workspace, fileName)

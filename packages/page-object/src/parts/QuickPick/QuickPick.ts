@@ -13,14 +13,20 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async executeCommand(
       command: string,
-      { pressKeyOnce = false, stayVisible = false }: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' } = {},
+      {
+        pressKeyOnce = false,
+        stayVisible = false,
+        stopsApplication = false,
+      }: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care'; stopsApplication?: boolean } = {},
     ) {
       try {
         await page.waitForIdle()
         await this.showCommands({ pressKeyOnce })
         await this.type(command)
-        await this.select(command, stayVisible)
-        await page.waitForIdle()
+        await this.select(command, stayVisible, stopsApplication)
+        if (!stopsApplication) {
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to execute command "${command}"`)
       }
@@ -127,7 +133,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to press Enter`)
       }
     },
-    async select(text: string | RegExp, stayVisible: boolean | 'dont-care' = false) {
+    async select(text: string | RegExp, stayVisible: boolean | 'dont-care' = false, stopsApplication = false) {
       try {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
@@ -146,12 +152,16 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           await page.waitForIdle()
           const label = item.locator('.label-name')
           await label.click()
-          await page.waitForIdle()
+          if (!stopsApplication) {
+            await page.waitForIdle()
+          }
         }
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()
         }
-        await page.waitForIdle()
+        if (!stopsApplication) {
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to select "${text}"`)
       }

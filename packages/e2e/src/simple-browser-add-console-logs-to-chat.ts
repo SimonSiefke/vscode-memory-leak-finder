@@ -15,38 +15,45 @@ const errorPageHtml = `<!doctype html>
   <body>
     <h1>Console Error Page</h1>
     <script>
-      console.error('${consoleErrorText}')
+      setTimeout(() => {
+        console.error('${consoleErrorText}')
+      }, 1000)
       setTimeout(() => {
         throw new Error('Simple browser uncaught error for chat context')
-      }, 0)
+      }, 1500)
     </script>
   </body>
 </html>`
 
-export const setup = async ({ ChatEditor, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ SideBar, ChatEditor, SimpleBrowser, Workspace, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: errorPageHtml,
       name: 'console-errors.html',
     },
   ])
+  await SideBar.hide()
   await ChatEditor.open()
+  await Editor.splitRight()
   // @ts-ignore
   await SimpleBrowser.createWorkspaceFileServer({
     id: testId,
     port: 3001,
     relativePath: 'console-errors.html',
   })
-}
-
-export const run = async ({ ChatEditor, SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.show({
     url: testUrl,
   })
+  // TODO
+  // @ts-ignore
+  // await Editor.closeOthers()
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
     text: 'Console Error Page',
   })
+}
+
+export const run = async ({ ChatEditor, SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.addConsoleLogsToChat()
   await ChatEditor.shouldHaveAttachedContextHoverText(consoleErrorText)
 }

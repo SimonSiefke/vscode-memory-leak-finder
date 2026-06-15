@@ -14,6 +14,8 @@ export interface PageObjectContext {
 export interface ActivityBar {
   hide(): Promise<void>
   hideTooltip(): Promise<void>
+  shouldBeHidden(): Promise<void>
+  shouldBeVisible(): Promise<void>
   show(): Promise<void>
   showTooltipExplorer(): Promise<void>
   showView(options?: any): Promise<void>
@@ -31,17 +33,25 @@ export interface ActivityBar {
 }
 export interface ChatEditor {
   addContext(initialPrompt: any, secondPrompt: any, confirmText: any): Promise<void>
+  approveAllAccessRequests(options?: any): Promise<any>
   clearAll(): Promise<void>
   clearContext(contextName: any): Promise<void>
   closeFinishSetup(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
+  getLatestResponseText(): Promise<string>
   moveToNewWindow(): Promise<{ close(): Promise<void> }>
   open(): Promise<void>
   openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
+  scrollToBottom(): Promise<void>
+  scrollToTop(): Promise<void>
+  send(options?: any): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
   shouldHaveAttachedContextHoverText(text: any): Promise<void>
+  shouldHaveCodeBlockWithLanguage(language: any): Promise<void>
+  shouldHaveLatestResponseCodeBlockWithLanguage(language: any): Promise<void>
+  waitForLatestExchange(message: any): Promise<void>
 }
 export interface ContextMenu {
   close(): Promise<void>
@@ -110,6 +120,7 @@ export interface Editor {
   disableStickyScroll(): Promise<void>
   disableVersionLens(): Promise<void>
   duplicateSelection(): Promise<void>
+  shouldContainText(text: any, timeout?: any): Promise<void>
   enable2x2GridView(): Promise<void>
   enableReadonly(): Promise<void>
   enableStickyScroll(): Promise<void>
@@ -160,6 +171,7 @@ export interface Editor {
   setLogpoint(lineNumber: any, logMessage: any): Promise<void>
   shouldHaveActiveLineNumber(value: any): Promise<void>
   shouldHaveBreadCrumb(text: any): Promise<void>
+  shouldHaveBreadCrumbs(): Promise<void>
   shouldHaveCodeLens(options: any): Promise<void>
   shouldHaveCodeLensWithVersion(options: any): Promise<void>
   shouldHaveCursor(estimate: any): Promise<void>
@@ -175,8 +187,11 @@ export interface Editor {
   shouldHaveSpark(): Promise<void>
   shouldHaveSquigglyError(): Promise<void>
   shouldHaveControlCharacterHighlight(): Promise<void>
+  shouldHaveMinimap(): Promise<void>
   shouldHaveText(text: any, fileName?: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
+  shouldNotHaveBreadCrumbs(): Promise<void>
+  shouldNotHaveMinimap(): Promise<void>
   shouldNotHaveSemanticToken(type: any): Promise<void>
   shouldNotHaveSquigglyError(): Promise<void>
   showBreadCrumbs(): Promise<void>
@@ -290,10 +305,12 @@ export interface Explorer {
   toHaveItem(direntName: any): Promise<void>
   openAllFiles(): Promise<void>
   openContextMenu(dirent: any, select?: any): Promise<void>
+  openItem(direntName: any): Promise<void>
   paste(options?: any): Promise<void>
   refresh(): Promise<void>
   removeCurrent(): Promise<void>
   rename(oldDirentName: any, newDirentName: any): Promise<void>
+  selectItem(direntName: any): Promise<void>
   shouldHaveFocusedItem(direntName: any): Promise<void>
   shouldHaveItem(direntName: any): Promise<void>
   toHaveItem(direntName: any): Promise<void>
@@ -532,6 +549,10 @@ export interface SideBar {
   hide(): Promise<void>
   moveLeft(): Promise<void>
   moveRight(): Promise<void>
+  shouldBeHidden(): Promise<void>
+  shouldBeLeft(): Promise<void>
+  shouldBeRight(): Promise<void>
+  shouldBeVisible(): Promise<void>
   show(): Promise<void>
   toggle(): Promise<void>
   togglePosition(): Promise<void>
@@ -541,6 +562,7 @@ export interface SimpleBrowser {
   createDeferredMockServer(options: any): Promise<void>
   createMockServer(options: any): Promise<void>
   disposeMockServer(options: any): Promise<void>
+  executeJavaScript(options: any): Promise<void>
   finishMockServerResponse(options: any): Promise<void>
   openDevtools(): Promise<number>
   show(options: any): Promise<void>
@@ -588,11 +610,25 @@ export interface StatusBar {
   click(label: any): Promise<void>
   hideItem(id: any): Promise<void>
   selectItem(id: any): Promise<void>
+  shouldBeHidden(): Promise<void>
+  shouldBeVisible(): Promise<void>
   showItem(id: any): Promise<void>
 }
 export interface Suggest {
   close(): Promise<void>
   open(expectedItem: any): Promise<void>
+}
+export interface SshServer {
+  dispose(): Promise<void>
+  launch(): Promise<{
+    alias: string
+    configPath: string
+    host: string
+    port: number
+    user: string
+  }>
+  shouldBeConnected(options?: any): Promise<void>
+  waitForPort(options?: any): Promise<void>
 }
 export interface Tab {
   openContextMenu(label: any): Promise<void>
@@ -639,6 +675,9 @@ export interface TerminalInlineChat {
   sendMessage(options?: any): Promise<void>
   show(): Promise<void>
 }
+export interface Timeout {
+  waitMinutes(minutes: any): Promise<void>
+}
 export interface NotebookInlineChat {
   hide(): Promise<void>
   show(): Promise<void>
@@ -670,16 +709,22 @@ export interface WebView {
   shouldBeVisible2(options?: any): Promise<void>
 }
 export interface WelcomePage {
+  checkStepByIndex(index: any): Promise<void>
+  collapseStepByIndex(index: any): Promise<void>
   expandStep(name: any): Promise<void>
+  expandStepByIndex(index: any): Promise<void>
+  getFundamentalsStepCount(): Promise<number>
   hide(): Promise<void>
   show(): Promise<void>
   showFundamentals(): Promise<void>
+  uncheckStepByIndex(index: any): Promise<void>
 }
 export interface Window {
   blur(): Promise<void>
   focus(): Promise<void>
 }
 export interface Workbench {
+  connectToSsh(options: { alias?: string; host?: string; port?: number; user?: string }): Promise<void>
   focusLeftEditorGroup(): Promise<void>
   openNewWindow(): Promise<{
     close(): Promise<void>
@@ -688,17 +733,23 @@ export interface Workbench {
     waitForIdle(): Promise<void>
     shouldBeVisible(): Promise<void>
   }>
+  reload(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldHaveEditorBackground(color: any): Promise<void>
 }
 export interface Workspace {
   add(file: any): Promise<void>
   addExtension(name: any): Promise<void>
+  getWorkspaceSettingsPath(): any
   initializeGitRepository(): Promise<void>
+  readWorkspaceSettings(): Promise<Record<string, unknown>>
   remove(file: any): Promise<void>
   setFiles(files: any): Promise<void>
   setFilesWithoutWaiting(files: any): Promise<void>
+  updateWorkspaceSettings(settings: any): Promise<void>
   waitForFile(fileName: any): Promise<void>
+  writeFile(relativePath: any, content: any): Promise<void>
+  writeWorkspaceSettings(settings: any): Promise<void>
 }
 
 export interface PageObjectApi {
@@ -753,11 +804,13 @@ export interface PageObjectApi {
   readonly SourceControl: SourceControl
   readonly StatusBar: StatusBar
   readonly Suggest: Suggest
+  readonly SshServer: SshServer
   readonly Tab: Tab
   readonly Task: Task
   readonly Terminal: Terminal
   readonly TerminalInlineChat: TerminalInlineChat
   readonly Testing: Testing
+  readonly Timeout: Timeout
   readonly TitleBar: TitleBar
   readonly View: View
   readonly WaitForApplicationToBeReady: WaitForApplicationToBeReady

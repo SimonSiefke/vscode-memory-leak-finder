@@ -1,5 +1,6 @@
 import * as CommandMap from '../CommandMap/CommandMap.ts'
 import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
+import * as CreateAllMockDataZip from '../CreateAllMockDataZip/CreateAllMockDataZip.ts'
 import * as InitialStart from '../InitialStart/InitialStart.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
 import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
@@ -9,6 +10,10 @@ import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 export const run = async (platform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
   await StdoutWorker.initialize()
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
+  if (argv.includes('--create-all-mock-data-zip')) {
+    await CreateAllMockDataZip.createAllMockDataZip()
+    return
+  }
   const options = ParseArgv.parseArgv(platform, arch, argv)
 
   // Parse isGithubActions once at startup
@@ -40,6 +45,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     measure: options.measure,
     measureAfter: options.measureAfter,
     measureNode: options.measureNode,
+    processRootStrategy: options.processRootStrategy,
     pageObjectPath: options.pageObjectPath,
     platform: options.platform,
     recordVideo: options.recordVideo,

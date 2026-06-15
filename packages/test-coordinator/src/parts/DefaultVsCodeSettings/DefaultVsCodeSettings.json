@@ -42,5 +42,9 @@
   "extensions.verifySignature": false,
   "telemetry.feedback.enabled": false,
   "telemetry.editStats.enabled": false,
-  "security.workspace.trust.enabled": false
+  "security.workspace.trust.enabled": false,
+  "remote.SSH.remotePlatform": {
+    "*": "linux"
+  },
+  "chat.allowAnonymousAccess": true
 }

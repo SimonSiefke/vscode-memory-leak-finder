@@ -8,6 +8,7 @@ import { URL } from 'url'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
 import * as HandleConnect from '../HandleConnect/HandleConnect.ts'
+import * as ParseRequestBody from '../ParseRequestBody/ParseRequestBody.ts'
 import * as Root from '../Root/Root.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
@@ -16,15 +17,6 @@ const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
 const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string, useProxyMock: boolean): Promise<void> => {
   // Check for mock response first (only if useProxyMock is enabled)
-  if (useProxyMock) {
-    const mockResponse = await GetMockResponse.getMockResponse(req.method || 'GET', targetUrl)
-    if (mockResponse) {
-      console.log(`[Proxy] Returning mock response for ${req.method} ${targetUrl}`)
-      GetMockResponse.sendMockResponse(res, mockResponse)
-      return // Don't record mock requests
-    }
-  }
-
   let parsedUrl: URL
   try {
     // In HTTP proxy protocol, the request line contains the full URL
@@ -102,138 +94,165 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   delete (options.headers as Record<string, string | string[] | undefined>)['proxy-connection']
   delete (options.headers as Record<string, string | string[] | undefined>)['proxy-authorization']
 
-  // Capture request body for POST/PUT/PATCH requests
+  // Buffer the request body so mock lookup can inspect it before any network request is sent.
   const requestBodyChunks: Buffer[] = []
+  const forwardBufferedRequest = async (requestBody: Buffer): Promise<void> => {
+    const proxyReq = requestModule(options, (proxyRes) => {
+      console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
 
-  const proxyReq = requestModule(options, (proxyRes) => {
-    console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
+      const responseChunks: Buffer[] = []
+      let saved = false
 
-    // Buffer the entire response first to handle chunked encoding properly
-    const responseChunks: Buffer[] = []
-    let saved = false
-
-    const saveAndWriteResponse = async (): Promise<void> => {
-      if (saved) {
-        return
-      }
-      saved = true
-
-      const responseData = Buffer.concat(responseChunks)
-
-      // Convert headers to Record<string, string | string[]> format for saving
-      const responseHeadersForSave: Record<string, string | string[]> = {}
-      for (const [k, v] of Object.entries(proxyRes.headers)) {
-        if (v !== undefined) {
-          responseHeadersForSave[k] = v
+      const saveAndWriteResponse = async (): Promise<void> => {
+        if (saved) {
+          return
         }
-      }
+        saved = true
 
-      // Clean headers - remove Transfer-Encoding, Connection, and Content-Length headers
-      // We'll set Content-Length ourselves based on buffered data to avoid chunked encoding issues
-      const responseHeaders: Record<string, string> = {}
-      const lowerCaseHeaders: Set<string> = new Set()
-      for (const [k, v] of Object.entries(proxyRes.headers)) {
-        const lowerKey = k.toLowerCase()
-        // Skip transfer-encoding, connection, and content-length headers
-        // We'll set Content-Length ourselves based on the buffered data
-        if (
-          lowerKey !== 'transfer-encoding' &&
-          lowerKey !== 'connection' &&
-          lowerKey !== 'content-length' && // Avoid duplicate headers by checking case-insensitively
-          !lowerCaseHeaders.has(lowerKey)
-        ) {
-          responseHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
-          lowerCaseHeaders.add(lowerKey)
+        const responseData = Buffer.concat(responseChunks)
+        const responseHeadersForSave: Record<string, string | string[]> = {}
+        for (const [key, value] of Object.entries(proxyRes.headers)) {
+          if (value !== undefined) {
+            responseHeadersForSave[key] = value
+          }
         }
-      }
 
-      // Add CORS headers for marketplace API responses
-      if (isMarketplaceApi) {
-        if (!lowerCaseHeaders.has('access-control-allow-origin')) {
-          responseHeaders['Access-Control-Allow-Origin'] = '*'
+        const responseHeaders: Record<string, string> = {}
+        const lowerCaseHeaders: Set<string> = new Set()
+        for (const [key, value] of Object.entries(proxyRes.headers)) {
+          const lowerKey = key.toLowerCase()
+          if (
+            lowerKey !== 'transfer-encoding' &&
+            lowerKey !== 'connection' &&
+            lowerKey !== 'content-length' &&
+            !lowerCaseHeaders.has(lowerKey)
+          ) {
+            responseHeaders[key] = Array.isArray(value) ? value.join(', ') : String(value)
+            lowerCaseHeaders.add(lowerKey)
+          }
         }
-        if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
-          responseHeaders['Access-Control-Allow-Credentials'] = 'true'
+
+        if (isMarketplaceApi) {
+          if (!lowerCaseHeaders.has('access-control-allow-origin')) {
+            responseHeaders['Access-Control-Allow-Origin'] = '*'
+          }
+          if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
+            responseHeaders['Access-Control-Allow-Credentials'] = 'true'
+          }
+          if (!lowerCaseHeaders.has('access-control-allow-headers')) {
+            responseHeaders['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with, x-market-client-id'
+          }
         }
-        if (!lowerCaseHeaders.has('access-control-allow-headers')) {
-          responseHeaders['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with, x-market-client-id'
+
+        for (const key of Object.keys(responseHeaders)) {
+          if (key.toLowerCase() === 'transfer-encoding') {
+            delete responseHeaders[key]
+          }
         }
-      }
 
-      // Explicitly remove Transfer-Encoding header if it somehow got through
-      // (case-insensitive check)
-      for (const key of Object.keys(responseHeaders)) {
-        if (key.toLowerCase() === 'transfer-encoding') {
-          delete responseHeaders[key]
+        responseHeaders['Content-Length'] = String(responseData.length)
+
+        if (res.headersSent) {
+          console.error(`[Proxy] Headers already sent for ${targetUrl}, cannot send response`)
+        } else {
+          res.writeHead(proxyRes.statusCode || 200, responseHeaders)
+          res.end(responseData)
         }
-      }
 
-      // Set Content-Length to avoid chunked encoding
-      responseHeaders['Content-Length'] = String(responseData.length)
+        if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+          await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody, {
+            responseData,
+            responseHeaders: responseHeadersForSave,
+            statusCode: proxyRes.statusCode || 200,
+            statusMessage: proxyRes.statusMessage,
+          })
+        }
 
-      // Write response headers and data
-      // Check if headers were already sent (shouldn't happen, but safety check)
-      if (res.headersSent) {
-        console.error(`[Proxy] Headers already sent for ${targetUrl}, cannot send response`)
-      } else {
-        res.writeHead(proxyRes.statusCode || 200, responseHeaders)
-        res.end(responseData)
-      }
-
-      // Save POST body if applicable (with response data)
-      if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
-        const requestBody = Buffer.concat(requestBodyChunks)
-        await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody, {
+        SaveRequest.saveRequest(
+          req,
+          proxyRes.statusCode || 200,
+          proxyRes.statusMessage,
+          responseHeadersForSave,
           responseData,
-          responseHeaders: responseHeadersForSave,
-          statusCode: proxyRes.statusCode || 200,
-          statusMessage: proxyRes.statusMessage,
+          requestBody,
+        ).catch((error) => {
+          console.error('[Proxy] Error saving request:', error)
         })
       }
 
-      SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeadersForSave, responseData).catch(
-        (error) => {
-          console.error('[Proxy] Error saving request:', error)
-        },
-      )
-    }
+      proxyRes.on('error', (error) => {
+        console.error(`[Proxy] Error receiving response from ${targetUrl}:`, error)
+        if (!res.headersSent) {
+          res.writeHead(500, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ error: 'Response error', message: error.message }))
+        }
+      })
 
-    // Handle errors on the response stream
-    proxyRes.on('error', (err) => {
-      console.error(`[Proxy] Error receiving response from ${targetUrl}:`, err)
+      proxyRes.on('data', (chunk: Buffer) => {
+        responseChunks.push(chunk)
+      })
+
+      proxyRes.on('end', async () => {
+        await saveAndWriteResponse()
+      })
+
+      proxyRes.on('close', async () => {
+        if (!saved) {
+          await saveAndWriteResponse()
+        }
+      })
+    })
+
+    proxyReq.on('error', (error) => {
+      const errorCode = (error as NodeJS.ErrnoException).code
+      const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
+
+      if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
+        if (isAzureMetadata) {
+          if (!res.headersSent) {
+            res.writeHead(503, { 'Content-Type': 'application/json' })
+            res.end(
+              JSON.stringify({
+                error: 'Service Unavailable',
+                message: 'Azure metadata service not available',
+                target: targetUrl,
+              }),
+            )
+          }
+          return
+        }
+        if (!res.headersSent) {
+          const statusCode = errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH' ? 504 : 500
+          res.writeHead(statusCode, { 'Content-Type': 'application/json' })
+          res.end(
+            JSON.stringify({
+              error: errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Network Error',
+              message:
+                errorCode === 'ETIMEDOUT' ? 'Connection timeout' : errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error',
+              target: targetUrl,
+            }),
+          )
+        }
+        return
+      }
+
+      console.error(`[Proxy] Error forwarding request to ${targetUrl}:`, error)
       if (!res.headersSent) {
         res.writeHead(500, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ error: 'Response error', message: err.message }))
+        res.end(
+          JSON.stringify({
+            error: 'Proxy forwarding error',
+            message: error.message,
+            target: targetUrl,
+          }),
+        )
       }
     })
 
-    // Buffer the entire response first
-    proxyRes.on('data', (chunk: Buffer) => {
-      responseChunks.push(chunk)
-    })
+    proxyReq.setTimeout(30_000, () => {
+      const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
 
-    proxyRes.on('end', async () => {
-      await saveAndWriteResponse()
-    })
-
-    // Also handle 'close' event in case connection closes without 'end'
-    // This is important for SSE streams that may never fire 'end'
-    proxyRes.on('close', async () => {
-      if (!saved) {
-        await saveAndWriteResponse()
-      }
-    })
-  })
-
-  proxyReq.on('error', (error) => {
-    const errorCode = (error as NodeJS.ErrnoException).code
-    // Azure metadata endpoint (169.254.169.254) is expected to fail when not on Azure
-    const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
-
-    // Handle common network errors silently
-    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
       if (isAzureMetadata) {
-        // Azure metadata endpoint failures are expected when not on Azure
         if (!res.headersSent) {
           res.writeHead(503, { 'Content-Type': 'application/json' })
           res.end(
@@ -244,83 +263,48 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
             }),
           )
         }
+        proxyReq.destroy()
         return
       }
-      // For other endpoints, handle network errors silently
+
+      console.error(`[Proxy] Timeout forwarding request to ${targetUrl}`)
       if (!res.headersSent) {
-        const statusCode = errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH' ? 504 : 500
-        res.writeHead(statusCode, { 'Content-Type': 'application/json' })
+        res.writeHead(504, { 'Content-Type': 'application/json' })
         res.end(
           JSON.stringify({
-            error: errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Network Error',
-            message:
-              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error',
-            target: targetUrl,
-          }),
-        )
-      }
-      return
-    }
-
-    // Only log unexpected errors
-    console.error(`[Proxy] Error forwarding request to ${targetUrl}:`, error)
-    if (!res.headersSent) {
-      res.writeHead(500, { 'Content-Type': 'application/json' })
-      res.end(
-        JSON.stringify({
-          error: 'Proxy forwarding error',
-          message: error.message,
-          target: targetUrl,
-        }),
-      )
-    }
-  })
-
-  // Handle request timeout
-  proxyReq.setTimeout(30_000, () => {
-    const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
-
-    // Azure metadata endpoint timeouts are expected when not on Azure
-    if (isAzureMetadata) {
-      if (!res.headersSent) {
-        res.writeHead(503, { 'Content-Type': 'application/json' })
-        res.end(
-          JSON.stringify({
-            error: 'Service Unavailable',
-            message: 'Azure metadata service not available',
+            error: 'Gateway Timeout',
+            message: 'Request to target server timed out',
             target: targetUrl,
           }),
         )
       }
       proxyReq.destroy()
-      return
-    }
+    })
 
-    console.error(`[Proxy] Timeout forwarding request to ${targetUrl}`)
-    if (!res.headersSent) {
-      res.writeHead(504, { 'Content-Type': 'application/json' })
-      res.end(
-        JSON.stringify({
-          error: 'Gateway Timeout',
-          message: 'Request to target server timed out',
-          target: targetUrl,
-        }),
-      )
+    if (requestBody.length > 0) {
+      proxyReq.write(requestBody)
     }
-    proxyReq.destroy()
-  })
+    proxyReq.end()
+  }
 
   req.on('data', (chunk: Buffer) => {
-    // Capture body for POST/PUT/PATCH requests
-    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
-      requestBodyChunks.push(chunk)
-    }
-    // Forward to target server
-    proxyReq.write(chunk)
+    requestBodyChunks.push(chunk)
   })
 
-  req.on('end', () => {
-    proxyReq.end()
+  req.on('end', async () => {
+    const requestBody = Buffer.concat(requestBodyChunks)
+    const parsedRequestBody = ParseRequestBody.parseRequestBody(req.headers, requestBody)
+
+    if (useProxyMock) {
+      const mockResponse = await GetMockResponse.getMockResponse(req.method || 'GET', targetUrl, parsedRequestBody)
+      if (mockResponse) {
+        console.log(`[Proxy] Returning mock response for ${req.method} ${targetUrl}`)
+        GetMockResponse.sendMockResponse(res, mockResponse)
+        return
+      }
+    }
+
+    await forwardBufferedRequest(requestBody)
   })
 }
 

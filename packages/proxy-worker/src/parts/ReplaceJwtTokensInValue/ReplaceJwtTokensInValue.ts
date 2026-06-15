@@ -3,6 +3,30 @@ import * as IsJwtToken from '../IsJwtToken/IsJwtToken.ts'
 import * as IsUnixTimestamp from '../IsUnixTimestamp/IsUnixTimestamp.ts'
 import * as ReplaceJwtToken from '../ReplaceJwtToken/ReplaceJwtToken.ts'
 
+const getCurrentTimestamp = (): number => {
+  return Math.floor(Date.now() / 1000)
+}
+
+const getOneYearFromNow = (): number => {
+  return getCurrentTimestamp() + 365 * 24 * 60 * 60
+}
+
+const isIssuedAtProperty = (key: string): boolean => {
+  return /^(iat|issued_at|issuedAt)$/i.test(key)
+}
+
+const isSignedCopilotToken = (value: string): boolean => {
+  return value.startsWith('tid=') || value.startsWith('Bearer tid=')
+}
+
+const isSignedCopilotTokenPayload = (value: unknown): value is { token: string } => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+  const token = (value as { token?: unknown }).token
+  return typeof token === 'string' && isSignedCopilotToken(token)
+}
+
 export const replaceJwtTokensInValue = async (value: any, parentKey?: string): Promise<any> => {
   if (typeof value === 'string') {
     if (IsJwtToken.isJwtToken(value)) {
@@ -22,8 +46,11 @@ export const replaceJwtTokensInValue = async (value: any, parentKey?: string): P
 
   // Check if this is an expiration timestamp property
   if (parentKey && IsExpirationProperty.isExpirationProperty(parentKey) && IsUnixTimestamp.isUnixTimestamp(value)) {
-    const oneYearFromNow = Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60
-    return oneYearFromNow
+    return getOneYearFromNow()
+  }
+
+  if (parentKey && isIssuedAtProperty(parentKey) && IsUnixTimestamp.isUnixTimestamp(value)) {
+    return getCurrentTimestamp()
   }
 
   if (Array.isArray(value)) {
@@ -31,6 +58,10 @@ export const replaceJwtTokensInValue = async (value: any, parentKey?: string): P
   }
 
   if (value !== null && typeof value === 'object') {
+    if (isSignedCopilotTokenPayload(value)) {
+      return value
+    }
+
     const result: Record<string, any> = {}
     for (const [key, val] of Object.entries(value)) {
       result[key] = await replaceJwtTokensInValue(val, key)

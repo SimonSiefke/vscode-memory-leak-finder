@@ -18,7 +18,6 @@ export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestCont
       name: 'image.svg',
     },
   ])
-  // TODO create an svg file, attach it as image
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
@@ -26,6 +25,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     image: 'image.svg',
     message: `what's displayed in this image`,
     verify: true,
+    model: 'GPT-4.1',
   })
   await ChatEditor.clearAll()
 }

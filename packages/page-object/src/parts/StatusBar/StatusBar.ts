@@ -54,6 +54,22 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to select status bar item`)
       }
     },
+    async shouldBeHidden() {
+      try {
+        const statusBar = page.locator('.part.statusbar')
+        await expect(statusBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that status bar is hidden`)
+      }
+    },
+    async shouldBeVisible() {
+      try {
+        const statusBar = page.locator('.part.statusbar')
+        await expect(statusBar).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that status bar is visible`)
+      }
+    },
     async showItem(id: string) {
       try {
         await page.waitForIdle()

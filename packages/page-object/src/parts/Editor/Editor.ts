@@ -1380,6 +1380,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify selected character count`)
       }
     },
+    async shouldHaveBreadCrumbs() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        await expect(breadcrumbs).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that breadcrumbs are visible`)
+      }
+    },
+    async shouldHaveMinimap() {
+      try {
+        await page.waitForIdle()
+        const minimap = page.locator('.minimap')
+        await expect(minimap).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that minimap is visible`)
+      }
+    },
     async shouldHaveSelection(left: string, width: string) {
       try {
         const selection = page.locator('.selected-text')
@@ -1567,6 +1585,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to verify semantic token ${type} is not present`)
+      }
+    },
+    async shouldNotHaveBreadCrumbs() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        await expect(breadcrumbs).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that breadcrumbs are hidden`)
+      }
+    },
+    async shouldNotHaveMinimap() {
+      try {
+        await page.waitForIdle()
+        const minimap = page.locator('.minimap')
+        await expect(minimap).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that minimap is hidden`)
       }
     },
     async shouldNotHaveSquigglyError() {

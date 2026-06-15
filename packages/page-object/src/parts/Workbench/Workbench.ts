@@ -2,18 +2,33 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+type ConnectToSshOptions = {
+  readonly alias?: string
+  readonly host?: string
+  readonly port?: number
+  readonly user?: string
+}
+
+type QuickPickApi = {
+  executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
+  getVisibleCommands: () => Promise<string[]>
+  pressEnter: () => Promise<void>
+  select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<void>
+  showCommands: (options?: { pressKeyOnce?: boolean }) => Promise<void>
+  type: (value: string) => Promise<void>
+}
+
+type WorkbenchDependencies = {
+  readonly createQuickPick: () => QuickPickApi
+  readonly sleep: (milliseconds: number) => Promise<void>
+}
+
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
   readonly sessionRpc?: any
   readonly locator?: (selector: string) => any
   readonly waitForIdle: () => Promise<void>
   readonly shouldBeVisible: () => Promise<void>
-}
-
-const rejectaftertimeout = () => {
-  const { promise, reject } = Promise.withResolvers<never>()
-  setTimeout(() => reject(new Error('Timeout waiting for new window')), 5000)
-  return promise
 }
 
 const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: string) => {
@@ -30,16 +45,178 @@ const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: strin
   }
 }
 
-export const create = ({ browserRpc, electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
-  return {
-    async waitForNewWindow() {
-      const { promise, resolve } = Promise.withResolvers<string>()
-      let targetCaptured = false
+const isReloadTransitionError = (error: unknown): boolean => {
+  const message = String((error as any)?.message || error || '')
+  return (
+    message.includes('Execution context was destroyed') ||
+    message.includes('uniqueContextId not found') ||
+    message.includes('Cannot find context with specified id')
+  )
+}
 
-      // TODO cleanup listener
+const resolveSshTarget = ({ alias, host = '127.0.0.1', port, user }: ConnectToSshOptions): string => {
+  if (alias) {
+    return alias
+  }
+  if (typeof port === 'number') {
+    return user ? `${user}@${host}:${port}` : `${host}:${port}`
+  }
+  throw new Error(`alias or port is required`)
+}
+
+const sleep = async (milliseconds: number): Promise<void> => {
+  const { promise, resolve } = Promise.withResolvers<void>()
+  setTimeout(resolve, milliseconds)
+  await promise
+}
+
+const getRemoteHostPlatformLabel = (platform: string): string => {
+  switch (platform) {
+    case 'linux':
+      return 'Linux'
+    case 'win32':
+      return 'Windows'
+    case 'darwin':
+      return 'macOS'
+    default:
+      throw new Error(`Unsupported platform for Remote - SSH host selection: ${platform}`)
+  }
+}
+
+const maybeSelectRemoteHostPlatform = async (
+  quickPick: QuickPickApi,
+  dependencies: WorkbenchDependencies,
+  platform: string,
+): Promise<void> => {
+  const expectedPlatform = getRemoteHostPlatformLabel(platform)
+  const platformOptions = ['Linux', 'Windows', 'macOS']
+  const start = Date.now()
+  while (Date.now() - start < 5_000) {
+    try {
+      const visibleCommands = await quickPick.getVisibleCommands()
+      if (visibleCommands.includes(expectedPlatform)) {
+        await quickPick.select(expectedPlatform)
+        return
+      }
+      if (visibleCommands.some((item) => platformOptions.includes(item))) {
+        throw new Error(
+          `Remote - SSH asked for the remote host platform, but the expected option "${expectedPlatform}" was not available. Visible options: ${visibleCommands.join(', ')}`,
+        )
+      }
+    } catch (error) {
+      const message = String((error as any)?.message || error || '')
+      if (!message.includes('Failed to get visible commands')) {
+        throw error
+      }
+    }
+    await dependencies.sleep(250)
+  }
+}
+
+const waitForSshConnection = async (
+  {
+    page,
+    reconnectDevtools,
+  }: {
+    page: any
+    reconnectDevtools: (() => Promise<void>) | undefined
+  },
+  dependencies: WorkbenchDependencies,
+) => {
+  const reconnectPromise = reconnectDevtools
+    ? reconnectDevtools().then(
+        () => true,
+        () => false,
+      )
+    : undefined
+
+  const reconnected = reconnectPromise ? await reconnectPromise : false
+  let recoveredFromTransitionError = false
+
+  if (!reconnected) {
+    const refreshedPage = await page.refresh()
+    await page.rebind(refreshedPage)
+  }
+
+  const start = Date.now()
+  while (Date.now() - start < 30_000) {
+    try {
+      await page.waitForIdle()
+      return
+    } catch (error) {
+      if (!recoveredFromTransitionError && isReloadTransitionError(error)) {
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
+        recoveredFromTransitionError = true
+        continue
+      }
+    }
+    await dependencies.sleep(250)
+  }
+  throw new Error(`Timed out waiting for Remote - SSH connection to settle`)
+}
+
+export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
+  return createWithDependencies(
+    reconnectDevtools
+      ? { browserRpc, electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }
+      : { browserRpc, electronApp, expect, ideVersion, page, platform, VError },
+    {
+      createQuickPick: () =>
+        QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        }),
+      sleep,
+    },
+  )
+}
+
+export const createWithDependencies = (
+  { browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams,
+  dependencies: WorkbenchDependencies,
+) => {
+  return {
+    async connectToSsh(options: ConnectToSshOptions): Promise<void> {
+      try {
+        const target = resolveSshTarget(options)
+        const quickPick = dependencies.createQuickPick()
+        await page.waitForIdle()
+        await quickPick.showCommands({ pressKeyOnce: true })
+        await quickPick.type(WellKnownCommands.RemoteSshConnectCurrentWindowToHost)
+        await quickPick.pressEnter()
+        await quickPick.type(target)
+        await page.waitForIdle()
+        await quickPick.pressEnter()
+        await maybeSelectRemoteHostPlatform(quickPick, dependencies, platform)
+        await waitForSshConnection({ page, reconnectDevtools }, dependencies)
+      } catch (error) {
+        const message =
+          options.alias || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`
+        throw new VError(error, message)
+      }
+    },
+    async waitForNewWindow({ timeout }: { timeout: number }) {
+      const { promise, resolve } = Promise.withResolvers<string>()
 
       if (!browserRpc) {
         throw new Error(`browser rpc is required`)
+      }
+
+      let targetCaptured = false
+
+      const cleanup = () => {
+        browserRpc.off('Target.attachedToTarget', handleNewTarget)
+        clearTimeout(timeoutRef)
+      }
+
+      const handleTimeout = () => {
+        cleanup()
+        resolve('')
       }
 
       const handleNewTarget = (message: any): void => {
@@ -47,10 +224,12 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           return
         }
         targetCaptured = true
+        cleanup()
         const sessionId = message.params.sessionId as string
         resolve(sessionId)
       }
       browserRpc.on('Target.attachedToTarget', handleNewTarget)
+      const timeoutRef = setTimeout(handleTimeout, timeout)
 
       const sessionId = await promise
 
@@ -58,7 +237,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
     },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
-        const newWindowPromise = this.waitForNewWindow()
+        const newWindowPromise = this.waitForNewWindow({ timeout: 5000 })
         // Run the quickpick command to open new window
         await page.waitForIdle()
         const quickPick = QuickPick.create({
@@ -71,7 +250,7 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
         })
         await quickPick.executeCommand(WellKnownCommands.NewWindow)
 
-        const sessionId = await Promise.race([newWindowPromise, rejectaftertimeout()])
+        const sessionId = await newWindowPromise
         if (!sessionId) {
           throw new Error(`Failed to wait for window`)
         }
@@ -108,12 +287,38 @@ export const create = ({ browserRpc, electronApp, expect, page, platform, VError
           async shouldBeVisible() {
             await newWindowPage.waitForIdle()
             const workbench = newWindowPage.locator('.monaco-workbench')
-            await expect(workbench).toBeVisible({ timeout: 10_000 })
+            await expect(workbench).toBeVisible({ timeout: 20_000 })
             await newWindowPage.waitForIdle()
           },
         }
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
+      }
+    },
+    async reload(): Promise<void> {
+      try {
+        await page.waitForIdle()
+
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+
+        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
+        try {
+          await page.waitForIdle()
+        } catch {
+          // The renderer can be in flux immediately after reload. Visibility check below is the real readiness gate.
+        }
+        await this.shouldBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to reload window`)
       }
     },
     async focusLeftEditorGroup() {
