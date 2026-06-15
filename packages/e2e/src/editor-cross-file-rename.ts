@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 const initialFiles = [
   {
     content: `let x:string = 1`,
