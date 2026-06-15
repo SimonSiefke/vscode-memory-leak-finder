@@ -121,6 +121,22 @@ test('waitForDevtoolsListening - error - es modules not supported', async () => 
   )
 })
 
+test('waitForDevtoolsListening - error - app threw during load and stream closes without details', async () => {
+  // @ts-ignore
+  const stream = new EventEmitter()
+  // @ts-ignore
+  stream.setEncoding = () => {}
+
+  setTimeout(() => {
+    stream.emit('data', 'App threw an error during load\n')
+    setTimeout(() => {
+      stream.emit('close')
+    }, 0)
+  }, 0)
+  const error = await getError(() => WaitForDevtoolsListening.waitForDevtoolsListening(stream))
+  expect(error.message).toBe(`App threw an error during load`)
+})
+
 test('waitForDevtoolsListening - error - syntax error in main', async () => {
   // @ts-ignore
   const stream = new EventEmitter()

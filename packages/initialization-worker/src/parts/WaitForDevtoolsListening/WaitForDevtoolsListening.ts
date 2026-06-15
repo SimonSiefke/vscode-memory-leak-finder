@@ -6,7 +6,15 @@ const RE_LISTENING_ON = /DevTools listening on (ws:\/\/.*)/
 
 interface ReadableStreamLike {
   emit(event: 'data', data: string): boolean
-  on(event: 'data', listener: (data: string) => void): unknown
+  on(event: 'data', listener: (data: string | Buffer) => void): unknown
+  on(event: 'end' | 'close', listener: () => void): unknown
+  on(event: 'error', listener: (error: unknown) => void): unknown
+  off?(event: 'data', listener: (data: string | Buffer) => void): unknown
+  off?(event: 'end' | 'close', listener: () => void): unknown
+  off?(event: 'error', listener: (error: unknown) => void): unknown
+  removeListener?(event: 'data', listener: (data: string | Buffer) => void): unknown
+  removeListener?(event: 'end' | 'close', listener: () => void): unknown
+  removeListener?(event: 'error', listener: (error: unknown) => void): unknown
 }
 
 const errorChecker = async (data: string, stream: ReadableStreamLike): Promise<void> => {

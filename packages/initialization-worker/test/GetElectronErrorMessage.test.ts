@@ -1,4 +1,5 @@
 import { test, expect } from '@jest/globals'
+import EventEmitter from 'node:events'
 import * as GetElectronErrorMessage from '../src/parts/GetElectronErrorMessage/GetElectronErrorMessage.ts'
 
 test('error - electron app not found', async () => {
@@ -38,4 +39,26 @@ test('error - invalid package json', async () => {
   expect(error.message).toBe(
     `Error launching app: Unable to parse /test/e2e/fixtures/sample.error-invalid-package-json/package.json: /test/e2e/fixtures/sample.error-invalid-package-json/package.json: Expected ',' or '}' after property value in JSON at position 182`,
   )
+})
+
+test('error - app threw during load in first chunk', async () => {
+  const firstData =
+    'App threw an error during load\n' +
+    'ReferenceError: abc is not defined\n' +
+    '    at Object.<anonymous> (/test/e2e/fixtures/sample.reference-error-in-main/main.js:16:1)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1141:14)\n'
+  const error = await GetElectronErrorMessage.getElectronErrorMessage(firstData)
+  expect(error.message).toBe(`App threw an error during load: ReferenceError: abc is not defined`)
+  expect(error.stack).toMatch(`Error: App threw an error during load: ReferenceError: abc is not defined
+    at Object.<anonymous> (/test/e2e/fixtures/sample.reference-error-in-main/main.js:16:1)
+    at Module._compile (node:internal/modules/cjs/loader:1141:14)`)
+})
+
+test('error - app threw during load and stream closes without details', async () => {
+  const stream = new EventEmitter()
+  setTimeout(() => {
+    stream.emit('close')
+  }, 0)
+  const error = await GetElectronErrorMessage.getElectronErrorMessage('App threw an error during load\n', stream)
+  expect(error.message).toBe(`App threw an error during load`)
 })
