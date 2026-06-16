@@ -54,6 +54,43 @@ const getAutoAttachEventTimeout = (attachedToPageTimeout: number): number => {
   return Math.min(attachedToPageTimeout, AUTO_ATTACH_EVENT_TIMEOUT)
 }
 
+const getAutoAttachFilter = (): readonly object[] => {
+  if (process.platform === 'darwin') {
+    return [
+      {
+        exclude: true,
+        type: 'browser',
+      },
+      {
+        exclude: false,
+        type: 'page',
+      },
+      {
+        exclude: false,
+        type: 'tab',
+      },
+    ]
+  }
+  return [
+    {
+      exclude: true,
+      type: 'browser',
+    },
+    {
+      exclude: true,
+      type: 'tab',
+    },
+    {
+      exclude: false,
+      type: 'page',
+    },
+  ]
+}
+
+const shouldWaitForDebuggerOnStart = (): boolean => {
+  return process.platform !== 'darwin'
+}
+
 const getRemainingTime = (deadline: number): number => {
   return Math.max(deadline - Date.now(), 0)
 }
@@ -272,27 +309,16 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
   if (!event) {
     autoAttachAttempted = true
     const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout) as Promise<AttachedToTargetEvent | null>
+    const filter = getAutoAttachFilter()
+    const waitForDebuggerOnStart = shouldWaitForDebuggerOnStart()
 
-    console.error(`[macos-ci-debug] Target.setAutoAttach start`)
+    console.error(`[macos-ci-debug] Target.setAutoAttach start waitForDebuggerOnStart=${waitForDebuggerOnStart}`)
     await withProtocolTimeout(
       DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
         autoAttach: true,
-        filter: [
-          {
-            exclude: true,
-            type: 'browser',
-          },
-          {
-            exclude: true,
-            type: 'tab',
-          },
-          {
-            exclude: false,
-            type: 'page',
-          },
-        ],
+        filter,
         flatten: true,
-        waitForDebuggerOnStart: true,
+        waitForDebuggerOnStart,
       }) as Promise<void>,
       'Target.setAutoAttach',
       attachedToPageTimeout,
