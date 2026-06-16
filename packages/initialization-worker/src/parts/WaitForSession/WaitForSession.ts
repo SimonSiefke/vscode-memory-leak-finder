@@ -1,4 +1,5 @@
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
@@ -17,12 +18,19 @@ interface AttachedToTargetEvent {
   }
 }
 
+interface TargetDiscoveryEvent {
+  params: {
+    targetInfo: TargetInfo
+  }
+}
+
 interface BrowserRpc {
   callbacks: Record<string, unknown>
   invoke(method: string, params?: unknown): Promise<unknown>
   invokeWithSession(sessionId: string, method: string, params?: unknown): Promise<unknown>
   listeners: Record<string, unknown>
-  on(event: string, listener: (event: AttachedToTargetEvent) => void): void
+  off(event: string, listener: (event: any) => void): void
+  on(event: string, listener: (event: any) => void): void
   once(event: string): Promise<AttachedToTargetEvent>
 }
 
@@ -34,6 +42,7 @@ interface TargetLookup {
 interface AttachResult {
   readonly attachError?: unknown
   readonly event?: AttachedToTargetEvent
+  readonly target?: TargetInfo
   readonly targetLookup: TargetLookup
 }
 
@@ -55,18 +64,6 @@ const getAutoAttachEventTimeout = (attachedToPageTimeout: number): number => {
 }
 
 const getAutoAttachFilter = (): readonly object[] => {
-  if (process.platform === 'darwin') {
-    return [
-      {
-        exclude: true,
-        type: 'browser',
-      },
-      {
-        exclude: false,
-        type: 'tab',
-      },
-    ]
-  }
   return [
     {
       exclude: true,
@@ -83,8 +80,8 @@ const getAutoAttachFilter = (): readonly object[] => {
   ]
 }
 
-const shouldWaitForDebuggerOnStart = (): boolean => {
-  return process.platform !== 'darwin'
+const isMacos = (): boolean => {
+  return process.platform === 'darwin'
 }
 
 const getRemainingTime = (deadline: number): number => {
@@ -194,6 +191,48 @@ const getAttachableTarget = (targets: readonly TargetInfo[]): TargetInfo | undef
   return getPageTarget(targets) ?? targets.find(isLikelyWorkbenchTabTarget)
 }
 
+const getTargetDiscoveryFilter = (): readonly object[] => {
+  return [
+    {
+      exclude: true,
+      type: 'browser',
+    },
+  ]
+}
+
+const waitForDiscoveredTarget = (browserRpc: BrowserRpc, timeout: number): Promise<TargetInfo | null> => {
+  const { promise, resolve } = Promise.withResolvers<TargetInfo | null>()
+
+  const cleanup = (targetInfo: TargetInfo | null): void => {
+    browserRpc.off(DevtoolsEventType.TargetTargetCreated, handleDiscoveryEvent)
+    browserRpc.off(DevtoolsEventType.TargetTargetInfoChanged, handleDiscoveryEvent)
+    clearTimeout(timeoutRef)
+    resolve(targetInfo)
+  }
+
+  const handleDiscoveryEvent = (message: TargetDiscoveryEvent): void => {
+    const targetInfo = message?.params?.targetInfo
+    if (!targetInfo) {
+      return
+    }
+    console.error(`[macos-ci-debug] target discovery event ${formatTarget(targetInfo)}`)
+    const target = getAttachableTarget([targetInfo])
+    if (target) {
+      cleanup(target)
+    }
+  }
+
+  const handleTimeout = (): void => {
+    console.error(`[macos-ci-debug] waitForDiscoveredTarget timed out after ${timeout}ms`)
+    cleanup(null)
+  }
+
+  browserRpc.on(DevtoolsEventType.TargetTargetCreated, handleDiscoveryEvent)
+  browserRpc.on(DevtoolsEventType.TargetTargetInfoChanged, handleDiscoveryEvent)
+  const timeoutRef = setTimeout(handleTimeout, timeout)
+  return promise
+}
+
 const attachToExistingTarget = async (browserRpc: BrowserRpc, targetInfo: TargetInfo, timeout: number): Promise<AttachedToTargetEvent> => {
   console.error(`[macos-ci-debug] attaching to existing target ${formatTarget(targetInfo)}`)
   const sessionId = await withProtocolTimeout(
@@ -244,21 +283,82 @@ const attachToExistingTargetWithRetries = async (
   }
 }
 
+const attachToDiscoveredTarget = async (browserRpc: BrowserRpc, attachedToPageTimeout: number, deadline: number): Promise<AttachResult> => {
+  let target: TargetInfo | null = null
+  let attachError: unknown
+
+  const discoveryPromise = waitForDiscoveredTarget(browserRpc, attachedToPageTimeout)
+  try {
+    const timeout = getAttemptTimeout(attachedToPageTimeout, deadline)
+    console.error(`[macos-ci-debug] Target.setDiscoverTargets start`)
+    await withProtocolTimeout(
+      DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
+        discover: true,
+        filter: getTargetDiscoveryFilter(),
+      }) as Promise<void>,
+      'Target.setDiscoverTargets',
+      timeout,
+    )
+    console.error(`[macos-ci-debug] Target.setDiscoverTargets complete`)
+    target = await discoveryPromise
+    if (!target) {
+      return {
+        targetLookup: {
+          targets: [],
+        },
+      }
+    }
+
+    try {
+      const event = await attachToExistingTarget(browserRpc, target, getAttemptTimeout(attachedToPageTimeout, deadline))
+      return {
+        event,
+        target,
+        targetLookup: {
+          targets: [target],
+        },
+      }
+    } catch (error) {
+      attachError = error
+    }
+  } catch (error) {
+    attachError = error
+  }
+
+  const result: AttachResult = {
+    attachError,
+    targetLookup: {
+      targets: target ? [target] : [],
+    },
+  }
+  if (target) {
+    return {
+      ...result,
+      target,
+    }
+  }
+  return result
+}
+
 const createAttachErrorMessage = ({
   attachedToPageTimeout,
   attachError,
   autoAttachAttempted,
+  targetDiscoveryAttempted,
   targetLookup,
 }: {
   attachedToPageTimeout: number
   attachError?: unknown
   autoAttachAttempted: boolean
+  targetDiscoveryAttempted: boolean
   targetLookup: TargetLookup
 }): string => {
   const parts = [`Failed to attach to page after ${attachedToPageTimeout}ms`]
 
   if (autoAttachAttempted) {
     parts.push(`No Target.attachedToTarget event was received after Target.setAutoAttach`)
+  } else if (targetDiscoveryAttempted) {
+    parts.push(`Target discovery did not find an attachable target`)
   } else {
     parts.push(`Manual Target.getTargets attach fallback did not find an attachable target`)
   }
@@ -285,6 +385,24 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
 
   let event: AttachedToTargetEvent | null = null
   let autoAttachAttempted = false
+  let targetDiscoveryAttempted = false
+
+  if (isMacos()) {
+    targetDiscoveryAttempted = true
+    const discoveryResult = await attachToDiscoveredTarget(browserRpc, attachedToPageTimeout, deadline)
+    event = discoveryResult.event ?? null
+    if (!event) {
+      throw new Error(
+        createAttachErrorMessage({
+          attachedToPageTimeout,
+          attachError: discoveryResult.attachError,
+          autoAttachAttempted,
+          targetDiscoveryAttempted,
+          targetLookup: discoveryResult.targetLookup,
+        }),
+      )
+    }
+  }
 
   if (shouldAttachManuallyBeforeAutoAttach(attachedToPageTimeout)) {
     console.error(`[macos-ci-debug] waitForSession using manual target attach before Target.setAutoAttach`)
@@ -296,6 +414,7 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
           attachedToPageTimeout,
           attachError: fallbackResult.attachError,
           autoAttachAttempted,
+          targetDiscoveryAttempted,
           targetLookup: fallbackResult.targetLookup,
         }),
       )
@@ -306,15 +425,14 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
     autoAttachAttempted = true
     const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout) as Promise<AttachedToTargetEvent | null>
     const filter = getAutoAttachFilter()
-    const waitForDebuggerOnStart = shouldWaitForDebuggerOnStart()
 
-    console.error(`[macos-ci-debug] Target.setAutoAttach start waitForDebuggerOnStart=${waitForDebuggerOnStart}`)
+    console.error(`[macos-ci-debug] Target.setAutoAttach start waitForDebuggerOnStart=true`)
     await withProtocolTimeout(
       DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
         autoAttach: true,
         filter,
         flatten: true,
-        waitForDebuggerOnStart,
+        waitForDebuggerOnStart: true,
       }) as Promise<void>,
       'Target.setAutoAttach',
       attachedToPageTimeout,
@@ -336,6 +454,7 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
             attachedToPageTimeout,
             attachError: fallbackResult.attachError,
             autoAttachAttempted,
+            targetDiscoveryAttempted,
             targetLookup: fallbackResult.targetLookup,
           }),
         )

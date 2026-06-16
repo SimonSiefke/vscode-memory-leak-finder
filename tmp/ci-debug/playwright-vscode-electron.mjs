@@ -87,6 +87,9 @@ try {
     log(`stderr ${data.toString().trimEnd()}`)
   })
 
+  const window = await withTimeout('electron.firstWindow', app.firstWindow(), timeout)
+  log(`firstWindow resolved title=${JSON.stringify(await window.title())} url=${window.url()}`)
+
   const appInfo = await withTimeout(
     'electron.evaluate',
     app.evaluate(async ({ app: electronApp }) => {
@@ -100,9 +103,6 @@ try {
     timeout,
   )
   log(`appInfo=${JSON.stringify(appInfo)}`)
-
-  const window = await withTimeout('electron.firstWindow', app.firstWindow(), timeout)
-  log(`firstWindow resolved title=${JSON.stringify(await window.title())} url=${window.url()}`)
 } catch (error) {
   log(`error=${error instanceof Error ? error.stack || error.message : String(error)}`)
   process.exitCode = 1

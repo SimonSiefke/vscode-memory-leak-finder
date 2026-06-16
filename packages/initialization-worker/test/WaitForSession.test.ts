@@ -27,11 +27,13 @@ const getError = async (fn: () => Promise<unknown>): Promise<Error> => {
 
 const createBrowserRpc = ({
   attachError,
+  discoveredTargets = [],
   hangingMethod,
   sessionId = 'manual-session',
   targets,
 }: {
   attachError?: Error
+  discoveredTargets?: readonly TargetInfo[]
   hangingMethod?: string
   sessionId?: string
   targets: readonly TargetInfo[]
@@ -48,6 +50,18 @@ const createBrowserRpc = ({
         return new Promise(() => {})
       }
       if (method === 'Target.setAutoAttach') {
+        return Promise.resolve({ result: {} })
+      }
+      if (method === 'Target.setDiscoverTargets') {
+        queueMicrotask(() => {
+          for (const targetInfo of discoveredTargets) {
+            listeners['Target.targetCreated']?.({
+              params: {
+                targetInfo,
+              },
+            })
+          }
+        })
         return Promise.resolve({ result: {} })
       }
       if (method === 'Target.getTargets') {
@@ -87,6 +101,21 @@ const createBrowserRpc = ({
   }
 }
 
+const withPlatform = async (platform: NodeJS.Platform, fn: () => Promise<void>): Promise<void> => {
+  const descriptor = Object.getOwnPropertyDescriptor(process, 'platform')
+  if (!descriptor) {
+    throw new Error('process.platform descriptor not found')
+  }
+  Object.defineProperty(process, 'platform', {
+    value: platform,
+  })
+  try {
+    await fn()
+  } finally {
+    Object.defineProperty(process, 'platform', descriptor)
+  }
+}
+
 test('waitForSession - attaches to existing page target after auto attach timeout', async () => {
   const browserRpc = createBrowserRpc({
     targets: [
@@ -110,6 +139,41 @@ test('waitForSession - attaches to existing page target after auto attach timeou
       flatten: true,
       targetId: 'page-1',
     },
+  })
+})
+
+test('waitForSession - on macos attaches to discovered tab target without auto attach', async () => {
+  await withPlatform('darwin', async () => {
+    const browserRpc = createBrowserRpc({
+      discoveredTargets: [
+        {
+          attached: false,
+          targetId: 'tab-1',
+          title: 'Visual Studio Code',
+          type: 'tab',
+          url: 'vscode-file://vscode-app/index.html',
+        },
+      ],
+      targets: [],
+    })
+
+    const result = await waitForSession(browserRpc, 100)
+
+    expect(result.sessionId).toBe('manual-session')
+    expect(result.targetId).toBe('tab-1')
+    expect(browserRpc.calls).toContainEqual({
+      method: 'Target.setDiscoverTargets',
+      params: {
+        discover: true,
+        filter: [
+          {
+            exclude: true,
+            type: 'browser',
+          },
+        ],
+      },
+    })
+    expect(browserRpc.calls.some((call) => call.method === 'Target.setAutoAttach')).toBe(false)
   })
 })
 
