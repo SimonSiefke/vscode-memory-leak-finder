@@ -41,6 +41,10 @@ const FALLBACK_PROTOCOL_TIMEOUT = 10_000
 const AUTO_ATTACH_EVENT_TIMEOUT = 5_000
 const FALLBACK_RETRY_DELAY = 1_000
 
+const shouldAttachManuallyBeforeAutoAttach = (): boolean => {
+  return process.platform === 'darwin'
+}
+
 const getFallbackProtocolTimeout = (attachedToPageTimeout: number): number => {
   return Math.min(attachedToPageTimeout, FALLBACK_PROTOCOL_TIMEOUT)
 }
@@ -209,16 +213,21 @@ const attachToExistingTargetWithRetries = async (
 const createAttachErrorMessage = ({
   attachedToPageTimeout,
   attachError,
+  autoAttachAttempted,
   targetLookup,
 }: {
   attachedToPageTimeout: number
   attachError?: unknown
+  autoAttachAttempted: boolean
   targetLookup: TargetLookup
 }): string => {
-  const parts = [
-    `Failed to attach to page after ${attachedToPageTimeout}ms`,
-    `No Target.attachedToTarget event was received after Target.setAutoAttach`,
-  ]
+  const parts = [`Failed to attach to page after ${attachedToPageTimeout}ms`]
+
+  if (autoAttachAttempted) {
+    parts.push(`No Target.attachedToTarget event was received after Target.setAutoAttach`)
+  } else {
+    parts.push(`Manual Target.getTargets attach fallback did not find an attachable target`)
+  }
 
   if (targetLookup.error) {
     parts.push(`Target.getTargets failed: ${formatUnknownError(targetLookup.error)}`)
@@ -239,51 +248,75 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
   console.error(`[macos-ci-debug] waitForSession start timeout=${attachedToPageTimeout}`)
   const deadline = Date.now() + attachedToPageTimeout
   const autoAttachEventTimeout = getAutoAttachEventTimeout(attachedToPageTimeout)
-  const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout) as Promise<AttachedToTargetEvent | null>
 
-  console.error(`[macos-ci-debug] Target.setAutoAttach start`)
-  await withProtocolTimeout(
-    DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
-      autoAttach: true,
-      filter: [
-        {
-          exclude: true,
-          type: 'browser',
-        },
-        {
-          exclude: true,
-          type: 'tab',
-        },
-        {
-          exclude: false,
-          type: 'page',
-        },
-      ],
-      flatten: true,
-      waitForDebuggerOnStart: true,
-    }) as Promise<void>,
-    'Target.setAutoAttach',
-    attachedToPageTimeout,
-  )
-  console.error(`[macos-ci-debug] Target.setAutoAttach complete`)
+  let event: AttachedToTargetEvent | null = null
+  let autoAttachAttempted = false
 
-  let event = await waitForInitialAutoAttachEvent(eventPromise, autoAttachEventTimeout)
-  console.error(`[macos-ci-debug] waitForSession initial event ${event ? 'received' : 'missing'}`)
-
-  if (!event) {
-    const fallbackResult = await Promise.race([
-      waitForLateAutoAttachEvent(eventPromise),
-      attachToExistingTargetWithRetries(browserRpc, attachedToPageTimeout, deadline),
-    ])
+  if (shouldAttachManuallyBeforeAutoAttach()) {
+    console.error(`[macos-ci-debug] waitForSession using manual target attach before Target.setAutoAttach`)
+    const fallbackResult = await attachToExistingTargetWithRetries(browserRpc, attachedToPageTimeout, deadline)
     event = fallbackResult.event ?? null
     if (!event) {
       throw new Error(
         createAttachErrorMessage({
           attachedToPageTimeout,
           attachError: fallbackResult.attachError,
+          autoAttachAttempted,
           targetLookup: fallbackResult.targetLookup,
         }),
       )
+    }
+  }
+
+  if (!event) {
+    autoAttachAttempted = true
+    const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout) as Promise<AttachedToTargetEvent | null>
+
+    console.error(`[macos-ci-debug] Target.setAutoAttach start`)
+    await withProtocolTimeout(
+      DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
+        autoAttach: true,
+        filter: [
+          {
+            exclude: true,
+            type: 'browser',
+          },
+          {
+            exclude: true,
+            type: 'tab',
+          },
+          {
+            exclude: false,
+            type: 'page',
+          },
+        ],
+        flatten: true,
+        waitForDebuggerOnStart: true,
+      }) as Promise<void>,
+      'Target.setAutoAttach',
+      attachedToPageTimeout,
+    )
+    console.error(`[macos-ci-debug] Target.setAutoAttach complete`)
+
+    event = await waitForInitialAutoAttachEvent(eventPromise, autoAttachEventTimeout)
+    console.error(`[macos-ci-debug] waitForSession initial event ${event ? 'received' : 'missing'}`)
+
+    if (!event) {
+      const fallbackResult = await Promise.race([
+        waitForLateAutoAttachEvent(eventPromise),
+        attachToExistingTargetWithRetries(browserRpc, attachedToPageTimeout, deadline),
+      ])
+      event = fallbackResult.event ?? null
+      if (!event) {
+        throw new Error(
+          createAttachErrorMessage({
+            attachedToPageTimeout,
+            attachError: fallbackResult.attachError,
+            autoAttachAttempted,
+            targetLookup: fallbackResult.targetLookup,
+          }),
+        )
+      }
     }
   }
   const { sessionId, targetInfo } = event.params
