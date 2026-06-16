@@ -6,11 +6,11 @@ import { VError } from '../VError/VError.ts'
 // const logStream = createWriteStream(logFile)
 
 const handleStdout = (data: string) => {
-  // logStream.write(data)
+  console.error(`[launch-worker-debug] stdout ${data}`)
 }
 
 const handleStdErr = (data: string) => {
-  // logStream.write(data)
+  console.error(`[launch-worker-debug] stderr ${data}`)
 }
 
 export const launchElectron = async ({
@@ -30,6 +30,7 @@ export const launchElectron = async ({
 }) => {
   try {
     const allArgs = GetElectronArgs.getElectronArgs({ args, headlessMode })
+    console.error(`[launch-worker-debug] spawning ${cliPath} ${allArgs.join(' ')}`)
     const child = Spawn.spawn(cliPath, allArgs, {
       cwd,
       env,
@@ -37,6 +38,16 @@ export const launchElectron = async ({
     if (child.pid === undefined) {
       throw new Error(`Failed to get PID from spawned process`)
     }
+    console.error(`[launch-worker-debug] spawned pid=${child.pid}`)
+    child.on('error', (error) => {
+      console.error(`[launch-worker-debug] process error ${error.message}`)
+    })
+    child.on('exit', (code, signal) => {
+      console.error(`[launch-worker-debug] process exit code=${code} signal=${signal}`)
+    })
+    child.on('close', (code, signal) => {
+      console.error(`[launch-worker-debug] process close code=${code} signal=${signal}`)
+    })
     addDisposable(() => {
       child.kill('SIGKILL')
     })

@@ -16,6 +16,7 @@ export const monkeyPatchElectronScript = `function () {
 
   const patchedAppEmit = (event, ...args) => {
     if (event === 'ready') {
+      console.error('[monkey-patch-debug] captured ready event listenerCount=' + app.listenerCount('ready') + ' args=' + args.length)
       readyEventArgs = args;
       return app.listenerCount('ready') > 0;
     }
@@ -37,10 +38,20 @@ export const monkeyPatchElectronScript = `function () {
   app.isReady = patchedIsReady
 
   return async () => {
+    const getWindowCount = () => {
+      try {
+        return electron.BrowserWindow.getAllWindows().length
+      } catch (error) {
+        return 'error:' + error.message
+      }
+    }
+    console.error('[monkey-patch-debug] undo start capturedReady=' + Boolean(readyEventArgs) + ' patchedIsReady=' + isReady + ' appIsReady=' + app.isReady() + ' windows=' + getWindowCount())
     const event = await originalWhenReady
+    console.error('[monkey-patch-debug] originalWhenReady resolved event=' + Boolean(event) + ' capturedReady=' + Boolean(readyEventArgs) + ' windows=' + getWindowCount())
     isReady = true
     resolve(event)
-    originalEmit('ready', ...readyEventArgs)
+    originalEmit('ready', ...(readyEventArgs || []))
+    console.error('[monkey-patch-debug] ready replayed listeners=' + app.listenerCount('ready') + ' windows=' + getWindowCount())
   }
 }
 `

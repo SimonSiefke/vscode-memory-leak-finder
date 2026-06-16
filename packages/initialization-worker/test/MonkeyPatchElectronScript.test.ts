@@ -4,7 +4,7 @@ import * as MonkeyPatchElectronScript from '../src/parts/MonkeyPatchElectronScri
 
 test('monkeyPatchElectronScript - keeps original ready-event patch', () => {
   expect(MonkeyPatchElectronScript.monkeyPatchElectronScript).toContain('const originalWhenReady = app.whenReady()')
-  expect(MonkeyPatchElectronScript.monkeyPatchElectronScript).toContain("originalEmit('ready', ...readyEventArgs)")
+  expect(MonkeyPatchElectronScript.monkeyPatchElectronScript).toContain("originalEmit('ready', ...(readyEventArgs || []))")
 })
 
 test('getMonkeyPatchElectronSafeStorageScript - injects secrets path and log path', () => {
