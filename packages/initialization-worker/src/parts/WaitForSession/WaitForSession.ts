@@ -195,15 +195,6 @@ const getAttachableTarget = (targets: readonly TargetInfo[]): TargetInfo | undef
   return getPageTarget(targets) ?? targets.find(isLikelyWorkbenchTabTarget)
 }
 
-const getTargetDiscoveryFilter = (): readonly object[] => {
-  return [
-    {
-      exclude: true,
-      type: 'browser',
-    },
-  ]
-}
-
 const waitForDiscoveredTarget = (browserRpc: BrowserRpc, timeout: number): Promise<TargetInfo | null> => {
   const { promise, resolve } = Promise.withResolvers<TargetInfo | null>()
 
@@ -312,7 +303,6 @@ const attachToDiscoveredTarget = async (
     await withProtocolTimeout(
       DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
         discover: true,
-        filter: getTargetDiscoveryFilter(),
       }) as Promise<void>,
       'Target.setDiscoverTargets',
       timeout,

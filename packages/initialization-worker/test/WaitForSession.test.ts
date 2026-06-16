@@ -169,12 +169,6 @@ test('waitForSession - on macos attaches to discovered tab target without auto a
       method: 'Target.setDiscoverTargets',
       params: {
         discover: true,
-        filter: [
-          {
-            exclude: true,
-            type: 'browser',
-          },
-        ],
       },
     })
     expect(browserRpc.calls.some((call) => call.method === 'Target.setAutoAttach')).toBe(false)
