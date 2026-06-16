@@ -63,10 +63,6 @@ const getAutoAttachFilter = (): readonly object[] => {
       },
       {
         exclude: false,
-        type: 'page',
-      },
-      {
-        exclude: false,
         type: 'tab',
       },
     ]
