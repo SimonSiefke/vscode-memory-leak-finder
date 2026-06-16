@@ -13,7 +13,7 @@ import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDe
 // TODO maybe pass it as argument from above
 const HTTP_SERVER_PORT = 9876
 
-const shouldConnectDevtoolsAfterReady = (): boolean => {
+const shouldUndoMonkeyPatchAfterTargetDiscovery = (): boolean => {
   return process.platform === 'darwin'
 }
 
@@ -69,24 +69,37 @@ export const prepareBoth = async (
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
   console.error(`[macos-ci-debug] prepareBoth devtools websocket ready`)
 
-  const connectAfterReady = shouldConnectDevtoolsAfterReady()
-  const connectDevtoolsPromise = connectAfterReady ? undefined : connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
+  let monkeyPatchUndone = false
+  const undoMonkeyPatch = async (): Promise<void> => {
+    if (monkeyPatchUndone) {
+      return
+    }
+    monkeyPatchUndone = true
+    // Always undo monkey patch to allow page creation.
+    // When tracking, we'll pause again after function-tracker is connected.
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+      objectId: monkeyPatchedElectronId,
+    })
+    console.error(`[macos-ci-debug] prepareBoth undo monkey patch complete`)
+  }
+
+  const undoAfterTargetDiscovery = shouldUndoMonkeyPatchAfterTargetDiscovery()
+  const connectDevtoolsPromise = connectDevtools(
+    devtoolsWebSocketUrl,
+    attachedToPageTimeout,
+    undoAfterTargetDiscovery ? undoMonkeyPatch : undefined,
+  )
 
   if (headlessMode) {
     // TODO
   }
 
-  // Always undo monkey patch immediately to allow page creation
-  // When tracking, we'll pause again after function-tracker is connected
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-    objectId: monkeyPatchedElectronId,
-  })
-  console.error(`[macos-ci-debug] prepareBoth undo monkey patch complete`)
+  if (!undoAfterTargetDiscovery) {
+    await undoMonkeyPatch()
+  }
 
-  const connectDevtoolsResult = connectAfterReady
-    ? await connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
-    : await connectDevtoolsPromise
+  const connectDevtoolsResult = await connectDevtoolsPromise
 
   // Wait for the page to be created by the initialization worker's connectDevtools
   const { dispose, sessionId, targetId } = connectDevtoolsResult

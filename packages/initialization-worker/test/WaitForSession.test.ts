@@ -181,6 +181,37 @@ test('waitForSession - on macos attaches to discovered tab target without auto a
   })
 })
 
+test('waitForSession - on macos runs beforeWaitForTarget after enabling discovery', async () => {
+  await withPlatform('darwin', async () => {
+    const targetInfo = {
+      attached: false,
+      targetId: 'tab-1',
+      title: 'Visual Studio Code',
+      type: 'tab',
+      url: 'vscode-file://vscode-app/index.html',
+    }
+    const browserRpc = createBrowserRpc({
+      targets: [],
+    })
+    let beforeWaitForTargetCalled = false
+
+    const result = await waitForSession(browserRpc, 100, {
+      async beforeWaitForTarget() {
+        beforeWaitForTargetCalled = true
+        browserRpc.listeners['Target.targetCreated']?.({
+          params: {
+            targetInfo,
+          },
+        })
+      },
+    })
+
+    expect(beforeWaitForTargetCalled).toBe(true)
+    expect(result.sessionId).toBe('manual-session')
+    expect(result.targetId).toBe('tab-1')
+  })
+})
+
 test('waitForSession - includes target details when no page target is available', async () => {
   const browserRpc = createBrowserRpc({
     targets: [

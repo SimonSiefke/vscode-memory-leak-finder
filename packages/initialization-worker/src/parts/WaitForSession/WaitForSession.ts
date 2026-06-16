@@ -46,6 +46,10 @@ interface AttachResult {
   readonly targetLookup: TargetLookup
 }
 
+interface WaitForSessionOptions {
+  readonly beforeWaitForTarget?: () => Promise<void>
+}
+
 const FALLBACK_PROTOCOL_TIMEOUT = 10_000
 const AUTO_ATTACH_EVENT_TIMEOUT = 5_000
 const FALLBACK_RETRY_DELAY = 1_000
@@ -283,7 +287,21 @@ const attachToExistingTargetWithRetries = async (
   }
 }
 
-const attachToDiscoveredTarget = async (browserRpc: BrowserRpc, attachedToPageTimeout: number, deadline: number): Promise<AttachResult> => {
+const runBeforeWaitForTarget = async (beforeWaitForTarget: (() => Promise<void>) | undefined): Promise<void> => {
+  if (!beforeWaitForTarget) {
+    return
+  }
+  console.error(`[macos-ci-debug] waitForSession beforeWaitForTarget start`)
+  await beforeWaitForTarget()
+  console.error(`[macos-ci-debug] waitForSession beforeWaitForTarget complete`)
+}
+
+const attachToDiscoveredTarget = async (
+  browserRpc: BrowserRpc,
+  attachedToPageTimeout: number,
+  deadline: number,
+  beforeWaitForTarget: (() => Promise<void>) | undefined,
+): Promise<AttachResult> => {
   let target: TargetInfo | null = null
   let attachError: unknown
 
@@ -300,6 +318,7 @@ const attachToDiscoveredTarget = async (browserRpc: BrowserRpc, attachedToPageTi
       timeout,
     )
     console.error(`[macos-ci-debug] Target.setDiscoverTargets complete`)
+    await runBeforeWaitForTarget(beforeWaitForTarget)
     target = await discoveryPromise
     if (!target) {
       return {
@@ -378,7 +397,7 @@ const createAttachErrorMessage = ({
   return parts.join('. ')
 }
 
-export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeout: number) => {
+export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeout: number, options: WaitForSessionOptions = {}) => {
   console.error(`[macos-ci-debug] waitForSession start timeout=${attachedToPageTimeout}`)
   const deadline = Date.now() + attachedToPageTimeout
   const autoAttachEventTimeout = getAutoAttachEventTimeout(attachedToPageTimeout)
@@ -389,7 +408,7 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
 
   if (isMacos()) {
     targetDiscoveryAttempted = true
-    const discoveryResult = await attachToDiscoveredTarget(browserRpc, attachedToPageTimeout, deadline)
+    const discoveryResult = await attachToDiscoveredTarget(browserRpc, attachedToPageTimeout, deadline, options.beforeWaitForTarget)
     event = discoveryResult.event ?? null
     if (!event) {
       throw new Error(

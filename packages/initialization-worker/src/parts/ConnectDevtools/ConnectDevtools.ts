@@ -3,12 +3,21 @@ import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/Deb
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
-export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<any> => {
+export const connectDevtools = async (
+  devtoolsWebSocketUrl: string,
+  attachedToPageTimeout: number,
+  beforeWaitForTarget?: () => Promise<void>,
+): Promise<any> => {
   console.error(`[macos-ci-debug] connectDevtools start timeout=${attachedToPageTimeout} url=${devtoolsWebSocketUrl}`)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   console.error(`[macos-ci-debug] connectDevtools websocket connected`)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
-  const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
+  const waitForSessionOptions = beforeWaitForTarget
+    ? {
+        beforeWaitForTarget,
+      }
+    : {}
+  const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, attachedToPageTimeout, waitForSessionOptions)
   console.error(`[macos-ci-debug] connectDevtools session ready sessionId=${sessionId} targetId=${targetId}`)
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)
   console.error(`[macos-ci-debug] connectDevtools runIfWaitingForDebugger complete`)
