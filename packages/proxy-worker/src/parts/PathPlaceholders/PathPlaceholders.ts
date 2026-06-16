@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { join, sep } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
 export const ROOT_PATH_PLACEHOLDER = '@@ROOT_PATH@@'
@@ -34,12 +34,22 @@ const replaceAll = (value: string, searchValue: string, replacement: string): st
   return value.split(searchValue).join(replacement)
 }
 
+const escapeRegExp = (value: string): string => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const normalizePlaceholderPathSeparators = (value: string, placeholder: string, separator: string): string => {
+  const pattern = new RegExp(`${escapeRegExp(placeholder)}[^\\s"'<>]*`, 'g')
+  return value.replace(pattern, (match) => match.replace(/[\\/]/g, separator))
+}
+
 export const replaceAbsolutePathsWithPlaceholdersInText = (value: string): string => {
   let result = value
   for (const target of replacementTargets) {
     for (const variant of getPathVariants(target.actualPath)) {
       result = replaceAll(result, variant, target.placeholder)
     }
+    result = normalizePlaceholderPathSeparators(result, target.placeholder, '/')
   }
   return result
 }
@@ -47,6 +57,7 @@ export const replaceAbsolutePathsWithPlaceholdersInText = (value: string): strin
 export const restoreAbsolutePathsFromPlaceholdersInText = (value: string): string => {
   let result = value
   for (const target of replacementTargets) {
+    result = normalizePlaceholderPathSeparators(result, target.placeholder, sep)
     result = replaceAll(result, target.placeholder, target.actualPath)
   }
   return result
