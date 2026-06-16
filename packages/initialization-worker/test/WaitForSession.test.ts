@@ -101,7 +101,7 @@ const createBrowserRpc = ({
   }
 }
 
-const withPlatform = async (platform: NodeJS.Platform, fn: () => Promise<void>): Promise<void> => {
+const withPlatform = async <T>(platform: NodeJS.Platform, fn: () => Promise<T>): Promise<T> => {
   const descriptor = Object.getOwnPropertyDescriptor(process, 'platform')
   if (!descriptor) {
     throw new Error('process.platform descriptor not found')
@@ -110,10 +110,14 @@ const withPlatform = async (platform: NodeJS.Platform, fn: () => Promise<void>):
     value: platform,
   })
   try {
-    await fn()
+    return await fn()
   } finally {
     Object.defineProperty(process, 'platform', descriptor)
   }
+}
+
+const waitForSessionOnLinux = async (browserRpc: any, attachedToPageTimeout: number) => {
+  return withPlatform('linux', () => waitForSession(browserRpc, attachedToPageTimeout))
 }
 
 test('waitForSession - attaches to existing page target after auto attach timeout', async () => {
@@ -129,7 +133,7 @@ test('waitForSession - attaches to existing page target after auto attach timeou
     ],
   })
 
-  const result = await waitForSession(browserRpc, 0)
+  const result = await waitForSessionOnLinux(browserRpc, 0)
 
   expect(result.sessionId).toBe('manual-session')
   expect(result.targetId).toBe('page-1')
@@ -197,7 +201,7 @@ test('waitForSession - includes target details when no page target is available'
     ],
   })
 
-  const error = await getError(() => waitForSession(browserRpc, 0))
+  const error = await getError(() => waitForSessionOnLinux(browserRpc, 0))
 
   expect(error.message).toContain('Failed to attach to page after 0ms')
   expect(error.message).toContain('No Target.attachedToTarget event was received after Target.setAutoAttach')
@@ -219,7 +223,7 @@ test('waitForSession - includes fallback attach error', async () => {
     ],
   })
 
-  const error = await getError(() => waitForSession(browserRpc, 0))
+  const error = await getError(() => waitForSessionOnLinux(browserRpc, 0))
 
   expect(error.message).toContain('page targetId=page-1 attached=true url="vscode-file://vscode-app/index.html" title="Visual Studio Code"')
   expect(error.message).toContain('Fallback Target.attachToTarget failed: Target closed')
@@ -231,7 +235,7 @@ test('waitForSession - times out fallback target lookup', async () => {
     targets: [],
   })
 
-  const error = await getError(() => waitForSession(browserRpc, 0))
+  const error = await getError(() => waitForSessionOnLinux(browserRpc, 0))
 
   expect(error.message).toContain('Target.getTargets failed: Target.getTargets timed out after 0ms')
 })
@@ -250,7 +254,7 @@ test('waitForSession - times out fallback target attach', async () => {
     ],
   })
 
-  const error = await getError(() => waitForSession(browserRpc, 0))
+  const error = await getError(() => waitForSessionOnLinux(browserRpc, 0))
 
   expect(error.message).toContain('Fallback Target.attachToTarget failed: Target.attachToTarget timed out after 0ms')
 })
