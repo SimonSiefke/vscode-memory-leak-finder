@@ -23,7 +23,9 @@ export const connectElectron = async (
   preGeneratedWorkbenchPath: string | null,
   measureId?: string,
 ) => {
-  console.error(`[macos-ci-debug] connectElectron start headless=${headlessMode} trackFunctions=${trackFunctions} openDevtools=${openDevtools}`)
+  console.error(
+    `[macos-ci-debug] connectElectron start headless=${headlessMode} trackFunctions=${trackFunctions} openDevtools=${openDevtools}`,
+  )
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   console.error(`[macos-ci-debug] connectElectron enabling debugger/runtime`)
   await Promise.all([
