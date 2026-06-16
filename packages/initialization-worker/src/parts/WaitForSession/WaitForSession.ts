@@ -41,8 +41,8 @@ const FALLBACK_PROTOCOL_TIMEOUT = 10_000
 const AUTO_ATTACH_EVENT_TIMEOUT = 5_000
 const FALLBACK_RETRY_DELAY = 1_000
 
-const shouldAttachManuallyBeforeAutoAttach = (): boolean => {
-  return process.platform === 'darwin'
+const shouldAttachManuallyBeforeAutoAttach = (attachedToPageTimeout: number): boolean => {
+  return process.platform === 'darwin' && attachedToPageTimeout > 0
 }
 
 const getFallbackProtocolTimeout = (attachedToPageTimeout: number): number => {
@@ -252,7 +252,7 @@ export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeo
   let event: AttachedToTargetEvent | null = null
   let autoAttachAttempted = false
 
-  if (shouldAttachManuallyBeforeAutoAttach()) {
+  if (shouldAttachManuallyBeforeAutoAttach(attachedToPageTimeout)) {
     console.error(`[macos-ci-debug] waitForSession using manual target attach before Target.setAutoAttach`)
     const fallbackResult = await attachToExistingTargetWithRetries(browserRpc, attachedToPageTimeout, deadline)
     event = fallbackResult.event ?? null
