@@ -1,5 +1,12 @@
 import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.ts'
 
+const getChromiumSwitches = (platform: string): readonly string[] => {
+  if (platform === 'darwin') {
+    return []
+  }
+  return ChromiumSwitches.chromiumSwitches
+}
+
 export const getVscodeArgs = ({
   enableExtensions,
   enableProxy,
@@ -29,7 +36,7 @@ export const getVscodeArgs = ({
 }): string[] => {
   const proxyBypassList = '<-loopback>;localhost;127.0.0.1;0.0.0.0;::1'
   const args = [
-    ...ChromiumSwitches.chromiumSwitches,
+    ...getChromiumSwitches(platform),
     '--wait',
     '--new-window',
     '--no-sandbox',

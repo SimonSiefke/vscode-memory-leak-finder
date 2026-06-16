@@ -59,3 +59,22 @@ test('getVscodeArgs - adds x11 ozone platform only on linux', () => {
   expect(GetVsCodeArgs.getVscodeArgs({ ...baseOptions, platform: 'linux' })).toContain('--ozone-platform=x11')
   expect(GetVsCodeArgs.getVscodeArgs({ ...baseOptions, platform: 'darwin' })).not.toContain('--ozone-platform=x11')
 })
+
+test('getVscodeArgs - omits chromium test switches on darwin', () => {
+  const baseOptions = {
+    enableExtensions: true,
+    enableProxy: false,
+    extensionsDir: '/tmp/extensions',
+    extraLaunchArgs: ['/tmp/workspace'],
+    inspectExtensions: false,
+    inspectExtensionsPort: 0,
+    inspectPtyHost: false,
+    inspectPtyHostPort: 0,
+    inspectSharedProcess: false,
+    inspectSharedProcessPort: 0,
+    userDataDir: '/tmp/user-data',
+  }
+
+  expect(GetVsCodeArgs.getVscodeArgs({ ...baseOptions, platform: 'linux' })).toContain('--metrics-recording-only')
+  expect(GetVsCodeArgs.getVscodeArgs({ ...baseOptions, platform: 'darwin' })).not.toContain('--metrics-recording-only')
+})
