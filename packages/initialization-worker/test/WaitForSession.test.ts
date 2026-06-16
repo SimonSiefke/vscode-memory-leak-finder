@@ -27,10 +27,12 @@ const getError = async (fn: () => Promise<unknown>): Promise<Error> => {
 
 const createBrowserRpc = ({
   attachError,
+  hangingMethod,
   sessionId = 'manual-session',
   targets,
 }: {
   attachError?: Error
+  hangingMethod?: string
   sessionId?: string
   targets: readonly TargetInfo[]
 }) => {
@@ -42,6 +44,9 @@ const createBrowserRpc = ({
     async dispose() {},
     invoke(method: string, params?: unknown): Promise<unknown> {
       calls.push({ method, params })
+      if (method === hangingMethod) {
+        return new Promise(() => {})
+      }
       if (method === 'Target.setAutoAttach') {
         return Promise.resolve({ result: {} })
       }
@@ -154,4 +159,34 @@ test('waitForSession - includes fallback attach error', async () => {
 
   expect(error.message).toContain('page targetId=page-1 attached=true url="vscode-file://vscode-app/index.html" title="Visual Studio Code"')
   expect(error.message).toContain('Fallback Target.attachToTarget failed: Target closed')
+})
+
+test('waitForSession - times out fallback target lookup', async () => {
+  const browserRpc = createBrowserRpc({
+    hangingMethod: 'Target.getTargets',
+    targets: [],
+  })
+
+  const error = await getError(() => waitForSession(browserRpc, 0))
+
+  expect(error.message).toContain('Target.getTargets failed: Target.getTargets timed out after 0ms')
+})
+
+test('waitForSession - times out fallback target attach', async () => {
+  const browserRpc = createBrowserRpc({
+    hangingMethod: 'Target.attachToTarget',
+    targets: [
+      {
+        attached: true,
+        targetId: 'page-1',
+        title: 'Visual Studio Code',
+        type: 'page',
+        url: 'vscode-file://vscode-app/index.html',
+      },
+    ],
+  })
+
+  const error = await getError(() => waitForSession(browserRpc, 0))
+
+  expect(error.message).toContain('Fallback Target.attachToTarget failed: Target.attachToTarget timed out after 0ms')
 })

@@ -31,6 +31,24 @@ interface TargetLookup {
   readonly targets: readonly TargetInfo[]
 }
 
+const FALLBACK_PROTOCOL_TIMEOUT = 10_000
+
+const getFallbackProtocolTimeout = (attachedToPageTimeout: number): number => {
+  return Math.min(attachedToPageTimeout, FALLBACK_PROTOCOL_TIMEOUT)
+}
+
+const withProtocolTimeout = async <T>(promise: Promise<T>, method: string, timeout: number): Promise<T> => {
+  const { promise: timeoutPromise, reject } = Promise.withResolvers<T>()
+  const timeoutRef = setTimeout(() => {
+    reject(new Error(`${method} timed out after ${timeout}ms`))
+  }, timeout)
+  try {
+    return await Promise.race([promise, timeoutPromise])
+  } finally {
+    clearTimeout(timeoutRef)
+  }
+}
+
 const formatUnknownError = (error: unknown): string => {
   if (error instanceof Error) {
     return error.message
@@ -49,9 +67,13 @@ const logTargets = (label: string, targets: readonly TargetInfo[]): void => {
   console.error(`[macos-ci-debug] ${label}: ${targets.length === 0 ? '<none>' : targets.map(formatTarget).join('; ')}`)
 }
 
-const getTargets = async (browserRpc: BrowserRpc): Promise<TargetLookup> => {
+const getTargets = async (browserRpc: BrowserRpc, timeout: number): Promise<TargetLookup> => {
   try {
-    const targets = await DevtoolsProtocolTarget.getTargets(browserRpc)
+    const targets = await withProtocolTimeout(
+      DevtoolsProtocolTarget.getTargets(browserRpc) as Promise<readonly TargetInfo[]>,
+      'Target.getTargets',
+      timeout,
+    )
     logTargets('Target.getTargets result', targets)
     return {
       targets,
@@ -68,12 +90,16 @@ const getPageTarget = (targets: readonly TargetInfo[]): TargetInfo | undefined =
   return targets.find((target) => target.type === 'page')
 }
 
-const attachToExistingPage = async (browserRpc: BrowserRpc, targetInfo: TargetInfo): Promise<AttachedToTargetEvent> => {
+const attachToExistingPage = async (browserRpc: BrowserRpc, targetInfo: TargetInfo, timeout: number): Promise<AttachedToTargetEvent> => {
   console.error(`[macos-ci-debug] attaching to existing page target ${formatTarget(targetInfo)}`)
-  const sessionId = await DevtoolsProtocolTarget.attachToTarget(browserRpc, {
-    flatten: true,
-    targetId: targetInfo.targetId,
-  })
+  const sessionId = await withProtocolTimeout(
+    DevtoolsProtocolTarget.attachToTarget(browserRpc, {
+      flatten: true,
+      targetId: targetInfo.targetId,
+    }) as Promise<string>,
+    'Target.attachToTarget',
+    timeout,
+  )
   console.error(`[macos-ci-debug] attached to existing page sessionId=${sessionId}`)
   return {
     params: {
@@ -114,40 +140,45 @@ const createAttachErrorMessage = ({
 
 export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeout: number) => {
   console.error(`[macos-ci-debug] waitForSession start timeout=${attachedToPageTimeout}`)
+  const fallbackProtocolTimeout = getFallbackProtocolTimeout(attachedToPageTimeout)
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
 
   console.error(`[macos-ci-debug] Target.setAutoAttach start`)
-  await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
-    autoAttach: true,
-    filter: [
-      {
-        exclude: true,
-        type: 'browser',
-      },
-      {
-        exclude: true,
-        type: 'tab',
-      },
-      {
-        exclude: false,
-        type: 'page',
-      },
-    ],
-    flatten: true,
-    waitForDebuggerOnStart: true,
-  })
+  await withProtocolTimeout(
+    DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
+      autoAttach: true,
+      filter: [
+        {
+          exclude: true,
+          type: 'browser',
+        },
+        {
+          exclude: true,
+          type: 'tab',
+        },
+        {
+          exclude: false,
+          type: 'page',
+        },
+      ],
+      flatten: true,
+      waitForDebuggerOnStart: true,
+    }) as Promise<void>,
+    'Target.setAutoAttach',
+    attachedToPageTimeout,
+  )
   console.error(`[macos-ci-debug] Target.setAutoAttach complete`)
 
   let event = await eventPromise
   console.error(`[macos-ci-debug] waitForSession initial event ${event ? 'received' : 'missing'}`)
 
   if (!event) {
-    const targetLookup = await getTargets(browserRpc)
+    const targetLookup = await getTargets(browserRpc, fallbackProtocolTimeout)
     const pageTarget = getPageTarget(targetLookup.targets)
     let attachError: unknown
     if (pageTarget) {
       try {
-        event = await attachToExistingPage(browserRpc, pageTarget)
+        event = await attachToExistingPage(browserRpc, pageTarget, fallbackProtocolTimeout)
       } catch (error) {
         attachError = error
       }
