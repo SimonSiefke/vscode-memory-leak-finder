@@ -52,6 +52,19 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npx lerna run test --since origin/main
+      - name: Debug Playwright Electron launch
+        if: matrix.os == 'macos-26'
+        continue-on-error: true
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+          VSCODE_VERSION: '1.124.2'
+        run: |
+          tmp_dir="$(mktemp -d)"
+          cp tmp/ci-debug/playwright-vscode-electron.mjs "$tmp_dir/"
+          cd "$tmp_dir"
+          npm init -y
+          npm install --no-save playwright @vscode/test-electron
+          node playwright-vscode-electron.mjs
       - name: Run headless test (with videos)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
