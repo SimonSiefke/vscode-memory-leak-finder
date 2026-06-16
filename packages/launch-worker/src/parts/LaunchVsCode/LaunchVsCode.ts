@@ -147,6 +147,7 @@ export const launchVsCode = async ({
       inspectPtyHostPort,
       inspectSharedProcess,
       inspectSharedProcessPort,
+      platform,
       userDataDir,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({
