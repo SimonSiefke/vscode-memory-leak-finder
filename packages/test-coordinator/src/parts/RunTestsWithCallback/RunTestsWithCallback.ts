@@ -31,6 +31,40 @@ interface WorkerMap {
   readonly videoRpc: Rpc
 }
 
+const MACOS_E2E_PHASE_TIMEOUT = 60_000
+const MACOS_E2E_TIMEOUT_CODE = 'MACOS_E2E_TIMEOUT'
+
+const createMacosTimeoutError = (phase: string, absolutePath: string): Error & { code: string } => {
+  const error = new Error(`macOS e2e timeout after ${MACOS_E2E_PHASE_TIMEOUT}ms during ${phase} for ${absolutePath}`)
+  ;(error as Error & { code: string }).code = MACOS_E2E_TIMEOUT_CODE
+  return error as Error & { code: string }
+}
+
+const isMacosTimeoutError = (error: unknown): boolean => {
+  return Boolean(error && typeof error === 'object' && 'code' in error && error.code === MACOS_E2E_TIMEOUT_CODE)
+}
+
+const withMacosPhaseTimeout = async <T>(promise: Promise<T>, platform: string, phase: string, absolutePath: string): Promise<T> => {
+  if (platform !== 'darwin') {
+    return promise
+  }
+  let timeout: NodeJS.Timeout | undefined
+  try {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeout = setTimeout(() => {
+        timeout = undefined
+        reject(createMacosTimeoutError(phase, absolutePath))
+      }, MACOS_E2E_PHASE_TIMEOUT)
+      timeout.unref?.()
+    })
+    return await Promise.race([promise, timeoutPromise])
+  } finally {
+    if (timeout) {
+      clearTimeout(timeout)
+    }
+  }
+}
+
 const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
   const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
   await Promise.all([functionTrackerRpc.dispose(), memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
@@ -255,8 +289,8 @@ export const runTestsWithCallback = async ({
       if (needsSetup) {
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
-        const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
-          await PrepareTestsOrAttach.prepareTestsAndAttach({
+        const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await withMacosPhaseTimeout(
+          PrepareTestsOrAttach.prepareTestsAndAttach({
             arch,
             attachedToPageTimeout,
             clearExtensions,
@@ -294,7 +328,11 @@ export const runTestsWithCallback = async ({
             useProxyMock,
             vscodePath,
             vscodeVersion,
-          })
+          }),
+          platform,
+          'prepareTestsAndAttach',
+          absolutePath,
+        )
         workers = {
           functionTrackerRpc: functionTrackerRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
@@ -317,14 +355,19 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
-          testWorkerRpc,
-          connectionId,
+        const testResult = await withMacosPhaseTimeout<any>(
+          TestWorkerSetupTest.testWorkerSetupTest(
+            testWorkerRpc,
+            connectionId,
+            absolutePath,
+            forceRun,
+            timeouts,
+            isGithubActions,
+            allowCopilotAuthInCi,
+          ),
+          platform,
+          'setupTest',
           absolutePath,
-          forceRun,
-          timeouts,
-          isGithubActions,
-          allowCopilotAuthInCi,
         )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped
@@ -347,14 +390,24 @@ export const runTestsWithCallback = async ({
           let isLeak = false
           if (checkLeaks) {
             if (measureAfter) {
-              await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
+              await withMacosPhaseTimeout(
+                TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2),
+                platform,
+                'measureAfterRunTests',
+                absolutePath,
+              )
             }
-            await MemoryLeakFinder.start(memoryRpc, connectionId)
-            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
+            await withMacosPhaseTimeout(MemoryLeakFinder.start(memoryRpc, connectionId), platform, 'memoryLeakStart', absolutePath)
+            await withMacosPhaseTimeout(
+              TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs),
+              platform,
+              'runTests',
+              absolutePath,
+            )
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            await MemoryLeakFinder.stop(memoryRpc, connectionId)
+            await withMacosPhaseTimeout(MemoryLeakFinder.stop(memoryRpc, connectionId), platform, 'memoryLeakStop', absolutePath)
 
             if (measureAfter) {
               await Timeout.setTimeout(3000)
@@ -375,7 +428,12 @@ export const runTestsWithCallback = async ({
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             }
 
-            const result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
+            const result = await withMacosPhaseTimeout<any>(
+              MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath),
+              platform,
+              'memoryLeakCompare',
+              absolutePath,
+            )
             if (result.isLeak) {
               isLeak = true
               leaking++
@@ -385,9 +443,19 @@ export const runTestsWithCallback = async ({
               console.log(result.summary)
             }
           } else {
-            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
+            await withMacosPhaseTimeout(
+              TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs),
+              platform,
+              'runTests',
+              absolutePath,
+            )
           }
-          await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
+          await withMacosPhaseTimeout(
+            TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath),
+            platform,
+            'teardownTest',
+            absolutePath,
+          )
           const end = Time.now()
           const duration = end - start
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak, wasOriginallySkipped)
@@ -396,6 +464,10 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
+        if (isMacosTimeoutError(error)) {
+          await disposeWorkers(workers)
+          throw error
+        }
         if (wasOriginallySkipped) {
           skippedFailed++
         } else {
