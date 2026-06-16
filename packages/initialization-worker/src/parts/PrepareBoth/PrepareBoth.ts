@@ -13,6 +13,10 @@ import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDe
 // TODO maybe pass it as argument from above
 const HTTP_SERVER_PORT = 9876
 
+const shouldConnectDevtoolsAfterReady = (): boolean => {
+  return process.platform === 'darwin'
+}
+
 export const prepareBoth = async (
   secretsPath: string,
   headlessMode: boolean,
@@ -65,7 +69,8 @@ export const prepareBoth = async (
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
   console.error(`[macos-ci-debug] prepareBoth devtools websocket ready`)
 
-  const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
+  const connectAfterReady = shouldConnectDevtoolsAfterReady()
+  const connectDevtoolsPromise = connectAfterReady ? undefined : connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
 
   if (headlessMode) {
     // TODO
@@ -79,8 +84,12 @@ export const prepareBoth = async (
   })
   console.error(`[macos-ci-debug] prepareBoth undo monkey patch complete`)
 
+  const connectDevtoolsResult = connectAfterReady
+    ? await connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
+    : await connectDevtoolsPromise
+
   // Wait for the page to be created by the initialization worker's connectDevtools
-  const { dispose, sessionId, targetId } = await connectDevtoolsPromise
+  const { dispose, sessionId, targetId } = connectDevtoolsResult
   console.error(`[macos-ci-debug] prepareBoth connectDevtools complete sessionId=${sessionId} targetId=${targetId}`)
 
   await Promise.all([electronRpc.dispose(), dispose()])
