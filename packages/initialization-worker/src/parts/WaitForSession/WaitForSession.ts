@@ -42,7 +42,8 @@ const AUTO_ATTACH_EVENT_TIMEOUT = 5_000
 const FALLBACK_RETRY_DELAY = 1_000
 
 const shouldAttachManuallyBeforeAutoAttach = (attachedToPageTimeout: number): boolean => {
-  return process.platform === 'darwin' && attachedToPageTimeout > 0
+  void attachedToPageTimeout
+  return false
 }
 
 const getFallbackProtocolTimeout = (attachedToPageTimeout: number): number => {
