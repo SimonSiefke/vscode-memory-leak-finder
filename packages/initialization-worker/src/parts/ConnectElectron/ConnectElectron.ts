@@ -23,13 +23,17 @@ export const connectElectron = async (
   preGeneratedWorkbenchPath: string | null,
   measureId?: string,
 ) => {
+  console.error(`[macos-ci-debug] connectElectron start headless=${headlessMode} trackFunctions=${trackFunctions} openDevtools=${openDevtools}`)
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
+  console.error(`[macos-ci-debug] connectElectron enabling debugger/runtime`)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
     DevtoolsProtocolRuntime.enable(electronRpc),
     DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc),
   ])
+  console.error(`[macos-ci-debug] connectElectron waiting for initial Debugger.paused`)
   const msg = await debuggerPausedPromise
+  console.error(`[macos-ci-debug] connectElectron got initial Debugger.paused`)
   const callFrame = msg.params.callFrames[0]
   const { callFrameId } = callFrame
 
@@ -49,6 +53,7 @@ export const connectElectron = async (
 
   const electronObjectId = electron.result.result.objectId
   const requireObjectId = require.result.result.objectId
+  console.error(`[macos-ci-debug] connectElectron got electron object ids electron=${electronObjectId} require=${requireObjectId}`)
 
   const monkeyPatchedElectronId = await applyMonkeyPatches(
     electronRpc,
@@ -62,8 +67,10 @@ export const connectElectron = async (
     preGeneratedWorkbenchPath,
     measureId,
   )
+  console.error(`[macos-ci-debug] connectElectron applied monkey patches id=${monkeyPatchedElectronId}`)
 
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
+  console.error(`[macos-ci-debug] connectElectron resumed electron runtime`)
 
   return {
     electronObjectId,

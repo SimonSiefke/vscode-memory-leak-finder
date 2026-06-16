@@ -51,5 +51,6 @@ export const waitForDebuggerListening = async (stream: ReadableStreamLike): Prom
     throw new Error(`Failed to extract websocket url from stdout`)
   }
   const webSocketUrl = match[1]
+  console.error(`[macos-ci-debug] debugger websocket url detected: ${webSocketUrl}`)
   return webSocketUrl
 }

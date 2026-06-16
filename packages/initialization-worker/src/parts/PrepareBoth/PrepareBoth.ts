@@ -27,6 +27,9 @@ export const prepareBoth = async (
   preGeneratedWorkbenchPath: string | null,
   binaryPath: string | null,
 ): Promise<any> => {
+  console.error(
+    `[macos-ci-debug] prepareBoth start platform=${process.platform} arch=${process.arch} headless=${headlessMode} timeout=${attachedToPageTimeout} vscode=${parsedVersion?.version ?? '<unknown>'}`,
+  )
   // Launch function-tracker worker BEFORE PrepareBoth if tracking is enabled
   // This ensures the socket server is ready when the protocol interceptor is injected
   if (trackFunctions && binaryPath) {
@@ -34,11 +37,14 @@ export const prepareBoth = async (
   }
 
   const stream = new PortReadStream(port)
+  console.error(`[macos-ci-debug] prepareBoth waiting for debugger websocket`)
   const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(stream)
 
+  console.error(`[macos-ci-debug] prepareBoth waiting for devtools websocket`)
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(stream)
 
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
+  console.error(`[macos-ci-debug] prepareBoth electron websocket connected`)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
   const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(
@@ -51,10 +57,13 @@ export const prepareBoth = async (
     preGeneratedWorkbenchPath,
     measureId,
   )
+  console.error(`[macos-ci-debug] prepareBoth connectElectron complete electronObjectId=${electronObjectId}`)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
+  console.error(`[macos-ci-debug] prepareBoth resumed debugger after monkey patch`)
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
+  console.error(`[macos-ci-debug] prepareBoth devtools websocket ready`)
 
   const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
 
@@ -68,11 +77,14 @@ export const prepareBoth = async (
     functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
     objectId: monkeyPatchedElectronId,
   })
+  console.error(`[macos-ci-debug] prepareBoth undo monkey patch complete`)
 
   // Wait for the page to be created by the initialization worker's connectDevtools
   const { dispose, sessionId, targetId } = await connectDevtoolsPromise
+  console.error(`[macos-ci-debug] prepareBoth connectDevtools complete sessionId=${sessionId} targetId=${targetId}`)
 
   await Promise.all([electronRpc.dispose(), dispose()])
+  console.error(`[macos-ci-debug] prepareBoth disposed init connections`)
 
   return {
     devtoolsWebSocketUrl,

@@ -40,5 +40,6 @@ export const waitForDevtoolsListening = async (stream: ReadableStreamLike): Prom
     throw new Error(`Failed to extract websocket url from stderr`)
   }
   const webSocketUrl = match[1]
+  console.error(`[macos-ci-debug] devtools websocket url detected: ${webSocketUrl}`)
   return webSocketUrl
 }
