@@ -1,8 +1,9 @@
 import * as IsIgnoredConstructorScopeEdge from '../IsIgnoredConstructorScopeEdge/IsIgnoredConstructorScopeEdge.ts'
+import type { CleanedNode, HeapSnapshotGraph } from '../Snapshot/Snapshot.ts'
 
-export const getConstructorScopeMap = (parsedNodes, graph) => {
+export const getConstructorScopeMap = (parsedNodes: readonly CleanedNode[], graph: HeapSnapshotGraph) => {
   const scopeMap = new Uint32Array(parsedNodes.length)
-  const edgeMap = [...Array.from({ length: parsedNodes.length }).fill('')]
+  const edgeMap: string[] = [...Array.from<string>({ length: parsedNodes.length }).fill('')]
   for (let i = 0; i < parsedNodes.length; i++) {
     const node = parsedNodes[i]
     const edges = graph[node.id]
