@@ -248,7 +248,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           .catch(() => {})
         await page.waitForIdle()
       }
-      if (ideVersion.minor >= 118) {
+      // if (ideVersion.minor >= 120) {
+      // }
+      if (ideVersion.minor >= 118 && ideVersion.minor <= 120) {
         const entry = await electron.waitForNewWebContentsView({
           existingIds: existingWebContentsIds,
         })
@@ -260,11 +262,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async navigateIntegratedBrowser({ url, waitForContentFrame }: { url: string; waitForContentFrame: boolean }) {
       const urlInput = this.getBrowserUrlInput()
+      console.log('nav...')
       await expect(urlInput).toBeVisible()
       await urlInput.fill('')
       await page.waitForIdle()
       await urlInput.type(url)
       await page.waitForIdle()
+      if (ideVersion.minor >= 120) {
+        // TODO since the url input is a contenteditable element, need to do something special to make it work...
+        await expect(urlInput).toHaveText(url)
+        await page.waitForIdle()
+        await new Promise((r) => {})
+      }
       await urlInput.press('Enter')
       await page.waitForIdle()
       console.log('navigateIntegratedBrowser:submitted', { url, webContentsId: this.modernBrowserWebContentsId })
