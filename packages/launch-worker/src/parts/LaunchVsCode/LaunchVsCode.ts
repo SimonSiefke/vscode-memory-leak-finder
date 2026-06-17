@@ -87,7 +87,7 @@ export const launchVsCode = async ({
     const sourcesDir = join(Root.root, '.vscode-sources')
     await mkdir(sourcesDir, { recursive: true })
     const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
-    const userDataDir = GetUserDataDir.getUserDataDir()
+    const userDataDir = GetUserDataDir.getUserDataDir(platform)
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
     if (clearExtensions) {
       await rm(extensionsDir, { force: true, recursive: true })
@@ -147,6 +147,7 @@ export const launchVsCode = async ({
       inspectPtyHostPort,
       inspectSharedProcess,
       inspectSharedProcessPort,
+      platform,
       userDataDir,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({

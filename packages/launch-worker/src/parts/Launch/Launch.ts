@@ -111,7 +111,8 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
-  const secretsPath = join(GetUserDataDir.getUserDataDir(), 'secrets', 'secrets.json')
+  const userDataDir = GetUserDataDir.getUserDataDir(platform)
+  const secretsPath = join(userDataDir, 'secrets', 'secrets.json')
   const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
     secretsPath,
