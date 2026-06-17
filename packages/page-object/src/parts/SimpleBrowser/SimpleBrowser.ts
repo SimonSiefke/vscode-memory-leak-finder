@@ -264,15 +264,33 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const urlInput = this.getBrowserUrlInput()
       console.log('nav...')
       await expect(urlInput).toBeVisible()
-      await urlInput.fill('')
-      await page.waitForIdle()
-      await urlInput.type(url)
-      await page.waitForIdle()
       if (ideVersion.minor >= 120) {
-        // TODO since the url input is a contenteditable element, need to do something special to make it work...
+        await urlInput.click()
+        await page.waitForIdle()
+        await page.evaluate({
+          expression: `(() => {
+  const element = document.querySelector('.browser-url-display')
+  if (!element) {
+    throw new Error('browser url display not found')
+  }
+  const range = document.createRange()
+  range.selectNodeContents(element)
+  const selection = window.getSelection()
+  if (!selection) {
+    throw new Error('selection not available')
+  }
+  selection.removeAllRanges()
+  selection.addRange(range)
+})()`,
+        })
+        await page.keyboard.contentEditableInsert({ value: url })
         await expect(urlInput).toHaveText(url)
         await page.waitForIdle()
-        await new Promise((r) => {})
+      } else {
+        await urlInput.fill('')
+        await page.waitForIdle()
+        await urlInput.type(url)
+        await page.waitForIdle()
       }
       await urlInput.press('Enter')
       await page.waitForIdle()
