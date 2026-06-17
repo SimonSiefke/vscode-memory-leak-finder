@@ -12,6 +12,7 @@
     "**/fixtures/**": true
   },
   "telemetry.telemetryLevel": "off",
+  "remote.SSH.useLocalServer": false,
   "update.mode": "none",
   "update.showReleaseNotes": false,
   "workbench.startupEditor": "none",
