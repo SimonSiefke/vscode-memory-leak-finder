@@ -20,9 +20,9 @@ test('compareDetachedDomNodesWithStackTraces - single new node', () => {
   expect(result).toEqual([
     {
       className: 'HTMLDivElement',
-      description: 'div.container',
       count: 1,
       delta: 1,
+      description: 'div.container',
     },
   ])
 })
@@ -77,9 +77,9 @@ test('compareDetachedDomNodesWithStackTraces - multiple nodes with different del
   expect(result).toHaveLength(1)
   expect(result[0]).toMatchObject({
     className: 'HTMLDivElement',
-    description: 'div.container',
     count: 3,
     delta: 2,
+    description: 'div.container',
   })
 })
 
@@ -149,20 +149,20 @@ test('compareDetachedDomNodesWithStackTraces - preserves additional node propert
   const after: any[] = [
     {
       className: 'HTMLDivElement',
+      customProp: 'customValue',
       description: 'div.container',
       objectId: '123456.1',
       subtype: 'node',
       type: 'object',
-      customProp: 'customValue',
     },
   ]
   const result = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces(before, after)
   expect(result[0]).toMatchObject({
     className: 'HTMLDivElement',
-    description: 'div.container',
-    customProp: 'customValue',
     count: 1,
+    customProp: 'customValue',
     delta: 1,
+    description: 'div.container',
   })
 })
 
@@ -203,9 +203,9 @@ test('compareDetachedDomNodesWithStackTraces - complex scenario with multiple di
   expect(result).toHaveLength(1)
   expect(result[0]).toMatchObject({
     className: 'HTMLDivElement',
-    description: 'div.container',
     count: 3,
     delta: 1,
+    description: 'div.container',
   })
 })
 

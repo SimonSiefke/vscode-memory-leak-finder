@@ -17,7 +17,7 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
 
     webSocket.addEventListener('error', errorHandler)
     webSocket.addEventListener('close', closeHandler)
-    await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)
+    await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
 
     const ipc = {
       get connectionClosed() {

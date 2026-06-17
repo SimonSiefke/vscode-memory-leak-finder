@@ -1,5 +1,5 @@
 export const toSorted = <T>(array: readonly T[], compare: (a: T, b: T) => number): T[] => {
-  return [...array].sort(compare)
+  return array.toSorted(compare)
 }
 
 export const sum = (values: readonly number[]): number => {
@@ -25,10 +25,7 @@ export const contextMap = <T, R, C extends readonly unknown[]>(
   fn: (element: T, ...context: C) => R,
   ...context: C
 ): R[] => {
-  const result: R[] = []
-  for (const element of array) {
-    result.push(fn(element, ...context))
-  }
+  const result: R[] = Array.from(array, (element) => fn(element, ...context))
   return result
 }
 

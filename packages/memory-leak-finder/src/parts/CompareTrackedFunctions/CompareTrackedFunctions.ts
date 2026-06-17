@@ -75,10 +75,9 @@ const normalizeUrl = (url: string): string => {
       if (isAbsolute(path)) {
         // For absolute paths, just normalize (don't resolve)
         return normalize(path)
-      } else {
-        // For relative paths, resolve then normalize
-        return normalize(resolve(path))
       }
+      // For relative paths, resolve then normalize
+      return normalize(resolve(path))
     } catch {
       // If anything fails, just normalize
       return normalize(path)
@@ -100,7 +99,7 @@ const isRelativeSourceMap = (sourceMapUrl: string): boolean => {
 const getSourceMapUrl = (script: { readonly url?: string; readonly sourceMapUrl?: string }): string => {
   if (script.url && script.sourceMapUrl && isRelativeSourceMap(script.sourceMapUrl)) {
     try {
-      return new URL(script.sourceMapUrl, script.url).toString()
+      return new URL(script.sourceMapUrl, script.url).href
     } catch {
       // If URL construction fails, try to find matching source map
     }
@@ -202,8 +201,8 @@ const findScript = (
         const scriptParts = normalizedScriptUrl.split(/[/\\]/)
         // Compare from the end (filename) backwards
         if (targetParts.length > 0 && scriptParts.length > 0) {
-          const targetFilename = targetParts[targetParts.length - 1]
-          const scriptFilename = scriptParts[scriptParts.length - 1]
+          const targetFilename = targetParts.at(-1)
+          const scriptFilename = scriptParts.at(-1)
           if (targetFilename === scriptFilename && targetFilename) {
             // If filenames match, check if the last few path segments match
             // Look for workbench.desktop.main.js specifically and match more segments

@@ -1,6 +1,6 @@
 import { platform } from 'node:os'
-import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 import { countInotifyWatchers } from '../CountInotifyWatchers/CountInotifyWatchers.ts'
+import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 
 export const getFileWatcherCount = async (pid: number | undefined): Promise<number> => {
   console.log({ pid })

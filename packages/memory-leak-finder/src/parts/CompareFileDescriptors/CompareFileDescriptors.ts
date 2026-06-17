@@ -3,16 +3,16 @@ import type { ProcessInfoWithDescriptors } from '../ProcessInfoWithDescriptors/P
 import { isExcludedPath } from '../IsExcludedPath/IsExcludedPath.ts'
 
 export interface FileDescriptorGroup {
-  target: string
   count: number
+  target: string
 }
 
 export interface FileDescriptorDelta {
-  name: string
   count: number
   delta: number
-  pid: number
+  name: string
   newFileDescriptors?: FileDescriptorGroup[]
+  pid: number
 }
 
 const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescriptorGroup[] => {
@@ -58,10 +58,7 @@ const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescri
   }
 
   // Convert to array and sort by count (descending)
-  const result: FileDescriptorGroup[] = []
-  for (const [target, count] of groups.entries()) {
-    result.push({ target, count })
-  }
+  const result: FileDescriptorGroup[] = Array.from(groups, ([target, count]) => ({ count, target }))
 
   result.sort((a, b) => b.count - a.count)
 

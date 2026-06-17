@@ -10,8 +10,7 @@ export const compare = async (connectionId: number, context: any, resultPath: st
   if (!state) {
     throw new Error(`no measure found`)
   }
-  const { measure } = state
-  const { after, before } = state
+  const { after, before, measure } = state
   if (!before) {
     throw new Error(`before missing`)
   }

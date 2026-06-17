@@ -14,10 +14,7 @@ const prepareDisposable = (disposable, scriptMap) => {
 }
 
 const prepareDisposables = (disposables, scriptMap) => {
-  const prepared: any[] = []
-  for (const disposable of disposables) {
-    prepared.push(prepareDisposable(disposable, scriptMap))
-  }
+  const prepared: any[] = Array.from(disposables, (disposable) => prepareDisposable(disposable, scriptMap))
   return prepared
 }
 

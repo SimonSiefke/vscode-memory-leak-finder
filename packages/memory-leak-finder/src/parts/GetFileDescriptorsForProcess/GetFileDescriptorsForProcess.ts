@@ -1,8 +1,8 @@
 import { platform } from 'node:os'
-import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 import type { ProcessInfoWithDescriptors } from '../ProcessInfoWithDescriptors/ProcessInfoWithDescriptors.ts'
-import { getProcessName } from '../GetProcessName/GetProcessName.ts'
+import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 import { getFileDescriptors } from '../GetFileDescriptors/GetFileDescriptors.ts'
+import { getProcessName } from '../GetProcessName/GetProcessName.ts'
 
 const getProcessInfo = async (processPid: number): Promise<ProcessInfoWithDescriptors> => {
   const [name, fileDescriptors] = await Promise.all([getProcessName(processPid), getFileDescriptors(processPid)])

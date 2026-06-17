@@ -171,7 +171,7 @@ test('CleanIpcMessages should handle uint8array with invalid binary data', () =>
     {
       args: [
         {
-          content: '\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF\u00FF', // Invalid binary data
+          content: '\u{FF}\u{FF}\u{FF}\u{FF}\u{FF}\u{FF}\u{FF}\u{FF}\u{FF}\u{FF}', // Invalid binary data
           length: 10,
           type: 'uint8array',
         },
@@ -396,7 +396,7 @@ test.skip('CleanIpcMessages should decode real-world uint8array with embedded JS
     args: [
       {
         content:
-          '\u0004\u0004\u0006d\u0006\uFFFD\u0006\u0001\u000FlocalFilesystem\u0001\u0004stat\u0004\u0001\u0005\uFFFD\u0001{"$mid":1,"path":"/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json","scheme":"file"}',
+          '\u{4}\u{4}\u{6}d\u{6}\u{FFFD}\u{6}\u{1}\u{F}localFilesystem\u{1}\u{4}stat\u{4}\u{1}\u{5}\u{FFFD}\u{1}{"$mid":1,"path":"/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-extensions/github.copilot-chat-0.36.1/package.nls.json","scheme":"file"}',
         length: 184,
         type: 'uint8array',
       },

@@ -1,5 +1,5 @@
-import { readFile } from 'node:fs/promises'
 import { execSync } from 'node:child_process'
+import { readFile } from 'node:fs/promises'
 import { isEnoentError } from '../IsEnoentError/IsEnoentError.ts'
 
 const typeMap: Record<string, string> = {

@@ -3,14 +3,14 @@ import { getFileDescriptors } from '../src/parts/GetFileDescriptors/GetFileDescr
 
 test('getFileDescriptors - returns empty array for non-existent PID', async () => {
   // Using a very large PID that likely doesn't exist
-  const pid = 9999999
+  const pid = 9_999_999
   const result = await getFileDescriptors(pid)
 
   expect(result).toEqual([])
 })
 
 test('getFileDescriptors - returns array or empty array based on platform', async () => {
-  const pid = process.pid
+  const { pid } = process
   const result = await getFileDescriptors(pid)
 
   // On Linux, should have file descriptors; on other platforms might be empty
@@ -25,7 +25,7 @@ test('getFileDescriptors - returns array or empty array based on platform', asyn
 })
 
 test('getFileDescriptors - returns array with correct descriptor structure', async () => {
-  const pid = process.pid
+  const { pid } = process
   const result = await getFileDescriptors(pid)
 
   // Result should always be an array

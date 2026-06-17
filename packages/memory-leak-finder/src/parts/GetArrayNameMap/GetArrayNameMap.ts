@@ -34,10 +34,7 @@ const getScopeValues = async (session: Session, objectId: string) => {
     ownProperties: true,
   })
   const descriptorValues = GetDescriptorValues.getDescriptorValues(rawResult)
-  const childPromises: Promise<any>[] = []
-  for (const descriptor of descriptorValues) {
-    childPromises.push(getScopeChildValues(session, descriptor.objectId))
-  }
+  const childPromises: Promise<any>[] = Array.from(descriptorValues, (descriptor) => getScopeChildValues(session, descriptor.objectId))
   const childScopeArrays = await Promise.all(childPromises)
   return childScopeArrays
 }
@@ -47,9 +44,8 @@ export const getArrayNameMap = async (session: Session, objectGroup: string) => 
   Assert.string(objectGroup)
   const functionObjectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
   const scopeListsObjectIds = await GetAllScopePropertiesInternal.getAllScopeListPropertiesInternal(session, objectGroup, functionObjectIds)
-  const scopeArrayPromises: Promise<any[]>[] = []
-  for (const scopeListObjectId of scopeListsObjectIds) {
-    scopeArrayPromises.push(getScopeValues(session, scopeListObjectId))
-  }
+  const scopeArrayPromises: Promise<any[]>[] = Array.from(scopeListsObjectIds, (scopeListObjectId) =>
+    getScopeValues(session, scopeListObjectId),
+  )
   return {}
 }

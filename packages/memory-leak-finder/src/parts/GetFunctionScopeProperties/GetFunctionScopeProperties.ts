@@ -8,10 +8,9 @@ export const getFunctionScopeProperties = async (session: Session, objectGroup: 
   Assert.object(session)
   Assert.string(objectGroup)
   const objectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
-  const promises: Promise<any>[] = []
-  for (const objectId of objectIds) {
-    promises.push(GetFunctionScopeProperty.getFunctionScopeProperty(session, objectGroup, objectId))
-  }
+  const promises: Promise<any>[] = Array.from(objectIds, (objectId) =>
+    GetFunctionScopeProperty.getFunctionScopeProperty(session, objectGroup, objectId),
+  )
   const scopeListsObjectIds = await Promise.all(promises)
   const defined = scopeListsObjectIds.filter(IsDefined.isDefined)
   return defined
