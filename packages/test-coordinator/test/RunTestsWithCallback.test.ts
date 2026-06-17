@@ -45,6 +45,7 @@ test('runTestsWithCallback - setupOnly skips launching and attaching to the app'
     insidersCommit: '',
     inspectExtensions: false,
     inspectExtensionsPort: 0,
+    inspectIntegratedBrowser: false,
     inspectPtyHost: false,
     inspectPtyHostPort: 0,
     inspectSharedProcess: false,
