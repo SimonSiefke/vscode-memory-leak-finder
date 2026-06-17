@@ -140,9 +140,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       return `http://localhost:${port}${path}`
     },
     getBrowserUrlInput() {
-      // if (ideVersion.minor >= 120) {
-      //   return page.locator('input[aria-label^="Enter a URL"]')
-      // }
+      if (ideVersion.minor >= 120) {
+        return page.locator('.browser-url-display')
+      }
+
       return page.locator('.browser-url-input')
     },
     getBrowserFindWidget() {
@@ -232,7 +233,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(intermediate).toBeHidden()
         await page.waitForIdle()
       }
-      await new Promise((r) => {})
+      // await new Promise((r) => {})
       const urlInput = this.getBrowserUrlInput()
       // await new Promise((r) => {})
       await expect(urlInput).toBeVisible()
