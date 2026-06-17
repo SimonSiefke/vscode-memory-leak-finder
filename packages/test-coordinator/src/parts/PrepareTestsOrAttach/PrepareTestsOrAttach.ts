@@ -28,6 +28,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -69,6 +70,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     insidersCommit,
     inspectExtensions,
     inspectExtensionsPort,
+    inspectIntegratedBrowser,
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,
@@ -163,6 +165,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     measureNode,
     inspectSharedProcess,
     inspectExtensions,
+    inspectIntegratedBrowser,
     inspectPtyHost,
     enableExtensions,
     inspectPtyHostPort,
@@ -171,10 +174,13 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     trackFunctions,
   )
   return {
+    devtoolsWebSocketUrl,
     functionTrackerRpc,
     initializationWorkerRpc,
     memoryRpc,
+    pid,
     testWorkerRpc,
     videoRpc,
+    webSocketUrl,
   }
 }
