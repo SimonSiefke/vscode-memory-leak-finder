@@ -1,9 +1,10 @@
 import * as Assert from '../Assert/Assert.ts'
+import type { HeapSnapshotGraph, ParsedEdge, ParsedNode } from '../Snapshot/Snapshot.ts'
 
-export const parseHeapSnapshotInternalGraph = (nodes, edges) => {
+export const parseHeapSnapshotInternalGraph = (nodes: readonly ParsedNode[], edges: readonly ParsedEdge[]): HeapSnapshotGraph => {
   Assert.array(edges)
   Assert.array(nodes)
-  const graph = Object.create(null)
+  const graph: HeapSnapshotGraph = Object.create(null)
   for (const node of nodes) {
     graph[node.id] = []
   }

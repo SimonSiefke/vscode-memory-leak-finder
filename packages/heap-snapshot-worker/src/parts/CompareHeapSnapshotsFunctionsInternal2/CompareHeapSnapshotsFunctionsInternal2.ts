@@ -15,6 +15,15 @@ interface UniqueLocationWithDelta extends UniqueLocation {
   readonly oldIndex: number
 }
 
+export interface CleanCompareResult {
+  readonly count: number
+  readonly delta: number
+  readonly name: string
+  readonly originalLocation?: string
+  readonly originalName?: string | null
+  readonly sourceLocation?: string
+}
+
 // TODO maybe have a different function for functions and closures. keys are not needed for functions
 
 export const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, minCount: number): readonly UniqueLocationWithDelta[] => {
@@ -66,7 +75,7 @@ export interface CompareFunctionsOptions {
   readonly minCount?: number
 }
 
-const filterOutExcluded = (items: readonly any[], excludes: readonly string[]): readonly any[] => {
+const filterOutExcluded = (items: readonly CompareResult[], excludes: readonly string[]): readonly CompareResult[] => {
   if (excludes.length > 0) {
     const lowered = excludes.map((e) => e.toLowerCase())
     return items.filter((item) => {
@@ -88,11 +97,11 @@ const filterOutExcluded = (items: readonly any[], excludes: readonly string[]): 
   return items
 }
 
-const compareCount = (a, b) => {
+const compareCount = (a: CompareResult, b: CompareResult): number => {
   return b.count - a.count
 }
 
-const cleanItem = (item) => {
+const cleanItem = (item: CompareResult): CleanCompareResult => {
   return {
     count: item.count,
     delta: item.delta,
@@ -107,7 +116,7 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   before: Snapshot,
   after: Snapshot,
   options: CompareFunctionsOptions,
-): Promise<readonly any[]> => {
+): Promise<readonly CleanCompareResult[]> => {
   const minCount = options.minCount || 0
   const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(
     after.meta.location_fields,
