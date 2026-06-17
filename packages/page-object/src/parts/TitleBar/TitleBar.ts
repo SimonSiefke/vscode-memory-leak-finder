@@ -29,6 +29,21 @@ export const create = ({ expect, page, VError }: CreateParams) => {
     async hideMenuFile() {
       return this.hideMenu(TitleBarMenuItems.File)
     },
+    async selectMenuItem(text: string) {
+      try {
+        const menu = page.locator('.monaco-menu .actions-container')
+        await expect(menu).toBeVisible()
+        const menuItem = menu.locator('.action-item', {
+          hasText: text,
+        })
+        await expect(menuItem).toBeVisible()
+        await menuItem.click()
+        await expect(menu).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select title bar menu item`)
+      }
+    },
     async showMenu(text: string) {
       try {
         const titleBar = page.locator('.part.titlebar')
@@ -45,21 +60,6 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await expect(menu).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to open title bar menu`)
-      }
-    },
-    async selectMenuItem(text: string) {
-      try {
-        const menu = page.locator('.monaco-menu .actions-container')
-        await expect(menu).toBeVisible()
-        const menuItem = menu.locator('.action-item', {
-          hasText: text,
-        })
-        await expect(menuItem).toBeVisible()
-        await menuItem.click()
-        await expect(menu).toBeHidden()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to select title bar menu item`)
       }
     },
     async showMenuEdit() {
