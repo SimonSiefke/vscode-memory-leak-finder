@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
-export const setup = async ({ Editor, SettingsEditor, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SettingsEditor, SideBar, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: 'console.log("Hello World");\n// This is a test file for font size changes',
@@ -20,25 +20,25 @@ export const setup = async ({ Editor, SettingsEditor, Workspace, SideBar }: Test
   })
   await SettingsEditor.setTextInput({
     name: 'editor.fontSize',
-    value: '14',
     type: 'number',
+    value: '14',
   })
 }
 
-export const run = async ({ SettingsEditor, Editor }: TestContext): Promise<void> => {
+export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
   // @ts-ignore
   await Editor.shouldHaveFontSize('14px')
   await SettingsEditor.setTextInput({
     name: 'editor.fontSize',
-    value: '40',
     type: 'number',
+    value: '40',
   })
   // @ts-ignore
   await Editor.shouldHaveFontSize('40px')
   await SettingsEditor.setTextInput({
     name: 'editor.fontSize',
-    value: '14',
     type: 'number',
+    value: '14',
   })
   // @ts-ignore
   await Editor.shouldHaveFontSize('14px')

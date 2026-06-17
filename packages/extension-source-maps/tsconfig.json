@@ -23,5 +23,9 @@
     "noUnusedLocals": true,
     "strictNullChecks": true
   },
+<<<<<<< HEAD
   "include": ["src", "test", "rollup.config.js"]
+=======
+  "include": ["src", "test", "playground"]
+>>>>>>> origin/main
 }

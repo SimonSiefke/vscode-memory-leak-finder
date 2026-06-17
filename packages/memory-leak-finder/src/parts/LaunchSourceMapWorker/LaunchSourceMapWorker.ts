@@ -2,12 +2,12 @@ import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
-const sourceMapWorkerPath = join(Root.root, 'packages', 'source-map-worker', 'src', 'sourceMapWorkerMain.ts')
+const workerPath = join(Root.root, 'packages', 'source-map-coordinator', 'src', 'main.ts')
 
-export const launchSourceMapWorker = async () => {
+export const launchSourceMapCoordinator = async () => {
   const rpc = await NodeWorkerRpcParent.create({
     commandMap: {},
-    path: sourceMapWorkerPath,
+    path: workerPath,
     stdio: 'inherit',
   })
   return {

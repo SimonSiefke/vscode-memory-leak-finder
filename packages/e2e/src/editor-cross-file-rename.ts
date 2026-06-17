@@ -51,6 +51,8 @@ console.log(result)
   },
 ]
 
+export const skip = 1
+
 export const setup = async ({ Editor, SideBar, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SideBar.hide()

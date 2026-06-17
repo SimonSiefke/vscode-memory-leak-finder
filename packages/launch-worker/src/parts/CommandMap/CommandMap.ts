@@ -6,4 +6,5 @@ export const commandMap = {
   'Launch.exit': Exit.exit,
   'Launch.isVscodeDownloaded': IsVscodeDownloaded.isVscodeDownloaded,
   'Launch.launch': PrepareBoth.launch,
+  'Launch.setProxyTestFolderName': PrepareBoth.setProxyTestFolderName,
 }

@@ -7,6 +7,7 @@ import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
+<<<<<<< HEAD
 const createUnknown = (id: number, name: string | null, value?: string): UnknownNode => {
   if (value !== undefined) {
     return {
@@ -22,6 +23,14 @@ const createUnknown = (id: number, name: string | null, value?: string): Unknown
     type: 'unknown',
   }
 }
+=======
+const createUnknown = (id: number, name: string | null, value?: string): AstNode => ({
+  id,
+  name,
+  type: 'unknown',
+  value: undefined,
+})
+>>>>>>> origin/main
 
 export const buildAstForNode = (
   nodeIndex: number,

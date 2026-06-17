@@ -17,6 +17,8 @@ export interface PrepareTestsAndAttachOptions {
   readonly compressVideo: boolean
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly headlessMode: boolean
@@ -32,8 +34,10 @@ export interface PrepareTestsAndAttachOptions {
   readonly inspectSharedProcessPort: number
   readonly measureId: string
   readonly measureNode: boolean
+  readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
+  readonly proxyTestFolderName: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
@@ -54,6 +58,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     compressVideo,
     connectionId,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -69,8 +75,10 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectSharedProcessPort,
     measureId,
     measureNode,
+    openDevtools,
     pageObjectPath,
     platform,
+    proxyTestFolderName,
     recordVideo,
     runMode,
     screencastQuality,
@@ -90,6 +98,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       commit,
       connectionId,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       headlessMode,
@@ -104,8 +114,10 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       inspectSharedProcess,
       inspectSharedProcessPort,
       measureId,
+      openDevtools,
       pageObjectPath,
       platform,
+      proxyTestFolderName,
       recordVideo,
       runMode,
       timeouts,
@@ -156,6 +168,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    trackFunctions,
   )
   return {
     functionTrackerRpc,

@@ -11,6 +11,10 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
   const options = {
     excludeOriginalPaths: [
       'async.ts',
+      'chatEditorInput.ts',
+      'commandsQuickAccess.ts',
+      'contextKeyService.ts',
+      'customEditorInput.ts',
       'debugName.ts',
       'diffEditorInput.ts',
       'editStack.ts',
@@ -23,13 +27,16 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'lazy.ts',
       'lifecycle.ts',
       'linkedList.ts',
+      'notebookEditorInput.ts',
       'numbers.ts',
       'position.ts',
+      'range.ts',
       'ternarySearchTree.ts',
       'textResourceEditorInput.ts',
       'undoRedoService.ts',
       'uri.ts',
       'uriIdentityService.ts',
+      '^webpack://xterm',
     ],
     minCount: threshold,
   }

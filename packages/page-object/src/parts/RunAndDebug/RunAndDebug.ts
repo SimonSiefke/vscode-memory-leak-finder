@@ -1,7 +1,8 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
     async continue() {
       try {
@@ -22,7 +23,14 @@ export const create = ({ expect, page, platform, VError }) => {
         const pauseButton = debugToolBar.locator('[aria-label^="Pause"]')
         await expect(pauseButton).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.DebugPause)
         await page.waitForIdle()
         await expect(pauseButton).toBeHidden({
@@ -37,7 +45,9 @@ export const create = ({ expect, page, platform, VError }) => {
     async removeAllBreakpoints() {
       try {
         const quickPick = QuickPick.create({
+          electronApp,
           expect,
+          ideVersion,
           page,
           platform,
           VError,
@@ -47,10 +57,20 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to remove all breakpoints`)
       }
     },
-    async runAndWaitForDebugConsoleOutput({ debugConfiguration, debugLabel, output }) {
+    async runAndWaitForDebugConsoleOutput({
+      debugConfiguration,
+      debugLabel,
+      output,
+    }: {
+      debugConfiguration: string
+      debugLabel: string
+      output?: string
+    }) {
       try {
         const quickPick = QuickPick.create({
+          electronApp,
           expect,
+          ideVersion,
           page,
           platform,
           VError,
@@ -68,10 +88,28 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to run debugger`)
       }
     },
-    async runAndWaitForPaused({ callStackSize, debugConfiguration, debugLabel, file, hasCallStack, line, viaIcon }) {
+    async runAndWaitForPaused({
+      callStackSize,
+      debugConfiguration,
+      debugLabel,
+      file,
+      hasCallStack,
+      line,
+      viaIcon,
+    }: {
+      callStackSize: number
+      debugConfiguration: string
+      debugLabel: string
+      file: string
+      hasCallStack?: boolean
+      line: number
+      viaIcon?: boolean
+    }) {
       try {
         const quickPick = QuickPick.create({
+          electronApp,
           expect,
+          ideVersion,
           page,
           platform,
           VError,
@@ -79,24 +117,61 @@ export const create = ({ expect, page, platform, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await page.waitForIdle()
         await this.startRunAndDebug({ debugConfiguration, debugLabel, viaIcon })
-        await this.waitForPaused({ callStackSize, file, hasCallStack, line })
+        await this.waitForPaused({
+          callStackSize,
+          file,
+          ...(hasCallStack === undefined ? {} : { hasCallStack }),
+          line,
+        })
       } catch (error) {
         throw new VError(error, `Failed to run debugger`)
       }
     },
-    async setPauseOnExceptions({ pauseOnCaughtExceptions, pauseOnExceptions }) {
+    async setPauseOnExceptions({
+      pauseOnCaughtExceptions,
+      pauseOnExceptions,
+    }: {
+      pauseOnCaughtExceptions: boolean
+      pauseOnExceptions: boolean
+    }) {
       try {
         await page.waitForIdle()
         const breakpoints = page.locator('.debug-breakpoints')
         await expect(breakpoints).toBeVisible()
-        const exception = breakpoints.locator('[aria-label="Caught Exceptions"] input[type="checkbox"]')
-        await expect(exception).toBeVisible()
-        const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] input[type="checkbox"]')
-        await expect(uncaughtException).toBeVisible()
-
-        await exception.setChecked(pauseOnExceptions)
-        await uncaughtException.setChecked(pauseOnCaughtExceptions)
         await page.waitForIdle()
+        // console.log({ ideVersion })
+        if (ideVersion.minor >= 108) {
+          const caughtException = breakpoints.locator('[aria-label="Caught Exceptions"] [role="checkbox"]')
+          await expect(caughtException).toBeVisible()
+          await page.waitForIdle()
+          const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] [role="checkbox"]')
+          await expect(uncaughtException).toBeVisible()
+          await page.waitForIdle()
+          const exceptionChecked = await caughtException.getAttribute('aria-checked')
+          const uncaughtExceptionChecked = await uncaughtException.getAttribute('aria-checked')
+          const sameExceptionChecked =
+            (exceptionChecked === 'true' && pauseOnCaughtExceptions) || (exceptionChecked === 'false' && !pauseOnCaughtExceptions)
+          const sameUncaughtExceptionChecked =
+            (uncaughtExceptionChecked === 'true' && pauseOnExceptions) || (uncaughtExceptionChecked === 'false' && !pauseOnExceptions)
+          if (!sameExceptionChecked) {
+            await caughtException.click()
+            await page.waitForIdle()
+          }
+          if (!sameUncaughtExceptionChecked) {
+            await uncaughtException.click()
+            await page.waitForIdle()
+          }
+        } else {
+          const exception = breakpoints.locator('[aria-label="Caught Exceptions"] input[type="checkbox"]')
+          await expect(exception).toBeVisible()
+          await page.waitForIdle()
+          const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] input[type="checkbox"]')
+          await expect(uncaughtException).toBeVisible()
+          await page.waitForIdle()
+          await exception.setChecked(pauseOnExceptions)
+          await uncaughtException.setChecked(pauseOnCaughtExceptions)
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to set pause on exceptions`)
       }
@@ -176,7 +251,14 @@ export const create = ({ expect, page, platform, VError }) => {
           await page.waitForIdle()
 
           if (debugConfiguration) {
-            const quickPick = QuickPick.create({ expect, page, platform, VError })
+            const quickPick = QuickPick.create({
+              electronApp,
+              expect,
+              ideVersion,
+              page,
+              platform,
+              VError,
+            })
             await quickPick.select(debugConfiguration)
             await page.waitForIdle()
           }
@@ -203,7 +285,9 @@ export const create = ({ expect, page, platform, VError }) => {
     }) {
       try {
         const quickPick = QuickPick.create({
+          electronApp,
           expect,
+          ideVersion,
           page,
           platform,
           VError,
@@ -234,7 +318,9 @@ export const create = ({ expect, page, platform, VError }) => {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
+          electronApp,
           expect,
+          ideVersion,
           page,
           platform,
           VError,
@@ -268,7 +354,9 @@ export const create = ({ expect, page, platform, VError }) => {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({
+          electronApp,
           expect,
+          ideVersion,
           page,
           platform,
           VError,
@@ -297,7 +385,14 @@ export const create = ({ expect, page, platform, VError }) => {
         const stopButton = debugToolBar.locator('[aria-label^="Stop"]')
         await expect(stopButton).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.DebugStop)
         await expect(stopButton).toBeHidden({
           timeout: 5000,
@@ -308,7 +403,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to stop`)
       }
     },
-    async waitForDebugConsoleOutput({ output }) {
+    async waitForDebugConsoleOutput({ output: _output }: { output: string }) {
       try {
         await page.waitForIdle()
         const repl = page.locator('.repl')
@@ -321,7 +416,55 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to wait for debug console output`)
       }
     },
-    async waitForPaused({ callStackSize, file, hasCallStack = true, line }) {
+    async takeCpuProfile({ seconds }: { seconds: number }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand('Debug: Take Performance Profile', {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
+        await quickPick.select('CPU Profile', true)
+        await page.waitForIdle()
+        await quickPick.select('Manual', false)
+        await page.waitForIdle()
+        await new Promise((r) => {
+          setTimeout(r, seconds * 1000)
+        })
+        await quickPick.executeCommand('Debug: Stop Performance Profile', {
+          pressKeyOnce: true,
+          stayVisible: false,
+        })
+        await page.waitForIdle()
+        const decoration = page.locator('.monaco-editor .codelens-decoration', {})
+        await expect(decoration).toBeVisible({
+          timeout: 5_000,
+        })
+        await page.waitForIdle()
+        await expect(decoration).toHaveText(/Self Time/)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to take performance profile`)
+      }
+    },
+    async waitForPaused({
+      callStackSize,
+      file,
+      hasCallStack = true,
+      line,
+    }: {
+      callStackSize?: number
+      file: string
+      hasCallStack?: boolean
+      line: number
+    }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       await expect(continueButton).toBeVisible({ timeout: 30_000 })
@@ -357,7 +500,7 @@ export const create = ({ expect, page, platform, VError }) => {
       await expect(editor).toBeFocused()
       await page.waitForIdle()
     },
-    async waitForPausedOnException({ exception = false, file, line }) {
+    async waitForPausedOnException({ exception = false, file, line }: { exception?: boolean; file: string; line: number }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       await expect(continueButton).toBeVisible({ timeout: 30_000 })

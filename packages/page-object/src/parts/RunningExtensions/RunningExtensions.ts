@@ -1,11 +1,17 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async show() {
+      await this.showAndWaitFor('Git')
+    },
+    async showAndWaitFor(name: string) {
       const quickPick = QuickPick.create({
+        electronApp,
         expect,
+        ideVersion,
         page,
         platform,
         VError,
@@ -13,10 +19,10 @@ export const create = ({ expect, page, platform, VError }) => {
       await quickPick.executeCommand(WellKnownCommands.ShowRunningExtensions)
       const tabLabel = page.locator('.tab-label[aria-label="Running Extensions"]')
       await expect(tabLabel).toBeVisible()
-      const gitExtension = page.locator('.editor-container .extension .name', {
-        hasExactText: 'Git',
+      const extension = page.locator('.editor-container .extension .name', {
+        hasExactText: name,
       })
-      await expect(gitExtension).toBeVisible()
+      await expect(extension).toBeVisible()
       await page.waitForIdle()
     },
     async startDebuggingExtensionHost() {

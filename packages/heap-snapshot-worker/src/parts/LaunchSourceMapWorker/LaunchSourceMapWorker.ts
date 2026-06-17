@@ -1,12 +1,12 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import { getSourceMapWorkerPath } from '../SourceMapWorkerPath/SourceMapWorkerPath.ts'
+import { getSourceMapCoordinatorPath } from '../SourceMapWorkerPath/SourceMapWorkerPath.ts'
 
-export const launchSourceMapWorker = async () => {
-  const sourceMapWorkerPath: string = getSourceMapWorkerPath()
+export const launchSourceMapCoordinator = async () => {
+  const workerPath: string = getSourceMapCoordinatorPath()
 
   const rpc = await NodeWorkerRpcParent.create({
     commandMap: {},
-    path: sourceMapWorkerPath,
+    path: workerPath,
     stdio: 'inherit',
   })
   return {

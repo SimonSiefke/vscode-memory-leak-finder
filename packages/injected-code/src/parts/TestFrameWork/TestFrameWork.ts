@@ -208,11 +208,17 @@ export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, wait
     if (waitForElement && toBeVisible(waitForElement, {})) {
       return
     }
+<<<<<<< HEAD
     const element = QuerySelector.querySelector(locator.selector)
     if (element && (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) {
       fn(element, { text: '' })
       fn(element, { text })
     }
+=======
+    const element = QuerySelector.querySelector(locator.selector) as any
+    fn(element, { text: '' })
+    fn(element, { text })
+>>>>>>> origin/main
     current *= exponentialFactor
     await Timeout.waitForMutation(document.body, current)
     currentTime = Time.getTimeStamp()
@@ -285,8 +291,13 @@ export const type = (text: string): void => {
   }
 }
 
+<<<<<<< HEAD
 export const getValue = (locator: Locator): string => {
   const element = QuerySelector.querySelector(locator.selector)
+=======
+export const getValue = (locator: any) => {
+  const element = QuerySelector.querySelector(locator.selector) as HTMLInputElement
+>>>>>>> origin/main
   if (!element) {
     throw new Error(`element not found`)
   }

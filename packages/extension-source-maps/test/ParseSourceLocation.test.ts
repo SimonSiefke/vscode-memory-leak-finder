@@ -44,3 +44,21 @@ test('parseSourceLocation - handles paths with colons in filename', () => {
     url: 'file:name.js',
   })
 })
+
+test.skip('parseSourceLocation - handles file:/ URLs', () => {
+  const result = ParseSourceLocation.parseSourceLocation('file:/home/simon/test.js:10:20')
+  expect(result).toEqual({
+    column: 20,
+    line: 10,
+    url: '/home/simon/test.js',
+  })
+})
+
+test.skip('parseSourceLocation - handles file:/// URLs', () => {
+  const result = ParseSourceLocation.parseSourceLocation('file:///home/simon/test.js:10:20')
+  expect(result).toEqual({
+    column: 20,
+    line: 10,
+    url: '/home/simon/test.js',
+  })
+})

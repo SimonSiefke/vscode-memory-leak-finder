@@ -1,11 +1,11 @@
 import * as CleanSource from '../CleanSource/CleanSource.ts'
 
 interface Position {
-  column?: number | null
-  line?: number | null
-  name?: string | null
-  source?: string | null
-  sourcesHash?: string | null
+  readonly column?: number | null | undefined
+  readonly line?: number | null | undefined
+  readonly name?: string | null | undefined
+  readonly source?: string | null | undefined
+  readonly sourcesHash?: string | null | undefined
 }
 
 export const getCleanPosition = (position: Position | null | undefined): Position | undefined => {

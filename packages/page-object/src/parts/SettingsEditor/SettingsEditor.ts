@@ -1,7 +1,9 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+<<<<<<< HEAD
 interface CreateParams {
   expect: any
   page: any
@@ -10,6 +12,9 @@ interface CreateParams {
 }
 
 export const create = ({ expect, page, platform, VError }: CreateParams) => {
+=======
+export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
+>>>>>>> origin/main
   return {
     async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {
@@ -46,15 +51,22 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to add item to settings editor`)
       }
     },
+<<<<<<< HEAD
     async applyFilter({ filterName, filterText }: { filterName: string; filterText: string }) {
+=======
+    async applyFilter({ filterName, filterText: _filterText }: { filterName: string; filterText: string }) {
+>>>>>>> origin/main
       try {
         await page.waitForIdle()
         const settingsFilter = page.locator('[aria-label="Filter Settings"]')
         await settingsFilter.click()
         await page.waitForIdle()
         const contextMenu = ContextMenu.create({
+          electronApp,
           expect,
+          ideVersion,
           page,
+          platform,
           VError,
         })
         await contextMenu.shouldHaveItem(filterName)
@@ -149,7 +161,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       // TODO maybe find a better way
       // create random quickpick to avoid race condition
       await page.waitForIdle()
-      const quickPick = QuickPick.create({ expect, page, platform, VError })
+      const quickPick = QuickPick.create({
+        electronApp,
+        expect,
+        ideVersion,
+        page,
+        platform,
+        VError,
+      })
       await quickPick.show()
       await quickPick.hide()
       await page.waitForIdle()
@@ -234,9 +253,17 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     async open() {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
         await page.waitForIdle()
+
         const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
         await expect(settingsSwitcher).toBeVisible()
         await page.waitForIdle()
@@ -246,6 +273,12 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const rightControls = page.locator('.settings-right-controls')
         await expect(rightControls).toBeVisible()
         await page.waitForIdle()
+        if (ideVersion.minor >= 114) {
+          const openInMainWindowButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
+          await expect(openInMainWindowButton).toBeVisible()
+          await openInMainWindowButton.click()
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to open settings ui`)
       }
@@ -307,7 +340,11 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to remove item`)
       }
     },
+<<<<<<< HEAD
     async search({ resultCount, value }: { resultCount: number; value: string }) {
+=======
+    async search({ resultCount, value }: { resultCount: number | 'many'; value: string }) {
+>>>>>>> origin/main
       try {
         await page.waitForIdle()
         const searchInput = page.locator('.search-container [role="textbox"]')
@@ -320,7 +357,11 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const searchCount = page.locator('.settings-count-widget')
         await expect(searchCount).toBeVisible()
         await page.waitForIdle()
+<<<<<<< HEAD
         if (resultCount > 1) {
+=======
+        if (resultCount === 'many' || resultCount > 1) {
+>>>>>>> origin/main
           await expect(searchCount).toHaveText(new RegExp(`\\d+ Settings Found`))
         } else {
           const word = resultCount === 1 ? 'Setting' : 'Settings'
@@ -348,7 +389,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to open select`)
       }
     },
-    async setTextInput({ name, value, type = 'text' }) {
+    async setTextInput({ name, type = 'text', value }: { name: string; value: string; type?: string }) {
       try {
         await page.waitForIdle()
         const settingItem = page.locator(`.setting-item-contents[data-key="${name}"]`)
@@ -374,6 +415,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await page.waitForIdle()
         const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
         await expect(checkbox).toBeVisible()
+
         await page.waitForIdle()
         const checkedValue = await checkbox.getAttribute('aria-checked')
         const nextValue = checkedValue === 'true' ? 'false' : 'true'

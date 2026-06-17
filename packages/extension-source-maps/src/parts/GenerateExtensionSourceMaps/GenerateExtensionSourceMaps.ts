@@ -4,22 +4,26 @@ import * as BuildExtension from '../BuildExtension/BuildExtension.ts'
 import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import * as Exec from '../Exec/Exec.ts'
 import * as FindCommitForVersion from '../FindCommitForVersion/FindCommitForVersion.ts'
-import * as GetDisplayname from '../GetDisplayname/GetDisplayname.ts'
 import * as GetNodeVersion from '../GetNodeVersion/GetNodeVersion.ts'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
-import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
 
 export const generateExtensionSourceMaps = async ({
   cacheDir,
   extensionName,
   repoUrl,
   version,
+  buildScript,
+  platform,
+  modifications,
 }: {
   extensionName: string
   version: string
   repoUrl: string
   cacheDir: string
+  platform: string
+  buildScript: readonly string[]
+  modifications: readonly any[]
 }): Promise<void> => {
   // Check if already built
   // Normalize version by stripping 'v' prefix if present
@@ -28,8 +32,6 @@ export const generateExtensionSourceMaps = async ({
   const extensionId = `${extensionName}-${normalizedVersion}`
   const sourceMapsOutputPath = join(cacheDir, extensionId)
   if (existsSync(sourceMapsOutputPath)) {
-    const displayName = GetDisplayname.getDisplayname(extensionName)
-    console.log(`[extension-source-maps] Source maps for ${displayName} ${version} already exist, skipping...`)
     return
   }
 
@@ -73,12 +75,13 @@ export const generateExtensionSourceMaps = async ({
   console.log(`[extension-source-maps] Dependencies installed successfully`)
 
   // Modify esbuild config
-  console.log(`[extension-source-maps] Modifying esbuild config to generate sourcemaps...`)
-  await ModifyEsbuildConfig.modifyEsbuildConfig(repoPath)
+  if (modifications && modifications.length > 0) {
+    // TODO
+  }
 
   // Build extension
   console.log(`[extension-source-maps] Building extension...`)
-  await BuildExtension.buildExtension(repoPath, nodeVersion)
+  await BuildExtension.buildExtension(repoPath, nodeVersion, platform, buildScript)
 
   console.log(`[extension-source-maps] Successfully generated source maps for ${extensionName} ${version}`)
 }

@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-26, windows-2025]
+        os: [ubuntu-24.04, macos-26, windows-2022]
     timeout-minutes: 1000
     steps:
       - uses: actions/checkout@v6
@@ -175,6 +175,12 @@ jobs:
             args: --measure worker-count
           - name: detached-dom-nodes-with-stack-traces
             args: --measure detached-dom-nodes-with-stack-traces --runs 37 --restart-between --run-skipped-tests-anyway
+          - name: file-descriptor-count
+            args: --measure file-descriptor-count --runs 37 --restart-between --run-skipped-tests-anyway
+          - name: file-descriptors
+            args: --measure file-descriptors --runs 37 --restart-between --run-skipped-tests-anyway
+          - name: file-watcher-count
+            args: --measure file-watcher-count --runs 37 --restart-between --run-skipped-tests-anyway
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v6
@@ -225,6 +231,7 @@ jobs:
   ci-linux-charts:
     runs-on: ubuntu-24.04
     needs: ci-linux-measures
+    if: always()
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
@@ -453,6 +460,21 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-detached-dom-nodes-with-stack-traces
           path: ./vscode-memory-leak-finder-results-linux-detached-dom-nodes-with-stack-traces
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-file-descriptor-count
+          path: ./vscode-memory-leak-finder-results-linux-file-descriptor-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-file-descriptors
+          path: ./vscode-memory-leak-finder-results-linux-file-descriptors
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-file-watcher-count
+          path: ./vscode-memory-leak-finder-results-linux-file-watcher-count
       - name: Merge all measure results
         run: node packages/build/src/mergeArtifacts.ts
       - name: Upload merged artifact
@@ -502,6 +524,16 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-detached-dom-nodes-with-stack-traces
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v5
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-file-descriptor-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v5
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-file-descriptors
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v5
         continue-on-error: true

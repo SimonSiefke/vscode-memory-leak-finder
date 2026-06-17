@@ -1,7 +1,10 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as RunningExtensions from '../RunningExtensions/RunningExtensions.ts'
+import * as Editor from '../Editor/Editor.ts'
 
-export const create = ({ expect, page, platform, VError }) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async clearFilter() {
       try {
@@ -22,7 +25,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to clear filter`)
       }
     },
-    async filter({ expectedResults, searchValue }) {
+    async filter({ searchValue }: { searchValue: string }) {
       try {
         await page.waitForIdle()
         const table = page.locator('.ai-models-management-editor .models-table-container')
@@ -46,7 +49,25 @@ export const create = ({ expect, page, platform, VError }) => {
     },
     async open() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const r = RunningExtensions.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await r.showAndWaitFor('GitHub Copilot Chat')
+        const editor = Editor.create({ page, electronApp, expect, ideVersion, platform, VError })
+        await editor.closeAll()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.ManageLanguageModels)
         // TODO verify editor is open
         const container = page.locator('.models-search-container')

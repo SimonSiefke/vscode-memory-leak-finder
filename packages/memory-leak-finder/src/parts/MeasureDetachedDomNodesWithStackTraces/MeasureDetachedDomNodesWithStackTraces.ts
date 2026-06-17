@@ -2,7 +2,6 @@ import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import type { Session } from '../Session/Session.ts'
 import * as CompareDetachedDomNodesWithStackTraces from '../CompareDetachedDomNodesWithStackTraces/CompareDetachedDomNodesWithStackTraces.ts'
 import * as GetDetachedDomNodesWithStackTraces from '../GetDetachedDomNodesWithStackTraces/GetDetachedDomNodesWithStackTraces.ts'
-import * as GetTotalInstanceCounts from '../GetTotalInstanceCounts/GetTotalInstanceCounts.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
@@ -40,13 +39,6 @@ export const releaseResources = async (session: Session, objectGroup: string) =>
 
 export const compare = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces
 
-export const isLeak = ({ after, before }) => {
-  return GetTotalInstanceCounts.getTotalInstanceCounts(after) > GetTotalInstanceCounts.getTotalInstanceCounts(before)
-}
-
-export const summary = ({ after, before }) => {
-  return {
-    after: GetTotalInstanceCounts.getTotalInstanceCounts(after),
-    before: GetTotalInstanceCounts.getTotalInstanceCounts(before),
-  }
+export const isLeak = (after: readonly any[]) => {
+  return after.length > 0
 }

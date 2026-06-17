@@ -6,7 +6,7 @@ export const setup = async ({ Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
 }
 
-export const run = async ({ ActivityBar, Git, SourceControl, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ ActivityBar, Git, SourceControl, Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: '<h1>hello world</h1>',
@@ -19,6 +19,9 @@ export const run = async ({ ActivityBar, Git, SourceControl, Workspace }: TestCo
   await Workspace.add({ content: 'test', name: 'file2.txt' })
   await Git.add()
   await Git.commit('second commit')
+  await ActivityBar.showExplorer()
+  await Explorer.refresh()
+  await Explorer.shouldHaveItem('file2.txt')
   await ActivityBar.showSourceControl()
   await SourceControl.shouldHaveHistoryItem('first commit')
   await SourceControl.shouldHaveHistoryItem('second commit')

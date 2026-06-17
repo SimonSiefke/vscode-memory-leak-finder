@@ -4,6 +4,7 @@ import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
+import * as GetProxyTestFolderName from '../GetProxyTestFolderName/GetProxyTestFolderName.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
@@ -16,24 +17,35 @@ import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTea
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
+import type { Rpc } from '@lvce-editor/rpc'
+import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
+import { doLogin } from '../DoLogin/DoLogin.ts'
 
-const emptyRpc = {
-  async dispose() {},
-  invoke() {
-    throw new Error(`not implemented`)
-  },
+interface WorkerMap {
+  readonly functionTrackerRpc: Rpc
+  readonly initializationWorkerRpc: Rpc
+  readonly memoryRpc: Rpc
+  readonly testWorkerRpc: Rpc
+  readonly videoRpc: Rpc
 }
 
+<<<<<<< HEAD
 const disposeWorkers = async (workers: { functionTrackerRpc: { dispose: () => Promise<void> }; initializationWorkerRpc: { dispose: () => Promise<void> }; memoryRpc: { dispose: () => Promise<void> }; testWorkerRpc: { dispose: () => Promise<void> }; videoRpc: { dispose: () => Promise<void> } }): Promise<void> => {
+=======
+const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
+>>>>>>> origin/main
   const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
   await Promise.all([functionTrackerRpc.dispose(), memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()
 }
 
 export const runTestsWithCallback = async ({
+  allowCopilotAuthInCi,
   arch,
   callback,
+  getTimeStamp,
   checkLeaks,
   clearExtensions,
   color,
@@ -41,6 +53,8 @@ export const runTestsWithCallback = async ({
   compressVideo,
   continueValue,
   cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
   filterValue,
@@ -59,6 +73,7 @@ export const runTestsWithCallback = async ({
   measure,
   measureAfter,
   measureNode,
+  openDevtools,
   pageObjectPath,
   platform,
   recordVideo,
@@ -109,20 +124,16 @@ export const runTestsWithCallback = async ({
     // Then recreate the workers, ensuring a clean state
 
     if (setupOnly && commit) {
-      const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+      await SetupOnly.setupOnly({
         arch,
-        attachedToPageTimeout,
         clearExtensions,
         commit,
-        compressVideo,
-        connectionId,
         cwd,
+        downloadUserDataZipFileToken,
+        downloadUserDataZipFileUrl,
         enableExtensions,
         enableProxy,
-        headlessMode,
         ide,
-        ideVersion,
-        idleTimeout,
         insidersCommit,
         inspectExtensions,
         inspectExtensionsPort,
@@ -130,23 +141,12 @@ export const runTestsWithCallback = async ({
         inspectPtyHostPort,
         inspectSharedProcess,
         inspectSharedProcessPort,
-        measureId: measure,
-        measureNode,
-        pageObjectPath: pageObjectPathResolved,
         platform,
-        recordVideo,
-        runMode,
-        screencastQuality,
-        timeouts,
-        trackFunctions,
         updateUrl,
         useProxyMock,
         vscodePath,
         vscodeVersion,
       })
-      await testWorkerRpc.dispose()
-      await memoryRpc?.dispose()
-      await videoRpc?.dispose()
       return {
         duration: 0,
         failed: 0,
@@ -161,69 +161,46 @@ export const runTestsWithCallback = async ({
     }
 
     if (login) {
-      const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
-        await PrepareTestsOrAttach.prepareTestsAndAttach({
-          arch,
-          attachedToPageTimeout,
-          clearExtensions,
-          commit,
-          compressVideo,
-          connectionId,
-          cwd,
-          enableExtensions,
-          enableProxy,
-          headlessMode,
-          ide,
-          ideVersion,
-          idleTimeout,
-          insidersCommit,
-          inspectExtensions,
-          inspectExtensionsPort,
-          inspectPtyHost,
-          inspectPtyHostPort,
-          inspectSharedProcess,
-          inspectSharedProcessPort,
-          measureId: measure,
-          measureNode,
-          pageObjectPath: pageObjectPathResolved,
-          platform,
-          recordVideo,
-          runMode,
-          screencastQuality,
-          timeouts,
-          trackFunctions,
-          updateUrl,
-          useProxyMock,
-          vscodePath,
-          vscodeVersion,
-        })
-      // Wait for user to interrupt (Ctrl+C) or terminate the process
-      const { promise, resolve } = Promise.withResolvers<void>()
-      const cleanup = async () => {
-        await testWorkerRpc.dispose()
-        await memoryRpc?.dispose()
-        await videoRpc?.dispose()
-        await functionTrackerRpc?.dispose()
-        if (initializationWorkerRpc) {
-          await initializationWorkerRpc.dispose()
-        }
-        resolve()
-      }
-      process.once('SIGINT', cleanup)
-      process.once('SIGTERM', cleanup)
-      // The IDE is now running. User can login manually and then press Ctrl+C when done
-      await promise
-      return {
-        duration: 0,
-        failed: 0,
+      return await doLogin({
+        arch,
+        attachedToPageTimeout,
+        clearExtensions,
+        commit,
+        compressVideo,
+        connectionId,
+        cwd,
+        downloadUserDataZipFileToken,
+        downloadUserDataZipFileUrl,
+        enableExtensions,
+        enableProxy,
         filterValue,
-        leaked: 0,
-        passed: 0,
-        skipped: 0,
-        skippedFailed: 0,
-        total: 0,
-        type: 'success',
-      }
+        headlessMode,
+        ide,
+        ideVersion,
+        idleTimeout,
+        insidersCommit,
+        inspectExtensions,
+        inspectExtensionsPort,
+        inspectPtyHost,
+        inspectPtyHostPort,
+        inspectSharedProcess,
+        inspectSharedProcessPort,
+        measure,
+        measureNode,
+        openDevtools,
+        pageObjectPathResolved,
+        platform,
+        proxyTestFolderName: '',
+        recordVideo,
+        runMode,
+        screencastQuality,
+        timeouts,
+        trackFunctions,
+        updateUrl,
+        useProxyMock,
+        vscodePath,
+        vscodeVersion,
+      })
     }
 
     let passed = 0
@@ -254,16 +231,16 @@ export const runTestsWithCallback = async ({
       runs,
     }
 
-    const intializeEnd = performance.now()
+    const intializeEnd = getTimeStamp()
     const intializeTime = intializeEnd - initialStart
 
     await callback(TestWorkerEventType.HandleInitialized, intializeTime)
 
-    const testStart = performance.now()
+    const testStart = getTimeStamp()
     await callback(TestWorkerEventType.TestsStarting, total)
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
-    let workers = {
+    let workers: WorkerMap = {
       functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
@@ -274,6 +251,7 @@ export const runTestsWithCallback = async ({
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
+      const proxyTestFolderName = GetProxyTestFolderName.getProxyTestFolderName(absolutePath)
       const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
 
       const needsSetup = i === 0 || restartBetween
@@ -290,6 +268,8 @@ export const runTestsWithCallback = async ({
             compressVideo,
             connectionId,
             cwd,
+            downloadUserDataZipFileToken,
+            downloadUserDataZipFileUrl,
             enableExtensions,
             enableProxy,
             headlessMode,
@@ -305,8 +285,10 @@ export const runTestsWithCallback = async ({
             inspectSharedProcessPort,
             measureId: measure,
             measureNode,
+            openDevtools,
             pageObjectPath: pageObjectPathResolved,
             platform,
+            proxyTestFolderName,
             recordVideo,
             runMode,
             screencastQuality,
@@ -320,11 +302,14 @@ export const runTestsWithCallback = async ({
         workers = {
           functionTrackerRpc: functionTrackerRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
-          // @ts-ignore
           memoryRpc: memoryRpc || emptyRpc,
           testWorkerRpc: testWorkerRpc || emptyRpc,
           videoRpc: videoRpc || emptyRpc,
         }
+      }
+
+      if (enableProxy) {
+        await workers.initializationWorkerRpc.invoke('Launch.setProxyTestFolderName', proxyTestFolderName)
       }
 
       const { memoryRpc, testWorkerRpc, videoRpc } = workers
@@ -343,6 +328,7 @@ export const runTestsWithCallback = async ({
           forceRun,
           timeouts,
           isGithubActions,
+          allowCopilotAuthInCi,
         )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped

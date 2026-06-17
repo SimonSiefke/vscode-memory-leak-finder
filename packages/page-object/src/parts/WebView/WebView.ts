@@ -1,13 +1,15 @@
 // this is a workaround for a race condition in vscode
 // where sometimes quickpick opens, but the webview is focused
 // and then quickpick doesn't work
-const waitForExtraIdle = async (page) => {
+const waitForExtraIdle = async (page: any): Promise<void> => {
   for (let i = 0; i < 30; i++) {
     await page.waitForIdle()
   }
 }
 
-export const create = ({ expect, page, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
     async focus() {
       try {

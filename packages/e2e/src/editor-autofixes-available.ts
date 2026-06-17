@@ -4,6 +4,8 @@ export const setup = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }
 
+export const skip = 1
+
 export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {

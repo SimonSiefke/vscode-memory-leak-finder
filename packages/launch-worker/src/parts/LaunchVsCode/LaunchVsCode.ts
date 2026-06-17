@@ -36,8 +36,9 @@ export const launchVsCode = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
-  updateUrl,
+  proxyTestFolderName,
   useProxyMock,
+  updateUrl,
   vscodePath,
   vscodeVersion,
 }: {
@@ -57,6 +58,7 @@ export const launchVsCode = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform: string
+  proxyTestFolderName: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -85,7 +87,7 @@ export const launchVsCode = async ({
     const sourcesDir = join(Root.root, '.vscode-sources')
     await mkdir(sourcesDir, { recursive: true })
     const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
-    const userDataDir = GetUserDataDir.getUserDataDir()
+    const userDataDir = GetUserDataDir.getUserDataDir(platform)
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
     if (clearExtensions) {
       await rm(extensionsDir, { force: true, recursive: true })
@@ -114,7 +116,7 @@ export const launchVsCode = async ({
       try {
         console.log('[LaunchVsCode] Starting proxy worker...')
         proxyWorkerRpc = await ProxyWorker.launch()
-        proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, settingsPath)
+        proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, settingsPath, proxyTestFolderName)
 
         // Get proxy environment variables
         if (proxyServer) {
@@ -145,6 +147,7 @@ export const launchVsCode = async ({
       inspectPtyHostPort,
       inspectSharedProcess,
       inspectSharedProcessPort,
+      platform,
       userDataDir,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({
@@ -162,8 +165,10 @@ export const launchVsCode = async ({
       headlessMode,
     })
     return {
+      binaryPath,
       child,
       pid,
+      proxyWorkerRpc,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch VSCode`)

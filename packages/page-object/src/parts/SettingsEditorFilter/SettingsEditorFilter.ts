@@ -1,8 +1,9 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ electronApp, expect, page, VError, ideVersion }: CreateParams) => {
   return {
-    async select({ filterName, filterText }) {
+    async select({ filterName, filterText }: { filterName: string; filterText: string }) {
       try {
         await page.waitForIdle()
         const settingsFilter = page.locator('[aria-label="Filter Settings"]')
@@ -21,7 +22,14 @@ export const create = ({ expect, page, VError }) => {
         })
         await page.waitForIdle()
         await expect(menu).toBeHidden()
-        const settingsEditorInput = SettingsEditorInput.create({ expect, page, VError })
+        const settingsEditorInput = SettingsEditorInput.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform: '',
+          VError,
+        })
         await settingsEditorInput.shouldHaveText(filterText)
       } catch (error) {
         throw new VError(error, `Failed to select filter ${filterName}`)

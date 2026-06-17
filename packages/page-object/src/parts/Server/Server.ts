@@ -1,4 +1,5 @@
 import { createServer } from 'node:http'
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 const DEFAULT_PORT = 0
 
@@ -9,7 +10,7 @@ export interface ServerInfo {
   readonly url: string
 }
 
-export const create = ({ VError }) => {
+export const create = ({ VError }: CreateParams) => {
   return {
     async start(
       { port = DEFAULT_PORT, requestHandler } = {} as { port: number; requestHandler?: (req: any, res: any) => void },

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { SourceMapConsumer } from 'source-map'
 import type { IntermediateItem } from '../IntermediateItem/IntermediateItem.ts'
 import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
-import * as AddOriginalPositions from '../AddOriginalPositions/AddOriginalPositions.ts'
+import * as AddOriginalNames from '../AddOriginalNames/AddOriginalNames.ts'
 import * as Assert from '../Assert/Assert.ts'
 import { root } from '../Root/Root.ts'
 
@@ -24,7 +24,7 @@ const getExtensionSourceMapDir = (sourceMapUrl: string): string | null => {
 
 export const getOriginalPositions = async (
   sourceMap: RawSourceMap,
-  positions: number[],
+  positions: readonly number[],
   classNames: boolean,
   hash: string,
   sourceMapUrl?: string,
@@ -68,7 +68,7 @@ export const getOriginalPositions = async (
     return intermediateItems
   })
 
-  const finalResults: readonly OriginalPosition[] = await AddOriginalPositions.addOriginalPositions(intermediateItems)
+  const finalResults: readonly OriginalPosition[] = await AddOriginalNames.addOriginalNames(intermediateItems)
 
   return finalResults
 }

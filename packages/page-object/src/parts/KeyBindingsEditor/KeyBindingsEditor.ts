@@ -2,7 +2,7 @@ import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const getKeybindingButtonsText = (keyBinding, platform) => {
+const getKeybindingButtonsText = (keyBinding: string, platform: string) => {
   if (keyBinding.startsWith('Control+')) {
     if (IsMacos.isMacos(platform)) {
       return `⌃${keyBinding.slice('Control+'.length)}`
@@ -12,9 +12,11 @@ const getKeybindingButtonsText = (keyBinding, platform) => {
   return keyBinding
 }
 
-export const create = ({ expect, page, platform, VError }) => {
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
+
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
-    async searchFor(searchValue) {
+    async searchFor(searchValue: string) {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         const input = keyBindingsEditor.locator('.keybindings-header input')
@@ -25,7 +27,7 @@ export const create = ({ expect, page, platform, VError }) => {
         throw new VError(error, `Failed to search for ${searchValue}`)
       }
     },
-    async setKeyBinding(commandName, keyBinding) {
+    async setKeyBinding(commandName: string, keyBinding: string) {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible()
@@ -51,16 +53,31 @@ export const create = ({ expect, page, platform, VError }) => {
     },
     async show() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.OpenKeyboardShortcuts)
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible({
           timeout: 3000,
         })
+        await page.waitForIdle()
         const body = page.locator('.keybindings-body')
         await expect(body).toBeVisible()
+        await page.waitForIdle()
         const list = body.locator('.monaco-list')
         await expect(list).toBeVisible()
+        await page.waitForIdle()
+        const input = page.locator('.keybindings-header .ibwrapper .input')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        await expect(input).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show keybindings editor`)
       }

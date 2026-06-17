@@ -4,17 +4,17 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-export const setup = async ({ ChatEditor, Editor, Electron }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Electron }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
   })
   await Editor.closeAll()
-  await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
-  // TODO send message and clear it
-  await ChatEditor.sendMessage({ message: 'test' })
+export const run = async ({ ChatEditor, Editor }: TestContext): Promise<void> => {
+  await ChatEditor.open()
+  await ChatEditor.sendMessage({ message: 'test', model: 'GPT-4.1' })
+  await Editor.closeAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {

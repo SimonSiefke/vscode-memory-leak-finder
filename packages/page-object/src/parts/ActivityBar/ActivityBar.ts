@@ -1,8 +1,10 @@
+import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+<<<<<<< HEAD
 interface CreateParams {
   readonly expect: unknown
   readonly page: unknown
@@ -11,12 +13,22 @@ interface CreateParams {
 }
 
 export const create = ({ expect, page, platform, VError }: CreateParams) => {
+=======
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+>>>>>>> origin/main
   return {
     async hide() {
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.HideActivityBar)
         await expect(activityBar).toBeHidden()
       } catch (error) {
@@ -46,7 +58,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await expect(activityBar).toBeVisible()
         const ariaLabel = 'Explorer'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
-        const contextMenu = ContextMenu.create({ expect, page, VError })
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
         await contextMenu.open(activityBarItem)
         await contextMenu.openSubMenu('Move To', false)
         await contextMenu.select('Panel', false)
@@ -54,9 +73,100 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to move explorer to panel`)
       }
     },
+    async moveExtensionsToPanel() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Extensions'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(activityBarItem)
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Panel', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move extensions to panel`)
+      }
+    },
+    async moveRunAndDebugToPanel() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Run and Debug'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(activityBarItem)
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Panel', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move run and debug to panel`)
+      }
+    },
+    async moveSearchToPanel() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Search'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(activityBarItem)
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Panel', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move search to panel`)
+      }
+    },
+    async moveSourceControlToPanel() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Source Control'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        const contextMenu = ContextMenu.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await contextMenu.open(activityBarItem)
+        await contextMenu.openSubMenu('Move To', false)
+        await contextMenu.select('Panel', false)
+      } catch (error) {
+        throw new VError(error, `Failed to move source control to panel`)
+      }
+    },
     async resetViewLocations() {
       try {
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand('View: Reset View Locations')
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
@@ -71,7 +181,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, platform, VError })
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
         await quickPick.executeCommand(WellKnownCommands.FocusActivityBar)
         await expect(activityBar).toBeVisible({ timeout: 10_000 })
       } catch (error) {
@@ -102,6 +219,22 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         ariaLabel: 'Source Control',
       })
     },
+    async shouldBeHidden() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that activity bar is hidden`)
+      }
+    },
+    async shouldBeVisible() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that activity bar is visible`)
+      }
+    },
     async showTooltipExplorer() {
       try {
         const activityBar = page.locator('.part.activitybar')
@@ -111,7 +244,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await activityBarItem.hover()
         const tooltip = page.locator('[role="tooltip"]')
         await expect(tooltip).toBeVisible()
-        const keyBinding = IsMacos.isMacos(platform) ? '⇧⌘E' : 'Ctrl+Shift+E'
+        const keyBinding = platform && IsMacos.isMacos(platform) ? '⇧⌘E' : 'Ctrl+Shift+E'
         await expect(tooltip).toHaveText(`Explorer (${keyBinding})`)
       } catch (error) {
         throw new VError(error, `Failed to show explorer tooltip`)
