@@ -112,7 +112,7 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
 
   // Find the two hidden nodes with the most boolean-like references
   // These are likely the true/false singletons
-  const candidates = [...hiddenNodeRefs.entries()]
+  const candidates = [...hiddenNodeRefs]
     .filter(([_, ref]) => ref.booleanLikeRefs >= 1) // At least 1 boolean-like reference
     .sort((a, b) => b[1].booleanLikeRefs - a[1].booleanLikeRefs)
     .slice(0, 2) // Take top 2 candidates

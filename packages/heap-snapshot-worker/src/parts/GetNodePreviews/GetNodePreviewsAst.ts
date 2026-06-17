@@ -50,7 +50,7 @@ export const buildAstForNode = (
   }
   if (nodeTypeName === 'number') {
     const n = typeof node.name === 'number' ? strings[node.name] : undefined
-    const parsed = n === undefined ? Number.NaN : Number(n)
+    const parsed = n === undefined ? NaN : Number(n)
     return { id, name, type: 'number', value: Number.isFinite(parsed) ? parsed : (n ?? '') }
   }
   if (nodeTypeName === 'bigint') {
@@ -166,7 +166,7 @@ export const buildAstForNode = (
         }
       }
     }
-    return { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: nodeTypeName as any }
+    return { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: nodeTypeName }
   }
 
   return createUnknown(id, name, `[${nodeTypeName} ${id}]`)

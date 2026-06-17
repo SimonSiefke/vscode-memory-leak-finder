@@ -15,7 +15,7 @@ export const parseHeapSnapshotObjects = (
   // Assert.array(values)
   Assert.array(valueFields)
   Assert.array(valueTypes)
-  const parsed: readonly any[] = [] as unknown as any[]
+  const parsed: readonly any[] = []
   const nodeFieldCount = valueFields.length
   const camelCaseNodeFields = valueFields.map(CamelCase.camelCase)
   for (let i = 0; i < values.length; i += nodeFieldCount) {
