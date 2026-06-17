@@ -128,10 +128,11 @@ test('installDependencies - installs missing node version from .nvmrc before npm
   const nvmrcPath = `${repoPath}/.nvmrc`
   const homeDir = homedir()
   const oldNvmDir = process.env.NVM_DIR
-  const nvmDir = `${homeDir}/.nvm`
-  const configNvmNodePath = `${homeDir}/.config/nvm/versions/node/v22.22.1/bin/node`
-  const npmPath = `${nvmDir}/versions/node/v22.22.1/bin/npm`
-  const nodePath = `${nvmDir}/versions/node/v22.22.1/bin/node`
+  const nvmDir = Path.join(homeDir, '.nvm')
+  const binPath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin')
+  const configNvmNodePath = Path.join(homeDir, '.config', 'nvm', 'versions', 'node', 'v22.22.1', 'bin', 'node')
+  const npmPath = Path.join(binPath, 'npm')
+  const nodePath = Path.join(binPath, 'node')
   let installed = false
 
   process.env.NVM_DIR = nvmDir
@@ -165,7 +166,7 @@ test('installDependencies - installs missing node version from .nvmrc before npm
         expect(command).toBe(npmPath)
         expect(args).toEqual(['ci'])
         expect(options.cwd).toBe(repoPath)
-        expect(options.env?.PATH).toContain(`${nvmDir}/versions/node/v22.22.1/bin`)
+        expect(options.env?.PATH).toContain(binPath)
         return { exitCode: 0, stderr: '', stdout: '' }
       },
     },
@@ -190,7 +191,7 @@ test('installDependencies - installs missing node version from .nvmrc before npm
         {
           cwd: repoPath,
           env: expect.objectContaining({
-            PATH: expect.stringContaining(`${nvmDir}/versions/node/v22.22.1/bin`),
+            PATH: expect.stringContaining(binPath),
           }),
           stdio: 'inherit',
         },

@@ -3,15 +3,16 @@ import { expect, test } from '@jest/globals'
 import { createMockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 import { getNpmPathFromNvmrc } from '../src/parts/GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
+import * as Path from '../src/parts/Path/Path.ts'
 
 test('getNpmPathFromNvmrc - returns installed npm path from nvm', async () => {
   const repoPath = '/test/repo'
   const nvmrcPath = `${repoPath}/.nvmrc`
   const homeDir = homedir()
   const oldNvmDir = process.env.NVM_DIR
-  const nvmDir = `${homeDir}/.nvm`
-  const npmPath = `${nvmDir}/versions/node/v22.22.1/bin/npm`
-  const nodePath = `${nvmDir}/versions/node/v22.22.1/bin/node`
+  const nvmDir = Path.join(homeDir, '.nvm')
+  const npmPath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'npm')
+  const nodePath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'node')
 
   process.env.NVM_DIR = nvmDir
 
@@ -46,10 +47,10 @@ test('getNpmPathFromNvmrc - installs missing node version and resolves npm path'
   const nvmrcPath = `${repoPath}/.nvmrc`
   const homeDir = homedir()
   const oldNvmDir = process.env.NVM_DIR
-  const nvmDir = `${homeDir}/.nvm`
-  const configNvmNodePath = `${homeDir}/.config/nvm/versions/node/v22.22.1/bin/node`
-  const npmPath = `${nvmDir}/versions/node/v22.22.1/bin/npm`
-  const nodePath = `${nvmDir}/versions/node/v22.22.1/bin/node`
+  const nvmDir = Path.join(homeDir, '.nvm')
+  const configNvmNodePath = Path.join(homeDir, '.config', 'nvm', 'versions', 'node', 'v22.22.1', 'bin', 'node')
+  const npmPath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'npm')
+  const nodePath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'node')
   let installed = false
 
   process.env.NVM_DIR = nvmDir
@@ -101,9 +102,9 @@ test('getNpmPathFromNvmrc - falls back to parent .nvmrc for nested folders', asy
   const buildNvmrcPath = `${repoPath}/.nvmrc`
   const homeDir = homedir()
   const oldNvmDir = process.env.NVM_DIR
-  const nvmDir = `${homeDir}/.nvm`
-  const npmPath = `${nvmDir}/versions/node/v22.22.1/bin/npm`
-  const nodePath = `${nvmDir}/versions/node/v22.22.1/bin/node`
+  const nvmDir = Path.join(homeDir, '.nvm')
+  const npmPath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'npm')
+  const nodePath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'node')
 
   process.env.NVM_DIR = nvmDir
 
