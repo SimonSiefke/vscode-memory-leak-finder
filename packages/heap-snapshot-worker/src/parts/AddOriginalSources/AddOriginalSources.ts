@@ -99,7 +99,9 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
     const item = enriched[i]
     const script = scriptMap[item.scriptId]
     if (script) {
-      item.url = script.url
+      if (script.url) {
+        item.url = script.url
+      }
       const sourceMapUrl = getSourceMapUrl(script)
       item.sourceMapUrl = sourceMapUrl
       if (item.url) {

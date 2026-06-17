@@ -16,9 +16,9 @@ const internalNames = [
  * @param {string|Array} name - The array name (string or array of strings)
  * @returns {boolean} - True if the array is a Chrome internal, false otherwise
  */
-export const isInternalArray = (name) => {
+export const isInternalArray = (name: string | readonly string[]): boolean => {
   // Convert array of names to comma-separated string for checking
-  const nameString = Array.isArray(name) ? name.join(',') : name
+  const nameString = typeof name === 'string' ? name : name.join(',')
 
   return internalNames.includes(nameString)
 }

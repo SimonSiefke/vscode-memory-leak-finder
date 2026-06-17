@@ -3,11 +3,19 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import { getArraysByClosureLocationFromHeapSnapshotInternal } from './GetArraysByClosureLocationFromHeapSnapshotInternal.ts'
 
-export const getArraysByClosureLocationFromHeapSnapshot = async (id, scriptMap) => {
+export interface ScriptMapEntry {
+  readonly sourceMapUrl?: string
+  readonly url?: string
+}
+
+export type ScriptMap = Readonly<Record<number, ScriptMapEntry>>
+
+export const getArraysByClosureLocationFromHeapSnapshot = async (id: string, scriptMap: ScriptMap) => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const { parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  const { edge_fields, edge_types, location_fields, node_fields, node_types } = heapsnapshot.snapshot.meta
+  const meta = heapsnapshot.snapshot?.meta ?? heapsnapshot.meta
+  const { edge_fields, edge_types, location_fields, node_fields, node_types } = meta
   const { edges, locations, nodes, strings } = heapsnapshot
   return getArraysByClosureLocationFromHeapSnapshotInternal(
     strings,

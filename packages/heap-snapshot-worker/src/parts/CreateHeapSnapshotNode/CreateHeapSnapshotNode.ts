@@ -1,7 +1,7 @@
-import type { HeapSnapshotRecord, HeapSnapshotValue } from '../Snapshot/Snapshot.ts'
+import type { HeapSnapshotRecord, HeapSnapshotValue, NumberArray } from '../Snapshot/Snapshot.ts'
 
 export const createHeapSnapshotNode = (
-  array: readonly number[],
+  array: NumberArray,
   startIndex: number,
   nodeFields: readonly string[],
   valueTypes: readonly string[],

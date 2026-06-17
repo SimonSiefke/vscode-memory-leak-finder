@@ -1,9 +1,9 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as ParseHeapSnapshotInternalObjects from '../ParseHeapSnapshotInternalObjects/ParseHeapSnapshotInternalObjects.ts'
-import type { ParsedEdge } from '../Snapshot/Snapshot.ts'
+import type { NumberArray, ParsedEdge } from '../Snapshot/Snapshot.ts'
 
 export const parseHeapSnapshotInternalEdges = (
-  edges: readonly number[],
+  edges: NumberArray,
   edgeFields: readonly string[],
   edgeTypes: readonly string[],
   nodeFieldCount: number,

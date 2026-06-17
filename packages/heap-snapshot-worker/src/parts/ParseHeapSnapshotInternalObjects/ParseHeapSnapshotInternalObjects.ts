@@ -1,10 +1,10 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as CamelCase from '../CamelCase/CamelCase.ts'
 import * as CreateHeapSnapshotNode from '../CreateHeapSnapshotNode/CreateHeapSnapshotNode.ts'
-import type { HeapSnapshotRecord } from '../Snapshot/Snapshot.ts'
+import type { HeapSnapshotRecord, NumberArray } from '../Snapshot/Snapshot.ts'
 
 export const parseHeapSnapshotObjects = (
-  values: readonly number[],
+  values: NumberArray,
   valueFields: readonly string[],
   valueTypes: readonly string[],
   typeKey: string,

@@ -3,9 +3,14 @@ import * as GetConstructorNodes from '../GetConstructorNodes/GetConstructorNodes
 import * as GetConstructorScope from '../GetConstructorScope/GetConstructorScope.ts'
 import * as GetConstructorScopeMap from '../GetConstructorScopeMap/GetConstructorScopeMap.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import type { CleanedNode, CountItem, Snapshot } from '../Snapshot/Snapshot.ts'
 
-const createCounts = (constructorNodesWithInfo) => {
-  const map = Object.create(null)
+interface DetailedNodeInfo {
+  readonly name: string
+}
+
+const createCounts = (constructorNodesWithInfo: readonly DetailedNodeInfo[]): readonly CountItem[] => {
+  const map: Record<string, number> = Object.create(null)
   for (const node of constructorNodesWithInfo) {
     map[node.name] ||= 0
     map[node.name]++
@@ -19,7 +24,7 @@ const createCounts = (constructorNodesWithInfo) => {
   return array
 }
 
-const isImportantScopeName = (name) => {
+const isImportantScopeName = (name: string): boolean => {
   switch (name) {
     case '':
     case '(object properties)':
@@ -32,7 +37,12 @@ const isImportantScopeName = (name) => {
   }
 }
 
-const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
+const getDetailedNodeInfo = (
+  parsedNodes: readonly CleanedNode[],
+  scopeMap: Uint32Array,
+  edgeMap: readonly string[],
+  node: CleanedNode,
+): DetailedNodeInfo => {
   const { scopeEdge, scopeNode } = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, node)
   const parentScope = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, scopeNode)
   if (isImportantScopeName(parentScope.scopeNode.name)) {
@@ -47,7 +57,10 @@ const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
   }
 }
 
-export const getNamedConstructorCountFromHeapSnapshot = async (heapsnapshot, constructorName) => {
+export const getNamedConstructorCountFromHeapSnapshot = async (
+  heapsnapshot: Snapshot,
+  constructorName: string,
+): Promise<readonly CountItem[]> => {
   Assert.object(heapsnapshot)
   const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const constructorNodes = GetConstructorNodes.getConstructorNodes(parsedNodes, constructorName)

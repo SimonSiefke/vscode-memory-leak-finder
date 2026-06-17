@@ -19,9 +19,9 @@ export interface CleanCompareResult {
   readonly count: number
   readonly delta: number
   readonly name: string
-  readonly originalLocation?: string
-  readonly originalName?: string | null
-  readonly sourceLocation?: string
+  readonly originalLocation?: string | undefined
+  readonly originalName?: string | null | undefined
+  readonly sourceLocation?: string | undefined
 }
 
 // TODO maybe have a different function for functions and closures. keys are not needed for functions
