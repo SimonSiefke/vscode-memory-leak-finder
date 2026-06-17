@@ -298,16 +298,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async waitForContentFrameModern({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       const electron = this.getElectron()
       console.log('waitForContentFrameModern:start', { urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
-      if (this.modernBrowserWebContentsId) {
-        await electron.waitForWebContentsUrl({
-          urlPattern,
-          webContentsId: this.modernBrowserWebContentsId,
-        })
-      } else {
-        await electron.waitForWebContentsView({
-          urlPattern,
-        })
-      }
+      const entry = this.modernBrowserWebContentsId
+        ? await electron.waitForWebContentsUrl({
+            urlPattern,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
+        : await electron.waitForWebContentsView({
+            urlPattern,
+          })
+      this.modernBrowserWebContentsId = entry.id
       console.log('waitForContentFrameModern:done', { urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
       await page.waitForIdle()
     },
