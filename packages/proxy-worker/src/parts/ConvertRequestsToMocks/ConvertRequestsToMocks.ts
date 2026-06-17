@@ -6,8 +6,8 @@ import { URL } from 'node:url'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
-import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
+import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeMockData from '../SanitizeMockData/SanitizeMockData.ts'
 
@@ -38,7 +38,6 @@ interface RecordedRequest {
   body?: unknown
   headers: Record<string, string | string[]>
   method: string
-  responseType?: string
   response?: {
     statusCode: number
     statusMessage?: string
@@ -46,6 +45,7 @@ interface RecordedRequest {
     body: any
     wasCompressed?: boolean
   }
+  responseType?: string
   timestamp: number
   url: string
 }
@@ -145,8 +145,8 @@ const convertRequestDirectoryToMocks = async (
         body: fileData.request.body,
         headers: fileData.request.headers,
         method: fileData.request.method,
-        responseType: fileData.metadata.responseType,
         response: fileData.response,
+        responseType: fileData.metadata.responseType,
         timestamp: fileData.metadata.timestamp,
         url: fileData.request.url,
       }

@@ -28,10 +28,12 @@ export const createHttpProxyServer = async (
 }
 
 export const disposeProxyServer = async (): Promise<void> => {
-  if (proxyServerInstance) {
-    await proxyServerInstance[Symbol.asyncDispose]()
-    proxyServerInstance = null
+  if (!proxyServerInstance) {
+  	return;
   }
+
+  await proxyServerInstance[Symbol.asyncDispose]()
+  proxyServerInstance = null
 }
 
 export const getCACertPath = (): string => {

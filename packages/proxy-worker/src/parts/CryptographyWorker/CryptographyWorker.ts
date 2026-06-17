@@ -18,8 +18,10 @@ export const getCryptographyWorker = async (): Promise<Awaited<ReturnType<typeof
 }
 
 export const disposeCryptographyWorker = async (): Promise<void> => {
-  if (cryptographyWorkerRpc) {
-    await cryptographyWorkerRpc.dispose()
-    cryptographyWorkerRpc = null
+  if (!cryptographyWorkerRpc) {
+  	return;
   }
+
+  await cryptographyWorkerRpc.dispose()
+  cryptographyWorkerRpc = null
 }

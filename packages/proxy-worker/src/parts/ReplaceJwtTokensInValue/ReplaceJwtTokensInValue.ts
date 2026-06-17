@@ -23,7 +23,7 @@ const isSignedCopilotTokenPayload = (value: unknown): value is { token: string }
   if (!value || typeof value !== 'object') {
     return false
   }
-  const token = (value as { token?: unknown }).token
+  const {token} = (value as { token?: unknown })
   return typeof token === 'string' && isSignedCopilotToken(token)
 }
 
