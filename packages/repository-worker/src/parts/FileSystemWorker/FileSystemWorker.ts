@@ -17,7 +17,7 @@ export const set = (rpc: RpcConnection): void => {
 
 export const dispose = async (): Promise<void> => {
   if (!state.rpc) {
-  	return;
+    return
   }
 
   await state.rpc.dispose()
