@@ -1,6 +1,13 @@
 import * as ParseHeapSnapshotInternal from '../ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.ts'
+import type { ParsedHeapSnapshot, Snapshot, SnapshotMetaData } from '../Snapshot/Snapshot.ts'
 
-export const parseHeapSnapshot = (heapsnapshot) => {
+interface HeapSnapshotWithNestedMeta extends Snapshot {
+  readonly snapshot?: {
+    readonly meta: SnapshotMetaData
+  }
+}
+
+export const parseHeapSnapshot = (heapsnapshot: HeapSnapshotWithNestedMeta): ParsedHeapSnapshot => {
   const { edges, locations, nodes, snapshot, strings } = heapsnapshot
   const meta = heapsnapshot.meta || snapshot.meta
   const { edge_fields, edge_types, location_fields, node_fields, node_types } = meta
