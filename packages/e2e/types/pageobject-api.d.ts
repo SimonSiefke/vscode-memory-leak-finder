@@ -692,6 +692,7 @@ export interface SimpleBrowser {
   addConsoleLogsToChat(): Promise<void>
   addElementToChat(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+  clickPageLink(options: any): Promise<void>
   back(options?: any): Promise<void>
   createMockServer(options: any): Promise<void>
   createDeferredMockServer(options: any): Promise<void>

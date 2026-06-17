@@ -682,6 +682,52 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to click link ${href}`)
       }
     },
+    async clickPageLink({ selector, urlPattern = /^https?:\/\// }: { selector: string; urlPattern?: RegExp }) {
+      try {
+        await page.waitForIdle()
+        if (ideVersion.minor >= 118) {
+          const electron = this.getElectron()
+          if (!this.modernBrowserWebContentsId) {
+            throw new Error('No tracked browser web contents available')
+          }
+          await electron.executeJavaScriptInWebContents({
+            expression: `(() => {
+  const link = document.querySelector(${JSON.stringify(selector)})
+  if (!(link instanceof HTMLAnchorElement)) {
+    throw new Error('Expected link matching selector ' + ${JSON.stringify(selector)})
+  }
+  link.scrollIntoView({
+    block: 'center',
+    inline: 'center',
+  })
+  link.click()
+})()`,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
+          await page.waitForIdle()
+          await this.waitForContentFrameModern({
+            urlPattern,
+          })
+          return
+        }
+
+        const innerFrame = await this.getContentFrame({
+          urlPattern: /^https?:\/\//,
+        })
+        await innerFrame.waitForIdle()
+        const link = innerFrame.locator(selector).first()
+        await expect(link).toBeVisible()
+        await link.click()
+        await innerFrame.waitForIdle()
+        await page.waitForIdle()
+        await this.getContentFrame({
+          urlPattern,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to click page link ${selector}`)
+      }
+    },
     async back({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       try {
         await page.waitForIdle()
