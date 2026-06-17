@@ -129,6 +129,9 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, SimpleBrowser, 
   const response = await ExternalRuntime.request('/health.txt')
   assert.strictEqual(response.ok, true)
 
+  await SimpleBrowser.show({
+    url: testUrl,
+  })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
     text: helloWorldText,
