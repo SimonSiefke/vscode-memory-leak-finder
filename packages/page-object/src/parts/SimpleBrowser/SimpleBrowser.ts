@@ -203,7 +203,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
       throw new Error(`Browser navigation button not found: ${names.join(', ')}`)
     },
-    async openIntegratedBrowser() {
+    async openIntegratedBrowser({ url = '' }: { url?: string } = {}) {
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       const electron = this.getElectron()
       const existingWebContentsIds = ideVersion.minor >= 118 ? (await electron.getAllWebContents()).map((entry) => entry.id) : []
@@ -228,6 +228,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await expect(intermediate).toBeFocused()
         await page.waitForIdle()
+        if (url) {
+          await intermediate.setValue(url)
+          await page.waitForIdle()
+          await expect(intermediate).toHaveValue(url)
+          await page.waitForIdle()
+        }
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         await expect(intermediate).toBeHidden()
@@ -682,7 +688,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to click link ${href}`)
       }
     },
-    async clickPageLink({ selector, urlPattern = /^https?:\/\// }: { selector: string; urlPattern?: RegExp }) {
+    async clickPageLink({
+      headingText = '',
+      requireHeading = false,
+      selector,
+      urlPattern = /^https?:\/\//,
+    }: {
+      headingText?: string
+      requireHeading?: boolean
+      selector: string
+      urlPattern?: RegExp
+    }) {
       try {
         await page.waitForIdle()
         if (ideVersion.minor >= 118) {
@@ -708,6 +724,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await this.waitForContentFrameModern({
             urlPattern,
           })
+          if (headingText) {
+            await electron.waitForWebContentsText({
+              selector: 'h1',
+              text: headingText,
+              urlPattern,
+              webContentsId: this.modernBrowserWebContentsId,
+            })
+          } else if (requireHeading) {
+            await electron.executeJavaScriptInWebContents({
+              expression: `(async () => {
+  for (let attempt = 0; attempt < 60; attempt++) {
+    const headingText = document.querySelector('h1')?.textContent?.trim() || ''
+    if (headingText) {
+      return
+    }
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+  }
+  throw new Error('Expected page heading')
+})()`,
+              webContentsId: this.modernBrowserWebContentsId,
+            })
+          }
           return
         }
 
@@ -720,9 +758,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await link.click()
         await innerFrame.waitForIdle()
         await page.waitForIdle()
-        await this.getContentFrame({
+        const nextFrame = await this.getContentFrame({
           urlPattern,
         })
+        if (requireHeading || headingText) {
+          const heading = nextFrame.locator('h1')
+          await expect(heading).toBeVisible()
+          if (headingText) {
+            await expect(heading).toContainText(headingText)
+          } else {
+            await expect(heading).toHaveText(/\S/)
+          }
+        }
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to click page link ${selector}`)
@@ -1015,7 +1062,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       })
     },
     async showModern({ url }: { url: string }) {
-      await this.openIntegratedBrowser()
+      await this.openIntegratedBrowser({
+        url: ideVersion.minor >= 120 ? url : '',
+      })
+      if (ideVersion.minor >= 120) {
+        await this.waitForContentFrameModern({
+          urlPattern: new RegExp(escapeRegExp(url)),
+        })
+        return
+      }
       await this.navigateIntegratedBrowser({
         url,
         waitForContentFrame: true,
@@ -1026,7 +1081,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (ideVersion.minor < 113) {
           throw new Error('Integrated browser is not available in this IDE version')
         }
-        await this.openIntegratedBrowser()
+        await this.openIntegratedBrowser({
+          url: ideVersion.minor >= 120 ? url : '',
+        })
+        if (ideVersion.minor >= 120) {
+          return
+        }
         await this.navigateIntegratedBrowser({
           url,
           waitForContentFrame: false,
