@@ -29,6 +29,61 @@ test('parseArgv - run skipped tests anyway', () => {
   })
 })
 
+test('parseArgv - allow copilot auth in ci', () => {
+  const argv = ['--allow-copilot-auth-in-ci']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    allowCopilotAuthInCi: true,
+  })
+})
+
+test('parseArgv - download user data zip file url', () => {
+  const argv = ['--download-user-data-zip-file-url', 'https://bot.example.com/api/user-data/download']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    downloadUserDataZipFileUrl: 'https://bot.example.com/api/user-data/download',
+  })
+})
+
+test('parseArgv - download user data zip file token', () => {
+  const argv = ['--download-user-data-zip-file-token', 'download-token']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    downloadUserDataZipFileToken: 'download-token',
+  })
+})
+
+test('parseArgv - download user data zip file token from env', () => {
+  const previousToken = process.env.DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN
+  process.env.DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN = 'download-token-from-env'
+  try {
+    const argv: readonly string[] = []
+    expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+      downloadUserDataZipFileToken: 'download-token-from-env',
+    })
+  } finally {
+    if (typeof previousToken === 'string') {
+      process.env.DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN = previousToken
+    } else {
+      delete process.env.DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN
+    }
+  }
+})
+
+test('parseArgv - download user data zip file url from env', () => {
+  const previousUrl = process.env.DOWNLOAD_USER_DATA_ZIP_FILE_URL
+  process.env.DOWNLOAD_USER_DATA_ZIP_FILE_URL = 'https://example.com/user-data.zip?X-Amz-Signature=abc123'
+  try {
+    const argv: readonly string[] = []
+    expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+      downloadUserDataZipFileUrl: 'https://example.com/user-data.zip?X-Amz-Signature=abc123',
+    })
+  } finally {
+    if (typeof previousUrl === 'string') {
+      process.env.DOWNLOAD_USER_DATA_ZIP_FILE_URL = previousUrl
+    } else {
+      delete process.env.DOWNLOAD_USER_DATA_ZIP_FILE_URL
+    }
+  }
+})
+
 test('parseArgv - runs', () => {
   const argv = ['--runs', '4']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
@@ -50,10 +105,73 @@ test('parseArgv - record video', () => {
   })
 })
 
+test('parseArgv - disable vscode node modules cache', () => {
+  const argv = ['--disable-vscode-node-modules-cache']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    disableVscodeNodeModulesCache: true,
+  })
+})
+
+test('parseArgv - disable vscode node modules cache not present', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    disableVscodeNodeModulesCache: false,
+  })
+})
+
+test('parseArgv - use stable vscode repo path', () => {
+  const argv = ['--use-stable-vscode-repo-path']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    useStableVscodeRepoPath: true,
+  })
+})
+
+test('parseArgv - use stable vscode repo path not present', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    useStableVscodeRepoPath: false,
+  })
+})
+
+test('parseArgv - compute vscode node modules cache key', () => {
+  const argv = ['--compute-vscode-node-modules-cache-key']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    computeVscodeNodeModulesCacheKey: true,
+  })
+})
+
+test('parseArgv - compute vscode node modules cache key not present', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    computeVscodeNodeModulesCacheKey: false,
+  })
+})
+
+test('parseArgv - resolve vscode commit hash', () => {
+  const argv = ['--resolve-vscode-commit-hash']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    resolveVscodeCommitHash: true,
+  })
+})
+
+test('parseArgv - resolve vscode commit hash not present', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    resolveVscodeCommitHash: false,
+  })
+})
+
 test('parseArgv - convert requests to mocks', () => {
   const argv = ['--convert-requests-to-mocks']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     convertRequestsToMocks: true,
+  })
+})
+
+test('parseArgv - create all mock data zip', () => {
+  const argv = ['--create-all-mock-data-zip']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    createAllMockDataZip: true,
   })
 })
 
@@ -122,6 +240,18 @@ test('parseArgv - measure-node flag', () => {
   const argv = ['--measure-node']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.measureNode).toBe(true)
+})
+
+test('parseArgv - process-root-strategy flag', () => {
+  const argv = ['--process-root-strategy', 'ssh-remote-server']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.processRootStrategy).toBe('ssh-remote-server')
+})
+
+test('parseArgv - process-root-strategy defaults to launch-pid', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.processRootStrategy).toBe('launch-pid')
 })
 
 test('parseArgv - inspect-shared-process flag', () => {

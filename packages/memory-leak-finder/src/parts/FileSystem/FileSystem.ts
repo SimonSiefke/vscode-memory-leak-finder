@@ -8,3 +8,7 @@ export const readDir = (path: string) => {
 export const readFileSync = (path: string, encoding: 'utf8'): string => {
   return NodeFsSync.readFileSync(path, encoding)
 }
+
+export const existsSync = (path: string): boolean => {
+  return NodeFsSync.existsSync(path)
+}

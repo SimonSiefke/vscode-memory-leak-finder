@@ -30,7 +30,8 @@ export interface StdinDataState {
   readonly isWindows: boolean
   readonly measure: string
   readonly measureAfter: boolean
-  readonly measureNode?: boolean
+  readonly measureNode: boolean
+  readonly processRootStrategy: string
   readonly mode: number
   readonly openDevtools: boolean
   readonly pageObjectPath: string
@@ -79,6 +80,8 @@ let state: StdinDataState = {
   isWindows: false,
   measure: Character.EmptyString,
   measureAfter: false,
+  measureNode: false,
+  processRootStrategy: 'launch-pid',
   mode: ModeType.Waiting,
   openDevtools: false,
   pageObjectPath: '',
@@ -125,6 +128,8 @@ export const setState = (newState: StdinDataState): void => {
     isWindows: newState.isWindows,
     measure: newState.measure,
     measureAfter: newState.measureAfter,
+    measureNode: newState.measureNode,
+    processRootStrategy: newState.processRootStrategy,
     mode: newState.mode,
     pageObjectPath: newState.pageObjectPath,
     platform: newState.platform,

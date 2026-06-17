@@ -22,6 +22,7 @@ export const launchIde = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
+  proxyTestFolderName,
   updateUrl,
   useProxyMock,
   vscodePath,
@@ -44,6 +45,7 @@ export const launchIde = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform: string
+  proxyTestFolderName: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -65,6 +67,7 @@ export const launchIde = async ({
       inspectPtyHostPort,
       inspectSharedProcess,
       inspectSharedProcessPort,
+      proxyTestFolderName,
       useProxyMock,
       vscodePath,
     })
@@ -72,6 +75,7 @@ export const launchIde = async ({
       child,
       parsedVersion: ParseVersion.parseVersion(cursorVersion),
       pid,
+      proxyWorkerRpc: null,
     }
   }
   let versionToParse: string
@@ -82,7 +86,7 @@ export const launchIde = async ({
   } else {
     versionToParse = vscodeVersion
   }
-  const { binaryPath, child, pid } = await LaunchVsCode.launchVsCode({
+  const { binaryPath, child, pid, proxyWorkerRpc } = await LaunchVsCode.launchVsCode({
     addDisposable,
     arch,
     clearExtensions,
@@ -99,6 +103,7 @@ export const launchIde = async ({
     inspectSharedProcess,
     inspectSharedProcessPort,
     platform,
+    proxyTestFolderName,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -110,5 +115,6 @@ export const launchIde = async ({
     child,
     parsedVersion: ParseVersion.parseVersion(versionToParse),
     pid,
+    proxyWorkerRpc,
   }
 }

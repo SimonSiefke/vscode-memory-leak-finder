@@ -1,8 +1,8 @@
 import { join as nodeJoin } from 'node:path'
 
 /**
- * Joins path segments using the platform-specific separator
+ * Joins path segments and normalizes separators for RPC-facing paths.
  */
 export const join = (...pathSegments: string[]): string => {
-  return nodeJoin(...pathSegments)
+  return nodeJoin(...pathSegments).replaceAll('\\', '/')
 }
