@@ -1,6 +1,6 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
-
-export const getEventListenerKey = (listener) => {
+export const getEventListenerKey = (listener: Dynamic) => {
   if ('location' in listener) {
     return listener.location
   }

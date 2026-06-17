@@ -1,7 +1,7 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { NodeForkedProcessRpcParent } from '@lvce-editor/rpc'
 import { getNodeMajorVersion } from '../GetNodeVersionMajor/GetNodeVersionMajor.ts'
 import * as HeapSnapshotWorkerPath from '../HeapSnapshotWorkerPath/HeapSnapshotWorkerPath.ts'
-
 export const launchHeapSnapshotWorker = async () => {
   const major = getNodeMajorVersion()
   if (major < 24) {
@@ -14,7 +14,7 @@ export const launchHeapSnapshotWorker = async () => {
     stdio: 'inherit',
   })
   return {
-    invoke(method: string, ...params: readonly any[]) {
+    invoke(method: string, ...params: readonly Dynamic[]) {
       return rpc.invoke(method, ...params)
     },
     async [Symbol.asyncDispose]() {
