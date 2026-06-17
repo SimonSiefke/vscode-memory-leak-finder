@@ -29,7 +29,7 @@ type WorkflowRunPayload = {
 }
 
 type WorkflowRunOctokit = {
-  readonly auth: (options: { type: 'installation' }) => Promise<{ token: string } | unknown>
+  readonly auth: (options: { type: 'installation' }) => Promise<unknown | { token: string }>
   readonly rest: {
     readonly actions: {
       readonly listWorkflowRunArtifacts: (options: {
@@ -195,13 +195,13 @@ export const handleWorkflowRunCompleted = async (
   })
 
   await octokit.rest.issues.updateComment({
-    owner: summary.sourceRepository.owner,
-    repo: summary.sourceRepository.repo,
-    comment_id: summary.statusCommentId,
     body: renderCompletionComment({
       chartEmbeds,
       summary,
       videoEmbeds,
     }),
+    comment_id: summary.statusCommentId,
+    owner: summary.sourceRepository.owner,
+    repo: summary.sourceRepository.repo,
   })
 }

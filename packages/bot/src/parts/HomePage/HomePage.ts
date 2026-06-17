@@ -131,7 +131,7 @@ export const handleHomePageRequest = (request: IncomingMessage, response: Server
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return false
   }
-  const path = request.url?.split('?')[0] ?? ''
+  const path = request.url?.split('?', 1)[0] ?? ''
   if (path !== '/') {
     return false
   }

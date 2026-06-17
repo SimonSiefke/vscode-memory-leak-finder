@@ -1,7 +1,7 @@
 import * as Character from '../Character/Character.ts'
 
 const indentLine = (line: string): string => {
-  return '    ' + line
+  return ' '.repeat(4) + line
 }
 
 export const indent = (string: string): string => {

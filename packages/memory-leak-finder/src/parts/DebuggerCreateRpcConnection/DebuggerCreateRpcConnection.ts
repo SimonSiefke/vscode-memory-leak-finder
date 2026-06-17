@@ -1,13 +1,13 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
-
 /**
  *
- * @param {any} ipc
+ * @param {unknown} ipc
  * @returns
  */
-export const createRpc = (ipc: any) => {
+export const createRpc = (ipc: Dynamic) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message: any) => {
+  const handleMessage = (message: Dynamic) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -28,7 +28,6 @@ export const createRpc = (ipc: any) => {
     }
   }
   ipc.onmessage = handleMessage
-
   const listeners = Object.create(null)
   const onceListeners = Object.create(null)
   let _id = 0
@@ -37,8 +36,8 @@ export const createRpc = (ipc: any) => {
     dispose() {
       ipc.dispose()
     },
-    invoke(method: string, params: any) {
-      const { promise, reject, resolve } = Promise.withResolvers<any>()
+    invoke(method: string, params: Dynamic) {
+      const { promise, reject, resolve } = Promise.withResolvers<Dynamic>()
       const id = _id++
       callbacks[id] = { reject, resolve }
       ipc.send({
@@ -48,8 +47,8 @@ export const createRpc = (ipc: any) => {
       })
       return promise
     },
-    invokeWithSession(sessionId: string, method: string, params: any) {
-      const { promise, reject, resolve } = Promise.withResolvers<any>()
+    invokeWithSession(sessionId: string, method: string, params: Dynamic) {
+      const { promise, reject, resolve } = Promise.withResolvers<Dynamic>()
       const id = _id++
       callbacks[id] = { reject, resolve }
       ipc.send({
@@ -62,14 +61,14 @@ export const createRpc = (ipc: any) => {
     },
     listeners,
     objectType: ObjectType.Rpc,
-    off(event: string, listener: any) {
+    off(event: string, listener: Dynamic) {
       delete listener[event]
     },
-    on(event: string, listener: any) {
+    on(event: string, listener: Dynamic) {
       listeners[event] = listener
     },
     once(event: string) {
-      const { promise, resolve } = Promise.withResolvers<any>()
+      const { promise, resolve } = Promise.withResolvers<Dynamic>()
       onceListeners[event] = resolve
       return promise
     },

@@ -2,9 +2,9 @@ import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 /**
- * @param {any} session
+ * @param {unknown} session
  * @param {string} objectGroup
- * @returns {Promise<any>}
+ * @returns {Promise<unknown>}
  */
 export const stopTrackingPromiseStackTraces = async (session: Session, objectGroup: string) => {
   await DevtoolsProtocolRuntime.evaluate(session, {

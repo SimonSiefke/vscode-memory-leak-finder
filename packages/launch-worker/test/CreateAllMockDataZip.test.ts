@@ -1,8 +1,8 @@
+import { expect, test } from '@jest/globals'
+import JSZip from 'jszip'
 import { mkdtemp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { expect, test } from '@jest/globals'
-import JSZip from 'jszip'
 import { createAllMockDataZip } from '../src/parts/CreateAllMockDataZip/CreateAllMockDataZip.ts'
 
 test('createAllMockDataZip uses compression for repetitive mock data', async () => {

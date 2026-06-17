@@ -1,25 +1,22 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets.ts'
-
-const compareCount = (a, b) => {
+const compareCount = (a: Dynamic, b: Dynamic) => {
   return b.count - a.count
 }
-
-const compareDescription = (a, b) => {
+const compareDescription = (a: Dynamic, b: Dynamic) => {
   const aDescription = a.description || ''
   const bDescription = b.description || ''
   return aDescription.localeCompare(bDescription)
 }
-const compareEventTarget = (a, b) => {
+const compareEventTarget = (a: Dynamic, b: Dynamic) => {
   return compareCount(a, b) || compareDescription(a, b)
 }
-
-const sort = (eventTargets) => {
+const sort = (eventTargets: Dynamic) => {
   return Arrays.toSorted(eventTargets, compareEventTarget)
 }
-
-export const compareEventTargets = (before, after) => {
+export const compareEventTargets = (before: Dynamic, after: Dynamic) => {
   Assert.array(before)
   Assert.array(after)
   const pretty = CompareEventTargets.compareEventTargets(before, after)
@@ -28,7 +25,7 @@ export const compareEventTargets = (before, after) => {
     beforeMap[item.description] ||= 0
     beforeMap[item.description] += item.count
   }
-  const leaked: any[] = []
+  const leaked: Dynamic[] = []
   for (const item of pretty.after) {
     const beforeCount = beforeMap[item.description] || 0
     const afterCount = item.count
