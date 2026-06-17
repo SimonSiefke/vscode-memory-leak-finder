@@ -1,4 +1,5 @@
 export interface StartRunningOptions {
+  readonly allowCopilotAuthInCi: boolean
   readonly arch: string
   readonly bisect: boolean
   readonly checkLeaks: boolean
@@ -8,6 +9,8 @@ export interface StartRunningOptions {
   readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly filterValue: string
@@ -27,6 +30,7 @@ export interface StartRunningOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly processRootStrategy: string
   readonly openDevtools: boolean
   readonly platform: string
   readonly recordVideo: boolean

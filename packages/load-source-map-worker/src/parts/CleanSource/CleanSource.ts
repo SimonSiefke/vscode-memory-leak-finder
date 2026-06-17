@@ -6,6 +6,8 @@ const commonJsExternalReplace = (match: string): string => {
   return match.replaceAll(' ', '/').replaceAll('"', '')
 }
 
+const RE_RELATIVE_SRC_PATH = /^(?:\.\/|\.\.\/)+\.?src\//
+
 export const cleanSource = (source: string): string => {
   if (!source) {
     return ''
@@ -20,6 +22,7 @@ export const cleanSource = (source: string): string => {
     .replace('webpack://markdown-language-features/', 'extensions/markdown-language-features/')
     .replace('out-vscode/vs/workbench/file:/mnt/vss/_work/1/s', '')
     .replace('file:/Users/cloudtest/vss/_work/1/s/', '')
+    .replace(RE_RELATIVE_SRC_PATH, 'src/')
     .replace(RE_VS, './src/vs/')
     .replace('../src', 'src')
     .replace('./src', 'src')

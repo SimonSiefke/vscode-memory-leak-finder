@@ -7,29 +7,32 @@ import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import { CERT_DIR } from '../Constants/Constants.ts'
 import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertificateForDomain.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
-import * as Root from '../Root/Root.ts'
+import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as ParseRequestBody from '../ParseRequestBody/ParseRequestBody.ts'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
+import * as SaveMockFile from '../SaveMockFile/SaveMockFile.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
-
-const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
 
 const saveInterceptedRequest = async (
   method: string,
   url: string,
   requestHeaders: Record<string, string>,
+  requestBody: Buffer,
   statusCode: number,
   responseHeaders: Record<string, string | string[]>,
   responseBody: Buffer,
 ): Promise<void> => {
   try {
-    await mkdir(REQUESTS_DIR, { recursive: true })
+    const requestsDir = GetProxyPaths.getRequestsDir()
+    await mkdir(requestsDir, { recursive: true })
     const timestamp = Date.now()
     const filename = `${timestamp}_${sanitizeFilename(url)}.json`
-    const filepath = join(REQUESTS_DIR, filename)
+    const filepath = join(requestsDir, filename)
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
     const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
@@ -131,12 +134,13 @@ const saveInterceptedRequest = async (
         timestamp,
       },
       request: {
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(ParseRequestBody.parseRequestBody(requestHeaders, requestBody)),
         headers: requestHeaders,
         method,
         url,
       },
       response: {
-        body: responseBodyData,
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(responseBodyData),
         headers: responseHeaders,
         statusCode,
       },
@@ -144,6 +148,20 @@ const saveInterceptedRequest = async (
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
     console.log(`[Proxy] Saved intercepted HTTPS request to ${filepath}`)
+
+    const mockFilePath = await SaveMockFile.saveMockFile({
+      method,
+      requestBody: requestData.request.body,
+      response: {
+        body: responseBodyData,
+        headers: responseHeaders,
+        statusCode,
+      },
+      responseType,
+      timestamp,
+      url,
+    })
+    console.log(`[Proxy] Saved mock file to ${mockFilePath}`)
   } catch (error) {
     console.error('[Proxy] Failed to save intercepted request:', error)
   }
@@ -291,7 +309,8 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
 
         // Check for mock response first (only if useProxyMock is enabled)
         if (useProxyMock) {
-          const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl)
+          const parsedRequestBody = ParseRequestBody.parseRequestBody(headers, body)
+          const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl, parsedRequestBody)
           if (mockResponse) {
             console.log(`[Proxy] Returning mock response for ${method} ${fullUrl}`)
             let bodyBuffer: Buffer
@@ -395,7 +414,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
                 responseHeaders[k] = v
               }
             }
-            await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, responseHeaders, responseData)
+            await saveInterceptedRequest(method, fullUrl, headers, body, targetRes.statusCode || 200, responseHeaders, responseData)
 
             // Write response back through TLS
             // Remove transfer-encoding header and set content-length instead

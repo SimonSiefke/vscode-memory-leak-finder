@@ -2,6 +2,7 @@ import { basename } from 'node:path'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -102,6 +103,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const { promise } = Promise.withResolvers<void>()
         await promise
         // throw new VError(error, `Failed to click ${text}`)
+      }
+    },
+    async clickLink(text: string) {
+      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const linkText = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        await expect(linkText).toBeVisible()
+        await page.keyboard.down(modifier)
+        await linkText.hover()
+        const activeLink = editor.locator('.detected-link-active', { hasText: text }).first()
+        await expect(activeLink).toBeVisible()
+        await activeLink.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to click link ${text}`)
+      } finally {
+        await page.keyboard.up(modifier).catch(() => undefined)
       }
     },
     async close() {
@@ -1359,6 +1380,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify selected character count`)
       }
     },
+    async shouldHaveBreadCrumbs() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        await expect(breadcrumbs).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that breadcrumbs are visible`)
+      }
+    },
+    async shouldHaveMinimap() {
+      try {
+        await page.waitForIdle()
+        const minimap = page.locator('.minimap')
+        await expect(minimap).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that minimap is visible`)
+      }
+    },
     async shouldHaveSelection(left: string, width: string) {
       try {
         const selection = page.locator('.selected-text')
@@ -1427,6 +1466,74 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify squiggly error`)
       }
     },
+    async shouldHaveControlCharacterHighlight() {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const controlCharacter = editor.locator('.mtkcontrol').first()
+        await expect(controlCharacter).toBeVisible({
+          timeout: 5_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify control character highlighting`)
+      }
+    },
+    async shouldHaveVisibleWhitespace(fileName?: string) {
+      try {
+        await page.waitForIdle()
+        const baseName = fileName ? basename(fileName) : ''
+        const editor = fileName ? page.locator(`.monaco-editor[data-uri$="${baseName}"]`) : page.locator('.editor-instance').first()
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const whitespace = editor.locator(
+          '.view-lines .mtkw, .view-lines .mtkz, .view-overlays .mwh, .view-overlays svg path, .view-overlays svg circle',
+        )
+        await expect(whitespace.first()).toBeVisible({
+          timeout: 5_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify visible whitespace rendering`)
+      }
+    },
+    async shouldNotHaveVisibleWhitespace(fileName?: string) {
+      try {
+        await page.waitForIdle()
+        const baseName = fileName ? basename(fileName) : ''
+        const editor = fileName ? page.locator(`.monaco-editor[data-uri$="${baseName}"]`) : page.locator('.editor-instance').first()
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const whitespace = editor.locator(
+          '.view-lines .mtkw, .view-lines .mtkz, .view-overlays .mwh, .view-overlays svg path, .view-overlays svg circle',
+        )
+        await expect(whitespace).toHaveCount(0)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify whitespace rendering is hidden`)
+      }
+    },
+    async shouldHaveVisibleLink(text: string) {
+      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const linkText = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        await expect(linkText).toBeVisible()
+        await page.keyboard.down(modifier)
+        await linkText.hover()
+        const activeLink = editor.locator('.detected-link-active', { hasText: text }).first()
+        await expect(activeLink).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify visible link ${text}`)
+      } finally {
+        await page.keyboard.up(modifier).catch(() => undefined)
+      }
+    },
     async shouldHaveText(text: string, fileName?: string, groupId?: number) {
       try {
         await page.waitForIdle()
@@ -1478,6 +1585,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to verify semantic token ${type} is not present`)
+      }
+    },
+    async shouldNotHaveBreadCrumbs() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        await expect(breadcrumbs).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that breadcrumbs are hidden`)
+      }
+    },
+    async shouldNotHaveMinimap() {
+      try {
+        await page.waitForIdle()
+        const minimap = page.locator('.minimap')
+        await expect(minimap).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that minimap is hidden`)
       }
     },
     async shouldNotHaveSquigglyError() {

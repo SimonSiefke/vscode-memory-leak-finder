@@ -1,5 +1,11 @@
 [
   {
+    "filename": "api_github_com_copilot_internal_org_custom_instructions_SimonSiefke_get.json",
+    "hostname": "api.github.com",
+    "method": "GET",
+    "pathname": "/copilot_internal/org_custom_instructions/SimonSiefke"
+  },
+  {
     "hostname": "api.github.com",
     "pathname": "/copilot_internal/subscribe_limited_user",
     "method": "OPTIONS",
@@ -26,8 +32,14 @@
   {
     "hostname": "api.github.com",
     "pathname": "/copilot_internal/v2/token",
-    "method": "*",
-    "filename": "api_github_com_copilot_internal_v2_token.json"
+    "method": "GET",
+    "filename": "api_github_com_copilot_internal_v2_token_get.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/v2/token",
+    "method": "OPTIONS",
+    "filename": "api_github_com_copilot_internal_v2_token_options.json"
   },
   {
     "hostname": "api.github.com",
@@ -54,16 +66,40 @@
     "filename": "api_github_com_embeddings_models_get.json"
   },
   {
+    "filename": "api_github_com_orgs_SimonSiefke_repos_get.json",
+    "hostname": "api.github.com",
+    "method": "GET",
+    "pathname": "/orgs/SimonSiefke/repos"
+  },
+  {
     "hostname": "api.github.com",
     "pathname": "/user",
     "method": "*",
     "filename": "api_github_com_user.json"
   },
   {
+    "filename": "api_github_com_users_SimonSiefke_events_get.json",
+    "hostname": "api.github.com",
+    "method": "GET",
+    "pathname": "/users/SimonSiefke/events"
+  },
+  {
+    "filename": "api_githubcopilot_com_agents_swe_models_get.json",
+    "hostname": "api.githubcopilot.com",
+    "method": "GET",
+    "pathname": "/agents/swe/models"
+  },
+  {
     "hostname": "api.individual.githubcopilot.com",
     "pathname": "/agents",
     "method": "*",
     "filename": "api_individual_githubcopilot_com_agents.json"
+  },
+  {
+    "filename": "api_individual_githubcopilot_com_agents_swe_models_get.json",
+    "hostname": "api.individual.githubcopilot.com",
+    "method": "GET",
+    "pathname": "/agents/swe/models"
   },
   {
     "hostname": "api.individual.githubcopilot.com",
@@ -330,6 +366,60 @@
     "pathname": "/text-3-small/v1.108/commands/ms-vscode.vscode-js-profile-table.json"
   },
   {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_120_commands_GitHub_copilot_chat_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.120/commands/GitHub.copilot-chat.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_120_commands_latest_txt_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.120/commands/latest.txt"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_120_commands_ms_vscode_remote_remote_ssh_edit_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.120/commands/ms-vscode-remote.remote-ssh-edit.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_120_commands_ms_vscode_remote_remote_ssh_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.120/commands/ms-vscode-remote.remote-ssh.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_120_commands_ms_vscode_js_debug_companion_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.120/commands/ms-vscode.js-debug-companion.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_120_commands_ms_vscode_js_debug_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.120/commands/ms-vscode.js-debug.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_120_commands_ms_vscode_remote_explorer_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.120/commands/ms-vscode.remote-explorer.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_120_commands_ms_vscode_vscode_js_profile_table_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.120/commands/ms-vscode.vscode-js-profile-table.json"
+  },
+  {
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_120_commands_TypeScriptTeam_jsts_chat_features_json_get.json",
+    "hostname": "embeddings.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/text-3-small/v1.120/commands/TypeScriptTeam.jsts-chat-features.json"
+  },
+  {
     "hostname": "feiskyer.gallerycdn.vsassets.io",
     "pathname": "/extensions/feiskyer/chatgpt-copilot/4.10.1/1763558369862/Microsoft.VisualStudio.Services.Icons.Default",
     "method": "GET",
@@ -496,6 +586,12 @@
     "hostname": "main.vscode-cdn.net",
     "method": "GET",
     "pathname": "/core/insiders.json"
+  },
+  {
+    "filename": "main_vscode_cdn_net_core_stable_json_get.json",
+    "hostname": "main.vscode-cdn.net",
+    "method": "GET",
+    "pathname": "/core/stable.json"
   },
   {
     "hostname": "main.vscode-cdn.net",
@@ -696,6 +792,18 @@
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_remote_remote_containers_latest_get.json"
   },
   {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_remote_remote_ssh_edit_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode-remote/remote-ssh-edit/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_remote_remote_ssh_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode-remote/remote-ssh/latest"
+  },
+  {
     "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_cpptools_extension_pack_latest_get.json",
     "hostname": "marketplace.visualstudio.com",
     "method": "GET",
@@ -712,6 +820,12 @@
     "hostname": "marketplace.visualstudio.com",
     "method": "GET",
     "pathname": "/_apis/public/gallery/vscode/ms-vscode/hexeditor/latest"
+  },
+  {
+    "filename": "marketplace_visualstudio_com_apis_public_gallery_vscode_ms_vscode_remote_explorer_latest_get.json",
+    "hostname": "marketplace.visualstudio.com",
+    "method": "GET",
+    "pathname": "/_apis/public/gallery/vscode/ms-vscode/remote-explorer/latest"
   },
   {
     "hostname": "marketplace.visualstudio.com",
@@ -832,5 +946,11 @@
     "pathname": "/extensions/vscodevim/vim/1.32.2/1764551967593/Microsoft.VisualStudio.Services.Icons.Default",
     "method": "GET",
     "filename": "vscodevim_gallerycdn_vsassets_io_extensions_vscodevim_vim_1_32_2_1764551967593_Microsoft_VisualStudio_Services_Icons_Default_get.json"
+  },
+  {
+    "filename": "www_githubstatus_com_api_v2_status_json_get.json",
+    "hostname": "www.githubstatus.com",
+    "method": "GET",
+    "pathname": "/api/v2/status.json"
   }
 ]

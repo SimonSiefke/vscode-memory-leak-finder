@@ -1,13 +1,13 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
-import * as Root from '../Root/Root.ts'
+import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
+import * as SaveMockFile from '../SaveMockFile/SaveMockFile.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
-
-const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
 export const savePostBody = async (
   method: string,
@@ -26,10 +26,11 @@ export const savePostBody = async (
   }
 
   try {
-    await mkdir(REQUESTS_DIR, { recursive: true })
+    const requestsDir = GetProxyPaths.getRequestsDir()
+    await mkdir(requestsDir, { recursive: true })
     const timestamp = Date.now()
     const filename = `${timestamp}_POST_${SanitizeFilename.sanitizeFilename(url)}.json`
-    const filepath = join(REQUESTS_DIR, filename)
+    const filepath = join(requestsDir, filename)
 
     const contentType = headers['content-type'] || headers['Content-Type'] || ''
     const contentTypeLower = contentType.toLowerCase()
@@ -159,14 +160,14 @@ export const savePostBody = async (
         timestamp,
       },
       request: {
-        body: requestBodyData,
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(requestBodyData),
         headers,
         method,
         url,
       },
       response: responseData
         ? {
-            body: responseBodyData,
+            body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(responseBodyData),
             headers: responseData.responseHeaders,
             statusCode: responseData.statusCode,
             statusMessage: responseData.statusMessage,
@@ -176,6 +177,23 @@ export const savePostBody = async (
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
     console.log(`[Proxy] Saved POST body to ${filepath}`)
+
+    if (responseData) {
+      const mockFilePath = await SaveMockFile.saveMockFile({
+        method,
+        requestBody: requestBodyData,
+        response: {
+          body: responseBodyData,
+          headers: responseData.responseHeaders,
+          statusCode: responseData.statusCode,
+          statusMessage: responseData.statusMessage,
+        },
+        responseType: responseType || 'text',
+        timestamp,
+        url,
+      })
+      console.log(`[Proxy] Saved mock file to ${mockFilePath}`)
+    }
   } catch (error) {
     console.error('[Proxy] Failed to save POST body:', error)
   }

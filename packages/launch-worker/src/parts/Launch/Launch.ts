@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
 import * as Root from '../Root/Root.ts'
@@ -28,12 +29,15 @@ export interface LaunchOptions {
   readonly measureId: string
   readonly openDevtools: boolean
   readonly platform: string
+  readonly proxyTestFolderName: string
   readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
 }
+
+let proxyWorkerRpc: any = null
 
 export const launch = async (options: LaunchOptions): Promise<any> => {
   const {
@@ -57,13 +61,20 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     measureId,
     openDevtools,
     platform,
+    proxyTestFolderName,
     trackFunctions,
     updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
   } = options
-  const { binaryPath, child, parsedVersion, pid } = await LaunchIde.launchIde({
+  const {
+    binaryPath,
+    child,
+    parsedVersion,
+    pid,
+    proxyWorkerRpc: currentProxyWorkerRpc,
+  } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
     clearExtensions,
@@ -81,11 +92,13 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     platform,
+    proxyTestFolderName,
     updateUrl,
     useProxyMock,
     vscodePath,
     vscodeVersion,
   })
+  proxyWorkerRpc = currentProxyWorkerRpc || null
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
 
@@ -98,8 +111,11 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
+  const userDataDir = GetUserDataDir.getUserDataDir(platform)
+  const secretsPath = join(userDataDir, 'secrets', 'secrets.json')
   const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
+    secretsPath,
     headlessMode,
     attachedToPageTimeout,
     port.port,
@@ -123,4 +139,11 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     utilityContext,
     webSocketUrl,
   }
+}
+
+export const setProxyTestFolderName = async (proxyTestFolderName: string): Promise<void> => {
+  if (!proxyWorkerRpc) {
+    return
+  }
+  await proxyWorkerRpc.invoke('Proxy.setTestFolderName', proxyTestFolderName)
 }

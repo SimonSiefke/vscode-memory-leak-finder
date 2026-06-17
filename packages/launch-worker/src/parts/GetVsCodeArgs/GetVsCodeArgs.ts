@@ -11,6 +11,7 @@ export const getVscodeArgs = ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  platform = process.platform,
   userDataDir,
 }: {
   enableExtensions: boolean
@@ -23,8 +24,10 @@ export const getVscodeArgs = ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  platform?: string
   userDataDir: string
 }): string[] => {
+  const proxyBypassList = '<-loopback>;localhost;127.0.0.1;0.0.0.0;::1'
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
@@ -34,16 +37,19 @@ export const getVscodeArgs = ({
     '--skip-welcome',
     '--skip-release-notes',
     '--disable-workspace-trust',
-    '--ozone-platform=x11',
     '--extensions-dir',
     extensionsDir,
     '--user-data-dir',
     userDataDir,
   ]
+  if (platform === 'linux') {
+    args.push('--ozone-platform=x11')
+  }
 
   // Ignore certificate errors when proxy is enabled (for MITM proxy)
   if (enableProxy) {
     args.push('--ignore-certificate-errors')
+    args.push(`--proxy-bypass-list=${proxyBypassList}`)
   }
 
   if (!enableExtensions) {

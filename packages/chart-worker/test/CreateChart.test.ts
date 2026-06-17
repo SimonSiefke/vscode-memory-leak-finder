@@ -22,3 +22,39 @@ test('main', async () => {
   white-space: pre;
 }</style><g aria-label=\"y-axis label\" text-anchor=\"start\" transform=\"translate(-57,-17)\"><text y=\"0.71em\" transform=\"translate(60,20)\">Y</text></g><g aria-label=\"x-axis label\" text-anchor=\"end\" transform=\"translate(17,27)\"><text transform=\"translate(620,370)\">X</text></g></svg>`)
 })
+
+test('bar chart highlights missing rows with full-width non-overlapping row boxes', async () => {
+  const result = await createChart(
+    [
+      { name: 'kept', value: 5 },
+      { name: 'gone-1', value: 3 },
+      { name: 'gone-2', value: 2 },
+    ],
+    {
+      highlightLabels: ['gone-1', 'gone-2'],
+      type: 'bar-chart',
+    },
+  )
+
+  expect(result).toContain('aria-label="fixed-row-highlights"')
+  expect(result).toContain('data-highlight-label="gone-1|gone-2"')
+  expect(result).toContain('x="8"')
+  expect(result).toContain('width="624"')
+  expect(result).toMatch(/height="53\.333/)
+})
+
+test('dual bar chart highlights by row name instead of value', async () => {
+  const result = await createChart(
+    [
+      { count: 5, delta: 1, name: 'kept' },
+      { count: 3, delta: 1, name: 'gone' },
+    ],
+    {
+      highlightLabels: ['gone'],
+      type: 'dual-bar-chart',
+    },
+  )
+
+  expect(result).toContain('data-highlight-label="gone"')
+  expect(result).toContain('height="30"')
+})
