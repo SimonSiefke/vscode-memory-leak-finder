@@ -2,6 +2,6 @@ import * as IgnoredHeapSnapshotEdges from '../IgnoredHeapSnapshotEdges/IgnoredHe
 
 const ignoredSet = new Set(IgnoredHeapSnapshotEdges.ignoredHeapSnapshotEdges)
 
-export const isImportantEdge = (node) => {
+export const isImportantEdge = (node: any) => {
   return !ignoredSet.has(node.name)
 }

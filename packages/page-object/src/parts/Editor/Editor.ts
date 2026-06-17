@@ -26,7 +26,19 @@ const isBinary = (file: string) => {
   return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
+<<<<<<< HEAD
+interface CreateParams {
+  expect: any
+  ideVersion: { major?: number; minor?: number; patch?: number } | string
+  page: any
+  platform: string
+  VError: any
+}
+
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
+=======
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+>>>>>>> origin/main
   return {
     async acceptInlineCompletion() {
       try {
@@ -879,7 +891,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
         await expect(lineNumberElement).toBeVisible()
+<<<<<<< HEAD
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+=======
         const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
+>>>>>>> origin/main
         await contextMenu.open(lineNumberElement)
         await page.waitForIdle()
         await contextMenu.select('Remove Breakpoint')
@@ -944,7 +960,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async replaceText({ newText }: { newText: string }) {
       try {
+<<<<<<< HEAD
+        const quickPick = QuickPick.create({ expect, page, platform, VError })
+=======
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+>>>>>>> origin/main
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
         await expect(renameInput).toBeVisible()
@@ -1027,7 +1047,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to select ${text}`)
       }
     },
+<<<<<<< HEAD
+    async selectAll({ viaKeyBoard = false }: { viaKeyBoard: boolean }) {
+=======
     async selectAll({ viaKeyBoard = false }: { viaKeyBoard?: boolean } = {}) {
+>>>>>>> origin/main
       try {
         if (viaKeyBoard) {
           await page.waitForIdle()
@@ -1380,6 +1404,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify selected character count`)
       }
     },
+<<<<<<< HEAD
+=======
     async shouldHaveBreadCrumbs() {
       try {
         await page.waitForIdle()
@@ -1398,6 +1424,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify that minimap is visible`)
       }
     },
+>>>>>>> origin/main
     async shouldHaveSelection(left: string, width: string) {
       try {
         const selection = page.locator('.selected-text')
@@ -1746,7 +1773,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to show empty source action`)
       }
     },
+<<<<<<< HEAD
+    async split(command: string, { groupCount = undefined }: { groupCount?: number }) {
+=======
     async split(command: string, { groupCount = undefined }: { groupCount?: number | undefined }) {
+>>>>>>> origin/main
       try {
         // TODO count editor groups
         const editors = page.locator('.editor-instance')
@@ -1766,18 +1797,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to split editor`)
       }
     },
+<<<<<<< HEAD
+    async splitDown() {
+      return this.split(WellKnownCommands.ViewSplitEditorDown, {})
+=======
     async splitDown({ groupCount = undefined, splitInto = false }: { groupCount?: number; splitInto?: boolean } = {}) {
       if (splitInto) {
         return this.split(WellKnownCommands.ViewSplitEditorDownInto, { groupCount })
       } else {
         return this.split(WellKnownCommands.ViewSplitEditorDown, { groupCount })
       }
+>>>>>>> origin/main
     },
     async splitLeft() {
       return this.split(WellKnownCommands.ViewSplitEditorLeft, {})
     },
+<<<<<<< HEAD
+    async splitRight({ groupCount = undefined }: { groupCount?: number }) {
+      const params = groupCount !== undefined ? { groupCount } : {}
+=======
     async splitRight({ groupCount = undefined }: { groupCount?: number } = {}) {
       const params = groupCount === undefined ? {} : { groupCount }
+>>>>>>> origin/main
       return this.split(WellKnownCommands.ViewSplitEditorRight, params)
     },
     async splitUp() {

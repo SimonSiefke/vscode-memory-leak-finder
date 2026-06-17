@@ -1,12 +1,18 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.ts'
 
-const getDifference = (prettyBefore, prettyAfter) => {
-  const beforeMap = Object.create(null)
+type DetachedDomNode = {
+  readonly description: string
+  readonly count: number
+  readonly [key: string]: unknown
+}
+
+const getDifference = (prettyBefore: readonly DetachedDomNode[], prettyAfter: readonly DetachedDomNode[]): readonly (DetachedDomNode & { beforeCount: number })[] => {
+  const beforeMap: { [description: string]: number } = Object.create(null)
   for (const element of prettyBefore) {
     beforeMap[element.description] = element.count
   }
-  const result: any[] = []
+  const result: (DetachedDomNode & { beforeCount: number })[] = []
   for (const element of prettyAfter) {
     const beforeCount = beforeMap[element.description] || 0
     if (element.count > beforeCount) {
@@ -19,11 +25,11 @@ const getDifference = (prettyBefore, prettyAfter) => {
   return result
 }
 
-export const compareDetachedDomNodesDifference = (before, after) => {
+export const compareDetachedDomNodesDifference = (before: readonly unknown[], after: readonly unknown[]): readonly (DetachedDomNode & { beforeCount: number })[] => {
   Assert.array(before)
   Assert.array(after)
-  const prettyBefore = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(before)
-  const prettyAfter = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(after)
+  const prettyBefore = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(before as readonly Record<string, unknown>[])
+  const prettyAfter = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(after as readonly Record<string, unknown>[])
   const difference = getDifference(prettyBefore, prettyAfter)
   return difference
 }

@@ -1,4 +1,4 @@
-export const createNameMap = (parsedNodes, graph) => {
+export const createNameMap = (parsedNodes: any[], graph: any) => {
   const nameMap = Object.create(null)
   for (const node of parsedNodes) {
     const edges = graph[node.id]

@@ -6,7 +6,7 @@ import * as GetMatchingFiles from '../GetMatchingFiles/GetMatchingFiles.ts'
 import * as Path from '../Path/Path.ts'
 import { VError } from '../VError/VError.ts'
 
-export const getTestsToRun = async (root, cwd, filterValue, continueValue) => {
+export const getTestsToRun = async (root: string, cwd: string, filterValue: string, continueValue: string) => {
   try {
     Assert.string(root)
     Assert.string(cwd)

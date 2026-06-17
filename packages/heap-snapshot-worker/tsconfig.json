@@ -9,7 +9,11 @@
     "isolatedModules": true,
     "strict": true,
     "strictNullChecks": true,
+<<<<<<< HEAD
+    "noImplicitAny": true,
+=======
     "noImplicitAny": false,
+>>>>>>> origin/main
     "noUncheckedSideEffectImports": true,
     "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,

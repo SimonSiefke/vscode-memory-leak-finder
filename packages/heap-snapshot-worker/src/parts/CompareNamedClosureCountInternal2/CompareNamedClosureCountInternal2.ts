@@ -4,7 +4,7 @@ import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationF
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
 
-const createKeyMap = (keys) => {
+const createKeyMap = (keys: string[]) => {
   const map = Object.create(null)
   for (const key of keys) {
     map[key] = true
@@ -46,11 +46,11 @@ const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
   return matchingNodeMap
 }
 
-const getNodeHash = (node) => {
+const getNodeHash = (node: any) => {
   return `${node.nodeName}:${node.nodeId}`
 }
 
-const getLeaked = (oldNodeMap, newNodeMap) => {
+const getLeaked = (oldNodeMap: any, newNodeMap: any) => {
   const leakedMap = Object.create(null)
   const keys = Object.keys(oldNodeMap)
   for (const key of keys) {

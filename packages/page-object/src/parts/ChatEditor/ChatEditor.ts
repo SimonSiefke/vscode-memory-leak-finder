@@ -7,6 +7,18 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+<<<<<<< HEAD
+interface CreateParams {
+  readonly electronApp: unknown
+  readonly expect: unknown
+  readonly ideVersion: unknown
+  readonly page: unknown
+  readonly platform: string
+  readonly VError: new (error: unknown, message: string) => Error
+}
+
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+=======
 const workspacePath = join(Root.root, '.vscode-test-workspace')
 const defaultPortWaitHost = '127.0.0.1'
 const defaultPortWaitTimeout = 120_000
@@ -337,6 +349,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     return null
   }
   const element = elements.sort((a, b) => b.scrollHeight - a.scrollHeight)[0]
+>>>>>>> origin/main
   return {
     clientHeight: element.clientHeight,
     scrollHeight: element.scrollHeight,
@@ -658,7 +671,25 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open finish setup`)
       }
     },
+<<<<<<< HEAD
+    async sendMessage({
+      expectedResponse,
+      message,
+      validateRequest = {
+        exists: [],
+      },
+      verify = false,
+      viewLinesText = '',
+    }: {
+      expectedResponse?: string
+      message: string
+      validateRequest?: { exists: readonly unknown[] }
+      verify?: boolean
+      viewLinesText?: string
+    }) {
+=======
     async selectModel(modelName: string, retry = true) {
+>>>>>>> origin/main
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -698,6 +729,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(item).toBeVisible()
         await item.click()
         await page.waitForIdle()
+<<<<<<< HEAD
+        const nonBreakingSpace = String.fromCharCode(160)
+        const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
+        await expect(lines).toHaveText(viewLinesText || adjustedMessage)
+=======
+>>>>>>> origin/main
         await page.waitForIdle()
         await expect(modelLocator).toHaveText(modelName)
         if (ideVersion && ideVersion.minor <= 118) {

@@ -3,7 +3,7 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
 const ITEMS_PER_NODE = 7
 
-export const getObjectShapeCountFromHeapSnapshot = (id) => {
+export const getObjectShapeCountFromHeapSnapshot = (id: any) => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const { nodes, snapshot } = heapsnapshot

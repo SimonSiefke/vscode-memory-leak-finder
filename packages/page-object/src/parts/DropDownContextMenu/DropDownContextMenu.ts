@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+export const create = ({
+  expect,
+  page,
+  VError,
+}: {
+  expect: any
+  page: any
+  VError: any
+}) => {
+=======
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams) => {
@@ -5,6 +16,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
     return page.locator('.monaco-dropdown.active .shadow-root-host:enter-shadow() .context-view.monaco-menu-container .actions-container')
   }
 
+>>>>>>> origin/main
   return {
     async close() {
       try {
@@ -17,6 +29,8 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to close context menu`)
       }
     },
+<<<<<<< HEAD
+=======
     async select(option: string) {
       try {
         await page.waitForIdle()
@@ -35,6 +49,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to select context menu item ${option}`)
       }
     },
+>>>>>>> origin/main
     async shouldHaveItem(option: string) {
       await page.waitForIdle()
       const contextMenu = getContextMenu()

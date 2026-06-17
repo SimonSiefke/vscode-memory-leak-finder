@@ -1,9 +1,9 @@
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.ts'
 
-const addSourceLocations = async (functionObjects, scriptMap) => {
+const addSourceLocations = async (functionObjects: readonly { scriptId: string; line: number; column: number; count: number; delta: number; [key: string]: unknown }[], scriptMap: { [scriptId: string]: { url: string; sourceMapUrl: string } }): Promise<readonly { count: number; delta: number; name: string; url: string }[]> => {
   const classNames = true
-  const requests = functionObjects.map((item) => {
+  const requests = functionObjects.map((item: { scriptId: string; line: number; column: number; count: number; delta: number; [key: string]: unknown }) => {
     const script = scriptMap[item.scriptId]
     const url = `${script.url}:${item.line}:${item.column}`
     return {
@@ -15,7 +15,7 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
     }
   })
   const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(requests, classNames)
-  const normalized = withOriginalStack.map((item) => {
+  const normalized = withOriginalStack.map((item: { count: number; delta: number; name: string; originalName?: string; originalStack?: readonly string[]; stack?: readonly string[] }) => {
     const { count, delta, name, originalName, originalStack, stack } = item
 
     return {
@@ -28,7 +28,7 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
   return normalized
 }
 
-export const compareNamedFunctionCount2 = async (beforePath, after, useParallel = true) => {
+export const compareNamedFunctionCount2 = async (beforePath: string, after: { heapSnapshotPath: string; scriptMap: { [scriptId: string]: { url: string; sourceMapUrl: string } } }, useParallel = true): Promise<readonly { count: number; delta: number; name: string; url: string }[]> => {
   // TODO ask heapsnapshot worker to compare functions
   // TODO then for the leaked functions, add sourcemap info
   const afterPath = after.heapSnapshotPath

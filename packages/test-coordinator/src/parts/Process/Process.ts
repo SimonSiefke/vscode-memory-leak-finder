@@ -1,3 +1,3 @@
-export const exit = (code) => {
+export const exit = (code: number): never => {
   process.exit(code)
 }

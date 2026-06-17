@@ -1,6 +1,9 @@
 import { relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+/**
+ * @param {string} line
+ */
 const isTestWorkerLine = (line) => {
   if (line.includes('test-worker/src')) {
     return true
@@ -8,6 +11,9 @@ const isTestWorkerLine = (line) => {
   return false
 }
 
+/**
+ * @param {string} line
+ */
 const isInternal = (line) => {
   if (line.includes('node:')) {
     return true
@@ -24,6 +30,9 @@ const isInternal = (line) => {
 const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:[0-9]+:[0-9]+\)?.*$)/
 const RE_STACK_PATH_2 = /(^\s*at .*?)([^()]+)(:\d+$)/
 
+/**
+ * @param {string} file
+ */
 const getFilePath = (file) => {
   if (file.startsWith('file://')) {
     return fileURLToPath(file)
@@ -31,6 +40,10 @@ const getFilePath = (file) => {
   return file
 }
 
+/**
+ * @param {string} line
+ * @param {string} root
+ */
 const formatLine = (line, root) => {
   if (!root) {
     return line
@@ -52,6 +65,10 @@ const formatLine = (line, root) => {
   return line
 }
 
+/**
+ * @param {string[]} lines
+ * @param {string} root
+ */
 const formatLines = (lines, root) => {
   const formattedLines = []
   for (const line of lines) {
@@ -60,6 +77,10 @@ const formatLines = (lines, root) => {
   return formattedLines
 }
 
+/**
+ * @param {string[]} lines
+ * @param {string} stack
+ */
 const getRelevantLines = (lines, stack) => {
   const isAssertionError =
     stack.includes('AssertionError:') ||
@@ -83,6 +104,10 @@ const getRelevantLines = (lines, stack) => {
   return relevantLines
 }
 
+/**
+ * @param {string} stack
+ * @param {{ root?: string }} options
+ */
 export const cleanStack = (stack, { root = '' } = {}) => {
   if (!stack) {
     return ''

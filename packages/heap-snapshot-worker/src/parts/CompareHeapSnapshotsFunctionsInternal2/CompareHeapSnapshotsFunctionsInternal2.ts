@@ -88,11 +88,11 @@ const filterOutExcluded = (items: readonly any[], excludes: readonly string[]): 
   return items
 }
 
-const compareCount = (a, b) => {
+const compareCount = (a: any, b: any) => {
   return b.count - a.count
 }
 
-const cleanItem = (item) => {
+const cleanItem = (item: any) => {
   return {
     count: item.count,
     delta: item.delta,

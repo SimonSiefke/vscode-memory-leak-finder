@@ -8,6 +8,17 @@ const isNoteBook = (file: string) => {
   return file.endsWith('.ipynb')
 }
 
+<<<<<<< HEAD
+interface CreateParams {
+  electronApp: any
+  expect: any
+  page: any
+  platform: string
+  VError: any
+}
+
+export const create = ({ electronApp, expect, page, platform, VError }: CreateParams) => {
+=======
 const normalizeText = (value: string) => {
   return value.replaceAll('\u00a0', ' ').replaceAll('\n', ' ')
 }
@@ -19,6 +30,7 @@ const wait = (milliseconds: number) => {
 }
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+>>>>>>> origin/main
   return {
     async expectModified(text: string) {
       try {
@@ -36,7 +48,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify original text ${text}`)
       }
     },
-    async open({
+async open({
       cell1Content,
       cell2Content,
       file1,
@@ -135,6 +147,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to scroll up in diff editor`)
       }
     },
+<<<<<<< HEAD
+=======
     async scrollUpInline() {
       try {
         await page.waitForIdle()
@@ -146,6 +160,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to scroll up in inline diff editor`)
       }
     },
+>>>>>>> origin/main
     async shouldHaveModifiedEditor(text: string) {
       try {
         const editor = page.locator('.editor.modified')

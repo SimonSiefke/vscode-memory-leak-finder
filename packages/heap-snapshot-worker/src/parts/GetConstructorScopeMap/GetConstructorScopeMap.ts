@@ -1,6 +1,6 @@
 import * as IsIgnoredConstructorScopeEdge from '../IsIgnoredConstructorScopeEdge/IsIgnoredConstructorScopeEdge.ts'
 
-export const getConstructorScopeMap = (parsedNodes, graph) => {
+export const getConstructorScopeMap = (parsedNodes: any[], graph: any) => {
   const scopeMap = new Uint32Array(parsedNodes.length)
   const edgeMap = [...Array.from({ length: parsedNodes.length }).fill('')]
   for (let i = 0; i < parsedNodes.length; i++) {

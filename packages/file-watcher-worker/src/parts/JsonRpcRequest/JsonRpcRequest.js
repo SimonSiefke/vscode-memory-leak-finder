@@ -2,6 +2,10 @@
 import * as Callback from '../Callback/Callback.js'
 import * as JsonRpcVersion from '../JsonRpcVersion/JsonRpcVersion.js'
 
+/**
+ * @param {string} method
+ * @param {unknown[]} params
+ */
 export const create = (method, params) => {
   const { id, promise } = Callback.registerPromise()
   const message = {

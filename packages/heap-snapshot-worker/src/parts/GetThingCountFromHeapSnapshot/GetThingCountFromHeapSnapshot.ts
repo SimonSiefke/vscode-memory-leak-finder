@@ -8,7 +8,7 @@ import { getThingCountFromHeapSnapshotInternal } from '../GetObjectCountFromHeap
  * @param {*} objectName
  * @returns {number}
  */
-export const getThingCountFromHeapSnapshot = (snapshot, typeName, objectName) => {
+export const getThingCountFromHeapSnapshot = (snapshot: any, typeName: any, objectName: any) => {
   const { meta, nodes, strings } = snapshot
   const { edge_fields, edge_types, node_fields, node_types } = meta
   const typeIndex = node_types[0].indexOf(typeName)

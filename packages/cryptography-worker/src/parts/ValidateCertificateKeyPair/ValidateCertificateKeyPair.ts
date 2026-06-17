@@ -10,8 +10,8 @@ export const validateCertificateKeyPair = (cert: string, key: string): boolean =
 
     // For RSA keys, compare the modulus (n) and public exponent (e)
     // The certificate's public key should match the public key derived from the private key
-    if (certPublicKey.n && certPublicKey.e && privateKey.n && privateKey.e) {
-      return certPublicKey.n.equals(privateKey.n) && certPublicKey.e.equals(privateKey.e)
+    if ((certPublicKey as any).n && (certPublicKey as any).e && (privateKey as any).n && (privateKey as any).e) {
+      return (certPublicKey as any).n.equals((privateKey as any).n) && (certPublicKey as any).e.equals((privateKey as any).e)
     }
 
     return false

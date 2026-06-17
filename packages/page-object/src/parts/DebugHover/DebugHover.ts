@@ -1,6 +1,18 @@
+<<<<<<< HEAD
+export const create = ({
+  expect,
+  page,
+  VError,
+}: {
+  expect: any
+  page: any
+  VError: any
+}) => {
+=======
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams) => {
+>>>>>>> origin/main
   return {
     async collapseProperty(name: string) {
       try {

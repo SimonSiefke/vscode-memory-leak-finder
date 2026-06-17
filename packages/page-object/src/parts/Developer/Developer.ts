@@ -2,6 +2,16 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+<<<<<<< HEAD
+interface CreateParams {
+  expect: any
+  page: any
+  platform: string
+  VError: any
+}
+
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
+=======
 export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
   const executeDeveloperCommand = async (command: string, errorMessage: string) => {
     try {
@@ -21,6 +31,7 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
     }
   }
 
+>>>>>>> origin/main
   return {
     async toggleScreenCastMode() {
       await executeDeveloperCommand(WellKnownCommands.ToggleScreenCastMode, `Failed to toggle screencast mode`)

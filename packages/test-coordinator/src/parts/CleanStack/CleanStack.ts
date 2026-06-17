@@ -50,11 +50,11 @@ const cleanLine = (line: string): string => {
   return line
 }
 
-const getCleanLines = (lines: readonly string[]): string[] => {
+const getCleanLines = (lines: string[]): string[] => {
   return lines.map(cleanLine)
 }
 
-const getRelevantLines = (lines: readonly string[], stack: string): readonly string[] => {
+const getRelevantLines = (lines: string[], stack: string): string[] => {
   const isAssertionError =
     stack.includes('AssertionError:') ||
     stack.includes('ExpectError:') ||
@@ -77,7 +77,7 @@ const getRelevantLines = (lines: readonly string[], stack: string): readonly str
   return relevantLines
 }
 
-export const cleanStack = (stack: string | null | undefined, { root = '' }: { root?: string } = {}): string => {
+export const cleanStack = (stack: string, { root = '' }: { root?: string } = {}): string => {
   if (!stack) {
     return ''
   }

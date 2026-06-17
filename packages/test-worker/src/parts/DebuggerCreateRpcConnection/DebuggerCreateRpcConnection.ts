@@ -5,7 +5,12 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
  * @param {any} ipc
  * @returns
  */
-export const createRpc = (ipc, canUseIdleCallback) => {
+type Ipc = {
+  onmessage: ((message: unknown) => void) | null
+  send(message: unknown): void
+}
+
+export const createRpc = (ipc: Ipc, canUseIdleCallback: boolean) => {
   const callbacks = Object.create(null)
   const handleMessage = (message) => {
     if ('id' in message) {
@@ -58,7 +63,7 @@ export const createRpc = (ipc, canUseIdleCallback) => {
       })
       return promise
     },
-    invokeWithTarget(targetId, sessionId, method, params) {
+    invokeWithTarget(targetId: string, sessionId: string, method: string, params?: unknown) {
       const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
       callbacks[id] = { reject, resolve }

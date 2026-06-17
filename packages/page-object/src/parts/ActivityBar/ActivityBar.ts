@@ -4,7 +4,18 @@ import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+<<<<<<< HEAD
+interface CreateParams {
+  readonly expect: unknown
+  readonly page: unknown
+  readonly platform: string
+  readonly VError: new (error: unknown, message: string) => Error
+}
+
+export const create = ({ expect, page, platform, VError }: CreateParams) => {
+=======
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+>>>>>>> origin/main
   return {
     async hide() {
       try {

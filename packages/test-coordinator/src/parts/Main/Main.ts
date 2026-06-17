@@ -1,6 +1,6 @@
 import * as Listen from '../Listen/Listen.ts'
 
-const handleUncaughtExceptionMonitor = (error) => {
+const handleUncaughtExceptionMonitor = (error: Error): void => {
   console.error(`[test-coordinator]: Unhandled Error: ${error}`)
 }
 

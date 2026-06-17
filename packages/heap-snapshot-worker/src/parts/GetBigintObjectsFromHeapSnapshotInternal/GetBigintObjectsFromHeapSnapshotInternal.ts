@@ -20,7 +20,7 @@ export interface BigintObject {
   variableNames: VariableName[]
 }
 
-export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
+export const getBigintObjectsFromHeapSnapshotInternal = (snapshot: any) => {
   const { edges, meta, nodes, strings } = snapshot
   const { edge_fields, edge_types, node_fields, node_types } = meta
   const {

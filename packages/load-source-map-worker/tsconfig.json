@@ -23,5 +23,5 @@
     "noUnusedLocals": true,
     "strictNullChecks": true
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "rollup.config.js"]
 }

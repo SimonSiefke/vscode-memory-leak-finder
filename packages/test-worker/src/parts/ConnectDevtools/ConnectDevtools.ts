@@ -106,19 +106,56 @@ export const connectDevtools = async (
 
   const pageObjectContext: any = {
     browserRpc,
+<<<<<<< HEAD
+    electronObjectId,
+    electronRpc,
+    firstWindow,
+    idleTimeout,
+    sessionRpc,
+  })
+  const pageObjectContext = {
+    defaultContext: {
+      callFunctionOn(options: unknown) {
+        return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+          ...(options as { expression: string }),
+          uniqueContextId: utilityContext.uniqueId,
+        })
+      },
+    },
+    electronApp,
+    evaluateInDefaultContext(item: unknown) {
+=======
     defaultContext: createDefaultContext(sessionRpc, utilityContext),
     electronApp: undefined,
     evaluateInDefaultContext(item) {
+>>>>>>> origin/main
       throw new Error(`not implemented`)
     },
-    evaluateInUtilityContext(item) {},
+    evaluateInUtilityContext(item: unknown) {},
     expect: Expect.expect,
     ideVersion: parsedIdeVersion,
     page: undefined,
     platform,
     reconnectDevtools: undefined,
     sessionRpc,
+<<<<<<< HEAD
+    utilityContext: {
+      callFunctionOn(options: unknown) {
+        return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {
+          ...(options as { functionDeclaration: string; objectId?: string }),
+          uniqueContextId: utilityContext.uniqueId,
+        })
+      },
+      evaluate(options: unknown) {
+        return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+          ...(options as { expression: string }),
+          uniqueContextId: utilityContext.uniqueId,
+        })
+      },
+    },
+=======
     utilityContext: createUtilityContext(sessionRpc, utilityContext),
+>>>>>>> origin/main
     VError,
   }
 

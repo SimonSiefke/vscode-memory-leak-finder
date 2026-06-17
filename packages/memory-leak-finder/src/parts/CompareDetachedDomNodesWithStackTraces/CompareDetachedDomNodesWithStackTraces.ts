@@ -1,5 +1,19 @@
 import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.ts'
 
+<<<<<<< HEAD
+type DetachedDomNode = {
+  readonly description: string
+  readonly count: number
+  readonly [key: string]: unknown
+}
+
+export const compareDetachedDomNodesWithStackTraces = (before: readonly unknown[], after: readonly unknown[]): { after: readonly DetachedDomNode[]; before: readonly DetachedDomNode[] } => {
+  const result = CompareDetachedDomNodes.compareDetachedDomNodes(before, after)
+  return {
+    after: result.after,
+    before: result.before,
+  }
+=======
 export interface DomNode {
   readonly type: string
   readonly subtype: string
@@ -128,4 +142,5 @@ export const compareDetachedDomNodesWithStackTraces = (
   const sorted = afterWithDeltas.toSorted(compareNode)
   const formatted = formatOutput(sorted)
   return formatted
+>>>>>>> origin/main
 }
