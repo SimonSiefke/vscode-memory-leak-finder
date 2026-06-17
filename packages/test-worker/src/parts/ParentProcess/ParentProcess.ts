@@ -16,7 +16,7 @@ const send = (message: any): void => {
 
 const dispose = (): void => {
   if (!state.rpc) {
-  	return;
+    return
   }
 
   state.rpc.dispose()
