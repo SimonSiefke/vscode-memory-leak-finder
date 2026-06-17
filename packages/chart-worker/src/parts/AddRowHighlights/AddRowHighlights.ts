@@ -8,7 +8,7 @@ type HighlightBlock = {
 }
 
 const escapeAttribute = (value: string): string => {
-  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 }
 
 const getHighlightBlocks = (data: readonly any[], highlightedNames: ReadonlySet<string>) => {
@@ -17,7 +17,7 @@ const getHighlightBlocks = (data: readonly any[], highlightedNames: ReadonlySet<
     if (!highlightedNames.has(data[i].name)) {
       continue
     }
-    const previousBlock = blocks[blocks.length - 1]
+    const previousBlock = blocks.at(-1)
     if (previousBlock && previousBlock.endIndex === i - 1) {
       previousBlock.endIndex = i
       previousBlock.labels.push(data[i].name)

@@ -4,7 +4,7 @@ type ArtifactRecord = {
 }
 
 type ArtifactDownloadOctokit = {
-  readonly auth: (options: { type: 'installation' }) => Promise<{ token: string } | unknown>
+  readonly auth: (options: { type: 'installation' }) => Promise<unknown | { token: string }>
 }
 
 const getToken = async (octokit: ArtifactDownloadOctokit): Promise<string> => {

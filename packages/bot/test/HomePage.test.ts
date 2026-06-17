@@ -1,6 +1,6 @@
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
-import { AddressInfo } from 'node:net'
+import type { AddressInfo } from 'node:net'
 import { afterEach, expect, test } from '@jest/globals'
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { handleHomePageRequest } from '../src/parts/HomePage/HomePage.ts'
 
 type TestServer = {
