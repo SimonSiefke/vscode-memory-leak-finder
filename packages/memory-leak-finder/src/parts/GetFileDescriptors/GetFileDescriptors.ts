@@ -1,24 +1,22 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { readdir, readlink } from 'node:fs/promises'
 import type { FileDescriptorInfo } from '../FileDescriptorInfo/FileDescriptorInfo.ts'
 import * as GetFileDescriptorCount from '../GetFileDescriptorCount/GetFileDescriptorCount.ts'
 import { isEnoentError } from '../IsEnoentError/IsEnoentError.ts'
-
 const getFileDescriptors = async (pid: number): Promise<FileDescriptorInfo[]> => {
   try {
     const fdDir = `/proc/${pid}/fd`
     const files = await readdir(fdDir)
     const descriptors: FileDescriptorInfo[] = []
-
     // Process all file descriptors in parallel
     const results = await Promise.allSettled(
-      files.map(async (fd) => {
+      files.map(async (fd: Dynamic) => {
         const fdPath = `${fdDir}/${fd}`
         const target = await readlink(fdPath)
         const description = GetFileDescriptorCount.describeFd(fd, target)
         return { description, fd, target }
       }),
     )
-
     for (const result of results) {
       if (result.status === 'fulfilled') {
         descriptors.push(result.value)
@@ -29,7 +27,6 @@ const getFileDescriptors = async (pid: number): Promise<FileDescriptorInfo[]> =>
         descriptors.push({ description: 'unavailable', fd: 'unknown', target: '<unavailable>' })
       }
     }
-
     return descriptors
   } catch (error) {
     // Silently ignore ENOENT errors - the process was cleaned up/killed, which is fine
@@ -40,5 +37,4 @@ const getFileDescriptors = async (pid: number): Promise<FileDescriptorInfo[]> =>
     return []
   }
 }
-
 export { getFileDescriptors }

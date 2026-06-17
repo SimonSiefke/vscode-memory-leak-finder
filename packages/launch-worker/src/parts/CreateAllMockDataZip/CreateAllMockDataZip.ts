@@ -1,6 +1,6 @@
+import JSZip from 'jszip'
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
-import JSZip from 'jszip'
 import * as Root from '../Root/Root.ts'
 
 const allMockDataDirectories = [
@@ -34,7 +34,7 @@ const addDirectoryToZip = async (zip: JSZip, rootDirectory: string, sourceDirect
     if (!entry.isFile()) {
       continue
     }
-    const relativePath = relative(rootDirectory, entryPath).split('\\').join('/')
+    const relativePath = relative(rootDirectory, entryPath).replaceAll('\\', '/')
     zip.file(relativePath, await readFile(entryPath))
   }
 }
@@ -68,8 +68,8 @@ export const createAllMockDataZip = async (
   })
   await writeFile(outputFilePath, zipContent)
   return {
+    includedDirectories,
     outputDirectory,
     outputFilePath,
-    includedDirectories,
   }
 }

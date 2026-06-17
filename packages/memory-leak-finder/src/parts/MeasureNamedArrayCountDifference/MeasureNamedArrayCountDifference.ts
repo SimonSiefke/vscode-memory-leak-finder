@@ -1,29 +1,23 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as CompareNamedArrayCountDifference from '../CompareNamedArrayCountDifference/CompareNamedArrayCountDifference.ts'
 import * as GetNamedArrayCount from '../GetNamedArrayCount/GetNamedArrayCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-
 export const id = MeasureId.NamedArrayCountDifference
-
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
-
 export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
-
 export const start = async (session: Session, objectGroup: string) => {
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, 0 as any)
+  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, 0 as Dynamic)
 }
-
 export const stop = async (session: Session, objectGroup: string) => {
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, 1 as any)
+  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, 1 as Dynamic)
 }
-
 export const compare = CompareNamedArrayCountDifference.compareNamedArrayCountDifference
-
-export const isLeak = (leaked) => {
+export const isLeak = (leaked: Dynamic) => {
   return leaked.length > 0
 }

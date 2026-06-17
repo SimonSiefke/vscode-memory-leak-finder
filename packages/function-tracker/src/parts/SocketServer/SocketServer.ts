@@ -1,4 +1,5 @@
-import { createServer, Server, IncomingMessage, ServerResponse } from 'http'
+import type { Server, IncomingMessage, ServerResponse } from 'http'
+import { createServer } from 'http'
 
 let httpServer: Server | null = null
 
@@ -9,7 +10,7 @@ export const startServer = async (port: number): Promise<void> => {
     return
   }
 
-  const { promise, resolve, reject } = Promise.withResolvers<void>()
+  const { promise, reject, resolve } = Promise.withResolvers<void>()
 
   httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     // HTTP server is kept for compatibility but no longer performs on-the-fly transformation
