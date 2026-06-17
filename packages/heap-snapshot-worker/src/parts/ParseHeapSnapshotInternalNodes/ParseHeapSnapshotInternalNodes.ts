@@ -5,7 +5,7 @@ import type { ParsedNode } from '../Snapshot/Snapshot.ts'
 export const parseHeapSnapshotInternalNodes = (
   nodes: readonly number[],
   nodeFields: readonly string[],
-  nodeTypes: readonly (readonly string[])[],
+  nodeTypes: readonly string[],
   strings: readonly string[],
 ): readonly ParsedNode[] => {
   // Assert.array(nodes)
@@ -19,7 +19,7 @@ export const parseHeapSnapshotInternalNodes = (
   return ParseHeapSnapshotInternalObjects.parseHeapSnapshotObjects(
     nodes,
     nodeFields,
-    nodeTypes[0] || [],
+    nodeTypes,
     typeKey,
     nameKey,
     indexMultiplierKey,

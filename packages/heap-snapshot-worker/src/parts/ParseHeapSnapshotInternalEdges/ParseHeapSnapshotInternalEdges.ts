@@ -5,7 +5,7 @@ import type { ParsedEdge } from '../Snapshot/Snapshot.ts'
 export const parseHeapSnapshotInternalEdges = (
   edges: readonly number[],
   edgeFields: readonly string[],
-  edgeTypes: readonly (readonly string[])[],
+  edgeTypes: readonly string[],
   nodeFieldCount: number,
   strings: readonly string[],
 ): readonly ParsedEdge[] => {
@@ -21,7 +21,7 @@ export const parseHeapSnapshotInternalEdges = (
   return ParseHeapSnapshotInternalObjects.parseHeapSnapshotObjects(
     edges,
     edgeFields,
-    edgeTypes[0] || [],
+    edgeTypes,
     typeKey,
     nameKey,
     indexMultiplierKey,

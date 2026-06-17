@@ -9,10 +9,10 @@ import type { ParsedHeapSnapshot } from '../Snapshot/Snapshot.ts'
 export const parseHeapSnapshotInternal = (
   nodes: readonly number[],
   nodeFields: readonly string[],
-  nodeTypes: readonly (readonly string[])[],
+  nodeTypes: readonly string[],
   edges: readonly number[],
   edgeFields: readonly string[],
-  edgeTypes: readonly (readonly string[])[],
+  edgeTypes: readonly string[],
   strings: readonly string[],
   locations: readonly number[],
   locationFields: readonly string[],
