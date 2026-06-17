@@ -16,35 +16,36 @@ const getIndexHtml = (): string => {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>React CDN Vite Fixture</title>
-    <link rel="stylesheet" href="/src/style.css" />
+    <title>React Vite Fixture</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module">
-      import React from 'https://esm.sh/react@19.2.0'
-      import { createRoot } from 'https://esm.sh/react-dom@19.2.0/client'
-      import { renderHelloWorld } from '/src/app.js'
-
-      renderHelloWorld({
-        React,
-        createRoot,
-        root: document.getElementById('root'),
-      })
-    </script>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
 `
 }
 
 const getAppSource = (): string => {
-  return `export const renderHelloWorld = ({ React, createRoot, root }) => {
-  if (!root) {
-    throw new Error('Expected root element')
-  }
-
-  createRoot(root).render(React.createElement('h1', undefined, '${helloWorldText}'))
+  return `export const HelloWorld = ({ React }) => {
+  return React.createElement('h1', undefined, '${helloWorldText}')
 }
+`
+}
+
+const getMainSource = (): string => {
+  return `import React from 'react'
+import { createRoot } from 'react-dom/client'
+import { HelloWorld } from './app.js'
+import './style.css'
+
+const root = document.getElementById('root')
+
+if (!root) {
+  throw new Error('Expected root element')
+}
+
+createRoot(root).render(React.createElement(HelloWorld, { React }))
 `
 }
 
@@ -84,7 +85,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
     setupCommands: [
       {
         command: 'npx',
-        args: ['--yes', 'create-vite@latest', 'vite-app', '--template', 'vanilla'],
+        args: ['--yes', 'create-vite@latest', 'vite-app', '--template', 'react'],
       },
       {
         command: 'npm',
@@ -105,6 +106,10 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
       {
         name: 'vite-app/src/app.js',
         content: getAppSource(),
+      },
+      {
+        name: 'vite-app/src/main.js',
+        content: getMainSource(),
       },
       {
         name: 'vite-app/src/style.css',
