@@ -1,15 +1,18 @@
-import type { CleanedNode } from '../Snapshot/Snapshot.ts'
+interface ConstructorScopeNode {
+  readonly id: number
+  readonly name: string
+}
 
 export interface ConstructorScope {
   readonly scopeEdge: string
-  readonly scopeNode: CleanedNode
+  readonly scopeNode: ConstructorScopeNode
 }
 
 export const getConstructorScope = (
-  parsedNodes: readonly CleanedNode[],
+  parsedNodes: readonly ConstructorScopeNode[],
   constructorScopeMap: Uint32Array,
   edgeMap: readonly string[],
-  node: CleanedNode,
+  node: ConstructorScopeNode,
 ): ConstructorScope => {
   // TODO avoid indexOf
   const nodeIndex = parsedNodes.indexOf(node)
