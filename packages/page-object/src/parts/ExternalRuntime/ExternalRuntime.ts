@@ -56,6 +56,7 @@ interface StartExternalRuntimeOptions {
   readonly cwd?: string
   readonly env?: Record<string, string>
   readonly command?: string
+  readonly connectMemory?: boolean
   readonly args?: readonly string[]
   readonly setupCommands?: readonly SetupCommand[]
   readonly setupFiles?: readonly SetupFile[]
@@ -619,6 +620,7 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
     async startExternalRuntime({
       args,
       command,
+      connectMemory = true,
       cwd,
       entryFile,
       entrySource,
@@ -694,34 +696,38 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
       await waitForInspector(runtimeName, inspectPort)
 
       let rpc: RuntimeRpc | undefined
-      const memoryRpc = await NodeWorkerRpcParent.create({
-        commandMap: {},
-        path: memoryLeakWorkerUrl,
-        stdio: 'inherit',
-      })
+      const memoryRpc = connectMemory
+        ? await NodeWorkerRpcParent.create({
+            commandMap: {},
+            path: memoryLeakWorkerUrl,
+            stdio: 'inherit',
+          })
+        : undefined
       const memoryConnectionId = nextConnectionId++
       let disposed = false
 
-      await memoryRpc.invoke(
-        connectDevtoolsCommand,
-        '',
-        '',
-        memoryConnectionId,
-        defaultMeasureId,
-        30_000,
-        false,
-        false,
-        false,
-        false,
-        false,
-        0,
-        0,
-        0,
-        childProcess.pid ?? 0,
-        [],
-        inspectPort,
-        runtimeName,
-      )
+      if (memoryRpc) {
+        await memoryRpc.invoke(
+          connectDevtoolsCommand,
+          '',
+          '',
+          memoryConnectionId,
+          defaultMeasureId,
+          30_000,
+          false,
+          false,
+          false,
+          false,
+          false,
+          0,
+          0,
+          0,
+          childProcess.pid ?? 0,
+          [],
+          inspectPort,
+          runtimeName,
+        )
+      }
 
       const connect = async () => {
         if (!rpc) {
@@ -740,7 +746,7 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
           }
           disposed = true
           rpc?.dispose()
-          await memoryRpc.dispose()
+          await memoryRpc?.dispose()
           if (childProcess.exitCode === null && childProcess.signalCode === null) {
             childProcess.kill('SIGTERM')
             try {
@@ -768,6 +774,9 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
           return (await response.json()) as T
         },
         async getNamedArrayCount() {
+          if (!memoryRpc) {
+            throw new Error('External runtime memory connection is disabled')
+          }
           const snapshotId = nextSnapshotId++
           const result = (await memoryRpc.invoke(getNamedArrayCountForConnectionCommand, memoryConnectionId, '', snapshotId)) as Record<
             string,
@@ -783,6 +792,9 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
           return fetch(url, init)
         },
         async takeSnapshot(name: string) {
+          if (!memoryRpc) {
+            throw new Error('External runtime memory connection is disabled')
+          }
           const snapshotId = nextSnapshotId++
           const sourcePath = (await memoryRpc.invoke(getHeapSnapshotForConnectionCommand, memoryConnectionId, snapshotId)) as string
           const outFile = join(workspacePath, '.external-runtime', `${name}.json`)

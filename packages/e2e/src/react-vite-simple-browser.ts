@@ -80,6 +80,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, SimpleBrowser, 
       String(serverPort),
       '--strictPort',
     ],
+    connectMemory: false,
     cwd: 'vite-app',
     healthPath: '/health.txt',
     setupCommands: [
