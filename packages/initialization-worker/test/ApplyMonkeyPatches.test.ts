@@ -15,8 +15,8 @@ test('applyMonkeyPatches - injects secrets path into monkey patch script', async
         return {
           result: {
             result: {
-              type: 'function',
               objectId: 'patched-electron-id',
+              type: 'function',
             },
           },
         }

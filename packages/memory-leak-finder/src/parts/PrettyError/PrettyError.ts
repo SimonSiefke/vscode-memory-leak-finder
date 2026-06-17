@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { codeFrameColumns } from '@babel/code-frame'
 import { readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join } from 'node:path'
@@ -6,19 +7,16 @@ import * as CleanStack from '../CleanStack/CleanStack.ts'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
 import * as FileSystem from '../FileSystem/FileSystem.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
-
-const getActualPath = (fileUri) => {
+const getActualPath = (fileUri: Dynamic) => {
   if (fileUri.startsWith('file://')) {
     return fileURLToPath(fileUri)
   }
   return fileUri
 }
-
-const isSyntheticRuntimePath = (path) => {
+const isSyntheticRuntimePath = (path: Dynamic) => {
   return path.startsWith('node:') || path.startsWith('node:internal/')
 }
-
-const getReadablePath = (filePath, root) => {
+const getReadablePath = (filePath: Dynamic, root: Dynamic) => {
   const actualPath = getActualPath(filePath)
   if (!root || isAbsolute(actualPath)) {
     return actualPath
@@ -27,7 +25,6 @@ const getReadablePath = (filePath, root) => {
   if (FileSystem.existsSync(directCandidate)) {
     return directCandidate
   }
-
   let currentRoot = root
   for (let i = 0; i < 5; i++) {
     const workspaceCandidate = join(currentRoot, '.vscode-test-workspace', actualPath)
@@ -40,13 +37,10 @@ const getReadablePath = (filePath, root) => {
     }
     currentRoot = parent
   }
-
   return directCandidate
 }
-
 const RE_MODULE_NOT_FOUND_STACK = /Cannot find package '([^']+)' imported from (.+)$/
-
-const prepareModuleNotFoundError = (error) => {
+const prepareModuleNotFoundError = (error: Dynamic) => {
   const { message } = error
   const match = message.match(RE_MODULE_NOT_FOUND_STACK)
   if (!match) {
@@ -87,8 +81,7 @@ const prepareModuleNotFoundError = (error) => {
     stack: newStack,
   }
 }
-
-const getPathDetails = (lines) => {
+const getPathDetails = (lines: Dynamic) => {
   for (let i = 0; i < lines.length; i++) {
     const file = lines[i]
     if (file) {
@@ -112,8 +105,7 @@ const getPathDetails = (lines) => {
   }
   return undefined
 }
-
-const getCodeFrame = (cleanedStack, { color, root }) => {
+const getCodeFrame = (cleanedStack: Dynamic, { color, root }: Dynamic) => {
   try {
     const lines = SplitLines.splitLines(cleanedStack)
     const pathDetails = getPathDetails(lines)
@@ -136,8 +128,7 @@ const getCodeFrame = (cleanedStack, { color, root }) => {
     return ''
   }
 }
-
-export const prepare = async (error, { color = true, root = '' } = {}) => {
+export const prepare = async (error: Dynamic, { color = true, root = '' }: Dynamic = {}) => {
   if (error && error.code === ErrorCodes.ERR_MODULE_NOT_FOUND) {
     return prepareModuleNotFoundError(error)
   }

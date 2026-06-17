@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import type { Session } from '../Session/Session.ts'
 import * as GetMutationObserverCount from '../GetMutationObserverCount/GetMutationObserverCount.ts'
@@ -9,24 +10,19 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackingMutationObserverStackTraces from '../StartTrackingMutationObserverStackTraces/StartTrackingMutationObserverStackTraces.ts'
 import * as StopTrackingMutationObserverStackTraces from '../StopTrackingMutationObserverStackTraces/StopTrackingMutationObserverStackTraces.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-
 export const id = MeasureId.MutationObserversWithStackTracesWithSourceMaps
-
 export const targets = [TargetId.Browser]
-
 export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
-
-export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup: Dynamic, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackingMutationObserverStackTraces.startTrackingMutationObserverStackTraces(session, objectGroup)
   return GetMutationObserverCount.getMutationObserverCount(session, objectGroup)
 }
-
-export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup: Dynamic, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const added = await GetMutationObserversWithStackTraces.getMutationObserversWithStackTraces(session, objectGroup)
   await StopTrackingMutationObserverStackTraces.stopTrackingMutationObserverStackTraces(session, objectGroup)
@@ -37,11 +33,9 @@ export const stop = async (session: Session, objectGroup, scriptHandler: IScript
   // console.log({ scriptMap, added })
   return pretty
 }
-
-export const compare = (before, after) => {
+export const compare = (before: Dynamic, after: Dynamic) => {
   return after
 }
-
-export const isLeak = (leaked) => {
+export const isLeak = (leaked: Dynamic) => {
   return leaked.length > 0
 }
