@@ -33,9 +33,7 @@ export const parseTscErrors = (output: string, baseDir: string): readonly TscErr
         break
       }
     }
-    if (matched) {
-      continue
-    }
+    if (matched) {}
   }
   return locations
 }

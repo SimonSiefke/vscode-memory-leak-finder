@@ -45,8 +45,8 @@ jest.unstable_mockModule('../src/parts/CloneRepository/CloneRepository.ts', () =
 }))
 
 jest.unstable_mockModule('../src/parts/InstallDependencies/InstallDependencies.ts', () => ({
-  installDependencies: mockInstallDependencies,
   ensureNestedDependencies: mockEnsureNestedDependencies,
+  installDependencies: mockInstallDependencies,
 }))
 
 jest.unstable_mockModule('../src/parts/ResolveCommitHash/ResolveCommitHash.ts', () => ({
@@ -139,10 +139,10 @@ beforeEach(() => {
           return mockPathExists(...params)
         case 'FileSystem.findFiles':
           return []
-        case 'FileSystem.readFileContent':
-          return '20.0.0'
         case 'FileSystem.makeDirectory':
           return mockMkdir(...params)
+        case 'FileSystem.readFileContent':
+          return '20.0.0'
 
         default:
           throw new Error(`not implemented ${method}`)
