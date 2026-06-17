@@ -61,7 +61,7 @@ h1 {
 `
 }
 
-export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, ExternalRuntime, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([])
   await Explorer.focus()
@@ -123,6 +123,18 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
     inspectPort,
     runtimeName: 'node',
     serverPort,
+  })
+
+  const response = await ExternalRuntime.request('/health.txt')
+  assert.strictEqual(response.ok, true)
+
+  await SimpleBrowser.show({
+    url: testUrl,
+  })
+  await SimpleBrowser.shouldHaveText({
+    selector: 'h1',
+    text: helloWorldText,
+    urlPattern: browserUrlPattern,
   })
 }
 
