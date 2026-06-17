@@ -1,7 +1,4 @@
 export const createUrls = (cdnUrls: string[], relativePath: string): string[] => {
-  const urls: string[] = []
-  for (const cdnUrl of cdnUrls) {
-    urls.push(`${cdnUrl}/${relativePath}`)
-  }
+  const urls: string[] = Array.from(cdnUrls, (cdnUrl) => `${cdnUrl}/${relativePath}`)
   return urls
 }
