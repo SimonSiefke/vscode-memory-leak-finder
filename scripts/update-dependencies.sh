@@ -37,6 +37,7 @@ cd packages/cryptography-worker && updateDependencies && cd ../../ &&
 cd packages/cursor-e2e && updateDependencies && cd ../../ &&
 cd packages/devtools-protocol && updateDependencies && cd ../../ &&
 cd packages/download-worker && updateDependencies && cd ../../ &&
+cd packages/dashboard && updateDependencies && cd ../../ &&
 cd packages/e2e && updateDependencies && cd ../../ &&
 cd packages/error-worker && updateDependencies && cd ../../ &&
 cd packages/exec-worker && updateDependencies && cd ../../ &&
