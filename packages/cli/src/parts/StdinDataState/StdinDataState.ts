@@ -22,6 +22,7 @@ export interface StdinDataState {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -72,6 +73,7 @@ let state: StdinDataState = {
   insidersCommit: '',
   inspectExtensions: false,
   inspectExtensionsPort: 5870,
+  inspectIntegratedBrowser: false,
   inspectPtyHost: false,
   inspectPtyHostPort: 5877,
   inspectSharedProcess: false,
@@ -120,6 +122,7 @@ export const setState = (newState: StdinDataState): void => {
     insidersCommit: newState.insidersCommit,
     inspectExtensions: newState.inspectExtensions,
     inspectExtensionsPort: newState.inspectExtensionsPort,
+    inspectIntegratedBrowser: newState.inspectIntegratedBrowser,
     inspectPtyHost: newState.inspectPtyHost,
     inspectPtyHostPort: newState.inspectPtyHostPort,
     inspectSharedProcess: newState.inspectSharedProcess,

@@ -62,6 +62,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     insidersCommit: options.insidersCommit,
     inspectExtensions: options.inspectExtensions,
     inspectExtensionsPort: options.inspectExtensionsPort,
+    inspectIntegratedBrowser: options.inspectIntegratedBrowser,
     inspectPtyHost: options.inspectPtyHost,
     inspectPtyHostPort: options.inspectPtyHostPort,
     inspectSharedProcess: options.inspectSharedProcess,

@@ -36,6 +36,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     insidersCommit: options.insidersCommit,
     inspectExtensions: options.inspectExtensions,
     inspectExtensionsPort: options.inspectExtensionsPort,
+    inspectIntegratedBrowser: options.inspectIntegratedBrowser,
     inspectPtyHost: options.inspectPtyHost,
     inspectPtyHostPort: options.inspectPtyHostPort,
     inspectSharedProcess: options.inspectSharedProcess,
