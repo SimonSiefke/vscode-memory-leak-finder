@@ -42,6 +42,10 @@ const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
   await initializationWorkerRpc.dispose()
 }
 
+const getProcessResultFolder = (inspectProcess: string): string => {
+  return inspectProcess.replaceAll('/', '-').replaceAll('\\', '-')
+}
+
 export const runTestsWithCallback = async ({
   allowCopilotAuthInCi,
   arch,
@@ -66,6 +70,7 @@ export const runTestsWithCallback = async ({
   inspectExtensions,
   inspectExtensionsPort,
   inspectIntegratedBrowser,
+  inspectProcess = '',
   inspectPtyHost,
   inspectPtyHostPort,
   inspectSharedProcess,
@@ -107,6 +112,7 @@ export const runTestsWithCallback = async ({
     Assert.boolean(measureAfter)
     Assert.boolean(measureNode)
     Assert.boolean(inspectIntegratedBrowser)
+    Assert.string(inspectProcess)
     Assert.boolean(timeouts)
     Assert.number(timeoutBetween)
     Assert.number(runMode)
@@ -185,6 +191,7 @@ export const runTestsWithCallback = async ({
         inspectExtensions,
         inspectExtensionsPort,
         inspectIntegratedBrowser,
+        inspectProcess,
         inspectPtyHost,
         inspectPtyHostPort,
         inspectSharedProcess,
@@ -287,6 +294,7 @@ export const runTestsWithCallback = async ({
             inspectExtensions,
             inspectExtensionsPort,
             inspectIntegratedBrowser,
+            inspectProcess,
             inspectPtyHost,
             inspectPtyHostPort,
             inspectSharedProcess,
@@ -332,7 +340,7 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        if (inspectIntegratedBrowser && workers.memoryRpc !== emptyRpc) {
+        if ((inspectIntegratedBrowser || inspectProcess) && workers.memoryRpc !== emptyRpc) {
           await workers.memoryRpc.dispose()
           workers.memoryRpc = emptyRpc
         }
@@ -370,24 +378,46 @@ export const runTestsWithCallback = async ({
             if (measureAfter) {
               await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
             }
-            if (inspectIntegratedBrowser) {
-              workers.memoryRpc = await MemoryLeakWorker.startWorker(
-                workers.devtoolsWebSocketUrl,
-                workers.webSocketUrl,
-                connectionId,
-                measure,
-                attachedToPageTimeout,
-                measureNode,
-                inspectSharedProcess,
-                inspectExtensions,
-                inspectIntegratedBrowser,
-                inspectPtyHost,
-                inspectPtyHostPort,
-                inspectSharedProcessPort,
-                inspectExtensionsPort,
-                workers.pid,
-                integratedBrowserExcludedTargetIds,
-              )
+            if (inspectIntegratedBrowser || inspectProcess) {
+              if (inspectProcess) {
+                workers.memoryRpc = await MemoryLeakWorker.startWorker(
+                  workers.devtoolsWebSocketUrl,
+                  workers.webSocketUrl,
+                  connectionId,
+                  measure,
+                  attachedToPageTimeout,
+                  measureNode,
+                  inspectSharedProcess,
+                  inspectExtensions,
+                  inspectIntegratedBrowser,
+                  inspectPtyHost,
+                  inspectPtyHostPort,
+                  inspectSharedProcessPort,
+                  inspectExtensionsPort,
+                  workers.pid,
+                  integratedBrowserExcludedTargetIds,
+                  inspectProcess,
+                  testWorkerRpc,
+                )
+              } else {
+                workers.memoryRpc = await MemoryLeakWorker.startWorker(
+                  workers.devtoolsWebSocketUrl,
+                  workers.webSocketUrl,
+                  connectionId,
+                  measure,
+                  attachedToPageTimeout,
+                  measureNode,
+                  inspectSharedProcess,
+                  inspectExtensions,
+                  inspectIntegratedBrowser,
+                  inspectPtyHost,
+                  inspectPtyHostPort,
+                  inspectSharedProcessPort,
+                  inspectExtensionsPort,
+                  workers.pid,
+                  integratedBrowserExcludedTargetIds,
+                )
+              }
             }
             const memoryRpc = workers.memoryRpc
             await MemoryLeakFinder.start(memoryRpc, connectionId)
@@ -414,6 +444,8 @@ export const runTestsWithCallback = async ({
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'pty-host', measure, fileName)
             } else if (inspectIntegratedBrowser) {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'integrated-browser', measure, fileName)
+            } else if (inspectProcess) {
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'process', getProcessResultFolder(inspectProcess), measure, fileName)
             } else {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             }

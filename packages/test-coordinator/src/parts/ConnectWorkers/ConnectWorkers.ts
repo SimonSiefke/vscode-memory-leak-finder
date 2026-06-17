@@ -26,6 +26,7 @@ export const connectWorkers = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectIntegratedBrowser: boolean,
+  inspectProcess = '',
   inspectPtyHost: boolean,
   enableExtensions: boolean,
   inspectPtyHostPort: number,
@@ -67,7 +68,7 @@ export const connectWorkers = async (
   )
   const [videoRpc, testWorkerRpc] = await Promise.all(promises)
 
-  const memoryRpc = inspectIntegratedBrowser
+  const memoryRpc = inspectIntegratedBrowser || inspectProcess
     ? emptyRpc
     : await MemoryLeakWorker.startWorker(
         devtoolsWebSocketUrl,

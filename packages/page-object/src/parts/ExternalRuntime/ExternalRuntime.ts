@@ -76,16 +76,29 @@ interface SetupFile {
 }
 
 export interface ExternalRuntimeHandle {
+  readonly args: readonly string[]
+  readonly command: string
   readonly inspectPort: number
+  readonly pid: number
   readonly runtimeName: RuntimeName
   readonly serverPort: number
   dispose(): Promise<void>
   evaluate(expression: string): Promise<unknown>
   getJson<T>(path: string, init?: RequestInit): Promise<T>
+  getRuntimeInfo(): ExternalRuntimeInfo
   getRuntimeName(): Promise<RuntimeName>
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: string, init?: RequestInit): Promise<Response>
   takeSnapshot(name: string): Promise<string>
+}
+
+export interface ExternalRuntimeInfo {
+  readonly args: readonly string[]
+  readonly command: string
+  readonly inspectPort: number
+  readonly pid: number
+  readonly runtimeName: RuntimeName
+  readonly serverPort: number
 }
 
 const workspacePath = join(Root.root, '.vscode-test-workspace')
@@ -737,7 +750,10 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
       }
 
       activeRuntime = {
+        args: launch.args,
+        command: launch.command,
         inspectPort,
+        pid: childProcess.pid ?? 0,
         runtimeName,
         serverPort,
         async dispose() {
@@ -787,6 +803,16 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
         async getRuntimeName() {
           return runtimeName
         },
+        getRuntimeInfo() {
+          return {
+            args: launch.args,
+            command: launch.command,
+            inspectPort,
+            pid: childProcess.pid ?? 0,
+            runtimeName,
+            serverPort,
+          }
+        },
         request(path: string, init: RequestInit = {}) {
           const url = new URL(path, `http://127.0.0.1:${serverPort}`)
           return fetch(url, init)
@@ -820,6 +846,9 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
     },
     getJson<T>(path: string, init?: RequestInit): Promise<T> {
       return getActiveRuntime().getJson<T>(path, init)
+    },
+    getRuntimeInfo(): ExternalRuntimeInfo {
+      return getActiveRuntime().getRuntimeInfo()
     },
     getRuntimeName(): Promise<RuntimeName> {
       return getActiveRuntime().getRuntimeName()

@@ -29,6 +29,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
   readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -71,6 +72,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectExtensions,
     inspectExtensionsPort,
     inspectIntegratedBrowser,
+    inspectProcess = '',
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,
@@ -166,6 +168,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     inspectSharedProcess,
     inspectExtensions,
     inspectIntegratedBrowser,
+    inspectProcess,
     inspectPtyHost,
     enableExtensions,
     inspectPtyHostPort,

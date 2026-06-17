@@ -19,6 +19,9 @@ export const connectDevtools = async (
   inspectExtensionsPort: number,
   pid: number,
   excludedTargetIds: readonly string[] = [],
+  inspectExternalRuntime = false,
+  externalRuntimeInspectPort = 0,
+  externalRuntimeName = '',
 ): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
   Assert.string(electronWebSocketUrl)
@@ -39,6 +42,9 @@ export const connectDevtools = async (
     inspectSharedProcessPort,
     inspectExtensionsPort,
     excludedTargetIds,
+    inspectExternalRuntime,
+    externalRuntimeInspectPort,
+    externalRuntimeName,
   )
 
   const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid)

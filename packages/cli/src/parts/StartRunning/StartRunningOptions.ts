@@ -21,6 +21,7 @@ export interface StartRunningOptions {
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
   readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean

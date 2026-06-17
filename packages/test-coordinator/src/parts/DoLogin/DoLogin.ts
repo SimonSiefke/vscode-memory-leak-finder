@@ -22,6 +22,7 @@ export interface LoginOptions {
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
   readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -64,6 +65,7 @@ export const doLogin = async ({
   inspectExtensions,
   inspectExtensionsPort,
   inspectIntegratedBrowser,
+  inspectProcess = '',
   inspectPtyHost,
   inspectPtyHostPort,
   inspectSharedProcess,
@@ -105,6 +107,7 @@ export const doLogin = async ({
       inspectExtensions,
       inspectExtensionsPort,
       inspectIntegratedBrowser,
+      inspectProcess,
       inspectPtyHost,
       inspectPtyHostPort,
       inspectSharedProcess,
