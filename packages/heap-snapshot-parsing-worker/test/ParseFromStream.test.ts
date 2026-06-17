@@ -37,7 +37,7 @@ test('parseFromStream - reproduces string parsing issue with multiple chunks', a
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
     validate: false,
-  } as any)
+  })
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
@@ -92,7 +92,7 @@ test('parseFromStream - reproduces issue with locations array ending in middle o
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
     validate: false,
-  } as any)
+  })
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
@@ -148,7 +148,7 @@ test('parseFromStream - reproduces actual heap snapshot format issue', async () 
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
     validate: false,
-  } as any)
+  })
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
@@ -210,7 +210,7 @@ test('parseFromStream - reproduces issue with multiple opening brackets before s
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
     validate: false,
-  } as any)
+  })
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
