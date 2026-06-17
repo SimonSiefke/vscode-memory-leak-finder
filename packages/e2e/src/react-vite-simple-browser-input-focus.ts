@@ -6,10 +6,14 @@ export const skip = true
 export const requiresNetwork = true
 
 const browserUrlPattern = /^http:\/\/127\.0\.0\.1:\d+\//
-const inputText = 'undo stack smoke value'
-const inputCount = 32
+const inputText = 'undo stack repro value'
+const inputsPerRun = 4
 
 let testUrl = ''
+
+const getStatusText = (createdInputCount: number): string => {
+  return `Created inputs: ${createdInputCount}; Active inputs: 0`
+}
 
 const getIndexHtml = (): string => {
   return `<!doctype html>
@@ -28,86 +32,89 @@ const getIndexHtml = (): string => {
 }
 
 const getAppSource = (): string => {
-  return `const inputCount = ${inputCount}
-
-export const InputFocusSmoke = ({ React }) => {
-  const [isInputMounted, setIsInputMounted] = React.useState(true)
-  const [generation, setGeneration] = React.useState(0)
-  const [values, setValues] = React.useState(() => Array.from({ length: inputCount }, () => ''))
-  const toggleInput = () => {
-    setIsInputMounted((isMounted) => {
-      const nextMounted = !isMounted
-      if (nextMounted) {
-        setGeneration((value) => value + 1)
-        setValues(Array.from({ length: inputCount }, () => ''))
-      }
-      return nextMounted
+  return `export const InputFocusSmoke = ({ React }) => {
+  const [activeInputId, setActiveInputId] = React.useState(null)
+  const [createdInputCount, setCreatedInputCount] = React.useState(0)
+  const [value, setValue] = React.useState('')
+  const createInput = () => {
+    setValue('')
+    setCreatedInputCount((count) => {
+      setActiveInputId(count)
+      return count + 1
     })
   }
-  const inputs = Array.from({ length: inputCount }, (_, index) => {
-    function retainedInputChangeHandler(event) {
-      const nextValue = event.target.value
-      setValues((currentValues) => currentValues.map((value, valueIndex) => (valueIndex === index ? nextValue : value)))
-    }
+  const removeInput = () => {
+    setActiveInputId(null)
+    setValue('')
+  }
+  const isInputMounted = activeInputId !== null
 
-    function retainedInputFocusHandler() {
-      window.__lastFocusedLeakyInput = index
-    }
+  function retainedInputChangeHandler(event) {
+    const nextValue = event.target.value
+    window.__lastChangedLeakyInput = activeInputId
+    setValue(nextValue)
+  }
 
-    return React.createElement(
-      'label',
-      {
-        className: 'input-row',
-        htmlFor: 'leaky-input-' + index,
-        key: generation + '-' + index,
-      },
-      'Leaky input ' + (index + 1),
-      React.createElement('input', {
-        id: 'leaky-input-' + index,
-        onChange: retainedInputChangeHandler,
-        onFocus: retainedInputFocusHandler,
-        type: 'text',
-        value: values[index],
-      }),
-    )
-  })
+  function retainedInputFocusHandler() {
+    window.__lastFocusedLeakyInput = activeInputId
+  }
 
   return React.createElement(
     'main',
     undefined,
     React.createElement('h1', undefined, 'Input Focus Fixture'),
-    isInputMounted
-      ? React.createElement(
-          'section',
-          {
-            'aria-label': 'Leaky inputs',
-            id: 'leaky-inputs',
-          },
-          inputs,
-        )
-      : null,
     React.createElement(
       'button',
       {
-        id: 'toggle-input',
+        id: 'create-input',
         type: 'button',
-        onClick: toggleInput,
+        onClick: createInput,
       },
-      isInputMounted ? 'Unmount input' : 'Mount input',
+      'Create input',
     ),
+    isInputMounted
+      ? React.createElement(
+          'label',
+          {
+            className: 'input-row',
+            htmlFor: 'leaky-input',
+            key: 'leaky-input-' + activeInputId,
+          },
+          'Leaky input ' + activeInputId,
+          React.createElement('input', {
+            'data-created-input-id': String(activeInputId),
+            id: 'leaky-input',
+            onChange: retainedInputChangeHandler,
+            onFocus: retainedInputFocusHandler,
+            type: 'text',
+            value,
+          }),
+        )
+      : null,
+    isInputMounted
+      ? React.createElement(
+          'button',
+          {
+            id: 'remove-input',
+            type: 'button',
+            onClick: removeInput,
+          },
+          'Remove input',
+        )
+      : null,
     React.createElement(
       'p',
       {
         id: 'input-status',
       },
-      isInputMounted ? 'Inputs mounted: ' + inputCount : 'Inputs unmounted',
+      'Created inputs: ' + createdInputCount + '; Active inputs: ' + (isInputMounted ? 1 : 0),
     ),
     React.createElement(
       'p',
       {
         id: 'input-value',
       },
-      'Filled input count: ' + values.filter(Boolean).length,
+      'Input value: ' + value,
     ),
   )
 }
@@ -147,111 +154,97 @@ p {
   margin: 0;
 }
 
-label {
-  display: grid;
-  gap: 8px;
-  max-width: 320px;
-}
-
-section {
-  display: grid;
-  gap: 8px;
-}
-
 button {
   width: fit-content;
 }
 
 .input-row {
   display: grid;
-  gap: 4px;
+  gap: 8px;
+  max-width: 320px;
 }
 `
 }
 
-const assertInputMounted = async (SimpleBrowser: TestContext['SimpleBrowser']): Promise<void> => {
+const assertNoInputMounted = async (SimpleBrowser: TestContext['SimpleBrowser'], createdInputCount: number): Promise<void> => {
   await SimpleBrowser.executeJavaScript({
     expression: `(() => {
-  const inputs = document.querySelectorAll('input[id^="leaky-input-"]')
-  if (inputs.length !== ${inputCount}) {
-    throw new Error('Expected ${inputCount} leaky inputs to be mounted, found ' + inputs.length)
+  const input = document.querySelector('#leaky-input')
+  if (input) {
+    throw new Error('Expected no active leaky input')
   }
 })()`,
   })
   await SimpleBrowser.shouldHaveText({
     selector: '#input-status',
-    text: `Inputs mounted: ${inputCount}`,
+    text: getStatusText(createdInputCount),
     urlPattern: browserUrlPattern,
   })
 }
 
-const focusAndTypeIntoInputs = async (SimpleBrowser: TestContext['SimpleBrowser']): Promise<void> => {
+const createInput = async (SimpleBrowser: TestContext['SimpleBrowser']): Promise<void> => {
   await SimpleBrowser.executeJavaScript({
     expression: `(async () => {
-  const inputs = Array.from(document.querySelectorAll('input[id^="leaky-input-"]'))
-  if (inputs.length !== ${inputCount}) {
-    throw new Error('Expected ${inputCount} leaky inputs, found ' + inputs.length)
+  const button = document.querySelector('#create-input')
+  if (!(button instanceof HTMLButtonElement)) {
+    throw new Error('Expected create input button')
   }
-  for (let index = 0; index < inputs.length; index++) {
-    const input = inputs[index]
-    if (!(input instanceof HTMLInputElement)) {
-      throw new Error('Expected leaky input at index ' + index)
-    }
-    const text = ${JSON.stringify(inputText)} + ' ' + index
-    input.focus()
-    input.select()
-    const inserted = document.execCommand('insertText', false, text)
-    if (!inserted || input.value !== text) {
-      const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
-      if (!valueSetter) {
-        throw new Error('Expected input value setter')
-      }
-      valueSetter.call(input, text)
-      input.dispatchEvent(new InputEvent('input', { bubbles: true, data: text, inputType: 'insertText' }))
-    }
-    if (document.activeElement !== input) {
-      throw new Error('Expected leaky input ' + index + ' to be focused')
+  button.click()
+  for (let attempt = 0; attempt < 60; attempt++) {
+    const input = document.querySelector('#leaky-input')
+    if (input instanceof HTMLInputElement) {
+      return Number(input.dataset.createdInputId)
     }
     await new Promise((resolve) => requestAnimationFrame(resolve))
   }
-})()`,
-  })
-  await SimpleBrowser.shouldHaveText({
-    selector: '#input-value',
-    text: `Filled input count: ${inputCount}`,
-    urlPattern: browserUrlPattern,
-  })
-}
-
-const clickToggleInputButton = async (SimpleBrowser: TestContext['SimpleBrowser']): Promise<void> => {
-  await SimpleBrowser.executeJavaScript({
-    expression: `(() => {
-  const button = document.querySelector('#toggle-input')
-  if (!(button instanceof HTMLButtonElement)) {
-    throw new Error('Expected toggle input button')
-  }
-  button.click()
+  throw new Error('Expected leaky input to be mounted')
 })()`,
   })
 }
 
-const assertInputUnmounted = async (SimpleBrowser: TestContext['SimpleBrowser']): Promise<void> => {
+const focusTypeAndRemoveInput = async (SimpleBrowser: TestContext['SimpleBrowser']): Promise<void> => {
   await SimpleBrowser.executeJavaScript({
     expression: `(async () => {
+  const input = document.querySelector('#leaky-input')
+  if (!(input instanceof HTMLInputElement)) {
+    throw new Error('Expected leaky input')
+  }
+  const inputId = input.dataset.createdInputId || 'unknown'
+  const text = ${JSON.stringify(inputText)} + ' ' + inputId
+  input.focus()
+  input.select()
+  const inserted = document.execCommand('insertText', false, text)
+  if (!inserted || input.value !== text) {
+    const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+    if (!valueSetter) {
+      throw new Error('Expected input value setter')
+    }
+    valueSetter.call(input, text)
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, data: text, inputType: 'insertText' }))
+  }
+  if (document.activeElement !== input) {
+    throw new Error('Expected leaky input to be focused')
+  }
+  await new Promise((resolve) => requestAnimationFrame(resolve))
+  const removeButton = document.querySelector('#remove-input')
+  if (!(removeButton instanceof HTMLButtonElement)) {
+    throw new Error('Expected remove input button')
+  }
+  removeButton.click()
   for (let attempt = 0; attempt < 60; attempt++) {
-    if (!document.querySelector('input[id^="leaky-input-"]')) {
+    if (!document.querySelector('#leaky-input')) {
       return
     }
     await new Promise((resolve) => requestAnimationFrame(resolve))
   }
-  throw new Error('Expected leaky inputs to be unmounted')
+  throw new Error('Expected leaky input to be unmounted')
 })()`,
   })
-  await SimpleBrowser.shouldHaveText({
-    selector: '#input-status',
-    text: 'Inputs unmounted',
-    urlPattern: browserUrlPattern,
-  })
+}
+
+const createFocusTypeAndRemoveInput = async (SimpleBrowser: TestContext['SimpleBrowser']): Promise<void> => {
+  await createInput(SimpleBrowser)
+  await focusTypeAndRemoveInput(SimpleBrowser)
 }
 
 export const setup = async ({ Editor, Explorer, ExternalRuntime, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
@@ -325,15 +318,16 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, SimpleBrowser, 
   await SimpleBrowser.show({
     url: testUrl,
   })
-  await assertInputMounted(SimpleBrowser)
+  await assertNoInputMounted(SimpleBrowser, 0)
 }
 
 export const run = async ({ ExternalRuntime, SimpleBrowser }: TestContext): Promise<void> => {
-  await focusAndTypeIntoInputs(SimpleBrowser)
-  await clickToggleInputButton(SimpleBrowser)
-  await assertInputUnmounted(SimpleBrowser)
-  await clickToggleInputButton(SimpleBrowser)
-  await assertInputMounted(SimpleBrowser)
+  const response = await ExternalRuntime.request('/health.txt')
+  assert.strictEqual(response.ok, true)
+
+  for (let i = 0; i < inputsPerRun; i++) {
+    await createFocusTypeAndRemoveInput(SimpleBrowser)
+  }
 }
 
 export const teardown = async ({ Editor, ExternalRuntime, Workspace }: TestContext): Promise<void> => {
