@@ -70,7 +70,7 @@ export interface ChatEditor {
   setMode(modeLabel: any): Promise<void>
   setModeLegacy(modeLabel: any): Promise<void>
   retryLastMessage(): Promise<void>
-  clickAccessButton(buttonText?: any): Promise<void>
+  clickAccessButton(buttonText?: any, timeout?: any): Promise<void>
   approveAllAccessRequests(options?: any): Promise<void>
   waitForLatestExchange(message: any): Promise<void>
   waitForNewWindow(options: any, electron: any): Promise<number>
@@ -781,11 +781,7 @@ export interface Terminal {
   scrollToBottom(): Promise<void>
   scrollToTop(): Promise<void>
   setFindInput(value: any): Promise<void>
-<<<<<<< HEAD
-  shouldContainText(text: any, timeout?: any): Promise<void>
-=======
   shouldHaveIncompleteDecoration(enabled: any): Promise<void>
->>>>>>> origin/main
   shouldHaveSuccessDecoration(): Promise<void>
   shouldContainText(text: any, timeout?: any): Promise<void>
   show(options?: any): Promise<void>

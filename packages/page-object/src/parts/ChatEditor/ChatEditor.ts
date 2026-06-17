@@ -311,13 +311,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     const response = await getLatestResponseContent(chatView)
     await expect(response).toBeVisible({ timeout: 60_000 })
     await page.waitForIdle()
-<<<<<<< HEAD
-=======
     await waitForToolApprovalToFinish(chatView, response)
     await page.waitForIdle()
     await expect(response).toBeVisible({ timeout: 30_000 })
     await page.waitForIdle()
->>>>>>> origin/main
     const requestBox = await requestMessage.boundingBox()
     const responseBox = await response.boundingBox()
     if (!requestBox || !responseBox) {
@@ -1040,9 +1037,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
       }
     },
-<<<<<<< HEAD
-    async clickAccessButton(buttonText: string = 'Allow', timeout = 0) {
-=======
     async retryLastMessage() {
       try {
         const chatView = page.locator('.interactive-session')
@@ -1069,17 +1063,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to retry last chat message`)
       }
     },
-    async clickAccessButton(buttonText: string = 'Allow') {
->>>>>>> origin/main
+    async clickAccessButton(buttonText: string = 'Allow', timeout = 0) {
       try {
-<<<<<<< Updated upstream
         const accessButton = getAccessButtons(page, buttonText)
-        const buttonCount = await accessButton.count()
-=======
-        const accessButton = page.locator(
-          '.interactive-session [role="button"], .interactive-session button, .interactive-session .monaco-button',
-          { hasText: buttonText },
-        )
         if (timeout > 0) {
           try {
             await expect(accessButton.first()).toBeVisible({ timeout })
@@ -1089,7 +1075,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           } catch (error) {
             const availableButtons = await page.evaluate({
               expression: `(() => {
-  const elements = Array.from(document.querySelectorAll('.interactive-session [role="button"], .interactive-session button, .interactive-session .monaco-button, .interactive-session input[type="button"], .interactive-session input[type="submit"]'))
+  const elements = Array.from(document.querySelectorAll('button, [role="button"], .action-label'))
   return elements
     .map((element) => {
       const text = (element.textContent || element.getAttribute('value') || '').trim().replace(/\s+/g, ' ')
@@ -1104,7 +1090,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             throw new Error(`Access button "${buttonText}" was not visible within ${timeout}ms. Available interactive-session buttons: ${availableButtonsText}`)
           }
         }
->>>>>>> Stashed changes
 
         const buttonCount = await accessButton.count()
         if (buttonCount > 0) {
