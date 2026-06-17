@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetMeasure from '../GetMeasure/GetMeasure.ts'
 import * as LoadMemoryLeakFinder from '../LoadMemoryLeakFinder/LoadMemoryLeakFinder.ts'
-
-export const getCombinedMeasure = async (session: Session, measureId: string, connectionId: number, pid: number): Promise<any> => {
+export const getCombinedMeasure = async (session: Session, measureId: string, connectionId: number, pid: number): Promise<Dynamic> => {
   Assert.object(session)
   Assert.string(measureId)
   const MemoryLeakFinder = LoadMemoryLeakFinder.loadMemoryLeakFinder()

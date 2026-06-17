@@ -1,7 +1,7 @@
+import JSZip from 'jszip'
 import { randomBytes } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import JSZip from 'jszip'
 import type { BotEnv } from '../Env/Env.ts'
 
 export interface UserDataSnapshotMetadata {
@@ -159,16 +159,16 @@ export const getUserDataDownloadInfo = async (
       throw new Error('BOT_USER_DATA_UPLOAD_TOKEN must be configured before starting measure workflows with private R2 snapshots')
     }
     return {
+      downloadAllMockDataZipFileUrl: getAllMockDataDownloadUrl(env.publicBaseUrl),
       downloadUserDataZipFileToken: env.userDataUploadToken,
       downloadUserDataZipFileUrl: '',
-      downloadAllMockDataZipFileUrl: getAllMockDataDownloadUrl(env.publicBaseUrl),
     }
   }
   if (env.userDataSnapshotUrl) {
     return {
+      downloadAllMockDataZipFileUrl: '',
       downloadUserDataZipFileToken: env.userDataSnapshotToken,
       downloadUserDataZipFileUrl: env.userDataSnapshotUrl,
-      downloadAllMockDataZipFileUrl: '',
     }
   }
   if (!env.publicBaseUrl) {
@@ -180,8 +180,8 @@ export const getUserDataDownloadInfo = async (
     throw new Error(userDataSnapshotUnavailableMessage)
   }
   return {
+    downloadAllMockDataZipFileUrl: '',
     downloadUserDataZipFileToken: metadata.downloadToken,
     downloadUserDataZipFileUrl: getUserDataDownloadUrl(env.publicBaseUrl),
-    downloadAllMockDataZipFileUrl: '',
   }
 }

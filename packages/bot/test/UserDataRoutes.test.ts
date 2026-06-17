@@ -1,10 +1,10 @@
-import { mkdtemp, rm } from 'node:fs/promises'
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
-import { AddressInfo } from 'node:net'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import type { AddressInfo } from 'node:net'
 import { afterEach, expect, jest, test } from '@jest/globals'
 import JSZip from 'jszip'
+import { mkdtemp, rm } from 'node:fs/promises'
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { createNodeMiddleware, Probot } from 'probot'
 import { createApp } from '../src/parts/App/App.ts'
 import { readUserDataSnapshotMetadata } from '../src/parts/UserDataSnapshot/UserDataSnapshot.ts'
@@ -35,12 +35,12 @@ const createZip = async (): Promise<Buffer> => {
 const createTestServer = async (storagePath: string, publicBaseUrl = ''): Promise<TestServer> => {
   const middleware = await createNodeMiddleware(
     createApp({
+      allMockDataR2ObjectKey: 'all-mock-data.zip',
       allowedLogins: ['SimonSiefke'],
       publicBaseUrl,
       userDataR2AccessKeyId: '',
       userDataR2AccountId: '',
       userDataR2Bucket: '',
-      allMockDataR2ObjectKey: 'all-mock-data.zip',
       userDataR2ObjectKey: '.vscode-user-data-dir.zip',
       userDataR2SecretAccessKey: '',
       userDataSnapshotToken: '',
@@ -84,12 +84,12 @@ test('upload route stores snapshot and download route returns it', async () => {
 
   try {
     const uploadResponse = await fetch(`${server.url}/api/user-data/upload`, {
-      method: 'POST',
+      body: zip,
       headers: {
         authorization: 'Bearer shared-upload-token',
         'content-type': 'application/zip',
       },
-      body: zip,
+      method: 'POST',
     })
     expect(uploadResponse.status).toBe(201)
     const uploadResult = (await uploadResponse.json()) as {
@@ -123,12 +123,12 @@ test('upload route returns the configured public base url for download links', a
 
   try {
     const uploadResponse = await fetch(`${server.url}/api/user-data/upload`, {
-      method: 'POST',
+      body: zip,
       headers: {
         authorization: 'Bearer shared-upload-token',
         'content-type': 'application/zip',
       },
-      body: zip,
+      method: 'POST',
     })
     expect(uploadResponse.status).toBe(201)
     const uploadResult = (await uploadResponse.json()) as {
@@ -149,12 +149,12 @@ test('upload route rejects invalid credentials', async () => {
 
   try {
     const invalidTokenResponse = await fetch(`${server.url}/api/user-data/upload`, {
-      method: 'POST',
+      body: zip,
       headers: {
         authorization: 'Bearer invalid-token',
         'content-type': 'application/zip',
       },
-      body: zip,
+      method: 'POST',
     })
     expect(invalidTokenResponse.status).toBe(401)
   } finally {
@@ -166,12 +166,12 @@ test('upload route returns service unavailable when upload token is not configur
   const storagePath = await mkdtemp(join(tmpdir(), 'bot-user-data-'))
   const middleware = await createNodeMiddleware(
     createApp({
+      allMockDataR2ObjectKey: 'all-mock-data.zip',
       allowedLogins: ['SimonSiefke'],
       publicBaseUrl: '',
       userDataR2AccessKeyId: '',
       userDataR2AccountId: '',
       userDataR2Bucket: '',
-      allMockDataR2ObjectKey: 'all-mock-data.zip',
       userDataR2ObjectKey: '.vscode-user-data-dir.zip',
       userDataR2SecretAccessKey: '',
       userDataSnapshotToken: '',
@@ -209,12 +209,12 @@ test('upload route returns service unavailable when upload token is not configur
 
   try {
     const uploadResponse = await fetch(`${testServer.url}/api/user-data/upload`, {
-      method: 'POST',
+      body: zip,
       headers: {
         authorization: 'Bearer anything',
         'content-type': 'application/zip',
       },
-      body: zip,
+      method: 'POST',
     })
     expect(uploadResponse.status).toBe(503)
   } finally {
@@ -229,12 +229,12 @@ test('download route rejects invalid bearer token', async () => {
 
   try {
     const uploadResponse = await fetch(`${server.url}/api/user-data/upload`, {
-      method: 'POST',
+      body: zip,
       headers: {
         authorization: 'Bearer shared-upload-token',
         'content-type': 'application/zip',
       },
-      body: zip,
+      method: 'POST',
     })
     expect(uploadResponse.status).toBe(201)
 
@@ -256,12 +256,12 @@ test('download route accepts the shared upload token', async () => {
 
   try {
     const uploadResponse = await fetch(`${server.url}/api/user-data/upload`, {
-      method: 'POST',
+      body: zip,
       headers: {
         authorization: 'Bearer shared-upload-token',
         'content-type': 'application/zip',
       },
-      body: zip,
+      method: 'POST',
     })
     expect(uploadResponse.status).toBe(201)
 
@@ -293,23 +293,23 @@ test('download route proxies a private R2 snapshot using the shared upload token
       seenAmzDate = headers.get('x-amz-date') || ''
       seenContentSha = headers.get('x-amz-content-sha256') || ''
       return new Response(zip, {
-        status: 200,
         headers: {
           'content-type': 'application/zip',
         },
+        status: 200,
       })
     }
     return originalFetch(input, init)
-  }) as typeof fetch
+  })
 
   const middleware = await createNodeMiddleware(
     createApp({
+      allMockDataR2ObjectKey: 'all-mock-data.zip',
       allowedLogins: ['SimonSiefke'],
       publicBaseUrl: 'https://bot.example.com',
       userDataR2AccessKeyId: 'ACCESSKEY123',
       userDataR2AccountId: 'cloudflare-account-id',
       userDataR2Bucket: 'vscode-memory-leak-finder',
-      allMockDataR2ObjectKey: 'all-mock-data.zip',
       userDataR2ObjectKey: '.vscode-user-data-dir.zip',
       userDataR2SecretAccessKey: 'SECRETKEY123',
       userDataSnapshotToken: '',

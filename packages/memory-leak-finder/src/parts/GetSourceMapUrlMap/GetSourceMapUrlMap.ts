@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
-
-const getUniqueInputs = (inputs) => {
+const getUniqueInputs = (inputs: Dynamic) => {
   const seen = Object.create(null)
-  const result: any[] = []
+  const result: Dynamic[] = []
   for (const input of inputs) {
     const { column, line, sourceMapUrl } = input
     const key = FormatUrl.formatUrl(sourceMapUrl, line, column)
@@ -15,8 +15,7 @@ const getUniqueInputs = (inputs) => {
   }
   return result
 }
-
-export const getSourceMapUrlMap = (eventListeners) => {
+export const getSourceMapUrlMap = (eventListeners: Dynamic) => {
   const map = Object.create(null)
   const inputs = eventListeners.map(GetSourceMapUrl.getSourceMapUrl)
   const uniqueInputs = getUniqueInputs(inputs)

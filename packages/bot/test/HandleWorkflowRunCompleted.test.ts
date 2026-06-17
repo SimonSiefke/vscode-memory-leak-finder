@@ -1,6 +1,6 @@
 import { expect, jest, test } from '@jest/globals'
-import { handleWorkflowRunCompleted } from '../src/parts/HandleWorkflowRunCompleted/HandleWorkflowRunCompleted.ts'
 import type { MeasureWorkflowSummary } from '../src/parts/MeasureWorkflowSummary/MeasureWorkflowSummary.ts'
+import { handleWorkflowRunCompleted } from '../src/parts/HandleWorkflowRunCompleted/HandleWorkflowRunCompleted.ts'
 
 type UpdateCommentCall = {
   readonly body: string

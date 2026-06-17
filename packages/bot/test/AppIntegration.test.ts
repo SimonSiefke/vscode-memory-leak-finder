@@ -1,15 +1,15 @@
-import { createHmac } from 'node:crypto'
-import { mkdtemp, rm } from 'node:fs/promises'
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
-import { AddressInfo } from 'node:net'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import type { AddressInfo } from 'node:net'
 import { afterEach, beforeEach, expect, test } from '@jest/globals'
 import JSZip from 'jszip'
 import nock from 'nock'
+import { createHmac } from 'node:crypto'
+import { mkdtemp, rm } from 'node:fs/promises'
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { createNodeMiddleware, Probot } from 'probot'
-import { createApp } from '../src/parts/App/App.ts'
 import type { BotEnv } from '../src/parts/Env/Env.ts'
+import { createApp } from '../src/parts/App/App.ts'
 import { handleIssueComment } from '../src/parts/HandleIssueComment/HandleIssueComment.ts'
 import { saveUserDataSnapshot } from '../src/parts/UserDataSnapshot/UserDataSnapshot.ts'
 
@@ -52,12 +52,12 @@ type TestServer = {
 const createTestServer = async (envOverrides: Partial<BotEnv> = {}): Promise<TestServer> => {
   const middleware = await createNodeMiddleware(
     createApp({
+      allMockDataR2ObjectKey: 'all-mock-data.zip',
       allowedLogins: ['SimonSiefke'],
       publicBaseUrl: '',
       userDataR2AccessKeyId: '',
       userDataR2AccountId: '',
       userDataR2Bucket: '',
-      allMockDataR2ObjectKey: 'all-mock-data.zip',
       userDataR2ObjectKey: '.vscode-user-data-dir.zip',
       userDataR2SecretAccessKey: '',
       userDataSnapshotToken: '',
@@ -115,14 +115,14 @@ const signPayload = (payload: string): string => {
 const sendWebhook = async (url: string, eventName: string, payload: object): Promise<Response> => {
   const body = JSON.stringify(payload)
   return fetch(`${url}/api/github/webhooks`, {
-    method: 'POST',
+    body,
     headers: {
       'content-type': 'application/json',
       'x-github-delivery': 'test-delivery-id',
       'x-github-event': eventName,
       'x-hub-signature-256': signPayload(body),
     },
-    body,
+    method: 'POST',
   })
 }
 
@@ -179,12 +179,12 @@ const createPullRequestSynchronizePayload = () => {
       },
       head: {
         ref: 'feature/bot',
-        sha: 'abcdefabcdefabcdefabcdefabcdefabcdefabcd',
         repo: {
           owner: {
             login: 'SimonSiefke',
           },
         },
+        sha: 'abcdefabcdefabcdefabcdefabcdefabcdefabcd',
       },
       html_url: 'https://github.com/SimonSiefke/vscode-memory-leak-finder/pull/2846',
       number: 2846,
@@ -388,9 +388,9 @@ test('app dispatches a workflow for valid run commands', async () => {
       base_commit: '0123456789abcdef0123456789abcdef01234567',
       candidate_ref: 'SimonSiefke/feature/bot',
       cli_args: '--measure named-function-count3 --only chat-editor-fix --inspect-extensions',
-      download_user_data_zip_file_url: 'https://bot.example.com/api/user-data/download',
-      download_user_data_zip_file_token: snapshot.downloadToken,
       download_all_mock_data_zip_file_url: '',
+      download_user_data_zip_file_token: snapshot.downloadToken,
+      download_user_data_zip_file_url: 'https://bot.example.com/api/user-data/download',
       measure: 'named-function-count3',
       only: 'chat-editor-fix',
       request_id: 'measure-run-2846-456',
@@ -415,11 +415,11 @@ test('app dispatches a workflow for valid run commands', async () => {
 
 test('app dispatches a workflow using an externally hosted user data snapshot', async () => {
   const server = await createTestServer({
+    allMockDataR2ObjectKey: 'all-mock-data.zip',
     publicBaseUrl: 'https://bot.example.com',
     userDataR2AccessKeyId: 'ACCESSKEY123',
     userDataR2AccountId: '1234567890abcdef1234567890abcdef',
     userDataR2Bucket: 'vscode-memory-leak-finder',
-    allMockDataR2ObjectKey: 'all-mock-data.zip',
     userDataR2ObjectKey: '.vscode-user-data-dir.zip',
     userDataR2SecretAccessKey: 'SECRETKEY123',
     userDataSnapshotToken: 'should-be-ignored',
@@ -504,11 +504,11 @@ test('app dispatches a workflow using an externally hosted user data snapshot', 
 
 test('app reruns the latest authorized measure command when a pull request branch is updated', async () => {
   const server = await createTestServer({
+    allMockDataR2ObjectKey: 'all-mock-data.zip',
     publicBaseUrl: 'https://bot.example.com',
     userDataR2AccessKeyId: 'ACCESSKEY123',
     userDataR2AccountId: '1234567890abcdef1234567890abcdef',
     userDataR2Bucket: 'vscode-memory-leak-finder',
-    allMockDataR2ObjectKey: 'all-mock-data.zip',
     userDataR2ObjectKey: '.vscode-user-data-dir.zip',
     userDataR2SecretAccessKey: 'SECRETKEY123',
     userDataSnapshotToken: 'should-be-ignored',
@@ -600,17 +600,17 @@ test('app reruns the latest authorized measure command when a pull request branc
 test('app posts a helpful error comment when no user data snapshot was uploaded yet', async () => {
   const storagePath = await mkdtemp(join(tmpdir(), 'bot-user-data-'))
   const env: BotEnv = {
+    allMockDataR2ObjectKey: 'all-mock-data.zip',
     allowedLogins: ['SimonSiefke'],
     publicBaseUrl: 'https://bot.example.com',
     userDataR2AccessKeyId: '',
     userDataR2AccountId: '',
     userDataR2Bucket: '',
-    allMockDataR2ObjectKey: 'all-mock-data.zip',
     userDataR2ObjectKey: '.vscode-user-data-dir.zip',
     userDataR2SecretAccessKey: '',
-    userDataStoragePath: storagePath,
     userDataSnapshotToken: '',
     userDataSnapshotUrl: '',
+    userDataStoragePath: storagePath,
     userDataUploadToken: 'shared-upload-token',
     workflowFileName: 'measure-on-demand.yml',
     workflowOwner: 'SimonSiefke',

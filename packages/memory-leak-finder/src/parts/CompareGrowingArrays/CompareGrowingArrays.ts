@@ -1,12 +1,11 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { launchHeapSnapshotWorker } from '../LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts'
-
-const getThreshold = (context: any): number => {
+const getThreshold = (context: Dynamic): number => {
   const defaultRuns = 2
   const threshold = context && Number.isFinite(context.runs) ? context.runs : defaultRuns
   return threshold
 }
-
-export const compareGrowingArrays = async (beforePath: string, afterPath: string, context: any): Promise<readonly any[]> => {
+export const compareGrowingArrays = async (beforePath: string, afterPath: string, context: Dynamic): Promise<readonly Dynamic[]> => {
   const threshold = getThreshold(context)
   const options = {
     excludeOriginalPaths: [

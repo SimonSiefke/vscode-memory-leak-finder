@@ -30,9 +30,9 @@ test('parseBotComment rejects unknown flags', () => {
   const result = parseBotComment('@vscode-memory-leak-finder run --measure named-function-count3 --only chat-editor-fix --bad-flag')
 
   expect(result).toEqual({
-    type: 'error',
     message:
       'Invalid command syntax. Unknown flag "--bad-flag". Supported flags: --measure <value>, --only <value>, --inspect-extensions, --inspect-shared-process, --inspect-ptyhost, --measure-node, --restart-between, --run-skipped-tests-anyway, --runs <value>, --process-root-strategy <value>.',
+    type: 'error',
   })
 })
 
@@ -40,9 +40,9 @@ test('parseBotComment rejects missing measure', () => {
   const result = parseBotComment('@vscode-memory-leak-finder-bot run --inspect-extensions')
 
   expect(result).toEqual({
-    type: 'error',
     message:
       'Invalid command syntax. Missing required flag "--measure". Supported flags: --measure <value>, --only <value>, --inspect-extensions, --inspect-shared-process, --inspect-ptyhost, --measure-node, --restart-between, --run-skipped-tests-anyway, --runs <value>, --process-root-strategy <value>.',
+    type: 'error',
   })
 })
 
@@ -50,9 +50,9 @@ test('parseBotComment rejects missing only', () => {
   const result = parseBotComment('@vscode-memory-leak-finder-bot run --measure named-function-count3 --inspect-extensions')
 
   expect(result).toEqual({
-    type: 'error',
     message:
       'Invalid command syntax. Missing required flag "--only". Supported flags: --measure <value>, --only <value>, --inspect-extensions, --inspect-shared-process, --inspect-ptyhost, --measure-node, --restart-between, --run-skipped-tests-anyway, --runs <value>, --process-root-strategy <value>.',
+    type: 'error',
   })
 })
 
