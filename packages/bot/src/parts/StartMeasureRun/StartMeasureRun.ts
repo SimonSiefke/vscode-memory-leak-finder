@@ -1,8 +1,8 @@
+import type { BotEnv } from '../Env/Env.ts'
+import type { ParsedBotComment } from '../ParseBotComment/ParseBotComment.ts'
 import { createCommentMarker } from '../CommentMarker/CommentMarker.ts'
 import { deriveMeasureRequest } from '../DeriveMeasureRequest/DeriveMeasureRequest.ts'
 import { dispatchMeasureWorkflow, type WorkflowDispatchOctokit } from '../DispatchMeasureWorkflow/DispatchMeasureWorkflow.ts'
-import type { BotEnv } from '../Env/Env.ts'
-import type { ParsedBotComment } from '../ParseBotComment/ParseBotComment.ts'
 import { renderStartedComment } from '../RenderStartedComment/RenderStartedComment.ts'
 import { userDataSnapshotUnavailableMessage } from '../UserDataSnapshot/UserDataSnapshot.ts'
 
@@ -76,19 +76,19 @@ export const startMeasureRun = async ({
   const { owner, repo } = sourceRepository
   const request = deriveMeasureRequest({
     actorLogin,
-    commentId: commandCommentId,
     command,
+    commentId: commandCommentId,
     issueNumber,
     pullRequest,
     sourceRepository,
-    ...(requestId ? { requestId } : {}),
+    ...(requestId && { requestId }),
   })
 
   const placeholderComment = await octokit.rest.issues.createComment({
+    body: 'Starting measure run...',
+    issue_number: issueNumber,
     owner,
     repo,
-    issue_number: issueNumber,
-    body: 'Starting measure run...',
   })
 
   const marker = createCommentMarker({
@@ -104,18 +104,18 @@ export const startMeasureRun = async ({
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     await octokit.rest.issues.updateComment({
+      body: renderWorkflowStartFailureComment(marker, errorMessage),
+      comment_id: placeholderComment.data.id,
       owner,
       repo,
-      comment_id: placeholderComment.data.id,
-      body: renderWorkflowStartFailureComment(marker, errorMessage),
     })
     return
   }
 
   await octokit.rest.issues.updateComment({
+    body: renderStartedComment(marker, request, workflowRunUrl, startedCommentIntro),
+    comment_id: placeholderComment.data.id,
     owner,
     repo,
-    comment_id: placeholderComment.data.id,
-    body: renderStartedComment(marker, request, workflowRunUrl, startedCommentIntro),
   })
 }

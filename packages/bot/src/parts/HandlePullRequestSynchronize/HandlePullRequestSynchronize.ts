@@ -1,5 +1,5 @@
-import { createRequestId } from '../CreateRequestId/CreateRequestId.ts'
 import type { BotEnv } from '../Env/Env.ts'
+import { createRequestId } from '../CreateRequestId/CreateRequestId.ts'
 import { isAuthorizedLogin } from '../IsAuthorizedLogin/IsAuthorizedLogin.ts'
 import { parseBotComment, type ParsedBotComment } from '../ParseBotComment/ParseBotComment.ts'
 import { startMeasureRun, type StartMeasureRunOctokit } from '../StartMeasureRun/StartMeasureRun.ts'
@@ -78,11 +78,11 @@ const listAllComments = async (
   const comments: IssueComment[] = []
   for (let page = 1; ; page++) {
     const response = await octokit.rest.issues.listComments({
-      owner,
-      repo,
       issue_number: issueNumber,
+      owner,
       page,
       per_page: 100,
+      repo,
     })
     comments.push(...response.data)
     if (response.data.length < 100) {
@@ -115,7 +115,7 @@ const getHeadOwnerLogin = (repo: unknown): string => {
   if (!repo || typeof repo !== 'object' || !('owner' in repo)) {
     return ''
   }
-  const owner = repo.owner
+  const { owner } = repo
   if (!owner || typeof owner !== 'object' || !('login' in owner) || typeof owner.login !== 'string') {
     return ''
   }
