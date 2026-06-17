@@ -2,7 +2,7 @@ import chalk from 'chalk'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 
 const watchUsage = chalk.bold('Watch Usage')
-const press = chalk.dim(' \u203A Press ')
+const press = chalk.dim(' \u{203A} Press ')
 const toRunAllTests = chalk.dim(' to run all tests.')
 const toRunOnlyFailedTests = chalk.dim(' to run only failed tests.')
 const toTriggerATestRun = chalk.dim(' to trigger a test run.')

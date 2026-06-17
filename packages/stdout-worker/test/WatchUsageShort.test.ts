@@ -3,6 +3,6 @@ import * as WatchUsageShort from '../src/parts/GetWatchUsageMessageShort/GetWatc
 
 test('print', () => {
   expect(WatchUsageShort.getWatchUsageMessageShort()).toBe(
-    `\n\u001B[1mWatch Usage: \u001B[22m\u001B[2mPress \u001B[22mw\u001B[2m to show more.\u001B[22m`,
+    `\n\u{1B}[1mWatch Usage: \u{1B}[22m\u{1B}[2mPress \u{1B}[22mw\u{1B}[2m to show more.\u{1B}[22m`,
   )
 })
