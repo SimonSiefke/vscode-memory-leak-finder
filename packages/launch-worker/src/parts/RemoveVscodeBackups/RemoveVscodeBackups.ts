@@ -1,9 +1,9 @@
 import { rm } from 'node:fs/promises'
 import { join } from 'node:path'
-import * as Root from '../Root/Root.ts'
+import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
 
-export const removeVscodeBackups = async () => {
-  const backupsPath = join(Root.root, '.vscode-user-data-dir', 'Backups')
+export const removeVscodeBackups = async (userDataDir = GetUserDataDir.getUserDataDir()) => {
+  const backupsPath = join(userDataDir, 'Backups')
   await rm(backupsPath, {
     force: true,
     recursive: true,

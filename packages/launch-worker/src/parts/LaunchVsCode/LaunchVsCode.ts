@@ -71,11 +71,12 @@ export const launchVsCode = async ({
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
-    await RemoveVscodeWorkspaceStorage.removeVsCodeWorkspaceStorage()
+    const userDataDir = GetUserDataDir.getUserDataDir(platform)
+    await RemoveVscodeWorkspaceStorage.removeVsCodeWorkspaceStorage(userDataDir)
     if (IsCi.isCi) {
-      await RemoveVscodeGlobalStorage.removeVsCodeGlobalStorage()
+      await RemoveVscodeGlobalStorage.removeVsCodeGlobalStorage(userDataDir)
     }
-    await RemoveVscodeBackups.removeVscodeBackups()
+    await RemoveVscodeBackups.removeVscodeBackups(userDataDir)
     const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
     if (runtimeDir) {
       await mkdir(runtimeDir, { recursive: true })
@@ -87,7 +88,6 @@ export const launchVsCode = async ({
     const sourcesDir = join(Root.root, '.vscode-sources')
     await mkdir(sourcesDir, { recursive: true })
     const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
-    const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
     if (clearExtensions) {
       await rm(extensionsDir, { force: true, recursive: true })
