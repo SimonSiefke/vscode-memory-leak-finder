@@ -2,6 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
 import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.ts'
+import type { HeapSnapshotInput } from '../Snapshot/Snapshot.ts'
 
 export interface ParsedNode {
   readonly edgeCount: number
@@ -90,12 +91,15 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (
   suspiciousPatterns: Record<string, unknown>
   detailedResults: readonly ChainAnalysisResult[]
 }> => {
-  const heapsnapshot = HeapSnapshotState.get(id)
+  const heapsnapshot = HeapSnapshotState.get<HeapSnapshotInput>(id)
   Assert.object(heapsnapshot)
 
   // Parse the heap snapshot to get both nodes and properly typed edges
   const { edges, nodes, snapshot, strings } = heapsnapshot
   const meta = snapshot?.meta ?? heapsnapshot.meta
+  if (!meta) {
+    throw new TypeError('no heap snapshot metadata found')
+  }
   const { edge_fields, edge_types, node_fields, node_types } = meta
 
   const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(

@@ -1,5 +1,5 @@
-type NodeTypes = [readonly string[]]
-type EdgeTypes = [readonly string[]]
+type NodeTypes = readonly (readonly string[])[]
+type EdgeTypes = readonly (readonly string[])[]
 export type HeapSnapshotValue = string | number
 export type HeapSnapshotRecord = Readonly<Record<string, HeapSnapshotValue>>
 export type NumberArray = ArrayLike<number>
@@ -25,7 +25,7 @@ export interface ParsedEdge extends HeapSnapshotRecord {
 
 export interface GraphEdge {
   readonly index: number
-  readonly name: string
+  readonly name: HeapSnapshotValue
 }
 
 export type HeapSnapshotGraph = Record<number, GraphEdge[]>
@@ -61,16 +61,13 @@ export interface SnapshotMetaData {
 }
 
 export interface Snapshot {
-  readonly edge_count?: number
-  readonly edges: NumberArray
-  readonly extra_native_bytes?: number
-  readonly locations: NumberArray
+  readonly edge_count: number
+  readonly edges: Uint32Array
+  readonly extra_native_bytes: number
+  readonly locations: Uint32Array
   readonly meta: SnapshotMetaData
-  readonly node_count?: number
-  readonly nodes: NumberArray
-  readonly snapshot?: {
-    readonly meta: SnapshotMetaData
-  }
+  readonly node_count: number
+  readonly nodes: Uint32Array
   readonly strings: readonly string[]
 }
 

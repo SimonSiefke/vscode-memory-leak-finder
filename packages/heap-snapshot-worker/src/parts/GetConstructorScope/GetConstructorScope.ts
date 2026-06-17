@@ -4,14 +4,14 @@ interface ConstructorScopeNode {
 }
 
 export interface ConstructorScope {
-  readonly scopeEdge: string
+  readonly scopeEdge: string | number
   readonly scopeNode: ConstructorScopeNode
 }
 
 export const getConstructorScope = (
   parsedNodes: readonly ConstructorScopeNode[],
   constructorScopeMap: Uint32Array,
-  edgeMap: readonly string[],
+  edgeMap: ArrayLike<string | number>,
   node: ConstructorScopeNode,
 ): ConstructorScope => {
   // TODO avoid indexOf

@@ -2,5 +2,8 @@ import * as IgnoredConstructorScopeEdges from '../IgnoredConstructorScopeEdges/I
 import type { GraphEdge } from '../Snapshot/Snapshot.ts'
 
 export const isIgnoredConstructorScopeEdge = (edge: GraphEdge): boolean => {
+  if (typeof edge.name !== 'string') {
+    return false
+  }
   return IgnoredConstructorScopeEdges.ignoredConstructorScopeEdges.includes(edge.name)
 }

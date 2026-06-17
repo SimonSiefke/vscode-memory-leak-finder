@@ -1,7 +1,7 @@
-import type { CleanedNode, HeapSnapshotGraph } from '../Snapshot/Snapshot.ts'
+import type { CleanedNode, HeapSnapshotGraph, HeapSnapshotValue } from '../Snapshot/Snapshot.ts'
 
 export interface NameMapEntry {
-  readonly edgeName: string
+  readonly edgeName: HeapSnapshotValue
   readonly nodeName: string
 }
 

@@ -25,7 +25,7 @@ interface MapObject {
   variableNames: VariableName[]
 }
 
-interface MapObjectResult {
+export interface MapObjectResult {
   readonly id: number
   readonly keys: readonly string[]
   readonly name: string | readonly string[]

@@ -14,7 +14,7 @@ export interface NamedArrayLocation {
 }
 
 export interface NamedArrayCountItem extends CountItem {
-  readonly locations?: readonly NamedArrayLocation[]
+  readonly locations: readonly NamedArrayLocation[]
 }
 
 const createCountMap = (names: readonly string[]): Record<string, number> => {
@@ -31,7 +31,7 @@ const filterByArray = (value: CreateNameMap.NameMapEntry): boolean => {
 }
 
 const getValueName = (value: CreateNameMap.NameMapEntry): string => {
-  return value.edgeName || value.nodeName
+  return String(value.edgeName || value.nodeName)
 }
 
 const getArrayNames = (nameMap: Record<number, CreateNameMap.NameMapEntry>): readonly string[] => {
@@ -45,6 +45,7 @@ const getArrayNamesWithCount = (countMap: Readonly<Record<string, number>>): rea
   const arrayNamesWithCount = Object.entries(countMap).map(([key, value]) => {
     return {
       count: value,
+      locations: [],
       name: key,
     }
   })

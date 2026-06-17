@@ -6,7 +6,9 @@ interface GraphNode {
   readonly id: number
 }
 
-type EdgeLike = Pick<ParsedEdge, 'nameOrIndex' | 'toNode'>
+type EdgeLike = Pick<ParsedEdge, 'toNode'> & {
+  readonly nameOrIndex: string | number
+}
 
 export const parseHeapSnapshotInternalGraph = (nodes: readonly GraphNode[], edges: readonly EdgeLike[]): HeapSnapshotGraph => {
   Assert.array(edges)

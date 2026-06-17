@@ -40,7 +40,7 @@ const isImportantScopeName = (name: string): boolean => {
 const getDetailedNodeInfo = (
   parsedNodes: readonly CleanedNode[],
   scopeMap: Uint32Array,
-  edgeMap: readonly string[],
+  edgeMap: ArrayLike<string | number>,
   node: CleanedNode,
 ): DetailedNodeInfo => {
   const { scopeEdge, scopeNode } = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, node)

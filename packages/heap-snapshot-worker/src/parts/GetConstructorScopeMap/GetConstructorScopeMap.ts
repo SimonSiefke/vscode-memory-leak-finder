@@ -8,7 +8,7 @@ interface ConstructorScopeNode {
 
 export const getConstructorScopeMap = (parsedNodes: readonly ConstructorScopeNode[], graph: HeapSnapshotGraph) => {
   const scopeMap = new Uint32Array(parsedNodes.length)
-  const edgeMap: string[] = [...Array.from<string>({ length: parsedNodes.length }).fill('')]
+  const edgeMap: Array<string | number> = [...Array.from<string>({ length: parsedNodes.length }).fill('')]
   for (let i = 0; i < parsedNodes.length; i++) {
     const node = parsedNodes[i]
     const edges = graph[node.id]

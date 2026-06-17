@@ -4,7 +4,7 @@ import * as IsImportantEdge from '../IsImportantEdge/IsImportantEdge.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import type { CleanedNode, GraphEdge } from '../Snapshot/Snapshot.ts'
 
-interface ClosureNode extends CleanedNode {
+export interface ClosureNode extends CleanedNode {
   readonly contextNodeCount: number
 }
 
