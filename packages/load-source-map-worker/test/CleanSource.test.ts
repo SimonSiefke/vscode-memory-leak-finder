@@ -27,3 +27,8 @@ test('cleanSource - up a folder relative path', () => {
   const input = '../src/eventEmitter2.ts'
   expect(cleanSource(input)).toBe('src/eventEmitter2.ts')
 })
+
+test('cleanSource - up a folder .src path', () => {
+  const input = '../.src/vs/nls.ts'
+  expect(cleanSource(input)).toBe('src/vs/nls.ts')
+})

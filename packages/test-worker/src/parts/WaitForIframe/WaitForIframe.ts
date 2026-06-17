@@ -88,6 +88,7 @@ export const waitForPage = async ({
     const mainFrameId = frameTreeResult.frameTree.frame.id
     pageUtilityContext = await addUtilityExecutionContext(pageRpc, utilityExecutionContextName, mainFrameId)
   }
+  await pageRpc.invoke('Runtime.runIfWaitingForDebugger', {})
 
   const page = createPage({
     browserRpc,

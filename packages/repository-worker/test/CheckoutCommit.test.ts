@@ -5,10 +5,11 @@ import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorke
 
 test('checkoutCommit executes git checkout command', async () => {
   const repoPath = '/test/repo'
+  const repoUrl = 'https://github.com/microsoft/vscode.git'
   const commit = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
+  mockInvoke.mockReturnValueOnce({ exitCode: 0, stderr: '', stdout: 'old-commit' }).mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -16,17 +17,18 @@ test('checkoutCommit executes git checkout command', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await checkoutCommit(repoPath, commit)
+  await checkoutCommit(repoPath, repoUrl, commit)
 
   expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('checkoutCommit handles different commit formats', async () => {
   const repoPath = '/test/repo'
+  const repoUrl = 'https://github.com/microsoft/vscode.git'
   const commit = 'main'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
+  mockInvoke.mockReturnValueOnce({ exitCode: 0, stderr: '', stdout: 'old-commit' }).mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -34,17 +36,18 @@ test('checkoutCommit handles different commit formats', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await checkoutCommit(repoPath, commit)
+  await checkoutCommit(repoPath, repoUrl, commit)
 
   expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('checkoutCommit handles short commit hash', async () => {
   const repoPath = '/test/repo'
+  const repoUrl = 'https://github.com/microsoft/vscode.git'
   const commit = 'a1b2c3d'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
+  mockInvoke.mockReturnValueOnce({ exitCode: 0, stderr: '', stdout: 'old-commit' }).mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -52,7 +55,26 @@ test('checkoutCommit handles short commit hash', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await checkoutCommit(repoPath, commit)
+  await checkoutCommit(repoPath, repoUrl, commit)
 
   expect(mockInvoke).toHaveBeenCalled()
+})
+
+test('checkoutCommit skips fetch when the requested commit is already checked out', async () => {
+  const repoPath = '/test/repo'
+  const repoUrl = 'https://github.com/microsoft/vscode.git'
+  const commit = 'a1b2c3d'
+
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: `${commit}\n` })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  await checkoutCommit(repoPath, repoUrl, commit)
+
+  expect(mockInvoke.mock.calls).toHaveLength(1)
 })

@@ -1,4 +1,5 @@
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
+import { disconnect } from '../Disconnect/Disconnect.ts'
 import * as RunTest from '../RunTest/RunTest.ts'
 import * as SetupTest from '../SetupTest/SetupTest.ts'
 import * as TearDownTest from '../TearDownTest/TearDownTest.ts'
@@ -9,4 +10,5 @@ export const commandMap = {
   [TestWorkerCommandType.RunTest]: RunTest.runTest,
   [TestWorkerCommandType.SetupTest]: SetupTest.setupTest,
   [TestWorkerCommandType.TearDownTest]: TearDownTest.tearDownTest,
+  [TestWorkerCommandType.Disconnect]: disconnect,
 }

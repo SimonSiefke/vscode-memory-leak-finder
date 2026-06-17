@@ -22,6 +22,7 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   // Step 2: Run command to move editor to new window
   const newWindow = await Editor.moveToNewWindow()
 
+  // TODO timeout is bad
   // Step 3: Wait for the new window to be ready
   await new Promise((resolve) => setTimeout(resolve, 3000))
 

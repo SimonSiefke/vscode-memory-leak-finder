@@ -10,7 +10,12 @@ const callback = async (method, ...params) => {
   await CliProcess.invoke(method, ...params)
 }
 
+const getTimeStamp = () => {
+  return performance.now()
+}
+
 export const runTests = async ({
+  allowCopilotAuthInCi,
   arch,
   bisect,
   checkLeaks,
@@ -20,6 +25,8 @@ export const runTests = async ({
   compressVideo,
   continueValue,
   cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
   filterValue,
@@ -70,6 +77,7 @@ export const runTests = async ({
       throw new Error('--bisect requires --check-leaks to be enabled')
     }
     const options: RunTestsOptions = {
+      allowCopilotAuthInCi,
       arch,
       bisect,
       checkLeaks,
@@ -79,6 +87,8 @@ export const runTests = async ({
       compressVideo,
       continueValue,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       filterValue,
@@ -121,6 +131,7 @@ export const runTests = async ({
 
   return RunTestsWithCallback.runTestsWithCallback({
     addDisposable: Disposables.add,
+    allowCopilotAuthInCi,
     arch,
     callback,
     checkLeaks,
@@ -131,6 +142,8 @@ export const runTests = async ({
     compressVideo,
     continueValue,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     filterValue,
@@ -167,5 +180,6 @@ export const runTests = async ({
     useProxyMock,
     vscodePath,
     vscodeVersion,
+    getTimeStamp,
   })
 }

@@ -10,6 +10,10 @@ const callback = async (method, ...params) => {
   await CliProcess.invoke(method, ...params)
 }
 
+const getTimeStamp = () => {
+  return performance.now()
+}
+
 export const performBisect = async (options: RunTestsOptions): Promise<BisectResult> => {
   let commits
   try {
@@ -47,6 +51,7 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
         clearDisposables: Disposables.disposeAll,
         commit: '',
         insidersCommit: commitHash,
+        getTimeStamp,
       })
 
       if (result.type === 'error') {

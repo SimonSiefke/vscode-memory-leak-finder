@@ -66,10 +66,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(keyBindingsEditor).toBeVisible({
           timeout: 3000,
         })
+        await page.waitForIdle()
         const body = page.locator('.keybindings-body')
         await expect(body).toBeVisible()
+        await page.waitForIdle()
         const list = body.locator('.monaco-list')
         await expect(list).toBeVisible()
+        await page.waitForIdle()
+        const input = page.locator('.keybindings-header .ibwrapper .input')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        await expect(input).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show keybindings editor`)
       }

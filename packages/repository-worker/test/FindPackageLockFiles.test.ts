@@ -16,10 +16,25 @@ test('findPackageLockFiles - returns empty array when no package-lock.json files
   const result = await findPackageLockFiles('/test/path')
 
   expect(result).toEqual([])
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.findFiles', '**/package-lock.json', {
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.findFiles', ['**/package-lock.json', '.vscode/**/package-lock.json'], {
     cwd: '/test/path',
     exclude: ['**/node_modules/**'],
   })
+})
+
+test('findPackageLockFiles - includes package-lock.json files inside .vscode', async () => {
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue(['.vscode/extensions/vscode-selfhost-test-provider/package-lock.json'])
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  const result = await findPackageLockFiles('/test/path')
+
+  expect(result).toEqual(['/test/path/.vscode/extensions/vscode-selfhost-test-provider/package-lock.json'])
 })
 
 test.skip('findPackageLockFiles - returns file URIs when package-lock.json files found', async () => {
@@ -70,7 +85,7 @@ test('findPackageLockFiles - throws VError when findFiles fails', async () => {
   FileSystemWorker.set(mockRpc)
 
   await expect(findPackageLockFiles('/test/path')).rejects.toThrow('Failed to find package-lock.json files in directory')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.findFiles', '**/package-lock.json', {
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.findFiles', ['**/package-lock.json', '.vscode/**/package-lock.json'], {
     cwd: '/test/path',
     exclude: ['**/node_modules/**'],
   })
