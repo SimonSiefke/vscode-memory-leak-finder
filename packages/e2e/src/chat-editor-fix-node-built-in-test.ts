@@ -9,7 +9,7 @@ export const skip = 1
 export const requiresNetwork = true
 
 const waitForFixedTest = async (cwd: string): Promise<void> => {
-  const { status, stdout, stderr } = spawnSync(`npm`, ['test'], {
+  const { status, stderr, stdout } = spawnSync(`npm`, ['test'], {
     cwd,
   })
   if (status !== 0) {
@@ -19,7 +19,6 @@ const waitForFixedTest = async (cwd: string): Promise<void> => {
 
 const initialFiles = [
   {
-    name: 'package.json',
     content: `{
   "name": "sample-node-project",
   "private": true,
@@ -29,13 +28,13 @@ const initialFiles = [
   }
 }
 `,
+    name: 'package.json',
   },
   {
-    name: 'src/add.js',
     content: sourceFileContent,
+    name: 'src/add.js',
   },
   {
-    name: 'test/add.test.js',
     content: `import assert from 'node:assert/strict'
 import test from 'node:test'
 import { add } from '../src/add.js'
@@ -44,10 +43,11 @@ test('add returns the sum of two numbers', () => {
   assert.equal(add(1, 2), 4)
 })
 `,
+    name: 'test/add.test.js',
   },
 ]
 
-export const setup = async ({ ChatEditor, Editor, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestContext): Promise<void> => {
   await SideBar.hide()
   await Workspace.setFiles(initialFiles)
   await Editor.closeAll()
@@ -61,11 +61,11 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
   const workspacePath = Workspace.getPath()
   const prompt = `Run the tests with node --test and fix the failing test in this workspace: ${workspacePath}. The implementation in ${workspacePath}/src/add.js is already correct, so prefer fixing ${workspacePath}/test/add.test.js. When you use file tools, pass absolute paths under ${workspacePath}, not relative paths.`
   await ChatEditor.sendMessage({
-    message: prompt,
-    verify: true,
     approveToolCalls: true,
-    waitForFileChanges: ['test/add.test.js'],
+    message: prompt,
     model: 'GPT-5 mini',
+    verify: true,
+    waitForFileChanges: ['test/add.test.js'],
   })
 
   await waitForFixedTest(workspacePath)

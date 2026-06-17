@@ -4,6 +4,4 @@ declare const process: {
 
 export * from './types/pageobject-api.d.ts'
 
-import Api from './types/pageobject-api.d.ts'
-
-export { Api as TestContext }
+export type { default as TestContext } from './types/pageobject-api.d.ts'
