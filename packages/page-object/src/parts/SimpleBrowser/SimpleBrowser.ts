@@ -215,11 +215,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
       await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
         pressKeyOnce: true,
+        stayVisible: 'dont-care',
       })
       await page.waitForIdle()
       const urlInput = this.getBrowserUrlInput()
       await expect(urlInput).toBeVisible()
       await page.waitForIdle()
+      const quickInput = page.locator('.quick-input-widget')
+      if (await quickInput.isVisible().catch(() => false)) {
+        await page.keyboard.press('Escape')
+        await expect(quickInput)
+          .toBeHidden({
+            timeout: 3000,
+          })
+          .catch(() => {})
+        await page.waitForIdle()
+      }
       if (ideVersion.minor >= 118) {
         const entry = await electron.waitForNewWebContentsView({
           existingIds: existingWebContentsIds,

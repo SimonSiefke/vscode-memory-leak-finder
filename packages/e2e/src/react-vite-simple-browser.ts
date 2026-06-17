@@ -143,9 +143,6 @@ export const run = async ({ ExternalRuntime, SimpleBrowser }: TestContext): Prom
   const response = await ExternalRuntime.request('/health.txt')
   assert.strictEqual(response.ok, true)
 
-  await SimpleBrowser.show({
-    url: testUrl,
-  })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
     text: helloWorldText,
