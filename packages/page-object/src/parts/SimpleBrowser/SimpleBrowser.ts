@@ -267,32 +267,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       if (ideVersion.minor >= 120) {
         await urlInput.click()
         await page.waitForIdle()
-        await page.evaluate({
-          expression: `(() => {
-  const element = document.querySelector('.browser-url-display')
-  if (!element) {
-    throw new Error('browser url display not found')
-  }
-  const range = document.createRange()
-  range.selectNodeContents(element)
-  const selection = window.getSelection()
-  if (!selection) {
-    throw new Error('selection not available')
-  }
-  selection.removeAllRanges()
-  selection.addRange(range)
-})()`,
-        })
-        await page.keyboard.contentEditableInsert({ value: url })
-        await expect(urlInput).toHaveText(url)
+        const quickInput = page.locator('.quick-input-widget .ibwrapper .input')
+        await expect(quickInput).toBeVisible()
+        await quickInput.setValue(url)
         await page.waitForIdle()
+        await expect(quickInput).toHaveValue(url)
+        await page.waitForIdle()
+        await quickInput.press('Enter')
       } else {
         await urlInput.fill('')
         await page.waitForIdle()
         await urlInput.type(url)
         await page.waitForIdle()
+        await urlInput.press('Enter')
       }
-      await urlInput.press('Enter')
       await page.waitForIdle()
       console.log('navigateIntegratedBrowser:submitted', { url, webContentsId: this.modernBrowserWebContentsId })
       if (waitForContentFrame) {
