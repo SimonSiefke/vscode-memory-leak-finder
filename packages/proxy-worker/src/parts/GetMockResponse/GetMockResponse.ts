@@ -40,7 +40,7 @@ const isExpiredSignedCopilotTokenPayload = (body: unknown): boolean => {
   if (!body || typeof body !== 'object') {
     return false
   }
-  const {token} = (body as { token?: unknown })
+  const { token } = body as { token?: unknown }
   const expiresAt = (body as { expires_at?: unknown }).expires_at
   const expiration = typeof token === 'string' ? getSignedCopilotTokenExpiration(token) : undefined
   const fallbackExpiration = typeof expiresAt === 'number' ? expiresAt : undefined
@@ -226,7 +226,7 @@ const getResponsesInputItems = (requestBody: unknown): readonly unknown[] => {
   if (!requestBody || typeof requestBody !== 'object') {
     return []
   }
-  const {input} = (requestBody as { input?: unknown })
+  const { input } = requestBody as { input?: unknown }
   return Array.isArray(input) ? input : []
 }
 
@@ -272,7 +272,7 @@ const getChatCompletionsMessages = (requestBody: unknown): readonly unknown[] =>
   if (!requestBody || typeof requestBody !== 'object') {
     return []
   }
-  const {messages} = (requestBody as { messages?: unknown })
+  const { messages } = requestBody as { messages?: unknown }
   return Array.isArray(messages) ? messages : []
 }
 

@@ -252,7 +252,7 @@ const normalizeToolCallArguments = (toolName: unknown, argumentsValue: unknown):
 }
 
 const normalizeMessage = (message: Record<string, unknown>): Record<string, unknown> => {
-  const {role} = message
+  const { role } = message
   const normalizedMessage: Record<string, unknown> = {}
   if (role !== undefined) {
     normalizedMessage.role = role

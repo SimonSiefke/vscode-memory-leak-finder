@@ -29,7 +29,7 @@ export const createHttpProxyServer = async (
 
 export const disposeProxyServer = async (): Promise<void> => {
   if (!proxyServerInstance) {
-  	return;
+    return
   }
 
   await proxyServerInstance[Symbol.asyncDispose]()
