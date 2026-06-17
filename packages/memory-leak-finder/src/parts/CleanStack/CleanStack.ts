@@ -1,11 +1,11 @@
-const isTestWorkerLine = (line) => {
+import type { Dynamic } from '../Types/Types.ts'
+const isTestWorkerLine = (line: Dynamic) => {
   if (line.includes('test-worker/src')) {
     return true
   }
   return false
 }
-
-const isInternal = (line) => {
+const isInternal = (line: Dynamic) => {
   if (line.includes('node:')) {
     return true
   }
@@ -32,8 +32,7 @@ const isInternal = (line) => {
   }
   return false
 }
-
-const cleanLine = (line) => {
+const cleanLine = (line: Dynamic) => {
   const trimmedLine = line.trim()
   if (trimmedLine.startsWith('at Module.')) {
     return line.replace('at Module.', 'at ')
@@ -49,12 +48,10 @@ const cleanLine = (line) => {
   }
   return line
 }
-
-const getCleanLines = (lines) => {
+const getCleanLines = (lines: Dynamic) => {
   return lines.map(cleanLine)
 }
-
-const getRelevantLines = (lines, stack) => {
+const getRelevantLines = (lines: Dynamic, stack: Dynamic) => {
   const isAssertionError =
     stack.includes('AssertionError:') ||
     stack.includes('ExpectError:') ||
@@ -76,8 +73,7 @@ const getRelevantLines = (lines, stack) => {
   }
   return relevantLines
 }
-
-export const cleanStack = (stack, { root = '' } = {}) => {
+export const cleanStack = (stack: Dynamic, { root = '' }: Dynamic = {}) => {
   if (!stack) {
     return ''
   }

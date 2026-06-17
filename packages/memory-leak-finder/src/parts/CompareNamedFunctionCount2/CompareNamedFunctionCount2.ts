@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.ts'
-
-const addSourceLocations = async (functionObjects, scriptMap) => {
+const addSourceLocations = async (functionObjects: Dynamic, scriptMap: Dynamic) => {
   const classNames = true
-  const requests = functionObjects.map((item) => {
+  const requests = functionObjects.map((item: Dynamic) => {
     const script = scriptMap[item.scriptId]
     const url = `${script.url}:${item.line}:${item.column}`
     return {
@@ -15,9 +15,8 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
     }
   })
   const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(requests, classNames)
-  const normalized = withOriginalStack.map((item) => {
+  const normalized = withOriginalStack.map((item: Dynamic) => {
     const { count, delta, name, originalName, originalStack, stack } = item
-
     return {
       count,
       delta,
@@ -27,8 +26,7 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
   })
   return normalized
 }
-
-export const compareNamedFunctionCount2 = async (beforePath, after, useParallel = true) => {
+export const compareNamedFunctionCount2 = async (beforePath: Dynamic, after: Dynamic, useParallel: Dynamic = true) => {
   // TODO ask heapsnapshot worker to compare functions
   // TODO then for the leaked functions, add sourcemap info
   const afterPath = after.heapSnapshotPath

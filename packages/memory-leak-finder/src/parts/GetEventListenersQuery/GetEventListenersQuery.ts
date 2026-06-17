@@ -1,8 +1,7 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
-
 const RE_URL = /(.*)\((.*):(\d+):(\d+)\)/s
-
-const parseUrl = (stackLine) => {
+const parseUrl = (stackLine: Dynamic) => {
   const urlMatch = stackLine.match(RE_URL)
   if (!urlMatch) {
     return {
@@ -18,15 +17,14 @@ const parseUrl = (stackLine) => {
     url: urlMatch[2],
   }
 }
-
-export const getEventListenerQuery = (stacks, scriptMap) => {
+export const getEventListenerQuery = (stacks: Dynamic, scriptMap: Dynamic) => {
   const reverseScriptMap = Object.create(null)
   for (const value of Object.values(scriptMap)) {
-    const v: any = value as any
+    const v: Dynamic = value as Dynamic
     reverseScriptMap[v.url] = v.sourceMapUrl
   }
   let originalIndex = 0
-  const allQueries: any[] = []
+  const allQueries: Dynamic[] = []
   for (const stack of stacks) {
     originalIndex++
     for (const stackLine of stack) {
