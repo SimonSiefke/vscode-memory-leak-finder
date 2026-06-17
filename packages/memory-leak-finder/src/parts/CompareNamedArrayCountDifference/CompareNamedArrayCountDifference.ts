@@ -1,17 +1,15 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
-
-const compareItem = (a, b) => {
+const compareItem = (a: Dynamic, b: Dynamic) => {
   return b.count - a.count
 }
-
-const sortByCounts = (items) => {
+const sortByCounts = (items: Dynamic) => {
   Assert.array(items)
   const sorted = Arrays.toSorted(items, compareItem)
   return sorted
 }
-
-export const compareNamedArrayCountDifference = (before, after) => {
+export const compareNamedArrayCountDifference = (before: Dynamic, after: Dynamic) => {
   Assert.array(before)
   Assert.array(after)
   const beforeMap = Object.create(null)
@@ -19,7 +17,7 @@ export const compareNamedArrayCountDifference = (before, after) => {
     beforeMap[item.name] ||= 0
     beforeMap[item.name] += item.count
   }
-  const leaked: any[] = []
+  const leaked: Dynamic[] = []
   for (const item of after) {
     const oldCount = beforeMap[item.name] || 0
     const afterCount = item.count
@@ -32,6 +30,5 @@ export const compareNamedArrayCountDifference = (before, after) => {
     }
   }
   const sorted = sortByCounts(leaked)
-
   return sorted
 }

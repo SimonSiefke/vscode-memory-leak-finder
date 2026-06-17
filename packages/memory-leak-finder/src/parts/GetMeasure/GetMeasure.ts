@@ -1,11 +1,10 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as CamelCase from '../CamelCase/CamelCase.ts'
-
 interface Measure {
-  readonly create?: (session: any) => any
+  readonly create?: (session: Dynamic) => Dynamic
   readonly id: string
 }
-
-export const getMeasure = (MemoryLeakFinder: any, measureId: string): Measure => {
+export const getMeasure = (MemoryLeakFinder: Dynamic, measureId: string): Measure => {
   const camelCaseId = CamelCase.camelCase(measureId)
   for (const measure of Object.values(MemoryLeakFinder.Measures)) {
     // @ts-ignore

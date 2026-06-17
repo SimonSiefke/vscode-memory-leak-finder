@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { normalize, resolve, isAbsolute } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Session } from '../Session/Session.ts'
 import * as FindMatchingSourceMap from '../FindMatchingSourceMap/FindMatchingSourceMap.ts'
 import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.ts'
-
 export interface TrackedFunctionResult {
   readonly delta: number
   readonly functionName: string
@@ -14,14 +14,12 @@ export interface TrackedFunctionResult {
   readonly originalSource?: string | null
   readonly totalCount: number
 }
-
 interface ParsedFunctionName {
   readonly column: number | null
   readonly line: number | null
   readonly name: string
   readonly url: string | null
 }
-
 const parseFunctionName = (functionName: string): ParsedFunctionName => {
   // Format: "functionName (url:line)" or "functionName (url:line:column)" or "functionName (scriptId:line:column)"
   // Or just "scriptId:line:column" (e.g., "123:38:57140")
@@ -61,7 +59,6 @@ const parseFunctionName = (functionName: string): ParsedFunctionName => {
     url: null,
   }
 }
-
 const normalizeUrl = (url: string): string => {
   try {
     let path: string
@@ -87,7 +84,6 @@ const normalizeUrl = (url: string): string => {
     return url
   }
 }
-
 const isRelativeSourceMap = (sourceMapUrl: string): boolean => {
   return (
     !sourceMapUrl.startsWith('http://') &&
@@ -96,7 +92,6 @@ const isRelativeSourceMap = (sourceMapUrl: string): boolean => {
     !sourceMapUrl.startsWith('data:')
   )
 }
-
 const getSourceMapUrl = (script: { readonly url?: string; readonly sourceMapUrl?: string }): string => {
   if (script.url && script.sourceMapUrl && isRelativeSourceMap(script.sourceMapUrl)) {
     try {
@@ -115,9 +110,14 @@ const getSourceMapUrl = (script: { readonly url?: string; readonly sourceMapUrl?
   }
   return sourceMapUrl
 }
-
 const convertScriptIdToUrl = (
-  scriptMap: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>,
+  scriptMap: Record<
+    string,
+    {
+      readonly url?: string
+      readonly sourceMapUrl?: string
+    }
+  >,
   scriptId: string,
 ): string | null => {
   // Try to find script by scriptId and return its URL
@@ -130,7 +130,7 @@ const convertScriptIdToUrl = (
     if (String(numericScriptId) in scriptMap) {
       return scriptMap[String(numericScriptId)].url || null
     }
-    // Also check if any key in scriptMap is a number that matches
+    // Also check if unknown key in scriptMap is a number that matches
     for (const key of Object.keys(scriptMap)) {
       const keyNum = Number.parseInt(key, 10)
       if (!Number.isNaN(keyNum) && keyNum === numericScriptId) {
@@ -140,10 +140,18 @@ const convertScriptIdToUrl = (
   }
   return null
 }
-
 const findWorkbenchScript = (
-  scriptMap: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>,
-): { readonly url?: string; readonly sourceMapUrl?: string } | null => {
+  scriptMap: Record<
+    string,
+    {
+      readonly url?: string
+      readonly sourceMapUrl?: string
+    }
+  >,
+): {
+  readonly url?: string
+  readonly sourceMapUrl?: string
+} | null => {
   // Find the script that corresponds to workbench.desktop.main.js
   for (const [_key, script] of Object.entries(scriptMap)) {
     if (script.url && script.url.includes('workbench.desktop.main.js')) {
@@ -152,11 +160,19 @@ const findWorkbenchScript = (
   }
   return null
 }
-
 const findScript = (
-  scriptMap: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>,
+  scriptMap: Record<
+    string,
+    {
+      readonly url?: string
+      readonly sourceMapUrl?: string
+    }
+  >,
   urlOrScriptId: string,
-): { readonly url?: string; readonly sourceMapUrl?: string } | null => {
+): {
+  readonly url?: string
+  readonly sourceMapUrl?: string
+} | null => {
   // First try to find by scriptId (if urlOrScriptId is a scriptId key in the map)
   // Check both string and numeric versions of the key
   if (urlOrScriptId in scriptMap) {
@@ -168,14 +184,14 @@ const findScript = (
     if (String(numericScriptId) in scriptMap) {
       return scriptMap[String(numericScriptId)]
     }
-    // Also check if any key in scriptMap is a number that matches
+    // Also check if unknown key in scriptMap is a number that matches
     for (const key of Object.keys(scriptMap)) {
       const keyNum = Number.parseInt(key, 10)
       if (!Number.isNaN(keyNum) && keyNum === numericScriptId) {
         return scriptMap[key]
       }
     }
-    // If scriptId is "123" (or any numeric ID that doesn't match), assume it's workbench.desktop.main.js
+    // If scriptId is "123" (or unknown numeric ID that doesn't match), assume it's workbench.desktop.main.js
     // This is a special case where scriptId 123 always refers to workbench.desktop.main.js
     const workbenchScript = findWorkbenchScript(scriptMap)
     if (workbenchScript) {
@@ -230,49 +246,70 @@ const findScript = (
   }
   return null
 }
-
 const SCRIPT_ID_PATTERN = /^\d+:\d+:\d+$/
 const FUNCTION_NAME_LOCATION_PATTERN = /^.+?\s*\((.+?)\)$/
-
+type TrackedFunctionsInput =
+  | Record<string, number>
+  | {
+      readonly trackedFunctions: Record<string, number>
+      readonly scriptMap?: Record<
+        string,
+        {
+          readonly url?: string
+          readonly sourceMapUrl?: string
+        }
+      >
+    }
+const hasTrackedFunctions = (
+  value: TrackedFunctionsInput,
+): value is Extract<TrackedFunctionsInput, { readonly trackedFunctions: Record<string, number> }> => {
+  return 'trackedFunctions' in value
+}
 export const compareTrackedFunctions = async (
   before:
     | Record<string, number>
     | {
         readonly trackedFunctions: Record<string, number>
-        readonly scriptMap?: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>
+        readonly scriptMap?: Record<
+          string,
+          {
+            readonly url?: string
+            readonly sourceMapUrl?: string
+          }
+        >
       },
   after:
     | Record<string, number>
     | {
         readonly trackedFunctions: Record<string, number>
-        readonly scriptMap?: Record<string, { readonly url?: string; readonly sourceMapUrl?: string }>
+        readonly scriptMap?: Record<
+          string,
+          {
+            readonly url?: string
+            readonly sourceMapUrl?: string
+          }
+        >
       },
   _context: Session,
 ): Promise<readonly TrackedFunctionResult[]> => {
   // Handle both old format (Record<string, number>) and new format (object with trackedFunctions and scriptMap)
-  const beforeFunctions = typeof before === 'object' && before !== null && 'trackedFunctions' in before ? before.trackedFunctions : before
-  const afterData =
-    typeof after === 'object' && after !== null && 'trackedFunctions' in after ? after : { scriptMap: undefined, trackedFunctions: after }
+  const beforeFunctions = hasTrackedFunctions(before) ? before.trackedFunctions : before
+  const afterData = hasTrackedFunctions(after) ? after : { scriptMap: undefined, trackedFunctions: after }
   const afterFunctions = afterData.trackedFunctions
   const { scriptMap } = afterData
-
   let results: TrackedFunctionResult[] = []
-
   // Get all unique function names from both before and after
   const allFunctionNames = new Set([...Object.keys(beforeFunctions), ...Object.keys(afterFunctions)])
-
   // Log a few original functionNames from statistics to see their format
   const sampleFunctionNames = [...allFunctionNames].slice(0, 3)
   for (const fn of sampleFunctionNames) {
     console.log(`[CompareTrackedFunctions] Sample functionName from statistics:`, fn)
   }
-
   // Calculate call counts for each function
   for (const functionName of allFunctionNames) {
     const beforeCount = beforeFunctions[functionName] || 0
     const afterCount = afterFunctions[functionName] || 0
     const delta = afterCount - beforeCount
-
     if (delta > 0) {
       results.push({
         delta,
@@ -281,16 +318,17 @@ export const compareTrackedFunctions = async (
       })
     }
   }
-
   // Sort by delta descending (highest first)
-  results = results.toSorted((a, b) => b.delta - a.delta)
-
+  results = results.toSorted((a: Dynamic, b: Dynamic) => b.delta - a.delta)
   // If we have a scriptMap, resolve source maps for the results
   if (scriptMap && Object.keys(scriptMap).length > 0) {
     console.log(`[CompareTrackedFunctions] scriptMap has ${Object.keys(scriptMap).length} entries`)
     const sourceMapUrlToPositions: Record<string, number[]> = Object.create(null)
-    const positionPointers: { index: number; sourceMapUrl: string; parsed: ParsedFunctionName }[] = []
-
+    const positionPointers: {
+      index: number
+      sourceMapUrl: string
+      parsed: ParsedFunctionName
+    }[] = []
     // Collect positions for source map resolution
     for (let i = 0; i < results.length; i++) {
       const result = results[i]
@@ -304,14 +342,12 @@ export const compareTrackedFunctions = async (
       if (i < 3) {
         console.log(`[CompareTrackedFunctions] Parsed column[${i}]:`, originalColumn)
       }
-
       // Process functions with location info
       if (parsed.url && parsed.line !== null) {
         // Try to find the script - findScript handles both scriptId and URL lookups
         // @ts-ignore
         let script = findScript(scriptMap, parsed.url)
         let actualUrl = parsed.url
-
         // If not found and parsed.url looks like a scriptId (numeric), try converting to URL first
         // This helps when the scriptId format doesn't match the scriptMap key format
         if (!script) {
@@ -330,7 +366,6 @@ export const compareTrackedFunctions = async (
           // If we found the script and it has a URL, use that URL
           actualUrl = script.url
         }
-
         // Update functionName to show URL with line and column if we have a URL
         // Always include column in the functionName format: (url:line:column)
         // Use the original column from parsing - it was tracked, so we have it
@@ -344,7 +379,6 @@ export const compareTrackedFunctions = async (
           // @ts-ignore
           results[i].functionName = `${displayName} (${actualUrl}:${parsed.line}:${column})`
         }
-
         if (script) {
           const sourceMapUrl = getSourceMapUrl(script)
           if (!sourceMapUrl) {
@@ -375,7 +409,6 @@ export const compareTrackedFunctions = async (
         )
       }
     }
-
     // Resolve original positions using source-map-worker
     const sourceMapUrls = Object.keys(sourceMapUrlToPositions)
     console.log(`[CompareTrackedFunctions] Resolving ${sourceMapUrls.length} source maps for ${positionPointers.length} positions`)
@@ -384,15 +417,12 @@ export const compareTrackedFunctions = async (
         const classNames = true
         const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlToPositions, classNames)
         const offsetMap: Record<string, number> = Object.create(null)
-
         for (const pointer of positionPointers) {
           const positions = cleanPositionMap[pointer.sourceMapUrl] || []
           const offset = offsetMap[pointer.sourceMapUrl] || 0
           const original = positions[offset]
           offsetMap[pointer.sourceMapUrl] = offset + 1
-
           const result = results[pointer.index]
-
           // Keep functionName with minified location, add originalLocation separately
           // Always include both line and column in originalLocation format: <file>:<line>:<column>
           let originalLocation: string | null = null
@@ -406,7 +436,6 @@ export const compareTrackedFunctions = async (
             originalColumn = original.column ?? null
             originalSource = original.source ?? null
             originalName = original.name ?? null
-
             // Build the original location string - always include both line and column when we have source and line
             if (original.source && original.line !== null) {
               // Always include column (default to 0 if not available)
@@ -416,7 +445,6 @@ export const compareTrackedFunctions = async (
             // If we don't have both source and line, don't set originalLocation (keep it null)
             // This ensures originalLocation always follows the format <file>:<line>:<column>
           }
-
           // Update functionName to use original name if available
           let updatedFunctionName = result.functionName
           if (originalName) {
@@ -429,7 +457,6 @@ export const compareTrackedFunctions = async (
               updatedFunctionName = originalName
             }
           }
-
           results[pointer.index] = {
             ...result,
             functionName: updatedFunctionName,
@@ -446,6 +473,5 @@ export const compareTrackedFunctions = async (
       }
     }
   }
-
   return results
 }
