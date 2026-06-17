@@ -737,6 +737,7 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
           0,
           childProcess.pid ?? 0,
           [],
+          true,
           inspectPort,
           runtimeName,
         )

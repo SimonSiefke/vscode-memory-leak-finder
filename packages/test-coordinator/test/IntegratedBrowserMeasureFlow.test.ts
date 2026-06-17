@@ -53,7 +53,7 @@ const mockMemoryStart = jest.fn(async () => {
   events.push('measure-start')
 })
 const mockMemoryStop = jest.fn(async () => undefined)
-const mockMemoryCompare = jest.fn(async () => ({
+const mockMemoryCompare = jest.fn(async (..._args: readonly unknown[]) => ({
   isLeak: false,
   summary: '',
 }))
@@ -181,5 +181,92 @@ test('runTestsWithCallback - inspect integrated browser starts memory worker aft
     0,
     123,
     ['existing-target'],
+  )
+})
+
+test('runTestsWithCallback - inspect process starts memory worker after setup', async () => {
+  const result = await runTestsWithCallback({
+    addDisposable: () => {},
+    allowCopilotAuthInCi: false,
+    arch: 'x64',
+    callback: async () => {},
+    checkLeaks: true,
+    clearDisposables: async () => {},
+    clearExtensions: false,
+    color: false,
+    commit: 'abc123',
+    compressVideo: false,
+    continueValue: '',
+    cwd: '/test-cwd',
+    downloadUserDataZipFileToken: '',
+    downloadUserDataZipFileUrl: '',
+    enableExtensions: false,
+    enableProxy: false,
+    filterValue: 'react-vite-simple-browser',
+    getTimeStamp: () => 0,
+    headlessMode: true,
+    ide: 'vscode',
+    ideVersion: 'stable',
+    insidersCommit: '',
+    inspectExtensions: false,
+    inspectExtensionsPort: 0,
+    inspectIntegratedBrowser: false,
+    inspectProcess: 'vite.js',
+    inspectPtyHost: false,
+    inspectPtyHostPort: 0,
+    inspectSharedProcess: false,
+    inspectSharedProcessPort: 0,
+    isGithubActions: false,
+    login: false,
+    measure: 'named-function-count3',
+    measureAfter: false,
+    measureNode: false,
+    openDevtools: false,
+    pageObjectPath: '',
+    platform: 'linux',
+    recordVideo: false,
+    restartBetween: false,
+    root: '/test-root',
+    runMode: 1,
+    runs: 1,
+    runSkippedTestsAnyway: true,
+    screencastQuality: 100,
+    setupOnly: false,
+    timeoutBetween: 0,
+    timeouts: false,
+    trackFunctions: false,
+    updateUrl: '',
+    useProxyMock: false,
+    vscodePath: '',
+    vscodeVersion: '1.0.0',
+  })
+
+  expect(result.type).toBe('success')
+  expect(events).toEqual(['setup-test', 'start-memory-worker', 'measure-start', 'memory-dispose'])
+  expect(mockGetBrowserPageTargetIds).not.toHaveBeenCalled()
+  expect(mockStartWorker).toHaveBeenCalledWith(
+    'ws://browser',
+    'ws://electron',
+    expect.any(Number),
+    'named-function-count3',
+    expect.any(Number),
+    false,
+    false,
+    false,
+    false,
+    false,
+    0,
+    0,
+    0,
+    123,
+    [],
+    'vite.js',
+    rpc,
+  )
+  expect(mockMemoryCompare).toHaveBeenCalledWith(
+    memoryRpc,
+    expect.any(Number),
+    { runs: 1 },
+    expect.stringContaining('/process/vite.js/named-function-count3/react-vite-simple-browser.json'),
   )
 })
