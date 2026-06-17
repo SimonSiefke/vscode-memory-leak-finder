@@ -45,9 +45,9 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     measure: options.measure,
     measureAfter: options.measureAfter,
     measureNode: options.measureNode,
-    processRootStrategy: options.processRootStrategy,
     pageObjectPath: options.pageObjectPath,
     platform: options.platform,
+    processRootStrategy: options.processRootStrategy,
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
@@ -63,5 +63,5 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     watch: options.watch,
     workers: options.workers,
   })
-  return InitialStart.initialStart({ ...options, isGithubActions } as ReturnType<typeof ParseArgv.parseArgv> & { isGithubActions: boolean })
+  return InitialStart.initialStart({ ...options, isGithubActions })
 }

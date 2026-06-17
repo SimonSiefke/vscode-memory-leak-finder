@@ -106,10 +106,10 @@ test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
   const mockRpc = MockRpc.create({
     invoke(method: any) {
       if (method === 'Stdout.getEraseLine') {
-        return '\u001B[2K'
+        return '\u{1B}[2K'
       }
       if (method === 'Stdout.getCursorLeft') {
-        return '\u001B[G'
+        return '\u{1B}[G'
       }
       if (method === 'Stdout.getEraseEndLine') {
         return '[erase-end-line]'

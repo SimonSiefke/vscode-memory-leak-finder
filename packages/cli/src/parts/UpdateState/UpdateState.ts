@@ -27,6 +27,7 @@ export const updateState = async (newState: any): Promise<void> => {
   StdinDataState.setState({ ...newState, previousFilters: [], stdout: [] })
   if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {
     await StartRunning.startRunning({
+      allowCopilotAuthInCi: false,
       arch: state.arch,
       bisect: state.bisect,
       checkLeaks: state.checkLeaks,
@@ -57,15 +58,14 @@ export const updateState = async (newState: any): Promise<void> => {
       measure: state.measure,
       measureAfter: state.measureAfter,
       measureNode: state.measureNode || false,
-      processRootStrategy: state.processRootStrategy,
       openDevtools: state.openDevtools,
       platform: state.platform,
+      processRootStrategy: state.processRootStrategy,
       recordVideo: state.recordVideo,
       restartBetween: state.restartBetween,
       runMode: state.runMode,
       runs: state.runs,
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
-      allowCopilotAuthInCi: false,
       screencastQuality: state.screencastQuality,
       setupOnly: false,
       timeoutBetween: state.timeoutBetween,
