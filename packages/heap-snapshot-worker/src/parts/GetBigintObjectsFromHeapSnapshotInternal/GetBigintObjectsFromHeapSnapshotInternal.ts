@@ -1,4 +1,5 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
@@ -20,7 +21,7 @@ export interface BigintObject {
   variableNames: VariableName[]
 }
 
-export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
+export const getBigintObjectsFromHeapSnapshotInternal = (snapshot: Snapshot): readonly BigintObject[] => {
   const { edges, meta, nodes, strings } = snapshot
   const { edge_fields, edge_types, node_fields, node_types } = meta
   const {

@@ -1,9 +1,19 @@
 import * as Assert from '../Assert/Assert.ts'
+import type { GraphEdge, HeapSnapshotGraph, ParsedEdge } from '../Snapshot/Snapshot.ts'
 
-export const parseHeapSnapshotInternalGraph = (nodes, edges) => {
+interface GraphNode {
+  readonly edgeCount: number
+  readonly id: number
+}
+
+type EdgeLike = Pick<ParsedEdge, 'toNode'> & {
+  readonly nameOrIndex: string | number
+}
+
+export const parseHeapSnapshotInternalGraph = (nodes: readonly GraphNode[], edges: readonly EdgeLike[]): HeapSnapshotGraph => {
   Assert.array(edges)
   Assert.array(nodes)
-  const graph = Object.create(null)
+  const graph: HeapSnapshotGraph = Object.create(null)
   for (const node of nodes) {
     graph[node.id] = []
   }
@@ -11,7 +21,7 @@ export const parseHeapSnapshotInternalGraph = (nodes, edges) => {
   for (const node of nodes) {
     for (let i = 0; i < node.edgeCount; i++) {
       const edge = edges[edgeIndex++]
-      graph[node.id].push({ index: edge.toNode, name: edge.nameOrIndex })
+      graph[node.id].push({ index: edge.toNode, name: edge.nameOrIndex } satisfies GraphEdge)
     }
   }
   return graph
