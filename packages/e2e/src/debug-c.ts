@@ -3,7 +3,7 @@ import type { TestContext } from '../types.js'
 export const skip = 1
 
 // VS Code 1.124 no longer exposes a stable generated C debug option in headless CI.
-export const skipForced = true
+// export const skipForced = true
 
 export const requiresNetwork = true
 
