@@ -1,9 +1,8 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
-
 const workerPath = join(Root.root, 'packages', 'source-map-coordinator', 'src', 'main.ts')
-
 export const launchSourceMapCoordinator = async () => {
   const rpc = await NodeWorkerRpcParent.create({
     commandMap: {},
@@ -11,7 +10,7 @@ export const launchSourceMapCoordinator = async () => {
     stdio: 'inherit',
   })
   return {
-    invoke(method: string, ...params: readonly any[]) {
+    invoke(method: string, ...params: readonly Dynamic[]) {
       return rpc.invoke(method, ...params)
     },
     async [Symbol.asyncDispose]() {

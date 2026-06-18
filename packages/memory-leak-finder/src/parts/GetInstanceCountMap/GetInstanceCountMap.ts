@@ -1,7 +1,7 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-
-export const getInstanceCountMap = async (session: Session, objectGroup, objects) => {
+export const getInstanceCountMap = async (session: Session, objectGroup: Dynamic, objects: Dynamic) => {
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const instances = this

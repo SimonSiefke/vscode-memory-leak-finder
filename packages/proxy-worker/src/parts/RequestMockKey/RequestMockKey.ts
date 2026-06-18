@@ -60,7 +60,7 @@ const stripToolCallEphemeralArgumentKeys = (value: unknown): unknown => {
   }
 
   const normalizedObject: Record<string, unknown> = {}
-  for (const key of Object.keys(value as Record<string, unknown>).sort()) {
+  for (const key of Object.keys(value).sort()) {
     if (TOOL_CALL_EPHEMERAL_ARGUMENT_KEYS.has(key)) {
       continue
     }
@@ -157,25 +157,25 @@ const normalizeText = (value: string, role?: string): string => {
   const relevantText = userRequests.length > 0 ? userRequests.join('\n') : stripTaggedBlocks(placeholderNormalizedValue)
   const textWithNormalizedArguments = normalizeEmbeddedArgumentsJson(relevantText)
   let normalizedValue = textWithNormalizedArguments
-    .replace(ISO_DATE_REGEX, '<date>')
-    .replace(MONTH_DATE_REGEX, '<date>')
-    .replace(UUID_REGEX, '<uuid>')
-    .replace(LONG_HEX_REGEX, '<hex>')
-    .replace(TIMESTAMP_REGEX, '<timestamp>')
-    .replace(SESSION_CALL_ID_REGEX, '<session-call-id>')
-    .replace(LOCALHOST_URL_WITH_PORT_REGEX, 'http://localhost:<port>')
-    .replace(JSON_META_FIELD_REGEX, (_match, key: string) => `"${key}":"<meta>"`)
-    .replace(JSON_TIMEOUT_FIELD_REGEX, '"timeout":<number>')
+    .replaceAll(ISO_DATE_REGEX, '<date>')
+    .replaceAll(MONTH_DATE_REGEX, '<date>')
+    .replaceAll(UUID_REGEX, '<uuid>')
+    .replaceAll(LONG_HEX_REGEX, '<hex>')
+    .replaceAll(TIMESTAMP_REGEX, '<timestamp>')
+    .replaceAll(SESSION_CALL_ID_REGEX, '<session-call-id>')
+    .replaceAll(LOCALHOST_URL_WITH_PORT_REGEX, 'http://localhost:<port>')
+    .replaceAll(JSON_META_FIELD_REGEX, (_match, key: string) => `"${key}":"<meta>"`)
+    .replaceAll(JSON_TIMEOUT_FIELD_REGEX, '"timeout":<number>')
 
   if (role === 'tool') {
     normalizedValue = normalizedValue
-      .replace(DURATION_MS_FIELD_REGEX, 'duration_ms <duration>')
-      .replace(MILLIS_DURATION_REGEX, '<duration-ms>')
-      .replace(SECONDS_DURATION_REGEX, '<duration-s>')
-      .replace(SHELL_PROMPT_DIRTY_BRANCH_REGEX, '($1)')
+      .replaceAll(DURATION_MS_FIELD_REGEX, 'duration_ms <duration>')
+      .replaceAll(MILLIS_DURATION_REGEX, '<duration-ms>')
+      .replaceAll(SECONDS_DURATION_REGEX, '<duration-s>')
+      .replaceAll(SHELL_PROMPT_DIRTY_BRANCH_REGEX, '($1)')
   }
 
-  return normalizedValue.replace(MULTI_WHITESPACE_REGEX, ' ').trim()
+  return normalizedValue.replaceAll(MULTI_WHITESPACE_REGEX, ' ').trim()
 }
 
 const normalizeValue = (value: unknown, role?: string): unknown => {
@@ -252,7 +252,7 @@ const normalizeToolCallArguments = (toolName: unknown, argumentsValue: unknown):
 }
 
 const normalizeMessage = (message: Record<string, unknown>): Record<string, unknown> => {
-  const role = message.role
+  const { role } = message
   const normalizedMessage: Record<string, unknown> = {}
   if (role !== undefined) {
     normalizedMessage.role = role

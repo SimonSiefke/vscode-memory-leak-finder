@@ -1,11 +1,11 @@
 export const getPrompt = ({
   content,
-  localVscodePath,
-  only,
-  runs,
-  measure,
-  ourPath,
   extraArgs,
+  localVscodePath,
+  measure,
+  only,
+  ourPath,
+  runs,
 }: {
   content: string
   localVscodePath: string

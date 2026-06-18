@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { filterNamedFunctions } from '../FilterNamedFunctions/FilterNamedFunctions.ts'
@@ -5,13 +6,12 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
 import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.ts'
 import * as GetNamedFunctionLocations from '../GetNamedFunctionLocations/GetNamedFunctionLocations.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
-
 export const getNamedFunctionCount = async (
   session: Session,
   objectGroup: string,
-  scriptMap: any,
+  scriptMap: Dynamic,
   includeSourceMap: boolean,
-): Promise<readonly any[]> => {
+): Promise<readonly Dynamic[]> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Function,
     objectGroup,

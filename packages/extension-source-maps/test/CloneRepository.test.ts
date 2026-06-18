@@ -201,7 +201,7 @@ test('cloneRepository - handles different commit hashes', async () => {
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'git' && args[0] === 'fetch') {
-        capturedCommit = args[args.length - 1]
+        capturedCommit = args.at(-1)
         return {
           exitCode: 0,
           stderr: '',

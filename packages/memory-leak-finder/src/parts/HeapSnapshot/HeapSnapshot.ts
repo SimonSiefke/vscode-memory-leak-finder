@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { createWriteStream } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import { dirname } from 'node:path'
@@ -5,8 +6,7 @@ import { pipeline } from 'node:stream/promises'
 import type { Session } from '../Session/Session.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as HeapSnapshotStream from '../HeapSnapshotStream/HeapSnapshotStream.ts'
-
-export const takeHeapSnapshot = async (session: Session, outFile, options = {}) => {
+export const takeHeapSnapshot = async (session: Session, outFile: Dynamic, options: Dynamic = {}) => {
   Assert.object(session)
   Assert.string(outFile)
   await mkdir(dirname(outFile), { recursive: true })

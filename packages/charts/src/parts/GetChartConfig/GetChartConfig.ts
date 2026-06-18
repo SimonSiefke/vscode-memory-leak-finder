@@ -3,6 +3,6 @@ export const getChartConfig = () => {
   const highlightChangesPath = highlightChangesIndex === -1 ? undefined : process.argv[highlightChangesIndex + 1]
   return {
     compress: true,
-    ...(highlightChangesPath ? { highlightChangesPath } : {}),
+    ...(highlightChangesPath && { highlightChangesPath }),
   }
 }
