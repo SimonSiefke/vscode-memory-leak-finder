@@ -1,4 +1,4 @@
-import type { ArrayNode, AstNode, ObjectNode, PropertyEntry } from '../AstNode/AstNode.ts'
+import type { ArrayNode, AstNode, CodeNode, ObjectNode, PropertyEntry } from '../AstNode/AstNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
@@ -166,7 +166,15 @@ export const buildAstForNode = (
         }
       }
     }
-    return { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: nodeTypeName }
+    const codeNode: CodeNode = {
+      id,
+      name,
+      ...(columnValue === undefined ? {} : { column: columnValue }),
+      ...(lineValue === undefined ? {} : { line: lineValue }),
+      ...(scriptIdValue === undefined ? {} : { scriptId: scriptIdValue }),
+      type: nodeTypeName,
+    }
+    return codeNode
   }
 
   return createUnknown(id, name, `[${nodeTypeName} ${id}]`)

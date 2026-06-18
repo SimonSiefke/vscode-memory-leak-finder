@@ -1,5 +1,4 @@
 import type { AggregatedFunction } from '../AggregateFunctionObjects/AggregateFunctionObjects.ts'
-import type { FunctionObject } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.ts'
 import { aggregateFunctionObjects } from '../AggregateFunctionObjects/AggregateFunctionObjects.ts'
 import * as Assert from '../Assert/Assert.ts'
 import { getFunctionsWithLocations } from '../GetFunctionsWithLocations/GetFunctionsWithLocations.ts'
