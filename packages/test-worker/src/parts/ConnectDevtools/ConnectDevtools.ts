@@ -143,7 +143,7 @@ export const connectDevtools = async (
   })
   pageObjectContext.electronApp = electronApp
   pageObjectContext.reconnectDevtools = async () => {
-    const reconnectTimeout = Math.min(attachedToPageTimeout, 5_000)
+    const reconnectTimeout = Math.min(attachedToPageTimeout, 5000)
     const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, reconnectTimeout)
     const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
     const utilityContext = await addUtilityExecutionContext(sessionRpc, utilityExecutionContextName, frameTree.frame.id)
