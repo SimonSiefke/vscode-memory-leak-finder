@@ -3,21 +3,21 @@ export interface FunctionStatistics {
 }
 
 export interface TransformOptions {
-  readonly scriptId?: number
   readonly filename?: string
   readonly includeLocation?: boolean
   readonly minify?: boolean
+  readonly scriptId?: number
 }
 
 export interface TrackingConfig {
   readonly enabled: boolean
-  readonly includeLocation: boolean
   readonly excludePatterns: string[]
+  readonly includeLocation: boolean
 }
 
 export interface VSCodeTrackerOptions {
-  readonly headless?: boolean
   readonly devtools?: boolean
+  readonly headless?: boolean
   readonly remoteDebuggingPort?: number
   readonly vscodeUrl?: string
 }

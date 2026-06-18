@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import JSZip from 'jszip'
 import type { Probot } from 'probot'
-import { downloadArtifactArchive } from '../DownloadArtifactArchive/DownloadArtifactArchive.ts'
+import JSZip from 'jszip'
 import type { BotEnv } from '../Env/Env.ts'
+import { downloadArtifactArchive } from '../DownloadArtifactArchive/DownloadArtifactArchive.ts'
 
 type WorkflowArtifact = {
   readonly archive_download_url: string
@@ -12,7 +12,7 @@ type WorkflowArtifact = {
 }
 
 type WorkflowArtifactRequestOctokit = {
-  readonly auth: (options: { type: 'installation' }) => Promise<{ token: string } | unknown>
+  readonly auth: (options: { type: 'installation' }) => Promise<unknown | { token: string }>
   readonly request: (route: string, options: Record<string, unknown>) => Promise<{ data: WorkflowArtifact }>
 }
 
@@ -54,17 +54,17 @@ const getContentType = (fileName: string): string => {
 }
 
 const sanitizeFileName = (fileName: string): string => {
-  return fileName.replace(/[^A-Za-z0-9._-]/g, '-')
+  return fileName.replaceAll(/[^A-Za-z0-9._-]/g, '-')
 }
 
 const getRepositoryInstallationId = async (app: Probot, env: BotEnv): Promise<number> => {
   const appOctokit = (await app.auth()) as AppOctokit
   const response = await appOctokit.request('GET /repos/{owner}/{repo}/installation', {
-    owner: env.workflowOwner,
-    repo: env.workflowRepo,
     headers: {
       accept: 'application/vnd.github+json',
     },
+    owner: env.workflowOwner,
+    repo: env.workflowRepo,
   })
   return response.data.id
 }
@@ -159,12 +159,12 @@ const createHandleWorkflowArtifactRequest = (app: Probot, env: BotEnv, artifactK
         parsePositiveInteger(requestUrl.searchParams.get('installation_id')) || (await getRepositoryInstallationId(app, env))
       const octokit = (await app.auth(installationId)) as WorkflowArtifactRequestOctokit
       const artifactResponse = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}', {
-        owner: env.workflowOwner,
-        repo: env.workflowRepo,
         artifact_id: artifactId,
         headers: {
           accept: 'application/vnd.github+json',
         },
+        owner: env.workflowOwner,
+        repo: env.workflowRepo,
       })
       const artifact = artifactResponse.data
       if (artifact.expired) {

@@ -3,7 +3,7 @@ import * as GetHandleTestSetupMessage from '../src/parts/GetHandleTestSetupMessa
 
 test('getHandleTestSetupMessage - should return formatted setup message', () => {
   const result = GetHandleTestSetupMessage.getHandleTestSetupMessage()
-  expect(result).toBe('\n\u001B[0m\u001B[7m\u001B[33m SETUP \u001B[39m\u001B[27m\u001B[0m\n')
+  expect(result).toBe('\n\u{1B}[0m\u{1B}[7m\u{1B}[33m SETUP \u{1B}[39m\u{1B}[27m\u{1B}[0m\n')
 })
 
 test('getHandleTestSetupMessage - should always return the same message', () => {
