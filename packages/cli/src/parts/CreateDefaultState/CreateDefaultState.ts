@@ -22,6 +22,8 @@ export const createDefaultState = (): StdinDataState => ({
   insidersCommit: '',
   inspectExtensions: false,
   inspectExtensionsPort: 5870,
+  inspectIntegratedBrowser: false,
+  inspectProcess: '',
   inspectPtyHost: false,
   inspectPtyHostPort: 5877,
   inspectSharedProcess: false,

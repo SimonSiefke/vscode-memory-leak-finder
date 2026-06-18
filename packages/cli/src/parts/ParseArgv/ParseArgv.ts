@@ -262,6 +262,17 @@ const parseInspectPtyHost = (argv: readonly string[]): boolean => {
   return argv.includes('--inspect-ptyhost')
 }
 
+const parseInspectIntegratedBrowser = (argv: readonly string[]): boolean => {
+  return argv.includes('--inspect-integrated-browser')
+}
+
+const parseInspectProcess = (argv: readonly string[]): string => {
+  if (argv.includes('--inspect-process')) {
+    return parseArgvString(argv, '--inspect-process')
+  }
+  return ''
+}
+
 const parseEnableExtensions = (argv: readonly string[]): boolean => {
   return argv.includes('--enable-extensions')
 }
@@ -379,6 +390,8 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const insidersCommit = parseInsidersCommit(parsedVersion, argv)
   const inspectExtensions = parseInspectExtensions(argv)
   const inspectExtensionsPort = parseInspectExtensionsPort(argv)
+  const inspectIntegratedBrowser = parseInspectIntegratedBrowser(argv)
+  const inspectProcess = parseInspectProcess(argv)
   const inspectPtyHost = parseInspectPtyHost(argv)
   const inspectPtyHostPort = parseInspectPtyHostPort(argv)
   const inspectSharedProcess = parseInspectSharedProcess(argv)
@@ -386,6 +399,11 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  if (inspectIntegratedBrowser && (measureNode || inspectSharedProcess || inspectExtensions || inspectPtyHost || inspectProcess)) {
+    throw new Error(
+      '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
+    )
+  }
   const processRootStrategy = parseProcessRootStrategy(argv)
   const recordVideo = parseRecordVideo(argv)
   const compressVideo = parseCompressVideo(argv)
@@ -435,6 +453,8 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     insidersCommit,
     inspectExtensions,
     inspectExtensionsPort,
+    inspectIntegratedBrowser,
+    inspectProcess,
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,

@@ -290,6 +290,44 @@ test('parseArgv - inspect-ptyhost flag not present', () => {
   expect(options.inspectPtyHost).toBe(false)
 })
 
+test('parseArgv - inspect-integrated-browser flag', () => {
+  const argv = ['--inspect-integrated-browser']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(true)
+})
+
+test('parseArgv - inspect-integrated-browser flag not present', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(false)
+})
+
+test('parseArgv - inspect-process flag', () => {
+  const argv = ['--inspect-process', 'vite.js']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectProcess).toBe('vite.js')
+})
+
+test('parseArgv - inspect-process flag not present', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectProcess).toBe('')
+})
+
+test('parseArgv - inspect-integrated-browser rejects other measure targets', () => {
+  const argv = ['--inspect-integrated-browser', '--inspect-extensions']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
+  )
+})
+
+test('parseArgv - inspect-integrated-browser rejects inspect-process target', () => {
+  const argv = ['--inspect-integrated-browser', '--inspect-process', 'vite.js']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
+  )
+})
+
 test('parseArgv - enable-extensions flag', () => {
   const argv = ['--enable-extensions']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
