@@ -1,5 +1,6 @@
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
 import { disconnect } from '../Disconnect/Disconnect.ts'
+import * as GetExternalRuntimeInfo from '../GetExternalRuntimeInfo/GetExternalRuntimeInfo.ts'
 import * as RunTest from '../RunTest/RunTest.ts'
 import * as SetupTest from '../SetupTest/SetupTest.ts'
 import * as TearDownTest from '../TearDownTest/TearDownTest.ts'
@@ -7,6 +8,7 @@ import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerComma
 
 export const commandMap = {
   [TestWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
+  [TestWorkerCommandType.GetExternalRuntimeInfo]: GetExternalRuntimeInfo.getExternalRuntimeInfo,
   [TestWorkerCommandType.Disconnect]: disconnect,
   [TestWorkerCommandType.RunTest]: RunTest.runTest,
   [TestWorkerCommandType.SetupTest]: SetupTest.setupTest,
