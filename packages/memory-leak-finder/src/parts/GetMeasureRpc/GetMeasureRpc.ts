@@ -1,8 +1,8 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { connectToDevtoolsWithJsonUrl } from '../ConnectToDevtoolsWithJsonUrl/ConnectToDevtoolsWithJsonUrl.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
-
 export const getMeasureRpc = async (
   devtoolsWebSocketUrl: string,
   electronWebSocketUrl: string,
@@ -14,10 +14,9 @@ export const getMeasureRpc = async (
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
-): Promise<any> => {
+): Promise<Dynamic> => {
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
-
   if (inspectSharedProcess) {
     await sessionRpc.dispose()
     const sharedProcessRpc = await connectToDevtoolsWithJsonUrl(inspectSharedProcessPort)
@@ -38,12 +37,10 @@ export const getMeasureRpc = async (
     const electronRpc = await DebuggerCreateIpcConnection.createConnection(electronWebSocketUrl)
     return electronRpc
   }
-
   await DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
     autoAttach: true,
     flatten: true,
     waitForDebuggerOnStart: false,
   })
-
   return sessionRpc
 }

@@ -1,15 +1,15 @@
+import { VError } from '@lvce-editor/verror'
 import type { TransformOptions } from '../Types/Types.ts'
+import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 import { createFunctionWrapperPlugin } from '../CreateFunctionWrapperPlugin/CreateFunctionWrapperPlugin.ts'
 import { getFunctionLocations } from '../GetFunctionLocations/GetFunctionLocations.ts'
-import { VError } from '@lvce-editor/verror'
-import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 
 export const transformCodeWithTracking = (code: string, options: TransformOptions = {}): string => {
   if (!code) {
     return ''
   }
 
-  const { scriptId = 123, minify = false, ...restOptions } = options
+  const { minify = false, scriptId = 123, ...restOptions } = options
 
   try {
     // Optimize parser options to reduce memory usage:
@@ -17,10 +17,10 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
     // - ranges: false - don't store range information (we only need loc)
     // - attachComments: false - don't attach comments to nodes (saves memory)
     const originalAst = parser2.parse(code, {
-      sourceType: 'module',
       plugins: [],
-      tokens: false,
       ranges: false,
+      sourceType: 'module',
+      tokens: false,
     })
 
     // Must collect locations BEFORE mutating AST, as mutations change node locations
@@ -33,11 +33,11 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
     functionLocations.clear()
 
     const result = generate2(originalAst, {
-      retainLines: false,
-      compact: false,
       comments: true,
-      minified: minify,
+      compact: false,
       jsonCompatibleStrings: false,
+      minified: minify,
+      retainLines: false,
     })
 
     return result.code

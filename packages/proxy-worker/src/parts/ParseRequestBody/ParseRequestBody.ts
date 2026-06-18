@@ -25,7 +25,7 @@ export const parseRequestBody = (
     try {
       const formData: Record<string, string> = {}
       const params = new URLSearchParams(parsedBody)
-      for (const [key, value] of params.entries()) {
+      for (const [key, value] of params) {
         formData[key] = value
       }
       return formData

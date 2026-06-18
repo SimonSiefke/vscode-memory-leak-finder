@@ -26,7 +26,8 @@ const mergeSelectors = (selector, subSelector = '', hasText = '', hasExactText =
     if (subSelector.startsWith('text=')) {
       const text = subSelector.slice('text='.length)
       return `${merged}:has-text("${text}")`
-    } else if (merged) {
+    }
+    if (merged) {
       merged += ` ${subSelector}`
     } else {
       merged = subSelector

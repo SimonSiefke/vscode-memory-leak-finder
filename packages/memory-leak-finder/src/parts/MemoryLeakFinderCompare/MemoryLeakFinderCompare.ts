@@ -2,8 +2,17 @@ import * as Assert from '../Assert/Assert.ts'
 import { getSummary } from '../GetSummary/GetSummary.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
+import type { MeasureContext, UnknownRecord } from '../Types/Types.ts'
 
-export const compare = async (connectionId: number, context: any, resultPath: string): Promise<any> => {
+const isRecord = (value: unknown): value is UnknownRecord => {
+  return typeof value === 'object' && value !== null
+}
+
+export const compare = async (
+  connectionId: number,
+  context: MeasureContext,
+  resultPath: string,
+): Promise<{ readonly isLeak: boolean; readonly summary: string }> => {
   Assert.number(connectionId)
   Assert.string(resultPath)
   const state = MemoryLeakFinderState.get(connectionId)
@@ -22,7 +31,7 @@ export const compare = async (connectionId: number, context: any, resultPath: st
 
   await JsonFile.writeJson(resultPath, result)
   return {
-    isLeak: result.isLeak || false,
+    isLeak: isRecord(result) && result.isLeak === true,
     summary: getSummary(result),
   }
 }

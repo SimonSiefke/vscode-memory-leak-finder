@@ -1,10 +1,10 @@
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
-import { AddressInfo } from 'node:net'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import type { AddressInfo } from 'node:net'
 import { afterEach, expect, test } from '@jest/globals'
 import JSZip from 'jszip'
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { restoreAllMockDataArchive } from '../src/parts/RestoreAllMockDataArchive/RestoreAllMockDataArchive.ts'
 
 type TestHttpServer = {

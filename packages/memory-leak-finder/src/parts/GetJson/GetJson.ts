@@ -1,25 +1,22 @@
+import type { Dynamic } from '../Types/Types.ts'
 import waitForLocalhost from 'wait-for-localhost'
 import { VError } from '../VError/VError.ts'
-
-export const getJson = async (port: number): Promise<any[]> => {
+export const getJson = async (port: number): Promise<Dynamic[]> => {
   try {
     await waitForLocalhost({
       path: '/json/list',
       port,
-      signal: AbortSignal.timeout(30_000),
+      signal: AbortSignal.timeout(30000),
       useGet: true,
     })
-
     const response = await fetch(`http://localhost:${port}/json/list`)
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-
     const targets = await response.json()
     if (!Array.isArray(targets)) {
       throw new TypeError(`Expected array but got ${typeof targets}`)
     }
-
     return targets
   } catch (error) {
     if (error.message && error.message.includes('Timed out waiting for')) {

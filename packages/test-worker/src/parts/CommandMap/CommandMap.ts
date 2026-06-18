@@ -7,8 +7,8 @@ import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerComma
 
 export const commandMap = {
   [TestWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
+  [TestWorkerCommandType.Disconnect]: disconnect,
   [TestWorkerCommandType.RunTest]: RunTest.runTest,
   [TestWorkerCommandType.SetupTest]: SetupTest.setupTest,
   [TestWorkerCommandType.TearDownTest]: TearDownTest.tearDownTest,
-  [TestWorkerCommandType.Disconnect]: disconnect,
 }
