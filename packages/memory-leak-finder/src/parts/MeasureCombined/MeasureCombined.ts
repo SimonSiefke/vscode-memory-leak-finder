@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
-
 // TODO for large data and multiple measures, it might be bad to store much data in memory
 // better to store before and after data on disk, and when comparing, read it from disk
 // comparison could also happen in another worker
-export const combine = (...measures) => {
+export const combine = (...measures: Dynamic[]) => {
   const start = async () => {
     const beforeMap = Object.create(null)
     for (const measure of measures) {
@@ -11,7 +11,6 @@ export const combine = (...measures) => {
     }
     return beforeMap
   }
-
   const stop = async () => {
     const afterMap = Object.create(null)
     for (const measure of measures) {
@@ -19,8 +18,7 @@ export const combine = (...measures) => {
     }
     return afterMap
   }
-
-  const compare = async (before, after, context) => {
+  const compare = async (before: Dynamic, after: Dynamic, context: Dynamic) => {
     const resultMap = Object.create(null)
     for (const measure of measures) {
       const comparison = await measure.compare(before[measure.id], after[measure.id], context)
@@ -34,13 +32,11 @@ export const combine = (...measures) => {
     }
     return resultMap
   }
-
   const releaseResources = async () => {
     for (const measure of measures) {
       await measure.releaseResources()
     }
   }
-
   return {
     compare,
     id: MeasureId.Combined,

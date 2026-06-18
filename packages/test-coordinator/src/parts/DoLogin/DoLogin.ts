@@ -1,5 +1,5 @@
-import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
+import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 
 export interface LoginOptions {
   readonly arch: string

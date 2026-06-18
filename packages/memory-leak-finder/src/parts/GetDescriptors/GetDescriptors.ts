@@ -1,8 +1,8 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
-
-export const getDescriptors = async (session: Session, prototype: string, objectGroup: string): Promise<any> => {
+export const getDescriptors = async (session: Session, prototype: string, objectGroup: string): Promise<Dynamic> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: prototype,
     objectGroup,
@@ -57,7 +57,6 @@ return detachedNodes
     objectId: objects.objects.objectId,
     returnByValue: false,
   })
-
   const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: fnResult1.objectId,
     ownProperties: true,

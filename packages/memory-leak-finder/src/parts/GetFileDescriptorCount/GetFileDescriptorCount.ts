@@ -1,21 +1,19 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { execSync } from 'node:child_process'
 import { readFile, readdir } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 import { describeFdTarget } from '../DescribeFdTarget/DescribeFdTarget.ts'
-
 export interface ProcessInfo {
   readonly fileDescriptorCount: number
   readonly name: string
   readonly pid: number
 }
-
 /**
  * Get detailed information about a specific file descriptor
  */
 export const describeFd = (fd: string, target: string): string => {
   const description = describeFdTarget(target)
-
   // Add special notes for standard file descriptors
   if (fd === '0') {
     return `stdin (${description})`
@@ -26,10 +24,8 @@ export const describeFd = (fd: string, target: string): string => {
   if (fd === '2') {
     return `stderr (${description})`
   }
-
   return description
 }
-
 const getFileDescriptorCount = async (pid: number): Promise<number> => {
   try {
     const fdDir = `/proc/${pid}/fd`
@@ -40,20 +36,16 @@ const getFileDescriptorCount = async (pid: number): Promise<number> => {
     return 0
   }
 }
-
 export const getProcessName = async (pid: number): Promise<string> => {
   try {
     // Try to read command line from /proc/[pid]/cmdline for more detailed info
     const cmdlinePath = `/proc/${pid}/cmdline`
     const cmdline = await readFile(cmdlinePath, 'utf-8')
-
     // cmdline is null-separated arguments, split and filter empty strings
-    const args = cmdline.split('\0').filter((arg) => arg.length > 0)
-
+    const args = cmdline.split('\0').filter((arg: Dynamic) => arg.length > 0)
     if (args.length > 0) {
       // Extract meaningful process name from command line
       const firstArg = args[0]
-
       // Handle VS Code processes
       if (firstArg.includes('code') || firstArg.includes('vscode')) {
         // Check for specific VS Code process types
@@ -75,7 +67,6 @@ export const getProcessName = async (pid: number): Promise<string> => {
           }
           return `VS Code ${processType}`
         }
-
         // Check for utility-sub-type
         const subTypeIndex = args.indexOf('--utility-sub-type')
         if (subTypeIndex !== -1 && subTypeIndex + 1 < args.length) {
@@ -91,44 +82,37 @@ export const getProcessName = async (pid: number): Promise<string> => {
           }
           return `VS Code ${subType.split('.').pop()}`
         }
-
         // Check for extension host
-        if (args.some((arg) => arg.includes('extensionHost'))) {
+        if (args.some((arg: Dynamic) => arg.includes('extensionHost'))) {
           return 'VS Code Extension Host'
         }
-
         return 'VS Code'
       }
-
       // Handle Node.js processes
       if (firstArg.includes('node') || firstArg.includes('nodejs')) {
         // Check if it's a worker process
-        if (args.some((arg) => arg.includes('worker'))) {
+        if (args.some((arg: Dynamic) => arg.includes('worker'))) {
           return 'Node.js Worker'
         }
         // Check for specific script names
-        const scriptIndex = args.findIndex((arg) => arg.endsWith('.js') || arg.endsWith('.ts'))
+        const scriptIndex = args.findIndex((arg: Dynamic) => arg.endsWith('.js') || arg.endsWith('.ts'))
         if (scriptIndex !== -1) {
           const scriptName = args[scriptIndex].split('/').pop() || 'script'
           return `Node.js ${scriptName}`
         }
         return 'Node.js'
       }
-
       // Handle other common processes
       if (firstArg.includes('bash') || firstArg.includes('sh')) {
         return 'Shell'
       }
-
       if (firstArg.includes('python')) {
         return 'Python'
       }
-
       // Return the base name of the first argument
       const baseName = firstArg.split('/').pop() || firstArg
       return baseName.length > 50 ? `${baseName.slice(0, 47)}...` : baseName
     }
-
     // Fallback to using ps command
     const stdout = execSync(`ps -p ${pid} -o comm=`).toString()
     return stdout.trim() || 'unknown'
@@ -143,7 +127,6 @@ export const getProcessName = async (pid: number): Promise<string> => {
     }
   }
 }
-
 export const getFileDescriptorCountForProcess = async (
   pid: number | undefined,
   platformName: string = platform(),
@@ -160,20 +143,16 @@ export const getFileDescriptorCountForProcess = async (
     const allPids = await getAllDescendantPids(pid)
     console.log(`[GetFileDescriptorCount] Found ${allPids.length} processes (including main process ${pid})`)
     const processInfos: ProcessInfo[] = []
-
     for (const processPid of allPids) {
       const [name, fdCount] = await Promise.all([getProcessName(processPid), getFileDescriptorCount(processPid)])
-
       processInfos.push({
         fileDescriptorCount: fdCount,
         name,
         pid: processPid,
       })
     }
-
     // Sort by file descriptor count descending
-    processInfos.sort((a, b) => b.fileDescriptorCount - a.fileDescriptorCount)
-
+    processInfos.sort((a: Dynamic, b: Dynamic) => b.fileDescriptorCount - a.fileDescriptorCount)
     console.log(`[GetFileDescriptorCount] Returning ${processInfos.length} process infos`)
     return processInfos
   } catch (error) {
