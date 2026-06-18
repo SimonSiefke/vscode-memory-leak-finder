@@ -68,25 +68,26 @@ export const connectWorkers = async (
   )
   const [videoRpc, testWorkerRpc] = await Promise.all(promises)
 
-  const memoryRpc = inspectIntegratedBrowser || inspectProcess
-    ? emptyRpc
-    : await MemoryLeakWorker.startWorker(
-        devtoolsWebSocketUrl,
-        webSocketUrl,
-        connectionId,
-        measureId,
-        attachedToPageTimeout,
-        measureNode,
-        inspectSharedProcess,
-        inspectExtensions,
-        inspectIntegratedBrowser,
-        inspectPtyHost,
-        inspectPtyHostPort,
-        inspectSharedProcessPort,
-        inspectExtensionsPort,
-        pid,
-        [],
-      )
+  const memoryRpc =
+    inspectIntegratedBrowser || inspectProcess
+      ? emptyRpc
+      : await MemoryLeakWorker.startWorker(
+          devtoolsWebSocketUrl,
+          webSocketUrl,
+          connectionId,
+          measureId,
+          attachedToPageTimeout,
+          measureNode,
+          inspectSharedProcess,
+          inspectExtensions,
+          inspectIntegratedBrowser,
+          inspectPtyHost,
+          inspectPtyHostPort,
+          inspectSharedProcessPort,
+          inspectExtensionsPort,
+          pid,
+          [],
+        )
 
   return {
     memoryRpc,

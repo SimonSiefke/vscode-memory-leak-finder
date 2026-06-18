@@ -445,7 +445,13 @@ export const runTestsWithCallback = async ({
             } else if (inspectIntegratedBrowser) {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'integrated-browser', measure, fileName)
             } else if (inspectProcess) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'process', getProcessResultFolder(inspectProcess), measure, fileName)
+              resultPath = join(
+                MemoryLeakResultsPath.memoryLeakResultsPath,
+                'process',
+                getProcessResultFolder(inspectProcess),
+                measure,
+                fileName,
+              )
             } else {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             }
