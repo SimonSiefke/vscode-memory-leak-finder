@@ -68,6 +68,9 @@ export interface ChatEditor {
   send(options?: any): Promise<void>
   sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
+<<<<<<< HEAD
+  verifyResponseMessage(): Promise<void>
+=======
   setModeLegacy(modeLabel: any): Promise<void>
   retryLastMessage(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
@@ -83,6 +86,7 @@ export interface ColorPicker {
   getColorValue(): Promise<string>
   open(): Promise<void>
   shouldChangeColorValueWhenDraggingColorAreaPointerRight(): Promise<void>
+>>>>>>> origin/main
 }
 export interface ContextMenu {
   check(name: any): Promise<void>
