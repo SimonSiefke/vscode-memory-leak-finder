@@ -8,6 +8,20 @@ const commonJsExternalReplace = (match: string): string => {
 
 const RE_RELATIVE_SRC_PATH = /^(?:\.\/|\.\.\/)+\.?src\//
 
+const cleanRelativePath = (source: string): string => {
+  let clean = source.replaceAll('\\', '/')
+  clean = clean.replace(/^[a-zA-Z]:\/+/, '')
+  clean = clean.replace(/^\/+/, '')
+  while (clean.startsWith('../') || clean.startsWith('./')) {
+    clean = clean.replace(/^(\.\.\/|\.\/)+/, '')
+  }
+  clean = clean.replaceAll('/../', '/')
+  clean = clean.replaceAll('/./', '/')
+  clean = clean.replace(/\/\.\.$/, '')
+  clean = clean.replace(/\/\.$/, '')
+  return clean
+}
+
 export const cleanSource = (source: string): string => {
   if (!source) {
     return ''
@@ -16,7 +30,7 @@ export const cleanSource = (source: string): string => {
   if (vscodeIndex !== -1) {
     return source.slice(vscodeIndex + 'vscode/'.length)
   }
-  return source
+  const cleaned = source
     .replace('webpack://markdown-math', 'extensions/markdown-math')
     .replace('webpack://markdown-language-features/./', 'extensions/markdown-language-features/')
     .replace('webpack://markdown-language-features/', 'extensions/markdown-language-features/')
@@ -27,4 +41,5 @@ export const cleanSource = (source: string): string => {
     .replace('../src', 'src')
     .replace('./src', 'src')
     .replace(RE_EXTERNAL_COMMON_JS, commonJsExternalReplace)
+  return cleanRelativePath(cleaned)
 }
