@@ -313,8 +313,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(terminal).toBeVisible()
         const rows = terminal.locator('.xterm-rows')
         await expect(rows).toBeVisible()
-        await expect(rows).toContainText(text, { timeout })
-        await page.waitForIdle()
+        const startTime = performance.now()
+        while (performance.now() - startTime < timeout) {
+          const content = await rows.textContent()
+          if (typeof content === 'string' && content.includes(text)) {
+            await page.waitForIdle()
+            return
+          }
+          await new Promise((resolve) => setTimeout(resolve, 200))
+          await page.waitForIdle()
+        }
+        throw new Error(`Timed out waiting for terminal text ${text}`)
       } catch (error) {
         throw new VError(error, `Failed to verify terminal contains text ${text}`)
       }

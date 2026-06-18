@@ -329,6 +329,31 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }
   }
 
+  const waitForLatestExchangeToFinish = async (chatView: any, response: any) => {
+    const progress = chatView.locator('.rendered-markdown.progress-step')
+    await expect(progress).toBeHidden({ timeout: 45_000 })
+    await page.waitForIdle()
+    await expect(response).toBeVisible({ timeout: 30_000 })
+    await page.waitForIdle()
+  }
+
+  const verifyToolInvocations = async (chatView: any, toolInvocations: readonly any[]) => {
+    if (toolInvocations.length === 0) {
+      return
+    }
+    const element = chatView.locator('.chat-tool-invocation-part')
+    await expect(element).toBeVisible({ timeout: 20_000 })
+    await page.waitForIdle()
+    for (const toolInvocation of toolInvocations) {
+      const block = element.locator('.chat-terminal-command-block')
+      await expect(block).toBeVisible({
+        timeout: 2000,
+      })
+      await expect(block).toHaveText(` ${toolInvocation.content}`)
+      await page.waitForIdle()
+    }
+  }
+
   const getChatScrollMetrics = async () => {
     return page.evaluate({
       expression: `(() => {
@@ -807,6 +832,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     async sendMessage({
+      accessButton = '',
       expectedResponse,
       image = '',
       message,
@@ -820,7 +846,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       waitForFileChanges: fileChangesToWaitFor = [],
       waitForPorts: portsToWaitFor = [],
       viewLinesText = '',
+      waitForCompletion = true,
     }: {
+      accessButton?: string
       expectedResponse?: string
       message: string
       approveToolCalls?: boolean
@@ -832,6 +860,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       image?: string
       toolInvocations?: readonly any[]
       model?: string
+      waitForCompletion?: boolean
     }) {
       try {
         const chatView = page.locator('.interactive-session')
@@ -921,18 +950,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await expect(response).toBeVisible()
         }
 
-        if (toolInvocations.length > 0) {
-          const element = chatView.locator('.chat-tool-invocation-part')
-          await expect(element).toBeVisible({ timeout: 20_000 })
-          await page.waitForIdle()
-          for (const toolInvocation of toolInvocations) {
-            const block = element.locator('.chat-terminal-command-block')
-            await expect(block).toBeVisible({
-              timeout: 2000,
-            })
-            await expect(block).toHaveText(` ${toolInvocation.content}`)
-            await page.waitForIdle()
-          }
+        await verifyToolInvocations(chatView, toolInvocations)
+
+        if (accessButton) {
+          await this.clickAccessButton(accessButton, 60_000)
+        }
+
+        if (waitForCompletion) {
+          await waitForLatestExchangeToFinish(chatView, response)
         }
 
         const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
@@ -1038,11 +1063,35 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to retry last chat message`)
       }
     },
-    async clickAccessButton(buttonText: string = 'Allow') {
+    async clickAccessButton(buttonText: string = 'Allow', timeout = 0) {
       try {
         const accessButton = getAccessButtons(page, buttonText)
-        const buttonCount = await accessButton.count()
+        if (timeout > 0) {
+          try {
+            await expect(accessButton.first()).toBeVisible({ timeout })
+            await accessButton.first().click()
+            await page.waitForIdle()
+            return
+          } catch (error) {
+            const availableButtons = await page.evaluate({
+              expression: `(() => {
+  const elements = Array.from(document.querySelectorAll('button, [role="button"], .action-label'))
+  return elements
+    .map((element) => {
+      const text = (element.textContent || element.getAttribute('value') || '').trim().replace(/\s+/g, ' ')
+      return text
+    })
+    .filter(Boolean)
+    .slice(0, 20)
+})()`,
+              returnByValue: true,
+            })
+            const availableButtonsText = Array.isArray(availableButtons) && availableButtons.length > 0 ? availableButtons.join(', ') : 'none'
+            throw new Error(`Access button "${buttonText}" was not visible within ${timeout}ms. Available interactive-session buttons: ${availableButtonsText}`)
+          }
+        }
 
+        const buttonCount = await accessButton.count()
         if (buttonCount > 0) {
           await expect(accessButton.first()).toBeVisible()
           await accessButton.first().click()

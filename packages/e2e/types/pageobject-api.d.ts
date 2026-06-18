@@ -70,7 +70,7 @@ export interface ChatEditor {
   setMode(modeLabel: any): Promise<void>
   setModeLegacy(modeLabel: any): Promise<void>
   retryLastMessage(): Promise<void>
-  clickAccessButton(buttonText?: any): Promise<void>
+  clickAccessButton(buttonText?: any, timeout?: any): Promise<void>
   approveAllAccessRequests(options?: any): Promise<void>
   waitForLatestExchange(message: any): Promise<void>
   waitForNewWindow(options: any, electron: any): Promise<number>
