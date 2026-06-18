@@ -107,9 +107,9 @@ export const create = ({ page, VError }: CreateParams) => {
   return createWithDependencies(
     { page, VError },
     {
-      spawnProcess: spawn,
       isPortOpen,
       sleep,
+      spawnProcess: spawn,
     },
   )
 }
@@ -128,6 +128,35 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
   }
 
   return {
+    async dispose(): Promise<void> {
+      try {
+        const {childProcess} = state
+        if (!childProcess) {
+          return
+        }
+        if (childProcess.exitCode !== null || childProcess.signalCode !== null) {
+          state.childProcess = undefined
+          return
+        }
+        try {
+          process.kill(-childProcess.pid, 'SIGTERM')
+        } catch {
+          childProcess.kill('SIGTERM')
+        }
+        await waitForExit(childProcess, 5000)
+        if (childProcess.exitCode === null && childProcess.signalCode === null) {
+          try {
+            process.kill(-childProcess.pid, 'SIGKILL')
+          } catch {
+            childProcess.kill('SIGKILL')
+          }
+          await waitForExit(childProcess, 1000)
+        }
+        state.childProcess = undefined
+      } catch (error) {
+        throw new VError(error, `Failed to dispose SSH server`)
+      }
+    },
     async launch(): Promise<SshServerConnection> {
       try {
         if (!state.childProcess || state.childProcess.exitCode !== null || state.childProcess.signalCode !== null) {
@@ -149,13 +178,6 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
         throw new VError(error, `Failed to launch SSH server`)
       }
     },
-    async waitForPort({ host = defaultHost, port = defaultPort, timeout = defaultTimeout } = {}): Promise<void> {
-      try {
-        await waitForPortInternal(state, dependencies, { host, port, timeout })
-      } catch (error) {
-        throw new VError(error, `Failed to wait for SSH server port ${host}:${port}`)
-      }
-    },
     async shouldBeConnected({ url = defaultUrl } = {}): Promise<void> {
       try {
         await page.waitForIdle()
@@ -170,33 +192,11 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
         throw new VError(error, `Failed to verify SSH server connection`)
       }
     },
-    async dispose(): Promise<void> {
+    async waitForPort({ host = defaultHost, port = defaultPort, timeout = defaultTimeout } = {}): Promise<void> {
       try {
-        const childProcess = state.childProcess
-        if (!childProcess) {
-          return
-        }
-        if (childProcess.exitCode !== null || childProcess.signalCode !== null) {
-          state.childProcess = undefined
-          return
-        }
-        try {
-          process.kill(-childProcess.pid, 'SIGTERM')
-        } catch {
-          childProcess.kill('SIGTERM')
-        }
-        await waitForExit(childProcess, 5_000)
-        if (childProcess.exitCode === null && childProcess.signalCode === null) {
-          try {
-            process.kill(-childProcess.pid, 'SIGKILL')
-          } catch {
-            childProcess.kill('SIGKILL')
-          }
-          await waitForExit(childProcess, 1_000)
-        }
-        state.childProcess = undefined
+        await waitForPortInternal(state, dependencies, { host, port, timeout })
       } catch (error) {
-        throw new VError(error, `Failed to dispose SSH server`)
+        throw new VError(error, `Failed to wait for SSH server port ${host}:${port}`)
       }
     },
   }
