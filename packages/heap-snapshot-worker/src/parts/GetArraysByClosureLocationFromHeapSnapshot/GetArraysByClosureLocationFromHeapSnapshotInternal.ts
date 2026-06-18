@@ -2,6 +2,8 @@ import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/Comput
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { isInternalArray } from '../IsInternalArray/IsInternalArray.ts'
+import type { CleanedNode, NumberArray } from '../Snapshot/Snapshot.ts'
+import type { ScriptMap } from './GetArraysByClosureLocationFromHeapSnapshot.ts'
 
 interface VariableName {
   readonly name: string
@@ -58,18 +60,18 @@ export interface ResultGroup {
 }
 
 export const getArraysByClosureLocationFromHeapSnapshotInternal = (
-  strings,
-  nodes,
-  node_types,
-  node_fields,
-  edges,
-  edge_types,
-  edge_fields,
-  parsedNodes,
-  locations,
-  locationFields,
-  scriptMap,
-) => {
+  strings: readonly string[],
+  nodes: NumberArray,
+  node_types: readonly (readonly string[])[],
+  node_fields: readonly string[],
+  edges: NumberArray,
+  edge_types: readonly (readonly string[])[],
+  edge_fields: readonly string[],
+  parsedNodes: readonly CleanedNode[],
+  locations: NumberArray,
+  locationFields: readonly string[],
+  scriptMap: ScriptMap,
+): readonly ResultGroup[] => {
   const {
     detachednessFieldIndex,
     edgeCountFieldIndex,

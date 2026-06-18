@@ -1,9 +1,10 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as CamelCase from '../CamelCase/CamelCase.ts'
 import * as CreateHeapSnapshotNode from '../CreateHeapSnapshotNode/CreateHeapSnapshotNode.ts'
+import type { HeapSnapshotRecord, NumberArray } from '../Snapshot/Snapshot.ts'
 
 export const parseHeapSnapshotObjects = (
-  values: readonly number[],
+  values: NumberArray,
   valueFields: readonly string[],
   valueTypes: readonly string[],
   typeKey: string,
@@ -11,11 +12,11 @@ export const parseHeapSnapshotObjects = (
   indexMultiplierKey: string,
   indexMultiplier: number,
   strings: readonly string[],
-) => {
+): readonly HeapSnapshotRecord[] => {
   // Assert.array(values)
   Assert.array(valueFields)
   Assert.array(valueTypes)
-  const parsed: readonly any[] = []
+  const parsed: HeapSnapshotRecord[] = []
   const nodeFieldCount = valueFields.length
   const camelCaseNodeFields = valueFields.map(CamelCase.camelCase)
   for (let i = 0; i < values.length; i += nodeFieldCount) {
@@ -30,7 +31,7 @@ export const parseHeapSnapshotObjects = (
       indexMultiplier,
       strings,
     )
-    ;(parsed as any[]).push(node)
+    parsed.push(node)
   }
   return parsed
 }
