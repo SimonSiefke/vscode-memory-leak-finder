@@ -24,7 +24,7 @@ beforeEach(() => {
 })
 
 test('launchFileSystemWorker - creates unrefed filesystem worker rpc', async () => {
-  const rpc = { invoke: jest.fn(), dispose: jest.fn() }
+  const rpc = { dispose: jest.fn(), invoke: jest.fn() }
   mockCreate.mockResolvedValue(rpc)
 
   await launchFileSystemWorker()

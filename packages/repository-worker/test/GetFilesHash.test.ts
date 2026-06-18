@@ -13,9 +13,8 @@ test('getFilesHash returns hash of file contents', async () => {
     callCount++
     if (callCount === 1) {
       return fileContents[0]
-    } else {
-      return fileContents[1]
     }
+    return fileContents[1]
   })
 
   const mockRpc = MockRpc.create({

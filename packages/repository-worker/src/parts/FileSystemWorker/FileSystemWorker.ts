@@ -16,10 +16,12 @@ export const set = (rpc: RpcConnection): void => {
 }
 
 export const dispose = async (): Promise<void> => {
-  if (state.rpc) {
-    await state.rpc.dispose()
-    state.rpc = undefined
+  if (!state.rpc) {
+    return
   }
+
+  await state.rpc.dispose()
+  state.rpc = undefined
 }
 
 const invoke = (method: string, ...params: unknown[]): Promise<unknown> => {
