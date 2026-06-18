@@ -40,7 +40,7 @@ const isRelativeSourceMap = (sourceMapUrl: string): boolean => {
 
 const getSourceMapUrl = (script: ScriptInfo): string => {
   if (script.url && script.sourceMapUrl && isRelativeSourceMap(script.sourceMapUrl)) {
-    return new URL(script.sourceMapUrl, script.url).toString()
+    return new URL(script.sourceMapUrl, script.url).href
   }
   let sourceMapUrl = script.sourceMapUrl || ''
   // If no source map URL was found, try to find a matching .js.map file

@@ -253,38 +253,37 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
   }
 
   // Convert closure location map to array and sort by potential memory leak indicators
-  const result: ResultGroup[] = [...closureLocationMap.values()]
-    .map((closureGroup) => {
-      // Calculate additional metrics for memory leak detection
-      const avgSize = closureGroup.totalSize / closureGroup.count
-      const totalLength = closureGroup.arrays.reduce((sum, arr) => sum + arr.length, 0)
-      const avgLength = totalLength / closureGroup.count
+  const result: ResultGroup[] = Array.from(closureLocationMap.values(), (closureGroup) => {
+    // Calculate additional metrics for memory leak detection
+    const avgSize = closureGroup.totalSize / closureGroup.count
+    const totalLength = closureGroup.arrays.reduce((sum, arr) => sum + arr.length, 0)
+    const avgLength = totalLength / closureGroup.count
 
-      // Filter out internal arrays
-      const nonInternalArrays = closureGroup.arrays.filter((arr) => {
-        if (arr.variableNames && arr.variableNames.length > 0) {
-          const uniqueNames = [...new Set(arr.variableNames.map((v) => v.name))]
-          return !isInternalArray(uniqueNames.length === 1 ? uniqueNames[0] : uniqueNames)
-        }
-        return !isInternalArray(arr.name)
-      })
-
-      return {
-        arrays: nonInternalArrays.map((arr) => ({
-          id: arr.id,
-          length: arr.length,
-          name: arr.variableNames && arr.variableNames.length > 0 ? [...new Set(arr.variableNames.map((v) => v.name))].sort() : arr.name,
-          selfSize: arr.selfSize,
-        })),
-        avgLength,
-        avgSize,
-        count: nonInternalArrays.length,
-        locationInfo: closureGroup.locationInfo,
-        locationKey: closureGroup.locationKey,
-        totalLength,
-        totalSize: nonInternalArrays.reduce((sum, arr) => sum + arr.selfSize, 0),
+    // Filter out internal arrays
+    const nonInternalArrays = closureGroup.arrays.filter((arr) => {
+      if (arr.variableNames && arr.variableNames.length > 0) {
+        const uniqueNames = [...new Set(arr.variableNames.map((v) => v.name))]
+        return !isInternalArray(uniqueNames.length === 1 ? uniqueNames[0] : uniqueNames)
       }
+      return !isInternalArray(arr.name)
     })
+
+    return {
+      arrays: nonInternalArrays.map((arr) => ({
+        id: arr.id,
+        length: arr.length,
+        name: arr.variableNames && arr.variableNames.length > 0 ? [...new Set(arr.variableNames.map((v) => v.name))].sort() : arr.name,
+        selfSize: arr.selfSize,
+      })),
+      avgLength,
+      avgSize,
+      count: nonInternalArrays.length,
+      locationInfo: closureGroup.locationInfo,
+      locationKey: closureGroup.locationKey,
+      totalLength,
+      totalSize: nonInternalArrays.reduce((sum, arr) => sum + arr.selfSize, 0),
+    }
+  })
     .filter((group) => group.count > 0) // Only include groups with non-internal arrays
     .sort((a, b) => {
       // Sort by multiple factors to identify potential memory leaks:

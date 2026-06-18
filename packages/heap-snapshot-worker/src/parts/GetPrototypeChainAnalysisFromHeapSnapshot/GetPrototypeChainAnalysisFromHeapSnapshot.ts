@@ -415,7 +415,7 @@ const calculateChainStatistics = (chainLengths: readonly number[]): AnalysisStat
     return { average: 0, count: 0, max: 0, median: 0, min: 0, percentile95: 0 }
   }
 
-  const sorted = [...chainLengths].sort((a, b) => a - b)
+  const sorted = chainLengths.toSorted((a, b) => a - b)
 
   // Avoid spread operator for large arrays - use reduce instead
   const max = chainLengths.reduce((max, current) => Math.max(max, current), 0)

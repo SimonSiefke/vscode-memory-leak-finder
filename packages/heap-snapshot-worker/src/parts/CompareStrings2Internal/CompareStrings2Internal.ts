@@ -2,8 +2,8 @@ import * as Assert from '../Assert/Assert.ts'
 import { isChromeInternalString } from '../IsChromeInternalString/IsChromeInternalString.ts'
 
 export interface LeakedString {
-  readonly string: string
   readonly delta: number
+  readonly string: string
 }
 
 const compareCount = (a: LeakedString, b: LeakedString): number => {
@@ -29,13 +29,11 @@ const getLeakedStrings = (
   for (const [key, value] of Object.entries(countMap)) {
     if (value < 0) {
       const delta = -value
-      if (delta >= minCount) {
-        if (includeChromeInternalStrings || !isChromeInternalString(key)) {
-          leaked.push({
-            string: key,
-            delta: delta,
-          })
-        }
+      if (delta >= minCount && (includeChromeInternalStrings || !isChromeInternalString(key))) {
+        leaked.push({
+          delta: delta,
+          string: key,
+        })
       }
     }
   }
