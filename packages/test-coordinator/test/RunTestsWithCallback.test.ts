@@ -24,6 +24,7 @@ test('runTestsWithCallback - setupOnly skips launching and attaching to the app'
     addDisposable: () => {},
     allowCopilotAuthInCi: false,
     arch: 'x64',
+    bailOnFailure: false,
     callback: async () => {},
     checkLeaks: false,
     clearDisposables: async () => {},

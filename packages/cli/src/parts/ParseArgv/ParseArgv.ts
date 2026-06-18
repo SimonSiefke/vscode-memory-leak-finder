@@ -77,6 +77,10 @@ const parseCheckLeaks = (argv: readonly string[]): boolean => {
   return false
 }
 
+const parseBailOnFailure = (argv: readonly string[]): boolean => {
+  return argv.includes('--bail-on-failure')
+}
+
 const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-skipped-tests-anyway')
 }
@@ -355,6 +359,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const platform = parsePlatform(processPlatform, argv)
   const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
+  const bailOnFailure = parseBailOnFailure(argv)
   const bisect = parseBisect(argv)
   const checkLeaks = parseCheckLeaks(argv)
   const clearExtensions = parseClearExtensions(argv)
@@ -412,6 +417,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const isWindows = IsWindows.isWindows(processPlatform)
   return {
     arch,
+    bailOnFailure,
     bisect,
     checkLeaks,
     clearExtensions,

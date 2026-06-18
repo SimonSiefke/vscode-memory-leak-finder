@@ -2,6 +2,9 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
+// VS Code 1.124 no longer exposes a stable generated C debug option in headless CI.
+// export const skipForced = true
+
 export const requiresNetwork = true
 
 export const setup = async ({ Editor, Extensions, RunAndDebug, Workspace }: TestContext): Promise<void> => {
@@ -13,7 +16,7 @@ int main() {
 	printf("Hello World\\n");
 	return 0;
 }
-`,
+      `,
       name: 'main.c',
     },
   ])
@@ -30,7 +33,7 @@ export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Pr
   await ActivityBar.showRunAndDebug()
   await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused({
-    debugLabel: 'C/C++: gcc build and debug active file',
+    debugLabel: ['gcc - Build and debug active file', 'C/C++: gcc build and debug active file'],
     file: 'main.c',
     hasCallStack: false,
     line: 2,

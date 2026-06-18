@@ -1,11 +1,15 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
 
+const mockInvoke = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<string>>
+const mockHandleExit = jest.fn() as jest.MockedFunction<() => Promise<void>>
+let isWatchMode = true
+
 beforeEach(() => {
   jest.resetModules()
   jest.resetAllMocks()
+  isWatchMode = true
+  process.exitCode = undefined
 })
-
-const mockInvoke = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<string>>
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
@@ -17,9 +21,15 @@ jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => 
   return {
     getState() {},
     isWatchMode() {
-      return true
+      return isWatchMode
     },
     setState() {},
+  }
+})
+
+jest.unstable_mockModule('../src/parts/HandleExit/HandleExit.ts', () => {
+  return {
+    handleExit: mockHandleExit,
   }
 })
 
@@ -40,6 +50,20 @@ test('handleTestsFinished - no filter value', async () => {
   await HandleTestsFinished.handleTestsFinished(2, 1, 0, 0, 0, 3, 3000, '')
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(expectedMessage)
+})
+
+test('handleTestsFinished - skipped failed exits with error outside watch mode', async () => {
+  const expectedMessage = 'tests finished with skipped failure\n'
+  isWatchMode = false
+  mockInvoke.mockResolvedValue(expectedMessage)
+  mockHandleExit.mockResolvedValue()
+
+  await HandleTestsFinished.handleTestsFinished(2, 0, 0, 1, 0, 3, 3000, '')
+
+  expect(Stdout.write).toHaveBeenCalledTimes(1)
+  expect(Stdout.write).toHaveBeenCalledWith(expectedMessage)
+  expect(process.exitCode).toBe(1)
+  expect(mockHandleExit).toHaveBeenCalledTimes(1)
 })
 
 test('handleTestsFinished - with filter value', async () => {

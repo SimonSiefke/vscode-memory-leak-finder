@@ -29,6 +29,13 @@ test('parseArgv - run skipped tests anyway', () => {
   })
 })
 
+test('parseArgv - bail on failure', () => {
+  const argv = ['--bail-on-failure']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    bailOnFailure: true,
+  })
+})
+
 test('parseArgv - allow copilot auth in ci', () => {
   const argv = ['--allow-copilot-auth-in-ci']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({

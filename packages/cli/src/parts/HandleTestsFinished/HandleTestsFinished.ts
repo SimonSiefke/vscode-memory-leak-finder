@@ -42,7 +42,7 @@ export const handleTestsFinished = async (
     mode: ModeType.FinishedRunning,
   })
   if (!isWatchMode) {
-    if (failed) {
+    if (failed || skippedFailed) {
       process.exitCode = ExitCode.Error
     }
     HandleExit.handleExit()

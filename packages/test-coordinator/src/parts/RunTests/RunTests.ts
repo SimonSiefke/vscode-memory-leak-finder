@@ -17,6 +17,7 @@ const getTimeStamp = () => {
 export const runTests = async ({
   allowCopilotAuthInCi,
   arch,
+  bailOnFailure,
   bisect,
   checkLeaks,
   clearExtensions,
@@ -79,6 +80,7 @@ export const runTests = async ({
     const options: RunTestsOptions = {
       allowCopilotAuthInCi,
       arch,
+      bailOnFailure,
       bisect,
       checkLeaks,
       clearExtensions,
@@ -133,6 +135,7 @@ export const runTests = async ({
     addDisposable: Disposables.add,
     allowCopilotAuthInCi,
     arch,
+    bailOnFailure,
     callback,
     checkLeaks,
     clearDisposables: Disposables.disposeAll,

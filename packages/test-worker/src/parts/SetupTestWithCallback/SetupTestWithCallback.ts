@@ -22,6 +22,9 @@ export const setupTestWithCallback = async (pageObject, file, forceRun, isGithub
   const wasOriginallySkipped = Boolean(module.skip)
   const isCi = isGithubActions
   const requiresCopilotAuth = Boolean(module.requiresCopilotAuth) || hasChatTestFileName(file)
+  if (module.skip && module.skipForced) {
+    return { error: null, skipped: true, wasOriginallySkipped }
+  }
   if (requiresCopilotAuth && isCi && !allowCopilotAuthInCi) {
     return { error: null, skipped: true, wasOriginallySkipped }
   }
