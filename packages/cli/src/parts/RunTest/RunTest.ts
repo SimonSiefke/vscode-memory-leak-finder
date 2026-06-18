@@ -11,7 +11,7 @@ export const state: State = {
 
 export const cleanup = (): void => {
   if (!state.testCoordinator) {
-  	return;
+    return
   }
 
   state.testCoordinator.dispose()

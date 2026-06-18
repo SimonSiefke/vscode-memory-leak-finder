@@ -33,7 +33,7 @@ export const invoke = async (method: string, ...args: any[]): Promise<any> => {
 
 export const cleanup = async (): Promise<void> => {
   if (!stdoutWorkerRpc) {
-  	return;
+    return
   }
 
   await stdoutWorkerRpc.dispose()
