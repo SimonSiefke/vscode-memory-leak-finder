@@ -32,8 +32,10 @@ export const invoke = async (method: string, ...args: any[]): Promise<any> => {
 }
 
 export const cleanup = async (): Promise<void> => {
-  if (stdoutWorkerRpc) {
-    await stdoutWorkerRpc.dispose()
-    stdoutWorkerRpc = undefined
+  if (!stdoutWorkerRpc) {
+    return
   }
+
+  await stdoutWorkerRpc.dispose()
+  stdoutWorkerRpc = undefined
 }

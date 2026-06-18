@@ -31,12 +31,12 @@ export interface StdinDataState {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
-  readonly processRootStrategy: string
   readonly mode: number
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly previousFilters: string[]
+  readonly processRootStrategy: string
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
@@ -81,12 +81,12 @@ let state: StdinDataState = {
   measure: Character.EmptyString,
   measureAfter: false,
   measureNode: false,
-  processRootStrategy: 'launch-pid',
   mode: ModeType.Waiting,
   openDevtools: false,
   pageObjectPath: '',
   platform: '',
   previousFilters: [],
+  processRootStrategy: 'launch-pid',
   recordVideo: false,
   restartBetween: false,
   runMode: TestRunMode.Auto,
@@ -129,11 +129,11 @@ export const setState = (newState: StdinDataState): void => {
     measure: newState.measure,
     measureAfter: newState.measureAfter,
     measureNode: newState.measureNode,
-    processRootStrategy: newState.processRootStrategy,
     mode: newState.mode,
     pageObjectPath: newState.pageObjectPath,
     platform: newState.platform,
     previousFilters: newState.previousFilters,
+    processRootStrategy: newState.processRootStrategy,
     recordVideo: newState.recordVideo,
     restartBetween: newState.restartBetween,
     runMode: newState.runMode,

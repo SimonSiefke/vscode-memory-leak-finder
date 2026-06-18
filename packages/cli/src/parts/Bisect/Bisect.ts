@@ -65,18 +65,19 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       await Stdout.write(`\nBisect completed successfully!\n`)
       await Stdout.write(`Memory leak regression introduced in commit: ${result.commit}\n`)
       return result as BisectResult
-    } else if (result.type === 'failed-test') {
+    }
+    if (result.type === 'failed-test') {
       await Stdout.write(`\nBisect failed due to failed test.\n`)
       return result as BisectResult
-    } else if (result.type === 'not-found') {
+    }
+    if (result.type === 'not-found') {
       await Stdout.write(`\nBisect completed but no leaking commit found in the tested range.\n`)
       return result as BisectResult
-    } else {
-      // This shouldn't happen, but handle regular test results
-      await Stdout.write(`\nUnexpected result type from bisect.\n`)
-      return {
-        type: 'failed-test',
-      }
+    }
+    // This shouldn't happen, but handle regular test results
+    await Stdout.write(`\nUnexpected result type from bisect.\n`)
+    return {
+      type: 'failed-test',
     }
   } catch (error) {
     await Stdout.write(`Bisect failed: ${error}\n`)
