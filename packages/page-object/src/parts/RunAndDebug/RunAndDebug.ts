@@ -2,7 +2,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async continue() {
       try {
@@ -120,7 +120,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         await this.waitForPaused({
           callStackSize,
           file,
-          ...(hasCallStack === undefined ? {} : { hasCallStack }),
+          ...(hasCallStack !== undefined && { hasCallStack }),
           line,
         })
       } catch (error) {
@@ -403,19 +403,6 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         throw new VError(error, `Failed to stop`)
       }
     },
-    async waitForDebugConsoleOutput({ output: _output }: { output: string }) {
-      try {
-        await page.waitForIdle()
-        const repl = page.locator('.repl')
-        await expect(repl).toBeVisible()
-        await page.waitForIdle()
-        const row = page.locator('.monaco-list-row[aria-label^="x = 1"]')
-        await expect(row).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to wait for debug console output`)
-      }
-    },
     async takeCpuProfile({ seconds }: { seconds: number }) {
       try {
         await page.waitForIdle()
@@ -445,13 +432,26 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         await page.waitForIdle()
         const decoration = page.locator('.monaco-editor .codelens-decoration', {})
         await expect(decoration).toBeVisible({
-          timeout: 5_000,
+          timeout: 5000,
         })
         await page.waitForIdle()
         await expect(decoration).toHaveText(/Self Time/)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to take performance profile`)
+      }
+    },
+    async waitForDebugConsoleOutput({ output: _output }: { output: string }) {
+      try {
+        await page.waitForIdle()
+        const repl = page.locator('.repl')
+        await expect(repl).toBeVisible()
+        await page.waitForIdle()
+        const row = page.locator('.monaco-list-row[aria-label^="x = 1"]')
+        await expect(row).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to wait for debug console output`)
       }
     },
     async waitForPaused({
