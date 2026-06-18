@@ -15,8 +15,10 @@ const cleanRelativePath = (source: string): string => {
   while (clean.startsWith('../') || clean.startsWith('./')) {
     clean = clean.replace(/^(\.\.\/|\.\/)+/, '')
   }
-  clean = clean.replaceAll('/../', '/')
-  clean = clean.replaceAll('/./', '/')
+  while (clean.includes('/../') || clean.includes('/./')) {
+    clean = clean.replaceAll('/../', '/')
+    clean = clean.replaceAll('/./', '/')
+  }
   clean = clean.replace(/\/\.\.$/, '')
   clean = clean.replace(/\/\.$/, '')
   return clean

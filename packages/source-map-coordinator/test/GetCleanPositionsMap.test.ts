@@ -40,6 +40,7 @@ jest.unstable_mockModule('../src/parts/LoadSourceMap/LoadSourceMap.ts', () => {
 const { getCleanPositionsMap } = await import('../src/parts/GetCleanPositionsMap/GetCleanPositionsMap.ts')
 
 test('getCleanPositionsMap - resolves source maps independently', async () => {
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
   const result = await getCleanPositionsMap(
     {
       'bad.js.map': [1, 2, 3, 4],
@@ -48,6 +49,8 @@ test('getCleanPositionsMap - resolves source maps independently', async () => {
     false,
   )
 
+  expect(warn).toHaveBeenCalled()
+  warn.mockRestore()
   expect(result['bad.js.map']).toEqual([undefined, undefined])
   expect(result['good.js.map']).toEqual([
     {

@@ -1,6 +1,9 @@
 import { expect, test } from '@jest/globals'
-import { mkdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
+import { SourceMapGenerator } from 'source-map'
 import { addOriginalSources } from '../src/parts/AddOriginalSources/AddOriginalSources.ts'
 import { root } from '../src/parts/Root/Root.ts'
 
@@ -39,4 +42,49 @@ test('addOriginalSources attaches urls from script maps folder without sourcemap
   expect(result[1].originalUrl).toBeUndefined()
   // Cleanup: remove temp file
   await rm(mapPath)
+})
+
+test('addOriginalSources attaches original locations from relative source maps', async () => {
+  const mapsDir: string = join(root, '.vscode-script-maps')
+  await mkdir(mapsDir, { recursive: true })
+  const mapPath: string = join(mapsDir, 'tmp-relative-source-map-test.json')
+  const tempDir = await mkdtemp(join(tmpdir(), 'source-map-test-'))
+  const generatedPath = join(tempDir, 'bundle.js')
+  const sourcePath = '../../node_modules/.pnpm/pkg/source.ts'
+  const generatedMap = new SourceMapGenerator({
+    file: 'bundle.js',
+  })
+  generatedMap.addMapping({
+    generated: {
+      column: 11,
+      line: 2,
+    },
+    name: 'makeLeak',
+    original: {
+      column: 3,
+      line: 7,
+    },
+    source: sourcePath,
+  })
+  generatedMap.setSourceContent(sourcePath, 'export function makeLeak() {}')
+  await writeFile(join(tempDir, 'bundle.js.map'), generatedMap.toString(), 'utf8')
+  const scriptMap = {
+    9001: {
+      sourceMapUrl: 'bundle.js.map',
+      url: pathToFileURL(generatedPath).toString(),
+    },
+  }
+  await writeFile(mapPath, JSON.stringify(scriptMap), 'utf8')
+
+  const result = await addOriginalSources([{ column: 10, count: 5, delta: 2, line: 1, name: 'm', scriptId: 9001 }])
+
+  expect(result[0]).toMatchObject({
+    originalLocation: 'node_modules/.pnpm/pkg/source.ts:7:3',
+    originalName: 'makeLeak',
+    sourceLocation: `${pathToFileURL(generatedPath).toString()}:1:10`,
+    sourceMapUrl: pathToFileURL(join(tempDir, 'bundle.js.map')).toString(),
+  })
+
+  await rm(mapPath)
+  await rm(tempDir, { recursive: true })
 })
