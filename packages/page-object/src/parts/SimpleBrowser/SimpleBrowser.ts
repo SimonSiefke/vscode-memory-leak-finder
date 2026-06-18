@@ -366,15 +366,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
           await electron.executeJavaScriptInWebContents({
             expression: `(() => {
-  const link = document.querySelector(${JSON.stringify(selector)})
+  const target = document.querySelector(${JSON.stringify(selector)})
+  if (!(target instanceof HTMLElement)) {
+    throw new Error('Expected element matching selector ' + ${JSON.stringify(selector)})
+  }
+  const link = target instanceof HTMLAnchorElement ? target : target.closest('a')
   if (!(link instanceof HTMLAnchorElement)) {
     throw new Error('Expected link matching selector ' + ${JSON.stringify(selector)})
   }
-  link.scrollIntoView({
+  target.scrollIntoView({
     block: 'center',
     inline: 'center',
   })
-  link.click()
+  target.click()
 })()`,
             webContentsId: this.modernBrowserWebContentsId,
           })

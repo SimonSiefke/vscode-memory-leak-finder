@@ -7,8 +7,8 @@ export const skip = true
 const blogUrl = 'https://react.dev/blog'
 const blogUrlPattern = /^https:\/\/react\.dev\/blog\/?$/
 const articleUrlPattern = /^https:\/\/react\.dev\/blog\/\d{4}\/\d{2}\/\d{2}\/[^/?#]+\/?$/
-const firstBlogPostLinkSelector = 'main a[href^="/blog/20"], main a[href^="https://react.dev/blog/20"]'
-const blogLinkSelector = 'main a[href="/blog"], main a[href="/blog/"], a[href="/blog"], a[href="/blog/"]'
+const firstBlogPostLinkSelector = 'main a[href^="/blog/20"] div.text-link'
+const blogLinkSelector = 'main article a[href="/blog"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
