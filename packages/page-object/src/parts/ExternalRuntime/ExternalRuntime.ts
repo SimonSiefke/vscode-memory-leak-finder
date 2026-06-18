@@ -630,29 +630,6 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
         serverPort,
       }
     },
-    async dispose(): Promise<void> {
-      if (!activeRuntime) {
-        return
-      }
-      const runtime = activeRuntime
-      activeRuntime = undefined
-      await runtime.dispose()
-    },
-    evaluate(expression: string): Promise<unknown> {
-      return getActiveRuntime().evaluate(expression)
-    },
-    getJson<T>(path: string, init?: RequestInit): Promise<T> {
-      return getActiveRuntime().getJson<T>(path, init)
-    },
-    getNamedArrayCount(): Promise<Record<string, number>> {
-      return getActiveRuntime().getNamedArrayCount()
-    },
-    getRuntimeName(): Promise<RuntimeName> {
-      return getActiveRuntime().getRuntimeName()
-    },
-    request(path: string, init?: RequestInit): Promise<Response> {
-      return getActiveRuntime().request(path, init)
-    },
     async startExternalRuntime({
       args,
       command,
