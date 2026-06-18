@@ -48,6 +48,8 @@ export const updateState = async (newState: any): Promise<void> => {
       insidersCommit: state.insidersCommit,
       inspectExtensions: state.inspectExtensions,
       inspectExtensionsPort: state.inspectExtensionsPort,
+      inspectIntegratedBrowser: state.inspectIntegratedBrowser,
+      inspectProcess: state.inspectProcess,
       inspectPtyHost: state.inspectPtyHost,
       inspectPtyHostPort: state.inspectPtyHostPort,
       inspectSharedProcess: state.inspectSharedProcess,
