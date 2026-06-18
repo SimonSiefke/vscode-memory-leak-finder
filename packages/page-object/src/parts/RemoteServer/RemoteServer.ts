@@ -130,7 +130,7 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
   return {
     async dispose(): Promise<void> {
       try {
-        const {childProcess} = state
+        const { childProcess } = state
         if (!childProcess) {
           return
         }

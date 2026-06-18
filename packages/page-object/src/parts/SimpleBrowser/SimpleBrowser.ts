@@ -346,6 +346,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to click link ${href}`)
       }
     },
+<<<<<<< HEAD
     async clickPageLink({
       headingText = '',
       requireHeading = false,
@@ -428,11 +429,29 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             await expect(heading).toHaveText(/\S/)
           }
         }
+=======
+    async createDeferredMockServer({ id, port }: { id: string; port: number }) {
+      try {
+        await page.waitForIdle()
+        const server = await createDeferredMockServer({ port })
+        this.mockServers[id] = server
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to create deferred mock server`)
+      }
+    },
+    async createMockServer({ id, port }: { id: string; port: number }) {
+      try {
+        await page.waitForIdle()
+        const server = await createMockServer({ port })
+        this.mockServers[id] = server
+>>>>>>> origin/main
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to click page link ${selector}`)
       }
     },
+<<<<<<< HEAD
     async createDeferredMockServer({ id, port }: { id: string; port: number }) {
       try {
         await page.waitForIdle()
@@ -453,6 +472,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to create mock server`)
       }
     },
+=======
+>>>>>>> origin/main
     async createWorkspaceFileServer({ id, port, relativePath }: { id: string; port: number; relativePath: string }) {
       try {
         await page.waitForIdle()
@@ -595,10 +616,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       throw new Error(`Browser navigation button not found: ${names.join(', ')}`)
     },
     getBrowserUrlInput() {
+<<<<<<< HEAD
       if (ideVersion.minor >= 120) {
         return page.locator('.browser-url-display')
       }
 
+=======
+>>>>>>> origin/main
       return page.locator('.browser-url-input')
     },
     async getContentFrame({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
@@ -722,6 +746,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     modernBrowserWebContentsId: undefined as number | undefined,
     async navigateIntegratedBrowser({ url, waitForContentFrame }: { url: string; waitForContentFrame: boolean }) {
       const urlInput = this.getBrowserUrlInput()
+<<<<<<< HEAD
       console.log('nav...')
       await expect(urlInput).toBeVisible()
       if (ideVersion.minor >= 120) {
@@ -741,6 +766,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await urlInput.press('Enter')
       }
+=======
+      await expect(urlInput).toBeVisible()
+      await urlInput.fill('')
+      await page.waitForIdle()
+      await urlInput.type(url)
+      await page.waitForIdle()
+      await urlInput.press('Enter')
+>>>>>>> origin/main
       await page.waitForIdle()
       console.log('navigateIntegratedBrowser:submitted', { url, webContentsId: this.modernBrowserWebContentsId })
       if (waitForContentFrame) {
@@ -779,7 +812,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open simple browser devtools`)
       }
     },
+<<<<<<< HEAD
     async openIntegratedBrowser({ url = '' }: { url?: string } = {}) {
+=======
+    async openIntegratedBrowser() {
+>>>>>>> origin/main
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       const electron = this.getElectron()
       const existingWebContentsIds = ideVersion.minor >= 118 ? (await electron.getAllWebContents()).map((entry) => entry.id) : []
@@ -795,6 +832,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
       await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
         pressKeyOnce: true,
+<<<<<<< HEAD
         stayVisible: 'dont-care',
       })
       await page.waitForIdle()
@@ -833,6 +871,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       // if (ideVersion.minor >= 120) {
       // }
       if (ideVersion.minor >= 118 && ideVersion.minor <= 120) {
+=======
+      })
+      await page.waitForIdle()
+      const urlInput = this.getBrowserUrlInput()
+      await expect(urlInput).toBeVisible()
+      await page.waitForIdle()
+      if (ideVersion.minor >= 118) {
+>>>>>>> origin/main
         const entry = await electron.waitForNewWebContentsView({
           existingIds: existingWebContentsIds,
         })
@@ -1061,6 +1107,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     async showModern({ url }: { url: string }) {
+<<<<<<< HEAD
       await this.openIntegratedBrowser({
         url: ideVersion.minor >= 120 ? url : '',
       })
@@ -1070,6 +1117,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         })
         return
       }
+=======
+      await this.openIntegratedBrowser()
+>>>>>>> origin/main
       await this.navigateIntegratedBrowser({
         url,
         waitForContentFrame: true,
@@ -1109,6 +1159,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async waitForContentFrameModern({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       const electron = this.getElectron()
       console.log('waitForContentFrameModern:start', { urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
+<<<<<<< HEAD
       const entry = this.modernBrowserWebContentsId
         ? await electron.waitForWebContentsUrl({
             urlPattern,
@@ -1118,6 +1169,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             urlPattern,
           })
       this.modernBrowserWebContentsId = entry.id
+=======
+      if (this.modernBrowserWebContentsId) {
+        await electron.waitForWebContentsUrl({
+          urlPattern,
+          webContentsId: this.modernBrowserWebContentsId,
+        })
+      } else {
+        await electron.waitForWebContentsView({
+          urlPattern,
+        })
+      }
+>>>>>>> origin/main
       console.log('waitForContentFrameModern:done', { urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
       await page.waitForIdle()
     },

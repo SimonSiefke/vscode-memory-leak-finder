@@ -158,7 +158,7 @@ const getAvailablePort = async (): Promise<number> => {
       reject(new Error('Failed to determine available SSH port'))
       return
     }
-    const {port} = address
+    const { port } = address
     server.close((error) => {
       if (error) {
         reject(error)
@@ -337,7 +337,11 @@ const waitForSshProbe = async (
   connection: SshServerConnection,
   timeout = defaultTimeout,
 ): Promise<void> => {
+<<<<<<< HEAD
   const {sshPath} = state
+=======
+  const { sshPath } = state
+>>>>>>> origin/main
   if (!sshPath) {
     throw new Error('ssh probe path is missing')
   }
@@ -469,7 +473,11 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
   return {
     async dispose(): Promise<void> {
       try {
+<<<<<<< HEAD
         const {childProcess} = state
+=======
+        const { childProcess } = state
+>>>>>>> origin/main
         if (childProcess) {
           if (childProcess.exitCode === null && childProcess.signalCode === null) {
             try {
