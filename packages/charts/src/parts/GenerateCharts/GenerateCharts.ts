@@ -66,6 +66,7 @@ export const generateCharts = async () => {
     { isNode: false, path: join(Root.root, '.vscode-memory-leak-finder-results', 'shared-process'), processType: 'shared-process' },
     { isNode: false, path: join(Root.root, '.vscode-memory-leak-finder-results', 'extension-host'), processType: 'extension-host' },
     { isNode: false, path: join(Root.root, '.vscode-memory-leak-finder-results', 'pty-host'), processType: 'pty-host' },
+    { isNode: false, path: join(Root.root, '.vscode-memory-leak-finder-results', 'integrated-browser'), processType: 'integrated-browser' },
   ]
 
   for (const basePathInfo of basePaths) {
