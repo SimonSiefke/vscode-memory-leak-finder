@@ -2,6 +2,30 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+type DebugLabel = string | readonly string[]
+
+const toDebugLabels = (debugLabel: DebugLabel): readonly string[] => {
+  return typeof debugLabel === 'string' ? [debugLabel] : debugLabel
+}
+
+const selectDebugOption = async (page: any, expect: any, debugLabel: DebugLabel): Promise<void> => {
+  const debugLabels = toDebugLabels(debugLabel)
+  let lastError: unknown = new Error(`No debug label configured`)
+  for (const label of debugLabels) {
+    const option = page.locator(`[role="option"][aria-label^="${label}"]`).first()
+    try {
+      await expect(option).toBeVisible({
+        timeout: 2000,
+      })
+      await option.click()
+      return
+    } catch (error) {
+      lastError = error
+    }
+  }
+  throw lastError
+}
+
 export const create = ({ electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
   return {
     async continue() {
@@ -63,7 +87,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
       output,
     }: {
       debugConfiguration: string
-      debugLabel: string
+      debugLabel: DebugLabel
       output?: string
     }) {
       try {
@@ -99,7 +123,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
     }: {
       callStackSize: number
       debugConfiguration: string
-      debugLabel: string
+      debugLabel: DebugLabel
       file: string
       hasCallStack?: boolean
       line: number
@@ -116,7 +140,11 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         })
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await page.waitForIdle()
-        await this.startRunAndDebug({ debugConfiguration, debugLabel, viaIcon })
+        await this.startRunAndDebug({
+          debugConfiguration,
+          debugLabel,
+          ...(viaIcon === undefined ? {} : { viaIcon }),
+        })
         await this.waitForPaused({
           callStackSize,
           file,
@@ -211,7 +239,15 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         throw new VError(error, `Failed to set variable value for ${variableName}`)
       }
     },
-    async startRunAndDebug({ debugConfiguration = '', debugLabel = 'Node.js', viaIcon = false } = {}) {
+    async startRunAndDebug({
+      debugConfiguration = '',
+      debugLabel = 'Node.js',
+      viaIcon = false,
+    }: {
+      debugConfiguration?: string
+      debugLabel?: DebugLabel
+      viaIcon?: boolean
+    } = {}) {
       try {
         if (viaIcon) {
           const icon = page.locator('.codicon-debug-start')
@@ -243,11 +279,10 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
           .catch(() => 0)
         const value = await Promise.race([quickPickPromise, debugToolBarPromise])
         if (value === 1) {
-          const option = page.locator(`[role="option"][aria-label^="${debugLabel}"]`)
           await expect(quickPickWidget).toBeVisible()
 
           await page.waitForIdle()
-          await option.click()
+          await selectDebugOption(page, expect, debugLabel)
           await page.waitForIdle()
 
           if (debugConfiguration) {

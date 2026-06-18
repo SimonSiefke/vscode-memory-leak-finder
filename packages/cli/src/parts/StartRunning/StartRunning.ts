@@ -25,6 +25,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   const {
     allowCopilotAuthInCi,
     arch,
+    bailOnFailure,
     bisect,
     checkLeaks,
     clearExtensions,
@@ -79,6 +80,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
     allowCopilotAuthInCi,
     arch,
+    bailOnFailure,
     bisect,
     checkLeaks,
     clearExtensions,

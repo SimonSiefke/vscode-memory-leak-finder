@@ -23,6 +23,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
   StdinDataState.setState({
     ...StdinDataState.getState(),
     arch: options.arch,
+    bailOnFailure: options.bailOnFailure,
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
     // @ts-ignore

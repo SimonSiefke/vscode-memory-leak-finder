@@ -220,7 +220,7 @@ jobs:
       - name: Run headless test (check leaks, ${{ matrix.measure.name }})
         uses: coactions/setup-xvfb@v1
         with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after ${{ matrix.measure.args }}
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --bail-on-failure ${{ matrix.measure.args }}
       - uses: actions/upload-artifact@v6
         if: always()
         with:

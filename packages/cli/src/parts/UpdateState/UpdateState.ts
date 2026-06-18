@@ -28,6 +28,7 @@ export const updateState = async (newState: any): Promise<void> => {
   if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {
     await StartRunning.startRunning({
       arch: state.arch,
+      bailOnFailure: state.bailOnFailure,
       bisect: state.bisect,
       checkLeaks: state.checkLeaks,
       clearExtensions: state.clearExtensions,

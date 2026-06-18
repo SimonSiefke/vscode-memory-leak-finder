@@ -5,6 +5,7 @@ import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export const createDefaultState = (): StdinDataState => ({
   arch: '',
+  bailOnFailure: false,
   bisect: false,
   buffering: false,
   checkLeaks: false,

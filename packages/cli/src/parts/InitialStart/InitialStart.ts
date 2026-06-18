@@ -43,6 +43,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
   await StartRunning.startRunning({
     allowCopilotAuthInCi: options.allowCopilotAuthInCi,
     arch: options.arch,
+    bailOnFailure: options.bailOnFailure,
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
     clearExtensions: options.clearExtensions,

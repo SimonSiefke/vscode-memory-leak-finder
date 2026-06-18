@@ -40,6 +40,7 @@ const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
 export const runTestsWithCallback = async ({
   allowCopilotAuthInCi,
   arch,
+  bailOnFailure,
   callback,
   getTimeStamp,
   checkLeaks,
@@ -91,6 +92,7 @@ export const runTestsWithCallback = async ({
   try {
     Assert.string(root)
     Assert.string(cwd)
+    Assert.boolean(bailOnFailure)
     Assert.string(filterValue)
     Assert.boolean(headlessMode)
     Assert.boolean(color)
@@ -411,6 +413,9 @@ export const runTestsWithCallback = async ({
           prettyError,
           wasOriginallySkipped,
         )
+        if (bailOnFailure) {
+          break
+        }
       }
     }
     const end = Time.now()
