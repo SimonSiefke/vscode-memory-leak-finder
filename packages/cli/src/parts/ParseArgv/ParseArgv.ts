@@ -6,7 +6,7 @@ import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
 const parseArgvNumber = (argv: readonly string[], name: string): number => {
-  const index = argv.indexOf(name)
+  const index = argv.lastIndexOf(name)
   const next = index + 1
   const value = argv[next]
   const parsed = Number.parseInt(value)
@@ -17,7 +17,7 @@ const parseArgvNumber = (argv: readonly string[], name: string): number => {
 }
 
 const parseArgvString = (argv: readonly string[], name: string): string => {
-  const index = argv.indexOf(name)
+  const index = argv.lastIndexOf(name)
   const next = index + 1
   const value = argv[next]
   if (typeof value === 'string') {
