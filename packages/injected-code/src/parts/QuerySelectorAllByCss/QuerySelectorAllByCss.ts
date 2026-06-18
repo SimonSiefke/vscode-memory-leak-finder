@@ -3,7 +3,7 @@ import * as Assert from '../Assert/Assert.ts'
 const querySelectorRoot = (root: Element, body: string): readonly HTMLElement[] => {
   Assert.object(root)
   Assert.string(body)
-  const nodeList = root.querySelectorAll(body)
+  const nodeList = root.querySelectorAll<HTMLElement>(body)
   return [...nodeList]
 }
 
