@@ -510,7 +510,7 @@ export interface NotebookInlineChat {
   type(message: any): Promise<void>
 }
 export interface Notification {
-  closeAll(): Promise<void>
+  closeAll(options?: { force?: boolean }): Promise<void>
   shouldHaveItem(expectedMessage: any): Promise<void>
 }
 export interface Output {

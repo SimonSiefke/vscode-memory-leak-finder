@@ -4,11 +4,13 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
-    async closeAll() {
+    async closeAll({ force = false }) {
       try {
         await page.waitForIdle()
         const toastContainer = page.locator('.notifications-toasts')
-        await expect(toastContainer).toBeVisible()
+        if (!force) {
+          await expect(toastContainer).toBeVisible()
+        }
         const quickPick = QuickPick.create({
           electronApp,
           expect,
