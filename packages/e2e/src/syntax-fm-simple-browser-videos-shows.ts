@@ -39,7 +39,7 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
     urlPattern: showsUrlPattern,
   })
 
-  await wait(1000)
+  // await wait(1000)
 
   await SimpleBrowser.clickPageLink({
     headingText: 'All Playlists',
