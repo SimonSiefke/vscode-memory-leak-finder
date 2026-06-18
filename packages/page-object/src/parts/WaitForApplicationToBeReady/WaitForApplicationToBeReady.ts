@@ -30,9 +30,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             timeout: 30_000,
           })
           return page
-        } else {
-          throw error
         }
+        throw error
       }
       if (!enableExtensions) {
         const notification = page.locator('text=All installed extensions are temporarily disabled.')
