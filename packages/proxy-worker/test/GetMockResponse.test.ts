@@ -142,7 +142,7 @@ test('getMockResponse - restores placeholderized file references and SSE payload
       metadata: { responseType: 'sse' },
       response: {
         body: `file-reference:@@ROOT_PATH@@/.vscode-sse-data/${testFolderName}/fixture.txt`,
-        headers: { 'content-type': 'text/event-stream', 'content-encoding': 'gzip' },
+        headers: { 'content-encoding': 'gzip', 'content-type': 'text/event-stream' },
         statusCode: 200,
       },
     }),
@@ -163,66 +163,66 @@ test('getMockResponse - prefers the closest /responses user-request fallback mat
   await mkdir(scopedMockDir, { recursive: true })
 
   const oldRequestBody = {
-    model: 'gpt-5-mini',
     input: [
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
+        content: [{ text: 'Running tests and inspecting files.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'Running tests and inspecting files.' }],
       },
-      { type: 'function_call_output', call_id: 'call_old_1', output: 'failing test output with expected 4' },
-      { type: 'function_call_output', call_id: 'call_old_2', output: 'No memories found.' },
-      { type: 'function_call_output', call_id: 'call_old_3', output: 'ERROR while calling tool: Invalid input path: src/add.js' },
-      { type: 'function_call_output', call_id: 'call_old_4', output: 'export const add = (a, b) => a + b' },
+      { call_id: 'call_old_1', output: 'failing test output with expected 4', type: 'function_call_output' },
+      { call_id: 'call_old_2', output: 'No memories found.', type: 'function_call_output' },
+      { call_id: 'call_old_3', output: 'ERROR while calling tool: Invalid input path: src/add.js', type: 'function_call_output' },
+      { call_id: 'call_old_4', output: 'export const add = (a, b) => a + b', type: 'function_call_output' },
       {
-        type: 'function_call_output',
         call_id: 'call_old_5',
         output: "import assert from 'node:assert/strict'\nassert.equal(add(1, 2), 4)",
+        type: 'function_call_output',
       },
     ],
+    model: 'gpt-5-mini',
   }
 
   const closeRequestBody = {
-    model: 'gpt-5.3-codex',
     input: [
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
+        content: [{ text: 'I found the bad assertion and will patch it.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'I found the bad assertion and will patch it.' }],
       },
-      { type: 'function_call_output', call_id: 'call_new_1', output: 'failing test output with expected 4 and actual 3' },
-      { type: 'function_call_output', call_id: 'call_new_2', output: 'No memories found.' },
+      { call_id: 'call_new_1', output: 'failing test output with expected 4 and actual 3', type: 'function_call_output' },
+      { call_id: 'call_new_2', output: 'No memories found.', type: 'function_call_output' },
     ],
+    model: 'gpt-5.3-codex',
   }
 
   const currentRequestBody = {
-    model: 'gpt-5.4',
     input: [
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
+        content: [{ text: 'I found the bad assertion and will patch it.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'I found the bad assertion and will patch it.' }],
       },
-      { type: 'function_call_output', call_id: 'call_current_1', output: 'failing test output with expected 4 and actual 5' },
-      { type: 'function_call_output', call_id: 'call_current_2', output: 'No memories found.' },
+      { call_id: 'call_current_1', output: 'failing test output with expected 4 and actual 5', type: 'function_call_output' },
+      { call_id: 'call_current_2', output: 'No memories found.', type: 'function_call_output' },
     ],
+    model: 'gpt-5.4',
   }
 
   const oldMockFileName = await GetMockFileName.getMockFileName('api.individual.githubcopilot.com', '/responses', 'POST', oldRequestBody)
   await writeFile(
     join(scopedMockDir, oldMockFileName),
     JSON.stringify({
-      response: { body: 'old-candidate', headers: { 'content-type': 'text/plain' }, statusCode: 200 },
       request: { body: oldRequestBody },
+      response: { body: 'old-candidate', headers: { 'content-type': 'text/plain' }, statusCode: 200 },
     }),
     'utf8',
   )
@@ -236,8 +236,8 @@ test('getMockResponse - prefers the closest /responses user-request fallback mat
   await writeFile(
     join(scopedMockDir, closeMockFileName),
     JSON.stringify({
-      response: { body: 'close-candidate', headers: { 'content-type': 'text/plain' }, statusCode: 200 },
       request: { body: closeRequestBody },
+      response: { body: 'close-candidate', headers: { 'content-type': 'text/plain' }, statusCode: 200 },
     }),
     'utf8',
   )
@@ -325,25 +325,25 @@ test('getMockResponse - matches responses mocks despite dynamic call ids and enc
   const recordedRequestBody = {
     input: [
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
-        type: 'reasoning',
+        encrypted_content: 'opaque-recorded',
         id: 'rs_recorded',
         summary: ['recorded'],
-        encrypted_content: 'opaque-recorded',
+        type: 'reasoning',
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_Recorded123',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_Recorded123',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_Recorded123',
         output: 'tests finished',
+        type: 'function_call_output',
       },
     ],
   }
@@ -351,25 +351,25 @@ test('getMockResponse - matches responses mocks despite dynamic call ids and enc
   const replayedRequestBody = {
     input: [
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
-        type: 'reasoning',
+        encrypted_content: 'opaque-replayed',
         id: 'rs_replayed',
         summary: ['replayed'],
-        encrypted_content: 'opaque-replayed',
+        type: 'reasoning',
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_Replayed456',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_Replayed456',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_Replayed456',
         output: 'tests finished',
+        type: 'function_call_output',
       },
     ],
   }
@@ -403,32 +403,32 @@ test('getMockResponse - matches responses mocks despite system prompt churn and 
   const recordedRequestBody = {
     input: [
       {
+        content: [{ text: 'system prompt version one', type: 'input_text' }],
         role: 'system',
-        content: [{ type: 'input_text', text: 'system prompt version one' }],
       },
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
-        type: 'reasoning',
         id: 'rs_recorded',
+        type: 'reasoning',
       },
       {
+        content: [{ text: 'Running the test suite with `node --test` to see failing output.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'Running the test suite with `node --test` to see failing output.' }],
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_Recorded123',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_Recorded123',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_Recorded123',
         output:
           '✖ add returns the sum of two numbers (2.484359ms)\nℹ tests 1\nℹ duration_ms 107.286992\nTime:        20.368 s\nsimon (main) .vscode-test-workspace $',
+        type: 'function_call_output',
       },
     ],
   }
@@ -436,32 +436,32 @@ test('getMockResponse - matches responses mocks despite system prompt churn and 
   const replayedRequestBody = {
     input: [
       {
+        content: [{ text: 'system prompt version two', type: 'input_text' }],
         role: 'system',
-        content: [{ type: 'input_text', text: 'system prompt version two' }],
       },
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
-        type: 'reasoning',
         id: 'rs_replayed',
+        type: 'reasoning',
       },
       {
+        content: [{ text: 'Running the test suite with `node --test` to see failing output.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'Running the test suite with `node --test` to see failing output.' }],
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_Replayed456',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_Replayed456',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_Replayed456',
         output:
           '✖ add returns the sum of two numbers (1.670809ms)\nℹ tests 1\nℹ duration_ms 105.086936\nTime:        18.102 s\nsimon (main *) .vscode-test-workspace $',
+        type: 'function_call_output',
       },
     ],
   }
@@ -517,8 +517,8 @@ test('getMockResponse - skips poisoned responses mocks with bad request auth err
   const requestBody = {
     input: [
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
     ],
   }
@@ -548,23 +548,23 @@ test('getMockResponse - falls back to a later healthy responses mock for the sam
   const earlyRequestBody = {
     input: [
       {
+        content: [{ text: '<userRequest>Run the tests with node --test and fix the failing test.</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Run the tests with node --test and fix the failing test.</userRequest>' }],
       },
       {
+        content: [{ text: 'Running node --test.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'Running node --test.' }],
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_First',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_First',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_First',
         output: 'tests failed',
+        type: 'function_call_output',
       },
     ],
   }
@@ -573,19 +573,19 @@ test('getMockResponse - falls back to a later healthy responses mock for the sam
     input: [
       ...earlyRequestBody.input,
       {
+        content: [{ text: 'Now I will inspect the test file.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'Now I will inspect the test file.' }],
       },
       {
-        type: 'function_call',
-        name: 'read_file',
-        call_id: 'call_Second',
         arguments: '{"filePath":"/workspace/test/add.test.js"}',
+        call_id: 'call_Second',
+        name: 'read_file',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_Second',
         output: 'assert.equal(add(1, 2), 4)',
+        type: 'function_call_output',
       },
     ],
   }

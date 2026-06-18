@@ -3,36 +3,8 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 // @ts-ignore
-export const create = ({ expect, page, platform, VError, electronApp, ideVersion, browserRpc, sessionRpc }: CreateParams) => {
+export const create = ({ browserRpc, electronApp, expect, ideVersion, page, platform, sessionRpc, VError }: CreateParams) => {
   return {
-    async waitForNewWindow({ timeout }: { timeout: number }) {
-      const { promise, resolve } = Promise.withResolvers<string>()
-
-      if (!browserRpc) {
-        throw new Error(`browser rpc is required`)
-      }
-
-      const cleanup = (value: string) => {
-        browserRpc.off('Target.attachedToTarget', handleNewTarget)
-        clearTimeout(timeoutRef)
-        resolve(value)
-      }
-
-      const handleTimeout = () => {
-        cleanup('')
-      }
-
-      const handleNewTarget = (message: any): void => {
-        const sessionId = message.params.sessionId as string
-        cleanup(sessionId)
-      }
-      browserRpc.on('Target.attachedToTarget', handleNewTarget)
-      const timeoutRef = setTimeout(handleTimeout, timeout)
-
-      const sessionId = await promise
-
-      return sessionId
-    },
     async show() {
       try {
         const newWindowPromise = this.waitForNewWindow({ timeout: 20_000 })
@@ -96,17 +68,45 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
           },
           locator: (selector: string) => newWindowPage.locator(selector),
           sessionRpc: newWindowPage.sessionRpc,
-          waitForIdle: () => newWindowPage.waitForIdle(),
           async shouldBeVisible() {
             await newWindowPage.waitForIdle()
             const processExplorer = newWindowPage.locator('#process-explorer')
             await expect(processExplorer).toBeVisible({ timeout: 10_000 })
             await newWindowPage.waitForIdle()
           },
+          waitForIdle: () => newWindowPage.waitForIdle(),
         }
       } catch (error) {
         throw new VError(error, `Failed to show process explorer`)
       }
+    },
+    async waitForNewWindow({ timeout }: { timeout: number }) {
+      const { promise, resolve } = Promise.withResolvers<string>()
+
+      if (!browserRpc) {
+        throw new Error(`browser rpc is required`)
+      }
+
+      const cleanup = (value: string) => {
+        browserRpc.off('Target.attachedToTarget', handleNewTarget)
+        clearTimeout(timeoutRef)
+        resolve(value)
+      }
+
+      const handleTimeout = () => {
+        cleanup('')
+      }
+
+      const handleNewTarget = (message: any): void => {
+        const sessionId = message.params.sessionId as string
+        cleanup(sessionId)
+      }
+      browserRpc.on('Target.attachedToTarget', handleNewTarget)
+      const timeoutRef = setTimeout(handleTimeout, timeout)
+
+      const sessionId = await promise
+
+      return sessionId
     },
   }
 }

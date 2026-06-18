@@ -14,7 +14,7 @@ test('main passes the current environment to probot run', async () => {
     actualOptions = additionalOptions
   }
 
-  await Main.main(runApp as typeof Main.main extends (runApp: infer T, ...args: unknown[]) => unknown ? T : never, env)
+  await Main.main(runApp, env)
 
   expect(actualApp).toBe(app)
   expect(actualOptions).toEqual({
@@ -33,7 +33,7 @@ test('main binds to 0.0.0.0 by default in production', async () => {
     actualOptions = additionalOptions
   }
 
-  await Main.main(runApp as typeof Main.main extends (runApp: infer T, ...args: unknown[]) => unknown ? T : never, env)
+  await Main.main(runApp, env)
 
   expect(actualOptions).toEqual({
     env: {
@@ -55,7 +55,7 @@ test('main preserves an explicitly configured host', async () => {
     actualOptions = additionalOptions
   }
 
-  await Main.main(runApp as typeof Main.main extends (runApp: infer T, ...args: unknown[]) => unknown ? T : never, env)
+  await Main.main(runApp, env)
 
   expect(actualOptions).toEqual({
     env,

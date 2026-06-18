@@ -20,13 +20,13 @@ test.skip('generateExtensionSourceMaps - skips when source maps already exist', 
   await mkdir(sourceMapsOutputPath, { recursive: true })
 
   await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
+    buildScript: ['npm ci', 'npm run compile'],
     cacheDir: tempCache,
     extensionName,
+    modifications: [],
+    platform: 'linux',
     repoUrl: 'git@github.com:test/repo.git',
     version,
-    platform: 'linux',
-    buildScript: ['npm ci', 'npm run compile'],
-    modifications: [],
   })
 
   expect(existsSync(sourceMapsOutputPath)).toBe(true)
@@ -96,13 +96,13 @@ test.skip('generateExtensionSourceMaps - clones repository when it does not exis
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
+    buildScript: ['npm ci', 'npm run compile'],
     cacheDir: tempCache,
     extensionName,
+    modifications: [],
+    platform: 'linux',
     repoUrl,
     version,
-    platform: 'linux',
-    buildScript: ['npm ci', 'npm run compile'],
-    modifications: [],
   })
 
   expect(cloneCalled).toBe(true)
@@ -185,13 +185,13 @@ test.skip('generateExtensionSourceMaps - finds commit and checks out', async () 
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
+    buildScript: ['npm ci', 'npm run compile'],
     cacheDir: tempCache,
     extensionName,
+    modifications: [],
+    platform: 'linux',
     repoUrl,
     version,
-    platform: 'linux',
-    buildScript: ['npm ci', 'npm run compile'],
-    modifications: [],
   })
 
   expect(findCommitCalled).toBe(true)
@@ -243,13 +243,13 @@ test.skip('generateExtensionSourceMaps - throws error when checkout fails', asyn
 
   await expect(
     generateExtensionSourceMaps({
+      buildScript: ['npm ci', 'npm run compile'],
       cacheDir: tempCache,
       extensionName,
+      modifications: [],
+      platform: 'linux',
       repoUrl,
       version,
-      platform: 'linux',
-      buildScript: ['npm ci', 'npm run compile'],
-      modifications: [],
     }),
   ).rejects.toThrow('Failed to checkout commit abc123: checkout failed')
 
@@ -344,13 +344,13 @@ test.skip('generateExtensionSourceMaps - executes full workflow', async () => {
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
+    buildScript: ['npm ci', 'npm run compile'],
     cacheDir: tempCache,
     extensionName,
+    modifications: [],
+    platform: 'linux',
     repoUrl,
     version,
-    platform: 'linux',
-    buildScript: ['npm ci', 'npm run compile'],
-    modifications: [],
   })
 
   expect(workflowCalls).toEqual([
@@ -432,13 +432,13 @@ test.skip('generateExtensionSourceMaps - logs messages correctly', async () => {
   const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
+    buildScript: ['npm ci', 'npm run compile'],
     cacheDir: tempCache,
     extensionName,
+    modifications: [],
+    platform: 'linux',
     repoUrl,
     version,
-    platform: 'linux',
-    buildScript: ['npm ci', 'npm run compile'],
-    modifications: [],
   })
 
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Finding commit for version ${version}...`)

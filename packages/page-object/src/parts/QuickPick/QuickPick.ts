@@ -47,6 +47,21 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to focus previous quick pick item`)
       }
     },
+    async getFocusedItemLabel() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const focusedItemLabel = quickPick.locator('.monaco-list-row.focused .label-name').first()
+        await expect(focusedItemLabel).toBeVisible()
+        const text = await focusedItemLabel.textContent()
+        if (!text) {
+          throw new Error(`Focused quick pick item has no text`)
+        }
+        return text
+      } catch (error) {
+        throw new VError(error, `Failed to get focused quick pick item label`)
+      }
+    },
     async getInputValue() {
       try {
         const quickPickInput = await this.waitForInputVisible()
@@ -72,21 +87,6 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         return commands
       } catch (error) {
         throw new VError(error, `Failed to get visible commands`)
-      }
-    },
-    async getFocusedItemLabel() {
-      try {
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const focusedItemLabel = quickPick.locator('.monaco-list-row.focused .label-name').first()
-        await expect(focusedItemLabel).toBeVisible()
-        const text = await focusedItemLabel.textContent()
-        if (!text) {
-          throw new Error(`Focused quick pick item has no text`)
-        }
-        return text
-      } catch (error) {
-        throw new VError(error, `Failed to get focused quick pick item label`)
       }
     },
     async hide() {
@@ -200,6 +200,13 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to show quick pick color theme`)
       }
     },
+    async showCommands({ pressKeyOnce = false } = {}) {
+      try {
+        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform || ''), pressKeyOnce })
+      } catch (error) {
+        throw new VError(error, `Failed to show quick pick`)
+      }
+    },
     async showFileIconTheme() {
       try {
         await this.executeCommand(WellKnownCommands.SelectFileIconTheme, {
@@ -209,20 +216,6 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to show quick pick file icon theme`)
       }
     },
-    async showCommands({ pressKeyOnce = false } = {}) {
-      try {
-        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform || ''), pressKeyOnce })
-      } catch (error) {
-        throw new VError(error, `Failed to show quick pick`)
-      }
-    },
-    async waitForInputVisible() {
-      const quickPick = page.locator('.quick-input-widget')
-      const quickPickInput = quickPick.locator('.ibwrapper .input')
-      await expect(quickPickInput).toBeVisible()
-      await expect(quickPickInput).toBeFocused({ timeout: 3000 })
-      return quickPickInput
-    },
     async type(value: string) {
       try {
         const quickPickInput = await this.waitForInputVisible()
@@ -231,6 +224,13 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       } catch (error) {
         throw new VError(error, `Failed to type ${value}`)
       }
+    },
+    async waitForInputVisible() {
+      const quickPick = page.locator('.quick-input-widget')
+      const quickPickInput = quickPick.locator('.ibwrapper .input')
+      await expect(quickPickInput).toBeVisible()
+      await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+      return quickPickInput
     },
   }
 }
