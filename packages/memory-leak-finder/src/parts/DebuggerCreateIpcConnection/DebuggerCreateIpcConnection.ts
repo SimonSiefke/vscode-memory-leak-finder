@@ -5,7 +5,6 @@ import { VError } from '../VError/VError.ts'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
 export const createConnection = async (wsUrl: string): Promise<Dynamic> => {
   try {
-    console.log({ wsUrl })
     const webSocket = new WebSocket(wsUrl)
     let connectionClosed = false
     const errorHandler = (error: Dynamic) => {
