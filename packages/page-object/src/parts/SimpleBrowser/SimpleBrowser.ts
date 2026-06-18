@@ -366,15 +366,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
           await electron.executeJavaScriptInWebContents({
             expression: `(() => {
-  const link = document.querySelector(${JSON.stringify(selector)})
+  const target = document.querySelector(${JSON.stringify(selector)})
+  if (!(target instanceof HTMLElement)) {
+    throw new Error('Expected element matching selector ' + ${JSON.stringify(selector)})
+  }
+  const link = target instanceof HTMLAnchorElement ? target : target.closest('a')
   if (!(link instanceof HTMLAnchorElement)) {
     throw new Error('Expected link matching selector ' + ${JSON.stringify(selector)})
   }
-  link.scrollIntoView({
+  target.scrollIntoView({
     block: 'center',
     inline: 'center',
   })
-  link.click()
+  target.click()
 })()`,
             webContentsId: this.modernBrowserWebContentsId,
           })
@@ -781,7 +785,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       const electron = this.getElectron()
       const existingWebContentsIds = ideVersion.minor >= 118 ? (await electron.getAllWebContents()).map((entry) => entry.id) : []
-      console.log('openIntegratedBrowser:start', { existingWebContentsIds })
 
       try {
         await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
@@ -833,7 +836,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           existingIds: existingWebContentsIds,
         })
         this.modernBrowserWebContentsId = entry.id
-        console.log('openIntegratedBrowser:tracked', entry)
         await new Promise((resolve) => setTimeout(resolve, 1000))
       }
       return urlInput
@@ -949,12 +951,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         if (ideVersion.minor >= 118) {
           const electron = this.getElectron()
-          console.log('shouldHaveText:modern:start', {
-            selector,
-            text,
-            urlPattern: `${urlPattern}`,
-            webContentsId: this.modernBrowserWebContentsId,
-          })
           const webContentsTextOptions = this.modernBrowserWebContentsId
             ? {
                 selector,
@@ -968,12 +964,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 urlPattern,
               }
           await electron.waitForWebContentsText(webContentsTextOptions)
-          console.log('shouldHaveText:modern:done', {
-            selector,
-            text,
-            urlPattern: `${urlPattern}`,
-            webContentsId: this.modernBrowserWebContentsId,
-          })
           await page.waitForIdle()
           return
         }
@@ -1104,7 +1094,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async waitForContentFrameModern({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       const electron = this.getElectron()
-      console.log('waitForContentFrameModern:start', { urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
       const entry = this.modernBrowserWebContentsId
         ? await electron.waitForWebContentsUrl({
             urlPattern,
@@ -1114,7 +1103,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             urlPattern,
           })
       this.modernBrowserWebContentsId = entry.id
-      console.log('waitForContentFrameModern:done', { urlPattern: `${urlPattern}`, webContentsId: this.modernBrowserWebContentsId })
       await page.waitForIdle()
     },
   }

@@ -84,8 +84,8 @@ test('parseArgv - download user data zip file url from env', () => {
   }
 })
 
-test('parseArgv - runs', () => {
-  const argv = ['--runs', '4']
+test('parseArgv - runs uses last value', () => {
+  const argv = ['--runs', '1', '--runs', '4']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     runs: 4,
   })

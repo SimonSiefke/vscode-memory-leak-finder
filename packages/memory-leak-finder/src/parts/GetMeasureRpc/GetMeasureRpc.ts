@@ -2,6 +2,7 @@ import type { Dynamic } from '../Types/Types.ts'
 import { connectToDevtoolsWithJsonUrl } from '../ConnectToDevtoolsWithJsonUrl/ConnectToDevtoolsWithJsonUrl.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetIntegratedBrowserMeasureRpc from '../GetIntegratedBrowserMeasureRpc/GetIntegratedBrowserMeasureRpc.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 export const getMeasureRpc = async (
   devtoolsWebSocketUrl: string,
@@ -10,12 +11,23 @@ export const getMeasureRpc = async (
   measureNode: boolean,
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
+  inspectIntegratedBrowser: boolean,
   inspectPtyHost: boolean,
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
+  excludedTargetIds: readonly string[],
+  inspectExternalRuntime = false,
+  externalRuntimeInspectPort = 0,
+  _externalRuntimeName = '',
 ): Promise<Dynamic> => {
+  if (inspectExternalRuntime) {
+    return connectToDevtoolsWithJsonUrl(externalRuntimeInspectPort)
+  }
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
+  if (inspectIntegratedBrowser) {
+    return GetIntegratedBrowserMeasureRpc.getIntegratedBrowserMeasureRpc(browserRpc, excludedTargetIds)
+  }
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
   if (inspectSharedProcess) {
     await sessionRpc.dispose()

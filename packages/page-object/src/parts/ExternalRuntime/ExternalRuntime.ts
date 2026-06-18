@@ -50,6 +50,7 @@ interface RuntimeRpc {
 interface StartExternalRuntimeOptions {
   readonly args?: readonly string[]
   readonly command?: string
+  readonly connectMemory?: boolean
   readonly cwd?: string
   readonly entryFile?: string
   readonly entrySource?: string
@@ -59,7 +60,6 @@ interface StartExternalRuntimeOptions {
   readonly moduleType?: 'commonjs' | 'module'
   readonly runtimeName?: RuntimeName
   readonly serverPort: number
-  readonly connectMemory?: boolean
   readonly setupCommands?: readonly SetupCommand[]
   readonly setupFiles?: readonly SetupFile[]
 }
@@ -78,17 +78,17 @@ interface SetupFile {
 export interface ExternalRuntimeHandle {
   readonly args: readonly string[]
   readonly command: string
-  readonly inspectPort: number
-  readonly pid: number
-  readonly runtimeName: RuntimeName
-  readonly serverPort: number
   dispose(): Promise<void>
   evaluate(expression: string): Promise<unknown>
   getJson<T>(path: string, init?: RequestInit): Promise<T>
+  getNamedArrayCount(): Promise<Record<string, number>>
   getRuntimeInfo(): ExternalRuntimeInfo
   getRuntimeName(): Promise<RuntimeName>
-  getNamedArrayCount(): Promise<Record<string, number>>
+  readonly inspectPort: number
+  readonly pid: number
   request(path: string, init?: RequestInit): Promise<Response>
+  readonly runtimeName: RuntimeName
+  readonly serverPort: number
   takeSnapshot(name: string): Promise<string>
 }
 
@@ -647,6 +647,9 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
     getNamedArrayCount(): Promise<Record<string, number>> {
       return getActiveRuntime().getNamedArrayCount()
     },
+    getRuntimeInfo(): ExternalRuntimeInfo {
+      return getActiveRuntime().getRuntimeInfo()
+    },
     getRuntimeName(): Promise<RuntimeName> {
       return getActiveRuntime().getRuntimeName()
     },
@@ -776,10 +779,6 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
       activeRuntime = {
         args: launch.args,
         command: launch.command,
-        inspectPort,
-        pid: childProcess.pid ?? 0,
-        runtimeName,
-        serverPort,
         async dispose() {
           if (disposed) {
             return
@@ -824,9 +823,6 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
           >
           return result
         },
-        async getRuntimeName() {
-          return runtimeName
-        },
         getRuntimeInfo() {
           return {
             args: launch.args,
@@ -837,10 +833,17 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
             serverPort,
           }
         },
+        async getRuntimeName() {
+          return runtimeName
+        },
+        inspectPort,
+        pid: childProcess.pid ?? 0,
         request(path: string, init: RequestInit = {}) {
           const url = new URL(path, `http://127.0.0.1:${serverPort}`)
           return fetch(url, init)
         },
+        runtimeName,
+        serverPort,
         async takeSnapshot(name: string) {
           if (!memoryRpc) {
             throw new Error('External runtime memory connection is disabled')
@@ -856,9 +859,6 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
       } satisfies ExternalRuntimeHandle
 
       return
-    },
-    getRuntimeInfo(): ExternalRuntimeInfo {
-      return getActiveRuntime().getRuntimeInfo()
     },
     takeSnapshot(name: string): Promise<string> {
       return getActiveRuntime().takeSnapshot(name)
