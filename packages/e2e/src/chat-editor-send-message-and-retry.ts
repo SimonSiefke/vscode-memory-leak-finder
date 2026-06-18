@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-export const setup = async ({ Editor, Electron, SideBar, ChatEditor }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, Electron, SideBar }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
   })

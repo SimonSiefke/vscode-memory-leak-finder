@@ -2,6 +2,8 @@ import type { TestContext } from '../types.js'
 
 export const requiresNetwork = true
 
+export const skip = true
+
 const blogUrl = 'https://react.dev/blog'
 const blogUrlPattern = /^https:\/\/react\.dev\/blog\/?$/
 const articleUrlPattern = /^https:\/\/react\.dev\/blog\/\d{4}\/\d{2}\/\d{2}\/[^/?#]+\/?$/

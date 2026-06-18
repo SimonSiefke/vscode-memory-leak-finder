@@ -1,8 +1,11 @@
+import type { Rpc } from '@lvce-editor/rpc'
 import { join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as BrowserPageTargets from '../BrowserPageTargets/BrowserPageTargets.ts'
+import { doLogin } from '../DoLogin/DoLogin.ts'
+import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetProxyTestFolderName from '../GetProxyTestFolderName/GetProxyTestFolderName.ts'
@@ -12,6 +15,7 @@ import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
+import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTests from '../TestWorkerRunTests/TestWorkerRunTests.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
@@ -19,11 +23,7 @@ import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTea
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
-import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
-import type { Rpc } from '@lvce-editor/rpc'
-import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
-import { doLogin } from '../DoLogin/DoLogin.ts'
 
 interface WorkerMap {
   devtoolsWebSocketUrl: string
@@ -50,7 +50,6 @@ export const runTestsWithCallback = async ({
   allowCopilotAuthInCi,
   arch,
   callback,
-  getTimeStamp,
   checkLeaks,
   clearExtensions,
   color,
@@ -63,6 +62,7 @@ export const runTestsWithCallback = async ({
   enableExtensions,
   enableProxy,
   filterValue,
+  getTimeStamp,
   headlessMode,
   ide,
   ideVersion,

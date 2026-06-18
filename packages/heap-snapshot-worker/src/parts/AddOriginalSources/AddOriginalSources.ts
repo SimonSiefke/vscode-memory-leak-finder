@@ -10,7 +10,19 @@ export interface ScriptInfo {
   readonly url?: string
 }
 
-const isRelativeSourceMap = (sourceMapUrl) => {
+interface OriginalPosition {
+  readonly column?: number | null
+  readonly line?: number | null
+  readonly name?: string | null
+  readonly source?: string | null
+}
+
+type OriginalPositionMap = Record<string, readonly OriginalPosition[]>
+type MutableCompareResult = {
+  -readonly [Key in keyof CompareResult]: CompareResult[Key]
+}
+
+const isRelativeSourceMap = (sourceMapUrl: string): boolean => {
   if (sourceMapUrl.startsWith('file://')) {
     return false
   }
@@ -28,7 +40,7 @@ const isRelativeSourceMap = (sourceMapUrl) => {
 
 const getSourceMapUrl = (script: ScriptInfo): string => {
   if (script.url && script.sourceMapUrl && isRelativeSourceMap(script.sourceMapUrl)) {
-    return new URL(script.sourceMapUrl, script.url).toString()
+    return new URL(script.sourceMapUrl, script.url).href
   }
   let sourceMapUrl = script.sourceMapUrl || ''
   // If no source map URL was found, try to find a matching .js.map file
@@ -41,7 +53,7 @@ const getSourceMapUrl = (script: ScriptInfo): string => {
   return sourceMapUrl
 }
 
-export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly any[]> => {
+export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly CompareResult[]> => {
   let scriptMap: Record<number, ScriptInfo> | undefined
   // Always attempt to load script maps from disk
   try {
@@ -75,7 +87,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
     // ignore if directory not found
   }
 
-  const enriched: CompareResult[] = [...items]
+  const enriched: MutableCompareResult[] = items.map((item) => ({ ...item }))
   if (!scriptMap) {
     return enriched
   }
@@ -84,10 +96,12 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
   const positionPointers: { index: number; sourceMapUrl: string }[] = []
 
   for (let i = 0; i < enriched.length; i++) {
-    const item = enriched[i] as any
+    const item = enriched[i]
     const script = scriptMap[item.scriptId]
     if (script) {
-      item.url = script.url
+      if (script.url) {
+        item.url = script.url
+      }
       const sourceMapUrl = getSourceMapUrl(script)
       item.sourceMapUrl = sourceMapUrl
       if (item.url) {
@@ -111,7 +125,11 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
   try {
     await using rpc = await LaunchSourceMapWorker.launchSourceMapCoordinator()
     const extendedOriginalNames = true
-    const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, extendedOriginalNames)
+    const cleanPositionMap = (await rpc.invoke(
+      'SourceMap.getCleanPositionsMap',
+      sourceMapUrlToPositions,
+      extendedOriginalNames,
+    )) as OriginalPositionMap
     const offsetMap: Record<string, number> = Object.create(null)
     for (const pointer of positionPointers) {
       const positions = cleanPositionMap[pointer.sourceMapUrl] || []
@@ -119,7 +137,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
       const original = positions[offset]
       offsetMap[pointer.sourceMapUrl] = offset + 1
       if (original) {
-        const target = enriched[pointer.index] as any
+        const target = enriched[pointer.index]
         target.originalSource = original.source ?? null
         target.originalUrl = original.source ?? null
         target.originalLine = original.line ?? null

@@ -32,10 +32,7 @@ const getAddedIndices = (indices: Uint32Array, ids: Uint32Array, idsOther: Uint3
 }
 
 const getSignatures = (asts: readonly AstNode[], depth: number): readonly string[] => {
-  const signatures: string[] = []
-  for (const ast of asts) {
-    signatures.push(signatureFor(ast, depth))
-  }
+  const signatures: string[] = Array.from(asts, (ast) => signatureFor(ast, depth))
   return signatures
 }
 

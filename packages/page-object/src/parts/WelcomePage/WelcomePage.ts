@@ -5,18 +5,6 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const welcomePage = {
-    getAllSteps() {
-      return page.locator('.getting-started-step')
-    },
-    getStepByIndex(index: number) {
-      return this.getAllSteps().nth(index)
-    },
-    getStepByName(name: string) {
-      return page.locator(`.getting-started-step[data-step-id="${name}"]`)
-    },
-    getStepCheckbox(step: ReturnType<typeof page.locator>) {
-      return step.locator('.monaco-custom-toggle, [role="checkbox"][aria-checked]').first()
-    },
     async checkStepByIndex(index: number) {
       try {
         const step = this.getStepByIndex(index)
@@ -75,6 +63,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to expand step at index ${index}`)
       }
     },
+    getAllSteps() {
+      return page.locator('.getting-started-step')
+    },
     async getFundamentalsStepCount() {
       try {
         const steps = this.getAllSteps()
@@ -83,6 +74,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       } catch (error) {
         throw new VError(error, `Failed to get fundamentals step count`)
       }
+    },
+    getStepByIndex(index: number) {
+      return this.getAllSteps().nth(index)
+    },
+    getStepByName(name: string) {
+      return page.locator(`.getting-started-step[data-step-id="${name}"]`)
+    },
+    getStepCheckbox(step: ReturnType<typeof page.locator>) {
+      return step.locator('.monaco-custom-toggle, [role="checkbox"][aria-checked]').first()
     },
     async hide() {
       try {

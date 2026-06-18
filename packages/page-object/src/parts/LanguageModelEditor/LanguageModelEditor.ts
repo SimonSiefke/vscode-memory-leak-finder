@@ -1,8 +1,8 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
-import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import * as RunningExtensions from '../RunningExtensions/RunningExtensions.ts'
 import * as Editor from '../Editor/Editor.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as RunningExtensions from '../RunningExtensions/RunningExtensions.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
@@ -58,7 +58,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           VError,
         })
         await r.showAndWaitFor('GitHub Copilot Chat')
-        const editor = Editor.create({ page, electronApp, expect, ideVersion, platform, VError })
+        const editor = Editor.create({ electronApp, expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         const quickPick = QuickPick.create({
           electronApp,

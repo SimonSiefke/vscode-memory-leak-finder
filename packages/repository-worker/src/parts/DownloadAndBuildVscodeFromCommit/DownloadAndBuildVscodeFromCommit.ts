@@ -5,8 +5,8 @@ import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import { computeVscodeNodeModulesCacheKey } from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.ts'
 import * as SetupNodeModulesFromCache from '../CopyNodeModulesFromCacheToRepositoryFolder/CopyNodeModulesFromCacheToRepositoryFolder.ts'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
-import { hasCompleteTopLevelNodeModules } from '../HasCompleteTopLevelNodeModules/HasCompleteTopLevelNodeModules.ts'
 import { fixTypescriptErrors } from '../FixTypescriptErrors/FixTypescriptErrors.ts'
+import { hasCompleteTopLevelNodeModules } from '../HasCompleteTopLevelNodeModules/HasCompleteTopLevelNodeModules.ts'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as Path from '../Path/Path.ts'
@@ -49,7 +49,7 @@ export const downloadAndBuildVscodeFromCommit = async (
 
   // For fork commits, ensure the owner directory exists
   if (commitRef.includes('/') && !commitRef.startsWith('http')) {
-    const owner = commitRef.split('/')[0]
+    const owner = commitRef.split('/', 1)[0]
     const ownerDir = Path.join(reposDir, owner)
     const existsOwnerDir = await FileSystemWorker.pathExists(ownerDir)
     if (!existsOwnerDir) {
@@ -58,10 +58,10 @@ export const downloadAndBuildVscodeFromCommit = async (
   }
 
   // Clone the repository if needed
-  if (!existsGitPath) {
-    await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash, commitHash)
-  } else {
+  if (existsGitPath) {
     await CheckoutCommit.checkoutCommit(repoPathWithCommitHash, repoUrl, commitHash)
+  } else {
+    await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash, commitHash)
   }
 
   // Check what's needed after the repository is at the requested commit
@@ -96,9 +96,7 @@ export const downloadAndBuildVscodeFromCommit = async (
       Logger.log(`[repository] node_modules cache for commit ${commitHash} is incomplete, running npm ci...`)
     }
     Logger.log(`[repository] Installing dependencies for commit ${commitHash}...`)
-    if (!nodeModulesCacheDir) {
-      await InstallDependencies.installDependencies(repoPathWithCommitHash, useNice)
-    } else {
+    if (nodeModulesCacheDir) {
       const nodeModulesHash = await computeVscodeNodeModulesCacheKey(repoPathWithCommitHash)
       const cacheExists = await FileSystemWorker.pathExists(Path.join(nodeModulesCacheDir, nodeModulesHash))
       if (cacheExists) {
@@ -111,6 +109,8 @@ export const downloadAndBuildVscodeFromCommit = async (
         await InstallDependencies.installDependencies(repoPathWithCommitHash, useNice)
         await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir, nodeModulesHash)
       }
+    } else {
+      await InstallDependencies.installDependencies(repoPathWithCommitHash, useNice)
     }
   } else if (!existsMainJsPath) {
     Logger.log(`[repository] node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)

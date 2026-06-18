@@ -8,24 +8,24 @@ test('getRequestMockKey returns different keys for different Copilot user reques
   const firstRequest = {
     messages: [
       {
-        role: 'system',
         content: 'system prompt',
+        role: 'system',
       },
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
     ],
   }
   const secondRequest = {
     messages: [
       {
-        role: 'system',
         content: 'system prompt',
+        role: 'system',
       },
       {
-        role: 'user',
         content: '<userRequest>Generate a title</userRequest>',
+        role: 'user',
       },
     ],
   }
@@ -42,24 +42,24 @@ test('getRequestMockKey ignores system prompts and date-like context noise', () 
   const firstRequest = {
     messages: [
       {
-        role: 'system',
         content: 'system prompt one',
+        role: 'system',
       },
       {
-        role: 'user',
         content: '<context>The current date is May 16, 2026.</context><userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
     ],
   }
   const secondRequest = {
     messages: [
       {
-        role: 'system',
         content: 'system prompt two',
+        role: 'system',
       },
       {
-        role: 'user',
         content: '<context>The current date is May 17, 2026.</context><userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
     ],
   }
@@ -74,18 +74,18 @@ test('getRequestMockKey normalizes dynamic session call IDs and localhost ports'
   const firstRequest = {
     messages: [
       {
-        role: 'user',
         content:
           '<userRequest>Fix the failing test</userRequest> Reading /tmp/call_AbC123XyZ__vscode-1778940406769/content.txt and proxy http://localhost:39107',
+        role: 'user',
       },
     ],
   }
   const secondRequest = {
     messages: [
       {
-        role: 'user',
         content:
           '<userRequest>Fix the failing test</userRequest> Reading /tmp/call_Qwe987Rty__vscode-1778940336321/content.txt and proxy http://localhost:34941',
+        role: 'user',
       },
     ],
   }
@@ -103,16 +103,16 @@ test('getRequestMockKey treats placeholderized workspace paths as the active wor
   const requestWithAbsolutePath = {
     messages: [
       {
-        role: 'user',
         content: `<userRequest>Fix the failing test</userRequest> Read ${workspacePath}`,
+        role: 'user',
       },
     ],
   }
   const requestWithPlaceholderPath = {
     messages: [
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest> Read @@WORKSPACE_PATH@@/test/add.test.js',
+        role: 'user',
       },
     ],
   }
@@ -139,18 +139,18 @@ test('getRequestMockKey normalizes embedded tool metadata in prompt text', () =>
   const firstRequest = {
     messages: [
       {
-        role: 'user',
         content:
           'Arguments (JSON): {"command":"node --test","explanation":"Run Node.js tests using the built-in test runner to identify any failing tests.","goal":"Run all tests and identify failures in the project","mode":"sync"}',
+        role: 'user',
       },
     ],
   }
   const secondRequest = {
     messages: [
       {
-        role: 'user',
         content:
           'Arguments (JSON): {"command":"node --test","explanation":"Run Node.js tests using the built-in test runner to identify any failing tests.","goal":"Run all tests and identify failures in the test suite.","mode":"sync","timeout":120000}',
+        role: 'user',
       },
     ],
   }
@@ -167,8 +167,8 @@ test('getRequestMockKey normalizes tool call metadata and timing-only tool outpu
   const firstRequest = {
     messages: [
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
       {
         role: 'assistant',
@@ -184,16 +184,16 @@ test('getRequestMockKey normalizes tool call metadata and timing-only tool outpu
         ],
       },
       {
-        role: 'tool',
         content: '✖ add returns the sum of two numbers (2.098225ms)\nℹ duration_ms 127.696059\nTime:        23.468 s',
+        role: 'tool',
       },
     ],
   }
   const secondRequest = {
     messages: [
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
       {
         role: 'assistant',
@@ -209,8 +209,8 @@ test('getRequestMockKey normalizes tool call metadata and timing-only tool outpu
         ],
       },
       {
-        role: 'tool',
         content: '✖ add returns the sum of two numbers (1.878015ms)\nℹ duration_ms 105.086936\nTime:        18.102 s',
+        role: 'tool',
       },
     ],
   }
@@ -227,28 +227,28 @@ test('getRequestMockKey differentiates later turns in the same Copilot conversat
   const firstTurn = {
     messages: [
       {
-        role: 'system',
         content: 'system prompt',
+        role: 'system',
       },
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
     ],
   }
   const secondTurn = {
     messages: [
       {
-        role: 'system',
         content: 'system prompt',
+        role: 'system',
       },
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
       {
-        role: 'assistant',
         content: 'I will update the test file.',
+        role: 'assistant',
       },
     ],
   }
@@ -265,20 +265,20 @@ test('getRelaxedRequestMockKey differentiates requests with different message co
   const firstRequest = {
     messages: [
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
     ],
   }
   const secondRequest = {
     messages: [
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
       {
-        role: 'assistant',
         content: 'I can help with that.',
+        role: 'assistant',
       },
     ],
   }
@@ -295,28 +295,28 @@ test('getRelaxedRequestMockKey differentiates tool-context turns', () => {
   const noToolContextRequest = {
     messages: [
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
       {
-        role: 'assistant',
         content: 'I will inspect the file.',
+        role: 'assistant',
       },
     ],
   }
   const toolContextRequest = {
     messages: [
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
       {
-        role: 'assistant',
         content: 'I will inspect the file.',
+        role: 'assistant',
       },
       {
-        role: 'tool',
         content: 'read_file output',
+        role: 'tool',
         tool_call_id: 'tool-call-1',
       },
     ],
@@ -344,8 +344,8 @@ test('getMockFileName adds Copilot request key suffix', async () => {
   const requestBody = {
     messages: [
       {
-        role: 'user',
         content: '<userRequest>Fix the failing test</userRequest>',
+        role: 'user',
       },
     ],
   }
@@ -367,25 +367,25 @@ test('getRequestMockKey ignores dynamic call ids and encrypted reasoning content
   const firstRequest = {
     input: [
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
-        type: 'reasoning',
+        encrypted_content: 'opaque-first',
         id: 'rs_123',
         summary: ['first summary'],
-        encrypted_content: 'opaque-first',
+        type: 'reasoning',
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_FirstToolCall123',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_FirstToolCall123',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_FirstToolCall123',
         output: 'tests finished',
+        type: 'function_call_output',
       },
     ],
   }
@@ -393,25 +393,25 @@ test('getRequestMockKey ignores dynamic call ids and encrypted reasoning content
   const secondRequest = {
     input: [
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
-        type: 'reasoning',
+        encrypted_content: 'opaque-second',
         id: 'rs_456',
         summary: ['second summary'],
-        encrypted_content: 'opaque-second',
+        type: 'reasoning',
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_SecondToolCall456',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_SecondToolCall456',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_SecondToolCall456',
         output: 'tests finished',
+        type: 'function_call_output',
       },
     ],
   }
@@ -428,32 +428,32 @@ test('getRequestMockKey ignores responses system prompt churn and timing-only to
   const firstRequest = {
     input: [
       {
+        content: [{ text: 'system prompt version one', type: 'input_text' }],
         role: 'system',
-        content: [{ type: 'input_text', text: 'system prompt version one' }],
       },
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
-        type: 'reasoning',
         id: 'rs_first',
+        type: 'reasoning',
       },
       {
+        content: [{ text: 'Running the test suite with `node --test` to see failing output.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'Running the test suite with `node --test` to see failing output.' }],
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_First',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_First',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_First',
         output:
           '✖ add returns the sum of two numbers (2.484359ms)\nℹ tests 1\nℹ duration_ms 107.286992\nTime:        20.368 s\nsimon (main) .vscode-test-workspace $',
+        type: 'function_call_output',
       },
     ],
   }
@@ -461,32 +461,32 @@ test('getRequestMockKey ignores responses system prompt churn and timing-only to
   const secondRequest = {
     input: [
       {
+        content: [{ text: 'system prompt version two', type: 'input_text' }],
         role: 'system',
-        content: [{ type: 'input_text', text: 'system prompt version two' }],
       },
       {
+        content: [{ text: '<userRequest>Fix the failing test</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Fix the failing test</userRequest>' }],
       },
       {
-        type: 'reasoning',
         id: 'rs_second',
+        type: 'reasoning',
       },
       {
+        content: [{ text: 'Running the test suite with `node --test` to see failing output.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'Running the test suite with `node --test` to see failing output.' }],
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_Second',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_Second',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_Second',
         output:
           '✖ add returns the sum of two numbers (1.670809ms)\nℹ tests 1\nℹ duration_ms 105.086936\nTime:        18.102 s\nsimon (main *) .vscode-test-workspace $',
+        type: 'function_call_output',
       },
     ],
   }
@@ -503,27 +503,27 @@ test('getUserRequestMockKey matches later responses turns for the same user requ
   const firstRequest = {
     input: [
       {
+        content: [{ text: 'system prompt version one', type: 'input_text' }],
         role: 'system',
-        content: [{ type: 'input_text', text: 'system prompt version one' }],
       },
       {
+        content: [{ text: '<userRequest>Run the tests with node --test and fix the failing test.</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Run the tests with node --test and fix the failing test.</userRequest>' }],
       },
       {
+        content: [{ text: 'Running node --test.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'Running node --test.' }],
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_First',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_First',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_First',
         output: 'tests failed',
+        type: 'function_call_output',
       },
     ],
   }
@@ -531,42 +531,42 @@ test('getUserRequestMockKey matches later responses turns for the same user requ
   const secondRequest = {
     input: [
       {
+        content: [{ text: 'system prompt version two', type: 'input_text' }],
         role: 'system',
-        content: [{ type: 'input_text', text: 'system prompt version two' }],
       },
       {
+        content: [{ text: '<userRequest>Run the tests with node --test and fix the failing test.</userRequest>', type: 'input_text' }],
         role: 'user',
-        content: [{ type: 'input_text', text: '<userRequest>Run the tests with node --test and fix the failing test.</userRequest>' }],
       },
       {
+        content: [{ text: 'Running node --test.', type: 'output_text' }],
         role: 'assistant',
-        content: [{ type: 'output_text', text: 'Running node --test.' }],
       },
       {
-        type: 'function_call',
-        name: 'run_in_terminal',
-        call_id: 'call_First',
         arguments: '{"command":"node --test","goal":"Run tests"}',
+        call_id: 'call_First',
+        name: 'run_in_terminal',
+        type: 'function_call',
       },
       {
-        type: 'function_call_output',
         call_id: 'call_First',
         output: 'tests failed',
-      },
-      {
-        role: 'assistant',
-        content: [{ type: 'output_text', text: 'Now I will inspect the test file.' }],
-      },
-      {
-        type: 'function_call',
-        name: 'read_file',
-        call_id: 'call_Second',
-        arguments: '{"filePath":"/workspace/test/add.test.js"}',
-      },
-      {
         type: 'function_call_output',
+      },
+      {
+        content: [{ text: 'Now I will inspect the test file.', type: 'output_text' }],
+        role: 'assistant',
+      },
+      {
+        arguments: '{"filePath":"/workspace/test/add.test.js"}',
+        call_id: 'call_Second',
+        name: 'read_file',
+        type: 'function_call',
+      },
+      {
         call_id: 'call_Second',
         output: 'assert.equal(add(1, 2), 4)',
+        type: 'function_call_output',
       },
     ],
   }

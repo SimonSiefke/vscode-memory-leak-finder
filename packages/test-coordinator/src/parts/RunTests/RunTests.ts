@@ -151,6 +151,7 @@ export const runTests = async ({
     enableExtensions,
     enableProxy,
     filterValue,
+    getTimeStamp,
     headlessMode,
     ide,
     ideVersion,
@@ -186,6 +187,5 @@ export const runTests = async ({
     useProxyMock,
     vscodePath,
     vscodeVersion,
-    getTimeStamp,
   })
 }
