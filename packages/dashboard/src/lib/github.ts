@@ -550,8 +550,9 @@ const getNearbyText = (body: string, index: number): string => {
 const pickBeforeAfterImages = (
   images: PullRequestImage[],
 ): { beforeImage: PullRequestImage | null; afterImage: PullRequestImage | null } => {
-  const sorted = images.toSorted((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-  const beforeImage = sorted.toReversed().find((image) => /before/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-2) ?? null
-  const afterImage = sorted.toReversed().find((image) => /after/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-1) ?? null
+  const sorted = images.slice().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+  const newestFirst = sorted.slice().reverse()
+  const beforeImage = newestFirst.find((image) => /before/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-2) ?? null
+  const afterImage = newestFirst.find((image) => /after/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-1) ?? null
   return { afterImage, beforeImage }
 }
