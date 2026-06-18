@@ -66,6 +66,44 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to move side bar right`)
       }
     },
+    async shouldBeHidden() {
+      try {
+        const sideBar = page.locator('.part.sidebar')
+        await expect(sideBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that side bar is hidden`)
+      }
+    },
+    async shouldBeLeft() {
+      try {
+        const sideBar = page.locator('.part.sidebar')
+        const className = await sideBar.getAttribute('class')
+        if (!className || !className.includes('left')) {
+          throw new Error(`Expected side bar to be on the left but got class "${className}"`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify that side bar is on the left`)
+      }
+    },
+    async shouldBeRight() {
+      try {
+        const sideBar = page.locator('.part.sidebar')
+        const className = await sideBar.getAttribute('class')
+        if (!className || !className.includes('right')) {
+          throw new Error(`Expected side bar to be on the right but got class "${className}"`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify that side bar is on the right`)
+      }
+    },
+    async shouldBeVisible() {
+      try {
+        const sideBar = page.locator('.part.sidebar')
+        await expect(sideBar).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that side bar is visible`)
+      }
+    },
     async show() {
       try {
         const sideBar = page.locator('.part.sidebar')
@@ -108,44 +146,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         VError,
       })
       await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarPosition)
-    },
-    async shouldBeHidden() {
-      try {
-        const sideBar = page.locator('.part.sidebar')
-        await expect(sideBar).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to verify that side bar is hidden`)
-      }
-    },
-    async shouldBeLeft() {
-      try {
-        const sideBar = page.locator('.part.sidebar')
-        const className = await sideBar.getAttribute('class')
-        if (!className || !className.includes('left')) {
-          throw new Error(`Expected side bar to be on the left but got class "${className}"`)
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to verify that side bar is on the left`)
-      }
-    },
-    async shouldBeRight() {
-      try {
-        const sideBar = page.locator('.part.sidebar')
-        const className = await sideBar.getAttribute('class')
-        if (!className || !className.includes('right')) {
-          throw new Error(`Expected side bar to be on the right but got class "${className}"`)
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to verify that side bar is on the right`)
-      }
-    },
-    async shouldBeVisible() {
-      try {
-        const sideBar = page.locator('.part.sidebar')
-        await expect(sideBar).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to verify that side bar is visible`)
-      }
     },
   }
 }

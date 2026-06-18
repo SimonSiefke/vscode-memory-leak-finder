@@ -319,8 +319,8 @@ test('convertRequestsToMocksMain - prefers a successful response over a later ex
   const requestBody = {
     messages: [
       {
-        role: 'user',
         content: 'fix the failing test',
+        role: 'user',
       },
     ],
   }

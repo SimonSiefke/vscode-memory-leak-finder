@@ -1,11 +1,11 @@
-import { mkdir, rm, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 import JSZip from 'jszip'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 
 const validateRelativePath = (normalizedName: string, archiveLabel: string): void => {
   const segments = normalizedName.split('/').filter(Boolean)
-  if (segments.some((segment) => segment === '..')) {
+  if (segments.includes('..')) {
     throw new Error(`Invalid ${archiveLabel} archive entry path: ${normalizedName}`)
   }
 }

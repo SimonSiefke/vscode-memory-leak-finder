@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as RemoveServerUrlPrefix from '../RemoveServerUrlPrefix/RemoveServerUrlPrefix.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
-
-export const addStackTraceToEventListener = async (session: Session, eventListener: any) => {
+export const addStackTraceToEventListener = async (session: Session, eventListener: Dynamic) => {
   if (!eventListener.objectId) {
     throw new Error('object id is required')
   }

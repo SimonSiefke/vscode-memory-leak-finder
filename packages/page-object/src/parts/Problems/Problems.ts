@@ -77,6 +77,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to move problems to sidebar`)
       }
     },
+    async shouldHaveCount(count: number) {
+      try {
+        const problemsBadge = page.locator('[role="tab"] [aria-label^="Problems"] + .badge')
+        const badgeContent = problemsBadge.locator('.badge-content')
+        if (count === 0) {
+          await expect(problemsBadge).toBeHidden()
+        } else {
+          await expect(problemsBadge).toBeVisible()
+          await expect(badgeContent).toHaveText(`${count}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to assert problems count of ${count}`)
+      }
+    },
     async shouldHaveVisibleCount(count: number) {
       try {
         await page.waitForIdle()
@@ -90,20 +104,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to assert visible problems count of ${count}`)
-      }
-    },
-    async shouldHaveCount(count: number) {
-      try {
-        const problemsBadge = page.locator('[role="tab"] [aria-label^="Problems"] + .badge')
-        const badgeContent = problemsBadge.locator('.badge-content')
-        if (count === 0) {
-          await expect(problemsBadge).toBeHidden()
-        } else {
-          await expect(problemsBadge).toBeVisible()
-          await expect(badgeContent).toHaveText(`${count}`)
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to assert problems count of ${count}`)
       }
     },
     async shouldHaveVisibleTextCount(text: string, count: number) {

@@ -21,12 +21,12 @@ const main = async () => {
   const content = await readFile(absolutePath, 'utf8')
   const prompt = getPrompt({
     content,
-    localVscodePath,
-    only,
-    runs,
-    ourPath,
-    measure,
     extraArgs,
+    localVscodePath,
+    measure,
+    only,
+    ourPath,
+    runs,
   })
   await clipboard.write(prompt)
   process.stdout.write(prompt)

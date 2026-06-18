@@ -20,7 +20,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   let parsedUrl: URL
   try {
     // In HTTP proxy protocol, the request line contains the full URL
-    // e.g., "GET http://example.com/path HTTP/1.1"
+    // e.g., "GET https://example.com/path HTTP/1.1"
     // Normalize http://hostname:443 to https://hostname (some proxy agents send this incorrectly)
     let normalizedUrl = targetUrl
     if (targetUrl.startsWith('http://') && targetUrl.includes(':443')) {
