@@ -15,9 +15,9 @@ export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, Si
   await Editor.closeAll()
   await SideBar.hide()
   // TODO
-  // await new Promise((r) => {
-  //   setTimeout(r, 3000)
-  // })
+  await new Promise((r) => {
+    setTimeout(r, 3000)
+  })
   await Notification.closeAll()
   await SimpleBrowser.show({
     url: blogUrl,
@@ -36,6 +36,9 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
     urlPattern: articleUrlPattern,
   })
 
+  await new Promise((r) => {
+    setTimeout(r, 1000)
+  })
   await SimpleBrowser.clickPageLink({
     headingText: 'React Blog',
     selector: blogLinkSelector,
