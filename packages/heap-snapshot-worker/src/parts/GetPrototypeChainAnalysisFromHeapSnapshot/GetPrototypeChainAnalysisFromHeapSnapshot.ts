@@ -102,12 +102,7 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (
   }
   const { edge_fields, edge_types, node_fields, node_types } = meta
 
-  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(
-    nodes,
-    node_fields,
-    node_types[0],
-    strings,
-  )
+  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, node_fields, node_types[0], strings)
   const parsedEdges = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
     edges,
     edge_fields,
