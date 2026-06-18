@@ -15,8 +15,10 @@ const send = (message: any): void => {
 }
 
 const dispose = (): void => {
-  if (state.rpc) {
-    state.rpc.dispose()
-    state.rpc = undefined
+  if (!state.rpc) {
+    return
   }
+
+  state.rpc.dispose()
+  state.rpc = undefined
 }

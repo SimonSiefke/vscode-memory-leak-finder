@@ -1,23 +1,7 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ page, VError, expect }: CreateParams) => {
+export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async shouldHaveImage(src: string) {
-      try {
-        await page.waitForIdle()
-        const preview = page.locator('.image-carousel-editor')
-        await expect(preview).toBeVisible()
-        await page.waitForIdle()
-        const image = preview.locator('.main-image')
-        await expect(image).toBeVisible()
-        await page.waitForIdle()
-        // TODO
-        // await expect(image).toHaveAttribute('complete', true)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to verify that images preview has image with src "${src}"`)
-      }
-    },
     async close() {
       try {
         await page.waitForIdle()
@@ -59,6 +43,22 @@ export const create = ({ page, VError, expect }: CreateParams) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to click previous`)
+      }
+    },
+    async shouldHaveImage(src: string) {
+      try {
+        await page.waitForIdle()
+        const preview = page.locator('.image-carousel-editor')
+        await expect(preview).toBeVisible()
+        await page.waitForIdle()
+        const image = preview.locator('.main-image')
+        await expect(image).toBeVisible()
+        await page.waitForIdle()
+        // TODO
+        // await expect(image).toHaveAttribute('complete', true)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that images preview has image with src "${src}"`)
       }
     },
   }

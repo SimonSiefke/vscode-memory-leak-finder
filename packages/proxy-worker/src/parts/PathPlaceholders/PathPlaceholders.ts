@@ -21,8 +21,7 @@ const replacementTargets = [
 ] as const
 
 const getPathVariants = (value: string): readonly string[] => {
-  const variants = new Set<string>()
-  variants.add(value)
+  const variants = new Set<string>([value])
   variants.add(value.replaceAll('\\', '/'))
   return [...variants].sort((first, second) => second.length - first.length)
 }
@@ -35,12 +34,12 @@ const replaceAll = (value: string, searchValue: string, replacement: string): st
 }
 
 const escapeRegExp = (value: string): string => {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 const normalizePlaceholderPathSeparators = (value: string, placeholder: string, separator: string): string => {
   const pattern = new RegExp(`${escapeRegExp(placeholder)}[^\\s"'<>]*`, 'g')
-  return value.replace(pattern, (match) => match.replace(/[\\/]/g, separator))
+  return value.replace(pattern, (match) => match.replaceAll(/[\\/]/g, separator))
 }
 
 export const replaceAbsolutePathsWithPlaceholdersInText = (value: string): string => {
