@@ -316,16 +316,28 @@ export interface Electron {
   unmockElectron(namespace: any, key: any): Promise<void>
 }
 export interface ExternalRuntimeHandle {
+  readonly args: readonly string[]
+  readonly command: string
   readonly inspectPort: number
+  readonly pid: number
   readonly runtimeName: 'bun' | 'node'
   readonly serverPort: number
   dispose(): Promise<void>
   evaluate(expression: any): Promise<unknown>
   getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeInfo(): ExternalRuntimeInfo
   getRuntimeName(): Promise<'bun' | 'node'>
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: any, init?: any): Promise<Response>
   takeSnapshot(name: any): Promise<string>
+}
+export interface ExternalRuntimeInfo {
+  readonly args: readonly string[]
+  readonly command: string
+  readonly inspectPort: number
+  readonly pid: number
+  readonly runtimeName: 'bun' | 'node'
+  readonly serverPort: number
 }
 export interface ExternalRuntime {
   createPorts(): Promise<{
@@ -335,6 +347,7 @@ export interface ExternalRuntime {
   dispose(): Promise<void>
   evaluate(expression: any): Promise<unknown>
   getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeInfo(): ExternalRuntimeInfo
   getRuntimeName(): Promise<'bun' | 'node'>
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: any, init?: any): Promise<Response>
@@ -413,6 +426,7 @@ export interface ExternalRuntime {
   dispose(): Promise<void>
   evaluate(expression: any): Promise<void>
   getNamedArrayCount(): Promise<void>
+  getRuntimeInfo(): Promise<void>
   getRuntimeName(): Promise<void>
   takeSnapshot(name: any): Promise<void>
   dispose(): Promise<void>
@@ -678,6 +692,7 @@ export interface SimpleBrowser {
   addConsoleLogsToChat(): Promise<void>
   addElementToChat(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+  clickPageLink(options: any): Promise<void>
   back(options?: any): Promise<void>
   createMockServer(options: any): Promise<void>
   createDeferredMockServer(options: any): Promise<void>
