@@ -251,9 +251,10 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
 }
 
 export const run = async ({ ExternalRuntime, Workspace }: TestContext): Promise<void> => {
-  await assertPhase(ExternalRuntime, phases[0])
+  const [firstPhase, ...otherPhases] = phases
+  await assertPhase(ExternalRuntime, firstPhase)
 
-  for (const phase of phases.slice(1)) {
+  for (const phase of otherPhases) {
     await updatePhase(Workspace, phase)
     await assertPhase(ExternalRuntime, phase)
   }
