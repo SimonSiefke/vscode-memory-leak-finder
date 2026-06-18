@@ -1,4 +1,5 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { join } from 'node:path'
 
 const events: string[] = []
 
@@ -267,6 +268,6 @@ test('runTestsWithCallback - inspect process starts memory worker after setup', 
     memoryRpc,
     expect.any(Number),
     { runs: 1 },
-    expect.stringContaining('/process/vite.js/named-function-count3/react-vite-simple-browser.json'),
+    expect.stringContaining(join('process', 'vite.js', 'named-function-count3', 'react-vite-simple-browser.json')),
   )
 })
