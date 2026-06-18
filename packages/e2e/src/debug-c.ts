@@ -80,7 +80,7 @@ export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Pr
     file: 'main.c',
     hasCallStack: false,
     line: 2,
-    viaIcon: true,
+    viaCommand: true,
   })
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()

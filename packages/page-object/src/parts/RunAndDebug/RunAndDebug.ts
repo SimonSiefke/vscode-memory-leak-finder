@@ -119,6 +119,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
       file,
       hasCallStack,
       line,
+      viaCommand,
       viaIcon,
     }: {
       callStackSize: number
@@ -127,6 +128,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
       file: string
       hasCallStack?: boolean
       line: number
+      viaCommand?: boolean
       viaIcon?: boolean
     }) {
       try {
@@ -143,6 +145,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         await this.startRunAndDebug({
           debugConfiguration,
           debugLabel,
+          ...(viaCommand === undefined ? {} : { viaCommand }),
           ...(viaIcon === undefined ? {} : { viaIcon }),
         })
         await this.waitForPaused({
@@ -242,14 +245,27 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
     async startRunAndDebug({
       debugConfiguration = '',
       debugLabel = 'Node.js',
+      viaCommand = false,
       viaIcon = false,
     }: {
       debugConfiguration?: string
       debugLabel?: DebugLabel
+      viaCommand?: boolean
       viaIcon?: boolean
     } = {}) {
       try {
-        if (viaIcon) {
+        if (viaCommand) {
+          const quickPick = QuickPick.create({
+            electronApp,
+            expect,
+            ideVersion,
+            page,
+            platform,
+            VError,
+          })
+          await quickPick.executeCommand(WellKnownCommands.DebugStart)
+          await page.waitForIdle()
+        } else if (viaIcon) {
           const icon = page.locator('.codicon-debug-start')
           await expect(icon).toBeVisible()
           await page.waitForIdle()
