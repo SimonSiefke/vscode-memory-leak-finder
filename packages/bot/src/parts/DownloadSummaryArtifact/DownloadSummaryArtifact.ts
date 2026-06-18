@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
-import { downloadArtifactArchive } from '../DownloadArtifactArchive/DownloadArtifactArchive.ts'
 import type { MeasureWorkflowSummary } from '../MeasureWorkflowSummary/MeasureWorkflowSummary.ts'
+import { downloadArtifactArchive } from '../DownloadArtifactArchive/DownloadArtifactArchive.ts'
 
 type ArtifactRecord = {
   readonly archive_download_url: string
@@ -9,7 +9,7 @@ type ArtifactRecord = {
 }
 
 type ArtifactDownloadOctokit = {
-  readonly auth: (options: { type: 'installation' }) => Promise<{ token: string } | unknown>
+  readonly auth: (options: { type: 'installation' }) => Promise<unknown | { token: string }>
 }
 
 export const downloadSummaryArtifact = async (

@@ -1,13 +1,12 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { dirname, sep } from 'node:path'
 import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.ts'
-
 const emptySourceMapUrl = {
   column: 0,
   line: 0,
   sourceMapUrl: '',
 }
-
-const isRelativeSourceMap = (sourceMapUrl) => {
+const isRelativeSourceMap = (sourceMapUrl: Dynamic) => {
   if (sourceMapUrl.startsWith('file://')) {
     return false
   }
@@ -22,10 +21,8 @@ const isRelativeSourceMap = (sourceMapUrl) => {
   }
   return true
 }
-
 const RE_PATH = /\((.+):\d+:\d+\)$/
-
-export const getSourceMapUrl = (eventListener) => {
+export const getSourceMapUrl = (eventListener: Dynamic) => {
   const { sourceMaps, stack } = eventListener
   if (!stack || !sourceMaps) {
     return emptySourceMapUrl
@@ -43,7 +40,6 @@ export const getSourceMapUrl = (eventListener) => {
       sourceMapUrl = dirname(path) + sep + sourceMapUrl
     }
   }
-
   return {
     column: parsed.column,
     line: parsed.line,
