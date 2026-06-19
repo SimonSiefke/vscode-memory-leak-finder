@@ -678,7 +678,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const modelPickerItem = getChatPickerItem(chatView, 1)
         await expect(modelPickerItem).toBeVisible()
         await page.waitForIdle()
-        // await new Promise(r => { })
+
         const modelLocator = page.locator(`.action-label[aria-label^="Pick Model"] a`)
         await expect(modelLocator).toBeVisible()
         await page.waitForIdle()
@@ -691,7 +691,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await expect(modelLocator).toBeFocused()
         await page.waitForIdle()
-        if (ideVersion && ideVersion.minor >= 118) {
+        if (ideVersion && ideVersion.minor >= 122) {
           await page.keyboard.press('Enter')
           await page.waitForIdle()
           const search = page.locator('.context-view input[placeholder="Search models"]')
@@ -701,13 +701,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           await search.type(modelName)
           await page.waitForIdle()
+          await page.keyboard.press('Enter')
+          await page.waitForIdle()
+        } else if (ideVersion && ideVersion.minor >= 118) {
+          await page.keyboard.press('Enter')
+          await page.waitForIdle()
+          const search = page.locator('.context-view input[placeholder="Search models"]')
+          await expect(search).toBeVisible()
+          await page.waitForIdle()
+          await expect(search).toBeFocused()
+          await page.waitForIdle()
+          await search.type(modelName)
+          await page.waitForIdle()
+          const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
+          await expect(item).toBeVisible()
+          await item.click()
         } else {
           await modelLocator.click()
           await page.waitForIdle()
         }
-        const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
-        await expect(item).toBeVisible()
-        await item.click()
+
         await page.waitForIdle()
         await page.waitForIdle()
         await expect(modelLocator).toHaveText(modelName)
