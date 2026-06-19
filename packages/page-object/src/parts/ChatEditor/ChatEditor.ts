@@ -433,6 +433,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.select('Files & Folders...', true)
         await quickPick.type(file)
+        const image = page.locator('.label-name', { hasText: file })
+        await expect(image).toBeVisible({ timeout: 30_000 })
         await quickPick.select(file)
         await page.waitForIdle()
         const attachedContext = page.locator('.chat-attached-context')
