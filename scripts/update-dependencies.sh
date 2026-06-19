@@ -16,7 +16,7 @@ fi
 
 function updateDependencies {
   echo "updating dependencies..."
-  OUTPUT=`ncu -u -x @types/node -x jest -x @jest/globals -x rollup -x lerna -x jsdom -x typescript -x babel/core -x @babel/preset-typescript @babel/parser`
+  OUTPUT=`ncu -u -x @types/node -x jest -x @jest/globals -x rollup -x lerna -x jsdom -x typescript -x babel/core -x @babel/preset-typescript -x @babel/parser`
   SUB='All dependencies match the latest package versions'
   if [[ "$OUTPUT" == *"$SUB"* ]]; then
     echo "$OUTPUT"
