@@ -7,5 +7,6 @@ export const requiresNetwork = 1
 export const run = async ({ Workbench }: TestContext): Promise<void> => {
   const newWindow = await Workbench.openNewWindow()
   await newWindow.shouldBeVisible()
-  await newWindow.close()
+  // @ts-ignore
+  await newWindow.closeGracefully()
 }
