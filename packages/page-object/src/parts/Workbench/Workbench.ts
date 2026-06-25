@@ -272,6 +272,23 @@ export const createWithDependencies = (
               throw new VError(error, `Failed to close new window`)
             }
           },
+          async closeGracefully() {
+            try {
+              // Wait for the window to be fully idle before attempting to close
+              await newWindowPage.waitForIdle()
+              const quickPick = QuickPick.create({
+                electronApp,
+                expect,
+                ideVersion,
+                page: newWindowPage,
+                platform,
+                VError,
+              })
+              await quickPick.executeCommand(WellKnownCommands.CloseWindow)
+            } catch (error) {
+              throw new VError(error, `Failed to close new window`)
+            }
+          },
           locator: (selector: string) => getNewWindowPage().locator(selector),
           sessionRpc: newWindowPage.sessionRpc,
           async shouldBeVisible() {
