@@ -4,12 +4,87 @@ import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
 import * as ParseVersion from '../ParseVersion/ParseVersion.ts'
 
+export const setupIde = async ({
+  arch,
+  clearExtensions,
+  commit,
+  cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
+  enableExtensions,
+  enableProxy,
+  ide,
+  insidersCommit,
+  inspectExtensions,
+  inspectExtensionsPort,
+  inspectPtyHost,
+  inspectPtyHostPort,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
+  platform,
+  proxyTestFolderName,
+  useProxyMock,
+  updateUrl,
+  vscodePath,
+  vscodeVersion,
+}: {
+  arch: string
+  clearExtensions: boolean
+  commit: string
+  cwd: string
+  downloadUserDataZipFileToken: string
+  downloadUserDataZipFileUrl: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  ide: string
+  insidersCommit: string
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  platform: string
+  proxyTestFolderName?: string
+  useProxyMock: boolean
+  updateUrl: string
+  vscodePath: string
+  vscodeVersion: string
+}) => {
+  if (ide === Ide.Cursor) {
+    const cursorVersion = '0.45.14' // TODO make it configurable
+    await LaunchCursor.setupCursor({
+      clearExtensions,
+      cursorVersion,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
+      vscodePath,
+    })
+    return
+  }
+  await LaunchVsCode.setupVsCode({
+    arch,
+    clearExtensions,
+    commit,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
+    enableExtensions,
+    insidersCommit,
+    platform,
+    updateUrl,
+    vscodePath,
+    vscodeVersion,
+  })
+}
+
 export const launchIde = async ({
   addDisposable,
   arch,
   clearExtensions,
   commit,
   cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
   headlessMode,
@@ -33,6 +108,8 @@ export const launchIde = async ({
   clearExtensions: boolean
   commit: string
   cwd: string
+  downloadUserDataZipFileToken: string
+  downloadUserDataZipFileUrl: string
   enableExtensions: boolean
   enableProxy: boolean
   headlessMode: boolean
@@ -58,6 +135,8 @@ export const launchIde = async ({
       clearExtensions,
       cursorVersion,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       headlessMode,
@@ -92,6 +171,8 @@ export const launchIde = async ({
     clearExtensions,
     commit,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
