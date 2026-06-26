@@ -242,10 +242,10 @@ test('handleWorkflowRunCompleted includes bot-hosted chart image urls in the upd
   expect(call?.body).toContain('### Before')
   expect(call?.body).toContain('### After')
   expect(call?.body).toContain(
-    'src="https://bot.example.com/api/workflow-artifacts/chart/42/11/base-charts/extension-host/named-function-count-3/chat-editor-fix-node-built-in-test.svg"',
+    'src="https://bot.example.com/api/workflow-artifacts/chart/SimonSiefke/vscode-memory-leak-finder/42/11/base-charts/extension-host/named-function-count-3/chat-editor-fix-node-built-in-test.svg"',
   )
   expect(call?.body).toContain(
-    'src="https://bot.example.com/api/workflow-artifacts/chart/42/12/candidate-charts/extension-host/named-function-count-3/chat-editor-fix-node-built-in-test.svg"',
+    'src="https://bot.example.com/api/workflow-artifacts/chart/SimonSiefke/vscode-memory-leak-finder/42/12/candidate-charts/extension-host/named-function-count-3/chat-editor-fix-node-built-in-test.svg"',
   )
   expect(call?.body).not.toContain('### Artifacts')
   expect(call?.body).not.toContain(
