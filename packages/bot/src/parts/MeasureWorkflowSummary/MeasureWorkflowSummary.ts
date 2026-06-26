@@ -36,6 +36,7 @@ export type MeasureWorkflowSummary = {
   }
   readonly statusCommentId: number
   readonly stepOutcomes: WorkflowStepOutcomes
+  readonly workflowDurationMs?: number
   readonly workflowRun: {
     readonly id: number
     readonly url: string
