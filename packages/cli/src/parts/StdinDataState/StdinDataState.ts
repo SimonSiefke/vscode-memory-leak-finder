@@ -6,6 +6,7 @@ import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 export interface StdinDataState {
   readonly arch: string
   readonly bisect: boolean
+  readonly buildVscodeMinified: boolean
   readonly buffering: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
@@ -58,6 +59,7 @@ export interface StdinDataState {
 let state: StdinDataState = {
   arch: '',
   bisect: false,
+  buildVscodeMinified: false,
   buffering: false,
   checkLeaks: false,
   clearExtensions: true,
@@ -112,6 +114,7 @@ export const setState = (newState: StdinDataState): void => {
     ...state,
     arch: newState.arch,
     bisect: newState.bisect,
+    buildVscodeMinified: newState.buildVscodeMinified,
     checkLeaks: newState.checkLeaks,
     compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,

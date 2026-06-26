@@ -9,6 +9,7 @@ import * as Root from '../Root/Root.ts'
 export interface LaunchOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly canUseIdleCallback: boolean
   readonly clearExtensions: boolean
   readonly commit: string
@@ -50,6 +51,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   const {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     connectionId,
@@ -86,6 +88,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     cwd,
@@ -153,6 +156,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
 
 export const setup = async ({
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   cwd,
@@ -175,6 +179,7 @@ export const setup = async ({
   vscodeVersion,
 }: {
   arch: string
+  buildVscodeMinified: boolean
   clearExtensions: boolean
   commit: string
   cwd: string
@@ -198,6 +203,7 @@ export const setup = async ({
 }): Promise<void> => {
   await LaunchIde.setupIde({
     arch,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     cwd,

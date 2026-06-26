@@ -12,6 +12,7 @@ export const state: State = {
 export interface PrepareTestsAndAttachOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly compressVideo: boolean
@@ -55,6 +56,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   const {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     compressVideo,
@@ -98,6 +100,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     state.promise = PrepareTests.prepareTests({
       arch,
       attachedToPageTimeout,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       connectionId,

@@ -15,10 +15,14 @@ test('measure-on-demand workflow accepts and masks snapshot download inputs', as
   expect(workflow).toContain('download_user_data_zip_file_url:')
   expect(workflow).toContain('download_user_data_zip_file_token:')
   expect(workflow).toContain('download_all_mock_data_zip_file_url:')
+  expect(workflow).toContain('build_vscode_minified:')
   expect(workflow).toContain('description: User-data download URL passed by the bot')
   expect(workflow).toContain('description: User-data download token passed by the bot')
   expect(workflow).toContain('description: All mock data download URL passed by the bot')
-  expect(workflow.match(/required: false/g) || []).toHaveLength(3)
+  expect(workflow).toContain('description: Build VS Code from source as a minified package')
+  expect(workflow).toContain('type: boolean')
+  expect(workflow).toContain('default: false')
+  expect(workflow.match(/required: false/g) || []).toHaveLength(4)
 
   expect(workflow.match(/- name: Initialize snapshot download settings/g) || []).toHaveLength(2)
   expect(workflow).toContain('event.inputs?.download_user_data_zip_file_url')
@@ -34,4 +38,12 @@ test('measure-on-demand workflow accepts and masks snapshot download inputs', as
   expect(workflow).not.toContain('DOWNLOAD_USER_DATA_ZIP_FILE_URL: ${{ inputs.download_user_data_zip_file_url }}')
   expect(workflow).not.toContain('--download-user-data-zip-file-token')
   expect(workflow).not.toContain('--download-user-data-zip-file-url')
+})
+
+test('measure-on-demand workflow passes optional minified vscode build flag to setup and measure', async () => {
+  const workflow = await readFile(getWorkflowPath(), 'utf8')
+
+  expect(workflow).toContain('BUILD_VSCODE_MINIFIED: ${{ inputs.build_vscode_minified }}')
+  expect(workflow.match(/BUILD_VSCODE_MINIFIED_FLAG=--build-vscode-minified/g) || []).toHaveLength(2)
+  expect(workflow.match(/\$BUILD_VSCODE_MINIFIED_FLAG/g) || []).toHaveLength(4)
 })

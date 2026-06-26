@@ -112,6 +112,20 @@ test('parseArgv - disable vscode node modules cache', () => {
   })
 })
 
+test('parseArgv - build vscode minified', () => {
+  const argv = ['--build-vscode-minified']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    buildVscodeMinified: true,
+  })
+})
+
+test('parseArgv - build vscode minified not present', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    buildVscodeMinified: false,
+  })
+})
+
 test('parseArgv - disable vscode node modules cache not present', () => {
   const argv: readonly string[] = []
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
