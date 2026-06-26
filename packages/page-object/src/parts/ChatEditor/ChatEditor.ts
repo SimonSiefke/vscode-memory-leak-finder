@@ -271,6 +271,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     ToolError2: 6,
   }
 
+  const isLoggedIn = async (page: any) => {
+    const loginButton = page.locator('[aria-label="Sign In"]')
+    try {
+      await expect(loginButton).toBeHidden()
+      return true
+    } catch (error) {
+      return false
+    }
+  }
+
+  const assertLoggedIn = async (page: any) => {
+    if (!(await isLoggedIn(page))) {
+      throw new Error('User is not logged in. Please log in to continue.')
+    }
+  }
+
   const waitForDoneOrToolApproval = async (expect: any, chatView: any) => {
     const loading = chatView.locator('.chat-response-loading')
     const toolApprovalSection = chatView.locator('.chat-confirmation-widget2')
@@ -794,6 +810,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       model?: string
     }) {
       try {
+        await assertLoggedIn(page)
         const chatView = page.locator('.interactive-session')
         const shouldWaitForFileChanges = fileChangesToWaitFor.length > 0
         const initialFileContents = shouldWaitForFileChanges
