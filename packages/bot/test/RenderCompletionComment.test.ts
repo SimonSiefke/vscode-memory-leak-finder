@@ -46,6 +46,7 @@ test('renderCompletionComment renders success with artifacts and details', () =>
         candidateMeasure: 'success',
         charts: 'success',
       },
+      workflowDurationMs: 3_723_000,
       workflowRun: {
         id: 1,
         url: 'https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/1',
@@ -65,6 +66,8 @@ test('renderCompletionComment renders success with artifacts and details', () =>
   )
   expect(result).toContain('named-function-count3')
   expect(result).toContain('https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/1')
+  expect(result).toContain('- Duration: 1h 2m 3s')
+  expect(result.indexOf('- Workflow:')).toBeLessThan(result.indexOf('- Duration: 1h 2m 3s'))
   expect(result).toContain('<details>')
   expect(result).toContain('```json')
   expect(result).not.toContain('### Artifacts')

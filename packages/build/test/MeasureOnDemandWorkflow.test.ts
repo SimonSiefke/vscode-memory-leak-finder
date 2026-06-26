@@ -29,6 +29,12 @@ test('measure-on-demand workflow accepts and masks snapshot download inputs', as
   expect(workflow).toContain("exportMaskedVariable('DOWNLOAD_USER_DATA_ZIP_FILE_URL', url)")
   expect(workflow).toContain("exportMaskedVariable('DOWNLOAD_ALL_MOCK_DATA_ZIP_FILE_URL', allMockDataUrl)")
   expect(workflow).toContain("exportMaskedVariable('DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN', token)")
+  expect(workflow).toContain('initialize:')
+  expect(workflow).toContain('startedAtEpochMs: ${{ steps.workflowStart.outputs.startedAtEpochMs }}')
+  expect(workflow).toContain('run: echo "startedAtEpochMs=$(date -u +%s%3N)" >> "$GITHUB_OUTPUT"')
+  expect(workflow).toContain('needs: initialize')
+  expect(workflow).toContain('needs: [initialize, measure-base, measure-candidate]')
+  expect(workflow).toContain('MEASURE_WORKFLOW_STARTED_AT_EPOCH_MS: ${{ needs.initialize.outputs.startedAtEpochMs }}')
 
   expect(workflow).not.toContain('DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN: ${{ inputs.download_user_data_zip_file_token }}')
   expect(workflow).not.toContain('DOWNLOAD_USER_DATA_ZIP_FILE_URL: ${{ inputs.download_user_data_zip_file_url }}')

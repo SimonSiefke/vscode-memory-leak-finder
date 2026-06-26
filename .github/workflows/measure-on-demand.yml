@@ -80,7 +80,17 @@ permissions:
   contents: read
 
 jobs:
+  initialize:
+    runs-on: ubuntu-24.04
+    outputs:
+      startedAtEpochMs: ${{ steps.workflowStart.outputs.startedAtEpochMs }}
+    steps:
+      - name: Record workflow start time
+        id: workflowStart
+        run: echo "startedAtEpochMs=$(date -u +%s%3N)" >> "$GITHUB_OUTPUT"
+
   measure-base:
+    needs: initialize
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     outputs:
@@ -285,6 +295,7 @@ jobs:
         run: exit 1
 
   measure-candidate:
+    needs: initialize
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     outputs:
@@ -490,7 +501,7 @@ jobs:
 
   finalize:
     if: always()
-    needs: [measure-base, measure-candidate]
+    needs: [initialize, measure-base, measure-candidate]
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -556,6 +567,7 @@ jobs:
             {"baseMeasure":"${{ needs.measure-base.outputs.measureOutcome }}","candidateMeasure":"${{ needs.measure-candidate.outputs.measureOutcome }}","charts":"${{ (needs.measure-base.outputs.chartsOutcome == 'failure' || needs.measure-candidate.outputs.chartsOutcome == 'failure') && 'failure' || ((needs.measure-base.outputs.chartsOutcome == 'success' || needs.measure-candidate.outputs.chartsOutcome == 'success') && 'success' || 'skipped') }}"}
           MEASURE_WORKFLOW_RUN_ID: ${{ github.run_id }}
           MEASURE_WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MEASURE_WORKFLOW_STARTED_AT_EPOCH_MS: ${{ needs.initialize.outputs.startedAtEpochMs }}
         run: node packages/build/src/createMeasureWorkflowSummary.ts .measure-runs/summary/summary.json
 
       - name: Upload charts artifact
