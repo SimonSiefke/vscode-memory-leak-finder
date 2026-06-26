@@ -13,7 +13,8 @@
     "postinstall": "lerna bootstrap --ci",
     "test": "lerna run test",
     "type-check": "tsc -b",
-    "build-charts": "node packages/charts/src/main.ts"
+    "build-charts": "node packages/charts/src/main.ts",
+    "backport-prs": "npm --prefix packages/build run backport-prs --"
   },
   "repository": {
     "type": "git",
