@@ -169,10 +169,14 @@ export const createBackportMarker = (upstreamRepo: string, pullRequestNumber: nu
   return `Backport-Upstream-PR: ${upstreamRepo}#${pullRequestNumber}`
 }
 
-export const createBackportBody = (pullRequest: MergedPullRequest, options: Pick<BackportOptions, 'upstreamRepo'>): string => {
+export const createBackportPullRequestBody = (pullRequest: MergedPullRequest): string => {
+  return `Backport of ${pullRequest.url}`
+}
+
+export const createBackportCommitBody = (pullRequest: MergedPullRequest, options: Pick<BackportOptions, 'upstreamRepo'>): string => {
   const mergeCommit = pullRequest.mergeCommit?.oid ?? 'unknown'
   return [
-    `Backport of ${pullRequest.url}`,
+    createBackportPullRequestBody(pullRequest),
     '',
     createBackportMarker(options.upstreamRepo, pullRequest.number),
     `Backport-Upstream-URL: ${pullRequest.url}`,
@@ -375,8 +379,9 @@ const createBackportPullRequest = async (candidate: BackportCandidate, options: 
       throw new Error(`Failed to inspect staged backport changes in ${worktreePath}`)
     }
 
-    const body = createBackportBody(candidate.pullRequest, options)
-    await executeCommand('git', ['commit', '-m', candidate.pullRequest.title, '-m', body], { cwd: worktreePath })
+    const commitBody = createBackportCommitBody(candidate.pullRequest, options)
+    const pullRequestBody = createBackportPullRequestBody(candidate.pullRequest)
+    await executeCommand('git', ['commit', '-m', candidate.pullRequest.title, '-m', commitBody], { cwd: worktreePath })
     await executeCommand('git', ['push', '--set-upstream', options.remote, candidate.branchName], { cwd: worktreePath })
     const pr = await executeCommand(
       'gh',
@@ -392,7 +397,7 @@ const createBackportPullRequest = async (candidate: BackportCandidate, options: 
         '--title',
         candidate.pullRequest.title,
         '--body',
-        body,
+        pullRequestBody,
       ],
       { cwd: worktreePath },
     )

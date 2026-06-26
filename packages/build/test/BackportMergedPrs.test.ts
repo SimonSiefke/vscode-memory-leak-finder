@@ -1,7 +1,8 @@
 import { expect, test } from '@jest/globals'
 import {
-  createBackportBody,
+  createBackportCommitBody,
   createBackportBranchName,
+  createBackportPullRequestBody,
   getBackportSkipReason,
   parseBackportedPrNumbers,
   selectNextBackportPullRequest,
@@ -51,7 +52,16 @@ test('createBackportBranchName creates a stable branch slug', () => {
   expect(createBackportBranchName(pullRequest)).toBe('backport/upstream-42-fix-a-great-thing')
 })
 
-test('createBackportBody includes repeatable upstream markers', () => {
+test('createBackportPullRequestBody only includes the backport reference', () => {
+  const pullRequest = createPullRequest({
+    number: 9,
+    title: 'feature: update default chat model',
+  })
+
+  expect(createBackportPullRequestBody(pullRequest)).toBe('Backport of https://github.com/SimonSiefke/vscode-memory-leak-finder-3/pull/9')
+})
+
+test('createBackportCommitBody includes repeatable upstream markers', () => {
   const pullRequest = createPullRequest({
     number: 9,
     title: 'feature: update default chat model',
@@ -60,7 +70,7 @@ test('createBackportBody includes repeatable upstream markers', () => {
     },
   })
 
-  expect(createBackportBody(pullRequest, { upstreamRepo })).toBe(
+  expect(createBackportCommitBody(pullRequest, { upstreamRepo })).toBe(
     [
       'Backport of https://github.com/SimonSiefke/vscode-memory-leak-finder-3/pull/9',
       '',
