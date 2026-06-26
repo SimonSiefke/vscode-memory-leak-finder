@@ -14,6 +14,8 @@ export interface LaunchOptions {
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly headlessMode: boolean
@@ -39,6 +41,11 @@ export interface LaunchOptions {
 
 let proxyWorkerRpc: any = null
 
+export const getSecretsPath = (): string => {
+  const userDataDir = GetUserDataDir.getUserDataDir()
+  return join(userDataDir, 'secrets', 'secrets.json')
+}
+
 export const launch = async (options: LaunchOptions): Promise<any> => {
   const {
     arch,
@@ -47,6 +54,8 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     commit,
     connectionId,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -80,6 +89,8 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     clearExtensions,
     commit,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -106,13 +117,12 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   if (trackFunctions) {
     preGeneratedWorkbenchPath = join(Root.root, '.vscode-workbench-tracked', 'workbench.desktop.main.js')
   }
+  const secretsPath = getSecretsPath()
 
   await using rpc = await launchInitializationWorker()
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
-  const userDataDir = GetUserDataDir.getUserDataDir(platform)
-  const secretsPath = join(userDataDir, 'secrets', 'secrets.json')
   const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
     secretsPath,
@@ -139,6 +149,76 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     utilityContext,
     webSocketUrl,
   }
+}
+
+export const setup = async ({
+  arch,
+  clearExtensions,
+  commit,
+  cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
+  enableExtensions,
+  enableProxy,
+  ide,
+  insidersCommit,
+  inspectExtensions,
+  inspectExtensionsPort,
+  inspectPtyHost,
+  inspectPtyHostPort,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
+  platform,
+  updateUrl,
+  useProxyMock,
+  vscodePath,
+  vscodeVersion,
+}: {
+  arch: string
+  clearExtensions: boolean
+  commit: string
+  cwd: string
+  downloadUserDataZipFileToken: string
+  downloadUserDataZipFileUrl: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  ide: string
+  insidersCommit: string
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  platform: string
+  updateUrl: string
+  useProxyMock: boolean
+  vscodePath: string
+  vscodeVersion: string
+}): Promise<void> => {
+  await LaunchIde.setupIde({
+    arch,
+    clearExtensions,
+    commit,
+    cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
+    enableExtensions,
+    enableProxy,
+    ide,
+    insidersCommit,
+    inspectExtensions,
+    inspectExtensionsPort,
+    inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcess,
+    inspectSharedProcessPort,
+    platform,
+    updateUrl,
+    useProxyMock,
+    vscodePath,
+    vscodeVersion,
+  })
 }
 
 export const setProxyTestFolderName = async (proxyTestFolderName: string): Promise<void> => {
