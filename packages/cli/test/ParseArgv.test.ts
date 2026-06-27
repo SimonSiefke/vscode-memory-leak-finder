@@ -189,6 +189,14 @@ test('parseArgv - create all mock data zip', () => {
   })
 })
 
+test('parseArgv - use proxy mock enables proxy', () => {
+  const argv = ['--use-proxy-mock']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    enableProxy: true,
+    useProxyMock: true,
+  })
+})
+
 test('parseArgv - cwd', () => {
   const argv = ['--cwd', '/test']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({

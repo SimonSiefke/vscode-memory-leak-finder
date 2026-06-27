@@ -303,7 +303,7 @@ const parseInspectExtensionsPort = (argv: readonly string[]): number => {
 }
 
 const parseEnableProxy = (argv: readonly string[]): boolean => {
-  return argv.includes('--enable-proxy')
+  return argv.includes('--enable-proxy') || argv.includes('--use-proxy-mock')
 }
 
 const parseUseProxyMock = (argv: readonly string[]): boolean => {

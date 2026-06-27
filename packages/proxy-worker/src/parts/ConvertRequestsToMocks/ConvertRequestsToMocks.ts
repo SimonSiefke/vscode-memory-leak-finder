@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs'
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
+import * as CryptographyWorker from '../CryptographyWorker/CryptographyWorker.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
@@ -289,5 +290,9 @@ const convertRequestsToMocks = async (): Promise<void> => {
 }
 
 export const convertRequestsToMocksMain = async (): Promise<void> => {
-  await convertRequestsToMocks()
+  try {
+    await convertRequestsToMocks()
+  } finally {
+    await CryptographyWorker.disposeCryptographyWorker()
+  }
 }
