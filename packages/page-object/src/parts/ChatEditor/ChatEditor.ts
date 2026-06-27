@@ -160,6 +160,16 @@ const isChatResponseErrorText = (text: string) => {
   return text.toLowerCase().includes('please try again')
 }
 
+export const Models = {
+  GPT41: 'GPT-4.1',
+  GPT5Mini: 'GPT-5 mini',
+  GPT54Mini: 'GPT-5.4 mini',
+  ZAiGLM45AirFree: 'zAiGLM4.5 air free',
+  DefaultFree: 'zAiGLM4.5 air free',
+} as const
+
+export type ChatModel = (typeof Models)[keyof typeof Models]
+
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const chatScrollSelector = '.interactive-session .monaco-list .monaco-scrollable-element'
 
@@ -379,6 +389,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
   }
 
   return {
+    Models,
     async addAllProblemsAsContext() {
       try {
         await this.addContext('Problems...', 'All Problems', 'All Problems')
@@ -687,7 +698,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to scroll chat editor to top`)
       }
     },
-    async selectModel(modelName: string, retry = true) {
+    async selectModel(modelName: ChatModel, retry = true) {
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -769,7 +780,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       message: string
       viewLinesText?: string
       image?: string
-      model?: string
+      model?: ChatModel
     }) {
       try {
         await this.sendPart1({
@@ -807,7 +818,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       viewLinesText?: string
       image?: string
       toolInvocations?: readonly any[]
-      model?: string
+      model?: ChatModel
     }) {
       try {
         await assertLoggedIn(page)
@@ -946,7 +957,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       message: string
       viewLinesText?: string | undefined
       image?: string | undefined
-      model?: string | undefined
+      model?: ChatModel | undefined
     }) {
       await page.waitForIdle()
       const chatView = page.locator('.interactive-session')

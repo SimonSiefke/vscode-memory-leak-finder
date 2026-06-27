@@ -94,15 +94,14 @@ export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestCont
   await Workspace.setFiles(initialFiles)
   await Editor.closeAll()
   await ChatEditor.open()
-  // @ts-ignore
-  await ChatEditor.selectModel('GPT-5 mini')
+  await ChatEditor.selectModel(ChatEditor.Models.GPT5Mini)
 }
 
 export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     approveToolCalls: true,
     message: prompt,
-    model: 'GPT-5 mini',
+    model: ChatEditor.Models.GPT5Mini,
     verify: true,
     waitForFileChanges: failingTestFiles.map((file) => file.name),
   })
