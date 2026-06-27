@@ -16,6 +16,34 @@ export interface NewWindowHandle {
   close(): Promise<void>
 }
 
+export interface ChatEditorModels {
+  readonly GPT41: 'GPT-4.1'
+  readonly GPT5Mini: 'GPT-5 mini'
+  readonly GPT54Mini: 'GPT-5.4 mini'
+  readonly ZAiGLM45AirFree: 'zAiGLM4.5 air free'
+  readonly DefaultFree: 'zAiGLM4.5 air free'
+}
+
+export type ChatModel = ChatEditorModels[keyof ChatEditorModels]
+export type ChatEditorText = string | RegExp
+
+export interface ChatEditorSendOptions {
+  readonly message: string
+  readonly viewLinesText?: ChatEditorText
+  readonly image?: string
+  readonly model?: ChatModel
+}
+
+export interface ChatEditorSendMessageOptions extends ChatEditorSendOptions {
+  readonly expectedResponse?: string
+  readonly approveToolCalls?: boolean
+  readonly validateRequest?: { readonly exists: readonly unknown[] }
+  readonly verify?: boolean
+  readonly waitForFileChanges?: readonly string[]
+  readonly waitForPorts?: readonly number[]
+  readonly toolInvocations?: readonly any[]
+}
+
 export interface PageObjectWindowHandle extends NewWindowHandle {
   sessionRpc?: any
   locator?: (selector: string) => any
@@ -44,6 +72,7 @@ export interface ActivityBar {
   showSourceControl(): Promise<void>
 }
 export interface ChatEditor {
+  readonly Models: ChatEditorModels
   addAllProblemsAsContext(): Promise<void>
   addContext(initialPrompt: any, secondPrompt: any, confirmText: any): Promise<void>
   attachImage(file: any): Promise<void>
@@ -63,10 +92,10 @@ export interface ChatEditor {
   open(): Promise<void>
   openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
-  selectModel(modelName: any, retry?: any): Promise<void>
-  sendPart1(options?: any): Promise<void>
-  send(options?: any): Promise<void>
-  sendMessage(options?: any): Promise<void>
+  selectModel(modelName: ChatModel, retry?: boolean): Promise<void>
+  sendPart1(options: ChatEditorSendOptions): Promise<void>
+  send(options: ChatEditorSendOptions): Promise<void>
+  sendMessage(options: ChatEditorSendMessageOptions): Promise<void>
   setMode(modeLabel: any): Promise<void>
   setModeLegacy(modeLabel: any): Promise<void>
   retryLastMessage(): Promise<void>
