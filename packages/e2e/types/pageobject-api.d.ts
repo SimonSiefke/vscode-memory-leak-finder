@@ -17,6 +17,7 @@ export interface NewWindowHandle {
 }
 
 export interface ChatEditorModels {
+  readonly Auto: 'Auto'
   readonly GPT41: 'GPT-4.1'
   readonly GPT5Mini: 'GPT-5 mini'
   readonly GPT54Mini: 'GPT-5.4 mini'
