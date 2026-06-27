@@ -6,6 +6,7 @@ import * as ParseVersion from '../ParseVersion/ParseVersion.ts'
 
 export const setupIde = async ({
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   cwd,
@@ -29,6 +30,7 @@ export const setupIde = async ({
   vscodeVersion,
 }: {
   arch: string
+  buildVscodeMinified: boolean
   clearExtensions: boolean
   commit: string
   cwd: string
@@ -64,6 +66,7 @@ export const setupIde = async ({
   }
   await LaunchVsCode.setupVsCode({
     arch,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     downloadUserDataZipFileToken,
@@ -80,6 +83,7 @@ export const setupIde = async ({
 export const launchIde = async ({
   addDisposable,
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   cwd,
@@ -105,6 +109,7 @@ export const launchIde = async ({
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
   arch: string
+  buildVscodeMinified: boolean
   clearExtensions: boolean
   commit: string
   cwd: string
@@ -168,6 +173,7 @@ export const launchIde = async ({
   const { binaryPath, child, pid, proxyWorkerRpc } = await LaunchVsCode.launchVsCode({
     addDisposable,
     arch,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     cwd,

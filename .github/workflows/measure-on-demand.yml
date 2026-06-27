@@ -19,6 +19,11 @@ on:
         description: Allowed CLI arguments including --measure and --only
         required: true
         type: string
+      build_vscode_minified:
+        description: Build VS Code from source as a minified package
+        required: false
+        type: boolean
+        default: false
       download_user_data_zip_file_url:
         description: User-data download URL passed by the bot
         required: false
@@ -102,6 +107,7 @@ jobs:
       MEASURE_NAME: ${{ inputs.measure }}
       ONLY: ${{ inputs.only }}
       CLI_ARGS: ${{ inputs.cli_args }}
+      BUILD_VSCODE_MINIFIED: ${{ inputs.build_vscode_minified }}
       BASE_COMMIT: ${{ inputs.base_commit }}
       CANDIDATE_REF: ${{ inputs.candidate_ref }}
       SOURCE_ACTOR: ${{ inputs.source_actor }}
@@ -225,6 +231,14 @@ jobs:
           rm -rf .measure-runs .vscode-memory-leak-finder-results .vscode-charts
           mkdir -p .measure-runs
 
+      - name: Initialize VS Code build settings
+        run: |
+          if [[ "$BUILD_VSCODE_MINIFIED" == "true" ]]; then
+            echo "BUILD_VSCODE_MINIFIED_FLAG=--build-vscode-minified" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_VSCODE_MINIFIED_FLAG=" >> "$GITHUB_ENV"
+          fi
+
       - name: Setup base revision
         run: |
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
@@ -232,6 +246,7 @@ jobs:
             --run-skipped-tests-anyway \
             --commit "${{ env.BASE_COMMIT }}" \
             --setup-only \
+            $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
 
       - name: Measure base revision
@@ -244,6 +259,7 @@ jobs:
             --measure-after \
             --run-skipped-tests-anyway \
             --commit "${{ env.BASE_COMMIT }}" \
+            $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
 
           if [[ ! -d .vscode-memory-leak-finder-results ]]; then
@@ -307,6 +323,7 @@ jobs:
       MEASURE_NAME: ${{ inputs.measure }}
       ONLY: ${{ inputs.only }}
       CLI_ARGS: ${{ inputs.cli_args }}
+      BUILD_VSCODE_MINIFIED: ${{ inputs.build_vscode_minified }}
       BASE_COMMIT: ${{ inputs.base_commit }}
       CANDIDATE_REF: ${{ inputs.candidate_ref }}
       SOURCE_ACTOR: ${{ inputs.source_actor }}
@@ -430,6 +447,14 @@ jobs:
           rm -rf .measure-runs .vscode-memory-leak-finder-results .vscode-charts
           mkdir -p .measure-runs
 
+      - name: Initialize VS Code build settings
+        run: |
+          if [[ "$BUILD_VSCODE_MINIFIED" == "true" ]]; then
+            echo "BUILD_VSCODE_MINIFIED_FLAG=--build-vscode-minified" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_VSCODE_MINIFIED_FLAG=" >> "$GITHUB_ENV"
+          fi
+
       - name: Setup candidate revision
         run: |
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
@@ -437,6 +462,7 @@ jobs:
             --run-skipped-tests-anyway \
             --commit "${{ env.CANDIDATE_REF }}" \
             --setup-only \
+            $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
 
       - name: Measure candidate revision
@@ -449,6 +475,7 @@ jobs:
             --measure-after \
             --run-skipped-tests-anyway \
             --commit "${{ env.CANDIDATE_REF }}" \
+            $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
 
           if [[ ! -d .vscode-memory-leak-finder-results ]]; then

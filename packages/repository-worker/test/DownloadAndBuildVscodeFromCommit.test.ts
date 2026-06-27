@@ -22,6 +22,7 @@ const mockInstallDependencies = jest.fn()
 const mockEnsureNestedDependencies = jest.fn<(cwd: string, useNice: boolean) => Promise<number>>()
 const mockResolveCommitHash = jest.fn()
 const mockRunCompile = jest.fn()
+const mockRunMinifiedBuild = jest.fn()
 const mockCopyNodeModulesFromCacheToRepositoryFolder = jest.fn()
 const mockHasCompleteTopLevelNodeModules = jest.fn<(repoPath: string) => Promise<boolean>>()
 const mockPreCacheRipgrep = jest.fn<(platform: string, arch: string) => Promise<void>>()
@@ -55,6 +56,7 @@ jest.unstable_mockModule('../src/parts/ResolveCommitHash/ResolveCommitHash.ts', 
 
 jest.unstable_mockModule('../src/parts/RunCompile/RunCompile.ts', () => ({
   runCompile: mockRunCompile,
+  runMinifiedBuild: mockRunMinifiedBuild,
 }))
 
 jest.unstable_mockModule('../src/parts/CopyNodeModulesFromCacheToRepositoryFolder/CopyNodeModulesFromCacheToRepositoryFolder.ts', () => ({
@@ -129,6 +131,7 @@ beforeEach(() => {
   mockEnsureNestedDependencies.mockResolvedValue(0)
   mockAddNodeModulesToCache.mockReturnValue(undefined)
   mockRunCompile.mockReturnValue(undefined)
+  mockRunMinifiedBuild.mockReturnValue(undefined)
   mockLog.mockReturnValue(undefined)
 
   const mockRpc = MockRpc.create({
@@ -341,6 +344,60 @@ test('downloadAndBuildVscodeFromCommit repairs nested dependencies after restori
   expect(mockRunCompile).not.toHaveBeenCalled()
 })
 
+test('downloadAndBuildVscodeFromCommit builds minified vscode in a separate cache folder', async () => {
+  const testCommitHash = '5555555555555555555555555555555555555555'
+  const reposDir = Path.join('/test', '.vscode-repos')
+  const repoParentPath = Path.join(reposDir, `${testCommitHash}-minified`)
+  const repoPath = Path.join(repoParentPath, 'source')
+  const gitPath = Path.join(repoPath, '.git')
+  const minifiedExecutablePath = Path.join(repoParentPath, 'VSCode-linux-x64', 'code-oss')
+  const mainJsPath = Path.join(repoPath, 'out', 'main.js')
+  const nodeModulesPath = Path.join(repoPath, 'node_modules')
+  const nodeModulesPackageLock = Path.join(nodeModulesPath, '.package-lock.json')
+  const outPath = Path.join(repoPath, 'out')
+
+  mockResolveCommitHash.mockImplementation(async () => ({
+    commitHash: testCommitHash,
+    owner: 'microsoft',
+  }))
+
+  mockPathExists.mockImplementation((path) => {
+    if (path === reposDir) {
+      return true
+    }
+    if (path === repoParentPath) {
+      return false
+    }
+    if (path === gitPath) {
+      return false
+    }
+    if (path === minifiedExecutablePath) {
+      return false
+    }
+    if (path === mainJsPath) {
+      return false
+    }
+    if (path === nodeModulesPath) {
+      return true
+    }
+    if (path === nodeModulesPackageLock) {
+      return true
+    }
+    if (path === outPath) {
+      return false
+    }
+    return false
+  })
+
+  const result = await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, DEFAULT_REPO_URL, reposDir, '', false, true)
+
+  expect(result).toBe(minifiedExecutablePath)
+  expect(mockMkdir).toHaveBeenCalledWith(repoParentPath)
+  expect(mockCloneRepository).toHaveBeenCalledWith(DEFAULT_REPO_URL, repoPath, testCommitHash)
+  expect(mockRunMinifiedBuild).toHaveBeenCalledWith(repoPath, 'linux', 'x64', false, minifiedExecutablePath)
+  expect(mockRunCompile).not.toHaveBeenCalled()
+})
+
 test('downloadAndBuildVscodeFromCommit uses stable repo folder name when provided', async () => {
   const testCommitHash = '1111111111111111111111111111111111111111'
   const reposDir = Path.join('/test', '.vscode-repos')
@@ -378,7 +435,7 @@ test('downloadAndBuildVscodeFromCommit uses stable repo folder name when provide
     return false
   })
 
-  await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, DEFAULT_REPO_URL, reposDir, '', false, 'default')
+  await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, DEFAULT_REPO_URL, reposDir, '', false, false, 'default')
 
   expect(mockCloneRepository.mock.calls).toEqual([[DEFAULT_REPO_URL, repoPath, testCommitHash]])
   expect(mockInstallDependencies).toHaveBeenCalledWith(repoPath, false)
@@ -421,7 +478,7 @@ test('downloadAndBuildVscodeFromCommit updates existing stable repo to the reque
     return false
   })
 
-  await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, DEFAULT_REPO_URL, reposDir, '', false, 'default')
+  await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, DEFAULT_REPO_URL, reposDir, '', false, false, 'default')
 
   expect(mockCheckoutCommit).toHaveBeenCalledWith(repoPath, DEFAULT_REPO_URL, testCommitHash)
   expect(mockCloneRepository).not.toHaveBeenCalled()

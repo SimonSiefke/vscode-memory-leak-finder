@@ -75,6 +75,7 @@ const restoreProxyArtifacts = async (downloadToken: string): Promise<void> => {
 
 const prepareVsCodeLaunch = async ({
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   downloadUserDataZipFileToken,
@@ -87,6 +88,7 @@ const prepareVsCodeLaunch = async ({
   vscodeVersion,
 }: {
   arch: string
+  buildVscodeMinified: boolean
   clearExtensions: boolean
   commit: string
   downloadUserDataZipFileToken: string
@@ -122,7 +124,16 @@ const prepareVsCodeLaunch = async ({
   await mkdir(sourceMapCacheDir, { recursive: true })
   const sourcesDir = join(Root.root, '.vscode-sources')
   await mkdir(sourcesDir, { recursive: true })
-  const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
+  const binaryPath = await GetBinaryPath.getBinaryPath(
+    platform,
+    arch,
+    vscodeVersion,
+    vscodePath,
+    commit,
+    insidersCommit,
+    updateUrl,
+    buildVscodeMinified,
+  )
   const userDataDir = GetUserDataDir.getUserDataDir()
   const extensionsDir = GetExtensionsDir.getExtensionsDir()
   if (downloadUserDataZipFileUrl) {
@@ -157,6 +168,7 @@ const prepareVsCodeLaunch = async ({
 
 export const setupVsCode = async ({
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   downloadUserDataZipFileToken,
@@ -169,6 +181,7 @@ export const setupVsCode = async ({
   vscodeVersion,
 }: {
   arch: string
+  buildVscodeMinified: boolean
   clearExtensions: boolean
   commit: string
   downloadUserDataZipFileToken: string
@@ -183,6 +196,7 @@ export const setupVsCode = async ({
   try {
     await prepareVsCodeLaunch({
       arch,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       downloadUserDataZipFileToken,
@@ -202,6 +216,7 @@ export const setupVsCode = async ({
 export const launchVsCode = async ({
   addDisposable,
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   cwd,
@@ -226,6 +241,7 @@ export const launchVsCode = async ({
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
   arch: string
+  buildVscodeMinified: boolean
   clearExtensions: boolean
   commit: string
   cwd: string
@@ -255,6 +271,7 @@ export const launchVsCode = async ({
   try {
     const { binaryPath, extensionsDir, runtimeDir, settingsPath, testWorkspacePath, userDataDir } = await prepareVsCodeLaunch({
       arch,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       downloadUserDataZipFileToken,
