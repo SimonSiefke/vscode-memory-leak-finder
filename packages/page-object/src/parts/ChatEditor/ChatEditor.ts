@@ -169,6 +169,7 @@ export const Models = {
 } as const
 
 export type ChatModel = (typeof Models)[keyof typeof Models]
+export type ChatEditorText = string | RegExp
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const chatScrollSelector = '.interactive-session .monaco-list .monaco-scrollable-element'
@@ -778,7 +779,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       viewLinesText = '',
     }: {
       message: string
-      viewLinesText?: string
+      viewLinesText?: ChatEditorText
       image?: string
       model?: ChatModel
     }) {
@@ -815,7 +816,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       verify?: boolean
       waitForFileChanges?: readonly string[]
       waitForPorts?: readonly number[]
-      viewLinesText?: string
+      viewLinesText?: ChatEditorText
       image?: string
       toolInvocations?: readonly any[]
       model?: ChatModel
@@ -955,7 +956,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       viewLinesText = '',
     }: {
       message: string
-      viewLinesText?: string | undefined
+      viewLinesText?: ChatEditorText | undefined
       image?: string | undefined
       model?: ChatModel | undefined
     }) {

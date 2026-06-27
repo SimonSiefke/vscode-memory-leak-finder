@@ -25,10 +25,11 @@ export interface ChatEditorModels {
 }
 
 export type ChatModel = ChatEditorModels[keyof ChatEditorModels]
+export type ChatEditorText = string | RegExp
 
 export interface ChatEditorSendOptions {
   readonly message: string
-  readonly viewLinesText?: string
+  readonly viewLinesText?: ChatEditorText
   readonly image?: string
   readonly model?: ChatModel
 }
