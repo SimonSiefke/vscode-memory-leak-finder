@@ -15,6 +15,27 @@ import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
+const createMissingMockResponseBody = (targetUrl: string): string => {
+  return JSON.stringify({
+    error: 'Mock response not found',
+    message: 'Proxy mock mode is enabled, but no mock response exists for this request. Refusing to forward request to the network.',
+    target: targetUrl,
+  })
+}
+
+const sendMissingMockResponse = (res: ServerResponse, targetUrl: string): void => {
+  const body = createMissingMockResponseBody(targetUrl)
+  res.writeHead(502, {
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Headers': 'authorization, content-type, accept, x-requested-with',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'Access-Control-Allow-Origin': '*',
+    'Content-Length': String(Buffer.byteLength(body)),
+    'Content-Type': 'application/json',
+  })
+  res.end(body)
+}
+
 const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string, useProxyMock: boolean): Promise<void> => {
   // Check for mock response first (only if useProxyMock is enabled)
   let parsedUrl: URL
@@ -38,7 +59,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
     if (!isAzureMetadata) {
       const portStr = parsedUrl.port ? `:${parsedUrl.port}` : ''
-      console.log(`[Proxy] Forwarding ${req.method} ${parsedUrl.protocol}//${parsedUrl.hostname}${portStr}${parsedUrl.pathname}`)
+      console.log(`[Proxy] Handling ${req.method} ${parsedUrl.protocol}//${parsedUrl.hostname}${portStr}${parsedUrl.pathname}`)
     }
   } catch (error) {
     console.error(`[Proxy] Invalid URL: ${targetUrl}`, error)
@@ -302,6 +323,9 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
         GetMockResponse.sendMockResponse(res, mockResponse)
         return
       }
+      console.error(`[Proxy] Missing mock response for ${req.method} ${targetUrl}; blocked live network request`)
+      sendMissingMockResponse(res, targetUrl)
+      return
     }
 
     await forwardBufferedRequest(requestBody)

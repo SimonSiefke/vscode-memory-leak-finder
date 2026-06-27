@@ -161,6 +161,7 @@ const isChatResponseErrorText = (text: string) => {
 }
 
 export const Models = {
+  Auto: 'Auto',
   GPT41: 'GPT-4.1',
   GPT5Mini: 'GPT-5 mini',
   GPT54Mini: 'GPT-5.4 mini',
