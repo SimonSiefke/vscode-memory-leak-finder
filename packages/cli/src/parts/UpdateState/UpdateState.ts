@@ -30,6 +30,7 @@ export const updateState = async (newState: any): Promise<void> => {
       allowCopilotAuthInCi: false,
       arch: state.arch,
       bisect: state.bisect,
+      buildVscodeMinified: state.buildVscodeMinified,
       checkLeaks: state.checkLeaks,
       clearExtensions: state.clearExtensions,
       color: true,
