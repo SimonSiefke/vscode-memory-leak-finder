@@ -3,8 +3,11 @@ import {
   createBackportCommitBody,
   createBackportBranchName,
   createBackportPullRequestBody,
+  createEnableSquashAutoMergeArgs,
   getBackportSkipReason,
+  parseBackportedPrNumberFromBranchName,
   parseBackportedPrNumbers,
+  parseMergedTargetBackportedPrNumbers,
   selectNextBackportPullRequest,
   sortMergedPullRequests,
   type BackportState,
@@ -81,6 +84,22 @@ test('createBackportCommitBody includes repeatable upstream markers', () => {
   )
 })
 
+test('createEnableSquashAutoMergeArgs enables squash auto-merge for a pull request url', () => {
+  expect(
+    createEnableSquashAutoMergeArgs('https://github.com/SimonSiefke/vscode-memory-leak-finder/pull/2969', {
+      targetRepo: 'SimonSiefke/vscode-memory-leak-finder',
+    }),
+  ).toEqual([
+    'pr',
+    'merge',
+    'https://github.com/SimonSiefke/vscode-memory-leak-finder/pull/2969',
+    '--repo',
+    'SimonSiefke/vscode-memory-leak-finder',
+    '--auto',
+    '--squash',
+  ])
+})
+
 test('parseBackportedPrNumbers finds upstream markers in git log output', () => {
   const gitLog = [
     'feature: update default chat model',
@@ -91,6 +110,45 @@ test('parseBackportedPrNumbers finds upstream markers in git log output', () => 
   ].join('\n')
 
   expect(parseBackportedPrNumbers(gitLog, upstreamRepo)).toEqual(new Set([9, 12]))
+})
+
+test('parseBackportedPrNumberFromBranchName finds generated backport branch numbers', () => {
+  expect(parseBackportedPrNumberFromBranchName('backport/upstream-3-add-optional-minified-vs-code-source-builds')).toBe(3)
+})
+
+test('parseBackportedPrNumberFromBranchName ignores unrelated branch names', () => {
+  expect(parseBackportedPrNumberFromBranchName('feature/update-dependencies')).toBeUndefined()
+  expect(parseBackportedPrNumberFromBranchName('backport/upstream-add-optional-minified-vs-code-source-builds')).toBeUndefined()
+})
+
+test('parseMergedTargetBackportedPrNumbers finds upstream markers in merged target pull request bodies', () => {
+  const pullRequests = [
+    {
+      body: [
+        'Backport of https://github.com/SimonSiefke/vscode-memory-leak-finder-3/pull/1',
+        '',
+        'Backport-Upstream-PR: SimonSiefke/vscode-memory-leak-finder-3#1',
+      ].join('\n'),
+      headRefName: 'feature/manual-backport',
+    },
+  ]
+
+  expect(parseMergedTargetBackportedPrNumbers(pullRequests, upstreamRepo)).toEqual(new Set([1]))
+})
+
+test('parseMergedTargetBackportedPrNumbers finds generated backport branch names for sparse pull request bodies', () => {
+  const pullRequests = [
+    {
+      body: 'Backport of https://github.com/SimonSiefke/vscode-memory-leak-finder-3/pull/3',
+      headRefName: 'backport/upstream-3-add-optional-minified-vs-code-source-builds',
+    },
+    {
+      body: 'Unrelated change',
+      headRefName: 'feature/update-dependencies',
+    },
+  ]
+
+  expect(parseMergedTargetBackportedPrNumbers(pullRequests, upstreamRepo)).toEqual(new Set([3]))
 })
 
 test('getBackportSkipReason detects already backported pull requests', () => {
@@ -148,6 +206,48 @@ test('selectNextBackportPullRequest returns the oldest missing pull request', ()
     createState({
       backportedPrNumbers: new Set([alreadyBackported.number]),
       remoteBranches: new Set([createBackportBranchName(existingBranch)]),
+    }),
+    upstreamRepo,
+  )
+
+  expect(candidate).toEqual({
+    pullRequest: selected,
+    branchName: 'backport/upstream-3-selected-change',
+  })
+})
+
+test('selectNextBackportPullRequest skips pull requests found in merged target metadata', () => {
+  const mergedWithMarker = createPullRequest({
+    number: 1,
+    mergedAt: '2026-06-26T21:00:00Z',
+  })
+  const mergedWithGeneratedBranch = createPullRequest({
+    number: 2,
+    mergedAt: '2026-06-26T22:00:00Z',
+  })
+  const selected = createPullRequest({
+    number: 3,
+    title: 'Selected Change',
+    mergedAt: '2026-06-26T23:00:00Z',
+  })
+  const backportedPrNumbers = parseMergedTargetBackportedPrNumbers(
+    [
+      {
+        body: 'Backport-Upstream-PR: SimonSiefke/vscode-memory-leak-finder-3#1',
+        headRefName: 'feature/manual-backport',
+      },
+      {
+        body: 'Backport of https://github.com/SimonSiefke/vscode-memory-leak-finder-3/pull/2',
+        headRefName: 'backport/upstream-2-merged-with-generated-branch',
+      },
+    ],
+    upstreamRepo,
+  )
+
+  const candidate = selectNextBackportPullRequest(
+    [selected, mergedWithGeneratedBranch, mergedWithMarker],
+    createState({
+      backportedPrNumbers,
     }),
     upstreamRepo,
   )
