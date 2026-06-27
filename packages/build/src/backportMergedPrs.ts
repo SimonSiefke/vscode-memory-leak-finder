@@ -60,6 +60,11 @@ interface OpenPullRequest {
   readonly headRefName: string
 }
 
+export interface MergedTargetPullRequest {
+  readonly body: string
+  readonly headRefName: string
+}
+
 const defaultOptions: BackportOptions = {
   upstreamRepo: DEFAULT_UPSTREAM_REPO,
   targetRepo: DEFAULT_TARGET_REPO,
@@ -184,12 +189,44 @@ export const createBackportCommitBody = (pullRequest: MergedPullRequest, options
   ].join('\n')
 }
 
+export const createEnableSquashAutoMergeArgs = (
+  pullRequestUrl: string,
+  options: Pick<BackportOptions, 'targetRepo'>,
+): readonly string[] => {
+  return ['pr', 'merge', pullRequestUrl, '--repo', options.targetRepo, '--auto', '--squash']
+}
+
 export const parseBackportedPrNumbers = (gitLog: string, upstreamRepo: string): Set<number> => {
   const escapedRepo = escapeRegExp(upstreamRepo)
   const markerPattern = new RegExp(`Backport-Upstream-PR: ${escapedRepo}#(\\d+)`, 'g')
   const numbers = new Set<number>()
   for (const match of gitLog.matchAll(markerPattern)) {
     numbers.add(Number(match[1]))
+  }
+  return numbers
+}
+
+export const parseBackportedPrNumberFromBranchName = (branchName: string): number | undefined => {
+  const match = /^backport\/upstream-(\d+)-/.exec(branchName)
+  if (!match) {
+    return undefined
+  }
+  return Number(match[1])
+}
+
+export const parseMergedTargetBackportedPrNumbers = (
+  pullRequests: readonly MergedTargetPullRequest[],
+  upstreamRepo: string,
+): Set<number> => {
+  const numbers = new Set<number>()
+  for (const pullRequest of pullRequests) {
+    for (const number of parseBackportedPrNumbers(pullRequest.body, upstreamRepo)) {
+      numbers.add(number)
+    }
+    const branchNumber = parseBackportedPrNumberFromBranchName(pullRequest.headRefName)
+    if (branchNumber) {
+      numbers.add(branchNumber)
+    }
   }
   return numbers
 }
@@ -290,9 +327,48 @@ const getOpenPullRequestBranches = async (options: BackportOptions): Promise<Set
   return new Set(pullRequests.map((pullRequest) => pullRequest.headRefName))
 }
 
-const getBackportedPrNumbers = async (options: BackportOptions): Promise<Set<number>> => {
+const getGitLogBackportedPrNumbers = async (options: BackportOptions): Promise<Set<number>> => {
   const result = await executeCommand('git', ['log', `${options.remote}/${options.baseBranch}`, '--format=%B'], { cwd: options.cwd })
   return parseBackportedPrNumbers(result.stdout, options.upstreamRepo)
+}
+
+const getMergedTargetBackportedPrNumbers = async (options: BackportOptions): Promise<Set<number>> => {
+  const result = await executeCommand(
+    'gh',
+    [
+      'pr',
+      'list',
+      '--repo',
+      options.targetRepo,
+      '--state',
+      'merged',
+      '--base',
+      options.baseBranch,
+      '--limit',
+      '1000',
+      '--json',
+      'body,headRefName',
+    ],
+    { cwd: options.cwd },
+  )
+  const pullRequests = JSON.parse(result.stdout) as MergedTargetPullRequest[]
+  return parseMergedTargetBackportedPrNumbers(pullRequests, options.upstreamRepo)
+}
+
+const getBackportedPrNumbers = async (options: BackportOptions): Promise<Set<number>> => {
+  const [gitLogBackportedPrNumbers, mergedTargetBackportedPrNumbers] = await Promise.all([
+    getGitLogBackportedPrNumbers(options),
+    getMergedTargetBackportedPrNumbers(options),
+  ])
+  return new Set([...gitLogBackportedPrNumbers, ...mergedTargetBackportedPrNumbers])
+}
+
+const cleanupLocalBackportBranch = async (candidate: BackportCandidate, options: BackportOptions): Promise<void> => {
+  await executeCommand('git', ['worktree', 'prune'], { cwd: options.cwd })
+  const localBranch = await executeCommand('git', ['branch', '--list', candidate.branchName], { cwd: options.cwd })
+  if (localBranch.stdout.trim()) {
+    await executeCommand('git', ['branch', '--delete', '--force', candidate.branchName], { cwd: options.cwd })
+  }
 }
 
 const getBackportState = async (options: BackportOptions): Promise<BackportState> => {
@@ -314,6 +390,7 @@ const printDryRun = (candidate: BackportCandidate, options: BackportOptions): vo
   console.log(`Would apply patch from: ${candidate.pullRequest.url}`)
   console.log(`Would push to: ${options.remote}`)
   console.log(`Would open PR in: ${options.targetRepo}`)
+  console.log('Would enable squash auto-merge')
 }
 
 interface CreatedBackportPullRequest {
@@ -335,6 +412,7 @@ const createBackportPullRequest = async (candidate: BackportCandidate, options: 
   let branchCreated = false
 
   try {
+    await cleanupLocalBackportBranch(candidate, options)
     await executeCommand('git', ['worktree', 'add', '--detach', worktreePath, `${options.remote}/${options.baseBranch}`], {
       cwd: options.cwd,
     })
@@ -401,10 +479,12 @@ const createBackportPullRequest = async (candidate: BackportCandidate, options: 
       ],
       { cwd: worktreePath },
     )
+    const pullRequestUrl = pr.stdout.trim()
+    await executeCommand('gh', createEnableSquashAutoMergeArgs(pullRequestUrl, options), { cwd: worktreePath })
 
     return {
       status: 'created',
-      url: pr.stdout.trim(),
+      url: pullRequestUrl,
     }
   } finally {
     if (!keepWorktree) {
