@@ -52,7 +52,7 @@ export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestCont
   await Workspace.setFiles(initialFiles)
   await Editor.closeAll()
   await ChatEditor.open()
-  await ChatEditor.selectModel(ChatEditor.Models.GPT5Mini)
+  await ChatEditor.selectModel(ChatEditor.Models.Auto)
 }
 
 export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void> => {
@@ -62,7 +62,7 @@ export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void>
   await ChatEditor.sendMessage({
     approveToolCalls: true,
     message: prompt,
-    model: ChatEditor.Models.GPT5Mini,
+    model: ChatEditor.Models.Auto,
     verify: true,
     waitForFileChanges: ['test/add.test.js'],
   })
