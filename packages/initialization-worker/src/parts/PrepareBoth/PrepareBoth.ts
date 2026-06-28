@@ -14,6 +14,7 @@ import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDe
 const HTTP_SERVER_PORT = 9876
 
 export const prepareBoth = async (
+  secretsPath: string,
   headlessMode: boolean,
   attachedToPageTimeout: number,
   port: MessagePort,
@@ -42,6 +43,7 @@ export const prepareBoth = async (
 
   const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(
     electronRpc,
+    secretsPath,
     headlessMode,
     trackFunctions,
     openDevtools,

@@ -1,3 +1,4 @@
+import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
 import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
@@ -24,6 +25,8 @@ export const connectWorkers = async (
   measureNode: boolean,
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
+  inspectIntegratedBrowser: boolean,
+  inspectProcess = '',
   inspectPtyHost: boolean,
   enableExtensions: boolean,
   inspectPtyHostPort: number,
@@ -65,21 +68,26 @@ export const connectWorkers = async (
   )
   const [videoRpc, testWorkerRpc] = await Promise.all(promises)
 
-  const memoryRpc = await MemoryLeakWorker.startWorker(
-    devtoolsWebSocketUrl,
-    webSocketUrl,
-    connectionId,
-    measureId,
-    attachedToPageTimeout,
-    measureNode,
-    inspectSharedProcess,
-    inspectExtensions,
-    inspectPtyHost,
-    inspectPtyHostPort,
-    inspectSharedProcessPort,
-    inspectExtensionsPort,
-    pid,
-  )
+  const memoryRpc =
+    inspectIntegratedBrowser || inspectProcess
+      ? emptyRpc
+      : await MemoryLeakWorker.startWorker(
+          devtoolsWebSocketUrl,
+          webSocketUrl,
+          connectionId,
+          measureId,
+          attachedToPageTimeout,
+          measureNode,
+          inspectSharedProcess,
+          inspectExtensions,
+          inspectIntegratedBrowser,
+          inspectPtyHost,
+          inspectPtyHostPort,
+          inspectSharedProcessPort,
+          inspectExtensionsPort,
+          pid,
+          [],
+        )
 
   return {
     memoryRpc,

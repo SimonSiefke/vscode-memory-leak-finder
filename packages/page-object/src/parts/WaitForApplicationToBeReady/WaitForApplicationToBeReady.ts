@@ -30,15 +30,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             timeout: 30_000,
           })
           return page
-        } else {
-          throw error
         }
+        throw error
       }
       if (!enableExtensions) {
         const notification = page.locator('text=All installed extensions are temporarily disabled.')
-        await expect(notification).toBeVisible({
-          timeout: 15_000,
-        })
+        try {
+          await expect(notification).toBeVisible({
+            timeout: 15_000,
+          })
+        } catch {
+          await page.waitForIdle()
+        }
       }
       if (inspectPtyHost) {
         const terminal = Terminal.create({

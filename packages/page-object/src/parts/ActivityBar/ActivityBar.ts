@@ -166,6 +166,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to reset view locations`)
       }
     },
+    async shouldBeHidden() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that activity bar is hidden`)
+      }
+    },
+    async shouldBeVisible() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that activity bar is visible`)
+      }
+    },
     async show() {
       try {
         const activityBar = page.locator('.part.activitybar')

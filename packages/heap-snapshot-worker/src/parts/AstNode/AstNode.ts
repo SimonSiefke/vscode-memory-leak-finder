@@ -90,14 +90,4 @@ export interface UnknownNode extends BaseAstNode {
 }
 
 export type AstNode =
-  | NumberNode
-  | StringNode
-  | BigIntNode
-  | BooleanNode
-  | UndefinedNode
-  | ObjectNode
-  | ArrayNode
-  | MapNode
-  | SetNode
-  | CodeNode
-  | UnknownNode
+  NumberNode | StringNode | BigIntNode | BooleanNode | UndefinedNode | ObjectNode | ArrayNode | MapNode | SetNode | CodeNode | UnknownNode

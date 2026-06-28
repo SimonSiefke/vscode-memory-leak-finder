@@ -64,7 +64,7 @@ export const pressKeyExponential = async (rpc, utilityContext, options) => {
   // TODO
 }
 
-export const contentEditableInsert = async (utilityContext, rpc, options) => {
+export const contentEditableInsert = async (rpc, utilityContext, options) => {
   Assert.object(options)
   Assert.string(options.value)
   await EvaluateInUtilityContext.evaluateInUtilityContext(

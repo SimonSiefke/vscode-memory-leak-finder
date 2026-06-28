@@ -1,10 +1,13 @@
 import { mkdir, readdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as Electron from '../Electron/Electron.ts'
 import * as Exec from '../Exec/Exec.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ page, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
 
   return {
@@ -64,6 +67,34 @@ export const create = ({ page, VError }: CreateParams) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to init`)
+      }
+    },
+    async initRepository(relativePath: string) {
+      try {
+        const repositoryPath = join(workspace, relativePath)
+        await mkdir(repositoryPath, { recursive: true })
+        await Exec.exec('git', ['init', '-b', 'main'], { cwd: repositoryPath, env: { ...process.env } })
+        await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: repositoryPath, env: { ...process.env } })
+        await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: repositoryPath, env: { ...process.env } })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to init repository at ${relativePath}`)
+      }
+    },
+    async openRepository(relativePath: string) {
+      try {
+        const repositoryPath = join(workspace, relativePath)
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await electron.mockOpenDialog({
+          bookmarks: [],
+          canceled: false,
+          filePaths: [repositoryPath],
+        })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitOpenRepository)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open repository at ${relativePath}`)
       }
     },
     async shouldHaveNoStagedDiff(fileName: string) {

@@ -1,4 +1,4 @@
-import { copyFile, mkdir, rm } from 'node:fs/promises'
+import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
@@ -11,14 +11,103 @@ import * as GetVsCodeEnv from '../GetVsCodeEnv/GetVsCodeEnv.ts'
 import * as GetVscodeRuntimeDir from '../GetVscodeRuntimeDir/GetVscodeRuntimeDir.ts'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.ts'
 import { join } from '../Path/Path.ts'
+import * as RestoreUserDataDir from '../RestoreUserDataDir/RestoreUserDataDir.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
+
+const pathExists = async (path: string): Promise<boolean> => {
+  try {
+    await stat(path)
+    return true
+  } catch {
+    return false
+  }
+}
+
+const prepareCursorLaunch = async ({
+  clearExtensions,
+  cursorVersion,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
+  vscodePath,
+}: {
+  clearExtensions: boolean
+  cursorVersion: string
+  downloadUserDataZipFileToken: string
+  downloadUserDataZipFileUrl: string
+  vscodePath: string | undefined
+}) => {
+  const shouldRestoreUserDataDir = downloadUserDataZipFileUrl !== ''
+  if (!downloadUserDataZipFileUrl && downloadUserDataZipFileToken) {
+    throw new Error('download user data zip file url is required when a token is provided')
+  }
+  const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
+  await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
+  const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
+  const binaryPath = vscodePath || (await DownloadAndUnzipCursor.downloadAndUnzipCursor(cursorVersion))
+  const userDataDir = GetUserDataDir.getUserDataDir()
+  const extensionsDir = GetExtensionsDir.getExtensionsDir()
+  if (shouldRestoreUserDataDir) {
+    await RestoreUserDataDir.restoreUserDataDir({
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
+      userDataDir,
+    })
+  }
+  if (clearExtensions) {
+    await rm(extensionsDir, { force: true, recursive: true })
+    await mkdir(extensionsDir)
+  } else {
+    await ClearExtensionsDirIfEmpty.clearExtensionsDirIfEmpty(extensionsDir)
+  }
+  const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
+  const settingsPath = join(userDataDir, 'User', 'settings.json')
+  await mkdir(dirname(settingsPath), { recursive: true })
+  if (!shouldRestoreUserDataDir || !(await pathExists(settingsPath))) {
+    await copyFile(defaultSettingsSourcePath, settingsPath)
+  }
+  return {
+    binaryPath,
+    extensionsDir,
+    runtimeDir,
+    testWorkspacePath,
+    userDataDir,
+  }
+}
+
+export const setupCursor = async ({
+  clearExtensions,
+  cursorVersion,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
+  vscodePath,
+}: {
+  clearExtensions: boolean
+  cursorVersion: string
+  downloadUserDataZipFileToken: string
+  downloadUserDataZipFileUrl: string
+  vscodePath: string | undefined
+}): Promise<void> => {
+  try {
+    await prepareCursorLaunch({
+      clearExtensions,
+      cursorVersion,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
+      vscodePath,
+    })
+  } catch (error) {
+    throw new VError(error, `Failed to set up Cursor`)
+  }
+}
 
 export const launchCursor = async ({
   addDisposable,
   clearExtensions,
   cursorVersion,
   cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
   headlessMode,
@@ -28,6 +117,7 @@ export const launchCursor = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  proxyTestFolderName: _proxyTestFolderName,
   useProxyMock,
   vscodePath,
 }: {
@@ -35,6 +125,8 @@ export const launchCursor = async ({
   clearExtensions: boolean
   cursorVersion: string
   cwd: string
+  downloadUserDataZipFileToken: string
+  downloadUserDataZipFileUrl: string
   enableExtensions: boolean
   enableProxy: boolean
   headlessMode: boolean
@@ -44,32 +136,18 @@ export const launchCursor = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  proxyTestFolderName?: string
   useProxyMock: boolean
   vscodePath?: string
 }) => {
   try {
-    const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
-    await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
-    // TODO
-    // await RemoveVscodeWorkspaceStorage.removeVsCodeWorkspaceStorage()
-    // if (IsCi.isCi) {
-    //   await RemoveVscodeGlobalStorage.removeVsCodeGlobalStorage()
-    // }
-    // await RemoveVscodeBackups.removeVscodeBackups()
-    const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
-    const binaryPath = vscodePath || (await DownloadAndUnzipCursor.downloadAndUnzipCursor(cursorVersion))
-    const userDataDir = GetUserDataDir.getUserDataDir()
-    const extensionsDir = GetExtensionsDir.getExtensionsDir()
-    if (clearExtensions) {
-      await rm(extensionsDir, { force: true, recursive: true })
-      await mkdir(extensionsDir)
-    } else {
-      await ClearExtensionsDirIfEmpty.clearExtensionsDirIfEmpty(extensionsDir)
-    }
-    const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
-    const settingsPath = join(userDataDir, 'User', 'settings.json')
-    await mkdir(dirname(settingsPath), { recursive: true })
-    await copyFile(defaultSettingsSourcePath, settingsPath)
+    const { binaryPath, extensionsDir, runtimeDir, testWorkspacePath, userDataDir } = await prepareCursorLaunch({
+      clearExtensions,
+      cursorVersion,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
+      vscodePath,
+    })
 
     const args = GetVsCodeArgs.getVscodeArgs({
       enableExtensions,
@@ -87,6 +165,7 @@ export const launchCursor = async ({
     const env = GetVsCodeEnv.getVsCodeEnv({
       processEnv: process.env,
       runtimeDir,
+      userDataDir,
     })
     const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,

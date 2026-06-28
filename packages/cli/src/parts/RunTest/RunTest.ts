@@ -10,10 +10,12 @@ export const state: State = {
 }
 
 export const cleanup = (): void => {
-  if (state.testCoordinator) {
-    state.testCoordinator.dispose()
-    state.testCoordinator = undefined
+  if (!state.testCoordinator) {
+    return
   }
+
+  state.testCoordinator.dispose()
+  state.testCoordinator = undefined
 }
 
 export const prepare = async (): Promise<Rpc> => {

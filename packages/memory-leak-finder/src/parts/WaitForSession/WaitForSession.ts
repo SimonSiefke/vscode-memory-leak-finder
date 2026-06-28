@@ -1,13 +1,12 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
-
-export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
+export const waitForSession = async (browserRpc: Dynamic, attachedToPageTimeout: Dynamic) => {
   // TODO maybe coult be implemented simpler by using getTargets
   // since at this point the page is already open and should be available
   // as a target
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
-
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
     autoAttach: true,
     filter: [
@@ -27,9 +26,7 @@ export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
     flatten: true,
     waitForDebuggerOnStart: false,
   })
-
   const event = await eventPromise
-
   if (!event) {
     throw new Error(`Failed to attach to page`)
   }

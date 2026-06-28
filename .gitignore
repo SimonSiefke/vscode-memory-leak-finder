@@ -1,3 +1,6 @@
+.bot-user-data
+.vscode-user-data-dir.zip
+.vscode-sse-data
 .vscode-project-cache
 .vscode-workbench-tracked
 workbench.desktop.main.tracked.js
