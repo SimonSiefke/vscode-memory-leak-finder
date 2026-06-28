@@ -49,6 +49,7 @@ const getProcessResultFolder = (inspectProcess: string): string => {
 export const runTestsWithCallback = async ({
   allowCopilotAuthInCi,
   arch,
+  buildVscodeMinified,
   callback,
   checkLeaks,
   clearExtensions,
@@ -104,6 +105,7 @@ export const runTestsWithCallback = async ({
     Assert.string(cwd)
     Assert.string(filterValue)
     Assert.boolean(headlessMode)
+    Assert.boolean(buildVscodeMinified)
     Assert.boolean(color)
     Assert.boolean(checkLeaks)
     Assert.boolean(recordVideo)
@@ -135,6 +137,7 @@ export const runTestsWithCallback = async ({
     if (setupOnly && commit) {
       await SetupOnly.setupOnly({
         arch,
+        buildVscodeMinified,
         clearExtensions,
         commit,
         cwd,
@@ -173,6 +176,7 @@ export const runTestsWithCallback = async ({
       return await doLogin({
         arch,
         attachedToPageTimeout,
+        buildVscodeMinified,
         clearExtensions,
         commit,
         compressVideo,
@@ -277,6 +281,7 @@ export const runTestsWithCallback = async ({
           await PrepareTestsOrAttach.prepareTestsAndAttach({
             arch,
             attachedToPageTimeout,
+            buildVscodeMinified,
             clearExtensions,
             commit,
             compressVideo,

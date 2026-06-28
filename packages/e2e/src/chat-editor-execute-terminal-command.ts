@@ -12,7 +12,7 @@ export const setup = async ({ ChatEditor, SideBar }: TestContext): Promise<void>
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: `Run echo hello world in terminal.`,
-    model: 'GPT-4.1',
+    model: ChatEditor.Models.GPT41,
     toolInvocations: [
       {
         content: `echo hello world`,

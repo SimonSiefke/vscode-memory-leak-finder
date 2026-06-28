@@ -24,6 +24,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     ...StdinDataState.getState(),
     arch: options.arch,
     bisect: options.bisect,
+    buildVscodeMinified: options.buildVscodeMinified,
     checkLeaks: options.checkLeaks,
     // @ts-ignore
     commit: options.commit,

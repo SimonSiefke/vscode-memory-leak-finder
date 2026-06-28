@@ -22,6 +22,7 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
   try {
     const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
       bisect: true,
+      buildVscodeMinified: options.buildVscodeMinified,
       checkLeaks: options.checkLeaks,
       color: options.color,
       commit: options.commit,

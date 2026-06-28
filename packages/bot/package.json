@@ -14,7 +14,7 @@
     "tunnel": "cloudflared tunnel --url http://localhost:3000"
   },
   "devDependencies": {
-    "nock": "^14.0.15",
+    "nock": "^14.0.16",
     "smee-client": "^5.0.0"
   },
   "dependencies": {

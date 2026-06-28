@@ -127,6 +127,10 @@ const parseCompressVideo = (argv: readonly string[]): boolean => {
   return argv.includes('--compress-video')
 }
 
+const parseBuildVscodeMinified = (argv: readonly string[]): boolean => {
+  return argv.includes('--build-vscode-minified')
+}
+
 const parseRuns = (argv: readonly string[]): number => {
   if (argv.includes('--runs')) {
     return parseArgvNumber(argv, '--runs')
@@ -299,7 +303,7 @@ const parseInspectExtensionsPort = (argv: readonly string[]): number => {
 }
 
 const parseEnableProxy = (argv: readonly string[]): boolean => {
-  return argv.includes('--enable-proxy')
+  return argv.includes('--enable-proxy') || argv.includes('--use-proxy-mock')
 }
 
 const parseUseProxyMock = (argv: readonly string[]): boolean => {
@@ -367,6 +371,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const bisect = parseBisect(argv)
+  const buildVscodeMinified = parseBuildVscodeMinified(argv)
   const checkLeaks = parseCheckLeaks(argv)
   const clearExtensions = parseClearExtensions(argv)
   const color = true
@@ -432,6 +437,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     allowCopilotAuthInCi,
     arch,
     bisect,
+    buildVscodeMinified,
     checkLeaks,
     clearExtensions,
     color,

@@ -19,20 +19,29 @@ on:
         description: Allowed CLI arguments including --measure and --only
         required: true
         type: string
+      build_vscode_minified:
+        description: Build VS Code from source as a minified package
+        required: false
+        type: boolean
+        default: false
+      download_user_data_zip_file_url:
+        description: User-data download URL passed by the bot
+        required: false
+        type: string
+      download_user_data_zip_file_token:
+        description: User-data download token passed by the bot
+        required: false
+        type: string
+      download_all_mock_data_zip_file_url:
+        description: All mock data download URL passed by the bot
+        required: false
+        type: string
       base_commit:
         description: Base VS Code commit SHA
         required: true
         type: string
       candidate_ref:
         description: Candidate VS Code ref in owner/ref or commit format
-        required: true
-        type: string
-      download_user_data_zip_file_url:
-        description: Authenticated download URL for the uploaded vscode-user-data-dir zip
-        required: true
-        type: string
-      download_user_data_zip_file_token:
-        description: Bearer token for the uploaded vscode-user-data-dir zip
         required: true
         type: string
       source_actor:
@@ -76,7 +85,17 @@ permissions:
   contents: read
 
 jobs:
+  initialize:
+    runs-on: ubuntu-24.04
+    outputs:
+      startedAtEpochMs: ${{ steps.workflowStart.outputs.startedAtEpochMs }}
+    steps:
+      - name: Record workflow start time
+        id: workflowStart
+        run: echo "startedAtEpochMs=$(date -u +%s%3N)" >> "$GITHUB_OUTPUT"
+
   measure-base:
+    needs: initialize
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     outputs:
@@ -88,10 +107,9 @@ jobs:
       MEASURE_NAME: ${{ inputs.measure }}
       ONLY: ${{ inputs.only }}
       CLI_ARGS: ${{ inputs.cli_args }}
+      BUILD_VSCODE_MINIFIED: ${{ inputs.build_vscode_minified }}
       BASE_COMMIT: ${{ inputs.base_commit }}
       CANDIDATE_REF: ${{ inputs.candidate_ref }}
-      DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN: ${{ inputs.download_user_data_zip_file_token }}
-      DOWNLOAD_USER_DATA_ZIP_FILE_URL: ${{ inputs.download_user_data_zip_file_url }}
       SOURCE_ACTOR: ${{ inputs.source_actor }}
       SOURCE_OWNER: ${{ inputs.source_owner }}
       SOURCE_REPO: ${{ inputs.source_repo }}
@@ -101,6 +119,33 @@ jobs:
       SOURCE_PULL_REQUEST_URL: ${{ inputs.source_pull_request_url }}
       TARGET_BASE_REF: ${{ inputs.target_base_ref }}
     steps:
+      - name: Initialize snapshot download settings
+        run: |
+          node <<'EOF'
+          const { appendFileSync, readFileSync } = await import('node:fs')
+
+          const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'))
+          const url = event.inputs?.download_user_data_zip_file_url || ''
+          const allMockDataUrl = event.inputs?.download_all_mock_data_zip_file_url || ''
+          const token = event.inputs?.download_user_data_zip_file_token || ''
+          if (!url && !allMockDataUrl) {
+            console.error('measure workflow requires download_user_data_zip_file_url or download_all_mock_data_zip_file_url input')
+            process.exit(1)
+          }
+          const exportMaskedVariable = (name, value) => {
+            if (!value) {
+              return
+            }
+            process.stdout.write(`::add-mask::${value}\n`)
+            appendFileSync(process.env.GITHUB_ENV, `${name}=${value}\n`)
+          }
+          exportMaskedVariable('DOWNLOAD_USER_DATA_ZIP_FILE_URL', url)
+          exportMaskedVariable('DOWNLOAD_ALL_MOCK_DATA_ZIP_FILE_URL', allMockDataUrl)
+          if (token) {
+            exportMaskedVariable('DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN', token)
+          }
+          EOF
+
       - name: Validate trigger actor
         run: |
           if [[ "$SOURCE_ACTOR" != "$ALLOWED_TRIGGER_LOGIN" ]]; then
@@ -186,15 +231,22 @@ jobs:
           rm -rf .measure-runs .vscode-memory-leak-finder-results .vscode-charts
           mkdir -p .measure-runs
 
+      - name: Initialize VS Code build settings
+        run: |
+          if [[ "$BUILD_VSCODE_MINIFIED" == "true" ]]; then
+            echo "BUILD_VSCODE_MINIFIED_FLAG=--build-vscode-minified" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_VSCODE_MINIFIED_FLAG=" >> "$GITHUB_ENV"
+          fi
+
       - name: Setup base revision
         run: |
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
             --cwd packages/e2e \
-            --download-user-data-zip-file-url "${DOWNLOAD_USER_DATA_ZIP_FILE_URL}" \
-            --download-user-data-zip-file-token "${DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN}" \
             --run-skipped-tests-anyway \
             --commit "${{ env.BASE_COMMIT }}" \
             --setup-only \
+            $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
 
       - name: Measure base revision
@@ -204,11 +256,10 @@ jobs:
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
             --cwd packages/e2e \
             --check-leaks \
-            --download-user-data-zip-file-url "${DOWNLOAD_USER_DATA_ZIP_FILE_URL}" \
-            --download-user-data-zip-file-token "${DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN}" \
             --measure-after \
             --run-skipped-tests-anyway \
             --commit "${{ env.BASE_COMMIT }}" \
+            $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
 
           if [[ ! -d .vscode-memory-leak-finder-results ]]; then
@@ -260,6 +311,7 @@ jobs:
         run: exit 1
 
   measure-candidate:
+    needs: initialize
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     outputs:
@@ -271,10 +323,9 @@ jobs:
       MEASURE_NAME: ${{ inputs.measure }}
       ONLY: ${{ inputs.only }}
       CLI_ARGS: ${{ inputs.cli_args }}
+      BUILD_VSCODE_MINIFIED: ${{ inputs.build_vscode_minified }}
       BASE_COMMIT: ${{ inputs.base_commit }}
       CANDIDATE_REF: ${{ inputs.candidate_ref }}
-      DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN: ${{ inputs.download_user_data_zip_file_token }}
-      DOWNLOAD_USER_DATA_ZIP_FILE_URL: ${{ inputs.download_user_data_zip_file_url }}
       SOURCE_ACTOR: ${{ inputs.source_actor }}
       SOURCE_OWNER: ${{ inputs.source_owner }}
       SOURCE_REPO: ${{ inputs.source_repo }}
@@ -284,6 +335,33 @@ jobs:
       SOURCE_PULL_REQUEST_URL: ${{ inputs.source_pull_request_url }}
       TARGET_BASE_REF: ${{ inputs.target_base_ref }}
     steps:
+      - name: Initialize snapshot download settings
+        run: |
+          node <<'EOF'
+          const { appendFileSync, readFileSync } = await import('node:fs')
+
+          const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'))
+          const url = event.inputs?.download_user_data_zip_file_url || ''
+          const allMockDataUrl = event.inputs?.download_all_mock_data_zip_file_url || ''
+          const token = event.inputs?.download_user_data_zip_file_token || ''
+          if (!url && !allMockDataUrl) {
+            console.error('measure workflow requires download_user_data_zip_file_url or download_all_mock_data_zip_file_url input')
+            process.exit(1)
+          }
+          const exportMaskedVariable = (name, value) => {
+            if (!value) {
+              return
+            }
+            process.stdout.write(`::add-mask::${value}\n`)
+            appendFileSync(process.env.GITHUB_ENV, `${name}=${value}\n`)
+          }
+          exportMaskedVariable('DOWNLOAD_USER_DATA_ZIP_FILE_URL', url)
+          exportMaskedVariable('DOWNLOAD_ALL_MOCK_DATA_ZIP_FILE_URL', allMockDataUrl)
+          if (token) {
+            exportMaskedVariable('DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN', token)
+          }
+          EOF
+
       - name: Validate trigger actor
         run: |
           if [[ "$SOURCE_ACTOR" != "$ALLOWED_TRIGGER_LOGIN" ]]; then
@@ -369,15 +447,22 @@ jobs:
           rm -rf .measure-runs .vscode-memory-leak-finder-results .vscode-charts
           mkdir -p .measure-runs
 
+      - name: Initialize VS Code build settings
+        run: |
+          if [[ "$BUILD_VSCODE_MINIFIED" == "true" ]]; then
+            echo "BUILD_VSCODE_MINIFIED_FLAG=--build-vscode-minified" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_VSCODE_MINIFIED_FLAG=" >> "$GITHUB_ENV"
+          fi
+
       - name: Setup candidate revision
         run: |
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
             --cwd packages/e2e \
-            --download-user-data-zip-file-url "${DOWNLOAD_USER_DATA_ZIP_FILE_URL}" \
-            --download-user-data-zip-file-token "${DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN}" \
             --run-skipped-tests-anyway \
             --commit "${{ env.CANDIDATE_REF }}" \
             --setup-only \
+            $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
 
       - name: Measure candidate revision
@@ -387,11 +472,10 @@ jobs:
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
             --cwd packages/e2e \
             --check-leaks \
-            --download-user-data-zip-file-url "${DOWNLOAD_USER_DATA_ZIP_FILE_URL}" \
-            --download-user-data-zip-file-token "${DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN}" \
             --measure-after \
             --run-skipped-tests-anyway \
             --commit "${{ env.CANDIDATE_REF }}" \
+            $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
 
           if [[ ! -d .vscode-memory-leak-finder-results ]]; then
@@ -444,7 +528,7 @@ jobs:
 
   finalize:
     if: always()
-    needs: [measure-base, measure-candidate]
+    needs: [initialize, measure-base, measure-candidate]
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -510,6 +594,7 @@ jobs:
             {"baseMeasure":"${{ needs.measure-base.outputs.measureOutcome }}","candidateMeasure":"${{ needs.measure-candidate.outputs.measureOutcome }}","charts":"${{ (needs.measure-base.outputs.chartsOutcome == 'failure' || needs.measure-candidate.outputs.chartsOutcome == 'failure') && 'failure' || ((needs.measure-base.outputs.chartsOutcome == 'success' || needs.measure-candidate.outputs.chartsOutcome == 'success') && 'success' || 'skipped') }}"}
           MEASURE_WORKFLOW_RUN_ID: ${{ github.run_id }}
           MEASURE_WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MEASURE_WORKFLOW_STARTED_AT_EPOCH_MS: ${{ needs.initialize.outputs.startedAtEpochMs }}
         run: node packages/build/src/createMeasureWorkflowSummary.ts .measure-runs/summary/summary.json
 
       - name: Upload charts artifact

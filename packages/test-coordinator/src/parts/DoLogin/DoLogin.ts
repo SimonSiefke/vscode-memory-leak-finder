@@ -4,6 +4,7 @@ import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAtt
 export interface LoginOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly compressVideo: boolean
@@ -47,6 +48,7 @@ export interface LoginOptions {
 export const doLogin = async ({
   arch,
   attachedToPageTimeout,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   compressVideo,
@@ -90,6 +92,7 @@ export const doLogin = async ({
     await PrepareTestsOrAttach.prepareTestsAndAttach({
       arch,
       attachedToPageTimeout,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       compressVideo,

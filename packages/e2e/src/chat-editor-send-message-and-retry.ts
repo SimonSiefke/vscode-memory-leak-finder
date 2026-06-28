@@ -11,7 +11,7 @@ export const setup = async ({ ChatEditor, Editor, Electron, SideBar }: TestConte
   await Editor.closeAll()
   await SideBar.hide()
   await ChatEditor.open()
-  await ChatEditor.sendMessage({ message: 'test', model: 'GPT-4.1', verify: true })
+  await ChatEditor.sendMessage({ message: 'test', model: ChatEditor.Models.GPT41, verify: true })
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {

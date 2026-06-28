@@ -81,7 +81,7 @@ export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> 
   await ChatEditor.sendMessage({
     message:
       'Run node confirm.js in the terminal. The script will pause briefly before it asks for confirmation. If it needs input, answer y and wait until it finishes successfully.',
-    model: 'GPT-4.1',
+    model: ChatEditor.Models.GPT41,
     verify: true,
   })
 

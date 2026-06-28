@@ -2,6 +2,7 @@ import * as LaunchInitializationWorker from '../LaunchInitializationWorker/Launc
 
 export const setupOnly = async ({
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   cwd,
@@ -24,6 +25,7 @@ export const setupOnly = async ({
   vscodeVersion,
 }: {
   arch: string
+  buildVscodeMinified: boolean
   clearExtensions: boolean
   commit: string
   cwd: string
@@ -49,6 +51,7 @@ export const setupOnly = async ({
   try {
     await rpc.invoke('Launch.setup', {
       arch,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       cwd,

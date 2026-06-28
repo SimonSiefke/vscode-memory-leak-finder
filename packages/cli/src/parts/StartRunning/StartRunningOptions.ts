@@ -2,6 +2,7 @@ export interface StartRunningOptions {
   readonly allowCopilotAuthInCi: boolean
   readonly arch: string
   readonly bisect: boolean
+  readonly buildVscodeMinified: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
   readonly color: boolean

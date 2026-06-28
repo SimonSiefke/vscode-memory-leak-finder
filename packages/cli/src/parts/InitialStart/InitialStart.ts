@@ -44,6 +44,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     allowCopilotAuthInCi: options.allowCopilotAuthInCi,
     arch: options.arch,
     bisect: options.bisect,
+    buildVscodeMinified: options.buildVscodeMinified,
     checkLeaks: options.checkLeaks,
     clearExtensions: options.clearExtensions,
     color: options.color,
