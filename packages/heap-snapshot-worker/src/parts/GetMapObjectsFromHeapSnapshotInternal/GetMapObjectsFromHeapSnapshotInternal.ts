@@ -1,5 +1,6 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
 import { isInternalMap } from '../IsInternalMap/IsInternalMap.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
@@ -24,7 +25,14 @@ interface MapObject {
   variableNames: VariableName[]
 }
 
-export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
+export interface MapObjectResult {
+  readonly id: number
+  readonly keys: readonly string[]
+  readonly name: string | readonly string[]
+  readonly note: string
+}
+
+export const getMapObjectsFromHeapSnapshotInternal = (snapshot: Snapshot): readonly MapObjectResult[] => {
   const { edges, nodes, strings } = snapshot
   const { edge_fields, edge_types, node_fields, node_types } = snapshot.meta
 
@@ -276,7 +284,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
       let nameField: string | string[]
 
       if (names.length === 1) {
-        nameField = names[0]
+        nameField = names[0] || ''
       } else {
         nameField = names
       }

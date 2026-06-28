@@ -6,7 +6,7 @@ export const setup = async ({ Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
 }
 
-export const run = async ({ ActivityBar, Git, SourceControl, Workspace, Explorer }: TestContext): Promise<void> => {
+export const run = async ({ ActivityBar, Explorer, Git, SourceControl, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: '<h1>hello world</h1>',

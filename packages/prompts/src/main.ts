@@ -9,24 +9,24 @@ const root = join(dirname, '..', '..', '..')
 
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
-const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/node/named-function-count3/window-open-new.1.json`
+const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/node/named-function-count3/window-open-new.json`
 const ourPath = `/home/simon/.cache/repos/vscode-memory-leak-finder`
 const only = 'window-open-new'
 const runs = 17
 const measure = 'named-function-count3'
-const extraArgs = '--measure-node'
+const extraArgs = ''
 
 const main = async () => {
   const absolutePath = isAbsolute(relativePath) ? relativePath : join(root, relativePath)
   const content = await readFile(absolutePath, 'utf8')
   const prompt = getPrompt({
     content,
-    localVscodePath,
-    only,
-    runs,
-    ourPath,
-    measure,
     extraArgs,
+    localVscodePath,
+    measure,
+    only,
+    ourPath,
+    runs,
   })
   await clipboard.write(prompt)
   process.stdout.write(prompt)

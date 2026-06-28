@@ -1,11 +1,34 @@
 import type * as ParseArgv from '../ParseArgv/ParseArgv.ts'
+import * as ComputeVscodeNodeModulesCacheKeyFromCommit from '../ComputeVscodeNodeModulesCacheKeyFromCommit/ComputeVscodeNodeModulesCacheKeyFromCommit.ts'
 import * as ConvertProxyRequestsToMocks from '../ConvertProxyRequestsToMocks/ConvertProxyRequestsToMocks.ts'
+import * as ResolveVscodeCommitHashFromCommit from '../ResolveVscodeCommitHashFromCommit/ResolveVscodeCommitHashFromCommit.ts'
 import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
 import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
+const disableVscodeNodeModulesCacheEnvVar = 'VSCODE_MEMORY_LEAK_FINDER_DISABLE_VSCODE_NODE_MODULES_CACHE'
+const useStableVscodeRepoPathEnvVar = 'VSCODE_MEMORY_LEAK_FINDER_USE_STABLE_VSCODE_REPO_PATH'
+
 export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArgv> & { isGithubActions: boolean }): Promise<void> => {
+  if (options.disableVscodeNodeModulesCache) {
+    process.env[disableVscodeNodeModulesCacheEnvVar] = '1'
+  } else {
+    delete process.env[disableVscodeNodeModulesCacheEnvVar]
+  }
+  if (options.useStableVscodeRepoPath) {
+    process.env[useStableVscodeRepoPathEnvVar] = '1'
+  } else {
+    delete process.env[useStableVscodeRepoPathEnvVar]
+  }
+  if (options.computeVscodeNodeModulesCacheKey) {
+    await ComputeVscodeNodeModulesCacheKeyFromCommit.computeVscodeNodeModulesCacheKeyFromCommit(options.commit, options.verbose)
+    return
+  }
+  if (options.resolveVscodeCommitHash) {
+    await ResolveVscodeCommitHashFromCommit.resolveVscodeCommitHashFromCommit(options.commit)
+    return
+  }
   if (options.convertRequestsToMocks) {
     await ConvertProxyRequestsToMocks.convertProxyRequestsToMocks()
     return
@@ -18,8 +41,10 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     return
   }
   await StartRunning.startRunning({
+    allowCopilotAuthInCi: options.allowCopilotAuthInCi,
     arch: options.arch,
     bisect: options.bisect,
+    buildVscodeMinified: options.buildVscodeMinified,
     checkLeaks: options.checkLeaks,
     clearExtensions: options.clearExtensions,
     color: options.color,
@@ -27,6 +52,8 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     compressVideo: options.compressVideo,
     continueValue: options.continueValue,
     cwd: options.cwd,
+    downloadUserDataZipFileToken: options.downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl: options.downloadUserDataZipFileUrl,
     enableExtensions: options.enableExtensions,
     enableProxy: options.enableProxy,
     filterValue: options.filter,
@@ -36,6 +63,8 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     insidersCommit: options.insidersCommit,
     inspectExtensions: options.inspectExtensions,
     inspectExtensionsPort: options.inspectExtensionsPort,
+    inspectIntegratedBrowser: options.inspectIntegratedBrowser,
+    inspectProcess: options.inspectProcess,
     inspectPtyHost: options.inspectPtyHost,
     inspectPtyHostPort: options.inspectPtyHostPort,
     inspectSharedProcess: options.inspectSharedProcess,
@@ -48,6 +77,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     measureNode: options.measureNode,
     openDevtools: options.openDevtools,
     platform: options.platform,
+    processRootStrategy: options.processRootStrategy,
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,

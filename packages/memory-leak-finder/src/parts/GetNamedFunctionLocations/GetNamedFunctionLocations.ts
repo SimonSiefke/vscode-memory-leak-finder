@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetNamedFunctionLocation from '../GetNamedFunctionLocation/GetNamedFunctionLocation.ts'
-
-export const getNamedFunctionLocations = async (session: Session, objectIds, scriptMap, includeSourceMap) => {
+export const getNamedFunctionLocations = async (session: Session, objectIds: Dynamic, scriptMap: Dynamic, includeSourceMap: Dynamic) => {
   Assert.object(session)
   Assert.array(objectIds)
   Assert.object(scriptMap)

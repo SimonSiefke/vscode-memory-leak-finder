@@ -2,13 +2,13 @@ import type { IncomingMessage } from 'node:http'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
-import * as Root from '../Root/Root.ts'
+import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as ParseRequestBody from '../ParseRequestBody/ParseRequestBody.ts'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
-
-const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
 export const saveRequest = async (
   req: IncomingMessage,
@@ -16,13 +16,15 @@ export const saveRequest = async (
   statusMessage: string | undefined,
   responseHeaders: Record<string, string | string[]>,
   responseData: Buffer,
+  requestBody?: Buffer,
 ): Promise<void> => {
   try {
-    await mkdir(REQUESTS_DIR, { recursive: true })
+    const requestsDir = GetProxyPaths.getRequestsDir()
+    await mkdir(requestsDir, { recursive: true })
     const timestamp = Date.now()
     const url = req.url || ''
     const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}.json`
-    const filepath = join(REQUESTS_DIR, filename)
+    const filepath = join(requestsDir, filename)
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
     const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
@@ -59,7 +61,7 @@ export const saveRequest = async (
           .map((k) => Number.parseInt(k, 10))
           .filter((k) => !isNaN(k))
           .sort((a, b) => a - b)
-        if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+        if (keys.length > 0 && keys[0] === 0 && keys.at(-1) === keys.length - 1) {
           const numbers = keys.map((k) => decompressedBody[k] as number)
           imageBuffer = Buffer.from(new Uint8Array(numbers))
         } else {
@@ -90,7 +92,7 @@ export const saveRequest = async (
           .map((k) => Number.parseInt(k, 10))
           .filter((k) => !isNaN(k))
           .sort((a, b) => a - b)
-        if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+        if (keys.length > 0 && keys[0] === 0 && keys.at(-1) === keys.length - 1) {
           // Looks like a serialized Buffer/Uint8Array
           const numbers = keys.map((k) => decompressedBody[k] as number)
           bodyString = new TextDecoder().decode(new Uint8Array(numbers))
@@ -124,12 +126,13 @@ export const saveRequest = async (
         timestamp,
       },
       request: {
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(ParseRequestBody.parseRequestBody(req.headers, requestBody)),
         headers: req.headers,
         method: req.method,
         url: req.url,
       },
       response: {
-        body: responseBodyData,
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(responseBodyData),
         headers: responseHeaders,
         statusCode,
         statusMessage,

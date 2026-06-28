@@ -1,11 +1,11 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as CleanDetachedDomNodesWithStackTraces from '../CleanDetachedDomNodesWithStackTraces/CleanDetachedDomNodesWithStackTraces.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as GetDetachedDomNodeRoots from '../GetDetachedDomNodeRoots/GetDetachedDomNodeRoots.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
-
-export const getDetachedDomNodesWithStackTraces = async (session: Session, objectGroup: string, scriptMap: Record<string, any>) => {
+export const getDetachedDomNodesWithStackTraces = async (session: Session, objectGroup: string, scriptMap: Record<string, Dynamic>) => {
   const fnResult1 = await GetDetachedDomNodeRoots.getDetachedDomNodeRoots(session, objectGroup)
   const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: fnResult1.objectId,
@@ -36,7 +36,7 @@ return stackTraces
     objectId: fnResult1.objectId,
     returnByValue: true,
   })
-  const merged: any[] = []
+  const merged: Dynamic[] = []
   if (descriptors.length !== stackTraces.length) {
     throw new Error(`descriptor length mismatch`)
   }

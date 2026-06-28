@@ -1,7 +1,10 @@
 import * as Assert from '../Assert/Assert.ts'
-import { getArraysByClosureLocationFromHeapSnapshot } from '../GetArraysByClosureLocationFromHeapSnapshot/GetArraysByClosureLocationFromHeapSnapshot.ts'
+import {
+  getArraysByClosureLocationFromHeapSnapshot,
+  type ScriptMap,
+} from '../GetArraysByClosureLocationFromHeapSnapshot/GetArraysByClosureLocationFromHeapSnapshot.ts'
 
-export const getArraysByClosureLocationFromHeapSnapshotCommand = async (id: any, scriptMap: any) => {
+export const getArraysByClosureLocationFromHeapSnapshotCommand = async (id: string, scriptMap: ScriptMap) => {
   Assert.string(id)
   Assert.object(scriptMap)
   const result = await getArraysByClosureLocationFromHeapSnapshot(id, scriptMap)

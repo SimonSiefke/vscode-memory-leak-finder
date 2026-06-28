@@ -6,17 +6,17 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "transform": "node src/transform-script.js",
-    "track": "node src/devtools-injector.js",
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
-    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch",
+    "track": "node src/devtools-injector.js",
+    "transform": "node src/transform-script.js"
   },
   "dependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/generator": "^7.29.1",
-    "@babel/parser": "^7.29.3",
-    "@babel/traverse": "^7.29.0",
-    "@babel/types": "^7.29.0",
+    "@babel/core": "^7.29.7",
+    "@babel/generator": "^7.29.7",
+    "@babel/parser": "^7.29.7",
+    "@babel/traverse": "^7.29.7",
+    "@babel/types": "^7.29.7",
     "@lvce-editor/assert": "^1.5.1",
     "@lvce-editor/rpc": "^6.4.0",
     "@lvce-editor/verror": "^1.7.0"

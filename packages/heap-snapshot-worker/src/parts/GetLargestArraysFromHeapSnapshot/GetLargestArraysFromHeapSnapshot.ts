@@ -3,14 +3,8 @@ import * as Assert from '../Assert/Assert.ts'
 import * as CreateNameMap from '../CreateNameMap/CreateNameMap.ts'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import type { HeapSnapshotGraph, HeapSnapshotValue } from '../Snapshot/Snapshot.ts'
 
-interface GraphEdge {
-  readonly index: number
-  readonly name: string
-}
-interface Graph {
-  readonly [nodeId: number]: readonly GraphEdge[]
-}
 interface ParsedNode {
   readonly id: number
   readonly name: string
@@ -25,7 +19,7 @@ const isArray = (node: ParsedNode): boolean => {
   return node.type === 'object' && node.name === 'Array'
 }
 
-const getElementCount = (parsedNodes: readonly ParsedNode[], graph: Graph, id: number): number => {
+const getElementCount = (parsedNodes: readonly ParsedNode[], graph: HeapSnapshotGraph, id: number): number => {
   Assert.array(parsedNodes)
   Assert.object(graph)
   Assert.number(id)
@@ -39,7 +33,11 @@ const getElementCount = (parsedNodes: readonly ParsedNode[], graph: Graph, id: n
   return elementsEdges.length
 }
 
-const getArraysWithCount = (parsedNodes: readonly ParsedNode[], graph: Graph, arrayNodes: readonly ParsedNode[]): ArrayWithCount[] => {
+const getArraysWithCount = (
+  parsedNodes: readonly ParsedNode[],
+  graph: HeapSnapshotGraph,
+  arrayNodes: readonly ParsedNode[],
+): ArrayWithCount[] => {
   const withCount: ArrayWithCount[] = []
   for (const arrayNode of arrayNodes) {
     const count = getElementCount(parsedNodes, graph, arrayNode.id)
@@ -64,7 +62,7 @@ const filterByMinLength = (arrays: readonly ArrayWithCount[], minLength: number)
 }
 
 interface NameMapEntry {
-  readonly edgeName: string | undefined
+  readonly edgeName: HeapSnapshotValue | undefined
   readonly nodeName: string | undefined
 }
 interface NameMap {
@@ -80,7 +78,7 @@ const addNames = (items: readonly ArrayWithCount[], nameMap: NameMap): ArrayWith
     const nameObject = nameMap[item.id]
     withNames.push({
       ...item,
-      name: nameObject.edgeName || nameObject.nodeName,
+      name: String(nameObject.edgeName || nameObject.nodeName),
     })
   }
   return withNames

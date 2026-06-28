@@ -11,10 +11,10 @@ const mockRpc = MockRpc.create({
   commandMap: {},
   invoke: (method: string) => {
     if (method === 'Stdout.getClear') {
-      return '\u001B[2J\u001B[3J\u001B[H'
+      return '\u{1B}[2J\u{1B}[3J\u{1B}[H'
     }
     if (method === 'Stdout.getPatternUsageMessage') {
-      return '\n\u001B[1mPattern Mode Usage\u001B[22m\n \u001B[2m› Press\u001B[22m Esc \u001B[2mto exit pattern mode.\u001B[22m\n \u001B[2m› Press\u001B[22m Enter \u001B[2mto filter by a regex pattern.\u001B[22m\n\n\u001B[2m pattern ›\u001B[22m '
+      return '\n\u{1B}[1mPattern Mode Usage\u{1B}[22m\n \u{1B}[2m› Press\u{1B}[22m Esc \u{1B}[2mto exit pattern mode.\u{1B}[22m\n \u{1B}[2m› Press\u{1B}[22m Enter \u{1B}[2mto filter by a regex pattern.\u{1B}[22m\n\n\u{1B}[2m pattern ›\u{1B}[22m '
     }
     throw new Error(`unexpected method ${method}`)
   },
@@ -46,12 +46,12 @@ test('HandleStdinDataInterruptedMode - go to filter mode', async () => {
   const newState = await HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(newState.stdout).toEqual([
-    '\u001B[2J\u001B[3J\u001B[H\n' +
-      '\u001B[1mPattern Mode Usage\u001B[22m\n' +
-      ' \u001B[2m› Press\u001B[22m Esc \u001B[2mto exit pattern mode.\u001B[22m\n' +
-      ' \u001B[2m› Press\u001B[22m Enter \u001B[2mto filter by a regex pattern.\u001B[22m\n' +
+    '\u{1B}[2J\u{1B}[3J\u{1B}[H\n' +
+      '\u{1B}[1mPattern Mode Usage\u{1B}[22m\n' +
+      ' \u{1B}[2m› Press\u{1B}[22m Esc \u{1B}[2mto exit pattern mode.\u{1B}[22m\n' +
+      ' \u{1B}[2m› Press\u{1B}[22m Enter \u{1B}[2mto filter by a regex pattern.\u{1B}[22m\n' +
       '\n' +
-      '\u001B[2m pattern ›\u001B[22m ',
+      '\u{1B}[2m pattern ›\u{1B}[22m ',
   ])
 })
 

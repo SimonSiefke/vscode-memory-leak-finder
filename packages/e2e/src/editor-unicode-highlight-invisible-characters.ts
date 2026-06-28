@@ -5,7 +5,7 @@ export const skip = 1
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      content: `before\u200bafter
+      content: `before\u{200B}after
 `,
       name: 'file.txt',
     },

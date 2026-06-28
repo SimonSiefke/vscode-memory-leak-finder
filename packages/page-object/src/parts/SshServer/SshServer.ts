@@ -1,10 +1,10 @@
+import { spawn } from 'node:child_process'
 import { constants } from 'node:fs'
 import { access } from 'node:fs/promises'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { createConnection, createServer } from 'node:net'
 import { userInfo } from 'node:os'
 import { dirname, join } from 'node:path'
-import { spawn } from 'node:child_process'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Root from '../Root/Root.ts'
 
@@ -150,7 +150,7 @@ const findExecutable = async (name: string): Promise<string | undefined> => {
 
 const getAvailablePort = async (): Promise<number> => {
   const server = createServer()
-  const { promise, resolve, reject } = Promise.withResolvers<number>()
+  const { promise, reject, resolve } = Promise.withResolvers<number>()
   server.once('error', reject)
   server.listen(0, defaultHost, () => {
     const address = server.address()
@@ -158,7 +158,7 @@ const getAvailablePort = async (): Promise<number> => {
       reject(new Error('Failed to determine available SSH port'))
       return
     }
-    const port = address.port
+    const { port } = address
     server.close((error) => {
       if (error) {
         reject(error)
@@ -212,8 +212,8 @@ const getPaths = (rootDir: string): SshPaths => {
     knownHostsPath: join(sshDir, 'known_hosts'),
     settingsPath: join(userDataDir, 'User', 'settings.json'),
     sshConfigPath: join(sshDir, 'config'),
-    sshDir,
     sshdConfigPath: join(sshDir, 'sshd_config'),
+    sshDir,
     sshdPidPath: join(sshDir, 'sshd.pid'),
     sshHostKeyPath: join(sshDir, 'ssh_host_ed25519_key'),
   }
@@ -223,8 +223,8 @@ const buildSshdConfig = ({
   authorizedKeysPath,
   host,
   port,
-  sshHostKeyPath,
   sshdPidPath,
+  sshHostKeyPath,
   user,
 }: {
   authorizedKeysPath: string
@@ -296,9 +296,9 @@ const mergeSettings = async (dependencies: SshServerDependencies, settingsPath: 
   const mergedSettings = {
     ...currentSettings,
     'remote.SSH.configFile': sshConfigPath,
-    'remote.SSH.useLocalServer': false,
-    'remote.SSH.useExecServer': false,
     'remote.SSH.showLoginTerminal': true,
+    'remote.SSH.useExecServer': false,
+    'remote.SSH.useLocalServer': false,
   }
   await dependencies.writeTextFile(settingsPath, `${JSON.stringify(mergedSettings, null, 2)}\n`)
 }
@@ -318,7 +318,7 @@ const waitForPortInternal = async (
   { host = defaultHost, port, timeout = defaultTimeout }: WaitForPortOptions,
 ): Promise<void> => {
   if (typeof port !== 'number') {
-    throw new Error('port is required')
+    throw new TypeError('port is required')
   }
   const start = Date.now()
   while (Date.now() - start < timeout) {
@@ -337,7 +337,7 @@ const waitForSshProbe = async (
   connection: SshServerConnection,
   timeout = defaultTimeout,
 ): Promise<void> => {
-  const sshPath = state.sshPath
+  const { sshPath } = state
   if (!sshPath) {
     throw new Error('ssh probe path is missing')
   }
@@ -380,8 +380,8 @@ const prepareFiles = async (
       authorizedKeysPath: paths.authorizedKeysPath,
       host: connection.host,
       port: connection.port,
-      sshHostKeyPath: paths.sshHostKeyPath,
       sshdPidPath: paths.sshdPidPath,
+      sshHostKeyPath: paths.sshHostKeyPath,
       user: connection.user,
     }),
   )
@@ -415,6 +415,11 @@ const resolveRequiredBinaries = async (dependencies: SshServerDependencies): Pro
     )
   }
   return {
+    sshdPath: await requireBinary(
+      dependencies,
+      'sshd',
+      'OpenSSH binary "sshd" was not found in PATH. Install the Linux OpenSSH server to run a real Remote - SSH repro. On Ubuntu: sudo apt update && sudo apt install openssh-server',
+    ),
     sshKeygenPath: await requireBinary(
       dependencies,
       'ssh-keygen',
@@ -424,11 +429,6 @@ const resolveRequiredBinaries = async (dependencies: SshServerDependencies): Pro
       dependencies,
       'ssh',
       'OpenSSH binary "ssh" was not found in PATH. Install the Linux OpenSSH client to verify the test target before using Remote - SSH.',
-    ),
-    sshdPath: await requireBinary(
-      dependencies,
-      'sshd',
-      'OpenSSH binary "sshd" was not found in PATH. Install the Linux OpenSSH server to run a real Remote - SSH repro. On Ubuntu: sudo apt update && sudo apt install openssh-server',
     ),
   }
 }
@@ -467,6 +467,35 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
   }
 
   return {
+    async dispose(): Promise<void> {
+      try {
+        const { childProcess } = state
+        if (childProcess) {
+          if (childProcess.exitCode === null && childProcess.signalCode === null) {
+            try {
+              process.kill(-childProcess.pid, 'SIGTERM')
+            } catch {
+              childProcess.kill('SIGTERM')
+            }
+            await waitForExit(childProcess, 5000)
+            if (childProcess.exitCode === null && childProcess.signalCode === null) {
+              try {
+                process.kill(-childProcess.pid, 'SIGKILL')
+              } catch {
+                childProcess.kill('SIGKILL')
+              }
+              await waitForExit(childProcess, 1000)
+            }
+          }
+          state.childProcess = undefined
+        }
+        if (state.sshDir) {
+          await dependencies.removeDirectory(state.sshDir)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to dispose SSH server`)
+      }
+    },
     async launch(): Promise<SshServerConnection> {
       try {
         const binaries = await resolveRequiredBinaries(dependencies)
@@ -494,6 +523,7 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
             stdio: ['ignore', 'pipe', 'pipe'],
           })
           state.childProcess = childProcess
+          await dependencies.writeTextFile(paths.sshdPidPath, `${childProcess.pid}\n`)
           childProcess.stdout.on('data', (chunk: unknown) => appendOutput(state, chunk))
           childProcess.stderr.on('data', (chunk: unknown) => appendOutput(state, chunk))
           childProcess.once('exit', (exitCode: number | null, signalCode: NodeJS.Signals | null) => {
@@ -508,17 +538,6 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
         throw new VError(error, `Failed to launch SSH server`)
       }
     },
-    async waitForPort({ host = defaultHost, port, timeout = defaultTimeout }: WaitForPortOptions = {}): Promise<void> {
-      try {
-        const resolvedPort = port || state.connection?.port
-        if (typeof resolvedPort !== 'number') {
-          throw new Error('port is required')
-        }
-        await waitForPortInternal(state, dependencies, { host, port: resolvedPort, timeout })
-      } catch (error) {
-        throw new VError(error, `Failed to wait for SSH server port ${host}:${port || state.connection?.port || ''}`.trim())
-      }
-    },
     async shouldBeConnected(): Promise<void> {
       try {
         await page.waitForIdle?.()
@@ -527,33 +546,15 @@ export const createWithDependencies = ({ page, VError }: SshServerCreateParams, 
         throw new VError(error, `Failed to verify SSH server connection`)
       }
     },
-    async dispose(): Promise<void> {
+    async waitForPort({ host = defaultHost, port, timeout = defaultTimeout }: WaitForPortOptions = {}): Promise<void> {
       try {
-        const childProcess = state.childProcess
-        if (childProcess) {
-          if (childProcess.exitCode === null && childProcess.signalCode === null) {
-            try {
-              process.kill(-childProcess.pid, 'SIGTERM')
-            } catch {
-              childProcess.kill('SIGTERM')
-            }
-            await waitForExit(childProcess, 5_000)
-            if (childProcess.exitCode === null && childProcess.signalCode === null) {
-              try {
-                process.kill(-childProcess.pid, 'SIGKILL')
-              } catch {
-                childProcess.kill('SIGKILL')
-              }
-              await waitForExit(childProcess, 1_000)
-            }
-          }
-          state.childProcess = undefined
+        const resolvedPort = port || state.connection?.port
+        if (typeof resolvedPort !== 'number') {
+          throw new TypeError('port is required')
         }
-        if (state.sshDir) {
-          await dependencies.removeDirectory(state.sshDir)
-        }
+        await waitForPortInternal(state, dependencies, { host, port: resolvedPort, timeout })
       } catch (error) {
-        throw new VError(error, `Failed to dispose SSH server`)
+        throw new VError(error, `Failed to wait for SSH server port ${host}:${port || state.connection?.port || ''}`.trim())
       }
     },
   }

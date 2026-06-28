@@ -1,51 +1,25 @@
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { spawnSync } from 'node:child_process'
 import type { TestContext } from '../types.js'
-
-const workspacePath = join(import.meta.dirname, '..', '..', '..', '.vscode-test-workspace')
-const sourceFilePath = join(workspacePath, 'src', 'add.js')
-const testFilePath = join(workspacePath, 'test', 'add.test.js')
 
 const sourceFileContent = `export const add = (a, b) => a + b
 `
-
-const incorrectAssertion = 'assert.equal(add(1, 2), 4)'
 
 export const skip = 1
 
 export const requiresNetwork = true
 
-const waitForFixedTest = async (): Promise<void> => {
-  const maxWaitTime = 90_000
-  const pollInterval = 1_000
-  const startTime = performance.now()
-
-  while (performance.now() - startTime < maxWaitTime) {
-    const [sourceContent, testContent] = await Promise.all([readFile(sourceFilePath, 'utf8'), readFile(testFilePath, 'utf8')])
-
-    if (sourceContent === sourceFileContent && !testContent.includes(incorrectAssertion)) {
-      return
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, pollInterval))
+const waitForFixedTest = async (cwd: string): Promise<void> => {
+  const { status, stderr, stdout } = spawnSync(`npm`, ['test'], {
+    cwd,
+  })
+  if (status !== 0) {
+    throw new Error(`Tests are still failing. Output:\n${stdout}\n${stderr}`)
   }
-
-  throw new Error('Timed out waiting for the test file to be fixed')
 }
 
-export const setup = async ({ ChatEditor, Editor, Electron, Extensions, Workspace }: TestContext): Promise<void> => {
-  await Electron.mockDialog({
-    response: 1,
-  })
-  await Extensions.install({
-    id: 'GitHub.copilot-chat',
-    name: 'GitHub Copilot Chat',
-  })
-
-  await Workspace.setFiles([
-    {
-      name: 'package.json',
-      content: `{
+const initialFiles = [
+  {
+    content: `{
   "name": "sample-node-project",
   "private": true,
   "type": "module",
@@ -54,14 +28,14 @@ export const setup = async ({ ChatEditor, Editor, Electron, Extensions, Workspac
   }
 }
 `,
-    },
-    {
-      name: 'src/add.js',
-      content: sourceFileContent,
-    },
-    {
-      name: 'test/add.test.js',
-      content: `import assert from 'node:assert/strict'
+    name: 'package.json',
+  },
+  {
+    content: sourceFileContent,
+    name: 'src/add.js',
+  },
+  {
+    content: `import assert from 'node:assert/strict'
 import test from 'node:test'
 import { add } from '../src/add.js'
 
@@ -69,27 +43,33 @@ test('add returns the sum of two numbers', () => {
   assert.equal(add(1, 2), 4)
 })
 `,
-    },
-  ])
+    name: 'test/add.test.js',
+  },
+]
 
+export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestContext): Promise<void> => {
+  await SideBar.hide()
+  await Workspace.setFiles(initialFiles)
   await Editor.closeAll()
-  await ChatEditor.clearAll()
   await ChatEditor.open()
+  await ChatEditor.selectModel(ChatEditor.Models.Auto)
 }
 
-export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void> => {
+  // @ts-ignore
+  const workspacePath = Workspace.getPath()
+  const prompt = `Run the tests with node --test and fix the failing test in this workspace: ${workspacePath}. The implementation in ${workspacePath}/src/add.js is already correct, so prefer fixing ${workspacePath}/test/add.test.js. When you use file tools, pass absolute paths under ${workspacePath}, not relative paths.`
   await ChatEditor.sendMessage({
-    message: `Run the tests with node --test and fix the failing test. The implementation in src/add.js is already correct, so prefer fixing the test in test/add.test.js.`,
+    approveToolCalls: true,
+    message: prompt,
+    model: ChatEditor.Models.Auto,
     verify: true,
+    waitForFileChanges: ['test/add.test.js'],
   })
 
-  await waitForFixedTest()
-
-  await Terminal.show({
-    waitForReady: true,
-  })
-  await Terminal.execute('node --test')
-  await Terminal.shouldHaveSuccessDecoration()
+  await waitForFixedTest(workspacePath)
+  await Workspace.setFiles(initialFiles)
+  await ChatEditor.clearAll()
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {

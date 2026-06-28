@@ -1,7 +1,7 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-
-export const filterNamedFunctions = async (session: Session, objects: any, objectGroup: string) => {
+export const filterNamedFunctions = async (session: Session, objects: Dynamic, objectGroup: string) => {
   const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const functions = this

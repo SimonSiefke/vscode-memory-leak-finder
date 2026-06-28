@@ -23,8 +23,10 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     return
   }
   const {
+    allowCopilotAuthInCi,
     arch,
     bisect,
+    buildVscodeMinified,
     checkLeaks,
     clearExtensions,
     color,
@@ -32,6 +34,8 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     compressVideo,
     continueValue,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     filterValue,
@@ -41,6 +45,8 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     insidersCommit,
     inspectExtensions,
     inspectExtensionsPort,
+    inspectIntegratedBrowser,
+    inspectProcess,
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,
@@ -53,6 +59,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     measureNode,
     openDevtools,
     platform,
+    processRootStrategy,
     recordVideo,
     restartBetween,
     runMode,
@@ -73,8 +80,10 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   await Stdout.write(clear)
   const rpc = await RunTest.prepare()
   const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
+    allowCopilotAuthInCi,
     arch,
     bisect,
+    buildVscodeMinified,
     checkLeaks,
     clearExtensions,
     color,
@@ -82,6 +91,8 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     compressVideo,
     continueValue,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     filterValue,
@@ -91,6 +102,8 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     insidersCommit,
     inspectExtensions,
     inspectExtensionsPort,
+    inspectIntegratedBrowser,
+    inspectProcess,
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,
@@ -102,6 +115,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     measureNode,
     openDevtools,
     platform,
+    processRootStrategy,
     recordVideo,
     restartBetween,
     root: cwd,

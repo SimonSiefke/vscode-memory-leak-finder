@@ -16,7 +16,7 @@ fi
 
 function updateDependencies {
   echo "updating dependencies..."
-  OUTPUT=`ncu -u -x @types/node -x jest -x @jest/globals -x rollup -x lerna -x jsdom -x typescript`
+  OUTPUT=`ncu -u -x @types/node -x jest -x @jest/globals -x rollup -x typescript -x lerna -x jsdom -x babel/core -x @babel/preset-typescript -x @babel/parser -x @babel/core -x @babel/code-frame -x @babel/generator -x @babel/traverse -x @babel/types`
   SUB='All dependencies match the latest package versions'
   if [[ "$OUTPUT" == *"$SUB"* ]]; then
     echo "$OUTPUT"
@@ -28,6 +28,7 @@ function updateDependencies {
 
 updateDependencies &&
 cd packages/build && updateDependencies && cd ../../ &&
+cd packages/bot && updateDependencies && cd ../../ &&
 cd packages/chart-worker && updateDependencies && cd ../../ &&
 cd packages/charts && updateDependencies && cd ../../ &&
 cd packages/cli && updateDependencies && cd ../../ &&
@@ -36,6 +37,7 @@ cd packages/cryptography-worker && updateDependencies && cd ../../ &&
 cd packages/cursor-e2e && updateDependencies && cd ../../ &&
 cd packages/devtools-protocol && updateDependencies && cd ../../ &&
 cd packages/download-worker && updateDependencies && cd ../../ &&
+cd packages/dashboard && updateDependencies && cd ../../ &&
 cd packages/e2e && updateDependencies && cd ../../ &&
 cd packages/error-worker && updateDependencies && cd ../../ &&
 cd packages/exec-worker && updateDependencies && cd ../../ &&

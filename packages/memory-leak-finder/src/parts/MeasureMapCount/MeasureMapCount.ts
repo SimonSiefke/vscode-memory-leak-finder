@@ -1,27 +1,21 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetMapCount from '../GetMapCount/GetMapCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-
 export const id = MeasureId.MapCount
-
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
-
-export const create = (session) => {
+export const create = (session: Dynamic) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
-
-export const start = (session, objectGroup) => {
+export const start = (session: Dynamic, objectGroup: Dynamic) => {
   return GetMapCount.getMapCount(session, objectGroup)
 }
-
-export const stop = (session, objectGroup) => {
+export const stop = (session: Dynamic, objectGroup: Dynamic) => {
   return GetMapCount.getMapCount(session, objectGroup)
 }
-
 export const compare = CompareCount.compareCount
-
 export const isLeak = IsLeakCount.isLeakCount

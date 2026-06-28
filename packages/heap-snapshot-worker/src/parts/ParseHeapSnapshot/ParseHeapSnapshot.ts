@@ -1,8 +1,12 @@
 import * as ParseHeapSnapshotInternal from '../ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.ts'
+import type { HeapSnapshotInput, ParsedHeapSnapshot } from '../Snapshot/Snapshot.ts'
 
-export const parseHeapSnapshot = (heapsnapshot) => {
+export const parseHeapSnapshot = (heapsnapshot: HeapSnapshotInput): ParsedHeapSnapshot => {
   const { edges, locations, nodes, snapshot, strings } = heapsnapshot
-  const meta = heapsnapshot.meta || snapshot.meta
+  const meta = snapshot?.meta ?? heapsnapshot.meta
+  if (!meta) {
+    throw new TypeError('no heap snapshot metadata found')
+  }
   const { edge_fields, edge_types, location_fields, node_fields, node_types } = meta
   return ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
     nodes,

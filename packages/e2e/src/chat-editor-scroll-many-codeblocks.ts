@@ -22,7 +22,7 @@ export const setup = async ({ ChatEditor, Editor, Electron }: TestContext): Prom
   for (const prompt of prompts) {
     await ChatEditor.sendMessage({
       message: prompt.message,
-      model: 'GPT-4.1',
+      model: ChatEditor.Models.GPT41,
       verify: true,
     })
 
