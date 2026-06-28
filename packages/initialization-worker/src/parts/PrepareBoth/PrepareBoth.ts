@@ -26,11 +26,12 @@ export const prepareBoth = async (
   pid: number,
   preGeneratedWorkbenchPath: string | null,
   binaryPath: string | null,
+  trackingMode = 'functions',
 ): Promise<any> => {
   // Launch function-tracker worker BEFORE PrepareBoth if tracking is enabled
   // This ensures the socket server is ready when the protocol interceptor is injected
   if (trackFunctions && binaryPath) {
-    await launchFunctionTrackerAndPreGenerateWorkbench(binaryPath, preGeneratedWorkbenchPath)
+    await launchFunctionTrackerAndPreGenerateWorkbench(binaryPath, preGeneratedWorkbenchPath, trackingMode)
   }
 
   const stream = new PortReadStream(port)

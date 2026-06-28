@@ -17,3 +17,7 @@ export const disable = (session, options) => {
 export const enable = (session) => {
   return Invoke.invoke(session, DevtoolsCommandType.HeapProfilerEnable, {})
 }
+
+export const collectGarbage = (session) => {
+  return Invoke.invoke(session, DevtoolsCommandType.HeapProfilerCollectGarbage, {})
+}

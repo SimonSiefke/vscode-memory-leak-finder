@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'no
 import { join, dirname, resolve } from 'node:path'
 import { transformCode } from '../Transform/Transform.ts'
 
-export const preGenerateWorkbench = async (vscodeBinaryPath: string, outputPath: string): Promise<void> => {
+export const preGenerateWorkbench = async (vscodeBinaryPath: string, outputPath: string, trackingMode = 'functions'): Promise<void> => {
   // Check if output file already exists (cache check)
   if (existsSync(outputPath)) {
     console.log(`[PreGenerateWorkbench] Cached file already exists at: ${outputPath}, skipping transformation`)
@@ -35,6 +35,7 @@ export const preGenerateWorkbench = async (vscodeBinaryPath: string, outputPath:
   const transformedCode = await transformCode(originalCode, {
     filename: workbenchPath,
     minify: true,
+    trackingMode,
   })
 
   console.log(`[PreGenerateWorkbench] Writing transformed file to: ${outputPath}`)
