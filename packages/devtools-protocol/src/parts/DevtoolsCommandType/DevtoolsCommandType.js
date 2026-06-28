@@ -12,6 +12,8 @@ export const HeapProfilerEnable = 'HeapProfiler.enable'
 
 export const HeapProfilerDisable = 'HeapProfiler.disable'
 
+export const HeapProfilerCollectGarbage = 'HeapProfiler.collectGarbage'
+
 export const RuntimeEvaluate = 'Runtime.evaluate'
 
 export const RuntimeQueryObjects = 'Runtime.queryObjects'
