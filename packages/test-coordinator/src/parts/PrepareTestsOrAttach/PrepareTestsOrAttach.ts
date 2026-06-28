@@ -12,6 +12,7 @@ export const state: State = {
 export interface PrepareTestsAndAttachOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly compressVideo: boolean
@@ -28,6 +29,8 @@ export interface PrepareTestsAndAttachOptions {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess?: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -53,6 +56,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   const {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     compressVideo,
@@ -69,6 +73,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     insidersCommit,
     inspectExtensions,
     inspectExtensionsPort,
+    inspectIntegratedBrowser,
+    inspectProcess = '',
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,
@@ -94,6 +100,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     state.promise = PrepareTests.prepareTests({
       arch,
       attachedToPageTimeout,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       connectionId,
@@ -163,6 +170,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     measureNode,
     inspectSharedProcess,
     inspectExtensions,
+    inspectIntegratedBrowser,
+    inspectProcess,
     inspectPtyHost,
     enableExtensions,
     inspectPtyHostPort,
@@ -171,10 +180,13 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     trackFunctions,
   )
   return {
+    devtoolsWebSocketUrl,
     functionTrackerRpc,
     initializationWorkerRpc,
     memoryRpc,
+    pid,
     testWorkerRpc,
     videoRpc,
+    webSocketUrl,
   }
 }

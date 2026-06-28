@@ -24,6 +24,7 @@ test('runTestsWithCallback - setupOnly skips launching and attaching to the app'
     addDisposable: () => {},
     allowCopilotAuthInCi: false,
     arch: 'x64',
+    buildVscodeMinified: false,
     callback: async () => {},
     checkLeaks: false,
     clearDisposables: async () => {},
@@ -45,6 +46,7 @@ test('runTestsWithCallback - setupOnly skips launching and attaching to the app'
     insidersCommit: '',
     inspectExtensions: false,
     inspectExtensionsPort: 0,
+    inspectIntegratedBrowser: false,
     inspectPtyHost: false,
     inspectPtyHostPort: 0,
     inspectSharedProcess: false,
@@ -90,6 +92,7 @@ test('runTestsWithCallback - setupOnly skips launching and attaching to the app'
     [
       {
         arch: 'x64',
+        buildVscodeMinified: false,
         clearExtensions: false,
         commit: 'abc123',
         cwd: '/test-cwd',

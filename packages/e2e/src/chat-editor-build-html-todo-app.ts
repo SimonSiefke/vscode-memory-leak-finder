@@ -51,7 +51,7 @@ export const run = async ({ ChatEditor, Editor, SimpleBrowser, Workspace }: Test
   await ChatEditor.sendMessage({
     approveToolCalls: true,
     message: prompt,
-    model: 'GPT-4.1',
+    model: ChatEditor.Models.GPT41,
     verify: true,
     waitForFileChanges: ['index.html'],
     waitForPorts: [3001],

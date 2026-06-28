@@ -16,6 +16,35 @@ export interface NewWindowHandle {
   close(): Promise<void>
 }
 
+export interface ChatEditorModels {
+  readonly Auto: 'Auto'
+  readonly GPT41: 'GPT-4.1'
+  readonly GPT5Mini: 'GPT-5 mini'
+  readonly GPT54Mini: 'GPT-5.4 mini'
+  readonly ZAiGLM45AirFree: 'zAiGLM4.5 air free'
+  readonly DefaultFree: 'zAiGLM4.5 air free'
+}
+
+export type ChatModel = ChatEditorModels[keyof ChatEditorModels]
+export type ChatEditorText = string | RegExp
+
+export interface ChatEditorSendOptions {
+  readonly message: string
+  readonly viewLinesText?: ChatEditorText
+  readonly image?: string
+  readonly model?: ChatModel
+}
+
+export interface ChatEditorSendMessageOptions extends ChatEditorSendOptions {
+  readonly expectedResponse?: string
+  readonly approveToolCalls?: boolean
+  readonly validateRequest?: { readonly exists: readonly unknown[] }
+  readonly verify?: boolean
+  readonly waitForFileChanges?: readonly string[]
+  readonly waitForPorts?: readonly number[]
+  readonly toolInvocations?: readonly any[]
+}
+
 export interface PageObjectWindowHandle extends NewWindowHandle {
   sessionRpc?: any
   locator?: (selector: string) => any
@@ -44,11 +73,15 @@ export interface ActivityBar {
   showSourceControl(): Promise<void>
 }
 export interface ChatEditor {
+  readonly Models: ChatEditorModels
   addAllProblemsAsContext(): Promise<void>
   addContext(initialPrompt: any, secondPrompt: any, confirmText: any): Promise<void>
+  archiveAllActiveItems(): Promise<void>
+  archiveFirstActiveItem(): Promise<void>
   attachImage(file: any): Promise<void>
   clearAll(): Promise<void>
   clearContext(contextName: any): Promise<void>
+  focusSessionList(): Promise<void>
   getLatestResponseText(): Promise<string>
   shouldHaveAttachedContextHoverText(text: any): Promise<void>
   closeFinishSetup(): Promise<void>
@@ -61,14 +94,17 @@ export interface ChatEditor {
   close(): Promise<void>
   moveToSideBar(): Promise<void>
   open(): Promise<void>
+  openView(): Promise<void>
   openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
-  selectModel(modelName: any, retry?: any): Promise<void>
-  sendPart1(options?: any): Promise<void>
-  send(options?: any): Promise<void>
-  sendMessage(options?: any): Promise<void>
+  selectModel(modelName: ChatModel, retry?: boolean): Promise<void>
+  sendPart1(options: ChatEditorSendOptions): Promise<void>
+  send(options: ChatEditorSendOptions): Promise<void>
+  sendMessage(options: ChatEditorSendMessageOptions): Promise<void>
   setMode(modeLabel: any): Promise<void>
   setModeLegacy(modeLabel: any): Promise<void>
+  shouldBeVisibleInSecondarySideBar(): Promise<void>
+  shouldHaveNoActiveItems(): Promise<void>
   retryLastMessage(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
   approveAllAccessRequests(options?: any): Promise<void>
@@ -316,16 +352,28 @@ export interface Electron {
   unmockElectron(namespace: any, key: any): Promise<void>
 }
 export interface ExternalRuntimeHandle {
+  readonly args: readonly string[]
+  readonly command: string
   readonly inspectPort: number
+  readonly pid: number
   readonly runtimeName: 'bun' | 'node'
   readonly serverPort: number
   dispose(): Promise<void>
   evaluate(expression: any): Promise<unknown>
   getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeInfo(): ExternalRuntimeInfo
   getRuntimeName(): Promise<'bun' | 'node'>
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: any, init?: any): Promise<Response>
   takeSnapshot(name: any): Promise<string>
+}
+export interface ExternalRuntimeInfo {
+  readonly args: readonly string[]
+  readonly command: string
+  readonly inspectPort: number
+  readonly pid: number
+  readonly runtimeName: 'bun' | 'node'
+  readonly serverPort: number
 }
 export interface ExternalRuntime {
   createPorts(): Promise<{
@@ -335,6 +383,7 @@ export interface ExternalRuntime {
   dispose(): Promise<void>
   evaluate(expression: any): Promise<unknown>
   getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeInfo(): ExternalRuntimeInfo
   getRuntimeName(): Promise<'bun' | 'node'>
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: any, init?: any): Promise<Response>
@@ -413,6 +462,7 @@ export interface ExternalRuntime {
   dispose(): Promise<void>
   evaluate(expression: any): Promise<void>
   getNamedArrayCount(): Promise<void>
+  getRuntimeInfo(): Promise<void>
   getRuntimeName(): Promise<void>
   takeSnapshot(name: any): Promise<void>
   dispose(): Promise<void>
@@ -496,7 +546,7 @@ export interface NotebookInlineChat {
   type(message: any): Promise<void>
 }
 export interface Notification {
-  closeAll(): Promise<void>
+  closeAll(options?: { force?: boolean }): Promise<void>
   shouldHaveItem(expectedMessage: any): Promise<void>
 }
 export interface Output {
@@ -657,6 +707,8 @@ export interface SideBar {
   shouldBeLeft(): Promise<void>
   shouldBeRight(): Promise<void>
   shouldBeVisible(): Promise<void>
+  shouldSecondaryBeVisible(): Promise<void>
+  showSecondary(): Promise<void>
 }
 export interface SimpleBrowser {
   isSimpleBrowserTabLoading(): Promise<boolean>
@@ -678,6 +730,7 @@ export interface SimpleBrowser {
   addConsoleLogsToChat(): Promise<void>
   addElementToChat(options: any): Promise<void>
   clickLink(options: any): Promise<void>
+  clickPageLink(options: any): Promise<void>
   back(options?: any): Promise<void>
   createMockServer(options: any): Promise<void>
   createDeferredMockServer(options: any): Promise<void>

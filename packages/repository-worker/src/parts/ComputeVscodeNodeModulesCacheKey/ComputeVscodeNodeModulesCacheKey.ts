@@ -11,7 +11,7 @@ export const computeVscodeNodeModulesCacheKey = async (folder: string): Promise<
   try {
     const nvmrcPath = Path.join(folder, '.nvmrc')
     const packageLockFiles = await findPackageLockFiles(folder)
-    const sortedPackageLockFiles = [...packageLockFiles].sort()
+    const sortedPackageLockFiles = packageLockFiles.toSorted()
     const contents = await Promise.all([
       FileSystemWorker.readFileContent(nvmrcPath),
       ...sortedPackageLockFiles.map((filePath) => FileSystemWorker.readFileContent(filePath)),

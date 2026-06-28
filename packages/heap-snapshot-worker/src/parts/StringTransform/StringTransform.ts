@@ -1,5 +1,5 @@
-import { Transform } from 'node:stream'
 import type { TransformCallback } from 'node:stream'
+import { Transform } from 'node:stream'
 
 export class StringTransform extends Transform {
   constructor() {

@@ -1,23 +1,21 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
-
-const compareItem = (a, b) => {
+const compareItem = (a: Dynamic, b: Dynamic) => {
   return b.count - a.count || a.name.localeCompare(b.name)
 }
-
-const sortByCounts = (items) => {
+const sortByCounts = (items: Dynamic) => {
   Assert.array(items)
   const sorted = Arrays.toSorted(items, compareItem)
   return sorted
 }
-
-export const compareNamedEmitterCount = (before, after) => {
+export const compareNamedEmitterCount = (before: Dynamic, after: Dynamic) => {
   const beforeMap = Object.create(null)
   for (const item of before) {
     beforeMap[item.name] ||= 0
     beforeMap[item.name] += item.count
   }
-  const result: any[] = []
+  const result: Dynamic[] = []
   for (const item of after) {
     const beforeCount = beforeMap[item.name] || 0
     const afterCount = item.count

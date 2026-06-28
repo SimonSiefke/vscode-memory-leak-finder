@@ -11,6 +11,10 @@ const workspacePath = join(Root.root, '.vscode-test-workspace')
 const defaultPortWaitHost = '127.0.0.1'
 const defaultPortWaitTimeout = 120_000
 
+const sleep = (milliseconds: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds))
+}
+
 const isPortOpen = async (port: number, host: string): Promise<boolean> => {
   const { promise, resolve } = Promise.withResolvers<boolean>()
   const socket = createConnection({ host, port })
@@ -32,7 +36,7 @@ const waitForPorts = async (ports: readonly number[], timeout: number): Promise<
     if (results.every(Boolean)) {
       return
     }
-    await new Promise((resolve) => setTimeout(resolve, 250))
+    await sleep(250)
   }
   throw new Error(`Timed out waiting for ports: ${ports.join(', ')}`)
 }
@@ -103,15 +107,15 @@ const waitForLocatorVisibleWithToolApproval = async (page: any, expect: any, loc
     }
     const clicked = await clickVisibleAccessButton(page, 'Allow')
     if (!clicked) {
-      await new Promise((resolve) => setTimeout(resolve, 200))
+      await sleep(200)
     }
     await page.waitForIdle()
   }
-  await expect(locator.first()).toBeVisible({ timeout: 1_000 })
+  await expect(locator.first()).toBeVisible({ timeout: 1000 })
 }
 
 const escapeForRegExp = (value: string) => {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 const wait = async (delay: number) => {
@@ -160,6 +164,18 @@ const isChatResponseErrorText = (text: string) => {
   return text.toLowerCase().includes('please try again')
 }
 
+export const Models = {
+  Auto: 'Auto',
+  GPT41: 'GPT-4.1',
+  GPT5Mini: 'GPT-5 mini',
+  GPT54Mini: 'GPT-5.4 mini',
+  ZAiGLM45AirFree: 'zAiGLM4.5 air free',
+  DefaultFree: 'zAiGLM4.5 air free',
+} as const
+
+export type ChatModel = (typeof Models)[keyof typeof Models]
+export type ChatEditorText = string | RegExp
+
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const chatScrollSelector = '.interactive-session .monaco-list .monaco-scrollable-element'
 
@@ -190,8 +206,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     const progress = chatView.locator('.rendered-markdown.progress-step')
     const loading = chatView.locator('.chat-response-loading')
     const timeout = 90_000
-    const settleTime = 1_500
-    const settleTimeAfterApproval = 4_000
+    const settleTime = 1500
+    const settleTimeAfterApproval = 4000
     const startTime = performance.now()
     let settledSince = 0
     let lastResponseText = ''
@@ -256,51 +272,74 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       return
     }
 
-    await expect(progress).toBeHidden({ timeout: 1_000 })
+    await expect(progress).toBeHidden({ timeout: 1000 })
   }
 
   const WaitResult = {
     ChatDone: 1,
     ChatError: 2,
-    ToolDone: 3,
-    ToolError: 4,
-    ToolDone2: 5,
-    ToolError2: 6,
+    ChatResponseError: 9,
     NotificationError: 7,
     NotificationTimeout: 8,
-    ChatResponseError: 9,
+    ToolDone: 3,
+    ToolDone2: 5,
+    ToolError: 4,
+    ToolError2: 6,
   }
 
-  const waitForDoneOrToolApproval = async (expect: any, chatView: any) => {
+  const isLoggedIn = async (page: any) => {
+    const loginButton = page.locator('[aria-label="Sign In"]')
+    try {
+      await expect(loginButton).toBeHidden()
+      return true
+    } catch (error) {
+      return false
+    }
+  }
+
+  const assertLoggedIn = async (page: any) => {
+    if (!(await isLoggedIn(page))) {
+      throw new Error('User is not logged in. Please log in to continue.')
+    }
+  }
+
+  const waitForDoneOrToolApproval = async (chatView: any) => {
     const loading = chatView.locator('.chat-response-loading')
     const toolApprovalSection = chatView.locator('.chat-confirmation-widget2')
     const toolApprovalSection2 = chatView.locator('.chat-tool-confirmation-carousel .chat-confirmation-widget2')
     const errorNotification = getErrorNotification(page)
-    const maxWaitTime = 45_0000
-    const donePromise = expect(loading)
-      .toBeHidden({ timeout: maxWaitTime })
-      .then(() => WaitResult.ChatDone)
-      .catch(() => WaitResult.ChatError)
-    const toolApprovalPromise = expect(toolApprovalSection)
-      .toBeVisible({ timeout: maxWaitTime })
-      .then(() => WaitResult.ToolDone)
-      .catch(() => WaitResult.ToolError)
-    const toolApproval2Promise = expect(toolApprovalSection2)
-      .toBeVisible({ timeout: maxWaitTime })
-      .then(() => WaitResult.ToolDone2)
-      .catch(() => WaitResult.ToolError2)
-    const errorNotificationPromise = expect(errorNotification.first())
-      .toBeVisible({ timeout: maxWaitTime })
-      .then(() => WaitResult.NotificationError)
-      .catch(() => WaitResult.NotificationTimeout)
-    const first = await Promise.race([donePromise, toolApprovalPromise, toolApproval2Promise, errorNotificationPromise])
-    if (first === WaitResult.ChatDone) {
-      const latestResponseText = await getLatestResponseText(chatView)
-      if (isChatResponseErrorText(latestResponseText)) {
-        return WaitResult.ChatResponseError
+    const maxWaitTime = 450_000
+    const startTime = Date.now()
+    while (Date.now() - startTime < maxWaitTime) {
+      if (await toolApprovalSection.isVisible().catch(() => false)) {
+        return WaitResult.ToolDone
       }
+      if (await toolApprovalSection2.isVisible().catch(() => false)) {
+        return WaitResult.ToolDone2
+      }
+      if (
+        await errorNotification
+          .first()
+          .isVisible()
+          .catch(() => false)
+      ) {
+        return WaitResult.NotificationError
+      }
+      if (
+        !(await loading
+          .first()
+          .isVisible()
+          .catch(() => false))
+      ) {
+        const latestResponseText = await getLatestResponseText(chatView)
+        if (isChatResponseErrorText(latestResponseText)) {
+          return WaitResult.ChatResponseError
+        }
+        return WaitResult.ChatDone
+      }
+      await sleep(250)
     }
-    return first
+    return WaitResult.ChatError
   }
 
   const waitForLatestExchange = async (chatView: any, message: string) => {
@@ -363,6 +402,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
   }
 
   return {
+    Models,
     async addAllProblemsAsContext() {
       try {
         await this.addContext('Problems...', 'All Problems', 'All Problems')
@@ -390,6 +430,41 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat context`)
       }
     },
+    async approveAllAccessRequests({
+      buttonTexts = ['Allow', 'Continue'],
+      maxClicks = 12,
+    }: {
+      buttonTexts?: readonly string[]
+      maxClicks?: number
+    } = {}) {
+      try {
+        let clickCount = 0
+        while (clickCount < maxClicks) {
+          let clicked = false
+          for (const buttonText of buttonTexts) {
+            const accessButton = getAccessButtons(page, buttonText).first()
+            if ((await accessButton.count()) === 0) {
+              continue
+            }
+            const isVisible = await accessButton.isVisible().catch(() => false)
+            if (!isVisible) {
+              continue
+            }
+            await accessButton.click()
+            await page.waitForIdle()
+            clickCount++
+            clicked = true
+            break
+          }
+          if (!clicked) {
+            break
+          }
+        }
+        return clickCount
+      } catch (error) {
+        throw new VError(error, `Failed to approve access requests`)
+      }
+    },
     async attachImage(file: string) {
       try {
         const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
@@ -398,6 +473,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.select('Files & Folders...', true)
         await quickPick.type(file)
+        const image = page.locator('.label-name', { hasText: file })
+        await expect(image).toBeVisible({ timeout: 30_000 })
         await quickPick.select(file)
         await page.waitForIdle()
         const attachedContext = page.locator('.chat-attached-context')
@@ -444,26 +521,57 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to clear chat context`)
       }
     },
-    async getLatestResponseText() {
+    async clickAccessButton(buttonText: string = 'Allow') {
       try {
-        const chatView = page.locator('.interactive-session')
-        await expect(chatView).toBeVisible()
-        return getLatestResponseText(chatView)
+        const accessButton = getAccessButtons(page, buttonText)
+        const buttonCount = await accessButton.count()
+
+        if (buttonCount > 0) {
+          await expect(accessButton.first()).toBeVisible()
+          await accessButton.first().click()
+          await page.waitForIdle()
+        }
       } catch (error) {
-        throw new VError(error, `Failed to get latest chat response text`)
+        throw new VError(error, `Failed to click access button with text "${buttonText}"`)
       }
     },
-    async shouldHaveAttachedContextHoverText(text: string) {
+    async archiveAllActiveItems() {
       try {
-        const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
-        await expect(contextLabel).toBeVisible()
-        await contextLabel.hover()
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ArchiveAllWorkspaceAgentSessions)
         await page.waitForIdle()
-        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
-        await expect(hover).toBeVisible()
-        await expect(hover).toContainText(text)
+        await this.shouldHaveNoActiveItems()
       } catch (error) {
-        throw new VError(error, `Failed to verify attached chat context hover text ${text}`)
+        throw new VError(error, `Failed to archive all active chat items`)
+      }
+    },
+    async archiveFirstActiveItem() {
+      try {
+        await this.focusSessionList()
+        const activeItems = page.locator('.agent-session-item:not(.archived)')
+        const firstActiveItem = activeItems.first()
+        await expect(firstActiveItem).toBeVisible({ timeout: 30_000 })
+        await firstActiveItem.hover()
+        await page.waitForIdle()
+
+        const archiveButton = firstActiveItem
+          .locator(
+            '.agent-session-title-toolbar [aria-label^="Archive"], .agent-session-title-toolbar .action-label[aria-label^="Archive"]',
+          )
+          .first()
+        const isArchiveButtonVisible =
+          (await archiveButton.count().catch(() => 0)) > 0 && (await archiveButton.isVisible().catch(() => false))
+        if (isArchiveButtonVisible) {
+          await archiveButton.click()
+        } else {
+          await firstActiveItem.click()
+          await page.waitForIdle()
+          await page.keyboard.press('Delete')
+        }
+        await page.waitForIdle()
+        await expect(firstActiveItem).toBeHidden({ timeout: 30_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to archive first active chat item`)
       }
     },
     async closeFinishSetup() {
@@ -480,85 +588,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to close finish setup`)
       }
     },
-    async scrollToBottom() {
+    async getLatestResponseText() {
       try {
-        await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
-        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
-        await expect(scrollContainer).toBeVisible()
-        const metrics = await getChatScrollMetrics()
-        if (!metrics) {
-          throw new Error('Chat scroll container not found')
-        }
-        await setChatScrollTop(metrics.scrollHeight)
-        await page.waitForIdle()
+        return getLatestResponseText(chatView)
       } catch (error) {
-        throw new VError(error, `Failed to scroll chat editor to bottom`)
+        throw new VError(error, `Failed to get latest chat response text`)
       }
     },
-    async scrollToTop() {
+    async focusSessionList() {
       try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.FocusAgentSessions)
         await page.waitForIdle()
-        const chatView = page.locator('.interactive-session')
-        await expect(chatView).toBeVisible()
-        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
-        await expect(scrollContainer).toBeVisible()
-        await setChatScrollTop(0)
-        await page.waitForIdle()
+        const sessionsViewer = page.locator('.agent-sessions-viewer')
+        await expect(sessionsViewer).toBeVisible({ timeout: 30_000 })
       } catch (error) {
-        throw new VError(error, `Failed to scroll chat editor to top`)
-      }
-    },
-    async shouldHaveCodeBlockWithLanguage(language: string) {
-      try {
-        await page.waitForIdle()
-        const chatView = page.locator('.interactive-session')
-        await expect(chatView).toBeVisible()
-        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
-        await expect(scrollContainer).toBeVisible()
-        const codeBlocks = chatView.locator(`.interactive-result-editor[data-mode-id="${language}"]`)
-        const timeout = 60_000
-        const startTime = Date.now()
-        while (Date.now() - startTime < timeout) {
-          const metrics = await getChatScrollMetrics()
-          if (!metrics) {
-            throw new Error('Chat scroll container not found')
-          }
-          const stepSize = Math.max(metrics.clientHeight - 40, 200)
-          const positions = new Set<number>([metrics.scrollTop, 0, Math.max(metrics.scrollHeight - metrics.clientHeight, 0)])
-          for (let offset = 0; offset <= metrics.scrollHeight; offset += stepSize) {
-            positions.add(offset)
-          }
-          for (const position of positions) {
-            await setChatScrollTop(position)
-            await page.waitForIdle()
-            const count = await codeBlocks.count()
-            if (count > 0) {
-              const codeBlock = codeBlocks.first()
-              await expect(codeBlock).toBeVisible({ timeout: 5_000 })
-              await page.waitForIdle()
-              return
-            }
-          }
-        }
-        throw new Error(`Timed out waiting for chat code block with language ${language}`)
-      } catch (error) {
-        throw new VError(error, `Failed to find chat code block with language ${language}`)
-      }
-    },
-    async shouldHaveLatestResponseCodeBlockWithLanguage(language: string) {
-      try {
-        await page.waitForIdle()
-        const chatView = page.locator('.interactive-session')
-        await expect(chatView).toBeVisible()
-        const response = await getLatestResponseContent(chatView)
-        await expect(response).toBeVisible({ timeout: 60_000 })
-        const codeBlock = response.locator(`.interactive-result-editor[data-mode-id="${language}"]`).first()
-        await expect(codeBlock).toBeVisible({ timeout: 60_000 })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to find latest response code block with language ${language}`)
+        throw new VError(error, `Failed to focus chat session list`)
       }
     },
     isFirst: false,
@@ -633,6 +680,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open chat editor`)
       }
     },
+    async openView() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.OpenChat)
+        await page.waitForIdle()
+        await this.shouldBeVisibleInSecondarySideBar()
+      } catch (error) {
+        throw new VError(error, `Failed to open chat view`)
+      }
+    },
     async openAgentDebugLogs() {
       try {
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
@@ -658,7 +716,63 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open finish setup`)
       }
     },
-    async selectModel(modelName: string, retry = true) {
+    async retryLastMessage() {
+      try {
+        const chatView = page.locator('.interactive-session')
+        const lastResponse = chatView.locator('.interactive-response.chat-most-recent-response')
+        await expect(lastResponse).toBeVisible()
+        await page.waitForIdle()
+        const refreshButton = lastResponse.locator('[aria-label="Retry"]')
+        await expect(refreshButton).toBeVisible()
+        await page.waitForIdle()
+        await refreshButton.focus()
+        await page.waitForIdle()
+        await expect(refreshButton).toBeFocused()
+        await page.waitForIdle()
+        const loadingResponse = page.locator('.chat-response-loading')
+        await expect(loadingResponse).toBeHidden()
+        await refreshButton.click()
+        await page.waitForIdle()
+        await expect(loadingResponse).toBeVisible({ timeout: 30_000 })
+        await expect(loadingResponse).toBeHidden({ timeout: 120_000 })
+        await page.waitForIdle()
+        await expect(lastResponse).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to retry last chat message`)
+      }
+    },
+    async scrollToBottom() {
+      try {
+        await page.waitForIdle()
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
+        await expect(scrollContainer).toBeVisible()
+        const metrics = await getChatScrollMetrics()
+        if (!metrics) {
+          throw new Error('Chat scroll container not found')
+        }
+        await setChatScrollTop(metrics.scrollHeight)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll chat editor to bottom`)
+      }
+    },
+    async scrollToTop() {
+      try {
+        await page.waitForIdle()
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
+        await expect(scrollContainer).toBeVisible()
+        await setChatScrollTop(0)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll chat editor to top`)
+      }
+    },
+    async selectModel(modelName: ChatModel, retry = true) {
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -667,7 +781,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const modelPickerItem = getChatPickerItem(chatView, 1)
         await expect(modelPickerItem).toBeVisible()
         await page.waitForIdle()
-        // await new Promise(r => { })
+
         const modelLocator = page.locator(`.action-label[aria-label^="Pick Model"] a`)
         await expect(modelLocator).toBeVisible()
         await page.waitForIdle()
@@ -680,7 +794,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await expect(modelLocator).toBeFocused()
         await page.waitForIdle()
-        if (ideVersion && ideVersion.minor >= 118) {
+        if (ideVersion && ideVersion.minor >= 122) {
           await page.keyboard.press('Enter')
           await page.waitForIdle()
           const search = page.locator('.context-view input[placeholder="Search models"]')
@@ -690,13 +804,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           await search.type(modelName)
           await page.waitForIdle()
+          await page.keyboard.press('Enter')
+          await page.waitForIdle()
+        } else if (ideVersion && ideVersion.minor >= 118) {
+          await page.keyboard.press('Enter')
+          await page.waitForIdle()
+          const search = page.locator('.context-view input[placeholder="Search models"]')
+          await expect(search).toBeVisible()
+          await page.waitForIdle()
+          await expect(search).toBeFocused()
+          await page.waitForIdle()
+          await search.type(modelName)
+          await page.waitForIdle()
+          const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
+          await expect(item).toBeVisible()
+          await item.click()
         } else {
           await modelLocator.click()
           await page.waitForIdle()
         }
-        const item = page.locator(`.monaco-list-row[aria-label^="${modelName}"]`)
-        await expect(item).toBeVisible()
-        await item.click()
+
         await page.waitForIdle()
         await page.waitForIdle()
         await expect(modelLocator).toHaveText(modelName)
@@ -718,72 +845,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to select model ${modelName}`)
       }
     },
-    async sendPart1({
-      image = '',
-      message,
-      model,
-      viewLinesText = '',
-    }: {
-      message: string
-      viewLinesText?: string | undefined
-      image?: string | undefined
-      model?: string | undefined
-    }) {
-      await page.waitForIdle()
-      const chatView = page.locator('.interactive-session')
-      await expect(chatView).toBeVisible()
-      await page.waitForIdle()
-      if (model) {
-        await this.selectModel(model)
-      }
-      const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
-      await expect(editArea).toBeVisible()
-      await page.waitForIdle()
-      if (image) {
-        await this.attachImage(image)
-      }
-      const editContext = editArea.locator('.native-edit-context')
-      await expect(editContext).toBeVisible()
-      await page.waitForIdle()
-      await editContext.focus()
-      await page.waitForIdle()
-      await expect(editContext).toBeFocused()
-      await page.waitForIdle()
-      await editContext.type(message)
-      await page.waitForIdle()
-      const lines = editArea.locator('.view-lines')
-      await expect(lines).toBeVisible()
-      await page.waitForIdle()
-      const nonBreakingSpace = String.fromCharCode(160)
-      const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
-      await expect(lines).toHaveText(viewLinesText || adjustedMessage)
-      await page.waitForIdle()
-      const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
-      await expect(interactiveInput).toBeVisible()
-      await page.waitForIdle()
-      const sendButtonAny = interactiveInput.locator('.action-item .action-label[aria-label^="Send"]').first()
-      await expect(sendButtonAny).toBeVisible({ timeout: 30_000 })
-      await page.waitForIdle()
-      const sendButton = interactiveInput.locator('.action-item .action-label:not(.disabled)[aria-label^="Send"]').first()
-      await expect(sendButton).toBeVisible({ timeout: 30_000 })
-      await page.waitForIdle()
-      await sendButton.focus()
-      await page.waitForIdle()
-      await expect(sendButton).toBeFocused()
-      await page.waitForIdle()
-      if (this.isFirst) {
-        this.isFirst = false
-        // TODO get rid of timeout
-        await new Promise((r) => {
-          setTimeout(r, 1000)
-        })
-      }
-      await page.waitForIdle()
-      await sendButton.click()
-      await page.waitForIdle()
-      await expect(lines).toHaveText('')
-      await page.waitForIdle()
-    },
     async send({
       image = '',
       message,
@@ -791,14 +852,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       viewLinesText = '',
     }: {
       message: string
-      viewLinesText?: string
+      viewLinesText?: ChatEditorText
       image?: string
-      model?: string
+      model?: ChatModel
     }) {
       try {
         await this.sendPart1({
-          message,
           image,
+          message,
           model,
           viewLinesText,
         })
@@ -807,19 +868,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     async sendMessage({
+      approveToolCalls = false,
       expectedResponse,
       image = '',
       message,
       model,
-      approveToolCalls = false,
       toolInvocations = [],
       validateRequest = {
         exists: [],
       },
       verify = false,
+      viewLinesText = '',
       waitForFileChanges: fileChangesToWaitFor = [],
       waitForPorts: portsToWaitFor = [],
-      viewLinesText = '',
     }: {
       expectedResponse?: string
       message: string
@@ -828,20 +889,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       verify?: boolean
       waitForFileChanges?: readonly string[]
       waitForPorts?: readonly number[]
-      viewLinesText?: string
+      viewLinesText?: ChatEditorText
       image?: string
       toolInvocations?: readonly any[]
-      model?: string
+      model?: ChatModel
     }) {
       try {
+        await assertLoggedIn(page)
         const chatView = page.locator('.interactive-session')
         const shouldWaitForFileChanges = fileChangesToWaitFor.length > 0
         const initialFileContents = shouldWaitForFileChanges
           ? await Promise.all(fileChangesToWaitFor.map((relativePath) => readWorkspaceFileContent(join(workspacePath, relativePath))))
           : []
         await this.sendPart1({
-          message,
           image,
+          message,
           model,
           viewLinesText,
         })
@@ -849,7 +911,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const maxToolCalls = 15
         for (let i = 0; i < maxToolCalls; i++) {
-          const result = await waitForDoneOrToolApproval(expect, chatView)
+          const result = await waitForDoneOrToolApproval(chatView)
           if (result === WaitResult.ChatDone) {
             break
           }
@@ -960,6 +1022,72 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to send chat message`)
       }
     },
+    async sendPart1({
+      image = '',
+      message,
+      model,
+      viewLinesText = '',
+    }: {
+      message: string
+      viewLinesText?: ChatEditorText | undefined
+      image?: string | undefined
+      model?: ChatModel | undefined
+    }) {
+      await page.waitForIdle()
+      const chatView = page.locator('.interactive-session')
+      await expect(chatView).toBeVisible()
+      await page.waitForIdle()
+      if (model) {
+        await this.selectModel(model)
+      }
+      const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+      await expect(editArea).toBeVisible()
+      await page.waitForIdle()
+      if (image) {
+        await this.attachImage(image)
+      }
+      const editContext = editArea.locator('.native-edit-context')
+      await expect(editContext).toBeVisible()
+      await page.waitForIdle()
+      await editContext.focus()
+      await page.waitForIdle()
+      await expect(editContext).toBeFocused()
+      await page.waitForIdle()
+      await editContext.type(message)
+      await page.waitForIdle()
+      const lines = editArea.locator('.view-lines')
+      await expect(lines).toBeVisible()
+      await page.waitForIdle()
+      const nonBreakingSpace = String.fromCharCode(160)
+      const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
+      await expect(lines).toHaveText(viewLinesText || adjustedMessage)
+      await page.waitForIdle()
+      const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
+      await expect(interactiveInput).toBeVisible()
+      await page.waitForIdle()
+      const sendButtonAny = interactiveInput.locator('.action-item .action-label[aria-label^="Send"]').first()
+      await expect(sendButtonAny).toBeVisible({ timeout: 30_000 })
+      await page.waitForIdle()
+      const sendButton = interactiveInput.locator('.action-item .action-label:not(.disabled)[aria-label^="Send"]').first()
+      await expect(sendButton).toBeVisible({ timeout: 30_000 })
+      await page.waitForIdle()
+      await sendButton.focus()
+      await page.waitForIdle()
+      await expect(sendButton).toBeFocused()
+      await page.waitForIdle()
+      if (this.isFirst) {
+        this.isFirst = false
+        // TODO get rid of timeout
+        await new Promise((r) => {
+          setTimeout(r, 1000)
+        })
+      }
+      await page.waitForIdle()
+      await sendButton.click()
+      await page.waitForIdle()
+      await expect(lines).toHaveText('')
+      await page.waitForIdle()
+    },
     async setMode(modeLabel: string) {
       try {
         if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor < 107) {
@@ -1012,79 +1140,87 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
       }
     },
-    async retryLastMessage() {
+    async shouldBeVisibleInSecondarySideBar() {
       try {
+        const chatView = page.locator('.auxiliarybar .interactive-session')
+        await expect(chatView).toBeVisible({ timeout: 30_000 })
+        const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(editArea).toBeVisible({ timeout: 30_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to verify chat view is visible in secondary side bar`)
+      }
+    },
+    async shouldHaveAttachedContextHoverText(text: string) {
+      try {
+        const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
+        await expect(contextLabel).toBeVisible()
+        await contextLabel.hover()
+        await page.waitForIdle()
+        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
+        await expect(hover).toBeVisible()
+        await expect(hover).toContainText(text)
+      } catch (error) {
+        throw new VError(error, `Failed to verify attached chat context hover text ${text}`)
+      }
+    },
+    async shouldHaveCodeBlockWithLanguage(language: string) {
+      try {
+        await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
-        const lastResponse = chatView.locator('.interactive-response.chat-most-recent-response')
-        await expect(lastResponse).toBeVisible()
-        await page.waitForIdle()
-        const refreshButton = lastResponse.locator('[aria-label="Retry"]')
-        await expect(refreshButton).toBeVisible()
-        await page.waitForIdle()
-        await refreshButton.focus()
-        await page.waitForIdle()
-        await expect(refreshButton).toBeFocused()
-        await page.waitForIdle()
-        const loadingResponse = page.locator('.chat-response-loading')
-        await expect(loadingResponse).toBeHidden()
-        await refreshButton.click()
-        await page.waitForIdle()
-        await expect(loadingResponse).toBeVisible({ timeout: 30_000 })
-        await expect(loadingResponse).toBeHidden({ timeout: 120_000 })
-        await page.waitForIdle()
-        await expect(lastResponse).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to retry last chat message`)
-      }
-    },
-    async clickAccessButton(buttonText: string = 'Allow') {
-      try {
-        const accessButton = getAccessButtons(page, buttonText)
-        const buttonCount = await accessButton.count()
-
-        if (buttonCount > 0) {
-          await expect(accessButton.first()).toBeVisible()
-          await accessButton.first().click()
-          await page.waitForIdle()
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to click access button with text "${buttonText}"`)
-      }
-    },
-    async approveAllAccessRequests({
-      buttonTexts = ['Allow', 'Continue'],
-      maxClicks = 12,
-    }: {
-      buttonTexts?: readonly string[]
-      maxClicks?: number
-    } = {}) {
-      try {
-        let clickCount = 0
-        while (clickCount < maxClicks) {
-          let clicked = false
-          for (const buttonText of buttonTexts) {
-            const accessButton = getAccessButtons(page, buttonText).first()
-            if ((await accessButton.count()) === 0) {
-              continue
-            }
-            const isVisible = await accessButton.isVisible().catch(() => false)
-            if (!isVisible) {
-              continue
-            }
-            await accessButton.click()
+        await expect(chatView).toBeVisible()
+        const scrollContainer = chatView.locator('.monaco-list .monaco-scrollable-element').first()
+        await expect(scrollContainer).toBeVisible()
+        const codeBlocks = chatView.locator(`.interactive-result-editor[data-mode-id="${language}"]`)
+        const timeout = 60_000
+        const startTime = Date.now()
+        while (Date.now() - startTime < timeout) {
+          const metrics = await getChatScrollMetrics()
+          if (!metrics) {
+            throw new Error('Chat scroll container not found')
+          }
+          const stepSize = Math.max(metrics.clientHeight - 40, 200)
+          const positions = new Set<number>([metrics.scrollTop, 0, Math.max(metrics.scrollHeight - metrics.clientHeight, 0)])
+          for (let offset = 0; offset <= metrics.scrollHeight; offset += stepSize) {
+            positions.add(offset)
+          }
+          for (const position of positions) {
+            await setChatScrollTop(position)
             await page.waitForIdle()
-            clickCount++
-            clicked = true
-            break
-          }
-          if (!clicked) {
-            break
+            const count = await codeBlocks.count()
+            if (count > 0) {
+              const codeBlock = codeBlocks.first()
+              await expect(codeBlock).toBeVisible({ timeout: 5000 })
+              await page.waitForIdle()
+              return
+            }
           }
         }
-        return clickCount
+        throw new Error(`Timed out waiting for chat code block with language ${language}`)
       } catch (error) {
-        throw new VError(error, `Failed to approve access requests`)
+        throw new VError(error, `Failed to find chat code block with language ${language}`)
+      }
+    },
+    async shouldHaveNoActiveItems() {
+      try {
+        const activeItems = page.locator('.agent-session-item:not(.archived)')
+        await expect(activeItems).toHaveCount(0, { timeout: 30_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that all chat items are archived`)
+      }
+    },
+    async shouldHaveLatestResponseCodeBlockWithLanguage(language: string) {
+      try {
+        await page.waitForIdle()
+        const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        const response = await getLatestResponseContent(chatView)
+        await expect(response).toBeVisible({ timeout: 60_000 })
+        const codeBlock = response.locator(`.interactive-result-editor[data-mode-id="${language}"]`).first()
+        await expect(codeBlock).toBeVisible({ timeout: 60_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to find latest response code block with language ${language}`)
       }
     },
     async waitForLatestExchange(message: string) {

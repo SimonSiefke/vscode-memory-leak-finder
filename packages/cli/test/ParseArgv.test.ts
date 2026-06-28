@@ -84,8 +84,8 @@ test('parseArgv - download user data zip file url from env', () => {
   }
 })
 
-test('parseArgv - runs', () => {
-  const argv = ['--runs', '4']
+test('parseArgv - runs uses last value', () => {
+  const argv = ['--runs', '1', '--runs', '4']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     runs: 4,
   })
@@ -109,6 +109,20 @@ test('parseArgv - disable vscode node modules cache', () => {
   const argv = ['--disable-vscode-node-modules-cache']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     disableVscodeNodeModulesCache: true,
+  })
+})
+
+test('parseArgv - build vscode minified', () => {
+  const argv = ['--build-vscode-minified']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    buildVscodeMinified: true,
+  })
+})
+
+test('parseArgv - build vscode minified not present', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    buildVscodeMinified: false,
   })
 })
 
@@ -172,6 +186,14 @@ test('parseArgv - create all mock data zip', () => {
   const argv = ['--create-all-mock-data-zip']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     createAllMockDataZip: true,
+  })
+})
+
+test('parseArgv - use proxy mock enables proxy', () => {
+  const argv = ['--use-proxy-mock']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    enableProxy: true,
+    useProxyMock: true,
   })
 })
 
@@ -288,6 +310,44 @@ test('parseArgv - inspect-ptyhost flag not present', () => {
   const argv: readonly string[] = []
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.inspectPtyHost).toBe(false)
+})
+
+test('parseArgv - inspect-integrated-browser flag', () => {
+  const argv = ['--inspect-integrated-browser']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(true)
+})
+
+test('parseArgv - inspect-integrated-browser flag not present', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(false)
+})
+
+test('parseArgv - inspect-process flag', () => {
+  const argv = ['--inspect-process', 'vite.js']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectProcess).toBe('vite.js')
+})
+
+test('parseArgv - inspect-process flag not present', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectProcess).toBe('')
+})
+
+test('parseArgv - inspect-integrated-browser rejects other measure targets', () => {
+  const argv = ['--inspect-integrated-browser', '--inspect-extensions']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
+  )
+})
+
+test('parseArgv - inspect-integrated-browser rejects inspect-process target', () => {
+  const argv = ['--inspect-integrated-browser', '--inspect-process', 'vite.js']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
+  )
 })
 
 test('parseArgv - enable-extensions flag', () => {

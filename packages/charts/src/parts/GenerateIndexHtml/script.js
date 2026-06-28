@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (arrowEndX > viewportWidth - 50) {
           // 50px margin from edge
           // Find next chart
-          const currentIndex = Array.from(charts).indexOf(currentChart)
+          const currentIndex = [...charts].indexOf(currentChart)
           if (currentIndex < charts.length - 1) {
             const nextChart = charts[currentIndex + 1]
             const nextChartId = nextChart.id

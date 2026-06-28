@@ -29,12 +29,12 @@ const parseAllowedLogins = (value: string | undefined): readonly string[] => {
 
 export const getEnv = (env: NodeJS.ProcessEnv): BotEnv => {
   return {
+    allMockDataR2ObjectKey: env.BOT_ALL_MOCK_DATA_R2_OBJECT_KEY || 'all-mock-data.zip',
     allowedLogins: parseAllowedLogins(env.BOT_ALLOWED_LOGINS),
     publicBaseUrl: env.BOT_PUBLIC_BASE_URL || env.WEBHOOK_PROXY_URL || '',
     userDataR2AccessKeyId: env.BOT_USER_DATA_R2_ACCESS_KEY_ID || '',
     userDataR2AccountId: env.BOT_USER_DATA_R2_ACCOUNT_ID || '',
     userDataR2Bucket: env.BOT_USER_DATA_R2_BUCKET || '',
-    allMockDataR2ObjectKey: env.BOT_ALL_MOCK_DATA_R2_OBJECT_KEY || 'all-mock-data.zip',
     userDataR2ObjectKey: env.BOT_USER_DATA_R2_OBJECT_KEY || '.vscode-user-data-dir.zip',
     userDataR2SecretAccessKey: env.BOT_USER_DATA_R2_SECRET_ACCESS_KEY || '',
     userDataSnapshotToken: env.BOT_USER_DATA_SNAPSHOT_TOKEN || '',

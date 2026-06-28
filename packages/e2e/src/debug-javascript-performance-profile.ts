@@ -5,46 +5,46 @@ export const skip = true
 export const setup = async ({ Editor, Electron, Explorer, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'package.json',
       content: JSON.stringify(
         {
           name: 'debug-profile-test',
           private: true,
-          version: '1.0.0',
           scripts: {
             start: 'node index.js',
           },
+          version: '1.0.0',
         },
         null,
         2,
       ),
+      name: 'package.json',
     },
     {
-      name: '.vscode/launch.json',
       content: JSON.stringify(
         {
-          version: '0.2.0',
           configurations: [
             {
-              type: 'node',
-              request: 'launch',
               name: 'Launch Program',
               program: '${workspaceFolder}/index.js',
+              request: 'launch',
+              type: 'node',
             },
           ],
+          version: '0.2.0',
         },
         null,
         2,
       ),
+      name: '.vscode/launch.json',
     },
     {
-      name: 'index.js',
       content: `let counter = 0
 
 setInterval(() => {
   counter++
 }, 1000)
 `,
+      name: 'index.js',
     },
   ])
 
@@ -73,14 +73,14 @@ setInterval(() => {
   })
 }
 
-export const run = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
+export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   // @ts-ignore
   await RunAndDebug.takeCpuProfile({ seconds: 3 })
   // @ts-ignore
   await Editor.closeOthers()
 }
 
-export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   // TODO need to call continue
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()

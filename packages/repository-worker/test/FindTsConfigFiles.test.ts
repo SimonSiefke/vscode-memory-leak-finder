@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { createMockRpc } from '@lvce-editor/rpc'
-import { findTsConfigFiles } from '../src/parts/FindTsConfigFiles/FindTsConfigFiles.ts'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { findTsConfigFiles } from '../src/parts/FindTsConfigFiles/FindTsConfigFiles.ts'
 
 test('findTsConfigFiles - excludes copilot chat-lib tsconfig files', async () => {
   const rootDir = '/test/path'

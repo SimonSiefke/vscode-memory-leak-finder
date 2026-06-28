@@ -15,7 +15,7 @@ export const setup = async ({ ChatEditor, Editor, Electron }: TestContext): Prom
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: 'Reply with exactly the word ready.',
-    model: 'GPT-4.1',
+    model: ChatEditor.Models.GPT41,
     verify: true,
   })
   await ChatEditor.scrollToTop()
@@ -32,7 +32,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.clearAll()
   await ChatEditor.sendMessage({
     message: 'Reply with exactly the word done.',
-    model: 'GPT-4.1',
+    model: ChatEditor.Models.GPT41,
     verify: true,
   })
   await ChatEditor.clearAll()

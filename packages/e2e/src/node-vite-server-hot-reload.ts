@@ -132,28 +132,28 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 const getFilesForPhase = (phase: number): ReadonlyArray<{ name: string; content: string }> => {
   return [
     {
-      name: 'vite-app/src/main.tsx',
       content: getMainContent(),
+      name: 'vite-app/src/main.tsx',
     },
     {
-      name: 'vite-app/src/App.tsx',
       content: getAppContent(phase),
+      name: 'vite-app/src/App.tsx',
     },
     {
-      name: 'vite-app/src/generated/metrics.ts',
       content: getMetricsContent(phase),
+      name: 'vite-app/src/generated/metrics.ts',
     },
     {
-      name: 'vite-app/src/generated/components/index.ts',
       content: getComponentIndexContent(phase),
+      name: 'vite-app/src/generated/components/index.ts',
     },
     {
-      name: 'vite-app/src/generated/root.css',
       content: getCssContent(phase),
+      name: 'vite-app/src/generated/root.css',
     },
     ...Array.from({ length: componentCount }, (_, index) => ({
-      name: getComponentPath(index),
       content: getComponentContent(phase, index),
+      name: getComponentPath(index),
     })),
   ]
 }
@@ -209,7 +209,6 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
 
   const { inspectPort, serverPort } = await ExternalRuntime.createPorts()
   await ExternalRuntime.startExternalRuntime({
-    command: 'node',
     args: [
       `--inspect=127.0.0.1:${inspectPort}`,
       './node_modules/vite/bin/vite.js',
@@ -219,41 +218,43 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
       String(serverPort),
       '--strictPort',
     ],
+    command: 'node',
     cwd: 'vite-app',
     healthPath: '/health.txt',
+    inspectPort,
+    runtimeName: 'node',
+    serverPort,
     setupCommands: [
       {
-        command: 'npx',
         args: ['--yes', 'create-vite@latest', 'vite-app', '--template', 'react-ts'],
+        command: 'npx',
       },
       {
-        command: 'npm',
         args: ['install', '--package-lock-only'],
+        command: 'npm',
         cwd: 'vite-app',
       },
       {
-        command: 'npm',
         args: ['ci'],
+        command: 'npm',
         cwd: 'vite-app',
       },
     ],
     setupFiles: [
       ...getFilesForPhase(phases[0]),
       {
-        name: 'vite-app/public/health.txt',
         content: 'ok\n',
+        name: 'vite-app/public/health.txt',
       },
     ],
-    inspectPort,
-    runtimeName: 'node',
-    serverPort,
   })
 }
 
 export const run = async ({ ExternalRuntime, Workspace }: TestContext): Promise<void> => {
-  await assertPhase(ExternalRuntime, phases[0])
+  const [firstPhase, ...otherPhases] = phases
+  await assertPhase(ExternalRuntime, firstPhase)
 
-  for (const phase of phases.slice(1)) {
+  for (const phase of otherPhases) {
     await updatePhase(Workspace, phase)
     await assertPhase(ExternalRuntime, phase)
   }

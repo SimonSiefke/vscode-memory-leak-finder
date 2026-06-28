@@ -1,9 +1,10 @@
-import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
+import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 
 export interface LoginOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly compressVideo: boolean
@@ -21,6 +22,8 @@ export interface LoginOptions {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess?: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -45,6 +48,7 @@ export interface LoginOptions {
 export const doLogin = async ({
   arch,
   attachedToPageTimeout,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   compressVideo,
@@ -62,6 +66,8 @@ export const doLogin = async ({
   insidersCommit,
   inspectExtensions,
   inspectExtensionsPort,
+  inspectIntegratedBrowser,
+  inspectProcess = '',
   inspectPtyHost,
   inspectPtyHostPort,
   inspectSharedProcess,
@@ -86,6 +92,7 @@ export const doLogin = async ({
     await PrepareTestsOrAttach.prepareTestsAndAttach({
       arch,
       attachedToPageTimeout,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       compressVideo,
@@ -102,6 +109,8 @@ export const doLogin = async ({
       insidersCommit,
       inspectExtensions,
       inspectExtensionsPort,
+      inspectIntegratedBrowser,
+      inspectProcess,
       inspectPtyHost,
       inspectPtyHostPort,
       inspectSharedProcess,

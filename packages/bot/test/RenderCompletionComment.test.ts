@@ -46,6 +46,7 @@ test('renderCompletionComment renders success with artifacts and details', () =>
         candidateMeasure: 'success',
         charts: 'success',
       },
+      workflowDurationMs: 3_723_000,
       workflowRun: {
         id: 1,
         url: 'https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/1',
@@ -65,6 +66,8 @@ test('renderCompletionComment renders success with artifacts and details', () =>
   )
   expect(result).toContain('named-function-count3')
   expect(result).toContain('https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/1')
+  expect(result).toContain('- Duration: 1h 2m 3s')
+  expect(result.indexOf('- Workflow:')).toBeLessThan(result.indexOf('- Duration: 1h 2m 3s'))
   expect(result).toContain('<details>')
   expect(result).toContain('```json')
   expect(result).not.toContain('### Artifacts')
@@ -234,12 +237,12 @@ test('renderCompletionComment renders failure details', () => {
       cliArgs: ['--measure', 'named-function-count3', '--only', 'chat-editor-fix'],
       conclusion: 'failure',
       error: {
+        message: 'candidate measure failed',
         tscErrorLines: [
           "[15:16:14] Error: /home/runner/work/vscode-memory-leak-finder-2/vscode-memory-leak-finder-2/.vscode-repos/default/src/vs/workbench/browser/parts/activitybar/activitybarPart.ts(286,34): Property 'menuService' is declared but its value is never read.",
           "[15:16:14] Error: /home/runner/work/vscode-memory-leak-finder-2/vscode-memory-leak-finder-2/.vscode-repos/default/src/vs/workbench/browser/parts/paneCompositeBar.ts(96,20): Property 'viewDescriptorService' is declared but its value is never read.",
           '[15:16:14] Finished compilation with 2 errors after 169115 ms',
         ],
-        message: 'candidate measure failed',
       },
       issueNumber: 123,
       measure: 'named-function-count3',

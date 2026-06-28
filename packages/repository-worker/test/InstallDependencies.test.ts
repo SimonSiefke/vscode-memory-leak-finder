@@ -1,12 +1,12 @@
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
-import { homedir } from 'node:os'
-import { tmpdir } from 'node:os'
 import { test, expect, jest } from '@jest/globals'
 import { MockRpc, createMockRpc } from '@lvce-editor/rpc'
 import { VError } from '@lvce-editor/verror'
+import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
+import { homedir } from 'node:os'
+import { tmpdir } from 'node:os'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
-import * as Path from '../src/parts/Path/Path.ts'
 import { ensureNestedDependencies, installDependencies } from '../src/parts/InstallDependencies/InstallDependencies.ts'
+import * as Path from '../src/parts/Path/Path.ts'
 
 test('installDependencies - runs npm ci without nice', async () => {
   const mockInvoke = jest.fn()
@@ -139,20 +139,6 @@ test('installDependencies - installs missing node version from .nvmrc before npm
 
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.readFileContent': () => '22.22.1',
-      'FileSystem.exists': (path: string) => {
-        if (path === nvmrcPath) {
-          return true
-        }
-        if (path === nodePath || path === npmPath) {
-          return installed
-        }
-        if (path === `${repoPath}/build/package.json`) {
-          return false
-        }
-        return false
-      },
-      'FileSystem.findFiles': () => [],
       'FileSystem.exec': (
         command: string,
         args: readonly string[],
@@ -169,6 +155,20 @@ test('installDependencies - installs missing node version from .nvmrc before npm
         expect(options.env?.PATH).toContain(binPath)
         return { exitCode: 0, stderr: '', stdout: '' }
       },
+      'FileSystem.exists': (path: string) => {
+        if (path === nvmrcPath) {
+          return true
+        }
+        if (path === nodePath || path === npmPath) {
+          return installed
+        }
+        if (path === `${repoPath}/build/package.json`) {
+          return false
+        }
+        return false
+      },
+      'FileSystem.findFiles': () => [],
+      'FileSystem.readFileContent': () => '22.22.1',
     },
   })
   try {
@@ -221,11 +221,11 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
 
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.readFileContent': (path: string) => {
-        if (path === repoNvmrcPath) {
-          return '20.0.0'
-        }
-        throw new Error(`unexpected read ${path}`)
+      'FileSystem.exec': (command: string, args: readonly string[], options: { cwd?: string }) => {
+        expect(command).toBe(npmPath)
+        expect(args).toEqual(['ci'])
+        expect([repoPath, buildPath, extensionPath]).toContain(options.cwd)
+        return { exitCode: 0, stderr: '', stdout: '' }
       },
       'FileSystem.exists': (path: string) => {
         if (path === nodePath || path === npmPath) {
@@ -254,13 +254,13 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
         }
         return false
       },
-      'FileSystem.exec': (command: string, args: readonly string[], options: { cwd?: string }) => {
-        expect(command).toBe(npmPath)
-        expect(args).toEqual(['ci'])
-        expect([repoPath, buildPath, extensionPath]).toContain(options.cwd)
-        return { exitCode: 0, stderr: '', stdout: '' }
-      },
       'FileSystem.findFiles': () => ['build/package-lock.json', 'extensions/esbuild-simple-browser/package-lock.json'],
+      'FileSystem.readFileContent': (path: string) => {
+        if (path === repoNvmrcPath) {
+          return '20.0.0'
+        }
+        throw new Error(`unexpected read ${path}`)
+      },
     },
   })
 
@@ -341,13 +341,13 @@ test('ensureNestedDependencies - skips nested folders without package.json', asy
   const nestedPath = `${repoPath}/extensions/esbuild-simple-browser`
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.findFiles': () => ['extensions/esbuild-simple-browser/package-lock.json'],
       'FileSystem.exists': (path: string) => {
         if (path === `${nestedPath}/package.json`) {
           return false
         }
         throw new Error(`unexpected exists ${path}`)
       },
+      'FileSystem.findFiles': () => ['extensions/esbuild-simple-browser/package-lock.json'],
     },
   })
 
@@ -389,7 +389,17 @@ test('ensureNestedDependencies - reinstalls nested dependencies when existing no
 
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.findFiles': () => ['.vscode/extensions/vscode-selfhost-test-provider/package-lock.json'],
+      'FileSystem.exec': (
+        command: string,
+        args: readonly string[],
+        options: { cwd?: string; env?: Record<string, string | undefined> },
+      ) => {
+        expect(command).toBe(npmPath)
+        expect(args).toEqual(['ci'])
+        expect(options.cwd).toBe(nestedPath)
+        expect(options.env?.PATH).toContain('/test/.nvm/versions/node/v20.0.0/bin')
+        return { exitCode: 0, stderr: '', stdout: '' }
+      },
       'FileSystem.exists': (path: string) => {
         if (path === `${nestedPath}/package.json`) {
           return true
@@ -408,22 +418,12 @@ test('ensureNestedDependencies - reinstalls nested dependencies when existing no
         }
         return false
       },
+      'FileSystem.findFiles': () => ['.vscode/extensions/vscode-selfhost-test-provider/package-lock.json'],
       'FileSystem.readFileContent': (path: string) => {
         if (path === repoNvmrcPath) {
           return '20.0.0'
         }
         throw new Error(`unexpected read ${path}`)
-      },
-      'FileSystem.exec': (
-        command: string,
-        args: readonly string[],
-        options: { cwd?: string; env?: Record<string, string | undefined> },
-      ) => {
-        expect(command).toBe(npmPath)
-        expect(args).toEqual(['ci'])
-        expect(options.cwd).toBe(nestedPath)
-        expect(options.env?.PATH).toContain('/test/.nvm/versions/node/v20.0.0/bin')
-        return { exitCode: 0, stderr: '', stdout: '' }
       },
     },
   })
@@ -477,7 +477,20 @@ test('ensureNestedDependencies - installs copilot and chat-lib dependencies with
   let copilotInstalled = false
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.findFiles': () => ['extensions/copilot/package-lock.json', 'extensions/copilot/chat-lib/package-lock.json'],
+      'FileSystem.exec': (command: string, args: readonly string[], options: { cwd?: string }) => {
+        expect(command).toBe(npmPath)
+        if (options.cwd === copilotPath && args[0] === 'ci') {
+          copilotInstalled = true
+          return { exitCode: 0, stderr: '', stdout: '' }
+        }
+        if (options.cwd === copilotNestedPath) {
+          expect(args).toEqual(['ci', '--ignore-scripts'])
+          return { exitCode: 0, stderr: '', stdout: '' }
+        }
+        expect(args).toEqual(['ci'])
+        expect([copilotPath]).toContain(options.cwd)
+        return { exitCode: 0, stderr: '', stdout: '' }
+      },
       'FileSystem.exists': (path: string) => {
         if (path === repoNvmrcPath) {
           return true
@@ -502,25 +515,12 @@ test('ensureNestedDependencies - installs copilot and chat-lib dependencies with
         }
         throw new Error(`unexpected exists ${path}`)
       },
+      'FileSystem.findFiles': () => ['extensions/copilot/package-lock.json', 'extensions/copilot/chat-lib/package-lock.json'],
       'FileSystem.readFileContent': (path: string) => {
         if (path === repoNvmrcPath) {
           return '20.0.0'
         }
         throw new Error(`unexpected read ${path}`)
-      },
-      'FileSystem.exec': (command: string, args: readonly string[], options: { cwd?: string }) => {
-        expect(command).toBe(npmPath)
-        if (options.cwd === copilotPath && args[0] === 'ci') {
-          copilotInstalled = true
-          return { exitCode: 0, stderr: '', stdout: '' }
-        }
-        if (options.cwd === copilotNestedPath) {
-          expect(args).toEqual(['ci', '--ignore-scripts'])
-          return { exitCode: 0, stderr: '', stdout: '' }
-        }
-        expect(args).toEqual(['ci'])
-        expect([copilotPath]).toContain(options.cwd)
-        return { exitCode: 0, stderr: '', stdout: '' }
       },
     },
   })

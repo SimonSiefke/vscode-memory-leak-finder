@@ -3,10 +3,10 @@ import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
-import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
-import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import type { MockResponse } from '../MockResponse/MockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
 import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
@@ -40,7 +40,7 @@ const isExpiredSignedCopilotTokenPayload = (body: unknown): boolean => {
   if (!body || typeof body !== 'object') {
     return false
   }
-  const token = (body as { token?: unknown }).token
+  const { token } = body as { token?: unknown }
   const expiresAt = (body as { expires_at?: unknown }).expires_at
   const expiration = typeof token === 'string' ? getSignedCopilotTokenExpiration(token) : undefined
   const fallbackExpiration = typeof expiresAt === 'number' ? expiresAt : undefined
@@ -226,7 +226,7 @@ const getResponsesInputItems = (requestBody: unknown): readonly unknown[] => {
   if (!requestBody || typeof requestBody !== 'object') {
     return []
   }
-  const input = (requestBody as { input?: unknown }).input
+  const { input } = requestBody as { input?: unknown }
   return Array.isArray(input) ? input : []
 }
 
@@ -272,7 +272,7 @@ const getChatCompletionsMessages = (requestBody: unknown): readonly unknown[] =>
   if (!requestBody || typeof requestBody !== 'object') {
     return []
   }
-  const messages = (requestBody as { messages?: unknown }).messages
+  const { messages } = requestBody as { messages?: unknown }
   return Array.isArray(messages) ? messages : []
 }
 
@@ -628,7 +628,7 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
       lowerKey !== 'content-encoding' &&
       !((isZipFile || isSseFile || isImageFile) && lowerKey === 'content-encoding')
     ) {
-      headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
+      headers[key] = Array.isArray(value) ? value.join(', ') : value
       lowerCaseHeaders.add(lowerKey)
     }
   }

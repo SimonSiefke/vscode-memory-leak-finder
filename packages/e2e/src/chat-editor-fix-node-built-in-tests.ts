@@ -35,7 +35,6 @@ const failingAdditions = [
 ] as const
 
 const failingTestFiles = failingAdditions.map(([left, right], index) => ({
-  name: `test/add-${index + 1}.test.js`,
   content: `import assert from 'node:assert/strict'
 import test from 'node:test'
 import { add } from '../src/add.js'
@@ -44,6 +43,7 @@ test('add returns the sum of ${left} and ${right}', () => {
   assert.equal(add(${left}, ${right}), ${left + right + 1})
 })
 `,
+  name: `test/add-${index + 1}.test.js`,
 }))
 
 export const skip = 1
@@ -51,7 +51,7 @@ export const skip = 1
 export const requiresNetwork = true
 
 const waitForFixedTest = async (cwd: string): Promise<void> => {
-  const { status, stdout, stderr } = spawnSync(`npm`, ['test'], {
+  const { status, stderr, stdout } = spawnSync(`npm`, ['test'], {
     cwd,
   })
   if (status !== 0) {
@@ -69,7 +69,6 @@ const assertSourceFileUnchanged = (cwd: string): void => {
 
 const initialFiles = [
   {
-    name: 'package.json',
     content: `{
   "name": "sample-node-project",
   "private": true,
@@ -79,32 +78,32 @@ const initialFiles = [
   }
 }
 `,
+    name: 'package.json',
   },
   {
-    name: 'src/add.js',
     content: sourceFileContent,
+    name: 'src/add.js',
   },
   ...failingTestFiles,
 ]
 
 const prompt = `Run npm test and fix every failing Node built-in test file under test/. The implementation in src/add.js is already correct, so do not change src/add.js unless the tests prove it is wrong. Update all failing test files so npm test passes.`
 
-export const setup = async ({ ChatEditor, Editor, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestContext): Promise<void> => {
   await SideBar.hide()
   await Workspace.setFiles(initialFiles)
   await Editor.closeAll()
   await ChatEditor.open()
-  // @ts-ignore
-  await ChatEditor.selectModel('GPT-5 mini')
+  await ChatEditor.selectModel(ChatEditor.Models.GPT5Mini)
 }
 
 export const run = async ({ ChatEditor, Workspace }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
-    message: prompt,
-    verify: true,
     approveToolCalls: true,
+    message: prompt,
+    model: ChatEditor.Models.GPT5Mini,
+    verify: true,
     waitForFileChanges: failingTestFiles.map((file) => file.name),
-    model: 'GPT-5 mini',
   })
 
   // @ts-ignore

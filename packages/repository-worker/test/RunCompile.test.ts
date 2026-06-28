@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
-import { runCompile } from '../src/parts/RunCompile/RunCompile.ts'
+import { runCompile, runMinifiedBuild } from '../src/parts/RunCompile/RunCompile.ts'
 
 test('runCompile runs the transpile step after compile', async () => {
   const cwd = '/test/repo'
@@ -62,4 +62,35 @@ test('runCompile throws error when main.js not found after compilation', async (
   })
   FileSystemWorker.set(mockRpc)
   await expect(runCompile(cwd, useNice, mainJsPath)).rejects.toThrow('Build failed: out/main.js not found after compilation')
+})
+
+test('runMinifiedBuild runs the platform minified vscode gulp task', async () => {
+  const cwd = '/test/repo'
+  const useNice = false
+  const executablePath = '/test/VSCode-linux-x64/code-oss'
+  const execCalls: unknown[][] = []
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke(method: string, ...params: unknown[]) {
+      if (method === 'FileSystem.readFileContent') {
+        return '20'
+      }
+      if (method === 'FileSystem.exists') {
+        return true
+      }
+      if (method === 'FileSystem.exec') {
+        execCalls.push(params)
+        return { exitCode: 0, stderr: '', stdout: '' }
+      }
+      throw new Error(`not implemented: ${method}`)
+    },
+  })
+  FileSystemWorker.set(mockRpc)
+
+  await runMinifiedBuild(cwd, 'linux', 'x64', useNice, executablePath)
+
+  expect(execCalls).toHaveLength(1)
+  expect(execCalls[0]?.[1]).toEqual(['gulp', 'vscode-linux-x64-min'])
+  expect(execCalls[0]?.[2]).toEqual({ cwd, reject: false })
 })

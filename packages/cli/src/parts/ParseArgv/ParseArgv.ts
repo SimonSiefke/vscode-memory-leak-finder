@@ -6,7 +6,7 @@ import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
 const parseArgvNumber = (argv: readonly string[], name: string): number => {
-  const index = argv.indexOf(name)
+  const index = argv.lastIndexOf(name)
   const next = index + 1
   const value = argv[next]
   const parsed = Number.parseInt(value)
@@ -17,7 +17,7 @@ const parseArgvNumber = (argv: readonly string[], name: string): number => {
 }
 
 const parseArgvString = (argv: readonly string[], name: string): string => {
-  const index = argv.indexOf(name)
+  const index = argv.lastIndexOf(name)
   const next = index + 1
   const value = argv[next]
   if (typeof value === 'string') {
@@ -125,6 +125,10 @@ const parseVerbose = (argv: readonly string[]): boolean => {
 
 const parseCompressVideo = (argv: readonly string[]): boolean => {
   return argv.includes('--compress-video')
+}
+
+const parseBuildVscodeMinified = (argv: readonly string[]): boolean => {
+  return argv.includes('--build-vscode-minified')
 }
 
 const parseRuns = (argv: readonly string[]): number => {
@@ -262,6 +266,17 @@ const parseInspectPtyHost = (argv: readonly string[]): boolean => {
   return argv.includes('--inspect-ptyhost')
 }
 
+const parseInspectIntegratedBrowser = (argv: readonly string[]): boolean => {
+  return argv.includes('--inspect-integrated-browser')
+}
+
+const parseInspectProcess = (argv: readonly string[]): string => {
+  if (argv.includes('--inspect-process')) {
+    return parseArgvString(argv, '--inspect-process')
+  }
+  return ''
+}
+
 const parseEnableExtensions = (argv: readonly string[]): boolean => {
   return argv.includes('--enable-extensions')
 }
@@ -288,7 +303,7 @@ const parseInspectExtensionsPort = (argv: readonly string[]): number => {
 }
 
 const parseEnableProxy = (argv: readonly string[]): boolean => {
-  return argv.includes('--enable-proxy')
+  return argv.includes('--enable-proxy') || argv.includes('--use-proxy-mock')
 }
 
 const parseUseProxyMock = (argv: readonly string[]): boolean => {
@@ -356,6 +371,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const bisect = parseBisect(argv)
+  const buildVscodeMinified = parseBuildVscodeMinified(argv)
   const checkLeaks = parseCheckLeaks(argv)
   const clearExtensions = parseClearExtensions(argv)
   const color = true
@@ -379,6 +395,8 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const insidersCommit = parseInsidersCommit(parsedVersion, argv)
   const inspectExtensions = parseInspectExtensions(argv)
   const inspectExtensionsPort = parseInspectExtensionsPort(argv)
+  const inspectIntegratedBrowser = parseInspectIntegratedBrowser(argv)
+  const inspectProcess = parseInspectProcess(argv)
   const inspectPtyHost = parseInspectPtyHost(argv)
   const inspectPtyHostPort = parseInspectPtyHostPort(argv)
   const inspectSharedProcess = parseInspectSharedProcess(argv)
@@ -386,6 +404,11 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  if (inspectIntegratedBrowser && (measureNode || inspectSharedProcess || inspectExtensions || inspectPtyHost || inspectProcess)) {
+    throw new Error(
+      '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
+    )
+  }
   const processRootStrategy = parseProcessRootStrategy(argv)
   const recordVideo = parseRecordVideo(argv)
   const compressVideo = parseCompressVideo(argv)
@@ -411,17 +434,19 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const workers = parseWorkers(argv)
   const isWindows = IsWindows.isWindows(processPlatform)
   return {
+    allowCopilotAuthInCi,
     arch,
     bisect,
+    buildVscodeMinified,
     checkLeaks,
     clearExtensions,
     color,
     commit,
-    computeVscodeNodeModulesCacheKey,
     compressVideo,
+    computeVscodeNodeModulesCacheKey,
+    continueValue,
     convertRequestsToMocks,
     createAllMockDataZip,
-    continueValue,
     cwd,
     disableVscodeNodeModulesCache,
     downloadUserDataZipFileToken,
@@ -435,6 +460,8 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     insidersCommit,
     inspectExtensions,
     inspectExtensionsPort,
+    inspectIntegratedBrowser,
+    inspectProcess,
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,
@@ -444,26 +471,25 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     measure,
     measureAfter,
     measureNode,
-    processRootStrategy,
     openDevtools,
     pageObjectPath,
     platform,
+    processRootStrategy,
     recordVideo,
-    resolveVscodeCommitHash,
     resolveExtensionSourceMaps,
+    resolveVscodeCommitHash,
     restartBetween,
     runMode,
     runs,
     runSkippedTestsAnyway,
-    allowCopilotAuthInCi,
     screencastQuality,
     setupOnly,
     timeoutBetween,
     timeouts,
     trackFunctions,
     updateUrl,
-    useStableVscodeRepoPath,
     useProxyMock,
+    useStableVscodeRepoPath,
     verbose,
     vscodePath,
     vscodeVersion,

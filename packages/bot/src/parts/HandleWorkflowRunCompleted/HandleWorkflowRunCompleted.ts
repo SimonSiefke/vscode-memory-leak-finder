@@ -29,7 +29,7 @@ type WorkflowRunPayload = {
 }
 
 type WorkflowRunOctokit = {
-  readonly auth: (options: { type: 'installation' }) => Promise<{ token: string } | unknown>
+  readonly auth: (options: { type: 'installation' }) => Promise<unknown | { token: string }>
   readonly rest: {
     readonly actions: {
       readonly listWorkflowRunArtifacts: (options: {
@@ -108,12 +108,16 @@ const getVideoEmbeds = async ({
 
 const getChartEmbeds = ({
   artifacts,
+  owner,
   publicBaseUrl,
+  repo,
   runId,
   summary,
 }: {
   readonly artifacts: readonly WorkflowRunArtifact[]
+  readonly owner: string
   readonly publicBaseUrl: string
+  readonly repo: string
   readonly runId: number
   readonly summary: CompletionSummary
 }): {
@@ -152,7 +156,7 @@ const getChartEmbeds = ({
       alt: candidate.alt,
       artifactName: candidate.artifactName,
       label: candidate.label,
-      url: getWorkflowArtifactChartUrl(publicBaseUrl, runId, artifact.id, candidate.chartPath),
+      url: getWorkflowArtifactChartUrl(publicBaseUrl, owner, repo, runId, artifact.id, candidate.chartPath),
     })
   }
   return chartEmbeds
@@ -183,7 +187,9 @@ export const handleWorkflowRunCompleted = async (
   const summary = await downloadSummaryArtifactFn(octokit, summaryArtifact)
   const chartEmbeds = getChartEmbeds({
     artifacts: artifactsResponse.data.artifacts,
+    owner,
     publicBaseUrl,
+    repo,
     runId,
     summary,
   })
@@ -195,13 +201,13 @@ export const handleWorkflowRunCompleted = async (
   })
 
   await octokit.rest.issues.updateComment({
-    owner: summary.sourceRepository.owner,
-    repo: summary.sourceRepository.repo,
-    comment_id: summary.statusCommentId,
     body: renderCompletionComment({
       chartEmbeds,
       summary,
       videoEmbeds,
     }),
+    comment_id: summary.statusCommentId,
+    owner: summary.sourceRepository.owner,
+    repo: summary.sourceRepository.repo,
   })
 }

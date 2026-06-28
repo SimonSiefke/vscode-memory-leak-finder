@@ -7,9 +7,7 @@ export const extractSourceMapUrls = async (jsFilePath: string): Promise<string[]
   const lines = content.split('\n')
   const sourceMapUrls: string[] = []
   // Sourcemap URL is always the very last line or the second to last line
-  const lastLine = lines[lines.length - 1]
-  const secondToLastLine = lines.length > 1 ? lines[lines.length - 2] : null
-  const linesToCheck = secondToLastLine ? [secondToLastLine, lastLine] : [lastLine]
+  const linesToCheck = lines.slice(-2)
   for (const line of linesToCheck) {
     const match = line.match(SOURCE_MAP_URL_REGEX)
     if (match) {

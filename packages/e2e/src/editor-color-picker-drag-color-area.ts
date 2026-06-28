@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Editor, Explorer, Workspace, ColorPicker }: TestContext): Promise<void> => {
+export const setup = async ({ ColorPicker, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: 'hello world',
@@ -24,7 +24,7 @@ export const run = async ({ ColorPicker }: TestContext): Promise<void> => {
   await ColorPicker.shouldChangeColorValueWhenDraggingColorAreaPointerRight()
 }
 
-export const teardown = async ({ Editor, ColorPicker }: TestContext): Promise<void> => {
+export const teardown = async ({ ColorPicker, Editor }: TestContext): Promise<void> => {
   await ColorPicker.close()
   await Editor.closeAll()
 }

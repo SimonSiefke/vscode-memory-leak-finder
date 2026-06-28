@@ -1,5 +1,5 @@
-import { dirname } from 'node:path'
 import { homedir } from 'node:os'
+import { dirname } from 'node:path'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
 import * as Path from '../Path/Path.ts'

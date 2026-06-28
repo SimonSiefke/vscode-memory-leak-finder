@@ -14,7 +14,7 @@ export const setup = async ({ Editor, Electron, SideBar }: TestContext): Promise
 
 export const run = async ({ ChatEditor, Editor }: TestContext): Promise<void> => {
   await ChatEditor.open()
-  await ChatEditor.sendMessage({ message: 'test', model: 'GPT-4.1', verify: true })
+  await ChatEditor.sendMessage({ message: 'test', model: ChatEditor.Models.GPT41, verify: true })
   // TODO right click context menum then delete
   await Editor.closeAll()
 }

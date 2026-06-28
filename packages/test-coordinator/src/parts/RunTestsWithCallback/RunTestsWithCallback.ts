@@ -1,16 +1,22 @@
+import type { Rpc } from '@lvce-editor/rpc'
 import { join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
+import * as BrowserPageTargets from '../BrowserPageTargets/BrowserPageTargets.ts'
+import { doLogin } from '../DoLogin/DoLogin.ts'
+import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetProxyTestFolderName from '../GetProxyTestFolderName/GetProxyTestFolderName.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
+import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import * as ShouldShowInitializingMessage from '../ShouldShowInitializingMessage/ShouldShowInitializingMessage.ts'
+import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTests from '../TestWorkerRunTests/TestWorkerRunTests.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
@@ -18,18 +24,17 @@ import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTea
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
-import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
-import type { Rpc } from '@lvce-editor/rpc'
-import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
-import { doLogin } from '../DoLogin/DoLogin.ts'
 
 interface WorkerMap {
+  devtoolsWebSocketUrl: string
   readonly functionTrackerRpc: Rpc
   readonly initializationWorkerRpc: Rpc
-  readonly memoryRpc: Rpc
+  memoryRpc: Rpc
+  pid: number
   readonly testWorkerRpc: Rpc
   readonly videoRpc: Rpc
+  webSocketUrl: string
 }
 
 const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
@@ -38,11 +43,15 @@ const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
   await initializationWorkerRpc.dispose()
 }
 
+const getProcessResultFolder = (inspectProcess: string): string => {
+  return inspectProcess.replaceAll('/', '-').replaceAll('\\', '-')
+}
+
 export const runTestsWithCallback = async ({
   allowCopilotAuthInCi,
   arch,
+  buildVscodeMinified,
   callback,
-  getTimeStamp,
   checkLeaks,
   clearExtensions,
   color,
@@ -55,12 +64,15 @@ export const runTestsWithCallback = async ({
   enableExtensions,
   enableProxy,
   filterValue,
+  getTimeStamp,
   headlessMode,
   ide,
   ideVersion,
   insidersCommit,
   inspectExtensions,
   inspectExtensionsPort,
+  inspectIntegratedBrowser,
+  inspectProcess = '',
   inspectPtyHost,
   inspectPtyHostPort,
   inspectSharedProcess,
@@ -94,6 +106,7 @@ export const runTestsWithCallback = async ({
     Assert.string(cwd)
     Assert.string(filterValue)
     Assert.boolean(headlessMode)
+    Assert.boolean(buildVscodeMinified)
     Assert.boolean(color)
     Assert.boolean(checkLeaks)
     Assert.boolean(recordVideo)
@@ -101,6 +114,8 @@ export const runTestsWithCallback = async ({
     Assert.string(measure)
     Assert.boolean(measureAfter)
     Assert.boolean(measureNode)
+    Assert.boolean(inspectIntegratedBrowser)
+    Assert.string(inspectProcess)
     Assert.boolean(timeouts)
     Assert.number(timeoutBetween)
     Assert.number(runMode)
@@ -123,6 +138,7 @@ export const runTestsWithCallback = async ({
     if (setupOnly && commit) {
       await SetupOnly.setupOnly({
         arch,
+        buildVscodeMinified,
         clearExtensions,
         commit,
         cwd,
@@ -161,6 +177,7 @@ export const runTestsWithCallback = async ({
       return await doLogin({
         arch,
         attachedToPageTimeout,
+        buildVscodeMinified,
         clearExtensions,
         commit,
         compressVideo,
@@ -178,6 +195,8 @@ export const runTestsWithCallback = async ({
         insidersCommit,
         inspectExtensions,
         inspectExtensionsPort,
+        inspectIntegratedBrowser,
+        inspectProcess,
         inspectPtyHost,
         inspectPtyHostPort,
         inspectSharedProcess,
@@ -236,30 +255,22 @@ export const runTestsWithCallback = async ({
       runs,
     }
 
-<<<<<<< HEAD
     let testStart = 0
     if (!showInitializingMessage) {
       testStart = performance.now()
       await callback(TestWorkerEventType.TestsStarting, total)
       await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, true)
     }
-=======
-    const intializeEnd = getTimeStamp()
-    const intializeTime = intializeEnd - initialStart
-
-    await callback(TestWorkerEventType.HandleInitialized, intializeTime)
-
-    const testStart = getTimeStamp()
-    await callback(TestWorkerEventType.TestsStarting, total)
-    await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
->>>>>>> origin/main
 
     let workers: WorkerMap = {
+      devtoolsWebSocketUrl: '',
       functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
+      pid: 0,
       testWorkerRpc: emptyRpc,
       videoRpc: emptyRpc,
+      webSocketUrl: '',
     }
     let hasHandledInitializing = false
 
@@ -278,10 +289,11 @@ export const runTestsWithCallback = async ({
         }
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
-        const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } =
+        const { devtoolsWebSocketUrl, functionTrackerRpc, initializationWorkerRpc, memoryRpc, pid, testWorkerRpc, videoRpc, webSocketUrl } =
           await PrepareTestsOrAttach.prepareTestsAndAttach({
             arch,
             attachedToPageTimeout,
+            buildVscodeMinified,
             clearExtensions,
             commit,
             compressVideo,
@@ -298,6 +310,8 @@ export const runTestsWithCallback = async ({
             insidersCommit,
             inspectExtensions,
             inspectExtensionsPort,
+            inspectIntegratedBrowser,
+            inspectProcess,
             inspectPtyHost,
             inspectPtyHostPort,
             inspectSharedProcess,
@@ -324,11 +338,14 @@ export const runTestsWithCallback = async ({
           hasHandledInitializing = true
         }
         workers = {
+          devtoolsWebSocketUrl,
           functionTrackerRpc: functionTrackerRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
           memoryRpc: memoryRpc || emptyRpc,
+          pid,
           testWorkerRpc: testWorkerRpc || emptyRpc,
           videoRpc: videoRpc || emptyRpc,
+          webSocketUrl,
         }
       }
 
@@ -336,7 +353,7 @@ export const runTestsWithCallback = async ({
         await workers.initializationWorkerRpc.invoke('Launch.setProxyTestFolderName', proxyTestFolderName)
       }
 
-      const { memoryRpc, testWorkerRpc, videoRpc } = workers
+      const { testWorkerRpc, videoRpc } = workers
 
       if (i === 0 && showInitializingMessage) {
         testStart = performance.now()
@@ -350,6 +367,12 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
+        if ((inspectIntegratedBrowser || inspectProcess) && workers.memoryRpc !== emptyRpc) {
+          await workers.memoryRpc.dispose()
+          workers.memoryRpc = emptyRpc
+        }
+        const integratedBrowserExcludedTargetIds =
+          checkLeaks && inspectIntegratedBrowser ? await BrowserPageTargets.getBrowserPageTargetIds(workers.devtoolsWebSocketUrl) : []
         const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
           testWorkerRpc,
           connectionId,
@@ -382,6 +405,48 @@ export const runTestsWithCallback = async ({
             if (measureAfter) {
               await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
             }
+            if (inspectIntegratedBrowser || inspectProcess) {
+              if (inspectProcess) {
+                workers.memoryRpc = await MemoryLeakWorker.startWorker(
+                  workers.devtoolsWebSocketUrl,
+                  workers.webSocketUrl,
+                  connectionId,
+                  measure,
+                  attachedToPageTimeout,
+                  measureNode,
+                  inspectSharedProcess,
+                  inspectExtensions,
+                  inspectIntegratedBrowser,
+                  inspectPtyHost,
+                  inspectPtyHostPort,
+                  inspectSharedProcessPort,
+                  inspectExtensionsPort,
+                  workers.pid,
+                  integratedBrowserExcludedTargetIds,
+                  inspectProcess,
+                  testWorkerRpc,
+                )
+              } else {
+                workers.memoryRpc = await MemoryLeakWorker.startWorker(
+                  workers.devtoolsWebSocketUrl,
+                  workers.webSocketUrl,
+                  connectionId,
+                  measure,
+                  attachedToPageTimeout,
+                  measureNode,
+                  inspectSharedProcess,
+                  inspectExtensions,
+                  inspectIntegratedBrowser,
+                  inspectPtyHost,
+                  inspectPtyHostPort,
+                  inspectSharedProcessPort,
+                  inspectExtensionsPort,
+                  workers.pid,
+                  integratedBrowserExcludedTargetIds,
+                )
+              }
+            }
+            const memoryRpc = workers.memoryRpc
             await MemoryLeakFinder.start(memoryRpc, connectionId)
             await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
             if (timeoutBetween) {
@@ -404,6 +469,16 @@ export const runTestsWithCallback = async ({
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'extension-host', measure, fileName)
             } else if (inspectPtyHost) {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'pty-host', measure, fileName)
+            } else if (inspectIntegratedBrowser) {
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'integrated-browser', measure, fileName)
+            } else if (inspectProcess) {
+              resultPath = join(
+                MemoryLeakResultsPath.memoryLeakResultsPath,
+                'process',
+                getProcessResultFolder(inspectProcess),
+                measure,
+                fileName,
+              )
             } else {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             }
@@ -454,11 +529,14 @@ export const runTestsWithCallback = async ({
     // TODO when in watch mode, dispose all workers except initialization worker to keep the application running
     await disposeWorkers(workers)
     workers = {
+      devtoolsWebSocketUrl: '',
       functionTrackerRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
       memoryRpc: emptyRpc,
+      pid: 0,
       testWorkerRpc: emptyRpc,
       videoRpc: emptyRpc,
+      webSocketUrl: '',
     }
     return {
       duration,

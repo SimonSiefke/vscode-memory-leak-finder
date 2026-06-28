@@ -24,10 +24,9 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
       if (method === 'Stdout.getHandleTestRunningMessage') {
         const isFirst = args[3]
         if (isFirst) {
-          return '\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n'
-        } else {
-          return '\n\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n'
+          return '\u{1B}[0m\u{1B}[7m\u{1B}[33m\u{1B}[1m RUNS \u{1B}[22m\u{1B}[39m\u{1B}[27m\u{1B}[0m \u{1B}[2m/test/\u{1B}[22m\u{1B}[1mapp.test.js\u{1B}[22m\n'
         }
+        return '\n\u{1B}[0m\u{1B}[7m\u{1B}[33m\u{1B}[1m RUNS \u{1B}[22m\u{1B}[39m\u{1B}[27m\u{1B}[0m \u{1B}[2m/test/\u{1B}[22m\u{1B}[1mapp.test.js\u{1B}[22m\n'
       }
       throw new Error(`unexpected method ${method}`)
     },
@@ -45,7 +44,7 @@ test.skip('handleTestRunning - first', async () => {
   await HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ true)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n',
+    '\u{1B}[0m\u{1B}[7m\u{1B}[33m\u{1B}[1m RUNS \u{1B}[22m\u{1B}[39m\u{1B}[27m\u{1B}[0m \u{1B}[2m/test/\u{1B}[22m\u{1B}[1mapp.test.js\u{1B}[22m\n',
   )
 })
 
@@ -54,6 +53,6 @@ test.skip('handleTestRunning - second', async () => {
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
     '\n' +
-      '\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n',
+      '\u{1B}[0m\u{1B}[7m\u{1B}[33m\u{1B}[1m RUNS \u{1B}[22m\u{1B}[39m\u{1B}[27m\u{1B}[0m \u{1B}[2m/test/\u{1B}[22m\u{1B}[1mapp.test.js\u{1B}[22m\n',
   )
 })

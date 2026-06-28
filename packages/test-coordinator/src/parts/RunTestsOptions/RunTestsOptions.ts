@@ -2,6 +2,7 @@ export interface RunTestsOptions {
   readonly allowCopilotAuthInCi: boolean
   readonly arch: string
   readonly bisect?: boolean
+  readonly buildVscodeMinified: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
   readonly color: boolean
@@ -20,6 +21,8 @@ export interface RunTestsOptions {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess?: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean

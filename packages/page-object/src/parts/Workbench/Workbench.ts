@@ -25,24 +25,24 @@ type WorkbenchDependencies = {
 
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
-  readonly Workbench?: any
-  readonly sessionRpc?: any
   readonly locator?: (selector: string) => any
-  readonly waitForIdle: () => Promise<void>
+  readonly sessionRpc?: any
   readonly shouldBeVisible: () => Promise<void>
+  readonly waitForIdle: () => Promise<void>
+  readonly Workbench?: any
 }
 
 const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: string) => {
   return {
-    objectType: 'locator',
-    rpc: sessionRpc,
-    sessionRpc,
-    sessionId,
-    selector,
     hasText: undefined,
     locator(subSelector: string) {
       return createLocatorProxy(sessionRpc, `${selector} ${subSelector}`, sessionId)
     },
+    objectType: 'locator',
+    rpc: sessionRpc,
+    selector,
+    sessionId,
+    sessionRpc,
   }
 }
 
@@ -73,12 +73,12 @@ const sleep = async (milliseconds: number): Promise<void> => {
 
 const getRemoteHostPlatformLabel = (platform: string): string => {
   switch (platform) {
+    case 'darwin':
+      return 'macOS'
     case 'linux':
       return 'Linux'
     case 'win32':
       return 'Windows'
-    case 'darwin':
-      return 'macOS'
     default:
       throw new Error(`Unsupported platform for Remote - SSH host selection: ${platform}`)
   }
@@ -92,7 +92,7 @@ const maybeSelectRemoteHostPlatform = async (
   const expectedPlatform = getRemoteHostPlatformLabel(platform)
   const platformOptions = ['Linux', 'Windows', 'macOS']
   const start = Date.now()
-  while (Date.now() - start < 5_000) {
+  while (Date.now() - start < 5000) {
     try {
       const visibleCommands = await quickPick.getVisibleCommands()
       if (visibleCommands.includes(expectedPlatform)) {
@@ -162,11 +162,11 @@ export const create = ({
   createPageObject,
   electronApp,
   expect,
+  ideVersion,
   page,
   platform,
   reconnectDevtools,
   VError,
-  ideVersion,
 }: CreateParams) => {
   const workbenchContext = {
     browserRpc,
@@ -176,8 +176,8 @@ export const create = ({
     page,
     platform,
     VError,
-    ...(createPageObject ? { createPageObject } : {}),
-    ...(reconnectDevtools ? { reconnectDevtools } : {}),
+    ...(createPageObject && { createPageObject }),
+    ...(reconnectDevtools && { reconnectDevtools }),
   }
   return createWithDependencies(workbenchContext, {
     createQuickPick: () =>
@@ -194,7 +194,7 @@ export const create = ({
 }
 
 export const createWithDependencies = (
-  { browserRpc, createPageObject, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams,
+  { browserRpc, createPageObject, electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }: CreateParams,
   dependencies: WorkbenchDependencies,
 ) => {
   return {
@@ -217,40 +217,18 @@ export const createWithDependencies = (
         throw new VError(error, message)
       }
     },
-    async waitForNewWindow({ timeout }: { timeout: number }) {
-      const { promise, resolve } = Promise.withResolvers<string>()
-
-      if (!browserRpc) {
-        throw new Error(`browser rpc is required`)
-      }
-
-      let targetCaptured = false
-
-      const cleanup = () => {
-        browserRpc.off('Target.attachedToTarget', handleNewTarget)
-        clearTimeout(timeoutRef)
-      }
-
-      const handleTimeout = () => {
-        cleanup()
-        resolve('')
-      }
-
-      const handleNewTarget = (message: any): void => {
-        if (targetCaptured) {
-          return
-        }
-        targetCaptured = true
-        cleanup()
-        const sessionId = message.params.sessionId as string
-        resolve(sessionId)
-      }
-      browserRpc.on('Target.attachedToTarget', handleNewTarget)
-      const timeoutRef = setTimeout(handleTimeout, timeout)
-
-      const sessionId = await promise
-
-      return sessionId
+    async focusLeftEditorGroup() {
+      await page.waitForIdle()
+      const quickPick = QuickPick.create({
+        electronApp,
+        expect,
+        ideVersion,
+        page,
+        platform,
+        VError,
+      })
+      await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
+      await page.waitForIdle()
     },
     async openNewWindow(): Promise<ISimplifedWindow> {
       try {
@@ -294,9 +272,25 @@ export const createWithDependencies = (
               throw new VError(error, `Failed to close new window`)
             }
           },
+          async closeGracefully() {
+            try {
+              // Wait for the window to be fully idle before attempting to close
+              await newWindowPage.waitForIdle()
+              const quickPick = QuickPick.create({
+                electronApp,
+                expect,
+                ideVersion,
+                page: newWindowPage,
+                platform,
+                VError,
+              })
+              await quickPick.executeCommand(WellKnownCommands.CloseWindow)
+            } catch (error) {
+              throw new VError(error, `Failed to close new window`)
+            }
+          },
           locator: (selector: string) => getNewWindowPage().locator(selector),
           sessionRpc: newWindowPage.sessionRpc,
-          waitForIdle: () => getNewWindowPage().waitForIdle(),
           async shouldBeVisible() {
             const page = getNewWindowPage()
             await page.waitForIdle()
@@ -304,6 +298,7 @@ export const createWithDependencies = (
             await expect(workbench).toBeVisible({ timeout: 20_000 })
             await page.waitForIdle()
           },
+          waitForIdle: () => getNewWindowPage().waitForIdle(),
         })
       } catch (error) {
         throw new VError(error, `Failed to open new window`)
@@ -335,19 +330,6 @@ export const createWithDependencies = (
         throw new VError(error, `Failed to reload window`)
       }
     },
-    async focusLeftEditorGroup() {
-      await page.waitForIdle()
-      const quickPick = QuickPick.create({
-        electronApp,
-        expect,
-        ideVersion,
-        page,
-        platform,
-        VError,
-      })
-      await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
-      await page.waitForIdle()
-    },
     async shouldBeVisible() {
       const workbench = page.locator('.monaco-workbench')
       await expect(workbench).toBeVisible()
@@ -361,6 +343,41 @@ export const createWithDependencies = (
       } catch (error) {
         throw new VError(error, `workbench has not the expected background color`)
       }
+    },
+    async waitForNewWindow({ timeout }: { timeout: number }) {
+      const { promise, resolve } = Promise.withResolvers<string>()
+
+      if (!browserRpc) {
+        throw new Error(`browser rpc is required`)
+      }
+
+      let targetCaptured = false
+
+      const cleanup = () => {
+        browserRpc.off('Target.attachedToTarget', handleNewTarget)
+        clearTimeout(timeoutRef)
+      }
+
+      const handleTimeout = () => {
+        cleanup()
+        resolve('')
+      }
+
+      const handleNewTarget = (message: any): void => {
+        if (targetCaptured) {
+          return
+        }
+        targetCaptured = true
+        cleanup()
+        const sessionId = message.params.sessionId as string
+        resolve(sessionId)
+      }
+      browserRpc.on('Target.attachedToTarget', handleNewTarget)
+      const timeoutRef = setTimeout(handleTimeout, timeout)
+
+      const sessionId = await promise
+
+      return sessionId
     },
   }
 }

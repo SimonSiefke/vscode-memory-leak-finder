@@ -1,9 +1,11 @@
 import { test, expect } from '@jest/globals'
+import type { Session } from '../src/parts/Session/Session.ts'
 import * as GetFunctionLocation from '../src/parts/GetFunctionLocation/GetFunctionLocation.ts'
 
 test('getFunctionLocation', async () => {
-  const session = {
-    invoke() {
+  const session: Session = {
+    dispose() {},
+    async invoke<T = unknown>(): Promise<T> {
       return {
         result: {
           result: {
@@ -20,7 +22,7 @@ test('getFunctionLocation', async () => {
             ],
           },
         },
-      }
+      } as T
     },
   }
   const objectId = 'test-123'
