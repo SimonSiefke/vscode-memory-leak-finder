@@ -104,6 +104,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify that side bar is visible`)
       }
     },
+    async shouldSecondaryBeVisible() {
+      try {
+        const secondarySideBar = page.locator('.auxiliarybar')
+        await expect(secondarySideBar).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that secondary side bar is visible`)
+      }
+    },
     async show() {
       try {
         const sideBar = page.locator('.part.sidebar')
@@ -119,6 +127,30 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show side bar`)
+      }
+    },
+    async showSecondary() {
+      try {
+        const secondarySideBar = page.locator('.auxiliarybar')
+        const isVisible = await secondarySideBar.isVisible()
+        if (isVisible) {
+          await expect(secondarySideBar).toBeVisible()
+          await page.waitForIdle()
+          return
+        }
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ToggleSecondarySideBarVisibility)
+        await expect(secondarySideBar).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show secondary side bar`)
       }
     },
     async toggle() {

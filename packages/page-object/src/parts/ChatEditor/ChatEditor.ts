@@ -524,6 +524,45 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to click access button with text "${buttonText}"`)
       }
     },
+    async archiveAllActiveItems() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ArchiveAllWorkspaceAgentSessions)
+        await page.waitForIdle()
+        await this.shouldHaveNoActiveItems()
+      } catch (error) {
+        throw new VError(error, `Failed to archive all active chat items`)
+      }
+    },
+    async archiveFirstActiveItem() {
+      try {
+        await this.focusSessionList()
+        const activeItems = page.locator('.agent-session-item:not(.archived)')
+        const firstActiveItem = activeItems.first()
+        await expect(firstActiveItem).toBeVisible({ timeout: 30_000 })
+        await firstActiveItem.hover()
+        await page.waitForIdle()
+
+        const archiveButton = firstActiveItem
+          .locator(
+            '.agent-session-title-toolbar [aria-label^="Archive"], .agent-session-title-toolbar .action-label[aria-label^="Archive"]',
+          )
+          .first()
+        const isArchiveButtonVisible =
+          (await archiveButton.count().catch(() => 0)) > 0 && (await archiveButton.isVisible().catch(() => false))
+        if (isArchiveButtonVisible) {
+          await archiveButton.click()
+        } else {
+          await firstActiveItem.click()
+          await page.waitForIdle()
+          await page.keyboard.press('Delete')
+        }
+        await page.waitForIdle()
+        await expect(firstActiveItem).toBeHidden({ timeout: 30_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to archive first active chat item`)
+      }
+    },
     async closeFinishSetup() {
       try {
         const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
@@ -545,6 +584,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         return getLatestResponseText(chatView)
       } catch (error) {
         throw new VError(error, `Failed to get latest chat response text`)
+      }
+    },
+    async focusSessionList() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.FocusAgentSessions)
+        await page.waitForIdle()
+        const sessionsViewer = page.locator('.agent-sessions-viewer')
+        await expect(sessionsViewer).toBeVisible({ timeout: 30_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to focus chat session list`)
       }
     },
     isFirst: false,
@@ -617,6 +667,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open chat editor`)
+      }
+    },
+    async openView() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.OpenChat)
+        await page.waitForIdle()
+        await this.shouldBeVisibleInSecondarySideBar()
+      } catch (error) {
+        throw new VError(error, `Failed to open chat view`)
       }
     },
     async openAgentDebugLogs() {
@@ -1068,6 +1129,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
       }
     },
+    async shouldBeVisibleInSecondarySideBar() {
+      try {
+        const chatView = page.locator('.auxiliarybar .interactive-session')
+        await expect(chatView).toBeVisible({ timeout: 30_000 })
+        const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(editArea).toBeVisible({ timeout: 30_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to verify chat view is visible in secondary side bar`)
+      }
+    },
     async shouldHaveAttachedContextHoverText(text: string) {
       try {
         const contextLabel = page.locator('.chat-attached-context [aria-label^="Attached context,"]').first()
@@ -1116,6 +1187,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new Error(`Timed out waiting for chat code block with language ${language}`)
       } catch (error) {
         throw new VError(error, `Failed to find chat code block with language ${language}`)
+      }
+    },
+    async shouldHaveNoActiveItems() {
+      try {
+        const activeItems = page.locator('.agent-session-item:not(.archived)')
+        await expect(activeItems).toHaveCount(0, { timeout: 30_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that all chat items are archived`)
       }
     },
     async shouldHaveLatestResponseCodeBlockWithLanguage(language: string) {
