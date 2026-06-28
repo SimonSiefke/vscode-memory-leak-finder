@@ -76,9 +76,12 @@ export interface ChatEditor {
   readonly Models: ChatEditorModels
   addAllProblemsAsContext(): Promise<void>
   addContext(initialPrompt: any, secondPrompt: any, confirmText: any): Promise<void>
+  archiveAllActiveItems(): Promise<void>
+  archiveFirstActiveItem(): Promise<void>
   attachImage(file: any): Promise<void>
   clearAll(): Promise<void>
   clearContext(contextName: any): Promise<void>
+  focusSessionList(): Promise<void>
   getLatestResponseText(): Promise<string>
   shouldHaveAttachedContextHoverText(text: any): Promise<void>
   closeFinishSetup(): Promise<void>
@@ -91,6 +94,7 @@ export interface ChatEditor {
   close(): Promise<void>
   moveToSideBar(): Promise<void>
   open(): Promise<void>
+  openView(): Promise<void>
   openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
   selectModel(modelName: ChatModel, retry?: boolean): Promise<void>
@@ -99,6 +103,8 @@ export interface ChatEditor {
   sendMessage(options: ChatEditorSendMessageOptions): Promise<void>
   setMode(modeLabel: any): Promise<void>
   setModeLegacy(modeLabel: any): Promise<void>
+  shouldBeVisibleInSecondarySideBar(): Promise<void>
+  shouldHaveNoActiveItems(): Promise<void>
   retryLastMessage(): Promise<void>
   clickAccessButton(buttonText?: any): Promise<void>
   approveAllAccessRequests(options?: any): Promise<void>
@@ -701,6 +707,8 @@ export interface SideBar {
   shouldBeLeft(): Promise<void>
   shouldBeRight(): Promise<void>
   shouldBeVisible(): Promise<void>
+  shouldSecondaryBeVisible(): Promise<void>
+  showSecondary(): Promise<void>
 }
 export interface SimpleBrowser {
   isSimpleBrowserTabLoading(): Promise<boolean>
