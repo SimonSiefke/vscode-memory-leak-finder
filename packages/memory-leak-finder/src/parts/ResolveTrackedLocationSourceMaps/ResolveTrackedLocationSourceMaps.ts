@@ -26,7 +26,9 @@ const emptyResolvedLocation: ResolvedTrackedLocation = {
   originalSource: null,
 }
 
-const parseLocation = (location: string): { readonly column: number; readonly line: number; readonly urlOrScriptId: string } | undefined => {
+const parseLocation = (
+  location: string,
+): { readonly column: number; readonly line: number; readonly urlOrScriptId: string } | undefined => {
   const match = location.match(/^(.+):(\d+):(\d+)$/)
   if (!match) {
     return undefined

@@ -37,7 +37,9 @@ export const compareTrackedAllocations = async (
   const afterData = hasTrackedAllocations(after) ? after : { scriptMap: undefined, trackedAllocations: after }
   const afterAllocations = afterData.trackedAllocations
   const allKeys = new Set([...Object.keys(beforeAllocations), ...Object.keys(afterAllocations)])
-  const locations = [...new Set([...allKeys].map((key) => afterAllocations[key]?.location || beforeAllocations[key]?.location).filter(Boolean))]
+  const locations = [
+    ...new Set([...allKeys].map((key) => afterAllocations[key]?.location || beforeAllocations[key]?.location).filter(Boolean)),
+  ]
   const resolvedLocations = await ResolveTrackedLocationSourceMaps.resolveTrackedLocationSourceMaps(locations, afterData.scriptMap)
 
   const results: TrackedAllocationResult[] = []
