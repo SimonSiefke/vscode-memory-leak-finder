@@ -2,9 +2,9 @@ import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 /**
- * @param {any} session
+ * @param {unknown} session
  * @param {string} objectGroup
- * @returns {Promise<any>}
+ * @returns {Promise<unknown>}
  */
 export const startTrackingPromiseStackTraces = async (session: Session, objectGroup: string) => {
   await DevtoolsProtocolRuntime.evaluate(session, {
@@ -68,8 +68,8 @@ globalThis.Promise = class extends globalThis.___originalPromise {
     return result
   }
 
-  static any(...args){
-    const result = super.any(...args)
+  static unknown(...args){
+    const result = super.unknown(...args)
     const stackTrace = callsites()
     globalThis.___promiseStackTraces.set(result, stackTrace)
     return result

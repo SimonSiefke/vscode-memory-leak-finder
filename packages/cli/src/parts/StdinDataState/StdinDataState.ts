@@ -6,6 +6,7 @@ import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 export interface StdinDataState {
   readonly arch: string
   readonly bisect: boolean
+  readonly buildVscodeMinified: boolean
   readonly buffering: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
@@ -22,6 +23,8 @@ export interface StdinDataState {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -30,12 +33,13 @@ export interface StdinDataState {
   readonly isWindows: boolean
   readonly measure: string
   readonly measureAfter: boolean
-  readonly measureNode?: boolean
+  readonly measureNode: boolean
   readonly mode: number
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly previousFilters: string[]
+  readonly processRootStrategy: string
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
@@ -55,6 +59,7 @@ export interface StdinDataState {
 let state: StdinDataState = {
   arch: '',
   bisect: false,
+  buildVscodeMinified: false,
   buffering: false,
   checkLeaks: false,
   clearExtensions: true,
@@ -71,6 +76,8 @@ let state: StdinDataState = {
   insidersCommit: '',
   inspectExtensions: false,
   inspectExtensionsPort: 5870,
+  inspectIntegratedBrowser: false,
+  inspectProcess: '',
   inspectPtyHost: false,
   inspectPtyHostPort: 5877,
   inspectSharedProcess: false,
@@ -79,11 +86,13 @@ let state: StdinDataState = {
   isWindows: false,
   measure: Character.EmptyString,
   measureAfter: false,
+  measureNode: false,
   mode: ModeType.Waiting,
   openDevtools: false,
   pageObjectPath: '',
   platform: '',
   previousFilters: [],
+  processRootStrategy: 'launch-pid',
   recordVideo: false,
   restartBetween: false,
   runMode: TestRunMode.Auto,
@@ -105,6 +114,7 @@ export const setState = (newState: StdinDataState): void => {
     ...state,
     arch: newState.arch,
     bisect: newState.bisect,
+    buildVscodeMinified: newState.buildVscodeMinified,
     checkLeaks: newState.checkLeaks,
     compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,
@@ -117,6 +127,8 @@ export const setState = (newState: StdinDataState): void => {
     insidersCommit: newState.insidersCommit,
     inspectExtensions: newState.inspectExtensions,
     inspectExtensionsPort: newState.inspectExtensionsPort,
+    inspectIntegratedBrowser: newState.inspectIntegratedBrowser,
+    inspectProcess: newState.inspectProcess,
     inspectPtyHost: newState.inspectPtyHost,
     inspectPtyHostPort: newState.inspectPtyHostPort,
     inspectSharedProcess: newState.inspectSharedProcess,
@@ -125,10 +137,12 @@ export const setState = (newState: StdinDataState): void => {
     isWindows: newState.isWindows,
     measure: newState.measure,
     measureAfter: newState.measureAfter,
+    measureNode: newState.measureNode,
     mode: newState.mode,
     pageObjectPath: newState.pageObjectPath,
     platform: newState.platform,
     previousFilters: newState.previousFilters,
+    processRootStrategy: newState.processRootStrategy,
     recordVideo: newState.recordVideo,
     restartBetween: newState.restartBetween,
     runMode: newState.runMode,

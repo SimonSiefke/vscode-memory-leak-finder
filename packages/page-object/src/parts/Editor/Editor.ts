@@ -2,10 +2,11 @@ import { basename } from 'node:path'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import * as Electron from '../Electron/Electron.ts'
+import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import * as Electron from '../Electron/Electron.ts'
 
 const initialDiagnosticTimeout = 60_000
 
@@ -104,6 +105,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         // throw new VError(error, `Failed to click ${text}`)
       }
     },
+    async clickLink(text: string) {
+      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const linkText = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        await expect(linkText).toBeVisible()
+        await page.keyboard.down(modifier)
+        await linkText.hover()
+        const activeLink = editor.locator('.detected-link-active', { hasText: text }).first()
+        await expect(activeLink).toBeVisible()
+        await activeLink.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to click link ${text}`)
+      } finally {
+        await page.keyboard.up(modifier).catch(() => undefined)
+      }
+    },
     async close() {
       try {
         const main = page.locator('[role="main"]')
@@ -138,21 +159,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to close all editors`)
-      }
-    },
-    async closeOthers() {
-      try {
-        await page.waitForIdle()
-        const main = page.locator('[role="main"]')
-        const tabs = main.locator('[role="tab"]')
-        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.ViewCloseOtherEditors)
-        await expect(tabs).toHaveCount(1, {
-          timeout: 4000,
-        })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to close other editors`)
       }
     },
     async closeAllEditorGroups() {
@@ -206,6 +212,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(inspectWidget).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed close inspect widget`)
+      }
+    },
+    async closeOthers() {
+      try {
+        await page.waitForIdle()
+        const main = page.locator('[role="main"]')
+        const tabs = main.locator('[role="tab"]')
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewCloseOtherEditors)
+        await expect(tabs).toHaveCount(1, {
+          timeout: 4000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close other editors`)
       }
     },
     async closePeekDefinition() {
@@ -689,6 +710,44 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to scroll in editor`)
       }
     },
+    async moveToNewWindow() {
+      try {
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
+
+        // Get window IDs before moving editor to a new window
+        const windowIdsBeforeRaw = await electron.getWindowIds()
+        const windowIdsBefore = Array.isArray(windowIdsBeforeRaw) ? windowIdsBeforeRaw : []
+
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.MoveEditorToNewWindow)
+
+        // Wait for a new window ID to appear using the same logic as Workbench.waitForWindowToShow
+        const newWindowId = await this.waitForNewWindow(windowIdsBefore, electron)
+
+        await page.waitForIdle()
+
+        // Return an object for manipulating the new window
+        return {
+          async close() {
+            try {
+              await electron.closeWindow(newWindowId)
+            } catch (error) {
+              throw new VError(error, `Failed to close new window`)
+            }
+          },
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to move editor to new window`)
+      }
+    },
     async newEditorGroupBottom() {
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       await quickPick.executeCommand(WellKnownCommands.NewEditorGroupBottom)
@@ -1168,6 +1227,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(breadCrumb).toBeVisible({ timeout: 10_000 })
       await page.waitForIdle()
     },
+    async shouldHaveBreadCrumbs() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        await expect(breadcrumbs).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that breadcrumbs are visible`)
+      }
+    },
     async shouldHaveCodeLens(options?: { timeout?: number }) {
       try {
         await page.waitForIdle()
@@ -1198,6 +1266,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to verify code lens shows version information`)
+      }
+    },
+    async shouldHaveControlCharacterHighlight() {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const controlCharacter = editor.locator('.mtkcontrol').first()
+        await expect(controlCharacter).toBeVisible({
+          timeout: 5000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify control character highlighting`)
       }
     },
     async shouldHaveCursor(estimate: string) {
@@ -1338,6 +1421,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify lightbulb`)
       }
     },
+    async shouldHaveMinimap() {
+      try {
+        await page.waitForIdle()
+        const minimap = page.locator('.minimap')
+        await expect(minimap).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that minimap is visible`)
+      }
+    },
     async shouldHaveOverlayMessage(message: string) {
       try {
         const messageElement = page.locator('.monaco-editor-overlaymessage')
@@ -1463,6 +1555,61 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(token).toHaveCss('color', color)
       await page.waitForIdle()
     },
+    async shouldHaveVisibleLink(text: string) {
+      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const linkText = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        await expect(linkText).toBeVisible()
+        await page.keyboard.down(modifier)
+        await linkText.hover()
+        const activeLink = editor.locator('.detected-link-active', { hasText: text }).first()
+        await expect(activeLink).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify visible link ${text}`)
+      } finally {
+        await page.keyboard.up(modifier).catch(() => undefined)
+      }
+    },
+    async shouldHaveVisibleWhitespace(fileName?: string) {
+      try {
+        await page.waitForIdle()
+        const baseName = fileName ? basename(fileName) : ''
+        const editor = fileName ? page.locator(`.monaco-editor[data-uri$="${baseName}"]`) : page.locator('.editor-instance').first()
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const whitespace = editor.locator(
+          '.view-lines .mtkw, .view-lines .mtkz, .view-overlays .mwh, .view-overlays svg path, .view-overlays svg circle',
+        )
+        await expect(whitespace.first()).toBeVisible({
+          timeout: 5000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify visible whitespace rendering`)
+      }
+    },
+    async shouldNotHaveBreadCrumbs() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        await expect(breadcrumbs).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that breadcrumbs are hidden`)
+      }
+    },
+    async shouldNotHaveMinimap() {
+      try {
+        await page.waitForIdle()
+        const minimap = page.locator('.minimap')
+        await expect(minimap).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that minimap is hidden`)
+      }
+    },
     async shouldNotHaveSemanticToken(type: string) {
       try {
         await page.waitForIdle()
@@ -1486,6 +1633,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(squiggle).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to verify that editor has no squiggly error`)
+      }
+    },
+    async shouldNotHaveVisibleWhitespace(fileName?: string) {
+      try {
+        await page.waitForIdle()
+        const baseName = fileName ? basename(fileName) : ''
+        const editor = fileName ? page.locator(`.monaco-editor[data-uri$="${baseName}"]`) : page.locator('.editor-instance').first()
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const whitespace = editor.locator(
+          '.view-lines .mtkw, .view-lines .mtkz, .view-overlays .mwh, .view-overlays svg path, .view-overlays svg circle',
+        )
+        await expect(whitespace).toHaveCount(0)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify whitespace rendering is hidden`)
       }
     },
     async showBreadCrumbs() {
@@ -1644,9 +1807,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async splitDown({ groupCount = undefined, splitInto = false }: { groupCount?: number; splitInto?: boolean } = {}) {
       if (splitInto) {
         return this.split(WellKnownCommands.ViewSplitEditorDownInto, { groupCount })
-      } else {
-        return this.split(WellKnownCommands.ViewSplitEditorDown, { groupCount })
       }
+      return this.split(WellKnownCommands.ViewSplitEditorDown, { groupCount })
     },
     async splitLeft() {
       return this.split(WellKnownCommands.ViewSplitEditorLeft, {})
@@ -1804,6 +1966,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(img).toBeVisible()
       await subFrame.waitForIdle()
     },
+    async waitForNewWindow(windowIdsBefore: readonly number[], electron: ReturnType<typeof Electron.create>) {
+      let windowIdsAfter = windowIdsBefore
+      const maxDelay = 5000 // 5 seconds max wait time
+      const startTime = performance.now()
+      while (windowIdsAfter.length <= windowIdsBefore.length) {
+        if (performance.now() - startTime > maxDelay) {
+          throw new Error(`New window did not appear within ${maxDelay}ms`)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        const ids = await electron.getWindowIds()
+        windowIdsAfter = Array.isArray(ids) ? ids : []
+      }
+
+      // Find the new window ID by comparing the lists
+      const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
+      if (newWindowId === undefined) {
+        throw new Error(`Could not identify the new window ID`)
+      }
+      return newWindowId
+    },
     async waitForNoteBookReady() {
       await page.waitForIdle()
       const notebookEditor = page.locator('.notebook-editor')
@@ -1852,64 +2034,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(pane).toBeVisible()
       const warningIcon = pane.locator('.codicon.codicon-warning')
       await expect(warningIcon).toBeVisible()
-    },
-    async moveToNewWindow() {
-      try {
-        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
-
-        // Get window IDs before moving editor to a new window
-        const windowIdsBeforeRaw = await electron.getWindowIds()
-        const windowIdsBefore = Array.isArray(windowIdsBeforeRaw) ? windowIdsBeforeRaw : []
-
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.MoveEditorToNewWindow)
-
-        // Wait for a new window ID to appear using the same logic as Workbench.waitForWindowToShow
-        const newWindowId = await this.waitForNewWindow(windowIdsBefore, electron)
-
-        await page.waitForIdle()
-
-        // Return an object for manipulating the new window
-        return {
-          async close() {
-            try {
-              await electron.closeWindow(newWindowId)
-            } catch (error) {
-              throw new VError(error, `Failed to close new window`)
-            }
-          },
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to move editor to new window`)
-      }
-    },
-    async waitForNewWindow(windowIdsBefore: readonly number[], electron: ReturnType<typeof Electron.create>) {
-      let windowIdsAfter = windowIdsBefore
-      const maxDelay = 5000 // 5 seconds max wait time
-      const startTime = performance.now()
-      while (windowIdsAfter.length <= windowIdsBefore.length) {
-        if (performance.now() - startTime > maxDelay) {
-          throw new Error(`New window did not appear within ${maxDelay}ms`)
-        }
-        await new Promise((resolve) => setTimeout(resolve, 100))
-        const ids = await electron.getWindowIds()
-        windowIdsAfter = Array.isArray(ids) ? ids : []
-      }
-
-      // Find the new window ID by comparing the lists
-      const newWindowId = windowIdsAfter.find((id: number) => !windowIdsBefore.includes(id))
-      if (newWindowId === undefined) {
-        throw new Error(`Could not identify the new window ID`)
-      }
-      return newWindowId
     },
   }
 }

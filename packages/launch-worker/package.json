@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@lvce-editor/rpc": "^6.4.0",
-    "@lvce-editor/verror": "^1.7.0"
+    "@lvce-editor/verror": "^1.7.0",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {}
 }

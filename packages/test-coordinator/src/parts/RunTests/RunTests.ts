@@ -15,8 +15,10 @@ const getTimeStamp = () => {
 }
 
 export const runTests = async ({
+  allowCopilotAuthInCi,
   arch,
   bisect,
+  buildVscodeMinified,
   checkLeaks,
   clearExtensions,
   color,
@@ -24,6 +26,8 @@ export const runTests = async ({
   compressVideo,
   continueValue,
   cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
   filterValue,
@@ -33,6 +37,8 @@ export const runTests = async ({
   insidersCommit: insidersCommitInput,
   inspectExtensions,
   inspectExtensionsPort,
+  inspectIntegratedBrowser,
+  inspectProcess = '',
   inspectPtyHost,
   inspectPtyHostPort,
   inspectSharedProcess,
@@ -74,8 +80,10 @@ export const runTests = async ({
       throw new Error('--bisect requires --check-leaks to be enabled')
     }
     const options: RunTestsOptions = {
+      allowCopilotAuthInCi,
       arch,
       bisect,
+      buildVscodeMinified,
       checkLeaks,
       clearExtensions,
       color,
@@ -83,6 +91,8 @@ export const runTests = async ({
       compressVideo,
       continueValue,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       filterValue,
@@ -92,6 +102,8 @@ export const runTests = async ({
       insidersCommit,
       inspectExtensions,
       inspectExtensionsPort,
+      inspectIntegratedBrowser,
+      inspectProcess,
       inspectPtyHost,
       inspectPtyHostPort,
       inspectSharedProcess,
@@ -125,7 +137,9 @@ export const runTests = async ({
 
   return RunTestsWithCallback.runTestsWithCallback({
     addDisposable: Disposables.add,
+    allowCopilotAuthInCi,
     arch,
+    buildVscodeMinified,
     callback,
     checkLeaks,
     clearDisposables: Disposables.disposeAll,
@@ -135,15 +149,20 @@ export const runTests = async ({
     compressVideo,
     continueValue,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     filterValue,
+    getTimeStamp,
     headlessMode,
     ide,
     ideVersion,
     insidersCommit,
     inspectExtensions,
     inspectExtensionsPort,
+    inspectIntegratedBrowser,
+    inspectProcess,
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,
@@ -171,6 +190,5 @@ export const runTests = async ({
     useProxyMock,
     vscodePath,
     vscodeVersion,
-    getTimeStamp,
   })
 }

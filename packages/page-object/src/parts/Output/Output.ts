@@ -151,7 +151,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(outputView).toBeHidden()
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.OutputFocusOnOutputView)
+        await quickPick.executeCommand(WellKnownCommands.OutputFocusOnOutputView, {
+          pressKeyOnce: true,
+        })
         await page.waitForIdle()
         await expect(outputView).toBeVisible()
         await page.waitForIdle()

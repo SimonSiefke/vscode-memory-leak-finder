@@ -1,10 +1,11 @@
 export const getPrompt = ({
   content,
+  extraArgs,
   localVscodePath,
-  only,
-  runs,
   measure,
+  only,
   ourPath,
+  runs,
 }: {
   content: string
   localVscodePath: string
@@ -12,6 +13,7 @@ export const getPrompt = ({
   measure: string
   runs: number
   ourPath: string
+  extraArgs: string
 }): string => {
   const prompt = `Hello,
 You are now an agent to find and fix memory leaks. please take a look at the following memory leak result data:
@@ -74,8 +76,10 @@ Additionally there are some stylistic rules:
 
 
 Additional information:
-- You can compile vscode by running \` npx gulp transpile-client-esbuild\`
-- You can run the measure by running \` xvfb-run -a node packages/cli/bin/test.js  --run-skipped-tests-anyway    --only ${only}    --runs ${runs} --measure ${measure} --check-leaks --measure-after  --enable-extensions --vscode-path "${localVscodePath}/scripts/code.sh" --measure-node\` in the vscode-memory-leak-finder repository at ${ourPath}
+- You can compile the whole VS Code checkout by running \`npm run compile\` in \`${localVscodePath}\`.
+- If you need the built-in Copilot extension in that checkout, run \`npm --prefix extensions/copilot run compile\` in \`${localVscodePath}\` as well.
+- When using a local VS Code checkout via \`--vscode-path "${localVscodePath}/scripts/code.sh"\`, this harness runs those commands before launch when the built-in Copilot extension is present and extensions are enabled.
+- You can run the measure by running \` xvfb-run -a node packages/cli/bin/test.js  --run-skipped-tests-anyway    --only ${only}    --runs ${runs} --measure ${measure} --check-leaks --measure-after  --enable-extensions --vscode-path "${localVscodePath}/scripts/code.sh" ${extraArgs}\` in the vscode-memory-leak-finder repository at ${ourPath}
 - The measure results are in .vscode-memory-leak-finder-results/${measure}/<testName>.json
 
 `

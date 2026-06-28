@@ -101,7 +101,7 @@ export const USKeyboardLayout = {
   Numpad8: { key: 'ArrowUp', keyCode: 38, location: 3, shiftKey: '8', shiftKeyCode: 104 },
   Numpad9: { key: 'PageUp', keyCode: 33, location: 3, shiftKey: '9', shiftKeyCode: 105 },
   NumpadAdd: { key: '+', keyCode: 107, location: 3 },
-  NumpadDecimal: { key: '\u0000', keyCode: 46, location: 3, shiftKey: '.', shiftKeyCode: 110 },
+  NumpadDecimal: { key: '\u{0}', keyCode: 46, location: 3, shiftKey: '.', shiftKeyCode: 110 },
 
   NumpadDivide: { key: '/', keyCode: 111, location: 3 },
   NumpadEnter: { key: 'Enter', keyCode: 13, location: 3, text: '\r' },

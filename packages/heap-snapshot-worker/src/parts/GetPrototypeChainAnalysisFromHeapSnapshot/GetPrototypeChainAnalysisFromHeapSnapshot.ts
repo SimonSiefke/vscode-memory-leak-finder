@@ -2,6 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
 import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.ts'
+import type { HeapSnapshotInput } from '../Snapshot/Snapshot.ts'
 
 export interface ParsedNode {
   readonly edgeCount: number
@@ -90,27 +91,25 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (
   suspiciousPatterns: Record<string, unknown>
   detailedResults: readonly ChainAnalysisResult[]
 }> => {
-  const heapsnapshot = HeapSnapshotState.get(id)
+  const heapsnapshot = HeapSnapshotState.get<HeapSnapshotInput>(id)
   Assert.object(heapsnapshot)
 
   // Parse the heap snapshot to get both nodes and properly typed edges
   const { edges, nodes, snapshot, strings } = heapsnapshot
-  const { meta } = snapshot
+  const meta = snapshot?.meta ?? heapsnapshot.meta
+  if (!meta) {
+    throw new TypeError('no heap snapshot metadata found')
+  }
   const { edge_fields, edge_types, node_fields, node_types } = meta
 
-  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(
-    nodes,
-    node_fields,
-    node_types[0],
-    strings,
-  ) as ParsedNode[]
+  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, node_fields, node_types[0], strings)
   const parsedEdges = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
     edges,
     edge_fields,
     edge_types[0],
     node_fields.length,
     strings,
-  ) as ParsedEdge[]
+  )
 
   // Find all objects and their prototype chains
   const prototypeAnalysis = analyzePrototypeChains(parsedNodes, parsedEdges)
@@ -416,7 +415,7 @@ const calculateChainStatistics = (chainLengths: readonly number[]): AnalysisStat
     return { average: 0, count: 0, max: 0, median: 0, min: 0, percentile95: 0 }
   }
 
-  const sorted = [...chainLengths].sort((a, b) => a - b)
+  const sorted = chainLengths.toSorted((a, b) => a - b)
 
   // Avoid spread operator for large arrays - use reduce instead
   const max = chainLengths.reduce((max, current) => Math.max(max, current), 0)

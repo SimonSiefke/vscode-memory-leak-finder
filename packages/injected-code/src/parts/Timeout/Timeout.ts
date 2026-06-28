@@ -1,19 +1,34 @@
 const waitForTimeout = (maxDelay: number) => {
   const { promise, resolve } = Promise.withResolvers<void>()
-  const timeout = setTimeout(resolve, maxDelay)
+  let disposed = false
   const dispose = () => {
+    if (disposed) {
+      return
+    }
+    disposed = true
     clearTimeout(timeout)
+    resolve()
   }
+  const timeout = setTimeout(dispose, maxDelay)
   return { promise, [Symbol.dispose]: dispose }
 }
 
-const waitForMutationInternal = () => {
+const waitForMutationInternal = (element: Node) => {
   const { promise, resolve } = Promise.withResolvers<void>()
-  const callback = () => {
+  let disposed = false
+  const dispose = () => {
+    if (disposed) {
+      return
+    }
+    disposed = true
+    observer.disconnect()
     resolve()
   }
+  const callback = () => {
+    dispose()
+  }
   const observer = new MutationObserver(callback)
-  observer.observe(document.body, {
+  observer.observe(element, {
     attributeOldValue: true,
     attributes: true,
     characterData: true,
@@ -21,16 +36,18 @@ const waitForMutationInternal = () => {
     childList: true,
     subtree: true,
   })
-  const dispose = () => {
-    observer.disconnect()
-  }
   return { promise, [Symbol.dispose]: dispose }
 }
 
-export const waitForMutation = async (element: any, maxDelay: number) => {
-  const item1 = waitForTimeout(maxDelay)
-  const item2 = waitForMutationInternal()
-  await Promise.race([item1.promise, item2.promise])
-  item1[Symbol.dispose]()
-  item2[Symbol.dispose]()
+export const waitForMutation = async (element: Node, maxDelay: number) => {
+  let timeout: ReturnType<typeof waitForTimeout> | undefined
+  let mutation: ReturnType<typeof waitForMutationInternal> | undefined
+  try {
+    timeout = waitForTimeout(maxDelay)
+    mutation = waitForMutationInternal(element)
+    await Promise.race([timeout.promise, mutation.promise])
+  } finally {
+    timeout?.[Symbol.dispose]()
+    mutation?.[Symbol.dispose]()
+  }
 }

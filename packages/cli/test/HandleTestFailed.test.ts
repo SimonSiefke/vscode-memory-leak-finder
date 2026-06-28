@@ -53,11 +53,11 @@ test.skip('handleTestFailed', async () => {
   const fileName: string = 'sample.close-window.js'
   const error = {
     codeFrame:
-      '\u001B[0m \u001B[90m 13 |\u001B[39m   \u001B[36mconst\u001B[39m window \u001B[33m=\u001B[39m \u001B[36mawait\u001B[39m electronApp\u001B[33m.\u001B[39mfirstWindow()\u001B[0m\n' +
-      '\u001B[0m \u001B[90m 14 |\u001B[39m   \u001B[36mawait\u001B[39m window\u001B[33m.\u001B[39mclose()\u001B[0m\n' +
-      '\u001B[0m\u001B[31m\u001B[1m>\u001B[22m\u001B[39m\u001B[90m 15 |\u001B[39m   \u001B[36mawait\u001B[39m expect(electronApp)\u001B[33m.\u001B[39mtoHaveWindowCount(\u001B[35m0\u001B[39m)\u001B[0m\n' +
-      '\u001B[0m \u001B[90m 16 |\u001B[39m   \u001B[36m}\u001B[39m\n' +
-      '\u001B[0m \u001B[90m 17 |\u001B[39m\u001B[0m',
+      '\u{1B}[0m \u{1B}[90m 13 |\u{1B}[39m   \u{1B}[36mconst\u{1B}[39m window \u{1B}[33m=\u{1B}[39m \u{1B}[36mawait\u{1B}[39m electronApp\u{1B}[33m.\u{1B}[39mfirstWindow()\u{1B}[0m\n' +
+      '\u{1B}[0m \u{1B}[90m 14 |\u{1B}[39m   \u{1B}[36mawait\u{1B}[39m window\u{1B}[33m.\u{1B}[39mclose()\u{1B}[0m\n' +
+      '\u{1B}[0m\u{1B}[31m\u{1B}[1m>\u{1B}[22m\u{1B}[39m\u{1B}[90m 15 |\u{1B}[39m   \u{1B}[36mawait\u{1B}[39m expect(electronApp)\u{1B}[33m.\u{1B}[39mtoHaveWindowCount(\u{1B}[35m0\u{1B}[39m)\u{1B}[0m\n' +
+      '\u{1B}[0m \u{1B}[90m 16 |\u{1B}[39m   \u{1B}[36m}\u{1B}[39m\n' +
+      '\u{1B}[0m \u{1B}[90m 17 |\u{1B}[39m\u{1B}[0m',
     message: 'expected window count to be 0 but was 1',
     stack: '    at Module.test (/test/e2e/src/sample.close-window.js:15:29)',
     type: 'Error',

@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Electron from '../Electron/Electron.ts'
@@ -39,6 +39,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to add extension ${name}`)
       }
     },
+    getPath() {
+      return workspace
+    },
     getWorkspaceFilePath(relativePath: string): string {
       const filePath = join(Root.root, '.vscode-test-workspace', relativePath)
       return filePath
@@ -46,10 +49,27 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     getWorkspacePath() {
       return workspace
     },
+    getWorkspaceSettingsPath() {
+      return join(workspace, '.vscode', 'settings.json')
+    },
+    async gitAdd() {
+      await Exec.exec('git', ['add', '-f', '.'], { cwd: workspace })
+    },
+    async gitCommit(message: string) {
+      await Exec.exec('git', ['commit', '-m', message], { cwd: workspace })
+    },
     async initializeGitRepository() {
       await Exec.exec('git', ['init'], { cwd: workspace })
       await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
       await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
+    },
+    async readWorkspaceSettings(): Promise<Record<string, unknown>> {
+      const settingsPath = this.getWorkspaceSettingsPath()
+      const content = await readFile(settingsPath, 'utf8').catch(() => '')
+      if (!content) {
+        return {}
+      }
+      return JSON.parse(content)
     },
     async remove(file: string) {
       const absolutePath = join(workspace, file)
@@ -69,6 +89,32 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
       await page.waitForIdle()
     },
+    async setFilesWithoutWaiting(files: Array<{ name: string; content: string }>) {
+      const dirents = await readdir(workspace).catch(() => [])
+      for (const dirent of dirents) {
+        const absolutePath = join(workspace, dirent)
+        await rm(absolutePath, { force: true, recursive: true })
+      }
+      for (const file of files) {
+        const absolutePath = join(workspace, file.name)
+        await mkdir(dirname(absolutePath), { recursive: true })
+        await writeFile(absolutePath, file.content)
+      }
+    },
+    async updateWorkspaceSettings(settings: Record<string, unknown>): Promise<void> {
+      const currentSettings = await this.readWorkspaceSettings()
+      const nextSettings: Record<string, unknown> = {
+        ...currentSettings,
+      }
+      for (const [key, value] of Object.entries(settings)) {
+        if (value === undefined) {
+          delete nextSettings[key]
+        } else {
+          nextSettings[key] = value
+        }
+      }
+      await this.writeWorkspaceSettings(nextSettings)
+    },
     async waitForFile(fileName: string): Promise<boolean> {
       const absolutePath = join(workspace, fileName)
       if (existsSync(absolutePath)) {
@@ -85,6 +131,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await promise
       }
       return false
+    },
+    async writeFile(relativePath: string, content: string): Promise<void> {
+      const absolutePath = join(workspace, relativePath)
+      await mkdir(dirname(absolutePath), { recursive: true })
+      await writeFile(absolutePath, content)
+      await page.waitForIdle()
+    },
+    async writeWorkspaceSettings(settings: Record<string, unknown>): Promise<void> {
+      await this.writeFile('.vscode/settings.json', JSON.stringify(settings, null, 2) + '\n')
     },
   }
 }

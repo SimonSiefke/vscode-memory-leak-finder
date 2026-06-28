@@ -1,7 +1,7 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput.ts'
 
-export const create = ({ electronApp, expect, page, VError, ideVersion }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, VError }: CreateParams) => {
   return {
     async select({ filterName, filterText }: { filterName: string; filterText: string }) {
       try {

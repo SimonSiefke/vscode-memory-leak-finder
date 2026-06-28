@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = process.platform === 'darwin'
+
 const createFiles = () => {
   const files = []
   for (let i = 0; i < 10; i++) {

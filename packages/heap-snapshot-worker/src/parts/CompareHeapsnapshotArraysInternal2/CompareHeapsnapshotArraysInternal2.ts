@@ -1,11 +1,16 @@
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import type { CountDeltaItem, CountItem, Snapshot } from '../Snapshot/Snapshot.ts'
 import * as Assert from '../Assert/Assert.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { isChromeInternalArrayName } from '../IsChromeInternalArrayName/IsChromeInternalArrayName.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 
-const getSortedCounts = (heapsnapshot: Snapshot) => {
+interface ArrayNameInfo {
+  count: number
+  readonly locations: Set<string>
+}
+
+const getSortedCounts = (heapsnapshot: Snapshot): readonly CountItem[] => {
   const { edges, nodes, strings } = heapsnapshot
   const { meta } = heapsnapshot
   const { edge_fields, edge_types, node_fields } = meta
@@ -43,7 +48,7 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
   // Second pass: scan all edges to find edges pointing TO array nodes
   // Collect ALL edge names for each array, including source node context for better identification
   // CreateNameMap processes ALL edge types, not just property edges
-  const arrayNamesMap = Object.create(null) // arrayNodeOffset -> Set of full names (sourceNodeName/edgeName or edgeName)
+  const arrayNamesMap: Record<number, Set<string>> = Object.create(null) // arrayNodeOffset -> Set of full names (sourceNodeName/edgeName or edgeName)
   const edgeMap = createEdgeMap(nodes, node_fields)
   const edgeTypeElement = edgeTypes.indexOf('element')
 
@@ -118,7 +123,7 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
   // Count arrays by joined names (one count per array, not per edge)
   // Join all names with "/" to differentiate arrays with the same name
   // Also collect location info for potential original name resolution
-  const nameMap = Object.create(null) // joinedName -> { count, locations: Set<string> }
+  const nameMap: Record<string, ArrayNameInfo> = Object.create(null) // joinedName -> { count, locations: Set<string> }
   for (const arrayOffset of arrayNodeOffsets) {
     const edgeNames = arrayNamesMap[arrayOffset]
     if (edgeNames.size > 0) {
@@ -162,7 +167,6 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
     .filter(([name]) => !isChromeInternalArrayName(name))
     .map(([key, value]) => {
       return {
-        // @ts-ignore
         count: value.count,
         name: key,
       }
@@ -171,23 +175,23 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
   return sorted
 }
 
-const compareItem = (a, b) => {
+const compareItem = (a: CountItem, b: CountItem): number => {
   return b.count - a.count
 }
 
-const sortByCounts = (items: readonly any[]) => {
+const sortByCounts = (items: readonly CountDeltaItem[]): readonly CountDeltaItem[] => {
   Assert.array(items)
   const sorted = items.toSorted(compareItem)
   return sorted
 }
 
-const compareCounts = (before, after) => {
-  const beforeMap = Object.create(null)
+const compareCounts = (before: readonly CountItem[], after: readonly CountItem[]): readonly CountDeltaItem[] => {
+  const beforeMap: Record<string, number> = Object.create(null)
   for (const item of before) {
     beforeMap[item.name] ||= 0
     beforeMap[item.name] += item.count
   }
-  const leaked: any[] = []
+  const leaked: CountDeltaItem[] = []
   for (const item of after) {
     const oldCount = beforeMap[item.name] || 0
     const afterCount = item.count

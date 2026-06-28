@@ -5,10 +5,56 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const getMarkersPanel = () => page.locator('.markers-panel')
+
   return {
+    async clearFilter() {
+      try {
+        await page.waitForIdle()
+        const markersPanel = getMarkersPanel()
+        await expect(markersPanel).toBeVisible()
+        await page.waitForIdle()
+        const input = markersPanel.locator('.input[placeholder^="Filter"]')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        await input.focus()
+        await page.waitForIdle()
+        await expect(input).toBeFocused()
+        await page.waitForIdle()
+        await input.clear()
+        await page.waitForIdle()
+        await expect(input).toHaveValue('')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear problems filter`)
+      }
+    },
+    async filter(filterValue: string) {
+      try {
+        await page.waitForIdle()
+        const markersPanel = getMarkersPanel()
+        await expect(markersPanel).toBeVisible()
+        await page.waitForIdle()
+        const input = markersPanel.locator('.input[placeholder^="Filter"]')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        await input.focus()
+        await page.waitForIdle()
+        await expect(input).toBeFocused()
+        await page.waitForIdle()
+        await input.clear()
+        await page.waitForIdle()
+        await input.setValue(filterValue)
+        await page.waitForIdle()
+        await expect(input).toHaveValue(filterValue)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to filter problems`)
+      }
+    },
     async hide() {
       try {
-        const markersPanel = page.locator('.markers-panel')
+        const markersPanel = getMarkersPanel()
         await expect(markersPanel).toBeVisible()
         const panel = Panel.create({ electronApp, expect, ideVersion, page, platform, VError })
         await panel.hide()
@@ -19,7 +65,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async moveProblemsToSidebar() {
       try {
-        const markersPanel = page.locator('.markers-panel')
+        const markersPanel = getMarkersPanel()
         await expect(markersPanel).toBeVisible()
         const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
         await expect(moreActions).toBeVisible()
@@ -45,9 +91,41 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to assert problems count of ${count}`)
       }
     },
+    async shouldHaveVisibleCount(count: number) {
+      try {
+        await page.waitForIdle()
+        const markersPanel = getMarkersPanel()
+        await expect(markersPanel).toBeVisible()
+        await page.waitForIdle()
+        const rows = markersPanel.locator('.monaco-list-row')
+        await expect(rows).toHaveCount(count, {
+          timeout: 15_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to assert visible problems count of ${count}`)
+      }
+    },
+    async shouldHaveVisibleTextCount(text: string, count: number) {
+      try {
+        await page.waitForIdle()
+        const markersPanel = getMarkersPanel()
+        await expect(markersPanel).toBeVisible()
+        await page.waitForIdle()
+        const rows = markersPanel.locator('.monaco-list-row', {
+          hasText: text,
+        })
+        await expect(rows).toHaveCount(count, {
+          timeout: 15_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to assert visible problem text count for ${text}`)
+      }
+    },
     async show() {
       try {
-        const markersPanel = page.locator('.markers-panel')
+        const markersPanel = getMarkersPanel()
         await expect(markersPanel).toBeHidden()
         const quickPick = QuickPick.create({
           electronApp,
@@ -66,7 +144,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async switchToTableView() {
       try {
         await page.waitForIdle()
-        const markersPanel = page.locator('.markers-panel')
+        const markersPanel = getMarkersPanel()
         await expect(markersPanel).toBeVisible()
         await page.waitForIdle()
         const panel = page.locator('.part.panel')
@@ -86,7 +164,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async switchToTreeView() {
       try {
         await page.waitForIdle()
-        const markersPanel = page.locator('.markers-panel')
+        const markersPanel = getMarkersPanel()
         await expect(markersPanel).toBeVisible()
         await page.waitForIdle()
         const panel = page.locator('.part.panel')

@@ -3,7 +3,7 @@ import * as GetConstructorInstanceCount from '../GetConstructorInstanceCount/Get
 
 /**
  *
- * @param {any} session
+ * @param {unknown} session
  * @returns {Promise<number>}
  */
 export const getWidgetCount = async (session: Session, objectGroup: string) => {

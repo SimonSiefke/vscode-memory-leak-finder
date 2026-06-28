@@ -1,10 +1,12 @@
+import type { NumberArray } from '../Snapshot/Snapshot.ts'
+
 /**
  * Creates an edge map for fast lookups of node edges
  * @param nodes - The nodes array from the heap snapshot
  * @param nodeFields - The node fields metadata
  * @returns A Uint32Array where edgeMap[i] = start edge index for node i
  */
-export const createEdgeMap = (nodes: Uint32Array, nodeFields: readonly string[]): Uint32Array => {
+export const createEdgeMap = (nodes: NumberArray, nodeFields: readonly string[]): Uint32Array => {
   const ITEMS_PER_NODE = nodeFields.length
   const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
 

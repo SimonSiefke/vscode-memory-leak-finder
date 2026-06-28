@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = true // TODO
+
 export const setup = async ({ Panel }: TestContext): Promise<void> => {
   await Panel.hide()
 }

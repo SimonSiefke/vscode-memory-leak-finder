@@ -9,13 +9,13 @@ import * as InstallDependencies from '../InstallDependencies/InstallDependencies
 import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
 
 export const generateExtensionSourceMaps = async ({
+  buildScript,
   cacheDir,
   extensionName,
+  modifications,
+  platform,
   repoUrl,
   version,
-  buildScript,
-  platform,
-  modifications,
 }: {
   extensionName: string
   version: string

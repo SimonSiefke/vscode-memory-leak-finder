@@ -1,12 +1,11 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { FileDescriptorInfo } from '../FileDescriptorInfo/FileDescriptorInfo.ts'
 import type { ProcessInfoWithDescriptors } from '../ProcessInfoWithDescriptors/ProcessInfoWithDescriptors.ts'
 import { isExcludedPath } from '../IsExcludedPath/IsExcludedPath.ts'
-
 export interface FileDescriptorGroup {
   target: string
   count: number
 }
-
 export interface FileDescriptorDelta {
   name: string
   count: number
@@ -14,21 +13,16 @@ export interface FileDescriptorDelta {
   pid: number
   newFileDescriptors?: FileDescriptorGroup[]
 }
-
 const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescriptorGroup[] => {
   const groups = new Map<string, number>()
-
   for (const fd of fileDescriptors) {
     const { target } = fd
-
     // Skip excluded paths
     if (isExcludedPath(target)) {
       continue
     }
-
     // Normalize the target by removing unique identifiers
     let groupKey: string
-
     if (target.startsWith('pipe:[')) {
       groupKey = 'pipe'
     } else if (target.startsWith('socket:[')) {
@@ -53,39 +47,32 @@ const groupFileDescriptors = (fileDescriptors: FileDescriptorInfo[]): FileDescri
       // For regular files, keep the full path
       groupKey = target
     }
-
     groups.set(groupKey, (groups.get(groupKey) || 0) + 1)
   }
-
   // Convert to array and sort by count (descending)
   const result: FileDescriptorGroup[] = []
   for (const [target, count] of groups.entries()) {
     result.push({ target, count })
   }
-
-  result.sort((a, b) => b.count - a.count)
-
+  result.sort((a: Dynamic, b: Dynamic) => b.count - a.count)
   return result
 }
-
 export const compareFileDescriptors = (
   before: ProcessInfoWithDescriptors[],
   after: ProcessInfoWithDescriptors[],
-  context: any,
+  context: Dynamic,
 ): FileDescriptorDelta[] => {
   // Create a map of before info by name for easy lookup
   const beforeMap = new Map<string, ProcessInfoWithDescriptors>()
   for (const item of before) {
     beforeMap.set(item.name, item)
   }
-
   // Calculate deltas for each item in after
   const deltas: FileDescriptorDelta[] = []
   for (const item of after) {
     const beforeItem = beforeMap.get(item.name)
     const beforeCount = beforeItem?.fileDescriptorCount || 0
     const delta = item.fileDescriptorCount - beforeCount
-
     // Only include items with delta >= context.runs
     if (delta >= context.runs) {
       const result: FileDescriptorDelta = {
@@ -94,11 +81,10 @@ export const compareFileDescriptors = (
         name: item.name,
         pid: item.pid,
       }
-
       // Find new file descriptors that didn't exist before
       if (beforeItem?.fileDescriptors) {
-        const beforeFdSet = new Set(beforeItem.fileDescriptors.map((fd) => fd.target))
-        const newFds = item.fileDescriptors.filter((fd) => !beforeFdSet.has(fd.target))
+        const beforeFdSet = new Set(beforeItem.fileDescriptors.map((fd: Dynamic) => fd.target))
+        const newFds = item.fileDescriptors.filter((fd: Dynamic) => !beforeFdSet.has(fd.target))
         if (newFds.length > 0) {
           result.newFileDescriptors = groupFileDescriptors(newFds)
         }
@@ -106,13 +92,10 @@ export const compareFileDescriptors = (
         // If there's no before state, all current FDs are "new"
         result.newFileDescriptors = groupFileDescriptors(item.fileDescriptors)
       }
-
       deltas.push(result)
     }
   }
-
   // Sort by highest delta (descending)
-  const sorted = deltas.toSorted((a, b) => b.delta - a.delta)
-
+  const sorted = deltas.toSorted((a: Dynamic, b: Dynamic) => b.delta - a.delta)
   return sorted
 }

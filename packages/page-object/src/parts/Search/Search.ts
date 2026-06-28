@@ -137,6 +137,17 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to set files to include`)
       }
     },
+    async shouldBeVisible() {
+      try {
+        await page.waitForIdle()
+        const searchView = page.locator('.search-view')
+        await expect(searchView).toBeVisible()
+        const searchInput = searchView.locator('textarea[aria-label^="Search"]')
+        await expect(searchInput).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that search view is visible`)
+      }
+    },
     async shouldHaveNoResults() {
       try {
         await page.waitForIdle()

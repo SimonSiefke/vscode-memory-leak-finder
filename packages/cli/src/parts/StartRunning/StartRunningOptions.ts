@@ -1,6 +1,8 @@
 export interface StartRunningOptions {
+  readonly allowCopilotAuthInCi: boolean
   readonly arch: string
   readonly bisect: boolean
+  readonly buildVscodeMinified: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
   readonly color: boolean
@@ -8,6 +10,8 @@ export interface StartRunningOptions {
   readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly filterValue: string
@@ -17,6 +21,8 @@ export interface StartRunningOptions {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -29,6 +35,7 @@ export interface StartRunningOptions {
   readonly measureNode: boolean
   readonly openDevtools: boolean
   readonly platform: string
+  readonly processRootStrategy: string
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number

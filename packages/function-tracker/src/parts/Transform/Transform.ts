@@ -1,5 +1,5 @@
-import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
 import type { TransformOptions } from '../Types/Types.ts'
+import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
 
 const PREAMBLE_CODE = `(() => {
   if(globalThis.trackFunctionCall){

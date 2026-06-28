@@ -13,7 +13,8 @@
     "postinstall": "lerna bootstrap --ci",
     "test": "lerna run test",
     "type-check": "tsc -b",
-    "build-charts": "node packages/charts/src/main.ts"
+    "build-charts": "node packages/charts/src/main.ts",
+    "backport-prs": "npm --prefix packages/build run backport-prs --"
   },
   "repository": {
     "type": "git",
@@ -27,16 +28,16 @@
   },
   "homepage": "https://github.com/SimonSiefke/vscode-memory-leak-finder#readme",
   "devDependencies": {
-    "@jest/globals": "^30.3.0",
+    "@jest/globals": "^30.4.1",
     "@lerna/legacy-package-management": "^8.2.4",
-    "@types/node": "^25.5.0",
+    "@types/node": "^26.0.1",
     "execa": "^9.6.1",
-    "jest": "^30.3.0",
-    "jest-environment-jsdom": "^30.3.0",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
     "lerna": "^8.2.4",
-    "prettier": "^3.8.1",
-    "ts-jest": "^29.4.6",
-    "typescript": "^5.9.3"
+    "prettier": "^3.9.0",
+    "ts-jest": "^29.4.11",
+    "typescript": "^6.0.3"
   },
   "jest": {
     "modulePathIgnorePatterns": [

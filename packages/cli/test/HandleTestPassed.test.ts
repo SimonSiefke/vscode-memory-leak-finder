@@ -33,7 +33,7 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
     commandMap: {},
     invoke: (method: string) => {
       if (method === 'Stdout.getClear') {
-        return '\u001B[2J\u001B[3J\u001B[H'
+        return '\u{1B}[2J\u{1B}[3J\u{1B}[H'
       }
       if (method === 'Stdout.getHandleTestPassedMessage') {
         return '[ansi-clear] test passed'

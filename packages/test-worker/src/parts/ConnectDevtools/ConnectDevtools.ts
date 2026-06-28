@@ -6,10 +6,57 @@ import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
 import * as ElectronApp from '../ElectronApp/ElectronApp.ts'
 import * as Expect from '../Expect/Expect.ts'
 import * as ImportScript from '../ImportScript/ImportScript.ts'
+import * as LivePage from '../LivePage/LivePage.ts'
 import * as Page from '../Page/Page.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import { VError } from '../VError/VError.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
+
+const createDefaultContext = (sessionRpc, utilityContext) => {
+  return {
+    callFunctionOn(options) {
+      return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+        ...options,
+        ...(utilityContext.uniqueId
+          ? {
+              uniqueContextId: utilityContext.uniqueId,
+            }
+          : {
+              contextId: utilityContext.id,
+            }),
+      })
+    },
+  }
+}
+
+const createUtilityContext = (sessionRpc, utilityContext) => {
+  return {
+    callFunctionOn(options) {
+      return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {
+        ...options,
+        ...(utilityContext.uniqueId
+          ? {
+              uniqueContextId: utilityContext.uniqueId,
+            }
+          : {
+              executionContextId: utilityContext.id,
+            }),
+      })
+    },
+    evaluate(options) {
+      return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+        ...options,
+        ...(utilityContext.uniqueId
+          ? {
+              uniqueContextId: utilityContext.uniqueId,
+            }
+          : {
+              contextId: utilityContext.id,
+            }),
+      })
+    },
+  }
+}
 
 export const connectDevtools = async (
   platform: string,
@@ -57,49 +104,65 @@ export const connectDevtools = async (
     utilityContext,
   })
 
-  const electronApp = ElectronApp.create({
+  const pageObjectContext: any = {
     browserRpc,
-    electronObjectId,
-    electronRpc,
-    firstWindow,
-    idleTimeout,
-    sessionRpc,
-  })
-  const pageObjectContext = {
-    browserRpc,
-    defaultContext: {
-      callFunctionOn(options) {
-        return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-          ...options,
-          uniqueContextId: utilityContext.uniqueId,
-        })
-      },
-    },
-    electronApp,
+    defaultContext: createDefaultContext(sessionRpc, utilityContext),
+    electronApp: undefined,
     evaluateInDefaultContext(item) {
       throw new Error(`not implemented`)
     },
     evaluateInUtilityContext(item) {},
     expect: Expect.expect,
     ideVersion: parsedIdeVersion,
-    page: firstWindow,
+    page: undefined,
     platform,
+    reconnectDevtools: undefined,
     sessionRpc,
-    utilityContext: {
-      callFunctionOn(options) {
-        return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {
-          ...options,
-          uniqueContextId: utilityContext.uniqueId,
-        })
-      },
-      evaluate(options) {
-        return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-          ...options,
-          uniqueContextId: utilityContext.uniqueId,
-        })
-      },
-    },
+    utilityContext: createUtilityContext(sessionRpc, utilityContext),
     VError,
+  }
+
+  const livePage: any = LivePage.create({
+    onRebind: async (nextPage) => {
+      pageObjectContext.defaultContext = createDefaultContext(nextPage.sessionRpc, nextPage.utilityContext)
+      pageObjectContext.page = livePage
+      pageObjectContext.sessionRpc = nextPage.sessionRpc
+      pageObjectContext.utilityContext = createUtilityContext(nextPage.sessionRpc, nextPage.utilityContext)
+    },
+    page: firstWindow,
+  })
+  pageObjectContext.page = livePage
+
+  const electronApp = ElectronApp.create({
+    browserRpc,
+    electronObjectId,
+    electronRpc,
+    firstWindow: livePage,
+    idleTimeout,
+    sessionRpc,
+  })
+  pageObjectContext.electronApp = electronApp
+  pageObjectContext.reconnectDevtools = async () => {
+    const reconnectTimeout = Math.min(attachedToPageTimeout, 5000)
+    const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, reconnectTimeout)
+    const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
+    const utilityContext = await addUtilityExecutionContext(sessionRpc, utilityExecutionContextName, frameTree.frame.id)
+    const nextPage = Page.create({
+      browserRpc,
+      electronObjectId,
+      electronRpc,
+      idleTimeout,
+      rpc: sessionRpc,
+      sessionId,
+      sessionRpc,
+      targetId,
+      utilityContext,
+    })
+    await livePage.rebind(nextPage)
+    electronApp.rebind({
+      firstWindow: livePage,
+      sessionRpc,
+    })
   }
 
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)

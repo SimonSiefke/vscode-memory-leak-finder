@@ -3,7 +3,7 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {
@@ -248,6 +248,7 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
         })
         await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
         await page.waitForIdle()
+
         const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
         await expect(settingsSwitcher).toBeVisible()
         await page.waitForIdle()
@@ -257,6 +258,12 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
         const rightControls = page.locator('.settings-right-controls')
         await expect(rightControls).toBeVisible()
         await page.waitForIdle()
+        if (ideVersion.minor >= 114) {
+          const openInMainWindowButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
+          await expect(openInMainWindowButton).toBeVisible()
+          await openInMainWindowButton.click()
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to open settings ui`)
       }
