@@ -228,20 +228,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         await page.waitForIdle()
         const quickPickWidget = page.locator('.quick-input-widget')
-        const quickPickPromise = expect(quickPickWidget)
-          .toBeVisible({
-            timeout: 15_000,
-          })
-          .then(() => 1)
-          .catch(() => 0)
         const debugToolBar = page.locator('.debug-toolbar')
-        const debugToolBarPromise = expect(debugToolBar)
-          .toBeVisible({
-            timeout: 15_000,
-          })
-          .then(() => 2)
-          .catch(() => 0)
-        const value = await Promise.race([quickPickPromise, debugToolBarPromise])
+        const waitForQuickPickOrDebugToolBar = async () => {
+          const startTime = Date.now()
+          while (Date.now() - startTime < 15_000) {
+            if (await quickPickWidget.isVisible().catch(() => false)) {
+              return 1
+            }
+            if (await debugToolBar.isVisible().catch(() => false)) {
+              return 2
+            }
+            await new Promise((resolve) => setTimeout(resolve, 250))
+          }
+          return 0
+        }
+        const value = await waitForQuickPickOrDebugToolBar()
         if (value === 1) {
           const option = page.locator(`[role="option"][aria-label^="${debugLabel}"]`)
           await expect(quickPickWidget).toBeVisible()

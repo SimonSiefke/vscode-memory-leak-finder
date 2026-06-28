@@ -11,6 +11,10 @@ const workspacePath = join(Root.root, '.vscode-test-workspace')
 const defaultPortWaitHost = '127.0.0.1'
 const defaultPortWaitTimeout = 120_000
 
+const sleep = (milliseconds: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds))
+}
+
 const isPortOpen = async (port: number, host: string): Promise<boolean> => {
   const { promise, resolve } = Promise.withResolvers<boolean>()
   const socket = createConnection({ host, port })
@@ -32,7 +36,7 @@ const waitForPorts = async (ports: readonly number[], timeout: number): Promise<
     if (results.every(Boolean)) {
       return
     }
-    await new Promise((resolve) => setTimeout(resolve, 250))
+    await sleep(250)
   }
   throw new Error(`Timed out waiting for ports: ${ports.join(', ')}`)
 }
@@ -103,7 +107,7 @@ const waitForLocatorVisibleWithToolApproval = async (page: any, expect: any, loc
     }
     const clicked = await clickVisibleAccessButton(page, 'Allow')
     if (!clicked) {
-      await new Promise((resolve) => setTimeout(resolve, 200))
+      await sleep(200)
     }
     await page.waitForIdle()
   }
@@ -299,36 +303,43 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }
   }
 
-  const waitForDoneOrToolApproval = async (expect: any, chatView: any) => {
+  const waitForDoneOrToolApproval = async (chatView: any) => {
     const loading = chatView.locator('.chat-response-loading')
     const toolApprovalSection = chatView.locator('.chat-confirmation-widget2')
     const toolApprovalSection2 = chatView.locator('.chat-tool-confirmation-carousel .chat-confirmation-widget2')
     const errorNotification = getErrorNotification(page)
     const maxWaitTime = 450_000
-    const donePromise = expect(loading)
-      .toBeHidden({ timeout: maxWaitTime })
-      .then(() => WaitResult.ChatDone)
-      .catch(() => WaitResult.ChatError)
-    const toolApprovalPromise = expect(toolApprovalSection)
-      .toBeVisible({ timeout: maxWaitTime })
-      .then(() => WaitResult.ToolDone)
-      .catch(() => WaitResult.ToolError)
-    const toolApproval2Promise = expect(toolApprovalSection2)
-      .toBeVisible({ timeout: maxWaitTime })
-      .then(() => WaitResult.ToolDone2)
-      .catch(() => WaitResult.ToolError2)
-    const errorNotificationPromise = expect(errorNotification.first())
-      .toBeVisible({ timeout: maxWaitTime })
-      .then(() => WaitResult.NotificationError)
-      .catch(() => WaitResult.NotificationTimeout)
-    const first = await Promise.race([donePromise, toolApprovalPromise, toolApproval2Promise, errorNotificationPromise])
-    if (first === WaitResult.ChatDone) {
-      const latestResponseText = await getLatestResponseText(chatView)
-      if (isChatResponseErrorText(latestResponseText)) {
-        return WaitResult.ChatResponseError
+    const startTime = Date.now()
+    while (Date.now() - startTime < maxWaitTime) {
+      if (await toolApprovalSection.isVisible().catch(() => false)) {
+        return WaitResult.ToolDone
       }
+      if (await toolApprovalSection2.isVisible().catch(() => false)) {
+        return WaitResult.ToolDone2
+      }
+      if (
+        await errorNotification
+          .first()
+          .isVisible()
+          .catch(() => false)
+      ) {
+        return WaitResult.NotificationError
+      }
+      if (
+        !(await loading
+          .first()
+          .isVisible()
+          .catch(() => false))
+      ) {
+        const latestResponseText = await getLatestResponseText(chatView)
+        if (isChatResponseErrorText(latestResponseText)) {
+          return WaitResult.ChatResponseError
+        }
+        return WaitResult.ChatDone
+      }
+      await sleep(250)
     }
-    return first
+    return WaitResult.ChatError
   }
 
   const waitForLatestExchange = async (chatView: any, message: string) => {
@@ -900,7 +911,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const maxToolCalls = 15
         for (let i = 0; i < maxToolCalls; i++) {
-          const result = await waitForDoneOrToolApproval(expect, chatView)
+          const result = await waitForDoneOrToolApproval(chatView)
           if (result === WaitResult.ChatDone) {
             break
           }
