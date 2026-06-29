@@ -6,6 +6,8 @@ const {
   DevtoolsProtocolHeapProfiler,
   DevtoolsProtocolMemory,
   DevtoolsProtocolPage,
+  DevtoolsProtocolPerformance,
+  DevtoolsProtocolProfiler,
   DevtoolsProtocolRuntime,
   DevtoolsProtocolTarget,
 } = module
@@ -13,6 +15,8 @@ const {
 export {
   DevtoolsProtocolHeapProfiler,
   DevtoolsProtocolPage,
+  DevtoolsProtocolPerformance,
+  DevtoolsProtocolProfiler,
   DevtoolsProtocolRuntime,
   DevtoolsProtocolTarget,
   DevtoolsProtocolMemory,

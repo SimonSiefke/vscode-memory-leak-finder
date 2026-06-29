@@ -17,6 +17,7 @@ export * as MeasureCssInlineStyles from '../MeasureCssInlineStyles/MeasureCssInl
 export * as MeasureCssRuleCount from '../MeasureCssRuleCount/MeasureCssRuleCount.ts'
 export * as MeasureCssRules from '../MeasureCssRules/MeasureCssRules.ts'
 export * as MeasureCssStyleSheetCount from '../MeasureCssStyleSheetCount/MeasureCssStyleSheetCount.ts'
+export * as MeasureCpuProfile from '../MeasureCpuProfile/MeasureCpuProfile.ts'
 export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/MeasureDetachedDomNodeCount.ts'
 export * as MeasureDetachedDomNodeRoots from '../MeasureDetachedDomNodeRoots/MeasureDetachedDomNodeRoots.ts'
 export * as MeasureDetachedDomNodeRootsWithStackTraces from '../MeasureDetachedDomNodeRootsWithStackTraces/MeasureDetachedDomNodeRootsWithStackTraces.ts'
