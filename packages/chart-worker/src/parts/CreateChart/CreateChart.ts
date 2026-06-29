@@ -2,6 +2,7 @@ import * as CompressSvg from '../CompressSvg/CompressSvg.ts'
 import { createBarChart } from '../CreateBarChart/CreateBarChart.ts'
 import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
 import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
+import { createGroupedHorizontalBarChart } from '../CreateGroupedHorizontalBarChart/CreateGroupedHorizontalBarChart.ts'
 
 export const createChart = async (data: any, options: any): Promise<string> => {
   let svg: string
@@ -11,6 +12,9 @@ export const createChart = async (data: any, options: any): Promise<string> => {
       break
     case 'dual-bar-chart':
       svg = createDualBarChart(data, options)
+      break
+    case 'grouped-horizontal-bar-chart':
+      svg = createGroupedHorizontalBarChart(data, options)
       break
     default:
       svg = createDefaultChart(data, options)
