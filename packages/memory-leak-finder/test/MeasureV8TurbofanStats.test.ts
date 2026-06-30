@@ -1,6 +1,5 @@
 import { expect, test } from '@jest/globals'
 import * as GetMeasure from '../src/parts/GetMeasure/GetMeasure.ts'
-import * as LoadMemoryLeakFinder from '../src/parts/LoadMemoryLeakFinder/LoadMemoryLeakFinder.ts'
 import * as MeasureV8TurbofanStats from '../src/parts/MeasureV8TurbofanStats/MeasureV8TurbofanStats.ts'
 
 test('v8 turbofan stats measure lifecycle starts tracing and parses events', async () => {
@@ -144,7 +143,11 @@ test('v8 turbofan stats measure compares as informational only', () => {
 })
 
 test('v8-turbofan-stats resolves through measure lookup', () => {
-  const MemoryLeakFinder = LoadMemoryLeakFinder.loadMemoryLeakFinder()
+  const MemoryLeakFinder = {
+    Measures: {
+      MeasureV8TurbofanStats,
+    },
+  }
   const measure = GetMeasure.getMeasure(MemoryLeakFinder, 'v8-turbofan-stats')
 
   expect(measure.id).toBe('v8TurbofanStats')
