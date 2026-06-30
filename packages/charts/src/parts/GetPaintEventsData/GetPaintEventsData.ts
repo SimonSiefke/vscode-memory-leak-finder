@@ -35,7 +35,10 @@ export const getPaintEventsData = async (basePath: string): Promise<any[]> => {
     const events = rawData.paintEvents?.events || []
     const data = events
       .filter((event: PaintEvent) => typeof event.totalArea === 'number')
-      .toSorted((a: PaintEvent, b: PaintEvent) => (b.totalArea || 0) - (a.totalArea || 0) || (b.durationMs || 0) - (a.durationMs || 0) || (a.index || 0) - (b.index || 0))
+      .toSorted(
+        (a: PaintEvent, b: PaintEvent) =>
+          (b.totalArea || 0) - (a.totalArea || 0) || (b.durationMs || 0) - (a.durationMs || 0) || (a.index || 0) - (b.index || 0),
+      )
       .slice(0, MaxPaintEvents)
       .map(toChartRow)
     allData.push({

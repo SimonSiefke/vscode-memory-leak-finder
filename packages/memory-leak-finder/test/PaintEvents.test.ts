@@ -87,7 +87,10 @@ test('getPaintEvents aggregates layer tree painted events with object clip rects
 })
 
 test('getPaintEvents tolerates missing duration and clip data', () => {
-  const result = getPaintEvents([{ name: 'Paint', ts: 2_000 }, { name: 'Paint', ts: 3_000, dur: Number.NaN }])
+  const result = getPaintEvents([
+    { name: 'Paint', ts: 2_000 },
+    { name: 'Paint', ts: 3_000, dur: Number.NaN },
+  ])
 
   expect(result.metrics).toEqual({
     averageDurationMs: 0,

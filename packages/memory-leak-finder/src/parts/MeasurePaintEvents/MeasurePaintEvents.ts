@@ -130,7 +130,12 @@ export const stop = async (session: Session, state: { trace: TraceState }) => {
   await DevtoolsProtocolTracing.end(session, {})
   await state.trace.complete
   await DevtoolsProtocolLayerTree.disable(session, {})
-  return PaintEvents.getPaintEvents(state.trace.traceEvents, state.trace.layerPaintEvents, state.trace.layerTreeEvents, state.trace.dataLossOccurred)
+  return PaintEvents.getPaintEvents(
+    state.trace.traceEvents,
+    state.trace.layerPaintEvents,
+    state.trace.layerTreeEvents,
+    state.trace.dataLossOccurred,
+  )
 }
 
 export const releaseResources = async (_session: Session, state: { trace: TraceState }) => {

@@ -251,11 +251,15 @@ export const formatPaintEventsSummary = ({ events, metrics }: PaintEventsSummary
     `maxDurationMs | ${metrics.maxDurationMs}`,
     `dataLossOccurred | ${metrics.dataLossOccurred}`,
   ]
-  const largestEvents = [...events].toSorted((a, b) => b.totalArea - a.totalArea || b.durationMs - a.durationMs || a.index - b.index).slice(0, MaxSummaryEvents)
+  const largestEvents = [...events]
+    .toSorted((a, b) => b.totalArea - a.totalArea || b.durationMs - a.durationMs || a.index - b.index)
+    .slice(0, MaxSummaryEvents)
   if (largestEvents.length > 0) {
     lines.push('index | source | startMs | durationMs | totalArea | rectCount | layerId')
     for (const event of largestEvents) {
-      lines.push(`${event.index} | ${event.source} | ${event.startMs} | ${event.durationMs} | ${event.totalArea} | ${event.rects.length} | ${event.layerId}`)
+      lines.push(
+        `${event.index} | ${event.source} | ${event.startMs} | ${event.durationMs} | ${event.totalArea} | ${event.rects.length} | ${event.layerId}`,
+      )
     }
   }
   return lines.join('\n')
