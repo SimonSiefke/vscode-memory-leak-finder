@@ -120,6 +120,7 @@ export * as MeasureTrustedTypePolicyCount from '../MeasureTrustedTypePolicyCount
 export * as MeasureTypedArrayCount from '../MeasureTypedArrayCount/MeasureTypedArrayCount.ts'
 export * as MeasureUrlCount from '../MeasureUrlCount/MeasureUrlCount.ts'
 export * as MeasureUserStringCount from '../MeasureUserStringCount/MeasureUserStringCount.ts'
+export * as MeasureV8TurbofanStats from '../MeasureV8TurbofanStats/MeasureV8TurbofanStats.ts'
 export * as MeasureWeakMapCount from '../MeasureWeakMapCount/MeasureWeakMapCount.ts'
 export * as MeasureWeakRefCount from '../MeasureWeakRefCount/MeasureWeakRefCount.ts'
 export * as MeasureWeakSetCount from '../MeasureWeakSetCount/MeasureWeakSetCount.ts'
