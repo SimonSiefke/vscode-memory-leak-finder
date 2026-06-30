@@ -58,3 +58,23 @@ test('dual bar chart highlights by row name instead of value', async () => {
   expect(result).toContain('data-highlight-label="gone"')
   expect(result).toContain('height="30"')
 })
+
+test('grouped horizontal bar chart renders created and collected counts with row highlights', async () => {
+  const result = await createChart(
+    [
+      { collected: 12, created: 10, name: 'src/a.ts' },
+      { collected: 2, created: 4, name: 'src/b.ts' },
+    ],
+    {
+      highlightLabels: ['src/a.ts'],
+      type: 'grouped-horizontal-bar-chart',
+    },
+  )
+
+  expect(result).toContain('Created and collected allocations by file')
+  expect(result).toContain('src/a.ts')
+  expect(result).toContain('created 10')
+  expect(result).toContain('collected 12')
+  expect(result).toContain('data-highlight-label="src/a.ts"')
+  expect(result).toContain('aria-label="fixed-row-highlights"')
+})
