@@ -10,6 +10,7 @@ const {
   DevtoolsProtocolProfiler,
   DevtoolsProtocolRuntime,
   DevtoolsProtocolTarget,
+  DevtoolsProtocolTracing,
 } = module
 
 export {
@@ -21,4 +22,5 @@ export {
   DevtoolsProtocolTarget,
   DevtoolsProtocolMemory,
   DevtoolsProtocolDomDebugger,
+  DevtoolsProtocolTracing,
 }

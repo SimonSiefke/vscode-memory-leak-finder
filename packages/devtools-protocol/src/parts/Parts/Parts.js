@@ -9,3 +9,4 @@ export * as DevtoolsProtocolPerformance from '../DevtoolsProtocolPerformance/Dev
 export * as DevtoolsProtocolProfiler from '../DevtoolsProtocolProfiler/DevtoolsProtocolProfiler.js'
 export * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js'
 export * as DevtoolsProtocolTarget from '../DevtoolsProtocolTarget/DevtoolsProtocolTarget.js'
+export * as DevtoolsProtocolTracing from '../DevtoolsProtocolTracing/DevtoolsProtocolTracing.js'
