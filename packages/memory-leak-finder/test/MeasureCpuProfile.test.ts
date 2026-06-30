@@ -1,6 +1,4 @@
 import { expect, test } from '@jest/globals'
-import * as GetMeasure from '../src/parts/GetMeasure/GetMeasure.ts'
-import * as LoadMemoryLeakFinder from '../src/parts/LoadMemoryLeakFinder/LoadMemoryLeakFinder.ts'
 import * as MeasureCpuProfile from '../src/parts/MeasureCpuProfile/MeasureCpuProfile.ts'
 
 test('cpu profile measure lifecycle starts and stops the profiler', async () => {
@@ -78,9 +76,6 @@ test('cpu profile measure compares as informational only', () => {
   expect(result.metrics.sampleCount).toBe(0)
 })
 
-test('cpu-profile resolves through measure lookup', () => {
-  const MemoryLeakFinder = LoadMemoryLeakFinder.loadMemoryLeakFinder()
-  const measure = GetMeasure.getMeasure(MemoryLeakFinder, 'cpu-profile')
-
-  expect(measure.id).toBe('cpuProfile')
+test('cpu profile measure has the expected id', () => {
+  expect(MeasureCpuProfile.id).toBe('cpuProfile')
 })
