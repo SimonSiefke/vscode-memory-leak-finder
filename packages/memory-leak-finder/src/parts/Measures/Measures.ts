@@ -66,6 +66,7 @@ export * as MeasureInstanceCountsWithSourceMap from '../MeasureInstanceCountsWit
 export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.ts'
 export * as MeasureIntersectionObserversWithStackTraces from '../MeasureIntersectionObserversWithStackTraces/MeasureIntersectionObserversWithStackTraces.ts'
 export * as MeasureLargestArrayCount from '../MeasureLargestArrayCount/MeasureLargestArrayCount.ts'
+export * as MeasureLayoutEvents from '../MeasureLayoutEvents/MeasureLayoutEvents.ts'
 export * as MeasureMapCount from '../MeasureMapCount/MeasureMapCount.ts'
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.ts'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.ts'

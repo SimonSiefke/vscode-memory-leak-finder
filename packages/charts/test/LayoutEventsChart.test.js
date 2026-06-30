@@ -1,0 +1,83 @@
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { expect, test } from '@jest/globals'
+import * as CreateLayoutEventsChart from '../src/parts/CreateLayoutEventsChart/CreateLayoutEventsChart.ts'
+import { getLayoutEventsData } from '../src/parts/GetLayoutEventsData/GetLayoutEventsData.ts'
+
+test('getLayoutEventsData returns slowest layout events per test file', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'layout-events-data-'))
+  const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const resultsPath = join(basePath, 'layout-events')
+
+  await mkdir(resultsPath, { recursive: true })
+  await writeFile(
+    join(resultsPath, 'chat.json'),
+    JSON.stringify({
+      layoutEvents: {
+        events: [
+          { durationMs: 1, index: 1, startMs: 0 },
+          { durationMs: 3, index: 2, startMs: 4.5 },
+          { durationMs: 2, index: 3, startMs: 9 },
+        ],
+      },
+    }),
+  )
+
+  try {
+    const result = await getLayoutEventsData(basePath)
+
+    expect(result).toEqual([
+      {
+        data: [
+          { name: '#2 @ 4.5ms', value: 3 },
+          { name: '#3 @ 9ms', value: 2 },
+          { name: '#1 @ 0ms', value: 1 },
+        ],
+        filename: 'chat',
+      },
+    ])
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})
+
+test('getLayoutEventsData caps chart rows at 50', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'layout-events-data-cap-'))
+  const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const resultsPath = join(basePath, 'layout-events')
+
+  await mkdir(resultsPath, { recursive: true })
+  await writeFile(
+    join(resultsPath, 'many.json'),
+    JSON.stringify({
+      layoutEvents: {
+        events: Array.from({ length: 60 }, (_, index) => ({
+          durationMs: index,
+          index: index + 1,
+          startMs: index * 10,
+        })),
+      },
+    }),
+  )
+
+  try {
+    const result = await getLayoutEventsData(basePath)
+
+    expect(result[0].data).toHaveLength(50)
+    expect(result[0].data[0]).toEqual({ name: '#60 @ 590ms', value: 59 })
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})
+
+test('createLayoutEventsChart uses bar chart multi-chart configuration', () => {
+  expect(CreateLayoutEventsChart.name).toBe('layout-events')
+  expect(CreateLayoutEventsChart.multiple).toBe(true)
+  expect(CreateLayoutEventsChart.createChart()).toEqual(
+    expect.objectContaining({
+      type: 'bar-chart',
+      yLabel: 'Slowest Layout Events',
+    }),
+  )
+})
