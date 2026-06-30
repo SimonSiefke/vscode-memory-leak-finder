@@ -1,6 +1,5 @@
 import { expect, test } from '@jest/globals'
 import * as GetMeasure from '../src/parts/GetMeasure/GetMeasure.ts'
-import * as LoadMemoryLeakFinder from '../src/parts/LoadMemoryLeakFinder/LoadMemoryLeakFinder.ts'
 import * as MeasureCssSelectorStats from '../src/parts/MeasureCssSelectorStats/MeasureCssSelectorStats.ts'
 
 test('css selector stats measure lifecycle starts tracing and parses selector stats', async () => {
@@ -134,7 +133,11 @@ test('css selector stats measure compares as informational only', () => {
 })
 
 test('css-selector-stats resolves through measure lookup', () => {
-  const MemoryLeakFinder = LoadMemoryLeakFinder.loadMemoryLeakFinder()
+  const MemoryLeakFinder = {
+    Measures: {
+      MeasureCssSelectorStats,
+    },
+  }
   const measure = GetMeasure.getMeasure(MemoryLeakFinder, 'css-selector-stats')
 
   expect(measure.id).toBe('cssSelectorStats')
