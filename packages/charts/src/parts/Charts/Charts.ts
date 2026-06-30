@@ -26,6 +26,7 @@ export * as MutationObserverCount from '../CreateMutationObserverCountChart/Crea
 export * as NamedFunctionCount3 from '../CreateNamedFunctionCountChart3/CreateNamedFunctionCountChart3.ts'
 export * as NumberCount from '../CreateNumberCountChart/CreateNumberCountChart.ts'
 export * as ObjectCount from '../CreateObjectCountChart/CreateObjectCountChart.ts'
+export * as PaintEvents from '../CreatePaintEventsChart/CreatePaintEventsChart.ts'
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.ts'
 export * as ProxyCount from '../CreateProxyCountChart/CreateProxyCountChart.ts'
 export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.ts'
