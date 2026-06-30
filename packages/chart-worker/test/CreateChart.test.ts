@@ -78,3 +78,57 @@ test('grouped horizontal bar chart renders created and collected counts with row
   expect(result).toContain('data-highlight-label="src/a.ts"')
   expect(result).toContain('aria-label="fixed-row-highlights"')
 })
+
+test('cpu profile flame chart renders frames, ticks, labels, and tooltips', async () => {
+  const result = await createChart(
+    [
+      {
+        colorKey: 'file:///workbench.js:10:4',
+        depth: 0,
+        durationMs: 2,
+        hitCount: 1,
+        location: 'file:///workbench.js:10:4',
+        name: 'render<Workbench>',
+        selfTimeMs: 2,
+        startMs: 0,
+        totalTimeMs: 5,
+      },
+      {
+        colorKey: 'file:///workbench.js:10:4',
+        depth: 0,
+        durationMs: 3,
+        hitCount: 1,
+        location: 'file:///workbench.js:10:4',
+        name: 'render<Workbench>',
+        selfTimeMs: 2,
+        startMs: 2,
+        totalTimeMs: 5,
+      },
+      {
+        colorKey: 'file:///layout.js:20:2',
+        depth: 1,
+        durationMs: 3,
+        hitCount: 1,
+        location: 'file:///layout.js:20:2',
+        name: 'layout',
+        selfTimeMs: 3,
+        startMs: 2,
+        totalTimeMs: 3,
+      },
+    ],
+    {
+      headerHeight: 72,
+      rowHeight: 18,
+      type: 'cpu-profile-flame-chart',
+      width: 400,
+    },
+  )
+
+  expect(result).toContain('CPU Profile Flame Chart')
+  expect(result).toContain('5 ms')
+  expect(result).toContain('render&lt;Workbench&gt;')
+  expect(result).toContain('Location: file:///workbench.js:10:4')
+  expect(result).toContain('data-frame="0"')
+  expect(result).toContain('data-frame="1"')
+  expect(result).not.toContain('data-frame="2"')
+})
