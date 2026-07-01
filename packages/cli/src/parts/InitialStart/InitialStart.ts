@@ -81,6 +81,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
+    runNetworkTestsAnyway: options.runNetworkTestsAnyway,
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     screencastQuality: options.screencastQuality,

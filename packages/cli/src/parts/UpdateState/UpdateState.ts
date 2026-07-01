@@ -67,6 +67,7 @@ export const updateState = async (newState: any): Promise<void> => {
       recordVideo: state.recordVideo,
       restartBetween: state.restartBetween,
       runMode: state.runMode,
+      runNetworkTestsAnyway: state.runNetworkTestsAnyway,
       runs: state.runs,
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
       screencastQuality: state.screencastQuality,

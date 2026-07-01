@@ -39,6 +39,7 @@ export interface RunTestsOptions {
   readonly restartBetween: boolean
   readonly root: string
   readonly runMode: number
+  readonly runNetworkTestsAnyway: boolean
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number

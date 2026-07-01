@@ -88,6 +88,7 @@ export const runTestsWithCallback = async ({
   restartBetween,
   root,
   runMode,
+  runNetworkTestsAnyway,
   runs,
   runSkippedTestsAnyway,
   screencastQuality,
@@ -359,6 +360,7 @@ export const runTestsWithCallback = async ({
           timeouts,
           isGithubActions,
           allowCopilotAuthInCi,
+          runNetworkTestsAnyway,
         )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped

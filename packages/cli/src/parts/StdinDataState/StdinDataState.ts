@@ -43,6 +43,7 @@ export interface StdinDataState {
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
+  readonly runNetworkTestsAnyway: boolean
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
@@ -96,6 +97,7 @@ let state: StdinDataState = {
   recordVideo: false,
   restartBetween: false,
   runMode: TestRunMode.Auto,
+  runNetworkTestsAnyway: false,
   runs: 1,
   runSkippedTestsAnyway: false,
   screencastQuality: 90,
@@ -146,6 +148,7 @@ export const setState = (newState: StdinDataState): void => {
     recordVideo: newState.recordVideo,
     restartBetween: newState.restartBetween,
     runMode: newState.runMode,
+    runNetworkTestsAnyway: newState.runNetworkTestsAnyway,
     runs: newState.runs,
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
     screencastQuality: newState.screencastQuality,

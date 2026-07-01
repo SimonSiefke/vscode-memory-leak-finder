@@ -63,6 +63,7 @@ test('runTestsWithCallback - setupOnly skips launching and attaching to the app'
     restartBetween: false,
     root: '/test-root',
     runMode: 1,
+    runNetworkTestsAnyway: false,
     runs: 1,
     runSkippedTestsAnyway: false,
     screencastQuality: 100,

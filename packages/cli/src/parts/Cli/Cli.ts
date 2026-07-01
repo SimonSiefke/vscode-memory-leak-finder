@@ -54,6 +54,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
+    runNetworkTestsAnyway: options.runNetworkTestsAnyway,
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     setupOnly: options.setupOnly,
