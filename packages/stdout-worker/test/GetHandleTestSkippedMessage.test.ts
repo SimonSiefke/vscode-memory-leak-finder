@@ -13,7 +13,7 @@ test('getHandleTestSkippedMessage - basic functionality', () => {
   expect(result).toContain('SKIP')
   expect(result).toContain('app.test.js')
   expect(result).toContain('/test/')
-  expect(result).toContain('0.100 s')
+  expect(result).not.toContain('0.100 s')
   expect(result.endsWith('\n')).toBe(true)
 })
 
@@ -26,7 +26,7 @@ test('getHandleTestSkippedMessage - different duration', () => {
   const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(result).toContain('component.test.js')
-  expect(result).toContain('1.500 s')
+  expect(result).not.toContain('1.500 s')
 })
 
 test('getHandleTestSkippedMessage - zero duration', () => {
@@ -38,7 +38,7 @@ test('getHandleTestSkippedMessage - zero duration', () => {
   const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(result).toContain('util.test.js')
-  expect(result).toContain('0.000 s')
+  expect(result).not.toContain('0.000 s')
 })
 
 test('getHandleTestSkippedMessage - nested directory path', () => {
@@ -51,7 +51,7 @@ test('getHandleTestSkippedMessage - nested directory path', () => {
 
   expect(result).toContain('button.test.js')
   expect(result).toContain('/test/components/button/')
-  expect(result).toContain('0.250 s')
+  expect(result).not.toContain('0.250 s')
 })
 
 test('getHandleTestSkippedMessage - very long duration', () => {
@@ -63,7 +63,7 @@ test('getHandleTestSkippedMessage - very long duration', () => {
   const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(result).toContain('slow.test.js')
-  expect(result).toContain('10.000 s')
+  expect(result).not.toContain('10.000 s')
 })
 
 test('getHandleTestSkippedMessage - empty relative directory', () => {
@@ -76,5 +76,5 @@ test('getHandleTestSkippedMessage - empty relative directory', () => {
 
   expect(result).toContain('root.test.js')
   expect(result).toContain('/')
-  expect(result).toContain('0.050 s')
+  expect(result).not.toContain('0.050 s')
 })
