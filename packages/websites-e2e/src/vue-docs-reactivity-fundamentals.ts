@@ -6,8 +6,8 @@ export const skip = true
 
 const introductionUrl = 'https://vuejs.org/guide/introduction'
 const introductionUrlPattern = /^https:\/\/vuejs\.org\/guide\/introduction\/?$/
-const reactivityUrlPattern = /^https:\/\/vuejs\.org\/guide\/essentials\/reactivity-fundamentals\/?$/
-const reactivityLinkSelector = 'a[href="/guide/essentials/reactivity-fundamentals"]'
+const tutorialUrlPattern = /^https:\/\/vuejs\.org\/tutorial\/?$/
+const tutorialLinkSelector = 'a[href="/tutorial/"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
@@ -26,9 +26,8 @@ export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, Si
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.clickPageLink({
-    headingText: 'Reactivity Fundamentals',
-    selector: reactivityLinkSelector,
-    urlPattern: reactivityUrlPattern,
+    selector: tutorialLinkSelector,
+    urlPattern: tutorialUrlPattern,
   })
   await SimpleBrowser.back({
     urlPattern: introductionUrlPattern,

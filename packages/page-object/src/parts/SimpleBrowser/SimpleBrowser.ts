@@ -15,12 +15,6 @@ interface DeferredMockServer extends MockServer {
   finishResponse: () => void
 }
 
-interface BrowserTarget {
-  readonly targetId: string
-  readonly type: string
-  readonly url?: string
-}
-
 const workspacePath = join(Root.root, '.vscode-test-workspace')
 
 const escapeRegExp = (value: string): string => {
@@ -132,7 +126,7 @@ const createWorkspaceFileServer = async ({ port, relativePath }: { port: number;
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ browserRpc, electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const api = {
     async activateChatEditorForBrowserContext() {
       const candidates = [
@@ -498,63 +492,48 @@ export const create = ({ browserRpc, electronApp, expect, ideVersion, page, plat
       if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
         throw new Error(`Failed to compute click point for ${selector}`)
       }
-      if (!browserRpc) {
-        throw new Error('No browser rpc available')
-      }
-      const entry = await electron.getWebContents(this.modernBrowserWebContentsId)
-      if (!entry) {
-        throw new Error(`Web contents ${this.modernBrowserWebContentsId} not found`)
-      }
-      const rawTargets = await browserRpc.invoke('Target.getTargets')
-      if ('error' in rawTargets) {
-        throw new Error(rawTargets.error.message)
-      }
-      const targets = rawTargets.result.targetInfos as readonly BrowserTarget[]
-      const target =
-        targets.find((entryTarget) => entryTarget.type === 'page' && entryTarget.url === entry.url) ||
-        targets.find((entryTarget) => entryTarget.type === 'page' && /^https?:\/\//.test(entryTarget.url || ''))
-      if (!target) {
-        throw new Error(`Browser target not found for ${entry.url}`)
-      }
-      const rawAttach = await browserRpc.invoke('Target.attachToTarget', {
-        flatten: true,
-        targetId: target.targetId,
-      })
-      if ('error' in rawAttach) {
-        throw new Error(rawAttach.error.message)
-      }
-      const { sessionId } = rawAttach.result
-      try {
-        const dispatchMouseEvent = async (params: any) => {
-          const rawResult = await browserRpc.invokeWithSession(sessionId, 'Input.dispatchMouseEvent', params)
-          if ('error' in rawResult) {
-            throw new Error(rawResult.error.message)
-          }
-        }
-        await dispatchMouseEvent({
-          type: 'mouseMoved',
-          x: point.x,
-          y: point.y,
-        })
-        await dispatchMouseEvent({
-          button: 'left',
-          clickCount: 1,
-          type: 'mousePressed',
-          x: point.x,
-          y: point.y,
-        })
-        await dispatchMouseEvent({
-          button: 'left',
-          clickCount: 1,
-          type: 'mouseReleased',
-          x: point.x,
-          y: point.y,
-        })
-      } finally {
-        await browserRpc.invoke('Target.detachFromTarget', {
-          sessionId,
-        })
-      }
+      await electron.evaluate(`(async () => {
+  const { webContents } = globalThis._____electron
+  const targetWebContents = webContents.fromId(${this.modernBrowserWebContentsId})
+  if (!targetWebContents || targetWebContents.isDestroyed()) {
+    throw new Error('webcontents not found')
+  }
+  const point = ${JSON.stringify(point)}
+  const wasAttached = targetWebContents.debugger.isAttached()
+  if (!wasAttached) {
+    targetWebContents.debugger.attach('1.3')
+  }
+  try {
+    const dispatchMouseEvent = (params) => {
+      return targetWebContents.debugger.sendCommand('Input.dispatchMouseEvent', params)
+    }
+    await dispatchMouseEvent({
+      type: 'mouseMoved',
+      x: point.x,
+      y: point.y,
+    })
+    await dispatchMouseEvent({
+      button: 'left',
+      buttons: 1,
+      clickCount: 1,
+      type: 'mousePressed',
+      x: point.x,
+      y: point.y,
+    })
+    await dispatchMouseEvent({
+      button: 'left',
+      buttons: 0,
+      clickCount: 1,
+      type: 'mouseReleased',
+      x: point.x,
+      y: point.y,
+    })
+  } finally {
+    if (!wasAttached && targetWebContents.debugger.isAttached()) {
+      targetWebContents.debugger.detach()
+    }
+  }
+})()`)
       await page.waitForIdle()
     },
     async createDeferredMockServer({ id, port }: { id: string; port: number }) {
