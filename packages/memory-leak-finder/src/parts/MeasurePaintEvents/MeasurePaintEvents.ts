@@ -4,14 +4,12 @@ import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as PaintEvents from '../PaintEvents/PaintEvents.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import { DevtoolsProtocolLayerTree, DevtoolsProtocolTracing } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolTracing } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 interface TraceState {
   complete: Promise<void>
   dataLossOccurred: boolean
   dispose: () => void
-  layerPaintEvents: Dynamic[]
-  layerTreeEvents: Dynamic[]
   traceEvents: Dynamic[]
 }
 
@@ -24,8 +22,6 @@ const emptyTraceState = (): TraceState => {
     complete: Promise.resolve(),
     dataLossOccurred: false,
     dispose() {},
-    layerPaintEvents: [],
-    layerTreeEvents: [],
     traceEvents: [],
   }
 }
@@ -48,16 +44,12 @@ const addListener = (session: Session, event: string, listener: Dynamic): void =
 
 const createTraceState = (session: Session): TraceState => {
   const traceEvents: Dynamic[] = []
-  const layerPaintEvents: Dynamic[] = []
-  const layerTreeEvents: Dynamic[] = []
   const { promise, resolve } = Promise.withResolvers<void>()
   let disposed = false
   const state: TraceState = {
     complete: promise,
     dataLossOccurred: false,
     dispose: cleanup,
-    layerPaintEvents,
-    layerTreeEvents,
     traceEvents,
   }
   function cleanup(): void {
@@ -67,8 +59,6 @@ const createTraceState = (session: Session): TraceState => {
     disposed = true
     removeListener(session, DevtoolsEventType.TracingDataCollected, handleDataCollected)
     removeListener(session, DevtoolsEventType.TracingTracingComplete, handleTracingComplete)
-    removeListener(session, DevtoolsEventType.LayerTreeLayerPainted, handleLayerPainted)
-    removeListener(session, DevtoolsEventType.LayerTreeLayerTreeDidChange, handleLayerTreeDidChange)
   }
   function handleDataCollected(message: Dynamic): void {
     const value = message?.params?.value
@@ -81,16 +71,8 @@ const createTraceState = (session: Session): TraceState => {
     cleanup()
     resolve()
   }
-  function handleLayerPainted(message: Dynamic): void {
-    layerPaintEvents.push(message)
-  }
-  function handleLayerTreeDidChange(message: Dynamic): void {
-    layerTreeEvents.push(message)
-  }
   addListener(session, DevtoolsEventType.TracingDataCollected, handleDataCollected)
   addListener(session, DevtoolsEventType.TracingTracingComplete, handleTracingComplete)
-  addListener(session, DevtoolsEventType.LayerTreeLayerPainted, handleLayerPainted)
-  addListener(session, DevtoolsEventType.LayerTreeLayerTreeDidChange, handleLayerTreeDidChange)
   return state
 }
 
@@ -98,15 +80,7 @@ const getTraceOptions = () => {
   return {
     transferMode: 'ReportEvents',
     traceConfig: {
-      includedCategories: [
-        '-*',
-        'devtools.timeline',
-        'disabled-by-default-devtools.timeline',
-        'disabled-by-default-devtools.timeline.layers',
-        'disabled-by-default-devtools.timeline.picture',
-        'disabled-by-default-cc',
-        'disabled-by-default-cc.debug',
-      ],
+      includedCategories: ['-*', 'devtools.timeline', 'disabled-by-default-devtools.timeline'],
       recordMode: 'recordUntilFull',
     },
   }
@@ -121,7 +95,6 @@ export const create = (session: Session) => {
 
 export const start = async (session: Session, state: { trace: TraceState }) => {
   state.trace = createTraceState(session)
-  await DevtoolsProtocolLayerTree.enable(session, {})
   await DevtoolsProtocolTracing.start(session, getTraceOptions())
   return PaintEvents.getPaintEvents([])
 }
@@ -130,12 +103,7 @@ export const stop = async (session: Session, state: { trace: TraceState }) => {
   await DevtoolsProtocolTracing.end(session, {})
   await state.trace.complete
   await DevtoolsProtocolLayerTree.disable(session, {})
-  return PaintEvents.getPaintEvents(
-    state.trace.traceEvents,
-    state.trace.layerPaintEvents,
-    state.trace.layerTreeEvents,
-    state.trace.dataLossOccurred,
-  )
+  return PaintEvents.getPaintEvents(state.trace.traceEvents, state.trace.dataLossOccurred)
 }
 
 export const releaseResources = async (_session: Session, state: { trace: TraceState }) => {
