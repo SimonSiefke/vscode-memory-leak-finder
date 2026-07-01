@@ -3,7 +3,6 @@ export * as DevtoolsProtocolCss from '../DevtoolsProtocolCss/DevtoolsProtocolCss
 export * as DevtoolsProtocolDebugger from '../DevtoolsProtocolDebugger/DevtoolsProtocolDebugger.js'
 export * as DevtoolsProtocolDomDebugger from '../DevtoolsProtocolDomDebugger/DevtoolsProtocolDomDebugger.js'
 export * as DevtoolsProtocolHeapProfiler from '../DevtoolsProtocolHeapProfiler/DevtoolsProtocolHeapProfiler.js'
-export * as DevtoolsProtocolLayerTree from '../DevtoolsProtocolLayerTree/DevtoolsProtocolLayerTree.js'
 export * as DevtoolsProtocolMemory from '../DevtoolsProtocolMemory/DevtoolsProtocolMemory.js'
 export * as DevtoolsProtocolPage from '../DevtoolsProtocolPage/DevtoolsProtocolPage.js'
 export * as DevtoolsProtocolPerformance from '../DevtoolsProtocolPerformance/DevtoolsProtocolPerformance.js'

@@ -88,10 +88,6 @@ export const TracingStart = 'Tracing.start'
 
 export const TracingEnd = 'Tracing.end'
 
-export const LayerTreeEnable = 'LayerTree.enable'
-
-export const LayerTreeDisable = 'LayerTree.disable'
-
 export const DebuggerStepInto = 'Debugger.stepInto'
 
 export const DebuggerStepOut = 'Debugger.stepOut'

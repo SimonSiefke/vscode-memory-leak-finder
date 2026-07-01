@@ -19,8 +19,6 @@ test('getPaintEvents aggregates trace paint events with clip and duration', () =
         ts: 10_000,
       },
     ],
-    [],
-    [],
     true,
   )
 
@@ -47,43 +45,6 @@ test('getPaintEvents aggregates trace paint events with clip and duration', () =
       totalArea: 1200,
     },
   ])
-})
-
-test('getPaintEvents aggregates layer tree painted events with object clip rects', () => {
-  const result = getPaintEvents(
-    [{ name: 'EventDispatch', ts: 1_000 }],
-    [
-      {
-        params: {
-          clip: { height: 6, width: 5, x: 3, y: 4 },
-          layerId: 'layer-2',
-        },
-        timestamp: 0.002,
-      },
-    ],
-  )
-
-  expect(result.metrics).toEqual({
-    averageDurationMs: 0,
-    dataLossOccurred: false,
-    maxDurationMs: 0,
-    paintAreaCount: 1,
-    paintCount: 1,
-    totalDurationMs: 0,
-    totalPaintedArea: 30,
-  })
-  expect(result.events[0]).toEqual({
-    durationMs: 0,
-    index: 1,
-    layerId: 'layer-2',
-    nodeId: 0,
-    nodeName: '',
-    rects: [{ area: 30, height: 6, width: 5, x: 3, y: 4 }],
-    source: 'layer-tree',
-    startMs: 1,
-    timestampUs: 2_000,
-    totalArea: 30,
-  })
 })
 
 test('getPaintEvents tolerates missing duration and clip data', () => {
@@ -129,39 +90,54 @@ test('getPaintEvents tolerates missing duration and clip data', () => {
   ])
 })
 
-test('getPaintEvents aggregates multiple rect sources and polygon clips', () => {
-  const result = getPaintEvents(
-    [
-      {
-        args: {
-          data: {
-            clip: [10, 10, 30, 10, 30, 20, 10, 20],
-          },
+test('getPaintEvents ignores Chrome infinite clip sentinel areas', () => {
+  const result = getPaintEvents([
+    {
+      args: {
+        data: {
+          clip: [-8_388_608, -8_388_608, 8_388_607, -8_388_608, 8_388_607, 8_388_607, -8_388_608, 8_388_607],
         },
-        dur: 1000,
-        name: 'Paint',
-        ts: 1_000,
       },
-    ],
-    [
-      {
-        params: {
-          clip: { height: 10, width: 10, x: 0, y: 0 },
-          layerId: 'layer-3',
-        },
-        timestamp: 0.002,
-      },
-    ],
-  )
+      dur: 1000,
+      name: 'Paint',
+      ts: 1_000,
+    },
+  ])
 
   expect(result.metrics).toEqual({
-    averageDurationMs: 0.5,
+    averageDurationMs: 1,
     dataLossOccurred: false,
     maxDurationMs: 1,
-    paintAreaCount: 2,
-    paintCount: 2,
+    paintAreaCount: 0,
+    paintCount: 1,
     totalDurationMs: 1,
-    totalPaintedArea: 300,
+    totalPaintedArea: 0,
+  })
+  expect(result.events[0].rects).toEqual([])
+})
+
+test('getPaintEvents aggregates polygon clips from trace paint events', () => {
+  const result = getPaintEvents([
+    {
+      args: {
+        data: {
+          clip: [10, 10, 30, 10, 30, 20, 10, 20],
+        },
+      },
+      dur: 1000,
+      name: 'Paint',
+      ts: 1_000,
+    },
+  ])
+
+  expect(result.metrics).toEqual({
+    averageDurationMs: 1,
+    dataLossOccurred: false,
+    maxDurationMs: 1,
+    paintAreaCount: 1,
+    paintCount: 1,
+    totalDurationMs: 1,
+    totalPaintedArea: 200,
   })
 })
 

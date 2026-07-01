@@ -69,6 +69,28 @@ test('unwrapResult - result with empty object', () => {
   ).toEqual({})
 })
 
+test('unwrapResult - performance metrics', () => {
+  expect(
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      result: {
+        metrics: [
+          {
+            name: 'LayoutCount',
+            value: 2,
+          },
+        ],
+      },
+    }),
+  ).toEqual({
+    metrics: [
+      {
+        name: 'LayoutCount',
+        value: 2,
+      },
+    ],
+  })
+})
+
 test('unwrapResult - wrapped null', () => {
   expect(UnwrapDevtoolsEvaluateResult.unwrapResult({ result: { result: { type: 'object', subtype: 'null', value: null } } })).toBe(null)
 })
