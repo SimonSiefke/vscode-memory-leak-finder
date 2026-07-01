@@ -19,7 +19,15 @@ export const id = MeasureId.CpuPerformanceCounters
 
 export const targets: readonly Dynamic[] = []
 
-export const create = ({ electronWebSocketUrl = '', pid, targetId = '' }: { electronWebSocketUrl?: string; pid: number; targetId?: string }) => {
+export const create = ({
+  electronWebSocketUrl = '',
+  pid,
+  targetId = '',
+}: {
+  electronWebSocketUrl?: string
+  pid: number
+  targetId?: string
+}) => {
   return [
     {
       electronWebSocketUrl,
