@@ -117,20 +117,18 @@ test('getPaintEvents ignores Chrome infinite clip sentinel areas', () => {
 })
 
 test('getPaintEvents aggregates polygon clips from trace paint events', () => {
-  const result = getPaintEvents(
-    [
-      {
-        args: {
-          data: {
-            clip: [10, 10, 30, 10, 30, 20, 10, 20],
-          },
+  const result = getPaintEvents([
+    {
+      args: {
+        data: {
+          clip: [10, 10, 30, 10, 30, 20, 10, 20],
         },
-        dur: 1000,
-        name: 'Paint',
-        ts: 1_000,
       },
-    ],
-  )
+      dur: 1000,
+      name: 'Paint',
+      ts: 1_000,
+    },
+  ])
 
   expect(result.metrics).toEqual({
     averageDurationMs: 1,

@@ -163,10 +163,7 @@ const createTracePaintEvent = (event: Dynamic, index: number, traceStartTimestam
   }
 }
 
-export const getPaintEvents = (
-  traceEvents: readonly Dynamic[],
-  dataLossOccurred = false,
-): PaintEventsSummary => {
+export const getPaintEvents = (traceEvents: readonly Dynamic[], dataLossOccurred = false): PaintEventsSummary => {
   const rawEvents = traceEvents.filter(isPaintEvent).toSorted((a, b) => toNumber(a?.ts) - toNumber(b?.ts))
   const traceStartTimestamp = getTraceStartTimestamp(traceEvents)
   const events: PaintEvent[] = []
