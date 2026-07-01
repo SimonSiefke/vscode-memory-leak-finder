@@ -230,7 +230,10 @@ export const createPaintEventsChart = (data: readonly PaintChartGroup[], options
       (a.name || '').localeCompare(b.name || ''),
   )
   const maxDuration = Math.max(1, ...orderedData.map((group) => toFiniteNumber(group.averageDurationMs)))
-  const maxComponentDuration = Math.max(1, ...orderedData.flatMap((group) => group.components || []).map((component) => toFiniteNumber(component.averageDurationMs)))
+  const maxComponentDuration = Math.max(
+    1,
+    ...orderedData.flatMap((group) => group.components || []).map((component) => toFiniteNumber(component.averageDurationMs)),
+  )
   const groupOffsets: number[] = []
   let offset = HEADER_HEIGHT
   for (const group of orderedData) {
