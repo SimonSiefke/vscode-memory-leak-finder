@@ -4,9 +4,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "e2e": "node ../cli/bin/test.js --cwd .",
-    "e2e:check-flakyness": "node ../cli/bin/test.js --cwd . --runs 10",
-    "e2e:headless": "node ../cli/bin/test.js --cwd . --headless",
+    "#e2e": "node ../cli/bin/test.js --cwd .",
+    "#e2e:check-flakyness": "node ../cli/bin/test.js --cwd . --runs 10",
+    "#e2e:headless": "node ../cli/bin/test.js --cwd . --headless",
     "test:watch": "node ../cli/bin/test.js --cwd . --watch"
   }
 }
