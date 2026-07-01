@@ -22,3 +22,9 @@ export const TargetTargetCrashed = 'Target.targetCrashed'
 export const TargetTargetCreated = 'Target.targetCreated'
 export const TargetTargetDestroyed = 'Target.targetDestroyed'
 export const TargetTargetInfoChanged = 'Target.targetInfoChanged'
+
+export const TracingDataCollected = 'Tracing.dataCollected'
+export const TracingTracingComplete = 'Tracing.tracingComplete'
+
+export const LayerTreeLayerPainted = 'LayerTree.layerPainted'
+export const LayerTreeLayerTreeDidChange = 'LayerTree.layerTreeDidChange'

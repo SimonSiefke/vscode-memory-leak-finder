@@ -355,7 +355,8 @@ const parsePageObjectPath = (argv: readonly string[]): string => {
 }
 
 const parseTrackFunctions = (argv: readonly string[]): boolean => {
-  return argv.includes('--track-functions') || parseMeasure(argv) === 'tracked-functions'
+  const measure = parseMeasure(argv)
+  return argv.includes('--track-functions') || measure === 'tracked-functions' || measure === 'tracked-allocations'
 }
 
 const parseOpenDevtools = (argv: readonly string[]): boolean => {

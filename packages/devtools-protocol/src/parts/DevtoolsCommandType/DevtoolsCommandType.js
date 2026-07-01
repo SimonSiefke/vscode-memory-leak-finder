@@ -12,6 +12,8 @@ export const HeapProfilerEnable = 'HeapProfiler.enable'
 
 export const HeapProfilerDisable = 'HeapProfiler.disable'
 
+export const HeapProfilerCollectGarbage = 'HeapProfiler.collectGarbage'
+
 export const RuntimeEvaluate = 'Runtime.evaluate'
 
 export const RuntimeQueryObjects = 'Runtime.queryObjects'
@@ -73,6 +75,22 @@ export const PerformanceEnable = 'Performance.enable'
 export const PerformanceDisable = 'Performance.disable'
 
 export const PerformanceGetMetrics = 'Performance.getMetrics'
+
+export const ProfilerEnable = 'Profiler.enable'
+
+export const ProfilerStart = 'Profiler.start'
+
+export const ProfilerStop = 'Profiler.stop'
+
+export const ProfilerDisable = 'Profiler.disable'
+
+export const TracingStart = 'Tracing.start'
+
+export const TracingEnd = 'Tracing.end'
+
+export const LayerTreeEnable = 'LayerTree.enable'
+
+export const LayerTreeDisable = 'LayerTree.disable'
 
 export const DebuggerStepInto = 'Debugger.stepInto'
 

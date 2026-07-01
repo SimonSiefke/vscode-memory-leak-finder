@@ -42,6 +42,13 @@ export interface LaunchOptions {
 
 let proxyWorkerRpc: any = null
 
+const getTrackingMode = (measureId: string): string => {
+  if (measureId === 'tracked-allocations' || measureId === 'trackedAllocations') {
+    return 'allocations'
+  }
+  return 'functions'
+}
+
 export const getSecretsPath = (): string => {
   const userDataDir = GetUserDataDir.getUserDataDir()
   return join(userDataDir, 'secrets', 'secrets.json')
@@ -117,8 +124,10 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   await using port = createPipeline(child.stderr)
 
   let preGeneratedWorkbenchPath: string | null = null
+  const trackingMode = getTrackingMode(measureId)
   if (trackFunctions) {
-    preGeneratedWorkbenchPath = join(Root.root, '.vscode-workbench-tracked', 'workbench.desktop.main.js')
+    const cacheFolder = trackingMode === 'allocations' ? '.vscode-workbench-tracked-allocations' : '.vscode-workbench-tracked'
+    preGeneratedWorkbenchPath = join(Root.root, cacheFolder, 'workbench.desktop.main.js')
   }
   const secretsPath = getSecretsPath()
 
@@ -140,6 +149,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     pid,
     preGeneratedWorkbenchPath,
     binaryPath,
+    trackingMode,
   )
 
   return {
