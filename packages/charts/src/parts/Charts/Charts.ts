@@ -2,6 +2,7 @@ export * as AbortControllerCount from '../CreateAbortControllerCountChart/Create
 export * as AbortSignalCount from '../CreateAbortSignalCountChart/CreateAbortSignalCountChart.ts'
 export * as ArrayCount from '../CreateArrayCountChart/CreateArrayCountChart.ts'
 export * as AttachedDomNodeCount from '../CreateAttachedDomNodeCountChart/CreateAttachedDomNodeCountChart.ts'
+export * as BrowserPerformanceCounters from '../CreateBrowserPerformanceCountersChart/CreateBrowserPerformanceCountersChart.ts'
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.ts'
 export * as CanvasRenderingContext2dCount from '../CreateCanvasRenderingContext2dCountChart/CreateCanvasRenderingContext2dCountChart.ts'
 export * as CssRuleCount from '../CreateCssRuleCountChart/CreateCssRuleCountChart.ts'
