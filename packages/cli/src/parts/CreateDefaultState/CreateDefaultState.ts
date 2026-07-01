@@ -43,6 +43,7 @@ export const createDefaultState = (): StdinDataState => ({
   recordVideo: false,
   restartBetween: false,
   runMode: TestRunMode.Auto,
+  runNetworkTestsAnyway: false,
   runs: 1,
   runSkippedTestsAnyway: false,
   screencastQuality: 90,

@@ -244,6 +244,7 @@ jobs:
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
             --cwd packages/e2e \
             --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
             --commit "${{ env.BASE_COMMIT }}" \
             --setup-only \
             $BUILD_VSCODE_MINIFIED_FLAG \
@@ -258,6 +259,7 @@ jobs:
             --check-leaks \
             --measure-after \
             --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
             --commit "${{ env.BASE_COMMIT }}" \
             $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
@@ -460,6 +462,7 @@ jobs:
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
             --cwd packages/e2e \
             --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
             --commit "${{ env.CANDIDATE_REF }}" \
             --setup-only \
             $BUILD_VSCODE_MINIFIED_FLAG \
@@ -474,6 +477,7 @@ jobs:
             --check-leaks \
             --measure-after \
             --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
             --commit "${{ env.CANDIDATE_REF }}" \
             $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
