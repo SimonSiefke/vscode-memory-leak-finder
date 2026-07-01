@@ -14,7 +14,7 @@ export const getCombinedMeasure = async (session: Session, measureId: string, co
   if (!measure.create) {
     throw new Error(`measure.create not available for ${measureId}`)
   }
-  const measureArgs = measure.create({ ...session, pid })
+  const measureArgs = measure.create({ ...session, connectionId, pid })
   const combinedMeasure = MemoryLeakFinder.combine(measureArgs)
   return combinedMeasure
 }
