@@ -132,3 +132,46 @@ test('cpu profile flame chart renders frames, ticks, labels, and tooltips', asyn
   expect(result).toContain('data-frame="1"')
   expect(result).not.toContain('data-frame="2"')
 })
+
+test('paint events chart renders document paint groups, selector breakdowns, and region thumbnails', async () => {
+  const result = await createChart(
+    [
+      {
+        averageDurationMs: 2.5,
+        averagePaintedArea: 120,
+        components: [
+          {
+            averageArea: 20,
+            averageDurationMs: 1,
+            count: 2,
+            height: 5,
+            rects: [{ area: 20, height: 5, selector: 'div.slider', width: 4, x: 1, y: 2 }],
+            selector: 'div.slider',
+            width: 4,
+            x: 1,
+            y: 2,
+          },
+        ],
+        count: 2,
+        id: 'paint-abc123',
+        name: 'paint-abc123 div.slider',
+        paintCount: 4,
+        rects: [{ area: 20, height: 5, selector: 'div.slider', width: 4, x: 1, y: 2 }],
+        sampleIndexes: [1, 2],
+        sampleStartMs: 10,
+        selectorSummary: 'div.slider',
+        totalDurationMs: 5,
+      },
+    ],
+    {
+      type: 'paint-events-chart',
+      width: 1180,
+    },
+  )
+
+  expect(result).toContain('Paint Events')
+  expect(result).toContain('paint-abc123')
+  expect(result).toContain('div.slider 4x5 @ 1,2')
+  expect(result).toContain('2.500 ms avg')
+  expect(result).toContain('<title>div.slider 4x5 @ 1,2</title>')
+})
