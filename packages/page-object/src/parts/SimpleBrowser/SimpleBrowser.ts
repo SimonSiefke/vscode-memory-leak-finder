@@ -800,7 +800,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       })
       await page.waitForIdle()
       if (ideVersion.minor >= 120) {
-        const intermediate = page.locator('input[aria-label^="Enter a URL"]')
+        const intermediate = page.locator('input[aria-label^="Enter a URL"],input[aria-label="Search or enter URL"]')
         await expect(intermediate).toBeVisible()
         await page.waitForIdle()
         await expect(intermediate).toBeFocused()
