@@ -207,6 +207,14 @@ Measures the total number of Timeouts.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-timeout --only base
 ```
 
+### V8TurbofanStats
+
+Measures V8 TurboFan optimization and deoptimization activity.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure v8-turbofan-stats --only base
+```
+
 ### WeakMapCount
 
 Measures the total number of WeakMaps.
