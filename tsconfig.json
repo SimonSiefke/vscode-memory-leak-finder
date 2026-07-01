@@ -38,6 +38,7 @@
     { "path": "./packages/storage-worker" },
     { "path": "./packages/test-coordinator" },
     { "path": "./packages/test-worker" },
-    { "path": "./packages/video-recording-worker" }
+    { "path": "./packages/video-recording-worker" },
+    { "path": "./packages/websites-e2e" }
   ]
 }
