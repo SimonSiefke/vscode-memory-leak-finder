@@ -6,8 +6,13 @@ export const wrapMeasure = (measure: Dynamic) => {
       const args = measure.create(session)
       return {
         ...measure,
+<<<<<<< Updated upstream
         compare(before: Dynamic, after: Dynamic, context: Dynamic) {
           return measure.compare(before, after, context)
+=======
+        compare(before, after, context) {
+          return measure.compare(before, after, context, ...args)
+>>>>>>> Stashed changes
         },
         async releaseResources() {
           if (measure.releaseResources) {

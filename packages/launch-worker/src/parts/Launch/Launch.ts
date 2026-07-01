@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
+import * as CallgrindConfig from '../CallgrindConfig/CallgrindConfig.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
@@ -95,7 +96,11 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
+<<<<<<< Updated upstream
     buildVscodeMinified,
+=======
+    callgrindConfig: CallgrindConfig.getCallgrindConfig(measureId, connectionId),
+>>>>>>> Stashed changes
     clearExtensions,
     commit,
     cwd,

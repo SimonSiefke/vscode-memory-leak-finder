@@ -102,6 +102,10 @@ export interface ChatEditor {
   send(options: ChatEditorSendOptions): Promise<void>
   sendMessage(options: ChatEditorSendMessageOptions): Promise<void>
   setMode(modeLabel: any): Promise<void>
+<<<<<<< Updated upstream
+=======
+  verifyResponseMessage(): Promise<void>
+>>>>>>> Stashed changes
   setModeLegacy(modeLabel: any): Promise<void>
   shouldBeVisibleInSecondarySideBar(): Promise<void>
   shouldHaveNoActiveItems(): Promise<void>

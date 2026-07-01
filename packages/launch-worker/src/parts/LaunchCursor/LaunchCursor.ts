@@ -1,5 +1,6 @@
 import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
@@ -103,6 +104,7 @@ export const setupCursor = async ({
 
 export const launchCursor = async ({
   addDisposable,
+  callgrindConfig,
   clearExtensions,
   cursorVersion,
   cwd,
@@ -122,6 +124,7 @@ export const launchCursor = async ({
   vscodePath,
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
+  callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   cursorVersion: string
   cwd: string
@@ -170,10 +173,12 @@ export const launchCursor = async ({
     const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,
       args,
+      callgrindConfig,
       cliPath: binaryPath,
       cwd,
       env,
       headlessMode,
+      platform: process.platform,
     })
     return {
       child,
