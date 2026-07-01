@@ -1,4 +1,5 @@
 import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
+import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import * as Ide from '../Ide/Ide.ts'
 import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
@@ -84,6 +85,7 @@ export const launchIde = async ({
   addDisposable,
   arch,
   buildVscodeMinified,
+  callgrindConfig,
   clearExtensions,
   commit,
   cwd,
@@ -110,6 +112,7 @@ export const launchIde = async ({
   addDisposable: (fn: () => Promise<void> | void) => void
   arch: string
   buildVscodeMinified: boolean
+  callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   commit: string
   cwd: string
@@ -137,6 +140,7 @@ export const launchIde = async ({
     const cursorVersion = '0.45.14' // TODO make it configurable
     const { child, pid } = await LaunchCursor.launchCursor({
       addDisposable,
+      callgrindConfig,
       clearExtensions,
       cursorVersion,
       cwd,
@@ -174,6 +178,7 @@ export const launchIde = async ({
     addDisposable,
     arch,
     buildVscodeMinified,
+    callgrindConfig,
     clearExtensions,
     commit,
     cwd,

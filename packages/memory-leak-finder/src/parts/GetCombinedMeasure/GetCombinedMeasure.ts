@@ -20,7 +20,7 @@ export const getCombinedMeasure = async (
   if (!measure.create) {
     throw new Error(`measure.create not available for ${measureId}`)
   }
-  const measureArgs = measure.create({ ...session, electronWebSocketUrl, pid })
+  const measureArgs = measure.create({ ...session, electronWebSocketUrl, connectionId, pid })
   const combinedMeasure = MemoryLeakFinder.combine(measureArgs)
   return combinedMeasure
 }
