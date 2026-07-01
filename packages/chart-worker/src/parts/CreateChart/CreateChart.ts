@@ -4,6 +4,7 @@ import { createCpuProfileFlameChart } from '../CreateCpuProfileFlameChart/Create
 import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
 import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
 import { createGroupedHorizontalBarChart } from '../CreateGroupedHorizontalBarChart/CreateGroupedHorizontalBarChart.ts'
+import { createPaintEventsChart } from '../CreatePaintEventsChart/CreatePaintEventsChart.ts'
 
 export const createChart = async (data: any, options: any): Promise<string> => {
   let svg: string
@@ -19,6 +20,9 @@ export const createChart = async (data: any, options: any): Promise<string> => {
       break
     case 'grouped-horizontal-bar-chart':
       svg = createGroupedHorizontalBarChart(data, options)
+      break
+    case 'paint-events-chart':
+      svg = createPaintEventsChart(data, options)
       break
     default:
       svg = createDefaultChart(data, options)
