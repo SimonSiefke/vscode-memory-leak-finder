@@ -25,3 +25,6 @@ export const TargetTargetInfoChanged = 'Target.targetInfoChanged'
 
 export const TracingDataCollected = 'Tracing.dataCollected'
 export const TracingTracingComplete = 'Tracing.tracingComplete'
+
+export const LayerTreeLayerPainted = 'LayerTree.layerPainted'
+export const LayerTreeLayerTreeDidChange = 'LayerTree.layerTreeDidChange'
