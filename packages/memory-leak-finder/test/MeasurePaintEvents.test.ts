@@ -1,6 +1,5 @@
 import { expect, test } from '@jest/globals'
 import * as GetMeasure from '../src/parts/GetMeasure/GetMeasure.ts'
-import * as LoadMemoryLeakFinder from '../src/parts/LoadMemoryLeakFinder/LoadMemoryLeakFinder.ts'
 import * as MeasurePaintEvents from '../src/parts/MeasurePaintEvents/MeasurePaintEvents.ts'
 
 test('paint events measure lifecycle starts tracing and parses paint events', async () => {
@@ -191,7 +190,11 @@ test('paint events measure compares as informational only', () => {
 })
 
 test('paint-events resolves through measure lookup', () => {
-  const MemoryLeakFinder = LoadMemoryLeakFinder.loadMemoryLeakFinder()
+  const MemoryLeakFinder = {
+    Measures: {
+      MeasurePaintEvents,
+    },
+  }
   const measure = GetMeasure.getMeasure(MemoryLeakFinder, 'paint-events')
 
   expect(measure.id).toBe('paintEvents')
