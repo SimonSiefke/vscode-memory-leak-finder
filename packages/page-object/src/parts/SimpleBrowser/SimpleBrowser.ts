@@ -15,6 +15,12 @@ interface DeferredMockServer extends MockServer {
   finishResponse: () => void
 }
 
+interface BrowserTarget {
+  readonly targetId: string
+  readonly type: string
+  readonly url?: string
+}
+
 const workspacePath = join(Root.root, '.vscode-test-workspace')
 
 const escapeRegExp = (value: string): string => {
@@ -126,7 +132,7 @@ const createWorkspaceFileServer = async ({ port, relativePath }: { port: number;
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ browserRpc, electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const api = {
     async activateChatEditorForBrowserContext() {
       const candidates = [
@@ -323,7 +329,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(button).toBeVisible()
         await button.click()
         await page.waitForIdle()
-        await this.getContentFrame({ urlPattern })
+        if (ideVersion.minor >= 118) {
+          await this.waitForContentFrameModern({ urlPattern })
+        } else {
+          await this.getContentFrame({ urlPattern })
+        }
       } catch (error) {
         throw new VError(error, `Failed to navigate simple browser back`)
       }
@@ -364,24 +374,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           if (!this.modernBrowserWebContentsId) {
             throw new Error('No tracked browser web contents available')
           }
-          await electron.executeJavaScriptInWebContents({
-            expression: `(() => {
-  const target = document.querySelector(${JSON.stringify(selector)})
-  if (!(target instanceof HTMLElement)) {
-    throw new Error('Expected element matching selector ' + ${JSON.stringify(selector)})
-  }
-  const link = target instanceof HTMLAnchorElement ? target : target.closest('a')
-  if (!(link instanceof HTMLAnchorElement)) {
-    throw new Error('Expected link matching selector ' + ${JSON.stringify(selector)})
-  }
-  target.scrollIntoView({
-    block: 'center',
-    inline: 'center',
-  })
-  target.click()
-})()`,
-            webContentsId: this.modernBrowserWebContentsId,
-          })
+          await this.clickBrowserWebContentsLink({ selector })
           await page.waitForIdle()
           await this.waitForContentFrameModern({
             urlPattern,
@@ -436,6 +429,122 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       } catch (error) {
         throw new VError(error, `Failed to click page link ${selector}`)
       }
+    },
+    async clickBrowserWebContentsLink({ selector }: { selector: string }) {
+      if (!this.modernBrowserWebContentsId) {
+        throw new Error('No tracked browser web contents available')
+      }
+      const electron = this.getElectron()
+      const point = await electron.executeJavaScriptInWebContents({
+        expression: `(async () => {
+  const targets = Array.from(document.querySelectorAll(${JSON.stringify(selector)}))
+  if (targets.length === 0) {
+    throw new Error('Expected element matching selector ' + ${JSON.stringify(selector)})
+  }
+  const getVisibleRect = (element) => {
+    const style = getComputedStyle(element)
+    if (style.display === 'none' || style.visibility === 'hidden') {
+      return undefined
+    }
+    for (const rect of element.getClientRects()) {
+      if (rect.width > 0 && rect.height > 0) {
+        return rect
+      }
+    }
+    return undefined
+  }
+  for (const target of targets) {
+    if (!(target instanceof HTMLElement)) {
+      continue
+    }
+    const link = target instanceof HTMLAnchorElement ? target : target.closest('a')
+    if (!(link instanceof HTMLElement)) {
+      continue
+    }
+    link.scrollIntoView({
+      block: 'center',
+      inline: 'center',
+    })
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    const elements = [link, ...link.querySelectorAll('*')]
+    for (const element of elements) {
+      if (!(element instanceof HTMLElement)) {
+        continue
+      }
+      const rect = getVisibleRect(element)
+      if (rect) {
+        return {
+          x: Math.round(rect.left + rect.width / 2),
+          y: Math.round(rect.top + rect.height / 2),
+        }
+      }
+    }
+  }
+  throw new Error('Expected visible link matching selector ' + ${JSON.stringify(selector)})
+})()`,
+        webContentsId: this.modernBrowserWebContentsId,
+      })
+      if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
+        throw new Error(`Failed to compute click point for ${selector}`)
+      }
+      if (!browserRpc) {
+        throw new Error('No browser rpc available')
+      }
+      const entry = await electron.getWebContents(this.modernBrowserWebContentsId)
+      if (!entry) {
+        throw new Error(`Web contents ${this.modernBrowserWebContentsId} not found`)
+      }
+      const rawTargets = await browserRpc.invoke('Target.getTargets')
+      if ('error' in rawTargets) {
+        throw new Error(rawTargets.error.message)
+      }
+      const targets = rawTargets.result.targetInfos as readonly BrowserTarget[]
+      const target =
+        targets.find((entryTarget) => entryTarget.type === 'page' && entryTarget.url === entry.url) ||
+        targets.find((entryTarget) => entryTarget.type === 'page' && /^https?:\/\//.test(entryTarget.url || ''))
+      if (!target) {
+        throw new Error(`Browser target not found for ${entry.url}`)
+      }
+      const rawAttach = await browserRpc.invoke('Target.attachToTarget', {
+        flatten: true,
+        targetId: target.targetId,
+      })
+      if ('error' in rawAttach) {
+        throw new Error(rawAttach.error.message)
+      }
+      const { sessionId } = rawAttach.result
+      try {
+        const dispatchMouseEvent = async (params: any) => {
+          const rawResult = await browserRpc.invokeWithSession(sessionId, 'Input.dispatchMouseEvent', params)
+          if ('error' in rawResult) {
+            throw new Error(rawResult.error.message)
+          }
+        }
+        await dispatchMouseEvent({
+          type: 'mouseMoved',
+          x: point.x,
+          y: point.y,
+        })
+        await dispatchMouseEvent({
+          button: 'left',
+          clickCount: 1,
+          type: 'mousePressed',
+          x: point.x,
+          y: point.y,
+        })
+        await dispatchMouseEvent({
+          button: 'left',
+          clickCount: 1,
+          type: 'mouseReleased',
+          x: point.x,
+          y: point.y,
+        })
+      } finally {
+        await browserRpc.invoke('Target.detachFromTarget', {
+          sessionId,
+        })
+      }
+      await page.waitForIdle()
     },
     async createDeferredMockServer({ id, port }: { id: string; port: number }) {
       try {
@@ -555,7 +664,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(button).toBeVisible()
         await button.click()
         await page.waitForIdle()
-        await this.getContentFrame({ urlPattern })
+        if (ideVersion.minor >= 118) {
+          await this.waitForContentFrameModern({ urlPattern })
+        } else {
+          await this.getContentFrame({ urlPattern })
+        }
       } catch (error) {
         throw new VError(error, `Failed to navigate simple browser forward`)
       }
@@ -585,13 +698,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async getBrowserNavigationButton({ names }: { names: readonly string[] }) {
       for (const name of names) {
-        const button = page.getByRole('button', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }).first()
-        if (await button.isVisible().catch(() => false)) {
-          return button
-        }
-      }
-      for (const name of names) {
-        const button = page.locator(`[aria-label="${name}"], [title="${name}"]`).first()
+        const button = page
+          .locator(
+            [
+              `.part.editor [role="button"][aria-label^="${name}"]`,
+              `.part.editor [role="button"][title^="${name}"]`,
+              `.part.editor button[aria-label^="${name}"]`,
+              `.part.editor button[title^="${name}"]`,
+              `.part.editor .action-label[aria-label^="${name}"]`,
+              `.part.editor .action-label[title^="${name}"]`,
+            ].join(', '),
+          )
+          .first()
         if (await button.isVisible().catch(() => false)) {
           return button
         }
