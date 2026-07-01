@@ -7,8 +7,8 @@ export const skip = true
 const videosUrl = 'https://syntax.fm/videos'
 const videosUrlPattern = /^https:\/\/syntax\.fm\/videos\/?$/
 const showsUrlPattern = /^https:\/\/syntax\.fm\/shows\/?$/
-const showsLinkSelector = 'nav.desktop_nav a[href="/shows"]'
-const videosLinkSelector = 'nav.desktop_nav a[href="/videos"]'
+const showsLinkSelector = 'a[href="/shows"]'
+const videosLinkSelector = 'a[href="/videos"]'
 
 const wait = (ms: number): Promise<void> => {
   return new Promise((resolve) => {
@@ -39,7 +39,7 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
     urlPattern: showsUrlPattern,
   })
 
-  // await wait(1000)
+  await wait(1000)
 
   await SimpleBrowser.clickPageLink({
     headingText: 'All Playlists',

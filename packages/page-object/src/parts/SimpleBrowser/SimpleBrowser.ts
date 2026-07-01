@@ -441,14 +441,28 @@ export const create = ({ browserRpc, electronApp, expect, ideVersion, page, plat
   if (targets.length === 0) {
     throw new Error('Expected element matching selector ' + ${JSON.stringify(selector)})
   }
-  const getVisibleRect = (element) => {
+  const getClickPoint = (link, element) => {
     const style = getComputedStyle(element)
     if (style.display === 'none' || style.visibility === 'hidden') {
       return undefined
     }
     for (const rect of element.getClientRects()) {
       if (rect.width > 0 && rect.height > 0) {
-        return rect
+        const xValues = [0.25, 0.5, 0.75]
+        const yValues = [0.25, 0.5, 0.75]
+        for (const yRatio of yValues) {
+          for (const xRatio of xValues) {
+            const x = Math.round(rect.left + rect.width * xRatio)
+            const y = Math.round(rect.top + rect.height * yRatio)
+            const hit = document.elementFromPoint(x, y)
+            if (hit === link || link.contains(hit)) {
+              return {
+                x,
+                y,
+              }
+            }
+          }
+        }
       }
     }
     return undefined
@@ -471,12 +485,9 @@ export const create = ({ browserRpc, electronApp, expect, ideVersion, page, plat
       if (!(element instanceof HTMLElement)) {
         continue
       }
-      const rect = getVisibleRect(element)
-      if (rect) {
-        return {
-          x: Math.round(rect.left + rect.width / 2),
-          y: Math.round(rect.top + rect.height / 2),
-        }
+      const point = getClickPoint(link, element)
+      if (point) {
+        return point
       }
     }
   }
