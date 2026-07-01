@@ -4,10 +4,10 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const introductionUrl = 'https://vuejs.org/guide/introduction.html'
-const introductionUrlPattern = /^https:\/\/vuejs\.org\/guide\/introduction\.html\/?$/
-const reactivityUrlPattern = /^https:\/\/vuejs\.org\/guide\/essentials\/reactivity-fundamentals\.html\/?$/
-const reactivityLinkSelector = 'a[href="/guide/essentials/reactivity-fundamentals.html"]'
+const introductionUrl = 'https://vuejs.org/guide/introduction'
+const introductionUrlPattern = /^https:\/\/vuejs\.org\/guide\/introduction\/?$/
+const reactivityUrlPattern = /^https:\/\/vuejs\.org\/guide\/essentials\/reactivity-fundamentals\/?$/
+const reactivityLinkSelector = 'a[href="/guide/essentials/reactivity-fundamentals"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])

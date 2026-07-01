@@ -6,8 +6,8 @@ export const skip = true
 
 const guideUrl = 'https://vite.dev/guide/'
 const guideUrlPattern = /^https:\/\/vite\.dev\/guide\/?$/
-const featuresUrlPattern = /^https:\/\/vite\.dev\/guide\/features\.html\/?$/
-const featuresLinkSelector = 'a[href="/guide/features.html"]'
+const featuresUrlPattern = /^https:\/\/vite\.dev\/guide\/features\/?$/
+const featuresLinkSelector = 'a[href="/guide/features"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
