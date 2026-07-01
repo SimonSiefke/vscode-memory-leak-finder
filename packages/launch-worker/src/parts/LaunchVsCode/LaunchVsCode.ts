@@ -217,11 +217,8 @@ export const setupVsCode = async ({
 export const launchVsCode = async ({
   addDisposable,
   arch,
-<<<<<<< Updated upstream
   buildVscodeMinified,
-=======
   callgrindConfig,
->>>>>>> Stashed changes
   clearExtensions,
   commit,
   cwd,
@@ -246,11 +243,8 @@ export const launchVsCode = async ({
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
   arch: string
-<<<<<<< Updated upstream
   buildVscodeMinified: boolean
-=======
   callgrindConfig: CallgrindConfig
->>>>>>> Stashed changes
   clearExtensions: boolean
   commit: string
   cwd: string

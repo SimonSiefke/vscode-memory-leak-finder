@@ -96,11 +96,8 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
-<<<<<<< Updated upstream
     buildVscodeMinified,
-=======
     callgrindConfig: CallgrindConfig.getCallgrindConfig(measureId, connectionId),
->>>>>>> Stashed changes
     clearExtensions,
     commit,
     cwd,
