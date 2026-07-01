@@ -11,20 +11,6 @@ test('paint events measure lifecycle starts tracing and parses paint events', as
     invoke(method: string, params: unknown) {
       calls.push([method, params])
       switch (method) {
-        case 'LayerTree.enable':
-          queueMicrotask(() => {
-            listeners['LayerTree.layerTreeDidChange']?.({ params: { layers: [{ layerId: 'layer-1' }] } })
-            listeners['LayerTree.layerPainted']?.({
-              params: {
-                clip: { height: 4, width: 3, x: 1, y: 2 },
-                layerId: 'layer-1',
-              },
-              timestamp: 0.004,
-            })
-          })
-          return Promise.resolve({ result: {} })
-        case 'LayerTree.disable':
-          return Promise.resolve({ result: {} })
         case 'Tracing.start':
           return Promise.resolve({ result: {} })
         case 'Tracing.end':
@@ -73,13 +59,13 @@ test('paint events measure lifecycle starts tracing and parses paint events', as
 
   expect(before.metrics.paintCount).toBe(0)
   expect(after.metrics).toEqual({
-    averageDurationMs: 1.25,
+    averageDurationMs: 2.5,
     dataLossOccurred: true,
     maxDurationMs: 2.5,
-    paintAreaCount: 2,
-    paintCount: 2,
+    paintAreaCount: 1,
+    paintCount: 1,
     totalDurationMs: 2.5,
-    totalPaintedArea: 1212,
+    totalPaintedArea: 1200,
   })
   expect(after.events).toEqual([
     {
@@ -94,46 +80,22 @@ test('paint events measure lifecycle starts tracing and parses paint events', as
       timestampUs: 2_000,
       totalArea: 1200,
     },
-    {
-      durationMs: 0,
-      index: 2,
-      layerId: 'layer-1',
-      nodeId: 0,
-      nodeName: '',
-      rects: [{ area: 12, height: 4, width: 3, x: 1, y: 2 }],
-      source: 'layer-tree',
-      startMs: 3,
-      timestampUs: 4_000,
-      totalArea: 12,
-    },
   ])
   expect(calls).toEqual([
-    ['LayerTree.enable', {}],
     [
       'Tracing.start',
       {
         transferMode: 'ReportEvents',
         traceConfig: {
-          includedCategories: [
-            '-*',
-            'devtools.timeline',
-            'disabled-by-default-devtools.timeline',
-            'disabled-by-default-devtools.timeline.layers',
-            'disabled-by-default-devtools.timeline.picture',
-            'disabled-by-default-cc',
-            'disabled-by-default-cc.debug',
-          ],
+          includedCategories: ['-*', 'devtools.timeline', 'disabled-by-default-devtools.timeline'],
           recordMode: 'recordUntilFull',
         },
       },
     ],
     ['Tracing.end', {}],
-    ['LayerTree.disable', {}],
   ])
   expect(listeners['Tracing.dataCollected']).toBeUndefined()
   expect(listeners['Tracing.tracingComplete']).toBeUndefined()
-  expect(listeners['LayerTree.layerPainted']).toBeUndefined()
-  expect(listeners['LayerTree.layerTreeDidChange']).toBeUndefined()
 })
 
 test('paint events measure compares as informational only', () => {

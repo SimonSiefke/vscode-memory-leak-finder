@@ -40,8 +40,9 @@ export interface PaintEventsSummary {
 }
 
 const MicrosecondToMillisecond = 1000
-const SecondToMicrosecond = 1_000_000
 const MetricPrecision = 1000
+const InfiniteClipSize = 16_777_215
+const InfiniteClipOffset = -8_388_608
 const MaxSummaryEvents = 10
 
 const roundMetricValue = (value: number): number => {
@@ -61,19 +62,12 @@ const getTimestamp = (event: Dynamic): number | undefined => {
   return typeof timestamp === 'number' && Number.isFinite(timestamp) ? timestamp : undefined
 }
 
-const getMonotonicTimestamp = (event: Dynamic): number | undefined => {
-  const timestamp = event?.timestamp
-  return typeof timestamp === 'number' && Number.isFinite(timestamp) ? timestamp * SecondToMicrosecond : undefined
-}
-
 const getTraceStartTimestamp = (events: readonly Dynamic[]): number => {
   let startTimestamp = Number.POSITIVE_INFINITY
   for (const event of events) {
     const timestamp = getTimestamp(event)
-    const monotonicTimestamp = getMonotonicTimestamp(event)
-    const candidateTimestamp = timestamp ?? monotonicTimestamp
-    if (candidateTimestamp !== undefined && candidateTimestamp < startTimestamp) {
-      startTimestamp = candidateTimestamp
+    if (timestamp !== undefined && timestamp < startTimestamp) {
+      startTimestamp = timestamp
     }
   }
   return Number.isFinite(startTimestamp) ? startTimestamp : 0
@@ -89,6 +83,10 @@ const normalizeRect = (x: number, y: number, width: number, height: number): Pai
     x: roundMetricValue(x),
     y: roundMetricValue(y),
   }
+}
+
+const isInfiniteClipRect = (rect: PaintRect): boolean => {
+  return rect.x <= InfiniteClipOffset && rect.y <= InfiniteClipOffset && rect.width >= InfiniteClipSize && rect.height >= InfiniteClipSize
 }
 
 const getRectFromObject = (value: Dynamic): PaintRect | undefined => {
@@ -123,10 +121,10 @@ const getRectFromArray = (value: readonly Dynamic[]): PaintRect | undefined => {
 const getRects = (value: Dynamic): readonly PaintRect[] => {
   if (Array.isArray(value)) {
     const rect = getRectFromArray(value)
-    return rect ? [rect] : []
+    return rect && !isInfiniteClipRect(rect) ? [rect] : []
   }
   const rect = getRectFromObject(value)
-  return rect ? [rect] : []
+  return rect && !isInfiniteClipRect(rect) ? [rect] : []
 }
 
 const getTraceClip = (event: Dynamic): Dynamic => {
@@ -135,10 +133,6 @@ const getTraceClip = (event: Dynamic): Dynamic => {
 
 const isPaintEvent = (event: Dynamic): boolean => {
   return event?.name === 'Paint'
-}
-
-const getLayerPaintEventTimestamp = (event: Dynamic): number => {
-  return getMonotonicTimestamp(event) ?? toNumber(event?.ts)
 }
 
 const getTotalArea = (rects: readonly PaintRect[]): number => {
@@ -169,34 +163,9 @@ const createTracePaintEvent = (event: Dynamic, index: number, traceStartTimestam
   }
 }
 
-const createLayerPaintEvent = (event: Dynamic, index: number, traceStartTimestamp: number): PaintEvent => {
-  const params = event?.params || {}
-  const timestampUs = getLayerPaintEventTimestamp(event)
-  const startMs = timestampUs === 0 ? 0 : roundMetricValue((timestampUs - traceStartTimestamp) / MicrosecondToMillisecond)
-  const rects = getRects(params.clip)
-  return {
-    durationMs: 0,
-    index,
-    layerId: toString(params.layerId),
-    nodeId: 0,
-    nodeName: '',
-    rects,
-    source: 'layer-tree',
-    startMs,
-    timestampUs,
-    totalArea: getTotalArea(rects),
-  }
-}
-
-export const getPaintEvents = (
-  traceEvents: readonly Dynamic[],
-  layerPaintEvents: readonly Dynamic[] = [],
-  layerTreeEvents: readonly Dynamic[] = [],
-  dataLossOccurred = false,
-): PaintEventsSummary => {
+export const getPaintEvents = (traceEvents: readonly Dynamic[], dataLossOccurred = false): PaintEventsSummary => {
   const rawEvents = traceEvents.filter(isPaintEvent).toSorted((a, b) => toNumber(a?.ts) - toNumber(b?.ts))
-  const sortedLayerPaintEvents = [...layerPaintEvents].toSorted((a, b) => getLayerPaintEventTimestamp(a) - getLayerPaintEventTimestamp(b))
-  const traceStartTimestamp = getTraceStartTimestamp([...traceEvents, ...sortedLayerPaintEvents])
+  const traceStartTimestamp = getTraceStartTimestamp(traceEvents)
   const events: PaintEvent[] = []
   let totalDurationMs = 0
   let maxDurationMs = 0
@@ -205,9 +174,6 @@ export const getPaintEvents = (
 
   for (const event of rawEvents) {
     events.push(createTracePaintEvent(event, events.length + 1, traceStartTimestamp))
-  }
-  for (const event of sortedLayerPaintEvents) {
-    events.push(createLayerPaintEvent(event, events.length + 1, traceStartTimestamp))
   }
 
   events.sort((a, b) => a.timestampUs - b.timestampUs || a.index - b.index)
@@ -225,8 +191,8 @@ export const getPaintEvents = (
 
   return {
     events: normalizedEvents,
-    layerPaintEvents: sortedLayerPaintEvents,
-    layerTreeEvents,
+    layerPaintEvents: [],
+    layerTreeEvents: [],
     metrics: {
       averageDurationMs,
       dataLossOccurred,

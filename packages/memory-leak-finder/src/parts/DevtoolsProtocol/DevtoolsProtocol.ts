@@ -4,7 +4,6 @@ const module = await import(url)
 const {
   DevtoolsProtocolDomDebugger,
   DevtoolsProtocolHeapProfiler,
-  DevtoolsProtocolLayerTree,
   DevtoolsProtocolMemory,
   DevtoolsProtocolPage,
   DevtoolsProtocolPerformance,
@@ -16,7 +15,6 @@ const {
 
 export {
   DevtoolsProtocolHeapProfiler,
-  DevtoolsProtocolLayerTree,
   DevtoolsProtocolPage,
   DevtoolsProtocolPerformance,
   DevtoolsProtocolProfiler,
