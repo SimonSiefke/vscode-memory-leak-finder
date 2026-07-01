@@ -9,6 +9,7 @@ export * as MeasureBrowserPerformanceCounters from '../MeasureBrowserPerformance
 export * as MeasureBufferCount from '../MeasureBufferCount/MeasureBufferCount.ts'
 export * as MeasureCanvasCount from '../MeasureCanvasCount/MeasureCanvasCount.ts'
 export * as MeasureCanvasRenderingContext2dCount from '../MeasureCanvasRenderingContext2dCount/MeasureCanvasRenderingContext2dCount.ts'
+export * as MeasureCallgrind from '../MeasureCallgrind/MeasureCallgrind.ts'
 export * as MeasureClassCount from '../MeasureClassCount/MeasureClassCount.ts'
 export * as MeasureClosureCount from '../MeasureClosureCount/MeasureClosureCount.ts'
 export * as MeasureClosuresWithReferences from '../MeasureClosuresWithReferences/MeasureClosuresWithReferences.ts'

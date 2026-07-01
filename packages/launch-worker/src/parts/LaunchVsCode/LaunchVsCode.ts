@@ -1,5 +1,6 @@
 import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
@@ -217,6 +218,7 @@ export const launchVsCode = async ({
   addDisposable,
   arch,
   buildVscodeMinified,
+  callgrindConfig,
   clearExtensions,
   commit,
   cwd,
@@ -242,6 +244,7 @@ export const launchVsCode = async ({
   addDisposable: (fn: () => Promise<void> | void) => void
   arch: string
   buildVscodeMinified: boolean
+  callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   commit: string
   cwd: string
@@ -342,10 +345,12 @@ export const launchVsCode = async ({
     const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,
       args,
+      callgrindConfig,
       cliPath: binaryPath,
       cwd,
       env,
       headlessMode,
+      platform,
     })
     return {
       binaryPath,
