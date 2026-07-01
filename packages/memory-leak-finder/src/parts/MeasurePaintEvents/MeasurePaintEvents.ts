@@ -102,7 +102,6 @@ export const start = async (session: Session, state: { trace: TraceState }) => {
 export const stop = async (session: Session, state: { trace: TraceState }) => {
   await DevtoolsProtocolTracing.end(session, {})
   await state.trace.complete
-  await DevtoolsProtocolLayerTree.disable(session, {})
   return PaintEvents.getPaintEvents(state.trace.traceEvents, state.trace.dataLossOccurred)
 }
 
