@@ -39,6 +39,14 @@ Measures the total number of classes.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure class-count --only base
 ```
 
+### CpuPerformanceCounters
+
+Measures CPU instructions and cycles for the inspected process.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
+```
+
 ### DetachedDomNodeCount
 
 Measures the total number of detached dom nodes.

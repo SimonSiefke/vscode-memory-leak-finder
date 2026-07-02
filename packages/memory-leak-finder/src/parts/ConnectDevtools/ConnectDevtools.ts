@@ -47,6 +47,6 @@ export const connectDevtools = async (
     externalRuntimeName,
   )
 
-  const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid)
+  const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid, electronWebSocketUrl)
   MemoryLeakFinderState.set(connectionId, { measure, pid, rpc: measureRpc })
 }
