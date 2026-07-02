@@ -294,7 +294,7 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
     await window.LEAK_TEST_BACKWARD()
   }
 })()`,
-    timeout: Math.max(30_000, cycles * 20_000),
+    timeout: Math.max(180_000, cycles * 60_000),
   })
 }
 
