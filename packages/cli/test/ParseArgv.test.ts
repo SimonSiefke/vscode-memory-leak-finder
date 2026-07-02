@@ -29,6 +29,13 @@ test('parseArgv - run skipped tests anyway', () => {
   })
 })
 
+test('parseArgv - run network tests anyway', () => {
+  const argv = ['--run-network-tests-anyway']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    runNetworkTestsAnyway: true,
+  })
+})
+
 test('parseArgv - allow copilot auth in ci', () => {
   const argv = ['--allow-copilot-auth-in-ci']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({

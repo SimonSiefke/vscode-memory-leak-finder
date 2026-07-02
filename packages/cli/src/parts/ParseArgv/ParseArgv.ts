@@ -81,6 +81,10 @@ const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-skipped-tests-anyway')
 }
 
+const parseRunNetworkTestsAnyway = (argv: readonly string[]): boolean => {
+  return argv.includes('--run-network-tests-anyway')
+}
+
 const parseAllowCopilotAuthInCi = (argv: readonly string[]): boolean => {
   return argv.includes('--allow-copilot-auth-in-ci')
 }
@@ -417,6 +421,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
+  const runNetworkTestsAnyway = parseRunNetworkTestsAnyway(argv)
   const allowCopilotAuthInCi = parseAllowCopilotAuthInCi(argv)
   const screencastQuality = parseScreencastQuality(argv)
   const setupOnly = parseSetupOnly(argv)
@@ -481,6 +486,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     resolveVscodeCommitHash,
     restartBetween,
     runMode,
+    runNetworkTestsAnyway,
     runs,
     runSkippedTestsAnyway,
     screencastQuality,

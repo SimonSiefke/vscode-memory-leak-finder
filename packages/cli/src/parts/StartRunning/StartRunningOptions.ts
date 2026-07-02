@@ -39,6 +39,7 @@ export interface StartRunningOptions {
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
+  readonly runNetworkTestsAnyway: boolean
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
