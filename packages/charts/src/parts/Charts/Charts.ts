@@ -6,6 +6,7 @@ export * as BrowserPerformanceCounters from '../CreateBrowserPerformanceCounters
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.ts'
 export * as CanvasRenderingContext2dCount from '../CreateCanvasRenderingContext2dCountChart/CreateCanvasRenderingContext2dCountChart.ts'
 export * as CssRuleCount from '../CreateCssRuleCountChart/CreateCssRuleCountChart.ts'
+export * as CpuPerformanceCounters from '../CreateCpuPerformanceCountersChart/CreateCpuPerformanceCountersChart.ts'
 export * as CpuProfile from '../CreateCpuProfileChart/CreateCpuProfileChart.ts'
 export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/CreateDetachedDomNodeCountChart.ts'
 export * as DomTimerCount from '../CreateDomTimerCountChart/CreateDomTimerCountChart.ts'

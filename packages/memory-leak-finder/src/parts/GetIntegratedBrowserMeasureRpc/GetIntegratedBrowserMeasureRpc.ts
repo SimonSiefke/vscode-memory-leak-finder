@@ -36,7 +36,7 @@ export const getIntegratedBrowserMeasureRpc = async (browserRpc: Dynamic, exclud
     flatten: true,
     targetId: target.targetId,
   })
-  const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+  const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId, target.targetId)
   await DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
     autoAttach: true,
     flatten: true,
