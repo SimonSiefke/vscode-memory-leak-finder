@@ -1,0 +1,161 @@
+name: PR Website Measures
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  website-measures:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - google-maps-search-clear
+          - google-translate-text-clear
+          - nextjs-docs-project-structure
+          - npm-package-search-clear
+          - openstreetmap-search-clear
+          - react-docs-simple-browser-blog
+          - react-router-docs-routing
+          - svelte-docs-getting-started
+          - syntax-fm-simple-browser-videos-shows
+          - tailwind-docs-styling-with-utility-classes
+          - vite-docs-guide-features
+          - vue-docs-reactivity-fundamentals
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config xvfb x11-xserver-utils
+
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - uses: actions/cache@v5
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-insiders-versions
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - uses: actions/cache@v5
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
+
+      - name: npm ci
+        run: npm ci --ignore-scripts && npm run postinstall
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+
+      - run: npm run build
+
+      - name: Run website measure (${{ matrix.test }})
+        continue-on-error: true
+        run: |
+          timeout 29m xvfb-run --auto-servernum node packages/cli/bin/test.js \
+            --cwd packages/websites-e2e \
+            --check-leaks \
+            --measure named-function-count3 \
+            --inspect-integrated-browser \
+            --runs 1997 \
+            --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
+            --only "${{ matrix.test }}"
+
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-results-website-${{ matrix.test }}
+          path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  website-charts:
+    runs-on: ubuntu-24.04
+    needs: website-measures
+    if: always()
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - uses: actions/cache@v5
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-insiders-versions
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+
+      - name: npm ci
+        run: npm ci --ignore-scripts && npm run postinstall
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+
+      - run: npm run build
+
+      - name: Download all website measure results
+        uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          pattern: vscode-memory-leak-finder-results-website-*
+          path: .
+
+      - name: Merge all website measure results
+        run: |
+          node --input-type=module <<'EOF'
+          import { mergeArtifacts } from './packages/build/src/mergeArtifacts.ts'
+
+          await mergeArtifacts({
+            pattern: 'vscode-memory-leak-finder-results-website-',
+          })
+          EOF
+
+      - name: Generate charts
+        run: node packages/charts/src/main.ts
+
+      - name: Upload charts artifact
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: vscode-website-memory-leak-finder-charts
+          path: ./.vscode-charts
+          include-hidden-files: true
+          if-no-files-found: warn
