@@ -575,7 +575,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to dispose mock server`)
       }
     },
-    async executeJavaScript({ expression }: { expression: string }) {
+    async executeJavaScript({ expression, timeout }: { expression: string; timeout?: number }) {
       try {
         if (ideVersion.minor >= 118) {
           const electron = this.getElectron()
@@ -584,6 +584,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
           await electron.executeJavaScriptInWebContents({
             expression,
+            ...(timeout === undefined ? {} : { timeout }),
             webContentsId: this.modernBrowserWebContentsId,
           })
           await page.waitForIdle()
