@@ -1050,10 +1050,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveText({
       selector = 'body',
       text,
+      timeout = 10_000,
       urlPattern = /http:\/\/localhost/,
     }: {
       selector?: string
       text: string
+      timeout?: number
       urlPattern?: RegExp
     }) {
       try {
@@ -1064,12 +1066,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             ? {
                 selector,
                 text,
+                timeout,
                 urlPattern,
                 webContentsId: this.modernBrowserWebContentsId,
               }
             : {
                 selector,
                 text,
+                timeout,
                 urlPattern,
               }
           await electron.waitForWebContentsText(webContentsTextOptions)
@@ -1078,7 +1082,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         const innerFrame = await this.getContentFrame({ urlPattern })
         const locator = innerFrame.locator(selector)
-        await expect(locator).toContainText(text)
+        await expect(locator).toContainText(text, { timeout })
         await innerFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {

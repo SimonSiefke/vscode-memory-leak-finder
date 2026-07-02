@@ -5,8 +5,11 @@ export const requiresNetwork = true
 export const skip = true
 
 const mapsUrl = 'https://www.google.com/maps'
-const basePlaceName = 'Brandenburg Gate Berlin'
-const alternatePlaceName = 'Alexanderplatz Berlin'
+const basePlaceName = 'Alexanderplatz Berlin'
+const basePlaceResultName = 'Alexanderplatz'
+const alternatePlaceName = 'Potsdamer Platz Berlin'
+const alternatePlaceResultName = 'Potsdamer Platz'
+const mapsUrlPattern = /^https:\/\/www\.google\.com\/maps/
 
 const consentExpression = `(async () => {
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -82,106 +85,37 @@ const consentExpression = `(async () => {
   throw new Error(\`Expected Google consent button or Maps search input. url=\${location.href}; consentPage=\${isConsentPage()}; buttons=\${getVisibleButtonTexts() || '<none>'}\`)
 })()`
 
-const getSubmitSearchExpression = (placeName: string): string => {
+const getNavigateToSearchExpression = (placeName: string): string => {
   return `(async () => {
-  const placeName = ${JSON.stringify(placeName)}
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-  const isVisible = (element) => {
-    if (!element) {
-      return false
-    }
-    const style = window.getComputedStyle(element)
-    const rect = element.getBoundingClientRect()
-    return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0
-  }
-  const getElementText = (element) => {
-    return [
-      element.textContent || '',
-      element.getAttribute('aria-label') || '',
-      element.getAttribute('value') || '',
-    ].join(' ').replace(/\\s+/g, ' ').trim()
-  }
-  const getVisibleButtonTexts = () => {
-    return Array.from(document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"]'))
-      .filter(isVisible)
-      .map(getElementText)
-      .filter(Boolean)
-      .slice(0, 12)
-      .join(' | ')
-  }
-  const isConsentPage = () => {
-    const bodyText = document.body.textContent || ''
-    return /consent\\.google\\./i.test(location.hostname) || /before you continue to google|bevor sie zu google weitergehen/i.test(bodyText)
-  }
-  const waitFor = async (callback, message, timeout = 20000) => {
-    const start = Date.now()
-    let lastValue
-    while (Date.now() - start < timeout) {
-      lastValue = callback()
-      if (lastValue) {
-        return lastValue
-      }
-      await delay(250)
-    }
-    throw new Error(\`\${message}. url=\${location.href}; consentPage=\${isConsentPage()}; buttons=\${getVisibleButtonTexts() || '<none>'}\`)
-  }
-  const getSearchInput = () => {
-    return document.querySelector('#searchboxinput, input[aria-label*="Search" i], input[aria-label*="Suche" i], input[aria-label*="Suchen" i], input[name="q"], input[type="search"]')
-  }
-  const searchInput = await waitFor(() => {
-    const input = getSearchInput()
-    return input instanceof HTMLInputElement && isVisible(input) ? input : undefined
-  }, \`Expected Google Maps search input for \${placeName}\`)
-  searchInput.focus()
-  const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
-  if (!valueSetter) {
-    throw new Error('Expected input value setter')
-  }
-  valueSetter.call(searchInput, placeName)
-  searchInput.dispatchEvent(new InputEvent('input', { bubbles: true, data: placeName, inputType: 'insertText' }))
-  searchInput.dispatchEvent(new Event('change', { bubbles: true }))
-  const searchButton = document.querySelector('#searchbox-searchbutton, button[aria-label*="Search" i], button[aria-label*="Suche" i], button[aria-label*="Suchen" i], [role="button"][aria-label*="Search" i], [role="button"][aria-label*="Suche" i], [role="button"][aria-label*="Suchen" i]')
-  if (searchButton instanceof HTMLElement && isVisible(searchButton)) {
-    searchButton.click()
-  } else {
-    searchInput.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', code: 'Enter' }))
-    searchInput.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', code: 'Enter' }))
-  }
+  const url = ${JSON.stringify(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`)}
+  setTimeout(() => {
+    location.href = url
+  }, 100)
 })()`
 }
 
-const getWaitForSearchResultExpression = (placeName: string): string => {
-  return `(async () => {
-  const placeName = ${JSON.stringify(placeName)}
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-  const waitFor = async (callback, message, timeout = 30000) => {
-    const start = Date.now()
-    let lastValue
-    while (Date.now() - start < timeout) {
-      lastValue = callback()
-      if (lastValue) {
-        return lastValue
-      }
-      await delay(250)
-    }
-    throw new Error(\`\${message}. url=\${location.href}\`)
-  }
-  await waitFor(() => {
-    const bodyText = document.body.textContent || ''
-    const expectedName = placeName.replace(/ Berlin$/i, '')
-    return new RegExp(expectedName, 'i').test(bodyText) || /\\/maps\\/(place|search)\\//.test(location.href)
-  }, \`Expected Google Maps search result for \${placeName}\`, 30000)
+const waitExpression = `(async () => {
+  await new Promise((resolve) => setTimeout(resolve, 1000))
 })()`
-}
 
-const searchPlace = async (SimpleBrowser: TestContext['SimpleBrowser'], placeName: string): Promise<void> => {
+const searchPlace = async (SimpleBrowser: TestContext['SimpleBrowser'], placeName: string, resultName: string): Promise<void> => {
   await SimpleBrowser.executeJavaScript({
-    expression: getSubmitSearchExpression(placeName),
-    timeout: 25_000,
+    expression: getNavigateToSearchExpression(placeName),
+    timeout: 5_000,
+  })
+  await SimpleBrowser.shouldHaveText({
+    text: resultName,
+    timeout: 45_000,
+    urlPattern: mapsUrlPattern,
   })
   await SimpleBrowser.executeJavaScript({
-    expression: getWaitForSearchResultExpression(placeName),
-    timeout: 35_000,
+    expression: waitExpression,
+    timeout: 5_000,
+  })
+  await SimpleBrowser.shouldHaveText({
+    text: resultName,
+    timeout: 10_000,
+    urlPattern: mapsUrlPattern,
   })
 }
 
@@ -197,12 +131,12 @@ export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, Si
     expression: consentExpression,
     timeout: 35_000,
   })
-  await searchPlace(SimpleBrowser, basePlaceName)
+  await searchPlace(SimpleBrowser, basePlaceName, basePlaceResultName)
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
-  await searchPlace(SimpleBrowser, alternatePlaceName)
-  await searchPlace(SimpleBrowser, basePlaceName)
+  await searchPlace(SimpleBrowser, alternatePlaceName, alternatePlaceResultName)
+  await searchPlace(SimpleBrowser, basePlaceName, basePlaceResultName)
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
