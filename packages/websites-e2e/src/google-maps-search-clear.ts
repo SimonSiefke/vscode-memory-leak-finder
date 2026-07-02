@@ -4,7 +4,7 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const mapsUrl = 'https://www.google.com/maps?hl=en'
+const mapsUrl = 'https://www.google.com/maps'
 const placeName = 'Brandenburg Gate Berlin'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
@@ -40,12 +40,47 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
       return patterns.some((pattern) => pattern.test(text))
     })
   }
-  const acceptConsent = findButtonByText([/accept all/i, /i agree/i, /agree/i])
-  if (acceptConsent && isVisible(acceptConsent)) {
-    acceptConsent.click()
-    await delay(1500)
+  const hasSearchInput = () => {
+    const input = document.querySelector('#searchboxinput, input[aria-label*="Search" i], input[name="q"], input[type="search"]')
+    return input instanceof HTMLInputElement && isVisible(input)
   }
-  const waitFor = async (callback, message, timeout = 20000) => {
+  const waitFor = async (callback, timeout = 7500) => {
+    const start = Date.now()
+    let lastValue
+    while (Date.now() - start < timeout) {
+      lastValue = callback()
+      if (lastValue) {
+        return lastValue
+      }
+      await delay(250)
+    }
+    return undefined
+  }
+  const consentButton = await waitFor(() => {
+    if (hasSearchInput()) {
+      return 'ready'
+    }
+    return findButtonByText([/reject all/i, /accept all/i, /i agree/i, /^agree$/i])
+  })
+  if (consentButton && isVisible(consentButton)) {
+    consentButton.click()
+    return
+  }
+})()`,
+  })
+
+  await SimpleBrowser.executeJavaScript({
+    expression: `(async () => {
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  const isVisible = (element) => {
+    if (!element) {
+      return false
+    }
+    const style = window.getComputedStyle(element)
+    const rect = element.getBoundingClientRect()
+    return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0
+  }
+  const waitFor = async (callback, message, timeout = 7500) => {
     const start = Date.now()
     let lastValue
     while (Date.now() - start < timeout) {
@@ -79,10 +114,58 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
     searchInput.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', code: 'Enter' }))
     searchInput.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', code: 'Enter' }))
   }
+})()`,
+  })
+
+  await SimpleBrowser.executeJavaScript({
+    expression: `(async () => {
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  const isVisible = (element) => {
+    if (!element) {
+      return false
+    }
+    const style = window.getComputedStyle(element)
+    const rect = element.getBoundingClientRect()
+    return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0
+  }
+  const findButtonByText = (patterns) => {
+    const buttons = Array.from(document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"]'))
+    return buttons.find((button) => {
+      const text = [
+        button.textContent || '',
+        button.getAttribute('aria-label') || '',
+        button.getAttribute('value') || '',
+      ].join(' ')
+      return patterns.some((pattern) => pattern.test(text))
+    })
+  }
+  const waitFor = async (callback, message, timeout = 7500) => {
+    const start = Date.now()
+    let lastValue
+    while (Date.now() - start < timeout) {
+      lastValue = callback()
+      if (lastValue) {
+        return lastValue
+      }
+      await delay(250)
+    }
+    throw new Error(message)
+  }
+  const getSearchInput = () => {
+    return document.querySelector('#searchboxinput, input[aria-label*="Search" i], input[name="q"], input[type="search"]')
+  }
   await waitFor(() => {
     const bodyText = document.body.textContent || ''
     return /Brandenburg Gate/i.test(bodyText) || /\\/maps\\/(place|search)\\//.test(location.href)
   }, 'Expected Google Maps search result for Brandenburg Gate')
+  const searchInput = await waitFor(() => {
+    const input = getSearchInput()
+    return input instanceof HTMLInputElement && isVisible(input) ? input : undefined
+  }, 'Expected Google Maps search input after searching')
+  const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+  if (!valueSetter) {
+    throw new Error('Expected input value setter')
+  }
   const clearButton =
     document.querySelector('button[aria-label*="Clear search" i], button[aria-label*="Clear" i], [role="button"][aria-label*="Clear" i]') ||
     findButtonByText([/clear search/i, /^clear$/i])
