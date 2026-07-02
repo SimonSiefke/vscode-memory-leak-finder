@@ -930,6 +930,7 @@ export interface PageObjectApi {
   readonly ChatEditor: ChatEditor
   readonly ColorPicker: ColorPicker
   readonly Colors: any
+  readonly SshServer: any
   readonly ContextMenu: ContextMenu
   readonly CursorChat: CursorChat
   readonly DebugConsole: DebugConsole

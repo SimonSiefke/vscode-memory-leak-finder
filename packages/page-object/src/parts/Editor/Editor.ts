@@ -4,6 +4,7 @@ import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Electron from '../Electron/Electron.ts'
 import * as IsMacos from '../IsMacos/IsMacos.ts'
+import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -133,7 +134,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (currentCount === 0) {
           throw new Error('no open editor found')
         }
-        await page.keyboard.press('Control+w')
+        await page.keyboard.press(KeyBindings.getCloseTab(platform))
         await expect(tabs).toHaveCount(currentCount - 1, {
           timeout: 3000,
         })
@@ -151,8 +152,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           return
         }
-        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors)
+        for (let i = currentCount; i > 0; i--) {
+          await page.keyboard.press(KeyBindings.getCloseTab(platform))
+          await expect(tabs).toHaveCount(i - 1, {
+            timeout: 3000,
+          })
+        }
         await expect(tabs).toHaveCount(0, {
           timeout: 4000,
         })
