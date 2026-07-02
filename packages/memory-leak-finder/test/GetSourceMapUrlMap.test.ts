@@ -44,3 +44,15 @@ test('getSourceMapUrlMap - sort inputs', () => {
     'index.js.map': [1, 1, 12, 1],
   })
 })
+
+test('getSourceMapUrlMap - resolves relative source map against http stack url', () => {
+  const eventListeners = [
+    {
+      sourceMaps: ['chunk.js.map'],
+      stack: ['listener (http://127.0.0.1:3000/_next/static/chunks/chunk.js:0:10)'],
+    },
+  ]
+  expect(GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)).toEqual({
+    'http://127.0.0.1:3000/_next/static/chunks/chunk.js.map': [0, 10],
+  })
+})
