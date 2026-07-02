@@ -250,33 +250,38 @@ const verifyLeakHooksExpression = `(() => {
 })()`
 
 export const setup = async ({ Editor, Notification, SideBar, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
-  const config = getProjectConfig()
-  const serverMode = parseServerMode()
-  const port = await getFreePort()
-  const url = `http://127.0.0.1:${port}${config.initialPath}`
+  try {
+    const config = getProjectConfig()
+    const serverMode = parseServerMode()
+    const port = await getFreePort()
+    const url = `http://127.0.0.1:${port}${config.initialPath}`
 
-  await Workspace.setFiles([])
-  await Editor.closeAll()
-  await SideBar.hide()
-  await Notification.closeAll({ force: true })
+    await Workspace.setFiles([])
+    await Editor.closeAll()
+    await SideBar.hide()
+    await Notification.closeAll({ force: true })
 
-  if (serverMode === 'preview') {
-    await runCommand(['run', 'build'], config.path)
+    if (serverMode === 'preview') {
+      await runCommand(['run', 'build'], config.path)
+    }
+    startServer(config, serverMode, port)
+    await waitForServer(url)
+
+    await SimpleBrowser.show({
+      url,
+    })
+    await SimpleBrowser.shouldHaveText({
+      selector: 'h1',
+      text: config.heading,
+      urlPattern: new RegExp(`^${escapeRegExp(url)}`),
+    })
+    await SimpleBrowser.executeJavaScript({
+      expression: verifyLeakHooksExpression,
+    })
+  } catch (error) {
+    await stopServer()
+    throw error
   }
-  startServer(config, serverMode, port)
-  await waitForServer(url)
-
-  await SimpleBrowser.show({
-    url,
-  })
-  await SimpleBrowser.shouldHaveText({
-    selector: 'h1',
-    text: config.heading,
-    urlPattern: new RegExp(`^${escapeRegExp(url)}`),
-  })
-  await SimpleBrowser.executeJavaScript({
-    expression: verifyLeakHooksExpression,
-  })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
