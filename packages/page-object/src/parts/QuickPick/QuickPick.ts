@@ -196,6 +196,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await this.executeCommand(WellKnownCommands.SelectColorTheme, {
           stayVisible: true,
         })
+        await this.waitForInputVisible()
       } catch (error) {
         throw new VError(error, `Failed to show quick pick color theme`)
       }
@@ -212,6 +213,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await this.executeCommand(WellKnownCommands.SelectFileIconTheme, {
           stayVisible: true,
         })
+        await this.waitForInputVisible()
       } catch (error) {
         throw new VError(error, `Failed to show quick pick file icon theme`)
       }
