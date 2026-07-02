@@ -46,6 +46,18 @@ const getProcessResultFolder = (inspectProcess: string): string => {
   return inspectProcess.replaceAll('/', '-').replaceAll('\\', '-')
 }
 
+const getMinimalReproductionResultName = (): string => {
+  return (process.env.MINIMAL_REPRODUCTION || '').replace(/[\\/]/g, '-')
+}
+
+const getResultRelativePath = (fileName: string, testName: string): string => {
+  const minimalReproductionName = getMinimalReproductionResultName()
+  if (testName === 'minimal-reproduction' && minimalReproductionName) {
+    return join('minimal-reproductions', `${minimalReproductionName}.json`)
+  }
+  return fileName
+}
+
 export const runTestsWithCallback = async ({
   allowCopilotAuthInCi,
   arch,
@@ -440,27 +452,28 @@ export const runTestsWithCallback = async ({
 
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const testName = fileName.replace('.json', '')
+            const resultRelativePath = getResultRelativePath(fileName, testName)
             let resultPath
             if (measureNode) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, testName + '.json')
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, resultRelativePath)
             } else if (inspectSharedProcess) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'shared-process', measure, fileName)
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'shared-process', measure, resultRelativePath)
             } else if (inspectExtensions) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'extension-host', measure, fileName)
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'extension-host', measure, resultRelativePath)
             } else if (inspectPtyHost) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'pty-host', measure, fileName)
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'pty-host', measure, resultRelativePath)
             } else if (inspectIntegratedBrowser) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'integrated-browser', measure, fileName)
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'integrated-browser', measure, resultRelativePath)
             } else if (inspectProcess) {
               resultPath = join(
                 MemoryLeakResultsPath.memoryLeakResultsPath,
                 'process',
                 getProcessResultFolder(inspectProcess),
                 measure,
-                fileName,
+                resultRelativePath,
               )
             } else {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, resultRelativePath)
             }
 
             const result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)

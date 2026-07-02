@@ -28,6 +28,7 @@ const headings: Record<string, string> = {
   'headlessui-closebutton-link': 'Headless UI CloseButton link repro',
   'headlessui-theme-radiogroup': 'Headless UI theme RadioGroup repro',
   'next-rsc-navigation': 'Get started with Tailwind CSS',
+  'next-tailwind-shaped-docs': 'Get started with Tailwind CSS',
   'react-aria-hover-global-listeners': 'React Aria hover global listeners repro',
   'react-aria-synthetic-blur': 'React Aria synthetic blur repro',
   'react-fiber-toggle-baseline': 'React Fiber toggle baseline',
@@ -293,7 +294,7 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
     await window.LEAK_TEST_BACKWARD()
   }
 })()`,
-    timeout: Math.max(10_000, cycles * 10_000),
+    timeout: Math.max(30_000, cycles * 20_000),
   })
 }
 

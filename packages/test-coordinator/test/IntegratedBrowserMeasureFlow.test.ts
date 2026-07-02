@@ -187,6 +187,93 @@ test('runTestsWithCallback - inspect integrated browser starts memory worker aft
   )
 })
 
+test('runTestsWithCallback - minimal reproduction result path uses scenario name', async () => {
+  const previousMinimalReproduction = process.env.MINIMAL_REPRODUCTION
+  process.env.MINIMAL_REPRODUCTION = 'headlessui-closebutton-link'
+  mockGetTestsToRun.mockResolvedValueOnce([
+    {
+      absolutePath: '/test-root/src/minimal-reproduction.ts',
+      dirent: 'minimal-reproduction.ts',
+      relativeDirname: 'src',
+      relativePath: 'src/minimal-reproduction.ts',
+    },
+  ])
+  try {
+    const result = await runTestsWithCallback({
+      addDisposable: () => {},
+      allowCopilotAuthInCi: false,
+      arch: 'x64',
+      buildVscodeMinified: false,
+      callback: async () => {},
+      checkLeaks: true,
+      clearDisposables: async () => {},
+      clearExtensions: false,
+      color: false,
+      commit: 'abc123',
+      compressVideo: false,
+      continueValue: '',
+      cwd: '/test-cwd',
+      downloadUserDataZipFileToken: '',
+      downloadUserDataZipFileUrl: '',
+      enableExtensions: false,
+      enableProxy: false,
+      filterValue: 'minimal-reproduction',
+      getTimeStamp: () => 0,
+      headlessMode: true,
+      ide: 'vscode',
+      ideVersion: 'stable',
+      insidersCommit: '',
+      inspectExtensions: false,
+      inspectExtensionsPort: 0,
+      inspectIntegratedBrowser: true,
+      inspectPtyHost: false,
+      inspectPtyHostPort: 0,
+      inspectSharedProcess: false,
+      inspectSharedProcessPort: 0,
+      isGithubActions: false,
+      login: false,
+      measure: 'named-function-count3',
+      measureAfter: false,
+      measureNode: false,
+      openDevtools: false,
+      pageObjectPath: '',
+      platform: 'linux',
+      recordVideo: false,
+      restartBetween: false,
+      root: '/test-root',
+      runMode: 1,
+      runNetworkTestsAnyway: false,
+      runs: 1,
+      runSkippedTestsAnyway: true,
+      screencastQuality: 100,
+      setupOnly: false,
+      timeoutBetween: 0,
+      timeouts: false,
+      trackFunctions: false,
+      updateUrl: '',
+      useProxyMock: false,
+      vscodePath: '',
+      vscodeVersion: '1.0.0',
+    })
+
+    expect(result.type).toBe('success')
+    expect(mockMemoryCompare).toHaveBeenCalledWith(
+      memoryRpc,
+      expect.any(Number),
+      { runs: 1 },
+      expect.stringContaining(
+        join('integrated-browser', 'named-function-count3', 'minimal-reproductions', 'headlessui-closebutton-link.json'),
+      ),
+    )
+  } finally {
+    if (typeof previousMinimalReproduction === 'string') {
+      process.env.MINIMAL_REPRODUCTION = previousMinimalReproduction
+    } else {
+      delete process.env.MINIMAL_REPRODUCTION
+    }
+  }
+})
+
 test('runTestsWithCallback - inspect process starts memory worker after setup', async () => {
   const result = await runTestsWithCallback({
     addDisposable: () => {},
