@@ -85,36 +85,90 @@ const consentExpression = `(async () => {
   throw new Error(\`Expected Google consent button or Maps search input. url=\${location.href}; consentPage=\${isConsentPage()}; buttons=\${getVisibleButtonTexts() || '<none>'}\`)
 })()`
 
-const getNavigateToSearchExpression = (placeName: string): string => {
+const getSearchPlaceExpression = (placeName: string, resultName: string): string => {
   return `(async () => {
-  const url = ${JSON.stringify(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`)}
-  setTimeout(() => {
-    location.href = url
-  }, 100)
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  const isVisible = (element) => {
+    if (!element) {
+      return false
+    }
+    const style = window.getComputedStyle(element)
+    const rect = element.getBoundingClientRect()
+    return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0
+  }
+  const waitForWindowLoad = async () => {
+    if (document.readyState === 'complete') {
+      return
+    }
+    await new Promise((resolve) => {
+      window.addEventListener('load', resolve, { once: true })
+    })
+  }
+  const waitForPageIdle = async () => {
+    await new Promise((resolve) => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(resolve, { timeout: 1500 })
+      } else {
+        setTimeout(resolve, 500)
+      }
+    })
+    await delay(250)
+  }
+  const waitFor = async (callback, message, timeout = 45000) => {
+    const start = Date.now()
+    let lastValue
+    while (Date.now() - start < timeout) {
+      lastValue = callback()
+      if (lastValue) {
+        return lastValue
+      }
+      await delay(250)
+    }
+    throw new Error(message)
+  }
+  const getSearchInput = () => {
+    return document.querySelector('#searchboxinput, input[aria-label*="Search" i], input[aria-label*="Suche" i], input[aria-label*="Suchen" i], input[name="q"], input[type="search"]')
+  }
+  const getSearchButton = () => {
+    const buttons = Array.from(document.querySelectorAll('#searchbox-searchbutton, button[aria-label*="Search" i], button[aria-label*="Suche" i], button[aria-label*="Suchen" i], button[type="submit"], input[type="submit"]'))
+    return buttons.find(isVisible)
+  }
+  const typeIntoInput = (input, value) => {
+    input.focus()
+    input.select()
+    if (!document.execCommand('insertText', false, value) || input.value !== value) {
+      throw new Error(\`Expected typed text "\${value}" in Google Maps search input, got "\${input.value}"\`)
+    }
+  }
+  await waitForWindowLoad()
+  await waitForPageIdle()
+  const searchInput = await waitFor(() => {
+    const input = getSearchInput()
+    return input instanceof HTMLInputElement && isVisible(input) ? input : undefined
+  }, 'Expected Google Maps search input')
+  typeIntoInput(searchInput, ${JSON.stringify(placeName)})
+  const searchButton = await waitFor(() => {
+    const button = getSearchButton()
+    return button instanceof HTMLElement ? button : undefined
+  }, 'Expected Google Maps search button')
+  searchButton.click()
+  await waitForWindowLoad()
+  await waitForPageIdle()
+  await waitFor(() => {
+    const bodyText = document.body.textContent || ''
+    return bodyText.includes(${JSON.stringify(resultName)})
+  }, ${JSON.stringify(`Expected Google Maps search results for ${placeName}`)})
 })()`
 }
 
-const waitExpression = `(async () => {
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-})()`
-
 const searchPlace = async (SimpleBrowser: TestContext['SimpleBrowser'], placeName: string, resultName: string): Promise<void> => {
   await SimpleBrowser.executeJavaScript({
-    expression: getNavigateToSearchExpression(placeName),
-    timeout: 5_000,
+    expression: getSearchPlaceExpression(placeName, resultName),
+    timeout: 55_000,
   })
   await SimpleBrowser.shouldHaveText({
     text: resultName,
     timeout: 45_000,
-    urlPattern: mapsUrlPattern,
-  })
-  await SimpleBrowser.executeJavaScript({
-    expression: waitExpression,
-    timeout: 5_000,
-  })
-  await SimpleBrowser.shouldHaveText({
-    text: resultName,
-    timeout: 10_000,
     urlPattern: mapsUrlPattern,
   })
 }

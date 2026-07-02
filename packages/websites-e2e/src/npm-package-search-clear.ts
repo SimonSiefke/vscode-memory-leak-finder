@@ -29,6 +29,24 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
     const rect = element.getBoundingClientRect()
     return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0
   }
+  const waitForWindowLoad = async () => {
+    if (document.readyState === 'complete') {
+      return
+    }
+    await new Promise((resolve) => {
+      window.addEventListener('load', resolve, { once: true })
+    })
+  }
+  const waitForPageIdle = async () => {
+    await new Promise((resolve) => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(resolve, { timeout: 1500 })
+      } else {
+        setTimeout(resolve, 500)
+      }
+    })
+    await delay(250)
+  }
   const waitFor = async (callback, message, timeout = 20000) => {
     const start = Date.now()
     let lastValue
@@ -44,27 +62,35 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   const getSearchInput = () => {
     return document.querySelector('input[type="search"], input[name="q"], input[placeholder*="Search" i], input[aria-label*="Search" i]')
   }
+  const typeIntoInput = (input, value) => {
+    input.focus()
+    input.select()
+    if (!document.execCommand('insertText', false, value) || input.value !== value) {
+      throw new Error(\`Expected typed text "\${value}" in npm search input, got "\${input.value}"\`)
+    }
+  }
+  const clearInput = (input) => {
+    input.focus()
+    input.select()
+    if (!document.execCommand('delete', false)) {
+      throw new Error('Expected npm search input text to be deleted')
+    }
+  }
+  await waitForWindowLoad()
+  await waitForPageIdle()
   const searchInput = await waitFor(() => {
     const input = getSearchInput()
     return input instanceof HTMLInputElement && isVisible(input) ? input : undefined
   }, 'Expected npm search input')
-  const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
-  if (!valueSetter) {
-    throw new Error('Expected input value setter')
-  }
-  searchInput.focus()
-  valueSetter.call(searchInput, ${JSON.stringify(packageName)})
-  searchInput.dispatchEvent(new InputEvent('input', { bubbles: true, data: ${JSON.stringify(packageName)}, inputType: 'insertText' }))
-  searchInput.dispatchEvent(new Event('change', { bubbles: true }))
+  typeIntoInput(searchInput, ${JSON.stringify(packageName)})
   const submitButton = document.querySelector('button[type="submit"], input[type="submit"], button[aria-label*="Search" i]')
   if (submitButton instanceof HTMLElement && isVisible(submitButton)) {
     submitButton.click()
-  } else if (searchInput.form) {
-    searchInput.form.requestSubmit()
   } else {
-    searchInput.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', code: 'Enter' }))
-    searchInput.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', code: 'Enter' }))
+    throw new Error('Expected visible npm search button')
   }
+  await waitForWindowLoad()
+  await waitForPageIdle()
   await waitFor(() => {
     const bodyText = document.body.textContent || ''
     return /typescript/i.test(bodyText) && (/\\/search/.test(location.pathname) || /packages found|search results|sort packages/i.test(bodyText))
@@ -77,11 +103,9 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
     if (!(activeInput instanceof HTMLInputElement)) {
       throw new Error('Expected npm search input after search')
     }
-    activeInput.focus()
-    valueSetter.call(activeInput, '')
-    activeInput.dispatchEvent(new InputEvent('input', { bubbles: true, data: null, inputType: 'deleteContentBackward' }))
-    activeInput.dispatchEvent(new Event('change', { bubbles: true }))
+    clearInput(activeInput)
   }
+  await waitForPageIdle()
   await waitFor(() => {
     const input = getSearchInput()
     return input instanceof HTMLInputElement && input.value === ''

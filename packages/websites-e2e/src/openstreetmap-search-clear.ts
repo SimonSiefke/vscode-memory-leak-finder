@@ -29,6 +29,24 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
     const rect = element.getBoundingClientRect()
     return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0
   }
+  const waitForWindowLoad = async () => {
+    if (document.readyState === 'complete') {
+      return
+    }
+    await new Promise((resolve) => {
+      window.addEventListener('load', resolve, { once: true })
+    })
+  }
+  const waitForPageIdle = async () => {
+    await new Promise((resolve) => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(resolve, { timeout: 1500 })
+      } else {
+        setTimeout(resolve, 500)
+      }
+    })
+    await delay(250)
+  }
   const waitFor = async (callback, message, timeout = 20000) => {
     const start = Date.now()
     let lastValue
@@ -44,27 +62,35 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   const getSearchInput = () => {
     return document.querySelector('#query, input[name="query"], input[type="search"], input[placeholder*="Search" i]')
   }
+  const typeIntoInput = (input, value) => {
+    input.focus()
+    input.select()
+    if (!document.execCommand('insertText', false, value) || input.value !== value) {
+      throw new Error(\`Expected typed text "\${value}" in OpenStreetMap search input, got "\${input.value}"\`)
+    }
+  }
+  const clearInput = (input) => {
+    input.focus()
+    input.select()
+    if (!document.execCommand('delete', false)) {
+      throw new Error('Expected OpenStreetMap search input text to be deleted')
+    }
+  }
+  await waitForWindowLoad()
+  await waitForPageIdle()
   const searchInput = await waitFor(() => {
     const input = getSearchInput()
     return input instanceof HTMLInputElement && isVisible(input) ? input : undefined
   }, 'Expected OpenStreetMap search input')
-  const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
-  if (!valueSetter) {
-    throw new Error('Expected input value setter')
-  }
-  searchInput.focus()
-  valueSetter.call(searchInput, ${JSON.stringify(placeName)})
-  searchInput.dispatchEvent(new InputEvent('input', { bubbles: true, data: ${JSON.stringify(placeName)}, inputType: 'insertText' }))
-  searchInput.dispatchEvent(new Event('change', { bubbles: true }))
+  typeIntoInput(searchInput, ${JSON.stringify(placeName)})
   const searchButton = document.querySelector('.search_form input[type="submit"], .search_form button[type="submit"], button[aria-label*="Search" i]')
   if (searchButton instanceof HTMLElement && isVisible(searchButton)) {
     searchButton.click()
-  } else if (searchInput.form) {
-    searchInput.form.requestSubmit()
   } else {
-    searchInput.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', code: 'Enter' }))
-    searchInput.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', code: 'Enter' }))
+    throw new Error('Expected visible OpenStreetMap search button')
   }
+  await waitForWindowLoad()
+  await waitForPageIdle()
   await waitFor(() => {
     const bodyText = document.body.textContent || ''
     return /Brandenburg Gate/i.test(bodyText) || /search/.test(location.href)
@@ -73,11 +99,9 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   if (clearButton instanceof HTMLElement && isVisible(clearButton)) {
     clearButton.click()
   } else {
-    searchInput.focus()
-    valueSetter.call(searchInput, '')
-    searchInput.dispatchEvent(new InputEvent('input', { bubbles: true, data: null, inputType: 'deleteContentBackward' }))
-    searchInput.dispatchEvent(new Event('change', { bubbles: true }))
+    clearInput(searchInput)
   }
+  await waitForPageIdle()
   await waitFor(() => {
     const input = getSearchInput()
     return input instanceof HTMLInputElement && input.value === ''

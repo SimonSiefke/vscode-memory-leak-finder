@@ -38,13 +38,33 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
         button.getAttribute('aria-label') || '',
         button.getAttribute('value') || '',
       ].join(' ')
+
       return patterns.some((pattern) => pattern.test(text))
     })
+  }
+  const waitForWindowLoad = async () => {
+    if (document.readyState === 'complete') {
+      return
+    }
+    await new Promise((resolve) => {
+      window.addEventListener('load', resolve, { once: true })
+    })
+  }
+  const waitForPageIdle = async () => {
+    await new Promise((resolve) => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(resolve, { timeout: 1500 })
+      } else {
+        setTimeout(resolve, 500)
+      }
+    })
+    await delay(250)
   }
   const acceptConsent = findButtonByText([/accept all/i, /i agree/i, /agree/i])
   if (acceptConsent && isVisible(acceptConsent)) {
     acceptConsent.click()
-    await delay(1500)
+    await waitForWindowLoad()
+    await waitForPageIdle()
   }
   const waitFor = async (callback, message, timeout = 20000) => {
     const start = Date.now()
@@ -61,18 +81,28 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   const getSourceTextArea = () => {
     return document.querySelector('textarea[aria-label*="Source text" i], textarea[aria-label*="Enter text" i], textarea')
   }
+  const typeIntoTextArea = (textArea, value) => {
+    textArea.focus()
+    textArea.select()
+    if (!document.execCommand('insertText', false, value) || textArea.value !== value) {
+      throw new Error(\`Expected typed text "\${value}" in Google Translate source text area, got "\${textArea.value}"\`)
+    }
+  }
+  const clearTextArea = (textArea) => {
+    textArea.focus()
+    textArea.select()
+    if (!document.execCommand('delete', false)) {
+      throw new Error('Expected Google Translate source text to be deleted')
+    }
+  }
+  await waitForWindowLoad()
+  await waitForPageIdle()
   const sourceTextArea = await waitFor(() => {
     const textArea = getSourceTextArea()
     return textArea instanceof HTMLTextAreaElement && isVisible(textArea) ? textArea : undefined
   }, 'Expected Google Translate source text area')
-  const valueSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set
-  if (!valueSetter) {
-    throw new Error('Expected textarea value setter')
-  }
-  sourceTextArea.focus()
-  valueSetter.call(sourceTextArea, ${JSON.stringify(sourceText)})
-  sourceTextArea.dispatchEvent(new InputEvent('input', { bubbles: true, data: ${JSON.stringify(sourceText)}, inputType: 'insertText' }))
-  sourceTextArea.dispatchEvent(new Event('change', { bubbles: true }))
+  typeIntoTextArea(sourceTextArea, ${JSON.stringify(sourceText)})
+  await waitForPageIdle()
   await waitFor(() => {
     const bodyText = document.body.textContent || ''
     return bodyText.includes(${JSON.stringify(translatedTextPattern)})
@@ -83,11 +113,9 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   if (clearButton instanceof HTMLElement && isVisible(clearButton)) {
     clearButton.click()
   } else {
-    sourceTextArea.focus()
-    valueSetter.call(sourceTextArea, '')
-    sourceTextArea.dispatchEvent(new InputEvent('input', { bubbles: true, data: null, inputType: 'deleteContentBackward' }))
-    sourceTextArea.dispatchEvent(new Event('change', { bubbles: true }))
+    clearTextArea(sourceTextArea)
   }
+  await waitForPageIdle()
   await waitFor(() => {
     const textArea = getSourceTextArea()
     if (!(textArea instanceof HTMLTextAreaElement) || textArea.value !== '') {
