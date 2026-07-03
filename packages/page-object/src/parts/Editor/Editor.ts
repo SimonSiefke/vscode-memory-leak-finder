@@ -1787,9 +1787,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async split(command: string, { groupCount = undefined }: { groupCount?: number | undefined }) {
       try {
         // TODO count editor groups
-        const editors = page.locator('.editor-instance')
+        const editors = page.locator('.editor-instance, .browser-root')
         const currentCount = await editors.count()
         if (currentCount === 0 && groupCount !== 0) {
+          const fallbackCommand =
+            command === WellKnownCommands.ViewSplitEditorRight
+              ? WellKnownCommands.NewEditorGroupRight
+              : command === WellKnownCommands.ViewSplitEditorLeft
+                ? WellKnownCommands.NewEditorGroupLeft
+                : command === WellKnownCommands.ViewSplitEditorUp
+                  ? WellKnownCommands.NewEditorGroupTop
+                  : command === WellKnownCommands.ViewSplitEditorDown
+                    ? WellKnownCommands.NewEditorGroupBottom
+                    : ''
+          if (fallbackCommand) {
+            const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+            await quickPick.executeCommand(fallbackCommand)
+            return
+          }
           throw new Error('no open editor found')
         }
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
