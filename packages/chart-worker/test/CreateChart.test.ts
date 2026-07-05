@@ -72,8 +72,8 @@ test('dual bar chart renders omitted entries footer', async () => {
   )
 
   expect(result).toContain('3213 entries omitted for brevity')
-  expect(result).toContain('height="58"')
-  expect(result).toContain('viewBox="0 0 640 58"')
+  expect(result).toContain('height="68"')
+  expect(result).toContain('viewBox="0 0 640 68"')
 })
 
 test('grouped horizontal bar chart renders created and collected counts with row highlights', async () => {
