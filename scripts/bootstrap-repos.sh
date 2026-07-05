@@ -9,6 +9,9 @@ nvm_dir="${NVM_DIR:-$HOME/.nvm}"
 nvm_version="${NVM_VERSION:-v0.40.5}"
 nvm_install_url="${NVM_INSTALL_URL:-https://raw.githubusercontent.com/nvm-sh/nvm/${nvm_version}/install.sh}"
 install_system_deps="${INSTALL_SYSTEM_DEPS:-1}"
+install_kasmvnc="${INSTALL_KASMVNC:-1}"
+kasmvnc_version="${KASMVNC_VERSION:-v1.4.0}"
+kasmvnc_package_url="${KASMVNC_PACKAGE_URL:-}"
 
 memory_leak_finder_dir="${workspace_dir}/vscode-memory-leak-finder"
 vscode_dir="${workspace_dir}/vscode"
@@ -49,6 +52,20 @@ has_common_developer_dependencies() {
 
 has_apt_packages_installed() {
   dpkg-query --show --showformat='${db:Status-Status}\n' "$@" 2>/dev/null | awk '{ if ($0 != "installed") exit 1 }'
+}
+
+download_to_file() {
+  local url="$1"
+  local output="$2"
+  if command -v curl >/dev/null 2>&1; then
+    curl --fail --location --silent --show-error --output "$output" "$url"
+    return
+  fi
+  if command -v wget >/dev/null 2>&1; then
+    wget --quiet --output-document="$output" "$url"
+    return
+  fi
+  die "Downloading ${url} requires curl or wget"
 }
 
 run_as_root() {
@@ -128,6 +145,125 @@ install_common_developer_dependencies() {
   fi
 
   die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python, python3, pkg-config, and Kerberos/GSSAPI development headers, then rerun this script."
+}
+
+get_os_release_value() {
+  local key="$1"
+  local value=""
+  if [[ -f /etc/os-release ]]; then
+    value="$(awk -F= -v key="$key" '$1 == key { gsub(/^"|"$/, "", $2); print $2; exit }' /etc/os-release)"
+  fi
+  printf '%s\n' "$value"
+}
+
+get_kasmvnc_deb_codename() {
+  local version_codename
+  version_codename="$(get_os_release_value VERSION_CODENAME)"
+
+  case "$version_codename" in
+    bookworm | bullseye | focal | jammy | kali-rolling | noble | trixie)
+      printf '%s\n' "$version_codename"
+      return
+      ;;
+  esac
+
+  die "Unsupported distro codename for KasmVNC: ${version_codename:-unknown}. Set KASMVNC_PACKAGE_URL to a matching KasmVNC package."
+}
+
+get_kasmvnc_deb_arch() {
+  local arch
+  arch="$(dpkg --print-architecture)"
+
+  case "$arch" in
+    amd64 | arm64)
+      printf '%s\n' "$arch"
+      return
+      ;;
+  esac
+
+  die "Unsupported architecture for KasmVNC: ${arch}. Set KASMVNC_PACKAGE_URL to a matching KasmVNC package."
+}
+
+get_kasmvnc_package_name_from_url() {
+  local url="$1"
+  local package_name="${url##*/}"
+  package_name="${package_name%%\?*}"
+  if [[ "$package_name" != *.deb ]]; then
+    package_name="kasmvncserver.deb"
+  fi
+  printf '%s\n' "$package_name"
+}
+
+get_kasmvnc_deb_url() {
+  if [[ -n "$kasmvnc_package_url" ]]; then
+    printf '%s\n' "$kasmvnc_package_url"
+    return
+  fi
+
+  local version_number="${kasmvnc_version#v}"
+  local codename
+  local arch
+  codename="$(get_kasmvnc_deb_codename)"
+  arch="$(get_kasmvnc_deb_arch)"
+  printf 'https://github.com/kasmtech/KasmVNC/releases/download/%s/kasmvncserver_%s_%s_%s.deb\n' "$kasmvnc_version" "$codename" "$version_number" "$arch"
+}
+
+get_kasmvnc_group_user() {
+  local group_user="${KASMVNC_GROUP_USER:-${SUDO_USER:-${USER:-}}}"
+  if [[ -n "$group_user" && "$group_user" != "root" ]]; then
+    printf '%s\n' "$group_user"
+  fi
+}
+
+add_kasmvnc_user_to_ssl_cert_group() {
+  local group_user
+  group_user="$(get_kasmvnc_group_user)"
+  if [[ -z "$group_user" ]]; then
+    return
+  fi
+
+  log "Adding ${group_user} to ssl-cert group for KasmVNC"
+  run_as_root usermod -a -G ssl-cert "$group_user"
+}
+
+install_kasmvnc_server() {
+  if [[ "$install_system_deps" != "1" || "$install_kasmvnc" != "1" ]]; then
+    log "Skipping KasmVNC installation"
+    return
+  fi
+
+  if ! command -v apt-get >/dev/null 2>&1; then
+    die "KasmVNC installation is only automated for apt-based systems. Set INSTALL_KASMVNC=0 to skip it."
+  fi
+
+  if has_apt_packages_installed kasmvncserver; then
+    log "KasmVNC is already installed"
+    add_kasmvnc_user_to_ssl_cert_group
+    return
+  fi
+
+  local package_url
+  local package_name
+  local package_dir
+  local package_path
+  package_url="$(get_kasmvnc_deb_url)"
+  package_name="$(get_kasmvnc_package_name_from_url "$package_url")"
+  package_dir="$(mktemp -d)"
+  package_path="${package_dir}/${package_name}"
+
+  log "Installing KasmVNC ${kasmvnc_version}"
+  if ! download_to_file "$package_url" "$package_path"; then
+    rm -rf "$package_dir"
+    return 1
+  fi
+  run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
+  if ! run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "$package_path"; then
+    rm -rf "$package_dir"
+    return 1
+  fi
+  rm -rf "$package_dir"
+
+  add_kasmvnc_user_to_ssl_cert_group
 }
 
 download_to_stdout() {
@@ -228,6 +364,7 @@ install_global_npm_package() {
 
 main() {
   install_common_developer_dependencies
+  install_kasmvnc_server
   require_command git
   mkdir -p "$workspace_dir"
   load_nvm
