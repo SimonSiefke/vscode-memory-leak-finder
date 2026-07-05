@@ -38,6 +38,31 @@ test('getTrackedAllocationsData returns allocation churn per test file', async (
   }
 })
 
+test('getTrackedAllocationsData includes tracked allocations from start results', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'tracked-allocations-from-start-data-'))
+  const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const resultsPath = join(basePath, 'tracked-allocations-from-start')
+
+  await mkdir(resultsPath, { recursive: true })
+  await writeFile(
+    join(resultsPath, 'editor-open.json'),
+    JSON.stringify([{ collectedCount: 11, createdCount: 13, location: '1:2:3', type: 'Array' }]),
+  )
+
+  try {
+    const result = await getTrackedAllocationsData(basePath)
+
+    expect(result).toEqual([
+      {
+        data: [{ count: 13, delta: 11, name: 'Array 1:2:3' }],
+        filename: 'tracked-allocations-from-start/editor-open',
+      },
+    ])
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})
+
 test('createTrackedAllocationsChart uses dual bar chart configuration', () => {
   expect(CreateTrackedAllocationsChart.name).toBe('tracked-allocations')
   expect(CreateTrackedAllocationsChart.multiple).toBe(true)
@@ -80,6 +105,31 @@ test('getTrackedAllocationsByFileData returns created and collected counts group
           { collected: 0, created: 1, name: 'Unknown' },
         ],
         filename: 'editor-open',
+      },
+    ])
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})
+
+test('getTrackedAllocationsByFileData includes tracked allocations from start results', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'tracked-allocations-from-start-by-file-data-'))
+  const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const resultsPath = join(basePath, 'tracked-allocations-from-start')
+
+  await mkdir(resultsPath, { recursive: true })
+  await writeFile(
+    join(resultsPath, 'editor-open.json'),
+    JSON.stringify([{ collectedCount: 3, createdCount: 5, originalSource: 'src/workbench.ts' }]),
+  )
+
+  try {
+    const result = await getTrackedAllocationsByFileData(basePath)
+
+    expect(result).toEqual([
+      {
+        data: [{ collected: 3, created: 5, name: 'src/workbench.ts' }],
+        filename: 'tracked-allocations-from-start/editor-open',
       },
     ])
   } finally {

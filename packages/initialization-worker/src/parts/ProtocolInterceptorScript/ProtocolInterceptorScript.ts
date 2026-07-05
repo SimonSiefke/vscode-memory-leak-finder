@@ -1,5 +1,6 @@
-export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPath: string | null): string => {
+export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPath: string | null, trackingMode = 'functions'): string => {
   const preGeneratedPath = preGeneratedWorkbenchPath ? JSON.stringify(preGeneratedWorkbenchPath) : 'null'
+  const mode = JSON.stringify(trackingMode)
   return `function() {
   const electron = this
   const require = globalThis._____require
@@ -8,12 +9,61 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
   const fs = require('fs')
   const path = require('path')
   const preGeneratedWorkbenchPath = ${preGeneratedPath}
+<<<<<<< Updated upstream
+=======
+  const transformServerPort = ${port}
+  const trackingMode = ${mode}
+>>>>>>> Stashed changes
 
   // Check if this is workbench.desktop.main.js and load pre-generated file
   const isWorkbenchMain = (filePath) => {
     return filePath.endsWith('workbench.desktop.main.js')
   }
 
+<<<<<<< Updated upstream
+=======
+  const getTrackingMode = () => {
+    return trackingMode
+  }
+
+  const readOriginalFile = (filePath, callback) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
+        callback({ error: -6 })
+        return
+      }
+      const mimeType = getMimeType(filePath)
+      callback({ data, mimeType })
+    })
+  }
+
+  const readTransformedFile = (filePath) => {
+    const requestPath = '/transform?filePath=' + encodeURIComponent(filePath) + '&trackingMode=' + encodeURIComponent(getTrackingMode())
+    return new Promise((resolve, reject) => {
+      const request = http.get({
+        hostname: '127.0.0.1',
+        path: requestPath,
+        port: transformServerPort,
+      }, (response) => {
+        const chunks = []
+        response.on('data', (chunk) => {
+          chunks.push(chunk)
+        })
+        response.on('end', () => {
+          const data = Buffer.concat(chunks)
+          if (response.statusCode !== 200) {
+            reject(new Error(data.toString('utf8') || 'Transform server failed with status ' + response.statusCode))
+            return
+          }
+          resolve(data)
+        })
+      })
+      request.on('error', reject)
+    })
+  }
+
+>>>>>>> Stashed changes
   // Get MIME type from file extension
   const getMimeType = (filePath) => {
     const ext = path.extname(filePath).toLowerCase()

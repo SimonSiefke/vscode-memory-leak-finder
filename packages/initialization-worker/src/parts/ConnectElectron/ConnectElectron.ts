@@ -22,6 +22,7 @@ export const connectElectron = async (
   port: number,
   preGeneratedWorkbenchPath: string | null,
   measureId?: string,
+  trackingMode = 'functions',
 ) => {
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
@@ -61,6 +62,7 @@ export const connectElectron = async (
     port,
     preGeneratedWorkbenchPath,
     measureId,
+    trackingMode,
   )
 
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
