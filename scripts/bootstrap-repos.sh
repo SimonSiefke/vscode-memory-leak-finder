@@ -42,6 +42,10 @@ has_common_developer_dependencies() {
     has_download_command
 }
 
+has_apt_packages_installed() {
+  dpkg-query --show --showformat='${db:Status-Status}\n' "$@" 2>/dev/null | awk '{ if ($0 != "installed") exit 1 }'
+}
+
 run_as_root() {
   if [[ "$(id -u)" -eq 0 ]]; then
     "$@"
@@ -60,30 +64,38 @@ install_common_developer_dependencies() {
     return
   fi
 
+  if command -v apt-get >/dev/null 2>&1; then
+    local apt_packages=(
+      build-essential
+      ca-certificates
+      curl
+      g++
+      git
+      libsecret-1-dev
+      libx11-dev
+      libxkbfile-dev
+      pkg-config
+      python-is-python3
+      python3
+      python3-setuptools
+    )
+    if has_apt_packages_installed "${apt_packages[@]}"; then
+      log "Common developer dependencies are already installed"
+      return
+    fi
+
+    log "Installing common developer dependencies"
+    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
+    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${apt_packages[@]}"
+    return
+  fi
+
   if has_common_developer_dependencies; then
     log "Common developer dependencies are already installed"
     return
   fi
 
   log "Installing common developer dependencies"
-  if command -v apt-get >/dev/null 2>&1; then
-    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
-    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      build-essential \
-      ca-certificates \
-      curl \
-      g++ \
-      git \
-      libsecret-1-dev \
-      libx11-dev \
-      libxkbfile-dev \
-      pkg-config \
-      python-is-python3 \
-      python3 \
-      python3-setuptools
-    return
-  fi
-
   if command -v dnf >/dev/null 2>&1; then
     run_as_root dnf install -y ca-certificates curl gcc gcc-c++ git make pkgconf-pkg-config python3
     return
