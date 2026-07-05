@@ -193,8 +193,9 @@ copy_ssh_keys() {
 
   log "Extracting SSH keys to ${remote}:${remote_ssh_dir}"
   ssh "$remote" "mkdir -p ${remote_ssh_dir_quoted} &&
-    tar -C ${remote_ssh_dir_quoted} -xzf ${remote_archive_quoted} &&
+    tar --no-same-owner --no-same-permissions -C ${remote_ssh_dir_quoted} -xzf ${remote_archive_quoted} &&
     rm -f ${remote_archive_quoted} &&
+    chown -R \"\$(id -u):\$(id -g)\" ${remote_ssh_dir_quoted} &&
     chmod 700 ${remote_ssh_dir_quoted} &&
     find ${remote_ssh_dir_quoted} -type d -exec chmod 700 {} + &&
     find ${remote_ssh_dir_quoted} -type f -exec chmod 600 {} + &&
