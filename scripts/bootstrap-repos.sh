@@ -179,13 +179,17 @@ get_desktop_user() {
   if [[ -n "$desktop_user" ]]; then
     printf '%s\n' "$desktop_user"
   fi
+  return 0
 }
 
 get_desktop_home() {
   local desktop_user="$1"
   local desktop_home=""
+  local desktop_record=""
   if command -v getent >/dev/null 2>&1; then
-    desktop_home="$(getent passwd "$desktop_user" | awk -F: '{ print $6; exit }')"
+    if desktop_record="$(getent passwd "$desktop_user")"; then
+      desktop_home="$(awk -F: '{ print $6; exit }' <<<"$desktop_record")"
+    fi
   fi
   if [[ -z "$desktop_home" && "$desktop_user" == "${USER:-}" ]]; then
     desktop_home="$HOME"
@@ -193,6 +197,7 @@ get_desktop_home() {
   if [[ -n "$desktop_home" ]]; then
     printf '%s\n' "$desktop_home"
   fi
+  return 0
 }
 
 configure_desktop_session() {
