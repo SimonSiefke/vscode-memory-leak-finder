@@ -6,6 +6,8 @@ workspace_dir="${WORKSPACE_DIR:-$HOME/.cache/repos}"
 memory_leak_finder_repo="${MEMORY_LEAK_FINDER_REPO:-https://github.com/SimonSiefke/vscode-memory-leak-finder.git}"
 vscode_repo="${VSCODE_REPO:-https://github.com/microsoft/vscode.git}"
 nvm_dir="${NVM_DIR:-$HOME/.nvm}"
+nvm_version="${NVM_VERSION:-v0.40.5}"
+nvm_install_url="${NVM_INSTALL_URL:-https://raw.githubusercontent.com/nvm-sh/nvm/${nvm_version}/install.sh}"
 
 memory_leak_finder_dir="${workspace_dir}/vscode-memory-leak-finder"
 vscode_dir="${workspace_dir}/vscode"
@@ -24,11 +26,31 @@ require_command() {
   command -v "$command_name" >/dev/null 2>&1 || die "Required command not found: ${command_name}"
 }
 
+download_to_stdout() {
+  local url="$1"
+  if command -v curl >/dev/null 2>&1; then
+    curl --fail --location --silent --show-error "$url"
+    return
+  fi
+  if command -v wget >/dev/null 2>&1; then
+    wget --quiet --output-document=- "$url"
+    return
+  fi
+  die "Installing nvm requires curl or wget"
+}
+
+install_nvm() {
+  log "Installing nvm ${nvm_version}"
+  mkdir -p "$nvm_dir"
+  download_to_stdout "$nvm_install_url" | PROFILE=/dev/null NVM_DIR="$nvm_dir" bash
+}
+
 load_nvm() {
   local nvm_script="${nvm_dir}/nvm.sh"
   if [[ ! -f "$nvm_script" ]]; then
-    die "nvm not found at ${nvm_script}. Install nvm or set NVM_DIR to the directory containing nvm.sh."
+    install_nvm
   fi
+  [[ -f "$nvm_script" ]] || die "nvm install did not create ${nvm_script}"
 
   set +u
   # shellcheck source=/dev/null
