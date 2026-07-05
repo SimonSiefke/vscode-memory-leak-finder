@@ -37,6 +37,7 @@ has_common_developer_dependencies() {
     command -v gcc >/dev/null 2>&1 &&
     command -v g++ >/dev/null 2>&1 &&
     command -v pkg-config >/dev/null 2>&1 &&
+    command -v python >/dev/null 2>&1 &&
     command -v python3 >/dev/null 2>&1 &&
     has_download_command
 }
@@ -71,9 +72,15 @@ install_common_developer_dependencies() {
       build-essential \
       ca-certificates \
       curl \
+      g++ \
       git \
+      libsecret-1-dev \
+      libx11-dev \
+      libxkbfile-dev \
       pkg-config \
-      python3
+      python-is-python3 \
+      python3 \
+      python3-setuptools
     return
   fi
 
@@ -102,7 +109,7 @@ install_common_developer_dependencies() {
     return
   fi
 
-  die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python3, and pkg-config, then rerun this script."
+  die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python, python3, and pkg-config, then rerun this script."
 }
 
 download_to_stdout() {
