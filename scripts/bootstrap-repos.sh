@@ -21,6 +21,7 @@ kasmvnc_geometry="${KASMVNC_GEOMETRY:-1920x1080}"
 kasmvnc_username="${KASMVNC_USERNAME:-}"
 kasmvnc_password="${KASMVNC_PASSWORD:-}"
 kasmvnc_service_name="${KASMVNC_SERVICE_NAME:-kasmvnc.service}"
+kasmvnc_background_color="${KASMVNC_BACKGROUND_COLOR:-lightblue}"
 google_chrome_key_url="${GOOGLE_CHROME_KEY_URL:-https://dl.google.com/linux/linux_signing_key.pub}"
 google_chrome_keyring_path="${GOOGLE_CHROME_KEYRING_PATH:-/etc/apt/keyrings/google-chrome.asc}"
 google_chrome_sources_path="${GOOGLE_CHROME_SOURCES_PATH:-/etc/apt/sources.list.d/google-chrome.list}"
@@ -364,6 +365,45 @@ get_user_group() {
   id -gn "$user" 2>/dev/null || printf '%s\n' "$user"
 }
 
+configure_xfce_background() {
+  local desktop_user="$1"
+  local desktop_home="$2"
+  local desktop_group
+  local xfce_config_dir="${desktop_home}/.config/xfce4/xfconf/xfce-perchannel-xml"
+  local xfce_desktop_config="${xfce_config_dir}/xfce4-desktop.xml"
+
+  log "Configuring XFCE desktop background for ${desktop_user}"
+  install -d -m 700 "$xfce_config_dir"
+  cat >"$xfce_desktop_config" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-desktop" version="1.0">
+  <property name="backdrop" type="empty">
+    <property name="screen0" type="empty">
+      <property name="monitorVNC-0" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="0"/>
+          <property name="rgba1" type="array">
+            <value type="double" value="0.68"/>
+            <value type="double" value="0.85"/>
+            <value type="double" value="0.95"/>
+            <value type="double" value="1.0"/>
+          </property>
+        </property>
+      </property>
+    </property>
+  </property>
+</channel>
+EOF
+  chmod 600 "$xfce_desktop_config"
+
+  if [[ "$(id -u)" -eq 0 ]]; then
+    desktop_group="$(get_user_group "$desktop_user")"
+    chown -R "$desktop_user:$desktop_group" "${desktop_home}/.config" 2>/dev/null || chown -R "$desktop_user" "${desktop_home}/.config"
+  fi
+}
+
 configure_desktop_session() {
   if [[ "$install_system_deps" != "1" || "$install_desktop" != "1" ]]; then
     return
@@ -385,6 +425,7 @@ configure_desktop_session() {
   if [[ -z "$desktop_home" ]]; then
     return
   fi
+  configure_xfce_background "$desktop_user" "$desktop_home"
   vnc_dir="${desktop_home}/.vnc"
   xstartup_path="${vnc_dir}/xstartup"
 
@@ -399,6 +440,9 @@ configure_desktop_session() {
 #!/usr/bin/env sh
 unset SESSION_MANAGER
 unset DBUS_SESSION_BUS_ADDRESS
+if command -v xsetroot >/dev/null 2>&1; then
+  xsetroot -solid "${KASMVNC_BACKGROUND_COLOR:-lightblue}" || true
+fi
 exec startxfce4
 EOF
   chmod 700 "$xstartup_path"
@@ -642,6 +686,7 @@ User=${desktop_user}
 WorkingDirectory=${desktop_home}
 Environment=HOME=${desktop_home}
 Environment=USER=${desktop_user}
+Environment=KASMVNC_BACKGROUND_COLOR=${kasmvnc_background_color}
 ExecStartPre=-${kasmvncserver_path} -kill ${kasmvnc_display}
 ExecStart=${kasmvncserver_path} ${kasmvnc_display} -fg -geometry ${kasmvnc_geometry}
 ExecStop=${kasmvncserver_path} -kill ${kasmvnc_display}
