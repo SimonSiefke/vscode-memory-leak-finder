@@ -9,6 +9,7 @@ nvm_dir="${NVM_DIR:-$HOME/.nvm}"
 nvm_version="${NVM_VERSION:-v0.40.5}"
 nvm_install_url="${NVM_INSTALL_URL:-https://raw.githubusercontent.com/nvm-sh/nvm/${nvm_version}/install.sh}"
 install_system_deps="${INSTALL_SYSTEM_DEPS:-1}"
+install_desktop="${INSTALL_DESKTOP:-1}"
 install_kasmvnc="${INSTALL_KASMVNC:-1}"
 kasmvnc_version="${KASMVNC_VERSION:-v1.4.0}"
 kasmvnc_package_url="${KASMVNC_PACKAGE_URL:-}"
@@ -145,6 +146,96 @@ install_common_developer_dependencies() {
   fi
 
   die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python, python3, pkg-config, and Kerberos/GSSAPI development headers, then rerun this script."
+}
+
+install_lightweight_desktop() {
+  if [[ "$install_system_deps" != "1" || "$install_desktop" != "1" ]]; then
+    log "Skipping desktop installation"
+    return
+  fi
+
+  if ! command -v apt-get >/dev/null 2>&1; then
+    die "Desktop installation is only automated for apt-based systems. Set INSTALL_DESKTOP=0 to skip it."
+  fi
+
+  local apt_packages=(
+    dbus-x11
+    xfce4
+    xfce4-terminal
+    x11-xserver-utils
+  )
+  if has_apt_packages_installed "${apt_packages[@]}"; then
+    log "Lightweight desktop is already installed"
+    return
+  fi
+
+  log "Installing lightweight XFCE desktop"
+  run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
+  run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${apt_packages[@]}"
+}
+
+get_desktop_user() {
+  local desktop_user="${DESKTOP_USER:-${SUDO_USER:-${USER:-}}}"
+  if [[ -n "$desktop_user" ]]; then
+    printf '%s\n' "$desktop_user"
+  fi
+}
+
+get_desktop_home() {
+  local desktop_user="$1"
+  local desktop_home=""
+  if command -v getent >/dev/null 2>&1; then
+    desktop_home="$(getent passwd "$desktop_user" | awk -F: '{ print $6; exit }')"
+  fi
+  if [[ -z "$desktop_home" && "$desktop_user" == "${USER:-}" ]]; then
+    desktop_home="$HOME"
+  fi
+  if [[ -n "$desktop_home" ]]; then
+    printf '%s\n' "$desktop_home"
+  fi
+}
+
+configure_desktop_session() {
+  if [[ "$install_system_deps" != "1" || "$install_desktop" != "1" ]]; then
+    return
+  fi
+
+  if ! command -v startxfce4 >/dev/null 2>&1; then
+    return
+  fi
+
+  local desktop_user
+  local desktop_home
+  local vnc_dir
+  local xstartup_path
+  desktop_user="$(get_desktop_user)"
+  if [[ -z "$desktop_user" ]]; then
+    return
+  fi
+  desktop_home="$(get_desktop_home "$desktop_user")"
+  if [[ -z "$desktop_home" ]]; then
+    return
+  fi
+  vnc_dir="${desktop_home}/.vnc"
+  xstartup_path="${vnc_dir}/xstartup"
+
+  if [[ -f "$xstartup_path" ]]; then
+    log "VNC desktop startup is already configured"
+    return
+  fi
+
+  log "Configuring VNC desktop startup for ${desktop_user}"
+  install -d -m 700 "$vnc_dir"
+  cat >"$xstartup_path" <<'EOF'
+#!/usr/bin/env sh
+unset SESSION_MANAGER
+unset DBUS_SESSION_BUS_ADDRESS
+exec startxfce4
+EOF
+  chmod 700 "$xstartup_path"
+  if [[ "$(id -u)" -eq 0 ]]; then
+    chown -R "${desktop_user}:${desktop_user}" "$vnc_dir" 2>/dev/null || chown -R "$desktop_user" "$vnc_dir"
+  fi
 }
 
 get_os_release_value() {
@@ -379,7 +470,9 @@ install_global_npm_package() {
 
 main() {
   install_common_developer_dependencies
+  install_lightweight_desktop
   install_kasmvnc_server
+  configure_desktop_session
   require_command git
   mkdir -p "$workspace_dir"
   load_nvm
