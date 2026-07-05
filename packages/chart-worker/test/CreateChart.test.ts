@@ -59,6 +59,23 @@ test('dual bar chart highlights by row name instead of value', async () => {
   expect(result).toContain('height="30"')
 })
 
+test('dual bar chart renders omitted entries footer', async () => {
+  const result = await createChart(
+    [
+      { count: 5, delta: 1, name: 'kept' },
+      { count: 3, delta: 1, name: 'gone' },
+    ],
+    {
+      omittedEntryCount: 3213,
+      type: 'dual-bar-chart',
+    },
+  )
+
+  expect(result).toContain('3213 entries omitted for brevity')
+  expect(result).toContain('height="58"')
+  expect(result).toContain('viewBox="0 0 640 58"')
+})
+
 test('grouped horizontal bar chart renders created and collected counts with row highlights', async () => {
   const result = await createChart(
     [
@@ -77,6 +94,24 @@ test('grouped horizontal bar chart renders created and collected counts with row
   expect(result).toContain('collected 12')
   expect(result).toContain('data-highlight-label="src/a.ts"')
   expect(result).toContain('aria-label="fixed-row-highlights"')
+  expect(result).not.toContain('entries omitted for brevity')
+})
+
+test('grouped horizontal bar chart renders omitted entries footer', async () => {
+  const result = await createChart(
+    [
+      { collected: 12, created: 10, name: 'src/a.ts' },
+      { collected: 2, created: 4, name: 'src/b.ts' },
+    ],
+    {
+      omittedEntryCount: 3,
+      type: 'grouped-horizontal-bar-chart',
+    },
+  )
+
+  expect(result).toContain('3 entries omitted for brevity')
+  expect(result).toContain('height="116"')
+  expect(result).toContain('viewBox="0 0 640 116"')
 })
 
 test('cpu profile flame chart renders frames, ticks, labels, and tooltips', async () => {
