@@ -31,6 +31,10 @@ has_download_command() {
   command -v curl >/dev/null 2>&1 || command -v wget >/dev/null 2>&1
 }
 
+has_gssapi_headers() {
+  [[ -f /usr/include/gssapi/gssapi.h ]]
+}
+
 has_common_developer_dependencies() {
   command -v git >/dev/null 2>&1 &&
     command -v make >/dev/null 2>&1 &&
@@ -39,7 +43,8 @@ has_common_developer_dependencies() {
     command -v pkg-config >/dev/null 2>&1 &&
     command -v python >/dev/null 2>&1 &&
     command -v python3 >/dev/null 2>&1 &&
-    has_download_command
+    has_download_command &&
+    has_gssapi_headers
 }
 
 has_apt_packages_installed() {
@@ -71,6 +76,7 @@ install_common_developer_dependencies() {
       curl
       g++
       git
+      libkrb5-dev
       libsecret-1-dev
       libx11-dev
       libxkbfile-dev
@@ -97,31 +103,31 @@ install_common_developer_dependencies() {
 
   log "Installing common developer dependencies"
   if command -v dnf >/dev/null 2>&1; then
-    run_as_root dnf install -y ca-certificates curl gcc gcc-c++ git make pkgconf-pkg-config python3
+    run_as_root dnf install -y ca-certificates curl gcc gcc-c++ git krb5-devel make pkgconf-pkg-config python3
     return
   fi
 
   if command -v yum >/dev/null 2>&1; then
-    run_as_root yum install -y ca-certificates curl gcc gcc-c++ git make pkgconfig python3
+    run_as_root yum install -y ca-certificates curl gcc gcc-c++ git krb5-devel make pkgconfig python3
     return
   fi
 
   if command -v apk >/dev/null 2>&1; then
-    run_as_root apk add --no-cache build-base ca-certificates curl git pkgconf python3
+    run_as_root apk add --no-cache build-base ca-certificates curl git krb5-dev pkgconf python3
     return
   fi
 
   if command -v pacman >/dev/null 2>&1; then
-    run_as_root pacman -Sy --needed --noconfirm base-devel ca-certificates curl git pkgconf python3
+    run_as_root pacman -Sy --needed --noconfirm base-devel ca-certificates curl git krb5 pkgconf python3
     return
   fi
 
   if command -v zypper >/dev/null 2>&1; then
-    run_as_root zypper --non-interactive install ca-certificates curl gcc gcc-c++ git make pkg-config python3
+    run_as_root zypper --non-interactive install ca-certificates curl gcc gcc-c++ git krb5-devel make pkg-config python3
     return
   fi
 
-  die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python, python3, and pkg-config, then rerun this script."
+  die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python, python3, pkg-config, and Kerberos/GSSAPI development headers, then rerun this script."
 }
 
 download_to_stdout() {
@@ -207,6 +213,19 @@ install_dependencies() {
   )
 }
 
+install_global_npm_package() {
+  local repo_dir="$1"
+  local repo_name="$2"
+  local package_name="$3"
+
+  log "Installing ${package_name}"
+  (
+    cd "$repo_dir"
+    use_repo_node "$repo_dir" "$repo_name"
+    npm install --global "$package_name"
+  )
+}
+
 main() {
   install_common_developer_dependencies
   require_command git
@@ -215,6 +234,7 @@ main() {
 
   clone_or_fetch_repo "$memory_leak_finder_repo" "$memory_leak_finder_dir" "vscode-memory-leak-finder"
   install_dependencies "$memory_leak_finder_dir" "vscode-memory-leak-finder" npm ci
+  install_global_npm_package "$memory_leak_finder_dir" "vscode-memory-leak-finder" @openai/codex
 
   clone_or_fetch_repo "$vscode_repo" "$vscode_dir" "VS Code"
   install_dependencies "$vscode_dir" "VS Code" npm install
