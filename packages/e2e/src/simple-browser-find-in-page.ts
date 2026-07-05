@@ -4,6 +4,8 @@ const testId = 'simple-browser-find-in-page'
 
 export const skip = 1
 
+export const requiresNetwork = true
+
 export const setup = async ({ Editor, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
