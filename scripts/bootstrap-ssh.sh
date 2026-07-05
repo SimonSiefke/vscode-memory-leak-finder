@@ -34,6 +34,13 @@ Environment:
   REMOTE_WORKSPACE_DIR=path     Workspace used by bootstrap-repos.sh.
   RUN_REMOTE_BOOTSTRAP=0        Only copy dotfiles and run dotfiles setup.
   REMOTE_BOOTSTRAP_PATH=path    Upload path for bootstrap-repos.sh.
+  START_KASMVNC=0               Skip starting the remote KasmVNC service.
+  KASMVNC_DISPLAY=:1            Remote KasmVNC display.
+  KASMVNC_WEBSOCKET_PORT=6901   Remote KasmVNC browser port.
+  KASMVNC_BIND_ADDRESS=0.0.0.0  Remote KasmVNC bind address.
+  KASMVNC_USERNAME=name         KasmVNC login username.
+  KASMVNC_PASSWORD=password     KasmVNC login password.
+  KASMVNC_GEOMETRY=1920x1080    Remote KasmVNC desktop size.
 EOF
 }
 
@@ -125,17 +132,49 @@ run_dotfiles_setup() {
   ssh "$remote" "bash '$remote_dotfiles_dir/ubuntu/os/setup-remote.sh' --yes"
 }
 
+quote_remote_value() {
+  printf '%q' "$1"
+}
+
+append_remote_env_if_set() {
+  local env_name="$1"
+  local env_value="${!env_name}"
+  if [[ -n "${env_value+x}" ]]; then
+    printf ' %s=%s' "$env_name" "$(quote_remote_value "$env_value")"
+  fi
+}
+
+get_remote_bootstrap_env() {
+  local remote_env="WORKSPACE_DIR=${remote_workspace_dir}"
+  local env_name
+  for env_name in \
+    START_KASMVNC \
+    KASMVNC_DISPLAY \
+    KASMVNC_WEBSOCKET_PORT \
+    KASMVNC_BIND_ADDRESS \
+    KASMVNC_USERNAME \
+    KASMVNC_PASSWORD \
+    KASMVNC_GEOMETRY; do
+    if [[ -v "$env_name" ]]; then
+      remote_env+="$(append_remote_env_if_set "$env_name")"
+    fi
+  done
+  printf '%s\n' "$remote_env"
+}
+
 run_bootstrap() {
   local script_dir="$1"
   local bootstrap_script="${script_dir}/bootstrap-repos.sh"
+  local remote_env
 
   [[ -f "$bootstrap_script" ]] || die "Missing bootstrap script: ${bootstrap_script}"
+  remote_env="$(get_remote_bootstrap_env)"
 
   log "Uploading bootstrap-repos.sh"
   scp "$bootstrap_script" "${remote}:${remote_bootstrap_path}"
 
   log "Running remote bootstrap"
-  ssh "$remote" "chmod +x ${remote_bootstrap_path} && WORKSPACE_DIR=${remote_workspace_dir} ${remote_bootstrap_path}"
+  ssh "$remote" "chmod +x ${remote_bootstrap_path} && ${remote_env} ${remote_bootstrap_path}"
 }
 
 main() {

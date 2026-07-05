@@ -11,8 +11,16 @@ nvm_install_url="${NVM_INSTALL_URL:-https://raw.githubusercontent.com/nvm-sh/nvm
 install_system_deps="${INSTALL_SYSTEM_DEPS:-1}"
 install_desktop="${INSTALL_DESKTOP:-1}"
 install_kasmvnc="${INSTALL_KASMVNC:-1}"
+start_kasmvnc="${START_KASMVNC:-1}"
 kasmvnc_version="${KASMVNC_VERSION:-v1.4.0}"
 kasmvnc_package_url="${KASMVNC_PACKAGE_URL:-}"
+kasmvnc_display="${KASMVNC_DISPLAY:-:1}"
+kasmvnc_websocket_port="${KASMVNC_WEBSOCKET_PORT:-6901}"
+kasmvnc_bind_address="${KASMVNC_BIND_ADDRESS:-0.0.0.0}"
+kasmvnc_geometry="${KASMVNC_GEOMETRY:-1920x1080}"
+kasmvnc_username="${KASMVNC_USERNAME:-}"
+kasmvnc_password="${KASMVNC_PASSWORD:-}"
+kasmvnc_service_name="${KASMVNC_SERVICE_NAME:-kasmvnc.service}"
 
 memory_leak_finder_dir="${workspace_dir}/vscode-memory-leak-finder"
 vscode_dir="${workspace_dir}/vscode"
@@ -80,6 +88,21 @@ run_as_root() {
     return
   fi
   die "Installing system dependencies requires root or sudo"
+}
+
+write_root_file() {
+  local source_path="$1"
+  local destination_path="$2"
+  local mode="$3"
+  if [[ "$(id -u)" -eq 0 ]]; then
+    install -m "$mode" "$source_path" "$destination_path"
+    return
+  fi
+  if command -v sudo >/dev/null 2>&1; then
+    sudo install -m "$mode" "$source_path" "$destination_path"
+    return
+  fi
+  die "Writing ${destination_path} requires root or sudo"
 }
 
 install_common_developer_dependencies() {
@@ -200,6 +223,11 @@ get_desktop_home() {
     printf '%s\n' "$desktop_home"
   fi
   return 0
+}
+
+get_user_group() {
+  local user="$1"
+  id -gn "$user" 2>/dev/null || printf '%s\n' "$user"
 }
 
 configure_desktop_session() {
@@ -379,6 +407,157 @@ install_kasmvnc_server() {
   add_kasmvnc_user_to_ssl_cert_group
 }
 
+generate_kasmvnc_password() {
+  if command -v openssl >/dev/null 2>&1; then
+    openssl rand -base64 32 | tr -dc 'A-Za-z0-9' | cut -c1-24
+    return
+  fi
+  dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -dc 'A-Za-z0-9' | cut -c1-24
+}
+
+ensure_kasmvnc_password() {
+  local desktop_user="$1"
+  local desktop_home="$2"
+  local desktop_group
+  local password_file="${desktop_home}/.kasmpasswd"
+  local password_text_path="${desktop_home}/.vnc/kasmvnc-password.txt"
+  local password="$kasmvnc_password"
+
+  if [[ -f "$password_file" && -f "$password_text_path" && -z "$password" ]]; then
+    log "KasmVNC password is already configured"
+    return
+  fi
+
+  if [[ -z "$password" ]]; then
+    password="$(generate_kasmvnc_password)"
+  fi
+  [[ -n "$password" ]] || die "Failed to generate KasmVNC password"
+
+  log "Configuring KasmVNC password for ${kasmvnc_username}"
+  install -d -m 700 "${desktop_home}/.vnc"
+  printf '%s\n%s\n' "$password" "$password" | vncpasswd -u "$kasmvnc_username" -ow "$password_file" >/dev/null
+  printf '%s\n' "$password" >"$password_text_path"
+  chmod 600 "$password_file" "$password_text_path"
+
+  if [[ "$(id -u)" -eq 0 ]]; then
+    desktop_group="$(get_user_group "$desktop_user")"
+    chown "$desktop_user:$desktop_group" "$password_file" "$password_text_path" 2>/dev/null || chown "$desktop_user" "$password_file" "$password_text_path"
+  fi
+}
+
+configure_kasmvnc_server() {
+  local desktop_user="$1"
+  local desktop_home="$2"
+  local desktop_group
+  local vnc_dir="${desktop_home}/.vnc"
+  local config_path="${vnc_dir}/kasmvnc.yaml"
+  local width="${kasmvnc_geometry%x*}"
+  local height="${kasmvnc_geometry#*x}"
+
+  [[ "$width" != "$kasmvnc_geometry" && -n "$width" && -n "$height" ]] || die "KASMVNC_GEOMETRY must look like 1920x1080"
+
+  log "Configuring KasmVNC server"
+  install -d -m 700 "$vnc_dir"
+  cat >"$config_path" <<EOF
+desktop:
+  resolution:
+    width: ${width}
+    height: ${height}
+  allow_resize: true
+  pixel_depth: 24
+network:
+  protocol: http
+  interface: ${kasmvnc_bind_address}
+  websocket_port: ${kasmvnc_websocket_port}
+  ssl:
+    require_ssl: true
+server:
+  advanced:
+    kasm_password_file: \${HOME}/.kasmpasswd
+command_line:
+  prompt: false
+EOF
+  chmod 600 "$config_path"
+
+  if [[ "$(id -u)" -eq 0 ]]; then
+    desktop_group="$(get_user_group "$desktop_user")"
+    chown "$desktop_user:$desktop_group" "$config_path" 2>/dev/null || chown "$desktop_user" "$config_path"
+  fi
+}
+
+configure_kasmvnc_service() {
+  local desktop_user="$1"
+  local desktop_home="$2"
+  local service_path="/etc/systemd/system/${kasmvnc_service_name}"
+  local kasmvncserver_path
+  local service_tmp
+
+  command -v systemctl >/dev/null 2>&1 || die "Starting KasmVNC as a daemon requires systemd"
+  kasmvncserver_path="$(command -v kasmvncserver || true)"
+  [[ -n "$kasmvncserver_path" ]] || die "KasmVNC server binary is missing"
+
+  service_tmp="$(mktemp)"
+  cat >"$service_tmp" <<EOF
+[Unit]
+Description=KasmVNC remote desktop
+After=network.target
+
+[Service]
+Type=simple
+User=${desktop_user}
+WorkingDirectory=${desktop_home}
+Environment=HOME=${desktop_home}
+Environment=USER=${desktop_user}
+ExecStartPre=-${kasmvncserver_path} -kill ${kasmvnc_display}
+ExecStart=${kasmvncserver_path} ${kasmvnc_display} -fg -geometry ${kasmvnc_geometry}
+ExecStop=${kasmvncserver_path} -kill ${kasmvnc_display}
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+  log "Installing ${kasmvnc_service_name}"
+  write_root_file "$service_tmp" "$service_path" 644
+  rm -f "$service_tmp"
+
+  run_as_root systemctl daemon-reload
+  run_as_root systemctl enable --now "$kasmvnc_service_name"
+}
+
+start_kasmvnc_service() {
+  if [[ "$start_kasmvnc" != "1" ]]; then
+    log "Skipping KasmVNC service startup"
+    return
+  fi
+
+  if [[ "$install_kasmvnc" != "1" ]]; then
+    log "Skipping KasmVNC service startup"
+    return
+  fi
+
+  local desktop_user
+  local desktop_home
+  desktop_user="$(get_desktop_user)"
+  [[ -n "$desktop_user" ]] || die "Could not determine user for KasmVNC service"
+  desktop_home="$(get_desktop_home "$desktop_user")"
+  [[ -n "$desktop_home" ]] || die "Could not determine home directory for ${desktop_user}"
+
+  if [[ -z "$kasmvnc_username" ]]; then
+    kasmvnc_username="$desktop_user"
+  fi
+
+  ensure_kasmvnc_password "$desktop_user" "$desktop_home"
+  configure_kasmvnc_server "$desktop_user" "$desktop_home"
+  configure_kasmvnc_service "$desktop_user" "$desktop_home"
+
+  log "KasmVNC is configured"
+  printf 'KasmVNC URL: https://<host>:%s\n' "$kasmvnc_websocket_port"
+  printf 'KasmVNC username: %s\n' "$kasmvnc_username"
+  printf 'KasmVNC password file: %s\n' "${desktop_home}/.vnc/kasmvnc-password.txt"
+}
+
 download_to_stdout() {
   local url="$1"
   if command -v curl >/dev/null 2>&1; then
@@ -480,6 +659,7 @@ main() {
   install_lightweight_desktop
   install_kasmvnc_server
   configure_desktop_session
+  start_kasmvnc_service
   require_command git
   mkdir -p "$workspace_dir"
   load_nvm
