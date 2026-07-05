@@ -167,11 +167,14 @@ get_kasmvnc_deb_codename() {
       ;;
   esac
 
-  die "Unsupported distro codename for KasmVNC: ${version_codename:-unknown}. Set KASMVNC_PACKAGE_URL to a matching KasmVNC package."
+  return 1
 }
 
 get_kasmvnc_deb_arch() {
   local arch
+  if ! command -v dpkg >/dev/null 2>&1; then
+    return 1
+  fi
   arch="$(dpkg --print-architecture)"
 
   case "$arch" in
@@ -181,7 +184,7 @@ get_kasmvnc_deb_arch() {
       ;;
   esac
 
-  die "Unsupported architecture for KasmVNC: ${arch}. Set KASMVNC_PACKAGE_URL to a matching KasmVNC package."
+  return 1
 }
 
 get_kasmvnc_package_name_from_url() {
@@ -203,8 +206,14 @@ get_kasmvnc_deb_url() {
   local version_number="${kasmvnc_version#v}"
   local codename
   local arch
-  codename="$(get_kasmvnc_deb_codename)"
-  arch="$(get_kasmvnc_deb_arch)"
+  if ! codename="$(get_kasmvnc_deb_codename)"; then
+    printf 'Error: Unsupported distro codename for KasmVNC: %s. Set KASMVNC_PACKAGE_URL to a matching KasmVNC package.\n' "$(get_os_release_value VERSION_CODENAME || printf unknown)" >&2
+    return 1
+  fi
+  if ! arch="$(get_kasmvnc_deb_arch)"; then
+    printf 'Error: Unsupported architecture for KasmVNC: %s. Set KASMVNC_PACKAGE_URL to a matching KasmVNC package.\n' "$(dpkg --print-architecture 2>/dev/null || printf unknown)" >&2
+    return 1
+  fi
   printf 'https://github.com/kasmtech/KasmVNC/releases/download/%s/kasmvncserver_%s_%s_%s.deb\n' "$kasmvnc_version" "$codename" "$version_number" "$arch"
 }
 
@@ -246,7 +255,9 @@ install_kasmvnc_server() {
   local package_name
   local package_dir
   local package_path
-  package_url="$(get_kasmvnc_deb_url)"
+  if ! package_url="$(get_kasmvnc_deb_url)"; then
+    return 1
+  fi
   package_name="$(get_kasmvnc_package_name_from_url "$package_url")"
   package_dir="$(mktemp -d)"
   package_path="${package_dir}/${package_name}"
