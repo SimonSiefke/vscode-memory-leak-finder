@@ -165,6 +165,10 @@ get_kasmvnc_deb_codename() {
       printf '%s\n' "$version_codename"
       return
       ;;
+    resolute)
+      printf 'noble\n'
+      return
+      ;;
   esac
 
   return 1
