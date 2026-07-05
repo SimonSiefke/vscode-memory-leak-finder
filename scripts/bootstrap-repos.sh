@@ -8,6 +8,7 @@ vscode_repo="${VSCODE_REPO:-https://github.com/microsoft/vscode.git}"
 nvm_dir="${NVM_DIR:-$HOME/.nvm}"
 nvm_version="${NVM_VERSION:-v0.40.5}"
 nvm_install_url="${NVM_INSTALL_URL:-https://raw.githubusercontent.com/nvm-sh/nvm/${nvm_version}/install.sh}"
+install_system_deps="${INSTALL_SYSTEM_DEPS:-1}"
 
 memory_leak_finder_dir="${workspace_dir}/vscode-memory-leak-finder"
 vscode_dir="${workspace_dir}/vscode"
@@ -24,6 +25,84 @@ die() {
 require_command() {
   local command_name="$1"
   command -v "$command_name" >/dev/null 2>&1 || die "Required command not found: ${command_name}"
+}
+
+has_download_command() {
+  command -v curl >/dev/null 2>&1 || command -v wget >/dev/null 2>&1
+}
+
+has_common_developer_dependencies() {
+  command -v git >/dev/null 2>&1 &&
+    command -v make >/dev/null 2>&1 &&
+    command -v gcc >/dev/null 2>&1 &&
+    command -v g++ >/dev/null 2>&1 &&
+    command -v pkg-config >/dev/null 2>&1 &&
+    command -v python3 >/dev/null 2>&1 &&
+    has_download_command
+}
+
+run_as_root() {
+  if [[ "$(id -u)" -eq 0 ]]; then
+    "$@"
+    return
+  fi
+  if command -v sudo >/dev/null 2>&1; then
+    sudo "$@"
+    return
+  fi
+  die "Installing system dependencies requires root or sudo"
+}
+
+install_common_developer_dependencies() {
+  if [[ "$install_system_deps" != "1" ]]; then
+    log "Skipping system dependency installation"
+    return
+  fi
+
+  if has_common_developer_dependencies; then
+    log "Common developer dependencies are already installed"
+    return
+  fi
+
+  log "Installing common developer dependencies"
+  if command -v apt-get >/dev/null 2>&1; then
+    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
+    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      build-essential \
+      ca-certificates \
+      curl \
+      git \
+      pkg-config \
+      python3
+    return
+  fi
+
+  if command -v dnf >/dev/null 2>&1; then
+    run_as_root dnf install -y ca-certificates curl gcc gcc-c++ git make pkgconf-pkg-config python3
+    return
+  fi
+
+  if command -v yum >/dev/null 2>&1; then
+    run_as_root yum install -y ca-certificates curl gcc gcc-c++ git make pkgconfig python3
+    return
+  fi
+
+  if command -v apk >/dev/null 2>&1; then
+    run_as_root apk add --no-cache build-base ca-certificates curl git pkgconf python3
+    return
+  fi
+
+  if command -v pacman >/dev/null 2>&1; then
+    run_as_root pacman -Sy --needed --noconfirm base-devel ca-certificates curl git pkgconf python3
+    return
+  fi
+
+  if command -v zypper >/dev/null 2>&1; then
+    run_as_root zypper --non-interactive install ca-certificates curl gcc gcc-c++ git make pkg-config python3
+    return
+  fi
+
+  die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python3, and pkg-config, then rerun this script."
 }
 
 download_to_stdout() {
@@ -110,6 +189,7 @@ install_dependencies() {
 }
 
 main() {
+  install_common_developer_dependencies
   require_command git
   mkdir -p "$workspace_dir"
   load_nvm
