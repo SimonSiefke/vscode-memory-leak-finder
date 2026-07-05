@@ -8,6 +8,9 @@ remote_dotfiles_dir="${REMOTE_DOTFILES_DIR:-dotfiles}"
 remote_workspace_dir="${REMOTE_WORKSPACE_DIR:-\$HOME/.cache/repos}"
 run_remote_bootstrap="${RUN_REMOTE_BOOTSTRAP:-1}"
 remote_bootstrap_path="${REMOTE_BOOTSTRAP_PATH:-/tmp/vscode-memory-leak-finder-bootstrap-repos.sh}"
+local_ssh_dir="${SSH_DIR:-${HOME}/.ssh}"
+remote_ssh_dir="${REMOTE_SSH_DIR:-.ssh}"
+copy_ssh_keys_enabled="${COPY_SSH_KEYS:-1}"
 dotfiles_tmp_dir=""
 
 log() {
@@ -34,6 +37,11 @@ Environment:
   REMOTE_WORKSPACE_DIR=path     Workspace used by bootstrap-repos.sh.
   RUN_REMOTE_BOOTSTRAP=0        Only copy dotfiles and run dotfiles setup.
   REMOTE_BOOTSTRAP_PATH=path    Upload path for bootstrap-repos.sh.
+  SSH_DIR=path                  Local SSH directory to mirror for git access.
+                                Defaults to ~/.ssh.
+  REMOTE_SSH_DIR=path           Remote SSH directory. Defaults to .ssh,
+                                relative to remote home.
+  COPY_SSH_KEYS=0               Skip copying local SSH keys to the remote.
   START_KASMVNC=0               Skip starting the remote KasmVNC service.
   KASMVNC_DISPLAY=:1            Remote KasmVNC display.
   KASMVNC_WEBSOCKET_PORT=6901   Remote KasmVNC browser port.
@@ -66,6 +74,14 @@ ensure_safe_remote_dotfiles_dir() {
   case "$remote_dotfiles_dir" in
     '' | / | . | .. | *$'\n'*)
       die "Refusing unsafe REMOTE_DOTFILES_DIR: ${remote_dotfiles_dir}"
+      ;;
+  esac
+}
+
+ensure_safe_remote_ssh_dir() {
+  case "$remote_ssh_dir" in
+    '' | / | . | .. | *$'\n'*)
+      die "Refusing unsafe REMOTE_SSH_DIR: ${remote_ssh_dir}"
       ;;
   esac
 }
@@ -125,6 +141,64 @@ copy_dotfiles_repo() {
 
   log "Extracting dotfiles to ${remote}:${remote_dotfiles_dir}"
   ssh "$remote" "rm -rf '$remote_dotfiles_dir' && mkdir -p '$remote_dotfiles_dir' && tar -C '$remote_dotfiles_dir' -xzf '$remote_archive' && rm -f '$remote_archive'"
+}
+
+create_ssh_keys_archive() {
+  local archive_path="$1"
+  local file_list="${dotfiles_tmp_dir}/ssh-files.txt"
+
+  if [[ ! -d "$local_ssh_dir" ]]; then
+    log "No local SSH directory found at ${local_ssh_dir}; skipping SSH key copy"
+    return 1
+  fi
+
+  log "Creating SSH key archive"
+  (
+    cd "$local_ssh_dir"
+    find . -mindepth 1 \( -type f -o -type l \) \
+      ! -name 'authorized_keys' \
+      ! -name 'authorized_keys2' \
+      ! -name '*.sock' \
+      ! -name '*.tmp' \
+      ! -name 'control*' \
+      -print0 >"$file_list"
+  )
+
+  if [[ ! -s "$file_list" ]]; then
+    log "No local SSH key files found in ${local_ssh_dir}; skipping SSH key copy"
+    return 1
+  fi
+
+  tar -C "$local_ssh_dir" -chzf "$archive_path" --null -T "$file_list"
+}
+
+copy_ssh_keys() {
+  local archive_path="$1"
+  local remote_archive="/tmp/vscode-memory-leak-finder-ssh-keys.tar.gz"
+  local remote_archive_quoted
+  local remote_ssh_dir_quoted
+
+  if [[ "$copy_ssh_keys_enabled" != "1" ]]; then
+    log "Skipping SSH key copy"
+    return
+  fi
+
+  create_ssh_keys_archive "$archive_path" || return
+
+  remote_archive_quoted="$(quote_remote_value "$remote_archive")"
+  remote_ssh_dir_quoted="$(quote_remote_value "$remote_ssh_dir")"
+
+  log "Copying SSH keys to ${remote}"
+  scp "$archive_path" "${remote}:${remote_archive}"
+
+  log "Extracting SSH keys to ${remote}:${remote_ssh_dir}"
+  ssh "$remote" "mkdir -p ${remote_ssh_dir_quoted} &&
+    tar -C ${remote_ssh_dir_quoted} -xzf ${remote_archive_quoted} &&
+    rm -f ${remote_archive_quoted} &&
+    chmod 700 ${remote_ssh_dir_quoted} &&
+    find ${remote_ssh_dir_quoted} -type d -exec chmod 700 {} + &&
+    find ${remote_ssh_dir_quoted} -type f -exec chmod 600 {} + &&
+    find ${remote_ssh_dir_quoted} -type f \\( -name '*.pub' -o -name 'known_hosts*' \\) -exec chmod 644 {} +"
 }
 
 run_dotfiles_setup() {
@@ -192,19 +266,23 @@ main() {
 
   local script_dir
   local dotfiles_archive
+  local ssh_keys_archive
   script_dir="$(get_script_dir)"
   dotfiles_tmp_dir="$(mktemp -d)"
   dotfiles_archive="${dotfiles_tmp_dir}/dotfiles.tar.gz"
+  ssh_keys_archive="${dotfiles_tmp_dir}/ssh-keys.tar.gz"
   trap 'rm -rf "$dotfiles_tmp_dir"' EXIT
 
   ensure_local_dotfiles_repo
   ensure_safe_remote_dotfiles_dir
+  ensure_safe_remote_ssh_dir
   preseed_remote_z
   ensure_remote_tar
   ensure_remote_download_command
   create_dotfiles_archive "$dotfiles_archive"
   copy_dotfiles_repo "$dotfiles_archive"
   run_dotfiles_setup
+  copy_ssh_keys "$ssh_keys_archive"
 
   if [[ "$run_remote_bootstrap" == "1" ]]; then
     run_bootstrap "$script_dir"

@@ -27,6 +27,10 @@ google_chrome_keyring_path="${GOOGLE_CHROME_KEYRING_PATH:-/etc/apt/keyrings/goog
 google_chrome_sources_path="${GOOGLE_CHROME_SOURCES_PATH:-/etc/apt/sources.list.d/google-chrome.list}"
 google_chrome_yum_sources_path="${GOOGLE_CHROME_YUM_SOURCES_PATH:-/etc/yum.repos.d/google-chrome.repo}"
 google_chrome_zypper_sources_path="${GOOGLE_CHROME_ZYPPER_SOURCES_PATH:-/etc/zypp/repos.d/google-chrome.repo}"
+mozilla_apt_key_url="${MOZILLA_APT_KEY_URL:-https://packages.mozilla.org/apt/repo-signing-key.gpg}"
+mozilla_apt_keyring_path="${MOZILLA_APT_KEYRING_PATH:-/etc/apt/keyrings/packages.mozilla.org.asc}"
+mozilla_apt_sources_path="${MOZILLA_APT_SOURCES_PATH:-/etc/apt/sources.list.d/mozilla.sources}"
+mozilla_apt_preferences_path="${MOZILLA_APT_PREFERENCES_PATH:-/etc/apt/preferences.d/mozilla}"
 
 memory_leak_finder_dir="${workspace_dir}/vscode-memory-leak-finder"
 vscode_dir="${workspace_dir}/vscode"
@@ -80,16 +84,6 @@ has_apt_packages_installed() {
   dpkg-query --show --showformat='${db:Status-Status}\n' "$@" 2>/dev/null | awk '{ if ($0 != "installed") exit 1 }'
 }
 
-has_any_apt_package_installed() {
-  local package_name
-  for package_name in "$@"; do
-    if has_apt_packages_installed "$package_name"; then
-      return 0
-    fi
-  done
-  return 1
-}
-
 download_to_file() {
   local url="$1"
   local output="$2"
@@ -131,28 +125,49 @@ write_root_file() {
   die "Writing ${destination_path} requires root or sudo"
 }
 
-get_apt_package_candidate() {
-  local package_name
-  for package_name in "$@"; do
-    if apt-cache show "$package_name" >/dev/null 2>&1; then
-      printf '%s\n' "$package_name"
-      return
-    fi
-  done
-  return 1
-}
-
-install_firefox_dependency() {
-  if has_any_apt_package_installed firefox firefox-esr; then
-    log "Firefox is already installed"
+install_mozilla_apt_repository() {
+  if [[ -f "$mozilla_apt_keyring_path" && -f "$mozilla_apt_sources_path" && -f "$mozilla_apt_preferences_path" ]]; then
     return
   fi
 
-  local firefox_package
-  log "Installing Firefox"
+  local keyring_dir
+  local keyring_tmp
+  local sources_tmp
+  local preferences_tmp
+  keyring_dir="$(dirname "$mozilla_apt_keyring_path")"
+  keyring_tmp="$(mktemp)"
+  sources_tmp="$(mktemp)"
+  preferences_tmp="$(mktemp)"
+
+  log "Configuring Mozilla apt repository"
+  run_as_root install -d -m 755 "$keyring_dir"
+  if ! download_to_file "$mozilla_apt_key_url" "$keyring_tmp"; then
+    rm -f "$keyring_tmp" "$sources_tmp" "$preferences_tmp"
+    return 1
+  fi
+  cat >"$sources_tmp" <<EOF
+Types: deb
+URIs: https://packages.mozilla.org/apt
+Suites: mozilla
+Components: main
+Signed-By: ${mozilla_apt_keyring_path}
+EOF
+  cat >"$preferences_tmp" <<EOF
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000
+EOF
+  write_root_file "$keyring_tmp" "$mozilla_apt_keyring_path" 644
+  write_root_file "$sources_tmp" "$mozilla_apt_sources_path" 644
+  write_root_file "$preferences_tmp" "$mozilla_apt_preferences_path" 644
+  rm -f "$keyring_tmp" "$sources_tmp" "$preferences_tmp"
+}
+
+install_firefox_dependency() {
+  install_mozilla_apt_repository
+  log "Installing Firefox deb package"
   run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
-  firefox_package="$(get_apt_package_candidate firefox firefox-esr)" || die "No Firefox package found in apt repositories"
-  run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$firefox_package"
+  run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-downgrades --no-install-recommends firefox
 }
 
 install_google_chrome_apt_repository() {
