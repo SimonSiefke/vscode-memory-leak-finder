@@ -16,23 +16,16 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
     return filePath.endsWith('workbench.desktop.main.js')
   }
 
+  const isLocalSourceOutJavaScript = (filePath) => {
+    const normalizedPath = filePath.replace(/\\\\/g, '/')
+    return normalizedPath.endsWith('.js') && normalizedPath.includes('/out/') && !normalizedPath.includes('/resources/app/out/')
+  }
+
   const getTrackingMode = () => {
     if (preGeneratedWorkbenchPath && preGeneratedWorkbenchPath.includes('tracked-allocations')) {
       return 'allocations'
     }
     return 'functions'
-  }
-
-  const readOriginalFile = (filePath, callback) => {
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
-        callback({ error: -6 })
-        return
-      }
-      const mimeType = getMimeType(filePath)
-      callback({ data, mimeType })
-    })
   }
 
   const readTransformedFile = (filePath) => {
@@ -191,8 +184,8 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
           })
         })
         return
-      } else if (isJavaScript) {
-        // For other JS files, transform lazily through the function-tracker worker.
+      } else if (isJavaScript && isLocalSourceOutJavaScript(filePath)) {
+        // For local VS Code source builds, transform additional out/**/*.js files lazily.
         fs.readFile(filePath, (err, data) => {
           if (err) {
             console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
@@ -217,6 +210,20 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
             const mimeType = getMimeType(filePath)
             callback({ data, mimeType })
           })
+        })
+        return
+      } else if (isJavaScript) {
+        // For packaged/downloaded VS Code, keep non-workbench JavaScript unchanged.
+        fs.readFile(filePath, (err, data) => {
+          if (err) {
+            console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
+            callback({ error: -6 })
+            return
+          }
+
+          const mimeType = getMimeType(filePath)
+          console.log('[ProtocolInterceptor] Returning original JS file:', filePath)
+          callback({ data, mimeType })
         })
         return
       }
