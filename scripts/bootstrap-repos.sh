@@ -21,6 +21,11 @@ kasmvnc_geometry="${KASMVNC_GEOMETRY:-1920x1080}"
 kasmvnc_username="${KASMVNC_USERNAME:-}"
 kasmvnc_password="${KASMVNC_PASSWORD:-}"
 kasmvnc_service_name="${KASMVNC_SERVICE_NAME:-kasmvnc.service}"
+google_chrome_key_url="${GOOGLE_CHROME_KEY_URL:-https://dl.google.com/linux/linux_signing_key.pub}"
+google_chrome_keyring_path="${GOOGLE_CHROME_KEYRING_PATH:-/etc/apt/keyrings/google-chrome.asc}"
+google_chrome_sources_path="${GOOGLE_CHROME_SOURCES_PATH:-/etc/apt/sources.list.d/google-chrome.list}"
+google_chrome_yum_sources_path="${GOOGLE_CHROME_YUM_SOURCES_PATH:-/etc/yum.repos.d/google-chrome.repo}"
+google_chrome_zypper_sources_path="${GOOGLE_CHROME_ZYPPER_SOURCES_PATH:-/etc/zypp/repos.d/google-chrome.repo}"
 
 memory_leak_finder_dir="${workspace_dir}/vscode-memory-leak-finder"
 vscode_dir="${workspace_dir}/vscode"
@@ -47,6 +52,14 @@ has_gssapi_headers() {
   [[ -f /usr/include/gssapi/gssapi.h ]]
 }
 
+has_firefox_command() {
+  command -v firefox >/dev/null 2>&1 || command -v firefox-esr >/dev/null 2>&1
+}
+
+has_google_chrome_command() {
+  command -v google-chrome >/dev/null 2>&1 || command -v google-chrome-stable >/dev/null 2>&1
+}
+
 has_common_developer_dependencies() {
   command -v git >/dev/null 2>&1 &&
     command -v make >/dev/null 2>&1 &&
@@ -57,11 +70,23 @@ has_common_developer_dependencies() {
     command -v python >/dev/null 2>&1 &&
     command -v python3 >/dev/null 2>&1 &&
     has_download_command &&
-    has_gssapi_headers
+    has_gssapi_headers &&
+    has_firefox_command &&
+    has_google_chrome_command
 }
 
 has_apt_packages_installed() {
   dpkg-query --show --showformat='${db:Status-Status}\n' "$@" 2>/dev/null | awk '{ if ($0 != "installed") exit 1 }'
+}
+
+has_any_apt_package_installed() {
+  local package_name
+  for package_name in "$@"; do
+    if has_apt_packages_installed "$package_name"; then
+      return 0
+    fi
+  done
+  return 1
 }
 
 download_to_file() {
@@ -105,6 +130,108 @@ write_root_file() {
   die "Writing ${destination_path} requires root or sudo"
 }
 
+get_apt_package_candidate() {
+  local package_name
+  for package_name in "$@"; do
+    if apt-cache show "$package_name" >/dev/null 2>&1; then
+      printf '%s\n' "$package_name"
+      return
+    fi
+  done
+  return 1
+}
+
+install_firefox_dependency() {
+  if has_any_apt_package_installed firefox firefox-esr; then
+    log "Firefox is already installed"
+    return
+  fi
+
+  local firefox_package
+  log "Installing Firefox"
+  run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
+  firefox_package="$(get_apt_package_candidate firefox firefox-esr)" || die "No Firefox package found in apt repositories"
+  run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$firefox_package"
+}
+
+install_google_chrome_apt_repository() {
+  if [[ -f "$google_chrome_keyring_path" && -f "$google_chrome_sources_path" ]]; then
+    return
+  fi
+
+  local keyring_dir
+  local keyring_tmp
+  local sources_tmp
+  keyring_dir="$(dirname "$google_chrome_keyring_path")"
+  keyring_tmp="$(mktemp)"
+  sources_tmp="$(mktemp)"
+
+  log "Configuring Google Chrome apt repository"
+  run_as_root install -d -m 755 "$keyring_dir"
+  if ! download_to_file "$google_chrome_key_url" "$keyring_tmp"; then
+    rm -f "$keyring_tmp" "$sources_tmp"
+    return 1
+  fi
+  printf 'deb [arch=amd64 signed-by=%s] http://dl.google.com/linux/chrome/deb/ stable main\n' "$google_chrome_keyring_path" >"$sources_tmp"
+  write_root_file "$keyring_tmp" "$google_chrome_keyring_path" 644
+  write_root_file "$sources_tmp" "$google_chrome_sources_path" 644
+  rm -f "$keyring_tmp" "$sources_tmp"
+}
+
+install_google_chrome_dependency() {
+  if has_apt_packages_installed google-chrome-stable; then
+    log "Google Chrome is already installed"
+    return
+  fi
+
+  if [[ "$(dpkg --print-architecture)" != "amd64" ]]; then
+    die "Google Chrome apt package is only available for amd64"
+  fi
+
+  install_google_chrome_apt_repository
+  log "Installing Google Chrome"
+  run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
+  run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends google-chrome-stable
+}
+
+install_google_chrome_rpm_repository() {
+  local sources_path="$1"
+  if [[ -f "$sources_path" ]]; then
+    return
+  fi
+
+  if [[ "$(uname -m)" != "x86_64" ]]; then
+    die "Google Chrome rpm package is only available for x86_64"
+  fi
+
+  local sources_dir
+  local sources_tmp
+  sources_dir="$(dirname "$sources_path")"
+  sources_tmp="$(mktemp)"
+
+  log "Configuring Google Chrome rpm repository"
+  run_as_root install -d -m 755 "$sources_dir"
+  cat >"$sources_tmp" <<EOF
+[google-chrome]
+name=google-chrome
+baseurl=https://dl.google.com/linux/chrome/rpm/stable/x86_64
+enabled=1
+gpgcheck=1
+gpgkey=${google_chrome_key_url}
+EOF
+  write_root_file "$sources_tmp" "$sources_path" 644
+  rm -f "$sources_tmp"
+}
+
+require_google_chrome_dependency() {
+  local package_manager="$1"
+  if has_google_chrome_command; then
+    return
+  fi
+
+  die "Google Chrome installation is not automated for ${package_manager}-based systems. Install Chrome manually, then rerun this script."
+}
+
 install_common_developer_dependencies() {
   if [[ "$install_system_deps" != "1" ]]; then
     log "Skipping system dependency installation"
@@ -130,12 +257,14 @@ install_common_developer_dependencies() {
     )
     if has_apt_packages_installed "${apt_packages[@]}"; then
       log "Common developer dependencies are already installed"
-      return
+    else
+      log "Installing common developer dependencies"
+      run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
+      run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${apt_packages[@]}"
     fi
 
-    log "Installing common developer dependencies"
-    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get update
-    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${apt_packages[@]}"
+    install_firefox_dependency
+    install_google_chrome_dependency
     return
   fi
 
@@ -146,31 +275,36 @@ install_common_developer_dependencies() {
 
   log "Installing common developer dependencies"
   if command -v dnf >/dev/null 2>&1; then
-    run_as_root dnf install -y ca-certificates curl gcc gcc-c++ git krb5-devel make pkgconf-pkg-config python3 xorg-x11-server-Xvfb
+    install_google_chrome_rpm_repository "$google_chrome_yum_sources_path"
+    run_as_root dnf install -y ca-certificates curl firefox gcc gcc-c++ git google-chrome-stable krb5-devel make pkgconf-pkg-config python3 xorg-x11-server-Xvfb
     return
   fi
 
   if command -v yum >/dev/null 2>&1; then
-    run_as_root yum install -y ca-certificates curl gcc gcc-c++ git krb5-devel make pkgconfig python3 xorg-x11-server-Xvfb
+    install_google_chrome_rpm_repository "$google_chrome_yum_sources_path"
+    run_as_root yum install -y ca-certificates curl firefox gcc gcc-c++ git google-chrome-stable krb5-devel make pkgconfig python3 xorg-x11-server-Xvfb
     return
   fi
 
   if command -v apk >/dev/null 2>&1; then
-    run_as_root apk add --no-cache build-base ca-certificates curl git krb5-dev pkgconf python3 xvfb
+    run_as_root apk add --no-cache build-base ca-certificates curl firefox git krb5-dev pkgconf python3 xvfb
+    require_google_chrome_dependency apk
     return
   fi
 
   if command -v pacman >/dev/null 2>&1; then
-    run_as_root pacman -Sy --needed --noconfirm base-devel ca-certificates curl git krb5 pkgconf python3 xorg-server-xvfb
+    run_as_root pacman -Sy --needed --noconfirm base-devel ca-certificates curl firefox git krb5 pkgconf python3 xorg-server-xvfb
+    require_google_chrome_dependency pacman
     return
   fi
 
   if command -v zypper >/dev/null 2>&1; then
-    run_as_root zypper --non-interactive install ca-certificates curl gcc gcc-c++ git krb5-devel make pkg-config python3 xorg-x11-server-Xvfb
+    install_google_chrome_rpm_repository "$google_chrome_zypper_sources_path"
+    run_as_root zypper --non-interactive install ca-certificates curl MozillaFirefox gcc gcc-c++ git google-chrome-stable krb5-devel make pkg-config python3 xorg-x11-server-Xvfb
     return
   fi
 
-  die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python, python3, pkg-config, Xvfb, and Kerberos/GSSAPI development headers, then rerun this script."
+  die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python, python3, pkg-config, Xvfb, Firefox, Chrome, and Kerberos/GSSAPI development headers, then rerun this script."
 }
 
 install_lightweight_desktop() {
