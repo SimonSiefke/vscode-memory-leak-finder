@@ -43,6 +43,14 @@ test('TransformCodeWithAllocationTracking - should not double instrument existin
   expect(transformed).toBe(`const value = trackAllocation([], 1, 2, 3, 'Array');`)
 })
 
+test('TransformCodeWithAllocationTracking - uses filename as stable allocation identifier', () => {
+  const code = `const value = {}`
+
+  const transformed = transformCodeWithAllocationTracking(code, { filename: '/tmp/vscode/out/vs/editor/editor.main.js' })
+
+  expect(transformed).toBe(`const value = trackAllocation({}, "/tmp/vscode/out/vs/editor/editor.main.js", 1, 14, "Object");`)
+})
+
 test('TransformCodeWithAllocationTracking - should preserve expression results', async () => {
   const code = `
     const value = { ok: true }

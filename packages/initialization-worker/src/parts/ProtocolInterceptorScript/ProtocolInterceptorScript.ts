@@ -6,12 +6,58 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
   const { protocol, app, BrowserWindow } = electron
 
   const fs = require('fs')
+  const http = require('http')
   const path = require('path')
   const preGeneratedWorkbenchPath = ${preGeneratedPath}
+  const transformServerPort = ${port}
 
   // Check if this is workbench.desktop.main.js and load pre-generated file
   const isWorkbenchMain = (filePath) => {
     return filePath.endsWith('workbench.desktop.main.js')
+  }
+
+  const getTrackingMode = () => {
+    if (preGeneratedWorkbenchPath && preGeneratedWorkbenchPath.includes('tracked-allocations')) {
+      return 'allocations'
+    }
+    return 'functions'
+  }
+
+  const readOriginalFile = (filePath, callback) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
+        callback({ error: -6 })
+        return
+      }
+      const mimeType = getMimeType(filePath)
+      callback({ data, mimeType })
+    })
+  }
+
+  const readTransformedFile = (filePath) => {
+    const requestPath = '/transform?filePath=' + encodeURIComponent(filePath) + '&trackingMode=' + encodeURIComponent(getTrackingMode())
+    return new Promise((resolve, reject) => {
+      const request = http.get({
+        hostname: '127.0.0.1',
+        path: requestPath,
+        port: transformServerPort,
+      }, (response) => {
+        const chunks = []
+        response.on('data', (chunk) => {
+          chunks.push(chunk)
+        })
+        response.on('end', () => {
+          const data = Buffer.concat(chunks)
+          if (response.statusCode !== 200) {
+            reject(new Error(data.toString('utf8') || 'Transform server failed with status ' + response.statusCode))
+            return
+          }
+          resolve(data)
+        })
+      })
+      request.on('error', reject)
+    })
   }
 
   // Get MIME type from file extension
@@ -146,7 +192,7 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
         })
         return
       } else if (isJavaScript) {
-        // For other JS files, return original file (no transformation)
+        // For other JS files, transform lazily through the function-tracker worker.
         fs.readFile(filePath, (err, data) => {
           if (err) {
             console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
@@ -163,9 +209,14 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
             return
           }
 
-          const mimeType = getMimeType(filePath)
-          console.log('[ProtocolInterceptor] Returning original JS file:', filePath)
-          callback({ data, mimeType })
+          readTransformedFile(filePath).then((transformed) => {
+            console.log('[ProtocolInterceptor] Returning transformed JS file:', filePath)
+            callback({ data: transformed, mimeType: 'application/javascript' })
+          }, (error) => {
+            console.error('[ProtocolInterceptor] Error transforming JS file, falling back to original:', filePath, error)
+            const mimeType = getMimeType(filePath)
+            callback({ data, mimeType })
+          })
         })
         return
       }

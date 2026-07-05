@@ -30,7 +30,7 @@ export const transformCodeWithAllocationTracking = (code: string, options: Trans
     return ''
   }
 
-  const { minify = false, scriptId = 123 } = options
+  const { filename = '', minify = false, scriptId = filename || 123 } = options
 
   try {
     const originalAst = parser2.parse(code, {

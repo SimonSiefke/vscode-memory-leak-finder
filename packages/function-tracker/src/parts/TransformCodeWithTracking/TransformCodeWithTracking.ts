@@ -10,6 +10,7 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
   }
 
   const { minify = false, scriptId = 123, ...restOptions } = options
+  const numericScriptId = typeof scriptId === 'number' ? scriptId : 123
 
   try {
     // Optimize parser options to reduce memory usage:
@@ -26,7 +27,7 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
     // Must collect locations BEFORE mutating AST, as mutations change node locations
     const functionLocations = getFunctionLocations(originalAst)
 
-    const plugin = createFunctionWrapperPlugin({ ...restOptions, functionLocations, scriptId })
+    const plugin = createFunctionWrapperPlugin({ ...restOptions, functionLocations, scriptId: numericScriptId })
     traverse2(originalAst, plugin)
 
     // Clear functionLocations map to help GC (though it will be GC'd when function returns anyway)
