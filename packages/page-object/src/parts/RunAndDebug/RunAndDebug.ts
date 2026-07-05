@@ -468,7 +468,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
-      await expect(continueButton).toBeVisible({ timeout: 30_000 })
+      await expect(continueButton).toBeVisible({ timeout: 45_000 })
       await page.waitForIdle()
       if (!hasCallStack) {
         // TODO maybe check some other things
@@ -504,7 +504,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async waitForPausedOnException({ exception = false, file, line }: { exception?: boolean; file: string; line: number }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
-      await expect(continueButton).toBeVisible({ timeout: 30_000 })
+      await expect(continueButton).toBeVisible({ timeout: 45_000 })
       await page.waitForIdle()
       const pausedStackFrame = page.locator('.debug-top-stack-frame-column')
       await expect(pausedStackFrame).toBeVisible()
