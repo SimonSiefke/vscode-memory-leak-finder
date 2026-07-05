@@ -45,6 +45,7 @@ has_common_developer_dependencies() {
     command -v gcc >/dev/null 2>&1 &&
     command -v g++ >/dev/null 2>&1 &&
     command -v pkg-config >/dev/null 2>&1 &&
+    command -v Xvfb >/dev/null 2>&1 &&
     command -v python >/dev/null 2>&1 &&
     command -v python3 >/dev/null 2>&1 &&
     has_download_command &&
@@ -102,6 +103,7 @@ install_common_developer_dependencies() {
       python-is-python3
       python3
       python3-setuptools
+      xvfb
     )
     if has_apt_packages_installed "${apt_packages[@]}"; then
       log "Common developer dependencies are already installed"
@@ -121,31 +123,31 @@ install_common_developer_dependencies() {
 
   log "Installing common developer dependencies"
   if command -v dnf >/dev/null 2>&1; then
-    run_as_root dnf install -y ca-certificates curl gcc gcc-c++ git krb5-devel make pkgconf-pkg-config python3
+    run_as_root dnf install -y ca-certificates curl gcc gcc-c++ git krb5-devel make pkgconf-pkg-config python3 xorg-x11-server-Xvfb
     return
   fi
 
   if command -v yum >/dev/null 2>&1; then
-    run_as_root yum install -y ca-certificates curl gcc gcc-c++ git krb5-devel make pkgconfig python3
+    run_as_root yum install -y ca-certificates curl gcc gcc-c++ git krb5-devel make pkgconfig python3 xorg-x11-server-Xvfb
     return
   fi
 
   if command -v apk >/dev/null 2>&1; then
-    run_as_root apk add --no-cache build-base ca-certificates curl git krb5-dev pkgconf python3
+    run_as_root apk add --no-cache build-base ca-certificates curl git krb5-dev pkgconf python3 xvfb
     return
   fi
 
   if command -v pacman >/dev/null 2>&1; then
-    run_as_root pacman -Sy --needed --noconfirm base-devel ca-certificates curl git krb5 pkgconf python3
+    run_as_root pacman -Sy --needed --noconfirm base-devel ca-certificates curl git krb5 pkgconf python3 xorg-server-xvfb
     return
   fi
 
   if command -v zypper >/dev/null 2>&1; then
-    run_as_root zypper --non-interactive install ca-certificates curl gcc gcc-c++ git krb5-devel make pkg-config python3
+    run_as_root zypper --non-interactive install ca-certificates curl gcc gcc-c++ git krb5-devel make pkg-config python3 xorg-x11-server-Xvfb
     return
   fi
 
-  die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python, python3, pkg-config, and Kerberos/GSSAPI development headers, then rerun this script."
+  die "No supported package manager found. Install git, curl or wget, make, gcc, g++, python, python3, pkg-config, Xvfb, and Kerberos/GSSAPI development headers, then rerun this script."
 }
 
 install_lightweight_desktop() {
