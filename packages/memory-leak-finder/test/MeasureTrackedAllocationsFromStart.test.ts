@@ -30,9 +30,8 @@ beforeEach(() => {
 })
 
 test('MeasureTrackedAllocationsFromStart.start uses an empty baseline and does not reset allocations', async () => {
-  const MeasureTrackedAllocationsFromStart = await import(
-    '../src/parts/MeasureTrackedAllocationsFromStart/MeasureTrackedAllocationsFromStart.ts'
-  )
+  const MeasureTrackedAllocationsFromStart =
+    await import('../src/parts/MeasureTrackedAllocationsFromStart/MeasureTrackedAllocationsFromStart.ts')
   const scriptHandler = {
     scriptMap: {},
     start: jest.fn<() => Promise<void>>().mockResolvedValue(),
@@ -49,9 +48,8 @@ test('MeasureTrackedAllocationsFromStart.start uses an empty baseline and does n
 })
 
 test('MeasureTrackedAllocationsFromStart.stop returns tracked allocations with script map', async () => {
-  const MeasureTrackedAllocationsFromStart = await import(
-    '../src/parts/MeasureTrackedAllocationsFromStart/MeasureTrackedAllocationsFromStart.ts'
-  )
+  const MeasureTrackedAllocationsFromStart =
+    await import('../src/parts/MeasureTrackedAllocationsFromStart/MeasureTrackedAllocationsFromStart.ts')
   const scriptHandler = {
     scriptMap: {
       '1': {
@@ -82,9 +80,8 @@ test('MeasureTrackedAllocationsFromStart.stop returns tracked allocations with s
 
 test('MeasureTrackedAllocationsFromStart.stop throws when instrumentation produced no data', async () => {
   mockGetTrackedAllocations.mockResolvedValue({})
-  const MeasureTrackedAllocationsFromStart = await import(
-    '../src/parts/MeasureTrackedAllocationsFromStart/MeasureTrackedAllocationsFromStart.ts'
-  )
+  const MeasureTrackedAllocationsFromStart =
+    await import('../src/parts/MeasureTrackedAllocationsFromStart/MeasureTrackedAllocationsFromStart.ts')
   const scriptHandler = {
     scriptMap: {},
     start: jest.fn<() => Promise<void>>().mockResolvedValue(),

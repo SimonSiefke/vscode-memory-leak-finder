@@ -6,10 +6,10 @@ test('protocolInterceptorScript requests lazy transforms for normal app modules'
 
   expect(script).toContain("const http = require('http')")
   expect(script).toContain("const requestPath = '/transform?filePath=' + encodeURIComponent(filePath)")
-  expect(script).toContain("port: transformServerPort")
+  expect(script).toContain('port: transformServerPort')
   expect(script).toContain('const trackingMode = "allocations"')
   expect(script).toContain('return trackingMode')
-  expect(script).toContain("readTransformedFile(filePath).then")
+  expect(script).toContain('readTransformedFile(filePath).then')
 })
 
 test('protocolInterceptorScript uses explicit function tracking mode by default', () => {

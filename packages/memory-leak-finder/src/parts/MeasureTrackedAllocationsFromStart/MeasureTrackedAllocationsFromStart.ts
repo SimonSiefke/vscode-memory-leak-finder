@@ -25,7 +25,9 @@ export const stop = async (session: Session, scriptHandler: IScriptHandler) => {
   await ForceGarbageCollection.forceGarbageCollection(session)
   const trackedAllocations = await GetTrackedAllocations.getTrackedAllocations(session)
   if (Object.keys(trackedAllocations).length === 0) {
-    throw new Error('Tracked allocations produced no data. The VS Code workbench was not instrumented, or no instrumented modules were loaded.')
+    throw new Error(
+      'Tracked allocations produced no data. The VS Code workbench was not instrumented, or no instrumented modules were loaded.',
+    )
   }
   await scriptHandler.stop(session)
   return {
