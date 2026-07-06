@@ -55,6 +55,7 @@ export * as MeasureFileWatcherCount from '../MeasureFileWatcherCount/MeasureFile
 export * as MeasureFunctionCount from '../MeasureFunctionCount/MeasureFunctionCount.ts'
 export * as MeasureFrontendStartupPerformance from '../MeasureFrontendStartupPerformance/MeasureFrontendStartupPerformance.ts'
 export * as MeasureGlobalLexicalScopeNames from '../MeasureGlobalLexicalScopeNames/MeasureGlobalLexicalScopeNames.ts'
+export * as MeasureGcStatistics from '../MeasureGcStatistics/MeasureGcStatistics.ts'
 export * as MeasureGpuCanvasContextCount from '../MeasureGpuCanvasContextCount/MeasureGpuCanvasContextCount.ts'
 export * as MeasureGrowingArrays from '../MeasureGrowingArrays/MeasureGrowingArrays.ts'
 export * as MeasureGrowingArrays2 from '../MeasureGrowingArrays2/MeasureGrowingArrays2.ts'
