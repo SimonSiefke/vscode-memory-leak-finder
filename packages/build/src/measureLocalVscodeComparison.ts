@@ -269,12 +269,20 @@ const writeStamp = async (path: string, content: string): Promise<void> => {
   await writeFile(path, `${content}\n`)
 }
 
+const getPathHash = (path: string): string => {
+  return createHash('sha1').update(resolve(path)).digest('hex').slice(0, 12)
+}
+
+export const getLocalVscodeComparisonCacheDir = (repoPath: string): string => {
+  return join(repositoryRoot, 'test_data', 'local-vscode-comparison', `${basename(repoPath)}-${getPathHash(repoPath)}`)
+}
+
 const getNodeModulesCacheStampPath = (repoPath: string): string => {
-  return join(repoPath, 'node_modules', '.cache.txt')
+  return join(getLocalVscodeComparisonCacheDir(repoPath), 'node_modules-cache-key.txt')
 }
 
 const getBuildCacheStampPath = (repoPath: string): string => {
-  return join(repoPath, 'node_modules', '.build-cache')
+  return join(getLocalVscodeComparisonCacheDir(repoPath), 'minified-build-commit.txt')
 }
 
 const moveSharedBuildToCheckoutBuild = async (vscodePath: string): Promise<void> => {

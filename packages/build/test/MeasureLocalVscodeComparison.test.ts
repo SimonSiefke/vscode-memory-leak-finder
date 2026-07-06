@@ -1,12 +1,13 @@
-import { mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import { expect, test } from '@jest/globals'
+import { afterEach, expect, test } from '@jest/globals'
 import {
   computeVscodeNodeModulesCacheKey,
   ensureLocalVscodeBuild,
   getEnsureLocalVscodeBuildActions,
   getLabeledResultPath,
+  getLocalVscodeComparisonCacheDir,
   getMinifiedExecutablePath,
   getResultPath,
   getResultTestName,
@@ -15,8 +16,15 @@ import {
   renameResult,
 } from '../src/measureLocalVscodeComparison.ts'
 
+const cacheDirsToRemove: string[] = []
+
+afterEach(async () => {
+  await Promise.all(cacheDirsToRemove.splice(0).map((cacheDir) => rm(cacheDir, { force: true, recursive: true })))
+})
+
 const createVscodeFixture = async (): Promise<string> => {
   const repoPath = await mkdtemp(join(tmpdir(), 'measure-local-vscode-comparison-vscode-'))
+  cacheDirsToRemove.push(getLocalVscodeComparisonCacheDir(repoPath))
   await writeFile(join(repoPath, '.nvmrc'), '22.15.0')
   await writeFile(
     join(repoPath, 'package-lock.json'),
@@ -163,7 +171,9 @@ test('computeVscodeNodeModulesCacheKey hashes nvmrc and package locks', async ()
 test('ensureLocalVscodeBuild skips commands when repo is ready', async () => {
   const repoPath = await createVscodeFixture()
   const commit = 'abcdef'
-  await writeFile(join(repoPath, 'node_modules', '.build-cache'), `${commit}\n`)
+  const cacheDir = getLocalVscodeComparisonCacheDir(repoPath)
+  await mkdir(cacheDir, { recursive: true })
+  await writeFile(join(cacheDir, 'minified-build-commit.txt'), `${commit}\n`)
   const commands: string[] = []
   const executablePath = await ensureLocalVscodeBuild(repoPath, false, {
     hasCompleteNodeModulesCache: async () => true,
@@ -207,7 +217,7 @@ test('ensureLocalVscodeBuild runs minify when executable is missing', async () =
 
   expect(executablePath).toBe(getMinifiedExecutablePath(repoPath))
   expect(commands).toEqual(['npx gulp vscode-linux-x64-min'])
-  await expect(readFile(join(repoPath, 'node_modules', '.build-cache'), 'utf8')).resolves.toBe('abcdef\n')
+  await expect(readFile(join(getLocalVscodeComparisonCacheDir(repoPath), 'minified-build-commit.txt'), 'utf8')).resolves.toBe('abcdef\n')
   await expect(readFile(getMinifiedExecutablePath(repoPath), 'utf8')).resolves.toBe('')
 })
 
@@ -215,8 +225,10 @@ test('ensureLocalVscodeBuild skips install when node_modules cache stamp matches
   const repoPath = await createVscodeFixture()
   const commit = 'abcdef'
   const cacheKey = await computeVscodeNodeModulesCacheKey(repoPath)
-  await writeFile(join(repoPath, 'node_modules', '.cache.txt'), `${cacheKey}\n`)
-  await writeFile(join(repoPath, 'node_modules', '.build-cache'), `${commit}\n`)
+  const cacheDir = getLocalVscodeComparisonCacheDir(repoPath)
+  await mkdir(cacheDir, { recursive: true })
+  await writeFile(join(cacheDir, 'node_modules-cache-key.txt'), `${cacheKey}\n`)
+  await writeFile(join(cacheDir, 'minified-build-commit.txt'), `${commit}\n`)
   const commands: string[] = []
 
   await ensureLocalVscodeBuild(repoPath, false, {
