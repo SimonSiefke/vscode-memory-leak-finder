@@ -8,6 +8,7 @@ import {
   getEnsureLocalVscodeBuildActions,
   getLabeledResultPath,
   getLocalVscodeComparisonCacheDir,
+  getMeasureCommandArgs,
   getMinifiedExecutablePath,
   getResultPath,
   getResultTestName,
@@ -48,6 +49,7 @@ test('parseArgv uses defaults', () => {
   expect(parseArgv([])).toEqual({
     display: ':1',
     measure: 'cpu-performance-counters',
+    measureAfter: false,
     newLabel: 'new',
     newVscodePath: '/root/.cache/repos/vscode-2',
     oldLabel: 'old',
@@ -80,10 +82,12 @@ test('parseArgv uses overrides', () => {
       ':2',
       '--skip-build',
       '--skip-charts',
+      '--measure-after',
     ]),
   ).toEqual({
     display: ':2',
     measure: 'tracked-allocations',
+    measureAfter: true,
     newLabel: 'branch',
     newVscodePath: '/tmp/vscode-b',
     oldLabel: 'main',
@@ -105,6 +109,39 @@ test('getResultPath derives measure result path', () => {
   expect(getResultPath('cpu-performance-counters', '^editor-open.ts').endsWith(
     join('.vscode-memory-leak-finder-results', 'cpu-performance-counters', 'editor-open.json'),
   )).toBe(true)
+})
+
+test('getMeasureCommandArgs forwards measure-after to cli', () => {
+  expect(
+    getMeasureCommandArgs(
+      {
+        display: ':1',
+        measure: 'gc-statistics',
+        measureAfter: true,
+        newLabel: 'new',
+        newVscodePath: '/tmp/vscode-b',
+        oldLabel: 'old',
+        oldVscodePath: '/tmp/vscode-a',
+        only: '^editor-open.ts',
+        runs: 97,
+        skipBuild: true,
+        skipCharts: true,
+      },
+      '/tmp/code-oss',
+    ),
+  ).toEqual([
+    'packages/cli/bin/test.js',
+    '--run-skipped-tests-anyway',
+    '--only',
+    '^editor-open.ts',
+    '--runs',
+    '97',
+    '--measure',
+    'gc-statistics',
+    '--vscode-path',
+    '/tmp/code-oss',
+    '--measure-after',
+  ])
 })
 
 test('getMinifiedExecutablePath derives local minified executable path', () => {

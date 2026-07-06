@@ -19,6 +19,7 @@ export interface MeasureLocalVscodeComparisonOptions {
   readonly newLabel: string
   readonly only: string
   readonly measure: string
+  readonly measureAfter: boolean
   readonly runs: number
   readonly display: string
   readonly skipBuild: boolean
@@ -63,6 +64,7 @@ export const parseArgv = (argv: readonly string[]): MeasureLocalVscodeComparison
   return {
     display: getString('--display', ':1'),
     measure: getString('--measure', 'cpu-performance-counters'),
+    measureAfter: argv.includes('--measure-after'),
     newLabel: getString('--new-label', 'new'),
     newVscodePath: getString('--new-vscode-path', defaultNewVscodePath),
     oldLabel: getString('--old-label', 'old'),
@@ -424,21 +426,27 @@ export const ensureLocalVscodeBuild = async (
   return executablePath
 }
 
+export const getMeasureCommandArgs = (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): readonly string[] => {
+  const measureAfterArgs = options.measureAfter ? ['--measure-after'] : []
+  return [
+    'packages/cli/bin/test.js',
+    '--run-skipped-tests-anyway',
+    '--only',
+    options.only,
+    '--runs',
+    String(options.runs),
+    '--measure',
+    options.measure,
+    '--vscode-path',
+    vscodeExecutablePath,
+    ...measureAfterArgs,
+  ]
+}
+
 const runMeasure = async (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): Promise<void> => {
   await runCommand(
     process.execPath,
-    [
-      'packages/cli/bin/test.js',
-      '--run-skipped-tests-anyway',
-      '--only',
-      options.only,
-      '--runs',
-      String(options.runs),
-      '--measure',
-      options.measure,
-      '--vscode-path',
-      vscodeExecutablePath,
-    ],
+    getMeasureCommandArgs(options, vscodeExecutablePath),
     {
       cwd: repositoryRoot,
       env: {
