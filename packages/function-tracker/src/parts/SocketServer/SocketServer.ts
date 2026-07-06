@@ -1,15 +1,14 @@
 import type { Server, IncomingMessage, ServerResponse } from 'http'
 import { createServer } from 'http'
 import { createHash } from 'node:crypto'
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { transformCode } from '../Transform/Transform.ts'
 
 let httpServer: Server | null = null
 
 interface CacheMetadata {
-  readonly mtimeMs: number
-  readonly size: number
+  readonly sourceHash: string
   readonly sourcePath: string
   readonly trackingMode: string
 }
@@ -28,11 +27,13 @@ const getCachePaths = (sourcePath: string, trackingMode: string) => {
   }
 }
 
-const getMetadata = async (sourcePath: string, trackingMode: string): Promise<CacheMetadata> => {
-  const sourceStats = await stat(sourcePath)
+const getSourceHash = (code: string): string => {
+  return createHash('sha256').update(code).digest('hex')
+}
+
+const getMetadata = (sourcePath: string, trackingMode: string, code: string): CacheMetadata => {
   return {
-    mtimeMs: sourceStats.mtimeMs,
-    size: sourceStats.size,
+    sourceHash: getSourceHash(code),
     sourcePath,
     trackingMode,
   }
@@ -48,15 +49,15 @@ const readMetadata = async (metadataPath: string): Promise<CacheMetadata | undef
 
 const isMetadataEqual = (actual: CacheMetadata | undefined, expected: CacheMetadata): boolean => {
   return (
-    actual?.mtimeMs === expected.mtimeMs &&
-    actual?.size === expected.size &&
+    actual?.sourceHash === expected.sourceHash &&
     actual?.sourcePath === expected.sourcePath &&
     actual?.trackingMode === expected.trackingMode
   )
 }
 
 export const transformFile = async (sourcePath: string, trackingMode: string): Promise<string> => {
-  const metadata = await getMetadata(sourcePath, trackingMode)
+  const code = await readFile(sourcePath, 'utf8')
+  const metadata = getMetadata(sourcePath, trackingMode, code)
   const { metadataPath, transformedPath } = getCachePaths(sourcePath, trackingMode)
   const cachedMetadata = await readMetadata(metadataPath)
   if (isMetadataEqual(cachedMetadata, metadata)) {
@@ -67,7 +68,6 @@ export const transformFile = async (sourcePath: string, trackingMode: string): P
     }
   }
 
-  const code = await readFile(sourcePath, 'utf8')
   const transformed = await transformCode(code, {
     filename: sourcePath,
     minify: true,
