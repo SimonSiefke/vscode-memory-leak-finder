@@ -1,5 +1,6 @@
-export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPath: string | null): string => {
+export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPath: string | null, trackingMode = 'functions'): string => {
   const preGeneratedPath = preGeneratedWorkbenchPath ? JSON.stringify(preGeneratedWorkbenchPath) : 'null'
+  const mode = JSON.stringify(trackingMode)
   return `function() {
   const electron = this
   const require = globalThis._____require
@@ -7,11 +8,55 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
 
   const fs = require('fs')
   const path = require('path')
+  const http = require('http')
   const preGeneratedWorkbenchPath = ${preGeneratedPath}
+  const transformServerPort = ${port}
+  const trackingMode = ${mode}
 
   // Check if this is workbench.desktop.main.js and load pre-generated file
   const isWorkbenchMain = (filePath) => {
     return filePath.endsWith('workbench.desktop.main.js')
+  }
+
+  const getTrackingMode = () => {
+    return trackingMode
+  }
+
+  const readOriginalFile = (filePath, callback) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
+        callback({ error: -6 })
+        return
+      }
+      const mimeType = getMimeType(filePath)
+      callback({ data, mimeType })
+    })
+  }
+
+  const readTransformedFile = (filePath) => {
+    const requestPath = '/transform?filePath=' + encodeURIComponent(filePath) + '&trackingMode=' + encodeURIComponent(getTrackingMode())
+    return new Promise((resolve, reject) => {
+      const request = http.get({
+        hostname: '127.0.0.1',
+        path: requestPath,
+        port: transformServerPort,
+      }, (response) => {
+        const chunks = []
+        response.on('data', (chunk) => {
+          chunks.push(chunk)
+        })
+        response.on('end', () => {
+          const data = Buffer.concat(chunks)
+          if (response.statusCode !== 200) {
+            reject(new Error(data.toString('utf8') || 'Transform server failed with status ' + response.statusCode))
+            return
+          }
+          resolve(data)
+        })
+      })
+      request.on('error', reject)
+    })
   }
 
   // Get MIME type from file extension
@@ -120,7 +165,8 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
 
       if (shouldSkip) {
         console.log('[ProtocolInterceptor] Skipping transformation for blob/worker script:', url)
-        // Fall through to read original file
+        readOriginalFile(filePath, callback)
+        return
       } else if (isJavaScript && isWorkbenchMain(filePath) && preGeneratedWorkbenchPath) {
         // For workbench.desktop.main.js, load the pre-generated file directly
         console.log('[ProtocolInterceptor] Loading pre-generated workbench.desktop.main.js from:', preGeneratedWorkbenchPath)
@@ -146,7 +192,7 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
         })
         return
       } else if (isJavaScript) {
-        // For other JS files, return original file (no transformation)
+        // For other JS files, request a lazy transform.
         fs.readFile(filePath, (err, data) => {
           if (err) {
             console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
@@ -158,14 +204,19 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
           const content = data.toString('utf8')
           if (shouldSkipByContent(content)) {
             console.log('[ProtocolInterceptor] Skipping transformation based on content pattern:', url)
-            const mimeType = getMimeType(filePath)
-            callback({ data, mimeType })
+            readOriginalFile(filePath, callback)
             return
           }
 
-          const mimeType = getMimeType(filePath)
-          console.log('[ProtocolInterceptor] Returning original JS file:', filePath)
-          callback({ data, mimeType })
+          readTransformedFile(filePath).then((data) => {
+            callback({
+              data,
+              mimeType: 'application/javascript',
+            })
+          }, (error) => {
+            console.error('[ProtocolInterceptor] Error transforming file:', filePath, error)
+            readOriginalFile(filePath, callback)
+          })
         })
         return
       }
