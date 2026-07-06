@@ -54,6 +54,8 @@ export const getVscodeArgs = ({
 
   if (!enableExtensions) {
     args.push('--disable-extensions')
+    args.push('--disable-extension=GitHub.copilot')
+    args.push('--disable-extension=GitHub.copilot-chat')
   }
 
   if (inspectPtyHost) {

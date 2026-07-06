@@ -1,5 +1,5 @@
 import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUtilityExecutionContext.ts'
-import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
 import * as Locator from '../Locator/Locator.ts'
 import * as PageBlur from '../PageBlur/PageBlur.ts'
@@ -81,6 +81,14 @@ export const create = ({
         awaitPromise,
         expression,
         replMode,
+      })
+    },
+    async evaluateInMainWorld({ awaitPromise = false, expression, replMode = false }) {
+      return DevtoolsProtocolRuntime.evaluate(this.rpc, {
+        awaitPromise,
+        expression,
+        replMode,
+        returnByValue: true,
       })
     },
     focus() {

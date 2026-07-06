@@ -20,6 +20,7 @@ export const applyMonkeyPatches = async (
   port: number,
   preGeneratedWorkbenchPath: string | null,
   measureId?: string,
+  trackingMode = 'functions',
 ): Promise<string> => {
   // TODO do this in parallel
 
@@ -56,7 +57,7 @@ export const applyMonkeyPatches = async (
 
   if (trackFunctions) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: protocolInterceptorScript(port, preGeneratedWorkbenchPath),
+      functionDeclaration: protocolInterceptorScript(port, preGeneratedWorkbenchPath, trackingMode),
       objectId: electronObjectId,
     })
   }
