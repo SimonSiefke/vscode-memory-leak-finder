@@ -147,8 +147,8 @@ test('getMeasureCommandArgs forwards measure-after to cli', () => {
 })
 
 test('getMinifiedExecutablePath derives local minified executable path', () => {
-  expect(getMinifiedExecutablePath('/root/.cache/repos/vscode')).toBe('/root/.cache/repos/VSCode-linux-x64-vscode/code-oss')
-  expect(getMinifiedExecutablePath('/root/.cache/repos/vscode-2')).toBe('/root/.cache/repos/VSCode-linux-x64-vscode-2/code-oss')
+  expect(getMinifiedExecutablePath('/root/.cache/repos/vscode')).toBe(join('/root/.cache/repos', 'VSCode-linux-x64-vscode', 'code-oss'))
+  expect(getMinifiedExecutablePath('/root/.cache/repos/vscode-2')).toBe(join('/root/.cache/repos', 'VSCode-linux-x64-vscode-2', 'code-oss'))
 })
 
 test('getLabeledResultPath inserts label before json extension', () => {
