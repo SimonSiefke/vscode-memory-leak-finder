@@ -70,6 +70,7 @@ export * as MeasureInstanceCountsDifferenceWithStackTraces from '../MeasureInsta
 export * as MeasureInstanceCountsWithSourceMap from '../MeasureInstanceCountsWithSourceMap/MeasureInstanceCountsWithSourceMap.ts'
 export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.ts'
 export * as MeasureIntersectionObserversWithStackTraces from '../MeasureIntersectionObserversWithStackTraces/MeasureIntersectionObserversWithStackTraces.ts'
+export * as MeasureJavascriptExecutionTime from '../MeasureJavascriptExecutionTime/MeasureJavascriptExecutionTime.ts'
 export * as MeasureLargestArrayCount from '../MeasureLargestArrayCount/MeasureLargestArrayCount.ts'
 export * as MeasureMapCount from '../MeasureMapCount/MeasureMapCount.ts'
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.ts'
