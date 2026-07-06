@@ -7,8 +7,8 @@ import { spawn } from 'node:child_process'
 import { hasCompleteNodeModulesCache, hasCompleteNodeModulesInDirectory } from './checkVscodeNodeModulesCache.ts'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
-const defaultOldVscodePath = '/root/.cache/repos/vscode'
-const defaultNewVscodePath = '/root/.cache/repos/vscode-2'
+const defaultOldVscodePath = '/root/.cache/repos/vscode-2'
+const defaultNewVscodePath = '/root/.cache/repos/vscode'
 const platform = 'linux'
 const arch = 'x64'
 
