@@ -43,6 +43,27 @@ test('bar chart highlights missing rows with full-width non-overlapping row boxe
   expect(result).toMatch(/height="53\.333/)
 })
 
+test('bar chart keeps two CPU performance counter rows inside the viewBox', async () => {
+  const result = await createChart(
+    [
+      { name: 'instructions', value: 123_456_789 },
+      { name: 'cycles', value: 98_765_432 },
+    ],
+    {
+      fontSize: 12,
+      marginLeft: 160,
+      marginRight: 220,
+      type: 'bar-chart',
+      width: 900,
+    },
+  )
+
+  expect(result).toContain('height="60"')
+  expect(result).toContain('viewBox="0 0 900 60"')
+  expect(result).toContain('V54')
+  expect(result).toContain(',56H')
+})
+
 test('dual bar chart highlights by row name instead of value', async () => {
   const result = await createChart(
     [
