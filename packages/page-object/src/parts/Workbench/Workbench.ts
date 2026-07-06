@@ -292,7 +292,7 @@ export const createWithDependencies = (
           locator: (selector: string) => getNewWindowPage().locator(selector),
           evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
             const page = getNewWindowPage()
-            return page.evaluate(options)
+            return page.evaluateInMainWorld(options)
           },
           sessionRpc: newWindowPage.sessionRpc,
           async shouldBeVisible() {
@@ -335,7 +335,7 @@ export const createWithDependencies = (
       }
     },
     evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
-      return page.evaluate(options)
+      return page.evaluateInMainWorld(options)
     },
     async shouldBeVisible() {
       const workbench = page.locator('.monaco-workbench')
