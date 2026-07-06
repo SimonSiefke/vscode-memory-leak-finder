@@ -1,6 +1,20 @@
 import type { TestContext } from '../types.ts'
 
 const getFrontendStartupPerformanceSample = `(() => {
+  const getEntryStartTime = (entryName, entryType) => {
+    const entries = performance.getEntriesByType(entryType)
+    const entry = entries.find((entry) => entry.name === entryName)
+    return entry && typeof entry.startTime === 'number' ? entry.startTime : undefined
+  }
+  const didLoadWorkbenchMain = getEntryStartTime('code/didLoadWorkbenchMain', 'mark')
+  const didStartWorkbench = getEntryStartTime('code/didStartWorkbench', 'mark')
+  const workbenchStartup =
+    typeof didLoadWorkbenchMain === 'number' && typeof didStartWorkbench === 'number'
+      ? didStartWorkbench - didLoadWorkbenchMain
+      : undefined
+  const workbenchCreateAndRestore = performance
+    .getEntriesByType('measure')
+    .find((entry) => entry.name === 'perf: workbench create & restore')
   const navigationEntry = performance.getEntriesByType('navigation')[0]
   const navigation = navigationEntry ? navigationEntry.toJSON() : {}
   const paintEntries = performance.getEntriesByType('paint')
@@ -14,6 +28,8 @@ const getFrontendStartupPerformanceSample = `(() => {
     responseEnd: navigation.responseEnd,
     timestamp: Date.now(),
     url: location.href,
+    workbenchCreateAndRestore: workbenchCreateAndRestore ? workbenchCreateAndRestore.duration : undefined,
+    workbenchStartup,
   }
   for (const entry of paintEntries) {
     sample[entry.name] = entry.startTime

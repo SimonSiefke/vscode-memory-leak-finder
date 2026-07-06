@@ -6,16 +6,17 @@ import { readJson } from '../ReadJson/ReadJson.ts'
 interface FrontendStartupPerformanceSample {
   readonly loadEventEnd?: number
   readonly runIndex?: number
+  readonly workbenchStartup?: number
 }
 
 const isChartableSample = (sample: FrontendStartupPerformanceSample): boolean => {
-  return typeof sample.loadEventEnd === 'number'
+  return typeof sample.workbenchStartup === 'number'
 }
 
 const toChartRow = (sample: FrontendStartupPerformanceSample, index: number) => {
   return {
     runIndex: typeof sample.runIndex === 'number' ? sample.runIndex : index,
-    value: sample.loadEventEnd || 0,
+    value: sample.workbenchStartup || 0,
   }
 }
 

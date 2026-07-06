@@ -26,7 +26,7 @@ export const createChart = (): {
     x: 'runIndex',
     xLabel: 'Run',
     y: 'value',
-    yLabel: 'loadEventEnd (ms)',
+    yLabel: 'workbenchStartup (ms)',
   }
 }
 

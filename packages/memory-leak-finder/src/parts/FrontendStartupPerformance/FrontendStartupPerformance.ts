@@ -11,6 +11,8 @@ export interface FrontendStartupPerformanceMetric {
 }
 
 const metricNames = [
+  'workbenchStartup',
+  'workbenchCreateAndRestore',
   'responseEnd',
   'domInteractive',
   'domContentLoadedEventStart',

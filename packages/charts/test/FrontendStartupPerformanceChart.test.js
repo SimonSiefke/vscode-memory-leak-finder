@@ -5,7 +5,7 @@ import { expect, test } from '@jest/globals'
 import * as CreateFrontendStartupPerformanceChart from '../src/parts/CreateFrontendStartupPerformanceChart/CreateFrontendStartupPerformanceChart.ts'
 import { getFrontendStartupPerformanceData } from '../src/parts/GetFrontendStartupPerformanceData/GetFrontendStartupPerformanceData.ts'
 
-test('getFrontendStartupPerformanceData returns load event end values per run', async () => {
+test('getFrontendStartupPerformanceData returns workbench startup values per run', async () => {
   const workspaceRoot = await mkdtemp(join(tmpdir(), 'frontend-startup-performance-data-'))
   const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
   const resultsPath = join(basePath, 'frontend-startup-performance')
@@ -16,7 +16,7 @@ test('getFrontendStartupPerformanceData returns load event end values per run', 
     JSON.stringify({
       frontendStartupPerformance: {
         metrics: [{ median: 25, name: 'duration' }],
-        samples: [{ loadEventEnd: 12, runIndex: 1 }, { loadEventEnd: 8, runIndex: 0 }, { duration: 25 }],
+        samples: [{ workbenchStartup: 12, runIndex: 1 }, { workbenchStartup: 8, runIndex: 0 }, { duration: 25 }],
       },
     }),
   )
@@ -46,7 +46,7 @@ test('createFrontendStartupPerformanceChart uses line chart multi-chart configur
       type: 'line-chart',
       x: 'runIndex',
       y: 'value',
-      yLabel: 'loadEventEnd (ms)',
+      yLabel: 'workbenchStartup (ms)',
     }),
   )
 })

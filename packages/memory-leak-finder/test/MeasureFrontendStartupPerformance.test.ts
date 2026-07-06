@@ -21,11 +21,11 @@ test('frontend startup performance measure lifecycle initializes and reads sampl
 
   const args = MeasureFrontendStartupPerformance.create(session) as [any]
   const before = await MeasureFrontendStartupPerformance.start(...args)
-  samples.push({ duration: 10, loadEventEnd: 20 })
+  samples.push({ duration: 10, loadEventEnd: 20, workbenchStartup: 15 })
   const after = await MeasureFrontendStartupPerformance.stop(...args)
 
   expect(before).toEqual([])
-  expect(after).toEqual([{ duration: 10, loadEventEnd: 20 }])
+  expect(after).toEqual([{ duration: 10, loadEventEnd: 20, workbenchStartup: 15 }])
   expect(calls).toHaveLength(2)
 })
 
@@ -36,11 +36,13 @@ test('frontend startup performance compare aggregates samples', () => {
       {
         duration: 30,
         loadEventStart: 10,
+        workbenchStartup: 20,
         'first-paint': 5,
       },
       {
         duration: 10,
         loadEventStart: 0,
+        workbenchStartup: 10,
         'first-paint': 15,
       },
     ],
@@ -56,6 +58,15 @@ test('frontend startup performance compare aggregates samples', () => {
     median: 20,
     min: 10,
     name: 'duration',
+    unit: 'ms',
+  })
+  expect(result.metrics.find((metric: any) => metric.name === 'workbenchStartup')).toEqual({
+    count: 2,
+    max: 20,
+    mean: 15,
+    median: 15,
+    min: 10,
+    name: 'workbenchStartup',
     unit: 'ms',
   })
   expect(result.metrics.find((metric: any) => metric.name === 'loadEventStart')).toEqual({
