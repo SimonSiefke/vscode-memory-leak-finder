@@ -3,9 +3,10 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-const mockTransformCode = jest.fn<
-  (code: string, options: { readonly filename?: string; readonly minify?: boolean; readonly trackingMode?: string }) => Promise<string>
->()
+const mockTransformCode =
+  jest.fn<
+    (code: string, options: { readonly filename?: string; readonly minify?: boolean; readonly trackingMode?: string }) => Promise<string>
+  >()
 
 jest.unstable_mockModule('../src/parts/Transform/Transform.ts', () => ({
   transformCode: mockTransformCode,

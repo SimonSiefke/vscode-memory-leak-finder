@@ -10,9 +10,9 @@ test('protocolInterceptorScript requests lazy transforms for local source out mo
   expect(script).toContain("!normalizedPath.includes('/resources/app/out/')")
   expect(script).toContain('isJavaScript && isLocalSourceOutJavaScript(filePath)')
   expect(script).toContain("const requestPath = '/transform?filePath=' + encodeURIComponent(filePath)")
-  expect(script).toContain("port: transformServerPort")
+  expect(script).toContain('port: transformServerPort')
   expect(script).toContain("return 'allocations'")
-  expect(script).toContain("readTransformedFile(filePath).then")
+  expect(script).toContain('readTransformedFile(filePath).then')
 })
 
 test('protocolInterceptorScript keeps worker and blob script skips', () => {
