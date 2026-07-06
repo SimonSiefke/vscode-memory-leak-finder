@@ -3,15 +3,19 @@ import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
-interface FrontendStartupPerformanceMetric {
-  readonly median?: number
-  readonly name?: string
+interface FrontendStartupPerformanceSample {
+  readonly loadEventEnd?: number
+  readonly runIndex?: number
 }
 
-const toChartRow = (metric: FrontendStartupPerformanceMetric) => {
+const isChartableSample = (sample: FrontendStartupPerformanceSample): boolean => {
+  return typeof sample.loadEventEnd === 'number'
+}
+
+const toChartRow = (sample: FrontendStartupPerformanceSample, index: number) => {
   return {
-    name: metric.name || '',
-    value: metric.median || 0,
+    runIndex: typeof sample.runIndex === 'number' ? sample.runIndex : index,
+    value: sample.loadEventEnd || 0,
   }
 }
 
@@ -25,11 +29,11 @@ export const getFrontendStartupPerformanceData = async (basePath: string): Promi
   for (const dirent of dirents.toSorted()) {
     const absolutePath = join(resultsPath, dirent)
     const rawData = await readJson(absolutePath)
-    const metrics = rawData.frontendStartupPerformance?.metrics || []
-    const data = metrics
-      .filter((metric: FrontendStartupPerformanceMetric) => typeof metric.median === 'number')
+    const samples = rawData.frontendStartupPerformance?.samples || []
+    const data = samples
+      .filter(isChartableSample)
       .map(toChartRow)
-      .sort((a: { value: number }, b: { value: number }) => b.value - a.value)
+      .sort((a: { runIndex: number }, b: { runIndex: number }) => a.runIndex - b.runIndex)
     allData.push({
       data,
       filename: dirent.replace('.json', ''),

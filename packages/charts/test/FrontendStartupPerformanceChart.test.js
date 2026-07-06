@@ -5,7 +5,7 @@ import { expect, test } from '@jest/globals'
 import * as CreateFrontendStartupPerformanceChart from '../src/parts/CreateFrontendStartupPerformanceChart/CreateFrontendStartupPerformanceChart.ts'
 import { getFrontendStartupPerformanceData } from '../src/parts/GetFrontendStartupPerformanceData/GetFrontendStartupPerformanceData.ts'
 
-test('getFrontendStartupPerformanceData returns median metric values per test file', async () => {
+test('getFrontendStartupPerformanceData returns load event end values per run', async () => {
   const workspaceRoot = await mkdtemp(join(tmpdir(), 'frontend-startup-performance-data-'))
   const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
   const resultsPath = join(basePath, 'frontend-startup-performance')
@@ -15,7 +15,8 @@ test('getFrontendStartupPerformanceData returns median metric values per test fi
     join(resultsPath, 'window-open-new.json'),
     JSON.stringify({
       frontendStartupPerformance: {
-        metrics: [{ median: 25, name: 'duration' }, { median: 12, name: 'loadEventEnd' }, { name: 'first-paint' }],
+        metrics: [{ median: 25, name: 'duration' }],
+        samples: [{ loadEventEnd: 12, runIndex: 1 }, { loadEventEnd: 8, runIndex: 0 }, { duration: 25 }],
       },
     }),
   )
@@ -26,8 +27,8 @@ test('getFrontendStartupPerformanceData returns median metric values per test fi
     expect(result).toEqual([
       {
         data: [
-          { name: 'duration', value: 25 },
-          { name: 'loadEventEnd', value: 12 },
+          { runIndex: 0, value: 8 },
+          { runIndex: 1, value: 12 },
         ],
         filename: 'window-open-new',
       },
@@ -37,13 +38,15 @@ test('getFrontendStartupPerformanceData returns median metric values per test fi
   }
 })
 
-test('createFrontendStartupPerformanceChart uses bar chart multi-chart configuration', () => {
+test('createFrontendStartupPerformanceChart uses line chart multi-chart configuration', () => {
   expect(CreateFrontendStartupPerformanceChart.name).toBe('frontend-startup-performance')
   expect(CreateFrontendStartupPerformanceChart.multiple).toBe(true)
   expect(CreateFrontendStartupPerformanceChart.createChart()).toEqual(
     expect.objectContaining({
-      type: 'bar-chart',
-      xLabel: 'Median (ms)',
+      type: 'line-chart',
+      x: 'runIndex',
+      y: 'value',
+      yLabel: 'loadEventEnd (ms)',
     }),
   )
 })

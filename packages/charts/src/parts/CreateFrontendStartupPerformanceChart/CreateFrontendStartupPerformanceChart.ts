@@ -19,14 +19,14 @@ export const createChart = (): {
 } => {
   return {
     fontSize: 12,
-    marginLeft: 260,
-    marginRight: 220,
-    type: 'bar-chart',
+    marginLeft: 70,
+    marginRight: 40,
+    type: 'line-chart',
     width: 900,
-    x: 'value',
-    xLabel: 'Median (ms)',
-    y: 'name',
-    yLabel: 'Frontend Startup Performance',
+    x: 'runIndex',
+    xLabel: 'Run',
+    y: 'value',
+    yLabel: 'loadEventEnd (ms)',
   }
 }
 
