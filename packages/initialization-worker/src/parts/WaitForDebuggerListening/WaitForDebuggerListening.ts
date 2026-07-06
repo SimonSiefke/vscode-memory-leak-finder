@@ -15,7 +15,11 @@ const isIgnoredError = (data: string): boolean => {
   if (data.includes('Failed to connect to the bus')) {
     return true
   }
+<<<<<<< HEAD
   if(data.includes(`For help, see: https://nodejs.org/learn/getting-started/debugging`)){
+=======
+  if (data.includes(`For help, see: https://nodejs.org/learn/getting-started/debugging`)) {
+>>>>>>> origin/main
     return true
   }
   return false
