@@ -274,7 +274,7 @@ const getPathHash = (path: string): string => {
 }
 
 export const getLocalVscodeComparisonCacheDir = (repoPath: string): string => {
-  return join(repositoryRoot, 'test_data', 'local-vscode-comparison', `${basename(repoPath)}-${getPathHash(repoPath)}`)
+  return join(repositoryRoot, '.vscode-test', 'cache-keys', 'local-vscode-comparison', `${basename(repoPath)}-${getPathHash(repoPath)}`)
 }
 
 const getNodeModulesCacheStampPath = (repoPath: string): string => {
