@@ -100,7 +100,8 @@ test('getResultPath derives measure result path', () => {
 })
 
 test('getMinifiedExecutablePath derives local minified executable path', () => {
-  expect(getMinifiedExecutablePath('/root/.cache/repos/vscode')).toBe('/root/.cache/repos/VSCode-linux-x64/code-oss')
+  expect(getMinifiedExecutablePath('/root/.cache/repos/vscode')).toBe('/root/.cache/repos/VSCode-linux-x64-vscode/code-oss')
+  expect(getMinifiedExecutablePath('/root/.cache/repos/vscode-2')).toBe('/root/.cache/repos/VSCode-linux-x64-vscode-2/code-oss')
 })
 
 test('getLabeledResultPath inserts label before json extension', () => {
@@ -185,9 +186,12 @@ test('ensureLocalVscodeBuild skips commands when repo is ready', async () => {
 test('ensureLocalVscodeBuild runs minify when executable is missing', async () => {
   const repoPath = await createVscodeFixture()
   const commands: string[] = []
+  const sharedBuildPath = join(dirname(repoPath), 'VSCode-linux-x64')
+  await mkdir(sharedBuildPath, { recursive: true })
+  await writeFile(join(sharedBuildPath, 'code-oss'), '')
   const executablePath = await ensureLocalVscodeBuild(repoPath, false, {
     hasCompleteNodeModulesCache: async () => true,
-    pathExists: async (path) => path !== getMinifiedExecutablePath(repoPath),
+    pathExists: async (path) => path === join(sharedBuildPath, 'code-oss'),
     readCommand: async (command, args) => {
       if (command === 'git' && args[0] === 'status') {
         return ''
@@ -196,12 +200,15 @@ test('ensureLocalVscodeBuild runs minify when executable is missing', async () =
     },
     runCommand: async (command, args) => {
       commands.push([command, ...args].join(' '))
+      await mkdir(sharedBuildPath, { recursive: true })
+      await writeFile(join(sharedBuildPath, 'code-oss'), '')
     },
   })
 
   expect(executablePath).toBe(getMinifiedExecutablePath(repoPath))
   expect(commands).toEqual(['npx gulp vscode-linux-x64-min'])
   await expect(readFile(join(repoPath, 'node_modules', '.build-cache'), 'utf8')).resolves.toBe('abcdef\n')
+  await expect(readFile(getMinifiedExecutablePath(repoPath), 'utf8')).resolves.toBe('')
 })
 
 test('ensureLocalVscodeBuild skips install when node_modules cache stamp matches', async () => {

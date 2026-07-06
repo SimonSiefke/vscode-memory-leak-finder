@@ -84,6 +84,10 @@ const pathExists = async (path: string): Promise<boolean> => {
 }
 
 export const getMinifiedExecutablePath = (vscodePath: string): string => {
+  return join(dirname(vscodePath), `VSCode-${platform}-${arch}-${basename(vscodePath)}`, 'code-oss')
+}
+
+const getSharedMinifiedExecutablePath = (vscodePath: string): string => {
   return join(dirname(vscodePath), `VSCode-${platform}-${arch}`, 'code-oss')
 }
 
@@ -273,6 +277,19 @@ const getBuildCacheStampPath = (repoPath: string): string => {
   return join(repoPath, 'node_modules', '.build-cache')
 }
 
+const moveSharedBuildToCheckoutBuild = async (vscodePath: string): Promise<void> => {
+  const sharedExecutablePath = getSharedMinifiedExecutablePath(vscodePath)
+  const checkoutExecutablePath = getMinifiedExecutablePath(vscodePath)
+  const sharedBuildPath = dirname(sharedExecutablePath)
+  const checkoutBuildPath = dirname(checkoutExecutablePath)
+  if (sharedBuildPath === checkoutBuildPath) {
+    return
+  }
+  await rm(checkoutBuildPath, { force: true, recursive: true })
+  await mkdir(dirname(checkoutBuildPath), { recursive: true })
+  await rename(sharedBuildPath, checkoutBuildPath)
+}
+
 const installDependencies = async (repoPath: string, run: RunCommand): Promise<void> => {
   const npmPath = await findNodeBinPath(repoPath, 'npm')
   const env = getCommandEnv(npmPath)
@@ -364,6 +381,7 @@ export const ensureLocalVscodeBuild = async (
 ): Promise<string> => {
   await assertNoUnstagedChanges(vscodePath, dependencies.readCommand)
   const executablePath = getMinifiedExecutablePath(vscodePath)
+  const sharedExecutablePath = getSharedMinifiedExecutablePath(vscodePath)
   const nodeModulesCacheKey = await computeVscodeNodeModulesCacheKey(vscodePath)
   const hasNodeModulesCache = await hasValidNodeModulesCache(vscodePath, nodeModulesCacheKey, dependencies.hasCompleteNodeModulesCache)
   const currentCommit = await getGitCommit(vscodePath, dependencies.readCommand)
@@ -380,10 +398,19 @@ export const ensureLocalVscodeBuild = async (
   }
   if (actions.includes('minify')) {
     const npxPath = await findNodeBinPath(vscodePath, 'npx')
-    await dependencies.runCommand(npxPath, ['gulp', `vscode-${platform}-${arch}-min`], {
-      cwd: vscodePath,
-      env: getCommandEnv(npxPath),
-    })
+    await rm(dirname(sharedExecutablePath), { force: true, recursive: true })
+    try {
+      await dependencies.runCommand(npxPath, ['gulp', `vscode-${platform}-${arch}-min`], {
+        cwd: vscodePath,
+        env: getCommandEnv(npxPath),
+      })
+    } catch (error) {
+      if (!(await dependencies.pathExists(sharedExecutablePath))) {
+        throw error
+      }
+      console.warn(`Warning: minified VS Code build command failed, but executable exists at ${sharedExecutablePath}. Continuing.`)
+    }
+    await moveSharedBuildToCheckoutBuild(vscodePath)
     await writeStamp(getBuildCacheStampPath(vscodePath), currentCommit)
   }
   return executablePath
@@ -424,12 +451,11 @@ export const renameResult = async (resultPath: string, label: string): Promise<s
 
 export const measureLocalVscodeComparison = async (options: MeasureLocalVscodeComparisonOptions): Promise<void> => {
   const oldExecutablePath = await ensureLocalVscodeBuild(options.oldVscodePath, options.skipBuild)
-  const newExecutablePath = await ensureLocalVscodeBuild(options.newVscodePath, options.skipBuild)
   const resultPath = getResultPath(options.measure, options.only)
-
   await runMeasure(options, oldExecutablePath)
   await renameResult(resultPath, options.oldLabel)
 
+  const newExecutablePath = await ensureLocalVscodeBuild(options.newVscodePath, options.skipBuild)
   await runMeasure(options, newExecutablePath)
   await renameResult(resultPath, options.newLabel)
 
