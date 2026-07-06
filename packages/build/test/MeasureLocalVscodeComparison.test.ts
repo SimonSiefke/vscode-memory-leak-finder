@@ -106,9 +106,11 @@ test('getResultTestName derives names from filters', () => {
 })
 
 test('getResultPath derives measure result path', () => {
-  expect(getResultPath('cpu-performance-counters', '^editor-open.ts').endsWith(
-    join('.vscode-memory-leak-finder-results', 'cpu-performance-counters', 'editor-open.json'),
-  )).toBe(true)
+  expect(
+    getResultPath('cpu-performance-counters', '^editor-open.ts').endsWith(
+      join('.vscode-memory-leak-finder-results', 'cpu-performance-counters', 'editor-open.json'),
+    ),
+  ).toBe(true)
 })
 
 test('getMeasureCommandArgs forwards measure-after to cli', () => {

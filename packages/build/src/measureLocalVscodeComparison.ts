@@ -444,17 +444,13 @@ export const getMeasureCommandArgs = (options: MeasureLocalVscodeComparisonOptio
 }
 
 const runMeasure = async (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): Promise<void> => {
-  await runCommand(
-    process.execPath,
-    getMeasureCommandArgs(options, vscodeExecutablePath),
-    {
-      cwd: repositoryRoot,
-      env: {
-        ...process.env,
-        DISPLAY: options.display,
-      },
+  await runCommand(process.execPath, getMeasureCommandArgs(options, vscodeExecutablePath), {
+    cwd: repositoryRoot,
+    env: {
+      ...process.env,
+      DISPLAY: options.display,
     },
-  )
+  })
 }
 
 export const renameResult = async (resultPath: string, label: string): Promise<string> => {
