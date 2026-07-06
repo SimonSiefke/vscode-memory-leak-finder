@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 
-const perfInstallCommand = 'sudo apt install linux-tools-common linux-tools-generic linux-tools-$(uname -r)'
+const perfInstallCommand = 'sudo apt install -y linux-tools-common linux-tools-generic linux-tools-$(uname -r)'
 
 export interface PerfStatResult {
   readonly code: number | null

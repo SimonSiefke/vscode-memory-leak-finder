@@ -38,7 +38,7 @@ test('startPerfStat handles missing perf program', async () => {
   })
 
   await expect(startPromise).rejects.toThrow(
-    'The perf program is not available. Install it with: sudo apt install linux-tools-common linux-tools-generic linux-tools-$(uname -r)',
+    'The perf program is not available. Install it with: sudo apt install -y linux-tools-common linux-tools-generic linux-tools-$(uname -r)',
   )
   expect(mockSpawn).toHaveBeenCalledWith('perf', PerfStat.getPerfStatArgs(338_272), {
     stdio: ['ignore', 'ignore', 'pipe'],
