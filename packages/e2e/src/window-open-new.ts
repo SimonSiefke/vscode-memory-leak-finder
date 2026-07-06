@@ -1,12 +1,48 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = 1
+const getFrontendStartupPerformanceSample = `(() => {
+  const navigationEntry = performance.getEntriesByType('navigation')[0]
+  const navigation = navigationEntry ? navigationEntry.toJSON() : {}
+  const paintEntries = performance.getEntriesByType('paint')
+  const sample = {
+    domContentLoadedEventEnd: navigation.domContentLoadedEventEnd,
+    domContentLoadedEventStart: navigation.domContentLoadedEventStart,
+    domInteractive: navigation.domInteractive,
+    duration: navigation.duration,
+    loadEventEnd: navigation.loadEventEnd,
+    loadEventStart: navigation.loadEventStart,
+    responseEnd: navigation.responseEnd,
+    timestamp: Date.now(),
+    url: location.href,
+  }
+  for (const entry of paintEntries) {
+    sample[entry.name] = entry.startTime
+  }
+  return sample
+})()`
 
-export const requiresNetwork = 1
+const appendFrontendStartupPerformanceSample = (sample: unknown): string => `(() => {
+  const samples = globalThis.__vscodeMemoryLeakFinderFrontendStartupPerformance
+  if (!Array.isArray(samples)) {
+    return false
+  }
+  const sample = ${JSON.stringify(sample)}
+  sample.runIndex = samples.length
+  samples.push(sample)
+  return true
+})()`
 
 export const run = async ({ Workbench }: TestContext): Promise<void> => {
   const newWindow = await Workbench.openNewWindow()
   await newWindow.shouldBeVisible()
+  const sample = await newWindow.evaluate({
+    expression: getFrontendStartupPerformanceSample,
+    returnByValue: true,
+  })
+  await Workbench.evaluate({
+    expression: appendFrontendStartupPerformanceSample(sample),
+    returnByValue: true,
+  })
   // @ts-ignore
   await newWindow.closeGracefully()
 }

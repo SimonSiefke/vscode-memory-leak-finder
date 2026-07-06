@@ -290,6 +290,10 @@ export const createWithDependencies = (
             }
           },
           locator: (selector: string) => getNewWindowPage().locator(selector),
+          evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
+            const page = getNewWindowPage()
+            return page.evaluate(options)
+          },
           sessionRpc: newWindowPage.sessionRpc,
           async shouldBeVisible() {
             const page = getNewWindowPage()
@@ -329,6 +333,9 @@ export const createWithDependencies = (
       } catch (error) {
         throw new VError(error, `Failed to reload window`)
       }
+    },
+    evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
+      return page.evaluate(options)
     },
     async shouldBeVisible() {
       const workbench = page.locator('.monaco-workbench')
