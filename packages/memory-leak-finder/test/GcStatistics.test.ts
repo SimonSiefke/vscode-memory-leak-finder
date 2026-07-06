@@ -1,9 +1,5 @@
 import { expect, test } from '@jest/globals'
-import {
-  formatGcStatisticsSummary,
-  getGcStatistics,
-  toGcStatisticsRows,
-} from '../src/parts/GcStatistics/GcStatistics.ts'
+import { formatGcStatisticsSummary, getGcStatistics, toGcStatisticsRows } from '../src/parts/GcStatistics/GcStatistics.ts'
 
 test('getGcStatistics counts gc events and computes heap metrics', () => {
   const metrics = getGcStatistics(
