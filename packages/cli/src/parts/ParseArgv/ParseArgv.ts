@@ -360,7 +360,14 @@ const parsePageObjectPath = (argv: readonly string[]): string => {
 
 const parseTrackFunctions = (argv: readonly string[]): boolean => {
   const measure = parseMeasure(argv)
-  return argv.includes('--track-functions') || measure === 'tracked-functions' || measure === 'tracked-allocations'
+  return (
+    argv.includes('--track-functions') ||
+    measure === 'tracked-functions' ||
+    measure === 'tracked-allocations' ||
+    measure === 'trackedAllocations' ||
+    measure === 'tracked-allocations-from-start' ||
+    measure === 'trackedAllocationsFromStart'
+  )
 }
 
 const parseOpenDevtools = (argv: readonly string[]): boolean => {

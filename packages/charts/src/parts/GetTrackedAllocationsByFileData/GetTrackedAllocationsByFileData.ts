@@ -18,6 +18,16 @@ type AllocationFileCounts = {
   name: string
 }
 
+const resultFolders = ['tracked-allocations', 'tracked-allocations-from-start']
+
+const getFilename = (folder: string, dirent: string): string => {
+  const name = dirent.replace('.json', '')
+  if (folder === 'tracked-allocations') {
+    return name
+  }
+  return `${folder}/${name}`
+}
+
 const getSourceName = (item: TrackedAllocation): string => {
   return item.originalSource || item.originalLocation || item.location || 'Unknown'
 }
@@ -49,26 +59,28 @@ const getAllocationFileCounts = (trackedAllocations: readonly TrackedAllocation[
 }
 
 export const getTrackedAllocationsByFileData = async (basePath: string) => {
-  const resultsPath = join(basePath, 'tracked-allocations')
-  if (!existsSync(resultsPath)) {
-    return []
-  }
-  const dirents = await readdir(resultsPath)
   const allData: any[] = []
-  for (const dirent of dirents.sort()) {
-    if (!dirent.endsWith('.json')) {
+  for (const folder of resultFolders) {
+    const resultsPath = join(basePath, folder)
+    if (!existsSync(resultsPath)) {
       continue
     }
-    const filePath = join(resultsPath, dirent)
-    const rawData = await readJson(filePath)
-    const trackedAllocations = getTrackedAllocations(rawData)
-    const fileData = getAllocationFileCounts(trackedAllocations)
-    const limitedData = fileData.slice(0, TrackedAllocationsChartLimit)
-    allData.push({
-      data: limitedData,
-      filename: dirent.replace('.json', ''),
-      omittedEntryCount: fileData.length - limitedData.length,
-    })
+    const dirents = await readdir(resultsPath)
+    for (const dirent of dirents.sort()) {
+      if (!dirent.endsWith('.json')) {
+        continue
+      }
+      const filePath = join(resultsPath, dirent)
+      const rawData = await readJson(filePath)
+      const trackedAllocations = getTrackedAllocations(rawData)
+      const fileData = getAllocationFileCounts(trackedAllocations)
+      const limitedData = fileData.slice(0, TrackedAllocationsChartLimit)
+      allData.push({
+        data: limitedData,
+        filename: getFilename(folder, dirent),
+        omittedEntryCount: fileData.length - limitedData.length,
+      })
+    }
   }
   return allData
 }

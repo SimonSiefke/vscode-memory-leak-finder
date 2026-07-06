@@ -1,3 +1,5 @@
+.vscode-workbench-tracked-allocations
+.vscode-workbench-tracked-modules
 .minimal-reproductions
 .bot-user-data
 .vscode-user-data-dir.zip
