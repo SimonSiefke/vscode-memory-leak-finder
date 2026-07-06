@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { readJson } from '../ReadJson/ReadJson.ts'
+import { TrackedAllocationsChartLimit } from '../TrackedAllocationsChartLimit/TrackedAllocationsChartLimit.ts'
 
 type TrackedAllocation = {
   readonly collectedCount?: number
@@ -54,7 +55,7 @@ const getAllocationFileCounts = (trackedAllocations: readonly TrackedAllocation[
     existing.created += item.createdCount || 0
     countsBySource.set(name, existing)
   }
-  return [...countsBySource.values()].sort((a, b) => b.created - a.created || b.collected - a.collected).slice(0, 10_000)
+  return [...countsBySource.values()].sort((a, b) => b.created - a.created || b.collected - a.collected)
 }
 
 export const getTrackedAllocationsByFileData = async (basePath: string) => {
@@ -72,9 +73,12 @@ export const getTrackedAllocationsByFileData = async (basePath: string) => {
       const filePath = join(resultsPath, dirent)
       const rawData = await readJson(filePath)
       const trackedAllocations = getTrackedAllocations(rawData)
+      const fileData = getAllocationFileCounts(trackedAllocations)
+      const limitedData = fileData.slice(0, TrackedAllocationsChartLimit)
       allData.push({
-        data: getAllocationFileCounts(trackedAllocations),
+        data: limitedData,
         filename: getFilename(folder, dirent),
+        omittedEntryCount: fileData.length - limitedData.length,
       })
     }
   }

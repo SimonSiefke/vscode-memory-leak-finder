@@ -99,6 +99,7 @@ export const generateCharts = async () => {
               ...chartMetaData,
               compress: config.compress,
               highlightLabels: getHighlightLabels(chartData, comparisonChartData, shouldHighlightChanges),
+              omittedEntryCount: item.omittedEntryCount || 0,
             })
             let outPath
             if (basePathInfo.isNode) {
