@@ -72,6 +72,7 @@ export const InstanceCountsDifferenceWithStackTraces = 'instanceCountsDifference
 export const InstanceCountsWithSourceMap = 'instanceCountsWithSourceMap'
 export const IntersectionObserverCount = 'intersectionObserverCount'
 export const IntersectionObserversWithStackTraces = 'intersectionObserversWithStackTraces'
+export const JavascriptExecutionTime = 'javascriptExecutionTime'
 export const LargestArrayCount = 'largestArrayCount'
 export const MapCount = 'mapCount'
 export const MapSize = 'mapSize'
