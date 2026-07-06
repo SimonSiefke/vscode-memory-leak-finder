@@ -53,6 +53,7 @@ export * as MeasureFileDescriptorCount from '../MeasureFileDescriptorCount/Measu
 export * as MeasureFileDescriptors from '../MeasureFileDescriptors/MeasureFileDescriptors.ts'
 export * as MeasureFileWatcherCount from '../MeasureFileWatcherCount/MeasureFileWatcherCount.ts'
 export * as MeasureFunctionCount from '../MeasureFunctionCount/MeasureFunctionCount.ts'
+export * as MeasureFrontendStartupPerformance from '../MeasureFrontendStartupPerformance/MeasureFrontendStartupPerformance.ts'
 export * as MeasureGlobalLexicalScopeNames from '../MeasureGlobalLexicalScopeNames/MeasureGlobalLexicalScopeNames.ts'
 export * as MeasureGpuCanvasContextCount from '../MeasureGpuCanvasContextCount/MeasureGpuCanvasContextCount.ts'
 export * as MeasureGrowingArrays from '../MeasureGrowingArrays/MeasureGrowingArrays.ts'

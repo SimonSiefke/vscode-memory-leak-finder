@@ -114,6 +114,28 @@ test('grouped horizontal bar chart renders omitted entries footer', async () => 
   expect(result).toContain('viewBox="0 0 640 116"')
 })
 
+test('line chart renders connected load event points', async () => {
+  const result = await createChart(
+    [
+      { runIndex: 1, value: 42 },
+      { runIndex: 0, value: 35 },
+    ],
+    {
+      type: 'line-chart',
+      x: 'runIndex',
+      xLabel: 'Run',
+      y: 'value',
+      yLabel: 'loadEventEnd (ms)',
+    },
+  )
+
+  expect(result).toContain('loadEventEnd (ms)')
+  expect(result).toContain('35 ms')
+  expect(result).toContain('42 ms')
+  expect(result).toContain('aria-label="line"')
+  expect(result).toContain('aria-label="dot"')
+})
+
 test('cpu profile flame chart renders frames, ticks, labels, and tooltips', async () => {
   const result = await createChart(
     [
