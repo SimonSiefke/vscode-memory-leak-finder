@@ -35,11 +35,7 @@ export const isImportantErrorMessage = (data: string): boolean => {
   if (data.includes(`For help, see: https://nodejs.org/en/docs/inspector`)) {
     return false
   }
-<<<<<<< HEAD
-  if(data.includes(`For help, see: https://nodejs.org/learn/getting-started/debugging`)){
-=======
   if (data.includes(`For help, see: https://nodejs.org/learn/getting-started/debugging`)) {
->>>>>>> origin/main
     return false
   }
   if (data.trim() === 'Debugger attached.') {
