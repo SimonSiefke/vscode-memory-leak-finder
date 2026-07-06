@@ -2,7 +2,7 @@ import { expect, test } from '@jest/globals'
 import { protocolInterceptorScript } from '../src/parts/ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
 
 test('protocolInterceptorScript requests lazy transforms for local source out modules', () => {
-  const script = protocolInterceptorScript(33692, '/tmp/.vscode-workbench-tracked-allocations/workbench.desktop.main.js')
+  const script = protocolInterceptorScript(33692, '/tmp/.vscode-workbench-tracked-allocations/workbench.desktop.main.js', 'allocations')
 
   expect(script).toContain("const http = require('http')")
   expect(script).toContain('const isLocalSourceOutJavaScript = (filePath) => {')
@@ -11,8 +11,16 @@ test('protocolInterceptorScript requests lazy transforms for local source out mo
   expect(script).toContain('isJavaScript && isLocalSourceOutJavaScript(filePath)')
   expect(script).toContain("const requestPath = '/transform?filePath=' + encodeURIComponent(filePath)")
   expect(script).toContain('port: transformServerPort')
-  expect(script).toContain("return 'allocations'")
+  expect(script).toContain('const trackingMode = "allocations"')
+  expect(script).toContain('return trackingMode')
   expect(script).toContain('readTransformedFile(filePath).then')
+})
+
+test('protocolInterceptorScript uses explicit function tracking mode by default', () => {
+  const script = protocolInterceptorScript(33692, '/tmp/.vscode-workbench-tracked-allocations/workbench.desktop.main.js')
+
+  expect(script).toContain('const trackingMode = "functions"')
+  expect(script).toContain('return trackingMode')
 })
 
 test('protocolInterceptorScript keeps worker and blob script skips', () => {

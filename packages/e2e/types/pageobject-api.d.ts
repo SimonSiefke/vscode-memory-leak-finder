@@ -47,6 +47,7 @@ export interface ChatEditorSendMessageOptions extends ChatEditorSendOptions {
 
 export interface PageObjectWindowHandle extends NewWindowHandle {
   sessionRpc?: any
+  evaluate(options: any): Promise<unknown>
   locator?: (selector: string) => any
   waitForIdle(): Promise<void>
   shouldBeVisible(): Promise<void>
@@ -903,6 +904,7 @@ export interface Workbench {
   waitForNewWindow(options: any): Promise<void>
   openNewWindow(): Promise<PageObjectApi & PageObjectWindowHandle>
   close(): Promise<void>
+  evaluate(options: any): Promise<unknown>
   shouldBeVisible(): Promise<void>
   reload(): Promise<void>
   focusLeftEditorGroup(): Promise<void>

@@ -1,4 +1,5 @@
 import { addRowHighlights } from '../AddRowHighlights/AddRowHighlights.ts'
+import { addOmittedEntriesFooter } from '../AddOmittedEntriesFooter/AddOmittedEntriesFooter.ts'
 import { getCommonBarChartOptions } from '../GetCommonBarChartOptions/GetCommonBarChartOptions.ts'
 
 const CREATED_COLOR = '#111111'
@@ -50,5 +51,6 @@ export const createGroupedHorizontalBarChart = (data: any, options: any): string
     .join('')
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" fill="currentColor" font-family="system-ui, sans-serif" font-size="${chartOptions.fontSize}" width="${chartOptions.width}" height="${chartOptions.height}" viewBox="0 0 ${chartOptions.width} ${chartOptions.height}" style="overflow: visible; background:white"><title>Created and collected allocations by file</title>${rows}</svg>`
-  return addRowHighlights(svg, orderedData, chartOptions, options)
+  const highlightedSvg = addRowHighlights(svg, orderedData, chartOptions, options)
+  return addOmittedEntriesFooter(highlightedSvg, options)
 }

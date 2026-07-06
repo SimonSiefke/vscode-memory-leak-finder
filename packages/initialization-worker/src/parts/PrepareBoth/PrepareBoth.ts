@@ -51,6 +51,7 @@ export const prepareBoth = async (
     HTTP_SERVER_PORT,
     preGeneratedWorkbenchPath,
     measureId,
+    trackingMode,
   )
 
   await DevtoolsProtocolDebugger.resume(electronRpc)

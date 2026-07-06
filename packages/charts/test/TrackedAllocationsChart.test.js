@@ -31,6 +31,33 @@ test('getTrackedAllocationsData returns allocation churn per test file', async (
           { count: 5, delta: 4, name: 'Array src/a.ts:2:3' },
         ],
         filename: 'chat',
+        omittedEntryCount: 0,
+      },
+    ])
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})
+
+test('getTrackedAllocationsData includes tracked allocations from start results', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'tracked-allocations-from-start-data-'))
+  const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const resultsPath = join(basePath, 'tracked-allocations-from-start')
+
+  await mkdir(resultsPath, { recursive: true })
+  await writeFile(
+    join(resultsPath, 'editor-open.json'),
+    JSON.stringify([{ collectedCount: 11, createdCount: 13, location: '1:2:3', type: 'Array' }]),
+  )
+
+  try {
+    const result = await getTrackedAllocationsData(basePath)
+
+    expect(result).toEqual([
+      {
+        data: [{ count: 13, delta: 11, name: 'Array 1:2:3' }],
+        filename: 'tracked-allocations-from-start/editor-open',
+        omittedEntryCount: 0,
       },
     ])
   } finally {
@@ -80,8 +107,84 @@ test('getTrackedAllocationsByFileData returns created and collected counts group
           { collected: 0, created: 1, name: 'Unknown' },
         ],
         filename: 'editor-open',
+        omittedEntryCount: 0,
       },
     ])
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})
+
+test('getTrackedAllocationsByFileData includes tracked allocations from start results', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'tracked-allocations-from-start-by-file-data-'))
+  const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const resultsPath = join(basePath, 'tracked-allocations-from-start')
+
+  await mkdir(resultsPath, { recursive: true })
+  await writeFile(
+    join(resultsPath, 'editor-open.json'),
+    JSON.stringify([{ collectedCount: 3, createdCount: 5, originalSource: 'src/workbench.ts' }]),
+  )
+
+  try {
+    const result = await getTrackedAllocationsByFileData(basePath)
+
+    expect(result).toEqual([
+      {
+        data: [{ collected: 3, created: 5, name: 'src/workbench.ts' }],
+        filename: 'tracked-allocations-from-start/editor-open',
+        omittedEntryCount: 0,
+      },
+    ])
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})
+
+test('getTrackedAllocationsData limits chart rows and records omitted entries', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'tracked-allocations-data-limit-'))
+  const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const resultsPath = join(basePath, 'tracked-allocations')
+  const trackedAllocations = Array.from({ length: 105 }, (_, index) => ({
+    collectedCount: index,
+    createdCount: index + 1,
+    location: `1:${index}:1`,
+    type: 'Object',
+  }))
+
+  await mkdir(resultsPath, { recursive: true })
+  await writeFile(join(resultsPath, 'chat.json'), JSON.stringify(trackedAllocations))
+
+  try {
+    const result = await getTrackedAllocationsData(basePath)
+
+    expect(result[0].data).toHaveLength(100)
+    expect(result[0].data[0]).toEqual({ count: 105, delta: 104, name: 'Object 1:104:1' })
+    expect(result[0].omittedEntryCount).toBe(5)
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})
+
+test('getTrackedAllocationsByFileData limits chart rows and records omitted entries', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'tracked-allocations-by-file-data-limit-'))
+  const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const resultsPath = join(basePath, 'tracked-allocations')
+  const trackedAllocations = Array.from({ length: 103 }, (_, index) => ({
+    collectedCount: index,
+    createdCount: index + 1,
+    originalSource: `src/${index}.ts`,
+  }))
+
+  await mkdir(resultsPath, { recursive: true })
+  await writeFile(join(resultsPath, 'editor-open.json'), JSON.stringify({ trackedAllocations }))
+
+  try {
+    const result = await getTrackedAllocationsByFileData(basePath)
+
+    expect(result[0].data).toHaveLength(100)
+    expect(result[0].data[0]).toEqual({ collected: 102, created: 103, name: 'src/102.ts' })
+    expect(result[0].omittedEntryCount).toBe(3)
   } finally {
     await rm(workspaceRoot, { recursive: true, force: true })
   }

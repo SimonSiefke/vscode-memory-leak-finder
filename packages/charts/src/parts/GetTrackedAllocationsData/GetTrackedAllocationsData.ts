@@ -2,14 +2,25 @@ import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { readJson } from '../ReadJson/ReadJson.ts'
+import { TrackedAllocationsChartLimit } from '../TrackedAllocationsChartLimit/TrackedAllocationsChartLimit.ts'
+
+const resultFolders = ['tracked-allocations', 'tracked-allocations-from-start']
+
+const getFilename = (folder: string, dirent: string): string => {
+  const name = dirent.replace('.json', '')
+  if (folder === 'tracked-allocations') {
+    return name
+  }
+  return `${folder}/${name}`
+}
 
 export const getTrackedAllocationsData = async (basePath: string) => {
-  const resultsPath = join(basePath, 'tracked-allocations')
-  if (!existsSync(resultsPath)) {
-    return []
-  }
   const allData: any[] = []
-  try {
+  for (const folder of resultFolders) {
+    const resultsPath = join(basePath, folder)
+    if (!existsSync(resultsPath)) {
+      continue
+    }
     const dirents = await readdir(resultsPath)
     for (const dirent of dirents) {
       if (!dirent.endsWith('.json')) {
@@ -27,14 +38,13 @@ export const getTrackedAllocationsData = async (basePath: string) => {
         }
       })
       fileData.sort((a: any, b: any) => b.delta - a.delta || b.count - a.count)
+      const limitedData = fileData.slice(0, TrackedAllocationsChartLimit)
       allData.push({
-        data: fileData.slice(0, 10_000),
-        filename: dirent.replace('.json', ''),
+        data: limitedData,
+        filename: getFilename(folder, dirent),
+        omittedEntryCount: fileData.length - limitedData.length,
       })
     }
-  } catch (error) {
-    console.error('Error reading tracked allocations data:', error)
-    return []
   }
   return allData
 }

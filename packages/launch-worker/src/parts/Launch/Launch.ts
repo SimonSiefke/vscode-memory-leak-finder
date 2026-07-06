@@ -43,8 +43,13 @@ export interface LaunchOptions {
 
 let proxyWorkerRpc: any = null
 
-const getTrackingMode = (measureId: string): string => {
-  if (measureId === 'tracked-allocations' || measureId === 'trackedAllocations') {
+export const getTrackingMode = (measureId: string): string => {
+  if (
+    measureId === 'tracked-allocations' ||
+    measureId === 'trackedAllocations' ||
+    measureId === 'tracked-allocations-from-start' ||
+    measureId === 'trackedAllocationsFromStart'
+  ) {
     return 'allocations'
   }
   return 'functions'
