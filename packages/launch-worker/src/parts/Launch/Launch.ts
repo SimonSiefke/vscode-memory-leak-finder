@@ -94,11 +94,8 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   } = options
-<<<<<<< HEAD
   const cpuPerformanceCountersFromStartConfig = CpuPerformanceCountersFromStart.getConfig(measureId, connectionId)
-=======
   const trackingMode = getTrackingMode(measureId)
->>>>>>> origin/main
   const {
     child,
     parsedVersion,
