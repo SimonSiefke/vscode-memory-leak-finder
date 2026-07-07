@@ -29,6 +29,8 @@ const ALLOCATION_PREAMBLE_CODE = `(() => {
     return
   }
   let allocationStatistics = Object.create(null)
+  let allocationRuns = []
+  let previousRunCreatedCounts = Object.create(null)
 
   const trackAllocation = (value, scriptId, line, column, type) => {
     if(value === null || (typeof value !== 'object' && typeof value !== 'function')){
@@ -77,8 +79,35 @@ const ALLOCATION_PREAMBLE_CODE = `(() => {
     return result
   }
 
+  globalThis.markAllocationRun = () => {
+    const allocations = []
+    for (const [key, entry] of Object.entries(allocationStatistics)) {
+      const previousCreatedCount = previousRunCreatedCounts[key] || 0
+      const createdCount = entry.createdCount - previousCreatedCount
+      previousRunCreatedCounts[key] = entry.createdCount
+      if(createdCount === 0){
+        continue
+      }
+      allocations.push({
+        createdCount,
+        location: entry.location,
+        type: entry.type,
+      })
+    }
+    allocationRuns.push({
+      allocations,
+      runIndex: allocationRuns.length,
+    })
+  }
+
+  globalThis.getAllocationRuns = () => {
+    return allocationRuns
+  }
+
   globalThis.resetAllocationStatistics = () => {
     allocationStatistics = Object.create(null)
+    allocationRuns = []
+    previousRunCreatedCounts = Object.create(null)
   }
 })();
 `

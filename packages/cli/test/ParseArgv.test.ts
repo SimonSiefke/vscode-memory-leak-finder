@@ -546,6 +546,13 @@ test('parseArgv - tracked allocations from start enables tracking transform', ()
   expect(options.trackFunctions).toBe(true)
 })
 
+test('parseArgv - tracked allocation timeline enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocation-timeline']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-allocation-timeline')
+  expect(options.trackFunctions).toBe(true)
+})
+
 test('parseArgv - explicit --check-leaks takes precedence', () => {
   const argv = ['--check-leaks', '--measure', 'event-listener-count']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
