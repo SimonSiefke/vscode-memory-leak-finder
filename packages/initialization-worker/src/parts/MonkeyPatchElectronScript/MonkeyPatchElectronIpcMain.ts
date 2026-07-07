@@ -163,7 +163,6 @@ export const monkeyPatchElectronIpcMain = `function () { const electron = this
 
   ipcMain.on = function(channel, listener) {
     const wrappedListener = (event, ...args) => {
-<<<<<<< HEAD
       const message = {
         channel,
         timestamp: Date.now(),
@@ -173,10 +172,6 @@ export const monkeyPatchElectronIpcMain = `function () { const electron = this
         to: getMainEndpoint(),
         args: args.map(serializeArg)
       }
-=======
-      patchSender(event.sender)
-      const message = { channel, timestamp: Date.now(), type: 'on', args: args.map(serializeArg) }
->>>>>>> origin/main
       pushMessage(message)
       return listener(event, ...args)
     }

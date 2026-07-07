@@ -1,5 +1,10 @@
-import { expect, test } from '@jest/globals'
+import { beforeEach, expect, test } from '@jest/globals'
 import { monkeyPatchElectronIpcMain } from '../src/parts/MonkeyPatchElectronScript/MonkeyPatchElectronIpcMain.ts'
+
+beforeEach(() => {
+  delete (globalThis as any).__ipcMessages
+  delete (globalThis as any).__vscodeMemoryLeakFinderIpcMainPatched
+})
 
 const runMonkeyPatch = (electron: any): void => {
   const fn = Function(`return (${monkeyPatchElectronIpcMain})`)()
