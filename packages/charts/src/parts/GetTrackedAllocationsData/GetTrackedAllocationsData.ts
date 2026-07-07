@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { readJson } from '../ReadJson/ReadJson.ts'
+import { TrackedAllocationsChartLimit } from '../TrackedAllocationsChartLimit/TrackedAllocationsChartLimit.ts'
 
 const resultFolders = ['tracked-allocations', 'tracked-allocations-from-start']
 
@@ -37,9 +38,11 @@ export const getTrackedAllocationsData = async (basePath: string) => {
         }
       })
       fileData.sort((a: any, b: any) => b.delta - a.delta || b.count - a.count)
+      const limitedData = fileData.slice(0, TrackedAllocationsChartLimit)
       allData.push({
-        data: fileData.slice(0, 10_000),
+        data: limitedData,
         filename: getFilename(folder, dirent),
+        omittedEntryCount: fileData.length - limitedData.length,
       })
     }
   }

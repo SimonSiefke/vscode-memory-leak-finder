@@ -14,6 +14,7 @@
     "test": "lerna run test",
     "type-check": "tsc -b",
     "build-charts": "node packages/charts/src/main.ts",
+    "measure-local-vscode-comparison": "npm --prefix packages/build run measure-local-vscode-comparison --",
     "backport-prs": "npm --prefix packages/build run backport-prs --"
   },
   "repository": {

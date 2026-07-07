@@ -6,6 +6,8 @@
 .vscode-sse-data
 .vscode-project-cache
 .vscode-workbench-tracked
+.vscode-workbench-tracked-allocations
+.vscode-workbench-tracked-modules
 workbench.desktop.main.tracked.js
 .vscode-image-data
 .vscode-insiders-metadata

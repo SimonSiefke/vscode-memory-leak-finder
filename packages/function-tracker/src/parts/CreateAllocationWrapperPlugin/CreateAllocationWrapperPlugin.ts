@@ -3,7 +3,7 @@ import * as t from '@babel/types'
 
 export interface CreateAllocationWrapperPluginOptions {
   readonly allocationLocations?: Map<any, { line: number; column: number }>
-  readonly scriptId?: number
+  readonly scriptId?: number | string
 }
 
 const getLocation = (node: any, allocationLocations: Map<any, { line: number; column: number }>) => {
@@ -64,13 +64,14 @@ const getFactoryCallType = (path: NodePath<t.CallExpression>): string | undefine
 
 export const createAllocationWrapperPlugin = (options: CreateAllocationWrapperPluginOptions): Visitor => {
   const { allocationLocations = new Map(), scriptId = 123 } = options
+  const scriptIdNode = typeof scriptId === 'number' ? t.numericLiteral(scriptId) : t.stringLiteral(scriptId)
 
   const wrapAllocation = (path: NodePath<t.Expression>, type: string) => {
     const node = path.node
     const location = getLocation(node, allocationLocations)
     const wrapped = t.callExpression(t.identifier('trackAllocation'), [
       node,
-      t.numericLiteral(scriptId),
+      scriptIdNode,
       t.numericLiteral(location.line),
       t.numericLiteral(location.column),
       t.stringLiteral(type),

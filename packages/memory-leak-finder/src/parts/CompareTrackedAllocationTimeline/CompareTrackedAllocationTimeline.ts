@@ -18,7 +18,7 @@ export interface TrackedAllocationTimelineResultRun {
   readonly runIndex: number
 }
 
-interface TrackedAllocationTimelineInput {
+export interface TrackedAllocationTimelineInput {
   readonly runs: readonly TrackedAllocationRun[]
   readonly scriptMap?: ScriptMap
 }
@@ -28,9 +28,7 @@ export const compareTrackedAllocationTimeline = async (
   after: TrackedAllocationTimelineInput,
   _context: Session,
 ): Promise<readonly TrackedAllocationTimelineResultRun[]> => {
-  const locations = [
-    ...new Set(after.runs.flatMap((run) => run.allocations.map((allocation) => allocation.location)).filter(Boolean)),
-  ]
+  const locations = [...new Set(after.runs.flatMap((run) => run.allocations.map((allocation) => allocation.location)).filter(Boolean))]
   const resolvedLocations = await ResolveTrackedLocationSourceMaps.resolveTrackedLocationSourceMaps(locations, after.scriptMap)
 
   return after.runs.map((run) => {

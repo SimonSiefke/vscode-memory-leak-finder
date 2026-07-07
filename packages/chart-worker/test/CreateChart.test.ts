@@ -43,6 +43,27 @@ test('bar chart highlights missing rows with full-width non-overlapping row boxe
   expect(result).toMatch(/height="53\.333/)
 })
 
+test('bar chart keeps two CPU performance counter rows inside the viewBox', async () => {
+  const result = await createChart(
+    [
+      { name: 'instructions', value: 123_456_789 },
+      { name: 'cycles', value: 98_765_432 },
+    ],
+    {
+      fontSize: 12,
+      marginLeft: 160,
+      marginRight: 220,
+      type: 'bar-chart',
+      width: 900,
+    },
+  )
+
+  expect(result).toContain('height="60"')
+  expect(result).toContain('viewBox="0 0 900 60"')
+  expect(result).toContain('V54')
+  expect(result).toContain(',56H')
+})
+
 test('dual bar chart highlights by row name instead of value', async () => {
   const result = await createChart(
     [
@@ -57,6 +78,23 @@ test('dual bar chart highlights by row name instead of value', async () => {
 
   expect(result).toContain('data-highlight-label="gone"')
   expect(result).toContain('height="30"')
+})
+
+test('dual bar chart renders omitted entries footer', async () => {
+  const result = await createChart(
+    [
+      { count: 5, delta: 1, name: 'kept' },
+      { count: 3, delta: 1, name: 'gone' },
+    ],
+    {
+      omittedEntryCount: 3213,
+      type: 'dual-bar-chart',
+    },
+  )
+
+  expect(result).toContain('3213 entries omitted for brevity')
+  expect(result).toContain('height="68"')
+  expect(result).toContain('viewBox="0 0 640 68"')
 })
 
 test('grouped horizontal bar chart renders created and collected counts with row highlights', async () => {
@@ -77,6 +115,46 @@ test('grouped horizontal bar chart renders created and collected counts with row
   expect(result).toContain('collected 12')
   expect(result).toContain('data-highlight-label="src/a.ts"')
   expect(result).toContain('aria-label="fixed-row-highlights"')
+  expect(result).not.toContain('entries omitted for brevity')
+})
+
+test('grouped horizontal bar chart renders omitted entries footer', async () => {
+  const result = await createChart(
+    [
+      { collected: 12, created: 10, name: 'src/a.ts' },
+      { collected: 2, created: 4, name: 'src/b.ts' },
+    ],
+    {
+      omittedEntryCount: 3,
+      type: 'grouped-horizontal-bar-chart',
+    },
+  )
+
+  expect(result).toContain('3 entries omitted for brevity')
+  expect(result).toContain('height="116"')
+  expect(result).toContain('viewBox="0 0 640 116"')
+})
+
+test('line chart renders connected load event points', async () => {
+  const result = await createChart(
+    [
+      { runIndex: 1, value: 42 },
+      { runIndex: 0, value: 35 },
+    ],
+    {
+      type: 'line-chart',
+      x: 'runIndex',
+      xLabel: 'Run',
+      y: 'value',
+      yLabel: 'loadEventEnd (ms)',
+    },
+  )
+
+  expect(result).toContain('loadEventEnd (ms)')
+  expect(result).toContain('35 ms')
+  expect(result).toContain('42 ms')
+  expect(result).toContain('aria-label="line"')
+  expect(result).toContain('aria-label="dot"')
 })
 
 test('cpu profile flame chart renders frames, ticks, labels, and tooltips', async () => {

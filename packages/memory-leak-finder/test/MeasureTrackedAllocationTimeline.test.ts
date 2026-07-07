@@ -36,9 +36,7 @@ beforeEach(() => {
 })
 
 test('MeasureTrackedAllocationTimeline.start resets allocations and starts script tracking', async () => {
-  const MeasureTrackedAllocationTimeline = await import(
-    '../src/parts/MeasureTrackedAllocationTimeline/MeasureTrackedAllocationTimeline.ts'
-  )
+  const MeasureTrackedAllocationTimeline = await import('../src/parts/MeasureTrackedAllocationTimeline/MeasureTrackedAllocationTimeline.ts')
   const scriptHandler = {
     scriptMap: {},
     start: jest.fn<() => Promise<void>>().mockResolvedValue(),
@@ -54,9 +52,7 @@ test('MeasureTrackedAllocationTimeline.start resets allocations and starts scrip
 })
 
 test('MeasureTrackedAllocationTimeline.runCompletion marks an allocation run', async () => {
-  const MeasureTrackedAllocationTimeline = await import(
-    '../src/parts/MeasureTrackedAllocationTimeline/MeasureTrackedAllocationTimeline.ts'
-  )
+  const MeasureTrackedAllocationTimeline = await import('../src/parts/MeasureTrackedAllocationTimeline/MeasureTrackedAllocationTimeline.ts')
 
   await MeasureTrackedAllocationTimeline.runCompletion({} as any)
 
@@ -64,9 +60,7 @@ test('MeasureTrackedAllocationTimeline.runCompletion marks an allocation run', a
 })
 
 test('MeasureTrackedAllocationTimeline.stop returns timeline runs with script map', async () => {
-  const MeasureTrackedAllocationTimeline = await import(
-    '../src/parts/MeasureTrackedAllocationTimeline/MeasureTrackedAllocationTimeline.ts'
-  )
+  const MeasureTrackedAllocationTimeline = await import('../src/parts/MeasureTrackedAllocationTimeline/MeasureTrackedAllocationTimeline.ts')
   const scriptHandler = {
     scriptMap: {
       '1': {
@@ -99,9 +93,7 @@ test('MeasureTrackedAllocationTimeline.stop returns timeline runs with script ma
 })
 
 test('MeasureTrackedAllocationTimeline.compare enriches timeline rows', async () => {
-  const MeasureTrackedAllocationTimeline = await import(
-    '../src/parts/MeasureTrackedAllocationTimeline/MeasureTrackedAllocationTimeline.ts'
-  )
+  const MeasureTrackedAllocationTimeline = await import('../src/parts/MeasureTrackedAllocationTimeline/MeasureTrackedAllocationTimeline.ts')
 
   const result = await MeasureTrackedAllocationTimeline.compare(
     {},

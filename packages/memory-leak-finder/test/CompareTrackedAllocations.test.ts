@@ -84,3 +84,42 @@ test('compareTrackedAllocations subtracts before counts', async () => {
     }),
   ])
 })
+
+test('compareTrackedAllocations preserves path based allocation locations from multiple modules', async () => {
+  const before = {}
+  const after = {
+    trackedAllocations: {
+      '/tmp/vscode/out/vs/editor/editor.main.js:2:8:Array': {
+        aliveCount: 0,
+        collectedCount: 3,
+        createdCount: 3,
+        location: '/tmp/vscode/out/vs/editor/editor.main.js:2:8',
+        type: 'Array',
+      },
+      '/tmp/vscode/out/vs/workbench/workbench.main.js:5:12:Object': {
+        aliveCount: 1,
+        collectedCount: 1,
+        createdCount: 2,
+        location: '/tmp/vscode/out/vs/workbench/workbench.main.js:5:12',
+        type: 'Object',
+      },
+    },
+  }
+
+  const result = await CompareTrackedAllocations.compareTrackedAllocations(before, after, {} as any)
+
+  expect(result).toEqual([
+    expect.objectContaining({
+      collectedCount: 3,
+      createdCount: 3,
+      location: '/tmp/vscode/out/vs/editor/editor.main.js:2:8',
+      type: 'Array',
+    }),
+    expect.objectContaining({
+      collectedCount: 1,
+      createdCount: 2,
+      location: '/tmp/vscode/out/vs/workbench/workbench.main.js:5:12',
+      type: 'Object',
+    }),
+  ])
+})
