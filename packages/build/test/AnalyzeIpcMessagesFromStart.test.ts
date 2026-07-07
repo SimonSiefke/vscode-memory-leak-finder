@@ -139,7 +139,7 @@ test('createSvgChart includes slices and legend labels', () => {
   expect(svg).toContain('File content')
 })
 
-test('createSvgChart leaves room for multi-row legend text', () => {
+test('createSvgChart leaves room for inline legend details', () => {
   const categoryIds = [
     'extension-manifests',
     'nls-data',
@@ -170,9 +170,10 @@ test('createSvgChart leaves room for multi-row legend text', () => {
 
   const svg = createSvgChart(summary)
 
-  expect(svg).toContain('width="640" height="504"')
+  expect(svg).toContain('width="640" height="392"')
   expect(svg).toContain('<rect x="320" y="63"')
-  expect(svg).toContain('<text x="344" y="94" font-size="13"')
+  expect(svg).toContain('<text x="344" y="76" font-size="14"')
+  expect(svg).toContain('<text x="493" y="76" font-size="13"')
 })
 
 test('getDefaultOutputPaths derives analysis paths from input path', () => {

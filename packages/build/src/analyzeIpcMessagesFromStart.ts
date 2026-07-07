@@ -540,13 +540,47 @@ const escapeXml = (value: string): string => {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
+const estimateTextWidth = (value: string, fontSize: number): number => {
+  let width = 0
+  for (const character of value) {
+    if (character === ' ') {
+      width += fontSize * 0.28
+    } else if ('il.,:;!|'.includes(character)) {
+      width += fontSize * 0.3
+    } else if ('mwMW'.includes(character)) {
+      width += fontSize * 0.88
+    } else if (/[A-Z0-9]/.test(character)) {
+      width += fontSize * 0.62
+    } else {
+      width += fontSize * 0.52
+    }
+  }
+  return Math.ceil(width)
+}
+
 export const createSvgChart = (summary: AnalysisSummary): string => {
   const categories = summary.categories.filter((category) => category.bytes > 0)
-  const width = 640
   const legendX = 320
   const legendY = 76
-  const legendRowHeight = 40
-  const height = Math.max(360, legendY + categories.length * legendRowHeight + 28)
+  const legendTextX = legendX + 24
+  const legendDetailGap = 12
+  const legendRowHeight = 28
+  const paddingRight = 36
+  const legendRowsData = categories.map((category) => {
+    const label = `${category.label} (${category.percentage.toFixed(2)}%)`
+    const detail = `${formatBytes(category.bytes)}, ${category.count} messages`
+    const detailX = legendTextX + estimateTextWidth(label, 14) + legendDetailGap
+    const rowWidth = detailX + estimateTextWidth(detail, 13) + paddingRight
+    return {
+      category,
+      detail,
+      detailX,
+      label,
+      rowWidth,
+    }
+  })
+  const width = Math.max(640, ...legendRowsData.map((row) => row.rowWidth))
+  const height = Math.max(360, legendY + categories.length * legendRowHeight + 36)
   const chartCenterX = 142
   const chartCenterY = 172
   const chartRadius = 72
@@ -564,16 +598,12 @@ export const createSvgChart = (summary: AnalysisSummary): string => {
     offset += length
   }
 
-  const legendRows = categories.map((category, index) => {
+  const legendRows = legendRowsData.map(({ category, detail, detailX, label }, index) => {
     const y = legendY + index * legendRowHeight
     return [
       `<rect x="${legendX}" y="${y - 13}" width="14" height="14" fill="${categoryColors[category.id]}" rx="2" />`,
-      `<text x="${legendX + 24}" y="${y}" font-size="14" font-family="Arial, sans-serif" fill="#222">${escapeXml(category.label)} (${category.percentage.toFixed(
-        2,
-      )}%)</text>`,
-      `<text x="${legendX + 24}" y="${y + 18}" font-size="13" font-family="Arial, sans-serif" fill="#555">${escapeXml(formatBytes(category.bytes))}, ${
-        category.count
-      } messages</text>`,
+      `<text x="${legendTextX}" y="${y}" font-size="14" font-family="Arial, sans-serif" fill="#222">${escapeXml(label)}</text>`,
+      `<text x="${detailX}" y="${y}" font-size="13" font-family="Arial, sans-serif" fill="#555">${escapeXml(detail)}</text>`,
     ].join('\n')
   })
 
