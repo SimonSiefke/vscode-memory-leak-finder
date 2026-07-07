@@ -31,6 +31,7 @@ jest.unstable_mockModule('../src/parts/ConnectElectron/ConnectElectron.ts', () =
   return {
     connectElectron: async () => ({
       electronObjectId: 'electron-object',
+      electronPid: 9876,
       monkeyPatchedElectronId: 'monkey-patched-electron',
     }),
   }
@@ -59,7 +60,7 @@ jest.unstable_mockModule('../src/parts/DevtoolsProtocol/DevtoolsProtocol.ts', ()
     },
     DevtoolsProtocolRuntime: {
       callFunctionOn: async () => {},
-      evaluate: async () => 9876,
+      evaluate: async () => undefined,
     },
   }
 })

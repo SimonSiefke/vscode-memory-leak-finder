@@ -111,6 +111,7 @@ test('launch - cpu performance counters from start spawn command', async () => {
     cliPath: '/usr/bin/code',
     cpuPerformanceCountersFromStartConfig: {
       enabled: true,
+      metadataPath: '/tmp/vmlf-perf-stat.json',
       outputPath: '/tmp/vmlf-perf-stat.txt',
     },
     cwd: '/tmp',
@@ -125,6 +126,8 @@ test('launch - cpu performance counters from start spawn command', async () => {
       '--no-big-num',
       '-x',
       ',',
+      '-I',
+      '100',
       '-e',
       'instructions:u,cycles:u',
       '-o',

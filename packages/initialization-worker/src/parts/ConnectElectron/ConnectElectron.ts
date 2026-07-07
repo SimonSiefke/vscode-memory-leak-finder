@@ -47,9 +47,17 @@ export const connectElectron = async (
     generatePreview: true,
     includeCommandLineAPI: true,
   })
+  const electronPidResult = await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
+    callFrameId,
+    expression: `process.pid`,
+    generatePreview: true,
+    includeCommandLineAPI: true,
+    returnByValue: true,
+  })
 
   const electronObjectId = electron.result.result.objectId
   const requireObjectId = require.result.result.objectId
+  const electronPid = electronPidResult.result.result.value
 
   const monkeyPatchedElectronId = await applyMonkeyPatches(
     electronRpc,
@@ -69,6 +77,7 @@ export const connectElectron = async (
 
   return {
     electronObjectId,
+    electronPid: typeof electronPid === 'number' && Number.isFinite(electronPid) ? electronPid : undefined,
     monkeyPatchedElectronId: monkeyPatchedElectronId,
   }
 }

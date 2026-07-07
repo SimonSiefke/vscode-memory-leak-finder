@@ -1,4 +1,4 @@
-import { mkdir, rm } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
@@ -29,6 +29,7 @@ export const launchElectron = async ({
   platform = process.platform,
   cpuPerformanceCountersFromStartConfig = {
     enabled: false,
+    metadataPath: '',
     outputPath: '',
   },
 }: {
@@ -68,6 +69,7 @@ export const launchElectron = async ({
       }
       await mkdir(dirname(cpuPerformanceCountersFromStartConfig.outputPath), { recursive: true })
       await rm(cpuPerformanceCountersFromStartConfig.outputPath, { force: true })
+      await rm(cpuPerformanceCountersFromStartConfig.metadataPath, { force: true })
       const measuredPath = spawnPath
       const measuredArgs = spawnArgs
       spawnPath = 'perf'
@@ -76,6 +78,8 @@ export const launchElectron = async ({
         '--no-big-num',
         '-x',
         ',',
+        '-I',
+        '100',
         '-e',
         'instructions:u,cycles:u',
         '-o',
@@ -91,6 +95,16 @@ export const launchElectron = async ({
     })
     if (child.pid === undefined) {
       throw new Error(`Failed to get PID from spawned process`)
+    }
+    if (cpuPerformanceCountersFromStartConfig.enabled) {
+      await writeFile(
+        cpuPerformanceCountersFromStartConfig.metadataPath,
+        JSON.stringify({
+          command: [spawnPath, ...spawnArgs],
+          outputPath: cpuPerformanceCountersFromStartConfig.outputPath,
+          perfPid: child.pid,
+        }),
+      )
     }
     addDisposable(() => {
       child.kill('SIGKILL')
