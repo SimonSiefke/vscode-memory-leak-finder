@@ -1,12 +1,10 @@
 import { readFile } from 'node:fs/promises'
-import { readFileSync } from 'node:fs'
 import { execFile } from 'node:child_process'
 import { join } from 'node:path'
 import { setTimeout } from 'node:timers/promises'
 import { promisify } from 'node:util'
 import type { Dynamic } from '../Types/Types.ts'
 import { parsePerfStatOutput } from '../CpuPerformanceCounters/CpuPerformanceCounters.ts'
-import { getAllDescendantPids } from '../GetAllPids/GetAllPids.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as Root from '../Root/Root.ts'
 
@@ -103,61 +101,6 @@ const findPerfPid = async (outputPath: string): Promise<number | undefined> => {
   }
 }
 
-const getChildPids = async (pid: number): Promise<readonly number[]> => {
-  try {
-    const { stdout } = await execFileAsync('pgrep', ['-P', `${pid}`])
-    return stdout
-      .trim()
-      .split('\n')
-      .map((line) => Number(line.trim()))
-      .filter((childPid) => Number.isFinite(childPid) && childPid > 0)
-  } catch {
-    return []
-  }
-}
-
-const isProcessAlive = (pid: number): boolean => {
-  try {
-    const status = readFileSync(`/proc/${pid}/stat`, 'utf8')
-    const state = status.split(' ')[2]
-    if (state === 'Z') {
-      return false
-    }
-    process.kill(pid, 0)
-    return true
-  } catch {
-    return false
-  }
-}
-
-const killProcess = (pid: number, signal: NodeJS.Signals): void => {
-  try {
-    process.kill(pid, signal)
-  } catch {
-    // The process may already have exited by the time the measure stops.
-  }
-}
-
-const killProcessTree = async (pid: number, signal: NodeJS.Signals): Promise<void> => {
-  const pids = await getAllDescendantPids(pid)
-  for (const processPid of [...pids].reverse()) {
-    killProcess(processPid, signal)
-  }
-}
-
-const isProcessTreeAlive = async (pid: number): Promise<boolean> => {
-  const pids = await getAllDescendantPids(pid)
-  return pids.some(isProcessAlive)
-}
-
-const waitForProcessExit = async (pid: number, timeout: number): Promise<boolean> => {
-  const start = Date.now()
-  while (isProcessAlive(pid) && Date.now() - start <= timeout) {
-    await setTimeout(PollInterval)
-  }
-  return !isProcessAlive(pid)
-}
-
 const readPerfOutput = async (outputPath: string): Promise<string> => {
   const start = Date.now()
   while (true) {
@@ -167,7 +110,7 @@ const readPerfOutput = async (outputPath: string): Promise<string> => {
         return rawOutput
       }
     } catch {
-      // Perf writes the file only after the measured process exits.
+      // Perf creates the file shortly after launch.
     }
     if (Date.now() - start > StopTimeout) {
       throw new Error(`Timed out waiting for perf stat output at ${outputPath}`)
@@ -210,30 +153,6 @@ export const start = async (state: CpuPerformanceCountersFromStartState) => {
 export const stop = async (state: CpuPerformanceCountersFromStartState): Promise<CpuPerformanceCountersFromStartSample> => {
   const outputPath = getOutputPath(state.connectionId)
   const perfPid = state.perfPid ?? (await findPerfPid(outputPath))
-  if (perfPid) {
-    const childPids = await getChildPids(perfPid)
-    for (const childPid of childPids) {
-      killProcess(childPid, 'SIGTERM')
-    }
-    const exited = await waitForProcessExit(perfPid, StopTimeout)
-    if (!exited) {
-      for (const childPid of childPids) {
-        await killProcessTree(childPid, 'SIGKILL')
-      }
-      await waitForProcessExit(perfPid, StopTimeout)
-    }
-  } else {
-    if (await isProcessTreeAlive(state.pid)) {
-      await killProcessTree(state.pid, 'SIGTERM')
-    }
-    const start = Date.now()
-    while ((await isProcessTreeAlive(state.pid)) && Date.now() - start <= StopTimeout) {
-      await setTimeout(PollInterval)
-    }
-    if (await isProcessTreeAlive(state.pid)) {
-      await killProcessTree(state.pid, 'SIGKILL')
-    }
-  }
   const rawOutput = await readPerfOutput(outputPath)
   const counters = parsePerfStatOutput(rawOutput)
   return {
