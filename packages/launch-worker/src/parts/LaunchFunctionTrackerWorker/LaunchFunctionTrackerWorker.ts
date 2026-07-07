@@ -1,12 +1,11 @@
 import { NodeForkedProcessRpcParent } from '@lvce-editor/rpc'
-import * as GetFunctionTrackerUrl from '../GetFunctionTrackerUrl/GetFunctionTrackerUrl.ts'
+import { getFunctionTrackerUrl } from '../GetFunctionTrackerUrl/GetFunctionTrackerUrl.ts'
 
 export const launchFunctionTrackerWorker = async () => {
-  const url = GetFunctionTrackerUrl.getFunctionTrackerUrl()
   const rpc = await NodeForkedProcessRpcParent.create({
     commandMap: {},
     execArgv: ['--max-old-space-size=8192'],
-    path: url,
+    path: getFunctionTrackerUrl(),
     stdio: 'inherit',
   })
   return {

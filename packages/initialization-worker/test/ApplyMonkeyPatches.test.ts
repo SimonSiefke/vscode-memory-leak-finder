@@ -39,8 +39,6 @@ test('applyMonkeyPatches - injects secrets path into monkey patch script', async
     false,
     false,
     false,
-    9876,
-    null,
   )
 
   expect(monkeyPatchedElectronId).toBe('patched-electron-id')

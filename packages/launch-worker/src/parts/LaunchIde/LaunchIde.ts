@@ -104,6 +104,8 @@ export const launchIde = async ({
   inspectSharedProcessPort,
   platform,
   proxyTestFolderName,
+  trackFunctions,
+  trackingMode,
   updateUrl,
   useProxyMock,
   vscodePath,
@@ -131,6 +133,8 @@ export const launchIde = async ({
   inspectSharedProcessPort: number
   platform: string
   proxyTestFolderName: string
+  trackFunctions: boolean
+  trackingMode: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -196,6 +200,8 @@ export const launchIde = async ({
     inspectSharedProcessPort,
     platform,
     proxyTestFolderName,
+    trackFunctions,
+    trackingMode,
     updateUrl,
     useProxyMock,
     vscodePath,
