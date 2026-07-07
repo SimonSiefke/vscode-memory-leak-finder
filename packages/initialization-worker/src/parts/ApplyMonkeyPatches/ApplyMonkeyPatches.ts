@@ -9,6 +9,16 @@ import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyP
 import { openDevtoolsScript } from '../OpenDevtoolsScript/OpenDevtoolsScript.ts'
 import { protocolInterceptorScript } from '../ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
 
+const isIpcMessagesMeasure = (measureId: string): boolean => {
+  return (
+    measureId === 'ipcMessageCount' ||
+    measureId === 'ipcmessagecount' ||
+    measureId === 'ipcMessagesFromStart' ||
+    measureId === 'ipcmessagesfromstart' ||
+    measureId === 'ipc-messages-from-start'
+  )
+}
+
 export const applyMonkeyPatches = async (
   electronRpc: RpcConnection,
   electronObjectId: string,
@@ -29,7 +39,7 @@ export const applyMonkeyPatches = async (
     objectId: electronObjectId,
   })
 
-  if (measureId && (measureId === 'ipcMessageCount' || measureId === 'ipcmessagecount')) {
+  if (measureId && isIpcMessagesMeasure(measureId)) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
       functionDeclaration: MonkeyPatchElectronIpcMain.monkeyPatchElectronIpcMain,
       objectId: electronObjectId,
