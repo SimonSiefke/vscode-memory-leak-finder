@@ -428,7 +428,9 @@ export const runTestsWithCallback = async ({
             }
             const memoryRpc = workers.memoryRpc
             await MemoryLeakFinder.start(memoryRpc, connectionId)
-            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
+            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs, () =>
+              MemoryLeakFinder.runCompletion(memoryRpc, connectionId),
+            )
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }

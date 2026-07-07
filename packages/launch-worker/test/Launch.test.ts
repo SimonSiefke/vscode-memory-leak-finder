@@ -6,6 +6,8 @@ test('getTrackingMode - tracked allocations measures use allocation tracking', (
   expect(getTrackingMode('trackedAllocations')).toBe('allocations')
   expect(getTrackingMode('tracked-allocations-from-start')).toBe('allocations')
   expect(getTrackingMode('trackedAllocationsFromStart')).toBe('allocations')
+  expect(getTrackingMode('tracked-allocation-timeline')).toBe('allocations')
+  expect(getTrackingMode('trackedAllocationTimeline')).toBe('allocations')
 })
 
 test('getTrackingMode - other measures use function tracking', () => {
