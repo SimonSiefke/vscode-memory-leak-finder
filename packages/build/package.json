@@ -8,6 +8,7 @@
     "build": "rollup -c rollup.config.js",
     "build:watch": "rollup -c rollup.config.js -w",
     "backport-prs": "node src/backportMergedPrs.ts",
+    "analyze-ipc-messages-from-start": "node src/analyzeIpcMessagesFromStart.ts",
     "generate-api-types": "node src/generate-api-types.ts",
     "measure-local-vscode-comparison": "node src/measureLocalVscodeComparison.ts",
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit"
