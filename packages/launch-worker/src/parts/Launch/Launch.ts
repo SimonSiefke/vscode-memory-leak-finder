@@ -48,7 +48,9 @@ export const getTrackingMode = (measureId: string): string => {
     measureId === 'tracked-allocations' ||
     measureId === 'trackedAllocations' ||
     measureId === 'tracked-allocations-from-start' ||
-    measureId === 'trackedAllocationsFromStart'
+    measureId === 'trackedAllocationsFromStart' ||
+    measureId === 'tracked-allocation-timeline' ||
+    measureId === 'trackedAllocationTimeline'
   ) {
     return 'allocations'
   }
