@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { copyFile, mkdir, readFile, readdir, readlink, rm, stat, symlink, writeFile, chmod, lstat } from 'node:fs/promises'
-import { basename, dirname, join, relative, resolve } from 'node:path'
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { transformCode } from '../Transform/Transform.ts'
 
 interface FileMetadata {
@@ -146,6 +146,11 @@ const shouldTransform = (relativePath: string, transformRelativeRoots: readonly 
   return transformRelativeRoots.some((root) => isPathInsideRelativeRoot(normalized, root))
 }
 
+const isPathInside = (root: string, path: string): boolean => {
+  const relativePath = relative(root, path)
+  return relativePath === '' || (!relativePath.startsWith('..') && !isAbsolute(relativePath))
+}
+
 const copyFileIfChanged = async (sourcePath: string, destinationPath: string): Promise<void> => {
   const sourceStat = await stat(sourcePath)
   try {
@@ -244,7 +249,7 @@ const getLocalSourceKind = async (binaryPath: string, trackingMode: string): Pro
   ]
   let targetBinaryPath = join(targetSourceRoot, relative(sourceRoot, binaryPath))
   const runtimeRoot = dirname(binaryPath)
-  if (!binaryPath.startsWith(`${sourceRoot}/`) && (await pathExists(runtimeRoot))) {
+  if (!isPathInside(sourceRoot, binaryPath) && (await pathExists(runtimeRoot))) {
     const targetRuntimeRoot = join(targetContainer, basename(runtimeRoot))
     copyRoots.push({
       sourceRoot: runtimeRoot,
