@@ -176,6 +176,10 @@ const parseMeasureNode = (argv: readonly string[]): boolean => {
   return argv.includes('--measure-node')
 }
 
+const isIpcMessageCountMeasure = (measure: string): boolean => {
+  return measure === 'ipc-message-count' || measure === 'ipcMessageCount' || measure === 'ipcmessagecount'
+}
+
 const parseProcessRootStrategy = (argv: readonly string[]): string => {
   if (argv.includes('--process-root-strategy')) {
     return parseArgvString(argv, '--process-root-strategy')
@@ -418,6 +422,9 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  if (isIpcMessageCountMeasure(measure) && !measureNode) {
+    throw new Error('--measure ipc-message-count requires --measure-node')
+  }
   if (inspectIntegratedBrowser && (measureNode || inspectSharedProcess || inspectExtensions || inspectPtyHost || inspectProcess)) {
     throw new Error(
       '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',

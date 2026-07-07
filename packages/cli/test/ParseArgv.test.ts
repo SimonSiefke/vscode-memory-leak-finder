@@ -271,6 +271,23 @@ test('parseArgv - measure-node flag', () => {
   expect(options.measureNode).toBe(true)
 })
 
+test('parseArgv - ipc-message-count requires measure-node', () => {
+  const argv = ['--measure', 'ipc-message-count']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow('--measure ipc-message-count requires --measure-node')
+})
+
+test('parseArgv - ipcMessageCount requires measure-node', () => {
+  const argv = ['--measure', 'ipcMessageCount']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow('--measure ipc-message-count requires --measure-node')
+})
+
+test('parseArgv - ipc-message-count allows measure-node', () => {
+  const argv = ['--measure', 'ipc-message-count', '--measure-node']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('ipc-message-count')
+  expect(options.measureNode).toBe(true)
+})
+
 test('parseArgv - process-root-strategy flag', () => {
   const argv = ['--process-root-strategy', 'ssh-remote-server']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)

@@ -14,6 +14,19 @@ test('getMeasure resolves tracked allocations from start public measure id', () 
   expect(GetMeasure.getMeasure(MemoryLeakFinder, 'tracked-allocations-from-start')).toBe(measure)
 })
 
+test('getMeasure resolves ipc messages from start public measure id', () => {
+  const measure = {
+    id: 'ipcMessagesFromStart',
+  }
+  const MemoryLeakFinder = {
+    Measures: {
+      MeasureIpcMessagesFromStart: measure,
+    },
+  }
+
+  expect(GetMeasure.getMeasure(MemoryLeakFinder, 'ipc-messages-from-start')).toBe(measure)
+})
+
 test('getMeasure resolves tracked allocation timeline public measure id', () => {
   const measure = {
     id: 'trackedAllocationTimeline',
