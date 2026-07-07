@@ -65,6 +65,7 @@ export * as MeasureIframeCount from '../MeasureIframeCount/MeasureIframeCount.ts
 export * as MeasureImageBitmapCount from '../MeasureImageBitmapCount/MeasureImageBitmapCount.ts'
 export * as MeasureInstanceCounts from '../MeasureInstanceCounts/MeasureInstanceCounts.ts'
 export * as MeasureIpcMessageCount from '../MeasureIpcMessageCount/MeasureIpcMessageCount.ts'
+export * as MeasureIpcMessagesFromStart from '../MeasureIpcMessagesFromStart/MeasureIpcMessagesFromStart.ts'
 export * as MeasureInstanceCountsDifference from '../MeasureInstanceCountsDifference/MeasureInstanceCountsDifference.ts'
 export * as MeasureInstanceCountsDifferenceWithSourceMap from '../MeasureInstanceCountsDifferenceWithSourceMap/MeasureInstanceCountsDifferenceWithSourceMap.ts'
 export * as MeasureInstanceCountsDifferenceWithStackTraces from '../MeasureInstanceCountsDifferenceWithStackTraces/MeasureInstanceCountsDifferenceWithStackTraces.ts'
