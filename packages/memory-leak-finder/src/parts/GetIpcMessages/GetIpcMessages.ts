@@ -9,7 +9,6 @@ export const getIpcMessages = async (session: Session): Promise<Dynamic> => {
     returnByValue: true,
   })
   const messages = result
-  console.log(JSON.stringify(messages, null, 2))
   const cleanedMessages = CleanIpcMessages.cleanMessages(messages)
   return cleanedMessages
 }
