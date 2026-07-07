@@ -18,6 +18,11 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
     return filePath.endsWith('workbench.desktop.main.js')
   }
 
+  const isLocalSourceOutJavaScript = (filePath) => {
+    const normalizedPath = filePath.replace(/\\\\/g, '/')
+    return normalizedPath.endsWith('.js') && normalizedPath.includes('/out/') && !normalizedPath.includes('/resources/app/out/')
+  }
+
   const getTrackingMode = () => {
     return trackingMode
   }
@@ -191,8 +196,8 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
           })
         })
         return
-      } else if (isJavaScript) {
-        // For other JS files, request a lazy transform.
+      } else if (isJavaScript && isLocalSourceOutJavaScript(filePath)) {
+        // For local VS Code source builds, transform additional out/**/*.js files lazily.
         fs.readFile(filePath, (err, data) => {
           if (err) {
             console.error('[ProtocolInterceptor] Error reading file:', filePath, err)
@@ -208,16 +213,19 @@ export const protocolInterceptorScript = (port: number, preGeneratedWorkbenchPat
             return
           }
 
-          readTransformedFile(filePath).then((data) => {
-            callback({
-              data,
-              mimeType: 'application/javascript',
-            })
+          readTransformedFile(filePath).then((transformed) => {
+            console.log('[ProtocolInterceptor] Returning transformed JS file:', filePath)
+            callback({ data: transformed, mimeType: 'application/javascript' })
           }, (error) => {
-            console.error('[ProtocolInterceptor] Error transforming file:', filePath, error)
+            console.error('[ProtocolInterceptor] Error transforming JS file, falling back to original:', filePath, error)
             readOriginalFile(filePath, callback)
           })
         })
+        return
+      } else if (isJavaScript) {
+        // For packaged/downloaded VS Code, keep non-workbench JavaScript unchanged.
+        console.log('[ProtocolInterceptor] Returning original JS file:', filePath)
+        readOriginalFile(filePath, callback)
         return
       }
 
