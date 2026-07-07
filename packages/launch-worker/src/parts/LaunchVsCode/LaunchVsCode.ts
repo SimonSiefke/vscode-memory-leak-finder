@@ -14,6 +14,7 @@ import * as GetVscodeRuntimeDir from '../GetVscodeRuntimeDir/GetVscodeRuntimeDir
 import * as IsCi from '../IsCi/IsCi.ts'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.ts'
 import { join } from '../Path/Path.ts'
+import * as PrepareTrackedVscode from '../PrepareTrackedVscode/PrepareTrackedVscode.ts'
 import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 import * as RemoveVscodeBackups from '../RemoveVscodeBackups/RemoveVscodeBackups.ts'
 import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveVscodeGlobalStorage.ts'
@@ -238,6 +239,8 @@ export const launchVsCode = async ({
   inspectSharedProcessPort,
   platform,
   proxyTestFolderName,
+  trackFunctions,
+  trackingMode,
   useProxyMock,
   updateUrl,
   vscodePath,
@@ -265,6 +268,8 @@ export const launchVsCode = async ({
   inspectSharedProcessPort: number
   platform: string
   proxyTestFolderName: string
+  trackFunctions: boolean
+  trackingMode: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -275,7 +280,7 @@ export const launchVsCode = async ({
     console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
   }
   try {
-    const { binaryPath, extensionsDir, runtimeDir, settingsPath, testWorkspacePath, userDataDir } = await prepareVsCodeLaunch({
+    let { binaryPath, extensionsDir, runtimeDir, settingsPath, testWorkspacePath, userDataDir } = await prepareVsCodeLaunch({
       arch,
       buildVscodeMinified,
       clearExtensions,
@@ -289,6 +294,9 @@ export const launchVsCode = async ({
       vscodePath,
       vscodeVersion,
     })
+    if (trackFunctions) {
+      binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode)
+    }
 
     // Start proxy server if enabled
     // Note: enableProxy might be undefined if RPC call doesn't pass it correctly

@@ -6,7 +6,6 @@ import * as Disposables from '../Disposables/Disposables.ts'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
-import * as Root from '../Root/Root.ts'
 
 export interface LaunchOptions {
   readonly arch: string
@@ -95,9 +94,12 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   } = options
+<<<<<<< HEAD
   const cpuPerformanceCountersFromStartConfig = CpuPerformanceCountersFromStart.getConfig(measureId, connectionId)
+=======
+  const trackingMode = getTrackingMode(measureId)
+>>>>>>> origin/main
   const {
-    binaryPath,
     child,
     parsedVersion,
     pid,
@@ -126,6 +128,8 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectSharedProcessPort,
     platform,
     proxyTestFolderName,
+    trackFunctions,
+    trackingMode,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -135,12 +139,6 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
 
-  let preGeneratedWorkbenchPath: string | null = null
-  const trackingMode = getTrackingMode(measureId)
-  if (trackFunctions) {
-    const cacheFolder = trackingMode === 'allocations' ? '.vscode-workbench-tracked-allocations' : '.vscode-workbench-tracked'
-    preGeneratedWorkbenchPath = join(Root.root, cacheFolder, 'workbench.desktop.main.js')
-  }
   const secretsPath = getSecretsPath()
 
   await using rpc = await launchInitializationWorker()
@@ -167,9 +165,6 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     connectionId,
     measureId,
     pid,
-    preGeneratedWorkbenchPath,
-    binaryPath,
-    trackingMode,
   )
 
   return {
