@@ -121,12 +121,15 @@ test('getPreparedVscodePath copies local source checkout and adjacent build runt
 
     expect(preparedPath).toContain(join('.vscode-test', 'tracked-vscode'))
     expect(preparedPath.endsWith(join('VSCode-linux-x64-vscode', 'code-oss'))).toBe(true)
-    expect(await readFile(join(dirname(preparedPath), 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js'), 'utf8')).toContain(
-      '/* functions:',
-    )
-    expect(await readFile(join(dirname(dirname(preparedPath)), basename(sourceRoot), 'out', 'vs', 'workbench', 'workbench.desktop.main.js'), 'utf8')).toContain(
-      '/* functions:',
-    )
+    expect(
+      await readFile(join(dirname(preparedPath), 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js'), 'utf8'),
+    ).toContain('/* functions:')
+    expect(
+      await readFile(
+        join(dirname(dirname(preparedPath)), basename(sourceRoot), 'out', 'vs', 'workbench', 'workbench.desktop.main.js'),
+        'utf8',
+      ),
+    ).toContain('/* functions:')
   } finally {
     await rm(root, { recursive: true, force: true })
     await rm(trackedVscodeRoot, { recursive: true, force: true })

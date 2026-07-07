@@ -34,13 +34,7 @@ const transformerFiles = [
   join(import.meta.dirname, '..', 'CreateAllocationWrapperPlugin', 'CreateAllocationWrapperPlugin.ts'),
 ]
 
-const excludedDirectoryNames = new Set([
-  '.build',
-  '.cache',
-  '.git',
-  '.vscode-test',
-  'node_modules',
-])
+const excludedDirectoryNames = new Set(['.build', '.cache', '.git', '.vscode-test', 'node_modules'])
 
 const getHash = (value: string): string => {
   return createHash('sha256').update(value).digest('hex')
