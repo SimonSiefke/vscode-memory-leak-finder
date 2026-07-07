@@ -140,12 +140,14 @@ export const start = async (state: CpuPerformanceCountersFromStartState) => {
   const metadata = await readMetadata(state.connectionId)
   const perfPid = metadata.perfPid ?? (await findPerfPid(outputPath)) ?? (await getParentPid(state.pid))
   const command = metadata.command ?? (await getCommand(perfPid))
-  state.perfPid = perfPid
+  if (perfPid !== undefined) {
+    state.perfPid = perfPid
+  }
   state.command = command
   return {
     command,
     outputPath,
-    perfPid,
+    ...(perfPid === undefined ? {} : { perfPid }),
     pid: state.pid,
   }
 }
@@ -159,7 +161,7 @@ export const stop = async (state: CpuPerformanceCountersFromStartState): Promise
     command: state.command ?? ['perf', 'stat'],
     instructionsPerCycle: getInstructionsPerCycle(counters.instructions, counters.cycles),
     outputPath,
-    perfPid,
+    ...(perfPid === undefined ? {} : { perfPid }),
     pid: state.pid,
     rawOutput,
     ...counters,
