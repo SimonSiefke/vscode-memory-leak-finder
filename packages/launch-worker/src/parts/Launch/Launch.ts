@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as CallgrindConfig from '../CallgrindConfig/CallgrindConfig.ts'
+import * as CpuPerformanceCountersFromStart from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
@@ -94,6 +95,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   } = options
+  const cpuPerformanceCountersFromStartConfig = CpuPerformanceCountersFromStart.getConfig(measureId, connectionId)
   const {
     binaryPath,
     child,
@@ -107,6 +109,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     callgrindConfig: CallgrindConfig.getCallgrindConfig(measureId, connectionId),
     clearExtensions,
     commit,
+    cpuPerformanceCountersFromStartConfig,
     cwd,
     downloadUserDataZipFileToken,
     downloadUserDataZipFileUrl,
@@ -144,7 +147,15 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
-  const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
+  const {
+    devtoolsWebSocketUrl,
+    electronObjectId,
+    pid: electronPid,
+    sessionId,
+    targetId,
+    utilityContext,
+    webSocketUrl,
+  } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
     secretsPath,
     headlessMode,
@@ -165,7 +176,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     devtoolsWebSocketUrl,
     electronObjectId,
     parsedVersion,
-    pid,
+    pid: typeof electronPid === 'number' ? electronPid : pid,
     sessionId,
     targetId,
     utilityContext,

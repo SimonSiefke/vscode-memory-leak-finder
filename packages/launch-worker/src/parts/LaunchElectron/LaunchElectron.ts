@@ -1,5 +1,7 @@
 import { mkdir, rm } from 'node:fs/promises'
+import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
+import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import * as AssertCallgrindAvailable from '../AssertCallgrindAvailable/AssertCallgrindAvailable.ts'
 import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.ts'
 import * as Spawn from '../Spawn/Spawn.ts'
@@ -25,11 +27,16 @@ export const launchElectron = async ({
   env,
   headlessMode,
   platform = process.platform,
+  cpuPerformanceCountersFromStartConfig = {
+    enabled: false,
+    outputPath: '',
+  },
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
   args: string[]
   callgrindConfig?: CallgrindConfig
   cliPath: string
+  cpuPerformanceCountersFromStartConfig?: CpuPerformanceCountersFromStartConfig
   cwd: string
   env: NodeJS.ProcessEnv
   headlessMode: boolean
@@ -53,6 +60,29 @@ export const launchElectron = async ({
         `--log-file=${callgrindConfig.spoolDir}/valgrind.%p.log`,
         cliPath,
         ...allArgs,
+      ]
+    }
+    if (cpuPerformanceCountersFromStartConfig.enabled) {
+      if (platform !== 'linux') {
+        throw new Error('cpu-performance-counters-from-start is only supported on linux')
+      }
+      await mkdir(dirname(cpuPerformanceCountersFromStartConfig.outputPath), { recursive: true })
+      await rm(cpuPerformanceCountersFromStartConfig.outputPath, { force: true })
+      const measuredPath = spawnPath
+      const measuredArgs = spawnArgs
+      spawnPath = 'perf'
+      spawnArgs = [
+        'stat',
+        '--no-big-num',
+        '-x',
+        ',',
+        '-e',
+        'instructions:u,cycles:u',
+        '-o',
+        cpuPerformanceCountersFromStartConfig.outputPath,
+        '--',
+        measuredPath,
+        ...measuredArgs,
       ]
     }
     const child = Spawn.spawn(spawnPath, spawnArgs, {

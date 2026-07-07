@@ -41,6 +41,10 @@ export const prepareBoth = async (
 
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
+  const electronPid = await DevtoolsProtocolRuntime.evaluate(electronRpc, {
+    expression: 'process.pid',
+    returnByValue: true,
+  })
 
   const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(
     electronRpc,
@@ -80,6 +84,7 @@ export const prepareBoth = async (
     devtoolsWebSocketUrl,
     electronObjectId,
     monkeyPatchedElectronId,
+    pid: typeof electronPid === 'number' && Number.isFinite(electronPid) ? electronPid : pid,
     sessionId,
     targetId,
     utilityContext: undefined,
