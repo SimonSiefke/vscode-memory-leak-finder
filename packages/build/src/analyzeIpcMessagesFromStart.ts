@@ -542,44 +542,52 @@ const escapeXml = (value: string): string => {
 
 export const createSvgChart = (summary: AnalysisSummary): string => {
   const categories = summary.categories.filter((category) => category.bytes > 0)
-  const circumference = 2 * Math.PI * 72
+  const width = 640
+  const legendX = 320
+  const legendY = 76
+  const legendRowHeight = 40
+  const height = Math.max(360, legendY + categories.length * legendRowHeight + 28)
+  const chartCenterX = 142
+  const chartCenterY = 172
+  const chartRadius = 72
+  const circumference = 2 * Math.PI * chartRadius
   let offset = 0
   const circles: string[] = []
   for (const category of categories) {
     const length = summary.totalBytes === 0 ? 0 : (category.bytes / summary.totalBytes) * circumference
     const gap = circumference - length
     circles.push(
-      `<circle cx="120" cy="120" r="72" fill="none" stroke="${categoryColors[category.id]}" stroke-width="34" stroke-dasharray="${length.toFixed(
+      `<circle cx="${chartCenterX}" cy="${chartCenterY}" r="${chartRadius}" fill="none" stroke="${categoryColors[category.id]}" stroke-width="34" stroke-dasharray="${length.toFixed(
         3,
-      )} ${gap.toFixed(3)}" stroke-dashoffset="${(-offset).toFixed(3)}" transform="rotate(-90 120 120)" />`,
+      )} ${gap.toFixed(3)}" stroke-dashoffset="${(-offset).toFixed(3)}" transform="rotate(-90 ${chartCenterX} ${chartCenterY})" />`,
     )
     offset += length
   }
 
   const legendRows = categories.map((category, index) => {
-    const y = 42 + index * 28
+    const y = legendY + index * legendRowHeight
     return [
-      `<rect x="250" y="${y - 12}" width="14" height="14" fill="${categoryColors[category.id]}" rx="2" />`,
-      `<text x="274" y="${y}" font-size="14" font-family="Arial, sans-serif" fill="#222">${escapeXml(category.label)} (${category.percentage.toFixed(
+      `<rect x="${legendX}" y="${y - 13}" width="14" height="14" fill="${categoryColors[category.id]}" rx="2" />`,
+      `<text x="${legendX + 24}" y="${y}" font-size="14" font-family="Arial, sans-serif" fill="#222">${escapeXml(category.label)} (${category.percentage.toFixed(
         2,
       )}%)</text>`,
-      `<text x="520" y="${y}" font-size="13" font-family="Arial, sans-serif" fill="#555" text-anchor="end">${escapeXml(formatBytes(category.bytes))}, ${
+      `<text x="${legendX + 24}" y="${y + 18}" font-size="13" font-family="Arial, sans-serif" fill="#555">${escapeXml(formatBytes(category.bytes))}, ${
         category.count
       } messages</text>`,
     ].join('\n')
   })
 
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" width="560" height="360" viewBox="0 0 560 360" role="img" aria-label="IPC startup payload bytes by category">',
-    '<rect width="560" height="360" fill="#ffffff" />',
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="IPC startup payload bytes by category">`,
+    `<rect width="${width}" height="${height}" fill="#ffffff" />`,
     '<text x="32" y="34" font-size="20" font-family="Arial, sans-serif" font-weight="700" fill="#111">IPC startup payload bytes</text>',
     '<g>',
     ...circles,
-    '<circle cx="120" cy="120" r="46" fill="#ffffff" />',
-    `<text x="120" y="116" font-size="18" font-family="Arial, sans-serif" font-weight="700" fill="#111" text-anchor="middle">${escapeXml(
+    `<circle cx="${chartCenterX}" cy="${chartCenterY}" r="46" fill="#ffffff" />`,
+    `<text x="${chartCenterX}" y="${chartCenterY - 4}" font-size="18" font-family="Arial, sans-serif" font-weight="700" fill="#111" text-anchor="middle">${escapeXml(
       formatBytes(summary.totalBytes),
     )}</text>`,
-    `<text x="120" y="138" font-size="12" font-family="Arial, sans-serif" fill="#666" text-anchor="middle">${summary.totalMessages} messages</text>`,
+    `<text x="${chartCenterX}" y="${chartCenterY + 18}" font-size="12" font-family="Arial, sans-serif" fill="#666" text-anchor="middle">${summary.totalMessages} messages</text>`,
     '</g>',
     '<g>',
     ...legendRows,

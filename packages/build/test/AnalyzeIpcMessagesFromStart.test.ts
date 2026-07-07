@@ -139,6 +139,42 @@ test('createSvgChart includes slices and legend labels', () => {
   expect(svg).toContain('File content')
 })
 
+test('createSvgChart leaves room for multi-row legend text', () => {
+  const categoryIds = [
+    'extension-manifests',
+    'nls-data',
+    'storage-data',
+    'file-content',
+    'theme-and-icon-data',
+    'file-metadata',
+    'policy-data',
+    'startup-config',
+    'keyboard-data',
+    'other',
+  ] as const
+  const summary = {
+    inputPath: 'input.json',
+    totalMessages: 10,
+    totalBytes: 10,
+    categories: categoryIds.map((id, index) => ({
+      id,
+      label: `Category ${index}`,
+      bytes: 1,
+      count: 1,
+      percentage: 10,
+      topMessages: [],
+    })),
+    largestMessages: [],
+    duplicatePayloads: [],
+  }
+
+  const svg = createSvgChart(summary)
+
+  expect(svg).toContain('width="640" height="504"')
+  expect(svg).toContain('<rect x="320" y="63"')
+  expect(svg).toContain('<text x="344" y="94" font-size="13"')
+})
+
 test('getDefaultOutputPaths derives analysis paths from input path', () => {
   expect(getDefaultOutputPaths('results/ipc.json')).toEqual({
     jsonPath: 'results/ipc.analysis.json',
