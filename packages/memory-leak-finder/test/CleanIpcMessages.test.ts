@@ -391,6 +391,33 @@ test('CleanIpcMessages should preserve all other message properties', () => {
   expect(result[0].args).toEqual(['arg1'])
 })
 
+test('CleanIpcMessages should preserve endpoint metadata', () => {
+  const messages = [
+    {
+      args: ['arg1'],
+      channel: 'test',
+      direction: 'renderer-to-main',
+      from: {
+        frameId: 1,
+        kind: 'renderer',
+        label: 'browser-window',
+        processId: 123,
+        webContentsId: 7,
+      },
+      timestamp: 123,
+      to: {
+        kind: 'electron-main',
+        label: 'electron-main',
+        pid: 456,
+      },
+      type: 'on',
+    },
+  ]
+
+  const result = CleanIpcMessages.cleanMessages(messages)
+  expect(result).toEqual(messages)
+})
+
 test.skip('CleanIpcMessages should decode real-world uint8array with embedded JSON', () => {
   const rawMessage = {
     args: [
