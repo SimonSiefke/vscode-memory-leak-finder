@@ -3,7 +3,10 @@ import type { TestContext } from '../types.ts'
 const fileName = 'file-with-content.txt'
 
 const getFileContent = (): string => {
-  return Array.from({ length: 100 }, (_, index) => `Line ${String(index + 1).padStart(3, '0')} - sample text for IPC readFileStream capture`).join('\n')
+  return Array.from(
+    { length: 100 },
+    (_, index) => `Line ${String(index + 1).padStart(3, '0')} - sample text for IPC readFileStream capture`,
+  ).join('\n')
 }
 
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
