@@ -1,0 +1,10 @@
+body {
+  padding: 24px;
+  color: var(--vscode-editor-foreground);
+  background: var(--vscode-editor-background);
+}
+
+#fixture-image {
+  width: 48px;
+  height: 48px;
+}
