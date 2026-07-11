@@ -18,8 +18,8 @@
     "smee-client": "^5.0.0"
   },
   "dependencies": {
-    "@lvce-editor/assert": "^1.5.1",
-    "@lvce-editor/rpc": "^6.4.0",
+    "@lvce-editor/assert": "^1.7.0",
+    "@lvce-editor/rpc": "^6.6.0",
     "@lvce-editor/verror": "^1.7.0",
     "dotenv": "^17.4.2",
     "jszip": "^3.10.1",
