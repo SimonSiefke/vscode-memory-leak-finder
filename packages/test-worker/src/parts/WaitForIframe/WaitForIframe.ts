@@ -46,7 +46,8 @@ export const waitForIframe = async ({
   const utilityExecutionContextName = 'utility'
 
   if (injectUtilityScript) {
-    const frameId = '' // TODO
+    const { frameTree } = await DevtoolsProtocolPage.getFrameTree(iframeRpc)
+    const frameId = frameTree.frame.id
     iframeUtilityContext = await addUtilityExecutionContext(iframeRpc, utilityExecutionContextName, frameId)
   }
 

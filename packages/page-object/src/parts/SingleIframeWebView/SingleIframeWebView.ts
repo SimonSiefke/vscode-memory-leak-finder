@@ -12,7 +12,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         const webView = page.locator('.webview.ready')
         await expect(webView).toBeVisible()
         const frame = await page.waitForIframe({
-          injectUtilityScript: false,
+          injectUtilityScript: true,
           url: new RegExp(`^vscode-webview://${escapeRegExp(extensionId)}/`),
         })
         await frame.waitForIdle()
