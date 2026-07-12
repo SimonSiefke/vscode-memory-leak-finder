@@ -1,5 +1,6 @@
 .vscode-webview-load-time-results
 .vscode-codex-webview-load-time-results
+.vscode-codex-warm-webview-load-time-results
 .vscode-memory-leak-finder-cpu-performance-counters
 .vscode-workbench-tracked-allocations
 .vscode-workbench-tracked-modules

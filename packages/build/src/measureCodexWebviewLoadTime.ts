@@ -18,6 +18,12 @@ interface Options {
   readonly singleIframeVscodePath: string
   readonly skipBuild: boolean
   readonly timeoutMs: number
+  readonly warmCache: boolean
+}
+
+interface StatePolicy {
+  readonly clearAfter: boolean
+  readonly clearBefore: boolean
 }
 
 interface Summary {
@@ -41,11 +47,17 @@ const parseArgv = (argv: readonly string[]): Options => {
   return {
     legacyVscodePath: getString('--legacy-vscode-path'),
     maxAttempts: getNumber('--max-attempts', 10),
-    outputDirectory: resolve(getString('--output-directory', join(repositoryRoot, '.vscode-codex-webview-load-time-results'))),
+    outputDirectory: resolve(
+      getString(
+        '--output-directory',
+        join(repositoryRoot, argv.includes('--warm-cache') ? '.vscode-codex-warm-webview-load-time-results' : '.vscode-codex-webview-load-time-results'),
+      ),
+    ),
     runs: getNumber('--runs', 17),
     singleIframeVscodePath: getString('--single-iframe-vscode-path'),
     skipBuild: argv.includes('--skip-build'),
     timeoutMs: getNumber('--timeout-ms', 90_000),
+    warmCache: argv.includes('--warm-cache'),
   }
 }
 
@@ -79,7 +91,7 @@ const summarize = (samples: readonly number[]): Summary => {
 
 const escapeXml = (value: string): string => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 
-const createChart = (legacy: readonly number[], singleIframe: readonly number[]): string => {
+const createChart = (legacy: readonly number[], singleIframe: readonly number[], warmCache: boolean): string => {
   const width = 1040
   const height = 640
   const left = 80
@@ -107,7 +119,7 @@ const createChart = (legacy: readonly number[], singleIframe: readonly number[])
     .map((_, index) => `<text x="${x(index)}" y="${top + plotHeight + 28}" text-anchor="middle">${index + 1}</text>`)
     .join('')
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-<rect width="100%" height="100%" fill="#fff"/><g font-family="sans-serif" fill="#2e3440"><text x="${left}" y="38" font-size="24" font-weight="600">Cold Codex webview click-to-ready time</text>${grid}${labels}
+<rect width="100%" height="100%" fill="#fff"/><g font-family="sans-serif" fill="#2e3440"><text x="${left}" y="38" font-size="24" font-weight="600">${warmCache ? 'Warm' : 'Cold'} Codex webview click-to-ready time</text>${grid}${labels}
 <line x1="${left}" y1="${top}" x2="${left}" y2="${top + plotHeight}" stroke="#6b7280"/><line x1="${left}" y1="${top + plotHeight}" x2="${width - right}" y2="${top + plotHeight}" stroke="#6b7280"/>
 <polyline points="${polyline(legacy)}" fill="none" stroke="#0969da" stroke-width="2"/>${circles(legacy, '#0969da')}
 <polyline points="${polyline(singleIframe)}" fill="none" stroke="#cf5c00" stroke-width="2"/>${circles(singleIframe, '#cf5c00')}
@@ -235,9 +247,11 @@ const clearBenchmarkState = async (): Promise<void> => {
   ])
 }
 
-const prepareColdLaunch = async (): Promise<void> => {
+const prepareLaunch = async (clearState: boolean): Promise<void> => {
   await stopBenchmarkProcesses()
-  await clearBenchmarkState()
+  if (clearState) {
+    await clearBenchmarkState()
+  }
   if ((await getBenchmarkProcessIds()).length > 0) {
     throw new Error('A benchmark VS Code process is still running')
   }
@@ -252,8 +266,14 @@ const stopProcess = (child: ChildProcess, signal: NodeJS.Signals = 'SIGTERM'): v
   } catch {}
 }
 
-const runSample = async (options: Options, mode: Mode, singleIframeExecutablePath: string, codexExtensionPath: string): Promise<number> => {
-  await prepareColdLaunch()
+const runSample = async (
+  options: Options,
+  mode: Mode,
+  singleIframeExecutablePath: string,
+  codexExtensionPath: string,
+  statePolicy: StatePolicy,
+): Promise<number> => {
+  await prepareLaunch(statePolicy.clearBefore)
   const launcherPath = join(repositoryRoot, 'scripts', 'run-vscode-codex-webview-e2e.sh')
   const args = [
     '-a',
@@ -299,7 +319,9 @@ const runSample = async (options: Options, mode: Mode, singleIframeExecutablePat
     child.on('exit', async (code) => {
       clearTimeout(timeout)
       await stopBenchmarkProcesses()
-      await clearBenchmarkState()
+      if (statePolicy.clearAfter) {
+        await clearBenchmarkState()
+      }
       const matches = [...output.matchAll(measurementPattern)]
       const duration = Number.parseFloat(matches.at(-1)?.[1] || '')
       if (code !== 0 || !Number.isFinite(duration) || duration <= 0) {
@@ -316,16 +338,18 @@ const runSampleWithRetries = async (
   mode: Mode,
   singleIframeExecutablePath: string,
   codexExtensionPath: string,
+  statePolicy: StatePolicy,
 ): Promise<number> => {
   for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
     try {
-      return await runSample(options, mode, singleIframeExecutablePath, codexExtensionPath)
+      return await runSample(options, mode, singleIframeExecutablePath, codexExtensionPath, statePolicy)
     } catch (error) {
       if (attempt === options.maxAttempts) {
         throw error
       }
       const message = error instanceof Error ? error.message : String(error)
-      console.warn(`[${mode}] attempt ${attempt}/${options.maxAttempts} failed; retrying with a fresh profile\n${message}`)
+      const retryState = statePolicy.clearBefore ? 'a fresh profile' : 'the populated cache'
+      console.warn(`[${mode}] attempt ${attempt}/${options.maxAttempts} failed; retrying with ${retryState}\n${message}`)
     }
   }
   throw new Error(`Unable to run ${mode} sample`)
@@ -340,21 +364,38 @@ export const main = async (): Promise<void> => {
   console.log(`Using ${extensionId} ${codexManifest.version} from ${codexExtensionPath}`)
   const singleIframeExecutablePath = await ensureLocalVscodeBuild(options.singleIframeVscodePath, options.skipBuild)
   const samples: Record<Mode, number[]> = { legacy: [], singleIframe: [] }
+  const primingSamples: Partial<Record<Mode, number>> = {}
   for (const mode of ['legacy', 'singleIframe'] as const) {
+    if (options.warmCache) {
+      const primingSample = await runSampleWithRetries(options, mode, singleIframeExecutablePath, codexExtensionPath, {
+        clearAfter: false,
+        clearBefore: true,
+      })
+      primingSamples[mode] = primingSample
+      console.log(`[${mode}] cache primed in ${round(primingSample)} ms; measurement excluded`)
+    }
     for (let index = 0; index < options.runs; index++) {
-      const sample = await runSampleWithRetries(options, mode, singleIframeExecutablePath, codexExtensionPath)
+      const sample = await runSampleWithRetries(options, mode, singleIframeExecutablePath, codexExtensionPath, {
+        clearAfter: !options.warmCache,
+        clearBefore: !options.warmCache,
+      })
       samples[mode].push(sample)
       console.log(`[${mode}] ${index + 1}/${options.runs}: ${round(sample)} ms`)
     }
+    if (options.warmCache) {
+      await prepareLaunch(true)
+    }
   }
   const result = {
-    cachePolicy:
-      'Before and after every attempt: stop benchmark-owned VS Code processes and delete user data, Service Worker/Cache Storage, Chromium caches, runtime data, shared-process data, and the per-run extensions directory',
+    cachePolicy: options.warmCache
+      ? 'For each loader: clear all benchmark state, perform one excluded priming launch, then preserve user data, Service Worker/Cache Storage, Chromium caches, runtime data, and shared-process data across all measured restarts'
+      : 'Before and after every attempt: stop benchmark-owned VS Code processes and delete user data, Service Worker/Cache Storage, Chromium caches, runtime data, shared-process data, and the per-run extensions directory',
     codexExtension: { id: extensionId, version: codexManifest.version },
     generatedAt: new Date().toISOString(),
     legacy: { label: 'VS Code 1.128.0 — legacy double iframe', samplesMs: samples.legacy, summary: summarize(samples.legacy) },
     measurement:
       "Page-object-worker timestamp immediately before the Codex Quick Pick command click until the Codex application sends its post-mount 'ready' message through acquireVsCodeApi().postMessage",
+    primingSamplesMs: primingSamples,
     runOrder: ['legacy', 'singleIframe'],
     runs: options.runs,
     singleIframe: {
@@ -366,7 +407,7 @@ export const main = async (): Promise<void> => {
   await mkdir(options.outputDirectory, { recursive: true })
   await Promise.all([
     writeFile(join(options.outputDirectory, 'codex-webview-load-time.json'), `${JSON.stringify(result, undefined, 2)}\n`),
-    writeFile(join(options.outputDirectory, 'codex-webview-load-time.svg'), createChart(samples.legacy, samples.singleIframe)),
+    writeFile(join(options.outputDirectory, 'codex-webview-load-time.svg'), createChart(samples.legacy, samples.singleIframe, options.warmCache)),
   ])
   const improvement = ((result.legacy.summary.median - result.singleIframe.summary.median) / result.legacy.summary.median) * 100
   console.log(`Median improvement: ${round(improvement)}%`)
