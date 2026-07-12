@@ -608,7 +608,7 @@ export interface QuickPick {
   hide(): Promise<void>
   openFile(fileName: any): Promise<void>
   pressEnter(): Promise<void>
-  select(text: any, stayVisible?: any, stopsApplication?: any): Promise<void>
+  select(text: any, stayVisible?: any, stopsApplication?: any): Promise<number>
   show(options?: any): Promise<void>
   showColorTheme(): Promise<void>
   showFileIconTheme(): Promise<void>
@@ -756,7 +756,7 @@ export interface SimpleBrowser {
   shouldHaveLoadError(options: any): Promise<void>
 }
 export interface SingleIframeWebView {
-  shouldHaveContent(options: any): Promise<string>
+  shouldHaveContent(options: any): Promise<{ loadTimeMs: string; readyAt: number }>
 }
 export interface SourceControl {
   checkoutBranch(branchName: any): Promise<void>
@@ -885,7 +885,7 @@ export interface WebView {
   focus(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldBeVisible2(options?: any): Promise<void>
-  shouldHaveContent(options: any): Promise<string>
+  shouldHaveContent(options: any): Promise<{ loadTimeMs: string; readyAt: number }>
 }
 export interface WelcomePage {
   checkStepByIndex(index: any): Promise<void>

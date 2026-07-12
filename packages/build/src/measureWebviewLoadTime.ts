@@ -1,10 +1,12 @@
-import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { spawn } from 'node:child_process'
+import { ensureLocalVscodeBuild } from './measureLocalVscodeComparison.ts'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
-const measurementPattern = /WEBVIEW_LOAD_TIME_MS=([0-9]+(?:\.[0-9]+)?)/g
+const internalMeasurementPattern = /WEBVIEW_INTERNAL_LOAD_TIME_MS=([0-9]+(?:\.[0-9]+)?)/g
+const uiMeasurementPattern = /WEBVIEW_UI_LOAD_TIME_MS=([0-9]+(?:\.[0-9]+)?)/g
 const testName = 'webview-single-iframe-show'
 
 interface Options {
@@ -13,6 +15,7 @@ interface Options {
   readonly outputDirectory: string
   readonly resume: boolean
   readonly runs: number
+  readonly skipBuild: boolean
   readonly singleIframeVscodePath: string
   readonly timeoutMs: number
 }
@@ -31,17 +34,31 @@ interface BenchmarkResult {
   readonly completed: boolean
   readonly generatedAt: string
   readonly legacy: {
+    readonly internalSamplesMs: readonly number[]
+    readonly internalSummary: Summary
     readonly label: string
-    readonly samplesMs: readonly number[]
-    readonly summary: Summary
+    readonly uiSamplesMs: readonly number[]
+    readonly uiSummary: Summary
   }
-  readonly measurement: string
+  readonly measurements: {
+    readonly internal: string
+    readonly ui: string
+  }
   readonly runs: number
+  readonly runOrder: readonly Mode[]
+  readonly schemaVersion: 2
   readonly singleIframe: {
+    readonly internalSamplesMs: readonly number[]
+    readonly internalSummary: Summary
     readonly label: string
-    readonly samplesMs: readonly number[]
-    readonly summary: Summary
+    readonly uiSamplesMs: readonly number[]
+    readonly uiSummary: Summary
   }
+}
+
+interface Sample {
+  readonly internalMs: number
+  readonly uiMs: number
 }
 
 type Mode = 'legacy' | 'singleIframe'
@@ -59,10 +76,11 @@ const parseArgv = (argv: readonly string[]): Options => {
   const resolveOptional = (value: string): string => (value ? resolve(value) : '')
   return {
     legacyVscodePath: resolveOptional(getString('--legacy-vscode-path', process.env.VSCODE_EXECUTABLE_PATH || '')),
-    maxAttempts: getPositiveNumber('--max-attempts', 3),
+    maxAttempts: getPositiveNumber('--max-attempts', 10),
     outputDirectory: resolve(getString('--output-directory', join(repositoryRoot, '.vscode-webview-load-time-results'))),
     resume: argv.includes('--resume'),
     runs: getPositiveNumber('--runs', 17),
+    skipBuild: argv.includes('--skip-build'),
     singleIframeVscodePath: resolveOptional(getString('--single-iframe-vscode-path', process.env.VSCODE_SOURCE_PATH || '')),
     timeoutMs: getPositiveNumber('--timeout-ms', 45_000),
   }
@@ -104,11 +122,16 @@ const escapeXml = (value: string): string => {
   return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
 }
 
-const createChart = (result: BenchmarkResult): string => {
+const createChart = (result: BenchmarkResult, metric: 'internal' | 'ui'): string => {
   const width = 1100
   const height = 680
   const plot = { bottom: 500, left: 90, right: 1050, top: 70 }
-  const allValues = [...result.legacy.samplesMs, ...result.singleIframe.samplesMs]
+  const isUiMetric = metric === 'ui'
+  const legacySamples = isUiMetric ? result.legacy.uiSamplesMs : result.legacy.internalSamplesMs
+  const singleIframeSamples = isUiMetric ? result.singleIframe.uiSamplesMs : result.singleIframe.internalSamplesMs
+  const legacySummary = isUiMetric ? result.legacy.uiSummary : result.legacy.internalSummary
+  const singleIframeSummary = isUiMetric ? result.singleIframe.uiSummary : result.singleIframe.internalSummary
+  const allValues = [...legacySamples, ...singleIframeSamples]
   const observedMax = Math.max(...allValues, 1)
   const yMax = Math.ceil((observedMax * 1.1) / 10) * 10
   const x = (index: number): number => plot.left + (index * (plot.right - plot.left)) / Math.max(result.runs - 1, 1)
@@ -133,55 +156,67 @@ const createChart = (result: BenchmarkResult): string => {
     }
     return `<text x="${x(index)}" y="${plot.bottom + 28}" text-anchor="middle">${index + 1}</text>`
   }).join('')
-  const medianImprovement = result.legacy.summary.median
-    ? ((result.legacy.summary.median - result.singleIframe.summary.median) / result.legacy.summary.median) * 100
-    : 0
+  const medianImprovement = legacySummary.median ? ((legacySummary.median - singleIframeSummary.median) / legacySummary.median) * 100 : 0
   const comparison = medianImprovement >= 0 ? `${round(medianImprovement)}% faster` : `${round(Math.abs(medianImprovement))}% slower`
+  const title = isUiMetric ? 'Cold webview click-to-ready time' : 'Cold webview internal load time'
+  const description = isUiMetric ? 'Quick Pick selection until visible ready marker' : 'Extension-internal createWebviewPanel lifecycle'
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description">
-  <title id="title">Cold webview load-time comparison</title>
-  <desc id="description">${result.runs} cold-profile samples for legacy and single-iframe Electron webviews.</desc>
+  <title id="title">${title}</title>
+  <desc id="description">${description}; ${result.runs} cold-profile samples for legacy and single-iframe Electron webviews.</desc>
   <rect width="100%" height="100%" fill="#ffffff"/>
   <style>text { font: 14px system-ui, sans-serif; fill: #24292f; } .heading { font-size: 24px; font-weight: 600; } .summary { font-size: 16px; }</style>
-  <text class="heading" x="${plot.left}" y="35">Cold webview load time</text>
+  <text class="heading" x="${plot.left}" y="35">${title}</text>
   ${gridLines}
   <line x1="${plot.left}" y1="${plot.top}" x2="${plot.left}" y2="${plot.bottom}" stroke="#57606a"/>
   <line x1="${plot.left}" y1="${plot.bottom}" x2="${plot.right}" y2="${plot.bottom}" stroke="#57606a"/>
   ${xLabels}
   <text x="${(plot.left + plot.right) / 2}" y="${plot.bottom + 58}" text-anchor="middle">Cold run</text>
   <text x="24" y="${(plot.top + plot.bottom) / 2}" text-anchor="middle" transform="rotate(-90 24 ${(plot.top + plot.bottom) / 2})">Load time (ms)</text>
-  <path d="${path(result.legacy.samplesMs)}" fill="none" stroke="#0969da" stroke-width="2"/>
-  ${points(result.legacy.samplesMs, '#0969da')}
-  <path d="${path(result.singleIframe.samplesMs)}" fill="none" stroke="#cf5700" stroke-width="2"/>
-  ${points(result.singleIframe.samplesMs, '#cf5700')}
-  <circle cx="${plot.left}" cy="575" r="5" fill="#0969da"/><text x="${plot.left + 14}" y="580">${escapeXml(result.legacy.label)} — median ${result.legacy.summary.median} ms, mean ${result.legacy.summary.mean} ms</text>
-  <circle cx="${plot.left}" cy="605" r="5" fill="#cf5700"/><text x="${plot.left + 14}" y="610">${escapeXml(result.singleIframe.label)} — median ${result.singleIframe.summary.median} ms, mean ${result.singleIframe.summary.mean} ms</text>
+  <path d="${path(legacySamples)}" fill="none" stroke="#0969da" stroke-width="2"/>
+  ${points(legacySamples, '#0969da')}
+  <path d="${path(singleIframeSamples)}" fill="none" stroke="#cf5700" stroke-width="2"/>
+  ${points(singleIframeSamples, '#cf5700')}
+  <circle cx="${plot.left}" cy="575" r="5" fill="#0969da"/><text x="${plot.left + 14}" y="580">${escapeXml(result.legacy.label)} — median ${legacySummary.median} ms, mean ${legacySummary.mean} ms</text>
+  <circle cx="${plot.left}" cy="605" r="5" fill="#cf5700"/><text x="${plot.left + 14}" y="610">${escapeXml(result.singleIframe.label)} — median ${singleIframeSummary.median} ms, mean ${singleIframeSummary.mean} ms</text>
   <text class="summary" x="${plot.left}" y="645">Median result: single iframe is ${comparison}. All ${allValues.length} samples are shown; no outliers were removed.</text>
 </svg>\n`
 }
 
 const createResult = (
   options: Options,
-  legacySamples: readonly number[],
-  singleIframeSamples: readonly number[],
+  legacyInternalSamples: readonly number[],
+  legacyUiSamples: readonly number[],
+  singleIframeInternalSamples: readonly number[],
+  singleIframeUiSamples: readonly number[],
   completed: boolean,
 ): BenchmarkResult => {
   return {
-    cachePolicy: 'Delete the complete .vscode-user-data-dir before every launch attempt, including retries',
+    cachePolicy:
+      'Before and after every attempt: stop all benchmark-owned VS Code processes; delete user data, Service Worker/Cache Storage, Chromium caches, runtime data, shared-process data, and extensions',
     completed,
     generatedAt: new Date().toISOString(),
     legacy: {
+      internalSamplesMs: legacyInternalSamples,
+      internalSummary: summarize(legacyInternalSamples),
       label: 'VS Code 1.128.0 — legacy double iframe',
-      samplesMs: legacySamples,
-      summary: summarize(legacySamples),
+      uiSamplesMs: legacyUiSamples,
+      uiSummary: summarize(legacyUiSamples),
     },
-    measurement:
-      'Extension-host performance.now() immediately before createWebviewPanel until CSS, image, script, VS Code API, and an extension-to-webview-to-extension message round trip are ready',
+    measurements: {
+      internal:
+        'Extension-host performance.now() immediately before createWebviewPanel until CSS, image, script, VS Code API, and an extension-to-webview-to-extension message round trip are ready',
+      ui: 'Page-object-worker timestamp immediately before the Quick Pick click is dispatched until the webview records that its resources, API, and message round trip are ready',
+    },
     runs: options.runs,
+    runOrder: ['legacy', 'singleIframe'],
+    schemaVersion: 2,
     singleIframe: {
-      label: 'Local VS Code — single iframe',
-      samplesMs: singleIframeSamples,
-      summary: summarize(singleIframeSamples),
+      internalSamplesMs: singleIframeInternalSamples,
+      internalSummary: summarize(singleIframeInternalSamples),
+      label: 'Local minified VS Code — single iframe',
+      uiSamplesMs: singleIframeUiSamples,
+      uiSummary: summarize(singleIframeUiSamples),
     },
   }
 }
@@ -190,40 +225,128 @@ const writeResults = async (options: Options, result: BenchmarkResult): Promise<
   await mkdir(options.outputDirectory, { recursive: true })
   await Promise.all([
     writeFile(join(options.outputDirectory, 'webview-load-time.json'), `${JSON.stringify(result, undefined, 2)}\n`),
-    writeFile(join(options.outputDirectory, 'webview-load-time.svg'), createChart(result)),
+    writeFile(join(options.outputDirectory, 'webview-load-time.svg'), createChart(result, 'ui')),
+    writeFile(join(options.outputDirectory, 'webview-internal-load-time.svg'), createChart(result, 'internal')),
   ])
 }
 
-const readPreviousSamples = async (options: Options): Promise<{ legacy: number[]; singleIframe: number[] }> => {
+const readPreviousSamples = async (
+  options: Options,
+): Promise<{ legacyInternal: number[]; legacyUi: number[]; singleIframeInternal: number[]; singleIframeUi: number[] }> => {
   if (!options.resume) {
-    return { legacy: [], singleIframe: [] }
+    return { legacyInternal: [], legacyUi: [], singleIframeInternal: [], singleIframeUi: [] }
   }
   const resultPath = join(options.outputDirectory, 'webview-load-time.json')
   const previous = JSON.parse(await readFile(resultPath, 'utf8')) as BenchmarkResult
-  if (previous.runs !== options.runs) {
+  if (previous.schemaVersion !== 2 || previous.runs !== options.runs) {
     throw new Error(`Cannot resume incompatible benchmark results at ${resultPath}`)
   }
   const isValidSample = (value: number): boolean => Number.isFinite(value) && value > 0
-  const legacy = previous.legacy.samplesMs.filter(isValidSample).slice(0, options.runs)
-  const singleIframe = previous.singleIframe.samplesMs.filter(isValidSample).slice(0, options.runs)
-  console.log(`Resuming with ${legacy.length} legacy and ${singleIframe.length} single-iframe samples`)
-  return { legacy, singleIframe }
+  const legacyInternal = previous.legacy.internalSamplesMs.filter(isValidSample).slice(0, options.runs)
+  const legacyUi = previous.legacy.uiSamplesMs.filter(isValidSample).slice(0, options.runs)
+  const singleIframeInternal = previous.singleIframe.internalSamplesMs.filter(isValidSample).slice(0, options.runs)
+  const singleIframeUi = previous.singleIframe.uiSamplesMs.filter(isValidSample).slice(0, options.runs)
+  if (legacyInternal.length !== legacyUi.length || singleIframeInternal.length !== singleIframeUi.length) {
+    throw new Error(`Cannot resume incomplete paired metrics at ${resultPath}`)
+  }
+  console.log(`Resuming with ${legacyInternal.length} legacy and ${singleIframeInternal.length} single-iframe samples`)
+  return { legacyInternal, legacyUi, singleIframeInternal, singleIframeUi }
 }
 
-const killProcessGroup = (pid: number | undefined): void => {
+const killProcessGroup = (pid: number | undefined, signal: NodeJS.Signals = 'SIGTERM'): void => {
   if (!pid) {
     return
   }
   try {
-    process.kill(-pid, 'SIGTERM')
+    process.kill(-pid, signal)
   } catch {
     // The child already exited.
   }
 }
 
-const runSample = async (options: Options, mode: Mode): Promise<number> => {
-  const userDataDirectory = join(repositoryRoot, '.vscode-user-data-dir')
-  await rm(userDataDirectory, { force: true, recursive: true })
+const benchmarkOwnedPaths = [
+  join(repositoryRoot, '.vscode-user-data-dir'),
+  join(repositoryRoot, '.vscode-runtime-dir'),
+  join(repositoryRoot, '.vscode-shared-data-dir'),
+]
+
+const getBenchmarkVscodeProcessIds = async (): Promise<readonly number[]> => {
+  const entries = await readdir('/proc', { withFileTypes: true })
+  const processIds: number[] = []
+  await Promise.all(
+    entries.map(async (entry) => {
+      if (!entry.isDirectory() || !/^\d+$/.test(entry.name)) {
+        return
+      }
+      const processId = Number.parseInt(entry.name, 10)
+      if (processId === process.pid) {
+        return
+      }
+      try {
+        const commandLine = (await readFile(`/proc/${entry.name}/cmdline`, 'utf8')).replaceAll('\0', ' ')
+        if (benchmarkOwnedPaths.some((path) => commandLine.includes(path))) {
+          processIds.push(processId)
+        }
+      } catch {
+        // The process exited while /proc was being inspected.
+      }
+    }),
+  )
+  return processIds
+}
+
+const wait = async (milliseconds: number): Promise<void> => {
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, milliseconds))
+}
+
+const stopBenchmarkVscodeProcesses = async (): Promise<void> => {
+  let processIds = await getBenchmarkVscodeProcessIds()
+  for (const processId of processIds) {
+    try {
+      process.kill(processId, 'SIGTERM')
+    } catch {
+      // The process already exited.
+    }
+  }
+  for (let attempt = 0; attempt < 50 && processIds.length > 0; attempt++) {
+    await wait(100)
+    processIds = await getBenchmarkVscodeProcessIds()
+  }
+  for (const processId of processIds) {
+    try {
+      process.kill(processId, 'SIGKILL')
+    } catch {
+      // The process already exited.
+    }
+  }
+  if (processIds.length > 0) {
+    await wait(250)
+  }
+  const remainingProcessIds = await getBenchmarkVscodeProcessIds()
+  if (remainingProcessIds.length > 0) {
+    throw new Error(`Benchmark VS Code processes did not exit: ${remainingProcessIds.join(', ')}`)
+  }
+}
+
+const clearBenchmarkState = async (): Promise<void> => {
+  await Promise.all([
+    ...benchmarkOwnedPaths.map((path) => rm(path, { force: true, recursive: true })),
+    rm(join(repositoryRoot, '.vscode-extensions'), { force: true, recursive: true }),
+    rm(join(repositoryRoot, '.vscode-test', 'extensions', 'sample.single-iframe-webview-legacy'), { force: true, recursive: true }),
+  ])
+}
+
+const prepareColdLaunch = async (): Promise<void> => {
+  await stopBenchmarkVscodeProcesses()
+  await clearBenchmarkState()
+  const processIds = await getBenchmarkVscodeProcessIds()
+  if (processIds.length > 0) {
+    throw new Error(`Another benchmark VS Code instance is already running: ${processIds.join(', ')}`)
+  }
+}
+
+const runSample = async (options: Options, mode: Mode, singleIframeExecutablePath: string): Promise<Sample> => {
+  await prepareColdLaunch()
 
   const launcherPath = join(repositoryRoot, 'scripts', 'run-vscode-single-iframe-e2e.sh')
   const args = [
@@ -249,10 +372,10 @@ const runSample = async (options: Options, mode: Mode): Promise<number> => {
     env.VSCODE_EXECUTABLE_PATH = options.legacyVscodePath
   } else {
     env.VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_SERVICE_WORKER = '1'
-    env.VSCODE_SOURCE_PATH = options.singleIframeVscodePath
+    env.VSCODE_EXECUTABLE_PATH = singleIframeExecutablePath
   }
 
-  return new Promise<number>((resolvePromise, rejectPromise) => {
+  return new Promise<Sample>((resolvePromise, rejectPromise) => {
     const child = spawn('xvfb-run', args, {
       cwd: repositoryRoot,
       detached: true,
@@ -268,35 +391,52 @@ const runSample = async (options: Options, mode: Mode): Promise<number> => {
     child.stderr.on('data', (chunk: string) => {
       output += chunk
     })
+    let timedOut = false
+    let forceKillTimeout: NodeJS.Timeout | undefined
     const timeout = setTimeout(() => {
+      timedOut = true
       killProcessGroup(child.pid)
-      rejectPromise(new Error(`${mode} sample timed out after ${options.timeoutMs} ms\n${output.slice(-4000)}`))
+      forceKillTimeout = setTimeout(() => killProcessGroup(child.pid, 'SIGKILL'), 5000)
     }, options.timeoutMs)
     child.on('error', (error) => {
       clearTimeout(timeout)
       rejectPromise(error)
     })
-    child.on('exit', (code) => {
+    child.on('exit', async (code) => {
       clearTimeout(timeout)
+      clearTimeout(forceKillTimeout)
+      try {
+        await stopBenchmarkVscodeProcesses()
+        await clearBenchmarkState()
+      } catch (error) {
+        rejectPromise(error)
+        return
+      }
+      if (timedOut) {
+        rejectPromise(new Error(`${mode} sample timed out after ${options.timeoutMs} ms\n${output.slice(-4000)}`))
+        return
+      }
       if (code !== 0) {
         rejectPromise(new Error(`${mode} sample failed with exit code ${code}\n${output.slice(-4000)}`))
         return
       }
-      const matches = [...output.matchAll(measurementPattern)]
-      const value = Number.parseFloat(matches.at(-1)?.[1] || '')
-      if (!Number.isFinite(value) || value <= 0) {
-        rejectPromise(new Error(`No valid webview load-time marker found for ${mode}\n${output.slice(-4000)}`))
+      const internalMatches = [...output.matchAll(internalMeasurementPattern)]
+      const uiMatches = [...output.matchAll(uiMeasurementPattern)]
+      const internalMs = Number.parseFloat(internalMatches.at(-1)?.[1] || '')
+      const uiMs = Number.parseFloat(uiMatches.at(-1)?.[1] || '')
+      if (!Number.isFinite(internalMs) || internalMs <= 0 || !Number.isFinite(uiMs) || uiMs <= 0) {
+        rejectPromise(new Error(`No valid paired webview load-time markers found for ${mode}\n${output.slice(-4000)}`))
         return
       }
-      resolvePromise(value)
+      resolvePromise({ internalMs, uiMs })
     })
   })
 }
 
-const runSampleWithRetries = async (options: Options, mode: Mode): Promise<number> => {
+const runSampleWithRetries = async (options: Options, mode: Mode, singleIframeExecutablePath: string): Promise<Sample> => {
   for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
     try {
-      return await runSample(options, mode)
+      return await runSample(options, mode, singleIframeExecutablePath)
     } catch (error) {
       if (attempt === options.maxAttempts) {
         throw error
@@ -317,39 +457,54 @@ Options:
   --runs <count>             Successful samples per loader (default: 17)
   --output-directory <path>  JSON and SVG destination
   --timeout-ms <ms>          Per-attempt timeout (default: 45000)
-  --max-attempts <count>     Attempts per successful sample (default: 3)
+  --max-attempts <count>     Attempts per successful sample (default: 10)
+  --skip-build               Reuse the cached local minified build
   --resume                   Continue a compatible partial result file`)
     return
   }
   const options = parseArgv(process.argv.slice(2))
   await assertPath('--legacy-vscode-path', options.legacyVscodePath)
   await assertPath('--single-iframe-vscode-path', options.singleIframeVscodePath)
+  console.log(`Preparing minified local VS Code build from ${options.singleIframeVscodePath}`)
+  const singleIframeExecutablePath = await ensureLocalVscodeBuild(options.singleIframeVscodePath, options.skipBuild)
+  console.log(`Using minified local VS Code executable ${singleIframeExecutablePath}`)
   const previous = await readPreviousSamples(options)
-  const legacySamples = previous.legacy
-  const singleIframeSamples = previous.singleIframe
+  const legacyInternalSamples = previous.legacyInternal
+  const legacyUiSamples = previous.legacyUi
+  const singleIframeInternalSamples = previous.singleIframeInternal
+  const singleIframeUiSamples = previous.singleIframeUi
 
-  for (let index = 0; index < options.runs; index++) {
-    const modes: readonly Mode[] = index % 2 === 0 ? ['legacy', 'singleIframe'] : ['singleIframe', 'legacy']
-    for (const mode of modes) {
-      const samples = mode === 'legacy' ? legacySamples : singleIframeSamples
-      if (samples.length > index) {
+  const modes: readonly Mode[] = ['legacy', 'singleIframe']
+  for (const mode of modes) {
+    for (let index = 0; index < options.runs; index++) {
+      const internalSamples = mode === 'legacy' ? legacyInternalSamples : singleIframeInternalSamples
+      const uiSamples = mode === 'legacy' ? legacyUiSamples : singleIframeUiSamples
+      if (internalSamples.length > index) {
         continue
       }
-      const sample = await runSampleWithRetries(options, mode)
-      samples.push(sample)
-      console.log(`[${mode}] ${samples.length}/${options.runs}: ${round(sample)} ms`)
-      await writeResults(options, createResult(options, legacySamples, singleIframeSamples, false))
+      const sample = await runSampleWithRetries(options, mode, singleIframeExecutablePath)
+      internalSamples.push(sample.internalMs)
+      uiSamples.push(sample.uiMs)
+      console.log(
+        `[${mode}] ${internalSamples.length}/${options.runs}: internal ${round(sample.internalMs)} ms, click-to-ready ${round(sample.uiMs)} ms`,
+      )
+      await writeResults(
+        options,
+        createResult(options, legacyInternalSamples, legacyUiSamples, singleIframeInternalSamples, singleIframeUiSamples, false),
+      )
     }
   }
 
-  const result = createResult(options, legacySamples, singleIframeSamples, true)
+  const result = createResult(options, legacyInternalSamples, legacyUiSamples, singleIframeInternalSamples, singleIframeUiSamples, true)
   await writeResults(options, result)
-  const improvement = ((result.legacy.summary.median - result.singleIframe.summary.median) / result.legacy.summary.median) * 100
-  console.log(`Legacy median: ${result.legacy.summary.median} ms`)
-  console.log(`Single-iframe median: ${result.singleIframe.summary.median} ms`)
-  console.log(`Single-iframe median improvement: ${round(improvement)}%`)
+  const internalImprovement =
+    ((result.legacy.internalSummary.median - result.singleIframe.internalSummary.median) / result.legacy.internalSummary.median) * 100
+  const uiImprovement = ((result.legacy.uiSummary.median - result.singleIframe.uiSummary.median) / result.legacy.uiSummary.median) * 100
+  console.log(`Internal median improvement: ${round(internalImprovement)}%`)
+  console.log(`Click-to-ready median improvement: ${round(uiImprovement)}%`)
   console.log(`Results: ${join(options.outputDirectory, 'webview-load-time.json')}`)
-  console.log(`Chart: ${join(options.outputDirectory, 'webview-load-time.svg')}`)
+  console.log(`Click-to-ready chart: ${join(options.outputDirectory, 'webview-load-time.svg')}`)
+  console.log(`Internal chart: ${join(options.outputDirectory, 'webview-internal-load-time.svg')}`)
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

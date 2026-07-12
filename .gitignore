@@ -41,6 +41,7 @@ ffmpeg-linux
 .vscode-videos
 .vscode-logs-history
 .vscode-user-data-dir
+.vscode-shared-data-dir
 .vscode-test-workspace
 .vscode-extensions
 .vscode-test-files

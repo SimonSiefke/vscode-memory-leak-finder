@@ -13,7 +13,7 @@ type QuickPickApi = {
   executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
   getVisibleCommands: () => Promise<string[]>
   pressEnter: () => Promise<void>
-  select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<void>
+  select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<number>
   showCommands: (options?: { pressKeyOnce?: boolean }) => Promise<void>
   type: (value: string) => Promise<void>
 }

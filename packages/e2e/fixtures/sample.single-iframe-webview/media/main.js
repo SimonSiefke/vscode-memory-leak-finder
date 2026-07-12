@@ -24,6 +24,7 @@ window.addEventListener('message', (event) => {
     vscode.postMessage({ type: 'complete' })
   }
   if (event.data?.type === 'measurement') {
+    status.dataset.readyAt = String(performance.timeOrigin + performance.now())
     status.dataset.loadTimeMs = String(event.data.durationMs)
     status.textContent = 'Webview fixture ready'
   }

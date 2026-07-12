@@ -12,9 +12,12 @@ else
 fi
 
 ROOT=$(dirname "$(dirname "$(readlink -f "$0")")")
+SHARED_DATA_DIR="$ROOT/.vscode-shared-data-dir"
 SOURCE_EXTENSION_PATH="$ROOT/packages/e2e/fixtures/sample.single-iframe-webview"
 EXTENSION_PATH="$SOURCE_EXTENSION_PATH"
 LAUNCH_ARGS=()
+
+touch "$ROOT/.vscode-test-workspace/webview-benchmark-warmup.txt"
 
 if [[ "${VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_SERVICE_WORKER:-}" == "1" ]]; then
 	LAUNCH_ARGS+=(--enable-proposed-api=vscode-memory-leak-finder.single-iframe-webview)
@@ -28,5 +31,6 @@ fi
 
 exec "$VSCODE_COMMAND" \
 	--extensionDevelopmentPath="$EXTENSION_PATH" \
+	--shared-data-dir="$SHARED_DATA_DIR" \
 	"${LAUNCH_ARGS[@]}" \
 	"$@"

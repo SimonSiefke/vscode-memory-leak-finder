@@ -138,12 +138,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
+        let selectedAt: number
         if (typeof text === 'string') {
           const option = quickPick.locator('.label-name', {
             hasExactText: text,
           })
           await expect(option).toBeVisible()
           await page.waitForIdle()
+          selectedAt = performance.timeOrigin + performance.now()
           await option.click()
         } else {
           const normal = `${text}`.slice(1, -1)
@@ -151,10 +153,8 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           await expect(item).toBeVisible()
           await page.waitForIdle()
           const label = item.locator('.label-name')
+          selectedAt = performance.timeOrigin + performance.now()
           await label.click()
-          if (!stopsApplication) {
-            await page.waitForIdle()
-          }
         }
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()
@@ -162,6 +162,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         if (!stopsApplication) {
           await page.waitForIdle()
         }
+        return selectedAt
       } catch (error) {
         throw new VError(error, `Failed to select "${text}"`)
       }
