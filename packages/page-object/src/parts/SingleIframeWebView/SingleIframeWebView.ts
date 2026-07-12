@@ -17,25 +17,21 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         const deadline = performance.now() + 30_000
         while (performance.now() < deadline) {
           try {
-            const readyAt = await frame.evaluateInMainWorld({
+            const result = await frame.evaluateInMainWorld({
               expression: `(() => {
-                const navigation = performance.getEntriesByType('navigation')[0]
-                return document.querySelector('#root') && navigation?.loadEventEnd > 0
-                  ? performance.timeOrigin + navigation.loadEventEnd
-                  : 0
+                const readyAt = Number(document.documentElement.dataset.vscodeMemoryLeakFinderReady)
+                return readyAt > 0 ? { readyAt } : undefined
               })()`,
             })
-            if (Number.isFinite(readyAt)) {
-              if (readyAt > 0) {
-                return { readyAt }
-              }
+            if (result?.readyAt > 0) {
+              return result
             }
           } catch {
             // The document may still be navigating.
           }
           await new Promise((resolve) => setTimeout(resolve, 50))
         }
-        throw new Error('webview did not finish loading within 30000ms')
+        throw new Error('webview did not report ready within 30000ms')
       } catch (error) {
         throw new VError(error, `Failed to find ready single-iframe webview for ${extensionId}`)
       }

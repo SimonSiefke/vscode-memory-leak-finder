@@ -28,16 +28,14 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         while (performance.now() < deadline) {
           try {
             const frame = await childPage.waitForSubIframe({ url })
-            const readyAt = await frame.evaluateInUtilityWorld({
+            const result = await frame.evaluateInUtilityWorld({
               expression: `(() => {
-                const navigation = performance.getEntriesByType('navigation')[0]
-                return document.querySelector('#root') && navigation?.loadEventEnd > 0
-                  ? performance.timeOrigin + navigation.loadEventEnd
-                  : 0
+                const readyAt = Number(document.documentElement.dataset.vscodeMemoryLeakFinderReady)
+                return readyAt > 0 ? { readyAt } : undefined
               })()`,
             })
-            if (Number.isFinite(readyAt) && readyAt > 0) {
-              return { readyAt }
+            if (result?.readyAt > 0) {
+              return result
             }
           } catch {
             // The inner document may still be navigating.

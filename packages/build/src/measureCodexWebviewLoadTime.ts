@@ -107,7 +107,7 @@ const createChart = (legacy: readonly number[], singleIframe: readonly number[])
     .map((_, index) => `<text x="${x(index)}" y="${top + plotHeight + 28}" text-anchor="middle">${index + 1}</text>`)
     .join('')
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-<rect width="100%" height="100%" fill="#fff"/><g font-family="sans-serif" fill="#2e3440"><text x="${left}" y="38" font-size="24" font-weight="600">Cold Codex webview click-to-load time</text>${grid}${labels}
+<rect width="100%" height="100%" fill="#fff"/><g font-family="sans-serif" fill="#2e3440"><text x="${left}" y="38" font-size="24" font-weight="600">Cold Codex webview click-to-ready time</text>${grid}${labels}
 <line x1="${left}" y1="${top}" x2="${left}" y2="${top + plotHeight}" stroke="#6b7280"/><line x1="${left}" y1="${top + plotHeight}" x2="${width - right}" y2="${top + plotHeight}" stroke="#6b7280"/>
 <polyline points="${polyline(legacy)}" fill="none" stroke="#0969da" stroke-width="2"/>${circles(legacy, '#0969da')}
 <polyline points="${polyline(singleIframe)}" fill="none" stroke="#cf5c00" stroke-width="2"/>${circles(singleIframe, '#cf5c00')}
@@ -354,7 +354,7 @@ export const main = async (): Promise<void> => {
     generatedAt: new Date().toISOString(),
     legacy: { label: 'VS Code 1.128.0 — legacy double iframe', samplesMs: samples.legacy, summary: summarize(samples.legacy) },
     measurement:
-      'Page-object-worker timestamp immediately before the Codex Quick Pick command click until the Codex inner document reports #root and a completed Navigation Timing load event',
+      "Page-object-worker timestamp immediately before the Codex Quick Pick command click until the Codex application sends its post-mount 'ready' message through acquireVsCodeApi().postMessage",
     runOrder: ['legacy', 'singleIframe'],
     runs: options.runs,
     singleIframe: {
