@@ -10,10 +10,15 @@ export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView }: T
   await QuickPick.type('Test: Show Single-Iframe WebView')
   await QuickPick.select('Test: Show Single-Iframe WebView')
   const webview = useSingleIframeWebview ? SingleIframeWebView : WebView
-  await webview.shouldHaveContent({
+  const duration = await webview.shouldHaveContent({
     extensionId,
     selector: '#single-iframe-webview-status',
     text: 'Webview fixture ready',
   })
+  const durationMs = Number.parseFloat(duration)
+  if (!Number.isFinite(durationMs) || durationMs <= 0) {
+    throw new Error(`Invalid webview load time: ${duration}`)
+  }
+  console.log(`WEBVIEW_LOAD_TIME_MS=${durationMs}`)
   await Editor.closeAll()
 }
