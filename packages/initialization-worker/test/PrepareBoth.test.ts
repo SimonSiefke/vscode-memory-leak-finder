@@ -47,12 +47,6 @@ jest.unstable_mockModule('../src/parts/ConnectDevtools/ConnectDevtools.ts', () =
   }
 })
 
-jest.unstable_mockModule('../src/parts/LaunchFunctionTrackerWorker/LaunchFunctionTrackerAndPreGenerateWorkbench.ts', () => {
-  return {
-    launchFunctionTrackerAndPreGenerateWorkbench: async () => {},
-  }
-})
-
 jest.unstable_mockModule('../src/parts/DevtoolsProtocol/DevtoolsProtocol.ts', () => {
   return {
     DevtoolsProtocolDebugger: {
@@ -82,9 +76,6 @@ test('prepareBoth returns real electron process id from runtime evaluation', asy
     1,
     'cpuPerformanceCountersFromStart',
     1234,
-    null,
-    null,
-    'functions',
   )
 
   expect(result.pid).toBe(9876)
