@@ -17,6 +17,8 @@ SOURCE_EXTENSION_PATH="$ROOT/packages/e2e/fixtures/sample.single-iframe-webview"
 EXTENSION_PATH="$SOURCE_EXTENSION_PATH"
 LAUNCH_ARGS=()
 
+touch "$ROOT/.vscode-test-workspace/webview-benchmark-warmup.txt"
+
 if [[ "${VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_SERVICE_WORKER:-}" == "1" ]]; then
 	LAUNCH_ARGS+=(--enable-proposed-api=vscode-memory-leak-finder.single-iframe-webview)
 else

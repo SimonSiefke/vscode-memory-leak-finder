@@ -145,16 +145,16 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           })
           await expect(option).toBeVisible()
           await page.waitForIdle()
-          await option.click()
           selectedAt = performance.timeOrigin + performance.now()
+          await option.click()
         } else {
           const normal = `${text}`.slice(1, -1)
           const item = quickPick.locator(`.monaco-list-row[aria-label*="${normal}"]`)
           await expect(item).toBeVisible()
           await page.waitForIdle()
           const label = item.locator('.label-name')
-          await label.click()
           selectedAt = performance.timeOrigin + performance.now()
+          await label.click()
         }
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()

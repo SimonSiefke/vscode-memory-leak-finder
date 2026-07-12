@@ -6,6 +6,8 @@ const useSingleIframeWebview = process.env.VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_
 export const skip = 1
 
 export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView }: TestContext): Promise<void> => {
+  await Editor.open('webview-benchmark-warmup.txt')
+  await Editor.close()
   await QuickPick.showCommands()
   await QuickPick.type('Test: Show Single-Iframe WebView')
   const selectedAt = await QuickPick.select('Test: Show Single-Iframe WebView')

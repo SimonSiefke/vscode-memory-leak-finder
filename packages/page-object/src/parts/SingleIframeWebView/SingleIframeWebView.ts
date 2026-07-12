@@ -19,7 +19,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         const content = frame.locator(selector)
         await expect(content).toBeVisible()
         await expect(content).toHaveText(text)
-        const readyAt = performance.timeOrigin + performance.now()
+        const readyAt = Number.parseFloat((await content.getAttribute('data-ready-at')) || '')
         await frame.waitForIdle()
         return { loadTimeMs: (await content.getAttribute('data-load-time-ms')) || '', readyAt }
       } catch (error) {

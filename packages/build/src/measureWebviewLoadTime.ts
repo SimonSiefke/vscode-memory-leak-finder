@@ -206,7 +206,7 @@ const createResult = (
     measurements: {
       internal:
         'Extension-host performance.now() immediately before createWebviewPanel until CSS, image, script, VS Code API, and an extension-to-webview-to-extension message round trip are ready',
-      ui: 'Page-object-worker timestamp immediately after the Quick Pick click is dispatched until the webview ready marker is visible',
+      ui: 'Page-object-worker timestamp immediately before the Quick Pick click is dispatched until the webview records that its resources, API, and message round trip are ready',
     },
     runs: options.runs,
     runOrder: ['legacy', 'singleIframe'],
