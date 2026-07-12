@@ -73,7 +73,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to check that webview is visible`)
       }
     },
-    async shouldHaveContent({ extensionId, selector, text }: { extensionId: string; selector: string; text: string }): Promise<void> {
+    async shouldHaveContent({ extensionId, selector, text }: { extensionId: string; selector: string; text: string }): Promise<string> {
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview.ready')
@@ -89,6 +89,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await expect(content).toBeVisible()
         await expect(content).toHaveText(text)
         await frame.waitForIdle()
+        return (await content.getAttribute('data-load-time-ms')) || ''
       } catch (error) {
         throw new VError(error, `Failed to find expected content in legacy webview`)
       }

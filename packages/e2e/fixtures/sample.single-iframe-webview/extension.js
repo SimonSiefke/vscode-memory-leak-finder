@@ -3,6 +3,7 @@ const vscode = require('vscode')
 exports.activate = (context) => {
   context.subscriptions.push(
     vscode.commands.registerCommand('test.showSingleIframeWebview', () => {
+      const startedAt = performance.now()
       const mediaRoot = vscode.Uri.joinPath(context.extensionUri, 'media')
       const panel = vscode.window.createWebviewPanel('singleIframeWebviewTest', 'Single-Iframe Webview Test', vscode.ViewColumn.One, {
         enableScripts: true,
@@ -27,7 +28,11 @@ exports.activate = (context) => {
 </html>`
       panel.webview.onDidReceiveMessage((message) => {
         if (message.type === 'ready') {
-          void panel.webview.postMessage({ type: 'pong' })
+          void panel.webview.postMessage({ type: 'ping' })
+        }
+        if (message.type === 'complete') {
+          const durationMs = performance.now() - startedAt
+          void panel.webview.postMessage({ durationMs, type: 'measurement' })
         }
       })
     }),
