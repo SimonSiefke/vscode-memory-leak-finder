@@ -1,4 +1,5 @@
 .vscode-webview-load-time-results
+.vscode-webview-memory-results
 .vscode-codex-webview-load-time-results
 .vscode-codex-warm-webview-load-time-results
 .vscode-memory-leak-finder-cpu-performance-counters

@@ -366,6 +366,8 @@ const runSample = async (options: Options, mode: Mode, singleIframeExecutablePat
   ]
   const env = { ...process.env }
   delete env.VSCODE_EXECUTABLE_PATH
+  delete env.VSCODE_MEMORY_LEAK_FINDER_MEASURE_WEBVIEW_MEMORY
+  delete env.VSCODE_MEMORY_LEAK_FINDER_MEMORY_HOLD_MS
   delete env.VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_SERVICE_WORKER
   delete env.VSCODE_SOURCE_PATH
   if (mode === 'legacy') {
