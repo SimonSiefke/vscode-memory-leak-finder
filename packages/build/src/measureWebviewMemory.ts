@@ -5,11 +5,13 @@ import { spawn } from 'node:child_process'
 import { ensureLocalVscodeBuild } from './measureLocalVscodeComparison.ts'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
-const readyMarker = 'WEBVIEW_MEMORY_READY=1'
+const baselineReadyMarker = 'WEBVIEW_MEMORY_BASELINE_READY=1'
+const webviewReadyMarker = 'WEBVIEW_MEMORY_READY=1'
 const testName = 'webview-single-iframe-show'
 const kilobytesPerMebibyte = 1024
 
 interface Options {
+  readonly baselineSettleMs: number
   readonly legacyVscodePath: string
   readonly maxAttempts: number
   readonly outputDirectory: string
@@ -17,10 +19,11 @@ interface Options {
   readonly runs: number
   readonly sampleCount: number
   readonly sampleIntervalMs: number
-  readonly settleMs: number
+  readonly singleIframeExecutablePath: string
   readonly singleIframeVscodePath: string
   readonly skipBuild: boolean
   readonly timeoutMs: number
+  readonly webviewSettleMs: number
 }
 
 interface Summary {
@@ -38,23 +41,34 @@ export interface ProcessMemory {
   readonly rssKiB: number
 }
 
-interface MemorySample {
+export interface MemorySample {
   readonly privateMiB: number
   readonly processCount: number
   readonly pssMiB: number
   readonly rssMiB: number
 }
 
+interface WebviewMemorySample {
+  readonly baseline: MemorySample
+  readonly delta: MemorySample
+  readonly withWebview: MemorySample
+}
+
+interface MetricResult {
+  readonly baselineSamples: readonly number[]
+  readonly baselineSummary: Summary
+  readonly deltaSamples: readonly number[]
+  readonly deltaSummary: Summary
+  readonly withWebviewSamples: readonly number[]
+  readonly withWebviewSummary: Summary
+}
+
 interface ModeResult {
   readonly label: string
-  readonly privateSamplesMiB: readonly number[]
-  readonly privateSummaryMiB: Summary
-  readonly processCountSamples: readonly number[]
-  readonly processCountSummary: Summary
-  readonly pssSamplesMiB: readonly number[]
-  readonly pssSummaryMiB: Summary
-  readonly rssSamplesMiB: readonly number[]
-  readonly rssSummaryMiB: Summary
+  readonly privateMiB: MetricResult
+  readonly processCount: MetricResult
+  readonly pssMiB: MetricResult
+  readonly rssMiB: MetricResult
 }
 
 interface BenchmarkResult {
@@ -69,7 +83,7 @@ interface BenchmarkResult {
   }
   readonly runs: number
   readonly runOrder: readonly Mode[]
-  readonly schemaVersion: 1
+  readonly schemaVersion: 2
   readonly singleIframe: ModeResult
 }
 
@@ -87,6 +101,7 @@ const parseArgv = (argv: readonly string[]): Options => {
   }
   const resolveOptional = (value: string): string => (value ? resolve(value) : '')
   return {
+    baselineSettleMs: getPositiveNumber('--baseline-settle-ms', 5000),
     legacyVscodePath: resolveOptional(getString('--legacy-vscode-path', process.env.VSCODE_EXECUTABLE_PATH || '')),
     maxAttempts: getPositiveNumber('--max-attempts', 5),
     outputDirectory: resolve(getString('--output-directory', join(repositoryRoot, '.vscode-webview-memory-results'))),
@@ -94,14 +109,16 @@ const parseArgv = (argv: readonly string[]): Options => {
     runs: getPositiveNumber('--runs', 10),
     sampleCount: getPositiveNumber('--sample-count', 5),
     sampleIntervalMs: getPositiveNumber('--sample-interval-ms', 200),
-    settleMs: getPositiveNumber('--settle-ms', 3000),
+    singleIframeExecutablePath: resolveOptional(getString('--single-iframe-executable-path')),
     singleIframeVscodePath: resolveOptional(getString('--single-iframe-vscode-path', process.env.VSCODE_SOURCE_PATH || '')),
     skipBuild: argv.includes('--skip-build'),
-    timeoutMs: getPositiveNumber('--timeout-ms', 45_000),
+    timeoutMs: getPositiveNumber('--timeout-ms', 60_000),
+    webviewSettleMs: getPositiveNumber('--webview-settle-ms', 3000),
   }
 }
 
 const round = (value: number): number => Math.round(value * 1000) / 1000
+const formatDelta = (value: number): string => `${value >= 0 ? '+' : ''}${value}`
 
 const summarize = (values: readonly number[]): Summary => {
   if (values.length === 0) {
@@ -143,6 +160,7 @@ const benchmarkOwnedPaths = [
   join(repositoryRoot, '.vscode-runtime-dir'),
   join(repositoryRoot, '.vscode-shared-data-dir'),
 ]
+const measurementContinuePath = join(repositoryRoot, '.tmp', 'webview-memory-benchmark-continue')
 
 const getBenchmarkVscodeProcessIds = async (): Promise<readonly number[]> => {
   const entries = await readdir('/proc', { withFileTypes: true })
@@ -203,8 +221,8 @@ const readTotalMemory = async (): Promise<MemorySample> => {
   }
 }
 
-const takeStableSample = async (options: Options): Promise<MemorySample> => {
-  await wait(options.settleMs)
+const takeStableSample = async (options: Options, settleMs: number): Promise<MemorySample> => {
+  await wait(settleMs)
   const samples: MemorySample[] = []
   for (let index = 0; index < options.sampleCount; index++) {
     samples.push(await readTotalMemory())
@@ -220,6 +238,13 @@ const takeStableSample = async (options: Options): Promise<MemorySample> => {
     rssMiB: middleSample(samples.map((sample) => sample.rssMiB)),
   }
 }
+
+export const subtractMemorySamples = (baseline: MemorySample, withWebview: MemorySample): MemorySample => ({
+  privateMiB: round(withWebview.privateMiB - baseline.privateMiB),
+  processCount: withWebview.processCount - baseline.processCount,
+  pssMiB: round(withWebview.pssMiB - baseline.pssMiB),
+  rssMiB: round(withWebview.rssMiB - baseline.rssMiB),
+})
 
 const stopBenchmarkVscodeProcesses = async (): Promise<void> => {
   let processIds = await getBenchmarkVscodeProcessIds()
@@ -251,6 +276,8 @@ const stopBenchmarkVscodeProcesses = async (): Promise<void> => {
 const clearBenchmarkState = async (): Promise<void> => {
   await Promise.all([
     ...benchmarkOwnedPaths.map((path) => rm(path, { force: true, recursive: true })),
+    rm(`${measurementContinuePath}-baseline`, { force: true }),
+    rm(`${measurementContinuePath}-webview`, { force: true }),
     rm(join(repositoryRoot, '.vscode-extensions'), { force: true, recursive: true }),
     rm(join(repositoryRoot, '.vscode-test', 'extensions', 'sample.single-iframe-webview-legacy'), { force: true, recursive: true }),
   ])
@@ -272,7 +299,7 @@ const killProcessGroup = (pid: number | undefined, signal: NodeJS.Signals = 'SIG
   }
 }
 
-const runSample = async (options: Options, mode: Mode, singleIframeExecutablePath: string): Promise<MemorySample> => {
+const runSample = async (options: Options, mode: Mode, singleIframeExecutablePath: string): Promise<WebviewMemorySample> => {
   await prepareColdLaunch()
   const launcherPath = join(repositoryRoot, 'scripts', 'run-vscode-single-iframe-e2e.sh')
   const args = [
@@ -295,7 +322,7 @@ const runSample = async (options: Options, mode: Mode, singleIframeExecutablePat
   delete env.VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_SERVICE_WORKER
   delete env.VSCODE_SOURCE_PATH
   env.VSCODE_MEMORY_LEAK_FINDER_MEASURE_WEBVIEW_MEMORY = '1'
-  env.VSCODE_MEMORY_LEAK_FINDER_MEMORY_HOLD_MS = String(options.settleMs + options.sampleCount * options.sampleIntervalMs + 5000)
+  env.VSCODE_MEMORY_LEAK_FINDER_MEMORY_CONTINUE_PATH = measurementContinuePath
   if (mode === 'legacy') {
     env.VSCODE_EXECUTABLE_PATH = options.legacyVscodePath
   } else {
@@ -303,14 +330,24 @@ const runSample = async (options: Options, mode: Mode, singleIframeExecutablePat
     env.VSCODE_EXECUTABLE_PATH = singleIframeExecutablePath
   }
 
-  return new Promise<MemorySample>((resolvePromise, rejectPromise) => {
+  return new Promise<WebviewMemorySample>((resolvePromise, rejectPromise) => {
     const child = spawn('xvfb-run', args, { cwd: repositoryRoot, detached: true, env, stdio: ['ignore', 'pipe', 'pipe'] })
     let output = ''
-    let measurement: Promise<MemorySample> | undefined
+    let baselineMeasurement: Promise<MemorySample> | undefined
+    let webviewMeasurement: Promise<MemorySample> | undefined
+    const measureAndContinue = async (point: 'baseline' | 'webview', settleMs: number): Promise<MemorySample> => {
+      const sample = await takeStableSample(options, settleMs)
+      await mkdir(dirname(measurementContinuePath), { recursive: true })
+      await writeFile(`${measurementContinuePath}-${point}`, '')
+      return sample
+    }
     const onOutput = (chunk: string): void => {
       output += chunk
-      if (!measurement && output.includes(readyMarker)) {
-        measurement = takeStableSample(options)
+      if (!baselineMeasurement && output.includes(baselineReadyMarker)) {
+        baselineMeasurement = measureAndContinue('baseline', options.baselineSettleMs)
+      }
+      if (!webviewMeasurement && output.includes(webviewReadyMarker)) {
+        webviewMeasurement = measureAndContinue('webview', options.webviewSettleMs)
       }
     }
     child.stdout.setEncoding('utf8')
@@ -332,7 +369,8 @@ const runSample = async (options: Options, mode: Mode, singleIframeExecutablePat
       clearTimeout(timeout)
       clearTimeout(forceKillTimeout)
       try {
-        const sample = measurement ? await measurement : undefined
+        const baseline = baselineMeasurement ? await baselineMeasurement : undefined
+        const withWebview = webviewMeasurement ? await webviewMeasurement : undefined
         await stopBenchmarkVscodeProcesses()
         await clearBenchmarkState()
         if (timedOut) {
@@ -341,10 +379,13 @@ const runSample = async (options: Options, mode: Mode, singleIframeExecutablePat
         if (code !== 0) {
           throw new Error(`${mode} sample failed with exit code ${code}`)
         }
-        if (!sample) {
-          throw new Error(`No ${readyMarker} marker found for ${mode}`)
+        if (!baseline) {
+          throw new Error(`No ${baselineReadyMarker} marker found for ${mode}`)
         }
-        resolvePromise(sample)
+        if (!withWebview) {
+          throw new Error(`No ${webviewReadyMarker} marker found for ${mode}`)
+        }
+        resolvePromise({ baseline, delta: subtractMemorySamples(baseline, withWebview), withWebview })
       } catch (error) {
         rejectPromise(new Error(`${error instanceof Error ? error.message : String(error)}\n${output.slice(-4000)}`))
       }
@@ -352,7 +393,7 @@ const runSample = async (options: Options, mode: Mode, singleIframeExecutablePat
   })
 }
 
-const runSampleWithRetries = async (options: Options, mode: Mode, executablePath: string): Promise<MemorySample> => {
+const runSampleWithRetries = async (options: Options, mode: Mode, executablePath: string): Promise<WebviewMemorySample> => {
   for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
     try {
       return await runSample(options, mode, executablePath)
@@ -360,34 +401,39 @@ const runSampleWithRetries = async (options: Options, mode: Mode, executablePath
       if (attempt === options.maxAttempts) {
         throw error
       }
-      console.warn(`[${mode}] attempt ${attempt}/${options.maxAttempts} failed; retrying with a fresh profile`)
+      const message = error instanceof Error ? error.message : String(error)
+      console.warn(`[${mode}] attempt ${attempt}/${options.maxAttempts} failed; retrying with a fresh profile\n${message.slice(-4000)}`)
     }
   }
   throw new Error(`Unable to run ${mode} sample`)
 }
 
-const createModeResult = (label: string, samples: readonly MemorySample[]): ModeResult => {
-  const privateSamplesMiB = samples.map((sample) => sample.privateMiB)
-  const processCountSamples = samples.map((sample) => sample.processCount)
-  const pssSamplesMiB = samples.map((sample) => sample.pssMiB)
-  const rssSamplesMiB = samples.map((sample) => sample.rssMiB)
+const createMetricResult = (samples: readonly WebviewMemorySample[], getValue: (sample: MemorySample) => number): MetricResult => {
+  const baselineSamples = samples.map((sample) => getValue(sample.baseline))
+  const deltaSamples = samples.map((sample) => getValue(sample.delta))
+  const withWebviewSamples = samples.map((sample) => getValue(sample.withWebview))
   return {
-    label,
-    privateSamplesMiB,
-    privateSummaryMiB: summarize(privateSamplesMiB),
-    processCountSamples,
-    processCountSummary: summarize(processCountSamples),
-    pssSamplesMiB,
-    pssSummaryMiB: summarize(pssSamplesMiB),
-    rssSamplesMiB,
-    rssSummaryMiB: summarize(rssSamplesMiB),
+    baselineSamples,
+    baselineSummary: summarize(baselineSamples),
+    deltaSamples,
+    deltaSummary: summarize(deltaSamples),
+    withWebviewSamples,
+    withWebviewSummary: summarize(withWebviewSamples),
   }
 }
 
+const createModeResult = (label: string, samples: readonly WebviewMemorySample[]): ModeResult => ({
+  label,
+  privateMiB: createMetricResult(samples, (sample) => sample.privateMiB),
+  processCount: createMetricResult(samples, (sample) => sample.processCount),
+  pssMiB: createMetricResult(samples, (sample) => sample.pssMiB),
+  rssMiB: createMetricResult(samples, (sample) => sample.rssMiB),
+})
+
 const createResult = (
   options: Options,
-  legacySamples: readonly MemorySample[],
-  singleIframeSamples: readonly MemorySample[],
+  legacySamples: readonly WebviewMemorySample[],
+  singleIframeSamples: readonly WebviewMemorySample[],
   completed: boolean,
 ): BenchmarkResult => ({
   cachePolicy: 'Before and after every sample: stop benchmark-owned VS Code processes and delete profiles, extensions, and caches',
@@ -395,13 +441,14 @@ const createResult = (
   generatedAt: new Date().toISOString(),
   legacy: createModeResult('VS Code 1.128.0 — double iframe with service worker', legacySamples),
   measurement: {
-    primaryMetric: 'Sum of Linux /proc/<pid>/smaps_rollup Pss for all benchmark-owned VS Code processes, in MiB',
+    primaryMetric:
+      'Per-run increase in the sum of Linux /proc/<pid>/smaps_rollup Pss for all benchmark-owned VS Code processes after opening the webview, in MiB',
     processSelection: 'Processes whose command line contains the benchmark user-data, runtime, or shared-data directory',
     temporalSampling: getTemporalSamplingDescription(options),
   },
   runs: options.runs,
   runOrder: ['legacy', 'singleIframe'],
-  schemaVersion: 1,
+  schemaVersion: 2,
   singleIframe: createModeResult('Local minified VS Code — single iframe without service worker', singleIframeSamples),
 })
 
@@ -412,11 +459,14 @@ const createChart = (result: BenchmarkResult): string => {
   const width = 1100
   const height = 680
   const plot = { bottom: 500, left: 90, right: 1050, top: 70 }
-  const legacy = result.legacy.pssSamplesMiB
-  const singleIframe = result.singleIframe.pssSamplesMiB
+  const legacy = result.legacy.pssMiB.deltaSamples
+  const singleIframe = result.singleIframe.pssMiB.deltaSamples
   const allValues = [...legacy, ...singleIframe]
-  const yMin = Math.max(0, Math.floor((Math.min(...allValues) * 0.9) / 10) * 10)
-  const yMax = Math.ceil((Math.max(...allValues, 1) * 1.05) / 10) * 10
+  const observedMin = Math.min(...allValues, 0)
+  const observedMax = Math.max(...allValues, 0)
+  const padding = Math.max((observedMax - observedMin) * 0.1, 5)
+  const yMin = Math.floor((observedMin - padding) / 5) * 5
+  const yMax = Math.ceil((observedMax + padding) / 5) * 5
   const x = (index: number): number => plot.left + (index * (plot.right - plot.left)) / Math.max(result.runs - 1, 1)
   const y = (value: number): number => plot.bottom - ((value - yMin) / Math.max(yMax - yMin, 1)) * (plot.bottom - plot.top)
   const path = (values: readonly number[]): string => values.map((value, index) => `${index ? 'L' : 'M'} ${x(index)} ${y(value)}`).join(' ')
@@ -431,42 +481,49 @@ const createChart = (result: BenchmarkResult): string => {
     const value = yMin + ((yMax - yMin) * index) / 5
     return `<line x1="${plot.left}" y1="${y(value)}" x2="${plot.right}" y2="${y(value)}" stroke="#d8dee9"/><text x="${plot.left - 12}" y="${y(value) + 5}" text-anchor="end">${round(value)}</text>`
   }).join('')
-  const delta = round(result.legacy.pssSummaryMiB.median - result.singleIframe.pssSummaryMiB.median)
+  const delta = round(result.legacy.pssMiB.deltaSummary.median - result.singleIframe.pssMiB.deltaSummary.median)
   const comparison = delta >= 0 ? `${delta} MiB less` : `${Math.abs(delta)} MiB more`
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description">
-  <title id="title">Total VS Code memory with one webview open</title>
-  <desc id="description">Linux proportional set size for double-iframe/service-worker and single-iframe/no-service-worker webviews.</desc>
+  <title id="title">Incremental VS Code memory for one webview</title>
+  <desc id="description">Change in Linux proportional set size from before opening the webview to after it is ready.</desc>
   <rect width="100%" height="100%" fill="#fff"/><style>text { font: 14px system-ui,sans-serif; fill: #24292f } .heading { font-size: 24px; font-weight: 600 } .summary { font-size: 16px }</style>
-  <text class="heading" x="${plot.left}" y="35">Total VS Code memory with one webview open</text>${grid}
+  <text class="heading" x="${plot.left}" y="35">Incremental VS Code memory for one webview</text>${grid}
   <line x1="${plot.left}" y1="${plot.top}" x2="${plot.left}" y2="${plot.bottom}" stroke="#57606a"/><line x1="${plot.left}" y1="${plot.bottom}" x2="${plot.right}" y2="${plot.bottom}" stroke="#57606a"/>
   <path d="${path(legacy)}" fill="none" stroke="#0969da" stroke-width="2"/>${points(legacy, '#0969da')}
   <path d="${path(singleIframe)}" fill="none" stroke="#cf5700" stroke-width="2"/>${points(singleIframe, '#cf5700')}
-  <text x="${(plot.left + plot.right) / 2}" y="${plot.bottom + 40}" text-anchor="middle">Paired cold run</text><text x="24" y="${(plot.top + plot.bottom) / 2}" text-anchor="middle" transform="rotate(-90 24 ${(plot.top + plot.bottom) / 2})">Total PSS (MiB)</text>
-  <circle cx="${plot.left}" cy="575" r="5" fill="#0969da"/><text x="${plot.left + 14}" y="580">${escapeXml(result.legacy.label)} — median ${result.legacy.pssSummaryMiB.median} MiB</text>
-  <circle cx="${plot.left}" cy="605" r="5" fill="#cf5700"/><text x="${plot.left + 14}" y="610">${escapeXml(result.singleIframe.label)} — median ${result.singleIframe.pssSummaryMiB.median} MiB</text>
-  <text class="summary" x="${plot.left}" y="645">Median result: single iframe uses ${comparison} PSS. No outliers removed.</text>
+  <text x="${(plot.left + plot.right) / 2}" y="${plot.bottom + 40}" text-anchor="middle">Paired cold run</text><text x="24" y="${(plot.top + plot.bottom) / 2}" text-anchor="middle" transform="rotate(-90 24 ${(plot.top + plot.bottom) / 2})">PSS increase (MiB)</text>
+  <circle cx="${plot.left}" cy="565" r="5" fill="#0969da"/><text x="${plot.left + 14}" y="570">${escapeXml(result.legacy.label)} — median ${result.legacy.pssMiB.baselineSummary.median} → ${result.legacy.pssMiB.withWebviewSummary.median} MiB; ${formatDelta(result.legacy.pssMiB.deltaSummary.median)} MiB</text>
+  <circle cx="${plot.left}" cy="600" r="5" fill="#cf5700"/><text x="${plot.left + 14}" y="605">${escapeXml(result.singleIframe.label)} — median ${result.singleIframe.pssMiB.baselineSummary.median} → ${result.singleIframe.pssMiB.withWebviewSummary.median} MiB; ${formatDelta(result.singleIframe.pssMiB.deltaSummary.median)} MiB</text>
+  <text class="summary" x="${plot.left}" y="645">Median webview cost: single iframe uses ${comparison} PSS. No outliers removed.</text>
 </svg>\n`
 }
 
-const samplesFromResult = (result: ModeResult): MemorySample[] =>
-  result.pssSamplesMiB.map((pssMiB, index) => ({
-    privateMiB: result.privateSamplesMiB[index] || 0,
-    processCount: result.processCountSamples[index] || 0,
-    pssMiB,
-    rssMiB: result.rssSamplesMiB[index] || 0,
-  }))
+const samplesFromResult = (result: ModeResult): WebviewMemorySample[] =>
+  result.pssMiB.deltaSamples.map((_, index) => {
+    const readSample = (point: 'baselineSamples' | 'deltaSamples' | 'withWebviewSamples'): MemorySample => ({
+      privateMiB: result.privateMiB[point][index] || 0,
+      processCount: result.processCount[point][index] || 0,
+      pssMiB: result.pssMiB[point][index] || 0,
+      rssMiB: result.rssMiB[point][index] || 0,
+    })
+    return {
+      baseline: readSample('baselineSamples'),
+      delta: readSample('deltaSamples'),
+      withWebview: readSample('withWebviewSamples'),
+    }
+  })
 
 const getTemporalSamplingDescription = (options: Options): string =>
-  `Median of ${options.sampleCount} snapshots at ${options.sampleIntervalMs} ms intervals after a ${options.settleMs} ms settle period`
+  `Median of ${options.sampleCount} snapshots at ${options.sampleIntervalMs} ms intervals; baseline settles for ${options.baselineSettleMs} ms and ready webview settles for ${options.webviewSettleMs} ms; the test proceeds immediately after each measurement handshake`
 
-const readPreviousSamples = async (options: Options): Promise<{ legacy: MemorySample[]; singleIframe: MemorySample[] }> => {
+const readPreviousSamples = async (options: Options): Promise<{ legacy: WebviewMemorySample[]; singleIframe: WebviewMemorySample[] }> => {
   if (!options.resume) {
     return { legacy: [], singleIframe: [] }
   }
   const resultPath = join(options.outputDirectory, 'webview-memory.json')
   const previous = JSON.parse(await readFile(resultPath, 'utf8')) as BenchmarkResult
   if (
-    previous.schemaVersion !== 1 ||
+    previous.schemaVersion !== 2 ||
     previous.runs !== options.runs ||
     previous.measurement.temporalSampling !== getTemporalSamplingDescription(options)
   ) {
@@ -501,25 +558,34 @@ export const main = async (): Promise<void> => {
   if (process.argv.includes('--help')) {
     console.log(`Usage: npm run measure-webview-memory -- \\
   --legacy-vscode-path /path/to/code \\
-  --single-iframe-vscode-path /path/to/vscode/source [options]
+  (--single-iframe-vscode-path /path/to/vscode/source | --single-iframe-executable-path /path/to/code) [options]
 
 Options:
   --runs <count>                Paired cold samples (default: 10)
-  --settle-ms <ms>              Wait after webview readiness (default: 3000)
+  --baseline-settle-ms <ms>     Wait before pre-webview sampling (default: 5000)
+  --webview-settle-ms <ms>      Wait after webview readiness (default: 3000)
   --sample-count <count>        /proc snapshots per sample (default: 5)
   --sample-interval-ms <ms>     Delay between snapshots (default: 200)
   --output-directory <path>     JSON and SVG destination
-  --timeout-ms <ms>             Per-attempt timeout (default: 45000)
+  --timeout-ms <ms>             Per-attempt timeout (default: 60000)
   --max-attempts <count>        Attempts per successful sample (default: 5)
+  --single-iframe-executable-path <path>
+                                 Use an already-built local executable
   --skip-build                  Reuse the cached local minified build
   --resume                      Continue a compatible partial result file`)
     return
   }
   const options = parseArgv(process.argv.slice(2))
   await assertPath('--legacy-vscode-path', options.legacyVscodePath)
-  await assertPath('--single-iframe-vscode-path', options.singleIframeVscodePath)
-  console.log(`Preparing minified local VS Code build from ${options.singleIframeVscodePath}`)
-  const executablePath = await ensureLocalVscodeBuild(options.singleIframeVscodePath, options.skipBuild)
+  let executablePath = options.singleIframeExecutablePath
+  if (executablePath) {
+    await assertPath('--single-iframe-executable-path', executablePath)
+    console.log(`Using local minified VS Code executable ${executablePath}`)
+  } else {
+    await assertPath('--single-iframe-vscode-path', options.singleIframeVscodePath)
+    console.log(`Preparing minified local VS Code build from ${options.singleIframeVscodePath}`)
+    executablePath = await ensureLocalVscodeBuild(options.singleIframeVscodePath, options.skipBuild)
+  }
   const samples = await readPreviousSamples(options)
   for (let index = 0; index < options.runs; index++) {
     for (const mode of ['legacy', 'singleIframe'] as const) {
@@ -530,15 +596,18 @@ Options:
       const sample = await runSampleWithRetries(options, mode, executablePath)
       target.push(sample)
       console.log(
-        `[${mode}] ${index + 1}/${options.runs}: ${sample.pssMiB} MiB PSS, ${sample.rssMiB} MiB RSS, ${sample.processCount} processes`,
+        `[${mode}] ${index + 1}/${options.runs}: PSS ${sample.baseline.pssMiB} → ${sample.withWebview.pssMiB} MiB (${formatDelta(sample.delta.pssMiB)} MiB), processes ${sample.baseline.processCount} → ${sample.withWebview.processCount}`,
       )
       await writeResults(options, createResult(options, samples.legacy, samples.singleIframe, false))
     }
   }
   const result = createResult(options, samples.legacy, samples.singleIframe, true)
   await writeResults(options, result)
-  const delta = round(result.legacy.pssSummaryMiB.median - result.singleIframe.pssSummaryMiB.median)
-  console.log(`Median PSS difference: ${delta} MiB (${delta >= 0 ? 'less' : 'more'} with single iframe)`)
+  const legacyCost = result.legacy.pssMiB.deltaSummary.median
+  const singleIframeCost = result.singleIframe.pssMiB.deltaSummary.median
+  const delta = round(legacyCost - singleIframeCost)
+  console.log(`Median webview PSS: legacy ${formatDelta(legacyCost)} MiB, single iframe ${formatDelta(singleIframeCost)} MiB`)
+  console.log(`Median webview PSS difference: ${delta} MiB (${delta >= 0 ? 'less' : 'more'} with single iframe)`)
   console.log(`Results: ${join(options.outputDirectory, 'webview-memory.json')}`)
   console.log(`Chart: ${join(options.outputDirectory, 'webview-memory.svg')}`)
 }
