@@ -28,6 +28,20 @@ const isBinary = (file: string) => {
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
+    async warmUpTextEditor(fileName = 'webview-benchmark-warmup.txt') {
+      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      const quickPick = page.locator('.quick-input-widget')
+      const input = quickPick.locator('.ibwrapper .input')
+      const option = quickPick.locator('.label-name', { hasExactText: fileName })
+      const tab = page.locator(`[role="tab"][data-resource-name="${fileName}"]`)
+      await page.keyboard.press(`${modifier}+p`)
+      await expect(input).toBeVisible({ timeout: 10_000 })
+      await input.typeAndWaitFor(fileName, option, { timeout: 10_000 })
+      await option.click()
+      await expect(tab).toBeVisible()
+      await page.keyboard.press(`${modifier}+w`)
+      await expect(tab).toBeHidden()
+    },
     async acceptInlineCompletion() {
       try {
         await page.waitForIdle()
