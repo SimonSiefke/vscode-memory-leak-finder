@@ -19,9 +19,10 @@
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "dts-bundle-generator": "^9.5.1",
-    "rollup": "^4.62.2"
+    "rollup": "^4.62.2",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@lvce-editor/assert": "^1.5.1"
+    "@lvce-editor/assert": "^1.7.0"
   }
 }
