@@ -138,6 +138,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
+        let selectedAt: number
         if (typeof text === 'string') {
           const option = quickPick.locator('.label-name', {
             hasExactText: text,
@@ -145,6 +146,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           await expect(option).toBeVisible()
           await page.waitForIdle()
           await option.click()
+          selectedAt = performance.timeOrigin + performance.now()
         } else {
           const normal = `${text}`.slice(1, -1)
           const item = quickPick.locator(`.monaco-list-row[aria-label*="${normal}"]`)
@@ -152,9 +154,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           await page.waitForIdle()
           const label = item.locator('.label-name')
           await label.click()
-          if (!stopsApplication) {
-            await page.waitForIdle()
-          }
+          selectedAt = performance.timeOrigin + performance.now()
         }
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()
@@ -162,6 +162,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         if (!stopsApplication) {
           await page.waitForIdle()
         }
+        return selectedAt
       } catch (error) {
         throw new VError(error, `Failed to select "${text}"`)
       }

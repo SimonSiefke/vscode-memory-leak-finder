@@ -8,17 +8,22 @@ export const skip = 1
 export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView }: TestContext): Promise<void> => {
   await QuickPick.showCommands()
   await QuickPick.type('Test: Show Single-Iframe WebView')
-  await QuickPick.select('Test: Show Single-Iframe WebView')
+  const selectedAt = await QuickPick.select('Test: Show Single-Iframe WebView')
   const webview = useSingleIframeWebview ? SingleIframeWebView : WebView
-  const duration = await webview.shouldHaveContent({
+  const result = await webview.shouldHaveContent({
     extensionId,
     selector: '#single-iframe-webview-status',
     text: 'Webview fixture ready',
   })
-  const durationMs = Number.parseFloat(duration)
+  const durationMs = Number.parseFloat(result.loadTimeMs)
   if (!Number.isFinite(durationMs) || durationMs <= 0) {
-    throw new Error(`Invalid webview load time: ${duration}`)
+    throw new Error(`Invalid webview load time: ${result.loadTimeMs}`)
   }
-  console.log(`WEBVIEW_LOAD_TIME_MS=${durationMs}`)
+  const endToEndDurationMs = result.readyAt - selectedAt
+  if (!Number.isFinite(endToEndDurationMs) || endToEndDurationMs <= 0) {
+    throw new Error(`Invalid click-to-ready time: ${endToEndDurationMs}`)
+  }
+  console.log(`WEBVIEW_INTERNAL_LOAD_TIME_MS=${durationMs}`)
+  console.log(`WEBVIEW_UI_LOAD_TIME_MS=${endToEndDurationMs}`)
   await Editor.closeAll()
 }
