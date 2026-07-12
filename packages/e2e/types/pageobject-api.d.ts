@@ -885,6 +885,7 @@ export interface WebView {
   focus(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldBeVisible2(options?: any): Promise<void>
+  shouldHaveContent(options: any): Promise<void>
 }
 export interface WelcomePage {
   checkStepByIndex(index: any): Promise<void>

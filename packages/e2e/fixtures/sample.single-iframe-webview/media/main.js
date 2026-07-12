@@ -7,7 +7,7 @@ let messageReceived = false
 const update = () => {
   const styleLoaded = getComputedStyle(document.body).paddingTop === '24px'
   if (imageLoaded && messageReceived && styleLoaded) {
-    status.textContent = 'Single iframe webview ready'
+    status.textContent = 'Webview fixture ready'
   }
 }
 
