@@ -105,6 +105,27 @@ test('parseArgv - runs', () => {
   })
 })
 
+test('parseArgv - startup runs', () => {
+  const argv = ['--measure', 'cpu-performance-counters-from-start', '--startup-runs', '30']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    startupRuns: 30,
+  })
+})
+
+test('parseArgv - startup runs uses last value', () => {
+  const argv = ['--measure', 'cpu-performance-counters-from-start', '--startup-runs', '3', '--startup-runs', '7']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    startupRuns: 7,
+  })
+})
+
+test('parseArgv - startup runs requires startup counter measure', () => {
+  const argv = ['--measure', 'event-listener-count', '--startup-runs', '2']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    '--startup-runs can only be used with --measure cpu-performance-counters-from-start',
+  )
+})
+
 test('parseArgv - record video', () => {
   const argv = ['--record-video']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({

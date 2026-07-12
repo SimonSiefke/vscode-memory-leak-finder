@@ -142,6 +142,13 @@ const parseRuns = (argv: readonly string[]): number => {
   return 1
 }
 
+const parseStartupRuns = (argv: readonly string[]): number => {
+  if (argv.includes('--startup-runs')) {
+    return parseArgvNumber(argv, '--startup-runs')
+  }
+  return 1
+}
+
 const parseCwd = (cwd: string, argv: readonly string[]): string => {
   if (argv.includes('--cwd')) {
     return parseArgvString(argv, '--cwd')
@@ -178,6 +185,10 @@ const parseMeasureNode = (argv: readonly string[]): boolean => {
 
 const isIpcMessageCountMeasure = (measure: string): boolean => {
   return measure === 'ipc-message-count' || measure === 'ipcMessageCount' || measure === 'ipcmessagecount'
+}
+
+const isCpuPerformanceCountersFromStartMeasure = (measure: string): boolean => {
+  return measure === 'cpu-performance-counters-from-start' || measure === 'cpuPerformanceCountersFromStart'
 }
 
 const parseProcessRootStrategy = (argv: readonly string[]): string => {
@@ -436,6 +447,10 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const restartBetween = parseRestartBetween(argv)
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
+  const startupRuns = parseStartupRuns(argv)
+  if (startupRuns > 1 && !isCpuPerformanceCountersFromStartMeasure(measure)) {
+    throw new Error('--startup-runs can only be used with --measure cpu-performance-counters-from-start')
+  }
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
   const runNetworkTestsAnyway = parseRunNetworkTestsAnyway(argv)
   const allowCopilotAuthInCi = parseAllowCopilotAuthInCi(argv)
@@ -507,6 +522,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     runSkippedTestsAnyway,
     screencastQuality,
     setupOnly,
+    startupRuns,
     timeoutBetween,
     timeouts,
     trackFunctions,

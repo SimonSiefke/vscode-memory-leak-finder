@@ -29,7 +29,7 @@ export const prepareBoth = async (
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(
+  const { electronObjectId, electronPid, monkeyPatchedElectronId } = await connectElectron(
     electronRpc,
     secretsPath,
     headlessMode,
@@ -64,6 +64,7 @@ export const prepareBoth = async (
     devtoolsWebSocketUrl,
     electronObjectId,
     monkeyPatchedElectronId,
+    pid: electronPid ?? pid,
     sessionId,
     targetId,
     utilityContext: undefined,

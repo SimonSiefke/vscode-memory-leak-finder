@@ -1,5 +1,6 @@
 import type { Rpc } from '@lvce-editor/rpc'
-import { join } from 'node:path'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
@@ -44,6 +45,133 @@ const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
 
 const getProcessResultFolder = (inspectProcess: string): string => {
   return inspectProcess.replaceAll('/', '-').replaceAll('\\', '-')
+}
+
+const StartupCounterMeasureId = 'cpu-performance-counters-from-start'
+const StartupCounterMeasureResultId = 'cpuPerformanceCountersFromStart'
+
+const isStartupCounterMeasure = (measure: string): boolean => {
+  return measure === StartupCounterMeasureId || measure === StartupCounterMeasureResultId
+}
+
+const round = (value: number): number => {
+  return Math.round((value + Number.EPSILON) * 1000) / 1000
+}
+
+const getMedian = (values: readonly number[]): number => {
+  const middle = Math.floor(values.length / 2)
+  if (values.length % 2 === 1) {
+    return values[middle]
+  }
+  return (values[middle - 1] + values[middle]) / 2
+}
+
+interface AggregateMetric {
+  readonly count: number
+  readonly max: number
+  readonly mean: number
+  readonly median: number
+  readonly min: number
+  readonly name: string
+  readonly unit: string
+}
+
+const getAggregateMetric = (samples: readonly any[], name: string, unit: string) => {
+  const values = samples
+    .map((sample) => sample[name])
+    .filter((value) => typeof value === 'number' && Number.isFinite(value))
+    .sort((a, b) => a - b)
+  if (values.length === 0) {
+    return undefined
+  }
+  const total = values.reduce((sum, value) => sum + value, 0)
+  return {
+    count: values.length,
+    max: round(values[values.length - 1]),
+    mean: round(total / values.length),
+    median: round(getMedian(values)),
+    min: round(values[0]),
+    name,
+    unit,
+  }
+}
+
+const isAggregateMetric = (metric: AggregateMetric | undefined): metric is AggregateMetric => {
+  return metric !== undefined
+}
+
+const getStartupCounterAggregate = (samples: readonly any[]) => {
+  const metrics = [
+    getAggregateMetric(samples, 'instructions', 'count'),
+    getAggregateMetric(samples, 'cycles', 'count'),
+    getAggregateMetric(samples, 'instructionsPerCycle', 'ratio'),
+  ].filter(isAggregateMetric)
+  const lines = ['CPU performance counters from start:', 'metric | count | median | mean | min | max | unit']
+  for (const metric of metrics) {
+    lines.push(`${metric.name} | ${metric.count} | ${metric.median} | ${metric.mean} | ${metric.min} | ${metric.max} | ${metric.unit}`)
+  }
+  return {
+    [StartupCounterMeasureResultId]: {
+      isLeak: false,
+      metrics,
+      samples,
+    },
+    isLeak: false,
+    samples,
+    summary: metrics.length === 0 ? 'No CPU performance counters from start were available' : lines.join('\n'),
+  }
+}
+
+const readJson = async (path: string): Promise<any> => {
+  const content = await readFile(path, 'utf8')
+  return JSON.parse(content)
+}
+
+const writeJson = async (path: string, value: any): Promise<void> => {
+  await mkdir(dirname(path), { recursive: true })
+  await writeFile(path, JSON.stringify(value, null, 2) + '\n')
+}
+
+const getResultPath = ({
+  dirent,
+  inspectExtensions,
+  inspectIntegratedBrowser,
+  inspectProcess,
+  inspectPtyHost,
+  inspectSharedProcess,
+  measure,
+  measureNode,
+}: {
+  readonly dirent: string
+  readonly inspectExtensions: boolean
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess: string
+  readonly inspectPtyHost: boolean
+  readonly inspectSharedProcess: boolean
+  readonly measure: string
+  readonly measureNode: boolean
+}): string => {
+  const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
+  const testName = fileName.replace('.json', '')
+  if (measureNode) {
+    return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, testName + '.json')
+  }
+  if (inspectSharedProcess) {
+    return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'shared-process', measure, fileName)
+  }
+  if (inspectExtensions) {
+    return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'extension-host', measure, fileName)
+  }
+  if (inspectPtyHost) {
+    return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'pty-host', measure, fileName)
+  }
+  if (inspectIntegratedBrowser) {
+    return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'integrated-browser', measure, fileName)
+  }
+  if (inspectProcess) {
+    return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'process', getProcessResultFolder(inspectProcess), measure, fileName)
+  }
+  return join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
 }
 
 export const runTestsWithCallback = async ({
@@ -93,6 +221,7 @@ export const runTestsWithCallback = async ({
   runSkippedTestsAnyway,
   screencastQuality,
   setupOnly,
+  startupRuns,
   timeoutBetween,
   timeouts,
   trackFunctions,
@@ -125,6 +254,7 @@ export const runTestsWithCallback = async ({
     Assert.boolean(setupOnly)
     Assert.boolean(login)
     Assert.boolean(enableExtensions)
+    Assert.number(startupRuns)
 
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
@@ -265,6 +395,197 @@ export const runTestsWithCallback = async ({
       testWorkerRpc: emptyRpc,
       videoRpc: emptyRpc,
       webSocketUrl: '',
+    }
+
+    if (isStartupCounterMeasure(measure) && startupRuns > 1) {
+      for (let i = 0; i < formattedPaths.length; i++) {
+        const formattedPath = formattedPaths[i]
+        const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
+        const proxyTestFolderName = GetProxyTestFolderName.getProxyTestFolderName(absolutePath)
+        const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
+        const start = i === 0 ? initialStart : Time.now()
+        if (i !== 0) {
+          await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
+        }
+        let wasOriginallySkipped = false
+        try {
+          const samples: any[] = []
+          for (let startupRun = 0; startupRun < startupRuns; startupRun++) {
+            await disposeWorkers(workers)
+            workers = {
+              devtoolsWebSocketUrl: '',
+              functionTrackerRpc: emptyRpc,
+              initializationWorkerRpc: emptyRpc,
+              memoryRpc: emptyRpc,
+              pid: 0,
+              testWorkerRpc: emptyRpc,
+              videoRpc: emptyRpc,
+              webSocketUrl: '',
+            }
+            PrepareTestsOrAttach.state.promise = undefined
+            const sampleConnectionId = connectionId
+            const prepared = await PrepareTestsOrAttach.prepareTestsAndAttach({
+              arch,
+              attachedToPageTimeout,
+              buildVscodeMinified,
+              clearExtensions,
+              commit,
+              compressVideo,
+              connectionId: sampleConnectionId,
+              cwd,
+              downloadUserDataZipFileToken,
+              downloadUserDataZipFileUrl,
+              enableExtensions,
+              enableProxy,
+              headlessMode,
+              ide,
+              ideVersion,
+              idleTimeout,
+              insidersCommit,
+              inspectExtensions,
+              inspectExtensionsPort,
+              inspectIntegratedBrowser,
+              inspectProcess,
+              inspectPtyHost,
+              inspectPtyHostPort,
+              inspectSharedProcess,
+              inspectSharedProcessPort,
+              measureId: measure,
+              measureNode,
+              openDevtools,
+              pageObjectPath: pageObjectPathResolved,
+              platform,
+              proxyTestFolderName,
+              recordVideo,
+              runMode,
+              screencastQuality,
+              timeouts,
+              trackFunctions,
+              updateUrl,
+              useProxyMock,
+              vscodePath,
+              vscodeVersion,
+            })
+            workers = {
+              devtoolsWebSocketUrl: prepared.devtoolsWebSocketUrl,
+              functionTrackerRpc: prepared.functionTrackerRpc || emptyRpc,
+              initializationWorkerRpc: prepared.initializationWorkerRpc || emptyRpc,
+              memoryRpc: prepared.memoryRpc || emptyRpc,
+              pid: prepared.pid,
+              testWorkerRpc: prepared.testWorkerRpc || emptyRpc,
+              videoRpc: prepared.videoRpc || emptyRpc,
+              webSocketUrl: prepared.webSocketUrl,
+            }
+            if (enableProxy) {
+              await workers.initializationWorkerRpc.invoke('Launch.setProxyTestFolderName', proxyTestFolderName)
+            }
+            const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
+              workers.testWorkerRpc,
+              sampleConnectionId,
+              absolutePath,
+              forceRun,
+              timeouts,
+              isGithubActions,
+              allowCopilotAuthInCi,
+              runNetworkTestsAnyway,
+            )
+            if (testResult.error) {
+              throw testResult.error
+            }
+            if (testResult.skipped) {
+              wasOriginallySkipped = testResult.wasOriginallySkipped
+              continue
+            }
+            wasOriginallySkipped = testResult.wasOriginallySkipped
+            await MemoryLeakFinder.start(workers.memoryRpc, sampleConnectionId)
+            await TestWorkerRunTests.testWorkerRunTests(
+              workers.testWorkerRpc,
+              sampleConnectionId,
+              absolutePath,
+              forceRun,
+              runMode,
+              platform,
+              runs,
+              () => MemoryLeakFinder.runCompletion(workers.memoryRpc, sampleConnectionId),
+            )
+            if (timeoutBetween) {
+              await Timeout.setTimeout(timeoutBetween)
+            }
+            await MemoryLeakFinder.stop(workers.memoryRpc, sampleConnectionId)
+            const resultPath = getResultPath({
+              dirent,
+              inspectExtensions,
+              inspectIntegratedBrowser,
+              inspectProcess,
+              inspectPtyHost,
+              inspectSharedProcess,
+              measure,
+              measureNode,
+            })
+            const sampleResultPath = resultPath.replace(/\.json$/, `.startup-${startupRun + 1}.json`)
+            await MemoryLeakFinder.compare(
+              workers.memoryRpc,
+              sampleConnectionId,
+              {
+                runs,
+                startupRun: startupRun + 1,
+                startupRuns,
+              },
+              sampleResultPath,
+            )
+            const sampleResult = await readJson(sampleResultPath)
+            samples.push(sampleResult[StartupCounterMeasureResultId] ?? sampleResult)
+            await TestWorkerTeardownTest.testWorkerTearDownTest(workers.testWorkerRpc, sampleConnectionId, absolutePath)
+          }
+          const resultPath = getResultPath({
+            dirent,
+            inspectExtensions,
+            inspectIntegratedBrowser,
+            inspectProcess,
+            inspectPtyHost,
+            inspectSharedProcess,
+            measure,
+            measureNode,
+          })
+          const aggregateResult = getStartupCounterAggregate(samples)
+          await writeJson(resultPath, aggregateResult)
+          console.log(aggregateResult.summary)
+          const end = Time.now()
+          const duration = end - start
+          await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, false, wasOriginallySkipped)
+          passed++
+        } catch (error) {
+          if (wasOriginallySkipped) {
+            skippedFailed++
+          } else {
+            failed++
+          }
+          const prettyError = await GetPrettyError.getPrettyError(error, color, root)
+          await callback(
+            TestWorkerEventType.TestFailed,
+            absolutePath,
+            relativeDirname,
+            relativePath,
+            dirent,
+            prettyError,
+            wasOriginallySkipped,
+          )
+        }
+      }
+      const end = Time.now()
+      const duration = end - testStart
+      await disposeWorkers(workers)
+      return {
+        duration,
+        failed,
+        filterValue,
+        leaked: leaking,
+        passed,
+        skipped,
+        skippedFailed,
+        total,
+        type: 'success',
+      }
     }
 
     for (let i = 0; i < formattedPaths.length; i++) {
@@ -440,30 +761,16 @@ export const runTestsWithCallback = async ({
               await Timeout.setTimeout(3000)
             }
 
-            const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
-            const testName = fileName.replace('.json', '')
-            let resultPath
-            if (measureNode) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, testName + '.json')
-            } else if (inspectSharedProcess) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'shared-process', measure, fileName)
-            } else if (inspectExtensions) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'extension-host', measure, fileName)
-            } else if (inspectPtyHost) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'pty-host', measure, fileName)
-            } else if (inspectIntegratedBrowser) {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'integrated-browser', measure, fileName)
-            } else if (inspectProcess) {
-              resultPath = join(
-                MemoryLeakResultsPath.memoryLeakResultsPath,
-                'process',
-                getProcessResultFolder(inspectProcess),
-                measure,
-                fileName,
-              )
-            } else {
-              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
-            }
+            const resultPath = getResultPath({
+              dirent,
+              inspectExtensions,
+              inspectIntegratedBrowser,
+              inspectProcess,
+              inspectPtyHost,
+              inspectSharedProcess,
+              measure,
+              measureNode,
+            })
 
             const result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
             if (result.isLeak) {

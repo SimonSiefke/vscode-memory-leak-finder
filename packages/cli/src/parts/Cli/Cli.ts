@@ -57,6 +57,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     runNetworkTestsAnyway: options.runNetworkTestsAnyway,
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
+    startupRuns: options.startupRuns,
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,

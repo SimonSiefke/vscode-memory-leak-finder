@@ -27,6 +27,21 @@ test('parsePerfStatOutput parses human perf output', () => {
   })
 })
 
+test('parsePerfStatOutput parses interval csv output', () => {
+  const result = parsePerfStatOutput(`0.100162207,100,,instructions:u,4854994,100.00,,
+0.100162207,200,,cycles:u,4854994,100.00,,
+0.200467945,<not counted>,,instructions:u,0,100.00,,
+0.200467945,<not counted>,,cycles:u,0,100.00,,
+0.300689033,300,,instructions:u,213671,100.00,,
+0.300689033,400,,cycles:u,213671,100.00,,
+`)
+
+  expect(result).toEqual({
+    cycles: 600,
+    instructions: 400,
+  })
+})
+
 test('toCpuPerformanceCounterRows marks unavailable counters', () => {
   const rows = toCpuPerformanceCounterRows({
     command: ['perf', 'stat'],

@@ -1,5 +1,6 @@
 import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
+import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import * as Ide from '../Ide/Ide.ts'
 import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
@@ -88,6 +89,7 @@ export const launchIde = async ({
   callgrindConfig,
   clearExtensions,
   commit,
+  cpuPerformanceCountersFromStartConfig,
   cwd,
   downloadUserDataZipFileToken,
   downloadUserDataZipFileUrl,
@@ -117,6 +119,7 @@ export const launchIde = async ({
   callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   commit: string
+  cpuPerformanceCountersFromStartConfig: CpuPerformanceCountersFromStartConfig
   cwd: string
   downloadUserDataZipFileToken: string
   downloadUserDataZipFileUrl: string
@@ -147,6 +150,7 @@ export const launchIde = async ({
       callgrindConfig,
       clearExtensions,
       cursorVersion,
+      cpuPerformanceCountersFromStartConfig,
       cwd,
       downloadUserDataZipFileToken,
       downloadUserDataZipFileUrl,
@@ -185,6 +189,7 @@ export const launchIde = async ({
     callgrindConfig,
     clearExtensions,
     commit,
+    cpuPerformanceCountersFromStartConfig,
     cwd,
     downloadUserDataZipFileToken,
     downloadUserDataZipFileUrl,

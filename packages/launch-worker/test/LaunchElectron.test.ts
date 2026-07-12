@@ -101,6 +101,51 @@ test('launch - callgrind spawn command', async () => {
   )
 })
 
+test('launch - cpu performance counters from start spawn command', async () => {
+  const child = createChild()
+  // @ts-ignore
+  Spawn.spawn.mockImplementation(() => child)
+  await LaunchElectron.launchElectron({
+    addDisposable() {},
+    args: ['--user-data-dir', '/tmp/user-data'],
+    cliPath: '/usr/bin/code',
+    cpuPerformanceCountersFromStartConfig: {
+      enabled: true,
+      metadataPath: '/tmp/vmlf-perf-stat.json',
+      outputPath: '/tmp/vmlf-perf-stat.txt',
+    },
+    cwd: '/tmp',
+    env: {},
+    headlessMode: false,
+    platform: 'linux',
+  })
+  expect(Spawn.spawn).toHaveBeenCalledWith(
+    'perf',
+    [
+      'stat',
+      '--no-big-num',
+      '-x',
+      ',',
+      '-I',
+      '100',
+      '-e',
+      'instructions:u,cycles:u',
+      '-o',
+      '/tmp/vmlf-perf-stat.txt',
+      '--',
+      '/usr/bin/code',
+      '--inspect-brk=0',
+      '--remote-debugging-port=0',
+      '--user-data-dir',
+      '/tmp/user-data',
+    ],
+    {
+      cwd: '/tmp',
+      env: {},
+    },
+  )
+})
+
 test.skip('launch - error - address already in use', async () => {
   // @ts-ignore
   Spawn.spawn.mockImplementation(() => {
