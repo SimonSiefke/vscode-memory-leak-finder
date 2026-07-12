@@ -177,6 +177,7 @@ export interface DropDownContextMenu {
   shouldHaveItem(option: any): Promise<void>
 }
 export interface Editor {
+  warmUpTextEditor(fileName?: any): Promise<void>
   acceptInlineCompletion(): Promise<void>
   acceptRename(): Promise<void>
   addCursorBelow(): Promise<void>
@@ -615,6 +616,7 @@ export interface QuickPick {
   showCommands(options?: any): Promise<void>
   waitForInputVisible(): Promise<void>
   type(value: any): Promise<void>
+  waitForCommand(command: any, timeout?: any): Promise<void>
 }
 export interface References {
   clear(): Promise<void>
@@ -756,6 +758,7 @@ export interface SimpleBrowser {
   shouldHaveLoadError(options: any): Promise<void>
 }
 export interface SingleIframeWebView {
+  shouldHaveLoaded(options: any): Promise<{ readyAt: number }>
   shouldHaveContent(options: any): Promise<{ loadTimeMs: string; readyAt: number }>
 }
 export interface SourceControl {
@@ -882,6 +885,7 @@ export interface WaitForApplicationToBeReady {
   waitForApplicationToBeReady(options: any): Promise<void>
 }
 export interface WebView {
+  shouldHaveLoaded(options: any): Promise<{ readyAt: number }>
   focus(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldBeVisible2(options?: any): Promise<void>

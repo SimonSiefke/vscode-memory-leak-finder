@@ -91,6 +91,15 @@ export const create = ({
         returnByValue: true,
       })
     },
+    async evaluateInUtilityWorld({ awaitPromise = false, expression, replMode = false }) {
+      return DevtoolsProtocolRuntime.evaluate(this.rpc, {
+        awaitPromise,
+        expression,
+        replMode,
+        returnByValue: true,
+        ...(this.utilityContext.uniqueId ? { uniqueContextId: this.utilityContext.uniqueId } : { contextId: this.utilityContext.id }),
+      })
+    },
     focus() {
       return PageFocus.focus({
         electronRpc: this.electronRpc,

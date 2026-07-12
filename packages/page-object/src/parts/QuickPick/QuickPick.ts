@@ -226,6 +226,30 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to type ${value}`)
       }
     },
+    async waitForCommand(command: string, timeout = 120_000) {
+      try {
+        const deadline = performance.now() + timeout
+        const quickPick = page.locator('.quick-input-widget')
+        while (performance.now() < deadline) {
+          await this.showCommands()
+          await this.type(command)
+          const option = quickPick.locator('.label-name', {
+            hasExactText: command,
+          })
+          if (await option.isVisible().catch(() => false)) {
+            await page.keyboard.press(KeyBindings.Escape)
+            await expect(quickPick).toBeHidden()
+            return
+          }
+          await page.keyboard.press(KeyBindings.Escape)
+          await expect(quickPick).toBeHidden()
+          await new Promise((resolve) => setTimeout(resolve, 250))
+        }
+        throw new Error(`Command did not become available within ${timeout}ms`)
+      } catch (error) {
+        throw new VError(error, `Failed to wait for command "${command}"`)
+      }
+    },
     async waitForInputVisible() {
       const quickPick = page.locator('.quick-input-widget')
       const quickPickInput = quickPick.locator('.ibwrapper .input')

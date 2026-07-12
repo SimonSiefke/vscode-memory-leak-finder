@@ -6,6 +6,40 @@ const escapeRegExp = (value: string): string => {
 
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
+    async shouldHaveLoaded({ extensionId }: { extensionId: string }): Promise<{ readyAt: number }> {
+      try {
+        const webView = page.locator('.webview')
+        await expect(webView).toBeVisible({ timeout: 30_000 })
+        const frame = await page.waitForIframe({
+          injectUtilityScript: false,
+          url: new RegExp(`^vscode-webview://${escapeRegExp(extensionId)}/`),
+        })
+        const deadline = performance.now() + 30_000
+        while (performance.now() < deadline) {
+          try {
+            const readyAt = await frame.evaluateInMainWorld({
+              expression: `(() => {
+                const navigation = performance.getEntriesByType('navigation')[0]
+                return document.querySelector('#root') && navigation?.loadEventEnd > 0
+                  ? performance.timeOrigin + navigation.loadEventEnd
+                  : 0
+              })()`,
+            })
+            if (Number.isFinite(readyAt)) {
+              if (readyAt > 0) {
+                return { readyAt }
+              }
+            }
+          } catch {
+            // The document may still be navigating.
+          }
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+        throw new Error('webview did not finish loading within 30000ms')
+      } catch (error) {
+        throw new VError(error, `Failed to find ready single-iframe webview for ${extensionId}`)
+      }
+    },
     async shouldHaveContent({ extensionId, selector, text }: { extensionId: string; selector: string; text: string }) {
       try {
         await page.waitForIdle()
