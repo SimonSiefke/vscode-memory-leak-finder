@@ -98,8 +98,6 @@ test('applyMonkeyPatches - applies ipc monkey patch for ipc messages from start 
     false,
     false,
     false,
-    9876,
-    null,
     'ipcMessagesFromStart',
   )
 
