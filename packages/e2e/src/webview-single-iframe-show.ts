@@ -3,8 +3,7 @@ import type { TestContext } from '../types.js'
 const extensionId = 'vscode-memory-leak-finder.single-iframe-webview'
 const useSingleIframeWebview = process.env.VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_SERVICE_WORKER === '1'
 
-export const skip=1
-
+export const skip = 1
 
 export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView }: TestContext): Promise<void> => {
   await QuickPick.showCommands()
