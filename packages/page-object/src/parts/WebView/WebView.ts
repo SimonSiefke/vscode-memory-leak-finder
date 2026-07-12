@@ -73,5 +73,25 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to check that webview is visible`)
       }
     },
+    async shouldHaveContent({ extensionId, selector, text }: { extensionId: string; selector: string; text: string }): Promise<void> {
+      try {
+        await page.waitForIdle()
+        const webView = page.locator('.webview.ready')
+        await expect(webView).toBeVisible()
+        const url = new RegExp(`extensionId=${extensionId}`)
+        const childPage = await page.waitForIframe({
+          injectUtilityScript: false,
+          url,
+        })
+        const frame = await childPage.waitForSubIframe({ url })
+        await frame.waitForIdle()
+        const content = frame.locator(selector)
+        await expect(content).toBeVisible()
+        await expect(content).toHaveText(text)
+        await frame.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to find expected content in legacy webview`)
+      }
+    },
   }
 }

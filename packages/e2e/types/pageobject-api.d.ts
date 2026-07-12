@@ -755,6 +755,9 @@ export interface SimpleBrowser {
   show(options?: any): Promise<void>
   shouldHaveLoadError(options: any): Promise<void>
 }
+export interface SingleIframeWebView {
+  shouldHaveContent(options: any): Promise<void>
+}
 export interface SourceControl {
   checkoutBranch(branchName: any): Promise<void>
   closeRepository(name: any): Promise<void>
@@ -882,6 +885,7 @@ export interface WebView {
   focus(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldBeVisible2(options?: any): Promise<void>
+  shouldHaveContent(options: any): Promise<void>
 }
 export interface WelcomePage {
   checkStepByIndex(index: any): Promise<void>
@@ -977,6 +981,7 @@ export interface PageObjectApi {
   readonly SettingsEditorInput: SettingsEditorInput
   readonly SideBar: SideBar
   readonly SimpleBrowser: SimpleBrowser
+  readonly SingleIframeWebView: SingleIframeWebView
   readonly SourceControl: SourceControl
   readonly SshServer: SshServer
   readonly StatusBar: StatusBar
