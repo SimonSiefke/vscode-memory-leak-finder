@@ -50,7 +50,10 @@ const parseArgv = (argv: readonly string[]): Options => {
     outputDirectory: resolve(
       getString(
         '--output-directory',
-        join(repositoryRoot, argv.includes('--warm-cache') ? '.vscode-codex-warm-webview-load-time-results' : '.vscode-codex-webview-load-time-results'),
+        join(
+          repositoryRoot,
+          argv.includes('--warm-cache') ? '.vscode-codex-warm-webview-load-time-results' : '.vscode-codex-webview-load-time-results',
+        ),
       ),
     ),
     runs: getNumber('--runs', 17),
@@ -407,7 +410,10 @@ export const main = async (): Promise<void> => {
   await mkdir(options.outputDirectory, { recursive: true })
   await Promise.all([
     writeFile(join(options.outputDirectory, 'codex-webview-load-time.json'), `${JSON.stringify(result, undefined, 2)}\n`),
-    writeFile(join(options.outputDirectory, 'codex-webview-load-time.svg'), createChart(samples.legacy, samples.singleIframe, options.warmCache)),
+    writeFile(
+      join(options.outputDirectory, 'codex-webview-load-time.svg'),
+      createChart(samples.legacy, samples.singleIframe, options.warmCache),
+    ),
   ])
   const improvement = ((result.legacy.summary.median - result.singleIframe.summary.median) / result.legacy.summary.median) * 100
   console.log(`Median improvement: ${round(improvement)}%`)
