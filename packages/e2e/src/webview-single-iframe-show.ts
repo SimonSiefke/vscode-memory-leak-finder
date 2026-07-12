@@ -27,5 +27,10 @@ export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView }: T
   }
   console.log(`WEBVIEW_INTERNAL_LOAD_TIME_MS=${durationMs}`)
   console.log(`WEBVIEW_UI_LOAD_TIME_MS=${endToEndDurationMs}`)
+  if (process.env.VSCODE_MEMORY_LEAK_FINDER_MEASURE_WEBVIEW_MEMORY === '1') {
+    const holdMs = Number.parseInt(process.env.VSCODE_MEMORY_LEAK_FINDER_MEMORY_HOLD_MS || '', 10)
+    console.log('WEBVIEW_MEMORY_READY=1')
+    await new Promise((resolve) => setTimeout(resolve, Number.isFinite(holdMs) && holdMs > 0 ? holdMs : 10_000))
+  }
   await Editor.closeAll()
 }
