@@ -14,7 +14,7 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   await Explorer.refresh()
   await Explorer.shouldHaveItem('index.html')
   await Editor.open('index.html')
-  await Editor.setCursor(1, 1)
+  await Editor.setCursor(1, 2)
   await Editor.shouldHaveBreadCrumb('index.html')
   await Editor.shouldHaveBreadCrumb('h1')
 }
