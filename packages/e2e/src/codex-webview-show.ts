@@ -6,6 +6,9 @@ const useSingleIframeWebview = process.env.VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_
 export const skip = 1
 
 export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView }: TestContext): Promise<void> => {
+  if (!process.env.VSCODE_CODEX_EXTENSION_PATH) {
+    return
+  }
   console.log('CODEX_BENCHMARK_PHASE=warmup')
   await Editor.warmUpTextEditor()
   await QuickPick.waitForCommand('Codex: Open Codex Sidebar')
