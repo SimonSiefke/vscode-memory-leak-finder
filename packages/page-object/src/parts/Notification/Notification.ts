@@ -4,7 +4,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
-    async closeAll({ force = false }) {
+    async closeAll({ force = false } = {}) {
       try {
         await page.waitForIdle()
         const toastContainer = page.locator('.notifications-toasts')
