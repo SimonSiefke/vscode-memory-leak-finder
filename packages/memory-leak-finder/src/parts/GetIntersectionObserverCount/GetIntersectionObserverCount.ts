@@ -3,5 +3,5 @@ import * as GetObjectCount from '../GetObjectCount/GetObjectCount.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 export const getIntersectionObserverCount = (session: Session, objectGroup: string): Promise<number> => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.IntersectionObserver, objectGroup)
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.IntersectionObserver)
 }
