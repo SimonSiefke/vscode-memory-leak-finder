@@ -58,10 +58,10 @@
   "dependencies": {
     "@babel/code-frame": "^7.29.7",
     "@lvce-editor/assert": "^1.7.0",
-    "@lvce-editor/rpc": "^6.6.0",
+    "@lvce-editor/rpc": "^6.8.0",
     "@lvce-editor/verror": "^1.7.0",
     "@types/babel__code-frame": "^7.27.0",
-    "pretty-bytes": "^7.1.0",
+    "pretty-bytes": "^7.1.1",
     "wait-for-localhost": "^5.0.2"
   }
 }

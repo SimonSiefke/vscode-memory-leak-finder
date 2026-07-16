@@ -35,7 +35,7 @@
     }
   },
   "dependencies": {
-    "@lvce-editor/rpc": "^6.6.0",
+    "@lvce-editor/rpc": "^6.8.0",
     "@lvce-editor/verror": "^1.7.0",
     "path-exists": "^5.0.0"
   }
