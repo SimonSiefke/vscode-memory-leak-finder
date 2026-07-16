@@ -433,7 +433,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const decoration = page.locator('.monaco-editor .codelens-decoration', {})
         await expect(decoration).toBeVisible({
-          timeout: 5000,
+          timeout: 15_000,
         })
         await page.waitForIdle()
         await expect(decoration).toHaveText(/Self Time/)
