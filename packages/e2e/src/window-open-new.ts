@@ -1,5 +1,9 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = true
+
+export const requiresNetwork = true
+
 const getFrontendStartupPerformanceSample = `(() => {
   const getEntryStartTime = (entryName, entryType) => {
     const entries = performance.getEntriesByType(entryType)
