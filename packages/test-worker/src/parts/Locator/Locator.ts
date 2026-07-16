@@ -92,8 +92,8 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     getValue() {
       return LocatorGetValue.getValue(this)
     },
-    hover() {
-      return LocatorHover.hover(this)
+    hover(options = {}) {
+      return LocatorHover.hover(this, options)
     },
     isVisible() {
       return LocatorIsVisible.isVisible(this)

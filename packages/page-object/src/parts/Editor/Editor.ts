@@ -120,23 +120,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     async clickLink(text: string) {
-      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      const modifier = IsMacos.isMacos(platform) ? { metaKey: true } : { ctrlKey: true }
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const linkText = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        const linkText = editor.locator('[class*="detected-link"]', { hasText: text }).first()
         await expect(linkText).toBeVisible()
-        await page.keyboard.down(modifier)
-        await linkText.hover()
+        await linkText.hover(modifier)
         const activeLink = editor.locator('.detected-link-active', { hasText: text }).first()
         await expect(activeLink).toBeVisible()
-        await activeLink.click()
+        await activeLink.click(modifier)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to click link ${text}`)
-      } finally {
-        await page.keyboard.up(modifier).catch(() => undefined)
       }
     },
     async close() {
@@ -1570,22 +1567,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await page.waitForIdle()
     },
     async shouldHaveVisibleLink(text: string) {
-      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      const modifier = IsMacos.isMacos(platform) ? { metaKey: true } : { ctrlKey: true }
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const linkText = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        const linkText = editor.locator('[class*="detected-link"]', { hasText: text }).first()
         await expect(linkText).toBeVisible()
-        await page.keyboard.down(modifier)
-        await linkText.hover()
+        await linkText.hover(modifier)
         const activeLink = editor.locator('.detected-link-active', { hasText: text }).first()
         await expect(activeLink).toBeVisible()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify visible link ${text}`)
-      } finally {
-        await page.keyboard.up(modifier).catch(() => undefined)
       }
     },
     async shouldHaveVisibleWhitespace(fileName?: string) {
