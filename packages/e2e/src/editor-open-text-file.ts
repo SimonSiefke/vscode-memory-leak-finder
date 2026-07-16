@@ -2,6 +2,10 @@ import type { TestContext } from '../types.ts'
 
 const fileName = 'file-with-content.txt'
 
+export const skip = 1
+
+export const requiresNetwork = 1
+
 const getFileContent = (): string => {
   return Array.from(
     { length: 100 },
