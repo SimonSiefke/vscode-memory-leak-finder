@@ -5,7 +5,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 export const getCanvasRenderingContext2dCount = async (session: Session, objectGroup: string): Promise<number> => {
   try {
-    return await GetObjectCount.getObjectCount(session, PrototypeExpression.CanvasRenderingContext2d, objectGroup)
+    return await GetObjectCount.getObjectCount(session, PrototypeExpression.CanvasRenderingContext2d)
   } catch (error) {
     throw new VError(error, `Failed to get canvas rendering context 2d count`)
   }
