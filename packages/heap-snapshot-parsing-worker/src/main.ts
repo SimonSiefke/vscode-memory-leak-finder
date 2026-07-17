@@ -1,6 +1,12 @@
 import { parentPort } from 'node:worker_threads'
 import { commandMap } from './parts/CommandMap/CommandMap.ts'
 
+type WorkerRequest = {
+  id: number
+  method: keyof typeof commandMap
+  params: Parameters<(typeof commandMap)[keyof typeof commandMap]>
+}
+
 // Ensure we're running in a worker thread context
 if (!parentPort) {
   throw new Error('This script must be run in a worker thread')
@@ -10,7 +16,7 @@ if (!parentPort) {
 const workerPort = parentPort
 
 // Helper function to get transferrable objects for zero-copy transfer
-const getTransferList = (result) => {
+const getTransferList = (result: Record<string, any> | undefined) => {
   const transferList: any[] = []
   if (result && typeof result === 'object') {
     if (result.nodes && result.nodes.buffer) {
@@ -22,21 +28,24 @@ const getTransferList = (result) => {
     if (result.locations && result.locations.buffer) {
       transferList.push(result.locations.buffer)
     }
+    if (result.traceFunctionInfos && result.traceFunctionInfos.buffer) {
+      transferList.push(result.traceFunctionInfos.buffer)
+    }
   }
   return transferList
 }
 
-workerPort.on('message', async (message) => {
+workerPort.on('message', async (message: WorkerRequest) => {
   const { id, method, params } = message
   try {
     const handler = commandMap[method]
     if (!handler) {
       throw new Error(`Unknown method: ${method}`)
     }
-    const result = await handler(...params)
+    const result = await (handler as (...parameters: any[]) => Promise<any>)(...params)
     const transferList = getTransferList(result)
     workerPort.postMessage({ id, result }, transferList)
-  } catch (error) {
+  } catch (error: any) {
     workerPort.postMessage({ error: error.message, id })
   }
 })

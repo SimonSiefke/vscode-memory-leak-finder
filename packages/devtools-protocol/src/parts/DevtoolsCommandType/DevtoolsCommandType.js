@@ -8,6 +8,10 @@ export const CssDisable = 'Css.disable'
 
 export const HeapProfilerTakeHeapSnapshot = 'HeapProfiler.takeHeapSnapshot'
 
+export const HeapProfilerStartTrackingHeapObjects = 'HeapProfiler.startTrackingHeapObjects'
+
+export const HeapProfilerStopTrackingHeapObjects = 'HeapProfiler.stopTrackingHeapObjects'
+
 export const HeapProfilerEnable = 'HeapProfiler.enable'
 
 export const HeapProfilerDisable = 'HeapProfiler.disable'

@@ -21,11 +21,16 @@ class CustomStream extends Readable {
     this.push(chunk)
   }
   async start() {
-    await DevtoolsProtocolHeapProfiler.takeHeapSnapshot(this.rpc, {
+    const options = {
       captureNumericValues: this.options.captureNumericValues,
       exposeInternals: false,
       reportProgress: true,
-    })
+    }
+    if (this.options.stopTracking) {
+      await DevtoolsProtocolHeapProfiler.stopTrackingHeapObjects(this.rpc, options)
+    } else {
+      await DevtoolsProtocolHeapProfiler.takeHeapSnapshot(this.rpc, options)
+    }
     this.rpc.off(DevtoolsEventType.HeapProfilerAddHeapSnapshotChunk, this.handleChunk)
     this.push(null)
   }

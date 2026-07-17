@@ -71,6 +71,39 @@ test('HeapSnapshotWriteStream - processes complete heap snapshot data', async ()
   expect(result.locations.length).toBe(4) // 1 location * 4 fields
 })
 
+test('HeapSnapshotWriteStream - preserves allocation trace data', () => {
+  const stream = createHeapSnapshotWriteStream({ parseStrings: true })
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal', 'weak']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object', 'closure', 'synthetic']],
+        trace_function_info_fields: ['function_id', 'name', 'script_name', 'script_id', 'line', 'column'],
+        trace_node_fields: ['id', 'function_info_index', 'count', 'size', 'children'],
+      },
+      edge_count: 0,
+      location_count: 0,
+      node_count: 1,
+      trace_function_count: 2,
+      trace_node_count: 2,
+    },
+    nodes: [5, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    trace_function_infos: [1, 1, 2, 7, 10, 4, 2, 3, 2, 7, 20, 8],
+    trace_tree: [1, 0, 1, 16, [2, 1, 1, 8, []]],
+    locations: [],
+    strings: ['(GC roots)', 'createService', 'workbench.js', 'allocateWidget'],
+  }
+  stream.end(Buffer.from(JSON.stringify(heapSnapshotData)))
+  const result = stream.getResult()
+  expect([...result.traceFunctionInfos]).toEqual(heapSnapshotData.trace_function_infos)
+  expect(result.traceTree).toEqual(heapSnapshotData.trace_tree)
+  expect(result.strings).toEqual(heapSnapshotData.strings)
+})
+
 test('HeapSnapshotWriteStream - handles empty heap snapshot', async () => {
   const stream = createHeapSnapshotWriteStream()
 

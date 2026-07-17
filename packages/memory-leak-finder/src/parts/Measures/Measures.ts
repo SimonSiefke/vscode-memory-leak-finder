@@ -106,6 +106,7 @@ export * as MeasurePromisesWithStackTrace from '../MeasurePromisesWithStackTrace
 export * as MeasureProxyCount from '../MeasureProxyCount/MeasureProxyCount.ts'
 export * as MeasureRealObjectCount from '../MeasureRealObjectCount/MeasureRealObjectCount.ts'
 export * as MeasureRegexCount from '../MeasureRegexCount/MeasureRegexCount.ts'
+export * as MeasureRetainerRiver from '../MeasureRetainerRiver/MeasureRetainerRiver.ts'
 export * as MeasureResizeObserverCount from '../MeasureResizeObserverCount/MeasureResizeObserverCount.ts'
 export * as MeasureResizeObserversWithStackTraces from '../MeasureResizeObserversWithStackTraces/MeasureResizeObserversWithStackTraces.ts'
 export * as MeasureScopeCount from '../MeasureScopeCount/MeasureScopeCount.ts'
