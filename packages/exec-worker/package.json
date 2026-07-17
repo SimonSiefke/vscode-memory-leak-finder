@@ -11,6 +11,6 @@
   "dependencies": {
     "@lvce-editor/rpc": "^6.8.0",
     "@lvce-editor/verror": "^1.7.0",
-    "execa": "^9.6.1"
+    "execa": "^10.0.0"
   }
 }
