@@ -112,6 +112,12 @@ export const RuntimeReleaseObjectGroup = 'Runtime.releaseObjectGroup'
 
 export const MemoryGetDomCounters = 'Memory.getDOMCounters'
 
+export const MemoryGetSamplingProfile = 'Memory.getSamplingProfile'
+
+export const MemoryStartSampling = 'Memory.startSampling'
+
+export const MemoryStopSampling = 'Memory.stopSampling'
+
 export const RuntimeGetHeapUsage = 'Runtime.getHeapUsage'
 
 export const RuntimeGlobalLexicalScopeNames = 'Runtime.globalLexicalScopeNames'
