@@ -46,6 +46,7 @@ export * as MeasureEmitterCount from '../MeasureEmitterCount/MeasureEmitterCount
 export * as MeasureErrorCount from '../MeasureErrorCount/MeasureErrorCount.ts'
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.ts'
 export * as MeasureEventListeners from '../MeasureEventListeners/MeasureEventListeners.ts'
+export * as MeasureEventListenersWithFullStackTraces from '../MeasureEventListenersWithFullStackTraces/MeasureEventListenersWithFullStackTraces.ts'
 export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersWithStackTraces/MeasureEventListenersWithStackTraces.ts'
 export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEventTargetCount.ts'
 export * as MeasureEventTargetDifference from '../MeasureEventTargetDifference/MeasureEventTargetDifference.ts'
