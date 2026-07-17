@@ -3,9 +3,11 @@ import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as CallgrindConfig from '../CallgrindConfig/CallgrindConfig.ts'
 import * as CpuPerformanceCountersFromStart from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.ts'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
+import * as PrepareTrackedVscode from '../PrepareTrackedVscode/PrepareTrackedVscode.ts'
 
 export interface LaunchOptions {
   readonly arch: string
@@ -33,6 +35,7 @@ export interface LaunchOptions {
   readonly measureId: string
   readonly openDevtools: boolean
   readonly platform: string
+  readonly preparedVscodePath: string
   readonly proxyTestFolderName: string
   readonly trackFunctions: boolean
   readonly updateUrl: string
@@ -90,6 +93,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     measureId,
     openDevtools,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
     trackFunctions,
     updateUrl,
@@ -127,6 +131,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
     trackFunctions,
     trackingMode,
@@ -177,6 +182,40 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     utilityContext,
     webSocketUrl,
   }
+}
+
+export const prepareTrackedVscode = async ({
+  arch,
+  buildVscodeMinified,
+  commit,
+  insidersCommit,
+  measureId,
+  platform,
+  updateUrl,
+  vscodePath,
+  vscodeVersion,
+}: {
+  readonly arch: string
+  readonly buildVscodeMinified: boolean
+  readonly commit: string
+  readonly insidersCommit: string
+  readonly measureId: string
+  readonly platform: string
+  readonly updateUrl: string
+  readonly vscodePath: string
+  readonly vscodeVersion: string
+}): Promise<string> => {
+  const binaryPath = await GetBinaryPath.getBinaryPath(
+    platform,
+    arch,
+    vscodeVersion,
+    vscodePath,
+    commit,
+    insidersCommit,
+    updateUrl,
+    buildVscodeMinified,
+  )
+  return PrepareTrackedVscode.prepareTrackedVscode(binaryPath, getTrackingMode(measureId))
 }
 
 export const setup = async ({

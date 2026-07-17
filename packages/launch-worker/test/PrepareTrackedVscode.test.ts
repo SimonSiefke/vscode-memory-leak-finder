@@ -1,4 +1,4 @@
-import { expect, jest, test } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 
 const events: string[] = []
 
@@ -18,6 +18,10 @@ jest.unstable_mockModule('../src/parts/LaunchFunctionTrackerWorker/LaunchFunctio
   launchFunctionTrackerWorker: jest.fn(async () => rpc),
 }))
 
+beforeEach(() => {
+  events.length = 0
+})
+
 test('prepareTrackedVscode waits for preparation before disposing the worker', async () => {
   const PrepareTrackedVscode = await import('../src/parts/PrepareTrackedVscode/PrepareTrackedVscode.ts')
 
@@ -25,4 +29,13 @@ test('prepareTrackedVscode waits for preparation before disposing the worker', a
 
   expect(result).toBe('/tmp/tracked-code')
   expect(events).toEqual(['invoke:FunctionTracker.getPreparedVscodePath:/tmp/code:timeouts', 'invoke-complete', 'dispose'])
+})
+
+test('prepareTrackedVscode reuses a path prepared before the test suite', async () => {
+  const PrepareTrackedVscode = await import('../src/parts/PrepareTrackedVscode/PrepareTrackedVscode.ts')
+
+  const result = await PrepareTrackedVscode.prepareTrackedVscode('/tmp/code', 'timeouts', '/tmp/tracked-code')
+
+  expect(result).toBe('/tmp/tracked-code')
+  expect(events).toEqual([])
 })
