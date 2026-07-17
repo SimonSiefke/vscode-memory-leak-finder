@@ -15,10 +15,53 @@ const getSelectAll = (platform: string): string => {
 
 const space = ' '
 const nonBreakingSpace = String.fromCharCode(160)
+const extensionListScrollSelector = '.extensions-viewlet .monaco-list .monaco-scrollable-element'
+const extensionNameSelector = '.extension-list-item .name'
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const getExtensionListScrollMetrics = async () => {
+    return page.evaluate({
+      expression: `(() => {
+  return Array.from(document.querySelectorAll('${extensionListScrollSelector}'))
+    .filter((element) => element.querySelector('${extensionNameSelector}'))
+    .map((element) => ({
+      clientHeight: element.clientHeight,
+      scrollHeight: element.scrollHeight,
+      scrollTop: element.scrollTop,
+    }))
+})()`,
+      returnByValue: true,
+    })
+  }
+
+  const getScrollPositions = (clientHeight: number, scrollHeight: number): readonly number[] => {
+    const maximumScrollTop = Math.max(scrollHeight - clientHeight, 0)
+    const stepSize = Math.max(clientHeight - 40, 1)
+    const positions = new Set<number>([0, maximumScrollTop])
+    for (let scrollTop = 0; scrollTop <= maximumScrollTop; scrollTop += stepSize) {
+      positions.add(scrollTop)
+    }
+    return [...positions]
+  }
+
+  const setExtensionListScrollTop = async (index: number, scrollTop: number): Promise<void> => {
+    await page.evaluate({
+      expression: `((index, scrollTop) => {
+  const elements = Array.from(document.querySelectorAll('${extensionListScrollSelector}'))
+    .filter((element) => element.querySelector('${extensionNameSelector}'))
+  const element = elements[index]
+  if (!element) {
+    throw new Error('Extension list scroll container not found')
+  }
+  element.scrollTo({ top: scrollTop })
+  element.scrollTop = scrollTop
+})(${JSON.stringify(index)}, ${JSON.stringify(scrollTop)})`,
+    })
+    await page.waitForIdle()
+  }
+
   return {
     async add({ expectedName, path }: { path: string; expectedName: string }) {
       try {
@@ -154,6 +197,36 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to hide extensions view`)
       }
     },
+    async getResultNames(): Promise<readonly string[]> {
+      try {
+        const names = new Set<string>()
+        const metrics = await getExtensionListScrollMetrics()
+        for (let index = 0; index < metrics.length; index++) {
+          const { clientHeight, scrollHeight } = metrics[index]
+          for (const scrollTop of getScrollPositions(clientHeight, scrollHeight)) {
+            await setExtensionListScrollTop(index, scrollTop)
+            const visibleNames = await page.evaluate({
+              expression: `(() => {
+  return Array.from(document.querySelectorAll('${extensionNameSelector}'))
+    .map((element) => element.textContent?.trim())
+    .filter(Boolean)
+})()`,
+              returnByValue: true,
+            })
+            for (const name of visibleNames) {
+              names.add(name)
+            }
+          }
+          await setExtensionListScrollTop(index, 0)
+        }
+        if (names.size === 0) {
+          throw new Error('No extension results found')
+        }
+        return [...names]
+      } catch (error) {
+        throw new VError(error, `Failed to get extension result names`)
+      }
+    },
     async install({ id, name }: { id: string; name: string }) {
       try {
         if (id.includes(' ')) {
@@ -233,6 +306,31 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
       } catch (error) {
         throw new VError(error, `Failed to clear`)
+      }
+    },
+    async openResult(name: string): Promise<void> {
+      try {
+        const metrics = await getExtensionListScrollMetrics()
+        for (let index = 0; index < metrics.length; index++) {
+          const { clientHeight, scrollHeight } = metrics[index]
+          for (const scrollTop of getScrollPositions(clientHeight, scrollHeight)) {
+            await setExtensionListScrollTop(index, scrollTop)
+            const extensionItems = page.locator('.extension-list-item')
+            const count = await extensionItems.count()
+            for (let itemIndex = 0; itemIndex < count; itemIndex++) {
+              const extensionItem = extensionItems.nth(itemIndex)
+              const actualName = await extensionItem.locator('.name').textContent()
+              if (actualName?.trim() === name) {
+                await extensionItem.click()
+                await page.waitForIdle()
+                return
+              }
+            }
+          }
+        }
+        throw new Error(`Extension result not found: ${name}`)
+      } catch (error) {
+        throw new VError(error, `Failed to open extension result ${name}`)
       }
     },
     async openSuggest() {
