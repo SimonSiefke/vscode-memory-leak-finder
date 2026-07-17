@@ -10,6 +10,11 @@ test('getTrackingMode - tracked allocations measures use allocation tracking', (
   expect(getTrackingMode('trackedAllocationTimeline')).toBe('allocations')
 })
 
+test('getTrackingMode - tracked timeout measures use timeout tracking', () => {
+  expect(getTrackingMode('tracked-timeouts')).toBe('timeouts')
+  expect(getTrackingMode('trackedTimeouts')).toBe('timeouts')
+})
+
 test('getTrackingMode - other measures use function tracking', () => {
   expect(getTrackingMode('tracked-functions')).toBe('functions')
   expect(getTrackingMode('event-listener-count')).toBe('functions')

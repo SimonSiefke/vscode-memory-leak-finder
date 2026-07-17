@@ -112,11 +112,53 @@ const ALLOCATION_PREAMBLE_CODE = `(() => {
 })();
 `
 
+const TIMEOUT_PREAMBLE_CODE = `(() => {
+  if(typeof globalThis.getTrackedTimeoutCount === 'function'){
+    return
+  }
+
+  const activeTimeouts = new Set()
+  const originalSetTimeout = globalThis.setTimeout.bind(globalThis)
+  const originalClearTimeout = globalThis.clearTimeout.bind(globalThis)
+  const originalClearInterval = globalThis.clearInterval.bind(globalThis)
+
+  globalThis.setTimeout = function(callback, timeout, ...args) {
+    let id
+    const wrappedCallback = typeof callback === 'function'
+      ? function(...callbackArgs) {
+          activeTimeouts.delete(id)
+          return Reflect.apply(callback, this, callbackArgs)
+        }
+      : callback
+    id = originalSetTimeout(wrappedCallback, timeout, ...args)
+    activeTimeouts.add(id)
+    return id
+  }
+
+  globalThis.clearTimeout = function(id) {
+    activeTimeouts.delete(id)
+    return originalClearTimeout(id)
+  }
+
+  globalThis.clearInterval = function(id) {
+    activeTimeouts.delete(id)
+    return originalClearInterval(id)
+  }
+
+  globalThis.getTrackedTimeoutCount = () => {
+    return activeTimeouts.size
+  }
+})();
+`
+
 export const transformCode = async (code: string, options: TransformOptions = {}): Promise<string> => {
   const { trackingMode = 'functions' } = options
   if (trackingMode === 'allocations') {
     const transformedCode = transformCodeWithAllocationTracking(code, { ...options })
     return ALLOCATION_PREAMBLE_CODE + '\n' + transformedCode
+  }
+  if (trackingMode === 'timeouts') {
+    return TIMEOUT_PREAMBLE_CODE + '\n' + code
   }
   const transformedCode = transformCodeWithTracking(code, { ...options })
   return PREAMBLE_CODE + '\n' + transformedCode

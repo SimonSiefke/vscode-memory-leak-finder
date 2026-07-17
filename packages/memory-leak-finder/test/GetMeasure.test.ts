@@ -39,3 +39,16 @@ test('getMeasure resolves tracked allocation timeline public measure id', () => 
 
   expect(GetMeasure.getMeasure(MemoryLeakFinder, 'tracked-allocation-timeline')).toBe(measure)
 })
+
+test('getMeasure resolves tracked timeouts public measure id', () => {
+  const measure = {
+    id: 'trackedTimeouts',
+  }
+  const MemoryLeakFinder = {
+    Measures: {
+      MeasureTrackedTimeouts: measure,
+    },
+  }
+
+  expect(GetMeasure.getMeasure(MemoryLeakFinder, 'tracked-timeouts')).toBe(measure)
+})

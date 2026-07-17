@@ -127,6 +127,7 @@ export * as MeasureTrackedAllocationTimeline from '../MeasureTrackedAllocationTi
 export * as MeasureTrackedAllocations from '../MeasureTrackedAllocations/MeasureTrackedAllocations.ts'
 export * as MeasureTrackedAllocationsFromStart from '../MeasureTrackedAllocationsFromStart/MeasureTrackedAllocationsFromStart.ts'
 export * as MeasureTrackedFunctions from '../MeasureTrackedFunctions/MeasureTrackedFunctions.ts'
+export * as MeasureTrackedTimeouts from '../MeasureTrackedTimeouts/MeasureTrackedTimeouts.ts'
 export * as MeasureTrustedTypePolicyCount from '../MeasureTrustedTypePolicyCount/MeasureTrustedTypePolicyCount.ts'
 export * as MeasureTypedArrayCount from '../MeasureTypedArrayCount/MeasureTypedArrayCount.ts'
 export * as MeasureUrlCount from '../MeasureUrlCount/MeasureUrlCount.ts'
