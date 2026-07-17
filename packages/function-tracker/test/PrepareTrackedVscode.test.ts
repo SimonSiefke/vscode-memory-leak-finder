@@ -77,6 +77,25 @@ test('getPreparedVscodePath does not share transformed output across tracking mo
   }
 })
 
+test('getPreparedVscodePath only transforms the workbench entry for timeout tracking', async () => {
+  const { binaryPath, root, runtimeRoot } = await createDownloadedRuntime()
+  const otherModulePath = join(runtimeRoot, 'resources', 'app', 'out', 'vs', 'platform', 'platform.js')
+  try {
+    await mkdir(dirname(otherModulePath), { recursive: true })
+    await writeFile(otherModulePath, 'const platform = {}\n')
+    await getPreparedVscodePath(binaryPath, 'timeouts')
+    const targetRuntimeRoot = join(dirname(runtimeRoot), 'vscode-linux-x64-1.127.0-modified-tracked-timeouts')
+    const targetWorkbenchPath = join(targetRuntimeRoot, 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js')
+    const targetOtherModulePath = join(targetRuntimeRoot, 'resources', 'app', 'out', 'vs', 'platform', 'platform.js')
+
+    expect(await readFile(targetWorkbenchPath, 'utf8')).toContain('/* timeouts:')
+    expect(await readFile(targetOtherModulePath, 'utf8')).toBe(await readFile(otherModulePath, 'utf8'))
+    expect(mockTransformCode).toHaveBeenCalledTimes(1)
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
 test('getPreparedVscodePath copies local source checkout and preserves script path shape', async () => {
   const root = await mkdtemp(join(tmpdir(), 'tracked-vscode-local-'))
   const sourceRoot = join(root, 'vscode')

@@ -138,11 +138,14 @@ const isPathInsideRelativeRoot = (relativePath: string, relativeRoot: string): b
   return relativePath === relativeRoot || relativePath.startsWith(`${relativeRoot}/`)
 }
 
-const shouldTransform = (relativePath: string, transformRelativeRoots: readonly string[]): boolean => {
+const shouldTransform = (relativePath: string, transformRelativeRoots: readonly string[], trackingMode: string): boolean => {
   if (!relativePath.endsWith('.js')) {
     return false
   }
   const normalized = relativePath.replaceAll('\\', '/')
+  if (trackingMode === 'timeouts') {
+    return normalized.endsWith('/vs/workbench/workbench.desktop.main.js')
+  }
   return transformRelativeRoots.some((root) => isPathInsideRelativeRoot(normalized, root))
 }
 
@@ -199,7 +202,7 @@ const syncCopyRoot = async (
     if (!entry.isFile()) {
       continue
     }
-    if (shouldTransform(relativePath, copyRoot.transformRelativeRoots)) {
+    if (shouldTransform(relativePath, copyRoot.transformRelativeRoots, trackingMode)) {
       await transformFileCached(sourcePath, destinationPath, trackingMode, transformerVersion)
       continue
     }
