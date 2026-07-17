@@ -34,7 +34,7 @@ const transformerFiles = [
   join(import.meta.dirname, '..', 'CreateAllocationWrapperPlugin', 'CreateAllocationWrapperPlugin.ts'),
 ]
 
-const excludedDirectoryNames = new Set(['.build', '.cache', '.git', '.vscode-test', 'node_modules'])
+const excludedDirectoryNames = new Set(['.build', '.cache', '.git', '.vscode-test'])
 
 const getHash = (value: string): string => {
   return createHash('sha256').update(value).digest('hex')
@@ -130,7 +130,10 @@ const transformFileCached = async (
   await writeFile(metadataPath, JSON.stringify(expectedMetadata, null, 2), 'utf8')
 }
 
-const shouldExclude = (name: string): boolean => {
+const shouldExclude = (name: string, copyRoot: CopyRoot): boolean => {
+  if (name === 'node_modules') {
+    return copyRoot.transformRelativeRoots.includes('out')
+  }
   return excludedDirectoryNames.has(name)
 }
 
@@ -184,7 +187,7 @@ const syncCopyRoot = async (
 ): Promise<void> => {
   const entries = await readdir(currentPath, { withFileTypes: true })
   for (const entry of entries) {
-    if (entry.isDirectory() && shouldExclude(entry.name)) {
+    if (entry.isDirectory() && shouldExclude(entry.name, copyRoot)) {
       continue
     }
     const sourcePath = join(currentPath, entry.name)
