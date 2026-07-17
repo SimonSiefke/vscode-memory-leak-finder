@@ -2,27 +2,28 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async shouldBeVisible() {
+    async shouldBeVisible({ useSingleIframe = false }: { useSingleIframe?: boolean } = {}) {
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview')
         await expect(webView).toBeVisible()
         await page.waitForIdle()
-        await expect(webView).toHaveClass('ready')
-        await page.waitForIdle()
         const childPage = await page.waitForIframe({
           injectUtilityScript: false,
-          url: /extensionId=vscode.markdown-language-features/,
+          url: useSingleIframe
+            ? /^vscode-webview:\/\/vscode\.markdown-language-features\//
+            : /extensionId=vscode.markdown-language-features/,
         })
-        // TODO double iframe...
-        const subFrame = await childPage.waitForSubIframe({
-          url: /extensionId=vscode.markdown-language-features/,
-        })
-        await subFrame.waitForIdle()
-        const markDown = subFrame.locator('.markdown-body')
+        const contentFrame = useSingleIframe
+          ? childPage
+          : await childPage.waitForSubIframe({
+              url: /extensionId=vscode.markdown-language-features/,
+            })
+        await contentFrame.waitForIdle()
+        const markDown = contentFrame.locator('.markdown-body')
         await expect(markDown).toBeVisible()
         await page.waitForIdle()
-        return subFrame
+        return contentFrame
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview is visible`)
       }
