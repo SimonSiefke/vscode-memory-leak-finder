@@ -215,6 +215,14 @@ Measures the total number of Timeouts.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-timeout --only base
 ```
 
+### TrackedTimeouts
+
+Measures active timeouts using workbench instrumentation installed at application startup.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --runs 1 --measure-after --measure tracked-timeouts --timeout-between 5000 --only base
+```
+
 ### V8TurbofanStats
 
 Measures V8 TurboFan optimization and deoptimization activity.

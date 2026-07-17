@@ -24,9 +24,5 @@ test('prepareTrackedVscode waits for preparation before disposing the worker', a
   const result = await PrepareTrackedVscode.prepareTrackedVscode('/tmp/code', 'timeouts')
 
   expect(result).toBe('/tmp/tracked-code')
-  expect(events).toEqual([
-    'invoke:FunctionTracker.getPreparedVscodePath:/tmp/code:timeouts',
-    'invoke-complete',
-    'dispose',
-  ])
+  expect(events).toEqual(['invoke:FunctionTracker.getPreparedVscodePath:/tmp/code:timeouts', 'invoke-complete', 'dispose'])
 })

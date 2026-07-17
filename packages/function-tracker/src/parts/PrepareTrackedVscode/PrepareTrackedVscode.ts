@@ -19,6 +19,7 @@ interface SourceKind {
 }
 
 interface CopyRoot {
+  readonly excludeNodeModules: boolean
   readonly sourceRoot: string
   readonly targetRoot: string
   readonly transformRelativeRoots: readonly string[]
@@ -27,6 +28,7 @@ interface CopyRoot {
 const repositoryRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
 const trackedVscodeRoot = join(repositoryRoot, '.vscode-test', 'tracked-vscode')
 const transformerFiles = [
+  join(import.meta.dirname, 'PrepareTrackedVscode.ts'),
   join(import.meta.dirname, '..', 'Transform', 'Transform.ts'),
   join(import.meta.dirname, '..', 'TransformCodeWithTracking', 'TransformCodeWithTracking.ts'),
   join(import.meta.dirname, '..', 'TransformCodeWithAllocationTracking', 'TransformCodeWithAllocationTracking.ts'),
@@ -132,7 +134,7 @@ const transformFileCached = async (
 
 const shouldExclude = (name: string, copyRoot: CopyRoot): boolean => {
   if (name === 'node_modules') {
-    return copyRoot.transformRelativeRoots.includes('out')
+    return copyRoot.excludeNodeModules
   }
   return excludedDirectoryNames.has(name)
 }
@@ -248,6 +250,7 @@ const getLocalSourceKind = async (binaryPath: string, trackingMode: string): Pro
   const targetSourceRoot = join(targetContainer, basename(sourceRoot))
   const copyRoots: CopyRoot[] = [
     {
+      excludeNodeModules: true,
       sourceRoot,
       targetRoot: targetSourceRoot,
       transformRelativeRoots: ['out', 'out-min'],
@@ -258,6 +261,7 @@ const getLocalSourceKind = async (binaryPath: string, trackingMode: string): Pro
   if (!isPathInside(sourceRoot, binaryPath) && (await pathExists(runtimeRoot))) {
     const targetRuntimeRoot = join(targetContainer, basename(runtimeRoot))
     copyRoots.push({
+      excludeNodeModules: false,
       sourceRoot: runtimeRoot,
       targetRoot: targetRuntimeRoot,
       transformRelativeRoots: ['resources/app/out'],
@@ -276,6 +280,7 @@ const getDownloadedSourceKind = (binaryPath: string, trackingMode: string): Sour
   return {
     copyRoots: [
       {
+        excludeNodeModules: false,
         sourceRoot,
         targetRoot,
         transformRelativeRoots: ['resources/app/out'],

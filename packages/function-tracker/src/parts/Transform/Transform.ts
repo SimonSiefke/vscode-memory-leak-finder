@@ -113,7 +113,7 @@ const ALLOCATION_PREAMBLE_CODE = `(() => {
 `
 
 const TIMEOUT_PREAMBLE_CODE = `(() => {
-  if(globalThis.getTrackedTimeoutCount){
+  if(typeof globalThis.getTrackedTimeoutCount === 'function'){
     return
   }
 
