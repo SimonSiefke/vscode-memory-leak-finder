@@ -12,10 +12,12 @@ import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetProxyTestFolderName from '../GetProxyTestFolderName/GetProxyTestFolderName.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
+import * as Ide from '../Ide/Ide.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
+import * as PrepareTrackedVscode from '../PrepareTrackedVscode/PrepareTrackedVscode.ts'
 import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTests from '../TestWorkerRunTests/TestWorkerRunTests.ts'
@@ -373,6 +375,21 @@ export const runTestsWithCallback = async ({
     const first = formattedPaths[0]
     await callback(TestWorkerEventType.HandleInitializing)
 
+    const preparedVscodePath =
+      trackFunctions && ide === Ide.VsCode
+        ? await PrepareTrackedVscode.prepareTrackedVscode({
+            arch,
+            buildVscodeMinified,
+            commit,
+            insidersCommit,
+            measureId: measure,
+            platform,
+            updateUrl,
+            vscodePath,
+            vscodeVersion,
+          })
+        : ''
+
     const context = {
       runs,
     }
@@ -455,6 +472,7 @@ export const runTestsWithCallback = async ({
               openDevtools,
               pageObjectPath: pageObjectPathResolved,
               platform,
+              preparedVscodePath,
               proxyTestFolderName,
               recordVideo,
               runMode,
@@ -631,6 +649,7 @@ export const runTestsWithCallback = async ({
             openDevtools,
             pageObjectPath: pageObjectPathResolved,
             platform,
+            preparedVscodePath,
             proxyTestFolderName,
             recordVideo,
             runMode,
