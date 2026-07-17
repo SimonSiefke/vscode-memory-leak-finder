@@ -118,9 +118,9 @@ const TIMEOUT_PREAMBLE_CODE = `(() => {
   }
 
   const activeTimeouts = new Set()
-  const originalSetTimeout = globalThis.setTimeout
-  const originalClearTimeout = globalThis.clearTimeout
-  const originalClearInterval = globalThis.clearInterval
+  const originalSetTimeout = globalThis.setTimeout.bind(globalThis)
+  const originalClearTimeout = globalThis.clearTimeout.bind(globalThis)
+  const originalClearInterval = globalThis.clearInterval.bind(globalThis)
 
   globalThis.setTimeout = function(callback, timeout, ...args) {
     let id
@@ -130,19 +130,19 @@ const TIMEOUT_PREAMBLE_CODE = `(() => {
           return Reflect.apply(callback, this, callbackArgs)
         }
       : callback
-    id = Reflect.apply(originalSetTimeout, this, [wrappedCallback, timeout, ...args])
+    id = originalSetTimeout(wrappedCallback, timeout, ...args)
     activeTimeouts.add(id)
     return id
   }
 
   globalThis.clearTimeout = function(id) {
     activeTimeouts.delete(id)
-    return Reflect.apply(originalClearTimeout, this, [id])
+    return originalClearTimeout(id)
   }
 
   globalThis.clearInterval = function(id) {
     activeTimeouts.delete(id)
-    return Reflect.apply(originalClearInterval, this, [id])
+    return originalClearInterval(id)
   }
 
   globalThis.getTrackedTimeoutCount = () => {
