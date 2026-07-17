@@ -38,7 +38,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 
   const getScrollPositions = (clientHeight: number, scrollHeight: number): readonly number[] => {
     const maximumScrollTop = Math.max(scrollHeight - clientHeight, 0)
-    const stepSize = Math.max(clientHeight - 40, 1)
+    const stepSize = Math.max(clientHeight - 40, 200)
     const positions = new Set<number>([0, maximumScrollTop])
     for (let scrollTop = 0; scrollTop <= maximumScrollTop; scrollTop += stepSize) {
       positions.add(scrollTop)
