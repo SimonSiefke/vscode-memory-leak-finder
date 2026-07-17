@@ -5,6 +5,9 @@ const getErrorCode = (rawResult) => {
   if (rawResult && rawResult.error && rawResult.error.code && rawResult.error.code === -32000) {
     return ErrorCodes.E_DEVTOOLS_INTERNAL_ERROR
   }
+  if (rawResult && rawResult.error && rawResult.error.code && rawResult.error.code === -32601) {
+    return ErrorCodes.E_DEVTOOLS_METHOD_NOT_FOUND
+  }
   return ''
 }
 

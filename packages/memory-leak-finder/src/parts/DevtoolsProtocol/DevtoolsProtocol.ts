@@ -3,6 +3,7 @@ const module = await import(url)
 
 const {
   DevtoolsProtocolDomDebugger,
+  DevtoolsProtocolErrorCodes,
   DevtoolsProtocolHeapProfiler,
   DevtoolsProtocolMemory,
   DevtoolsProtocolPage,
@@ -22,5 +23,6 @@ export {
   DevtoolsProtocolTarget,
   DevtoolsProtocolMemory,
   DevtoolsProtocolDomDebugger,
+  DevtoolsProtocolErrorCodes,
   DevtoolsProtocolTracing,
 }
