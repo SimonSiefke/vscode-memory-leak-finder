@@ -105,6 +105,7 @@ export const launchIde = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
+  preparedVscodePath,
   proxyTestFolderName,
   trackFunctions,
   trackingMode,
@@ -135,6 +136,7 @@ export const launchIde = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform: string
+  preparedVscodePath: string
   proxyTestFolderName: string
   trackFunctions: boolean
   trackingMode: string
@@ -204,6 +206,7 @@ export const launchIde = async ({
     inspectSharedProcess,
     inspectSharedProcessPort,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
     trackFunctions,
     trackingMode,

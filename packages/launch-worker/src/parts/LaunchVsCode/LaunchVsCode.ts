@@ -238,6 +238,7 @@ export const launchVsCode = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
+  preparedVscodePath,
   proxyTestFolderName,
   trackFunctions,
   trackingMode,
@@ -267,6 +268,7 @@ export const launchVsCode = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform: string
+  preparedVscodePath: string
   proxyTestFolderName: string
   trackFunctions: boolean
   trackingMode: string
@@ -291,11 +293,11 @@ export const launchVsCode = async ({
       insidersCommit,
       platform,
       updateUrl,
-      vscodePath,
+      vscodePath: preparedVscodePath || vscodePath,
       vscodeVersion,
     })
     if (trackFunctions) {
-      binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode)
+      binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
     }
 
     // Start proxy server if enabled
