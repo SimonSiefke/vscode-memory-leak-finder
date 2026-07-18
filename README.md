@@ -240,6 +240,14 @@ Measures active timeouts using workbench instrumentation installed at applicatio
 node packages/cli/bin/test.js --cwd packages/e2e --runs 1 --measure-after --measure tracked-timeouts --timeout-between 5000 --only base
 ```
 
+### TrackedAllocationLeaks
+
+Reports allocation sites that retain instances after forced garbage collection. Results are informational potential leak candidates.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure tracked-allocation-leaks --only editor-open
+```
+
 ### V8TurbofanStats
 
 Measures V8 TurboFan optimization and deoptimization activity.
