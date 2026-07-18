@@ -16,7 +16,7 @@ cherry`,
   await Editor.setCursor(1, 1)
 }
 
-export const run = async ({ Editor }: TestContext): Promise<void> => {
+export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   // @ts-ignore
   await Editor.addCursorBelow()
   // @ts-ignore
@@ -31,11 +31,20 @@ prefix cherry`)
   await Editor.shouldHaveText(`prefix apple
 prefix banana
 prefix cherry`)
-  await Editor.undo()
+  await Editor.closeAll()
+  await Workspace.setFiles([
+    {
+      content: `apple
+banana
+cherry`,
+      name: 'file.txt',
+    },
+  ])
+  await Editor.open('file.txt')
+  await Editor.setCursor(1, 1)
   await Editor.shouldHaveText(`apple
 banana
 cherry`)
-  await Editor.save({ viaKeyBoard: false })
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
