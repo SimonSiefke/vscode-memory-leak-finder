@@ -144,13 +144,14 @@ export const create = ({
     async waitForIdle() {
       return PageWaitForIdle.waitForIdle(this.rpc, this.electronRpc.canUseIdleCallback, idleTimeout)
     },
-    waitForIframe({ injectUtilityScript = true, url }) {
+    waitForIframe({ iframeIndex = 0, injectUtilityScript = true, url }) {
       return WaitForIframe.waitForIframe({
         browserRpc,
         createPage: create,
         electronObjectId,
         electronRpc,
         idleTimeout,
+        iframeIndex,
         injectUtilityScript,
         sessionRpc,
         url,

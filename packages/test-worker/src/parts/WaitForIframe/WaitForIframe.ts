@@ -9,16 +9,20 @@ interface TargetInfo {
   readonly url: string
 }
 
-const findMatchingIframe = (targets, expectedUrl) => {
+const findMatchingIframe = (targets, expectedUrl, iframeIndex) => {
+  let matchingIndex = 0
   for (const target of targets) {
     if (expectedUrl.test(target.url) || expectedUrl.test(target.title)) {
-      return target
+      if (matchingIndex === iframeIndex) {
+        return target
+      }
+      matchingIndex++
     }
   }
   return undefined
 }
 
-const waitForMatchingIframe = async (sessionRpc, url, timeout = 30_000) => {
+const waitForMatchingIframe = async (sessionRpc, url, iframeIndex, timeout = 30_000) => {
   const deadline = performance.now() + timeout
   let targets: readonly TargetInfo[] = []
   while (performance.now() < deadline) {
@@ -26,6 +30,7 @@ const waitForMatchingIframe = async (sessionRpc, url, timeout = 30_000) => {
     const matchingIframe = findMatchingIframe(
       targets.filter((target) => target.type === 'iframe'),
       url,
+      iframeIndex,
     )
     if (matchingIframe) {
       return matchingIframe
@@ -42,6 +47,7 @@ export const waitForIframe = async ({
   electronObjectId,
   electronRpc,
   idleTimeout,
+  iframeIndex = 0,
   injectUtilityScript,
   sessionRpc,
   url,
@@ -53,7 +59,7 @@ export const waitForIframe = async ({
   // 4. resolve promise with execution context id and frame Id, clean up listeners
 
   // TODO ask browser rpc for targets / add target change listener
-  const matchingIframe = await waitForMatchingIframe(sessionRpc, url)
+  const matchingIframe = await waitForMatchingIframe(sessionRpc, url, iframeIndex)
 
   const iframeSessionId = await DevtoolsProtocolTarget.attachToTarget(sessionRpc, {
     flatten: true,

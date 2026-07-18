@@ -31,7 +31,7 @@ export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommand
   await Editor.focusBottomEditorGroup()
   await Editor.open('second.md')
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
-  const subFrame2 = await MarkdownPreview.shouldBeVisible()
+  const subFrame2 = await MarkdownPreview.shouldBeVisible(1)
   await MarkdownPreview.shouldHaveHeading(subFrame2, 'second-document')
 
   await Editor.closeAll()
