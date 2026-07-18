@@ -41,7 +41,7 @@ jobs:
       - name: Run editor-cross-file-rename diagnostic attempt ${{ matrix.attempt }}
         uses: coactions/setup-xvfb@v1
         with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure detached-dom-nodes-with-stack-traces --restart-between --run-skipped-tests-anyway --only '^editor-cross-file-rename\.ts$' --workers 1
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure detached-dom-nodes-with-stack-traces --restart-between --run-skipped-tests-anyway --only ^editor-cross-file-rename.ts --workers 1
       - uses: actions/upload-artifact@v7
         if: always()
         with:
