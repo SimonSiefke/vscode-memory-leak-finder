@@ -13,6 +13,62 @@ npm run e2e
 
 <!--  -->
 
+## Performance lab
+
+The performance lab runs isolated user-action benchmarks against local VS Code
+builds. Scoring uses action-to-ready latency and Linux `perf` counters without a
+profiler attached. Diagnostics run separately and retain source-mapped Chrome CPU
+profiles.
+
+The editor pilot has two scenarios:
+
+- `editor-open-text-file-cold-performance`: first text editor in a fresh process.
+- `editor-open-text-file-warm-performance`: one excluded warm-up, followed by one
+  measured editor open in a fresh process.
+
+Both prepare Quick Open before measurement, measure Enter-to-rendered-content,
+then validate and close the editor after measurement.
+
+Create a 20-sample baseline:
+
+```sh
+npm run performance-lab -- baseline \
+  --vscode-path /path/to/code-oss \
+  --vscode-source-path /path/to/vscode \
+  --scenario editor-open-text-file-warm-performance
+```
+
+Run the five-pair ABBA quick comparison, or add `--confirm` for 20 pairs:
+
+```sh
+npm run performance-lab -- compare \
+  --baseline-vscode-path /path/to/baseline/code-oss \
+  --baseline-vscode-source-path /path/to/baseline/vscode \
+  --candidate-vscode-path /path/to/candidate/code-oss \
+  --candidate-vscode-source-path /path/to/candidate/vscode \
+  --scenario editor-open-text-file-warm-performance \
+  --goal latency:-50%
+```
+
+Collect source-mapped hotspot and call-edge reports without contaminating the
+scoring samples:
+
+```sh
+npm run performance-lab -- diagnose \
+  --baseline-vscode-path /path/to/baseline/code-oss \
+  --baseline-vscode-source-path /path/to/baseline/vscode \
+  --candidate-vscode-path /path/to/candidate/code-oss \
+  --candidate-vscode-source-path /path/to/candidate/vscode \
+  --scenario editor-open-text-file-warm-performance
+```
+
+Each command writes `experiment.json` plus raw counter/profile artifacts under
+`.performance-lab`. The report includes build and machine identity, the pinned
+harness/scenario hashes, distributions and confidence intervals, semantic VS
+Code phase timings, process IDs, ranked original-source hotspots, an
+Amdahl-style ceiling, escalation recommendations, and the final keep/reject
+verdict. A run is rejected if the harness changes while it is executing.
+
 ## Measures
 
 ### MemoryCity
@@ -58,7 +114,8 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 
 ### CpuPerformanceCounters
 
-Measures CPU instructions and cycles for the inspected process.
+Measures CPU instructions, cycles, task-clock time, context switches, and page
+faults for the inspected process.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base

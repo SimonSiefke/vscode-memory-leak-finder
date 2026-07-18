@@ -537,7 +537,7 @@ export const runTestsWithCallback = async ({
             }
             wasOriginallySkipped = testResult.wasOriginallySkipped
             await MemoryLeakFinder.start(workers.memoryRpc, sampleConnectionId)
-            await TestWorkerRunTests.testWorkerRunTests(
+            const testRunResults = await TestWorkerRunTests.testWorkerRunTests(
               workers.testWorkerRpc,
               sampleConnectionId,
               absolutePath,
@@ -569,6 +569,7 @@ export const runTestsWithCallback = async ({
                 runs,
                 startupRun: startupRun + 1,
                 startupRuns,
+                testRunResults,
               },
               sampleResultPath,
             )
@@ -824,7 +825,7 @@ export const runTestsWithCallback = async ({
                   MemoryLeakFinder.start(rendererRpc, connectionId),
                   MemoryLeakFinder.start(extensionHostRpc, connectionId),
                 ])
-                await TestWorkerRunTests.testWorkerRunTests(
+                const testRunResults = await TestWorkerRunTests.testWorkerRunTests(
                   testWorkerRpc,
                   connectionId,
                   absolutePath,
@@ -845,8 +846,8 @@ export const runTestsWithCallback = async ({
                 // Analyze sequentially so two full dominator graphs never compete for
                 // memory. Capture remains simultaneous around the shared scenario.
                 await runMemoryCityComparisons(
-                  () => MemoryLeakFinder.compare(rendererRpc, connectionId, context, rendererResultPath),
-                  () => MemoryLeakFinder.compare(extensionHostRpc, connectionId, context, extensionHostResultPath),
+                  () => MemoryLeakFinder.compare(rendererRpc, connectionId, { ...context, testRunResults }, rendererResultPath),
+                  () => MemoryLeakFinder.compare(extensionHostRpc, connectionId, { ...context, testRunResults }, extensionHostResultPath),
                 )
                 const [rendererResult, extensionHostResult] = await Promise.all([
                   readJson(rendererResultPath),
@@ -875,7 +876,7 @@ export const runTestsWithCallback = async ({
             } else {
               const memoryRpc = workers.memoryRpc
               await MemoryLeakFinder.start(memoryRpc, connectionId)
-              await TestWorkerRunTests.testWorkerRunTests(
+              const testRunResults = await TestWorkerRunTests.testWorkerRunTests(
                 testWorkerRpc,
                 connectionId,
                 absolutePath,
@@ -894,7 +895,7 @@ export const runTestsWithCallback = async ({
                 await Timeout.setTimeout(3000)
               }
 
-              result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
+              result = await MemoryLeakFinder.compare(memoryRpc, connectionId, { ...context, testRunResults }, resultPath)
             }
             if (result.isLeak) {
               isLeak = true

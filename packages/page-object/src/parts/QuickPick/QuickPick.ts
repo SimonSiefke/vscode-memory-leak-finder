@@ -4,6 +4,16 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
+    async acceptSelected() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        const quickPickInput = await this.waitForInputVisible()
+        await quickPickInput.press('Enter')
+        await expect(quickPick).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to accept selected quick pick item`)
+      }
+    },
     async close() {
       try {
         await this.hide()

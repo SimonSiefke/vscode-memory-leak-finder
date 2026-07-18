@@ -15,10 +15,13 @@ export const testWorkerRunTests = async (
   Assert.string(absolutePath)
   Assert.boolean(forceRun)
   Assert.string(platform)
+  const results: any[] = []
   for (let i = 0; i < runs; i++) {
-    await TestWorkerRunTest.testWorkerRunTest(rpc, connectionId, absolutePath, forceRun, runMode, platform)
+    const result = await TestWorkerRunTest.testWorkerRunTest(rpc, connectionId, absolutePath, forceRun, runMode, platform)
+    results.push(result)
     if (runCompletion) {
       await runCompletion()
     }
   }
+  return results
 }
