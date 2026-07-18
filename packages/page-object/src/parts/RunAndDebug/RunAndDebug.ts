@@ -406,7 +406,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async takeCpuProfile({ seconds }: { seconds: number }) {
       try {
-        await page.waitForIdle()
         const quickPick = QuickPick.create({
           electronApp,
           expect,
@@ -417,27 +416,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         })
         await quickPick.executeCommand('Debug: Take Performance Profile', {
           pressKeyOnce: true,
+          skipIdle: true,
           stayVisible: true,
         })
-        await quickPick.select('CPU Profile', true)
-        await page.waitForIdle()
-        await quickPick.select('Manual', false)
-        await page.waitForIdle()
+        await quickPick.select('CPU Profile', true, false, { skipIdle: true })
+        await quickPick.select('Manual', false, false, { skipIdle: true })
         await new Promise((r) => {
           setTimeout(r, seconds * 1000)
         })
         await quickPick.executeCommand('Debug: Stop Performance Profile', {
           pressKeyOnce: true,
+          skipIdle: true,
           stayVisible: false,
         })
-        await page.waitForIdle()
         const decoration = page.locator('.monaco-editor .codelens-decoration', {})
         await expect(decoration).toBeVisible({
           timeout: 15_000,
         })
-        await page.waitForIdle()
         await expect(decoration).toHaveText(/Self Time/)
-        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to take performance profile`)
       }
