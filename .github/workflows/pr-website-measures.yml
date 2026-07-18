@@ -41,6 +41,11 @@ jobs:
           - vite-docs-guide-features
           - vitest-docs-features
           - vue-docs-reactivity-fundamentals
+        runs:
+          - 1997
+        include:
+          - test: chatgpt-ask-new-chat
+            runs: 1
     steps:
       - uses: actions/checkout@v6
 
@@ -95,7 +100,7 @@ jobs:
             --check-leaks \
             --measure named-function-count3 \
             --inspect-integrated-browser \
-            --runs 1997 \
+            --runs "${{ matrix.runs }}" \
             --run-skipped-tests-anyway \
             --run-network-tests-anyway \
             --only "${{ matrix.test }}"
