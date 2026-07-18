@@ -40,7 +40,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await this.selectCommand(httpOption, true)
 
         const quickPickLocator = page.locator('.quick-input-widget')
-        const quickPickInput = quickPickLocator.locator('[aria-autocomplete="list"]')
+        const quickPickInput = quickPickLocator.locator('.ibwrapper .input')
         await expect(quickPickInput).toHaveAttribute('aria-label', `URL of the MCP server (e.g., http://localhost:3000) - Enter Server URL`)
         await page.waitForIdle()
         await quickPickInput.type(`${serverUrl}/mcp`)
@@ -48,9 +48,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await quickPick.pressEnter()
 
         // if (ideVersion && ideVersion.minor <= 80) {
-        await expect(quickPickInput).toHaveAttribute('aria-label', `Unique identifier for this server - Enter Server ID`, {
-          timeout: 10_000,
-        })
+        await expect(quickPickInput).toHaveAttribute('aria-label', `Unique identifier for this server - Enter Server ID`)
         // } else {
         //   await expect(quickPickInput).toHaveAttribute(
         //     'aria-label',
@@ -64,9 +62,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await quickPick.pressEnter()
 
-        await expect(quickPickInput).toHaveAttribute('aria-label', `Select the configuration target - Add MCP Server`, {
-          timeout: 10_000,
-        })
+        await expect(quickPickInput).toHaveAttribute('aria-label', `Select the configuration target - Add MCP Server`)
         await this.selectCommand('Global')
 
         await page.waitForIdle()
