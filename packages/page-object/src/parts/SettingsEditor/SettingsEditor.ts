@@ -362,6 +362,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           hasText: value,
         })
         await option.click()
+        await expect(select).toHaveValue(value)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open select`)
       }
