@@ -55,7 +55,7 @@ jobs:
       - name: Run quick-pick-color-theme attempt ${{ matrix.attempt }}
         uses: coactions/setup-xvfb@v1
         with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --only ^quick-pick-color-theme.ts$ --run-skipped-tests-anyway --record-video
+          run: node packages/cli/bin/test.js --cwd packages/e2e --only quick-pick-color-theme.ts --run-skipped-tests-anyway --record-video
       - uses: actions/upload-artifact@v7
         if: always()
         with:
