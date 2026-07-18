@@ -55,7 +55,7 @@ jobs:
       - name: Run problems-filter diagnostic attempt ${{ matrix.attempt }}
         uses: coactions/setup-xvfb@v1
         with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --only problems-filter.ts --workers 1 --record-video
+          run: node packages/cli/bin/test.js --cwd packages/e2e --only problems-filter.ts --workers 1 --run-skipped-tests-anyway --record-video
       - uses: actions/upload-artifact@v7
         if: always()
         with:

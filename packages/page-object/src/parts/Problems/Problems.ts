@@ -6,6 +6,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const getMarkersPanel = () => page.locator('.markers-panel')
+  const getFilterInput = () => page.locator('.viewpane-filter-container .input[aria-label="Filter Problems"]')
 
   return {
     async clearFilter() {
@@ -14,7 +15,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const markersPanel = getMarkersPanel()
         await expect(markersPanel).toBeVisible()
         await page.waitForIdle()
-        const input = markersPanel.locator('.input[placeholder^="Filter"]')
+        const input = getFilterInput()
         await expect(input).toBeVisible()
         await page.waitForIdle()
         await input.focus()
@@ -35,7 +36,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const markersPanel = getMarkersPanel()
         await expect(markersPanel).toBeVisible()
         await page.waitForIdle()
-        const input = markersPanel.locator('.input[placeholder^="Filter"]')
+        const input = getFilterInput()
         await expect(input).toBeVisible()
         await page.waitForIdle()
         await input.focus()
