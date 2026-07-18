@@ -17,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         test:
-          - angular-docs-installation
-          - ember-guides-html-css-javascript
+          - astro-docs-installation
+          - docusaurus-docs-installation
           - google-maps-search-clear
           - google-translate-text-clear
           - jest-docs-using-matchers

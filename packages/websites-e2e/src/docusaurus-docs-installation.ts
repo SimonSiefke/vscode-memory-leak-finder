@@ -4,10 +4,10 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const quickStartUrl = 'https://guides.emberjs.com/release/getting-started/quick-start/'
-const quickStartUrlPattern = /^https:\/\/guides\.emberjs\.com\/release\/getting-started\/quick-start\/?$/
-const htmlCssJavascriptUrlPattern = /^https:\/\/guides\.emberjs\.com\/release\/getting-started\/working-with-html-css-and-javascript\/?$/
-const htmlCssJavascriptLinkSelector = 'a[href="/release/getting-started/working-with-html-css-and-javascript/"]'
+const gettingStartedUrl = 'https://docusaurus.io/docs/category/getting-started'
+const gettingStartedUrlPattern = /^https:\/\/docusaurus\.io\/docs\/category\/getting-started\/?$/
+const installationUrlPattern = /^https:\/\/docusaurus\.io\/docs\/installation\/?$/
+const installationLinkSelector = 'a[href="/docs/installation"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
@@ -15,28 +15,28 @@ export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, Si
   await SideBar.hide()
   await Notification.closeAll({ force: true })
   await SimpleBrowser.show({
-    url: quickStartUrl,
+    url: gettingStartedUrl,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'Quick Start',
-    urlPattern: quickStartUrlPattern,
+    text: 'Getting Started',
+    urlPattern: gettingStartedUrlPattern,
   })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.clickPageLink({
-    headingText: 'Working with HTML, CSS, and JavaScript',
-    selector: htmlCssJavascriptLinkSelector,
-    urlPattern: htmlCssJavascriptUrlPattern,
+    headingText: 'Installation',
+    selector: installationLinkSelector,
+    urlPattern: installationUrlPattern,
   })
   await SimpleBrowser.back({
-    urlPattern: quickStartUrlPattern,
+    urlPattern: gettingStartedUrlPattern,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'Quick Start',
-    urlPattern: quickStartUrlPattern,
+    text: 'Getting Started',
+    urlPattern: gettingStartedUrlPattern,
   })
 }
 

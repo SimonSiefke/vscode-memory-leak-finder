@@ -4,10 +4,10 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const overviewUrl = 'https://angular.dev/overview'
-const overviewUrlPattern = /^https:\/\/angular\.dev\/overview\/?$/
-const installationUrlPattern = /^https:\/\/angular\.dev\/installation\/?$/
-const installationLinkSelector = 'a[href="/installation"]'
+const overviewUrl = 'https://docs.astro.build/en/getting-started/'
+const overviewUrlPattern = /^https:\/\/docs\.astro\.build\/en\/getting-started\/?$/
+const installationUrlPattern = /^https:\/\/docs\.astro\.build\/en\/install-and-setup\/?$/
+const installationLinkSelector = 'a[href="/en/install-and-setup/"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
@@ -19,14 +19,14 @@ export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, Si
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'What is Angular?',
+    text: 'Astro Docs',
     urlPattern: overviewUrlPattern,
   })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.clickPageLink({
-    headingText: 'Installation',
+    headingText: 'Install Astro',
     selector: installationLinkSelector,
     urlPattern: installationUrlPattern,
   })
@@ -35,7 +35,7 @@ export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'What is Angular?',
+    text: 'Astro Docs',
     urlPattern: overviewUrlPattern,
   })
 }
