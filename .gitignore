@@ -1,9 +1,18 @@
+.vscode-webview-load-time-results
+.vscode-webview-memory-results
+.vscode-codex-webview-load-time-results
+.vscode-codex-warm-webview-load-time-results
+.vscode-memory-leak-finder-cpu-performance-counters
+.vscode-workbench-tracked-allocations
+.vscode-workbench-tracked-modules
 .minimal-reproductions
 .bot-user-data
 .vscode-user-data-dir.zip
 .vscode-sse-data
 .vscode-project-cache
 .vscode-workbench-tracked
+.vscode-workbench-tracked-allocations
+.vscode-workbench-tracked-modules
 workbench.desktop.main.tracked.js
 .vscode-image-data
 .vscode-insiders-metadata
@@ -35,6 +44,7 @@ ffmpeg-linux
 .vscode-videos
 .vscode-logs-history
 .vscode-user-data-dir
+.vscode-shared-data-dir
 .vscode-test-workspace
 .vscode-extensions
 .vscode-test-files

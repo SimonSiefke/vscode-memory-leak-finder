@@ -21,6 +21,40 @@ const escapeRegExp = (value: string): string => {
   return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+const getDurationMs = (start: number): number => {
+  return Math.round((performance.now() - start) * 1000) / 1000
+}
+
+const isHttpUrl = (url: string): boolean => {
+  return /^https?:\/\//.test(url)
+}
+
+const logPhase = (phase: string, start: number, details: Record<string, unknown> = {}): void => {
+  console.log('SimpleBrowser:phase', {
+    phase,
+    durationMs: getDurationMs(start),
+    ...details,
+  })
+}
+
+const timePhase = async <T>(phase: string, details: Record<string, unknown>, fn: () => Promise<T>): Promise<T> => {
+  const start = performance.now()
+  try {
+    const result = await fn()
+    logPhase(phase, start, {
+      ...details,
+      status: 'ok',
+    })
+    return result
+  } catch (error) {
+    logPhase(phase, start, {
+      ...details,
+      status: 'error',
+    })
+    throw error
+  }
+}
+
 const getContentType = (filePath: string): string => {
   switch (extname(filePath)) {
     case '.css':
@@ -601,10 +635,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to execute JavaScript in simple browser`)
       }
     },
-    async executeWorkbenchCommand(commandId: string): Promise<boolean> {
+    async executeWorkbenchCommand(commandId: string, ...args: readonly unknown[]): Promise<boolean> {
       const result = await page.evaluate({
         awaitPromise: true,
         expression: `((async () => {
+  const args = ${JSON.stringify(args)}
   const candidates = [
     ['workbench', globalThis.workbench?.commands],
     ['vscode', globalThis.vscode?.commands],
@@ -614,7 +649,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
   for (const [source, commands] of candidates) {
     if (commands && typeof commands.executeCommand === 'function') {
       try {
-        await commands.executeCommand(${JSON.stringify(commandId)})
+        await commands.executeCommand(${JSON.stringify(commandId)}, ...args)
         return { ok: true, source }
       } catch (error) {
         return {
@@ -712,6 +747,37 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         return page.locator('.browser-url-display')
       }
       return page.locator('.browser-url-input')
+    },
+    async waitForBrowserUrlDisplay({ timeout = 2000, urlPattern }: { timeout?: number; urlPattern: RegExp }): Promise<void> {
+      const startTime = performance.now()
+      while (true) {
+        const values = await page.evaluate({
+          expression: `(() => {
+  const selectors = [
+    '.browser-url-display',
+    '.browser-url-input',
+  ]
+  return selectors.flatMap((selector) => {
+    return Array.from(document.querySelectorAll(selector)).map((element) => {
+      return [
+        element.value || '',
+        element.textContent || '',
+        element.getAttribute('aria-label') || '',
+        element.getAttribute('title') || '',
+      ].join('\\n')
+    })
+  })
+})()`,
+          returnByValue: true,
+        })
+        if (Array.isArray(values) && values.some((value) => typeof value === 'string' && urlPattern.test(value))) {
+          return
+        }
+        if (performance.now() - startTime > timeout) {
+          throw new Error(`Browser URL display did not match ${urlPattern}. Found: ${Array.isArray(values) ? values.join(', ') : ''}`)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
     },
     async getContentFrame({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       if (ideVersion.minor >= 118) {
@@ -834,25 +900,27 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     modernBrowserWebContentsId: undefined as number | undefined,
     async navigateIntegratedBrowser({ url, waitForContentFrame }: { url: string; waitForContentFrame: boolean }) {
       const urlInput = this.getBrowserUrlInput()
-      await expect(urlInput).toBeVisible()
+      await timePhase('navigateIntegratedBrowser.urlInputVisible', { url }, async () => {
+        await expect(urlInput).toBeVisible()
+      })
       if (ideVersion.minor >= 120) {
-        await urlInput.click()
-        await page.waitForIdle()
-        const quickInput = page.locator('.quick-input-widget .ibwrapper .input')
-        await expect(quickInput).toBeVisible()
-        await quickInput.setValue(url)
-        await page.waitForIdle()
-        await expect(quickInput).toHaveValue(url)
-        await page.waitForIdle()
-        await quickInput.press('Enter')
+        await timePhase('navigateIntegratedBrowser.enterModernUrl', { url }, async () => {
+          await urlInput.click()
+          const quickInput = page.locator('.quick-input-widget .ibwrapper .input')
+          await expect(quickInput).toBeVisible()
+          await quickInput.fill('')
+          await quickInput.type(url)
+          await expect(quickInput).toHaveValue(url)
+          await quickInput.press('Enter')
+        })
       } else {
         await urlInput.fill('')
         await page.waitForIdle()
         await urlInput.type(url)
         await page.waitForIdle()
         await urlInput.press('Enter')
+        await page.waitForIdle()
       }
-      await page.waitForIdle()
       console.log('navigateIntegratedBrowser:submitted', { url, webContentsId: this.modernBrowserWebContentsId })
       if (waitForContentFrame) {
         if (ideVersion.minor >= 118) {
@@ -891,61 +959,134 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     async openIntegratedBrowser({ url = '' }: { url?: string } = {}) {
+      const totalStart = performance.now()
       const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
       const electron = this.getElectron()
-      const existingWebContentsIds = ideVersion.minor >= 118 ? (await electron.getAllWebContents()).map((entry) => entry.id) : []
+      const openDirectly = ideVersion.minor >= 120 && isHttpUrl(url)
+      const existingWebContentsIds =
+        ideVersion.minor >= 118
+          ? await timePhase('openIntegratedBrowser.getExistingWebContents', { url }, async () => {
+              return (await electron.getAllWebContents()).map((entry) => entry.id)
+            })
+          : []
 
       try {
-        await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
-          pressKeyOnce: true,
+        await timePhase('openIntegratedBrowser.clearNotifications', { url }, async () => {
+          await quickPick.executeCommand(WellKnownCommands.ClearAllNotifications, {
+            pressKeyOnce: true,
+          })
         })
-        await page.waitForIdle()
       } catch {
         // Notifications are not always present, and failing to clear them should not block browser tests.
       }
-      await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
-        pressKeyOnce: true,
-        stayVisible: 'dont-care',
-      })
-      await page.waitForIdle()
-      if (ideVersion.minor >= 120) {
-        const intermediate = page.locator('input[aria-label^="Enter a URL"],input[aria-label="Search or enter URL"]')
-        await expect(intermediate).toBeVisible()
-        await page.waitForIdle()
-        await expect(intermediate).toBeFocused()
-        await page.waitForIdle()
-        if (url) {
-          await intermediate.setValue(url)
-          await page.waitForIdle()
-          await expect(intermediate).toHaveValue(url)
+      const openedDirectly = openDirectly
+        ? await (async () => {
+            const start = performance.now()
+            const opened = await this.executeWorkbenchCommand('workbench.action.browser.open', url)
+            logPhase('openIntegratedBrowser.executeWorkbenchCommand', start, {
+              url,
+              openedDirectly: opened,
+            })
+            return opened
+          })()
+        : false
+      if (!openedDirectly) {
+        await timePhase('openIntegratedBrowser.executeCommand', { url }, async () => {
+          await quickPick.executeCommand(WellKnownCommands.OpenIntegratedBrower, {
+            pressKeyOnce: true,
+            stayVisible: 'dont-care',
+            stopsApplication: ideVersion.minor >= 120,
+          })
+        })
+        if (ideVersion.minor < 120 || (url && !isHttpUrl(url))) {
           await page.waitForIdle()
         }
-        await page.keyboard.press('Enter')
-        await page.waitForIdle()
-        await expect(intermediate).toBeHidden()
-        await page.waitForIdle()
-      }
-      // await new Promise((r) => {})
-      const urlInput = this.getBrowserUrlInput()
-      // await new Promise((r) => {})
-      await expect(urlInput).toBeVisible()
-      await page.waitForIdle()
-      const quickInput = page.locator('.quick-input-widget')
-      if (await quickInput.isVisible().catch(() => false)) {
-        await page.keyboard.press('Escape')
-        await expect(quickInput)
-          .toBeHidden({
-            timeout: 3000,
+        if (ideVersion.minor >= 120) {
+          await timePhase('openIntegratedBrowser.enterInitialUrl', { url }, async () => {
+            const intermediate = page.locator('input[aria-label^="Enter a URL"],input[aria-label="Search or enter URL"]')
+            await expect(intermediate).toBeVisible()
+            await expect(intermediate).toBeFocused()
+            if (url) {
+              await intermediate.setValue(url)
+              if (!isHttpUrl(url)) {
+                await page.waitForIdle()
+              }
+              await expect(intermediate).toHaveValue(url)
+            }
+            if (!url || isHttpUrl(url)) {
+              await intermediate.press('Enter')
+            } else {
+              await page.waitForIdle()
+              await page.keyboard.press('Enter')
+              await page.waitForIdle()
+              await expect(intermediate).toBeHidden()
+              await page.waitForIdle()
+            }
           })
-          .catch(() => {})
+        }
+      }
+      const urlInput = this.getBrowserUrlInput()
+      await timePhase('openIntegratedBrowser.browserChromeVisible', { url }, async () => {
+        await expect(urlInput).toBeVisible()
+      })
+      if (ideVersion.minor >= 120 && isHttpUrl(url)) {
+        await timePhase('openIntegratedBrowser.confirmInitialUrlSubmitted', { url }, async () => {
+          const quickInput = page.locator('.quick-input-widget .ibwrapper .input')
+          if (await quickInput.isVisible().catch(() => false)) {
+            await expect(quickInput).toHaveValue(url)
+            await quickInput.press('Enter')
+          }
+        })
+      }
+      if (ideVersion.minor < 120 || !isHttpUrl(url)) {
+        await timePhase('openIntegratedBrowser.closeStrayQuickInput', { url }, async () => {
+          const quickInput = page.locator('.quick-input-widget')
+          if (await quickInput.isVisible().catch(() => false)) {
+            await page.keyboard.press('Escape')
+            await expect(quickInput)
+              .toBeHidden({
+                timeout: 3000,
+              })
+              .catch(() => {})
+          }
+        })
+      }
+      if (ideVersion.minor < 120) {
         await page.waitForIdle()
       }
       if (ideVersion.minor >= 118) {
-        const entry = await electron.waitForNewWebContentsView({
-          existingIds: existingWebContentsIds,
-        })
+        const entry = await timePhase(
+          'openIntegratedBrowser.waitForNewWebContents',
+          {
+            url,
+          },
+          async () => {
+            return electron.waitForNewWebContentsView({
+              existingIds: existingWebContentsIds,
+            })
+          },
+        )
         this.modernBrowserWebContentsId = entry.id
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        logPhase('openIntegratedBrowser.total', totalStart, {
+          url,
+          webContentsId: entry.id,
+          webContentsUrl: entry.url,
+        })
+      } else if (ideVersion.minor >= 118) {
+        logPhase('openIntegratedBrowser.total', totalStart, {
+          url,
+          webContentsId: '',
+          webContentsUrl: '',
+        })
+      } else {
+        logPhase('openIntegratedBrowser.total', totalStart, {
+          url,
+          webContentsId: '',
+          webContentsUrl: '',
+        })
+      }
+      if (ideVersion.minor < 118) {
+        await page.waitForIdle()
       }
       return urlInput
     },
@@ -1205,18 +1346,71 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
       throw new Error('Timed out waiting for condition')
     },
-    async waitForContentFrameModern({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
+    async waitForContentFrameModern({
+      timeout = 10_000,
+      urlPattern = /http:\/\/localhost/,
+    }: { timeout?: number; urlPattern?: RegExp } = {}) {
       const electron = this.getElectron()
-      const entry = this.modernBrowserWebContentsId
-        ? await electron.waitForWebContentsUrl({
+      const trackedWebContentsId = this.modernBrowserWebContentsId
+      const entry = await timePhase(
+        'waitForContentFrameModern',
+        {
+          urlPattern: String(urlPattern),
+          webContentsId: trackedWebContentsId || '',
+        },
+        async () => {
+          if (trackedWebContentsId) {
+            try {
+              return await electron.waitForWebContentsUrl({
+                timeout: Math.min(timeout, 1000),
+                urlPattern,
+                webContentsId: trackedWebContentsId,
+              })
+            } catch (error) {
+              console.log('SimpleBrowser:phase', {
+                phase: 'waitForContentFrameModern.trackedMiss',
+                webContentsId: trackedWebContentsId,
+                urlPattern: String(urlPattern),
+                error: error instanceof Error ? error.message : String(error),
+              })
+              await this.waitForBrowserUrlDisplay({
+                timeout: Math.min(timeout, 2000),
+                urlPattern,
+              })
+              const trackedEntry = await electron.getWebContents(trackedWebContentsId)
+              if (trackedEntry) {
+                return trackedEntry
+              }
+            }
+          }
+          return electron.waitForWebContentsView({
+            timeout,
             urlPattern,
-            webContentsId: this.modernBrowserWebContentsId,
           })
-        : await electron.waitForWebContentsView({
-            urlPattern,
-          })
+        },
+      )
       this.modernBrowserWebContentsId = entry.id
-      await page.waitForIdle()
+      logPhase('waitForContentFrameModern.ready', performance.now(), {
+        urlPattern: String(urlPattern),
+        webContentsId: entry.id,
+        webContentsUrl: entry.url,
+      })
+      if (ideVersion.minor >= 120) {
+        await timePhase('waitForContentFrameModern.closeQuickInput', { urlPattern: String(urlPattern) }, async () => {
+          const quickInput = page.locator('.quick-input-widget')
+          if (await quickInput.isVisible().catch(() => false)) {
+            await quickInput.locator('.ibwrapper .input, input, textarea').first().focus()
+            await page.keyboard.press('Enter')
+            if (await quickInput.isVisible().catch(() => false)) {
+              const closeButton = quickInput.locator('[aria-label="Close"], .codicon-close, .quick-input-action').first()
+              if (await closeButton.isVisible().catch(() => false)) {
+                await closeButton.click()
+              }
+            }
+            await expect(quickInput).toBeHidden({ timeout: 3000 })
+          }
+        })
+      }
     },
   }
 

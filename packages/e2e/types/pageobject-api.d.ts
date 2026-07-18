@@ -47,6 +47,7 @@ export interface ChatEditorSendMessageOptions extends ChatEditorSendOptions {
 
 export interface PageObjectWindowHandle extends NewWindowHandle {
   sessionRpc?: any
+  evaluate(options: any): Promise<unknown>
   locator?: (selector: string) => any
   waitForIdle(): Promise<void>
   shouldBeVisible(): Promise<void>
@@ -176,6 +177,7 @@ export interface DropDownContextMenu {
   shouldHaveItem(option: any): Promise<void>
 }
 export interface Editor {
+  warmUpTextEditor(fileName?: any): Promise<void>
   acceptInlineCompletion(): Promise<void>
   acceptRename(): Promise<void>
   addCursorBelow(): Promise<void>
@@ -607,13 +609,14 @@ export interface QuickPick {
   hide(): Promise<void>
   openFile(fileName: any): Promise<void>
   pressEnter(): Promise<void>
-  select(text: any, stayVisible?: any, stopsApplication?: any): Promise<void>
+  select(text: any, stayVisible?: any, stopsApplication?: any): Promise<number>
   show(options?: any): Promise<void>
   showColorTheme(): Promise<void>
   showFileIconTheme(): Promise<void>
   showCommands(options?: any): Promise<void>
   waitForInputVisible(): Promise<void>
   type(value: any): Promise<void>
+  waitForCommand(command: any, timeout?: any): Promise<void>
 }
 export interface References {
   clear(): Promise<void>
@@ -754,6 +757,10 @@ export interface SimpleBrowser {
   show(options?: any): Promise<void>
   shouldHaveLoadError(options: any): Promise<void>
 }
+export interface SingleIframeWebView {
+  shouldHaveLoaded(options: any): Promise<{ readyAt: number }>
+  shouldHaveContent(options: any): Promise<{ loadTimeMs: string; readyAt: number }>
+}
 export interface SourceControl {
   checkoutBranch(branchName: any): Promise<void>
   closeRepository(name: any): Promise<void>
@@ -878,9 +885,11 @@ export interface WaitForApplicationToBeReady {
   waitForApplicationToBeReady(options: any): Promise<void>
 }
 export interface WebView {
+  shouldHaveLoaded(options: any): Promise<{ readyAt: number }>
   focus(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldBeVisible2(options?: any): Promise<void>
+  shouldHaveContent(options: any): Promise<{ loadTimeMs: string; readyAt: number }>
 }
 export interface WelcomePage {
   checkStepByIndex(index: any): Promise<void>
@@ -903,6 +912,7 @@ export interface Workbench {
   waitForNewWindow(options: any): Promise<void>
   openNewWindow(): Promise<PageObjectApi & PageObjectWindowHandle>
   close(): Promise<void>
+  evaluate(options: any): Promise<unknown>
   shouldBeVisible(): Promise<void>
   reload(): Promise<void>
   focusLeftEditorGroup(): Promise<void>
@@ -975,6 +985,7 @@ export interface PageObjectApi {
   readonly SettingsEditorInput: SettingsEditorInput
   readonly SideBar: SideBar
   readonly SimpleBrowser: SimpleBrowser
+  readonly SingleIframeWebView: SingleIframeWebView
   readonly SourceControl: SourceControl
   readonly SshServer: SshServer
   readonly StatusBar: StatusBar

@@ -14,6 +14,7 @@ export const getElectronWindowProcessId = async (electronWebSocketUrl: string, t
   try {
     const result = await DevtoolsProtocolRuntime.evaluate(electronRpc, {
       expression: `(() => {
+        const require = globalThis._____require
         const electron = require('electron')
         const targetWebContents = electron.webContents.fromDevToolsTargetId(${escapeString(targetId)})
         if (!targetWebContents || typeof targetWebContents.getOSProcessId !== 'function') {

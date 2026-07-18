@@ -20,15 +20,15 @@ jobs:
         os: [ubuntu-24.04, macos-26, windows-2022]
     timeout-minutes: 1000
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: npm-cache
         with:
           path: |
@@ -43,7 +43,7 @@ jobs:
         id: sourceMapsCacheKey
         run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: source-maps-cache
         with:
           path: |
@@ -81,7 +81,7 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: vscode-videos-${{ runner.os }}
@@ -183,15 +183,15 @@ jobs:
             args: --measure file-watcher-count --runs 37 --restart-between --run-skipped-tests-anyway
     timeout-minutes: 360
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: npm-cache
         with:
           path: |
@@ -206,7 +206,7 @@ jobs:
         id: sourceMapsCacheKey
         run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: source-maps-cache
         with:
           path: |
@@ -221,7 +221,7 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after ${{ matrix.measure.args }}
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: vscode-memory-leak-finder-results-linux-${{ matrix.measure.name }}
@@ -234,15 +234,15 @@ jobs:
     if: always()
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: npm-cache
         with:
           path: |
@@ -260,217 +260,217 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - name: Download all measure results
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-event-listeners
           path: ./vscode-memory-leak-finder-results-linux-event-listeners
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-event-listener-count
           path: ./vscode-memory-leak-finder-results-linux-event-listener-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-dom-counters
           path: ./vscode-memory-leak-finder-results-linux-dom-counters
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-detached-dom-node-count
           path: ./vscode-memory-leak-finder-results-linux-detached-dom-node-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-promise-count
           path: ./vscode-memory-leak-finder-results-linux-promise-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace
           path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-extensions
           path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace-extensions
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-array-count
           path: ./vscode-memory-leak-finder-results-linux-named-array-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-array-count
           path: ./vscode-memory-leak-finder-results-linux-array-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-css-rule-count
           path: ./vscode-memory-leak-finder-results-linux-css-rule-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-regex-count
           path: ./vscode-memory-leak-finder-results-linux-regex-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-edit-context-count
           path: ./vscode-memory-leak-finder-results-linux-edit-context-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-function-count
           path: ./vscode-memory-leak-finder-results-linux-function-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3
           path: ./vscode-memory-leak-finder-results-linux-named-function-count3
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-shared-process
           path: ./vscode-memory-leak-finder-results-linux-named-function-count3-shared-process
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-extensions
           path: ./vscode-memory-leak-finder-results-linux-named-function-count3-extensions
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-node
           path: ./vscode-memory-leak-finder-results-linux-named-function-count3-node
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-pty-host
           path: ./vscode-memory-leak-finder-results-linux-named-function-count3-pty-host
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-mutation-observer-count
           path: ./vscode-memory-leak-finder-results-linux-mutation-observer-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-resize-observer-count
           path: ./vscode-memory-leak-finder-results-linux-resize-observer-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-intersection-observer-count
           path: ./vscode-memory-leak-finder-results-linux-intersection-observer-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-weak-map-count
           path: ./vscode-memory-leak-finder-results-linux-weak-map-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-number-count
           path: ./vscode-memory-leak-finder-results-linux-number-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-error-count
           path: ./vscode-memory-leak-finder-results-linux-error-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-weak-set-count
           path: ./vscode-memory-leak-finder-results-linux-weak-set-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-map-size
           path: ./vscode-memory-leak-finder-results-linux-map-size
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-set-size
           path: ./vscode-memory-leak-finder-results-linux-set-size
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-canvas-count
           path: ./vscode-memory-leak-finder-results-linux-canvas-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-canvas-rendering-context-2d-count
           path: ./vscode-memory-leak-finder-results-linux-canvas-rendering-context-2d-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-gpu-canvas-context-count
           path: ./vscode-memory-leak-finder-results-linux-gpu-canvas-context-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-image-bitmap-count
           path: ./vscode-memory-leak-finder-results-linux-image-bitmap-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-webgl2-rendering-context-count
           path: ./vscode-memory-leak-finder-results-linux-webgl2-rendering-context-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-iframe-count
           path: ./vscode-memory-leak-finder-results-linux-iframe-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-media-query-list-count
           path: ./vscode-memory-leak-finder-results-linux-media-query-list-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-message-port-count
           path: ./vscode-memory-leak-finder-results-linux-message-port-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-symbol-count
           path: ./vscode-memory-leak-finder-results-linux-symbol-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-object-count
           path: ./vscode-memory-leak-finder-results-linux-object-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
           path: ./vscode-memory-leak-finder-results-linux-disposable-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-worker-count
           path: ./vscode-memory-leak-finder-results-linux-worker-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-detached-dom-nodes-with-stack-traces
           path: ./vscode-memory-leak-finder-results-linux-detached-dom-nodes-with-stack-traces
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-file-descriptor-count
           path: ./vscode-memory-leak-finder-results-linux-file-descriptor-count
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-file-descriptors
           path: ./vscode-memory-leak-finder-results-linux-file-descriptors
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-file-watcher-count
@@ -478,226 +478,226 @@ jobs:
       - name: Merge all measure results
         run: node packages/build/src/mergeArtifacts.ts
       - name: Upload merged artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: vscode-memory-leak-finder-results-linux
           path: ./.vscode-memory-leak-finder-results
           include-hidden-files: true
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-resize-observer-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-set-size
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-symbol-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-weak-map-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-weak-set-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-webgl2-rendering-context-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-worker-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-detached-dom-nodes-with-stack-traces
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-file-descriptor-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-file-descriptors
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-event-listeners
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-event-listener-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-dom-counters
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-detached-dom-node-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-promise-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-extensions
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-array-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-array-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-css-rule-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-regex-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-edit-context-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-function-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-shared-process
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-extensions
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-node
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-pty-host
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-mutation-observer-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-intersection-observer-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-number-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-error-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-map-size
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-canvas-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-canvas-rendering-context-2d-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-gpu-canvas-context-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-image-bitmap-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-iframe-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-media-query-list-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-message-port-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-object-count
       - name: Delete individual artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./.vscode-charts
 
@@ -710,4 +710,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

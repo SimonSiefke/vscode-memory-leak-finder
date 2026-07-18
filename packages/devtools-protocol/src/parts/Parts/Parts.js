@@ -2,6 +2,7 @@ export * as DevtoolsProtoclAnimation from '../DevtoolsProtocolAnimation/Devtools
 export * as DevtoolsProtocolCss from '../DevtoolsProtocolCss/DevtoolsProtocolCss.js'
 export * as DevtoolsProtocolDebugger from '../DevtoolsProtocolDebugger/DevtoolsProtocolDebugger.js'
 export * as DevtoolsProtocolDomDebugger from '../DevtoolsProtocolDomDebugger/DevtoolsProtocolDomDebugger.js'
+export * as DevtoolsProtocolErrorCodes from '../ErrorCodes/ErrorCodes.js'
 export * as DevtoolsProtocolHeapProfiler from '../DevtoolsProtocolHeapProfiler/DevtoolsProtocolHeapProfiler.js'
 export * as DevtoolsProtocolMemory from '../DevtoolsProtocolMemory/DevtoolsProtocolMemory.js'
 export * as DevtoolsProtocolPage from '../DevtoolsProtocolPage/DevtoolsProtocolPage.js'

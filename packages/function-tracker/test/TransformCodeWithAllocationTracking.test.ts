@@ -43,6 +43,14 @@ test('TransformCodeWithAllocationTracking - should not double instrument existin
   expect(transformed).toBe(`const value = trackAllocation([], 1, 2, 3, 'Array');`)
 })
 
+test('TransformCodeWithAllocationTracking - uses filename as stable allocation identifier', () => {
+  const code = `const value = {}`
+
+  const transformed = transformCodeWithAllocationTracking(code, { filename: '/tmp/vscode/out/vs/editor/editor.main.js' })
+
+  expect(transformed).toBe(`const value = trackAllocation({}, "/tmp/vscode/out/vs/editor/editor.main.js", 1, 14, "Object");`)
+})
+
 test('TransformCodeWithAllocationTracking - should preserve expression results', async () => {
   const code = `
     const value = { ok: true }
@@ -63,4 +71,52 @@ test('TransformCodeWithAllocationTracking - should preserve expression results',
       type: 'Object',
     },
   })
+})
+
+test('TransformCodeWithAllocationTracking - should record allocation run deltas', async () => {
+  const code = `
+    globalThis.createValue = () => ({ ok: true })
+  `
+
+  const transformed = await transformCode(code, { scriptId: 7, trackingMode: 'allocations' })
+  const context = { WeakRef }
+  runInNewContext(transformed, context)
+
+  ;(context as any).createValue()
+  ;(context as any).markAllocationRun()
+  ;(context as any).createValue()
+  ;(context as any).createValue()
+  ;(context as any).markAllocationRun()
+  ;(context as any).markAllocationRun()
+
+  expect((context as any).getAllocationRuns()).toEqual([
+    {
+      allocations: [
+        {
+          createdCount: 1,
+          location: '7:2:36',
+          type: 'Object',
+        },
+      ],
+      runIndex: 0,
+    },
+    {
+      allocations: [
+        {
+          createdCount: 2,
+          location: '7:2:36',
+          type: 'Object',
+        },
+      ],
+      runIndex: 1,
+    },
+    {
+      allocations: [],
+      runIndex: 2,
+    },
+  ])
+
+  ;(context as any).resetAllocationStatistics()
+
+  expect((context as any).getAllocationRuns()).toEqual([])
 })

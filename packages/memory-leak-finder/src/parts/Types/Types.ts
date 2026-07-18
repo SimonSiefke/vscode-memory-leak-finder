@@ -31,6 +31,7 @@ export interface MeasureInstance {
   compare(before: unknown, after: unknown, context: MeasureContext): Promise<unknown> | unknown
   isLeak?(value: unknown): boolean
   releaseResources(): Promise<void> | void
+  runCompletion?(): Promise<unknown> | unknown
   start(): Promise<unknown> | unknown
   stop(): Promise<unknown> | unknown
   summary?(value: unknown): unknown
@@ -43,6 +44,7 @@ export interface MeasureDefinition {
   create?(session: Session): readonly unknown[]
   isLeak?(value: unknown): boolean
   releaseResources?(...args: readonly unknown[]): Promise<void> | void
+  runCompletion?(...args: readonly unknown[]): Promise<unknown> | unknown
   start?(...args: readonly unknown[]): Promise<unknown> | unknown
   stop?(...args: readonly unknown[]): Promise<unknown> | unknown
   summary?(value: unknown): unknown

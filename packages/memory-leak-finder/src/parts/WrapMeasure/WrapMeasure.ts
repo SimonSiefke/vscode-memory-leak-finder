@@ -14,6 +14,11 @@ export const wrapMeasure = (measure: Dynamic) => {
             await measure.releaseResources(...args)
           }
         },
+        async runCompletion() {
+          if (measure.runCompletion) {
+            return measure.runCompletion(...args)
+          }
+        },
         start() {
           return measure.start(...args)
         },

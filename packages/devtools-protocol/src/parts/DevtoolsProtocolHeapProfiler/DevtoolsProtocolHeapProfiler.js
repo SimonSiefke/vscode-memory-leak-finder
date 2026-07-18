@@ -21,3 +21,11 @@ export const enable = (session) => {
 export const collectGarbage = (session) => {
   return Invoke.invoke(session, DevtoolsCommandType.HeapProfilerCollectGarbage, {})
 }
+
+export const startTrackingHeapObjects = (session, options) => {
+  return Invoke.invoke(session, DevtoolsCommandType.HeapProfilerStartTrackingHeapObjects, options)
+}
+
+export const stopTrackingHeapObjects = (session, options) => {
+  return Invoke.invoke(session, DevtoolsCommandType.HeapProfilerStopTrackingHeapObjects, options)
+}

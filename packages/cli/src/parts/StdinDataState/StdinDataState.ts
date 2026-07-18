@@ -47,6 +47,7 @@ export interface StdinDataState {
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
+  readonly startupRuns: number
   readonly stdout: string[]
   readonly timeoutBetween: number
   readonly timeouts: boolean
@@ -101,6 +102,7 @@ let state: StdinDataState = {
   runs: 1,
   runSkippedTestsAnyway: false,
   screencastQuality: 90,
+  startupRuns: 1,
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
@@ -152,6 +154,7 @@ export const setState = (newState: StdinDataState): void => {
     runs: newState.runs,
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
     screencastQuality: newState.screencastQuality,
+    startupRuns: newState.startupRuns,
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
     timeouts: newState.timeouts,
