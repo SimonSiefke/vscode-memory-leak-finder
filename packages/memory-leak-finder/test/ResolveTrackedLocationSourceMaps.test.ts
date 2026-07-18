@@ -38,6 +38,7 @@ test('resolves tracked runtime locations against vscode-file script urls', async
     {
       [sourceMapUrl]: [440, 2784],
     },
+    false,
     true,
   )
   expect(result[location]).toEqual({

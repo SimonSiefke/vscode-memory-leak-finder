@@ -28,6 +28,7 @@ export const getOriginalPositions = async (
   classNames: boolean,
   hash: string,
   sourceMapUrl?: string,
+  constructorNames = false,
 ): Promise<readonly OriginalPosition[]> => {
   Assert.object(sourceMap)
   Assert.array(positions)
@@ -42,7 +43,12 @@ export const getOriginalPositions = async (
         line: line + 1,
       })
       let codePath: string | null = null
-      if (classNames && originalPosition.source && originalPosition.line !== null && originalPosition.column !== null) {
+      if (
+        (classNames || constructorNames) &&
+        originalPosition.source &&
+        originalPosition.line !== null &&
+        originalPosition.column !== null
+      ) {
         const index: number = sourceMap.sources.indexOf(originalPosition.source)
         if (index !== -1) {
           const sourceFileRelativePath: string = sourceMap.sources[index]
@@ -68,7 +74,7 @@ export const getOriginalPositions = async (
     return intermediateItems
   })
 
-  const finalResults: readonly OriginalPosition[] = await AddOriginalNames.addOriginalNames(intermediateItems)
+  const finalResults: readonly OriginalPosition[] = await AddOriginalNames.addOriginalNames(intermediateItems, constructorNames)
 
   return finalResults
 }

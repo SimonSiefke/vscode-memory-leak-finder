@@ -174,7 +174,7 @@ export const resolveTrackedLocationSourceMaps = async (
     return result
   }
 
-  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlToPositions, true)
+  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlToPositions, false, true)
   const offsetMap: Record<string, number> = Object.create(null)
   for (const pointer of pointers) {
     const positions = cleanPositionMap[pointer.sourceMapUrl] || []
