@@ -1285,7 +1285,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         await page.waitForIdle()
-        const controlCharacter = editor.locator('.view-lines .unicode-highlight').first()
+        const controlCharacter = editor.locator('.mtkcontrol').first()
         await expect(controlCharacter).toBeVisible({
           timeout: 5000,
         })

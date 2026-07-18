@@ -5,19 +5,19 @@ export const skip = 1
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      content: `before\u{200B}after
+      content: `before\u{202E}after
 `,
-      name: 'file.js',
+      name: 'file.txt',
     },
   ])
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.refresh()
-  await Explorer.shouldHaveItem('file.js')
+  await Explorer.shouldHaveItem('file.txt')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.open('file.js')
+  await Editor.open('file.txt')
   await Editor.shouldHaveControlCharacterHighlight()
 }
 
