@@ -73,11 +73,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async moveOutputToSidebar() {
       try {
+        await page.waitForIdle()
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
+        await page.waitForIdle()
         const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
         await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
+        await moreActions.focus()
+        await page.waitForIdle()
+        await expect(moreActions).toBeFocused()
+        await page.waitForIdle()
         await moreActions.click()
+        await page.waitForIdle()
         const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
         await contextMenu.openSubMenu('Move To', false)
         await contextMenu.select('Sidebar', false)
