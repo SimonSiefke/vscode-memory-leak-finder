@@ -597,6 +597,22 @@ test('parseArgv - tracked allocation timeline enables tracking transform', () =>
   expect(options.trackFunctions).toBe(true)
 })
 
+test('parseArgv - tracked allocation leaks enables tracking transform', () => {
+  for (const measure of ['tracked-allocation-leaks', 'trackedAllocationLeaks']) {
+    const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', measure])
+    expect(options.measure).toBe(measure)
+    expect(options.trackFunctions).toBe(true)
+  }
+})
+
+test('parseArgv - tracked allocation performance enables tracking transform', () => {
+  for (const measure of ['tracked-allocation-performance', 'trackedAllocationPerformance']) {
+    const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', measure])
+    expect(options.measure).toBe(measure)
+    expect(options.trackFunctions).toBe(true)
+  }
+})
+
 test('parseArgv - tracked timeouts enables tracking transform', () => {
   const argv = ['--measure', 'tracked-timeouts']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)

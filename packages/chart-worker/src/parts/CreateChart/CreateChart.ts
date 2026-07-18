@@ -1,4 +1,5 @@
 import * as CompressSvg from '../CompressSvg/CompressSvg.ts'
+import { createAllocationPerformanceChart } from '../CreateAllocationPerformanceChart/CreateAllocationPerformanceChart.ts'
 import { createBarChart } from '../CreateBarChart/CreateBarChart.ts'
 import { createCpuProfileFlameChart } from '../CreateCpuProfileFlameChart/CreateCpuProfileFlameChart.ts'
 import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
@@ -10,6 +11,9 @@ import { createPaintEventsChart } from '../CreatePaintEventsChart/CreatePaintEve
 export const createChart = async (data: any, options: any): Promise<string> => {
   let svg: string
   switch (options.type) {
+    case 'allocation-performance-chart':
+      svg = createAllocationPerformanceChart(data, options)
+      break
     case 'bar-chart':
       svg = createBarChart(data, options)
       break
