@@ -73,6 +73,7 @@ test('compareTrackedAllocationLeaks returns only retained allocation sites in re
       originalLine: 245,
       originalLocation: 'src/prefixSumComputer.ts:245:9',
       originalSource: 'src/prefixSumComputer.ts',
+      originalType: 'PrefixSumComputer',
       type: 'PrefixSumComputer',
     },
     {
@@ -84,6 +85,7 @@ test('compareTrackedAllocationLeaks returns only retained allocation sites in re
       originalLine: null,
       originalLocation: null,
       originalSource: null,
+      originalType: 'Object',
       type: 'Object',
     },
   ])
