@@ -469,6 +469,15 @@ h1 {
   min-height: 18px;
 }
 
+.EverythingPath button {
+  background: none;
+  border: 0;
+  color: #a5bddb;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
 .EverythingInspector {
   max-height: calc(100% - 42px);
   overflow: auto;
@@ -489,6 +498,18 @@ h1 {
 }
 
 .EverythingInspector li span {
+  color: #8ca2c0;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.EverythingSiteDetail {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.EverythingSiteDetail span {
   color: #8ca2c0;
   font-size: 11px;
   overflow-wrap: anywhere;

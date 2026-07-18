@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { getSitePath } from './trackedEverythingModel.ts'
+import { getSitePath, moveTrackedEverythingCursor } from './trackedEverythingModel.ts'
 import type { TrackedEverythingAggregates, TrackedEverythingDataset } from './trackedEverythingTypes.ts'
 
 let dataset: TrackedEverythingDataset
@@ -23,22 +23,17 @@ const buildTimeline = (): void => {
 }
 
 const moveCursor = (nextCursor: number): void => {
-  nextCursor = Math.max(0, Math.min(events.length, Math.round(nextCursor)))
-  if (nextCursor > cursor) {
-    for (let index = cursor; index < nextCursor; index++) {
-      counts[events[index]]++
-    }
-  } else {
-    for (let index = cursor - 1; index >= nextCursor; index--) {
-      counts[events[index]]--
-    }
-  }
-  cursor = nextCursor
+  cursor = moveTrackedEverythingCursor(events, counts, cursor, nextCursor)
 }
 
 const publish = (): void => {
   const fileCounts: Record<string, number> = Object.create(null)
+  const recentFileCounts: Record<string, number> = Object.create(null)
+  const recentSiteCounts = new Uint32Array(counts.length)
   const typeCounts: Record<string, number> = Object.create(null)
+  for (let index = Math.max(0, cursor - 1024); index < cursor; index++) {
+    recentSiteCounts[events[index]]++
+  }
   for (let siteId = 0; siteId < counts.length; siteId++) {
     const count = counts[siteId]
     if (count === 0) {
@@ -49,12 +44,15 @@ const publish = (): void => {
     if (!selectedType || site.type === selectedType) {
       const path = getSitePath(site)
       fileCounts[path] = (fileCounts[path] || 0) + count
+      recentFileCounts[path] = (recentFileCounts[path] || 0) + recentSiteCounts[siteId]
     }
   }
   const message: TrackedEverythingAggregates & { readonly kind: 'aggregates' } = {
     cursor,
     fileCounts,
     kind: 'aggregates',
+    recentFileCounts,
+    recentSiteCounts: Array.from(recentSiteCounts),
     siteCounts: Array.from(counts),
     timeline,
     typeCounts,

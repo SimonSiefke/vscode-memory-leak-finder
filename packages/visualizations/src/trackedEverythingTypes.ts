@@ -27,6 +27,8 @@ export interface TrackedEverythingDataset {
 export interface TrackedEverythingAggregates {
   readonly cursor: number
   readonly fileCounts: Readonly<Record<string, number>>
+  readonly recentFileCounts: Readonly<Record<string, number>>
+  readonly recentSiteCounts: readonly number[]
   readonly siteCounts: readonly number[]
   readonly timeline: Readonly<Record<string, readonly number[]>>
   readonly typeCounts: Readonly<Record<string, number>>

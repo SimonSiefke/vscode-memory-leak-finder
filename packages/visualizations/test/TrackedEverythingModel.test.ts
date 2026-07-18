@@ -4,6 +4,7 @@ import {
   eventIndexToTime,
   getSitePath,
   isTrackedEverythingDataset,
+  moveTrackedEverythingCursor,
   timeToEventIndex,
 } from '../src/trackedEverythingModel.ts'
 import type { TrackedEverythingDataset } from '../src/trackedEverythingTypes.ts'
@@ -46,6 +47,9 @@ test('validates the tracked-everything dataset contract', () => {
   expect(isTrackedEverythingDataset(dataset)).toBe(true)
   expect(isTrackedEverythingDataset({ ...dataset, kind: 'other' })).toBe(false)
   expect(isTrackedEverythingDataset({ ...dataset, eventCount: 1.5 })).toBe(false)
+  expect(isTrackedEverythingDataset({ ...dataset, eventFile: '/absolute/events.bin' })).toBe(false)
+  expect(isTrackedEverythingDataset({ ...dataset, sites: [{ ...dataset.sites[0], id: 1 }, dataset.sites[1]] })).toBe(false)
+  expect(isTrackedEverythingDataset({ ...dataset, timeMarks: dataset.timeMarks.slice(0, -1) })).toBe(false)
 })
 
 test('validates and decodes the little event stream', () => {
@@ -79,4 +83,13 @@ test('decodes a synthetic 400,000-event capture without losing order', () => {
   expect(decoded).toHaveLength(400_000)
   expect(decoded[0]).toBe(0)
   expect(decoded[399_999]).toBe(1)
+
+  const counts = new Uint32Array(2)
+  let cursor = moveTrackedEverythingCursor(decoded, counts, 0, decoded.length)
+  expect([...counts]).toEqual([200_000, 200_000])
+  cursor = moveTrackedEverythingCursor(decoded, counts, cursor, 123_456)
+  expect([...counts]).toEqual([61_728, 61_728])
+  cursor = moveTrackedEverythingCursor(decoded, counts, cursor, 0)
+  expect(cursor).toBe(0)
+  expect([...counts]).toEqual([0, 0])
 })

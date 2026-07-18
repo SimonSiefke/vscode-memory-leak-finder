@@ -195,6 +195,25 @@ const EVERYTHING_PREAMBLE_CODE = `(() => {
       }
       seenSymbols.add(value)
     }
+    if(methodLocations.length > 0 && value !== null && (valueType === 'object' || valueType === 'function')){
+      const containers = hint === 'Class' ? [value, value.prototype] : [value]
+      for(const container of containers){
+        if(!container){
+          continue
+        }
+        for(const descriptor of Object.values(Object.getOwnPropertyDescriptors(container))){
+          if(typeof descriptor.value === 'function'){
+            seenIdentities.add(descriptor.value)
+          }
+          if(typeof descriptor.get === 'function'){
+            seenIdentities.add(descriptor.get)
+          }
+          if(typeof descriptor.set === 'function'){
+            seenIdentities.add(descriptor.set)
+          }
+        }
+      }
+    }
     for(const methodLocation of methodLocations){
       recordSite(scriptId, methodLocation[0], methodLocation[1], 'Function')
     }
