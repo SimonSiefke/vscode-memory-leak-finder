@@ -44,6 +44,8 @@ const singleColumnFolders = new Set([
   'file-descriptor-count',
   'named-function-count-3',
   'paint-events',
+  'tracked-allocation-leaks',
+  'tracked-allocation-performance',
   'tracked-allocations-by-file',
 ])
 
