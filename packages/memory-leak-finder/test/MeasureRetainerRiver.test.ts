@@ -1,4 +1,5 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { join } from 'node:path'
 
 const collectGarbage = jest.fn()
 const disable = jest.fn()
@@ -39,6 +40,8 @@ const MeasureRetainerRiver = await import('../src/parts/MeasureRetainerRiver/Mea
 
 const session = {} as any
 const state = { directory: '/tmp/retainer-river' }
+const afterHeapSnapshotPath = join(state.directory, 'after.heapsnapshot')
+const beforeHeapSnapshotPath = join(state.directory, 'before.heapsnapshot')
 const scriptHandler: any = {
   scriptMap: { 17: { url: 'bundle.js' } },
   start: jest.fn(),
@@ -52,12 +55,12 @@ beforeEach(() => {
 })
 
 test('MeasureRetainerRiver starts allocation tracking before the baseline snapshot', async () => {
-  await expect(MeasureRetainerRiver.start(session, state, scriptHandler)).resolves.toBe('/tmp/retainer-river/before.heapsnapshot')
+  await expect(MeasureRetainerRiver.start(session, state, scriptHandler)).resolves.toBe(beforeHeapSnapshotPath)
 
   expect(scriptHandler.start).toHaveBeenCalledWith(session)
   expect(enable).toHaveBeenCalledWith(session)
   expect(startTrackingHeapObjects).toHaveBeenCalledWith(session, { trackAllocations: true })
-  expect(takeHeapSnapshot).toHaveBeenCalledWith(session, '/tmp/retainer-river/before.heapsnapshot')
+  expect(takeHeapSnapshot).toHaveBeenCalledWith(session, beforeHeapSnapshotPath)
   expect(startTrackingHeapObjects.mock.invocationCallOrder[0]).toBeLessThan(takeHeapSnapshot.mock.invocationCallOrder[0])
 })
 
@@ -65,10 +68,10 @@ test('MeasureRetainerRiver collects before stopping tracking and returns script 
   const result = await MeasureRetainerRiver.stop(session, state, scriptHandler)
 
   expect(collectGarbage).toHaveBeenCalledWith(session)
-  expect(takeTrackingHeapSnapshot).toHaveBeenCalledWith(session, '/tmp/retainer-river/after.heapsnapshot')
+  expect(takeTrackingHeapSnapshot).toHaveBeenCalledWith(session, afterHeapSnapshotPath)
   expect(scriptHandler.stop).toHaveBeenCalledWith(session)
   expect(result).toEqual({
-    heapSnapshotPath: '/tmp/retainer-river/after.heapsnapshot',
+    heapSnapshotPath: afterHeapSnapshotPath,
     scriptMap: scriptHandler.scriptMap,
   })
 })
