@@ -41,7 +41,7 @@ jobs:
       - name: Run exact e2e test
         uses: coactions/setup-xvfb@v1
         with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --record-video --only editor-surround-with-function.ts --workers 1
+          run: node packages/cli/bin/test.js --cwd packages/e2e --record-video --only editor-surround-with-function.ts --run-skipped-tests-anyway --workers 1
       - uses: actions/upload-artifact@v7
         if: always()
         with:
