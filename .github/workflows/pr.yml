@@ -48,6 +48,7 @@ jobs:
             --measure detached-dom-nodes-with-stack-traces
             --restart-between
             --run-skipped-tests-anyway
+            --enable-extensions
             --only ^notification-storm.ts
             --workers 1
             --record-video
