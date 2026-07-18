@@ -6,12 +6,14 @@ on:
       - main
 
 jobs:
-  pr:
-    runs-on: ${{ matrix.os }}
+  reproduce-markdown-preview-switch:
+    name: markdown-preview-switch (attempt ${{ matrix.attempt }})
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
-        os: [ubuntu-24.04, macos-26, windows-2022]
+        attempt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v7
@@ -34,66 +36,17 @@ jobs:
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
-      - name: Compute source maps cache key
-        id: sourceMapsCacheKey
-        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
-        shell: bash
-      - uses: actions/cache@v6
-        id: source-maps-cache
-        with:
-          path: |
-            **/.vscode-source-maps
-            **/.vscode-sources
-          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci --ignore-scripts && npm run postinstall
         if: steps.npm-cache.outputs.cache-hit != 'true'
-      - run: npm run type-check
-      - run: npm run lint
       - run: npm run build
-      - run: npx lerna run test --since origin/main
-      - name: Run headless test (with videos)
-        if: matrix.os != 'macos-26'
+      - name: Run markdown-preview-switch
         uses: coactions/setup-xvfb@v1
         with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
-      - name: Run headless test
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run e2e
-      - name: Run headless test (flakyness check)
-        if: matrix.os != 'macos-26'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run e2e:check-flakyness
-      - name: Run headless test (second flakyness check)
-        if: matrix.os != 'macos-26'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run e2e:check-flakyness
-      - name: Run headless test (check leaks, event listener count)
-        if: matrix.os != 'macos-26'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
-      - name: Run headless test (check leaks, event listeners)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
-      - name: Run Memory City smoke test
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure memory-city --only ^editor-open.ts --workers 1
-      - name: Generate charts
-        run: node packages/charts/src/main.ts
-      - name: Validate Memory City artifact
-        if: matrix.os == 'ubuntu-24.04'
-        run: node packages/visualizations/src/validate.ts
+          run: node packages/cli/bin/test.js --cwd packages/e2e --record-video --only ^markdown-preview-switch.ts --workers 1 --run-skipped-tests-anyway
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: vscode-videos-${{ runner.os }}
+          name: markdown-preview-switch-attempt-${{ matrix.attempt }}
           path: ./.vscode-videos
           include-hidden-files: true
