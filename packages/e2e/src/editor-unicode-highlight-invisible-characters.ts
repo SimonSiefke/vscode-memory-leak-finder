@@ -7,17 +7,17 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
     {
       content: `before\u{200B}after
 `,
-      name: 'file.txt',
+      name: 'file.js',
     },
   ])
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.refresh()
-  await Explorer.shouldHaveItem('file.txt')
+  await Explorer.shouldHaveItem('file.js')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.open('file.txt')
+  await Editor.open('file.js')
   await Editor.shouldHaveControlCharacterHighlight()
 }
 
