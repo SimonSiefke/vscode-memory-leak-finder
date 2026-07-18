@@ -21,6 +21,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to close quick pick`)
       }
     },
+    async clearInput() {
+      try {
+        const quickPickInput = await this.waitForInputVisible()
+        await quickPickInput.fill('')
+      } catch (error) {
+        throw new VError(error, `Failed to clear quick pick input`)
+      }
+    },
     async executeCommand(
       command: string,
       {

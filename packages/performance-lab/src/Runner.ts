@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, readFile, unlink, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { diffProfileSummaries, summarizeProfiles } from './CpuProfile.ts'
@@ -93,6 +93,12 @@ const runMeasure = async ({
   readonly scenario: string
   readonly vscodePath: string
 }): Promise<any> => {
+  const resultPath = getResultPath(measure, scenario)
+  await unlink(resultPath).catch((error) => {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error
+    }
+  })
   const args = [
     'packages/cli/bin/test.js',
     '--run-skipped-tests-anyway',
@@ -109,7 +115,6 @@ const runMeasure = async ({
     ...process.env,
     DISPLAY: display,
   })
-  const resultPath = getResultPath(measure, scenario)
   await mkdir(dirname(artifactPath), { recursive: true })
   await copyFile(resultPath, artifactPath)
   return JSON.parse(await readFile(resultPath, 'utf8'))

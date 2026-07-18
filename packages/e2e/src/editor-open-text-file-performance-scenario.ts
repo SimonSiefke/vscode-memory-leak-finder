@@ -45,6 +45,7 @@ export const createEditorOpenPerformanceScenario = (mode: 'cold' | 'warm'): Perf
     async prepare({ QuickPick }: TestContext, iteration: number): Promise<void> {
       const file = getIterationFile(iteration)
       await QuickPick.show()
+      await QuickPick.clearInput()
       await QuickPick.type(file.name)
       const focusedItem = await QuickPick.getFocusedItemLabel()
       if (focusedItem !== file.name) {

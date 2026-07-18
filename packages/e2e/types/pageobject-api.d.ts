@@ -602,6 +602,7 @@ export interface Profile {
 }
 export interface QuickPick {
   acceptSelected(): Promise<void>
+  clearInput(): Promise<void>
   close(): Promise<void>
   executeCommand(command: any, options?: any): Promise<void>
   focusNext(): Promise<void>
