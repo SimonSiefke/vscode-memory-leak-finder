@@ -34,6 +34,7 @@ test('compareTrackedAllocations returns sorted allocation churn rows', async () 
       originalLine: null,
       originalLocation: null,
       originalSource: null,
+      originalType: 'Object',
       type: 'Object',
     },
     {
@@ -45,6 +46,7 @@ test('compareTrackedAllocations returns sorted allocation churn rows', async () 
       originalLine: null,
       originalLocation: null,
       originalSource: null,
+      originalType: 'Array',
       type: 'Array',
     },
   ])

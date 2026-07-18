@@ -42,7 +42,12 @@ const parseLocation = (
 
 const normalizeUrl = (url: string): string => {
   try {
-    const path = url.startsWith('file://') ? fileURLToPath(url) : url
+    const vscodeFilePrefix = 'vscode-file://vscode-app'
+    const path = url.startsWith(vscodeFilePrefix)
+      ? decodeURIComponent(url.slice(vscodeFilePrefix.length))
+      : url.startsWith('file://')
+        ? fileURLToPath(url)
+        : url
     if (isAbsolute(path)) {
       return normalize(path)
     }
@@ -50,6 +55,24 @@ const normalizeUrl = (url: string): string => {
   } catch {
     return url
   }
+}
+
+const getRuntimeRelativePath = (path: string): string => {
+  const match = path.match(/(?:^|[\\/])resources[\\/]app[\\/](.*)$/)
+  return match?.[1]?.replaceAll('\\', '/') || ''
+}
+
+const isMatchingScriptUrl = (scriptUrl: string, targetUrl: string): boolean => {
+  if (scriptUrl === targetUrl) {
+    return true
+  }
+  const normalizedScriptUrl = normalizeUrl(scriptUrl)
+  const normalizedTargetUrl = normalizeUrl(targetUrl)
+  if (normalizedScriptUrl === normalizedTargetUrl) {
+    return true
+  }
+  const scriptRuntimeRelativePath = getRuntimeRelativePath(normalizedScriptUrl)
+  return Boolean(scriptRuntimeRelativePath && scriptRuntimeRelativePath === getRuntimeRelativePath(normalizedTargetUrl))
 }
 
 const isRelativeSourceMap = (sourceMapUrl: string): boolean => {
@@ -102,13 +125,11 @@ const findScript = (scriptMap: ScriptMap, urlOrScriptId: string): ScriptMapEntry
     return findWorkbenchScript(scriptMap)
   }
 
-  const normalizedTarget = normalizeUrl(urlOrScriptId)
   for (const script of Object.values(scriptMap)) {
     if (!script.url) {
       continue
     }
-    const normalizedScriptUrl = normalizeUrl(script.url)
-    if (script.url === urlOrScriptId || normalizedScriptUrl === normalizedTarget) {
+    if (isMatchingScriptUrl(script.url, urlOrScriptId)) {
       return script
     }
   }
@@ -153,7 +174,7 @@ export const resolveTrackedLocationSourceMaps = async (
     return result
   }
 
-  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlToPositions, true)
+  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlToPositions, false, true)
   const offsetMap: Record<string, number> = Object.create(null)
   for (const pointer of pointers) {
     const positions = cleanPositionMap[pointer.sourceMapUrl] || []
