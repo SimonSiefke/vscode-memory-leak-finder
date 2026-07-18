@@ -7,9 +7,7 @@ export const CssEnable = 'Css.enable'
 export const CssDisable = 'Css.disable'
 
 export const HeapProfilerTakeHeapSnapshot = 'HeapProfiler.takeHeapSnapshot'
-
 export const HeapProfilerStartTrackingHeapObjects = 'HeapProfiler.startTrackingHeapObjects'
-
 export const HeapProfilerStopTrackingHeapObjects = 'HeapProfiler.stopTrackingHeapObjects'
 
 export const HeapProfilerEnable = 'HeapProfiler.enable'
@@ -115,6 +113,12 @@ export const DomDebuggerGetEventListeners = 'DOMDebugger.getEventListeners'
 export const RuntimeReleaseObjectGroup = 'Runtime.releaseObjectGroup'
 
 export const MemoryGetDomCounters = 'Memory.getDOMCounters'
+
+export const MemoryGetSamplingProfile = 'Memory.getSamplingProfile'
+
+export const MemoryStartSampling = 'Memory.startSampling'
+
+export const MemoryStopSampling = 'Memory.stopSampling'
 
 export const RuntimeGetHeapUsage = 'Runtime.getHeapUsage'
 

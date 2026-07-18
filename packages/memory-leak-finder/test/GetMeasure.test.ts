@@ -1,5 +1,17 @@
 import { expect, test } from '@jest/globals'
 import * as GetMeasure from '../src/parts/GetMeasure/GetMeasure.ts'
+import * as Measures from '../src/parts/Measures/Measures.ts'
+
+test('getMeasure resolves event listeners with full stack traces public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'event-listeners-with-full-stack-traces',
+    ),
+  ).toBe(Measures.MeasureEventListenersWithFullStackTraces)
+})
 
 test('getMeasure resolves tracked allocations from start public measure id', () => {
   const measure = {

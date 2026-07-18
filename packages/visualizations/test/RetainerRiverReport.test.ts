@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals'
-import { fixtureReport } from '../src/fixture.ts'
-import { formatBytes, getFilteredReport, validateRetainerRiverReport } from '../src/report.ts'
+import { fixtureReport } from '../src/retainerRiver/fixture.ts'
+import { formatBytes, getFilteredReport, validateRetainerRiverReport } from '../src/retainerRiver/report.ts'
 
 describe('formatBytes', () => {
   test.each([

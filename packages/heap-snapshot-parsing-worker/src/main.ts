@@ -17,7 +17,7 @@ const workerPort = parentPort
 
 // Helper function to get transferrable objects for zero-copy transfer
 const getTransferList = (result: Record<string, any> | undefined) => {
-  const transferList: any[] = []
+  const transferList: ArrayBuffer[] = []
   if (result && typeof result === 'object') {
     if (result.nodes && result.nodes.buffer) {
       transferList.push(result.nodes.buffer)
@@ -26,10 +26,16 @@ const getTransferList = (result: Record<string, any> | undefined) => {
       transferList.push(result.edges.buffer)
     }
     if (result.locations && result.locations.buffer) {
-      transferList.push(result.locations.buffer)
+      transferList.push(result.locations.buffer as ArrayBuffer)
     }
     if (result.traceFunctionInfos && result.traceFunctionInfos.buffer) {
-      transferList.push(result.traceFunctionInfos.buffer)
+      transferList.push(result.traceFunctionInfos.buffer as ArrayBuffer)
+    }
+    if (result.traceTree && result.traceTree.buffer) {
+      transferList.push(result.traceTree.buffer as ArrayBuffer)
+    }
+    if (result.traceTreeParents && result.traceTreeParents.buffer) {
+      transferList.push(result.traceTreeParents.buffer as ArrayBuffer)
     }
   }
   return transferList
@@ -38,7 +44,7 @@ const getTransferList = (result: Record<string, any> | undefined) => {
 workerPort.on('message', async (message: WorkerRequest) => {
   const { id, method, params } = message
   try {
-    const handler = commandMap[method]
+    const handler = commandMap[method as keyof typeof commandMap] as ((...args: any[]) => Promise<any>) | undefined
     if (!handler) {
       throw new Error(`Unknown method: ${method}`)
     }

@@ -100,7 +100,8 @@ test('HeapSnapshotWriteStream - preserves allocation trace data', () => {
   stream.end(Buffer.from(JSON.stringify(heapSnapshotData)))
   const result = stream.getResult()
   expect([...result.traceFunctionInfos]).toEqual(heapSnapshotData.trace_function_infos)
-  expect(result.traceTree).toEqual(heapSnapshotData.trace_tree)
+  expect([...result.traceTree]).toEqual([1, 0, 1, 16, 2, 1, 1, 8])
+  expect([...result.traceTreeParents]).toEqual([0, 1])
   expect(result.strings).toEqual(heapSnapshotData.strings)
 })
 

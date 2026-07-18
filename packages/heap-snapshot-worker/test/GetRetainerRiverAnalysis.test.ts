@@ -30,7 +30,8 @@ const createSnapshot = (
       readonly scriptId: number
       readonly source: string
     }[]
-    readonly traceTree?: readonly unknown[]
+    readonly traceTree?: readonly number[]
+    readonly traceTreeParents?: readonly number[]
   } = {},
 ): Snapshot => {
   const strings = ['']
@@ -81,7 +82,8 @@ const createSnapshot = (
     nodes: new Uint32Array(nodes),
     strings,
     traceFunctionInfos: new Uint32Array(traceFunctionInfos),
-    traceTree: options.traceTree || [],
+    traceTree: new Uint32Array(options.traceTree || []),
+    traceTreeParents: new Uint32Array(options.traceTreeParents || []),
   }
 }
 
@@ -209,7 +211,8 @@ test('getRetainerRiverAnalysis preserves allocation stacks and infers a source o
         { column: 4, functionName: 'createOwner', line: 10, scriptId: 17, source: '/src/owner.js' },
         { column: 8, functionName: 'createLeak', line: 20, scriptId: 18, source: '/src/leak.js' },
       ],
-      traceTree: [1, 0, 1, 16, [2, 1, 1, 64, []]],
+      traceTree: [1, 0, 1, 16, 2, 1, 1, 64],
+      traceTreeParents: [0, 1],
     },
   )
 
@@ -245,7 +248,8 @@ test('getRetainerRiverAnalysis uses the leaked allocation module when retaining 
     ],
     {
       traceFunctions: [{ column: 8, functionName: 'createLeak', line: 20, scriptId: 18, source: '/src/features/leak.js' }],
-      traceTree: [1, 0, 1, 64, []],
+      traceTree: [1, 0, 1, 64],
+      traceTreeParents: [0],
     },
   )
 

@@ -399,6 +399,7 @@ export const buildRetainerGraph = (snapshot: Snapshot): Graph => {
 
 const getTraceStacks = (snapshot: Snapshot): ReadonlyMap<number, readonly StackFrame[]> => {
   const fields = snapshot.meta.trace_function_info_fields || []
+  const traceFields = snapshot.meta.trace_node_fields || []
   const itemsPerFunction = fields.length
   const infos = snapshot.traceFunctionInfos || new Uint32Array()
   const nameOffset = fields.indexOf('name')
@@ -407,7 +408,14 @@ const getTraceStacks = (snapshot: Snapshot): ReadonlyMap<number, readonly StackF
   const lineOffset = fields.indexOf('line')
   const columnOffset = fields.indexOf('column')
   const frames: StackFrame[] = []
-  if (itemsPerFunction > 0) {
+  if (
+    itemsPerFunction > 0 &&
+    nameOffset !== -1 &&
+    scriptNameOffset !== -1 &&
+    scriptIdOffset !== -1 &&
+    lineOffset !== -1 &&
+    columnOffset !== -1
+  ) {
     for (let offset = 0; offset < infos.length; offset += itemsPerFunction) {
       const functionName = snapshot.strings[infos[offset + nameOffset]] || '(anonymous)'
       const source = snapshot.strings[infos[offset + scriptNameOffset]] || ''
@@ -427,31 +435,21 @@ const getTraceStacks = (snapshot: Snapshot): ReadonlyMap<number, readonly StackF
   }
 
   const stacks = new Map<number, readonly StackFrame[]>()
-  const visit = (value: readonly unknown[], offset: number, parentStack: readonly StackFrame[]): void => {
-    if (value.length < offset + 5 || typeof value[offset] !== 'number' || typeof value[offset + 1] !== 'number') {
-      return
-    }
-    const id = value[offset] as number
-    const frame = frames[value[offset + 1] as number]
+  const traceTree = snapshot.traceTree || new Uint32Array()
+  const traceTreeParents = snapshot.traceTreeParents || new Uint32Array()
+  const recordLength = traceFields.indexOf('children')
+  const idOffset = traceFields.indexOf('id')
+  const functionInfoIndexOffset = traceFields.indexOf('function_info_index')
+  if (recordLength <= 0 || idOffset === -1 || functionInfoIndexOffset === -1) {
+    return stacks
+  }
+  for (let offset = 0, nodeIndex = 0; offset < traceTree.length; offset += recordLength, nodeIndex++) {
+    const id = traceTree[offset + idOffset]
+    const frame = frames[traceTree[offset + functionInfoIndexOffset]]
+    const parentStack = stacks.get(traceTreeParents[nodeIndex] || 0) || []
     const stack = frame ? [frame, ...parentStack] : parentStack
     stacks.set(id, stack)
-    const children = value[offset + 4]
-    if (Array.isArray(children)) {
-      if (Array.isArray(children[0])) {
-        for (const child of children) {
-          if (Array.isArray(child)) {
-            visit(child, 0, stack)
-          }
-        }
-      } else {
-        for (let childOffset = 0; childOffset + 4 < children.length; childOffset += 5) {
-          visit(children, childOffset, stack)
-        }
-      }
-    }
   }
-  const traceTree = snapshot.traceTree || []
-  visit(traceTree, 0, [])
   return stacks
 }
 

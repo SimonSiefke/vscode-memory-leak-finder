@@ -5,6 +5,7 @@ const disable = jest.fn()
 const enable = jest.fn()
 const startTrackingHeapObjects = jest.fn()
 const takeHeapSnapshot = jest.fn()
+const takeTrackingHeapSnapshot = jest.fn()
 const invoke = jest.fn()
 const dispose = jest.fn()
 const resolveRetainerRiverSourceMaps = jest.fn()
@@ -20,6 +21,7 @@ jest.unstable_mockModule('../src/parts/DevtoolsProtocol/DevtoolsProtocol.ts', ()
 
 jest.unstable_mockModule('../src/parts/HeapSnapshot/HeapSnapshot.ts', () => ({
   takeHeapSnapshot,
+  takeTrackingHeapSnapshot,
 }))
 
 jest.unstable_mockModule('../src/parts/LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts', () => ({
@@ -63,9 +65,7 @@ test('MeasureRetainerRiver collects before stopping tracking and returns script 
   const result = await MeasureRetainerRiver.stop(session, state, scriptHandler)
 
   expect(collectGarbage).toHaveBeenCalledWith(session)
-  expect(takeHeapSnapshot).toHaveBeenCalledWith(session, '/tmp/retainer-river/after.heapsnapshot', {
-    stopTracking: true,
-  })
+  expect(takeTrackingHeapSnapshot).toHaveBeenCalledWith(session, '/tmp/retainer-river/after.heapsnapshot')
   expect(scriptHandler.stop).toHaveBeenCalledWith(session)
   expect(result).toEqual({
     heapSnapshotPath: '/tmp/retainer-river/after.heapsnapshot',

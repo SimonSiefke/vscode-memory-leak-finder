@@ -45,7 +45,7 @@ export const start = async (session: Session, state: RetainerRiverState, scriptH
 export const stop = async (session: Session, state: RetainerRiverState, scriptHandler: IScriptHandler): Promise<RetainerRiverAfter> => {
   await DevtoolsProtocolHeapProfiler.collectGarbage(session)
   const heapSnapshotPath = join(state.directory, 'after.heapsnapshot')
-  await HeapSnapshot.takeHeapSnapshot(session, heapSnapshotPath, { stopTracking: true })
+  await HeapSnapshot.takeTrackingHeapSnapshot(session, heapSnapshotPath)
   await scriptHandler.stop(session)
   return {
     heapSnapshotPath,

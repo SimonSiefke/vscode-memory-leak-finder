@@ -15,9 +15,11 @@ const doStop = async (connectionId: number): Promise<unknown> => {
   if (rpc && typeof rpc.connectionClosed === 'function' && rpc.connectionClosed()) {
     return { connectionClosed: true }
   }
-  const result = await measure.stop()
-  await measure.releaseResources()
-  return result
+  try {
+    return await measure.stop()
+  } finally {
+    await measure.releaseResources()
+  }
 }
 
 export const stop = async (connectionId: number, electronTargetId: string): Promise<unknown> => {

@@ -8,42 +8,45 @@ import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnaps
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.ts'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.ts'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.ts'
+import { parseTraceTreeWithParents } from '../ParseTraceTree/ParseTraceTree.ts'
 import * as TokenType from '../TokenType/TokenType.ts'
 import { parseStringArray } from '../WriteStringArrayData/WriteStringArrayData.ts'
 
 class HeapSnapshotWriteStream extends Writable {
   arrayIndex: number
   currentNumber: number
-  data: Uint8Array<ArrayBuffer>
-  edges: Uint32Array<ArrayBuffer>
+  data: Uint8Array<ArrayBufferLike>
+  edges: Uint32Array<ArrayBufferLike>
   hasDigits: boolean
-  intermediateArray: Uint32Array<ArrayBuffer>
-  locations: Uint32Array<ArrayBuffer>
+  intermediateArray: Uint32Array<ArrayBufferLike>
+  locations: Uint32Array<ArrayBufferLike>
   metaData: any
-  nodes: Uint32Array<ArrayBuffer>
+  nodes: Uint32Array<ArrayBufferLike>
   options: any
   state: number
   strings: string[]
-  traceFunctionInfos: Uint32Array<ArrayBuffer>
-  traceTree: readonly unknown[]
+  traceFunctionInfos: Uint32Array<ArrayBufferLike>
+  traceTree: Uint32Array<ArrayBufferLike>
+  traceTreeParents: Uint32Array<ArrayBufferLike>
   validate: any
 
   constructor(options: { parseStrings?: boolean; validate?: boolean } = {}) {
     super()
     this.arrayIndex = 0
     this.currentNumber = 0
-    this.data = new Uint8Array()
-    this.edges = new Uint32Array()
+    this.data = new Uint8Array(0)
+    this.edges = new Uint32Array(0)
     this.hasDigits = false
     this.intermediateArray = new Uint32Array(this.writableHighWaterMark)
-    this.locations = new Uint32Array()
+    this.locations = new Uint32Array(0)
     this.metaData = {}
-    this.nodes = new Uint32Array()
+    this.nodes = new Uint32Array(0)
     this.options = options
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
     this.strings = []
-    this.traceFunctionInfos = new Uint32Array()
-    this.traceTree = []
+    this.traceFunctionInfos = new Uint32Array(0)
+    this.traceTree = new Uint32Array(0)
+    this.traceTreeParents = new Uint32Array(0)
     this.validate = options.validate ?? true
   }
 
@@ -70,7 +73,7 @@ class HeapSnapshotWriteStream extends Writable {
     this.nodes = new Uint32Array(nodeCount)
     this.state = HeapSnapshotParsingState.ParsingNodesMetaData
     const rest = this.data.slice(metaData.endIndex)
-    this.data = new Uint8Array()
+    this.data = new Uint8Array(0)
     this.handleChunk(rest)
   }
 
@@ -83,7 +86,7 @@ class HeapSnapshotWriteStream extends Writable {
     }
 
     const rest = this.data.slice(endIndex)
-    this.data = new Uint8Array()
+    this.data = new Uint8Array(0)
     this.arrayIndex = 0
     this.resetParsingState()
     this.state = nextState
@@ -94,7 +97,7 @@ class HeapSnapshotWriteStream extends Writable {
     this.writeParsingArrayMetaData(chunk, TokenType.Nodes, HeapSnapshotParsingState.ParsingNodes)
   }
 
-  writeArrayData(chunk: Uint8Array, array: Uint32Array, nextState: number): void {
+  writeArrayData(chunk: Uint8Array, array: Uint32Array<ArrayBufferLike>, nextState: number): void {
     // Parse the chunk directly - no concatenation needed due to stateful parsing
     const { arrayIndex, currentNumber, dataIndex, done, hasDigits } = parseHeapSnapshotArray(
       chunk,
@@ -151,6 +154,54 @@ class HeapSnapshotWriteStream extends Writable {
     this.writeArrayData(chunk, this.edges, nextState)
   }
 
+  writeParsingTraceFunctionInfosMetaData(chunk: Uint8Array): void {
+    const traceFunctionCount = this.metaData.data.trace_function_count || 0
+    const fields = this.metaData.data.meta.trace_function_info_fields || []
+    if (this.traceFunctionInfos.length === 0) {
+      this.traceFunctionInfos = new Uint32Array(traceFunctionCount * fields.length)
+    }
+    this.writeParsingArrayMetaData(chunk, TokenType.TraceFunctionInfos, HeapSnapshotParsingState.ParsingTraceFunctionInfos)
+  }
+
+  writeParsingTraceFunctionInfos(chunk: Uint8Array): void {
+    this.writeArrayData(chunk, this.traceFunctionInfos, HeapSnapshotParsingState.ParsingTraceTreeMetaData)
+  }
+
+  writeParsingTraceTreeMetaData(chunk: Uint8Array): void {
+    this.writeParsingArrayMetaData(chunk, TokenType.TraceTree, HeapSnapshotParsingState.ParsingTraceTree)
+  }
+
+  writeParsingTraceTree(chunk: Uint8Array): void {
+    this.data = concatArray(this.data, chunk)
+    const content = `[${decodeArray(this.data)}`
+    let depth = 0
+    let endIndex = -1
+    for (let i = 0; i < content.length; i++) {
+      if (content[i] === '[') {
+        depth++
+      } else if (content[i] === ']') {
+        depth--
+        if (depth === 0) {
+          endIndex = i + 1
+          break
+        }
+      }
+    }
+    if (endIndex === -1) {
+      return
+    }
+    const parsed = JSON.parse(content.slice(0, endIndex))
+    const fields = this.metaData.data.meta.trace_node_fields || []
+    const result = parseTraceTreeWithParents(parsed, fields)
+    this.traceTree = result.tree
+    this.traceTreeParents = result.parents
+    const consumedDataLength = endIndex - 1
+    const rest = this.data.slice(consumedDataLength)
+    this.data = new Uint8Array(0)
+    this.state = HeapSnapshotParsingState.ParsingLocationsMetaData
+    this.handleChunk(rest)
+  }
+
   writeParsingLocationsMetaData(chunk: Uint8Array): void {
     this.writeParsingArrayMetaData(chunk, TokenType.Locations, HeapSnapshotParsingState.ParsingLocations)
   }
@@ -196,53 +247,6 @@ class HeapSnapshotWriteStream extends Writable {
     } else {
       this.writeResizableArrayData(chunk, 'locations', HeapSnapshotParsingState.Done)
     }
-  }
-
-  writeParsingTraceFunctionInfosMetaData(chunk: Uint8Array): void {
-    this.writeParsingArrayMetaData(chunk, TokenType.TraceFunctionInfos, HeapSnapshotParsingState.ParsingTraceFunctionInfos)
-  }
-
-  writeParsingTraceFunctionInfos(chunk: Uint8Array): void {
-    this.writeResizableArrayData(chunk, 'traceFunctionInfos', HeapSnapshotParsingState.ParsingTraceTreeMetaData)
-  }
-
-  writeParsingTraceTreeMetaData(chunk: Uint8Array): void {
-    this.data = concatArray(this.data, chunk)
-    const dataString = decodeArray(this.data)
-    const endIndex = parseHeapSnapshotArrayHeader(dataString, TokenType.TraceTree)
-    if (endIndex === -1) {
-      return
-    }
-    const rest = this.data.slice(endIndex)
-    this.data = new TextEncoder().encode('[')
-    this.state = HeapSnapshotParsingState.ParsingTraceTree
-    this.handleChunk(rest)
-  }
-
-  writeParsingTraceTree(chunk: Uint8Array): void {
-    this.data = concatArray(this.data, chunk)
-    const dataString = decodeArray(this.data)
-    let balance = 0
-    let endIndex = -1
-    for (let i = 0; i < dataString.length; i++) {
-      if (dataString[i] === '[') {
-        balance++
-      } else if (dataString[i] === ']') {
-        balance--
-        if (balance === 0) {
-          endIndex = i + 1
-          break
-        }
-      }
-    }
-    if (endIndex === -1) {
-      return
-    }
-    this.traceTree = JSON.parse(dataString.slice(0, endIndex))
-    const rest = this.data.slice(endIndex)
-    this.data = new Uint8Array()
-    this.state = HeapSnapshotParsingState.ParsingLocationsMetaData
-    this.handleChunk(rest)
   }
 
   writeParsingStringsMetaData(chunk: Uint8Array): void {
@@ -356,6 +360,7 @@ class HeapSnapshotWriteStream extends Writable {
       strings: this.strings,
       traceFunctionInfos: this.traceFunctionInfos,
       traceTree: this.traceTree,
+      traceTreeParents: this.traceTreeParents,
     }
   }
 }
