@@ -21,6 +21,11 @@ jobs:
           - docusaurus-docs-installation
           - google-maps-search-clear
           - google-translate-text-clear
+          - github-vscode-issue-navigation
+          - github-vscode-issues-assigned-to-me
+          - github-vscode-issues-search
+          - github-vscode-repository-issues-navigation
+          - github-vscode-repository-more-menu
           - jest-docs-using-matchers
           - nextjs-docs-project-structure
           - npm-package-search-clear
