@@ -2,12 +2,9 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 
 const mockResolveTrackedLocationSourceMaps = jest.fn<any>()
 
-jest.unstable_mockModule(
-  '../src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts',
-  () => ({
-    resolveTrackedLocationSourceMaps: mockResolveTrackedLocationSourceMaps,
-  }),
-)
+jest.unstable_mockModule('../src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts', () => ({
+  resolveTrackedLocationSourceMaps: mockResolveTrackedLocationSourceMaps,
+}))
 
 beforeEach(() => {
   mockResolveTrackedLocationSourceMaps.mockReset()
@@ -71,10 +68,7 @@ test('getCpuProfileSourceSummary source maps JavaScript leaf samples and exclude
       'src/b.ts': 2,
     },
   })
-  expect(mockResolveTrackedLocationSourceMaps).toHaveBeenCalledWith(
-    ['file:///bundle.js:3:2', 'file:///bundle.js:5:4'],
-    {},
-  )
+  expect(mockResolveTrackedLocationSourceMaps).toHaveBeenCalledWith(['file:///bundle.js:3:2', 'file:///bundle.js:5:4'], {})
 })
 
 test('getCpuProfileSourceSummary distributes profile duration when time deltas are missing', async () => {

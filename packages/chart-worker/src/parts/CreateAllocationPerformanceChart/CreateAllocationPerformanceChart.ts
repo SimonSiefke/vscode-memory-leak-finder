@@ -35,10 +35,7 @@ export const createAllocationPerformanceChart = (data: readonly any[], options: 
   const allocationWidth = availableWidth * 0.58
   const cpuWidth = availableWidth - allocationWidth
   const cpuX = marginLeft + allocationWidth + gap
-  const maxAllocationCount = Math.max(
-    1,
-    ...orderedData.flatMap((item) => [item.createdCount || 0, item.collectedCount || 0]),
-  )
+  const maxAllocationCount = Math.max(1, ...orderedData.flatMap((item) => [item.createdCount || 0, item.collectedCount || 0]))
   const maxCpuPercent = Math.max(1, ...orderedData.map((item) => item.sourceSelfTimePercent || 0))
   const height = Math.max(HeaderHeight + RowHeight, HeaderHeight + orderedData.length * RowHeight)
 

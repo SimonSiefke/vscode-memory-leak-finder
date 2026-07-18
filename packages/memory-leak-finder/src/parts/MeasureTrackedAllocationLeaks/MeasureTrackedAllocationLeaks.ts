@@ -49,10 +49,7 @@ export const summary = (allocations: readonly TrackedAllocationResult[]): string
   if (allocations.length === 0) {
     return 'Tracked allocation leak candidates: none'
   }
-  const lines = [
-    `Tracked allocation leak candidates: ${allocations.length}`,
-    'retained | created | collected | type | location',
-  ]
+  const lines = [`Tracked allocation leak candidates: ${allocations.length}`, 'retained | created | collected | type | location']
   for (const allocation of allocations.slice(0, 10)) {
     lines.push(
       `${allocation.aliveCount} | ${allocation.createdCount} | ${allocation.collectedCount} | ${allocation.type} | ${allocation.originalLocation || allocation.location}`,

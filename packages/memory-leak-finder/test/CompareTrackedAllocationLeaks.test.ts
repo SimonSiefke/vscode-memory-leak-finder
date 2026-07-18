@@ -2,12 +2,9 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 
 const mockResolveTrackedLocationSourceMaps = jest.fn<any>()
 
-jest.unstable_mockModule(
-  '../src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts',
-  () => ({
-    resolveTrackedLocationSourceMaps: mockResolveTrackedLocationSourceMaps,
-  }),
-)
+jest.unstable_mockModule('../src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts', () => ({
+  resolveTrackedLocationSourceMaps: mockResolveTrackedLocationSourceMaps,
+}))
 
 beforeEach(() => {
   mockResolveTrackedLocationSourceMaps.mockReset()
@@ -34,8 +31,7 @@ beforeEach(() => {
 })
 
 test('compareTrackedAllocationLeaks returns only retained allocation sites in retained-count order', async () => {
-  const CompareTrackedAllocationLeaks =
-    await import('../src/parts/CompareTrackedAllocationLeaks/CompareTrackedAllocationLeaks.ts')
+  const CompareTrackedAllocationLeaks = await import('../src/parts/CompareTrackedAllocationLeaks/CompareTrackedAllocationLeaks.ts')
   const result = await CompareTrackedAllocationLeaks.compareTrackedAllocationLeaks(
     {},
     {
@@ -94,8 +90,7 @@ test('compareTrackedAllocationLeaks returns only retained allocation sites in re
 })
 
 test('compareTrackedAllocationLeaks excludes collected-over-created deltas defensively', async () => {
-  const CompareTrackedAllocationLeaks =
-    await import('../src/parts/CompareTrackedAllocationLeaks/CompareTrackedAllocationLeaks.ts')
+  const CompareTrackedAllocationLeaks = await import('../src/parts/CompareTrackedAllocationLeaks/CompareTrackedAllocationLeaks.ts')
   const result = await CompareTrackedAllocationLeaks.compareTrackedAllocationLeaks(
     {},
     {

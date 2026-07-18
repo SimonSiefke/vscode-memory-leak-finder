@@ -31,8 +31,7 @@ beforeEach(() => {
 })
 
 test('tracked allocation leak measure resets after source-map capture and forced GC', async () => {
-  const MeasureTrackedAllocationLeaks =
-    await import('../src/parts/MeasureTrackedAllocationLeaks/MeasureTrackedAllocationLeaks.ts')
+  const MeasureTrackedAllocationLeaks = await import('../src/parts/MeasureTrackedAllocationLeaks/MeasureTrackedAllocationLeaks.ts')
   const calls: string[] = []
   const scriptHandler = {
     scriptMap: {},
@@ -61,8 +60,7 @@ test('tracked allocation leak measure resets after source-map capture and forced
 })
 
 test('tracked allocation leak summary is informational and compact', async () => {
-  const MeasureTrackedAllocationLeaks =
-    await import('../src/parts/MeasureTrackedAllocationLeaks/MeasureTrackedAllocationLeaks.ts')
+  const MeasureTrackedAllocationLeaks = await import('../src/parts/MeasureTrackedAllocationLeaks/MeasureTrackedAllocationLeaks.ts')
   expect(MeasureTrackedAllocationLeaks.summary([])).toBe('Tracked allocation leak candidates: none')
   expect(
     MeasureTrackedAllocationLeaks.summary([

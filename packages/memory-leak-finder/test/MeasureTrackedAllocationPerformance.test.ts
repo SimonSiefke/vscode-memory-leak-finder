@@ -161,9 +161,7 @@ test('tracked allocation performance stops source capture before reporting missi
     },
   }
 
-  await expect(MeasureTrackedAllocationPerformance.stop(session, state)).rejects.toThrow(
-    'Tracked allocation performance produced no data',
-  )
+  await expect(MeasureTrackedAllocationPerformance.stop(session, state)).rejects.toThrow('Tracked allocation performance produced no data')
   expect(calls).toEqual(['Profiler.stop', 'gc', 'script-stop'])
   expect(state.profilerStarted).toBe(false)
 })

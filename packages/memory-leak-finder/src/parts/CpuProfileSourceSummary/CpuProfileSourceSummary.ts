@@ -53,10 +53,7 @@ const getGeneratedLocation = (node: Dynamic): string => {
   return `${url}:${line}:${column}`
 }
 
-export const getCpuProfileSourceSummary = async (
-  profile: Dynamic,
-  scriptMap: ScriptMap | undefined,
-): Promise<CpuProfileSourceSummary> => {
+export const getCpuProfileSourceSummary = async (profile: Dynamic, scriptMap: ScriptMap | undefined): Promise<CpuProfileSourceSummary> => {
   const nodes = toArray(profile?.nodes)
   const samples = toArray(profile?.samples)
   const sampleTimes = getSampleTimes(profile, samples)
