@@ -19,6 +19,7 @@ import * as GetNamedFunctionCountFromHeapSnapshot from '../GetNamedFunctionCount
 import * as GetObjectShapeCountFromHeapSnapshot from '../GetObjectShapeCountFromHeapSnapshot/GetObjectShapeCountFromHeapSnapshot.ts'
 import * as GetObjectsWithProperties from '../GetObjectsWithProperties/GetObjectsWithProperties.ts'
 import * as GetPrototypeChainAnalysisFromHeapSnapshot from '../GetPrototypeChainAnalysisFromHeapSnapshot/GetPrototypeChainAnalysisFromHeapSnapshot.ts'
+import * as GetRetainerRiver from '../GetRetainerRiver/GetRetainerRiver.ts'
 import * as GetRegexpObjectsFromHeapSnapshot from '../GetRegexpObjectsFromHeapSnapshot/GetRegexpObjectsFromHeapSnapshot.ts'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as LoadHeapSnapshot from '../LoadHeapSnapshot/LoadHeapSnapshot.ts'
@@ -45,6 +46,7 @@ export const commandMap = {
   'HeapSnapshot.getLargestArraysFromHeapSnapshot': GetLargestArraysFromHeapSnapshot.getLargestArraysFromHeapSnapshot,
   'HeapSnapshot.getObjectsWithProperties': GetObjectsWithProperties.getObjectsWithProperties,
   'HeapSnapshot.getRegexpObjects': GetRegexpObjectsFromHeapSnapshot.getRegexpObjectsFromHeapSnapshot,
+  'HeapSnapshot.getRetainerRiver': GetRetainerRiver.getRetainerRiver,
   'HeapSnapshot.load': LoadHeapSnapshot.loadHeapSnapshot,
   'HeapSnapshot.parseDomTimerCount': GetDomTimerCountFromHeapSnapshot.getDomTimerCountFromHeapSnapshot,
   'HeapSnapshot.parseFunctions': GetNamedFunctionCountFromHeapSnapshot.getNamedFunctionCountFromHeapSnapshot,
