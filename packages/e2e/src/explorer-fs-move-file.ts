@@ -75,7 +75,6 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
   await Explorer.refresh()
 
   // Verify folder structure change
-  await Explorer.collapse('source-folder')
   await Explorer.not.toHaveItem('source-folder')
 
   await Explorer.expand('another-folder')
