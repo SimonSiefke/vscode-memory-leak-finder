@@ -1,5 +1,6 @@
 import type { TransformOptions } from '../Types/Types.ts'
 import { transformCodeWithAllocationTracking } from '../TransformCodeWithAllocationTracking/TransformCodeWithAllocationTracking.ts'
+import { transformCodeWithEverythingTracking } from '../TransformCodeWithEverythingTracking/TransformCodeWithEverythingTracking.ts'
 import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
 
 const PREAMBLE_CODE = `(() => {
@@ -112,6 +113,118 @@ const ALLOCATION_PREAMBLE_CODE = `(() => {
 })();
 `
 
+const EVERYTHING_PREAMBLE_CODE = `(() => {
+  if(typeof globalThis.__vscodeMemoryLeakFinderGetTrackedEverythingMetadata === 'function'){
+    return
+  }
+
+  const CHUNK_SIZE = 65536
+  const TIME_MARK_INTERVAL = 1024
+  const chunks = []
+  let currentChunk = new Uint32Array(CHUNK_SIZE)
+  let currentChunkLength = 0
+  let eventCount = 0
+  const sites = []
+  const siteIds = Object.create(null)
+  const seenIdentities = new WeakSet()
+  const seenSymbols = new Set()
+  const timeMarks = []
+  const now = () => typeof performance === 'object' && typeof performance.now === 'function' ? performance.now() : Date.now()
+  const startedAt = now()
+
+  const getType = (value, hint) => {
+    if(hint !== 'Dynamic'){
+      return hint
+    }
+    if(value === null){
+      return 'Null'
+    }
+    const valueType = typeof value
+    if(valueType === 'object'){
+      return Array.isArray(value) ? 'Array' : 'Object'
+    }
+    return valueType[0].toUpperCase() + valueType.slice(1)
+  }
+
+  const markTime = (force = false) => {
+    if(!force && eventCount !== 0 && eventCount % TIME_MARK_INTERVAL !== 0){
+      return
+    }
+    const elapsedMs = now() - startedAt
+    const previous = timeMarks[timeMarks.length - 1]
+    if(previous && previous.eventIndex === eventCount){
+      previous.elapsedMs = elapsedMs
+      return
+    }
+    timeMarks.push({ eventIndex: eventCount, elapsedMs })
+  }
+
+  const appendEvent = (siteId) => {
+    markTime()
+    if(currentChunkLength === CHUNK_SIZE){
+      chunks.push(currentChunk)
+      currentChunk = new Uint32Array(CHUNK_SIZE)
+      currentChunkLength = 0
+    }
+    currentChunk[currentChunkLength++] = siteId
+    eventCount++
+  }
+
+  const recordSite = (scriptId, line, column, type) => {
+    const location = \`\${scriptId}:\${line}:\${column}\`
+    const key = \`\${location}:\${type}\`
+    let siteId = siteIds[key]
+    if(siteId === undefined){
+      siteId = sites.length
+      siteIds[key] = siteId
+      sites.push({ id: siteId, location, type })
+    }
+    appendEvent(siteId)
+  }
+
+  const trackEverything = (value, scriptId, line, column, hint, identityMode, methodLocations) => {
+    const valueType = typeof value
+    if(value !== null && (valueType === 'object' || valueType === 'function')){
+      if(identityMode === 'observed' && seenIdentities.has(value)){
+        return value
+      }
+      seenIdentities.add(value)
+    } else if(valueType === 'symbol'){
+      if(identityMode === 'observed' && seenSymbols.has(value)){
+        return value
+      }
+      seenSymbols.add(value)
+    }
+    recordSite(scriptId, line, column, getType(value, hint))
+    for(const methodLocation of methodLocations){
+      recordSite(scriptId, methodLocation[0], methodLocation[1], 'Function')
+    }
+    return value
+  }
+
+  globalThis.__vscodeMemoryLeakFinderTrackEverything = trackEverything
+  globalThis.__vscodeMemoryLeakFinderGetTrackedEverythingMetadata = () => {
+    markTime(true)
+    return {
+      chunkCount: chunks.length + (currentChunkLength > 0 ? 1 : 0),
+      durationMs: now() - startedAt,
+      eventCount,
+      sites,
+      timeMarks,
+    }
+  }
+  globalThis.__vscodeMemoryLeakFinderGetTrackedEverythingChunk = (index) => {
+    if(index < chunks.length){
+      return Array.from(chunks[index])
+    }
+    if(index === chunks.length && currentChunkLength > 0){
+      return Array.from(currentChunk.subarray(0, currentChunkLength))
+    }
+    return []
+  }
+})();
+`
+
 const TIMEOUT_PREAMBLE_CODE = `(() => {
   if(typeof globalThis.getTrackedTimeoutCount === 'function'){
     return
@@ -153,6 +266,10 @@ const TIMEOUT_PREAMBLE_CODE = `(() => {
 
 export const transformCode = async (code: string, options: TransformOptions = {}): Promise<string> => {
   const { trackingMode = 'functions' } = options
+  if (trackingMode === 'everything') {
+    const transformedCode = transformCodeWithEverythingTracking(code, { ...options })
+    return EVERYTHING_PREAMBLE_CODE + '\n' + transformedCode
+  }
   if (trackingMode === 'allocations') {
     const transformedCode = transformCodeWithAllocationTracking(code, { ...options })
     return ALLOCATION_PREAMBLE_CODE + '\n' + transformedCode

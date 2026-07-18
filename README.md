@@ -15,6 +15,19 @@ npm run e2e
 
 ## Measures
 
+### TrackedEverything
+
+Records every source-observable value creation in the VS Code renderer from the
+first instrumented startup script through the end of the measured scenario.
+The result includes a lossless allocation-order stream and an interactive
+timeline city. This exhaustive instrumentation substantially changes runtime
+performance and memory use and does not include hidden V8 or Chromium
+allocations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure tracked-everything --only base
+```
+
 ### MemoryCity
 
 Captures allocation-aware renderer and extension-host heap snapshots, computes

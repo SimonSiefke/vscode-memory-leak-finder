@@ -597,6 +597,14 @@ test('parseArgv - tracked allocation timeline enables tracking transform', () =>
   expect(options.trackFunctions).toBe(true)
 })
 
+test('parseArgv - tracked everything enables tracking transform', () => {
+  for (const measure of ['tracked-everything', 'trackedEverything']) {
+    const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', measure])
+    expect(options.measure).toBe(measure)
+    expect(options.trackFunctions).toBe(true)
+  }
+})
+
 test('parseArgv - tracked timeouts enables tracking transform', () => {
   const argv = ['--measure', 'tracked-timeouts']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
