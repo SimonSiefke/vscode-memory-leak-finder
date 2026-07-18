@@ -63,6 +63,17 @@ test('getMeasure resolves tracked allocation leaks public measure id', () => {
   ).toBe(Measures.MeasureTrackedAllocationLeaks)
 })
 
+test('getMeasure resolves tracked allocation performance public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'tracked-allocation-performance',
+    ),
+  ).toBe(Measures.MeasureTrackedAllocationPerformance)
+})
+
 test('getMeasure resolves tracked timeouts public measure id', () => {
   const measure = {
     id: 'trackedTimeouts',

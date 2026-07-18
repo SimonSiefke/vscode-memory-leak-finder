@@ -57,6 +57,8 @@ export const getTrackingMode = (measureId: string): string => {
     measureId === 'trackedAllocationsFromStart' ||
     measureId === 'tracked-allocation-leaks' ||
     measureId === 'trackedAllocationLeaks' ||
+    measureId === 'tracked-allocation-performance' ||
+    measureId === 'trackedAllocationPerformance' ||
     measureId === 'tracked-allocation-timeline' ||
     measureId === 'trackedAllocationTimeline'
   ) {

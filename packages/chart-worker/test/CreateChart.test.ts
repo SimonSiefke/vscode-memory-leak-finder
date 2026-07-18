@@ -135,6 +135,33 @@ test('grouped horizontal bar chart renders omitted entries footer', async () => 
   expect(result).toContain('viewBox="0 0 640 116"')
 })
 
+test('allocation performance chart renders churn and source CPU correlation', async () => {
+  const result = await createChart(
+    [
+      {
+        collectedCount: 8,
+        createdCount: 10,
+        name: 'src/a<&>.ts',
+        retainedCount: 2,
+        sourceSelfTimeMs: 4.5,
+        sourceSelfTimePercent: 45,
+      },
+    ],
+    {
+      omittedEntryCount: 3,
+      type: 'allocation-performance-chart',
+      width: 1200,
+    },
+  )
+
+  expect(result).toContain('Allocation churn and sampled JavaScript CPU self-time by source file')
+  expect(result).toContain('src/a&lt;&amp;&gt;.ts')
+  expect(result).toContain('created 10')
+  expect(result).toContain('collected 8, retained 2')
+  expect(result).toContain('4.5 ms (45%)')
+  expect(result).toContain('3 entries omitted for brevity')
+})
+
 test('line chart renders connected load event points', async () => {
   const result = await createChart(
     [

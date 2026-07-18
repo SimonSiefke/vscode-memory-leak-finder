@@ -248,6 +248,14 @@ Reports allocation sites that retain instances after forced garbage collection. 
 node packages/cli/bin/test.js --cwd packages/e2e --measure tracked-allocation-leaks --only editor-open
 ```
 
+### TrackedAllocationPerformance
+
+Correlates allocation churn with sampled JavaScript CPU self-time by source file. The CPU percentage describes the source file, not the cost of allocation itself.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure tracked-allocation-performance --only editor-type-many-characters
+```
+
 ### V8TurbofanStats
 
 Measures V8 TurboFan optimization and deoptimization activity.

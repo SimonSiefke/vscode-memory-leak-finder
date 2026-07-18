@@ -384,6 +384,8 @@ const parseTrackFunctions = (argv: readonly string[]): boolean => {
     measure === 'trackedAllocationsFromStart' ||
     measure === 'tracked-allocation-leaks' ||
     measure === 'trackedAllocationLeaks' ||
+    measure === 'tracked-allocation-performance' ||
+    measure === 'trackedAllocationPerformance' ||
     measure === 'tracked-allocation-timeline' ||
     measure === 'trackedAllocationTimeline' ||
     measure === 'tracked-timeouts' ||
