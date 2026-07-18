@@ -407,6 +407,12 @@ test('parseArgv - enable-extensions flag not present', () => {
   expect(options.enableExtensions).toBe(false)
 })
 
+test('parseArgv - memory-city automatically enables and inspects extensions', () => {
+  const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', 'memory-city'])
+  expect(options.enableExtensions).toBe(true)
+  expect(options.inspectExtensions).toBe(true)
+})
+
 test('parseArgv - inspect-ptyhost-port flag', () => {
   const argv = ['--inspect-ptyhost-port', '9999']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)

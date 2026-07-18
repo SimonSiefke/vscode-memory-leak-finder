@@ -78,6 +78,7 @@ export * as MeasureJavascriptExecutionTime from '../MeasureJavascriptExecutionTi
 export * as MeasureLargestArrayCount from '../MeasureLargestArrayCount/MeasureLargestArrayCount.ts'
 export * as MeasureMapCount from '../MeasureMapCount/MeasureMapCount.ts'
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.ts'
+export * as MeasureMemoryCity from '../MeasureMemoryCity/MeasureMemoryCity.ts'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.ts'
 export * as MeasureMessagePortCount from '../MeasureMessagePortCount/MeasureMessagePortCount.ts'
 export * as MeasureMinimapCount from '../MeasureMinimapCount/MeasureMinimapCount.ts'

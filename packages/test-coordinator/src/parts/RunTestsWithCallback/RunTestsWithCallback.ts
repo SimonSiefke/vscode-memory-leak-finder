@@ -1,8 +1,9 @@
 import type { Rpc } from '@lvce-editor/rpc'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
+import { runMemoryCityComparisons } from '../RunMemoryCityComparisons/RunMemoryCityComparisons.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as BrowserPageTargets from '../BrowserPageTargets/BrowserPageTargets.ts'
 import { doLogin } from '../DoLogin/DoLogin.ts'
@@ -54,6 +55,10 @@ const StartupCounterMeasureResultId = 'cpuPerformanceCountersFromStart'
 
 const isStartupCounterMeasure = (measure: string): boolean => {
   return measure === StartupCounterMeasureId || measure === StartupCounterMeasureResultId
+}
+
+const isMemoryCityMeasure = (measure: string): boolean => {
+  return measure === 'memory-city' || measure === 'memoryCity'
 }
 
 const round = (value: number): number => {
@@ -155,6 +160,9 @@ const getResultPath = ({
 }): string => {
   const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
   const testName = fileName.replace('.json', '')
+  if (isMemoryCityMeasure(measure)) {
+    return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'memory-city', fileName)
+  }
   if (measureNode) {
     return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, testName + '.json')
   }
@@ -766,20 +774,6 @@ export const runTestsWithCallback = async ({
                 )
               }
             }
-            const memoryRpc = workers.memoryRpc
-            await MemoryLeakFinder.start(memoryRpc, connectionId)
-            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs, () =>
-              MemoryLeakFinder.runCompletion(memoryRpc, connectionId),
-            )
-            if (timeoutBetween) {
-              await Timeout.setTimeout(timeoutBetween)
-            }
-            await MemoryLeakFinder.stop(memoryRpc, connectionId)
-
-            if (measureAfter) {
-              await Timeout.setTimeout(3000)
-            }
-
             const resultPath = getResultPath({
               dirent,
               inspectExtensions,
@@ -790,8 +784,105 @@ export const runTestsWithCallback = async ({
               measure,
               measureNode,
             })
+            let result
+            if (isMemoryCityMeasure(measure)) {
+              const extensionHostRpc = workers.memoryRpc
+              const rendererRpc = await MemoryLeakWorker.startWorker(
+                workers.devtoolsWebSocketUrl,
+                workers.webSocketUrl,
+                connectionId,
+                measure,
+                attachedToPageTimeout,
+                false,
+                false,
+                false,
+                false,
+                false,
+                inspectPtyHostPort,
+                inspectSharedProcessPort,
+                inspectExtensionsPort,
+                workers.pid,
+                integratedBrowserExcludedTargetIds,
+              )
+              const rendererResultPath = `${resultPath}.renderer.tmp`
+              const extensionHostResultPath = `${resultPath}.extension-host.tmp`
+              try {
+                await Promise.all([
+                  MemoryLeakFinder.start(rendererRpc, connectionId),
+                  MemoryLeakFinder.start(extensionHostRpc, connectionId),
+                ])
+                await TestWorkerRunTests.testWorkerRunTests(
+                  testWorkerRpc,
+                  connectionId,
+                  absolutePath,
+                  forceRun,
+                  runMode,
+                  platform,
+                  runs,
+                  () =>
+                    Promise.all([
+                      MemoryLeakFinder.runCompletion(rendererRpc, connectionId),
+                      MemoryLeakFinder.runCompletion(extensionHostRpc, connectionId),
+                    ]),
+                )
+                if (timeoutBetween) {
+                  await Timeout.setTimeout(timeoutBetween)
+                }
+                await Promise.all([MemoryLeakFinder.stop(rendererRpc, connectionId), MemoryLeakFinder.stop(extensionHostRpc, connectionId)])
+                // Analyze sequentially so two full dominator graphs never compete for
+                // memory. Capture remains simultaneous around the shared scenario.
+                await runMemoryCityComparisons(
+                  () => MemoryLeakFinder.compare(rendererRpc, connectionId, context, rendererResultPath),
+                  () => MemoryLeakFinder.compare(extensionHostRpc, connectionId, context, extensionHostResultPath),
+                )
+                const [rendererResult, extensionHostResult] = await Promise.all([
+                  readJson(rendererResultPath),
+                  readJson(extensionHostResultPath),
+                ])
+                const renderer = rendererResult.memoryCity || rendererResult
+                const extensionHost = extensionHostResult.memoryCity || extensionHostResult
+                const combined = {
+                  isLeak: false,
+                  memoryCity: {
+                    owners: {
+                      extensionHost,
+                      renderer,
+                    },
+                  },
+                }
+                await writeJson(resultPath, combined)
+                result = { isLeak: false, summary: '' }
+              } finally {
+                await Promise.all([
+                  rendererRpc.dispose(),
+                  rm(rendererResultPath, { force: true }),
+                  rm(extensionHostResultPath, { force: true }),
+                ])
+              }
+            } else {
+              const memoryRpc = workers.memoryRpc
+              await MemoryLeakFinder.start(memoryRpc, connectionId)
+              await TestWorkerRunTests.testWorkerRunTests(
+                testWorkerRpc,
+                connectionId,
+                absolutePath,
+                forceRun,
+                runMode,
+                platform,
+                runs,
+                () => MemoryLeakFinder.runCompletion(memoryRpc, connectionId),
+              )
+              if (timeoutBetween) {
+                await Timeout.setTimeout(timeoutBetween)
+              }
+              await MemoryLeakFinder.stop(memoryRpc, connectionId)
 
-            const result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
+              if (measureAfter) {
+                await Timeout.setTimeout(3000)
+              }
+
+              result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
+            }
             if (result.isLeak) {
               isLeak = true
               leaking++

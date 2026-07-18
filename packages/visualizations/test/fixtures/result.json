@@ -1,0 +1,49 @@
+{
+  "isLeak": false,
+  "memoryCity": {
+    "owners": {
+      "extensionHost": {
+        "buildings": [
+          {
+            "kind": "source",
+            "largestObjectRetainedBytes": 2048,
+            "objectCount": 4,
+            "path": "extensions/git/src/extension.ts",
+            "retainedBytes": 4096,
+            "shallowBytes": 4096
+          }
+        ],
+        "totals": {
+          "allocationTraceObjects": 3,
+          "attributedObjects": 4,
+          "locationObjects": 1,
+          "objectCount": 4,
+          "retainedBytes": 4096,
+          "runtimeObjects": 0,
+          "shallowBytes": 4096
+        }
+      },
+      "renderer": {
+        "buildings": [
+          {
+            "kind": "source",
+            "largestObjectRetainedBytes": 8192,
+            "objectCount": 8,
+            "path": "src/vs/editor/common/model/textModel.ts",
+            "retainedBytes": 16384,
+            "shallowBytes": 16384
+          }
+        ],
+        "totals": {
+          "allocationTraceObjects": 6,
+          "attributedObjects": 8,
+          "locationObjects": 2,
+          "objectCount": 8,
+          "retainedBytes": 16384,
+          "runtimeObjects": 0,
+          "shallowBytes": 16384
+        }
+      }
+    }
+  }
+}
