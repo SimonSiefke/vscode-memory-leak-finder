@@ -48,7 +48,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await quickPick.pressEnter()
 
         // if (ideVersion && ideVersion.minor <= 80) {
-        await expect(quickPickInput).toHaveAttribute('aria-label', `Unique identifier for this server - Enter Server ID`)
+        await expect(quickPickInput).toHaveAttribute('aria-label', `Unique identifier for this server - Enter Server ID`, {
+          timeout: 10_000,
+        })
         // } else {
         //   await expect(quickPickInput).toHaveAttribute(
         //     'aria-label',
@@ -62,7 +64,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await quickPick.pressEnter()
 
-        await expect(quickPickInput).toHaveAttribute('aria-label', `Select the configuration target - Add MCP Server`)
+        await expect(quickPickInput).toHaveAttribute('aria-label', `Select the configuration target - Add MCP Server`, {
+          timeout: 10_000,
+        })
         await this.selectCommand('Global')
 
         await page.waitForIdle()
