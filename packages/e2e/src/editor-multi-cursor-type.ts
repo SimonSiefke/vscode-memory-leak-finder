@@ -31,6 +31,11 @@ prefix cherry`)
   await Editor.shouldHaveText(`prefix apple
 prefix banana
 prefix cherry`)
+  await Editor.undo()
+  await Editor.shouldHaveText(`apple
+banana
+cherry`)
+  await Editor.save({ viaKeyBoard: false })
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
