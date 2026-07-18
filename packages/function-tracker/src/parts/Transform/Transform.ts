@@ -195,10 +195,10 @@ const EVERYTHING_PREAMBLE_CODE = `(() => {
       }
       seenSymbols.add(value)
     }
-    recordSite(scriptId, line, column, getType(value, hint))
     for(const methodLocation of methodLocations){
       recordSite(scriptId, methodLocation[0], methodLocation[1], 'Function')
     }
+    recordSite(scriptId, line, column, getType(value, hint))
     return value
   }
 

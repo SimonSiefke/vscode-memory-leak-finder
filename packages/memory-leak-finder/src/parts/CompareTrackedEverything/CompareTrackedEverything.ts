@@ -1,5 +1,5 @@
 import { basename, dirname, extname, join } from 'node:path'
-import { mkdir, rename } from 'node:fs/promises'
+import { mkdir, rename, rm } from 'node:fs/promises'
 import type { Session } from '../Session/Session.ts'
 import type { ScriptMap } from '../ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts'
 import * as ResolveTrackedLocationSourceMaps from '../ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts'
@@ -58,6 +58,7 @@ export const compareTrackedEverything = async (
   })
   const eventPath = getEventPath(context.resultPath)
   await mkdir(dirname(eventPath), { recursive: true })
+  await rm(eventPath, { force: true })
   await rename(after.temporaryEventPath, eventPath)
   return {
     durationMs: after.metadata.durationMs,

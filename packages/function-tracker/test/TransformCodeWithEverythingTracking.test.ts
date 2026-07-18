@@ -77,6 +77,17 @@ test('records function and class declarations and method creation', async () => 
   expect(types).toContain('Object')
 })
 
+test('preserves tagged templates, inheritance, and super calls', async () => {
+  const { context } = await run(`
+    const tag = (parts, value) => parts[0] + value
+    class Base { constructor() { this.value = 2 } }
+    class Child extends Base { constructor() { super() } }
+    const child = new Child()
+    globalThis.result = tag\`value-\${child.value}\`
+  `)
+  expect(context.result).toBe('value-2')
+})
+
 test('uses fixed-size chunks without dropping events', async () => {
   const { context } = await run(`globalThis.record = () => 1`)
   for (let index = 0; index < 65_540; index++) {

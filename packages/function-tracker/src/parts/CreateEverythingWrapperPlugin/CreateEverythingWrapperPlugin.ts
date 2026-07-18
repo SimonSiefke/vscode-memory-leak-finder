@@ -6,6 +6,7 @@ export interface CreateEverythingWrapperPluginOptions {
 }
 
 const helperName = '__vscodeMemoryLeakFinderTrackEverything'
+const createHelper = (): t.MemberExpression => t.memberExpression(t.identifier('globalThis'), t.identifier(helperName))
 
 const getLocationNodes = (node: t.Node, scriptIdNode: t.Expression): readonly t.Expression[] => {
   return [
@@ -26,7 +27,11 @@ const getCalleeName = (node: t.Expression | t.V8IntrinsicIdentifier): string => 
 }
 
 const isGeneratedHelperCall = (node: t.CallExpression | t.OptionalCallExpression): boolean => {
-  return t.isIdentifier(node.callee) && node.callee.name === helperName
+  return (
+    t.isMemberExpression(node.callee) &&
+    t.isIdentifier(node.callee.object, { name: 'globalThis' }) &&
+    t.isIdentifier(node.callee.property, { name: helperName })
+  )
 }
 
 const shouldTrackLiteral = (path: NodePath<t.Expression>): boolean => {
@@ -84,7 +89,7 @@ export const createEverythingWrapperPlugin = (options: CreateEverythingWrapperPl
     methodLocations: t.ArrayExpression = t.arrayExpression(),
   ): void => {
     const node = path.node
-    const wrapped = t.callExpression(t.identifier(helperName), [
+    const wrapped = t.callExpression(createHelper(), [
       node,
       ...getLocationNodes(node, scriptIdNode),
       t.stringLiteral(hint),
@@ -103,7 +108,7 @@ export const createEverythingWrapperPlugin = (options: CreateEverythingWrapperPl
     }
     const methods = t.isClassDeclaration(node) ? getMethodLocations(node) : t.arrayExpression()
     const call = t.expressionStatement(
-      t.callExpression(t.identifier(helperName), [
+      t.callExpression(createHelper(), [
         t.identifier(id.name),
         ...getLocationNodes(node, scriptIdNode),
         t.stringLiteral(hint),
@@ -159,7 +164,13 @@ export const createEverythingWrapperPlugin = (options: CreateEverythingWrapperPl
     TaggedTemplateExpression: {
       exit: (path: NodePath<t.TaggedTemplateExpression>) => wrap(path, 'Dynamic', 'observed'),
     },
-    TemplateLiteral: { exit: (path: NodePath<t.TemplateLiteral>) => wrap(path, 'String') },
+    TemplateLiteral: {
+      exit: (path: NodePath<t.TemplateLiteral>) => {
+        if (!path.parentPath?.isTaggedTemplateExpression()) {
+          wrap(path, 'String')
+        }
+      },
+    },
     UnaryExpression: { exit: (path: NodePath<t.UnaryExpression>) => wrap(path, 'Dynamic') },
     UpdateExpression: { exit: (path: NodePath<t.UpdateExpression>) => wrap(path, 'Number') },
   }

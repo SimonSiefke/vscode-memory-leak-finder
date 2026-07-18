@@ -3,7 +3,7 @@ import { ChevronRight, Layers3, Pause, Play, Search } from 'lucide-react'
 import { computeCityLayout } from './layout.ts'
 import { MemoryCityScene } from './MemoryCityScene.tsx'
 import { TrackedEverythingTimeline } from './TrackedEverythingTimeline.tsx'
-import { eventIndexToTime, getSitePath, timeToEventIndex } from './trackedEverythingModel.ts'
+import { decodeTrackedEverythingEvents, eventIndexToTime, getSitePath, timeToEventIndex } from './trackedEverythingModel.ts'
 import type { TrackedEverythingAggregates, TrackedEverythingDataset } from './trackedEverythingTypes.ts'
 import type { BuildingLayout, BuildingView } from './types.ts'
 
@@ -64,7 +64,7 @@ export const TrackedEverythingApp = ({ dataset }: { readonly dataset: TrackedEve
         if (buffer.byteLength !== dataset.eventCount * 4) {
           throw new Error(`expected ${dataset.eventCount * 4} event bytes, received ${buffer.byteLength}`)
         }
-        const events = new Uint32Array(buffer)
+        const events = decodeTrackedEverythingEvents(buffer, dataset)
         setFinalFileCounts(getFinalFileCounts(events, dataset))
         worker.postMessage({ buffer, dataset, kind: 'init' }, [buffer])
       } catch (loadError) {

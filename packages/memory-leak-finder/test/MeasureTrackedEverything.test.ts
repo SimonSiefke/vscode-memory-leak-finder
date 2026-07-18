@@ -21,8 +21,8 @@ const CompareTrackedEverything = await import(
 test('tracked everything preserves startup data and writes chunks in order', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'tracked-everything-measure-'))
   const eventPath = join(directory, 'events.bin')
-  const start = jest.fn<() => Promise<void>>().mockResolvedValue()
-  const stop = jest.fn<() => Promise<void>>().mockResolvedValue()
+  const start = jest.fn<(_session: any) => Promise<void>>().mockResolvedValue()
+  const stop = jest.fn<(_session: any) => Promise<void>>().mockResolvedValue()
   const state = {
     scriptHandler: { scriptMap: {}, start, stop },
     temporaryEventPath: eventPath,
@@ -50,11 +50,11 @@ test('tracked everything preserves startup data and writes chunks in order', asy
 })
 
 test('tracked everything rejects empty instrumentation output', async () => {
-  const stop = jest.fn<() => Promise<void>>().mockResolvedValue()
+  const stop = jest.fn<(_session: any) => Promise<void>>().mockResolvedValue()
   mockGetMetadata.mockResolvedValue({ chunkCount: 0, durationMs: 0, eventCount: 0, sites: [], timeMarks: [] })
   await expect(
     MeasureTrackedEverything.stop({} as any, {
-      scriptHandler: { scriptMap: {}, start: jest.fn(), stop },
+      scriptHandler: { scriptMap: {}, start: jest.fn<(_session: any) => Promise<void>>().mockResolvedValue(), stop },
       temporaryEventPath: '/unused',
     }),
   ).rejects.toThrow('Tracked everything produced no data')
