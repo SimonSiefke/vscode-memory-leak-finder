@@ -22,22 +22,6 @@ const isRelativeSourceMap = (sourceMapUrl: Dynamic) => {
   return true
 }
 const RE_PATH = /\((.+):\d+:\d+\)$/
-const isUrl = (path: string) => {
-  return path.startsWith('http://') || path.startsWith('https://') || path.startsWith('file://')
-}
-
-const resolveRelativeSourceMap = (sourceMapUrl: Dynamic, stackLine: Dynamic) => {
-  const pathMatch = stackLine.match(RE_PATH, '')
-  if (!pathMatch) {
-    return sourceMapUrl
-  }
-  const path = pathMatch[1]
-  if (isUrl(path)) {
-    return new URL(sourceMapUrl, path).toString()
-  }
-  return dirname(path) + sep + sourceMapUrl
-}
-
 export const getSourceMapUrl = (eventListener: Dynamic) => {
   const { sourceMaps, stack } = eventListener
   if (!stack || !sourceMaps) {
@@ -50,7 +34,11 @@ export const getSourceMapUrl = (eventListener: Dynamic) => {
   }
   let sourceMapUrl = sourceMaps[0] || ''
   if (sourceMapUrl && isRelativeSourceMap(sourceMapUrl)) {
-    sourceMapUrl = resolveRelativeSourceMap(sourceMapUrl, firstStackLine)
+    const pathMatch = firstStackLine.match(RE_PATH, '')
+    if (pathMatch) {
+      const path = pathMatch[1]
+      sourceMapUrl = dirname(path) + sep + sourceMapUrl
+    }
   }
   return {
     column: parsed.column,
