@@ -3,10 +3,7 @@ import { mkdir, rename, rm } from 'node:fs/promises'
 import type { Session } from '../Session/Session.ts'
 import type { ScriptMap } from '../ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts'
 import * as ResolveTrackedLocationSourceMaps from '../ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts'
-import type {
-  TrackedEverythingMetadata,
-  TrackedEverythingSite,
-} from '../GetTrackedEverything/GetTrackedEverything.ts'
+import type { TrackedEverythingMetadata, TrackedEverythingSite } from '../GetTrackedEverything/GetTrackedEverything.ts'
 
 export interface TrackedEverythingAfter {
   readonly metadata: TrackedEverythingMetadata

@@ -100,10 +100,7 @@ export const TrackedEverythingApp = ({ dataset }: { readonly dataset: TrackedEve
     return () => window.clearInterval(handle)
   }, [aggregates.cursor, dataset.eventCount, playing, setCursor])
 
-  const finalViews = useMemo(
-    () => Object.entries(finalFileCounts).map(([path, count]) => toView(path, count)),
-    [finalFileCounts],
-  )
+  const finalViews = useMemo(() => Object.entries(finalFileCounts).map(([path, count]) => toView(path, count)), [finalFileCounts])
   const finalLayout = useMemo(() => computeCityLayout(finalViews), [finalViews])
   const buildings = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -142,32 +139,69 @@ export const TrackedEverythingApp = ({ dataset }: { readonly dataset: TrackedEve
     <div className="App EverythingApp">
       <header className="Topbar">
         <div className="Brand">
-          <span className="BrandMark"><Layers3 size={21} /></span>
-          <div><div className="Eyebrow">LOSSLESS CREATION HISTORY</div><h1>Tracked Everything</h1></div>
+          <span className="BrandMark">
+            <Layers3 size={21} />
+          </span>
+          <div>
+            <div className="Eyebrow">LOSSLESS CREATION HISTORY</div>
+            <h1>Tracked Everything</h1>
+          </div>
         </div>
         <div className="HeaderStats">
-          <div><span>Created</span><strong>{aggregates.cursor.toLocaleString()}</strong></div>
-          <div><span>Sites</span><strong>{dataset.sites.length.toLocaleString()}</strong></div>
-          <div><span>Elapsed</span><strong>{elapsedMs.toFixed(1)} ms</strong></div>
+          <div>
+            <span>Created</span>
+            <strong>{aggregates.cursor.toLocaleString()}</strong>
+          </div>
+          <div>
+            <span>Sites</span>
+            <strong>{dataset.sites.length.toLocaleString()}</strong>
+          </div>
+          <div>
+            <span>Elapsed</span>
+            <strong>{elapsedMs.toFixed(1)} ms</strong>
+          </div>
         </div>
       </header>
       <section className="ControlDeck">
         <div className="ControlRow">
           <div className="Segmented">
-            <button className={axis === 'time' ? 'Active' : ''} onClick={() => setAxis('time')} type="button">Time</button>
-            <button className={axis === 'allocation' ? 'Active' : ''} onClick={() => setAxis('allocation')} type="button">Allocation</button>
+            <button className={axis === 'time' ? 'Active' : ''} onClick={() => setAxis('time')} type="button">
+              Time
+            </button>
+            <button className={axis === 'allocation' ? 'Active' : ''} onClick={() => setAxis('allocation')} type="button">
+              Allocation
+            </button>
           </div>
-          <label className="Search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find a source file…" /></label>
-          <select className="TypeSelect" value={selectedType} onChange={(event) => {
-            const value = event.target.value
-            setSelectedType(value)
-            setCursor(aggregates.cursor, value)
-          }}>
+          <label className="Search">
+            <Search size={15} />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find a source file…" />
+          </label>
+          <select
+            className="TypeSelect"
+            value={selectedType}
+            onChange={(event) => {
+              const value = event.target.value
+              setSelectedType(value)
+              setCursor(aggregates.cursor, value)
+            }}
+          >
             <option value="">All types</option>
-            {aggregates.types.map((type) => <option value={type} key={type}>{type}</option>)}
+            {aggregates.types.map((type) => (
+              <option value={type} key={type}>
+                {type}
+              </option>
+            ))}
           </select>
         </div>
-        <div className="EverythingPath">{dataset.scenario}{selectedPath && <><ChevronRight size={13} />{selectedPath}</>}</div>
+        <div className="EverythingPath">
+          {dataset.scenario}
+          {selectedPath && (
+            <>
+              <ChevronRight size={13} />
+              {selectedPath}
+            </>
+          )}
+        </div>
       </section>
       <main className="Viewport">
         <MemoryCityScene
@@ -185,24 +219,43 @@ export const TrackedEverythingApp = ({ dataset }: { readonly dataset: TrackedEve
           {selectedPath ? (
             <ol>
               {selectedSites.map((site) => (
-                <li key={site.id}><b>{site.count.toLocaleString()}</b><span>{site.type} · line {site.originalLine ?? site.location}</span></li>
+                <li key={site.id}>
+                  <b>{site.count.toLocaleString()}</b>
+                  <span>
+                    {site.type} · line {site.originalLine ?? site.location}
+                  </span>
+                </li>
               ))}
             </ol>
           ) : (
-            <p>Select a building to inspect its hottest creation sites. Building footprints use final totals; heights show progress at the cursor.</p>
+            <p>
+              Select a building to inspect its hottest creation sites. Building footprints use final totals; heights show progress at the
+              cursor.
+            </p>
           )}
         </aside>
         {error && <div className="LoadNotice">{error}</div>}
       </main>
       <footer className="Timeline EverythingTimeline">
-        <button className="PlayButton" type="button" onClick={() => {
-          if (aggregates.cursor >= dataset.eventCount) {
-            setCursor(0)
-          }
-          setPlaying((value) => !value)
-        }}>{playing ? <Pause size={17} /> : <Play size={17} />}</button>
+        <button
+          className="PlayButton"
+          type="button"
+          onClick={() => {
+            if (aggregates.cursor >= dataset.eventCount) {
+              setCursor(0)
+            }
+            setPlaying((value) => !value)
+          }}
+        >
+          {playing ? <Pause size={17} /> : <Play size={17} />}
+        </button>
         <div className="EverythingTrack">
-          <TrackedEverythingTimeline cursor={aggregates.cursor} eventCount={dataset.eventCount} timeline={aggregates.timeline} types={aggregates.types} />
+          <TrackedEverythingTimeline
+            cursor={aggregates.cursor}
+            eventCount={dataset.eventCount}
+            timeline={aggregates.timeline}
+            types={aggregates.types}
+          />
           <input
             aria-label={axis === 'time' ? 'Elapsed time' : 'Allocation index'}
             type="range"
@@ -216,7 +269,10 @@ export const TrackedEverythingApp = ({ dataset }: { readonly dataset: TrackedEve
               setCursor(axis === 'time' ? timeToEventIndex(dataset.timeMarks, value, dataset.eventCount) : value)
             }}
           />
-          <div className="EverythingScale"><span>0</span><span>{axis === 'time' ? `${dataset.durationMs.toFixed(1)} ms` : dataset.eventCount.toLocaleString()}</span></div>
+          <div className="EverythingScale">
+            <span>0</span>
+            <span>{axis === 'time' ? `${dataset.durationMs.toFixed(1)} ms` : dataset.eventCount.toLocaleString()}</span>
+          </div>
         </div>
       </footer>
     </div>

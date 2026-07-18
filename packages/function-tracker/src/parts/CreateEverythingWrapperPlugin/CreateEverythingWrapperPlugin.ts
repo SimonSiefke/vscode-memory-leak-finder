@@ -9,11 +9,7 @@ const helperName = '__vscodeMemoryLeakFinderTrackEverything'
 const createHelper = (): t.MemberExpression => t.memberExpression(t.identifier('globalThis'), t.identifier(helperName))
 
 const getLocationNodes = (node: t.Node, scriptIdNode: t.Expression): readonly t.Expression[] => {
-  return [
-    scriptIdNode,
-    t.numericLiteral(node.loc?.start.line ?? -1),
-    t.numericLiteral(node.loc?.start.column ?? -1),
-  ]
+  return [scriptIdNode, t.numericLiteral(node.loc?.start.line ?? -1), t.numericLiteral(node.loc?.start.column ?? -1)]
 }
 
 const getCalleeName = (node: t.Expression | t.V8IntrinsicIdentifier): string => {
@@ -65,15 +61,11 @@ const getMethodLocations = (node: t.ObjectExpression | t.ClassExpression | t.Cla
     ? node.properties.filter((property) => t.isObjectMethod(property))
     : node.body.body.filter(
         (element) =>
-          (t.isClassMethod(element) || t.isClassPrivateMethod(element)) &&
-          !(t.isClassMethod(element) && element.kind === 'constructor'),
+          (t.isClassMethod(element) || t.isClassPrivateMethod(element)) && !(t.isClassMethod(element) && element.kind === 'constructor'),
       )
   return t.arrayExpression(
     methods.map((method) =>
-      t.arrayExpression([
-        t.numericLiteral(method.loc?.start.line ?? -1),
-        t.numericLiteral(method.loc?.start.column ?? -1),
-      ]),
+      t.arrayExpression([t.numericLiteral(method.loc?.start.line ?? -1), t.numericLiteral(method.loc?.start.column ?? -1)]),
     ),
   )
 }

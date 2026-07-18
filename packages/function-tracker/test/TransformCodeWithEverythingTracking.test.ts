@@ -23,15 +23,7 @@ test('tracks primitive evaluations and explicit identities in source order', asy
     globalThis.result = [number, string, array, object]
   `)
   const types = events.map((event: number) => metadata.sites[event].type)
-  expect(types).toEqual([
-    'Number',
-    'Number',
-    'Number',
-    'String',
-    'Array',
-    'Object',
-    'Array',
-  ])
+  expect(types).toEqual(['Number', 'Number', 'Number', 'String', 'Array', 'Object', 'Array'])
 })
 
 test('counts repeated primitive call results but only first observes an object identity', async () => {

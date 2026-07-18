@@ -11,12 +11,8 @@ jest.unstable_mockModule('../src/parts/GetTrackedEverything/GetTrackedEverything
   getTrackedEverythingMetadata: mockGetMetadata,
 }))
 
-const MeasureTrackedEverything = await import(
-  '../src/parts/MeasureTrackedEverything/MeasureTrackedEverything.ts'
-)
-const CompareTrackedEverything = await import(
-  '../src/parts/CompareTrackedEverything/CompareTrackedEverything.ts'
-)
+const MeasureTrackedEverything = await import('../src/parts/MeasureTrackedEverything/MeasureTrackedEverything.ts')
+const CompareTrackedEverything = await import('../src/parts/CompareTrackedEverything/CompareTrackedEverything.ts')
 
 test('tracked everything preserves startup data and writes chunks in order', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'tracked-everything-measure-'))

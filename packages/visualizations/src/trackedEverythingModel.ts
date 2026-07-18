@@ -33,10 +33,7 @@ export const getSitePath = (site: TrackedEverythingDataset['sites'][number]): st
   return (match?.[1] || 'runtime/unmapped').replaceAll('\\', '/')
 }
 
-export const decodeTrackedEverythingEvents = (
-  buffer: ArrayBuffer,
-  dataset: TrackedEverythingDataset,
-): Uint32Array => {
+export const decodeTrackedEverythingEvents = (buffer: ArrayBuffer, dataset: TrackedEverythingDataset): Uint32Array => {
   if (buffer.byteLength !== dataset.eventCount * 4) {
     throw new Error(`Invalid event stream length: expected ${dataset.eventCount * 4} bytes, received ${buffer.byteLength}`)
   }
@@ -49,11 +46,7 @@ export const decodeTrackedEverythingEvents = (
   return events
 }
 
-export const timeToEventIndex = (
-  timeMarks: readonly TrackedEverythingTimeMark[],
-  elapsedMs: number,
-  eventCount: number,
-): number => {
+export const timeToEventIndex = (timeMarks: readonly TrackedEverythingTimeMark[], elapsedMs: number, eventCount: number): number => {
   if (timeMarks.length === 0 || elapsedMs <= timeMarks[0].elapsedMs) {
     return 0
   }
@@ -77,11 +70,7 @@ export const timeToEventIndex = (
   return Math.max(0, Math.min(eventCount, Math.round(left.eventIndex + (right.eventIndex - left.eventIndex) * progress)))
 }
 
-export const eventIndexToTime = (
-  timeMarks: readonly TrackedEverythingTimeMark[],
-  eventIndex: number,
-  durationMs: number,
-): number => {
+export const eventIndexToTime = (timeMarks: readonly TrackedEverythingTimeMark[], eventIndex: number, durationMs: number): number => {
   if (timeMarks.length === 0 || eventIndex <= 0) {
     return 0
   }

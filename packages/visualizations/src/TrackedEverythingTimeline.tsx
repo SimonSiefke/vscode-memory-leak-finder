@@ -31,9 +31,7 @@ export const TrackedEverythingTimeline = ({
     context.scale(scale, scale)
     context.clearRect(0, 0, width, height)
     const binCount = types.length ? timeline[types[0]]?.length || 0 : 0
-    const totals = Array.from({ length: binCount }, (_, bin) =>
-      types.reduce((total, type) => total + (timeline[type]?.[bin] || 0), 0),
-    )
+    const totals = Array.from({ length: binCount }, (_, bin) => types.reduce((total, type) => total + (timeline[type]?.[bin] || 0), 0))
     const maximum = Math.max(1, ...totals)
     for (let bin = 0; bin < binCount; bin++) {
       const x = (bin / Math.max(1, binCount)) * width
