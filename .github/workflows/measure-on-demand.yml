@@ -572,8 +572,24 @@ jobs:
           if [[ -f .measure-runs/downloaded-candidate-charts/${REQUEST_ID}-candidate-charts-part.zip ]]; then
             unzip -q .measure-runs/downloaded-candidate-charts/${REQUEST_ID}-candidate-charts-part.zip -d .measure-runs
           fi
-          if [[ -d .measure-runs/base-charts || -d .measure-runs/candidate-charts ]]; then
-            (cd .measure-runs && zip -rq "$REQUEST_ID-charts.zip" base-charts candidate-charts)
+          memory_city_args=()
+          if [[ -f .measure-runs/base-charts/memory-city/memory-city.json ]]; then
+            memory_city_args+=(--revision "${{ inputs.base_commit }}=.measure-runs/base-charts/memory-city/memory-city.json")
+          fi
+          if [[ -f .measure-runs/candidate-charts/memory-city/memory-city.json ]]; then
+            memory_city_args+=(--revision "${{ inputs.candidate_ref }}=.measure-runs/candidate-charts/memory-city/memory-city.json")
+          fi
+          if [[ ${#memory_city_args[@]} -gt 0 ]]; then
+            node packages/visualizations/src/merge.ts "${memory_city_args[@]}" --out .measure-runs/memory-city
+          fi
+          chart_dirs=()
+          for chart_dir in base-charts candidate-charts memory-city; do
+            if [[ -d ".measure-runs/$chart_dir" ]]; then
+              chart_dirs+=("$chart_dir")
+            fi
+          done
+          if [[ ${#chart_dirs[@]} -gt 0 ]]; then
+            (cd .measure-runs && zip -rq "$REQUEST_ID-charts.zip" "${chart_dirs[@]}")
           fi
 
       - name: Write summary JSON

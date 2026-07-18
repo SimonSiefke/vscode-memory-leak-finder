@@ -1,4 +1,6 @@
 export const Nodes = 'nodes'
 export const Edges = 'edges'
+export const TraceFunctionInfos = 'trace_function_infos'
+export const TraceTree = 'trace_tree'
 export const Locations = 'locations'
 export const Strings = 'strings'

@@ -417,14 +417,16 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const useStableVscodeRepoPath = parseUseStableVscodeRepoPath(argv)
   const downloadUserDataZipFileToken = parseDownloadUserDataZipFileToken(argv)
   const downloadUserDataZipFileUrl = parseDownloadUserDataZipFileUrl(argv)
-  const enableExtensions = parseEnableExtensions(argv)
+  const measure = parseMeasure(argv)
+  const memoryCity = measure === 'memory-city' || measure === 'memoryCity'
+  const enableExtensions = parseEnableExtensions(argv) || memoryCity
   const enableProxy = parseEnableProxy(argv)
   const filter = parseFilter(argv)
   const headless = parseHeadless(argv)
   const ide = parseIde(argv)
   const ideVersion = ''
   const insidersCommit = parseInsidersCommit(parsedVersion, argv)
-  const inspectExtensions = parseInspectExtensions(argv)
+  const inspectExtensions = parseInspectExtensions(argv) || memoryCity
   const inspectExtensionsPort = parseInspectExtensionsPort(argv)
   const inspectIntegratedBrowser = parseInspectIntegratedBrowser(argv)
   const inspectProcess = parseInspectProcess(argv)
@@ -432,7 +434,6 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const inspectPtyHostPort = parseInspectPtyHostPort(argv)
   const inspectSharedProcess = parseInspectSharedProcess(argv)
   const inspectSharedProcessPort = parseInspectSharedProcessPort(argv)
-  const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
   if (isIpcMessageCountMeasure(measure) && !measureNode) {
