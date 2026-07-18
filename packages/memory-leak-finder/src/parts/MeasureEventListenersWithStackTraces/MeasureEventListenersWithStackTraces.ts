@@ -33,10 +33,7 @@ export const stop = async (session: Session, objectGroup: Dynamic, scriptHandler
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   const resultWithStackTraces = await AddStackTracesToEventListeners.addStackTracesToEventListeners(session, result)
   await StopTrackingEventListenerStackTraces.stopTrackingEventListenerStackTraces(session, objectGroup)
-  return {
-    result: resultWithStackTraces,
-    scriptMap: scriptHandler.scriptMap,
-  }
+  return resultWithStackTraces
 }
 export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
