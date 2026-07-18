@@ -17,17 +17,31 @@ jobs:
       fail-fast: false
       matrix:
         test:
+          - angular-docs-installation
+          - ember-guides-html-css-javascript
           - google-maps-search-clear
           - google-translate-text-clear
+          - jest-docs-using-matchers
           - nextjs-docs-project-structure
           - npm-package-search-clear
+          - nuxt-docs-installation
           - openstreetmap-search-clear
+          - playwright-docs-writing-tests
+          - prisma-docs-getting-started
+          - qwik-docs-project-structure
           - react-docs-simple-browser-blog
+          - react-native-docs-core-components
           - react-router-docs-routing
+          - redux-docs-installation
+          - sentry-docs-installation-methods
+          - storybook-docs-install
+          - supabase-docs-getting-started
           - svelte-docs-getting-started
           - syntax-fm-simple-browser-videos-shows
           - tailwind-docs-styling-with-utility-classes
+          - vercel-docs-getting-started
           - vite-docs-guide-features
+          - vitest-docs-features
           - vue-docs-reactivity-fundamentals
     steps:
       - uses: actions/checkout@v6
