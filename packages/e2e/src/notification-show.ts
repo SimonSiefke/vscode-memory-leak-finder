@@ -8,6 +8,7 @@ export const setup = async ({ Extensions }: TestContext) => {
 }
 
 export const run = async ({ Notification, QuickPick }: TestContext): Promise<void> => {
+  await QuickPick.waitForCommand('Hello World')
   await QuickPick.showCommands()
   await QuickPick.type('Hello world')
   await QuickPick.select('Hello World')
