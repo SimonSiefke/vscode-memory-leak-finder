@@ -48,6 +48,32 @@ Measures the total number of elements in all arrays.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure array-element-count --only base
 ```
 
+### LargestArrayCount
+
+Reports arrays that grew between main-process heap snapshots. The opt-in
+terminal output scenario exercises the unconsumed PTY event buffer fixed by
+[microsoft/vscode#323980](https://github.com/microsoft/vscode/pull/323980).
+
+Compare a vulnerable VS Code checkout with a checkout containing the fix:
+
+```sh
+npm run measure-local-vscode-comparison -- \
+  --old-vscode-path /path/to/vscode-before \
+  --new-vscode-path /path/to/vscode-with-fix \
+  --old-label before \
+  --new-label after \
+  --only '^terminal-write-a-lot-of-data.ts' \
+  --measure largest-array-count \
+  --measure-node \
+  --measure-after \
+  --runs 5
+```
+
+The vulnerable result should contain growing arrays and report `isLeak: true`;
+the fixed result should contain no growing arrays and report `isLeak: false`.
+The comparison runner is Linux-only and explicitly runs the otherwise skipped
+scenario.
+
 ### ClassCount
 
 Measures the total number of classes.
