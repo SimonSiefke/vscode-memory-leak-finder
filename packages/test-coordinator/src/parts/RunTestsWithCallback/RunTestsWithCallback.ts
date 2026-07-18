@@ -192,13 +192,7 @@ const getResultPath = ({
     return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'integrated-browser', measure, resultRelativePath)
   }
   if (inspectProcess) {
-    return join(
-      MemoryLeakResultsPath.memoryLeakResultsPath,
-      'process',
-      getProcessResultFolder(inspectProcess),
-      measure,
-      resultRelativePath,
-    )
+    return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'process', getProcessResultFolder(inspectProcess), measure, resultRelativePath)
   }
   return join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, resultRelativePath)
 }

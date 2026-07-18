@@ -248,6 +248,7 @@ test('runTestsWithCallback - minimal reproduction result path uses scenario name
       runSkippedTestsAnyway: true,
       screencastQuality: 100,
       setupOnly: false,
+      startupRuns: 1,
       timeoutBetween: 0,
       timeouts: false,
       trackFunctions: false,
