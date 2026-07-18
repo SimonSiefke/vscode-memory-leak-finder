@@ -4,7 +4,7 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const introductionUrl = 'https://nuxt.com/docs/getting-started/introduction'
+const introductionUrl = 'https://nuxt.com/docs/4.x/getting-started/introduction'
 const introductionUrlPattern = /^https:\/\/nuxt\.com\/docs\/(?:\d+\.x\/)?getting-started\/introduction\/?$/
 const installationUrlPattern = /^https:\/\/nuxt\.com\/docs\/(?:\d+\.x\/)?getting-started\/installation\/?$/
 const installationLinkSelector = 'a[href$="/getting-started/installation"]'
