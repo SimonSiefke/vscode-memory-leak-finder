@@ -160,4 +160,22 @@ export const generateCharts = async () => {
       throw error
     }
   }
+
+  const trackedEverythingResults = join(Root.root, '.vscode-memory-leak-finder-results', 'tracked-everything')
+  try {
+    await access(trackedEverythingResults)
+    await execFileAsync(process.execPath, [
+      join(Root.root, 'packages', 'visualizations', 'src', 'generateTrackedEverything.ts'),
+      '--results',
+      trackedEverythingResults,
+      '--assets',
+      join(Root.root, 'packages', 'visualizations', 'dist'),
+      '--out',
+      join(Root.root, '.vscode-charts', 'tracked-everything'),
+    ])
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error
+    }
+  }
 }

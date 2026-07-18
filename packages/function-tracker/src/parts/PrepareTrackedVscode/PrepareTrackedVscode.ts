@@ -32,8 +32,10 @@ const transformerFiles = [
   join(import.meta.dirname, '..', 'Transform', 'Transform.ts'),
   join(import.meta.dirname, '..', 'TransformCodeWithTracking', 'TransformCodeWithTracking.ts'),
   join(import.meta.dirname, '..', 'TransformCodeWithAllocationTracking', 'TransformCodeWithAllocationTracking.ts'),
+  join(import.meta.dirname, '..', 'TransformCodeWithEverythingTracking', 'TransformCodeWithEverythingTracking.ts'),
   join(import.meta.dirname, '..', 'CreateFunctionWrapperPlugin', 'CreateFunctionWrapperPlugin.ts'),
   join(import.meta.dirname, '..', 'CreateAllocationWrapperPlugin', 'CreateAllocationWrapperPlugin.ts'),
+  join(import.meta.dirname, '..', 'CreateEverythingWrapperPlugin', 'CreateEverythingWrapperPlugin.ts'),
 ]
 
 const excludedDirectoryNames = new Set(['.build', '.cache', '.git', '.vscode-test'])

@@ -15,6 +15,11 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     return
   }
   const options = ParseArgv.parseArgv(platform, arch, argv)
+  if (options.measure === 'tracked-everything' || options.measure === 'trackedEverything') {
+    console.warn(
+      'Warning: tracked-everything exhaustively instruments source-observable creations and substantially changes runtime performance and memory use.',
+    )
+  }
 
   // Parse isGithubActions once at startup
   const isGithubActions = Boolean(env.GITHUB_ACTIONS)

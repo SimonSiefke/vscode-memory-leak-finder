@@ -15,6 +15,11 @@ test('getTrackingMode - tracked timeout measures use timeout tracking', () => {
   expect(getTrackingMode('trackedTimeouts')).toBe('timeouts')
 })
 
+test('getTrackingMode - tracked everything uses everything tracking', () => {
+  expect(getTrackingMode('tracked-everything')).toBe('everything')
+  expect(getTrackingMode('trackedEverything')).toBe('everything')
+})
+
 test('getTrackingMode - other measures use function tracking', () => {
   expect(getTrackingMode('tracked-functions')).toBe('functions')
   expect(getTrackingMode('event-listener-count')).toBe('functions')

@@ -29,6 +29,11 @@ const baseStructure = `
 
 const getMiddleHtml = (dirents: string[]) => {
   let html = '<ul class="Charts">\n'
+  for (const directory of ['memory-city', 'tracked-everything']) {
+    if (dirents.includes(directory)) {
+      html += `        <li class="Chart"><a href="./${directory}/index.html">Open ${directory.replaceAll('-', ' ')}</a></li>\n`
+    }
+  }
   for (const dirent of dirents) {
     if (!dirent.endsWith('.svg')) {
       continue
