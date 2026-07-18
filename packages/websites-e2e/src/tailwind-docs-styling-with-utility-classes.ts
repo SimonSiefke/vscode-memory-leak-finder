@@ -4,47 +4,39 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const videosUrl = 'https://syntax.fm/videos'
-const videosUrlPattern = /^https:\/\/syntax\.fm\/videos\/?$/
-const showsUrlPattern = /^https:\/\/syntax\.fm\/shows\/?$/
-const showsLinkSelector = 'a[href="/shows"]'
-
-const wait = (ms: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
-}
+const installationUrl = 'https://tailwindcss.com/docs/installation/using-vite'
+const installationUrlPattern = /^https:\/\/tailwindcss\.com\/docs\/installation\/using-vite\/?$/
+const utilityClassesUrlPattern = /^https:\/\/tailwindcss\.com\/docs\/styling-with-utility-classes\/?$/
+const utilityClassesLinkSelector = 'a[href="/docs/styling-with-utility-classes"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
   await SideBar.hide()
-  await wait(3000)
   await Notification.closeAll({ force: true })
   await SimpleBrowser.show({
-    url: videosUrl,
+    url: installationUrl,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Get started with Tailwind CSS',
+    urlPattern: installationUrlPattern,
   })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.clickPageLink({
-    headingText: 'All Episodes',
-    selector: showsLinkSelector,
-    urlPattern: showsUrlPattern,
+    headingText: 'Styling with utility classes',
+    selector: utilityClassesLinkSelector,
+    urlPattern: utilityClassesUrlPattern,
   })
-
   await SimpleBrowser.back({
-    urlPattern: videosUrlPattern,
+    urlPattern: installationUrlPattern,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Get started with Tailwind CSS',
+    urlPattern: installationUrlPattern,
   })
 }
 

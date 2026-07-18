@@ -4,47 +4,39 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const videosUrl = 'https://syntax.fm/videos'
-const videosUrlPattern = /^https:\/\/syntax\.fm\/videos\/?$/
-const showsUrlPattern = /^https:\/\/syntax\.fm\/shows\/?$/
-const showsLinkSelector = 'a[href="/shows"]'
-
-const wait = (ms: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
-}
+const guideUrl = 'https://vite.dev/guide/'
+const guideUrlPattern = /^https:\/\/vite\.dev\/guide\/?$/
+const featuresUrlPattern = /^https:\/\/vite\.dev\/guide\/features\/?$/
+const featuresLinkSelector = 'a[href="/guide/features"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
   await SideBar.hide()
-  await wait(3000)
   await Notification.closeAll({ force: true })
   await SimpleBrowser.show({
-    url: videosUrl,
+    url: guideUrl,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Getting Started',
+    urlPattern: guideUrlPattern,
   })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.clickPageLink({
-    headingText: 'All Episodes',
-    selector: showsLinkSelector,
-    urlPattern: showsUrlPattern,
+    headingText: 'Features',
+    selector: featuresLinkSelector,
+    urlPattern: featuresUrlPattern,
   })
-
   await SimpleBrowser.back({
-    urlPattern: videosUrlPattern,
+    urlPattern: guideUrlPattern,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Getting Started',
+    urlPattern: guideUrlPattern,
   })
 }
 

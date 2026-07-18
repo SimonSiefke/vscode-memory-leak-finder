@@ -4,47 +4,39 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const videosUrl = 'https://syntax.fm/videos'
-const videosUrlPattern = /^https:\/\/syntax\.fm\/videos\/?$/
-const showsUrlPattern = /^https:\/\/syntax\.fm\/shows\/?$/
-const showsLinkSelector = 'a[href="/shows"]'
-
-const wait = (ms: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
-}
+const gettingStartedUrl = 'https://jestjs.io/docs/getting-started'
+const gettingStartedUrlPattern = /^https:\/\/jestjs\.io\/docs\/getting-started\/?$/
+const usingMatchersUrlPattern = /^https:\/\/jestjs\.io\/docs\/using-matchers\/?$/
+const usingMatchersLinkSelector = 'a[href="/docs/using-matchers"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
   await SideBar.hide()
-  await wait(3000)
   await Notification.closeAll({ force: true })
   await SimpleBrowser.show({
-    url: videosUrl,
+    url: gettingStartedUrl,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Getting Started',
+    urlPattern: gettingStartedUrlPattern,
   })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.clickPageLink({
-    headingText: 'All Episodes',
-    selector: showsLinkSelector,
-    urlPattern: showsUrlPattern,
+    headingText: 'Using Matchers',
+    selector: usingMatchersLinkSelector,
+    urlPattern: usingMatchersUrlPattern,
   })
-
   await SimpleBrowser.back({
-    urlPattern: videosUrlPattern,
+    urlPattern: gettingStartedUrlPattern,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Getting Started',
+    urlPattern: gettingStartedUrlPattern,
   })
 }
 

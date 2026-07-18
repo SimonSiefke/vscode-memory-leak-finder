@@ -4,47 +4,38 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const videosUrl = 'https://syntax.fm/videos'
-const videosUrlPattern = /^https:\/\/syntax\.fm\/videos\/?$/
-const showsUrlPattern = /^https:\/\/syntax\.fm\/shows\/?$/
-const showsLinkSelector = 'a[href="/shows"]'
-
-const wait = (ms: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
-}
+const introductionUrl = 'https://vuejs.org/guide/introduction'
+const introductionUrlPattern = /^https:\/\/vuejs\.org\/guide\/introduction\/?$/
+const tutorialUrlPattern = /^https:\/\/vuejs\.org\/tutorial\/?$/
+const tutorialLinkSelector = 'a[href="/tutorial/"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
   await SideBar.hide()
-  await wait(3000)
   await Notification.closeAll({ force: true })
   await SimpleBrowser.show({
-    url: videosUrl,
+    url: introductionUrl,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Introduction',
+    urlPattern: introductionUrlPattern,
   })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.clickPageLink({
-    headingText: 'All Episodes',
-    selector: showsLinkSelector,
-    urlPattern: showsUrlPattern,
+    selector: tutorialLinkSelector,
+    urlPattern: tutorialUrlPattern,
   })
-
   await SimpleBrowser.back({
-    urlPattern: videosUrlPattern,
+    urlPattern: introductionUrlPattern,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Introduction',
+    urlPattern: introductionUrlPattern,
   })
 }
 

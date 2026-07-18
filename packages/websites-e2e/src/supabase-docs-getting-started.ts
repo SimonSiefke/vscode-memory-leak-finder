@@ -4,47 +4,39 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const videosUrl = 'https://syntax.fm/videos'
-const videosUrlPattern = /^https:\/\/syntax\.fm\/videos\/?$/
-const showsUrlPattern = /^https:\/\/syntax\.fm\/shows\/?$/
-const showsLinkSelector = 'a[href="/shows"]'
-
-const wait = (ms: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
-}
+const docsUrl = 'https://supabase.com/docs'
+const docsUrlPattern = /^https:\/\/supabase\.com\/docs\/?$/
+const gettingStartedUrlPattern = /^https:\/\/supabase\.com\/docs\/guides\/getting-started\/?$/
+const gettingStartedLinkSelector = 'a[href="/docs/guides/getting-started"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
   await SideBar.hide()
-  await wait(3000)
   await Notification.closeAll({ force: true })
   await SimpleBrowser.show({
-    url: videosUrl,
+    url: docsUrl,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Supabase Documentation',
+    urlPattern: docsUrlPattern,
   })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.clickPageLink({
-    headingText: 'All Episodes',
-    selector: showsLinkSelector,
-    urlPattern: showsUrlPattern,
+    headingText: 'Getting Started',
+    selector: gettingStartedLinkSelector,
+    urlPattern: gettingStartedUrlPattern,
   })
-
   await SimpleBrowser.back({
-    urlPattern: videosUrlPattern,
+    urlPattern: docsUrlPattern,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Supabase Documentation',
+    urlPattern: docsUrlPattern,
   })
 }
 

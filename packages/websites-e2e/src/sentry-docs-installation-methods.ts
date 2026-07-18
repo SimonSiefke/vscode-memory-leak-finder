@@ -4,47 +4,39 @@ export const requiresNetwork = true
 
 export const skip = true
 
-const videosUrl = 'https://syntax.fm/videos'
-const videosUrlPattern = /^https:\/\/syntax\.fm\/videos\/?$/
-const showsUrlPattern = /^https:\/\/syntax\.fm\/shows\/?$/
-const showsLinkSelector = 'a[href="/shows"]'
-
-const wait = (ms: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
-}
+const browserJavascriptUrl = 'https://docs.sentry.io/platforms/javascript/'
+const browserJavascriptUrlPattern = /^https:\/\/docs\.sentry\.io\/platforms\/javascript\/?$/
+const installationMethodsUrlPattern = /^https:\/\/docs\.sentry\.io\/platforms\/javascript\/install\/?$/
+const installationMethodsLinkSelector = 'a[href="/platforms/javascript/install/"]'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
   await SideBar.hide()
-  await wait(3000)
   await Notification.closeAll({ force: true })
   await SimpleBrowser.show({
-    url: videosUrl,
+    url: browserJavascriptUrl,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Browser JavaScript',
+    urlPattern: browserJavascriptUrlPattern,
   })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {
   await SimpleBrowser.clickPageLink({
-    headingText: 'All Episodes',
-    selector: showsLinkSelector,
-    urlPattern: showsUrlPattern,
+    headingText: 'Installation Methods',
+    selector: installationMethodsLinkSelector,
+    urlPattern: installationMethodsUrlPattern,
   })
-
   await SimpleBrowser.back({
-    urlPattern: videosUrlPattern,
+    urlPattern: browserJavascriptUrlPattern,
   })
   await SimpleBrowser.shouldHaveText({
     selector: 'h1',
-    text: 'All Playlists',
-    urlPattern: videosUrlPattern,
+    text: 'Browser JavaScript',
+    urlPattern: browserJavascriptUrlPattern,
   })
 }
 
