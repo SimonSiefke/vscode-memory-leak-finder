@@ -1,7 +1,8 @@
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { copyFile, mkdir, readFile, unlink, writeFile } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
+import { constants } from 'node:fs'
+import { copyFile, cp, mkdir, readFile, rename, rm, unlink, writeFile } from 'node:fs/promises'
+import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { diffProfileSummaries, summarizeProfiles } from './CpuProfile.ts'
 import { getExperimentVerdict, getPhaseBreakdown } from './Experiment.ts'
@@ -14,6 +15,7 @@ import type { Goal, ScoreSample } from './Types.ts'
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const resultsRoot = join(repositoryRoot, '.vscode-memory-leak-finder-results')
 const defaultArtifactsRoot = join(repositoryRoot, '.performance-lab')
+const runtimeRoot = join(repositoryRoot, '.performance-lab-runtime')
 
 export interface CommonRunOptions {
   readonly display: string
@@ -172,30 +174,75 @@ const getProcessBreakdown = (samples: readonly ScoreSample[]) => {
   }
 }
 
+const getRuntimePath = (): string => {
+  return join(runtimeRoot, `${process.pid}-${Date.now()}`)
+}
+
+const stageBuild = async (build: BuildOptions, runtimePath: string, label: string): Promise<void> => {
+  const stagedPath = join(runtimePath, label)
+  await rm(stagedPath, { force: true, recursive: true })
+  await mkdir(runtimePath, { recursive: true })
+  await cp(dirname(build.vscodePath), stagedPath, {
+    force: true,
+    mode: constants.COPYFILE_FICLONE,
+    preserveTimestamps: true,
+    recursive: true,
+  })
+}
+
+const removeRuntimePath = async (runtimePath: string): Promise<void> => {
+  await rm(runtimePath, { force: true, recursive: true })
+}
+
+const withStagedBuild = async <T>(
+  build: BuildOptions,
+  runtimePath: string,
+  label: string,
+  fn: (vscodePath: string) => Promise<T>,
+): Promise<T> => {
+  const stagedPath = join(runtimePath, label)
+  const activePath = join(runtimePath, 'vscode')
+  await rename(stagedPath, activePath)
+  try {
+    return await fn(join(activePath, basename(build.vscodePath)))
+  } finally {
+    await rename(activePath, stagedPath)
+  }
+}
+
 const runScoreSample = async (
   build: BuildOptions,
   common: CommonRunOptions,
   outputPath: string,
+  runtimePath: string,
   label: string,
   index: number,
 ): Promise<ScoreSample> => {
   const artifactPath = join(outputPath, 'raw', label, `sample-${String(index + 1).padStart(2, '0')}.json`)
-  const rawResult = await runMeasure({
-    artifactPath,
-    display: common.display,
-    measure: 'cpu-performance-counters',
-    scenario: common.scenario,
-    vscodePath: build.vscodePath,
-  })
+  const rawResult = await withStagedBuild(build, runtimePath, label, (vscodePath) =>
+    runMeasure({
+      artifactPath,
+      display: common.display,
+      measure: 'cpu-performance-counters',
+      scenario: common.scenario,
+      vscodePath,
+    }),
+  )
   return parseScoreResult(rawResult)
 }
 
 export const runBaseline = async (build: BuildOptions, common: CommonRunOptions): Promise<string> => {
   const outputPath = common.outputPath || getDefaultOutputPath('baseline')
+  const runtimePath = getRuntimePath()
   const harnessHash = await hashPaths(getHarnessPaths())
   const samples: ScoreSample[] = []
-  for (let index = 0; index < common.samples; index++) {
-    samples.push(await runScoreSample(build, common, outputPath, 'baseline', index))
+  try {
+    await stageBuild(build, runtimePath, 'baseline')
+    for (let index = 0; index < common.samples; index++) {
+      samples.push(await runScoreSample(build, common, outputPath, runtimePath, 'baseline', index))
+    }
+  } finally {
+    await removeRuntimePath(runtimePath)
   }
   await assertHarnessUnchanged(harnessHash)
   return writeExperiment(outputPath, {
@@ -242,13 +289,20 @@ export const runComparison = async (
   goal: Goal,
 ): Promise<string> => {
   const outputPath = common.outputPath || getDefaultOutputPath('compare')
+  const runtimePath = getRuntimePath()
   const harnessHash = await hashPaths(getHarnessPaths())
   const baseline: ScoreSample[] = []
   const candidate: ScoreSample[] = []
-  for (const label of getInterleavedOrder(common.samples)) {
-    const target = label === 'baseline' ? baseline : candidate
-    const build = label === 'baseline' ? baselineBuild : candidateBuild
-    target.push(await runScoreSample(build, common, outputPath, label, target.length))
+  try {
+    await stageBuild(baselineBuild, runtimePath, 'baseline')
+    await stageBuild(candidateBuild, runtimePath, 'candidate')
+    for (const label of getInterleavedOrder(common.samples)) {
+      const target = label === 'baseline' ? baseline : candidate
+      const build = label === 'baseline' ? baselineBuild : candidateBuild
+      target.push(await runScoreSample(build, common, outputPath, runtimePath, label, target.length))
+    }
+  } finally {
+    await removeRuntimePath(runtimePath)
   }
   await assertHarnessUnchanged(harnessHash)
   const result = getExperimentVerdict(baseline, candidate, goal)
@@ -294,18 +348,21 @@ const runDiagnosticBuild = async (
   build: BuildOptions,
   common: CommonRunOptions,
   outputPath: string,
+  runtimePath: string,
   label: string,
 ): Promise<{ readonly profiles: readonly any[]; readonly summary: Awaited<ReturnType<typeof summarizeProfiles>> }> => {
   const profiles: any[] = []
   for (let index = 0; index < common.samples; index++) {
     const artifactPath = join(outputPath, 'raw', label, `sample-${String(index + 1).padStart(2, '0')}.json`)
-    const result = await runMeasure({
-      artifactPath,
-      display: common.display,
-      measure: 'cpu-profile',
-      scenario: common.scenario,
-      vscodePath: build.vscodePath,
-    })
+    const result = await withStagedBuild(build, runtimePath, label, (vscodePath) =>
+      runMeasure({
+        artifactPath,
+        display: common.display,
+        measure: 'cpu-profile',
+        scenario: common.scenario,
+        vscodePath,
+      }),
+    )
     const profile = getRawProfile(result)
     profiles.push(profile)
     await writeFile(artifactPath.replace(/\.json$/, '.cpuprofile'), JSON.stringify(profile))
@@ -322,9 +379,20 @@ export const runDiagnosis = async (
   common: CommonRunOptions,
 ): Promise<string> => {
   const outputPath = common.outputPath || getDefaultOutputPath('diagnose')
+  const runtimePath = getRuntimePath()
   const harnessHash = await hashPaths(getHarnessPaths())
-  const baseline = await runDiagnosticBuild(baselineBuild, common, outputPath, 'baseline')
-  const candidate = candidateBuild ? await runDiagnosticBuild(candidateBuild, common, outputPath, 'candidate') : undefined
+  let baseline: Awaited<ReturnType<typeof runDiagnosticBuild>>
+  let candidate: Awaited<ReturnType<typeof runDiagnosticBuild>> | undefined
+  try {
+    await stageBuild(baselineBuild, runtimePath, 'baseline')
+    if (candidateBuild) {
+      await stageBuild(candidateBuild, runtimePath, 'candidate')
+    }
+    baseline = await runDiagnosticBuild(baselineBuild, common, outputPath, runtimePath, 'baseline')
+    candidate = candidateBuild ? await runDiagnosticBuild(candidateBuild, common, outputPath, runtimePath, 'candidate') : undefined
+  } finally {
+    await removeRuntimePath(runtimePath)
+  }
   await assertHarnessUnchanged(harnessHash)
   return writeExperiment(outputPath, {
     baseline: {
