@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import { cpus, freemem, hostname, loadavg, platform, release, totalmem, uptime } from 'node:os'
 import { dirname, join } from 'node:path'
 import { execFile } from 'node:child_process'
@@ -57,17 +58,49 @@ const getSourceCommit = async (sourcePath: string | undefined): Promise<string> 
   }
 }
 
+const getSourceDirty = async (sourcePath: string | undefined): Promise<boolean> => {
+  if (!sourcePath) {
+    return false
+  }
+  try {
+    const { stdout } = await execFileAsync('git', ['status', '--porcelain'], { cwd: sourcePath })
+    return stdout.trim().length > 0
+  } catch {
+    return false
+  }
+}
+
+const getFileHash = async (path: string): Promise<string> => {
+  try {
+    return createHash('sha256')
+      .update(await readFile(path))
+      .digest('hex')
+  } catch {
+    return ''
+  }
+}
+
 export const getSystemMetadata = async (vscodePath: string, sourcePath?: string) => {
   const product = await readJson(join(dirname(vscodePath), 'resources', 'app', 'product.json'))
+  const sourceCommit = await getSourceCommit(sourcePath)
+  const sourceDirty = await getSourceDirty(sourcePath)
+  const workbenchPath = join(dirname(vscodePath), 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js')
+  const sourceMapPath = sourcePath ? join(sourcePath, 'out-vscode-min', 'vs', 'workbench', 'workbench.desktop.main.js.map') : ''
   const cpu = cpus()[0]
   const proc = await getProcStat()
   return {
     architecture: process.arch,
     build: {
-      commit: product?.commit || (await getSourceCommit(sourcePath)),
+      commit: product?.commit || sourceCommit,
       executable: vscodePath,
+      executableSha256: await getFileHash(vscodePath),
+      productCommit: product?.commit || '',
+      sourceCommit,
+      sourceDirty,
+      sourceMapSha256: sourceMapPath ? await getFileHash(sourceMapPath) : '',
       sourcePath: sourcePath || '',
       version: product?.version || '',
+      workbenchSha256: await getFileHash(workbenchPath),
     },
     cpu: {
       count: cpus().length,

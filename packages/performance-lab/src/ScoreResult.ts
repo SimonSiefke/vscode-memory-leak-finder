@@ -55,6 +55,13 @@ const defaultPosition: SamplePosition = {
   pattern: 'ABBA',
 }
 
+const getProcessManifest = (value: unknown): NonNullable<ScoreSample['processManifest']> => {
+  if (!Array.isArray(value)) {
+    return []
+  }
+  return value.filter((entry) => typeof entry?.args === 'string' && typeof entry?.pid === 'number' && typeof entry?.ppid === 'number')
+}
+
 export const parseScoreResult = (result: any, position: SamplePosition = defaultPosition): ScoreSample => {
   if (result?.cpuProfile || result?.trace || result?.timeline) {
     throw new Error(`Profiler-enabled results cannot enter the scoring dataset`)
@@ -122,6 +129,7 @@ export const parseScoreResult = (result: any, position: SamplePosition = default
     pageFaults: getMetric(metrics, 'pageFaults'),
     paintedLatencyMs,
     pid,
+    processManifest: getProcessManifest(performanceSample.processManifest),
     rawCounterOutput,
     taskClockMs: getMetric(metrics, 'taskClockMs'),
     workerLatencyMs,

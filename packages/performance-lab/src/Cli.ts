@@ -48,6 +48,7 @@ const getCommonOptions = (argv: readonly string[], defaultSamples: number): Comm
     blocks: getNumber(argv, '--blocks', tier === 'confirmation' ? 50 : 12),
     collectWork: argv.includes('--collect-work'),
     ...(cpuList ? { cpuList } : {}),
+    deferCalibrationVerdict: argv.includes('--defer-calibration-verdict'),
     display: getString(argv, '--display', process.env.DISPLAY || ':1'),
     orderSeed: getInteger(argv, '--order-seed', 0x51f15e),
     ...(output ? { outputPath: resolve(output) } : {}),
@@ -77,6 +78,7 @@ const printUsage = (): void => {
 
 Common options: --scenario NAME --display DISPLAY --output PATH --tier quick|confirmation
                 --cpu-list LIST --order-seed NUMBER --replica-id ID
+                --defer-calibration-verdict
                 --collect-work --work-samples NUMBER --track-include SOURCE_PATTERN`)
 }
 

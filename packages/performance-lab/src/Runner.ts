@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { constants, createReadStream } from 'node:fs'
-import { copyFile, cp, mkdir, readFile, readdir, rename, rm, unlink, writeFile } from 'node:fs/promises'
+import { cp, mkdir, readFile, readdir, rename, rm, unlink, writeFile } from 'node:fs/promises'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { diffProfileSummaries, summarizeProfiles } from './CpuProfile.ts'
@@ -21,6 +21,7 @@ export interface CommonRunOptions {
   readonly blocks: number
   readonly collectWork: boolean
   readonly cpuList?: string
+  readonly deferCalibrationVerdict: boolean
   readonly display: string
   readonly orderSeed: number
   readonly outputPath?: string
@@ -35,6 +36,29 @@ export interface CommonRunOptions {
 export interface BuildOptions {
   readonly sourcePath?: string
   readonly vscodePath: string
+}
+
+type SystemMetadata = Awaited<ReturnType<typeof getSystemMetadata>>
+
+const assertBuildIdentity = (metadata: SystemMetadata, label: string): void => {
+  const { build } = metadata
+  if (!build.executableSha256 || !build.workbenchSha256) {
+    throw new Error(`${label} build is missing executable or workbench identity`)
+  }
+  if (build.sourcePath && !build.sourceMapSha256) {
+    throw new Error(`${label} build is missing matching optimized workbench source maps`)
+  }
+  if (build.productCommit && build.sourceCommit && !build.sourceDirty && build.productCommit !== build.sourceCommit) {
+    throw new Error(`${label} product commit ${build.productCommit} does not match clean source commit ${build.sourceCommit}`)
+  }
+}
+
+const isIdenticalBuild = (baseline: SystemMetadata, candidate: SystemMetadata): boolean => {
+  return (
+    baseline.build.executableSha256 === candidate.build.executableSha256 &&
+    baseline.build.workbenchSha256 === candidate.build.workbenchSha256 &&
+    baseline.build.sourceMapSha256 === candidate.build.sourceMapSha256
+  )
 }
 
 const getScenarioName = (scenario: string): string => {
@@ -138,6 +162,7 @@ const runMeasure = async ({
       {
         ...process.env,
         DISPLAY: display,
+        VSCODE_PERFORMANCE_CORE_WORKLOAD: '1',
         VSCODE_PERFORMANCE_TRACK_INCLUDE: JSON.stringify(trackingIncludePatterns),
         VSCODE_PERFORMANCE_SOURCE_PATH: sourcePath || '',
         VSCODE_PERFORMANCE_USER_DATA_DIR: userDataPath,
@@ -145,8 +170,9 @@ const runMeasure = async ({
       cpuList,
     )
     await mkdir(dirname(artifactPath), { recursive: true })
-    await copyFile(resultPath, artifactPath)
-    return JSON.parse(await readFile(resultPath, 'utf8'))
+    const result = JSON.parse(await readFile(resultPath, 'utf8'))
+    await writeFile(artifactPath, JSON.stringify(result, null, 2) + '\n')
+    return result
   } finally {
     await rm(userDataPath, { force: true, recursive: true })
   }
@@ -457,7 +483,13 @@ export const runComparison = async (
   const harnessHash = await hashPaths(getHarnessPaths())
   const baseline: ScoreSample[] = []
   const candidate: ScoreSample[] = []
+  const baselineMetadata = await getSystemMetadata(baselineBuild.vscodePath, baselineBuild.sourcePath)
+  const candidateMetadata = await getSystemMetadata(candidateBuild.vscodePath, candidateBuild.sourcePath)
+  assertBuildIdentity(baselineMetadata, 'Baseline')
+  assertBuildIdentity(candidateMetadata, 'Candidate')
+  const identicalBuildCalibration = isIdenticalBuild(baselineMetadata, candidateMetadata)
   let workComparison: WorkComparison | undefined
+  let skippedWorkReason = ''
   try {
     await stageBuild(baselineBuild, runtimePath, 'baseline')
     await stageBuild(candidateBuild, runtimePath, 'candidate')
@@ -467,24 +499,31 @@ export const runComparison = async (
       const build = label === 'baseline' ? baselineBuild : candidateBuild
       target.push(await runScoreSample(build, common, outputPath, runtimePath, label, target.length, position))
     }
-    if (common.collectWork) {
+    const validateCalibration = identicalBuildCalibration && !common.deferCalibrationVerdict
+    const preliminary = getExperimentVerdict(baseline, candidate, goal, common.tier, undefined, validateCalibration)
+    if (common.collectWork && identicalBuildCalibration) {
+      skippedWorkReason = 'deterministic work is not collected for identical-build calibration'
+    } else if (common.collectWork && (preliminary.verdict.status === 'invalid' || preliminary.verdict.status === 'rejected')) {
+      skippedWorkReason = `scoring verdict was already ${preliminary.verdict.status}`
+    } else if (common.collectWork) {
       workComparison = await runWorkComparison(baselineBuild, candidateBuild, common, outputPath, runtimePath)
     }
   } finally {
     await removeRuntimePath(runtimePath)
   }
   await assertHarnessUnchanged(harnessHash)
-  const result = getExperimentVerdict(baseline, candidate, goal, common.tier, workComparison)
+  const validateCalibration = identicalBuildCalibration && !common.deferCalibrationVerdict
+  const result = getExperimentVerdict(baseline, candidate, goal, common.tier, workComparison, validateCalibration)
   return writeExperiment(outputPath, {
     baseline: {
-      metadata: await getSystemMetadata(baselineBuild.vscodePath, baselineBuild.sourcePath),
+      metadata: baselineMetadata,
       phaseBreakdown: getPhaseBreakdown(baseline),
       processBreakdown: getProcessBreakdown(baseline),
       samples: baseline,
       statistics: getScoreStatistics(baseline),
     },
     candidate: {
-      metadata: await getSystemMetadata(candidateBuild.vscodePath, candidateBuild.sourcePath),
+      metadata: candidateMetadata,
       phaseBreakdown: getPhaseBreakdown(candidate),
       processBreakdown: getProcessBreakdown(candidate),
       samples: candidate,
@@ -495,6 +534,7 @@ export const runComparison = async (
     createdAt: new Date().toISOString(),
     goal,
     harnessHash,
+    identicalBuildCalibration,
     order: getInterleavedOrder(common.blocks, common.orderSeed),
     replicaId: common.replicaId,
     scenario: {
@@ -505,6 +545,7 @@ export const runComparison = async (
     tier: common.tier,
     verdict: result.verdict,
     ...(workComparison ? { workComparison } : {}),
+    ...(skippedWorkReason ? { skippedWorkReason } : {}),
   })
 }
 

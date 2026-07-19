@@ -18,6 +18,13 @@ const createResult = (percentage = '100.00') => ({
         latencyMs: 6,
         mode: 'warm',
         paintedLatencyMs: 20,
+        processManifest: [
+          {
+            args: 'code-oss --type=renderer',
+            pid: 123,
+            ppid: 1,
+          },
+        ],
         workerLatencyMs: 30,
         work: {
           allocations: {},
@@ -43,6 +50,13 @@ test('parseScoreResult returns one unprofiled action sample', () => {
     mode: 'warm',
     paintedLatencyMs: 20,
     pid: 123,
+    processManifest: [
+      {
+        args: 'code-oss --type=renderer',
+        pid: 123,
+        ppid: 1,
+      },
+    ],
     taskClockMs: 3,
   })
 })

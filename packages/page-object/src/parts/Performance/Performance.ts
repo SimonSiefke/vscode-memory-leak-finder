@@ -174,7 +174,7 @@ export const create = ({ page }: CreateParams) => {
       })
     },
     async getCodeMarks() {
-      const result = await page.evaluate({
+      const result = await page.evaluateInMainWorld({
         expression: `(() => {
   const marks = globalThis.MonacoPerformanceMarks?.getMarks?.() || []
   return marks.filter(mark => typeof mark?.name === 'string' && mark.name.startsWith('code/'))

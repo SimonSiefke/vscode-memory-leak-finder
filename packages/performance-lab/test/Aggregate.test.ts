@@ -114,6 +114,40 @@ test('aggregate records an identical-build A/A calibration as inconclusive', () 
   })
 })
 
+test('aggregate invalidates an underpowered identical-build calibration', () => {
+  const replicas = [replica('0', 0.98, 'same', 'same'), replica('1', 1, 'same', 'same'), replica('2', 1.02, 'same', 'same')]
+  for (const item of replicas) {
+    item.goal.targetRelativeChange = -0.01
+    item.verdict.workEvidence.improved = false
+  }
+
+  const result = aggregateExperiments(replicas, 3)
+
+  expect(result.status).toBe('invalid')
+  expect(result.invalidReasons).toContainEqual(expect.stringContaining('minimum detectable effect'))
+})
+
+test('aggregate uses fingerprints rather than commits to identify an A/A build', () => {
+  const replicas = [replica('0', 1, 'same', 'same'), replica('1', 1, 'same', 'same'), replica('2', 1, 'same', 'same')]
+  for (const item of replicas) {
+    Object.assign(item.baseline.metadata.build, {
+      executableSha256: 'electron',
+      sourceMapSha256: 'baseline-map',
+      workbenchSha256: 'baseline-workbench',
+    })
+    Object.assign(item.candidate.metadata.build, {
+      executableSha256: 'electron',
+      sourceMapSha256: 'candidate-map',
+      workbenchSha256: 'candidate-workbench',
+    })
+    item.verdict.workEvidence.improved = false
+  }
+
+  const result = aggregateExperiments(replicas, 3)
+
+  expect(result.calibration.isIdenticalBuild).toBe(false)
+})
+
 test('aggregate invalidates an identical-build false-positive winner', () => {
   const result = aggregateExperiments(
     [replica('0', 0.8, 'same', 'same'), replica('1', 0.8, 'same', 'same'), replica('2', 0.8, 'same', 'same')],

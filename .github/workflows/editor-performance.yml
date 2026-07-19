@@ -217,6 +217,7 @@ jobs:
             --cpu-list "$cpu_list" \
             --order-seed "$order_seed" \
             --replica-id "$REPLICA" \
+            --defer-calibration-verdict \
             --collect-work \
             --work-samples 3 \
             --track-include 'vs/editor/contrib/inlineCompletions/' \

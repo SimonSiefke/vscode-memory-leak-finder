@@ -125,3 +125,29 @@ test('invalid performance scenario fails before measurement', async () => {
     ),
   ).rejects.toThrow('performanceScenario.prepare must be a function')
 })
+
+test('process manifest includes workload descendants without polling during scoring', () => {
+  const snapshot = `  10       1 code-oss --user-data-dir=/tmp/performance-profile
+  11      10 code-oss --type=utility
+  12      11 /resources/@github/copilot-linux-x64/index.js --headless
+  20       1 unrelated
+`
+
+  expect(TestStage.getProcessManifestFromSnapshot(snapshot, '/tmp/performance-profile')).toEqual([
+    {
+      args: 'code-oss --user-data-dir=/tmp/performance-profile',
+      pid: 10,
+      ppid: 1,
+    },
+    {
+      args: 'code-oss --type=utility',
+      pid: 11,
+      ppid: 10,
+    },
+    {
+      args: '/resources/@github/copilot-linux-x64/index.js --headless',
+      pid: 12,
+      ppid: 11,
+    },
+  ])
+})

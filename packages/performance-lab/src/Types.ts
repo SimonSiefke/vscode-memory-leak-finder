@@ -31,6 +31,11 @@ export interface ScoreSample {
   readonly paintedLatencyMs: number
   readonly pattern: 'ABBA' | 'BAAB'
   readonly pid: number
+  readonly processManifest?: readonly {
+    readonly args: string
+    readonly pid: number
+    readonly ppid: number
+  }[]
   readonly rawCounterOutput: string
   readonly taskClockMs: number
   readonly workerLatencyMs: number

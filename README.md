@@ -29,7 +29,9 @@ The editor pilot has two scenarios:
 
 Both prepare Quick Open and wait for a quiet renderer before measurement. They
 measure Enter-to-DOM-ready and Enter-to-painted-content, then validate and close
-the editor after measurement.
+the editor after measurement. Performance runs also disable the core agent host
+and built-in AI features. Every scoring sample records its process tree and is
+invalid if bundled Copilot still starts.
 
 Create a 20-sample baseline:
 
@@ -82,6 +84,19 @@ hosted runner, measures them in that same runner, and aggregates only
 within-runner blocked effects. Quick runs use three replicas; confirmation and
 scheduled identical-build calibration use five. Results are classified as
 `inconclusive`, `proxy-win`, `ux-confirmed`, `rejected`, or `invalid`.
+
+Before optimizing, run an identical-build A/A comparison for the requested
+goal. The lab records executable, workbench bundle, source commit, dirty state,
+and source-map fingerprints. It rejects mismatched clean source/build commits
+and invalidates an A/A run whose confidence interval cannot detect the requested
+effect. Identical-build calibration and already rejected/invalid scoring runs
+skip tracked-work collection.
+
+Future optimization agents should follow
+[`packages/performance-lab/AGENTS.md`](packages/performance-lab/AGENTS.md). In
+particular, they must stop before profiling or changing VS Code when calibration
+is invalid, semantic `code/*` phase marks are missing, or a forbidden process is
+present.
 
 ## Measures
 

@@ -71,6 +71,7 @@ export const getExperimentVerdict = (
   goal: Goal,
   tier: ExperimentTier = 'quick',
   workComparison?: WorkComparison,
+  identicalBuildCalibration = false,
 ): {
   readonly comparisons: Readonly<Record<MetricName, MetricComparison>>
   readonly verdict: ExperimentVerdict
@@ -93,6 +94,20 @@ export const getExperimentVerdict = (
     instructions: compareSamples(baseline, candidate, 'instructions', invalidReasons),
     latencyMs: compareSamples(baseline, candidate, 'latencyMs', invalidReasons),
     paintedLatencyMs: compareSamples(baseline, candidate, 'paintedLatencyMs', invalidReasons),
+  }
+
+  if ([...baseline, ...candidate].some(({ codeMarks }) => codeMarks.length === 0)) {
+    invalidReasons.push(`Performance sample is missing semantic code/* marks`)
+  }
+  if ([...baseline, ...candidate].some(({ processManifest }) => !processManifest || processManifest.length === 0)) {
+    invalidReasons.push(`Performance sample is missing its process manifest`)
+  }
+  if (
+    [...baseline, ...candidate].some(({ processManifest }) =>
+      processManifest?.some(({ args }) => /@github\/copilot-[^/\s]+\/index\.js/.test(args)),
+    )
+  ) {
+    invalidReasons.push(`Core performance workload launched bundled Copilot`)
   }
 
   const expectedSamplesPerArm = new Set([...baseline, ...candidate].map(({ blockIndex }) => blockIndex)).size * 2
@@ -125,6 +140,18 @@ export const getExperimentVerdict = (
   ].filter((value): value is string => Boolean(value))
 
   const primary = comparisons[goal.metric]
+  if (identicalBuildCalibration) {
+    const minimumDetectableEffect = (primary.confidenceInterval.upper - primary.confidenceInterval.lower) / 2
+    const requiredDetectableEffect = Math.abs(goal.targetRelativeChange)
+    if (primary.confidenceInterval.lower > 0 || primary.confidenceInterval.upper < 0) {
+      invalidReasons.push(`Identical-build A/A confidence interval excludes zero`)
+    }
+    if (minimumDetectableEffect > requiredDetectableEffect) {
+      invalidReasons.push(
+        `Identical-build A/A minimum detectable effect ${(minimumDetectableEffect * 100).toFixed(2)}% exceeds ${(requiredDetectableEffect * 100).toFixed(2)}%`,
+      )
+    }
+  }
   const getWorkTotal = (work: WorkCounters): number => {
     return [...Object.values(work.allocations), ...Object.values(work.functions)].reduce((sum, value) => sum + value, 0)
   }
@@ -160,11 +187,10 @@ export const getExperimentVerdict = (
       const separator = key.indexOf(':')
       const kind = key.slice(0, separator) as keyof WorkCounters
       const metric = key.slice(separator + 1)
-      const statistics = compareMetric(
-        samples.map((sample) => sample[kind][metric] || 0),
-        samples.map((sample) => sample[kind][metric] || 0),
-      ).baseline
-      return medianValue > 0 && statistics.relativeMad > 0.02
+      const values = samples.map((sample) => sample[kind][metric] || 0)
+      const maximumRelativeDeviation =
+        medianValue === 0 ? 0 : Math.max(...values.map((value) => Math.abs(value - medianValue) / medianValue))
+      return maximumRelativeDeviation > 0.02
     })
   }
   if (workAvailable && (hasUnstableMetric(baselineWorkCounters) || hasUnstableMetric(candidateWorkCounters))) {

@@ -8,6 +8,9 @@ interface ReplicaExperiment {
     readonly metadata?: {
       readonly build?: {
         readonly commit?: string
+        readonly executableSha256?: string
+        readonly sourceMapSha256?: string
+        readonly workbenchSha256?: string
       }
     }
     readonly samples: readonly ScoreSample[]
@@ -16,6 +19,9 @@ interface ReplicaExperiment {
     readonly metadata?: {
       readonly build?: {
         readonly commit?: string
+        readonly executableSha256?: string
+        readonly sourceMapSha256?: string
+        readonly workbenchSha256?: string
       }
     }
     readonly samples: readonly ScoreSample[]
@@ -191,17 +197,41 @@ export const aggregateExperiments = (
           : proxyWin
             ? 'proxy-win'
             : 'inconclusive'
-  const buildPairs = experiments.map((experiment) => ({
-    baseline: experiment.baseline.metadata?.build?.commit || '',
-    candidate: experiment.candidate.metadata?.build?.commit || '',
-  }))
+  const buildPairs = experiments.map((experiment) => {
+    const baseline = experiment.baseline.metadata?.build
+    const candidate = experiment.candidate.metadata?.build
+    return {
+      baselineCommit: baseline?.commit || '',
+      candidateCommit: candidate?.commit || '',
+      fingerprintsAvailable: Boolean(
+        baseline?.executableSha256 &&
+        baseline.workbenchSha256 &&
+        baseline.sourceMapSha256 &&
+        candidate?.executableSha256 &&
+        candidate.workbenchSha256 &&
+        candidate.sourceMapSha256,
+      ),
+      fingerprintsMatch:
+        baseline?.executableSha256 === candidate?.executableSha256 &&
+        baseline?.workbenchSha256 === candidate?.workbenchSha256 &&
+        baseline?.sourceMapSha256 === candidate?.sourceMapSha256,
+    }
+  })
   const isIdenticalBuild =
-    buildPairs.length > 0 && buildPairs.every(({ baseline, candidate }) => baseline.length > 0 && baseline === candidate)
-  const falsePositive = isIdenticalBuild && (candidateStatus === 'proxy-win' || candidateStatus === 'ux-confirmed')
+    buildPairs.length > 0 &&
+    buildPairs.every(({ baselineCommit, candidateCommit, fingerprintsAvailable, fingerprintsMatch }) =>
+      fingerprintsAvailable ? fingerprintsMatch : baselineCommit.length > 0 && baselineCommit === candidateCommit,
+    )
+  const falsePositive = isIdenticalBuild && (primary.confidenceInterval.lower > 0 || primary.confidenceInterval.upper < 0)
   if (falsePositive) {
     invalidReasons.push(`Identical-build A/A calibration produced a false-positive winner`)
   }
-  const minimumDetectableEffect = Math.max(Math.abs(primary.confidenceInterval.lower), Math.abs(primary.confidenceInterval.upper))
+  const minimumDetectableEffect = (primary.confidenceInterval.upper - primary.confidenceInterval.lower) / 2
+  if (isIdenticalBuild && minimumDetectableEffect > Math.abs(goal.targetRelativeChange)) {
+    invalidReasons.push(
+      `Identical-build A/A minimum detectable effect ${(minimumDetectableEffect * 100).toFixed(2)}% exceeds ${(Math.abs(goal.targetRelativeChange) * 100).toFixed(2)}%`,
+    )
+  }
   const updatedCalibrationHistory = [
     ...calibrationHistory,
     ...(isIdenticalBuild
@@ -219,7 +249,10 @@ export const aggregateExperiments = (
   if (repeatedFalsePositives) {
     invalidReasons.push(`The two most recent A/A calibrations produced false-positive winners`)
   }
-  const status = falsePositive || repeatedFalsePositives ? 'invalid' : candidateStatus
+  const status =
+    falsePositive || repeatedFalsePositives || (isIdenticalBuild && minimumDetectableEffect > Math.abs(goal.targetRelativeChange))
+      ? 'invalid'
+      : candidateStatus
   const falsePositiveCount = updatedCalibrationHistory.filter((entry) => entry.falsePositive).length
 
   return {

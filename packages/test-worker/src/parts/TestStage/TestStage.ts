@@ -1,6 +1,54 @@
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+
+const execFileAsync = promisify(execFile)
+
 interface PerformanceMark {
   readonly name: string
   readonly startTime: number
+}
+
+interface ProcessManifestEntry {
+  readonly args: string
+  readonly pid: number
+  readonly ppid: number
+}
+
+const processManifests = new WeakMap<object, readonly ProcessManifestEntry[]>()
+
+export const getProcessManifestFromSnapshot = (value: string, userDataPath: string): readonly ProcessManifestEntry[] => {
+  const entries: ProcessManifestEntry[] = []
+  for (const line of value.split('\n')) {
+    const match = /^\s*(\d+)\s+(\d+)\s+(.*)$/.exec(line)
+    if (match) {
+      entries.push({
+        args: match[3],
+        pid: Number(match[1]),
+        ppid: Number(match[2]),
+      })
+    }
+  }
+  const included = new Set(entries.filter(({ args }) => args.includes(userDataPath)).map(({ pid }) => pid))
+  let changed = true
+  while (changed) {
+    changed = false
+    for (const entry of entries) {
+      if (included.has(entry.ppid) && !included.has(entry.pid)) {
+        included.add(entry.pid)
+        changed = true
+      }
+    }
+  }
+  return entries.filter(({ pid }) => included.has(pid))
+}
+
+const getPerformanceProcessManifest = async (): Promise<readonly ProcessManifestEntry[]> => {
+  const userDataPath = process.env.VSCODE_PERFORMANCE_USER_DATA_DIR
+  if (!userDataPath || process.platform !== 'linux') {
+    return []
+  }
+  const { stdout } = await execFileAsync('ps', ['-eo', 'pid=,ppid=,args='])
+  return getProcessManifestFromSnapshot(stdout, userDataPath)
 }
 
 interface PerformanceScenarioTimingResult {
@@ -94,6 +142,7 @@ export const setup = async (module: any, context: any) => {
   }
   await scenario.prepare(context, 0)
   await scenario.timing?.arm(context, 0)
+  processManifests.set(module, await getPerformanceProcessManifest())
 }
 
 export const teardown = async (module: any, context: any) => {
@@ -130,6 +179,7 @@ export const run = async (module: any, context: any) => {
         latencyMs: domReadyLatencyMs,
         mode: scenario.mode,
         paintedLatencyMs,
+        processManifest: processManifests.get(module) || [],
         workerLatencyMs,
         work: timing?.work || {
           allocations: {},
