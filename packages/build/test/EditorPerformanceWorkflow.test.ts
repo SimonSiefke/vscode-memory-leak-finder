@@ -29,7 +29,7 @@ test('editor performance workflow measures both revisions in every replica', asy
 test('editor performance workflow runs scheduled identical-build calibration', async () => {
   const workflow = await getWorkflow()
 
-  expect(workflow).toContain("CANDIDATE_SHA=\"$BASELINE_SHA\"")
+  expect(workflow).toContain('CANDIDATE_SHA="$BASELINE_SHA"')
   expect(workflow).toContain('REQUESTED_TIER=confirmation')
   expect(workflow).toContain('perf_event_paranoid=-1')
   expect(workflow).toContain('--cpu-list "$cpu_list"')
