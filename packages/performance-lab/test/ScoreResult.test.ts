@@ -12,9 +12,17 @@ const createResult = (percentage = '100.00') => ({
     ],
     performanceSamples: [
       {
+        clock: 'renderer',
         codeMarks: [],
+        domReadyLatencyMs: 6,
         latencyMs: 6,
         mode: 'warm',
+        paintedLatencyMs: 20,
+        workerLatencyMs: 30,
+        work: {
+          allocations: {},
+          functions: {},
+        },
       },
     ],
     raw: {
@@ -29,9 +37,11 @@ const createResult = (percentage = '100.00') => ({
 test('parseScoreResult returns one unprofiled action sample', () => {
   expect(parseScoreResult(createResult())).toMatchObject({
     cycles: 200,
+    domReadyLatencyMs: 6,
     instructions: 100,
     latencyMs: 6,
     mode: 'warm',
+    paintedLatencyMs: 20,
     pid: 123,
     taskClockMs: 3,
   })

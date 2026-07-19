@@ -57,6 +57,18 @@ export const setupEditorOpenPerformanceScenario = async ({ Editor, Explorer, Wor
 export const createEditorOpenPerformanceScenario = (mode: 'cold' | 'warm'): PerformanceScenario<TestContext> => {
   return {
     mode,
+    timing: {
+      async arm({ Performance }: TestContext, iteration: number): Promise<void> {
+        const file = getIterationFile(iteration)
+        await Performance.armActionTiming({
+          expectedText: file.content,
+          fileName: file.name,
+        })
+      },
+      async read({ Performance }: TestContext) {
+        return Performance.readActionTiming()
+      },
+    },
     async prepare({ QuickPick }: TestContext, iteration: number): Promise<void> {
       const file = getIterationFile(iteration)
       await QuickPick.show()
@@ -67,10 +79,7 @@ export const createEditorOpenPerformanceScenario = (mode: 'cold' | 'warm'): Perf
     async action({ QuickPick }: TestContext): Promise<void> {
       await QuickPick.acceptSelected()
     },
-    async ready({ Editor }: TestContext, iteration: number): Promise<void> {
-      const file = getIterationFile(iteration)
-      await Editor.waitForTextFileRendered(file.name, file.content)
-    },
+    async ready(): Promise<void> {},
     async validate({ Editor }: TestContext, iteration: number): Promise<void> {
       const file = getIterationFile(iteration)
       await Editor.shouldHaveBreadCrumb(file.name)

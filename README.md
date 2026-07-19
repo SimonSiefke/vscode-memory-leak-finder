@@ -16,9 +16,10 @@ npm run e2e
 ## Performance lab
 
 The performance lab runs isolated user-action benchmarks against local VS Code
-builds. Scoring uses action-to-ready latency and Linux `perf` counters without a
-profiler attached. Diagnostics run separately and retain source-mapped Chrome CPU
-profiles.
+builds. The primary clock runs in the renderer: it starts on the Enter keydown,
+records complete DOM readiness, and records paint after two animation frames.
+Linux `perf` counters are secondary scorecards. Profiles and targeted work
+tracking run separately.
 
 The editor pilot has two scenarios:
 
@@ -26,8 +27,9 @@ The editor pilot has two scenarios:
 - `editor-open-text-file-warm-performance`: one excluded warm-up, followed by one
   measured editor open in a fresh process.
 
-Both prepare Quick Open before measurement, measure Enter-to-rendered-content,
-then validate and close the editor after measurement.
+Both prepare Quick Open and wait for a quiet renderer before measurement. They
+measure Enter-to-DOM-ready and Enter-to-painted-content, then validate and close
+the editor after measurement.
 
 Create a 20-sample baseline:
 
@@ -38,7 +40,8 @@ npm run performance-lab -- baseline \
   --scenario editor-open-text-file-warm-performance
 ```
 
-Run the five-pair ABBA quick comparison, or add `--confirm` for 20 pairs:
+Run a 12-block randomized ABBA/BAAB quick comparison. Confirmation uses 50
+blocks, which produces 100 samples per revision:
 
 ```sh
 npm run performance-lab -- compare \
@@ -47,6 +50,11 @@ npm run performance-lab -- compare \
   --candidate-vscode-path /path/to/candidate/code-oss \
   --candidate-vscode-source-path /path/to/candidate/vscode \
   --scenario editor-open-text-file-warm-performance \
+  --tier quick \
+  --blocks 12 \
+  --collect-work \
+  --track-include 'vs/editor/contrib/inlineCompletions/' \
+  --track-include 'vs/workbench/contrib/inlineCompletions/' \
   --goal latency:-50%
 ```
 
@@ -68,6 +76,12 @@ harness/scenario hashes, distributions and confidence intervals, semantic VS
 Code phase timings, process IDs, ranked original-source hotspots, an
 Amdahl-style ceiling, escalation recommendations, and the final keep/reject
 verdict. A run is rejected if the harness changes while it is executing.
+
+The `Editor Performance` GitHub Actions workflow builds both revisions in every
+hosted runner, measures them in that same runner, and aggregates only
+within-runner blocked effects. Quick runs use three replicas; confirmation and
+scheduled identical-build calibration use five. Results are classified as
+`inconclusive`, `proxy-win`, `ux-confirmed`, `rejected`, or `invalid`.
 
 ## Measures
 

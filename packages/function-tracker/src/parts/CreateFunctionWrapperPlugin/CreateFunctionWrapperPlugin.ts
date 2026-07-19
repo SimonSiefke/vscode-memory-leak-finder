@@ -30,9 +30,16 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     )
   }
 
+  const shouldTrack = (node: any): boolean => {
+    return functionLocations.has(node)
+  }
+
   // Transform visitor - locations are already collected
   const transformVisitor: Visitor = {
     ArrowFunctionExpression: (path: NodePath<t.ArrowFunctionExpression>) => {
+      if (!shouldTrack(path.node)) {
+        return
+      }
       const trackingCall = createTrackingCall(path.node)
 
       if (t.isBlockStatement(path.node.body)) {
@@ -46,6 +53,9 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     },
 
     ClassMethod: (path: NodePath<t.ClassMethod>) => {
+      if (!shouldTrack(path.node)) {
+        return
+      }
       const originalBody: t.BlockStatement = path.node.body
       const trackingCall = createTrackingCall(path.node)
 
@@ -53,6 +63,9 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     },
 
     FunctionDeclaration: (path: NodePath<t.FunctionDeclaration>) => {
+      if (!shouldTrack(path.node)) {
+        return
+      }
       // Wrap function body
       const originalBody: t.BlockStatement = path.node.body
       const trackingCall = createTrackingCall(path.node)
@@ -61,6 +74,9 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     },
 
     FunctionExpression: (path: NodePath<t.FunctionExpression>) => {
+      if (!shouldTrack(path.node)) {
+        return
+      }
       const originalBody: t.BlockStatement = path.node.body
       const trackingCall = createTrackingCall(path.node)
 
@@ -68,6 +84,9 @@ export const createFunctionWrapperPlugin = (options: CreateFunctionWrapperPlugin
     },
 
     ObjectMethod: (path: NodePath<t.ObjectMethod>) => {
+      if (!shouldTrack(path.node)) {
+        return
+      }
       const originalBody: t.BlockStatement = path.node.body
       const trackingCall = createTrackingCall(path.node)
 

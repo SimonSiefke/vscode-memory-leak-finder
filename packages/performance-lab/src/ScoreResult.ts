@@ -1,4 +1,4 @@
-import type { CodeMark, ScoreSample } from './Types.ts'
+import type { CodeMark, SamplePosition, ScoreSample } from './Types.ts'
 
 interface CounterMetric {
   readonly available?: boolean
@@ -38,7 +38,24 @@ const getCodeMarks = (value: unknown): readonly CodeMark[] => {
   )
 }
 
-export const parseScoreResult = (result: any): ScoreSample => {
+const getWorkCounts = (value: unknown): Readonly<Record<string, number>> => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {}
+  }
+  const entries = Object.entries(value).filter(
+    (entry): entry is [string, number] => typeof entry[1] === 'number' && Number.isFinite(entry[1]) && entry[1] >= 0,
+  )
+  return Object.fromEntries(entries)
+}
+
+const defaultPosition: SamplePosition = {
+  blockIndex: 0,
+  blockPosition: 0,
+  orderIndex: 0,
+  pattern: 'ABBA',
+}
+
+export const parseScoreResult = (result: any, position: SamplePosition = defaultPosition): ScoreSample => {
   if (result?.cpuProfile || result?.trace || result?.timeline) {
     throw new Error(`Profiler-enabled results cannot enter the scoring dataset`)
   }
@@ -59,6 +76,26 @@ export const parseScoreResult = (result: any): ScoreSample => {
   ) {
     throw new Error(`Performance scenario sample has invalid mode or latency`)
   }
+  const clock = performanceSample.clock
+  if (clock !== 'renderer') {
+    throw new Error(`Scoring requires renderer-clock timing`)
+  }
+  const domReadyLatencyMs = performanceSample.domReadyLatencyMs
+  const paintedLatencyMs = performanceSample.paintedLatencyMs
+  const workerLatencyMs = performanceSample.workerLatencyMs
+  if (
+    typeof domReadyLatencyMs !== 'number' ||
+    !Number.isFinite(domReadyLatencyMs) ||
+    domReadyLatencyMs < 0 ||
+    typeof paintedLatencyMs !== 'number' ||
+    !Number.isFinite(paintedLatencyMs) ||
+    paintedLatencyMs < domReadyLatencyMs ||
+    typeof workerLatencyMs !== 'number' ||
+    !Number.isFinite(workerLatencyMs) ||
+    workerLatencyMs < 0
+  ) {
+    throw new Error(`Performance scenario sample has invalid renderer timing`)
+  }
   const metrics = Array.isArray(comparison.metrics) ? comparison.metrics : []
   const rawAfter = comparison.raw?.after || {}
   const rawCounterOutput = typeof rawAfter.rawOutput === 'string' ? rawAfter.rawOutput : ''
@@ -72,16 +109,25 @@ export const parseScoreResult = (result: any): ScoreSample => {
   const cycles = getMetric(metrics, 'cycles')
   const instructions = getMetric(metrics, 'instructions')
   return {
+    ...position,
+    clock,
     codeMarks: getCodeMarks(performanceSample.codeMarks),
     contextSwitches: getMetric(metrics, 'contextSwitches'),
     cycles,
+    domReadyLatencyMs,
     instructions,
     instructionsPerCycle: cycles === 0 ? 0 : instructions / cycles,
-    latencyMs: performanceSample.latencyMs,
+    latencyMs: domReadyLatencyMs,
     mode: performanceSample.mode,
     pageFaults: getMetric(metrics, 'pageFaults'),
+    paintedLatencyMs,
     pid,
     rawCounterOutput,
     taskClockMs: getMetric(metrics, 'taskClockMs'),
+    workerLatencyMs,
+    work: {
+      allocations: getWorkCounts(performanceSample.work?.allocations),
+      functions: getWorkCounts(performanceSample.work?.functions),
+    },
   }
 }

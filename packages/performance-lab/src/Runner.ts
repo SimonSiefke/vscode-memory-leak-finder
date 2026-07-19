@@ -1,16 +1,16 @@
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { constants } from 'node:fs'
-import { copyFile, cp, mkdir, readFile, rename, rm, unlink, writeFile } from 'node:fs/promises'
+import { constants, createReadStream } from 'node:fs'
+import { copyFile, cp, mkdir, readFile, readdir, rename, rm, unlink, writeFile } from 'node:fs/promises'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { diffProfileSummaries, summarizeProfiles } from './CpuProfile.ts'
-import { getExperimentVerdict, getPhaseBreakdown } from './Experiment.ts'
+import { getExperimentVerdict, getPhaseBreakdown, type WorkComparison, type WorkCounters } from './Experiment.ts'
 import { hashPaths } from './Hash.ts'
 import { parseScoreResult } from './ScoreResult.ts'
 import { getMetricStatistics } from './Statistics.ts'
 import { getSystemMetadata } from './SystemMetadata.ts'
-import type { Goal, ScoreSample } from './Types.ts'
+import type { ExperimentArm, ExperimentTier, Goal, SamplePosition, ScoreSample } from './Types.ts'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const resultsRoot = join(repositoryRoot, '.vscode-memory-leak-finder-results')
@@ -18,10 +18,18 @@ const defaultArtifactsRoot = join(repositoryRoot, '.performance-lab')
 const runtimeRoot = join(repositoryRoot, '.performance-lab-runtime')
 
 export interface CommonRunOptions {
+  readonly blocks: number
+  readonly collectWork: boolean
+  readonly cpuList?: string
   readonly display: string
+  readonly orderSeed: number
   readonly outputPath?: string
+  readonly replicaId: string
   readonly samples: number
   readonly scenario: string
+  readonly tier: ExperimentTier
+  readonly trackingIncludePatterns: readonly string[]
+  readonly workSamples: number
 }
 
 export interface BuildOptions {
@@ -53,9 +61,11 @@ const getHarnessPaths = (): readonly string[] => {
   ]
 }
 
-const runCommand = async (command: string, args: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
+const runCommand = async (command: string, args: readonly string[], env: NodeJS.ProcessEnv, cpuList?: string): Promise<void> => {
   await new Promise<void>((resolvePromise, rejectPromise) => {
-    const child = spawn(command, args, {
+    const executable = cpuList && process.platform === 'linux' ? 'taskset' : command
+    const executableArgs = cpuList && process.platform === 'linux' ? ['-c', cpuList, command, ...args] : args
+    const child = spawn(executable, executableArgs, {
       cwd: repositoryRoot,
       env,
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -84,18 +94,26 @@ const runCommand = async (command: string, args: readonly string[], env: NodeJS.
 
 const runMeasure = async ({
   artifactPath,
+  cpuList,
   display,
   measure,
   scenario,
+  sourcePath,
+  trackingIncludePatterns = [],
   vscodePath,
 }: {
   readonly artifactPath: string
+  readonly cpuList?: string
   readonly display: string
   readonly measure: string
   readonly scenario: string
+  readonly sourcePath?: string
+  readonly trackingIncludePatterns?: readonly string[]
   readonly vscodePath: string
 }): Promise<any> => {
   const resultPath = getResultPath(measure, scenario)
+  const userDataPath = join(dirname(artifactPath), `.user-data-${process.pid}-${Date.now()}`)
+  await mkdir(dirname(userDataPath), { recursive: true })
   await unlink(resultPath).catch((error) => {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
       throw error
@@ -113,13 +131,46 @@ const runMeasure = async ({
     '--vscode-path',
     vscodePath,
   ]
-  await runCommand(process.execPath, args, {
-    ...process.env,
-    DISPLAY: display,
-  })
-  await mkdir(dirname(artifactPath), { recursive: true })
-  await copyFile(resultPath, artifactPath)
-  return JSON.parse(await readFile(resultPath, 'utf8'))
+  try {
+    await runCommand(
+      process.execPath,
+      args,
+      {
+        ...process.env,
+        DISPLAY: display,
+        VSCODE_PERFORMANCE_TRACK_INCLUDE: JSON.stringify(trackingIncludePatterns),
+        VSCODE_PERFORMANCE_SOURCE_PATH: sourcePath || '',
+        VSCODE_PERFORMANCE_USER_DATA_DIR: userDataPath,
+      },
+      cpuList,
+    )
+    await mkdir(dirname(artifactPath), { recursive: true })
+    await copyFile(resultPath, artifactPath)
+    return JSON.parse(await readFile(resultPath, 'utf8'))
+  } finally {
+    await rm(userDataPath, { force: true, recursive: true })
+  }
+}
+
+const getWorkRows = (result: any, kind: 'allocations' | 'functions'): readonly any[] => {
+  const rows = kind === 'allocations' ? result?.trackedAllocations : result?.trackedFunctions
+  if (!Array.isArray(rows)) {
+    throw new Error(`Tracked ${kind} result is missing source-mapped rows`)
+  }
+  return rows
+}
+
+export const parseWorkCounts = (result: any, kind: 'allocations' | 'functions'): Readonly<Record<string, number>> => {
+  const counts: Record<string, number> = Object.create(null)
+  for (const row of getWorkRows(result, kind)) {
+    const count = kind === 'allocations' ? row?.createdCount : row?.delta
+    if (typeof count !== 'number' || !Number.isFinite(count) || count <= 0) {
+      continue
+    }
+    const key = row?.originalSource || row?.originalLocation || (kind === 'allocations' ? row?.location : row?.functionName)
+    counts[String(key)] = (counts[String(key)] || 0) + count
+  }
+  return counts
 }
 
 const getScenarioHash = async (scenario: string): Promise<string> => {
@@ -161,7 +212,9 @@ const getScoreStatistics = (samples: readonly ScoreSample[]) => {
     instructionsPerCycle: getMetricStatistics(samples.map(({ instructionsPerCycle }) => instructionsPerCycle)),
     latencyMs: getMetricStatistics(samples.map(({ latencyMs }) => latencyMs)),
     pageFaults: getMetricStatistics(samples.map(({ pageFaults }) => pageFaults)),
+    paintedLatencyMs: getMetricStatistics(samples.map(({ paintedLatencyMs }) => paintedLatencyMs)),
     taskClockMs: getMetricStatistics(samples.map(({ taskClockMs }) => taskClockMs)),
+    workerLatencyMs: getMetricStatistics(samples.map(({ workerLatencyMs }) => workerLatencyMs)),
   }
 }
 
@@ -194,6 +247,43 @@ const removeRuntimePath = async (runtimePath: string): Promise<void> => {
   await rm(runtimePath, { force: true, recursive: true })
 }
 
+const warmFile = async (path: string): Promise<void> => {
+  await new Promise<void>((resolvePromise, rejectPromise) => {
+    const stream = createReadStream(path)
+    stream.on('data', () => {})
+    stream.once('end', resolvePromise)
+    stream.once('error', (error: NodeJS.ErrnoException) => {
+      if (error.code === 'ENOENT') {
+        resolvePromise()
+      } else {
+        rejectPromise(error)
+      }
+    })
+  })
+}
+
+const warmActiveBuild = async (activePath: string, executableName: string): Promise<void> => {
+  const rootEntries = await readdir(activePath, { withFileTypes: true })
+  const rootFiles = rootEntries
+    .filter((entry) => entry.isFile() && (entry.name.endsWith('.pak') || entry.name.endsWith('.so')))
+    .map((entry) => join(activePath, entry.name))
+  const paths = [
+    join(activePath, executableName),
+    join(activePath, 'icudtl.dat'),
+    join(activePath, 'resources.pak'),
+    join(activePath, 'snapshot_blob.bin'),
+    join(activePath, 'v8_context_snapshot.bin'),
+    join(activePath, 'resources', 'app', 'node_modules.asar'),
+    join(activePath, 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js'),
+    join(activePath, 'resources', 'app', 'package.json'),
+    join(activePath, 'resources', 'app', 'product.json'),
+    ...rootFiles,
+  ]
+  for (const path of new Set(paths)) {
+    await warmFile(path)
+  }
+}
+
 const withStagedBuild = async <T>(
   build: BuildOptions,
   runtimePath: string,
@@ -204,6 +294,7 @@ const withStagedBuild = async <T>(
   const activePath = join(runtimePath, 'vscode')
   await rename(stagedPath, activePath)
   try {
+    await warmActiveBuild(activePath, basename(build.vscodePath))
     return await fn(join(activePath, basename(build.vscodePath)))
   } finally {
     await rename(activePath, stagedPath)
@@ -217,18 +308,77 @@ const runScoreSample = async (
   runtimePath: string,
   label: string,
   index: number,
+  position?: SamplePosition,
 ): Promise<ScoreSample> => {
   const artifactPath = join(outputPath, 'raw', label, `sample-${String(index + 1).padStart(2, '0')}.json`)
   const rawResult = await withStagedBuild(build, runtimePath, label, (vscodePath) =>
     runMeasure({
       artifactPath,
+      ...(common.cpuList ? { cpuList: common.cpuList } : {}),
       display: common.display,
       measure: 'cpu-performance-counters',
       scenario: common.scenario,
       vscodePath,
     }),
   )
-  return parseScoreResult(rawResult)
+  return parseScoreResult(rawResult, position)
+}
+
+const runWorkSample = async (
+  build: BuildOptions,
+  common: CommonRunOptions,
+  outputPath: string,
+  runtimePath: string,
+  label: string,
+  index: number,
+): Promise<WorkCounters> => {
+  const run = async (kind: 'allocations' | 'functions') => {
+    const measure = kind === 'allocations' ? 'tracked-allocations' : 'tracked-functions'
+    const artifactPath = join(outputPath, 'diagnostics', 'work', label, `${kind}-${String(index + 1).padStart(2, '0')}.json`)
+    return withStagedBuild(build, runtimePath, label, (vscodePath) =>
+      runMeasure({
+        artifactPath,
+        ...(common.cpuList ? { cpuList: common.cpuList } : {}),
+        display: common.display,
+        measure,
+        scenario: common.scenario,
+        ...(build.sourcePath ? { sourcePath: build.sourcePath } : {}),
+        trackingIncludePatterns: common.trackingIncludePatterns,
+        vscodePath,
+      }),
+    )
+  }
+  const functionResult = await run('functions')
+  const allocationResult = await run('allocations')
+  return {
+    allocations: parseWorkCounts(allocationResult, 'allocations'),
+    functions: parseWorkCounts(functionResult, 'functions'),
+  }
+}
+
+const runWorkComparison = async (
+  baselineBuild: BuildOptions,
+  candidateBuild: BuildOptions,
+  common: CommonRunOptions,
+  outputPath: string,
+  runtimePath: string,
+): Promise<WorkComparison> => {
+  const result: {
+    baseline: WorkCounters[]
+    candidate: WorkCounters[]
+  } = {
+    baseline: [],
+    candidate: [],
+  }
+  const blocks = Math.ceil(common.workSamples / 2)
+  for (const { label } of getInterleavedOrder(blocks, common.orderSeed ^ 0x7a11c)) {
+    if (result[label].length >= common.workSamples) {
+      continue
+    }
+    const build = label === 'baseline' ? baselineBuild : candidateBuild
+    result[label].push(await runWorkSample(build, common, outputPath, runtimePath, label, result[label].length))
+  }
+  return result
 }
 
 export const runBaseline = async (build: BuildOptions, common: CommonRunOptions): Promise<string> => {
@@ -260,23 +410,37 @@ export const runBaseline = async (build: BuildOptions, common: CommonRunOptions)
       hash: await getScenarioHash(common.scenario),
       name: getScenarioName(common.scenario),
     },
-    schemaVersion: 1,
+    schemaVersion: 2,
   })
 }
 
-const getInterleavedOrder = (samples: number): readonly ('baseline' | 'candidate')[] => {
-  const order: ('baseline' | 'candidate')[] = []
-  const counts = {
-    baseline: 0,
-    candidate: 0,
+interface OrderEntry extends SamplePosition {
+  readonly label: ExperimentArm
+}
+
+const createRandom = (seed: number): (() => number) => {
+  let state = seed >>> 0
+  return () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0
+    return state / 0x1_0000_0000
   }
-  const pattern = ['baseline', 'candidate', 'candidate', 'baseline'] as const
-  while (counts.baseline < samples || counts.candidate < samples) {
-    for (const label of pattern) {
-      if (counts[label] < samples) {
-        order.push(label)
-        counts[label]++
-      }
+}
+
+export const getInterleavedOrder = (blocks: number, seed: number): readonly OrderEntry[] => {
+  const order: OrderEntry[] = []
+  const random = createRandom(seed)
+  for (let blockIndex = 0; blockIndex < blocks; blockIndex++) {
+    const pattern = random() < 0.5 ? 'ABBA' : 'BAAB'
+    const labels: readonly ExperimentArm[] =
+      pattern === 'ABBA' ? ['baseline', 'candidate', 'candidate', 'baseline'] : ['candidate', 'baseline', 'baseline', 'candidate']
+    for (let blockPosition = 0; blockPosition < labels.length; blockPosition++) {
+      order.push({
+        blockIndex,
+        blockPosition,
+        label: labels[blockPosition],
+        orderIndex: order.length,
+        pattern,
+      })
     }
   }
   return order
@@ -293,19 +457,24 @@ export const runComparison = async (
   const harnessHash = await hashPaths(getHarnessPaths())
   const baseline: ScoreSample[] = []
   const candidate: ScoreSample[] = []
+  let workComparison: WorkComparison | undefined
   try {
     await stageBuild(baselineBuild, runtimePath, 'baseline')
     await stageBuild(candidateBuild, runtimePath, 'candidate')
-    for (const label of getInterleavedOrder(common.samples)) {
+    for (const entry of getInterleavedOrder(common.blocks, common.orderSeed)) {
+      const { label, ...position } = entry
       const target = label === 'baseline' ? baseline : candidate
       const build = label === 'baseline' ? baselineBuild : candidateBuild
-      target.push(await runScoreSample(build, common, outputPath, runtimePath, label, target.length))
+      target.push(await runScoreSample(build, common, outputPath, runtimePath, label, target.length, position))
+    }
+    if (common.collectWork) {
+      workComparison = await runWorkComparison(baselineBuild, candidateBuild, common, outputPath, runtimePath)
     }
   } finally {
     await removeRuntimePath(runtimePath)
   }
   await assertHarnessUnchanged(harnessHash)
-  const result = getExperimentVerdict(baseline, candidate, goal)
+  const result = getExperimentVerdict(baseline, candidate, goal, common.tier, workComparison)
   return writeExperiment(outputPath, {
     baseline: {
       metadata: await getSystemMetadata(baselineBuild.vscodePath, baselineBuild.sourcePath),
@@ -326,13 +495,16 @@ export const runComparison = async (
     createdAt: new Date().toISOString(),
     goal,
     harnessHash,
-    order: getInterleavedOrder(common.samples),
+    order: getInterleavedOrder(common.blocks, common.orderSeed),
+    replicaId: common.replicaId,
     scenario: {
       hash: await getScenarioHash(common.scenario),
       name: getScenarioName(common.scenario),
     },
-    schemaVersion: 1,
+    schemaVersion: 2,
+    tier: common.tier,
     verdict: result.verdict,
+    ...(workComparison ? { workComparison } : {}),
   })
 }
 
@@ -357,6 +529,7 @@ const runDiagnosticBuild = async (
     const result = await withStagedBuild(build, runtimePath, label, (vscodePath) =>
       runMeasure({
         artifactPath,
+        ...(common.cpuList ? { cpuList: common.cpuList } : {}),
         display: common.display,
         measure: 'cpu-profile',
         scenario: common.scenario,
@@ -415,6 +588,6 @@ export const runDiagnosis = async (
       hash: await getScenarioHash(common.scenario),
       name: getScenarioName(common.scenario),
     },
-    schemaVersion: 1,
+    schemaVersion: 2,
   })
 }

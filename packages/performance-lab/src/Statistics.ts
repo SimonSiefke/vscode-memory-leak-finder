@@ -32,6 +32,7 @@ export const getMetricStatistics = (values: readonly number[]): MetricStatistics
     count: values.length,
     mad,
     median: medianValue,
+    p90: percentile(values, 0.9),
     p95: percentile(values, 0.95),
     relativeMad: medianValue === 0 ? 0 : mad / medianValue,
   }
@@ -59,18 +60,17 @@ export const pairedBootstrapRelativeChange = (
     }
   }
   const random = createRandom(seed)
+  const logEffects = baseline
+    .slice(0, count)
+    .map((value, index) => (value > 0 && candidate[index] > 0 ? Math.log(candidate[index]) - Math.log(value) : 0))
   const changes: number[] = []
   for (let iteration = 0; iteration < iterations; iteration++) {
-    const sampledBaseline: number[] = []
-    const sampledCandidate: number[] = []
+    const sampledEffects: number[] = []
     for (let index = 0; index < count; index++) {
       const sampledIndex = Math.floor(random() * count)
-      sampledBaseline.push(baseline[sampledIndex])
-      sampledCandidate.push(candidate[sampledIndex])
+      sampledEffects.push(logEffects[sampledIndex])
     }
-    const baselineMedian = median(sampledBaseline)
-    const candidateMedian = median(sampledCandidate)
-    changes.push(baselineMedian === 0 ? 0 : candidateMedian / baselineMedian - 1)
+    changes.push(Math.exp(median(sampledEffects)) - 1)
   }
   return {
     lower: percentile(changes, 0.025),
@@ -86,5 +86,107 @@ export const compareMetric = (baseline: readonly number[], candidate: readonly n
     candidate: candidateStatistics,
     confidenceInterval: pairedBootstrapRelativeChange(baseline, candidate),
     relativeChange: baselineStatistics.median === 0 ? 0 : candidateStatistics.median / baselineStatistics.median - 1,
+  }
+}
+
+interface PositionedValue {
+  readonly blockIndex: number
+  readonly value: number
+}
+
+const groupByBlock = (values: readonly PositionedValue[]): Map<number, readonly number[]> => {
+  const grouped = new Map<number, number[]>()
+  for (const item of values) {
+    const block = grouped.get(item.blockIndex) || []
+    block.push(item.value)
+    grouped.set(item.blockIndex, block)
+  }
+  return grouped
+}
+
+export const getBlockLogEffects = (baseline: readonly PositionedValue[], candidate: readonly PositionedValue[]): readonly number[] => {
+  const baselineByBlock = groupByBlock(baseline)
+  const candidateByBlock = groupByBlock(candidate)
+  const blockIndices = [...new Set([...baselineByBlock.keys(), ...candidateByBlock.keys()])].toSorted((a, b) => a - b)
+  return blockIndices.map((blockIndex) => {
+    const baselineValues = baselineByBlock.get(blockIndex) || []
+    const candidateValues = candidateByBlock.get(blockIndex) || []
+    if (baselineValues.length !== 2 || candidateValues.length !== 2) {
+      throw new Error(`ABBA block ${blockIndex} must contain exactly two baseline and two candidate samples`)
+    }
+    if ([...baselineValues, ...candidateValues].some((value) => value <= 0 || !Number.isFinite(value))) {
+      throw new Error(`ABBA block ${blockIndex} contains a non-positive metric`)
+    }
+    const baselineMean = (Math.log(baselineValues[0]) + Math.log(baselineValues[1])) / 2
+    const candidateMean = (Math.log(candidateValues[0]) + Math.log(candidateValues[1])) / 2
+    return candidateMean - baselineMean
+  })
+}
+
+const bootstrapLogEffects = (effects: readonly number[], iterations: number, random: () => number): ConfidenceInterval => {
+  if (effects.length === 0) {
+    return {
+      lower: 0,
+      upper: 0,
+    }
+  }
+  const changes: number[] = []
+  for (let iteration = 0; iteration < iterations; iteration++) {
+    const sampled: number[] = []
+    for (let index = 0; index < effects.length; index++) {
+      sampled.push(effects[Math.floor(random() * effects.length)])
+    }
+    changes.push(Math.exp(median(sampled)) - 1)
+  }
+  return {
+    lower: percentile(changes, 0.025),
+    upper: percentile(changes, 0.975),
+  }
+}
+
+export const compareBlockedMetric = (
+  baseline: readonly PositionedValue[],
+  candidate: readonly PositionedValue[],
+  iterations = 4000,
+  seed = 0x51f15e,
+): MetricComparison => {
+  const baselineValues = baseline.map(({ value }) => value)
+  const candidateValues = candidate.map(({ value }) => value)
+  const effects = getBlockLogEffects(baseline, candidate)
+  return {
+    baseline: getMetricStatistics(baselineValues),
+    candidate: getMetricStatistics(candidateValues),
+    confidenceInterval: bootstrapLogEffects(effects, iterations, createRandom(seed)),
+    relativeChange: Math.exp(median(effects)) - 1,
+  }
+}
+
+export const hierarchicalBootstrapRelativeChange = (
+  replicaEffects: readonly (readonly number[])[],
+  iterations = 8000,
+  seed = 0x1cedc0de,
+): ConfidenceInterval => {
+  const nonEmptyReplicas = replicaEffects.filter((effects) => effects.length > 0)
+  if (nonEmptyReplicas.length === 0) {
+    return {
+      lower: 0,
+      upper: 0,
+    }
+  }
+  const random = createRandom(seed)
+  const changes: number[] = []
+  for (let iteration = 0; iteration < iterations; iteration++) {
+    const sampledEffects: number[] = []
+    for (let replicaIndex = 0; replicaIndex < nonEmptyReplicas.length; replicaIndex++) {
+      const replica = nonEmptyReplicas[Math.floor(random() * nonEmptyReplicas.length)]
+      for (let blockIndex = 0; blockIndex < replica.length; blockIndex++) {
+        sampledEffects.push(replica[Math.floor(random() * replica.length)])
+      }
+    }
+    changes.push(Math.exp(median(sampledEffects)) - 1)
+  }
+  return {
+    lower: percentile(changes, 0.025),
+    upper: percentile(changes, 0.975),
   }
 }

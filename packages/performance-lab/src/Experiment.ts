@@ -1,8 +1,41 @@
-import { compareMetric } from './Statistics.ts'
-import type { ExperimentVerdict, Goal, MetricComparison, MetricName, ScoreSample } from './Types.ts'
+import { compareBlockedMetric, compareMetric, median } from './Statistics.ts'
+import type { ExperimentTier, ExperimentVerdict, Goal, MetricComparison, MetricName, ScoreSample } from './Types.ts'
+
+export interface WorkCounters {
+  readonly allocations: Readonly<Record<string, number>>
+  readonly functions: Readonly<Record<string, number>>
+}
+
+export interface WorkComparison {
+  readonly baseline: readonly WorkCounters[]
+  readonly candidate: readonly WorkCounters[]
+}
 
 const getValues = (samples: readonly ScoreSample[], metric: MetricName): readonly number[] => {
   return samples.map((sample) => sample[metric])
+}
+
+const compareSamples = (
+  baseline: readonly ScoreSample[],
+  candidate: readonly ScoreSample[],
+  metric: MetricName,
+  invalidReasons: string[],
+): MetricComparison => {
+  try {
+    return compareBlockedMetric(
+      baseline.map((sample) => ({
+        blockIndex: sample.blockIndex,
+        value: sample[metric],
+      })),
+      candidate.map((sample) => ({
+        blockIndex: sample.blockIndex,
+        value: sample[metric],
+      })),
+    )
+  } catch (error) {
+    invalidReasons.push(error instanceof Error ? error.message : String(error))
+    return compareMetric(getValues(baseline, metric), getValues(candidate, metric))
+  }
 }
 
 const getMedianGuardrailFailure = (
@@ -36,6 +69,8 @@ export const getExperimentVerdict = (
   baseline: readonly ScoreSample[],
   candidate: readonly ScoreSample[],
   goal: Goal,
+  tier: ExperimentTier = 'quick',
+  workComparison?: WorkComparison,
 ): {
   readonly comparisons: Readonly<Record<MetricName, MetricComparison>>
   readonly verdict: ExperimentVerdict
@@ -54,24 +89,26 @@ export const getExperimentVerdict = (
   }
 
   const comparisons = {
-    cycles: compareMetric(getValues(baseline, 'cycles'), getValues(candidate, 'cycles')),
-    instructions: compareMetric(getValues(baseline, 'instructions'), getValues(candidate, 'instructions')),
-    latencyMs: compareMetric(getValues(baseline, 'latencyMs'), getValues(candidate, 'latencyMs')),
+    cycles: compareSamples(baseline, candidate, 'cycles', invalidReasons),
+    instructions: compareSamples(baseline, candidate, 'instructions', invalidReasons),
+    latencyMs: compareSamples(baseline, candidate, 'latencyMs', invalidReasons),
+    paintedLatencyMs: compareSamples(baseline, candidate, 'paintedLatencyMs', invalidReasons),
   }
-  const noisyMetrics = (Object.entries(comparisons) as readonly [MetricName, MetricComparison][])
-    .filter(([, comparison]) => comparison.baseline.relativeMad > 0.1 || comparison.candidate.relativeMad > 0.1)
-    .map(([name]) => name)
-  if (noisyMetrics.length > 0) {
-    invalidReasons.push(`Excessive noise in ${noisyMetrics.join(', ')} (relative MAD above 10%)`)
+
+  const expectedSamplesPerArm = new Set([...baseline, ...candidate].map(({ blockIndex }) => blockIndex)).size * 2
+  if (baseline.length !== expectedSamplesPerArm || candidate.length !== expectedSamplesPerArm) {
+    invalidReasons.push(`Every ABBA block must contain two samples per revision`)
   }
 
   const guardrailFailures = [
-    getP95GuardrailFailure(
-      'p95 latency',
-      baseline.map(({ latencyMs }) => latencyMs),
-      candidate.map(({ latencyMs }) => latencyMs),
-      0.05,
-    ),
+    tier === 'confirmation'
+      ? getP95GuardrailFailure(
+          'p95 painted latency',
+          baseline.map(({ paintedLatencyMs }) => paintedLatencyMs),
+          candidate.map(({ paintedLatencyMs }) => paintedLatencyMs),
+          0.05,
+        )
+      : undefined,
     goal.metric === 'latencyMs'
       ? getMedianGuardrailFailure(
           'instructions',
@@ -88,19 +125,91 @@ export const getExperimentVerdict = (
   ].filter((value): value is string => Boolean(value))
 
   const primary = comparisons[goal.metric]
-  const objectiveMet =
+  const getWorkTotal = (work: WorkCounters): number => {
+    return [...Object.values(work.allocations), ...Object.values(work.functions)].reduce((sum, value) => sum + value, 0)
+  }
+  const baselineWorkCounters = workComparison?.baseline || baseline.map(({ work }) => work)
+  const candidateWorkCounters = workComparison?.candidate || candidate.map(({ work }) => work)
+  const baselineWork = baselineWorkCounters.map(getWorkTotal)
+  const candidateWork = candidateWorkCounters.map(getWorkTotal)
+  const baselineWorkMedian = median(baselineWork)
+  const candidateWorkMedian = median(candidateWork)
+  const workAvailable = [...baselineWork, ...candidateWork].some((value) => value > 0)
+  const getMetricMedians = (samples: readonly WorkCounters[]) => {
+    const keys = new Set<string>()
+    for (const sample of samples) {
+      for (const key of Object.keys(sample.allocations)) {
+        keys.add(`allocations:${key}`)
+      }
+      for (const key of Object.keys(sample.functions)) {
+        keys.add(`functions:${key}`)
+      }
+    }
+    return Object.fromEntries(
+      [...keys].map((key) => {
+        const separator = key.indexOf(':')
+        const kind = key.slice(0, separator) as keyof WorkCounters
+        const metric = key.slice(separator + 1)
+        return [key, median(samples.map((sample) => sample[kind][metric] || 0))]
+      }),
+    )
+  }
+  const hasUnstableMetric = (samples: readonly WorkCounters[]): boolean => {
+    const medians = getMetricMedians(samples)
+    return Object.entries(medians).some(([key, medianValue]) => {
+      const separator = key.indexOf(':')
+      const kind = key.slice(0, separator) as keyof WorkCounters
+      const metric = key.slice(separator + 1)
+      const statistics = compareMetric(
+        samples.map((sample) => sample[kind][metric] || 0),
+        samples.map((sample) => sample[kind][metric] || 0),
+      ).baseline
+      return medianValue > 0 && statistics.relativeMad > 0.02
+    })
+  }
+  if (workAvailable && (hasUnstableMetric(baselineWorkCounters) || hasUnstableMetric(candidateWorkCounters))) {
+    invalidReasons.push(`Deterministic work counters vary by more than 2% within a revision`)
+  }
+  const baselineMetricMedians = getMetricMedians(baselineWorkCounters)
+  const candidateMetricMedians = getMetricMedians(candidateWorkCounters)
+  const workMetricKeys = new Set([...Object.keys(baselineMetricMedians), ...Object.keys(candidateMetricMedians)])
+  const improvedMetrics = [...workMetricKeys].filter((key) => (candidateMetricMedians[key] || 0) < (baselineMetricMedians[key] || 0))
+  const regressedMetrics = [...workMetricKeys].filter((key) => (candidateMetricMedians[key] || 0) > (baselineMetricMedians[key] || 0))
+  const workRelativeChange =
+    baselineWorkMedian === 0 ? (candidateWorkMedian === 0 ? 0 : Number.POSITIVE_INFINITY) : candidateWorkMedian / baselineWorkMedian - 1
+  const workEvidence = {
+    available: workAvailable,
+    baselineMedian: baselineWorkMedian,
+    candidateMedian: candidateWorkMedian,
+    improved: workAvailable && improvedMetrics.length > 0 && regressedMetrics.length === 0,
+    improvedMetrics,
+    regressedMetrics,
+    relativeChange: workRelativeChange,
+  }
+  if (regressedMetrics.length > 0) {
+    guardrailFailures.push(`deterministic work increased in ${regressedMetrics.join(', ')}`)
+  }
+
+  const targetReached =
+    primary.relativeChange <= goal.targetRelativeChange && primary.confidenceInterval.upper <= goal.targetRelativeChange + 0.05
+  const uxConfirmed =
     invalidReasons.length === 0 &&
     guardrailFailures.length === 0 &&
-    primary.relativeChange <= goal.targetRelativeChange &&
-    primary.confidenceInterval.upper <= goal.targetRelativeChange + 0.05
+    workEvidence.improved &&
+    targetReached &&
+    primary.confidenceInterval.upper < 0
+  const proxyWin =
+    invalidReasons.length === 0 && guardrailFailures.length === 0 && workEvidence.improved && primary.confidenceInterval.upper <= 0.02
 
   let status: ExperimentVerdict['status']
   if (invalidReasons.length > 0) {
     status = 'invalid'
-  } else if (objectiveMet) {
-    status = 'met'
-  } else if (guardrailFailures.length > 0 || primary.confidenceInterval.lower > 0) {
+  } else if (uxConfirmed) {
+    status = 'ux-confirmed'
+  } else if (guardrailFailures.length > 0 || primary.confidenceInterval.lower > 0.02) {
     status = 'rejected'
+  } else if (proxyWin) {
+    status = 'proxy-win'
   } else {
     status = 'inconclusive'
   }
@@ -109,9 +218,10 @@ export const getExperimentVerdict = (
     comparisons,
     verdict: {
       guardrailFailures,
-      invalidReasons,
-      objectiveMet,
+      invalidReasons: [...new Set(invalidReasons)],
+      objectiveMet: uxConfirmed,
       status,
+      workEvidence,
     },
   }
 }

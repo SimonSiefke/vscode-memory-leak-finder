@@ -623,7 +623,23 @@ export interface QuickPick {
   waitForCommand(command: any, timeout?: any): Promise<void>
 }
 export interface Performance {
+  armActionTiming(options: {
+    readonly expectedText: string
+    readonly fileName: string
+    readonly quietTimeoutMs?: number
+    readonly quietWindowMs?: number
+    readonly readyTimeoutMs?: number
+  }): Promise<void>
   getCodeMarks(): Promise<readonly { readonly name: string; readonly startTime: number }[]>
+  readActionTiming(): Promise<{
+    readonly actionStartMs: number
+    readonly domReadyMs: number
+    readonly paintReadyMs: number
+    readonly work: {
+      readonly allocations: Readonly<Record<string, number>>
+      readonly functions: Readonly<Record<string, number>>
+    }
+  }>
   waitForAnimationFrames(count?: number): Promise<void>
 }
 export interface References {

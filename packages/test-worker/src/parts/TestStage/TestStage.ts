@@ -3,12 +3,26 @@ interface PerformanceMark {
   readonly startTime: number
 }
 
+interface PerformanceScenarioTimingResult {
+  readonly actionStartMs: number
+  readonly domReadyMs: number
+  readonly paintReadyMs: number
+  readonly work?: {
+    readonly allocations?: Readonly<Record<string, number>>
+    readonly functions?: Readonly<Record<string, number>>
+  }
+}
+
 interface PerformanceScenario {
   readonly action: (context: any, iteration: number) => Promise<void>
   readonly mode: 'cold' | 'warm'
   readonly prepare: (context: any, iteration: number) => Promise<void>
   readonly ready: (context: any, iteration: number) => Promise<void>
   readonly reset: (context: any, iteration: number) => Promise<void>
+  readonly timing?: {
+    readonly arm: (context: any, iteration: number) => Promise<void>
+    readonly read: (context: any, iteration: number) => Promise<PerformanceScenarioTimingResult>
+  }
   readonly validate: (context: any, iteration: number) => Promise<void>
 }
 
@@ -25,7 +39,20 @@ const getPerformanceScenario = (module: any): PerformanceScenario | undefined =>
       throw new Error(`performanceScenario.${name} must be a function`)
     }
   }
+  if (scenario.timing && (typeof scenario.timing.arm !== 'function' || typeof scenario.timing.read !== 'function')) {
+    throw new Error(`performanceScenario.timing must provide arm and read functions`)
+  }
   return scenario
+}
+
+const assertTimingResult = (value: PerformanceScenarioTimingResult): void => {
+  const values = [value?.actionStartMs, value?.domReadyMs, value?.paintReadyMs]
+  if (values.some((item) => typeof item !== 'number' || !Number.isFinite(item))) {
+    throw new Error(`performanceScenario.timing.read returned invalid timestamps`)
+  }
+  if (value.domReadyMs < value.actionStartMs || value.paintReadyMs < value.domReadyMs) {
+    throw new Error(`performanceScenario.timing.read returned non-monotonic timestamps`)
+  }
 }
 
 const getCodeMarks = async (context: any): Promise<readonly PerformanceMark[]> => {
@@ -55,12 +82,18 @@ export const setup = async (module: any, context: any) => {
   }
   if (scenario.mode === 'warm') {
     await scenario.prepare(context, -1)
+    await scenario.timing?.arm(context, -1)
     await scenario.action(context, -1)
     await scenario.ready(context, -1)
+    if (scenario.timing) {
+      const timing = await scenario.timing.read(context, -1)
+      assertTimingResult(timing)
+    }
     await scenario.validate(context, -1)
     await scenario.reset(context, -1)
   }
   await scenario.prepare(context, 0)
+  await scenario.timing?.arm(context, 0)
 }
 
 export const teardown = async (module: any, context: any) => {
@@ -81,13 +114,27 @@ export const run = async (module: any, context: any) => {
     const start = performance.now()
     await scenario.action(context, 0)
     await scenario.ready(context, 0)
-    const latencyMs = performance.now() - start
+    const timing = scenario.timing ? await scenario.timing.read(context, 0) : undefined
+    const workerLatencyMs = performance.now() - start
+    if (timing) {
+      assertTimingResult(timing)
+    }
+    const domReadyLatencyMs = timing ? timing.domReadyMs - timing.actionStartMs : workerLatencyMs
+    const paintedLatencyMs = timing ? timing.paintReadyMs - timing.actionStartMs : workerLatencyMs
     const marksAfter = await getCodeMarks(context)
     return {
       performanceScenario: {
+        clock: timing ? 'renderer' : 'test-worker',
         codeMarks: getNewMarks(marksBefore, marksAfter),
-        latencyMs,
+        domReadyLatencyMs,
+        latencyMs: domReadyLatencyMs,
         mode: scenario.mode,
+        paintedLatencyMs,
+        workerLatencyMs,
+        work: timing?.work || {
+          allocations: {},
+          functions: {},
+        },
       },
     }
   }
