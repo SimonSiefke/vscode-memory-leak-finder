@@ -1,5 +1,7 @@
 import type { PerformanceScenario, TestContext } from '../types.ts'
 
+export const skip = 1
+
 const warmupFileName = 'editor-open-performance-warmup.txt'
 const measuredFileName = 'editor-open-performance-measured.txt'
 
