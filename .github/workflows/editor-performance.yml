@@ -220,7 +220,11 @@ jobs:
             --defer-calibration-verdict \
             --collect-work \
             --work-samples 3 \
+            --track-include 'vs/base/browser/ui/breadcrumbs/breadcrumbsWidget.ts' \
+            --track-include 'vs/editor/browser/config/editorConfiguration.ts' \
+            --track-include 'vs/editor/browser/config/migrateOptions.ts' \
             --track-include 'vs/editor/contrib/inlineCompletions/' \
+            --track-include 'vs/workbench/contrib/files/browser/editors/textFileEditor.ts' \
             --track-include 'vs/workbench/contrib/inlineCompletions/' \
             --goal latency:-5% \
             --output "$output"

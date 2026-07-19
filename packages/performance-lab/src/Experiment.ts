@@ -181,26 +181,34 @@ export const getExperimentVerdict = (
       }),
     )
   }
-  const hasUnstableMetric = (samples: readonly WorkCounters[]): boolean => {
+  const getUnstableMetrics = (samples: readonly WorkCounters[]): ReadonlySet<string> => {
     const medians = getMetricMedians(samples)
-    return Object.entries(medians).some(([key, medianValue]) => {
-      const separator = key.indexOf(':')
-      const kind = key.slice(0, separator) as keyof WorkCounters
-      const metric = key.slice(separator + 1)
-      const values = samples.map((sample) => sample[kind][metric] || 0)
-      const maximumRelativeDeviation =
-        medianValue === 0 ? 0 : Math.max(...values.map((value) => Math.abs(value - medianValue) / medianValue))
-      return maximumRelativeDeviation > 0.02
-    })
-  }
-  if (workAvailable && (hasUnstableMetric(baselineWorkCounters) || hasUnstableMetric(candidateWorkCounters))) {
-    invalidReasons.push(`Deterministic work counters vary by more than 2% within a revision`)
+    return new Set(
+      Object.entries(medians)
+        .filter(([key, medianValue]) => {
+          const separator = key.indexOf(':')
+          const kind = key.slice(0, separator) as keyof WorkCounters
+          const metric = key.slice(separator + 1)
+          const values = samples.map((sample) => sample[kind][metric] || 0)
+          const maximumRelativeDeviation =
+            medianValue === 0 ? 0 : Math.max(...values.map((value) => Math.abs(value - medianValue) / medianValue))
+          return maximumRelativeDeviation > 0.02
+        })
+        .map(([key]) => key),
+    )
   }
   const baselineMetricMedians = getMetricMedians(baselineWorkCounters)
   const candidateMetricMedians = getMetricMedians(candidateWorkCounters)
   const workMetricKeys = new Set([...Object.keys(baselineMetricMedians), ...Object.keys(candidateMetricMedians)])
-  const improvedMetrics = [...workMetricKeys].filter((key) => (candidateMetricMedians[key] || 0) < (baselineMetricMedians[key] || 0))
-  const regressedMetrics = [...workMetricKeys].filter((key) => (candidateMetricMedians[key] || 0) > (baselineMetricMedians[key] || 0))
+  const changedMetricKeys = [...workMetricKeys].filter((key) => (candidateMetricMedians[key] || 0) !== (baselineMetricMedians[key] || 0))
+  const unstableMetrics = new Set([...getUnstableMetrics(baselineWorkCounters), ...getUnstableMetrics(candidateWorkCounters)])
+  const unstableChangedMetrics = changedMetricKeys.filter((key) => unstableMetrics.has(key))
+  if (workAvailable && unstableChangedMetrics.length > 0) {
+    invalidReasons.push(`Changed deterministic work counters vary by more than 2% within a revision`)
+  }
+  const stableChangedMetrics = changedMetricKeys.filter((key) => !unstableMetrics.has(key))
+  const improvedMetrics = stableChangedMetrics.filter((key) => (candidateMetricMedians[key] || 0) < (baselineMetricMedians[key] || 0))
+  const regressedMetrics = stableChangedMetrics.filter((key) => (candidateMetricMedians[key] || 0) > (baselineMetricMedians[key] || 0))
   const workRelativeChange =
     baselineWorkMedian === 0 ? (candidateWorkMedian === 0 ? 0 : Number.POSITIVE_INFINITY) : candidateWorkMedian / baselineWorkMedian - 1
   const workEvidence = {

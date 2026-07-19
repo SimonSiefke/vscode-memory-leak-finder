@@ -157,7 +157,7 @@ test('unstable deterministic work counters invalidate a comparison', () => {
   expect(result.verdict.invalidReasons).toContainEqual(expect.stringContaining('work counters vary'))
 })
 
-test('work stability detects variation hidden by a three-sample median absolute deviation', () => {
+test('work stability ignores an unstable counter when it has no baseline-candidate delta', () => {
   const baseline = [sample(100, 1000, 0, 0, 49), sample(100, 1000, 0, 3, 51), sample(100, 1000, 1, 0, 51), sample(100, 1000, 1, 3, 51)]
 
   const result = getExperimentVerdict(baseline, baseline, {
@@ -165,8 +165,8 @@ test('work stability detects variation hidden by a three-sample median absolute 
     targetRelativeChange: -0.01,
   })
 
-  expect(result.verdict.status).toBe('invalid')
-  expect(result.verdict.invalidReasons).toContainEqual(expect.stringContaining('work counters vary'))
+  expect(result.verdict.status).toBe('inconclusive')
+  expect(result.verdict.invalidReasons).toEqual([])
 })
 
 test('bundled Copilot invalidates the core performance workload', () => {

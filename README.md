@@ -94,9 +94,12 @@ skip tracked-work collection.
 
 Future optimization agents should follow
 [`packages/performance-lab/AGENTS.md`](packages/performance-lab/AGENTS.md). In
-particular, they must stop before profiling or changing VS Code when calibration
-is invalid, semantic `code/*` phase marks are missing, or a forbidden process is
-present.
+particular, they must stop scoring when semantic `code/*` phase marks are
+missing or a forbidden process is present. An otherwise valid but underpowered
+local A/A may enter deterministic mechanism exploration: collect three stable
+narrowly source-mapped samples, estimate the ceiling, save and revert small
+candidate patches, and send only a sufficiently large compatible batch to
+hosted timing. Deterministic evidence alone is never described as a speedup.
 
 ## Measures
 
