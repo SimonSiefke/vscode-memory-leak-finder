@@ -10,6 +10,19 @@ const getFileContent = (label: string): string => {
 const warmupContent = getFileContent('Warmup')
 const measuredContent = getFileContent('Measured')
 
+const waitForFocusedQuickPickItem = async (QuickPick: TestContext['QuickPick'], expected: string): Promise<void> => {
+  const deadline = performance.now() + 10_000
+  let actual = ''
+  while (performance.now() < deadline) {
+    actual = await QuickPick.getFocusedItemLabel()
+    if (actual === expected) {
+      return
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  }
+  throw new Error(`Expected quick pick item "${expected}" to be focused, got "${actual}"`)
+}
+
 const getIterationFile = (iteration: number) => {
   return iteration < 0
     ? {
@@ -47,10 +60,7 @@ export const createEditorOpenPerformanceScenario = (mode: 'cold' | 'warm'): Perf
       await QuickPick.show()
       await QuickPick.clearInput()
       await QuickPick.type(file.name)
-      const focusedItem = await QuickPick.getFocusedItemLabel()
-      if (focusedItem !== file.name) {
-        throw new Error(`Expected quick pick item "${file.name}" to be focused, got "${focusedItem}"`)
-      }
+      await waitForFocusedQuickPickItem(QuickPick, file.name)
     },
     async action({ QuickPick }: TestContext): Promise<void> {
       await QuickPick.acceptSelected()
