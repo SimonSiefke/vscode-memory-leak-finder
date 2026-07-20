@@ -90,18 +90,7 @@ test('applyMonkeyPatches - applies ipc monkey patch for ipc messages from start 
     },
   }
 
-  await applyMonkeyPatches(
-    electronRpc as any,
-    'electron-object',
-    'require-object',
-    '',
-    false,
-    false,
-    false,
-    9876,
-    null,
-    'ipcMessagesFromStart',
-  )
+  await applyMonkeyPatches(electronRpc as any, 'electron-object', 'require-object', '', false, false, false, 'ipcMessagesFromStart')
 
   const ipcPatchCall = calls.find(
     (call) =>

@@ -1,4 +1,5 @@
 import * as UnwrapDevtoolsEvaluateResult from '../src/parts/UnwrapDevtoolsEvaluateResult/UnwrapDevtoolsEvaluateResult.js'
+import * as ErrorCodes from '../src/parts/ErrorCodes/ErrorCodes.js'
 import { test, expect } from '@jest/globals'
 
 test('unwrapResult - undefined', () => {
@@ -143,4 +144,39 @@ test('unwrapResult - global lexical scope names', () => {
   expect(UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)).toEqual({
     names: [],
   })
+})
+
+test('unwrapResult - preserves method not found errors', () => {
+  expect.assertions(2)
+  try {
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      error: {
+        code: -32601,
+        message: "'Memory.startSampling' wasn't found",
+      },
+    })
+  } catch (error) {
+    expect(error).toMatchObject({
+      code: ErrorCodes.E_DEVTOOLS_METHOD_NOT_FOUND,
+      message: "'Memory.startSampling' wasn't found",
+    })
+    expect(error).toBeInstanceOf(Error)
+  }
+})
+
+test('unwrapResult - does not classify unrelated protocol failures as method not found', () => {
+  expect.assertions(2)
+  try {
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      error: {
+        code: -32602,
+        message: 'Invalid parameters',
+      },
+    })
+  } catch (error) {
+    expect(error).toMatchObject({
+      message: 'Invalid parameters',
+    })
+    expect(error).not.toHaveProperty('code')
+  }
 })

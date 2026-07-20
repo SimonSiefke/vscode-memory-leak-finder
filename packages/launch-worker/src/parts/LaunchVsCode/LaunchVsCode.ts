@@ -1,6 +1,7 @@
 import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
+import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
@@ -222,6 +223,7 @@ export const launchVsCode = async ({
   callgrindConfig,
   clearExtensions,
   commit,
+  cpuPerformanceCountersFromStartConfig,
   cwd,
   downloadUserDataZipFileToken,
   downloadUserDataZipFileUrl,
@@ -236,6 +238,7 @@ export const launchVsCode = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
+  preparedVscodePath,
   proxyTestFolderName,
   trackFunctions,
   trackingMode,
@@ -250,6 +253,7 @@ export const launchVsCode = async ({
   callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   commit: string
+  cpuPerformanceCountersFromStartConfig: CpuPerformanceCountersFromStartConfig
   cwd: string
   downloadUserDataZipFileToken: string
   downloadUserDataZipFileUrl: string
@@ -264,6 +268,7 @@ export const launchVsCode = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform: string
+  preparedVscodePath: string
   proxyTestFolderName: string
   trackFunctions: boolean
   trackingMode: string
@@ -288,11 +293,11 @@ export const launchVsCode = async ({
       insidersCommit,
       platform,
       updateUrl,
-      vscodePath,
+      vscodePath: preparedVscodePath || vscodePath,
       vscodeVersion,
     })
     if (trackFunctions) {
-      binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode)
+      binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
     }
 
     // Start proxy server if enabled
@@ -355,6 +360,7 @@ export const launchVsCode = async ({
       args,
       callgrindConfig,
       cliPath: binaryPath,
+      cpuPerformanceCountersFromStartConfig,
       cwd,
       env,
       headlessMode,

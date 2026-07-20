@@ -20,7 +20,9 @@ export interface MeasureLocalVscodeComparisonOptions {
   readonly only: string
   readonly measure: string
   readonly measureAfter: boolean
+  readonly measureNode: boolean
   readonly runs: number
+  readonly startupRuns: number
   readonly display: string
   readonly skipBuild: boolean
   readonly skipCharts: boolean
@@ -65,12 +67,14 @@ export const parseArgv = (argv: readonly string[]): MeasureLocalVscodeComparison
     display: getString('--display', ':1'),
     measure: getString('--measure', 'cpu-performance-counters'),
     measureAfter: argv.includes('--measure-after'),
+    measureNode: argv.includes('--measure-node'),
     newLabel: getString('--new-label', 'new'),
     newVscodePath: getString('--new-vscode-path', defaultNewVscodePath),
     oldLabel: getString('--old-label', 'old'),
     oldVscodePath: getString('--old-vscode-path', defaultOldVscodePath),
     only: getString('--only', '^editor-open.ts'),
     runs: getNumber('--runs', 1),
+    startupRuns: getNumber('--startup-runs', 1),
     skipBuild: argv.includes('--skip-build'),
     skipCharts: argv.includes('--skip-charts'),
   }
@@ -428,6 +432,7 @@ export const ensureLocalVscodeBuild = async (
 
 export const getMeasureCommandArgs = (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): readonly string[] => {
   const measureAfterArgs = options.measureAfter ? ['--measure-after'] : []
+  const measureNodeArgs = options.measureNode ? ['--measure-node'] : []
   return [
     'packages/cli/bin/test.js',
     '--run-skipped-tests-anyway',
@@ -435,8 +440,11 @@ export const getMeasureCommandArgs = (options: MeasureLocalVscodeComparisonOptio
     options.only,
     '--runs',
     String(options.runs),
+    '--startup-runs',
+    String(options.startupRuns),
     '--measure',
     options.measure,
+    ...measureNodeArgs,
     '--vscode-path',
     vscodeExecutablePath,
     ...measureAfterArgs,

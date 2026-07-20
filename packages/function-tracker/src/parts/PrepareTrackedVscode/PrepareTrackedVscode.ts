@@ -19,6 +19,7 @@ interface SourceKind {
 }
 
 interface CopyRoot {
+  readonly excludeNodeModules: boolean
   readonly sourceRoot: string
   readonly targetRoot: string
   readonly transformRelativeRoots: readonly string[]
@@ -27,6 +28,7 @@ interface CopyRoot {
 const repositoryRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
 const trackedVscodeRoot = join(repositoryRoot, '.vscode-test', 'tracked-vscode')
 const transformerFiles = [
+  join(import.meta.dirname, 'PrepareTrackedVscode.ts'),
   join(import.meta.dirname, '..', 'Transform', 'Transform.ts'),
   join(import.meta.dirname, '..', 'TransformCodeWithTracking', 'TransformCodeWithTracking.ts'),
   join(import.meta.dirname, '..', 'TransformCodeWithAllocationTracking', 'TransformCodeWithAllocationTracking.ts'),
@@ -34,7 +36,7 @@ const transformerFiles = [
   join(import.meta.dirname, '..', 'CreateAllocationWrapperPlugin', 'CreateAllocationWrapperPlugin.ts'),
 ]
 
-const excludedDirectoryNames = new Set(['.build', '.cache', '.git', '.vscode-test', 'node_modules'])
+const excludedDirectoryNames = new Set(['.build', '.cache', '.git', '.vscode-test'])
 
 const getHash = (value: string): string => {
   return createHash('sha256').update(value).digest('hex')
@@ -130,7 +132,10 @@ const transformFileCached = async (
   await writeFile(metadataPath, JSON.stringify(expectedMetadata, null, 2), 'utf8')
 }
 
-const shouldExclude = (name: string): boolean => {
+const shouldExclude = (name: string, copyRoot: CopyRoot): boolean => {
+  if (name === 'node_modules') {
+    return copyRoot.excludeNodeModules
+  }
   return excludedDirectoryNames.has(name)
 }
 
@@ -138,11 +143,14 @@ const isPathInsideRelativeRoot = (relativePath: string, relativeRoot: string): b
   return relativePath === relativeRoot || relativePath.startsWith(`${relativeRoot}/`)
 }
 
-const shouldTransform = (relativePath: string, transformRelativeRoots: readonly string[]): boolean => {
+const shouldTransform = (relativePath: string, transformRelativeRoots: readonly string[], trackingMode: string): boolean => {
   if (!relativePath.endsWith('.js')) {
     return false
   }
   const normalized = relativePath.replaceAll('\\', '/')
+  if (trackingMode === 'timeouts') {
+    return normalized.endsWith('/vs/workbench/workbench.desktop.main.js')
+  }
   return transformRelativeRoots.some((root) => isPathInsideRelativeRoot(normalized, root))
 }
 
@@ -181,7 +189,7 @@ const syncCopyRoot = async (
 ): Promise<void> => {
   const entries = await readdir(currentPath, { withFileTypes: true })
   for (const entry of entries) {
-    if (entry.isDirectory() && shouldExclude(entry.name)) {
+    if (entry.isDirectory() && shouldExclude(entry.name, copyRoot)) {
       continue
     }
     const sourcePath = join(currentPath, entry.name)
@@ -199,7 +207,7 @@ const syncCopyRoot = async (
     if (!entry.isFile()) {
       continue
     }
-    if (shouldTransform(relativePath, copyRoot.transformRelativeRoots)) {
+    if (shouldTransform(relativePath, copyRoot.transformRelativeRoots, trackingMode)) {
       await transformFileCached(sourcePath, destinationPath, trackingMode, transformerVersion)
       continue
     }
@@ -242,6 +250,7 @@ const getLocalSourceKind = async (binaryPath: string, trackingMode: string): Pro
   const targetSourceRoot = join(targetContainer, basename(sourceRoot))
   const copyRoots: CopyRoot[] = [
     {
+      excludeNodeModules: true,
       sourceRoot,
       targetRoot: targetSourceRoot,
       transformRelativeRoots: ['out', 'out-min'],
@@ -252,6 +261,7 @@ const getLocalSourceKind = async (binaryPath: string, trackingMode: string): Pro
   if (!isPathInside(sourceRoot, binaryPath) && (await pathExists(runtimeRoot))) {
     const targetRuntimeRoot = join(targetContainer, basename(runtimeRoot))
     copyRoots.push({
+      excludeNodeModules: false,
       sourceRoot: runtimeRoot,
       targetRoot: targetRuntimeRoot,
       transformRelativeRoots: ['resources/app/out'],
@@ -270,6 +280,7 @@ const getDownloadedSourceKind = (binaryPath: string, trackingMode: string): Sour
   return {
     copyRoots: [
       {
+        excludeNodeModules: false,
         sourceRoot,
         targetRoot,
         transformRelativeRoots: ['resources/app/out'],

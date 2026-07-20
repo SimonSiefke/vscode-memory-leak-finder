@@ -28,13 +28,17 @@ const createDownloadedRuntime = async () => {
   const runtimeRoot = join(root, 'vscode-linux-x64-1.127.0')
   const binaryPath = join(runtimeRoot, 'code-oss')
   const modulePath = join(runtimeRoot, 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js')
+  const productionDependencyPath = join(runtimeRoot, 'resources', 'app', 'node_modules', 'dependency', 'index.js')
   await mkdir(dirname(modulePath), { recursive: true })
+  await mkdir(dirname(productionDependencyPath), { recursive: true })
   await writeFile(binaryPath, '')
   await chmod(binaryPath, 0o755)
   await writeFile(modulePath, 'const value = {}\n')
+  await writeFile(productionDependencyPath, 'module.exports = {}\n')
   return {
     binaryPath,
     modulePath,
+    productionDependencyPath,
     root,
     runtimeRoot,
   }
@@ -47,7 +51,7 @@ test('getDownloadedModifiedFolderName appends tracking mode', () => {
 })
 
 test('getPreparedVscodePath prepares downloaded runtime and reuses cached transformed js', async () => {
-  const { binaryPath, root, runtimeRoot } = await createDownloadedRuntime()
+  const { binaryPath, productionDependencyPath, root, runtimeRoot } = await createDownloadedRuntime()
   try {
     const first = await getPreparedVscodePath(binaryPath, 'allocations')
     const second = await getPreparedVscodePath(binaryPath, 'allocations')
@@ -57,6 +61,9 @@ test('getPreparedVscodePath prepares downloaded runtime and reuses cached transf
     expect(first).toBe(join(targetRuntimeRoot, 'code-oss'))
     expect(second).toBe(first)
     expect(await readFile(targetModulePath, 'utf8')).toContain('/* allocations:')
+    expect(await readFile(join(targetRuntimeRoot, 'resources', 'app', 'node_modules', 'dependency', 'index.js'), 'utf8')).toBe(
+      await readFile(productionDependencyPath, 'utf8'),
+    )
     expect(mockTransformCode).toHaveBeenCalledTimes(1)
   } finally {
     await rm(root, { recursive: true, force: true })
@@ -72,6 +79,25 @@ test('getPreparedVscodePath does not share transformed output across tracking mo
     expect(functionsPath).toContain('-modified-tracked-functions')
     expect(allocationsPath).toContain('-modified-tracked-allocations')
     expect(mockTransformCode).toHaveBeenCalledTimes(2)
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
+test('getPreparedVscodePath only transforms the workbench entry for timeout tracking', async () => {
+  const { binaryPath, root, runtimeRoot } = await createDownloadedRuntime()
+  const otherModulePath = join(runtimeRoot, 'resources', 'app', 'out', 'vs', 'platform', 'platform.js')
+  try {
+    await mkdir(dirname(otherModulePath), { recursive: true })
+    await writeFile(otherModulePath, 'const platform = {}\n')
+    await getPreparedVscodePath(binaryPath, 'timeouts')
+    const targetRuntimeRoot = join(dirname(runtimeRoot), 'vscode-linux-x64-1.127.0-modified-tracked-timeouts')
+    const targetWorkbenchPath = join(targetRuntimeRoot, 'resources', 'app', 'out', 'vs', 'workbench', 'workbench.desktop.main.js')
+    const targetOtherModulePath = join(targetRuntimeRoot, 'resources', 'app', 'out', 'vs', 'platform', 'platform.js')
+
+    expect(await readFile(targetWorkbenchPath, 'utf8')).toContain('/* timeouts:')
+    expect(await readFile(targetOtherModulePath, 'utf8')).toBe(await readFile(otherModulePath, 'utf8'))
+    expect(mockTransformCode).toHaveBeenCalledTimes(1)
   } finally {
     await rm(root, { recursive: true, force: true })
   }

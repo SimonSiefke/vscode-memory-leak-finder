@@ -58,6 +58,8 @@ export interface SnapshotMetaData {
   readonly location_fields: readonly string[]
   readonly node_fields: readonly string[]
   readonly node_types: NodeTypes
+  readonly trace_function_info_fields?: readonly string[]
+  readonly trace_node_fields?: readonly string[]
 }
 
 export interface Snapshot {
@@ -69,6 +71,9 @@ export interface Snapshot {
   readonly node_count: number
   readonly nodes: Uint32Array
   readonly strings: readonly string[]
+  readonly traceFunctionInfos?: Uint32Array
+  readonly traceTree?: Uint32Array
+  readonly traceTreeParents?: Uint32Array
 }
 
 export interface HeapSnapshotInput {

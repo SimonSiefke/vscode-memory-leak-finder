@@ -1,3 +1,8 @@
+.vscode-webview-load-time-results
+.vscode-webview-memory-results
+.vscode-codex-webview-load-time-results
+.vscode-codex-warm-webview-load-time-results
+.vscode-memory-leak-finder-cpu-performance-counters
 .vscode-workbench-tracked-allocations
 .vscode-workbench-tracked-modules
 .minimal-reproductions
@@ -39,6 +44,7 @@ ffmpeg-linux
 .vscode-videos
 .vscode-logs-history
 .vscode-user-data-dir
+.vscode-shared-data-dir
 .vscode-test-workspace
 .vscode-extensions
 .vscode-test-files

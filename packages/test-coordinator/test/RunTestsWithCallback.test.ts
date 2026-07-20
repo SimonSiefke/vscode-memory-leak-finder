@@ -68,6 +68,7 @@ test('runTestsWithCallback - setupOnly skips launching and attaching to the app'
     runSkippedTestsAnyway: false,
     screencastQuality: 100,
     setupOnly: true,
+    startupRuns: 1,
     timeoutBetween: 0,
     timeouts: false,
     trackFunctions: false,

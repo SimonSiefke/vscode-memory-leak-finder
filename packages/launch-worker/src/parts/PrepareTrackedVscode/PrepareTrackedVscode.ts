@@ -1,6 +1,9 @@
 import * as LaunchFunctionTrackerWorker from '../LaunchFunctionTrackerWorker/LaunchFunctionTrackerWorker.ts'
 
-export const prepareTrackedVscode = async (binaryPath: string, trackingMode: string): Promise<string> => {
+export const prepareTrackedVscode = async (binaryPath: string, trackingMode: string, preparedVscodePath = ''): Promise<string> => {
+  if (preparedVscodePath) {
+    return preparedVscodePath
+  }
   await using rpc = await LaunchFunctionTrackerWorker.launchFunctionTrackerWorker()
-  return rpc.invoke('FunctionTracker.getPreparedVscodePath', binaryPath, trackingMode) as Promise<string>
+  return (await rpc.invoke('FunctionTracker.getPreparedVscodePath', binaryPath, trackingMode)) as string
 }

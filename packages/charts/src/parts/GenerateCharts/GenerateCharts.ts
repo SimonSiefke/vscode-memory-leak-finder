@@ -1,5 +1,7 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { execFile } from 'node:child_process'
+import { access, mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
+import { promisify } from 'node:util'
 import * as Charts from '../Charts/Charts.ts'
 import * as GetChartConfig from '../GetChartConfig/GetChartConfig.ts'
 import { launchChartWorker } from '../LaunchChartWorker/LaunchChartWorker.ts'
@@ -16,6 +18,8 @@ const visitors = Object.values(Charts).map((value) => {
     skip: value.skip,
   }
 })
+
+const execFileAsync = promisify(execFile)
 
 const getComparisonBasePath = (
   highlightChangesPath: string | undefined,
@@ -134,6 +138,26 @@ export const generateCharts = async () => {
         await mkdir(dirname(outPath), { recursive: true })
         await writeFile(outPath, svg)
       }
+    }
+  }
+
+  const memoryCityResults = join(Root.root, '.vscode-memory-leak-finder-results', 'memory-city')
+  try {
+    await access(memoryCityResults)
+    await execFileAsync(process.execPath, [
+      join(Root.root, 'packages', 'visualizations', 'src', 'generate.ts'),
+      '--revision',
+      `${process.env.MEMORY_CITY_REVISION_LABEL || 'Current revision'}=${memoryCityResults}`,
+      '--scenario',
+      process.env.MEMORY_CITY_SCENARIO || 'VS Code memory scenario',
+      '--assets',
+      join(Root.root, 'packages', 'visualizations', 'dist'),
+      '--out',
+      join(Root.root, '.vscode-charts', 'memory-city'),
+    ])
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error
     }
   }
 }

@@ -6,8 +6,17 @@ test('getTrackingMode - tracked allocations measures use allocation tracking', (
   expect(getTrackingMode('trackedAllocations')).toBe('allocations')
   expect(getTrackingMode('tracked-allocations-from-start')).toBe('allocations')
   expect(getTrackingMode('trackedAllocationsFromStart')).toBe('allocations')
+  expect(getTrackingMode('tracked-allocation-leaks')).toBe('allocations')
+  expect(getTrackingMode('trackedAllocationLeaks')).toBe('allocations')
+  expect(getTrackingMode('tracked-allocation-performance')).toBe('allocations')
+  expect(getTrackingMode('trackedAllocationPerformance')).toBe('allocations')
   expect(getTrackingMode('tracked-allocation-timeline')).toBe('allocations')
   expect(getTrackingMode('trackedAllocationTimeline')).toBe('allocations')
+})
+
+test('getTrackingMode - tracked timeout measures use timeout tracking', () => {
+  expect(getTrackingMode('tracked-timeouts')).toBe('timeouts')
+  expect(getTrackingMode('trackedTimeouts')).toBe('timeouts')
 })
 
 test('getTrackingMode - other measures use function tracking', () => {
