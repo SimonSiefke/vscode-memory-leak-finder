@@ -36,7 +36,8 @@ export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView, Sid
   console.log('CODEX_BENCHMARK_PHASE=quickpick')
   await QuickPick.showCommands()
   await QuickPick.type('Open Codex Sidebar')
-  await QuickPick.pressEnter()
+  await QuickPick.select('Codex: Open Codex Sidebar')
+  // await QuickPick.pressEnter()
   const selectedAt = 0
   // const selectedAt = await QuickPick.select('Codex: Open Codex Sidebar', false, true)
   // TODO
@@ -53,6 +54,7 @@ export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView, Sid
     extensionId: 'openai.chatgpt',
     selector: '#root',
     text: '',
+    focusSelector:'body'
   })
   await Editor.closeAll()
   await SideBar.hideSecondary()

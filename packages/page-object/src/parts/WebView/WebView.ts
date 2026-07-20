@@ -130,7 +130,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to check that webview is visible`)
       }
     },
-    async shouldHaveContent({ extensionId, selector, text }: { extensionId: string; selector: string; text: string }) {
+    async shouldHaveContent({ extensionId, selector, text, focusSelector='' }: { extensionId: string; selector: string; text: string, focusSelector:string }) {
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview.ready')
@@ -141,6 +141,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
           injectUtilityScript: false,
           url,
         })
+        await page.waitForIdle()
         const frame = await childPage.waitForSubIframe({ url })
         await frame.waitForIdle()
         await page.waitForIdle()
@@ -151,8 +152,14 @@ export const create = ({ expect, page, VError }: CreateParams) => {
           await expect(content).toHaveText(text)
         }
         const readyAt = Number.parseFloat((await content.getAttribute('data-ready-at')) || '')
+        await page.waitForIdle()
         await frame.waitForIdle()
         await page.waitForIdle()
+        if(focusSelector){
+          const locator=frame.locator(focusSelector)
+          await expect(locator).toBeFocused()
+        }
+        // await new Promise(r=>{})
         return { loadTimeMs: (await content.getAttribute('data-load-time-ms')) || '', readyAt }
       } catch (error) {
         throw new VError(error, `Failed to find expected content in legacy webview`)
