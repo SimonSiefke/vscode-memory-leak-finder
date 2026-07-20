@@ -159,7 +159,6 @@ export const create = ({ expect, page, VError }: CreateParams) => {
           const locator=frame.locator(focusSelector)
           await expect(locator).toBeFocused()
         }
-        // await new Promise(r=>{})
         return { loadTimeMs: (await content.getAttribute('data-load-time-ms')) || '', readyAt }
       } catch (error) {
         throw new VError(error, `Failed to find expected content in legacy webview`)

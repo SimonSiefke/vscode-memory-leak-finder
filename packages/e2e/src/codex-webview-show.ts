@@ -54,7 +54,7 @@ export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView, Sid
     extensionId: 'openai.chatgpt',
     selector: '#root',
     text: '',
-    focusSelector:'body'
+    focusSelector: 'body',
   })
   await Editor.closeAll()
   await SideBar.hideSecondary()
