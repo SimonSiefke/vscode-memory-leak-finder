@@ -57,7 +57,8 @@ export const create = ({ expect, page, VError }: CreateParams) => {
     async shouldHaveLoaded({ extensionId, measureTimings =false}: { extensionId: string, measureTimings:boolean }): Promise<{ readyAt: number }> {
       try {
         await this.waitForOuterFrame()
-        await this.waitForInnerFrame({extensionId, measureTimings})
+        const result=await this.waitForInnerFrame({extensionId, measureTimings})
+        return result
       } catch (error) {
         throw new VError(error, `Failed to find ready legacy webview for ${extensionId}`)
       }
