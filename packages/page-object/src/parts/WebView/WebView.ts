@@ -15,14 +15,16 @@ const escapeRegExp = (value: string): string => {
 
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async shouldHaveLoaded({ extensionId, measureTimings =false}: { extensionId: string, measureTimings:boolean }): Promise<{ readyAt: number }> {
-      try {
-        const webView = page.locator('.webview')
+    async waitForOuterFrame (){
+         const webView = page.locator('.webview')
         await expect(webView).toHaveCount(1)
         const webViewReady = page.locator('.webview.ready')
         await expect(webViewReady).toHaveCount(1)
         await expect(webView).toBeVisible({ timeout: 30_000 })
-        const url = new RegExp(`extensionId=${escapeRegExp(extensionId)}`)
+
+    },
+    async waitForInnerFrame({extensionId, measureTimings}:{extensionId:string, measureTimings:boolean}){
+       const url = new RegExp(`extensionId=${escapeRegExp(extensionId)}`)
         const childPage = await page.waitForIframe({
           injectUtilityScript: false,
           url,
@@ -51,6 +53,11 @@ export const create = ({ expect, page, VError }: CreateParams) => {
           await new Promise((resolve) => setTimeout(resolve, 50))
         }
         throw new Error('webview did not finish loading within 30000ms')
+    },
+    async shouldHaveLoaded({ extensionId, measureTimings =false}: { extensionId: string, measureTimings:boolean }): Promise<{ readyAt: number }> {
+      try {
+        await this.waitForOuterFrame()
+        await this.waitForInnerFrame({extensionId, measureTimings})
       } catch (error) {
         throw new VError(error, `Failed to find ready legacy webview for ${extensionId}`)
       }
