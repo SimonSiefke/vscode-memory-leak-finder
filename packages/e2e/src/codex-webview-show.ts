@@ -49,6 +49,10 @@ export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView, Sid
   }
   console.log('CODEX_BENCHMARK_PHASE=ready')
   console.log(`CODEX_WEBVIEW_LOAD_TIME_MS=${durationMs}`)
+  await WebView.shouldHaveContent({
+extensionId:'openai.chatgpt',
+selector:'#root', text:''
+  })
   await Editor.closeAll()
   await SideBar.hideSecondary()
 }
