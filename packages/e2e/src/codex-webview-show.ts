@@ -10,13 +10,13 @@ export const setup = async ({ Editor, Extensions, SideBar, Workspace }: TestCont
   //   return
   // }
   console.log('CODEX_BENCHMARK_PHASE=warmup')
-await Workspace.setFiles([
+  await Workspace.setFiles([
     {
       content: 'test',
       name: 'webview-benchmark-warmup.txt',
     },
   ])
-    await Editor.closeAll()
+  await Editor.closeAll()
   await SideBar.hide()
   // @ts-ignore
   await SideBar.hideSecondary()
@@ -37,7 +37,7 @@ export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView, Sid
   await QuickPick.showCommands()
   await QuickPick.type('Open Codex Sidebar')
   await QuickPick.pressEnter()
-  const selectedAt=0
+  const selectedAt = 0
   // const selectedAt = await QuickPick.select('Codex: Open Codex Sidebar', false, true)
   // TODO
   console.log('CODEX_BENCHMARK_PHASE=webview')

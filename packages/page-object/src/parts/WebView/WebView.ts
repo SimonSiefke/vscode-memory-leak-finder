@@ -15,49 +15,54 @@ const escapeRegExp = (value: string): string => {
 
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async waitForOuterFrame (){
-         const webView = page.locator('.webview')
-        await expect(webView).toHaveCount(1)
-        const webViewReady = page.locator('.webview.ready')
-        await expect(webViewReady).toHaveCount(1)
-        await expect(webView).toBeVisible({ timeout: 30_000 })
-
+    async waitForOuterFrame() {
+      const webView = page.locator('.webview')
+      await expect(webView).toHaveCount(1)
+      const webViewReady = page.locator('.webview.ready')
+      await expect(webViewReady).toHaveCount(1)
+      await expect(webView).toBeVisible({ timeout: 30_000 })
     },
-    async waitForInnerFrame({extensionId, measureTimings}:{extensionId:string, measureTimings:boolean}){
-       const url = new RegExp(`extensionId=${escapeRegExp(extensionId)}`)
-        const childPage = await page.waitForIframe({
-          injectUtilityScript: false,
-          url,
-        })
-        const deadline = performance.now() + 30_000
-        while (performance.now() < deadline) {
-          try {
-            const frame = await childPage.waitForSubIframe({ url })
-            if(!measureTimings){
-              return {
-                readyAt:1
-              }
+    async waitForInnerFrame({ extensionId, measureTimings }: { extensionId: string; measureTimings: boolean }) {
+      const url = new RegExp(`extensionId=${escapeRegExp(extensionId)}`)
+      const childPage = await page.waitForIframe({
+        injectUtilityScript: false,
+        url,
+      })
+      const deadline = performance.now() + 30_000
+      while (performance.now() < deadline) {
+        try {
+          const frame = await childPage.waitForSubIframe({ url })
+          if (!measureTimings) {
+            return {
+              readyAt: 1,
             }
-            const result = await frame.evaluateInUtilityWorld({
-              expression: `(() => {
+          }
+          const result = await frame.evaluateInUtilityWorld({
+            expression: `(() => {
                 const readyAt = Number(document.documentElement.dataset.vscodeMemoryLeakFinderReady)
                 return readyAt > 0 ? { readyAt } : undefined
               })()`,
-            })
-            if (result?.readyAt > 0) {
-              return result
-            }
-          } catch {
-            // The inner document may still be navigating.
+          })
+          if (result?.readyAt > 0) {
+            return result
           }
-          await new Promise((resolve) => setTimeout(resolve, 50))
+        } catch {
+          // The inner document may still be navigating.
         }
-        throw new Error('webview did not finish loading within 30000ms')
+        await new Promise((resolve) => setTimeout(resolve, 50))
+      }
+      throw new Error('webview did not finish loading within 30000ms')
     },
-    async shouldHaveLoaded({ extensionId, measureTimings =false}: { extensionId: string, measureTimings:boolean }): Promise<{ readyAt: number }> {
+    async shouldHaveLoaded({
+      extensionId,
+      measureTimings = false,
+    }: {
+      extensionId: string
+      measureTimings: boolean
+    }): Promise<{ readyAt: number }> {
       try {
         await this.waitForOuterFrame()
-        const result=await this.waitForInnerFrame({extensionId, measureTimings})
+        const result = await this.waitForInnerFrame({ extensionId, measureTimings })
         return result
       } catch (error) {
         throw new VError(error, `Failed to find ready legacy webview for ${extensionId}`)
