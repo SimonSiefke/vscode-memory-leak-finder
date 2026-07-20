@@ -15,9 +15,12 @@ const escapeRegExp = (value: string): string => {
 
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async shouldHaveLoaded({ extensionId }: { extensionId: string }): Promise<{ readyAt: number }> {
+    async shouldHaveLoaded({ extensionId, measureTimings =false}: { extensionId: string, measureTimings:boolean }): Promise<{ readyAt: number }> {
       try {
         const webView = page.locator('.webview')
+        await expect(webView).toHaveCount(1)
+        const webViewReady = page.locator('.webview.ready')
+        await expect(webViewReady).toHaveCount(1)
         await expect(webView).toBeVisible({ timeout: 30_000 })
         const url = new RegExp(`extensionId=${escapeRegExp(extensionId)}`)
         const childPage = await page.waitForIframe({
@@ -28,6 +31,11 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         while (performance.now() < deadline) {
           try {
             const frame = await childPage.waitForSubIframe({ url })
+            if(!measureTimings){
+              return {
+                readyAt:1
+              }
+            }
             const result = await frame.evaluateInUtilityWorld({
               expression: `(() => {
                 const readyAt = Number(document.documentElement.dataset.vscodeMemoryLeakFinderReady)

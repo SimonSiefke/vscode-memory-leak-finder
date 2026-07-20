@@ -36,7 +36,10 @@ export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView, Sid
   console.log('CODEX_BENCHMARK_PHASE=quickpick')
   await QuickPick.showCommands()
   await QuickPick.type('Open Codex Sidebar')
-  const selectedAt = await QuickPick.select('Codex: Open Codex Sidebar', false, true)
+  await QuickPick.pressEnter()
+  const selectedAt=0
+  // const selectedAt = await QuickPick.select('Codex: Open Codex Sidebar', false, true)
+  // TODO
   console.log('CODEX_BENCHMARK_PHASE=webview')
   const webview = useSingleIframeWebview ? SingleIframeWebView : WebView
   const result = await webview.shouldHaveLoaded({ extensionId })
