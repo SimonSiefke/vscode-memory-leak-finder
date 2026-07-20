@@ -170,6 +170,9 @@ export const create = ({ expect, page, VError }: CreateParams) => {
           await expect(locator).toBeFocused()
           await frame.waitForIdle()
           await page.waitForIdle()
+          await expect(locator).toBeFocused()
+          await frame.waitForIdle()
+          await page.waitForIdle()
         }
         return { loadTimeMs: (await content.getAttribute('data-load-time-ms')) || '', readyAt }
       } catch (error) {
