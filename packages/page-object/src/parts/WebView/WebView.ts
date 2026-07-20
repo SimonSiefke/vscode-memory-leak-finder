@@ -9,8 +9,44 @@ const waitForExtraIdle = async (page: any): Promise<void> => {
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
+const escapeRegExp = (value: string): string => {
+  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
+    async shouldHaveLoaded({ extensionId }: { extensionId: string }): Promise<{ readyAt: number }> {
+      try {
+        const webView = page.locator('.webview')
+        await expect(webView).toBeVisible({ timeout: 30_000 })
+        const url = new RegExp(`extensionId=${escapeRegExp(extensionId)}`)
+        const childPage = await page.waitForIframe({
+          injectUtilityScript: false,
+          url,
+        })
+        const deadline = performance.now() + 30_000
+        while (performance.now() < deadline) {
+          try {
+            const frame = await childPage.waitForSubIframe({ url })
+            const result = await frame.evaluateInUtilityWorld({
+              expression: `(() => {
+                const readyAt = Number(document.documentElement.dataset.vscodeMemoryLeakFinderReady)
+                return readyAt > 0 ? { readyAt } : undefined
+              })()`,
+            })
+            if (result?.readyAt > 0) {
+              return result
+            }
+          } catch {
+            // The inner document may still be navigating.
+          }
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+        throw new Error('webview did not finish loading within 30000ms')
+      } catch (error) {
+        throw new VError(error, `Failed to find ready legacy webview for ${extensionId}`)
+      }
+    },
     async focus() {
       try {
         await page.waitForIdle()
@@ -71,6 +107,28 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         return subFrame
       } catch (error) {
         throw new VError(error, `Failed to check that webview is visible`)
+      }
+    },
+    async shouldHaveContent({ extensionId, selector, text }: { extensionId: string; selector: string; text: string }) {
+      try {
+        await page.waitForIdle()
+        const webView = page.locator('.webview.ready')
+        await expect(webView).toBeVisible()
+        const url = new RegExp(`extensionId=${extensionId}`)
+        const childPage = await page.waitForIframe({
+          injectUtilityScript: false,
+          url,
+        })
+        const frame = await childPage.waitForSubIframe({ url })
+        await frame.waitForIdle()
+        const content = frame.locator(selector)
+        await expect(content).toBeVisible()
+        await expect(content).toHaveText(text)
+        const readyAt = Number.parseFloat((await content.getAttribute('data-ready-at')) || '')
+        await frame.waitForIdle()
+        return { loadTimeMs: (await content.getAttribute('data-load-time-ms')) || '', readyAt }
+      } catch (error) {
+        throw new VError(error, `Failed to find expected content in legacy webview`)
       }
     },
   }

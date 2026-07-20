@@ -5,7 +5,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 export const getImageBitmapCount = async (session: Session, objectGroup: string): Promise<number> => {
   try {
-    return await GetObjectCount.getObjectCount(session, PrototypeExpression.ImageBitmap, objectGroup)
+    return await GetObjectCount.getObjectCount(session, PrototypeExpression.ImageBitmap)
   } catch (error) {
     throw new VError(error, `Failed to get image bitmap count`)
   }

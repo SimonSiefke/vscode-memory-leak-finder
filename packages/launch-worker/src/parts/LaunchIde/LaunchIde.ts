@@ -1,4 +1,6 @@
 import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
+import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
+import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import * as Ide from '../Ide/Ide.ts'
 import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
@@ -84,8 +86,10 @@ export const launchIde = async ({
   addDisposable,
   arch,
   buildVscodeMinified,
+  callgrindConfig,
   clearExtensions,
   commit,
+  cpuPerformanceCountersFromStartConfig,
   cwd,
   downloadUserDataZipFileToken,
   downloadUserDataZipFileUrl,
@@ -101,7 +105,10 @@ export const launchIde = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
+  preparedVscodePath,
   proxyTestFolderName,
+  trackFunctions,
+  trackingMode,
   updateUrl,
   useProxyMock,
   vscodePath,
@@ -110,8 +117,10 @@ export const launchIde = async ({
   addDisposable: (fn: () => Promise<void> | void) => void
   arch: string
   buildVscodeMinified: boolean
+  callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   commit: string
+  cpuPerformanceCountersFromStartConfig: CpuPerformanceCountersFromStartConfig
   cwd: string
   downloadUserDataZipFileToken: string
   downloadUserDataZipFileUrl: string
@@ -127,7 +136,10 @@ export const launchIde = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform: string
+  preparedVscodePath: string
   proxyTestFolderName: string
+  trackFunctions: boolean
+  trackingMode: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -137,8 +149,10 @@ export const launchIde = async ({
     const cursorVersion = '0.45.14' // TODO make it configurable
     const { child, pid } = await LaunchCursor.launchCursor({
       addDisposable,
+      callgrindConfig,
       clearExtensions,
       cursorVersion,
+      cpuPerformanceCountersFromStartConfig,
       cwd,
       downloadUserDataZipFileToken,
       downloadUserDataZipFileUrl,
@@ -174,8 +188,10 @@ export const launchIde = async ({
     addDisposable,
     arch,
     buildVscodeMinified,
+    callgrindConfig,
     clearExtensions,
     commit,
+    cpuPerformanceCountersFromStartConfig,
     cwd,
     downloadUserDataZipFileToken,
     downloadUserDataZipFileUrl,
@@ -190,7 +206,10 @@ export const launchIde = async ({
     inspectSharedProcess,
     inspectSharedProcessPort,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
+    trackFunctions,
+    trackingMode,
     updateUrl,
     useProxyMock,
     vscodePath,

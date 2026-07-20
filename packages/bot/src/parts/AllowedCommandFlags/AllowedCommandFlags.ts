@@ -6,13 +6,14 @@ export const booleanFlags = [
   '--inspect-ptyhost',
   '--measure-node',
   '--restart-between',
+  '--run-network-tests-anyway',
   '--run-skipped-tests-anyway',
 ] as const
 
 export const valuedFlags = ['--measure', '--only', '--runs', '--process-root-strategy'] as const
 
 export const supportedFlagsMessage =
-  '--measure <value>, --only <value>, --inspect-extensions, --inspect-shared-process, --inspect-ptyhost, --measure-node, --restart-between, --run-skipped-tests-anyway, --runs <value>, --process-root-strategy <value>'
+  '--measure <value>, --only <value>, --inspect-extensions, --inspect-shared-process, --inspect-ptyhost, --measure-node, --restart-between, --run-network-tests-anyway, --run-skipped-tests-anyway, --runs <value>, --process-root-strategy <value>'
 
 export const isBooleanFlag = (value: string): value is (typeof booleanFlags)[number] => {
   return booleanFlags.includes(value as (typeof booleanFlags)[number])

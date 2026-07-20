@@ -8,7 +8,13 @@
     "build": "rollup -c rollup.config.js",
     "build:watch": "rollup -c rollup.config.js -w",
     "backport-prs": "node src/backportMergedPrs.ts",
+    "analyze-ipc-messages-from-start": "node src/analyzeIpcMessagesFromStart.ts",
     "generate-api-types": "node src/generate-api-types.ts",
+    "measure-local-vscode-comparison": "node src/measureLocalVscodeComparison.ts",
+    "measure-codex-webview-load-time": "node src/measureCodexWebviewLoadTime.ts",
+    "measure-warm-codex-webview-load-time": "node src/measureCodexWebviewLoadTime.ts --warm-cache",
+    "measure-webview-memory": "node src/measureWebviewMemory.ts",
+    "measure-webview-load-time": "node src/measureWebviewLoadTime.ts",
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit"
   },
   "devDependencies": {
@@ -17,9 +23,10 @@
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "dts-bundle-generator": "^9.5.1",
-    "rollup": "^4.62.2"
+    "rollup": "^4.62.2",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@lvce-editor/assert": "^1.5.1"
+    "@lvce-editor/assert": "^1.7.0"
   }
 }

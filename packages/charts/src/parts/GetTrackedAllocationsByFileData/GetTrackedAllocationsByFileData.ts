@@ -1,0 +1,86 @@
+import { existsSync } from 'node:fs'
+import { readdir } from 'node:fs/promises'
+import { join } from 'node:path'
+import { readJson } from '../ReadJson/ReadJson.ts'
+import { TrackedAllocationsChartLimit } from '../TrackedAllocationsChartLimit/TrackedAllocationsChartLimit.ts'
+
+type TrackedAllocation = {
+  readonly collectedCount?: number
+  readonly createdCount?: number
+  readonly location?: string
+  readonly originalLocation?: string
+  readonly originalSource?: string
+}
+
+type AllocationFileCounts = {
+  collected: number
+  created: number
+  name: string
+}
+
+const resultFolders = ['tracked-allocations', 'tracked-allocations-from-start']
+
+const getFilename = (folder: string, dirent: string): string => {
+  const name = dirent.replace('.json', '')
+  if (folder === 'tracked-allocations') {
+    return name
+  }
+  return `${folder}/${name}`
+}
+
+const getSourceName = (item: TrackedAllocation): string => {
+  return item.originalSource || item.originalLocation || item.location || 'Unknown'
+}
+
+const getTrackedAllocations = (rawData: any): readonly TrackedAllocation[] => {
+  if (Array.isArray(rawData)) {
+    return rawData
+  }
+  if (Array.isArray(rawData.trackedAllocations)) {
+    return rawData.trackedAllocations
+  }
+  return []
+}
+
+const getAllocationFileCounts = (trackedAllocations: readonly TrackedAllocation[]): readonly AllocationFileCounts[] => {
+  const countsBySource = new Map<string, AllocationFileCounts>()
+  for (const item of trackedAllocations) {
+    const name = getSourceName(item)
+    const existing = countsBySource.get(name) || {
+      collected: 0,
+      created: 0,
+      name,
+    }
+    existing.collected += item.collectedCount || 0
+    existing.created += item.createdCount || 0
+    countsBySource.set(name, existing)
+  }
+  return [...countsBySource.values()].sort((a, b) => b.created - a.created || b.collected - a.collected)
+}
+
+export const getTrackedAllocationsByFileData = async (basePath: string) => {
+  const allData: any[] = []
+  for (const folder of resultFolders) {
+    const resultsPath = join(basePath, folder)
+    if (!existsSync(resultsPath)) {
+      continue
+    }
+    const dirents = await readdir(resultsPath)
+    for (const dirent of dirents.sort()) {
+      if (!dirent.endsWith('.json')) {
+        continue
+      }
+      const filePath = join(resultsPath, dirent)
+      const rawData = await readJson(filePath)
+      const trackedAllocations = getTrackedAllocations(rawData)
+      const fileData = getAllocationFileCounts(trackedAllocations)
+      const limitedData = fileData.slice(0, TrackedAllocationsChartLimit)
+      allData.push({
+        data: limitedData,
+        filename: getFilename(folder, dirent),
+        omittedEntryCount: fileData.length - limitedData.length,
+      })
+    }
+  }
+  return allData
+}

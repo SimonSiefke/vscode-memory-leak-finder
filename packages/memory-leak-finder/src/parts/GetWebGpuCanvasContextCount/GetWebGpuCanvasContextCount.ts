@@ -5,7 +5,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 export const getWebGpuCanvasContextCount = async (session: Session, objectGroup: string): Promise<number> => {
   try {
-    return await GetObjectCount.getObjectCount(session, PrototypeExpression.GPUCanvasContext, objectGroup)
+    return await GetObjectCount.getObjectCount(session, PrototypeExpression.GPUCanvasContext)
   } catch (error) {
     throw new VError(error, `Failed to get webgpu canvas context count`)
   }

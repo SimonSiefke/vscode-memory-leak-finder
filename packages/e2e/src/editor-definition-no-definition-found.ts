@@ -12,7 +12,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   await Editor.open('index.html')
   await Editor.shouldHaveText('<h1>hello world</h1>')
   await Editor.shouldHaveBreadCrumb('index.html')
-  await Editor.shouldHaveToken('h1', 'rgb(86, 156, 214)')
+  await Editor.shouldHaveToken('h1', 'rgb(126, 231, 135)')
   await Editor.shouldHaveBreadCrumb('h1')
 }
 

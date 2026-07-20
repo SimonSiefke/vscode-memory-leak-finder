@@ -1,5 +1,4 @@
 import { addRowHighlights } from '../AddRowHighlights/AddRowHighlights.ts'
-import { fixSvgHeight } from '../FixSvgHeight/FixSvgHeight.ts'
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import { getCommonBarChartOptions } from '../GetCommonBarChartOptions/GetCommonBarChartOptions.ts'
 import * as Plot from '../Plot/Plot.ts'
@@ -45,6 +44,5 @@ export const createBarChart = (data: any, options: any): string => {
   }).outerHTML
 
   const finalHtml = fixHtmlNamespace(baseHtml)
-  const resizedHtml = fixSvgHeight(finalHtml, dataCount)
-  return addRowHighlights(resizedHtml, orderedData, chartOptions, options)
+  return addRowHighlights(finalHtml, orderedData, chartOptions, options)
 }

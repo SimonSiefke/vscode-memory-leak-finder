@@ -4,14 +4,10 @@ import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import { launchFunctionTrackerAndPreGenerateWorkbench } from '../LaunchFunctionTrackerWorker/LaunchFunctionTrackerAndPreGenerateWorkbench.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
-
-// TODO maybe pass it as argument from above
-const HTTP_SERVER_PORT = 9876
 
 export const prepareBoth = async (
   secretsPath: string,
@@ -24,15 +20,7 @@ export const prepareBoth = async (
   connectionId: number,
   measureId: string,
   pid: number,
-  preGeneratedWorkbenchPath: string | null,
-  binaryPath: string | null,
 ): Promise<any> => {
-  // Launch function-tracker worker BEFORE PrepareBoth if tracking is enabled
-  // This ensures the socket server is ready when the protocol interceptor is injected
-  if (trackFunctions && binaryPath) {
-    await launchFunctionTrackerAndPreGenerateWorkbench(binaryPath, preGeneratedWorkbenchPath)
-  }
-
   const stream = new PortReadStream(port)
   const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(stream)
 
@@ -41,14 +29,12 @@ export const prepareBoth = async (
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(
+  const { electronObjectId, electronPid, monkeyPatchedElectronId } = await connectElectron(
     electronRpc,
     secretsPath,
     headlessMode,
     trackFunctions,
     openDevtools,
-    HTTP_SERVER_PORT,
-    preGeneratedWorkbenchPath,
     measureId,
   )
 
@@ -78,6 +64,7 @@ export const prepareBoth = async (
     devtoolsWebSocketUrl,
     electronObjectId,
     monkeyPatchedElectronId,
+    pid: electronPid ?? pid,
     sessionId,
     targetId,
     utilityContext: undefined,

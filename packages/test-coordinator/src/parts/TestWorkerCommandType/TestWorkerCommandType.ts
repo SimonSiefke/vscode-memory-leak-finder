@@ -1,6 +1,7 @@
 export const ConnectDevtools = 'ConnectDevtools.connectDevtools'
 export const GetExternalRuntimeInfo = 'GetExternalRuntimeInfo.getExternalRuntimeInfo'
 export const MemoryLeakFinderStart = 'MemoryLeakFinderStart.start'
+export const MemoryLeakFinderRunCompletion = 'MemoryLeakFinderRunCompletion.runCompletion'
 export const MemoryLeakFinderStop = 'MemoryLeakFinderStop.stop'
 export const MemoryLeakFinderCompare = 'MemoryLeakFinderStop.compare'
 export const RunTest = 'RunTest.runTest'

@@ -39,8 +39,6 @@ test('applyMonkeyPatches - injects secrets path into monkey patch script', async
     false,
     false,
     false,
-    9876,
-    null,
   )
 
   expect(monkeyPatchedElectronId).toBe('patched-electron-id')
@@ -60,4 +58,45 @@ test('applyMonkeyPatches - injects secrets path into monkey patch script', async
       call.params.functionDeclaration.includes('[secrets-mock] mocked electron safeStorage'),
   )
   expect(safeStoragePatchCall).toBeDefined()
+})
+
+test('applyMonkeyPatches - applies ipc monkey patch for ipc messages from start measure', async () => {
+  const calls: Array<{ method: string; params: any }> = []
+
+  const electronRpc = {
+    invoke: async (method: string, params: any) => {
+      calls.push({ method, params })
+      if (
+        method === 'Runtime.callFunctionOn' &&
+        params.objectId === 'electron-object' &&
+        params.functionDeclaration.includes('const originalWhenReady = app.whenReady()')
+      ) {
+        return {
+          result: {
+            result: {
+              objectId: 'patched-electron-id',
+              type: 'function',
+            },
+          },
+        }
+      }
+      return {
+        result: {
+          result: {
+            type: 'undefined',
+          },
+        },
+      }
+    },
+  }
+
+  await applyMonkeyPatches(electronRpc as any, 'electron-object', 'require-object', '', false, false, false, 'ipcMessagesFromStart')
+
+  const ipcPatchCall = calls.find(
+    (call) =>
+      call.method === 'Runtime.callFunctionOn' &&
+      call.params.objectId === 'electron-object' &&
+      call.params.functionDeclaration.includes('globalThis.__ipcMessages = []'),
+  )
+  expect(ipcPatchCall).toBeDefined()
 })

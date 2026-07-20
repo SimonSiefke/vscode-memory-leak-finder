@@ -1,16 +1,36 @@
 import * as CompressSvg from '../CompressSvg/CompressSvg.ts'
+import { createAllocationPerformanceChart } from '../CreateAllocationPerformanceChart/CreateAllocationPerformanceChart.ts'
 import { createBarChart } from '../CreateBarChart/CreateBarChart.ts'
+import { createCpuProfileFlameChart } from '../CreateCpuProfileFlameChart/CreateCpuProfileFlameChart.ts'
 import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
 import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
+import { createGroupedHorizontalBarChart } from '../CreateGroupedHorizontalBarChart/CreateGroupedHorizontalBarChart.ts'
+import { createLineChart } from '../CreateLineChart/CreateLineChart.ts'
+import { createPaintEventsChart } from '../CreatePaintEventsChart/CreatePaintEventsChart.ts'
 
 export const createChart = async (data: any, options: any): Promise<string> => {
   let svg: string
   switch (options.type) {
+    case 'allocation-performance-chart':
+      svg = createAllocationPerformanceChart(data, options)
+      break
     case 'bar-chart':
       svg = createBarChart(data, options)
       break
+    case 'cpu-profile-flame-chart':
+      svg = createCpuProfileFlameChart(data, options)
+      break
     case 'dual-bar-chart':
       svg = createDualBarChart(data, options)
+      break
+    case 'grouped-horizontal-bar-chart':
+      svg = createGroupedHorizontalBarChart(data, options)
+      break
+    case 'line-chart':
+      svg = createLineChart(data, options)
+      break
+    case 'paint-events-chart':
+      svg = createPaintEventsChart(data, options)
       break
     default:
       svg = createDefaultChart(data, options)

@@ -1,5 +1,7 @@
 import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
+import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
@@ -12,6 +14,7 @@ import * as GetVscodeRuntimeDir from '../GetVscodeRuntimeDir/GetVscodeRuntimeDir
 import * as IsCi from '../IsCi/IsCi.ts'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.ts'
 import { join } from '../Path/Path.ts'
+import * as PrepareTrackedVscode from '../PrepareTrackedVscode/PrepareTrackedVscode.ts'
 import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 import * as RemoveVscodeBackups from '../RemoveVscodeBackups/RemoveVscodeBackups.ts'
 import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveVscodeGlobalStorage.ts'
@@ -217,8 +220,10 @@ export const launchVsCode = async ({
   addDisposable,
   arch,
   buildVscodeMinified,
+  callgrindConfig,
   clearExtensions,
   commit,
+  cpuPerformanceCountersFromStartConfig,
   cwd,
   downloadUserDataZipFileToken,
   downloadUserDataZipFileUrl,
@@ -233,7 +238,10 @@ export const launchVsCode = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
+  preparedVscodePath,
   proxyTestFolderName,
+  trackFunctions,
+  trackingMode,
   useProxyMock,
   updateUrl,
   vscodePath,
@@ -242,8 +250,10 @@ export const launchVsCode = async ({
   addDisposable: (fn: () => Promise<void> | void) => void
   arch: string
   buildVscodeMinified: boolean
+  callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   commit: string
+  cpuPerformanceCountersFromStartConfig: CpuPerformanceCountersFromStartConfig
   cwd: string
   downloadUserDataZipFileToken: string
   downloadUserDataZipFileUrl: string
@@ -258,7 +268,10 @@ export const launchVsCode = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform: string
+  preparedVscodePath: string
   proxyTestFolderName: string
+  trackFunctions: boolean
+  trackingMode: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -269,7 +282,7 @@ export const launchVsCode = async ({
     console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
   }
   try {
-    const { binaryPath, extensionsDir, runtimeDir, settingsPath, testWorkspacePath, userDataDir } = await prepareVsCodeLaunch({
+    let { binaryPath, extensionsDir, runtimeDir, settingsPath, testWorkspacePath, userDataDir } = await prepareVsCodeLaunch({
       arch,
       buildVscodeMinified,
       clearExtensions,
@@ -280,9 +293,12 @@ export const launchVsCode = async ({
       insidersCommit,
       platform,
       updateUrl,
-      vscodePath,
+      vscodePath: preparedVscodePath || vscodePath,
       vscodeVersion,
     })
+    if (trackFunctions) {
+      binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
+    }
 
     // Start proxy server if enabled
     // Note: enableProxy might be undefined if RPC call doesn't pass it correctly
@@ -342,10 +358,13 @@ export const launchVsCode = async ({
     const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,
       args,
+      callgrindConfig,
       cliPath: binaryPath,
+      cpuPerformanceCountersFromStartConfig,
       cwd,
       env,
       headlessMode,
+      platform,
     })
     return {
       binaryPath,

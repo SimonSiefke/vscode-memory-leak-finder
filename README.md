@@ -15,6 +15,23 @@ npm run e2e
 
 ## Measures
 
+### MemoryCity
+
+Captures allocation-aware renderer and extension-host heap snapshots, computes
+source-mapped retained ownership, and generates the interactive VS Code Memory
+City visualization.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure memory-city --only base
+```
+
+Build or preview the standalone viewer:
+
+```sh
+npm --prefix packages/visualizations run build
+npm --prefix packages/visualizations run dev
+```
+
 ### ArrayCount
 
 Measures the total number of arrays.
@@ -37,6 +54,14 @@ Measures the total number of classes.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure class-count --only base
+```
+
+### CpuPerformanceCounters
+
+Measures CPU instructions and cycles for the inspected process.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
 ```
 
 ### DetachedDomNodeCount
@@ -207,6 +232,38 @@ Measures the total number of Timeouts.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-timeout --only base
 ```
 
+### TrackedTimeouts
+
+Measures active timeouts using workbench instrumentation installed at application startup.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --runs 1 --measure-after --measure tracked-timeouts --timeout-between 5000 --only base
+```
+
+### TrackedAllocationLeaks
+
+Reports allocation sites that retain instances after forced garbage collection. Results are informational potential leak candidates.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure tracked-allocation-leaks --only editor-open
+```
+
+### TrackedAllocationPerformance
+
+Correlates allocation churn with sampled JavaScript CPU self-time by source file. The CPU percentage describes the source file, not the cost of allocation itself.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure tracked-allocation-performance --only editor-type-many-characters
+```
+
+### V8TurbofanStats
+
+Measures V8 TurboFan optimization and deoptimization activity.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure v8-turbofan-stats --only base
+```
+
 ### WeakMapCount
 
 Measures the total number of WeakMaps.
@@ -245,6 +302,7 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 - packages/source-map-worker: Functions for querying original positions and function names using source maps
 - packages/test-coordinator: Determines which tests to run, launches VSCode, file-watcher-worker, test-worker, memory-leak-worker, video-recording-worker
 - packages/test-worker: Runs tests
+- packages/visualizations: Interactive source-mapped memory visualizations
 - packages/test-worker-commands: Functions used by test-worker
 - packages/video-recording-worker: Record screencasts of the tests
 

@@ -138,12 +138,14 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
+        let selectedAt: number
         if (typeof text === 'string') {
           const option = quickPick.locator('.label-name', {
             hasExactText: text,
           })
           await expect(option).toBeVisible()
           await page.waitForIdle()
+          selectedAt = performance.timeOrigin + performance.now()
           await option.click()
         } else {
           const normal = `${text}`.slice(1, -1)
@@ -151,10 +153,8 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           await expect(item).toBeVisible()
           await page.waitForIdle()
           const label = item.locator('.label-name')
+          selectedAt = performance.timeOrigin + performance.now()
           await label.click()
-          if (!stopsApplication) {
-            await page.waitForIdle()
-          }
         }
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()
@@ -162,6 +162,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         if (!stopsApplication) {
           await page.waitForIdle()
         }
+        return selectedAt
       } catch (error) {
         throw new VError(error, `Failed to select "${text}"`)
       }
@@ -225,6 +226,30 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to type ${value}`)
+      }
+    },
+    async waitForCommand(command: string, timeout = 120_000) {
+      try {
+        const deadline = performance.now() + timeout
+        const quickPick = page.locator('.quick-input-widget')
+        while (performance.now() < deadline) {
+          await this.showCommands()
+          await this.type(command)
+          const option = quickPick.locator('.label-name', {
+            hasExactText: command,
+          })
+          if (await option.isVisible().catch(() => false)) {
+            await page.keyboard.press(KeyBindings.Escape)
+            await expect(quickPick).toBeHidden()
+            return
+          }
+          await page.keyboard.press(KeyBindings.Escape)
+          await expect(quickPick).toBeHidden()
+          await new Promise((resolve) => setTimeout(resolve, 250))
+        }
+        throw new Error(`Command did not become available within ${timeout}ms`)
+      } catch (error) {
+        throw new VError(error, `Failed to wait for command "${command}"`)
       }
     },
     async waitForInputVisible() {
