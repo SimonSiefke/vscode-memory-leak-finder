@@ -46,5 +46,6 @@
   "remote.SSH.remotePlatform": {
     "*": "linux"
   },
-  "chat.allowAnonymousAccess": true
+  "chat.allowAnonymousAccess": true,
+  "application.shellEnvironmentResolutionTimeout": 119
 }
