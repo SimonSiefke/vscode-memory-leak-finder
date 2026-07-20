@@ -130,7 +130,17 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to check that webview is visible`)
       }
     },
-    async shouldHaveContent({ extensionId, selector, text, focusSelector='' }: { extensionId: string; selector: string; text: string, focusSelector:string }) {
+    async shouldHaveContent({
+      extensionId,
+      selector,
+      text,
+      focusSelector = '',
+    }: {
+      extensionId: string
+      selector: string
+      text: string
+      focusSelector: string
+    }) {
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview.ready')
@@ -155,9 +165,11 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await page.waitForIdle()
         await frame.waitForIdle()
         await page.waitForIdle()
-        if(focusSelector){
-          const locator=frame.locator(focusSelector)
+        if (focusSelector) {
+          const locator = frame.locator(focusSelector)
           await expect(locator).toBeFocused()
+          await frame.waitForIdle()
+          await page.waitForIdle()
         }
         return { loadTimeMs: (await content.getAttribute('data-load-time-ms')) || '', readyAt }
       } catch (error) {
