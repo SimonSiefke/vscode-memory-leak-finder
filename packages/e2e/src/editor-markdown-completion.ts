@@ -15,15 +15,10 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   await Editor.setCursor(2, 8)
 }
 
-export const run = async ({ Editor, Suggest }: TestContext): Promise<void> => {
+export const run = async ({  Suggest }: TestContext): Promise<void> => {
   await Suggest.open('#test')
   await Suggest.close()
-  // await Editor.deleteAll()
-  // await Editor.shouldHaveText('')
-  // await Editor.type('[test](#')
-  // await new Promise(r=>{})
-  // await Editor.shouldHaveText('h1 { visibil }')
-  // await Editor.setCursor(1, 13)
+
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
