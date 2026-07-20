@@ -5,12 +5,18 @@ const useSingleIframeWebview = process.env.VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_
 
 export const skip = 1
 
-export const setup=async ({Editor, Extensions, SideBar}:TestContext )=>{
+export const setup = async ({ Editor, Extensions, SideBar, Workspace }: TestContext) => {
   // if (!process.env.VSCODE_CODEX_EXTENSION_PATH) {
   //   return
   // }
   console.log('CODEX_BENCHMARK_PHASE=warmup')
-   await Editor.closeAll()
+await Workspace.setFiles([
+    {
+      content: 'test',
+      name: 'webview-benchmark-warmup.txt',
+    },
+  ])
+    await Editor.closeAll()
   await SideBar.hide()
   // @ts-ignore
   await SideBar.hideSecondary()
@@ -20,7 +26,6 @@ export const setup=async ({Editor, Extensions, SideBar}:TestContext )=>{
     name: 'Codex – OpenAI’s coding agent',
   })
   await Editor.warmUpTextEditor()
-
 }
 
 export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView, SideBar }: TestContext): Promise<void> => {
