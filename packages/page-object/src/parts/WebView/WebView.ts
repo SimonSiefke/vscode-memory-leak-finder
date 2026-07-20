@@ -144,8 +144,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await frame.waitForIdle()
         const content = frame.locator(selector)
         await expect(content).toBeVisible()
-        if(text){
-
+        if (text) {
           await expect(content).toHaveText(text)
         }
         const readyAt = Number.parseFloat((await content.getAttribute('data-ready-at')) || '')
