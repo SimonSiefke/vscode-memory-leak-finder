@@ -135,6 +135,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await page.waitForIdle()
         const webView = page.locator('.webview.ready')
         await expect(webView).toBeVisible()
+        await page.waitForIdle()
         const url = new RegExp(`extensionId=${extensionId}`)
         const childPage = await page.waitForIframe({
           injectUtilityScript: false,
@@ -142,13 +143,16 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         })
         const frame = await childPage.waitForSubIframe({ url })
         await frame.waitForIdle()
+        await page.waitForIdle()
         const content = frame.locator(selector)
         await expect(content).toBeVisible()
+        await page.waitForIdle()
         if (text) {
           await expect(content).toHaveText(text)
         }
         const readyAt = Number.parseFloat((await content.getAttribute('data-ready-at')) || '')
         await frame.waitForIdle()
+        await page.waitForIdle()
         return { loadTimeMs: (await content.getAttribute('data-load-time-ms')) || '', readyAt }
       } catch (error) {
         throw new VError(error, `Failed to find expected content in legacy webview`)
