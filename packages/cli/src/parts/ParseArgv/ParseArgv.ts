@@ -81,6 +81,10 @@ const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-skipped-tests-anyway')
 }
 
+const parseRunNetworkTestsAnyway = (argv: readonly string[]): boolean => {
+  return argv.includes('--run-network-tests-anyway')
+}
+
 const parseAllowCopilotAuthInCi = (argv: readonly string[]): boolean => {
   return argv.includes('--allow-copilot-auth-in-ci')
 }
@@ -138,6 +142,13 @@ const parseRuns = (argv: readonly string[]): number => {
   return 1
 }
 
+const parseStartupRuns = (argv: readonly string[]): number => {
+  if (argv.includes('--startup-runs')) {
+    return parseArgvNumber(argv, '--startup-runs')
+  }
+  return 1
+}
+
 const parseCwd = (cwd: string, argv: readonly string[]): string => {
   if (argv.includes('--cwd')) {
     return parseArgvString(argv, '--cwd')
@@ -170,6 +181,14 @@ const parseMeasureAfter = (argv: readonly string[]): boolean => {
 
 const parseMeasureNode = (argv: readonly string[]): boolean => {
   return argv.includes('--measure-node')
+}
+
+const isIpcMessageCountMeasure = (measure: string): boolean => {
+  return measure === 'ipc-message-count' || measure === 'ipcMessageCount' || measure === 'ipcmessagecount'
+}
+
+const isCpuPerformanceCountersFromStartMeasure = (measure: string): boolean => {
+  return measure === 'cpu-performance-counters-from-start' || measure === 'cpuPerformanceCountersFromStart'
 }
 
 const parseProcessRootStrategy = (argv: readonly string[]): string => {
@@ -355,7 +374,23 @@ const parsePageObjectPath = (argv: readonly string[]): string => {
 }
 
 const parseTrackFunctions = (argv: readonly string[]): boolean => {
-  return argv.includes('--track-functions') || parseMeasure(argv) === 'tracked-functions'
+  const measure = parseMeasure(argv)
+  return (
+    argv.includes('--track-functions') ||
+    measure === 'tracked-functions' ||
+    measure === 'tracked-allocations' ||
+    measure === 'trackedAllocations' ||
+    measure === 'tracked-allocations-from-start' ||
+    measure === 'trackedAllocationsFromStart' ||
+    measure === 'tracked-allocation-leaks' ||
+    measure === 'trackedAllocationLeaks' ||
+    measure === 'tracked-allocation-performance' ||
+    measure === 'trackedAllocationPerformance' ||
+    measure === 'tracked-allocation-timeline' ||
+    measure === 'trackedAllocationTimeline' ||
+    measure === 'tracked-timeouts' ||
+    measure === 'trackedTimeouts'
+  )
 }
 
 const parseOpenDevtools = (argv: readonly string[]): boolean => {
@@ -386,14 +421,16 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const useStableVscodeRepoPath = parseUseStableVscodeRepoPath(argv)
   const downloadUserDataZipFileToken = parseDownloadUserDataZipFileToken(argv)
   const downloadUserDataZipFileUrl = parseDownloadUserDataZipFileUrl(argv)
-  const enableExtensions = parseEnableExtensions(argv)
+  const measure = parseMeasure(argv)
+  const memoryCity = measure === 'memory-city' || measure === 'memoryCity'
+  const enableExtensions = parseEnableExtensions(argv) || memoryCity
   const enableProxy = parseEnableProxy(argv)
   const filter = parseFilter(argv)
   const headless = parseHeadless(argv)
   const ide = parseIde(argv)
   const ideVersion = ''
   const insidersCommit = parseInsidersCommit(parsedVersion, argv)
-  const inspectExtensions = parseInspectExtensions(argv)
+  const inspectExtensions = parseInspectExtensions(argv) || memoryCity
   const inspectExtensionsPort = parseInspectExtensionsPort(argv)
   const inspectIntegratedBrowser = parseInspectIntegratedBrowser(argv)
   const inspectProcess = parseInspectProcess(argv)
@@ -401,9 +438,11 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const inspectPtyHostPort = parseInspectPtyHostPort(argv)
   const inspectSharedProcess = parseInspectSharedProcess(argv)
   const inspectSharedProcessPort = parseInspectSharedProcessPort(argv)
-  const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  if (isIpcMessageCountMeasure(measure) && !measureNode) {
+    throw new Error('--measure ipc-message-count requires --measure-node')
+  }
   if (inspectIntegratedBrowser && (measureNode || inspectSharedProcess || inspectExtensions || inspectPtyHost || inspectProcess)) {
     throw new Error(
       '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
@@ -415,7 +454,12 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const restartBetween = parseRestartBetween(argv)
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
+  const startupRuns = parseStartupRuns(argv)
+  if (startupRuns > 1 && !isCpuPerformanceCountersFromStartMeasure(measure)) {
+    throw new Error('--startup-runs can only be used with --measure cpu-performance-counters-from-start')
+  }
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
+  const runNetworkTestsAnyway = parseRunNetworkTestsAnyway(argv)
   const allowCopilotAuthInCi = parseAllowCopilotAuthInCi(argv)
   const screencastQuality = parseScreencastQuality(argv)
   const setupOnly = parseSetupOnly(argv)
@@ -480,10 +524,12 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     resolveVscodeCommitHash,
     restartBetween,
     runMode,
+    runNetworkTestsAnyway,
     runs,
     runSkippedTestsAnyway,
     screencastQuality,
     setupOnly,
+    startupRuns,
     timeoutBetween,
     timeouts,
     trackFunctions,

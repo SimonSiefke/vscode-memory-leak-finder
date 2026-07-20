@@ -29,6 +29,13 @@ test('parseArgv - run skipped tests anyway', () => {
   })
 })
 
+test('parseArgv - run network tests anyway', () => {
+  const argv = ['--run-network-tests-anyway']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    runNetworkTestsAnyway: true,
+  })
+})
+
 test('parseArgv - allow copilot auth in ci', () => {
   const argv = ['--allow-copilot-auth-in-ci']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
@@ -96,6 +103,27 @@ test('parseArgv - runs', () => {
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     runs: 4,
   })
+})
+
+test('parseArgv - startup runs', () => {
+  const argv = ['--measure', 'cpu-performance-counters-from-start', '--startup-runs', '30']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    startupRuns: 30,
+  })
+})
+
+test('parseArgv - startup runs uses last value', () => {
+  const argv = ['--measure', 'cpu-performance-counters-from-start', '--startup-runs', '3', '--startup-runs', '7']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    startupRuns: 7,
+  })
+})
+
+test('parseArgv - startup runs requires startup counter measure', () => {
+  const argv = ['--measure', 'event-listener-count', '--startup-runs', '2']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    '--startup-runs can only be used with --measure cpu-performance-counters-from-start',
+  )
 })
 
 test('parseArgv - record video', () => {
@@ -264,6 +292,23 @@ test('parseArgv - measure-node flag', () => {
   expect(options.measureNode).toBe(true)
 })
 
+test('parseArgv - ipc-message-count requires measure-node', () => {
+  const argv = ['--measure', 'ipc-message-count']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow('--measure ipc-message-count requires --measure-node')
+})
+
+test('parseArgv - ipcMessageCount requires measure-node', () => {
+  const argv = ['--measure', 'ipcMessageCount']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow('--measure ipc-message-count requires --measure-node')
+})
+
+test('parseArgv - ipc-message-count allows measure-node', () => {
+  const argv = ['--measure', 'ipc-message-count', '--measure-node']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('ipc-message-count')
+  expect(options.measureNode).toBe(true)
+})
+
 test('parseArgv - process-root-strategy flag', () => {
   const argv = ['--process-root-strategy', 'ssh-remote-server']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
@@ -360,6 +405,12 @@ test('parseArgv - enable-extensions flag not present', () => {
   const argv: readonly string[] = []
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.enableExtensions).toBe(false)
+})
+
+test('parseArgv - memory-city automatically enables and inspects extensions', () => {
+  const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', 'memory-city'])
+  expect(options.enableExtensions).toBe(true)
+  expect(options.inspectExtensions).toBe(true)
 })
 
 test('parseArgv - inspect-ptyhost-port flag', () => {
@@ -524,6 +575,49 @@ test('parseArgv - check-leaks automatically true when --measure is specified wit
   const argv = ['--measure', 'heap-usage']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.checkLeaks).toBe(true)
+})
+
+test('parseArgv - tracked allocations enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocations']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.trackFunctions).toBe(true)
+})
+
+test('parseArgv - tracked allocations from start enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocations-from-start']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-allocations-from-start')
+  expect(options.trackFunctions).toBe(true)
+})
+
+test('parseArgv - tracked allocation timeline enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocation-timeline']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-allocation-timeline')
+  expect(options.trackFunctions).toBe(true)
+})
+
+test('parseArgv - tracked allocation leaks enables tracking transform', () => {
+  for (const measure of ['tracked-allocation-leaks', 'trackedAllocationLeaks']) {
+    const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', measure])
+    expect(options.measure).toBe(measure)
+    expect(options.trackFunctions).toBe(true)
+  }
+})
+
+test('parseArgv - tracked allocation performance enables tracking transform', () => {
+  for (const measure of ['tracked-allocation-performance', 'trackedAllocationPerformance']) {
+    const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', measure])
+    expect(options.measure).toBe(measure)
+    expect(options.trackFunctions).toBe(true)
+  }
+})
+
+test('parseArgv - tracked timeouts enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-timeouts']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-timeouts')
+  expect(options.trackFunctions).toBe(true)
 })
 
 test('parseArgv - explicit --check-leaks takes precedence', () => {

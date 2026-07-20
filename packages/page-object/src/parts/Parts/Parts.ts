@@ -46,6 +46,7 @@ export * as SettingsEditorFilter from '../SettingsEditorFilter/SettingsEditorFil
 export * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput.ts'
 export * as SideBar from '../SideBar/SideBar.ts'
 export * as SimpleBrowser from '../SimpleBrowser/SimpleBrowser.ts'
+export * as SingleIframeWebView from '../SingleIframeWebView/SingleIframeWebView.ts'
 export * as SourceControl from '../SourceControl/SourceControl.ts'
 export * as SshServer from '../SshServer/SshServer.ts'
 export * as StatusBar from '../StatusBar/StatusBar.ts'

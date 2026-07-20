@@ -182,9 +182,9 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
 
@@ -195,7 +195,7 @@ jobs:
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: npm-cache
         with:
           path: |
@@ -211,7 +211,7 @@ jobs:
         id: sourceMapsCacheKey
         run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: source-maps-cache
         with:
           path: |
@@ -244,6 +244,7 @@ jobs:
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
             --cwd packages/e2e \
             --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
             --commit "${{ env.BASE_COMMIT }}" \
             --setup-only \
             $BUILD_VSCODE_MINIFIED_FLAG \
@@ -258,6 +259,7 @@ jobs:
             --check-leaks \
             --measure-after \
             --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
             --commit "${{ env.BASE_COMMIT }}" \
             $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
@@ -294,14 +296,14 @@ jobs:
 
       - name: Upload base results artifact
         if: always() && hashFiles('.measure-runs/*-base-results.zip') != ''
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.request_id }}-base-results
           path: .measure-runs/${{ inputs.request_id }}-base-results.zip
 
       - name: Upload base charts partial artifact
         if: always() && hashFiles('.measure-runs/*-base-charts-part.zip') != ''
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.request_id }}-base-charts-part
           path: .measure-runs/${{ inputs.request_id }}-base-charts-part.zip
@@ -398,9 +400,9 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
 
@@ -411,7 +413,7 @@ jobs:
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: npm-cache
         with:
           path: |
@@ -427,7 +429,7 @@ jobs:
         id: sourceMapsCacheKey
         run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: source-maps-cache
         with:
           path: |
@@ -460,6 +462,7 @@ jobs:
           xvfb-run --auto-servernum node packages/cli/bin/test.js \
             --cwd packages/e2e \
             --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
             --commit "${{ env.CANDIDATE_REF }}" \
             --setup-only \
             $BUILD_VSCODE_MINIFIED_FLAG \
@@ -474,6 +477,7 @@ jobs:
             --check-leaks \
             --measure-after \
             --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
             --commit "${{ env.CANDIDATE_REF }}" \
             $BUILD_VSCODE_MINIFIED_FLAG \
             ${{ env.CLI_ARGS }}
@@ -510,14 +514,14 @@ jobs:
 
       - name: Upload candidate results artifact
         if: always() && hashFiles('.measure-runs/*-candidate-results.zip') != ''
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.request_id }}-candidate-results
           path: .measure-runs/${{ inputs.request_id }}-candidate-results.zip
 
       - name: Upload candidate charts partial artifact
         if: always() && hashFiles('.measure-runs/*-candidate-charts-part.zip') != ''
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.request_id }}-candidate-charts-part
           path: .measure-runs/${{ inputs.request_id }}-candidate-charts-part.zip
@@ -534,9 +538,9 @@ jobs:
     env:
       REQUEST_ID: ${{ inputs.request_id }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
 
@@ -547,14 +551,14 @@ jobs:
 
       - name: Download base charts partial artifact
         if: needs.measure-base.outputs.chartsOutcome == 'success'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.request_id }}-base-charts-part
           path: .measure-runs/downloaded-base-charts
 
       - name: Download candidate charts partial artifact
         if: needs.measure-candidate.outputs.chartsOutcome == 'success'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.request_id }}-candidate-charts-part
           path: .measure-runs/downloaded-candidate-charts
@@ -568,8 +572,24 @@ jobs:
           if [[ -f .measure-runs/downloaded-candidate-charts/${REQUEST_ID}-candidate-charts-part.zip ]]; then
             unzip -q .measure-runs/downloaded-candidate-charts/${REQUEST_ID}-candidate-charts-part.zip -d .measure-runs
           fi
-          if [[ -d .measure-runs/base-charts || -d .measure-runs/candidate-charts ]]; then
-            (cd .measure-runs && zip -rq "$REQUEST_ID-charts.zip" base-charts candidate-charts)
+          memory_city_args=()
+          if [[ -f .measure-runs/base-charts/memory-city/memory-city.json ]]; then
+            memory_city_args+=(--revision "${{ inputs.base_commit }}=.measure-runs/base-charts/memory-city/memory-city.json")
+          fi
+          if [[ -f .measure-runs/candidate-charts/memory-city/memory-city.json ]]; then
+            memory_city_args+=(--revision "${{ inputs.candidate_ref }}=.measure-runs/candidate-charts/memory-city/memory-city.json")
+          fi
+          if [[ ${#memory_city_args[@]} -gt 0 ]]; then
+            node packages/visualizations/src/merge.ts "${memory_city_args[@]}" --out .measure-runs/memory-city
+          fi
+          chart_dirs=()
+          for chart_dir in base-charts candidate-charts memory-city; do
+            if [[ -d ".measure-runs/$chart_dir" ]]; then
+              chart_dirs+=("$chart_dir")
+            fi
+          done
+          if [[ ${#chart_dirs[@]} -gt 0 ]]; then
+            (cd .measure-runs && zip -rq "$REQUEST_ID-charts.zip" "${chart_dirs[@]}")
           fi
 
       - name: Write summary JSON
@@ -599,14 +619,14 @@ jobs:
 
       - name: Upload charts artifact
         if: always() && hashFiles('.measure-runs/*-charts.zip') != ''
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.request_id }}-charts
           path: .measure-runs/${{ inputs.request_id }}-charts.zip
 
       - name: Upload summary artifact
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.request_id }}-summary
           path: .measure-runs/summary/summary.json

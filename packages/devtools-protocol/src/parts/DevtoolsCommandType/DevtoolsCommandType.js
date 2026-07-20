@@ -7,10 +7,14 @@ export const CssEnable = 'Css.enable'
 export const CssDisable = 'Css.disable'
 
 export const HeapProfilerTakeHeapSnapshot = 'HeapProfiler.takeHeapSnapshot'
+export const HeapProfilerStartTrackingHeapObjects = 'HeapProfiler.startTrackingHeapObjects'
+export const HeapProfilerStopTrackingHeapObjects = 'HeapProfiler.stopTrackingHeapObjects'
 
 export const HeapProfilerEnable = 'HeapProfiler.enable'
 
 export const HeapProfilerDisable = 'HeapProfiler.disable'
+
+export const HeapProfilerCollectGarbage = 'HeapProfiler.collectGarbage'
 
 export const RuntimeEvaluate = 'Runtime.evaluate'
 
@@ -68,6 +72,24 @@ export const PageSetLifecycleEventsEnabled = 'Page.setLifecycleEventsEnabled'
 
 export const PageScreencastFrameAck = 'Page.screencastFrameAck'
 
+export const PerformanceEnable = 'Performance.enable'
+
+export const PerformanceDisable = 'Performance.disable'
+
+export const PerformanceGetMetrics = 'Performance.getMetrics'
+
+export const ProfilerEnable = 'Profiler.enable'
+
+export const ProfilerStart = 'Profiler.start'
+
+export const ProfilerStop = 'Profiler.stop'
+
+export const ProfilerDisable = 'Profiler.disable'
+
+export const TracingStart = 'Tracing.start'
+
+export const TracingEnd = 'Tracing.end'
+
 export const DebuggerStepInto = 'Debugger.stepInto'
 
 export const DebuggerStepOut = 'Debugger.stepOut'
@@ -91,6 +113,12 @@ export const DomDebuggerGetEventListeners = 'DOMDebugger.getEventListeners'
 export const RuntimeReleaseObjectGroup = 'Runtime.releaseObjectGroup'
 
 export const MemoryGetDomCounters = 'Memory.getDOMCounters'
+
+export const MemoryGetSamplingProfile = 'Memory.getSamplingProfile'
+
+export const MemoryStartSampling = 'Memory.startSampling'
+
+export const MemoryStopSampling = 'Memory.stopSampling'
 
 export const RuntimeGetHeapUsage = 'Runtime.getHeapUsage'
 

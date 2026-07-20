@@ -240,9 +240,11 @@ export const create = ({ electronApp, VError }: CreateParams) => {
     async waitForNewWebContentsView({
       existingIds,
       timeout = 10_000,
+      urlPattern,
     }: {
       existingIds: readonly number[]
       timeout?: number
+      urlPattern?: RegExp
     }): Promise<WebContentsEntry> {
       try {
         const existingIdSet = new Set(existingIds)
@@ -250,14 +252,19 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         while (true) {
           const entries = await this.getAllWebContents()
           const match = entries.find((entry) => {
-            return !existingIdSet.has(entry.id) && entry.ownerWindowVisible !== false && !entry.url.startsWith('devtools://')
+            return (
+              !existingIdSet.has(entry.id) &&
+              entry.ownerWindowVisible !== false &&
+              !entry.url.startsWith('devtools://') &&
+              (!urlPattern || urlPattern.test(entry.url))
+            )
           })
           if (match) {
             return match
           }
           if (performance.now() - startTime > timeout) {
             throw new Error(
-              `No new visible web contents found. Existing ids: ${existingIds.join(', ')}. Found: ${getWebContentsSummary(entries)}`,
+              `No new visible web contents found${urlPattern ? ` matching ${urlPattern}` : ''}. Existing ids: ${existingIds.join(', ')}. Found: ${getWebContentsSummary(entries)}`,
             )
           }
           await new Promise((resolve) => setTimeout(resolve, 100))

@@ -5,6 +5,9 @@ const getErrorCode = (rawResult) => {
   if (rawResult && rawResult.error && rawResult.error.code && rawResult.error.code === -32000) {
     return ErrorCodes.E_DEVTOOLS_INTERNAL_ERROR
   }
+  if (rawResult && rawResult.error && rawResult.error.code && rawResult.error.code === -32601) {
+    return ErrorCodes.E_DEVTOOLS_METHOD_NOT_FOUND
+  }
   return ''
 }
 
@@ -12,7 +15,7 @@ export const unwrapResult = (rawResult) => {
   if ('result' in rawResult) {
     rawResult = rawResult.result
   }
-  if ('documents' in rawResult || 'usedSize' in rawResult || 'names' in rawResult) {
+  if ('documents' in rawResult || 'usedSize' in rawResult || 'names' in rawResult || 'metrics' in rawResult || 'profile' in rawResult) {
     return rawResult
   }
   if ('error' in rawResult) {

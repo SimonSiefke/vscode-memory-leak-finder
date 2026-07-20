@@ -1,6 +1,35 @@
 import { expect, test } from '@jest/globals'
 import * as CleanIpcMessages from '../src/parts/CleanIpcMessages/CleanIpcMessages.ts'
 
+const serializeInt = (value: number): Buffer => {
+  const bytes: number[] = []
+  let current = value
+  while (current >= 0x80) {
+    bytes.push((current & 0x7f) | 0x80)
+    current >>>= 7
+  }
+  bytes.push(current)
+  return Buffer.from(bytes)
+}
+
+const serializeValue = (value: unknown): Buffer => {
+  if (value === undefined) {
+    return Buffer.from([CleanIpcMessages.DataType.Undefined])
+  }
+  if (typeof value === 'number') {
+    return Buffer.concat([Buffer.from([CleanIpcMessages.DataType.Int]), serializeInt(value)])
+  }
+  if (typeof value === 'string') {
+    const bytes = Buffer.from(value, 'utf8')
+    return Buffer.concat([Buffer.from([CleanIpcMessages.DataType.String]), serializeInt(bytes.length), bytes])
+  }
+  if (Array.isArray(value)) {
+    return Buffer.concat([Buffer.from([CleanIpcMessages.DataType.Array]), serializeInt(value.length), ...value.map(serializeValue)])
+  }
+  const bytes = Buffer.from(JSON.stringify(value), 'utf8')
+  return Buffer.concat([Buffer.from([CleanIpcMessages.DataType.Object]), serializeInt(bytes.length), bytes])
+}
+
 test('CleanIpcMessages should read a single byte integer', () => {
   const buffer = Buffer.from([0x42])
   const result = CleanIpcMessages.readIntVQL(buffer, 0)
@@ -151,7 +180,8 @@ test('CleanIpcMessages should deserialize uint8array args', () => {
     {
       args: [
         {
-          content: binary.toString('utf8'),
+          content: binary.toString('latin1'),
+          encoding: 'latin1',
           length: binary.length,
           type: 'uint8array',
         },
@@ -259,7 +289,8 @@ test('CleanIpcMessages should handle complex nested messages', () => {
     {
       args: [
         {
-          content: binary.toString('utf8'),
+          content: binary.toString('latin1'),
+          encoding: 'latin1',
           length: binary.length,
           type: 'uint8array',
         },
@@ -272,6 +303,56 @@ test('CleanIpcMessages should handle complex nested messages', () => {
 
   const result = CleanIpcMessages.cleanMessages(messages)
   expect(result[0].args[0]).toEqual(['logger', 'onDidChangeVisibility', []])
+})
+
+test('CleanIpcMessages should decode VS Code IPC header and body', () => {
+  const header = [100, 1021, 'localFilesystem', 'stat']
+  const body = [{ $mid: 1, path: '/tmp/file.txt', scheme: 'file' }]
+  const binary = Buffer.concat([serializeValue(header), serializeValue(body)])
+
+  const messages = [
+    {
+      args: [
+        {
+          content: binary.toString('latin1'),
+          encoding: 'latin1',
+          length: binary.length,
+          type: 'uint8array',
+        },
+      ],
+      channel: 'vscode:message',
+      timestamp: 123,
+      type: 'on',
+    },
+  ]
+
+  const result = CleanIpcMessages.cleanMessages(messages)
+  expect(result[0].args[0]).toEqual([100, 1021, 'localFilesystem', 'stat', body])
+})
+
+test('CleanIpcMessages should decode outgoing VS Code IPC send messages', () => {
+  const header = [204, 1021]
+  const body = { data: 'file contents' }
+  const binary = Buffer.concat([serializeValue(header), serializeValue(body)])
+
+  const messages = [
+    {
+      args: [
+        {
+          content: binary.toString('latin1'),
+          encoding: 'latin1',
+          length: binary.length,
+          type: 'uint8array',
+        },
+      ],
+      channel: 'vscode:message',
+      timestamp: 123,
+      type: 'send',
+    },
+  ]
+
+  const result = CleanIpcMessages.cleanMessages(messages)
+  expect(result[0].args[0]).toEqual([204, 1021, body])
 })
 
 test('CleanIpcMessages should handle multiple args with mixed types', () => {
@@ -389,6 +470,33 @@ test('CleanIpcMessages should preserve all other message properties', () => {
   expect(result[0].type).toBe('on')
   expect(result[0].customProp).toBe('custom value')
   expect(result[0].args).toEqual(['arg1'])
+})
+
+test('CleanIpcMessages should preserve endpoint metadata', () => {
+  const messages = [
+    {
+      args: ['arg1'],
+      channel: 'test',
+      direction: 'renderer-to-main',
+      from: {
+        frameId: 1,
+        kind: 'renderer',
+        label: 'browser-window',
+        processId: 123,
+        webContentsId: 7,
+      },
+      timestamp: 123,
+      to: {
+        kind: 'electron-main',
+        label: 'electron-main',
+        pid: 456,
+      },
+      type: 'on',
+    },
+  ]
+
+  const result = CleanIpcMessages.cleanMessages(messages)
+  expect(result).toEqual(messages)
 })
 
 test.skip('CleanIpcMessages should decode real-world uint8array with embedded JSON', () => {

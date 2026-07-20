@@ -5,7 +5,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 export const getTrustedTypePolicyCount = async (session: Session, objectGroup: string): Promise<number> => {
   try {
-    return await GetObjectCount.getObjectCount(session, PrototypeExpression.TrustedTypePolicy, objectGroup)
+    return await GetObjectCount.getObjectCount(session, PrototypeExpression.TrustedTypePolicy)
   } catch (error) {
     throw new VError(error, `Failed to get trusted type policy count`)
   }

@@ -12,11 +12,12 @@ const hasChatTestFileName = (file: string): boolean => {
 }
 
 // @ts-ignore
-export const setupTestWithCallback = async (pageObject, file, forceRun, isGithubActions, allowCopilotAuthInCi) => {
+export const setupTestWithCallback = async (pageObject, file, forceRun, isGithubActions, allowCopilotAuthInCi, runNetworkTestsAnyway) => {
   Assert.object(pageObject)
   Assert.string(file)
   Assert.boolean(forceRun)
   Assert.boolean(isGithubActions)
+  Assert.boolean(runNetworkTestsAnyway)
   // Assert.boolean(allowCopilotAuthInCi)
   const module = await ImportTest.importTest(file)
   const wasOriginallySkipped = Boolean(module.skip)
@@ -25,7 +26,7 @@ export const setupTestWithCallback = async (pageObject, file, forceRun, isGithub
   if (requiresCopilotAuth && isCi && !allowCopilotAuthInCi) {
     return { error: null, skipped: true, wasOriginallySkipped }
   }
-  if (module.requiresNetwork && isCi && !forceRun) {
+  if (module.requiresNetwork && isCi && !runNetworkTestsAnyway) {
     return { error: null, skipped: true, wasOriginallySkipped }
   }
   if (module.skip && !forceRun) {
