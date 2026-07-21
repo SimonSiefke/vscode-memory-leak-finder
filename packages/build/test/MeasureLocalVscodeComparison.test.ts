@@ -60,6 +60,8 @@ test('parseArgv uses defaults', () => {
     startupRuns: 1,
     skipBuild: false,
     skipCharts: false,
+             "proxyCaptureRuns": 3,
+                      "extraTestArgs": [],
   })
 })
 
@@ -103,6 +105,8 @@ test('parseArgv uses overrides', () => {
     startupRuns: 30,
     skipBuild: true,
     skipCharts: true,
+      "proxyCaptureRuns": 3,
+                      "extraTestArgs": [],
   })
 })
 
