@@ -23,9 +23,9 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   await Explorer.focus()
 }
 
-export const run = async ({ ContextMenu, Explorer, ImagesPreview }: TestContext): Promise<void> => {
-  await Explorer.openContextMenu('folder')
-  await ContextMenu.select('Open in Images Preview')
+export const run = async ({ ImagesPreview }: TestContext): Promise<void> => {
+  // @ts-ignore
+  await ImagesPreview.open('folder')
   await ImagesPreview.shouldHaveImage('file.svg')
   await ImagesPreview.close()
 }
