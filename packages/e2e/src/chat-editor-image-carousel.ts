@@ -17,11 +17,24 @@ export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestCont
       content: svg,
       name: 'image.svg',
     },
+    {
+      content: svg,
+      name: 'image-2.svg',
+    },
+    {
+      content: svg,
+      name: 'image-3.svg',
+    },
   ])
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.attachImage('image.svg')
+  await ChatEditor.attachImage('image-2.svg')
+  await ChatEditor.attachImage('image-3.svg')
+
+  console.log('wait...')
+  await new Promise(r=>{})
   // TODO click on image to open carousel
   // TODO close carousel
 }
