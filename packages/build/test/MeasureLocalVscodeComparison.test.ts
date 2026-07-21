@@ -155,11 +155,12 @@ test('getMeasureCommandArgs forwards measure-after to cli', () => {
     '97',
     '--startup-runs',
     '30',
+      '--vscode-path',
+    '/tmp/code-oss',
     '--measure',
     'gc-statistics',
     '--measure-node',
-    '--vscode-path',
-    '/tmp/code-oss',
+
     '--measure-after',
   ])
 })
