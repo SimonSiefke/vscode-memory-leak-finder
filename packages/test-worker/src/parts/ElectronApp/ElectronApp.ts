@@ -47,13 +47,14 @@ export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow,
       currentSessionRpc = sessionRpc
     },
     rpc: electronRpc,
-    waitForIframe({ injectUtilityScript = true, url }) {
+    waitForIframe({ iframeIndex = 0, injectUtilityScript = true, url }) {
       return WaitForIframe.waitForIframe({
         browserRpc,
         createPage: Page.create,
         electronObjectId,
         electronRpc,
         idleTimeout,
+        iframeIndex,
         injectUtilityScript,
         sessionRpc: currentSessionRpc,
         url,

@@ -2,7 +2,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async shouldBeVisible() {
+    async shouldBeVisible(iframeIndex = 0) {
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview')
@@ -11,6 +11,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await expect(webView).toHaveClass('ready')
         await page.waitForIdle()
         const childPage = await page.waitForIframe({
+          iframeIndex,
           injectUtilityScript: false,
           url: /extensionId=vscode.markdown-language-features/,
         })
