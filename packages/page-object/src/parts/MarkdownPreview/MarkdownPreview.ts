@@ -1,7 +1,15 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ expect, page, VError, electronApp, ideVersion, platform }: CreateParams) => {
   return {
+    async show(){
+      const quickPick=QuickPick.create({page, expect, VError, electronApp, ideVersion, platform})
+  await quickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
+  return this.shouldBeVisible()
+
+    },
     async shouldBeVisible() {
       try {
         await page.waitForIdle()
@@ -19,8 +27,10 @@ export const create = ({ expect, page, VError }: CreateParams) => {
           url: /extensionId=vscode.markdown-language-features/,
         })
         await subFrame.waitForIdle()
+        await page.waitForIdle()
         const markDown = subFrame.locator('.markdown-body')
         await expect(markDown).toBeVisible()
+        await subFrame.waitForIdle()
         await page.waitForIdle()
         return subFrame
       } catch (error) {
@@ -49,11 +59,14 @@ export const create = ({ expect, page, VError }: CreateParams) => {
     },
     async shouldHaveHeading(subFrame: any, id: string) {
       try {
+        await subFrame.waitForIdle()
         await page.waitForIdle()
         const heading = subFrame.locator(`#${id}`)
         await expect(heading).toBeVisible()
+        await subFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
+        await new Promise(r=>{})
         throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
       }
     },

@@ -24,14 +24,14 @@ export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommand
   await Editor.open('first.md')
   await Editor.splitDown()
   await Editor.focusTopEditorGroup()
-  await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
-  const subFrame1 = await MarkdownPreview.shouldBeVisible()
+  // @ts-ignore
+  const subFrame1 = await MarkdownPreview.show()
   await MarkdownPreview.shouldHaveHeading(subFrame1, 'first-document')
 
   await Editor.focusBottomEditorGroup()
   await Editor.open('second.md')
-  await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
-  const subFrame2 = await MarkdownPreview.shouldBeVisible()
+  // @ts-ignore
+  const subFrame2 = await MarkdownPreview.show()
   await MarkdownPreview.shouldHaveHeading(subFrame2, 'second-document')
 
   await Editor.closeAll()
