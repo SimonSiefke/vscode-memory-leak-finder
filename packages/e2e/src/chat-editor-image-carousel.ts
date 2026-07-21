@@ -4,9 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-const svg = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="50" cy="50" r="50" />
-</svg>`
+const greenPng = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNg+M/wHwAEAQH/cetH5QAAAABJRU5ErkJggg==', 'base64')
 
 export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
@@ -14,27 +12,27 @@ export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestCont
   await ChatEditor.open()
   await Workspace.setFiles([
     {
-      content: svg,
-      name: 'image.svg',
+      content: greenPng,
+      name: 'image.png',
     },
     {
-      content: svg,
-      name: 'image-2.svg',
+      content: greenPng,
+      name: 'image-2.png',
     },
     {
-      content: svg,
-      name: 'image-3.svg',
+      content: greenPng,
+      name: 'image-3.png',
     },
   ])
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
-  await ChatEditor.attachImage('image.svg')
-  await ChatEditor.attachImage('image-2.svg')
-  await ChatEditor.attachImage('image-3.svg')
+  await ChatEditor.attachImage('image.png')
+  await ChatEditor.attachImage('image-2.png')
+  await ChatEditor.attachImage('image-3.png')
 
   console.log('wait...')
-  await new Promise(r=>{})
+  await new Promise(() => {})
   // TODO click on image to open carousel
   // TODO close carousel
 }
