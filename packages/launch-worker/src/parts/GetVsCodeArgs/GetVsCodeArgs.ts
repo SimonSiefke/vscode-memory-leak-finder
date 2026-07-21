@@ -31,8 +31,8 @@ export const getVscodeArgs = ({
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
-    '--new-window',
     '--no-sandbox',
+    '--force-disable-user-env',
     '--disable-updates',
     '--skip-welcome',
     '--skip-release-notes',
