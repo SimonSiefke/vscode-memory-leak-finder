@@ -7,6 +7,8 @@ test('getVsCodeEnv - remove node options', () => {
     NODE_OPTIONS: '--max-old-space-size=8192',
   }
   expect(GetVsCodeEnv.getVsCodeEnv({ processEnv, runtimeDir })).toEqual({
+             "SHELL": "/bin/bash",
+
     XDG_RUNTIME_DIR: '/test',
   })
 })
@@ -17,6 +19,7 @@ test('getVsCodeEnv - remove electron run as node', () => {
     ELECTRON_RUN_AS_NODE: 'true',
   }
   expect(GetVsCodeEnv.getVsCodeEnv({ processEnv, runtimeDir })).toEqual({
+             "SHELL": "/bin/bash",
     XDG_RUNTIME_DIR: '/test',
   })
 })
