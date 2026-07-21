@@ -16,7 +16,7 @@ test('getVsCodeEnv - remove electron run as node', () => {
   const processEnv = {
     ELECTRON_RUN_AS_NODE: 'true',
   }
-  expect(GetVsCodeEnv.getVsCodeEnv({ processEnv, runtimeDir })).toMatchObject( {
+  expect(GetVsCodeEnv.getVsCodeEnv({ processEnv, runtimeDir })).toMatchObject({
     XDG_RUNTIME_DIR: '/test',
   })
 })
