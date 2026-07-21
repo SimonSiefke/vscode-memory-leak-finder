@@ -5,17 +5,42 @@ const useSingleIframeWebview = process.env.VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_
 
 export const skip = 1
 
-export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView }: TestContext): Promise<void> => {
-  if (!process.env.VSCODE_CODEX_EXTENSION_PATH) {
-    return
-  }
+export const setup = async ({ Editor, Extensions, SideBar, Workspace }: TestContext) => {
+  // if (!process.env.VSCODE_CODEX_EXTENSION_PATH) {
+  //   return
+  // }
   console.log('CODEX_BENCHMARK_PHASE=warmup')
+  await Workspace.setFiles([
+    {
+      content: 'test',
+      name: 'webview-benchmark-warmup.txt',
+    },
+  ])
+  await Editor.closeAll()
+  await SideBar.hide()
+  // @ts-ignore
+  await SideBar.hideSecondary()
+
+  await Extensions.install({
+    id: 'openai.chatgpt',
+    name: 'Codex – OpenAI’s coding agent',
+  })
   await Editor.warmUpTextEditor()
+}
+
+export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView, SideBar }: TestContext): Promise<void> => {
+  // if (!process.env.VSCODE_CODEX_EXTENSION_PATH) {
+  //   return
+  // }
   await QuickPick.waitForCommand('Codex: Open Codex Sidebar')
   console.log('CODEX_BENCHMARK_PHASE=quickpick')
   await QuickPick.showCommands()
   await QuickPick.type('Open Codex Sidebar')
-  const selectedAt = await QuickPick.select('Codex: Open Codex Sidebar', false, true)
+  await QuickPick.select('Codex: Open Codex Sidebar')
+  // await QuickPick.pressEnter()
+  const selectedAt = 0
+  // const selectedAt = await QuickPick.select('Codex: Open Codex Sidebar', false, true)
+  // TODO
   console.log('CODEX_BENCHMARK_PHASE=webview')
   const webview = useSingleIframeWebview ? SingleIframeWebView : WebView
   const result = await webview.shouldHaveLoaded({ extensionId })
@@ -25,4 +50,12 @@ export const run = async ({ Editor, QuickPick, SingleIframeWebView, WebView }: T
   }
   console.log('CODEX_BENCHMARK_PHASE=ready')
   console.log(`CODEX_WEBVIEW_LOAD_TIME_MS=${durationMs}`)
+  await WebView.shouldHaveContent({
+    extensionId: 'openai.chatgpt',
+    selector: '#root',
+    text: '',
+    focusSelector: 'body',
+  })
+  await Editor.closeAll()
+  await SideBar.hideSecondary()
 }
