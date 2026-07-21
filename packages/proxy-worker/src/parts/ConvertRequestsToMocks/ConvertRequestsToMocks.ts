@@ -14,6 +14,11 @@ import * as SanitizeMockData from '../SanitizeMockData/SanitizeMockData.ts'
 
 const REQUESTS_ROOT_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_ROOT_DIR = join(Root.root, '.vscode-mock-requests')
+const PING_REQUEST_URL = 'https://api.individual.githubcopilot.com/_ping'
+const PING_REQUEST_HOSTNAME = 'api.individual.githubcopilot.com'
+const PING_REQUEST_PATHNAME = '/_ping'
+const PING_REQUEST_METHOD = 'GET'
+const PING_RESPONSE_BODY = 'OK'
 
 interface RecordedRequestFile {
   metadata: {
@@ -87,6 +92,34 @@ const getCorrelationKey = (request: RecordedRequest): string => {
   }
 
   return getUrlMethodKey(request.method, request.url)
+}
+
+const createPingMockIfMissing = async (mockRequestsDir: string): Promise<void> => {
+  const mockFileName = await GetMockFileName.getMockFileName(PING_REQUEST_HOSTNAME, PING_REQUEST_PATHNAME, PING_REQUEST_METHOD)
+  const mockFilePath = join(mockRequestsDir, mockFileName)
+  if (existsSync(mockFilePath)) {
+    return
+  }
+
+  const mockData = {
+    metadata: {
+      responseType: 'text',
+      timestamp: Date.now(),
+    },
+    request: {
+      body: undefined,
+      method: PING_REQUEST_METHOD,
+      url: PING_REQUEST_URL,
+    },
+    response: {
+      body: PING_RESPONSE_BODY,
+      headers: { 'content-type': 'text/plain' },
+      statusCode: 200,
+      statusMessage: 'OK',
+    },
+  }
+
+  await writeFile(mockFilePath, JSON.stringify(mockData, null, 2), 'utf8')
 }
 
 const shouldReplaceRecordedRequest = (existing: RecordedRequest | undefined, next: RecordedRequest): boolean => {
@@ -248,6 +281,8 @@ const convertRequestDirectoryToMocks = async (
       skippedCount++
     }
   }
+
+  await createPingMockIfMissing(mockRequestsDir)
 
   return {
     savedCount,
