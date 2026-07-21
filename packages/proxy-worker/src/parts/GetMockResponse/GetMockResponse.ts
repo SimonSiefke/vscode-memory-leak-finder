@@ -272,10 +272,134 @@ const getStaticMockResponse = (parsedUrl: URL, method: string): MockResponse | n
   const normalizedMethod = method.toUpperCase()
   const { hostname, pathname } = parsedUrl
 
+  if (
+    normalizedMethod === 'GET' &&
+    hostname === 'api.github.com' &&
+    (pathname === '/copilot_internal/user' || pathname === '/copilot_internal/v2/token' || pathname === '/user')
+  ) {
+    if (pathname === '/user') {
+      return {
+        body: JSON.stringify({
+          login: 'mock-user',
+          id: 1_234_567,
+          node_id: 'MDQ6VXNlcjEyMzQ1Njc=',
+          url: 'https://api.github.com/user',
+        }),
+        headers: { 'content-type': 'application/json' },
+        statusCode: 200,
+      }
+    }
+
+    if (pathname === '/copilot_internal/v2/token') {
+      return {
+        body: JSON.stringify({
+          blackbird_clientside_indexing: false,
+          code_quote_enabled: false,
+          code_review_enabled: false,
+          codesearch: false,
+          copilotignore_enabled: false,
+          endpoints: {
+            api: 'https://api.githubcopilot.com',
+            'origin-tracker': 'https://origin-tracker.github.com',
+            proxy: 'https://api.githubcopilot.com',
+            telemetry: 'https://telemetry.github.com',
+          },
+          enterprise_list: null,
+          expires_at: 4_102_444_800,
+          individual: true,
+          limited_user_quotas: {
+            chat: 0,
+            completions: 0,
+          },
+          limited_user_reset_date: 0,
+          public_suggestions: 'enabled',
+          refresh_in: 1800,
+          sku: 'no_auth_limited_copilot',
+          telemetry: 'enabled',
+          token: 'tid=00000000-0000-4000-8000-000000000001;exp=4102444800;iat=1700000000;sku=no_auth_limited_copilot',
+          token_based_billing: false,
+          organization_list: [],
+        }),
+        headers: { 'content-type': 'application/json' },
+        statusCode: 200,
+      }
+    }
+
+    return {
+      body: JSON.stringify({
+        access_type_sku: 'no_auth_limited_copilot',
+        analytics_tracking_id: 'vscode-memory-leak-finder-mock',
+        assigned_date: '2024-07-21T00:00:00Z',
+        can_signup_for_limited: false,
+        copilot_plan: 'individual',
+        organization_list: [],
+        organization_login_list: [],
+      }),
+      headers: { 'content-type': 'application/json' },
+      statusCode: 200,
+    }
+  }
+
+  if (
+    normalizedMethod === 'GET' &&
+    hostname === 'api.github.com' &&
+    pathname.startsWith('/users/') &&
+    pathname.endsWith('/events')
+  ) {
+    return {
+      body: JSON.stringify([]),
+      headers: { 'content-type': 'application/json' },
+      statusCode: 200,
+    }
+  }
+
+  if (normalizedMethod === 'GET' && hostname === 'api.githubcopilot.com' && pathname === '/_ping') {
+    return {
+      body: 'OK',
+      headers: { 'content-type': 'text/plain' },
+      statusCode: 200,
+    }
+  }
+
+  if (normalizedMethod === 'GET' && hostname === 'api.githubcopilot.com' && pathname === '/responses') {
+    return {
+      body: JSON.stringify([]),
+      headers: { 'content-type': 'application/json' },
+      statusCode: 200,
+    }
+  }
+
   if (normalizedMethod === 'GET' && hostname === 'api.individual.githubcopilot.com' && pathname === '/_ping') {
     return {
       body: 'OK',
       headers: { 'content-type': 'text/plain' },
+      statusCode: 200,
+    }
+  }
+
+  if (
+    normalizedMethod === 'POST' &&
+    (hostname === 'api.githubcopilot.com' || hostname === 'api.individual.githubcopilot.com') &&
+    pathname === '/embeddings'
+  ) {
+    return {
+      body: JSON.stringify({
+        data: [
+          {
+            embedding: Array.from({ length: 8 }, () => 0.0),
+            index: 0,
+            object: 'embedding',
+          },
+        ],
+        model: 'mock-embeddings-model',
+        object: 'list',
+        usage: {
+          completion_tokens: 0,
+          prompt_tokens: 0,
+          total_tokens: 0,
+        },
+      }),
+      headers: { 'content-type': 'application/json' },
       statusCode: 200,
     }
   }
@@ -504,13 +628,15 @@ const findCompatibleCopilotMockFile = async (
         }
         const candidateRequestBody = mockData.request?.body
         const candidateUserRequestMockKey = RequestMockKey.getUserRequestMockKey(hostname, pathname, method, candidateRequestBody)
-        const isMatchingUserRequest = candidateUserRequestMockKey === requestedUserRequestMockKey
-        const shouldCompareCandidate = pathname === '/responses' ? true : isMatchingUserRequest
-        if (shouldCompareCandidate) {
-          const candidateDistance =
-            pathname === '/chat/completions'
-              ? compareChatCompletionsRequestShape(requestBody, candidateRequestBody)
-              : compareResponsesRequestShape(requestBody, candidateRequestBody)
+        const candidateDistance =
+          pathname === '/chat/completions'
+            ? compareChatCompletionsRequestShape(requestBody, candidateRequestBody)
+            : compareResponsesRequestShape(requestBody, candidateRequestBody)
+        if (
+          candidateUserRequestMockKey === requestedUserRequestMockKey ||
+          pathname === '/responses' ||
+          pathname === '/chat/completions'
+        ) {
           if (isBetterResponsesRequestShapeMatch(candidateDistance, bestCandidateDistance)) {
             bestCandidateDistance = candidateDistance
             bestCandidateFile = candidateFile
@@ -614,20 +740,20 @@ export const getMockResponse = async (method: string, url: string, requestBody?:
           }
         }
 
-        if (!isCopilotMockKeyedRequest(hostname, pathname, method) && fallbackMockFileName !== mockFileName) {
-          const fallbackMockFile = join(mockRequestsDir, fallbackMockFileName)
-          const fallbackMockResponse = await loadMockResponse(fallbackMockFile)
-          if (fallbackMockResponse) {
-            console.log(`[Proxy] Loaded fallback mock file ${fallbackMockFileName} for ${method} ${pathname}`)
-            return fallbackMockResponse
-          }
+        const fallbackMockFile = join(mockRequestsDir, fallbackMockFileName)
+        const fallbackMockResponse = await loadMockResponse(fallbackMockFile)
+        if (fallbackMockResponse) {
+          console.log(`[Proxy] Loaded fallback mock file ${fallbackMockFileName} for ${method} ${pathname}`)
+          return fallbackMockResponse
         }
       }
     }
 
-    if (requestBody !== undefined && isCopilotMockKeyedRequest(hostname, pathname, method)) {
-      console.log(`[Proxy] No compatible keyed mock file found for ${method} ${pathname}; skipping generic fallback`)
-      return null
+    if (
+      requestBody !== undefined &&
+      isCopilotMockKeyedRequest(hostname, pathname, method)
+    ) {
+      console.log(`[Proxy] No compatible keyed mock file found for ${method} ${pathname}; no fallback mock available`)
     }
 
     return null // No mock found, pass through

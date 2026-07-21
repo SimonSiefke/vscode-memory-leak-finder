@@ -17,7 +17,9 @@ test('getVscodeArgs - adds loopback proxy bypass arguments when proxy is enabled
   })
 
   expect(args).toContain('--ignore-certificate-errors')
-  expect(args).toContain('--proxy-bypass-list=<-loopback>;localhost;127.0.0.1;0.0.0.0;::1')
+  expect(args).toContain(
+    '--proxy-bypass-list=<-loopback>;localhost;127.0.0.1;0.0.0.0;::1;chatgpt.com;ab.chatgpt.com',
+  )
 })
 
 test('getVscodeArgs - does not add loopback proxy bypass arguments when proxy is disabled', () => {

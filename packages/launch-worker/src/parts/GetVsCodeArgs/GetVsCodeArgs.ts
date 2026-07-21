@@ -5,6 +5,7 @@ export const getVscodeArgs = ({
   enableProxy,
   extensionsDir,
   extraLaunchArgs,
+  vscodeAppPath = '',
   inspectExtensions,
   inspectExtensionsPort,
   inspectPtyHost,
@@ -18,6 +19,7 @@ export const getVscodeArgs = ({
   enableProxy: boolean
   extensionsDir: string
   extraLaunchArgs: string[]
+  vscodeAppPath?: string
   inspectExtensions: boolean
   inspectExtensionsPort: number
   inspectPtyHost: boolean
@@ -27,7 +29,7 @@ export const getVscodeArgs = ({
   platform?: string
   userDataDir: string
 }): string[] => {
-  const proxyBypassList = '<-loopback>;localhost;127.0.0.1;0.0.0.0;::1'
+  const proxyBypassList = '<-loopback>;localhost;127.0.0.1;0.0.0.0;::1;chatgpt.com;ab.chatgpt.com'
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
@@ -37,27 +39,24 @@ export const getVscodeArgs = ({
     '--skip-welcome',
     '--skip-release-notes',
     '--disable-workspace-trust',
-    '--extensions-dir',
-    extensionsDir,
-    '--user-data-dir',
-    userDataDir,
   ]
   if (platform === 'linux') {
     args.push('--ozone-platform=x11')
   }
-
-  // Ignore certificate errors when proxy is enabled (for MITM proxy)
+  if (vscodeAppPath) {
+    args.push(vscodeAppPath)
+  }
+  args.push('--extensions-dir', extensionsDir)
+  args.push('--user-data-dir', userDataDir)
   if (enableProxy) {
     args.push('--ignore-certificate-errors')
     args.push(`--proxy-bypass-list=${proxyBypassList}`)
   }
-
   if (!enableExtensions) {
     args.push('--disable-extensions')
     args.push('--disable-extension=GitHub.copilot')
     args.push('--disable-extension=GitHub.copilot-chat')
   }
-
   if (inspectPtyHost) {
     args.push(`--inspect-ptyhost=${inspectPtyHostPort}`)
   }
