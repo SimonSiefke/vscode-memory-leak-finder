@@ -137,6 +137,8 @@ test('getMeasureCommandArgs forwards measure-after to cli', () => {
         startupRuns: 30,
         skipBuild: true,
         skipCharts: true,
+        extraTestArgs:[],
+        proxyCaptureRuns:0
       },
       '/tmp/code-oss',
     ),
