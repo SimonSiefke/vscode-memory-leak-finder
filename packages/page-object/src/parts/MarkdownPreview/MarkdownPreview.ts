@@ -4,21 +4,22 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError, electronApp, ideVersion, platform }: CreateParams) => {
   return {
-    async show(){
-      const quickPick=QuickPick.create({page, expect, VError, electronApp, ideVersion, platform})
-  await quickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
-  return this.shouldBeVisible()
-
+    async show() {
+      const index = await page.locator('.webview').count()
+      const quickPick = QuickPick.create({ page, expect, VError, electronApp, ideVersion, platform })
+      await quickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
+      return this.shouldBeVisible(index)
     },
-    async shouldBeVisible() {
+    async shouldBeVisible(index = 0) {
       try {
         await page.waitForIdle()
-        const webView = page.locator('.webview')
+        const webView = page.locator('.webview').nth(index)
         await expect(webView).toBeVisible()
         await page.waitForIdle()
         await expect(webView).toHaveClass('ready')
         await page.waitForIdle()
         const childPage = await page.waitForIframe({
+          index,
           injectUtilityScript: false,
           url: /extensionId=vscode.markdown-language-features/,
         })
@@ -66,7 +67,6 @@ export const create = ({ expect, page, VError, electronApp, ideVersion, platform
         await subFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
-        await new Promise(r=>{})
         throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
       }
     },

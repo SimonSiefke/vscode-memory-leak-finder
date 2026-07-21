@@ -20,17 +20,15 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   await Explorer.shouldHaveItem('second.md')
 }
 
-export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands }: TestContext): Promise<void> => {
+export const run = async ({ Editor, MarkdownPreview }: TestContext): Promise<void> => {
   await Editor.open('first.md')
   await Editor.splitDown()
   await Editor.focusTopEditorGroup()
-  // @ts-ignore
   const subFrame1 = await MarkdownPreview.show()
   await MarkdownPreview.shouldHaveHeading(subFrame1, 'first-document')
 
   await Editor.focusBottomEditorGroup()
   await Editor.open('second.md')
-  // @ts-ignore
   const subFrame2 = await MarkdownPreview.show()
   await MarkdownPreview.shouldHaveHeading(subFrame2, 'second-document')
 
