@@ -31,7 +31,19 @@ export interface MeasureLocalVscodeComparisonOptions {
 }
 
 const isKnownFlagWithValue = (arg: string): boolean => {
-  return ['--display', '--measure', '--new-label', '--new-vscode-path', '--old-label', '--old-vscode-path', '--only', '--runs', '--startup-runs', '--vscode-path', '--proxy-capture-runs'].includes(arg)
+  return [
+    '--display',
+    '--measure',
+    '--new-label',
+    '--new-vscode-path',
+    '--old-label',
+    '--old-vscode-path',
+    '--only',
+    '--runs',
+    '--startup-runs',
+    '--vscode-path',
+    '--proxy-capture-runs',
+  ].includes(arg)
 }
 
 const isKnownFlagWithoutValue = (arg: string): boolean => {
