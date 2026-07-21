@@ -65,6 +65,56 @@ test('getMockResponse - falls back to shared root mock files when scoped mock is
   })
 })
 
+test('getMockResponse - uses static copilot mock for github copilot token endpoint when no file is needed', async () => {
+  ProxyState.setTestFolderName(testFolderName)
+  const result = await GetMockResponse.getMockResponse('GET', 'https://api.github.com/copilot_internal/v2/token')
+
+  expect(result).not.toBeNull()
+  expect(result?.statusCode).toBe(200)
+  expect(result?.headers).toEqual({ 'content-type': 'application/json' })
+  const parsedBody = JSON.parse(result?.body as string)
+  expect(parsedBody.token).toContain('tid=')
+  expect(parsedBody.sku).toBe('no_auth_limited_copilot')
+})
+
+test('getMockResponse - uses static copilot mock for github copilot user endpoint when no file is needed', async () => {
+  ProxyState.setTestFolderName(testFolderName)
+  const result = await GetMockResponse.getMockResponse('GET', 'https://api.github.com/copilot_internal/user')
+
+  expect(result).not.toBeNull()
+  expect(result?.statusCode).toBe(200)
+  expect(result?.headers).toEqual({ 'content-type': 'application/json' })
+  expect(result?.body).toContain('mock-user')
+})
+
+test('getMockResponse - uses static mock for github user endpoint when no file is needed', async () => {
+  ProxyState.setTestFolderName(testFolderName)
+  const result = await GetMockResponse.getMockResponse('GET', 'https://api.github.com/user')
+
+  expect(result).not.toBeNull()
+  expect(result?.statusCode).toBe(200)
+  expect(result?.headers).toEqual({ 'content-type': 'application/json' })
+  expect(result?.body).toContain('"login":"mock-user"')
+})
+
+test('getMockResponse - uses static mock for github copilot responses endpoint when no file is needed', async () => {
+  ProxyState.setTestFolderName(testFolderName)
+  const result = await GetMockResponse.getMockResponse('GET', 'https://api.githubcopilot.com/responses')
+
+  expect(result).not.toBeNull()
+  expect(result?.statusCode).toBe(200)
+  expect(JSON.parse(result?.body as string)).toEqual([])
+})
+
+test('getMockResponse - uses static mock for missing github user events endpoint', async () => {
+  ProxyState.setTestFolderName(testFolderName)
+  const result = await GetMockResponse.getMockResponse('GET', 'https://api.github.com/users/mock-user/events?per_page=100')
+
+  expect(result).not.toBeNull()
+  expect(result?.statusCode).toBe(200)
+  expect(JSON.parse(result?.body as string)).toEqual([])
+})
+
 test('getMockResponse - preserves signed copilot token payloads for existing json mocks', async () => {
   ProxyState.setTestFolderName(testFolderName)
   await mkdir(scopedMockDir, { recursive: true })

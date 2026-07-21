@@ -774,16 +774,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async selectModel(modelName: ChatModel, retry = true) {
       try {
+        console.log('selecint model')
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
         await page.waitForIdle()
         const modelPickerItem = getChatPickerItem(chatView, 1)
         await expect(modelPickerItem).toBeVisible()
+        console.log('picker item visible')
         await page.waitForIdle()
 
-        const modelLocator = page.locator(`.action-label[aria-label^="Pick Model"] a`)
+        const modelLocator = page.locator(`.action-label[aria-label^="Models,"] a`)
+        // await new Promise(r=>{})
         await expect(modelLocator).toBeVisible()
+        console.log('model locaor')
         await page.waitForIdle()
         const modelText = (await modelLocator.textContent()) || ''
         await page.waitForIdle()

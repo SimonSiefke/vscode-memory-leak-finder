@@ -12,6 +12,7 @@ const secondTestFolderName = 'proxy-test-convert-b'
 const expiredTokenTestFolderName = 'proxy-test-convert-expired-token'
 const pathPlaceholderTestFolderName = 'proxy-test-convert-paths'
 const tokenTestFolderName = 'proxy-test-convert-token'
+const staticFallbackTestFolderName = 'proxy-test-convert-static-fallback'
 
 const writeRecordedRequest = async (testFolderName: string, body: string, timestamp: number): Promise<void> => {
   const requestsDir = join(requestsRootDir, testFolderName)
@@ -45,11 +46,13 @@ afterEach(async () => {
   await rm(join(requestsRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, tokenTestFolderName), { force: true, recursive: true })
+  await rm(join(requestsRootDir, staticFallbackTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, firstTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, secondTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, tokenTestFolderName), { force: true, recursive: true })
+  await rm(join(mocksRootDir, staticFallbackTestFolderName), { force: true, recursive: true })
 })
 
 test('convertRequestsToMocksMain - converts each test folder independently', async () => {
@@ -396,4 +399,208 @@ test('convertRequestsToMocksMain - prefers a successful response over a later ex
       wasCompressed: undefined,
     },
   })
+})
+
+test('convertRequestsToMocksMain - keeps static copilot fallback mocks on successful responses', async () => {
+  const requestsDir = join(requestsRootDir, staticFallbackTestFolderName)
+  await mkdir(requestsDir, { recursive: true })
+
+  const requestBody = {
+    model: 'mai-code-1-flash',
+    input: [{ type: 'message', role: 'user', content: 'add 1 + 1' }],
+  }
+
+  await writeFile(
+    join(requestsDir, '1_POST_https___api_individual_githubcopilot_com_responses.json'),
+    JSON.stringify(
+      {
+        metadata: {
+          responseType: 'text',
+          timestamp: 2,
+        },
+        request: {
+          body: requestBody,
+          headers: {},
+          method: 'POST',
+          url: 'https://api.individual.githubcopilot.com/responses',
+        },
+        response: {
+          body: 'IDE token expired: unauthorized: token expired',
+          headers: { 'content-type': 'text/plain' },
+          statusCode: 401,
+          statusMessage: 'Unauthorized',
+        },
+      },
+      null,
+      0,
+    ),
+    'utf8',
+  )
+
+  await writeFile(
+    join(requestsDir, '2_POST_https___api_individual_githubcopilot_com_responses.json'),
+    JSON.stringify(
+      {
+        metadata: {
+          responseType: 'text',
+          timestamp: 1,
+        },
+        request: {
+          body: requestBody,
+          headers: {},
+          method: 'POST',
+          url: 'https://api.individual.githubcopilot.com/responses',
+        },
+        response: {
+          body: 'ok',
+          headers: { 'content-type': 'text/plain' },
+          statusCode: 200,
+          statusMessage: 'OK',
+        },
+      },
+      null,
+      0,
+    ),
+    'utf8',
+  )
+
+  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+
+  const mockFileName = await GetMockFileName.getMockFileName('api.individual.githubcopilot.com', '/responses', 'POST')
+  const mockContent = JSON.parse(await readFile(join(mocksRootDir, staticFallbackTestFolderName, mockFileName), 'utf8'))
+
+  expect(mockContent.response.body).toBe('ok')
+})
+
+test('convertRequestsToMocksMain - writes static copilot fallback mocks for api githubcopilot host aliases', async () => {
+  const requestsDir = join(requestsRootDir, staticFallbackTestFolderName)
+  await mkdir(requestsDir, { recursive: true })
+
+  await writeFile(
+    join(requestsDir, '1_POST_https___api_individual_githubcopilot_com_chat_completions.json'),
+    JSON.stringify(
+      {
+        metadata: {
+          responseType: 'text',
+          timestamp: 1,
+        },
+        request: {
+          body: { model: 'mai-code-1-flash' },
+          headers: {},
+          method: 'POST',
+          url: 'https://api.individual.githubcopilot.com/chat/completions',
+        },
+        response: {
+          body: 'ok',
+          headers: { 'content-type': 'text/plain' },
+          statusCode: 200,
+          statusMessage: 'OK',
+        },
+      },
+      null,
+      0,
+    ),
+    'utf8',
+  )
+
+  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+
+  const aliasedHost = 'api.githubcopilot.com'
+  const fallbackMockFileName = await GetMockFileName.getMockFileName(aliasedHost, '/chat/completions', 'POST')
+  const fallbackMockPath = join(mocksRootDir, staticFallbackTestFolderName, fallbackMockFileName)
+  const fallbackContent = JSON.parse(await readFile(fallbackMockPath, 'utf8'))
+
+  expect(fallbackContent.response.body).toBe('ok')
+  expect(fallbackContent.request.url).toBe('https://api.githubcopilot.com/chat/completions')
+})
+
+test('convertRequestsToMocksMain - writes static copilot fallback mocks for model session endpoints', async () => {
+  const requestsDir = join(requestsRootDir, staticFallbackTestFolderName)
+  await mkdir(requestsDir, { recursive: true })
+
+  const modelsSessionBody = {
+    auto_mode: {
+      model_hints: ['auto'],
+    },
+  }
+
+  const modelSessionIntentBody = {
+    model: 'gpt-5-mini',
+    intent: 'edit',
+  }
+
+  await writeFile(
+    join(requestsDir, '1_POST_https___api_individual_githubcopilot_com_models_session.json'),
+    JSON.stringify(
+      {
+        metadata: {
+          responseType: 'text',
+          timestamp: 1,
+        },
+        request: {
+          body: modelsSessionBody,
+          headers: {},
+          method: 'POST',
+          url: 'https://api.individual.githubcopilot.com/models/session',
+        },
+        response: {
+          body: 'ok',
+          headers: { 'content-type': 'text/plain' },
+          statusCode: 200,
+          statusMessage: 'OK',
+        },
+      },
+      null,
+      0,
+    ),
+    'utf8',
+  )
+
+  await writeFile(
+    join(requestsDir, '2_POST_https___api_individual_githubcopilot_com_models_session_intent.json'),
+    JSON.stringify(
+      {
+        metadata: {
+          responseType: 'text',
+          timestamp: 1,
+        },
+        request: {
+          body: modelSessionIntentBody,
+          headers: {},
+          method: 'POST',
+          url: 'https://api.individual.githubcopilot.com/models/session/intent',
+        },
+        response: {
+          body: 'ok',
+          headers: { 'content-type': 'text/plain' },
+          statusCode: 200,
+          statusMessage: 'OK',
+        },
+      },
+      null,
+      0,
+    ),
+    'utf8',
+  )
+
+  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+
+  const aliasedHost = 'api.githubcopilot.com'
+  const fallbackModelSessionMockFileName = await GetMockFileName.getMockFileName(aliasedHost, '/models/session', 'POST')
+  const fallbackModelSessionMockPath = join(mocksRootDir, staticFallbackTestFolderName, fallbackModelSessionMockFileName)
+  const fallbackModelSessionContent = JSON.parse(await readFile(fallbackModelSessionMockPath, 'utf8'))
+
+  expect(fallbackModelSessionContent.response.body).toBe('ok')
+  expect(fallbackModelSessionContent.request.url).toBe('https://api.githubcopilot.com/models/session')
+
+  const fallbackModelSessionIntentMockFileName = await GetMockFileName.getMockFileName(aliasedHost, '/models/session/intent', 'POST')
+  const fallbackModelSessionIntentMockPath = join(
+    mocksRootDir,
+    staticFallbackTestFolderName,
+    fallbackModelSessionIntentMockFileName,
+  )
+  const fallbackModelSessionIntentContent = JSON.parse(await readFile(fallbackModelSessionIntentMockPath, 'utf8'))
+
+  expect(fallbackModelSessionIntentContent.response.body).toBe('ok')
+  expect(fallbackModelSessionIntentContent.request.url).toBe('https://api.githubcopilot.com/models/session/intent')
 })

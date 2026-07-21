@@ -19,6 +19,15 @@ const PING_REQUEST_HOSTNAME = 'api.individual.githubcopilot.com'
 const PING_REQUEST_PATHNAME = '/_ping'
 const PING_REQUEST_METHOD = 'GET'
 const PING_RESPONSE_BODY = 'OK'
+const COPILOT_HOSTS = ['api.githubcopilot.com', 'api.individual.githubcopilot.com'] as const
+const COPILOT_STATIC_ALIAS_PATHS = [
+  'GET /models',
+  'POST /chat/completions',
+  'POST /responses',
+  'POST /v1/messages',
+  'POST /models/session',
+  'POST /models/session/intent',
+]
 
 interface RecordedRequestFile {
   metadata: {
@@ -122,6 +131,89 @@ const createPingMockIfMissing = async (mockRequestsDir: string): Promise<void> =
   await writeFile(mockFilePath, JSON.stringify(mockData, null, 2), 'utf8')
 }
 
+const getLeadingJsonValueEndIndex = (text: string): number => {
+  if (text.length === 0 || text[0] !== '{') {
+    return -1
+  }
+
+  let depth = 0
+  let inString = false
+  let escaped = false
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index]
+
+    if (inString) {
+      if (escaped) {
+        escaped = false
+      } else if (char === '\\') {
+        escaped = true
+      } else if (char === '"') {
+        inString = false
+      }
+      continue
+    }
+
+    if (char === '"') {
+      inString = true
+      continue
+    }
+
+    if (char === '{') {
+      depth += 1
+      continue
+    }
+
+    if (char === '}') {
+      depth -= 1
+      if (depth === 0) {
+        return index + 1
+      }
+    }
+  }
+
+  return -1
+}
+
+const parseRequestFileContent = (content: string): RecordedRequestFile | undefined => {
+  const trimmed = content.trim()
+  if (!trimmed) {
+    return undefined
+  }
+
+  try {
+    return JSON.parse(trimmed) as RecordedRequestFile
+  } catch (error) {
+    const endIndex = getLeadingJsonValueEndIndex(trimmed)
+    if (endIndex === -1) {
+      throw error
+    }
+    const leadingJson = trimmed.slice(0, endIndex)
+    const trailing = trimmed.slice(endIndex).trim()
+    if (trailing.length > 0) {
+      console.warn(`Request file contains trailing data after first JSON value: ${trailing.length} chars`)
+    }
+    return JSON.parse(leadingJson) as RecordedRequestFile
+  }
+}
+
+const getCopilotFallbackHosts = (hostname: string): readonly string[] => {
+  if (hostname === 'api.individual.githubcopilot.com') {
+    return ['api.individual.githubcopilot.com', 'api.githubcopilot.com']
+  }
+  if (hostname === 'api.githubcopilot.com') {
+    return ['api.githubcopilot.com', 'api.individual.githubcopilot.com']
+  }
+  return [hostname]
+}
+
+const isCopilotStaticAliasTarget = (hostname: string, method: string, pathname: string): boolean => {
+  return (
+    COPILOT_HOSTS.includes(hostname as (typeof COPILOT_HOSTS)[number]) &&
+    COPILOT_STATIC_ALIAS_PATHS.includes(`${method} ${pathname}`)
+  )
+}
+
 const shouldReplaceRecordedRequest = (existing: RecordedRequest | undefined, next: RecordedRequest): boolean => {
   if (!existing) {
     return true
@@ -168,12 +260,16 @@ const convertRequestDirectoryToMocks = async (
 
   const latestRequests = new Map<string, RecordedRequest>()
   const pendingRequestBodies = new Map<string, RecordedRequest[]>()
+  const latestStaticCopilotMocks = new Map<string, { timestamp: number; request: RecordedRequest }>()
 
   for (const file of jsonFiles) {
     try {
       const filePath = join(requestsDir, file)
       const content = await readFile(filePath, 'utf8')
-      const fileData: RecordedRequestFile = JSON.parse(content)
+      const fileData = parseRequestFileContent(content)
+      if (!fileData) {
+        continue
+      }
 
       const request: RecordedRequest = {
         body: fileData.request.body,
@@ -218,6 +314,30 @@ const convertRequestDirectoryToMocks = async (
       const existing = latestRequests.get(key)
       if (shouldReplaceRecordedRequest(existing, mergedRequest)) {
         latestRequests.set(key, mergedRequest)
+      }
+
+      let parsedUrlForFallback
+      try {
+        parsedUrlForFallback = new URL(mergedRequest.url)
+      } catch {
+        continue
+      }
+      const fallbackCandidateHost = parsedUrlForFallback.hostname
+      const fallbackCandidatePath = parsedUrlForFallback.pathname
+      if (isCopilotStaticAliasTarget(fallbackCandidateHost, mergedRequest.method, fallbackCandidatePath)) {
+        for (const fallbackHost of getCopilotFallbackHosts(fallbackCandidateHost)) {
+          const fallbackMockKey = `${fallbackHost}|${mergedRequest.method}|${fallbackCandidatePath}`
+          const existingFallback = latestStaticCopilotMocks.get(fallbackMockKey)
+          if (!existingFallback || shouldReplaceRecordedRequest(existingFallback.request, mergedRequest)) {
+            latestStaticCopilotMocks.set(fallbackMockKey, {
+              timestamp: mergedRequest.timestamp,
+              request: {
+                ...mergedRequest,
+                url: mergedRequest.url.replace(fallbackCandidateHost, fallbackHost),
+              },
+            })
+          }
+        }
       }
     } catch (error) {
       console.error(`Error processing file ${file}:`, error)
@@ -278,6 +398,46 @@ const convertRequestDirectoryToMocks = async (
       savedCount++
     } catch (error) {
       console.error(`Error converting request ${request.method} ${request.url}:`, error)
+      skippedCount++
+    }
+  }
+
+  for (const { request } of latestStaticCopilotMocks.values()) {
+    try {
+      const parsedUrl = new URL(request.url)
+      const { hostname, pathname } = parsedUrl
+      const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
+      const mockFilePath = join(mockRequestsDir, mockFileName)
+
+      const processedRequestBody = PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(request.body)
+      const processedBody = PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(
+        SanitizeMockData.sanitizeMockBody(await ReplaceJwtTokensInValue.replaceJwtTokensInValue(request.response.body)),
+      )
+      const processedHeaders = SanitizeMockData.sanitizeMockHeaders(request.response.headers || {})
+
+      const mockData = {
+        metadata: {
+          responseType: request.responseType,
+          timestamp: request.timestamp,
+        },
+        request: {
+          body: processedRequestBody,
+          method: request.method,
+          url: request.url,
+        },
+        response: {
+          body: processedBody,
+          headers: processedHeaders,
+          statusCode: request.response.statusCode,
+          statusMessage: request.response.statusMessage,
+          wasCompressed: request.response.wasCompressed,
+        },
+      }
+
+      await writeFile(mockFilePath, JSON.stringify(mockData, null, 2), 'utf8')
+      savedCount++
+    } catch (error) {
+      console.error(`Error converting static copilot mock for ${request.method} ${request.url}:`, error)
       skippedCount++
     }
   }

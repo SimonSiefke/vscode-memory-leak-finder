@@ -161,6 +161,7 @@ const prepareVsCodeLaunch = async ({
   }
   return {
     binaryPath,
+    sourceVscodePathForElectron: vscodePath,
     extensionsDir,
     runtimeDir,
     settingsPath,
@@ -282,7 +283,15 @@ export const launchVsCode = async ({
     console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
   }
   try {
-    let { binaryPath, extensionsDir, runtimeDir, settingsPath, testWorkspacePath, userDataDir } = await prepareVsCodeLaunch({
+    let {
+      binaryPath,
+      extensionsDir,
+      runtimeDir,
+      settingsPath,
+      sourceVscodePathForElectron,
+      testWorkspacePath,
+      userDataDir,
+    } = await prepareVsCodeLaunch({
       arch,
       buildVscodeMinified,
       clearExtensions,
@@ -296,6 +305,17 @@ export const launchVsCode = async ({
       vscodePath: preparedVscodePath || vscodePath,
       vscodeVersion,
     })
+    let explicitVscodeAppPath = ''
+    if (sourceVscodePathForElectron) {
+      try {
+        const sourceVscodePathStats = await stat(sourceVscodePathForElectron)
+        if (sourceVscodePathStats.isDirectory()) {
+          explicitVscodeAppPath = sourceVscodePathForElectron
+        }
+      } catch {
+        // ignore and continue without an explicit app path
+      }
+    }
     if (trackFunctions) {
       binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
     }
@@ -339,6 +359,7 @@ export const launchVsCode = async ({
       enableProxy,
       extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
+      vscodeAppPath: explicitVscodeAppPath,
       inspectExtensions,
       inspectExtensionsPort,
       inspectPtyHost,

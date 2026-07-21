@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { access, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -23,11 +23,63 @@ export interface MeasureLocalVscodeComparisonOptions {
   readonly measureNode: boolean
   readonly runs: number
   readonly startupRuns: number
+  readonly proxyCaptureRuns: number
   readonly display: string
+  readonly extraTestArgs: readonly string[]
   readonly skipBuild: boolean
+  readonly skipCleanCheck: boolean
   readonly skipCharts: boolean
 }
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+const isKnownFlagWithValue = (arg: string): boolean => {
+  return ['--display', '--measure', '--new-label', '--new-vscode-path', '--old-label', '--old-vscode-path', '--only', '--runs', '--startup-runs', '--vscode-path', '--proxy-capture-runs'].includes(arg)
+}
+
+const isKnownFlagWithoutValue = (arg: string): boolean => {
+<<<<<<< Updated upstream
+  return ['--measure-after', '--measure-node', '--skip-build', '--skip-charts'].includes(arg)
+=======
+  return ['--measure-after', '--measure-node', '--skip-build', '--skip-clean-check', '--skip-charts'].includes(arg)
+>>>>>>> Stashed changes
+}
+
+const isProxyPreparationEnabled = (extraTestArgs: readonly string[]): boolean => {
+  return extraTestArgs.includes('--enable-proxy') && extraTestArgs.includes('--use-proxy-mock')
+}
+
+const getExtraTestArgs = (argv: readonly string[]): readonly string[] => {
+  const extraTestArgs: string[] = []
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]
+    if (!arg.startsWith('--')) {
+      continue
+    }
+    if (isKnownFlagWithValue(arg)) {
+      i += 1
+      continue
+    }
+    if (isKnownFlagWithoutValue(arg)) {
+      continue
+    }
+    extraTestArgs.push(arg)
+    const nextArg = argv[i + 1]
+    if (nextArg && !nextArg.startsWith('--')) {
+      extraTestArgs.push(nextArg)
+      i += 1
+    }
+  }
+  return extraTestArgs
+}
+
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 interface RunCommandOptions {
   readonly cwd: string
   readonly env?: NodeJS.ProcessEnv
@@ -74,10 +126,28 @@ export const parseArgv = (argv: readonly string[]): MeasureLocalVscodeComparison
     oldVscodePath: getString('--old-vscode-path', defaultOldVscodePath),
     only: getString('--only', '^editor-open.ts'),
     runs: getNumber('--runs', 1),
+    proxyCaptureRuns: getNumber('--proxy-capture-runs', 3),
     startupRuns: getNumber('--startup-runs', 1),
     skipBuild: argv.includes('--skip-build'),
+    skipCleanCheck: argv.includes('--skip-clean-check'),
     skipCharts: argv.includes('--skip-charts'),
+    extraTestArgs: getExtraTestArgs(argv),
   }
+}
+
+const getMeasureCommandBaseArgs = (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): readonly string[] => {
+  return [
+    'packages/cli/bin/test.js',
+    '--run-skipped-tests-anyway',
+    '--only',
+    options.only,
+    '--runs',
+    String(options.runs),
+    '--startup-runs',
+    String(options.startupRuns),
+    '--vscode-path',
+    vscodeExecutablePath,
+  ]
 }
 
 const pathExists = async (path: string): Promise<boolean> => {
@@ -270,6 +340,60 @@ const readStamp = async (path: string): Promise<string> => {
   }
 }
 
+const getResultPathWithFallback = async (baseResultPath: string, filter: string): Promise<string> => {
+  const resultDirectory = dirname(baseResultPath)
+  const expectedName = basename(baseResultPath)
+  const expectedPath = join(resultDirectory, expectedName)
+  try {
+    await access(expectedPath)
+    return expectedPath
+  } catch {
+    // eslint-disable-next-line no-console
+    console.log(`Expected result file not found: ${expectedPath}`)
+  }
+  const filterBase = basename(filter.replace(/^\^/, '').replace(/\$$/, '')).replace(/\.ts$/, '').replace(/\.js$/, '')
+  const resultFiles = await readdir(resultDirectory, { withFileTypes: true })
+  const candidateFiles = resultFiles.filter((entry) => entry.isFile()).map((entry) => entry.name)
+  const directMatch = candidateFiles.find((name) => name === `${filterBase}.json`)
+  if (directMatch) {
+    return join(resultDirectory, directMatch)
+  }
+  const suffixedMatch = candidateFiles.find((name) => name.endsWith(`-${filterBase}.json`))
+  if (suffixedMatch) {
+    return join(resultDirectory, suffixedMatch)
+  }
+  const includedMatch = candidateFiles.find((name) => name.includes(filterBase) && name.endsWith('.json'))
+  if (!includedMatch) {
+    return expectedPath
+  }
+  const includedMatchPath = join(resultDirectory, includedMatch)
+  const stats = await Promise.all(
+    resultFiles
+      .filter((entry) => entry.isFile())
+      .filter((entry) => entry.name.endsWith('.json') && entry.name.includes(filterBase))
+      .map(async (entry) => {
+        const filePath = join(resultDirectory, entry.name)
+        const fileStats = await stat(filePath)
+        return { filePath, mtimeMs: fileStats.mtimeMs }
+      }),
+  )
+  if (stats.length === 0) {
+    return includedMatchPath
+  }
+  stats.sort((a, b) => b.mtimeMs - a.mtimeMs)
+  return stats[0].filePath
+}
+
+const cleanupResultFiles = async (resultPath: string, filter: string): Promise<void> => {
+  const resultDirectory = dirname(resultPath)
+  const filterBase = getResultTestName(filter)
+  const resultFiles = await readdir(resultDirectory, { withFileTypes: true })
+  const matchingFiles = resultFiles.filter((entry) => entry.isFile() && entry.name.includes(filterBase) && entry.name.endsWith('.json'))
+  await Promise.all(
+    matchingFiles.map((entry) => rm(join(resultDirectory, entry.name), { force: true })),
+  )
+}
+
 const writeStamp = async (path: string, content: string): Promise<void> => {
   await mkdir(dirname(path), { recursive: true })
   await writeFile(path, `${content}\n`)
@@ -386,6 +510,7 @@ const hasValidNodeModulesCache = async (
 export const ensureLocalVscodeBuild = async (
   vscodePath: string,
   skipBuild: boolean,
+  skipCleanCheck: boolean,
   dependencies: EnsureLocalVscodeBuildDependencies = {
     hasCompleteNodeModulesCache,
     pathExists,
@@ -393,7 +518,9 @@ export const ensureLocalVscodeBuild = async (
     runCommand,
   },
 ): Promise<string> => {
-  await assertNoUnstagedChanges(vscodePath, dependencies.readCommand)
+  if (!skipCleanCheck) {
+    await assertNoUnstagedChanges(vscodePath, dependencies.readCommand)
+  }
   const executablePath = getMinifiedExecutablePath(vscodePath)
   const sharedExecutablePath = getSharedMinifiedExecutablePath(vscodePath)
   const nodeModulesCacheKey = await computeVscodeNodeModulesCacheKey(vscodePath)
@@ -434,20 +561,29 @@ export const getMeasureCommandArgs = (options: MeasureLocalVscodeComparisonOptio
   const measureAfterArgs = options.measureAfter ? ['--measure-after'] : []
   const measureNodeArgs = options.measureNode ? ['--measure-node'] : []
   return [
+    ...getMeasureCommandBaseArgs(options, vscodeExecutablePath),
+    '--measure',
+    options.measure,
+    ...measureNodeArgs,
+    ...measureAfterArgs,
+    ...options.extraTestArgs,
+  ]
+}
+
+const getProxyCaptureCommandArgs = (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): readonly string[] => {
+  const noUseProxyMockArgs = options.extraTestArgs.filter((arg) => arg !== '--use-proxy-mock' && arg !== '--convert-requests-to-mocks')
+  return [
     'packages/cli/bin/test.js',
     '--run-skipped-tests-anyway',
     '--only',
     options.only,
     '--runs',
-    String(options.runs),
+    String(options.proxyCaptureRuns),
     '--startup-runs',
     String(options.startupRuns),
-    '--measure',
-    options.measure,
-    ...measureNodeArgs,
     '--vscode-path',
     vscodeExecutablePath,
-    ...measureAfterArgs,
+    ...noUseProxyMockArgs,
   ]
 }
 
@@ -461,23 +597,91 @@ const runMeasure = async (options: MeasureLocalVscodeComparisonOptions, vscodeEx
   })
 }
 
+<<<<<<< Updated upstream
+const prepareProxyMocksIfNeeded = async (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): Promise<void> => {
+  if (!isProxyPreparationEnabled(options.extraTestArgs)) {
+    return
+  }
+  await runCommand(process.execPath, getProxyCaptureCommandArgs(options, vscodeExecutablePath), {
+    cwd: repositoryRoot,
+    env: {
+      ...process.env,
+      DISPLAY: options.display,
+    },
+  })
+  await runCommand(process.execPath, ['packages/cli/bin/test.js', '--convert-requests-to-mocks', '--vscode-path', vscodeExecutablePath], {
+    cwd: repositoryRoot,
+    env: {
+      ...process.env,
+      DISPLAY: options.display,
+    },
+  })
+}
+
+=======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
 export const renameResult = async (resultPath: string, label: string): Promise<string> => {
   const labeledResultPath = getLabeledResultPath(resultPath, label)
+=======
+const prepareProxyMocksIfNeeded = async (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): Promise<void> => {
+  if (!isProxyPreparationEnabled(options.extraTestArgs)) {
+    return
+  }
+  await runCommand(process.execPath, getProxyCaptureCommandArgs(options, vscodeExecutablePath), {
+    cwd: repositoryRoot,
+    env: {
+      ...process.env,
+      DISPLAY: options.display,
+    },
+  })
+  await runCommand(process.execPath, ['packages/cli/bin/test.js', '--convert-requests-to-mocks', '--vscode-path', vscodeExecutablePath], {
+    cwd: repositoryRoot,
+    env: {
+      ...process.env,
+      DISPLAY: options.display,
+    },
+  })
+}
+
+export const renameResult = async (resultPath: string, filter: string, label: string): Promise<string> => {
+  const resolvedResultPath = await getResultPathWithFallback(resultPath, filter)
+  const labeledResultPath = getLabeledResultPath(resolvedResultPath, label)
+>>>>>>> Stashed changes
   await mkdir(dirname(labeledResultPath), { recursive: true })
   await rm(labeledResultPath, { force: true })
-  await rename(resultPath, labeledResultPath)
+  await rename(resolvedResultPath, labeledResultPath)
   return labeledResultPath
 }
 
 export const measureLocalVscodeComparison = async (options: MeasureLocalVscodeComparisonOptions): Promise<void> => {
-  const oldExecutablePath = await ensureLocalVscodeBuild(options.oldVscodePath, options.skipBuild)
+  const oldExecutablePath = await ensureLocalVscodeBuild(options.oldVscodePath, options.skipBuild, options.skipCleanCheck)
   const resultPath = getResultPath(options.measure, options.only)
+<<<<<<< Updated upstream
+  await prepareProxyMocksIfNeeded(options, oldExecutablePath)
+=======
+<<<<<<< Updated upstream
+=======
+  await prepareProxyMocksIfNeeded(options, oldExecutablePath)
+  await cleanupResultFiles(resultPath, options.only)
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   await runMeasure(options, oldExecutablePath)
-  await renameResult(resultPath, options.oldLabel)
+  await renameResult(resultPath, options.only, options.oldLabel)
 
+<<<<<<< Updated upstream
   const newExecutablePath = await ensureLocalVscodeBuild(options.newVscodePath, options.skipBuild)
+<<<<<<< Updated upstream
+  await prepareProxyMocksIfNeeded(options, newExecutablePath)
+=======
+=======
+  const newExecutablePath = await ensureLocalVscodeBuild(options.newVscodePath, options.skipBuild, options.skipCleanCheck)
+  await prepareProxyMocksIfNeeded(options, newExecutablePath)
+  await cleanupResultFiles(resultPath, options.only)
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   await runMeasure(options, newExecutablePath)
-  await renameResult(resultPath, options.newLabel)
+  await renameResult(resultPath, options.only, options.newLabel)
 
   if (!options.skipCharts) {
     await runCommand('npm', ['run', 'build-charts'], {

@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
@@ -29,8 +30,13 @@ export const savePostBody = async (
     const requestsDir = GetProxyPaths.getRequestsDir()
     await mkdir(requestsDir, { recursive: true })
     const timestamp = Date.now()
-    const filename = `${timestamp}_POST_${SanitizeFilename.sanitizeFilename(url)}.json`
-    const filepath = join(requestsDir, filename)
+    const filename = `${timestamp}_${process.hrtime.bigint()}_POST_${SanitizeFilename.sanitizeFilename(url)}`
+    let filepath = join(requestsDir, `${filename}.json`)
+    let collisionCounter = 1
+    while (existsSync(filepath)) {
+      filepath = join(requestsDir, `${filename}_${collisionCounter}.json`)
+      collisionCounter += 1
+    }
 
     const contentType = headers['content-type'] || headers['Content-Type'] || ''
     const contentTypeLower = contentType.toLowerCase()

@@ -7,6 +7,7 @@ export const requiresNetwork = 1
 export const setup = async ({ ChatEditor, Editor, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SideBar.hide()
+  await SideBar.hideSecondary()
   await ChatEditor.open()
 }
 
@@ -14,6 +15,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     expectedResponse: '2',
     message: `what's 1 + 1? Respond with just the number. Don't use any todo list. Don't create a todo. Under no circumstances use any tool.`,
+    model: ChatEditor.Models.Auto
   })
 
   await ChatEditor.clearAll()
