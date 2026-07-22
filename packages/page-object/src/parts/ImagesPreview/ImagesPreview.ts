@@ -1,6 +1,8 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as Explorer from '../Explorer/Explorer.ts'
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ expect, page, VError, ideVersion, electronApp, platform }: CreateParams) => {
   return {
     async close() {
       try {
@@ -15,6 +17,18 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await expect(focusElement).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to hide images preview`)
+      }
+    },
+    async open(folderName: string) {
+      try {
+        const explorer = Explorer.create({ page, expect, VError, ideVersion, electronApp, platform })
+        await explorer.openContextMenu(folderName)
+        const menu = ContextMenu.create({ expect, page, VError, electronApp, ideVersion, platform })
+        await menu.select('Open in Images Preview')
+
+        // TODO wait for images preview to be visible
+      } catch (error) {
+        throw new VError(error, `Failed show images preview`)
       }
     },
     async next() {
