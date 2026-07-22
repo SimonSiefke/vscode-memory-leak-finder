@@ -47,19 +47,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to filter`)
       }
     },
-    async open() {
+    async prepare() {
+      const r = RunningExtensions.create({
+        electronApp,
+        expect,
+        ideVersion,
+        page,
+        platform,
+        VError,
+      })
+      await r.showAndWaitFor('GitHub Copilot Chat')
+      const editor = Editor.create({ electronApp, expect, ideVersion, page, platform, VError })
+      await editor.closeAll()
+    },
+    async open({ hasItems = true } = {}) {
       try {
-        const r = RunningExtensions.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await r.showAndWaitFor('GitHub Copilot Chat')
-        const editor = Editor.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await editor.closeAll()
         const quickPick = QuickPick.create({
           electronApp,
           expect,
@@ -79,22 +81,36 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const progress = page.locator('.monaco-progress-container.active.infinite')
         await expect(progress).toBeHidden({ timeout: 30_000 })
         await page.waitForIdle()
-        const rows = table.locator('.monaco-list-row')
-        const firstRow = rows.nth(0)
-        await expect(firstRow).toBeVisible({
-          timeout: 30_000,
-        })
-        await page.waitForIdle()
-        const secondRow = rows.nth(1)
-        await expect(secondRow).toBeVisible({
-          timeout: 30_000,
-        })
-        await page.waitForIdle()
-        const thirdRow = rows.nth(2)
-        await expect(thirdRow).toBeVisible({
-          timeout: 30_000,
-        })
-        await page.waitForIdle()
+        const mainEditorButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
+        const count = await mainEditorButton.count()
+        if (count > 0) {
+          await page.waitForIdle()
+          await mainEditorButton.click()
+          await page.waitForIdle()
+          await await expect(mainEditorButton).toBeHidden()
+          await page.waitForIdle()
+          const tab = page.locator('.content .tab[aria-label="Language Models"]')
+          await expect(tab).toBeVisible()
+          await page.waitForIdle()
+        }
+        if (hasItems) {
+          const rows = table.locator('.monaco-list-row')
+          const firstRow = rows.nth(0)
+          await expect(firstRow).toBeVisible({
+            timeout: 30_000,
+          })
+          await page.waitForIdle()
+          const secondRow = rows.nth(1)
+          await expect(secondRow).toBeVisible({
+            timeout: 30_000,
+          })
+          await page.waitForIdle()
+          const thirdRow = rows.nth(2)
+          await expect(thirdRow).toBeVisible({
+            timeout: 30_000,
+          })
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to open language models view`)
       }
