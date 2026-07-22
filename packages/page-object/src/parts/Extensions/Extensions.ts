@@ -75,16 +75,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async disable({ id }: { id: string }) {
       try {
-        if (id.includes(' ')) {
-          throw new Error(`id cannot contain spaces`)
+        if (!/^[a-z0-9.-]+$/i.test(id)) {
+          throw new Error(`id contains invalid characters`)
         }
         const editor = Editor.create({ electronApp, expect, ideVersion, page, platform, VError })
         await editor.closeAll()
         await this.show()
-        await this.search(`@builtin ${id}`)
-        const extension = page.locator(`.extension-list-item[data-extension-id*="${id}" i]`).first()
-        await expect(extension).toBeVisible({ timeout: 15_000 })
-        await extension.click()
+        await this.search(id)
+        const extensionRow = page.locator(`.monaco-list-row[data-extension-id*="${id}"]`).first()
+        await expect(extensionRow).toBeVisible({ timeout: 15_000 })
+        await extensionRow.click()
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
         const extensionDetailView = ExtensionDetailView.create({ electronApp, expect, ideVersion, page, platform, VError })

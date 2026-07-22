@@ -1,6 +1,7 @@
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async disableExtension() {
       try {
@@ -10,10 +11,26 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         if (await disabledStatusLabel.isVisible().catch(() => false)) {
           return
         }
-        const action = extensionEditor.locator('.action-label[aria-label^="Disable"]')
+        const action = extensionEditor.locator('.action-label[aria-label^="Disable"]').first()
+        if ((await action.count()) === 0) {
+          return
+        }
         await expect(action).toBeVisible()
-        await action.click()
-        await expect(disabledStatusLabel).toBeVisible()
+        const actionLabel = await action.getAttribute('aria-label')
+        if (actionLabel?.startsWith('Disable AI Features')) {
+          const actionItem = extensionEditor.locator(
+            '.action-item.action-dropdown-item:has(.action-label[aria-label^="Disable AI Features"])',
+          )
+          const dropDown = actionItem.locator('.action-label.dropdown')
+          await expect(dropDown).toBeVisible()
+          await dropDown.click()
+          const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
+          await contextMenu.select('Disable AI Features (Workspace)')
+        } else {
+          await action.click()
+        }
+        const enableAction = extensionEditor.locator('.action-label[aria-label^="Enable"]')
+        await expect(enableAction).toBeVisible()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to disable extension`)
