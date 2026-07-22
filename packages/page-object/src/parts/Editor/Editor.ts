@@ -1112,7 +1112,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await expect(list).toBeFocused()
         await page.waitForIdle()
-        const actionItem = widget.locator(`.monaco-list-row[aria-label="${actionText}"]`)
+        const actionItem = widget.locator('.monaco-list-row', { hasText: actionText }).first()
         await expect(actionItem).toBeVisible({ timeout: 10_000 })
         await actionItem.click()
         await page.waitForIdle()
