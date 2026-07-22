@@ -428,9 +428,11 @@ export interface Extensions {
   shouldBe(name: any): Promise<void>
   shouldHaveActivationTime(): Promise<void>
   hide(): Promise<void>
+  getResultNames(): Promise<readonly string[]>
   install(options: any): Promise<void>
   moveScrollBar(y: any, expectedScrollBarTop: any): Promise<void>
   open(options: any): Promise<void>
+  openResult(name: any): Promise<void>
   openSuggest(): Promise<void>
   restart(): Promise<void>
   scrollDown(): Promise<void>
