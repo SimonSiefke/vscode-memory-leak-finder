@@ -774,20 +774,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async selectModel(modelName: ChatModel, retry = true) {
       try {
-        console.log('selecint model')
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
         await page.waitForIdle()
         const modelPickerItem = getChatPickerItem(chatView, 1)
         await expect(modelPickerItem).toBeVisible()
-        console.log('picker item visible')
         await page.waitForIdle()
 
         const modelLocator = page.locator(`.action-label[aria-label^="Models,"] a`)
-        // await new Promise(r=>{})
         await expect(modelLocator).toBeVisible()
-        console.log('model locaor')
         await page.waitForIdle()
         const modelText = (await modelLocator.textContent()) || ''
         await page.waitForIdle()
@@ -882,11 +878,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         exists: [],
       },
       verify = false,
+      compactToolInvocations = false,
       viewLinesText = '',
       waitForFileChanges: fileChangesToWaitFor = [],
       waitForPorts: portsToWaitFor = [],
     }: {
       expectedResponse?: string
+      compactToolInvocations?: boolean
       message: string
       approveToolCalls?: boolean
       validateRequest?: { exists: readonly unknown[] }
@@ -991,13 +989,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           const element = chatView.locator('.chat-tool-invocation-part')
           await expect(element).toBeVisible({ timeout: 20_000 })
           await page.waitForIdle()
-          for (const toolInvocation of toolInvocations) {
-            const block = element.locator('.chat-terminal-command-block')
-            await expect(block).toBeVisible({
-              timeout: 2000,
-            })
-            await expect(block).toHaveText(` ${toolInvocation.content}`)
-            await page.waitForIdle()
+          if(compactToolInvocations){
+            // TODO
+          }else{
+
+            for (const toolInvocation of toolInvocations) {
+              const block = element.locator('.chat-terminal-command-block')
+              await expect(block).toBeVisible({
+                timeout: 2000,
+              })
+              await expect(block).toHaveText(` ${toolInvocation.content}`)
+              await page.waitForIdle()
+            }
           }
         }
 

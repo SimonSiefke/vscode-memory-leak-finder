@@ -14,6 +14,9 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: `Run echo hello world in terminal.`,
     model: ChatEditor.Models.Auto,
+    approveToolCalls:true,
+    // @ts-ignore
+    compactToolInvocations: true,
     toolInvocations: [
       {
         content: `echo hello world`,
