@@ -161,6 +161,8 @@ jobs:
             args: --measure webgl2-rendering-context-count
           - name: iframe-count
             args: --measure iframe-count
+          - name: ipc-messages-from-start
+            args: --measure ipc-messages-from-start --runs 5 --measure-node
           - name: media-query-list-count
             args: --measure media-query-list-count
           - name: message-port-count
@@ -428,6 +430,11 @@ jobs:
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-ipc-messages-from-start
+          path: ./vscode-memory-leak-finder-results-linux-ipc-messages-from-start
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-media-query-list-count
           path: ./vscode-memory-leak-finder-results-linux-media-query-list-count
       - uses: actions/download-artifact@v8
@@ -674,6 +681,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-iframe-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-ipc-messages-from-start
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
