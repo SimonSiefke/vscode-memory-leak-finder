@@ -543,7 +543,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (hasDefinition) {
           // TODO
         } else {
-          const notification = page.locator('[role="dialog"][aria-label^="Error: No source definitions found."]')
+          const notification = page.locator('.notifications-toasts [aria-label^="Error: No source definitions found."]')
           await expect(notification).toBeVisible()
         }
       } catch (error) {
