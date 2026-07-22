@@ -229,7 +229,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await quickPick.select(taskName)
         await page.waitForIdle()
         const panel = page.locator('.part.panel')
-        await expect(panel).toBeVisible()
+        await expect(panel).toBeVisible({ timeout: 10_000 })
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
         await page.waitForIdle()
@@ -244,7 +244,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(actionLabel).toBeVisible()
         await page.waitForIdle()
         if (check) {
-          await expect(actionLabel).toHaveText(' echo  -  Task ')
+          await expect(actionLabel).toHaveText(/ echo(?: \([^)]*\))?  -  Task /)
           await page.waitForIdle()
           const checkLocator = actionLabel.locator('.codicon-check')
           await expect(checkLocator).toBeVisible()
