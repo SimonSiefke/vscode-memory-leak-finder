@@ -47,20 +47,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to filter`)
       }
     },
-    async prepare(){
-     const r = RunningExtensions.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await r.showAndWaitFor('GitHub Copilot Chat')
-        const editor = Editor.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await editor.closeAll()
+    async prepare() {
+      const r = RunningExtensions.create({
+        electronApp,
+        expect,
+        ideVersion,
+        page,
+        platform,
+        VError,
+      })
+      await r.showAndWaitFor('GitHub Copilot Chat')
+      const editor = Editor.create({ electronApp, expect, ideVersion, page, platform, VError })
+      await editor.closeAll()
     },
-    async open({hasItems=true}={}) {
+    async open({ hasItems = true } = {}) {
       try {
         const quickPick = QuickPick.create({
           electronApp,
@@ -81,19 +81,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const progress = page.locator('.monaco-progress-container.active.infinite')
         await expect(progress).toBeHidden({ timeout: 30_000 })
         await page.waitForIdle()
-        const mainEditorButton=page.locator('[aria-label="Open Modal Editor in Main Window"]')
-        const count=await mainEditorButton.count()
-        if(count>0){
+        const mainEditorButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
+        const count = await mainEditorButton.count()
+        if (count > 0) {
           await page.waitForIdle()
           await mainEditorButton.click()
           await page.waitForIdle()
           await await expect(mainEditorButton).toBeHidden()
           await page.waitForIdle()
-          const tab=page.locator('.content .tab[aria-label="Language Models"]')
+          const tab = page.locator('.content .tab[aria-label="Language Models"]')
           await expect(tab).toBeVisible()
           await page.waitForIdle()
         }
-        if(hasItems){
+        if (hasItems) {
           const rows = table.locator('.monaco-list-row')
           const firstRow = rows.nth(0)
           await expect(firstRow).toBeVisible({
