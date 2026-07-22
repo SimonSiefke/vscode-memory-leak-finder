@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from '@jest/globals'
+import { afterEach, expect, jest, test } from '@jest/globals'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as ConvertRequestsToMocks from '../src/parts/ConvertRequestsToMocks/ConvertRequestsToMocks.ts'
@@ -10,6 +10,7 @@ const mocksRootDir = join(Root.root, '.vscode-mock-requests')
 const firstTestFolderName = 'proxy-test-convert-a'
 const secondTestFolderName = 'proxy-test-convert-b'
 const expiredTokenTestFolderName = 'proxy-test-convert-expired-token'
+const invalidTestFolderName = 'proxy-test-convert-invalid'
 const pathPlaceholderTestFolderName = 'proxy-test-convert-paths'
 const tokenTestFolderName = 'proxy-test-convert-token'
 
@@ -43,14 +44,39 @@ afterEach(async () => {
   await rm(join(requestsRootDir, firstTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, secondTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
+  await rm(join(requestsRootDir, invalidTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, tokenTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, firstTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, secondTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
+  await rm(join(mocksRootDir, invalidTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, tokenTestFolderName), { force: true, recursive: true })
 })
+
+test(
+  'convertRequestsToMocksMain - reports invalid request response pairs',
+  async () => {
+    const requestsDir = join(requestsRootDir, invalidTestFolderName)
+    await mkdir(requestsDir, { recursive: true })
+    await writeFile(join(requestsDir, 'invalid.json'), '{"invalid": true} trailing data', 'utf8')
+
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+    try {
+      await ConvertRequestsToMocks.convertRequestsToMocksMain()
+
+      const summary = consoleSpy.mock.calls
+        .map(([message]) => message)
+        .find((message) => typeof message === 'string' && message.endsWith('invalid request/response pairs'))
+      const match = typeof summary === 'string' ? summary.match(/^Found (\d+) invalid request\/response pairs$/) : null
+      expect(Number(match?.[1])).toBeGreaterThanOrEqual(1)
+    } finally {
+      consoleSpy.mockRestore()
+    }
+  },
+  30_000,
+)
 
 test('convertRequestsToMocksMain - converts each test folder independently', async () => {
   await writeRecordedRequest(firstTestFolderName, 'body-a', 1)
