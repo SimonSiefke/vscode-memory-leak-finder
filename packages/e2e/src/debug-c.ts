@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process'
+import { chmodSync } from 'node:fs'
 import { join } from 'node:path'
 import type { TestContext } from '../types.js'
 
@@ -31,8 +32,7 @@ int main() {
       "program": "\${workspaceFolder}/main",
       "cwd": "\${workspaceFolder}",
       "MIMode": "gdb",
-      "miDebuggerPath": "/usr/bin/gdb",
-      "miDebuggerArgs": "--command=\${workspaceFolder}/.gdbinit",
+      "miDebuggerPath": "\${workspaceFolder}/gdb-wrapper.sh",
       "stopAtEntry": true,
       "externalConsole": false
     }
@@ -42,10 +42,14 @@ int main() {
       name: '.vscode/launch.json',
     },
     {
-      content: 'set debuginfod enabled off\n',
-      name: '.gdbinit',
+      content: `#!/bin/sh
+unset DEBUGINFOD_URLS
+exec gdb "$@"
+`,
+      name: 'gdb-wrapper.sh',
     },
   ])
+  chmodSync(join(workspacePath, 'gdb-wrapper.sh'), 0o755)
   const compileResult = spawnSync('gcc', ['-g', 'main.c', '-o', 'main'], {
     cwd: workspacePath,
     encoding: 'utf8',
@@ -65,22 +69,31 @@ int main() {
 }
 
 export const run = async ({ ActivityBar, Editor, RunAndDebug }: TestContext): Promise<void> => {
-  await Editor.open('main.c')
-  await ActivityBar.showRunAndDebug()
-  await RunAndDebug.runAndWaitForPaused({
-    debugLabel: 'Debug C',
-    file: 'main.c',
-    hasCallStack: false,
-    line: 2,
-    viaIcon: true,
-  })
-  await RunAndDebug.stop()
-  await RunAndDebug.removeAllBreakpoints()
-  await Editor.closeAll()
-}
-
-export const teardown = async ({ Editor, RunAndDebug }: TestContext) => {
-  await RunAndDebug.stop()
-  await RunAndDebug.removeAllBreakpoints()
-  await Editor.closeAll()
+  let debuggerStarted = false
+  try {
+    await Editor.open('main.c')
+    await ActivityBar.showRunAndDebug()
+    await RunAndDebug.startRunAndDebug({
+      debugLabel: 'Debug C',
+      viaIcon: true,
+    })
+    debuggerStarted = true
+    await RunAndDebug.waitForPaused({
+      file: 'main.c',
+      hasCallStack: false,
+      line: 2,
+    })
+  } finally {
+    try {
+      if (debuggerStarted) {
+        await RunAndDebug.stop()
+      }
+    } finally {
+      try {
+        await RunAndDebug.removeAllBreakpoints()
+      } finally {
+        await Editor.closeAll()
+      }
+    }
+  }
 }
