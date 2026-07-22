@@ -423,6 +423,7 @@ export interface Extensions {
   add(options: any): Promise<void>
   clear(): Promise<void>
   closeSuggest(): Promise<void>
+  disable(options: { id: string }): Promise<void>
   click(): Promise<void>
   openContextMenu(): Promise<void>
   shouldBe(name: any): Promise<void>

@@ -10,6 +10,7 @@ export const skip = 1
 export const requiresNetwork = true
 
 export const setup = async ({ Editor, Extensions, RunAndDebug, Workspace }: TestContext): Promise<void> => {
+  await Extensions.disable({ id: 'copilot' })
   await Workspace.setFiles([
     {
       content: `#include<stdio.h>
