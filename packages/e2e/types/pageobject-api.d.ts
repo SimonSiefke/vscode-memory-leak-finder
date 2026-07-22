@@ -449,7 +449,7 @@ export interface Extensions {
   readonly second: any
 }
 export interface ExtensionDetailView {
-  disableExtension(): Promise<void>
+  disableExtension(): Promise<boolean>
   enableExtension(options?: any): Promise<void>
   installExtension(): Promise<void>
   openFeature(featureName: any): Promise<void>

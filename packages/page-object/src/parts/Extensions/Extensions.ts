@@ -88,9 +88,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
         const extensionDetailView = ExtensionDetailView.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await extensionDetailView.disableExtension()
-        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
+        const didDisable = await extensionDetailView.disableExtension()
+        if (didDisable) {
+          const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+          await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
+        }
         const sideBar = SideBar.create({ electronApp, expect, ideVersion, page, platform, VError })
         await sideBar.hide()
         await editor.closeAll()

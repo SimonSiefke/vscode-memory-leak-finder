@@ -9,11 +9,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(extensionEditor).toBeVisible()
         const disabledStatusLabel = extensionEditor.locator('.extension-status-label[aria-label="Disabled"]')
         if (await disabledStatusLabel.isVisible().catch(() => false)) {
-          return
+          return false
         }
         const action = extensionEditor.locator('.action-label[aria-label^="Disable"]').first()
         if ((await action.count()) === 0) {
-          return
+          return false
         }
         await expect(action).toBeVisible()
         const actionLabel = await action.getAttribute('aria-label')
@@ -32,6 +32,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const enableAction = extensionEditor.locator('.action-label[aria-label^="Enable"]')
         await expect(enableAction).toBeVisible()
         await page.waitForIdle()
+        return true
       } catch (error) {
         throw new VError(error, `Failed to disable extension`)
       }
