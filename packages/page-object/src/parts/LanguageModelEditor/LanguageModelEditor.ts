@@ -96,7 +96,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         })
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to set chat context`)
+        throw new VError(error, `Failed to open language models view`)
       }
     },
     async waitForCountChange(action: () => Promise<void>) {
