@@ -8,6 +8,7 @@ import * as Root from '../src/parts/Root/Root.ts'
 const requestsRootDir = join(Root.root, '.vscode-requests')
 const mocksRootDir = join(Root.root, '.vscode-mock-requests')
 const firstTestFolderName = 'proxy-test-convert-a'
+const modelCatalogTestFolderName = 'proxy-test-convert-model-catalog'
 const secondTestFolderName = 'proxy-test-convert-b'
 const expiredTokenTestFolderName = 'proxy-test-convert-expired-token'
 const pathPlaceholderTestFolderName = 'proxy-test-convert-paths'
@@ -41,11 +42,13 @@ const writeRecordedRequest = async (testFolderName: string, body: string, timest
 
 afterEach(async () => {
   await rm(join(requestsRootDir, firstTestFolderName), { force: true, recursive: true })
+  await rm(join(requestsRootDir, modelCatalogTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, secondTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, tokenTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, firstTestFolderName), { force: true, recursive: true })
+  await rm(join(mocksRootDir, modelCatalogTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, secondTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
@@ -94,6 +97,50 @@ test('convertRequestsToMocksMain - converts each test folder independently', asy
       statusMessage: 'OK',
     },
   })
+})
+
+test('convertRequestsToMocksMain - keeps the richest Copilot model catalog', async () => {
+  const requestsDir = join(requestsRootDir, modelCatalogTestFolderName)
+  await mkdir(requestsDir, { recursive: true })
+
+  const writeModelCatalog = async (timestamp: number, modelIds: readonly string[]): Promise<void> => {
+    await writeFile(
+      join(requestsDir, `${timestamp}_https___api_individual_githubcopilot_com_models.json`),
+      JSON.stringify({
+        metadata: {
+          responseType: 'json',
+          timestamp,
+        },
+        request: {
+          headers: {},
+          method: 'GET',
+          url: 'https://api.individual.githubcopilot.com/models',
+        },
+        response: {
+          body: {
+            data: modelIds.map((id) => ({ id })),
+            object: 'list',
+          },
+          headers: { 'content-type': 'application/json' },
+          statusCode: 200,
+          statusMessage: 'OK',
+        },
+      }),
+      'utf8',
+    )
+  }
+
+  await writeModelCatalog(1, ['gpt-5.6-sol', 'mai-code-1-flash-tertiary'])
+  await writeModelCatalog(2, ['gpt-5.6-sol'])
+
+  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+
+  const mockFileName = await GetMockFileName.getMockFileName('api.individual.githubcopilot.com', '/models', 'GET')
+  const mockContent = await readFile(join(mocksRootDir, modelCatalogTestFolderName, mockFileName), 'utf8')
+  const mockData = JSON.parse(mockContent)
+
+  expect(mockData.metadata.timestamp).toBe(1)
+  expect(mockData.response.body.data).toEqual([{ id: 'gpt-5.6-sol' }, { id: 'mai-code-1-flash-tertiary' }])
 })
 
 test('convertRequestsToMocksMain - keeps GET and OPTIONS token mocks separate', async () => {
