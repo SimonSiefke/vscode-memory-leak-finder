@@ -938,6 +938,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async killAllPorts() {
       await killUsedPorts()
     },
+    async trackPort(port: number) {
+      usedPorts.add(port)
+    },
     async mockElectronDebugger({ selector: _selector }: { selector: string }) {
       try {
         await page.waitForIdle()
