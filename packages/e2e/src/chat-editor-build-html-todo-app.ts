@@ -10,7 +10,9 @@ const workspacePath = join(import.meta.dirname, '..', '..', '..', '.vscode-test-
 const indexHtmlPath = join(workspacePath, 'index.html')
 const expectedInitialTodoText = 'Ship this todo app'
 
-const getPrompt = (appPort: number): string => `Build a small todo app using plain HTML, CSS, and JavaScript in the exact workspace directory ${workspacePath}. Do not create or modify files outside ${workspacePath}. Use a single page served at http://localhost:${appPort} and enable auto approval for any commands you need to run. The app must include:
+const getPrompt = (
+  appPort: number,
+): string => `Build a small todo app using plain HTML, CSS, and JavaScript in the exact workspace directory ${workspacePath}. Do not create or modify files outside ${workspacePath}. Use a single page served at http://localhost:${appPort} and enable auto approval for any commands you need to run. The app must include:
 - an h1 with the exact text "Todo App"
 - a div with id="todo-list"
 - an initial todo item with the exact text "${expectedInitialTodoText}"
