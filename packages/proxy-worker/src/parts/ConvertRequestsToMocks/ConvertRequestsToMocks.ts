@@ -132,6 +132,20 @@ const createPingMockIfMissing = async (mockRequestsDir: string): Promise<void> =
   await writeFile(mockFilePath, JSON.stringify(mockData, null, 2), 'utf8')
 }
 
+const getCopilotModelCatalogSize = (request: RecordedRequest): number | undefined => {
+  if (request.method !== 'GET' || !request.response || typeof request.response.body !== 'object' || !request.response.body) {
+    return undefined
+  }
+
+  const { hostname, pathname } = new URL(request.url)
+  if (hostname !== 'api.individual.githubcopilot.com' || pathname !== '/models') {
+    return undefined
+  }
+
+  const { data } = request.response.body as { data?: unknown }
+  return Array.isArray(data) ? data.length : undefined
+}
+
 const shouldReplaceRecordedRequest = (existing: RecordedRequest | undefined, next: RecordedRequest): boolean => {
   if (!existing) {
     return true
@@ -142,6 +156,12 @@ const shouldReplaceRecordedRequest = (existing: RecordedRequest | undefined, nex
 
   if (existingExpiredTokenError !== nextExpiredTokenError) {
     return !nextExpiredTokenError
+  }
+
+  const existingModelCatalogSize = getCopilotModelCatalogSize(existing)
+  const nextModelCatalogSize = getCopilotModelCatalogSize(next)
+  if (existingModelCatalogSize !== undefined && nextModelCatalogSize !== undefined && existingModelCatalogSize !== nextModelCatalogSize) {
+    return nextModelCatalogSize > existingModelCatalogSize
   }
 
   return next.timestamp > existing.timestamp

@@ -10,7 +10,7 @@ export const setup = async ({ ChatEditor, SideBar, Editor }: TestContext): Promi
   await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: `Run echo hello world in terminal.`,
     model: ChatEditor.Models.Auto,
@@ -25,6 +25,9 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     ],
     verify: true,
   })
+
+  await Terminal.killAll()
+  await ChatEditor.clearAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
