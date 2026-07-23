@@ -20,20 +20,21 @@ const prompt = `Build a small todo app using plain HTML, CSS, and JavaScript in 
 
 Create index.html in the workspace. Inline CSS and JavaScript are fine. Start the server on localhost:3001 from the workspace and finish only after the server is running.`
 
-const assertIndexHtmlContainsExpectedSelectors = (): void => {
+const assertIndexHtmlContainsExpectedSelectors = (): string => {
   const indexHtmlContent = readFileSync(indexHtmlPath, 'utf8')
   if (!indexHtmlContent.includes('id="todo-list"')) {
-    throw new Error('Expected index.html to include a #todo-list element')
+    return 'Expected index.html to include a #todo-list element'
   }
   if (!indexHtmlContent.includes('id="todo-input"')) {
-    throw new Error('Expected index.html to include a #todo-input element')
+    return 'Expected index.html to include a #todo-input element'
   }
   if (!indexHtmlContent.includes('id="add-todo-button"')) {
-    throw new Error('Expected index.html to include a #add-todo-button element')
+    return 'Expected index.html to include a #add-todo-button element'
   }
   if (!indexHtmlContent.includes(expectedInitialTodoText)) {
-    throw new Error(`Expected index.html to include the initial todo text "${expectedInitialTodoText}"`)
+    return `Expected index.html to include the initial todo text "${expectedInitialTodoText}"`
   }
+  return ''
 }
 
 export const setup = async ({ ChatEditor, Editor, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
@@ -51,14 +52,17 @@ export const run = async ({ ChatEditor, Editor, SimpleBrowser, Workspace }: Test
   await ChatEditor.sendMessage({
     approveToolCalls: true,
     message: prompt,
-    model: ChatEditor.Models.GPT41,
+    model: ChatEditor.Models.Auto,
     verify: true,
     waitForFileChanges: ['index.html'],
     waitForPorts: [3001],
   })
 
   await Workspace.waitForFile('index.html')
-  assertIndexHtmlContainsExpectedSelectors()
+  const errorMessage = assertIndexHtmlContainsExpectedSelectors()
+  if (errorMessage) {
+    throw new Error(`Workspace error: ${errorMessage}`)
+  }
 
   await SimpleBrowser.show({
     url: appUrl,
