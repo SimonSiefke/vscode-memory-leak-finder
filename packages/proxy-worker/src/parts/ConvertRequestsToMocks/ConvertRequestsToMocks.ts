@@ -12,8 +12,8 @@ import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeMockData from '../SanitizeMockData/SanitizeMockData.ts'
 
-const REQUESTS_ROOT_DIR = join(Root.root, '.vscode-requests')
-const MOCK_REQUESTS_ROOT_DIR = join(Root.root, '.vscode-mock-requests')
+const defaultRequestsRootDir = join(Root.root, '.vscode-requests')
+const defaultMockRequestsRootDir = join(Root.root, '.vscode-mock-requests')
 const PING_REQUEST_URL = 'https://api.individual.githubcopilot.com/_ping'
 const PING_REQUEST_HOSTNAME = 'api.individual.githubcopilot.com'
 const PING_REQUEST_PATHNAME = '/_ping'
@@ -54,6 +54,16 @@ interface RecordedRequest {
   responseType?: string
   timestamp: number
   url: string
+}
+
+interface InvalidRequestResponsePair {
+  readonly error: unknown
+  readonly source: string
+}
+
+export interface ConvertRequestsToMocksOptions {
+  readonly mockRequestsRootDir?: string
+  readonly requestsRootDir?: string
 }
 
 const getUrlMethodKey = (method: string, url: string): string => {
@@ -137,20 +147,23 @@ const shouldReplaceRecordedRequest = (existing: RecordedRequest | undefined, nex
   return next.timestamp > existing.timestamp
 }
 
-const getRequestDirectories = async (): Promise<readonly { requestsDir: string; mockRequestsDir: string }[]> => {
-  if (!existsSync(REQUESTS_ROOT_DIR)) {
+const getRequestDirectories = async (
+  requestsRootDir: string,
+  mockRequestsRootDir: string,
+): Promise<readonly { requestsDir: string; mockRequestsDir: string }[]> => {
+  if (!existsSync(requestsRootDir)) {
     return []
   }
-  const entries = await readdir(REQUESTS_ROOT_DIR, { withFileTypes: true })
+  const entries = await readdir(requestsRootDir, { withFileTypes: true })
   const requestDirectories = entries
     .filter((entry) => entry.isDirectory())
     .map((entry) => ({
-      mockRequestsDir: join(MOCK_REQUESTS_ROOT_DIR, entry.name),
-      requestsDir: join(REQUESTS_ROOT_DIR, entry.name),
+      mockRequestsDir: join(mockRequestsRootDir, entry.name),
+      requestsDir: join(requestsRootDir, entry.name),
     }))
   const hasRootJsonFiles = entries.some((entry) => entry.isFile() && entry.name.endsWith('.json'))
   if (hasRootJsonFiles) {
-    return [{ mockRequestsDir: MOCK_REQUESTS_ROOT_DIR, requestsDir: REQUESTS_ROOT_DIR }, ...requestDirectories]
+    return [{ mockRequestsDir: mockRequestsRootDir, requestsDir: requestsRootDir }, ...requestDirectories]
   }
   return requestDirectories
 }
@@ -158,6 +171,7 @@ const getRequestDirectories = async (): Promise<readonly { requestsDir: string; 
 const convertRequestDirectoryToMocks = async (
   requestsDir: string,
   mockRequestsDir: string,
+  invalidPairs: InvalidRequestResponsePair[],
 ): Promise<{ savedCount: number; skippedCount: number }> => {
   await mkdir(mockRequestsDir, { recursive: true })
 
@@ -220,7 +234,10 @@ const convertRequestDirectoryToMocks = async (
         latestRequests.set(key, mergedRequest)
       }
     } catch (error) {
-      console.error(`Error processing file ${file}:`, error)
+      invalidPairs.push({
+        error,
+        source: join(requestsDir, file),
+      })
     }
   }
 
@@ -232,7 +249,10 @@ const convertRequestDirectoryToMocks = async (
   for (const request of latestRequests.values()) {
     try {
       if (!request.response || request.response.statusCode === undefined) {
-        console.log(`Skipping request ${request.method} ${request.url} - no response data or missing statusCode`)
+        invalidPairs.push({
+          error: new Error('No response data or missing statusCode'),
+          source: `${request.method} ${request.url}`,
+        })
         skippedCount++
         continue
       }
@@ -241,7 +261,6 @@ const convertRequestDirectoryToMocks = async (
       try {
         parsedUrl = new URL(request.url)
       } catch (error) {
-        console.log({ request })
         throw new VError(error, `Failed to parse ${request.url}`)
       }
       const { hostname, pathname } = parsedUrl
@@ -277,7 +296,10 @@ const convertRequestDirectoryToMocks = async (
       await writeFile(mockFilePath, JSON.stringify(mockData, null, 2), 'utf8')
       savedCount++
     } catch (error) {
-      console.error(`Error converting request ${request.method} ${request.url}:`, error)
+      invalidPairs.push({
+        error,
+        source: `${request.method} ${request.url}`,
+      })
       skippedCount++
     }
   }
@@ -290,10 +312,14 @@ const convertRequestDirectoryToMocks = async (
   }
 }
 
-const convertRequestsToMocks = async (): Promise<void> => {
+const convertRequestsToMocks = async ({
+  mockRequestsRootDir = defaultMockRequestsRootDir,
+  requestsRootDir = defaultRequestsRootDir,
+}: ConvertRequestsToMocksOptions): Promise<void> => {
+  const invalidPairs: InvalidRequestResponsePair[] = []
   try {
-    if (!existsSync(REQUESTS_ROOT_DIR)) {
-      console.log(`Requests directory does not exist: ${REQUESTS_ROOT_DIR}`)
+    if (!existsSync(requestsRootDir)) {
+      console.log(`Requests directory does not exist: ${requestsRootDir}`)
       console.log('No requests to convert.')
       return
     }
@@ -301,15 +327,15 @@ const convertRequestsToMocks = async (): Promise<void> => {
     let savedCount = 0
     let skippedCount = 0
 
-    const requestDirectories = await getRequestDirectories()
+    const requestDirectories = await getRequestDirectories(requestsRootDir, mockRequestsRootDir)
     if (requestDirectories.length === 0) {
-      console.log(`Requests directory does not contain any test folders: ${REQUESTS_ROOT_DIR}`)
+      console.log(`Requests directory does not contain any test folders: ${requestsRootDir}`)
       console.log('No requests to convert.')
       return
     }
 
     for (const requestDirectory of requestDirectories) {
-      const result = await convertRequestDirectoryToMocks(requestDirectory.requestsDir, requestDirectory.mockRequestsDir)
+      const result = await convertRequestDirectoryToMocks(requestDirectory.requestsDir, requestDirectory.mockRequestsDir, invalidPairs)
       savedCount += result.savedCount
       skippedCount += result.skippedCount
     }
@@ -321,12 +347,14 @@ const convertRequestsToMocks = async (): Promise<void> => {
   } catch (error) {
     console.error('Error converting requests to mocks:', error)
     throw error
+  } finally {
+    console.log(`Found ${invalidPairs.length} invalid request/response pairs`)
   }
 }
 
-export const convertRequestsToMocksMain = async (): Promise<void> => {
+export const convertRequestsToMocksMain = async (options: ConvertRequestsToMocksOptions = {}): Promise<void> => {
   try {
-    await convertRequestsToMocks()
+    await convertRequestsToMocks(options)
   } finally {
     await CryptographyWorker.disposeCryptographyWorker()
   }
