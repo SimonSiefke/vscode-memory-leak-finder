@@ -8,17 +8,16 @@ export const requiresNetwork = true
 
 const workspacePath = join(import.meta.dirname, '..', '..', '..', '.vscode-test-workspace')
 const indexHtmlPath = join(workspacePath, 'index.html')
-const appUrl = 'http://localhost:3001'
 const expectedInitialTodoText = 'Ship this todo app'
 
-const prompt = `Build a small todo app using plain HTML, CSS, and JavaScript in the current workspace. Use a single page served at http://localhost:3001 and enable auto approval for any commands you need to run. The app must include:
+const getPrompt = (appPort: number): string => `Build a small todo app using plain HTML, CSS, and JavaScript in the exact workspace directory ${workspacePath}. Do not create or modify files outside ${workspacePath}. Use a single page served at http://localhost:${appPort} and enable auto approval for any commands you need to run. The app must include:
 - an h1 with the exact text "Todo App"
 - a div with id="todo-list"
 - an initial todo item with the exact text "${expectedInitialTodoText}"
 - an input with id="todo-input"
 - a button with id="add-todo-button" and the exact text "Add Todo"
 
-Create index.html in the workspace. Inline CSS and JavaScript are fine. Start the server on localhost:3001 from the workspace and finish only after the server is running.`
+Create ${indexHtmlPath}. Inline CSS and JavaScript are fine. Start the server on localhost:${appPort} with ${workspacePath} as its working directory and finish only after the server is running.`
 
 const assertIndexHtmlContainsExpectedSelectors = (): string => {
   const indexHtmlContent = readFileSync(indexHtmlPath, 'utf8')
@@ -37,25 +36,28 @@ const assertIndexHtmlContainsExpectedSelectors = (): string => {
   return ''
 }
 
-export const setup = async ({ ChatEditor, Editor, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
   await SideBar.hide()
   await Workspace.setFiles([])
   await Terminal.killAll()
   await Editor.closeAll()
-  await ChatEditor.open()
-  await ChatEditor.clearAll()
 }
 
-export const run = async ({ ChatEditor, Editor, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor, Editor, SimpleBrowser, Terminal, Workspace }: TestContext): Promise<void> => {
+  const appPort = await SimpleBrowser.getRandomPort()
+  const appUrl = `http://localhost:${appPort}`
+
+  await ChatEditor.open()
+  await ChatEditor.clearAll()
   await ChatEditor.setMode('Agent')
 
   await ChatEditor.sendMessage({
     approveToolCalls: true,
-    message: prompt,
+    message: getPrompt(appPort),
     model: ChatEditor.Models.Auto,
-    verify: true,
+    viewLinesText: /running\.$/,
     waitForFileChanges: ['index.html'],
-    waitForPorts: [3001],
+    waitForPorts: [appPort],
   })
 
   await Workspace.waitForFile('index.html')
@@ -81,8 +83,9 @@ export const run = async ({ ChatEditor, Editor, SimpleBrowser, Workspace }: Test
     text: 'Add Todo',
   })
 
-  await Editor.close()
-  await ChatEditor.clearAll()
+  await SimpleBrowser.killAllPorts()
+  await Terminal.killAll()
+  await Editor.closeAll()
   await Workspace.setFiles([])
 }
 

@@ -717,6 +717,8 @@ export interface SideBar {
 }
 export interface SimpleBrowser {
   isSimpleBrowserTabLoading(): Promise<boolean>
+  getRandomPort(): Promise<number>
+  killAllPorts(): Promise<void>
   getBrowserNavigationButton(options: any): Promise<void>
   openIntegratedBrowser(): Promise<void>
   navigateIntegratedBrowser(options: any): Promise<void>
