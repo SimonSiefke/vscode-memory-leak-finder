@@ -51,23 +51,6 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  await rm(join(requestsRootDir, firstTestFolderName), { force: true, recursive: true })
-  await rm(join(requestsRootDir, modelCatalogTestFolderName), { force: true, recursive: true })
-  await rm(join(requestsRootDir, secondTestFolderName), { force: true, recursive: true })
-  await rm(join(requestsRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
-  await rm(join(requestsRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
-  await rm(join(requestsRootDir, tokenTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, firstTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, modelCatalogTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, secondTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, tokenTestFolderName), { force: true, recursive: true })
-=======
-=======
->>>>>>> origin/main
   await rm(testRootDir, { force: true, recursive: true })
 })
 
@@ -90,10 +73,6 @@ test('convertRequestsToMocksMain - reports invalid request response pairs', asyn
   } finally {
     consoleSpy.mockRestore()
   }
-<<<<<<< HEAD
->>>>>>> feature/mocks321321
-=======
->>>>>>> origin/main
 })
 
 test('convertRequestsToMocksMain - converts each test folder independently', async () => {
@@ -174,7 +153,7 @@ test('convertRequestsToMocksMain - keeps the richest Copilot model catalog', asy
   await writeModelCatalog(1, ['gpt-5.6-sol', 'mai-code-1-flash-tertiary'])
   await writeModelCatalog(2, ['gpt-5.6-sol'])
 
-  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+  await convertRequestsToMocks()
 
   const mockFileName = await GetMockFileName.getMockFileName('api.individual.githubcopilot.com', '/models', 'GET')
   const mockContent = await readFile(join(mocksRootDir, modelCatalogTestFolderName, mockFileName), 'utf8')
