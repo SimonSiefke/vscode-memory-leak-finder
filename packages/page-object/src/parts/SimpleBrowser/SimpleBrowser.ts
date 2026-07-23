@@ -1435,9 +1435,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 timeout: Math.min(timeout, 2000),
                 urlPattern,
               })
-              const trackedEntry = await electron.getWebContents(trackedWebContentsId)
-              if (trackedEntry) {
-                return trackedEntry
+              try {
+                return await electron.waitForWebContentsUrl({
+                  timeout,
+                  urlPattern,
+                  webContentsId: trackedWebContentsId,
+                })
+              } catch {
+                // Fall back to finding the browser by URL below.
               }
             }
           }
