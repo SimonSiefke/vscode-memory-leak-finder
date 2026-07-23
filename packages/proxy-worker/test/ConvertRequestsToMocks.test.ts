@@ -52,6 +52,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
 <<<<<<< HEAD
+<<<<<<< HEAD
   await rm(join(requestsRootDir, firstTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, modelCatalogTestFolderName), { force: true, recursive: true })
   await rm(join(requestsRootDir, secondTestFolderName), { force: true, recursive: true })
@@ -65,6 +66,8 @@ afterEach(async () => {
   await rm(join(mocksRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
   await rm(join(mocksRootDir, tokenTestFolderName), { force: true, recursive: true })
 =======
+=======
+>>>>>>> origin/main
   await rm(testRootDir, { force: true, recursive: true })
 })
 
@@ -87,7 +90,10 @@ test('convertRequestsToMocksMain - reports invalid request response pairs', asyn
   } finally {
     consoleSpy.mockRestore()
   }
+<<<<<<< HEAD
 >>>>>>> feature/mocks321321
+=======
+>>>>>>> origin/main
 })
 
 test('convertRequestsToMocksMain - converts each test folder independently', async () => {
