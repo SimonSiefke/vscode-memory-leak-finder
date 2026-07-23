@@ -335,11 +335,7 @@ const convertRequestsToMocks = async ({
     }
 
     for (const requestDirectory of requestDirectories) {
-      const result = await convertRequestDirectoryToMocks(
-        requestDirectory.requestsDir,
-        requestDirectory.mockRequestsDir,
-        invalidPairs,
-      )
+      const result = await convertRequestDirectoryToMocks(requestDirectory.requestsDir, requestDirectory.mockRequestsDir, invalidPairs)
       savedCount += result.savedCount
       skippedCount += result.skippedCount
     }
