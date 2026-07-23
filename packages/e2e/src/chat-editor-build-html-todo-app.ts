@@ -81,6 +81,8 @@ export const run = async ({ ChatEditor, Editor, SimpleBrowser, Workspace }: Test
     text: 'Add Todo',
   })
 
+  // TODO only close browser tab. keep chat tab open
+
   await Editor.closeAll()
 }
 
