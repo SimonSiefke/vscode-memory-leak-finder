@@ -1,14 +1,38 @@
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async disableExtension() {
       try {
         const extensionEditor = page.locator('.extension-editor')
-        const action = extensionEditor.locator('.action-label[aria-label^="Disable"]')
-        await action.click()
+        await expect(extensionEditor).toBeVisible()
         const disabledStatusLabel = extensionEditor.locator('.extension-status-label[aria-label="Disabled"]')
-        await expect(disabledStatusLabel).toBeVisible()
+        if (await disabledStatusLabel.isVisible().catch(() => false)) {
+          return false
+        }
+        const action = extensionEditor.locator('.action-label[aria-label^="Disable"]').first()
+        if ((await action.count()) === 0) {
+          return false
+        }
+        await expect(action).toBeVisible()
+        const actionLabel = await action.getAttribute('aria-label')
+        if (actionLabel?.startsWith('Disable AI Features')) {
+          const actionItem = extensionEditor.locator(
+            '.action-item.action-dropdown-item:has(.action-label[aria-label^="Disable AI Features"])',
+          )
+          const dropDown = actionItem.locator('.action-label.dropdown')
+          await expect(dropDown).toBeVisible()
+          await dropDown.click()
+          const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
+          await contextMenu.select('Disable AI Features (Workspace)')
+        } else {
+          await action.click()
+        }
+        const enableAction = extensionEditor.locator('.action-label[aria-label^="Enable"]')
+        await expect(enableAction).toBeVisible()
+        await page.waitForIdle()
+        return true
       } catch (error) {
         throw new VError(error, `Failed to disable extension`)
       }
