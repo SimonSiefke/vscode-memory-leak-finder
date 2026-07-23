@@ -1,15 +1,17 @@
-import { afterEach, expect, test } from '@jest/globals'
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as ConvertRequestsToMocks from '../src/parts/ConvertRequestsToMocks/ConvertRequestsToMocks.ts'
 import * as GetMockFileName from '../src/parts/GetMockFileName/GetMockFileName.ts'
 import * as Root from '../src/parts/Root/Root.ts'
 
-const requestsRootDir = join(Root.root, '.vscode-requests')
-const mocksRootDir = join(Root.root, '.vscode-mock-requests')
+let testRootDir: string
+let requestsRootDir: string
+let mocksRootDir: string
 const firstTestFolderName = 'proxy-test-convert-a'
 const secondTestFolderName = 'proxy-test-convert-b'
 const expiredTokenTestFolderName = 'proxy-test-convert-expired-token'
+const invalidTestFolderName = 'proxy-test-convert-invalid'
 const pathPlaceholderTestFolderName = 'proxy-test-convert-paths'
 const tokenTestFolderName = 'proxy-test-convert-token'
 
@@ -39,24 +41,44 @@ const writeRecordedRequest = async (testFolderName: string, body: string, timest
   )
 }
 
+beforeEach(async () => {
+  const tempRootDir = join(Root.root, '.tmp')
+  await mkdir(tempRootDir, { recursive: true })
+  testRootDir = await mkdtemp(join(tempRootDir, 'convert-requests-to-mocks-'))
+  requestsRootDir = join(testRootDir, '.vscode-requests')
+  mocksRootDir = join(testRootDir, '.vscode-mock-requests')
+})
+
 afterEach(async () => {
-  await rm(join(requestsRootDir, firstTestFolderName), { force: true, recursive: true })
-  await rm(join(requestsRootDir, secondTestFolderName), { force: true, recursive: true })
-  await rm(join(requestsRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
-  await rm(join(requestsRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
-  await rm(join(requestsRootDir, tokenTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, firstTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, secondTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, expiredTokenTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, pathPlaceholderTestFolderName), { force: true, recursive: true })
-  await rm(join(mocksRootDir, tokenTestFolderName), { force: true, recursive: true })
+  await rm(testRootDir, { force: true, recursive: true })
+})
+
+const convertRequestsToMocks = async (): Promise<void> => {
+  await ConvertRequestsToMocks.convertRequestsToMocksMain({
+    mockRequestsRootDir: mocksRootDir,
+    requestsRootDir,
+  })
+}
+
+test('convertRequestsToMocksMain - reports invalid request response pairs', async () => {
+  const requestsDir = join(requestsRootDir, invalidTestFolderName)
+  await mkdir(requestsDir, { recursive: true })
+  await writeFile(join(requestsDir, 'invalid.json'), '{"invalid": true} trailing data', 'utf8')
+
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+  try {
+    await convertRequestsToMocks()
+    expect(consoleSpy).toHaveBeenCalledWith('Found 1 invalid request/response pairs')
+  } finally {
+    consoleSpy.mockRestore()
+  }
 })
 
 test('convertRequestsToMocksMain - converts each test folder independently', async () => {
   await writeRecordedRequest(firstTestFolderName, 'body-a', 1)
   await writeRecordedRequest(secondTestFolderName, 'body-b', 2)
 
-  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+  await convertRequestsToMocks()
 
   const mockFileName = await GetMockFileName.getMockFileName('example.com', '/api/data', 'GET')
   const firstMockContent = await readFile(join(mocksRootDir, firstTestFolderName, mockFileName), 'utf8')
@@ -146,7 +168,7 @@ test('convertRequestsToMocksMain - keeps GET and OPTIONS token mocks separate', 
     'utf8',
   )
 
-  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+  await convertRequestsToMocks()
 
   const getMockFileName = await GetMockFileName.getMockFileName('api.github.com', '/copilot_internal/v2/token', 'GET')
   const optionsMockFileName = await GetMockFileName.getMockFileName('api.github.com', '/copilot_internal/v2/token', 'OPTIONS')
@@ -233,7 +255,7 @@ test('convertRequestsToMocksMain - sanitizes signed nltoken payloads and telemet
     'utf8',
   )
 
-  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+  await convertRequestsToMocks()
 
   const mockFileName = await GetMockFileName.getMockFileName('api.github.com', '/copilot_internal/v2/nltoken', 'GET')
   const mockContent = await readFile(join(mocksRootDir, tokenTestFolderName, mockFileName), 'utf8')
@@ -286,7 +308,7 @@ test('convertRequestsToMocksMain - replaces absolute root and workspace paths wi
     'utf8',
   )
 
-  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+  await convertRequestsToMocks()
 
   const mockFileName = await GetMockFileName.getMockFileName('example.com', '/api/data', 'POST', {
     filePath: workspaceFilePath,
@@ -373,7 +395,7 @@ test('convertRequestsToMocksMain - prefers a successful response over a later ex
     'utf8',
   )
 
-  await ConvertRequestsToMocks.convertRequestsToMocksMain()
+  await convertRequestsToMocks()
 
   const mockFileName = await GetMockFileName.getMockFileName('api.individual.githubcopilot.com', '/chat/completions', 'POST', requestBody)
   const mockContent = await readFile(join(mocksRootDir, expiredTokenTestFolderName, mockFileName), 'utf8')
