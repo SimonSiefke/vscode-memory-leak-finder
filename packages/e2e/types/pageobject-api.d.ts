@@ -423,6 +423,7 @@ export interface Extensions {
   add(options: any): Promise<void>
   clear(): Promise<void>
   closeSuggest(): Promise<void>
+  disable(options: { id: string }): Promise<void>
   click(): Promise<void>
   openContextMenu(): Promise<void>
   shouldBe(name: any): Promise<void>
@@ -448,7 +449,7 @@ export interface Extensions {
   readonly second: any
 }
 export interface ExtensionDetailView {
-  disableExtension(): Promise<void>
+  disableExtension(): Promise<boolean>
   enableExtension(options?: any): Promise<void>
   installExtension(): Promise<void>
   openFeature(featureName: any): Promise<void>
