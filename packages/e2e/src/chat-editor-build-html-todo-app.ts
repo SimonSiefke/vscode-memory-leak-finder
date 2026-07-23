@@ -81,9 +81,9 @@ export const run = async ({ ChatEditor, Editor, SimpleBrowser, Workspace }: Test
     text: 'Add Todo',
   })
 
-  // TODO only close browser tab. keep chat tab open
-
-  await Editor.closeAll()
+  await Editor.close()
+  await ChatEditor.clearAll()
+  await Workspace.setFiles([])
 }
 
 export const teardown = async ({ Editor, Terminal, Workspace }: TestContext): Promise<void> => {
