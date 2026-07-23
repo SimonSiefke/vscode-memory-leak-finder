@@ -38,6 +38,26 @@ test('getRequestMockKey returns different keys for different Copilot user reques
   expect(firstKey).not.toBe(secondKey)
 })
 
+test('getRequestMockKey differentiates Anthropic message turns', () => {
+  const firstRequest = {
+    messages: [{ content: '<userRequest>Build a todo app</userRequest>', role: 'user' }],
+  }
+  const secondRequest = {
+    messages: [
+      { content: '<userRequest>Build a todo app</userRequest>', role: 'user' },
+      { content: 'Created index.html', role: 'assistant' },
+      { content: 'Tool completed', role: 'user' },
+    ],
+  }
+
+  const firstKey = RequestMockKey.getRequestMockKey('api.individual.githubcopilot.com', '/v1/messages', 'POST', firstRequest)
+  const secondKey = RequestMockKey.getRequestMockKey('api.individual.githubcopilot.com', '/v1/messages', 'POST', secondRequest)
+
+  expect(firstKey).toBeDefined()
+  expect(secondKey).toBeDefined()
+  expect(firstKey).not.toBe(secondKey)
+})
+
 test('getRequestMockKey ignores system prompts and date-like context noise', () => {
   const firstRequest = {
     messages: [
