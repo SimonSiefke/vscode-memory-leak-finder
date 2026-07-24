@@ -2,11 +2,19 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
+import { SourceMapGenerator } from 'source-map'
 
-const mockTransformCode =
-  jest.fn<
-    (code: string, options: { readonly filename?: string; readonly minify?: boolean; readonly trackingMode?: string }) => Promise<string>
-  >()
+const mockTransformCode = jest.fn<
+  (
+    code: string,
+    options: {
+      readonly filename?: string
+      readonly includeGeneratedLocation?: (line: number, column: number) => boolean
+      readonly minify?: boolean
+      readonly trackingMode?: string
+    },
+  ) => Promise<string>
+>()
 
 jest.unstable_mockModule('../src/parts/Transform/Transform.ts', () => ({
   transformCode: mockTransformCode,
@@ -19,8 +27,51 @@ const trackedVscodeRoot = join(repositoryRoot, '.vscode-test', 'tracked-vscode')
 
 beforeEach(async () => {
   jest.clearAllMocks()
+  delete process.env.VSCODE_PERFORMANCE_TRACK_INCLUDE
   mockTransformCode.mockImplementation(async (code, options) => `/* ${options.trackingMode}:${options.filename} */\n${code}`)
   await rm(trackedVscodeRoot, { recursive: true, force: true })
+})
+
+test('getPreparedVscodePath filters instrumentation through matching source maps', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'tracked-vscode-targeted-'))
+  const sourceRoot = join(root, 'source')
+  const runtimeRoot = join(root, 'VSCode-linux-x64')
+  const binaryPath = join(runtimeRoot, 'code-oss')
+  const relativeBundle = join('vs', 'workbench', 'workbench.desktop.main.js')
+  const runtimeModulePath = join(runtimeRoot, 'resources', 'app', 'out', relativeBundle)
+  const mapPath = join(sourceRoot, 'out-vscode-min', `${relativeBundle}.map`)
+  const map = new SourceMapGenerator({
+    file: relativeBundle,
+  })
+  map.addMapping({
+    generated: { column: 0, line: 1 },
+    original: { column: 0, line: 1 },
+    source: '../../../src/vs/editor/contrib/inlineCompletions/included.ts',
+  })
+  map.addMapping({
+    generated: { column: 0, line: 2 },
+    original: { column: 0, line: 1 },
+    source: '../../../src/vs/editor/contrib/other/excluded.ts',
+  })
+  try {
+    await mkdir(dirname(runtimeModulePath), { recursive: true })
+    await mkdir(dirname(mapPath), { recursive: true })
+    await writeFile(binaryPath, '')
+    await chmod(binaryPath, 0o755)
+    await writeFile(runtimeModulePath, 'function included() {}\nfunction excluded() {}\n')
+    await writeFile(mapPath, map.toString())
+    process.env.VSCODE_PERFORMANCE_TRACK_INCLUDE = JSON.stringify(['vs/editor/contrib/inlineCompletions/'])
+
+    await getPreparedVscodePath(binaryPath, 'functions')
+
+    const options = mockTransformCode.mock.calls.find(([, options]) => options.filename === runtimeModulePath)?.[1]
+    expect(options?.includeGeneratedLocation?.(1, 0)).toBe(true)
+    expect(options?.includeGeneratedLocation?.(2, 0)).toBe(false)
+  } finally {
+    delete process.env.VSCODE_PERFORMANCE_TRACK_INCLUDE
+    await rm(root, { recursive: true, force: true })
+    await rm(trackedVscodeRoot, { recursive: true, force: true })
+  }
 })
 
 const createDownloadedRuntime = async () => {
@@ -155,7 +206,7 @@ test('getPreparedVscodePath copies local source checkout and adjacent build runt
         join(dirname(dirname(preparedPath)), basename(sourceRoot), 'out', 'vs', 'workbench', 'workbench.desktop.main.js'),
         'utf8',
       ),
-    ).toContain('/* functions:')
+    ).toBe('const source = {}\n')
   } finally {
     await rm(root, { recursive: true, force: true })
     await rm(trackedVscodeRoot, { recursive: true, force: true })

@@ -1,0 +1,141 @@
+import type { CodeMark, SamplePosition, ScoreSample } from './Types.ts'
+
+interface CounterMetric {
+  readonly available?: boolean
+  readonly name?: string
+  readonly value?: number | null
+}
+
+const getMetric = (metrics: readonly CounterMetric[], name: string): number => {
+  const metric = metrics.find((item) => item.name === name)
+  if (!metric?.available || typeof metric.value !== 'number' || !Number.isFinite(metric.value)) {
+    throw new Error(`Required performance counter "${name}" is unavailable`)
+  }
+  return metric.value
+}
+
+const hasCounterMultiplexing = (rawOutput: string): boolean => {
+  for (const line of rawOutput.split('\n')) {
+    const fields = line.split(',')
+    const percentage = fields.at(-3)
+    if (percentage && Number(percentage) < 99.5) {
+      return true
+    }
+  }
+  return false
+}
+
+const getCodeMarks = (value: unknown): readonly CodeMark[] => {
+  if (!Array.isArray(value)) {
+    return []
+  }
+  return value.filter(
+    (mark): mark is CodeMark =>
+      typeof mark === 'object' &&
+      mark !== null &&
+      typeof (mark as CodeMark).name === 'string' &&
+      typeof (mark as CodeMark).startTime === 'number',
+  )
+}
+
+const getWorkCounts = (value: unknown): Readonly<Record<string, number>> => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {}
+  }
+  const entries = Object.entries(value).filter(
+    (entry): entry is [string, number] => typeof entry[1] === 'number' && Number.isFinite(entry[1]) && entry[1] >= 0,
+  )
+  return Object.fromEntries(entries)
+}
+
+const defaultPosition: SamplePosition = {
+  blockIndex: 0,
+  blockPosition: 0,
+  orderIndex: 0,
+  pattern: 'ABBA',
+}
+
+const getProcessManifest = (value: unknown): NonNullable<ScoreSample['processManifest']> => {
+  if (!Array.isArray(value)) {
+    return []
+  }
+  return value.filter((entry) => typeof entry?.args === 'string' && typeof entry?.pid === 'number' && typeof entry?.ppid === 'number')
+}
+
+export const parseScoreResult = (result: any, position: SamplePosition = defaultPosition): ScoreSample => {
+  if (result?.cpuProfile || result?.trace || result?.timeline) {
+    throw new Error(`Profiler-enabled results cannot enter the scoring dataset`)
+  }
+  const comparison = result?.cpuPerformanceCounters
+  if (!comparison) {
+    throw new Error(`Result does not contain cpuPerformanceCounters`)
+  }
+  const performanceSamples = comparison.performanceSamples
+  if (!Array.isArray(performanceSamples) || performanceSamples.length !== 1) {
+    throw new Error(`Expected exactly one performance scenario sample, got ${performanceSamples?.length || 0}`)
+  }
+  const performanceSample = performanceSamples[0]
+  if (
+    (performanceSample.mode !== 'cold' && performanceSample.mode !== 'warm') ||
+    typeof performanceSample.latencyMs !== 'number' ||
+    !Number.isFinite(performanceSample.latencyMs) ||
+    performanceSample.latencyMs < 0
+  ) {
+    throw new Error(`Performance scenario sample has invalid mode or latency`)
+  }
+  const clock = performanceSample.clock
+  if (clock !== 'renderer') {
+    throw new Error(`Scoring requires renderer-clock timing`)
+  }
+  const domReadyLatencyMs = performanceSample.domReadyLatencyMs
+  const paintedLatencyMs = performanceSample.paintedLatencyMs
+  const workerLatencyMs = performanceSample.workerLatencyMs
+  if (
+    typeof domReadyLatencyMs !== 'number' ||
+    !Number.isFinite(domReadyLatencyMs) ||
+    domReadyLatencyMs < 0 ||
+    typeof paintedLatencyMs !== 'number' ||
+    !Number.isFinite(paintedLatencyMs) ||
+    paintedLatencyMs < domReadyLatencyMs ||
+    typeof workerLatencyMs !== 'number' ||
+    !Number.isFinite(workerLatencyMs) ||
+    workerLatencyMs < 0
+  ) {
+    throw new Error(`Performance scenario sample has invalid renderer timing`)
+  }
+  const metrics = Array.isArray(comparison.metrics) ? comparison.metrics : []
+  const rawAfter = comparison.raw?.after || {}
+  const rawCounterOutput = typeof rawAfter.rawOutput === 'string' ? rawAfter.rawOutput : ''
+  if (hasCounterMultiplexing(rawCounterOutput)) {
+    throw new Error(`Performance counters were multiplexed below 99.5%`)
+  }
+  const pid = rawAfter.pid
+  if (typeof pid !== 'number' || pid <= 0) {
+    throw new Error(`Performance counter target process is missing`)
+  }
+  const cycles = getMetric(metrics, 'cycles')
+  const instructions = getMetric(metrics, 'instructions')
+  return {
+    ...position,
+    clock,
+    codeMarks: getCodeMarks(performanceSample.codeMarks),
+    contextSwitches: getMetric(metrics, 'contextSwitches'),
+    cycles,
+    domReadyLatencyMs,
+    instructions,
+    instructionsPerCycle: cycles === 0 ? 0 : instructions / cycles,
+    latencyMs: domReadyLatencyMs,
+    mode: performanceSample.mode,
+    pageFaults: getMetric(metrics, 'pageFaults'),
+    paintedLatencyMs,
+    pid,
+    processManifest: getProcessManifest(performanceSample.processManifest),
+    rawCounterOutput,
+    taskClockMs: getMetric(metrics, 'taskClockMs'),
+    workerLatencyMs,
+    work: {
+      allocations: getWorkCounts(performanceSample.work?.allocations),
+      functions: getWorkCounts(performanceSample.work?.functions),
+    },
+  }
+}

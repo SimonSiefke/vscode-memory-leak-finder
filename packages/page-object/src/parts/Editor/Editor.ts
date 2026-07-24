@@ -1230,6 +1230,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify active line number ${value}`)
       }
     },
+    async shouldBeFocused() {
+      try {
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        if (ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100) {
+          await expect(editor.locator('.inputarea')).toBeFocused()
+        } else {
+          await expect(editor.locator('.native-edit-context')).toBeFocused()
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify that the editor is focused`)
+      }
+    },
     async shouldHaveBreadCrumb(text: string) {
       await page.waitForIdle()
       const breadCrumb = page.locator(`.monaco-breadcrumb-item`, {
@@ -1556,6 +1569,32 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify editor text ${text}`)
+      }
+    },
+    async waitForTextFileRendered(fileName: string, text: string) {
+      try {
+        const editor = page.locator(`.editor-instance[aria-label^="${fileName}"]`)
+        const tab = page.locator(`[role="tab"][data-resource-name="${fileName}"]`)
+        const breadCrumb = page.locator('.monaco-breadcrumb-item', {
+          hasText: fileName,
+        })
+        await expect(tab).toBeVisible()
+        await expect(editor).toBeVisible()
+        await expect(breadCrumb).toBeVisible()
+        const firstLine = text.split(Character.NewLine, 1)[0].replaceAll(Character.Space, Character.NonBreakingSpace)
+        const renderedContent = editor.locator('.view-lines', {
+          hasText: firstLine,
+        })
+        await expect(renderedContent).toBeVisible({
+          timeout: 10_000,
+        })
+        await page.evaluate({
+          awaitPromise: true,
+          expression: `new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))`,
+          returnByValue: true,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to wait for rendered text editor "${fileName}"`)
       }
     },
     async shouldHaveToken(text: string, color: string) {

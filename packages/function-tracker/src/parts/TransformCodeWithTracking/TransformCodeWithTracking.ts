@@ -26,6 +26,13 @@ export const transformCodeWithTracking = (code: string, options: TransformOption
 
     // Must collect locations BEFORE mutating AST, as mutations change node locations
     const functionLocations = getFunctionLocations(originalAst)
+    if (options.includeGeneratedLocation) {
+      for (const [node, location] of functionLocations) {
+        if (!options.includeGeneratedLocation(location.line, location.column)) {
+          functionLocations.delete(node)
+        }
+      }
+    }
 
     const plugin = createFunctionWrapperPlugin({ ...restOptions, functionLocations, scriptId: numericScriptId })
     traverse2(originalAst, plugin)

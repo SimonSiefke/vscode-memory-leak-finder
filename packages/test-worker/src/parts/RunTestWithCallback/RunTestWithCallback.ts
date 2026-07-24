@@ -13,9 +13,5 @@ const getModule = (runMode: number) => {
 
 export const runTestWithCallback = async (pageObject: any, file: string, forceRun: boolean, runMode: any, platform: string) => {
   const fn = getModule(runMode)
-  if (runMode === TestRunMode.Vm) {
-    await fn(pageObject, file, forceRun, platform)
-  } else {
-    await fn(pageObject, file, forceRun, platform)
-  }
+  return fn(pageObject, file, forceRun, platform)
 }

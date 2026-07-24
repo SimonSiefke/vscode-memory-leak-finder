@@ -30,6 +30,7 @@ export * as NotebookInlineChat from '../NotebookInlineChat/NotebookInlineChat.ts
 export * as Notification from '../Notification/Notification.ts'
 export * as Output from '../Output/Output.ts'
 export * as Panel from '../Panel/Panel.ts'
+export * as Performance from '../Performance/Performance.ts'
 export * as PortsView from '../PortsView/PortsView.ts'
 export * as Problems from '../Problems/Problems.ts'
 export * as ProcessExplorer from '../ProcessExplorer/ProcessExplorer.ts'

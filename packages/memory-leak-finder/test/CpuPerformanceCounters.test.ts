@@ -11,8 +11,11 @@ test('parsePerfStatOutput parses perf csv output', () => {
 `)
 
   expect(result).toEqual({
+    contextSwitches: null,
     cycles: 789012,
     instructions: 123456,
+    pageFaults: null,
+    taskClockMs: null,
   })
 })
 
@@ -22,8 +25,11 @@ test('parsePerfStatOutput parses human perf output', () => {
 `)
 
   expect(result).toEqual({
+    contextSwitches: null,
     cycles: 134745265,
     instructions: 107379466,
+    pageFaults: null,
+    taskClockMs: null,
   })
 })
 
@@ -37,18 +43,39 @@ test('parsePerfStatOutput parses interval csv output', () => {
 `)
 
   expect(result).toEqual({
+    contextSwitches: null,
     cycles: 600,
     instructions: 400,
+    pageFaults: null,
+    taskClockMs: null,
+  })
+})
+
+test('parsePerfStatOutput parses software counters with units', () => {
+  const result = parsePerfStatOutput(`12.5,msec,task-clock,12000000,100.00,,
+4,,context-switches,12000000,100.00,,
+7,,page-faults,12000000,100.00,,
+`)
+
+  expect(result).toEqual({
+    contextSwitches: 4,
+    cycles: null,
+    instructions: null,
+    pageFaults: 7,
+    taskClockMs: 12.5,
   })
 })
 
 test('toCpuPerformanceCounterRows marks unavailable counters', () => {
   const rows = toCpuPerformanceCounterRows({
     command: ['perf', 'stat'],
+    contextSwitches: null,
     cycles: null,
     instructions: 10,
+    pageFaults: null,
     pid: 123,
     rawOutput: '',
+    taskClockMs: null,
   })
 
   expect(rows).toEqual([
@@ -63,6 +90,27 @@ test('toCpuPerformanceCounterRows marks unavailable counters', () => {
       available: false,
       event: 'cycles:u',
       name: 'cycles',
+      unit: 'count',
+      value: null,
+    },
+    {
+      available: false,
+      event: 'task-clock',
+      name: 'taskClockMs',
+      unit: 'ms',
+      value: null,
+    },
+    {
+      available: false,
+      event: 'context-switches',
+      name: 'contextSwitches',
+      unit: 'count',
+      value: null,
+    },
+    {
+      available: false,
+      event: 'page-faults',
+      name: 'pageFaults',
       unit: 'count',
       value: null,
     },

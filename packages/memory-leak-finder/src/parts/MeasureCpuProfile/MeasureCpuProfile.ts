@@ -28,11 +28,21 @@ export const releaseResources = async (session: Session) => {
   await DevtoolsProtocolProfiler.disable(session, {})
 }
 
-export const compare = (_before: Dynamic, after: Dynamic) => {
+const getPerformanceSamples = (context: Dynamic): readonly Dynamic[] => {
+  if (!Array.isArray(context?.testRunResults)) {
+    return []
+  }
+  return context.testRunResults
+    .map((result: Dynamic) => result?.performanceScenario)
+    .filter((result: Dynamic) => result && typeof result.latencyMs === 'number')
+}
+
+export const compare = (_before: Dynamic, after: Dynamic, context?: Dynamic) => {
   const summary = CpuProfile.getCpuProfileSummary(after)
   return {
     isLeak: false,
     metrics: summary.metrics,
+    performanceSamples: getPerformanceSamples(context),
     raw: {
       after,
       before: _before,

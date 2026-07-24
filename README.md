@@ -13,6 +13,94 @@ npm run e2e
 
 <!--  -->
 
+## Performance lab
+
+The performance lab runs isolated user-action benchmarks against local VS Code
+builds. The primary clock runs in the renderer: it starts on the Enter keydown,
+records complete DOM readiness, and records paint after two animation frames.
+Linux `perf` counters are secondary scorecards. Profiles and targeted work
+tracking run separately.
+
+The editor pilot has two scenarios:
+
+- `editor-open-text-file-cold-performance`: first text editor in a fresh process.
+- `editor-open-text-file-warm-performance`: one excluded warm-up, followed by one
+  measured editor open in a fresh process.
+
+Both prepare Quick Open and wait for a quiet renderer before measurement. They
+measure Enter-to-DOM-ready and Enter-to-painted-content, then validate and close
+the editor after measurement. Performance runs also disable the core agent host
+and built-in AI features. Every scoring sample records its process tree and is
+invalid if bundled Copilot still starts.
+
+Create a 20-sample baseline:
+
+```sh
+npm run performance-lab -- baseline \
+  --vscode-path /path/to/code-oss \
+  --vscode-source-path /path/to/vscode \
+  --scenario editor-open-text-file-warm-performance
+```
+
+Run a 12-block randomized ABBA/BAAB quick comparison. Confirmation uses 50
+blocks, which produces 100 samples per revision:
+
+```sh
+npm run performance-lab -- compare \
+  --baseline-vscode-path /path/to/baseline/code-oss \
+  --baseline-vscode-source-path /path/to/baseline/vscode \
+  --candidate-vscode-path /path/to/candidate/code-oss \
+  --candidate-vscode-source-path /path/to/candidate/vscode \
+  --scenario editor-open-text-file-warm-performance \
+  --tier quick \
+  --blocks 12 \
+  --collect-work \
+  --track-include 'vs/editor/contrib/inlineCompletions/' \
+  --track-include 'vs/workbench/contrib/inlineCompletions/' \
+  --goal latency:-50%
+```
+
+Collect source-mapped hotspot and call-edge reports without contaminating the
+scoring samples:
+
+```sh
+npm run performance-lab -- diagnose \
+  --baseline-vscode-path /path/to/baseline/code-oss \
+  --baseline-vscode-source-path /path/to/baseline/vscode \
+  --candidate-vscode-path /path/to/candidate/code-oss \
+  --candidate-vscode-source-path /path/to/candidate/vscode \
+  --scenario editor-open-text-file-warm-performance
+```
+
+Each command writes `experiment.json` plus raw counter/profile artifacts under
+`.performance-lab`. The report includes build and machine identity, the pinned
+harness/scenario hashes, distributions and confidence intervals, semantic VS
+Code phase timings, process IDs, ranked original-source hotspots, an
+Amdahl-style ceiling, escalation recommendations, and the final keep/reject
+verdict. A run is rejected if the harness changes while it is executing.
+
+The `Editor Performance` GitHub Actions workflow builds both revisions in every
+hosted runner, measures them in that same runner, and aggregates only
+within-runner blocked effects. Quick runs use three replicas; confirmation and
+scheduled identical-build calibration use five. Results are classified as
+`inconclusive`, `proxy-win`, `ux-confirmed`, `rejected`, or `invalid`.
+
+Before optimizing, run an identical-build A/A comparison for the requested
+goal. The lab records executable, workbench bundle, source commit, dirty state,
+and source-map fingerprints. It rejects mismatched clean source/build commits
+and invalidates an A/A run whose confidence interval cannot detect the requested
+effect. Identical-build calibration and already rejected/invalid scoring runs
+skip tracked-work collection.
+
+Future optimization agents should follow
+[`packages/performance-lab/AGENTS.md`](packages/performance-lab/AGENTS.md). In
+particular, they must stop scoring when semantic `code/*` phase marks are
+missing or a forbidden process is present. An otherwise valid but underpowered
+local A/A may enter deterministic mechanism exploration: collect three stable
+narrowly source-mapped samples, estimate the ceiling, save and revert small
+candidate patches, and send only a sufficiently large compatible batch to
+hosted timing. Deterministic evidence alone is never described as a speedup.
+
 ## Measures
 
 ### MemoryCity
@@ -58,7 +146,8 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 
 ### CpuPerformanceCounters
 
-Measures CPU instructions and cycles for the inspected process.
+Measures CPU instructions, cycles, task-clock time, context switches, and page
+faults for the inspected process.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
