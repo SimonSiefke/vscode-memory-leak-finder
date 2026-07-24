@@ -76,6 +76,23 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await expect(installButton).toBeHidden()
         await page.waitForIdle()
+        const popup = page.locator('.monaco-dialog-box[aria-modal="true"]')
+        // TODO ugly timeout
+        await new Promise((r) => {
+          setTimeout(r, 300)
+        })
+        const popupCount = await popup.count()
+        if (popupCount > 0) {
+          const acceptButton = popup.locator('.dialog-buttons .monaco-button', { hasText: 'Trust Publisher & Install' })
+          await expect(acceptButton).toBeVisible()
+          await page.waitForIdle()
+
+          await acceptButton.click()
+          await page.waitForIdle()
+          await expect(popup).toBeHidden()
+          await page.waitForIdle()
+        }
+
         await expect(unInstallButton).toBeVisible({ timeout: 120_000 })
         await page.waitForIdle()
       } catch (error) {
