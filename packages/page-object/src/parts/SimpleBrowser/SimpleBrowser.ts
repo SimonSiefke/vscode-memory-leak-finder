@@ -1363,9 +1363,27 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         url: ideVersion.minor >= 120 ? url : '',
       })
       if (ideVersion.minor >= 120) {
-        await this.waitForContentFrameModern({
-          urlPattern: new RegExp(escapeRegExp(url)),
-        })
+        const urlPattern = new RegExp(escapeRegExp(url))
+        try {
+          await this.waitForContentFrameModern({
+            urlPattern,
+          })
+        } catch {
+          // The integrated browser can occasionally create its web contents before
+          // the initial quick input submission reaches it. Load the intended URL in
+          // that exact browser view instead of continuing to wait on blank contents.
+          if (!this.modernBrowserWebContentsId) {
+            throw new Error('No tracked browser web contents available')
+          }
+          const electron = this.getElectron()
+          await electron.loadWebContentsUrl({
+            url,
+            webContentsId: this.modernBrowserWebContentsId,
+          })
+          await this.waitForContentFrameModern({
+            urlPattern,
+          })
+        }
         return
       }
       await this.navigateIntegratedBrowser({

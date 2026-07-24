@@ -12,14 +12,19 @@ globalThis.___knownIds = Object.create(null)
 
 globalThis.___originalSetTimeout = globalThis.setTimeout.bind(globalThis)
 globalThis.___originalClearTimeout = globalThis.clearTimeout.bind(globalThis)
-globalThis.setTimeout = (fn, timeout) => {
+globalThis.setTimeout = (fn, timeout, ...args) => {
   globalThis.___timeouts++
-  const wrapper = () => {
+  let id
+  const wrapper = (...wrapperArgs) => {
     globalThis.___timeouts--
-    fn()
+    delete globalThis.___knownIds[id]
+    fn(...wrapperArgs)
   }
-  const id = globalThis.___originalSetTimeout(wrapper, timeout)
-  globalThis.___knownIds[id] = true
+  id = globalThis.___originalSetTimeout(wrapper, timeout, ...args)
+  globalThis.___knownIds[id] = {
+    delay: timeout,
+    stack: new Error().stack,
+  }
   return id
 }
 
@@ -58,4 +63,11 @@ export const getTimeoutCount = async (session: Session): Promise<number> => {
     returnByValue: false,
   })
   return count
+}
+
+export const getTimeoutsWithStackTraces = async (session: Session): Promise<readonly unknown[]> => {
+  return DevtoolsProtocolRuntime.evaluate(session, {
+    expression: 'Object.values(globalThis.___knownIds)',
+    returnByValue: true,
+  })
 }

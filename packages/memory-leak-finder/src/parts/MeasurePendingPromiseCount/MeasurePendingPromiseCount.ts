@@ -16,12 +16,15 @@ export const create = (session: Session) => {
   return [session, objectGroup]
 }
 
-export const start = (session: Session, objectGroup: string) => {
-  return GetPendingPromiseCount.getPendingPromiseCount(session, objectGroup)
+export const start = async (session: Session, objectGroup: string) => {
+  const result = await GetPendingPromiseCount.getPendingPromiseCount(session, objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
+  return result
 }
 
 export const stop = async (session: Session, objectGroup: string) => {
   const result = await GetPendingPromiseCount.getPendingPromiseCount(session, objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 

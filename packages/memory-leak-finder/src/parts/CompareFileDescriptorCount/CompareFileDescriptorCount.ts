@@ -9,10 +9,11 @@ export const compareFileDescriptorCount = (
   count: number
   delta: number
 }> => {
-  // Create a map of before counts by name for easy lookup
-  const beforeMap = new Map<string, number>()
+  // Process names are not unique (for example, most Electron children are
+  // reported as "VS Code"), so use the stable process ID for matching.
+  const beforeMap = new Map<number, number>()
   for (const item of before) {
-    beforeMap.set(item.name, item.fileDescriptorCount)
+    beforeMap.set(item.pid, item.fileDescriptorCount)
   }
   // Calculate deltas for each item in after
   const deltas: Array<{
@@ -21,7 +22,7 @@ export const compareFileDescriptorCount = (
     delta: number
   }> = []
   for (const item of after) {
-    const beforeCount = beforeMap.get(item.name) || 0
+    const beforeCount = beforeMap.get(item.pid) || 0
     const delta = item.fileDescriptorCount - beforeCount
     // Only include items with delta >= context.runs
     if (delta >= context.runs) {

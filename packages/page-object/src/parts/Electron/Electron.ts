@@ -175,6 +175,20 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get window visibility`)
       }
     },
+    async loadWebContentsUrl({ url, webContentsId }: { url: string; webContentsId: number }): Promise<void> {
+      try {
+        await this.evaluate(`(async () => {
+  const { webContents } = globalThis._____electron
+  const targetWebContents = webContents.fromId(${webContentsId})
+  if (!targetWebContents || targetWebContents.isDestroyed()) {
+    throw new Error('webcontents not found')
+  }
+  await targetWebContents.loadURL(${JSON.stringify(url)})
+})()`)
+      } catch (error) {
+        throw new VError(error, `Failed to load URL in web contents ${webContentsId}`)
+      }
+    },
     async mockDialog(response: any) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))

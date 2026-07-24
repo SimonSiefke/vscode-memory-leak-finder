@@ -25,7 +25,7 @@ export const getPendingPromiseCount = async (session: Session, objectGroup: stri
   const properties = previews.map((preview: Dynamic) => preview.properties)
   const promiseStates = properties.map((innerProperties: Dynamic) => {
     const state = innerProperties.find((item: Dynamic) => item.name === '[[PromiseState]]')
-    return state.value
+    return state?.value
   })
   const fulfilled = promiseStates.filter((value: Dynamic) => value === 'fulfilled')
   const fulfilledCount = fulfilled.length
