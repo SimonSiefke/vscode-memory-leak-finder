@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { join, normalize, resolve } from 'node:path'
 import * as Ide from '../Ide/Ide.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
 import { root } from '../Root/Root.ts'
@@ -154,6 +154,11 @@ const parseCwd = (cwd: string, argv: readonly string[]): string => {
     return parseArgvString(argv, '--cwd')
   }
   return join(root, 'packages/e2e')
+}
+
+const isWebsitesE2e = (cwd: string): boolean => {
+  const relativeWebsitesE2ePath = join('packages', 'websites-e2e')
+  return normalize(cwd) === relativeWebsitesE2ePath || resolve(cwd) === join(root, relativeWebsitesE2ePath)
 }
 
 const parseMeasure = (argv: readonly string[]): string => {
@@ -440,6 +445,9 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const inspectSharedProcessPort = parseInspectSharedProcessPort(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  if (checkLeaks && isWebsitesE2e(cwd) && !inspectIntegratedBrowser) {
+    throw new Error('websites-e2e test measures can only be run with --inspect-integrated-browser')
+  }
   if (isIpcMessageCountMeasure(measure) && !measureNode) {
     throw new Error('--measure ipc-message-count requires --measure-node')
   }
