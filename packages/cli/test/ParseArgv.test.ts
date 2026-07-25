@@ -369,6 +369,32 @@ test('parseArgv - inspect-integrated-browser flag not present', () => {
   expect(options.inspectIntegratedBrowser).toBe(false)
 })
 
+test('parseArgv - websites-e2e measure requires inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--measure', 'named-function-count-3']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    'websites-e2e test measures can only be run with --inspect-integrated-browser',
+  )
+})
+
+test('parseArgv - websites-e2e check-leaks requires inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--check-leaks']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    'websites-e2e test measures can only be run with --inspect-integrated-browser',
+  )
+})
+
+test('parseArgv - websites-e2e measure allows inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--measure', 'named-function-count-3', '--inspect-integrated-browser']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(true)
+})
+
+test('parseArgv - websites-e2e test without measure allows no inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(false)
+})
+
 test('parseArgv - inspect-process flag', () => {
   const argv = ['--inspect-process', 'vite.js']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
