@@ -1065,7 +1065,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             await expect(intermediate).toBeVisible()
             await expect(intermediate).toBeFocused()
             if (url) {
-              await intermediate.setValue(url)
+              await intermediate.fill('')
+              await intermediate.type(url)
               if (!isHttpUrl(url)) {
                 await page.waitForIdle()
               }
@@ -1073,6 +1074,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             }
             if (!url || isHttpUrl(url)) {
               await intermediate.press('Enter')
+              await expect(intermediate).toBeHidden()
             } else {
               await page.waitForIdle()
               await page.keyboard.press('Enter')
