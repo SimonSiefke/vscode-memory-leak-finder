@@ -120,8 +120,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await tab.click()
         await page.waitForIdle()
-        await expect(tab).toHaveAttribute('aria-checked', 'true')
-        await page.waitForIdle()
+        await this.verifyTabChecked(text)
         if (options && options.webView) {
           const webView = page.locator('.webview')
           await expect(webView).toBeVisible()
@@ -174,13 +173,27 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify extension detail heading ${text}`)
       }
     },
+    async verifyTabChecked(text: string) {
+      const tab = page.locator('.extension-editor .action-label', {
+        hasText: text,
+      })
+      if (ideVersion.minor >= 120) {
+        await expect(tab).toHaveAttribute('aria-pressed', 'true')
+        await page.waitForIdle()
+      } else {
+        await expect(tab).toHaveAttribute('aria-checked', 'true')
+        await page.waitForIdle()
+      }
+    },
     async shouldHaveTab(text: string) {
       try {
         const tab = page.locator('.extension-editor .action-label', {
           hasText: text,
         })
+        await page.waitForIdle()
         await expect(tab).toBeVisible()
-        await expect(tab).toHaveAttribute('aria-checked', 'true')
+        await page.waitForIdle()
+        await this.verifyTabChecked(text)
       } catch (error) {
         throw new VError(error, `Failed to verify extension detail tab ${text}`)
       }
