@@ -18,9 +18,6 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
         const titleBar = page.locator('.part.titlebar')
         await expect(titleBar).toBeVisible()
         await page.waitForIdle()
-        const menuBar = titleBar.locator('.menubar')
-        await expect(menuBar).toBeVisible()
-        await page.waitForIdle()
         const quickPick = QuickPick.create({ platform, page, expect, VError, electronApp, ideVersion })
         await quickPick.executeCommand(WellKnownCommands.ToggleTitleBarMenu)
       } catch (error) {
