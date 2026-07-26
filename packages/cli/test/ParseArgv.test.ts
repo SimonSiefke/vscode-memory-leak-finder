@@ -29,6 +29,34 @@ test('parseArgv - run skipped tests anyway', () => {
   })
 })
 
+test('parseArgv - hides skipped failed test duration locally by default', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, {})).toMatchObject({
+    showSkippedFailedTestDuration: false,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration when enabled', () => {
+  const argv = ['--show-skipped-failed-test-duration']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, {})).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration in ci', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, { CI: 'true' })).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration in GitHub Actions', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, { GITHUB_ACTIONS: 'true' })).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
 test('parseArgv - run network tests anyway', () => {
   const argv = ['--run-network-tests-anyway']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({

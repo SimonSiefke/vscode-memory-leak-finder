@@ -81,6 +81,10 @@ const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-skipped-tests-anyway')
 }
 
+const parseShowSkippedFailedTestDuration = (argv: readonly string[], env: NodeJS.ProcessEnv): boolean => {
+  return argv.includes('--show-skipped-failed-test-duration') || Boolean(env.CI || env.GITHUB_ACTIONS)
+}
+
 const parseRunNetworkTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-network-tests-anyway')
 }
@@ -406,7 +410,7 @@ const parseResolveExtensionSourceMaps = (argv: readonly string[]): boolean => {
   return argv.includes('--resolve-extension-source-maps')
 }
 
-export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
+export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv = process.env) => {
   const platform = parsePlatform(processPlatform, argv)
   const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
@@ -467,6 +471,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     throw new Error('--startup-runs can only be used with --measure cpu-performance-counters-from-start')
   }
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
+  const showSkippedFailedTestDuration = parseShowSkippedFailedTestDuration(argv, env)
   const runNetworkTestsAnyway = parseRunNetworkTestsAnyway(argv)
   const allowCopilotAuthInCi = parseAllowCopilotAuthInCi(argv)
   const screencastQuality = parseScreencastQuality(argv)
@@ -535,6 +540,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     runNetworkTestsAnyway,
     runs,
     runSkippedTestsAnyway,
+    showSkippedFailedTestDuration,
     screencastQuality,
     setupOnly,
     startupRuns,
