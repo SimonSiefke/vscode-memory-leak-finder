@@ -71,7 +71,7 @@ export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => 
   await Editor.shouldHaveText(`export function add(a: number, b: number): number {
   return a + b
 }`)
-  await Editor.click('add')
+  await Editor.setCursor(1, 16)
   await Editor.rename('subtract')
   await Editor.shouldHaveText(`export function subtract(a: number, b: number): number {
   return a + b
