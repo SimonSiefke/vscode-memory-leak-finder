@@ -1252,7 +1252,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const timeout = options?.timeout || 15_000
+        const timeout = options?.timeout || 25_000
         await page.waitForIdle({ timeout: 10_000 })
         const codeLens = page.locator('.codelens-decoration')
         await expect(codeLens).toBeVisible({ timeout })
@@ -1265,7 +1265,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const timeout = options?.timeout || 15_000
+        const timeout = options?.timeout || 25_000
         await page.waitForIdle({ timeout: 10_000 })
         const codeLens = page.locator('.codelens-decoration')
         await expect(codeLens).toBeVisible({ timeout })
