@@ -33,5 +33,6 @@ cherry`)
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.save({ viaKeyBoard: false })
   await Editor.closeAll()
 }
