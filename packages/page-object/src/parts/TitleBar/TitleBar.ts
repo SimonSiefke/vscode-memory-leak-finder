@@ -6,11 +6,50 @@ const TitleBarMenuItems = {
   Selection: 'Selection',
   View: 'View',
 }
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ expect, platform, page, VError, electronApp, ideVersion }: CreateParams) => {
   return {
+    async toggleMenuBar() {
+      try {
+        const titleBar = page.locator('.part.titlebar')
+        await expect(titleBar).toBeVisible()
+        const menuBar = titleBar.locator('.menubar')
+        await expect(menuBar).toBeVisible()
+        const quickPick = QuickPick.create({ platform, page, expect, VError, electronApp, ideVersion })
+        await quickPick.executeCommand(WellKnownCommands.ToggleTitleBarMenu)
+        await expect(menuBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to toggle title bar menu bar`)
+      }
+    },
+    async hideMenuBar() {
+      try {
+        const titleBar = page.locator('.part.titlebar')
+        await expect(titleBar).toBeVisible()
+        const menuBar = titleBar.locator('.menubar')
+        await expect(menuBar).toBeVisible()
+        await this.toggleMenuBar()
+        await expect(menuBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide title bar menu bar`)
+      }
+    },
+    async showMenuBar() {
+      try {
+        const titleBar = page.locator('.part.titlebar')
+        await expect(titleBar).toBeVisible()
+        const menuBar = titleBar.locator('.menubar')
+        await expect(menuBar).toBeHidden()
+        await this.toggleMenuBar()
+        await expect(menuBar).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show title bar menu bar`)
+      }
+    },
     async hideMenu(text: string) {
       try {
         const titleBar = page.locator('.part.titlebar')
