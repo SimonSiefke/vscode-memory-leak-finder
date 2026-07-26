@@ -53,7 +53,8 @@ console.log(result)
 
 export const skip = 1
 
-export const setup = async ({ Editor, SideBar, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SideBar, Workspace, Extensions }: TestContext): Promise<void> => {
+  await Extensions.disable({ id: 'copilot' })
   await Editor.closeAll()
   await SideBar.hide()
   await Workspace.setFiles(initialFiles)
@@ -71,7 +72,7 @@ export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => 
   await Editor.shouldHaveText(`export function add(a: number, b: number): number {
   return a + b
 }`)
-  await Editor.click('add')
+  await Editor.setCursor(1, 16)
   await Editor.rename('subtract')
   await Editor.shouldHaveText(`export function subtract(a: number, b: number): number {
   return a + b
