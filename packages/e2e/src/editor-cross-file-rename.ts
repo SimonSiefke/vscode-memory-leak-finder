@@ -53,7 +53,8 @@ console.log(result)
 
 export const skip = 1
 
-export const setup = async ({ Editor, SideBar, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SideBar, Workspace, Extensions }: TestContext): Promise<void> => {
+  await Extensions.disable({ id: 'copilot' })
   await Editor.closeAll()
   await SideBar.hide()
   await Workspace.setFiles(initialFiles)
