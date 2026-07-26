@@ -17,11 +17,12 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
       try {
         const titleBar = page.locator('.part.titlebar')
         await expect(titleBar).toBeVisible()
+        await page.waitForIdle()
         const menuBar = titleBar.locator('.menubar')
         await expect(menuBar).toBeVisible()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ platform, page, expect, VError, electronApp, ideVersion })
         await quickPick.executeCommand(WellKnownCommands.ToggleTitleBarMenu)
-        await expect(menuBar).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to toggle title bar menu bar`)
       }
@@ -30,9 +31,12 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
       try {
         const titleBar = page.locator('.part.titlebar')
         await expect(titleBar).toBeVisible()
+        await page.waitForIdle()
         const menuBar = titleBar.locator('.menubar')
         await expect(menuBar).toBeVisible()
+        await page.waitForIdle()
         await this.toggleMenuBar()
+        await page.waitForIdle()
         await expect(menuBar).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide title bar menu bar`)
@@ -42,10 +46,13 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
       try {
         const titleBar = page.locator('.part.titlebar')
         await expect(titleBar).toBeVisible()
+        await page.waitForIdle()
         const menuBar = titleBar.locator('.menubar')
         await expect(menuBar).toBeHidden()
+        await page.waitForIdle()
         await this.toggleMenuBar()
         await expect(menuBar).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show title bar menu bar`)
       }
