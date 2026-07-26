@@ -46,6 +46,7 @@ export interface StdinDataState {
   readonly runNetworkTestsAnyway: boolean
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
+  readonly showSkippedFailedTestDuration: boolean
   readonly screencastQuality: number
   readonly startupRuns: number
   readonly stdout: string[]
@@ -101,6 +102,7 @@ let state: StdinDataState = {
   runNetworkTestsAnyway: false,
   runs: 1,
   runSkippedTestsAnyway: false,
+  showSkippedFailedTestDuration: false,
   screencastQuality: 90,
   startupRuns: 1,
   stdout: [],
@@ -153,6 +155,7 @@ export const setState = (newState: StdinDataState): void => {
     runNetworkTestsAnyway: newState.runNetworkTestsAnyway,
     runs: newState.runs,
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
+    showSkippedFailedTestDuration: newState.showSkippedFailedTestDuration,
     screencastQuality: newState.screencastQuality,
     startupRuns: newState.startupRuns,
     stdout: newState.stdout,
@@ -212,6 +215,10 @@ export const isWindows = (): boolean => {
 
 export const shouldCheckLeaks = (): boolean => {
   return state.checkLeaks
+}
+
+export const shouldShowSkippedFailedTestDuration = (): boolean => {
+  return state.showSkippedFailedTestDuration
 }
 
 export const getRuns = (): number => {

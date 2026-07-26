@@ -46,6 +46,7 @@ export const createDefaultState = (): StdinDataState => ({
   runNetworkTestsAnyway: false,
   runs: 1,
   runSkippedTestsAnyway: false,
+  showSkippedFailedTestDuration: false,
   screencastQuality: 90,
   startupRuns: 1,
   stdout: [],
