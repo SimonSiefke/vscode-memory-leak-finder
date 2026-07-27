@@ -1,4 +1,5 @@
 import { compareDomTimerCount } from '../CompareDomTimerCount/CompareDomTimerCount.ts'
+import { compareConcatenatedErrorStringCount } from '../CompareConcatenatedErrorStringCount/CompareConcatenatedErrorStringCount.ts'
 import * as CompareGrowingArrays from '../CompareGrowingArrays/CompareGrowingArrays.ts'
 import * as CompareHeapsnapshotArrays2 from '../CompareHeapsnapshotArrays2/CompareHeapsnapshotArrays2.ts'
 import * as CompareHeapSnapshotsFunctions2 from '../CompareHeapSnapshotsFunctions2/CompareHeapSnapshotsFunctions2.ts'
@@ -30,6 +31,7 @@ import * as ParseUserStrings from '../ParseUserStrings/ParseUserStrings.ts'
 
 export const commandMap = {
   'HeapSnapshot.compareArrays2': CompareHeapsnapshotArrays2.compareHeapsnapshotArrays2,
+  'HeapSnapshot.compareConcatenatedErrorStringCount': compareConcatenatedErrorStringCount,
   'HeapSnapshot.compareDomTimerCount': compareDomTimerCount,
   'HeapSnapshot.compareFunctions': CompareHeapSnapshotsFunctions.compareHeapSnapshotFunctions,
   'HeapSnapshot.compareFunctions2': CompareHeapSnapshotsFunctions2.compareHeapSnapshotFunctions2,
