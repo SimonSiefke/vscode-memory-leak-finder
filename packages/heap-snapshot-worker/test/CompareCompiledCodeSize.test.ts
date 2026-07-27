@@ -45,7 +45,7 @@ test('compares function sizes, enriches locations, and limits both rankings', as
   expect(result.isLeak).toBe(false)
   expect(result.largestFunctions).toHaveLength(100)
   expect(result.largestGrowth).toHaveLength(100)
-  expect(result.largestFunctions[0]).toMatchObject({
+  expect(result.largestFunctions[0]).toEqual({
     after: breakdown(114),
     before: breakdown(109),
     delta: breakdown(5),

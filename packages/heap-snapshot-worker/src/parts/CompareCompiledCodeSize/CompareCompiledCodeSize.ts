@@ -46,6 +46,18 @@ const emptyBreakdown: CodeSizeBreakdown = {
   totalBytes: 0,
 }
 
+const toBreakdown = (value: CodeSizeBreakdown | undefined): CodeSizeBreakdown => {
+  if (!value) {
+    return emptyBreakdown
+  }
+  return {
+    bytecodeBytes: value.bytecodeBytes,
+    instructionBytes: value.instructionBytes,
+    metadataBytes: value.metadataBytes,
+    totalBytes: value.totalBytes,
+  }
+}
+
 const subtractBreakdown = (after: CodeSizeBreakdown, before: CodeSizeBreakdown): CodeSizeBreakdown => ({
   bytecodeBytes: after.bytecodeBytes - before.bytecodeBytes,
   instructionBytes: after.instructionBytes - before.instructionBytes,
@@ -79,11 +91,13 @@ const createFunctionDeltas = (
     const beforeItem = beforeMap.get(key)
     const afterItem = afterMap.get(key)
     const location = afterItem || beforeItem!
+    const afterBreakdown = toBreakdown(afterItem)
+    const beforeBreakdown = toBreakdown(beforeItem)
     return {
-      after: afterItem || emptyBreakdown,
-      before: beforeItem || emptyBreakdown,
+      after: afterBreakdown,
+      before: beforeBreakdown,
       column: location.column,
-      delta: subtractBreakdown(afterItem || emptyBreakdown, beforeItem || emptyBreakdown),
+      delta: subtractBreakdown(afterBreakdown, beforeBreakdown),
       key,
       line: location.line,
       name: location.name,
@@ -113,7 +127,7 @@ const enrichFunctions = async (
       after: item.after,
       before: item.before,
       delta: item.delta,
-      name: source.originalName || item.name,
+      name: item.name,
       ...(source.originalLocation ? { originalLocation: source.originalLocation } : {}),
       ...(source.originalName !== undefined ? { originalName: source.originalName } : {}),
       ...(source.sourceLocation ? { sourceLocation: source.sourceLocation } : {}),
@@ -155,9 +169,11 @@ export const compareCompiledCodeSize = async (
   afterPath: string,
   scriptMap: Readonly<Record<number, ScriptInfo>>,
 ): Promise<CompiledCodeComparison> => {
-  const [beforeSnapshot, afterSnapshot] = await Promise.all([
-    prepareHeapSnapshot(beforePath, { parseStrings: true }),
-    prepareHeapSnapshot(afterPath, { parseStrings: true }),
-  ])
-  return compareCompiledCodeSizeInternal(analyzeCompiledCodeSnapshot(beforeSnapshot), analyzeCompiledCodeSnapshot(afterSnapshot), scriptMap)
+  const analyzePath = async (path: string): Promise<CompiledCodeSnapshotAnalysis> => {
+    const snapshot = await prepareHeapSnapshot(path, { parseStrings: true })
+    return analyzeCompiledCodeSnapshot(snapshot)
+  }
+  const before = await analyzePath(beforePath)
+  const after = await analyzePath(afterPath)
+  return compareCompiledCodeSizeInternal(before, after, scriptMap)
 }
