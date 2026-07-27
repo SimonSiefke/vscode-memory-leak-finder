@@ -2,7 +2,9 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace, SideBar }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+  await SideBar.hide()
   await Workspace.setFiles([
     {
       content: `before\u{200B}after
@@ -10,7 +12,6 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
       name: 'file.txt',
     },
   ])
-  await Editor.closeAll()
   await Explorer.focus()
   await Explorer.refresh()
   await Explorer.shouldHaveItem('file.txt')
