@@ -86,3 +86,14 @@ test('getMeasure resolves tracked timeouts public measure id', () => {
 
   expect(GetMeasure.getMeasure(MemoryLeakFinder, 'tracked-timeouts')).toBe(measure)
 })
+
+test('getMeasure resolves compiled code size public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'compiled-code-size',
+    ),
+  ).toBe(Measures.MeasureCompiledCodeSize)
+})

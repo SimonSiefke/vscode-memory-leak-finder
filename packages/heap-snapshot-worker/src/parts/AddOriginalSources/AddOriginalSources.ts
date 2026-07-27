@@ -53,38 +53,43 @@ const getSourceMapUrl = (script: ScriptInfo): string => {
   return sourceMapUrl
 }
 
-export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly CompareResult[]> => {
-  let scriptMap: Record<number, ScriptInfo> | undefined
-  // Always attempt to load script maps from disk
-  try {
-    const scriptMapsDir: string = join(root, '.vscode-script-maps')
-    const entries = await readdir(scriptMapsDir, { withFileTypes: true })
-    const mergedMap: Record<number, ScriptInfo> = Object.create(null)
-    for (const entry of entries) {
-      if (entry.isFile() && entry.name.endsWith('.json')) {
-        const fullPath = join(scriptMapsDir, entry.name)
-        try {
-          const content = await readFile(fullPath, 'utf8')
-          const parsed = JSON.parse(content) as Record<number, ScriptInfo>
-          for (const [key, value] of Object.entries(parsed)) {
-            const numericKey = Number(key)
-            const existing = mergedMap[numericKey]
-            if (existing) {
-              if (!existing.sourceMapUrl && value.sourceMapUrl) {
+export const addOriginalSources = async (
+  items: readonly CompareResult[],
+  providedScriptMap?: Readonly<Record<number, ScriptInfo>>,
+): Promise<readonly CompareResult[]> => {
+  let scriptMap = providedScriptMap
+  if (!scriptMap) {
+    // Existing measures persist script maps before launching this worker.
+    try {
+      const scriptMapsDir: string = join(root, '.vscode-script-maps')
+      const entries = await readdir(scriptMapsDir, { withFileTypes: true })
+      const mergedMap: Record<number, ScriptInfo> = Object.create(null)
+      for (const entry of entries) {
+        if (entry.isFile() && entry.name.endsWith('.json')) {
+          const fullPath = join(scriptMapsDir, entry.name)
+          try {
+            const content = await readFile(fullPath, 'utf8')
+            const parsed = JSON.parse(content) as Record<number, ScriptInfo>
+            for (const [key, value] of Object.entries(parsed)) {
+              const numericKey = Number(key)
+              const existing = mergedMap[numericKey]
+              if (existing) {
+                if (!existing.sourceMapUrl && value.sourceMapUrl) {
+                  mergedMap[numericKey] = value
+                }
+              } else {
                 mergedMap[numericKey] = value
               }
-            } else {
-              mergedMap[numericKey] = value
             }
+          } catch {
+            // ignore invalid files
           }
-        } catch {
-          // ignore invalid files
         }
       }
+      scriptMap = mergedMap
+    } catch {
+      // ignore if directory not found
     }
-    scriptMap = mergedMap
-  } catch {
-    // ignore if directory not found
   }
 
   const enriched: MutableCompareResult[] = items.map((item) => ({ ...item }))
