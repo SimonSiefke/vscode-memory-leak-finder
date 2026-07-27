@@ -34,7 +34,7 @@ export const stop = (session: Session, objectGroup: string) => {
 
 export const compare = async (beforePath: string, afterPath: string): Promise<ConcatenatedErrorStringCountComparison> => {
   await using rpc = await launchHeapSnapshotWorker()
-  return HeapSnapshotFunctions.compareConcatenatedErrorStringCount(rpc, beforePath, afterPath)
+  return await HeapSnapshotFunctions.compareConcatenatedErrorStringCount(rpc, beforePath, afterPath)
 }
 
 export const isLeak = ({ after, before }: ConcatenatedErrorStringCountComparison): boolean => {

@@ -23,6 +23,7 @@ test('uses the public measure id and supports browser, Node, and worker targets'
 })
 
 test('compares snapshot paths through the heap snapshot worker', async () => {
+  const events: string[] = []
   const comparison = {
     after: 0,
     before: 2386,
@@ -31,7 +32,15 @@ test('compares snapshot paths through the heap snapshot worker', async () => {
     totalBefore: 27792,
     totalDelta: -33,
   }
-  invoke.mockResolvedValue(comparison as never)
+  invoke.mockImplementation(async () => {
+    events.push('invoke started')
+    await Promise.resolve()
+    events.push('invoke settled')
+    return comparison
+  })
+  dispose.mockImplementation(async () => {
+    events.push('disposed')
+  })
 
   await expect(MeasureConcatenatedErrorStringCount.compare('/tmp/before.heapsnapshot', '/tmp/after.heapsnapshot')).resolves.toEqual(
     comparison,
@@ -42,7 +51,7 @@ test('compares snapshot paths through the heap snapshot worker', async () => {
     '/tmp/before.heapsnapshot',
     '/tmp/after.heapsnapshot',
   )
-  expect(dispose).toHaveBeenCalled()
+  expect(events).toEqual(['invoke started', 'invoke settled', 'disposed'])
 })
 
 test('reports a leak only when the matching count grows', () => {
