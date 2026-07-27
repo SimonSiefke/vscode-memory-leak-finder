@@ -31,6 +31,7 @@ export const setup = async ({ Editor, Explorer, Workspace, SideBar }: TestContex
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.open('file.txt')
+  // @ts-ignore
   await Editor.shouldHaveUnicodeHighlight()
 }
 
