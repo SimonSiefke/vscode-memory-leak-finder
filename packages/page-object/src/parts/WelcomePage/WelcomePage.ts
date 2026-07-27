@@ -46,7 +46,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         await expect(step).toHaveAttribute('aria-expanded', 'true')
       } catch (error) {
-        await new Promise((r) => {})
         throw new VError(error, `Failed to expand step ${name}`)
       }
     },
