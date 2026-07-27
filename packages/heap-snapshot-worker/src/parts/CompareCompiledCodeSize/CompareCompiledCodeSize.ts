@@ -135,6 +135,7 @@ const createFunctionDeltas = (
 const enrichFunctions = async (
   items: readonly FunctionDeltaInternal[],
   scriptMap: Readonly<Record<number, ScriptInfo>>,
+  extendedOriginalNames = true,
 ): Promise<ReadonlyMap<string, EnrichedFunctionDelta>> => {
   const sourceItems: CompareResult[] = items.map((item) => ({
     column: item.column,
@@ -144,7 +145,7 @@ const enrichFunctions = async (
     name: item.name,
     scriptId: item.scriptId,
   }))
-  const enriched = await addOriginalSources(sourceItems, scriptMap)
+  const enriched = await addOriginalSources(sourceItems, scriptMap, extendedOriginalNames)
   const result = new Map<string, EnrichedFunctionDelta>()
   for (let index = 0; index < items.length; index++) {
     const item = items[index]
@@ -207,8 +208,12 @@ export const compareCompiledCodeSizeInternal = async (
     .filter((item) => item.delta.totalBytes > 0)
     .toSorted(compareByGrowth)
     .slice(0, MAX_FUNCTION_ROWS)
-  const enriched = await enrichFunctions(deltas, scriptMap)
-  const files = createFileDeltas([...enriched.values()])
+  const selected = new Map<string, FunctionDeltaInternal>()
+  for (const item of [...largestFunctions, ...largestGrowth]) {
+    selected.set(item.key, item)
+  }
+  const enriched = await enrichFunctions([...selected.values()], scriptMap)
+  const files = createFileDeltas([...(await enrichFunctions(deltas, scriptMap, false)).values()])
   return {
     functionCount: deltas.length,
     isLeak: false,

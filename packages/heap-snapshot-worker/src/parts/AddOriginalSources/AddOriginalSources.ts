@@ -63,6 +63,7 @@ const getSourceMapUrl = (script: ScriptInfo): string => {
 export const addOriginalSources = async (
   items: readonly CompareResult[],
   providedScriptMap?: Readonly<Record<number, ScriptInfo>>,
+  extendedOriginalNames = true,
 ): Promise<readonly CompareResult[]> => {
   let scriptMap = providedScriptMap
   if (!scriptMap) {
@@ -136,7 +137,6 @@ export const addOriginalSources = async (
 
   try {
     await using rpc = await LaunchSourceMapWorker.launchSourceMapCoordinator()
-    const extendedOriginalNames = true
     const cleanPositionMap = (await rpc.invoke(
       'SourceMap.getCleanPositionsMap',
       sourceMapUrlToPositions,
