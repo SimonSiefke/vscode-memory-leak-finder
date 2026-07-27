@@ -86,3 +86,14 @@ test('getMeasure resolves tracked timeouts public measure id', () => {
 
   expect(GetMeasure.getMeasure(MemoryLeakFinder, 'tracked-timeouts')).toBe(measure)
 })
+
+test('getMeasure resolves concatenated error string count public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'concatenated-error-string-count',
+    ),
+  ).toBe(Measures.MeasureConcatenatedErrorStringCount)
+})

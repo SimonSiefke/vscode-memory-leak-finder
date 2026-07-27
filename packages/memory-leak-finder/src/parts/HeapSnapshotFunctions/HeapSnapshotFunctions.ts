@@ -57,3 +57,6 @@ export const compareHeapSnapshotFunctions = async (rpc: Dynamic, pathA: Dynamic,
 export const compareStringCounts = async (rpc: Dynamic, pathA: string, pathB: string) => {
   return rpc.invoke('HeapSnapshot.compareStringCount', pathA, pathB)
 }
+export const compareConcatenatedErrorStringCount = async (rpc: Dynamic, beforePath: string, afterPath: string) => {
+  return rpc.invoke('HeapSnapshot.compareConcatenatedErrorStringCount', beforePath, afterPath)
+}
