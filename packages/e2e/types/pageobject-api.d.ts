@@ -12,6 +12,47 @@ export interface PageObjectContext {
   readonly electronApp?: any
 }
 
+export interface NewWindowHandle {
+  close(): Promise<void>
+}
+
+export interface ChatEditorModels {
+  readonly Auto: 'Auto'
+  readonly GPT41: 'GPT-4.1'
+  readonly GPT5Mini: 'GPT-5 mini'
+  readonly GPT54Mini: 'GPT-5.4 mini'
+  readonly ZAiGLM45AirFree: 'zAiGLM4.5 air free'
+  readonly DefaultFree: 'zAiGLM4.5 air free'
+}
+
+export type ChatModel = ChatEditorModels[keyof ChatEditorModels]
+export type ChatEditorText = string | RegExp
+
+export interface ChatEditorSendOptions {
+  readonly message: string
+  readonly viewLinesText?: ChatEditorText
+  readonly image?: string
+  readonly model?: ChatModel
+}
+
+export interface ChatEditorSendMessageOptions extends ChatEditorSendOptions {
+  readonly expectedResponse?: string
+  readonly approveToolCalls?: boolean
+  readonly validateRequest?: { readonly exists: readonly unknown[] }
+  readonly verify?: boolean
+  readonly waitForFileChanges?: readonly string[]
+  readonly waitForPorts?: readonly number[]
+  readonly toolInvocations?: readonly any[]
+}
+
+export interface PageObjectWindowHandle extends NewWindowHandle {
+  sessionRpc?: any
+  evaluate(options: any): Promise<unknown>
+  locator?: (selector: string) => any
+  waitForIdle(): Promise<void>
+  shouldBeVisible(): Promise<void>
+}
+
 export interface ActivityBar {
   hide(): Promise<void>
   hideTooltip(): Promise<void>
@@ -21,9 +62,9 @@ export interface ActivityBar {
   moveSearchToPanel(): Promise<void>
   moveSourceControlToPanel(): Promise<void>
   resetViewLocations(): Promise<void>
+  show(): Promise<void>
   shouldBeHidden(): Promise<void>
   shouldBeVisible(): Promise<void>
-  show(): Promise<void>
   showTooltipExplorer(): Promise<void>
   showView(options?: any): Promise<void>
   showExplorer(): Promise<void>
@@ -33,42 +74,43 @@ export interface ActivityBar {
   showSourceControl(): Promise<void>
 }
 export interface ChatEditor {
+  readonly Models: ChatEditorModels
   addAllProblemsAsContext(): Promise<void>
   addContext(initialPrompt: any, secondPrompt: any, confirmText: any): Promise<void>
-  approveAllAccessRequests(options?: any): Promise<void>
+  archiveAllActiveItems(): Promise<void>
+  archiveFirstActiveItem(): Promise<void>
   attachImage(file: any): Promise<void>
   clearAll(): Promise<void>
   clearContext(contextName: any): Promise<void>
-  clickAccessButton(buttonText?: any): Promise<void>
-  archiveAllActiveItems(): Promise<void>
-  archiveFirstActiveItem(): Promise<void>
-  closeFinishSetup(): Promise<void>
-  getLatestResponseText(): Promise<void>
   focusSessionList(): Promise<void>
+  getLatestResponseText(): Promise<string>
+  shouldHaveAttachedContextHoverText(text: any): Promise<void>
+  closeFinishSetup(): Promise<void>
+  scrollToBottom(): Promise<void>
+  scrollToTop(): Promise<void>
+  shouldHaveCodeBlockWithLanguage(language: any): Promise<void>
+  shouldHaveLatestResponseCodeBlockWithLanguage(language: any): Promise<void>
   moveToEditor(): Promise<void>
-  moveToNewWindow(): Promise<void>
+  moveToNewWindow(): Promise<NewWindowHandle>
   close(): Promise<void>
   moveToSideBar(): Promise<void>
   open(): Promise<void>
   openView(): Promise<void>
   openAgentDebugLogs(): Promise<void>
   openFinishSetup(): Promise<void>
-  retryLastMessage(): Promise<void>
-  scrollToBottom(): Promise<void>
-  scrollToTop(): Promise<void>
-  selectModel(modelName: any, retry?: any): Promise<void>
-  send(options?: any): Promise<void>
-  sendMessage(options?: any): Promise<void>
-  sendPart1(options?: any): Promise<void>
+  selectModel(modelName: ChatModel, retry?: boolean): Promise<void>
+  sendPart1(options: ChatEditorSendOptions): Promise<void>
+  send(options: ChatEditorSendOptions): Promise<void>
+  sendMessage(options: ChatEditorSendMessageOptions): Promise<void>
   setMode(modeLabel: any): Promise<void>
   setModeLegacy(modeLabel: any): Promise<void>
   shouldBeVisibleInSecondarySideBar(): Promise<void>
-  shouldHaveAttachedContextHoverText(text: any): Promise<void>
-  shouldHaveCodeBlockWithLanguage(language: any): Promise<void>
   shouldHaveNoActiveItems(): Promise<void>
-  shouldHaveLatestResponseCodeBlockWithLanguage(language: any): Promise<void>
+  retryLastMessage(): Promise<void>
+  clickAccessButton(buttonText?: any): Promise<void>
+  approveAllAccessRequests(options?: any): Promise<void>
   waitForLatestExchange(message: any): Promise<void>
-  waitForNewWindow(options: any, electron: any): Promise<void>
+  waitForNewWindow(options: any, electron: any): Promise<number>
   waitForWindowCount(electron: any, expectedCount: any): Promise<void>
 }
 export interface ColorPicker {
@@ -112,10 +154,10 @@ export interface DebugHover {
   expandProperty(name: any, options: any): Promise<void>
 }
 export interface Developer {
+  toggleScreenCastMode(): Promise<void>
+  toggleProcessExplorer(): Promise<void>
   startTracing(): Promise<void>
   stopTracing(): Promise<void>
-  toggleProcessExplorer(): Promise<void>
-  toggleScreenCastMode(): Promise<void>
 }
 export interface DiffEditor {
   expectModified(text: any): Promise<void>
@@ -144,11 +186,11 @@ export interface Editor {
   clickLink(text: any): Promise<void>
   close(): Promise<void>
   closeAll(): Promise<void>
+  closeOthers(): Promise<void>
   closeAllEditorGroups(): Promise<void>
   closeAutoFix(): Promise<void>
   closeFind(): Promise<void>
   closeInspectedTokens(): Promise<void>
-  closeOthers(): Promise<void>
   closePeekDefinition(): Promise<void>
   cursorRight(): Promise<void>
   deleteAll(): Promise<void>
@@ -186,8 +228,6 @@ export interface Editor {
   hover(hoverText: any): Promise<void>
   inspectTokens(): Promise<void>
   moveScrollBar(y: any, expectedScrollBarY: any): Promise<void>
-  moveToNewWindow(): Promise<void>
-  close(): Promise<void>
   newEditorGroupBottom(): Promise<void>
   newEditorGroupLeft(): Promise<void>
   newEditorGroupRight(): Promise<void>
@@ -221,10 +261,8 @@ export interface Editor {
   setLogpoint(lineNumber: any, logMessage: any): Promise<void>
   shouldHaveActiveLineNumber(value: any): Promise<void>
   shouldHaveBreadCrumb(text: any): Promise<void>
-  shouldHaveBreadCrumbs(): Promise<void>
   shouldHaveCodeLens(options: any): Promise<void>
   shouldHaveCodeLensWithVersion(options: any): Promise<void>
-  shouldHaveUnicodeHighlight(): Promise<void>
   shouldHaveCursor(estimate: any): Promise<void>
   shouldHaveEmptySelection(): Promise<void>
   shouldHaveError(fileName: any): Promise<void>
@@ -236,22 +274,24 @@ export interface Editor {
   shouldHaveInlineCompletion(expectedText: any): Promise<void>
   shouldHaveInspectedToken(name: any): Promise<void>
   shouldHaveLightBulb(): Promise<void>
-  shouldHaveMinimap(): Promise<void>
   shouldHaveOverlayMessage(message: any): Promise<void>
   shouldHaveSelectedCharacters(count: any): Promise<void>
+  shouldHaveBreadCrumbs(): Promise<void>
+  shouldHaveMinimap(): Promise<void>
   shouldHaveSelection(left: any, width: any): Promise<void>
   shouldHaveSemanticToken(type: any): Promise<void>
   shouldHaveSpark(): Promise<void>
   shouldHaveSquigglyError(): Promise<void>
+  shouldHaveControlCharacterHighlight(): Promise<void>
+  shouldHaveVisibleWhitespace(fileName?: any): Promise<void>
+  shouldNotHaveVisibleWhitespace(fileName?: any): Promise<void>
+  shouldHaveVisibleLink(text: any): Promise<void>
   shouldHaveText(text: any, fileName?: any, groupId?: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
-  shouldHaveVisibleLink(text: any): Promise<void>
-  shouldHaveVisibleWhitespace(fileName?: any): Promise<void>
+  shouldNotHaveSemanticToken(type: any): Promise<void>
   shouldNotHaveBreadCrumbs(): Promise<void>
   shouldNotHaveMinimap(): Promise<void>
-  shouldNotHaveSemanticToken(type: any): Promise<void>
   shouldNotHaveSquigglyError(): Promise<void>
-  shouldNotHaveVisibleWhitespace(fileName?: any): Promise<void>
   showBreadCrumbs(): Promise<void>
   showColorPicker(): Promise<void>
   showDebugHover(options: any): Promise<void>
@@ -276,11 +316,13 @@ export interface Editor {
   unpin(): Promise<void>
   waitForBinaryReady(): Promise<void>
   waitForImageReady(): Promise<void>
-  waitForNewWindow(options: any, electron: any): Promise<void>
   waitForNoteBookReady(): Promise<void>
   waitforTextFileReady(fileName: any): Promise<void>
   waitForVideoReady(hasError: any): Promise<void>
   waitForWarning(): Promise<void>
+  moveToNewWindow(): Promise<NewWindowHandle>
+  close(): Promise<void>
+  waitForNewWindow(options: any, electron: any): Promise<number>
 }
 export interface EditorFind {
   openReplace(): Promise<void>
@@ -289,27 +331,66 @@ export interface EditorFind {
   setSearchValue(value: any): Promise<void>
 }
 export interface Electron {
-  closeWindow(windowId: any): Promise<void>
   evaluate(expression: any): Promise<void>
-  executeJavaScriptInWebContents(options?: any): Promise<void>
-  getAllWebContents(): Promise<readonly WebContentsEntry[]>
-  getNewWindowId(): Promise<number | null>
-  getWebContents(webContentsId: any): Promise<WebContentsEntry | undefined>
   getWindowCount(): Promise<number>
-  getWindowIds(): Promise<readonly number[]>
   getWindowIsVisible(windowId: any): Promise<boolean>
+  getWindowIds(): Promise<readonly number[]>
+  getAllWebContents(): Promise<readonly WebContentsEntry[]>
+  getWebContents(webContentsId: any): Promise<WebContentsEntry | undefined>
+  waitForNewWebContentsView(options?: any): Promise<WebContentsEntry>
+  waitForWebContentsView(options?: any): Promise<WebContentsEntry>
+  waitForWebContentsUrl(options?: any): Promise<WebContentsEntry>
+  executeJavaScriptInWebContents(options?: any): Promise<void>
+  waitForWebContentsText(options?: any): Promise<void>
+  waitForWindowCount(expectedCount: any, timeout?: any): Promise<void>
+  getNewWindowId(): Promise<number | null>
+  waitForWindowVisible(windowId: any): Promise<void>
+  closeWindow(windowId: any): Promise<void>
   mockDialog(response: any): Promise<void>
   mockElectron(namespace: any, key: any, implementationCode: any): Promise<void>
   mockOpenDialog(response: any): Promise<void>
   mockSaveDialog(response: any): Promise<void>
   mockShellTrashItem(): Promise<void>
   unmockElectron(namespace: any, key: any): Promise<void>
-  waitForNewWebContentsView(options?: any): Promise<WebContentsEntry>
-  waitForWebContentsText(options?: any): Promise<void>
-  waitForWebContentsUrl(options?: any): Promise<WebContentsEntry>
-  waitForWebContentsView(options?: any): Promise<WebContentsEntry>
-  waitForWindowCount(expectedCount: any, timeout?: any): Promise<void>
-  waitForWindowVisible(windowId: any): Promise<void>
+}
+export interface ExternalRuntimeHandle {
+  readonly args: readonly string[]
+  readonly command: string
+  readonly inspectPort: number
+  readonly pid: number
+  readonly runtimeName: 'bun' | 'node'
+  readonly serverPort: number
+  dispose(): Promise<void>
+  evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeInfo(): ExternalRuntimeInfo
+  getRuntimeName(): Promise<'bun' | 'node'>
+  getNamedArrayCount(): Promise<Record<string, number>>
+  request(path: any, init?: any): Promise<Response>
+  takeSnapshot(name: any): Promise<string>
+}
+export interface ExternalRuntimeInfo {
+  readonly args: readonly string[]
+  readonly command: string
+  readonly inspectPort: number
+  readonly pid: number
+  readonly runtimeName: 'bun' | 'node'
+  readonly serverPort: number
+}
+export interface ExternalRuntime {
+  createPorts(): Promise<{
+    inspectPort: number
+    serverPort: number
+  }>
+  dispose(): Promise<void>
+  evaluate(expression: any): Promise<unknown>
+  getJson<T>(path: any, init?: any): Promise<T>
+  getRuntimeInfo(): ExternalRuntimeInfo
+  getRuntimeName(): Promise<'bun' | 'node'>
+  getNamedArrayCount(): Promise<Record<string, number>>
+  request(path: any, init?: any): Promise<Response>
+  startExternalRuntime(options: any): Promise<void>
+  takeSnapshot(name: any): Promise<string>
 }
 export interface Explorer {
   cancel(): Promise<void>
@@ -332,8 +413,8 @@ export interface Explorer {
   refresh(): Promise<void>
   removeCurrent(): Promise<void>
   rename(oldDirentName: any, newDirentName: any): Promise<void>
-  selectItem(direntName: any): Promise<void>
   shouldHaveFocusedItem(direntName: any): Promise<void>
+  selectItem(direntName: any): Promise<void>
   shouldHaveItem(direntName: any): Promise<void>
   toHaveItem(direntName: any): Promise<void>
   readonly not: any
@@ -342,7 +423,7 @@ export interface Extensions {
   add(options: any): Promise<void>
   clear(): Promise<void>
   closeSuggest(): Promise<void>
-  disable(options: any): Promise<void>
+  disable(options: { id: string }): Promise<void>
   click(): Promise<void>
   openContextMenu(): Promise<void>
   shouldBe(name: any): Promise<void>
@@ -368,7 +449,7 @@ export interface Extensions {
   readonly second: any
 }
 export interface ExtensionDetailView {
-  disableExtension(): Promise<void>
+  disableExtension(): Promise<boolean>
   enableExtension(options?: any): Promise<void>
   installExtension(): Promise<void>
   openFeature(featureName: any): Promise<void>
@@ -376,18 +457,18 @@ export interface ExtensionDetailView {
   selectCategory(text: any): Promise<void>
   shouldHaveFeatureHeading(featureText: any): Promise<void>
   shouldHaveHeading(text: any): Promise<void>
-  verifyTabChecked(text: any): Promise<void>
   shouldHaveTab(text: any): Promise<void>
 }
 export interface ExternalRuntime {
   createPorts(): Promise<any>
-  dispose(): Promise<void>
   startExternalRuntime(options?: any): Promise<void>
   dispose(): Promise<void>
   evaluate(expression: any): Promise<void>
   getNamedArrayCount(): Promise<void>
+  getRuntimeInfo(): Promise<void>
   getRuntimeName(): Promise<void>
   takeSnapshot(name: any): Promise<void>
+  dispose(): Promise<void>
 }
 export interface Git {
   add(): Promise<void>
@@ -410,15 +491,14 @@ export interface GitHubPullRequests {
 }
 export interface Hover {
   hide(): Promise<void>
-  shouldHaveActions(): Promise<void>
   shouldHaveText(text: any): Promise<void>
+  shouldHaveActions(): Promise<void>
 }
 export interface ImagesPreview {
+  shouldHaveImage(src: any): Promise<void>
   close(): Promise<void>
-  open(folderName: any): Promise<void>
   next(): Promise<void>
   previous(): Promise<void>
-  shouldHaveImage(src: any): Promise<void>
 }
 export interface KeyBindingsEditor {
   searchFor(searchValue: any): Promise<void>
@@ -428,12 +508,11 @@ export interface KeyBindingsEditor {
 export interface LanguageModelEditor {
   clearFilter(): Promise<void>
   filter(options: any): Promise<void>
-  prepare(): Promise<void>
-  open(options?: any): Promise<void>
+  open(): Promise<void>
 }
 export interface MarkdownPreview {
-  show(): Promise<void>
-  shouldBeVisible(index?: any): Promise<void>
+  show(): Promise<any>
+  shouldBeVisible(index?: number): Promise<any>
   shouldHaveCodeBlocks(subFrame: any, count: any): Promise<void>
   shouldHaveCodeBlockWithLanguage(subFrame: any, language: any): Promise<void>
   shouldHaveHeading(subFrame: any, id: any): Promise<void>
@@ -471,7 +550,7 @@ export interface NotebookInlineChat {
   type(message: any): Promise<void>
 }
 export interface Notification {
-  closeAll(options?: any): Promise<void>
+  closeAll(options?: { force?: boolean }): Promise<void>
   shouldHaveItem(expectedMessage: any): Promise<void>
 }
 export interface Output {
@@ -502,18 +581,18 @@ export interface Problems {
   filter(filterValue: any): Promise<void>
   hide(): Promise<void>
   moveProblemsToSidebar(): Promise<void>
-  shouldHaveCount(count: any): Promise<void>
   shouldHaveVisibleCount(count: any): Promise<void>
+  shouldHaveCount(count: any): Promise<void>
   shouldHaveVisibleTextCount(text: any, count: any): Promise<void>
   show(): Promise<void>
   switchToTableView(): Promise<void>
   switchToTreeView(): Promise<void>
 }
 export interface ProcessExplorer {
-  show(): Promise<void>
+  waitForNewWindow(options: any): Promise<string>
+  show(): Promise<PageObjectWindowHandle>
   close(): Promise<void>
   shouldBeVisible(): Promise<void>
-  waitForNewWindow(options: any): Promise<void>
 }
 export interface Profile {
   create(info: any): Promise<void>
@@ -526,19 +605,20 @@ export interface QuickPick {
   executeCommand(command: any, options?: any): Promise<void>
   focusNext(): Promise<void>
   focusPrevious(): Promise<void>
-  getFocusedItemLabel(): Promise<void>
   getInputValue(): Promise<string>
   getVisibleCommands(): Promise<string[]>
+  getFocusedItemLabel(): Promise<string>
   hide(): Promise<void>
   openFile(fileName: any): Promise<void>
   pressEnter(): Promise<void>
-  select(text: any, stayVisible?: any, stopsApplication?: any): Promise<void>
+  select(text: any, stayVisible?: any, stopsApplication?: any): Promise<number>
+  show(options?: any): Promise<void>
   showColorTheme(): Promise<void>
-  showCommands(options?: any): Promise<void>
   showFileIconTheme(): Promise<void>
+  showCommands(options?: any): Promise<void>
+  waitForInputVisible(): Promise<void>
   type(value: any): Promise<void>
   waitForCommand(command: any, timeout?: any): Promise<void>
-  waitForInputVisible(): Promise<void>
 }
 export interface References {
   clear(): Promise<void>
@@ -562,8 +642,8 @@ export interface RunAndDebug {
   stepInto(options: any): Promise<void>
   stepOutOf(options: any): Promise<void>
   stop(): Promise<void>
-  takeCpuProfile(options: any): Promise<void>
   waitForDebugConsoleOutput(options: any): Promise<void>
+  takeCpuProfile(options: any): Promise<void>
   waitForPaused(options?: any): Promise<void>
   waitForPausedOnException(options?: any): Promise<void>
 }
@@ -575,6 +655,7 @@ export interface RunningExtensions {
   stopProfilingExtensionHost(): Promise<void>
 }
 export interface Search {
+  shouldBeVisible(): Promise<void>
   clear(): Promise<void>
   collapseFiles(): Promise<void>
   deleteText(): Promise<void>
@@ -583,7 +664,6 @@ export interface Search {
   openEditor(): Promise<void>
   replace(): Promise<void>
   setFilesToInclude(pattern: any): Promise<void>
-  shouldBeVisible(): Promise<void>
   shouldHaveNoResults(): Promise<void>
   toHaveResults(options: any): Promise<void>
   type(text: any): Promise<void>
@@ -625,69 +705,66 @@ export interface SideBar {
   hideSecondary(): Promise<void>
   moveLeft(): Promise<void>
   moveRight(): Promise<void>
+  show(): Promise<void>
+  toggle(): Promise<void>
+  togglePosition(): Promise<void>
   shouldBeHidden(): Promise<void>
   shouldBeLeft(): Promise<void>
   shouldBeRight(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldSecondaryBeVisible(): Promise<void>
-  show(): Promise<void>
   showSecondary(): Promise<void>
-  toggle(): Promise<void>
-  togglePosition(): Promise<void>
 }
 export interface SimpleBrowser {
-  activateChatEditorForBrowserContext(): Promise<void>
-  activateModernBrowserEditor(): Promise<void>
-  addConsoleLogsToChat(): Promise<void>
-  addElementToChat(options: any): Promise<void>
-  back(options?: any): Promise<void>
-  clickLink(options: any): Promise<void>
-  clickPageLink(options?: any): Promise<void>
-  clickBrowserWebContentsLink(options: any): Promise<void>
-  createDeferredMockServer(options: any): Promise<void>
-  createMockServer(options: any): Promise<void>
-  createWorkspaceFileServer(options: any): Promise<void>
-  disposeMockServer(options: any): Promise<void>
-  executeJavaScript(options: any): Promise<void>
-  executeWorkbenchCommand(commandId: any, options: any): Promise<boolean>
-  finishMockServerResponse(options: any): Promise<void>
-  forward(options?: any): Promise<void>
-  getAttachedChatContextCounts(): Promise<void>
+  isSimpleBrowserTabLoading(): Promise<boolean>
+  getRandomPort(): Promise<number>
+  killAllPorts(): Promise<void>
+  trackPort(port: number): Promise<void>
   getBrowserNavigationButton(options: any): Promise<void>
-  waitForBrowserUrlDisplay(options?: any): Promise<void>
-  getContentFrame(options?: any): Promise<void>
-  getRandomPort(): Promise<void>
+  openIntegratedBrowser(): Promise<void>
+  navigateIntegratedBrowser(options: any): Promise<void>
+  waitForContentFrameModern(options?: any): Promise<void>
+  activateModernBrowserEditor(): Promise<void>
+  activateChatEditorForBrowserContext(): Promise<void>
   getContentFrameLegacy(options?: any): Promise<void>
   getContentFrameModern(options?: any): Promise<void>
-  getVisibleTabAndActionLabels(): Promise<string>
+  getContentFrame(options?: any): Promise<void>
+  executeJavaScript(options: any): Promise<void>
+  tryClickFirstVisible(options: any): Promise<boolean>
   hasAttachedChatContext(): Promise<boolean>
-  isSimpleBrowserTabLoading(): Promise<boolean>
-  killAllPorts(): Promise<void>
-  trackPort(port: any): Promise<void>
+  getAttachedChatContextCounts(): Promise<void>
+  executeWorkbenchCommand(commandId: any): Promise<boolean>
+  getVisibleTabAndActionLabels(): Promise<string>
+  addConsoleLogsToChat(): Promise<void>
+  addElementToChat(options: any): Promise<void>
+  clickLink(options: any): Promise<void>
+  clickPageLink(options: any): Promise<void>
+  back(options?: any): Promise<void>
+  createMockServer(options: any): Promise<void>
+  createDeferredMockServer(options: any): Promise<void>
+  createWorkspaceFileServer(options: any): Promise<void>
+  disposeMockServer(options: any): Promise<void>
+  finishMockServerResponse(options: any): Promise<void>
   mockElectronDebugger(options: any): Promise<void>
-  navigateIntegratedBrowser(options: any): Promise<void>
-  openDevtools(): Promise<void>
-  openIntegratedBrowser(options?: any): Promise<void>
   openMoreActions(): Promise<void>
+  openDevtools(): Promise<void>
+  forward(options?: any): Promise<void>
   reload(options?: any): Promise<void>
+  shouldHaveText(options?: any): Promise<void>
+  shouldHaveTabTitle(options: any): Promise<void>
+  shouldHaveTabLoadingSpinner(): Promise<void>
+  shouldNotHaveTabLoadingSpinner(): Promise<void>
   shouldHaveElementScreenshotInChat(): Promise<void>
   shouldHaveFindWidget(): Promise<void>
-  shouldHaveLoadError(options: any): Promise<void>
-  shouldHaveTabLoadingSpinner(): Promise<void>
-  shouldHaveTabTitle(options: any): Promise<void>
-  shouldHaveText(options?: any): Promise<void>
-  shouldNotHaveTabLoadingSpinner(): Promise<void>
-  show(options?: any): Promise<void>
   showLegacy(options: any): Promise<void>
-  showLoadError(options: any): Promise<void>
   showModern(options: any): Promise<void>
-  tryClickFirstVisible(options: any): Promise<boolean>
-  waitForContentFrameModern(options?: any): Promise<void>
-  catch(error: any): Promise<void>
+  showLoadError(options: any): Promise<void>
+  show(options?: any): Promise<void>
+  shouldHaveLoadError(options: any): Promise<void>
 }
 export interface SingleIframeWebView {
-  shouldHaveLoaded(options: any): Promise<any>
-  shouldHaveContent(options: any): Promise<void>
+  shouldHaveLoaded(options: any): Promise<{ readyAt: number }>
+  shouldHaveContent(options: any): Promise<{ loadTimeMs: string; readyAt: number }>
 }
 export interface SourceControl {
   checkoutBranch(branchName: any): Promise<void>
@@ -697,14 +774,14 @@ export interface SourceControl {
   enableInlineBlame(options: any): Promise<void>
   hideBranchPicker(): Promise<void>
   hideGraph(): Promise<void>
-  openChange(name: any): Promise<void>
   refresh(): Promise<void>
   selectBranch(branchName: any): Promise<void>
+  openChange(name: any): Promise<void>
+  show(): Promise<void>
   shouldHaveHistoryItem(name: any): Promise<void>
   shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
   shouldNotHaveHistoryItem(name: any): Promise<void>
-  show(): Promise<void>
   showBranchPicker(): Promise<void>
   showGraph(): Promise<void>
   stageFile(name: any, parentFolder?: any): Promise<void>
@@ -715,10 +792,10 @@ export interface SourceControl {
   viewAsTree(): Promise<void>
 }
 export interface SshServer {
-  dispose(): Promise<void>
   launch(): Promise<SshServerConnection>
-  shouldBeConnected(): Promise<void>
   waitForPort(options?: any): Promise<void>
+  shouldBeConnected(): Promise<void>
+  dispose(): Promise<void>
 }
 export interface StatusBar {
   click(label: any): Promise<void>
@@ -769,9 +846,9 @@ export interface Terminal {
   scrollToBottom(): Promise<void>
   scrollToTop(): Promise<void>
   setFindInput(value: any): Promise<void>
-  shouldContainText(text: any, timeout?: any): Promise<void>
   shouldHaveIncompleteDecoration(enabled: any): Promise<void>
   shouldHaveSuccessDecoration(): Promise<void>
+  shouldContainText(text: any, timeout?: any): Promise<void>
   show(options?: any): Promise<void>
   split(): Promise<void>
   type(command: any): Promise<void>
@@ -798,19 +875,10 @@ export interface Timeout {
   waitMinutes(minutes: any): Promise<void>
 }
 export interface TitleBar {
-  ensureCommandCenterVisible(): Promise<void>
-  ensureLayoutControlsVisible(): Promise<void>
-  hideCommandCenter(): Promise<void>
-  hideLayoutControls(): Promise<void>
-  toggleMenuBar(): Promise<void>
-  hideMenuBar(): Promise<void>
-  showMenuBar(): Promise<void>
-  showCommandCenter(): Promise<void>
-  showLayoutControls(): Promise<void>
   hideMenu(text: any): Promise<void>
   hideMenuFile(): Promise<void>
-  selectMenuItem(text: any): Promise<void>
   showMenu(text: any): Promise<void>
+  selectMenuItem(text: any): Promise<void>
   showMenuEdit(): Promise<void>
   showMenuFile(): Promise<void>
 }
@@ -822,20 +890,18 @@ export interface WaitForApplicationToBeReady {
   waitForApplicationToBeReady(options: any): Promise<void>
 }
 export interface WebView {
-  waitForOuterFrame(): Promise<void>
-  waitForInnerFrame(options: any): Promise<void>
-  shouldHaveLoaded(options?: any): Promise<any>
+  shouldHaveLoaded(options: any): Promise<{ readyAt: number }>
   focus(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldBeVisible2(options?: any): Promise<void>
-  shouldHaveContent(options?: any): Promise<void>
+  shouldHaveContent(options: any): Promise<{ loadTimeMs: string; readyAt: number }>
 }
 export interface WelcomePage {
   checkStepByIndex(index: any): Promise<void>
   collapseStepByIndex(index: any): Promise<void>
   expandStep(name: any): Promise<void>
   expandStepByIndex(index: any): Promise<void>
-  getFundamentalsStepCount(): Promise<void>
+  getFundamentalsStepCount(): Promise<number>
   hide(): Promise<void>
   show(): Promise<void>
   showFundamentals(): Promise<void>
@@ -848,38 +914,30 @@ export interface Window {
 }
 export interface Workbench {
   connectToSsh(options: any): Promise<void>
-  focusLeftEditorGroup(): Promise<void>
-  openNewWindow(): Promise<
-    PageObjectApi & {
-      close(): Promise<void>
-      sessionRpc?: any
-      locator?: (selector: string) => any
-      waitForIdle(): Promise<void>
-      shouldBeVisible(): Promise<void>
-    }
-  >
+  waitForNewWindow(options: any): Promise<void>
+  openNewWindow(): Promise<PageObjectApi & PageObjectWindowHandle>
   close(): Promise<void>
-  closeGracefully(): Promise<void>
+  evaluate(options: any): Promise<unknown>
   shouldBeVisible(): Promise<void>
   reload(): Promise<void>
+  focusLeftEditorGroup(): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldHaveEditorBackground(color: any): Promise<void>
-  waitForNewWindow(options: any): Promise<void>
 }
 export interface Workspace {
   add(options: any): Promise<void>
   addExtension(name: any): Promise<void>
+  initializeGitRepository(): Promise<void>
   gitAdd(): Promise<void>
   gitCommit(message: any): Promise<void>
-  initializeGitRepository(): Promise<void>
-  readWorkspaceSettings(): Promise<Record<string, unknown>>
   remove(file: any): Promise<void>
   setFiles(options: any): Promise<void>
   setFilesWithoutWaiting(options: any): Promise<void>
+  readWorkspaceSettings(): Promise<Record<string, unknown>>
   updateWorkspaceSettings(settings: any): Promise<void>
-  waitForFile(fileName: any): Promise<boolean>
   writeFile(relativePath: any, content: any): Promise<void>
   writeWorkspaceSettings(settings: any): Promise<void>
+  waitForFile(fileName: any): Promise<boolean>
 }
 
 export interface PageObjectApi {
@@ -897,6 +955,7 @@ export interface PageObjectApi {
   readonly Editor: Editor
   readonly EditorFind: EditorFind
   readonly Electron: Electron
+  readonly ExternalRuntime: ExternalRuntime
   readonly Explorer: Explorer
   readonly Extensions: Extensions
   readonly ExtensionDetailView: ExtensionDetailView
