@@ -18,7 +18,7 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   await Explorer.shouldHaveItem('folder')
 }
 
-export const run = async ({ Explorer, Notification }: TestContext): Promise<void> => {
+export const run = async ({ Explorer, Notification, ImagesPreview }: TestContext): Promise<void> => {
   await Explorer.focus()
   // @ts-ignore
   await ImagesPreview.open('folder')
