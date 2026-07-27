@@ -113,10 +113,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const startTag = editor.locator('[class^="mtk"]', { hasText: text, nth: 0 })
         await startTag.click()
       } catch (error) {
-        console.log(error)
-        const { promise } = Promise.withResolvers<void>()
-        await promise
-        // throw new VError(error, `Failed to click ${text}`)
+        throw new VError(error, `Failed to click ${text}`)
       }
     },
     async clickLink(text: string) {
