@@ -43,6 +43,7 @@ test('compares function sizes, enriches locations, and limits both rankings', as
   })
 
   expect(result.isLeak).toBe(false)
+  expect(result.functionCount).toBe(110)
   expect(result.largestFunctions).toHaveLength(100)
   expect(result.largestGrowth).toHaveLength(100)
   expect(result.largestFunctions[0]).toEqual({
@@ -53,6 +54,15 @@ test('compares function sizes, enriches locations, and limits both rankings', as
     sourceLocation: 'file:///app.js:109:109',
   })
   expect(result.largestGrowth[0].delta.totalBytes).toBe(5)
+  expect(result.sourceFileCount).toBe(1)
+  expect(result.largestFiles).toEqual([
+    {
+      after: breakdown(6545),
+      before: breakdown(5995),
+      delta: breakdown(550),
+      source: 'file:///app.js',
+    },
+  ])
   expect(result.totals.delta).toEqual({
     attributedBytes: 550,
     bytecodeBytes: 550,

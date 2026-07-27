@@ -185,6 +185,49 @@ test('grouped horizontal bar chart renders omitted entries footer', async () => 
   expect(result).toContain('viewBox="0 0 640 116"')
 })
 
+test('compiled code size chart renders stacked bytes, totals, deltas, and omitted entries', async () => {
+  const result = await createChart(
+    [
+      {
+        after: {
+          bytecodeBytes: 1024,
+          instructionBytes: 2048,
+          metadataBytes: 1024,
+          totalBytes: 4096,
+        },
+        before: {
+          bytecodeBytes: 512,
+          instructionBytes: 1024,
+          metadataBytes: 512,
+          totalBytes: 2048,
+        },
+        delta: {
+          bytecodeBytes: 512,
+          instructionBytes: 1024,
+          metadataBytes: 512,
+          totalBytes: 2048,
+        },
+        name: 'render&lt;Workbench&gt; (src/workbench.ts:10:2)',
+      },
+    ],
+    {
+      omittedEntryCount: 5,
+      title: 'Largest compiled-code functions',
+      type: 'compiled-code-size-chart',
+      width: 1200,
+    },
+  )
+
+  expect(result).toContain('Largest compiled-code functions')
+  expect(result).toContain('Bytecode')
+  expect(result).toContain('Native instructions')
+  expect(result).toContain('Metadata')
+  expect(result).toContain('4.0 KiB')
+  expect(result).toContain('(+2.0 KiB)')
+  expect(result).toContain('render&amp;lt;Workbench&amp;gt;')
+  expect(result).toContain('5 entries omitted for brevity')
+})
+
 test('allocation performance chart renders churn and source CPU correlation', async () => {
   const result = await createChart(
     [

@@ -1,5 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { dirname, isAbsolute, join, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareResult.ts'
 import * as FindMatchingSourceMap from '../FindMatchingSourceMap/FindMatchingSourceMap.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
@@ -40,7 +41,13 @@ const isRelativeSourceMap = (sourceMapUrl: string): boolean => {
 
 const getSourceMapUrl = (script: ScriptInfo): string => {
   if (script.url && script.sourceMapUrl && isRelativeSourceMap(script.sourceMapUrl)) {
-    return new URL(script.sourceMapUrl, script.url).href
+    try {
+      return new URL(script.sourceMapUrl, script.url).href
+    } catch {
+      if (isAbsolute(script.url)) {
+        return pathToFileURL(resolve(dirname(script.url), script.sourceMapUrl)).href
+      }
+    }
   }
   let sourceMapUrl = script.sourceMapUrl || ''
   // If no source map URL was found, try to find a matching .js.map file
