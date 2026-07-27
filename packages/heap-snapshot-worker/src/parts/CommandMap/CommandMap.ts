@@ -1,9 +1,6 @@
 import { compareDomTimerCount } from '../CompareDomTimerCount/CompareDomTimerCount.ts'
-<<<<<<< HEAD
 import * as CompareCompiledCodeSize from '../CompareCompiledCodeSize/CompareCompiledCodeSize.ts'
-=======
 import { compareConcatenatedErrorStringCount } from '../CompareConcatenatedErrorStringCount/CompareConcatenatedErrorStringCount.ts'
->>>>>>> origin/main
 import * as CompareGrowingArrays from '../CompareGrowingArrays/CompareGrowingArrays.ts'
 import * as CompareHeapsnapshotArrays2 from '../CompareHeapsnapshotArrays2/CompareHeapsnapshotArrays2.ts'
 import * as CompareHeapSnapshotsFunctions2 from '../CompareHeapSnapshotsFunctions2/CompareHeapSnapshotsFunctions2.ts'

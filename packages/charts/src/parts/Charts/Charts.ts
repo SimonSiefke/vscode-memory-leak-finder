@@ -5,12 +5,9 @@ export * as AttachedDomNodeCount from '../CreateAttachedDomNodeCountChart/Create
 export * as BrowserPerformanceCounters from '../CreateBrowserPerformanceCountersChart/CreateBrowserPerformanceCountersChart.ts'
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.ts'
 export * as CanvasRenderingContext2dCount from '../CreateCanvasRenderingContext2dCountChart/CreateCanvasRenderingContext2dCountChart.ts'
-<<<<<<< HEAD
 export * as CompiledCodeSizeByFile from '../CreateCompiledCodeSizeByFileChart/CreateCompiledCodeSizeByFileChart.ts'
 export * as CompiledCodeSizeByFunction from '../CreateCompiledCodeSizeByFunctionChart/CreateCompiledCodeSizeByFunctionChart.ts'
-=======
 export * as ConcatenatedErrorStringCount from '../CreateConcatenatedErrorStringCountChart/CreateConcatenatedErrorStringCountChart.ts'
->>>>>>> origin/main
 export * as CssRuleCount from '../CreateCssRuleCountChart/CreateCssRuleCountChart.ts'
 export * as CpuPerformanceCounters from '../CreateCpuPerformanceCountersChart/CreateCpuPerformanceCountersChart.ts'
 export * as CpuProfile from '../CreateCpuProfileChart/CreateCpuProfileChart.ts'

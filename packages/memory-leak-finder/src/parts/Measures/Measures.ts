@@ -14,11 +14,8 @@ export * as MeasureClassCount from '../MeasureClassCount/MeasureClassCount.ts'
 export * as MeasureClosureCount from '../MeasureClosureCount/MeasureClosureCount.ts'
 export * as MeasureClosuresWithReferences from '../MeasureClosuresWithReferences/MeasureClosuresWithReferences.ts'
 export * as MeasureCodeEditorWidgetCount from '../MeasureCodeEditorWidgetCount/MeasureCodeEditorWidgetCount.ts'
-<<<<<<< HEAD
 export * as MeasureCompiledCodeSize from '../MeasureCompiledCodeSize/MeasureCompiledCodeSize.ts'
-=======
 export * as MeasureConcatenatedErrorStringCount from '../MeasureConcatenatedErrorStringCount/MeasureConcatenatedErrorStringCount.ts'
->>>>>>> origin/main
 export * as MeasureCssInlineStyleCount from '../MeasureCssInlineStyleCount/MeasureCssInlineStyleCount.ts'
 export * as MeasureCssInlineStyles from '../MeasureCssInlineStyles/MeasureCssInlineStyles.ts'
 export * as MeasureCssRuleCount from '../MeasureCssRuleCount/MeasureCssRuleCount.ts'
