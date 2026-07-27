@@ -114,9 +114,9 @@ const enrichFunctions = async (
       before: item.before,
       delta: item.delta,
       name: source.originalName || item.name,
-      originalLocation: source.originalLocation,
-      originalName: source.originalName,
-      sourceLocation: source.sourceLocation,
+      ...(source.originalLocation ? { originalLocation: source.originalLocation } : {}),
+      ...(source.originalName !== undefined ? { originalName: source.originalName } : {}),
+      ...(source.sourceLocation ? { sourceLocation: source.sourceLocation } : {}),
     })
   }
   return result
@@ -159,9 +159,5 @@ export const compareCompiledCodeSize = async (
     prepareHeapSnapshot(beforePath, { parseStrings: true }),
     prepareHeapSnapshot(afterPath, { parseStrings: true }),
   ])
-  return compareCompiledCodeSizeInternal(
-    analyzeCompiledCodeSnapshot(beforeSnapshot),
-    analyzeCompiledCodeSnapshot(afterSnapshot),
-    scriptMap,
-  )
+  return compareCompiledCodeSizeInternal(analyzeCompiledCodeSnapshot(beforeSnapshot), analyzeCompiledCodeSnapshot(afterSnapshot), scriptMap)
 }

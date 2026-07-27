@@ -139,9 +139,7 @@ export const analyzeCompiledCodeSnapshot = (snapshot: Snapshot): CompiledCodeSna
     }
   }
 
-  const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(
-    meta.location_fields,
-  )
+  const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(meta.location_fields)
   if (columnOffset < 0 || lineOffset < 0 || objectIndexOffset < 0 || scriptIdOffset < 0) {
     throw new Error('heap snapshot is missing function location metadata')
   }

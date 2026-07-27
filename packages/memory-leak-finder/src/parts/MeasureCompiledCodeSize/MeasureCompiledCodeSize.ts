@@ -73,10 +73,7 @@ export const stop = async (session: Session, state: CompiledCodeState): Promise<
   }
 }
 
-export const compare = async (
-  before: CompiledCodeCapture,
-  after: CompiledCodeCapture,
-): Promise<unknown> => {
+export const compare = async (before: CompiledCodeCapture, after: CompiledCodeCapture): Promise<unknown> => {
   try {
     await using rpc = await launchHeapSnapshotWorker()
     return await rpc.invoke('HeapSnapshot.compareCompiledCodeSize', before.heapSnapshotPath, after.heapSnapshotPath, {

@@ -124,16 +124,7 @@ const createSnapshot = (): Snapshot => {
     edge_count: edges.length / edgeFields.length,
     edges: new Uint32Array(edges),
     extra_native_bytes: 0,
-    locations: new Uint32Array([
-      0 * nodeFields.length,
-      1,
-      10,
-      2,
-      10 * nodeFields.length,
-      1,
-      20,
-      3,
-    ]),
+    locations: new Uint32Array([0 * nodeFields.length, 1, 10, 2, 10 * nodeFields.length, 1, 20, 3]),
     meta: {
       edge_fields: edgeFields,
       edge_types: [edgeTypes],
@@ -159,9 +150,7 @@ test('attributes compiled code to functions and reconciles exact totals', () => 
     totalBytes: 647,
     unattributedBytes: 155,
   })
-  expect(result.totals.attributedBytes + result.totals.sharedBytes + result.totals.unattributedBytes).toBe(
-    result.totals.totalBytes,
-  )
+  expect(result.totals.attributedBytes + result.totals.sharedBytes + result.totals.unattributedBytes).toBe(result.totals.totalBytes)
   expect(result.functions).toEqual([
     {
       bytecodeBytes: 100,
