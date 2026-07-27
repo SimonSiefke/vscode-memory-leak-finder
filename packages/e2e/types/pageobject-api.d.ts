@@ -849,7 +849,15 @@ export interface Window {
 export interface Workbench {
   connectToSsh(options: any): Promise<void>
   focusLeftEditorGroup(): Promise<void>
-  openNewWindow(): Promise<PageObjectApi & { close(): Promise<void>; sessionRpc?: any; locator?: (selector: string) => any; waitForIdle(): Promise<void>; shouldBeVisible(): Promise<void> }>
+  openNewWindow(): Promise<
+    PageObjectApi & {
+      close(): Promise<void>
+      sessionRpc?: any
+      locator?: (selector: string) => any
+      waitForIdle(): Promise<void>
+      shouldBeVisible(): Promise<void>
+    }
+  >
   close(): Promise<void>
   closeGracefully(): Promise<void>
   shouldBeVisible(): Promise<void>
