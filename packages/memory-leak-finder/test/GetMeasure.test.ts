@@ -108,3 +108,25 @@ test('getMeasure resolves concatenated error string count public measure id', ()
     ),
   ).toBe(Measures.MeasureConcatenatedErrorStringCount)
 })
+
+test('getMeasure resolves concatenated strings public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'concatenated-strings',
+    ),
+  ).toBe(Measures.MeasureConcatenatedStrings)
+})
+
+test('getMeasure resolves duplicated strings public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'duplicated-strings',
+    ),
+  ).toBe(Measures.MeasureDuplicatedStrings)
+})
