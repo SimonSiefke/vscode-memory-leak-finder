@@ -1279,19 +1279,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify code lens shows version information`)
       }
     },
-    async shouldHaveControlCharacterHighlight() {
+    async shouldHaveUnicodeHighlight() {
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         await page.waitForIdle()
-        const controlCharacter = editor.locator('.mtkcontrol').first()
-        await expect(controlCharacter).toBeVisible({
+        const unicodeHighlight = editor.locator('.unicode-highlight').first()
+        await expect(unicodeHighlight).toBeVisible({
           timeout: 5000,
         })
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to verify control character highlighting`)
+        throw new VError(error, `Failed to verify Unicode highlighting`)
       }
     },
     async shouldHaveCursor(estimate: string) {
