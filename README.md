@@ -56,12 +56,24 @@ Measures the total number of classes.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure class-count --only base
 ```
 
+<<<<<<< HEAD
 ### CompiledCodeSize
 
 Measures V8 compiled-code bytes from before and after heap snapshots. Results include the exact total, attributed/shared/unattributed buckets, and rankings by function size and growth.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure compiled-code-size --only base
+=======
+### ConcatenatedErrorStringCount
+
+Measures V8 concatenated-string nodes whose bounded prefix is an `Error`-style
+stack trace. The result includes before/after matching counts and diagnostic
+totals for all concatenated strings; stack contents are not written to the
+result.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure concatenated-error-string-count --only base
+>>>>>>> origin/main
 ```
 
 ### CpuPerformanceCounters
