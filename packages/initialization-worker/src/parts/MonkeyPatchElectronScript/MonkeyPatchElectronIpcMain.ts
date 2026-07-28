@@ -12,7 +12,10 @@ export const monkeyPatchElectronIpcMain = `function () { const electron = this
   // Intercept IPC messages
   const { ipcMain } = electron
   const originalIpcMainOn = ipcMain.on.bind(ipcMain)
+  const originalIpcMainRemoveListener = ipcMain.removeListener.bind(ipcMain)
+  const originalIpcMainOff = ipcMain.off.bind(ipcMain)
   const originalIpcMainHandle = ipcMain.handle.bind(ipcMain)
+  const wrappedIpcMainListeners = new WeakMap()
   const safeCall = (fn, fallback = undefined) => {
     try {
       return fn()
@@ -176,7 +179,40 @@ export const monkeyPatchElectronIpcMain = `function () { const electron = this
       return listener(event, ...args)
     }
 
-    return originalIpcMainOn(channel, wrappedListener)
+    const result = originalIpcMainOn(channel, wrappedListener)
+    let registrations = wrappedIpcMainListeners.get(listener)
+    if (!registrations) {
+      registrations = []
+      wrappedIpcMainListeners.set(listener, registrations)
+    }
+    registrations.push({ channel, wrappedListener })
+    return result
+  }
+
+  const takeWrappedIpcMainListener = (channel, listener) => {
+    const registrations = wrappedIpcMainListeners.get(listener)
+    if (!registrations) {
+      return listener
+    }
+    for (let index = registrations.length - 1; index >= 0; index--) {
+      const registration = registrations[index]
+      if (registration.channel === channel) {
+        registrations.splice(index, 1)
+        if (registrations.length === 0) {
+          wrappedIpcMainListeners.delete(listener)
+        }
+        return registration.wrappedListener
+      }
+    }
+    return listener
+  }
+
+  ipcMain.removeListener = function(channel, listener) {
+    return originalIpcMainRemoveListener(channel, takeWrappedIpcMainListener(channel, listener))
+  }
+
+  ipcMain.off = function(channel, listener) {
+    return originalIpcMainOff(channel, takeWrappedIpcMainListener(channel, listener))
   }
 
   ipcMain.handle = function(channel, listener) {

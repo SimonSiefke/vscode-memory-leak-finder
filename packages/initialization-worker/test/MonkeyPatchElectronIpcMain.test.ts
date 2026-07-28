@@ -1,4 +1,5 @@
 import { beforeEach, expect, test } from '@jest/globals'
+import { EventEmitter } from 'node:events'
 import { monkeyPatchElectronIpcMain } from '../src/parts/MonkeyPatchElectronScript/MonkeyPatchElectronIpcMain.ts'
 
 beforeEach(() => {
@@ -42,6 +43,11 @@ const createElectron = (contents: any[] = []) => {
   const ipcListeners = Object.create(null)
   const ipcHandlers = Object.create(null)
   const appListeners = Object.create(null)
+  const removeIpcListener = (channel: string, listener: any) => {
+    if (ipcListeners[channel] === listener) {
+      delete ipcListeners[channel]
+    }
+  }
   const electron = {
     app: {
       on: (event: string, listener: any) => {
@@ -55,6 +61,8 @@ const createElectron = (contents: any[] = []) => {
       on: (channel: string, listener: any) => {
         ipcListeners[channel] = listener
       },
+      off: removeIpcListener,
+      removeListener: removeIpcListener,
     },
     webContents: {
       getAllWebContents: () => contents,
@@ -62,6 +70,33 @@ const createElectron = (contents: any[] = []) => {
   }
   return { appListeners, electron, ipcHandlers, ipcListeners }
 }
+
+for (const method of ['removeListener', 'off'] as const) {
+  test(`monkeyPatchElectronIpcMain preserves listener identity for ipcMain.${method}`, () => {
+    const { electron, ipcListeners } = createElectron()
+    runMonkeyPatch(electron)
+    const listener = () => {}
+
+    electron.ipcMain.on('test', listener)
+    electron.ipcMain[method]('test', listener)
+
+    expect(ipcListeners.test).toBeUndefined()
+  })
+}
+
+test('monkeyPatchElectronIpcMain preserves listener identity for ipcMain.once', () => {
+  const { electron } = createElectron()
+  const ipcMain = new EventEmitter() as any
+  ipcMain.handle = electron.ipcMain.handle
+  electron.ipcMain = ipcMain
+  runMonkeyPatch(electron)
+  const listener = () => {}
+
+  electron.ipcMain.once('test', listener)
+  electron.ipcMain.removeListener('test', listener)
+
+  expect(electron.ipcMain.listenerCount('test')).toBe(0)
+})
 
 test('monkeyPatchElectronIpcMain records renderer-to-main endpoints for ipcMain.on', () => {
   const { contents } = createWebContents()
