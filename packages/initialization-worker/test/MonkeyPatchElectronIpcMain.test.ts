@@ -92,10 +92,10 @@ test('monkeyPatchElectronIpcMain preserves listener identity for ipcMain.once', 
   runMonkeyPatch(electron)
   const listener = () => {}
 
-  electron.ipcMain.once('test', listener)
-  electron.ipcMain.removeListener('test', listener)
+  ipcMain.once('test', listener)
+  ipcMain.removeListener('test', listener)
 
-  expect(electron.ipcMain.listenerCount('test')).toBe(0)
+  expect(ipcMain.listenerCount('test')).toBe(0)
 })
 
 test('monkeyPatchElectronIpcMain records renderer-to-main endpoints for ipcMain.on', () => {

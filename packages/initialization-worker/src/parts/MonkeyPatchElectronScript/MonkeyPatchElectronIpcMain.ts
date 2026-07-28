@@ -178,6 +178,7 @@ export const monkeyPatchElectronIpcMain = `function () { const electron = this
       pushMessage(message)
       return listener(event, ...args)
     }
+    wrappedListener.listener = typeof listener.listener === 'function' ? listener.listener : listener
 
     const result = originalIpcMainOn(channel, wrappedListener)
     let registrations = wrappedIpcMainListeners.get(listener)
