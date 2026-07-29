@@ -5,6 +5,7 @@ import * as RunTest from '../RunTest/RunTest.ts'
 import * as SetupTest from '../SetupTest/SetupTest.ts'
 import * as TearDownTest from '../TearDownTest/TearDownTest.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
+import * as WaitForQuiescence from '../WaitForQuiescence/WaitForQuiescence.ts'
 
 export const commandMap = {
   [TestWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
@@ -13,4 +14,5 @@ export const commandMap = {
   [TestWorkerCommandType.RunTest]: RunTest.runTest,
   [TestWorkerCommandType.SetupTest]: SetupTest.setupTest,
   [TestWorkerCommandType.TearDownTest]: TearDownTest.tearDownTest,
+  [TestWorkerCommandType.WaitForQuiescence]: WaitForQuiescence.waitForQuiescence,
 }

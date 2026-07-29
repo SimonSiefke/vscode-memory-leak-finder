@@ -8,6 +8,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as BrowserPageTargets from '../BrowserPageTargets/BrowserPageTargets.ts'
 import { doLogin } from '../DoLogin/DoLogin.ts'
 import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
+import * as ForceKillProcessTree from '../ForceKillProcessTree/ForceKillProcessTree.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetPrettyError from '../GetPrettyError/GetPrettyError.ts'
 import * as GetProxyTestFolderName from '../GetProxyTestFolderName/GetProxyTestFolderName.ts'
@@ -19,6 +20,7 @@ import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import * as PrepareTrackedVscode from '../PrepareTrackedVscode/PrepareTrackedVscode.ts'
+import { PhaseTimeoutError, runPhase, type TestPhase } from '../RunPhase/RunPhase.ts'
 import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTests from '../TestWorkerRunTests/TestWorkerRunTests.ts'
@@ -28,6 +30,7 @@ import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
+import * as WaitForMeasurementQuiescence from '../WaitForMeasurementQuiescence/WaitForMeasurementQuiescence.ts'
 
 interface WorkerMap {
   devtoolsWebSocketUrl: string
@@ -40,10 +43,62 @@ interface WorkerMap {
   webSocketUrl: string
 }
 
+const createEmptyWorkerMap = (): WorkerMap => {
+  return {
+    devtoolsWebSocketUrl: '',
+    functionTrackerRpc: emptyRpc,
+    initializationWorkerRpc: emptyRpc,
+    memoryRpc: emptyRpc,
+    pid: 0,
+    testWorkerRpc: emptyRpc,
+    videoRpc: emptyRpc,
+    webSocketUrl: '',
+  }
+}
+
 const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
   const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
   await Promise.all([functionTrackerRpc.dispose(), memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()
+}
+
+const isRecoveryError = (error: unknown): boolean => {
+  if (error instanceof PhaseTimeoutError) {
+    return true
+  }
+  if (!(error instanceof Error)) {
+    return false
+  }
+  return (
+    error.name === 'MeasurementInconclusiveError' ||
+    error.message.includes('Measurement is inconclusive') ||
+    error.message.includes('renderer/CDP idle call timed out')
+  )
+}
+
+const forceRecoverWorkers = async (workers: WorkerMap, test: string, iteration: number): Promise<void> => {
+  try {
+    if (workers.pid) {
+      await ForceKillProcessTree.forceKillProcessTree(workers.pid)
+    } else {
+      await ForceKillProcessTree.forceKillProcessTreeFromLock()
+    }
+  } catch (error) {
+    console.error(`failed to terminate VS Code after ${test} timed out`, error)
+  }
+  try {
+    await runPhase(
+      {
+        iteration,
+        phase: 'dispose',
+        test,
+        timeout: TimeoutConstants.Dispose,
+      },
+      () => disposeWorkers(workers),
+    )
+  } catch (error) {
+    console.error(`failed to dispose workers after forced process-tree termination`, error)
+  }
 }
 
 const getProcessResultFolder = (inspectProcess: string): string => {
@@ -424,16 +479,7 @@ export const runTestsWithCallback = async ({
     await callback(TestWorkerEventType.TestsStarting, total)
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
-    let workers: WorkerMap = {
-      devtoolsWebSocketUrl: '',
-      functionTrackerRpc: emptyRpc,
-      initializationWorkerRpc: emptyRpc,
-      memoryRpc: emptyRpc,
-      pid: 0,
-      testWorkerRpc: emptyRpc,
-      videoRpc: emptyRpc,
-      webSocketUrl: '',
-    }
+    let workers = createEmptyWorkerMap()
 
     if (isStartupCounterMeasure(measure) && startupRuns > 1) {
       for (let i = 0; i < formattedPaths.length; i++) {
@@ -449,62 +495,70 @@ export const runTestsWithCallback = async ({
         try {
           const samples: any[] = []
           for (let startupRun = 0; startupRun < startupRuns; startupRun++) {
-            await disposeWorkers(workers)
-            workers = {
-              devtoolsWebSocketUrl: '',
-              functionTrackerRpc: emptyRpc,
-              initializationWorkerRpc: emptyRpc,
-              memoryRpc: emptyRpc,
-              pid: 0,
-              testWorkerRpc: emptyRpc,
-              videoRpc: emptyRpc,
-              webSocketUrl: '',
+            const iteration = startupRun + 1
+            const runStartupPhase = <T>(phase: TestPhase, operation: () => Promise<T>, timeout = TimeoutConstants.Test): Promise<T> => {
+              return runPhase(
+                {
+                  iteration,
+                  phase,
+                  test: dirent,
+                  timeout,
+                },
+                operation,
+              )
             }
+            await runStartupPhase('dispose', () => disposeWorkers(workers), TimeoutConstants.Dispose)
+            workers = createEmptyWorkerMap()
             PrepareTestsOrAttach.state.promise = undefined
             const sampleConnectionId = connectionId
-            const prepared = await PrepareTestsOrAttach.prepareTestsAndAttach({
-              arch,
-              attachedToPageTimeout,
-              buildVscodeMinified,
-              clearExtensions,
-              commit,
-              compressVideo,
-              connectionId: sampleConnectionId,
-              cwd,
-              downloadUserDataZipFileToken,
-              downloadUserDataZipFileUrl,
-              enableExtensions,
-              enableProxy,
-              headlessMode,
-              ide,
-              ideVersion,
-              idleTimeout,
-              insidersCommit,
-              inspectExtensions,
-              inspectExtensionsPort,
-              inspectIntegratedBrowser,
-              inspectProcess,
-              inspectPtyHost,
-              inspectPtyHostPort,
-              inspectSharedProcess,
-              inspectSharedProcessPort,
-              measureId: measure,
-              measureNode,
-              openDevtools,
-              pageObjectPath: pageObjectPathResolved,
-              platform,
-              preparedVscodePath,
-              proxyTestFolderName,
-              recordVideo,
-              runMode,
-              screencastQuality,
-              timeouts,
-              trackFunctions,
-              updateUrl,
-              useProxyMock,
-              vscodePath,
-              vscodeVersion,
-            })
+            const prepared = await runStartupPhase(
+              'prepare',
+              () =>
+                PrepareTestsOrAttach.prepareTestsAndAttach({
+                  arch,
+                  attachedToPageTimeout,
+                  buildVscodeMinified,
+                  clearExtensions,
+                  commit,
+                  compressVideo,
+                  connectionId: sampleConnectionId,
+                  cwd,
+                  downloadUserDataZipFileToken,
+                  downloadUserDataZipFileUrl,
+                  enableExtensions,
+                  enableProxy,
+                  headlessMode,
+                  ide,
+                  ideVersion,
+                  idleTimeout,
+                  insidersCommit,
+                  inspectExtensions,
+                  inspectExtensionsPort,
+                  inspectIntegratedBrowser,
+                  inspectProcess,
+                  inspectPtyHost,
+                  inspectPtyHostPort,
+                  inspectSharedProcess,
+                  inspectSharedProcessPort,
+                  measureId: measure,
+                  measureNode,
+                  openDevtools,
+                  pageObjectPath: pageObjectPathResolved,
+                  platform,
+                  preparedVscodePath,
+                  proxyTestFolderName,
+                  recordVideo,
+                  runMode,
+                  screencastQuality,
+                  timeouts,
+                  trackFunctions,
+                  updateUrl,
+                  useProxyMock,
+                  vscodePath,
+                  vscodeVersion,
+                }),
+              TimeoutConstants.Prepare,
+            )
             workers = {
               devtoolsWebSocketUrl: prepared.devtoolsWebSocketUrl,
               functionTrackerRpc: prepared.functionTrackerRpc || emptyRpc,
@@ -516,17 +570,21 @@ export const runTestsWithCallback = async ({
               webSocketUrl: prepared.webSocketUrl,
             }
             if (enableProxy) {
-              await workers.initializationWorkerRpc.invoke('Launch.setProxyTestFolderName', proxyTestFolderName)
+              await runStartupPhase('prepare', () =>
+                workers.initializationWorkerRpc.invoke('Launch.setProxyTestFolderName', proxyTestFolderName),
+              )
             }
-            const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
-              workers.testWorkerRpc,
-              sampleConnectionId,
-              absolutePath,
-              forceRun,
-              timeouts,
-              isGithubActions,
-              allowCopilotAuthInCi,
-              runNetworkTestsAnyway,
+            const testResult: any = await runStartupPhase('setup', () =>
+              TestWorkerSetupTest.testWorkerSetupTest(
+                workers.testWorkerRpc,
+                sampleConnectionId,
+                absolutePath,
+                forceRun,
+                timeouts,
+                isGithubActions,
+                allowCopilotAuthInCi,
+                runNetworkTestsAnyway,
+              ),
             )
             if (testResult.error) {
               throw testResult.error
@@ -536,21 +594,31 @@ export const runTestsWithCallback = async ({
               continue
             }
             wasOriginallySkipped = testResult.wasOriginallySkipped
-            await MemoryLeakFinder.start(workers.memoryRpc, sampleConnectionId)
-            await TestWorkerRunTests.testWorkerRunTests(
-              workers.testWorkerRpc,
-              sampleConnectionId,
-              absolutePath,
-              forceRun,
-              runMode,
-              platform,
-              runs,
-              () => MemoryLeakFinder.runCompletion(workers.memoryRpc, sampleConnectionId),
+            await runStartupPhase('measure', () => MemoryLeakFinder.start(workers.memoryRpc, sampleConnectionId))
+            await runStartupPhase('measure', () =>
+              TestWorkerRunTests.testWorkerRunTests(
+                workers.testWorkerRpc,
+                sampleConnectionId,
+                absolutePath,
+                forceRun,
+                runMode,
+                platform,
+                runs,
+                () => MemoryLeakFinder.runCompletion(workers.memoryRpc, sampleConnectionId),
+              ),
             )
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            await MemoryLeakFinder.stop(workers.memoryRpc, sampleConnectionId)
+            await runStartupPhase('measure', async () => {
+              await WaitForMeasurementQuiescence.waitForMeasurementQuiescence({
+                connectionId: sampleConnectionId,
+                iteration,
+                rpc: workers.testWorkerRpc,
+                test: dirent,
+              })
+              await MemoryLeakFinder.stop(workers.memoryRpc, sampleConnectionId)
+            })
             const resultPath = getResultPath({
               dirent,
               inspectExtensions,
@@ -562,19 +630,23 @@ export const runTestsWithCallback = async ({
               measureNode,
             })
             const sampleResultPath = resultPath.replace(/\.json$/, `.startup-${startupRun + 1}.json`)
-            await MemoryLeakFinder.compare(
-              workers.memoryRpc,
-              sampleConnectionId,
-              {
-                runs,
-                startupRun: startupRun + 1,
-                startupRuns,
-              },
-              sampleResultPath,
+            await runStartupPhase('measure', () =>
+              MemoryLeakFinder.compare(
+                workers.memoryRpc,
+                sampleConnectionId,
+                {
+                  runs,
+                  startupRun: startupRun + 1,
+                  startupRuns,
+                },
+                sampleResultPath,
+              ),
             )
             const sampleResult = await readJson(sampleResultPath)
             samples.push(sampleResult[StartupCounterMeasureResultId] ?? sampleResult)
-            await TestWorkerTeardownTest.testWorkerTearDownTest(workers.testWorkerRpc, sampleConnectionId, absolutePath)
+            await runStartupPhase('teardown', () =>
+              TestWorkerTeardownTest.testWorkerTearDownTest(workers.testWorkerRpc, sampleConnectionId, absolutePath),
+            )
           }
           const resultPath = getResultPath({
             dirent,
@@ -594,6 +666,11 @@ export const runTestsWithCallback = async ({
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, false, wasOriginallySkipped)
           passed++
         } catch (error) {
+          if (isRecoveryError(error)) {
+            await forceRecoverWorkers(workers, dirent, i + 1)
+            workers = createEmptyWorkerMap()
+            PrepareTestsOrAttach.state.promise = undefined
+          }
           if (wasOriginallySkipped) {
             skippedFailed++
           } else {
@@ -616,7 +693,20 @@ export const runTestsWithCallback = async ({
       }
       const end = Time.now()
       const duration = end - testStart
-      await disposeWorkers(workers)
+      try {
+        await runPhase(
+          {
+            iteration: startupRuns,
+            phase: 'dispose',
+            test: '<final>',
+            timeout: TimeoutConstants.Dispose,
+          },
+          () => disposeWorkers(workers),
+        )
+      } catch (error) {
+        await ForceKillProcessTree.forceKillProcessTree(workers.pid)
+        console.error(`final worker disposal failed`, error)
+      }
       return {
         duration,
         failed,
@@ -630,101 +720,119 @@ export const runTestsWithCallback = async ({
       }
     }
 
+    let needsRecovery = false
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
       const proxyTestFolderName = GetProxyTestFolderName.getProxyTestFolderName(absolutePath)
       const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
-
-      const needsSetup = i === 0 || restartBetween
-
-      if (needsSetup) {
-        await disposeWorkers(workers)
-        PrepareTestsOrAttach.state.promise = undefined
-        const { devtoolsWebSocketUrl, functionTrackerRpc, initializationWorkerRpc, memoryRpc, pid, testWorkerRpc, videoRpc, webSocketUrl } =
-          await PrepareTestsOrAttach.prepareTestsAndAttach({
-            arch,
-            attachedToPageTimeout,
-            buildVscodeMinified,
-            clearExtensions,
-            commit,
-            compressVideo,
-            connectionId,
-            cwd,
-            downloadUserDataZipFileToken,
-            downloadUserDataZipFileUrl,
-            enableExtensions,
-            enableProxy,
-            headlessMode,
-            ide,
-            ideVersion,
-            idleTimeout,
-            insidersCommit,
-            inspectExtensions,
-            inspectExtensionsPort,
-            inspectIntegratedBrowser,
-            inspectProcess,
-            inspectPtyHost,
-            inspectPtyHostPort,
-            inspectSharedProcess,
-            inspectSharedProcessPort,
-            measureId: measure,
-            measureNode,
-            openDevtools,
-            pageObjectPath: pageObjectPathResolved,
-            platform,
-            preparedVscodePath,
-            proxyTestFolderName,
-            recordVideo,
-            runMode,
-            screencastQuality,
-            timeouts,
-            trackFunctions,
-            updateUrl,
-            useProxyMock,
-            vscodePath,
-            vscodeVersion,
-          })
-        workers = {
-          devtoolsWebSocketUrl,
-          functionTrackerRpc: functionTrackerRpc || emptyRpc,
-          initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
-          memoryRpc: memoryRpc || emptyRpc,
-          pid,
-          testWorkerRpc: testWorkerRpc || emptyRpc,
-          videoRpc: videoRpc || emptyRpc,
-          webSocketUrl,
-        }
-      }
-
-      if (enableProxy) {
-        await workers.initializationWorkerRpc.invoke('Launch.setProxyTestFolderName', proxyTestFolderName)
-      }
-
-      const { testWorkerRpc, videoRpc } = workers
-
       let wasOriginallySkipped = false
       if (i !== 0) {
         await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
 
       const start = i === 0 ? initialStart : Time.now()
+      const iteration = i + 1
+      const runTestPhase = <T>(phase: TestPhase, operation: () => Promise<T>, timeout = TimeoutConstants.Test): Promise<T> => {
+        return runPhase(
+          {
+            iteration,
+            phase,
+            test: dirent,
+            timeout,
+          },
+          operation,
+        )
+      }
       try {
+        const needsSetup = i === 0 || restartBetween || needsRecovery
+        if (needsSetup) {
+          await runTestPhase('dispose', () => disposeWorkers(workers), TimeoutConstants.Dispose)
+          workers = createEmptyWorkerMap()
+          PrepareTestsOrAttach.state.promise = undefined
+          const prepared = await runTestPhase(
+            'prepare',
+            () =>
+              PrepareTestsOrAttach.prepareTestsAndAttach({
+                arch,
+                attachedToPageTimeout,
+                buildVscodeMinified,
+                clearExtensions,
+                commit,
+                compressVideo,
+                connectionId,
+                cwd,
+                downloadUserDataZipFileToken,
+                downloadUserDataZipFileUrl,
+                enableExtensions,
+                enableProxy,
+                headlessMode,
+                ide,
+                ideVersion,
+                idleTimeout,
+                insidersCommit,
+                inspectExtensions,
+                inspectExtensionsPort,
+                inspectIntegratedBrowser,
+                inspectProcess,
+                inspectPtyHost,
+                inspectPtyHostPort,
+                inspectSharedProcess,
+                inspectSharedProcessPort,
+                measureId: measure,
+                measureNode,
+                openDevtools,
+                pageObjectPath: pageObjectPathResolved,
+                platform,
+                preparedVscodePath,
+                proxyTestFolderName,
+                recordVideo,
+                runMode,
+                screencastQuality,
+                timeouts,
+                trackFunctions,
+                updateUrl,
+                useProxyMock,
+                vscodePath,
+                vscodeVersion,
+              }),
+            TimeoutConstants.Prepare,
+          )
+          workers = {
+            devtoolsWebSocketUrl: prepared.devtoolsWebSocketUrl,
+            functionTrackerRpc: prepared.functionTrackerRpc || emptyRpc,
+            initializationWorkerRpc: prepared.initializationWorkerRpc || emptyRpc,
+            memoryRpc: prepared.memoryRpc || emptyRpc,
+            pid: prepared.pid,
+            testWorkerRpc: prepared.testWorkerRpc || emptyRpc,
+            videoRpc: prepared.videoRpc || emptyRpc,
+            webSocketUrl: prepared.webSocketUrl,
+          }
+          needsRecovery = false
+        }
+
+        if (enableProxy) {
+          await runTestPhase('prepare', () => workers.initializationWorkerRpc.invoke('Launch.setProxyTestFolderName', proxyTestFolderName))
+        }
+
+        const { testWorkerRpc, videoRpc } = workers
         if ((inspectIntegratedBrowser || inspectProcess) && workers.memoryRpc !== emptyRpc) {
-          await workers.memoryRpc.dispose()
+          await runTestPhase('dispose', () => workers.memoryRpc.dispose(), TimeoutConstants.Dispose)
           workers.memoryRpc = emptyRpc
         }
         const integratedBrowserExcludedTargetIds =
           checkLeaks && inspectIntegratedBrowser ? await BrowserPageTargets.getBrowserPageTargetIds(workers.devtoolsWebSocketUrl) : []
-        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
-          testWorkerRpc,
-          connectionId,
-          absolutePath,
-          forceRun,
-          timeouts,
-          isGithubActions,
-          allowCopilotAuthInCi,
-          runNetworkTestsAnyway,
+        const testResult: any = await runTestPhase('setup', () =>
+          TestWorkerSetupTest.testWorkerSetupTest(
+            testWorkerRpc,
+            connectionId,
+            absolutePath,
+            forceRun,
+            timeouts,
+            isGithubActions,
+            allowCopilotAuthInCi,
+            runNetworkTestsAnyway,
+          ),
         )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped
@@ -747,46 +855,52 @@ export const runTestsWithCallback = async ({
           let isLeak = false
           if (checkLeaks) {
             if (measureAfter) {
-              await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
+              await runTestPhase('warmup', () =>
+                TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2),
+              )
             }
             if (inspectIntegratedBrowser || inspectProcess) {
               if (inspectProcess) {
-                workers.memoryRpc = await MemoryLeakWorker.startWorker(
-                  workers.devtoolsWebSocketUrl,
-                  workers.webSocketUrl,
-                  connectionId,
-                  measure,
-                  attachedToPageTimeout,
-                  measureNode,
-                  inspectSharedProcess,
-                  inspectExtensions,
-                  inspectIntegratedBrowser,
-                  inspectPtyHost,
-                  inspectPtyHostPort,
-                  inspectSharedProcessPort,
-                  inspectExtensionsPort,
-                  workers.pid,
-                  integratedBrowserExcludedTargetIds,
-                  inspectProcess,
-                  testWorkerRpc,
+                workers.memoryRpc = await runTestPhase('measure', () =>
+                  MemoryLeakWorker.startWorker(
+                    workers.devtoolsWebSocketUrl,
+                    workers.webSocketUrl,
+                    connectionId,
+                    measure,
+                    attachedToPageTimeout,
+                    measureNode,
+                    inspectSharedProcess,
+                    inspectExtensions,
+                    inspectIntegratedBrowser,
+                    inspectPtyHost,
+                    inspectPtyHostPort,
+                    inspectSharedProcessPort,
+                    inspectExtensionsPort,
+                    workers.pid,
+                    integratedBrowserExcludedTargetIds,
+                    inspectProcess,
+                    testWorkerRpc,
+                  ),
                 )
               } else {
-                workers.memoryRpc = await MemoryLeakWorker.startWorker(
-                  workers.devtoolsWebSocketUrl,
-                  workers.webSocketUrl,
-                  connectionId,
-                  measure,
-                  attachedToPageTimeout,
-                  measureNode,
-                  inspectSharedProcess,
-                  inspectExtensions,
-                  inspectIntegratedBrowser,
-                  inspectPtyHost,
-                  inspectPtyHostPort,
-                  inspectSharedProcessPort,
-                  inspectExtensionsPort,
-                  workers.pid,
-                  integratedBrowserExcludedTargetIds,
+                workers.memoryRpc = await runTestPhase('measure', () =>
+                  MemoryLeakWorker.startWorker(
+                    workers.devtoolsWebSocketUrl,
+                    workers.webSocketUrl,
+                    connectionId,
+                    measure,
+                    attachedToPageTimeout,
+                    measureNode,
+                    inspectSharedProcess,
+                    inspectExtensions,
+                    inspectIntegratedBrowser,
+                    inspectPtyHost,
+                    inspectPtyHostPort,
+                    inspectSharedProcessPort,
+                    inspectExtensionsPort,
+                    workers.pid,
+                    integratedBrowserExcludedTargetIds,
+                  ),
                 )
               }
             }
@@ -803,53 +917,61 @@ export const runTestsWithCallback = async ({
             let result
             if (isMemoryCityMeasure(measure)) {
               const extensionHostRpc = workers.memoryRpc
-              const rendererRpc = await MemoryLeakWorker.startWorker(
-                workers.devtoolsWebSocketUrl,
-                workers.webSocketUrl,
-                connectionId,
-                measure,
-                attachedToPageTimeout,
-                false,
-                false,
-                false,
-                false,
-                false,
-                inspectPtyHostPort,
-                inspectSharedProcessPort,
-                inspectExtensionsPort,
-                workers.pid,
-                integratedBrowserExcludedTargetIds,
+              const rendererRpc = await runTestPhase('measure', () =>
+                MemoryLeakWorker.startWorker(
+                  workers.devtoolsWebSocketUrl,
+                  workers.webSocketUrl,
+                  connectionId,
+                  measure,
+                  attachedToPageTimeout,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  inspectPtyHostPort,
+                  inspectSharedProcessPort,
+                  inspectExtensionsPort,
+                  workers.pid,
+                  integratedBrowserExcludedTargetIds,
+                ),
               )
               const rendererResultPath = `${resultPath}.renderer.tmp`
               const extensionHostResultPath = `${resultPath}.extension-host.tmp`
               try {
-                await Promise.all([
-                  MemoryLeakFinder.start(rendererRpc, connectionId),
-                  MemoryLeakFinder.start(extensionHostRpc, connectionId),
-                ])
-                await TestWorkerRunTests.testWorkerRunTests(
-                  testWorkerRpc,
-                  connectionId,
-                  absolutePath,
-                  forceRun,
-                  runMode,
-                  platform,
-                  runs,
-                  () =>
+                await runTestPhase('measure', () =>
+                  Promise.all([MemoryLeakFinder.start(rendererRpc, connectionId), MemoryLeakFinder.start(extensionHostRpc, connectionId)]),
+                )
+                await runTestPhase('measure', () =>
+                  TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs, () =>
                     Promise.all([
                       MemoryLeakFinder.runCompletion(rendererRpc, connectionId),
                       MemoryLeakFinder.runCompletion(extensionHostRpc, connectionId),
                     ]),
+                  ),
                 )
                 if (timeoutBetween) {
                   await Timeout.setTimeout(timeoutBetween)
                 }
-                await Promise.all([MemoryLeakFinder.stop(rendererRpc, connectionId), MemoryLeakFinder.stop(extensionHostRpc, connectionId)])
+                await runTestPhase('measure', async () => {
+                  await WaitForMeasurementQuiescence.waitForMeasurementQuiescence({
+                    connectionId,
+                    iteration,
+                    rpc: testWorkerRpc,
+                    test: dirent,
+                  })
+                  await Promise.all([
+                    MemoryLeakFinder.stop(rendererRpc, connectionId),
+                    MemoryLeakFinder.stop(extensionHostRpc, connectionId),
+                  ])
+                })
                 // Analyze sequentially so two full dominator graphs never compete for
                 // memory. Capture remains simultaneous around the shared scenario.
-                await runMemoryCityComparisons(
-                  () => MemoryLeakFinder.compare(rendererRpc, connectionId, context, rendererResultPath),
-                  () => MemoryLeakFinder.compare(extensionHostRpc, connectionId, context, extensionHostResultPath),
+                await runTestPhase('measure', () =>
+                  runMemoryCityComparisons(
+                    () => MemoryLeakFinder.compare(rendererRpc, connectionId, context, rendererResultPath),
+                    () => MemoryLeakFinder.compare(extensionHostRpc, connectionId, context, extensionHostResultPath),
+                  ),
                 )
                 const [rendererResult, extensionHostResult] = await Promise.all([
                   readJson(rendererResultPath),
@@ -870,34 +992,37 @@ export const runTestsWithCallback = async ({
                 result = { isLeak: false, summary: '' }
               } finally {
                 await Promise.all([
-                  rendererRpc.dispose(),
+                  runTestPhase('dispose', () => rendererRpc.dispose(), TimeoutConstants.Dispose),
                   rm(rendererResultPath, { force: true }),
                   rm(extensionHostResultPath, { force: true }),
                 ])
               }
             } else {
               const memoryRpc = workers.memoryRpc
-              await MemoryLeakFinder.start(memoryRpc, connectionId)
-              await TestWorkerRunTests.testWorkerRunTests(
-                testWorkerRpc,
-                connectionId,
-                absolutePath,
-                forceRun,
-                runMode,
-                platform,
-                runs,
-                () => MemoryLeakFinder.runCompletion(memoryRpc, connectionId),
+              await runTestPhase('measure', () => MemoryLeakFinder.start(memoryRpc, connectionId))
+              await runTestPhase('measure', () =>
+                TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs, () =>
+                  MemoryLeakFinder.runCompletion(memoryRpc, connectionId),
+                ),
               )
               if (timeoutBetween) {
                 await Timeout.setTimeout(timeoutBetween)
               }
-              await MemoryLeakFinder.stop(memoryRpc, connectionId)
+              await runTestPhase('measure', async () => {
+                await WaitForMeasurementQuiescence.waitForMeasurementQuiescence({
+                  connectionId,
+                  iteration,
+                  rpc: testWorkerRpc,
+                  test: dirent,
+                })
+                await MemoryLeakFinder.stop(memoryRpc, connectionId)
+              })
 
               if (measureAfter) {
                 await Timeout.setTimeout(3000)
               }
 
-              result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
+              result = await runTestPhase('measure', () => MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath))
             }
             if (result.isLeak) {
               isLeak = true
@@ -908,9 +1033,11 @@ export const runTestsWithCallback = async ({
               console.log(result.summary)
             }
           } else {
-            await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs)
+            await runTestPhase('measure', () =>
+              TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, runs),
+            )
           }
-          await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
+          await runTestPhase('teardown', () => TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath))
           const end = Time.now()
           const duration = end - start
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak, wasOriginallySkipped)
@@ -919,6 +1046,7 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
+        const requiresRecovery = isRecoveryError(error)
         if (wasOriginallySkipped) {
           skippedFailed++
         } else {
@@ -937,6 +1065,12 @@ export const runTestsWithCallback = async ({
           wasOriginallySkipped,
           duration,
         )
+        if (requiresRecovery) {
+          await forceRecoverWorkers(workers, dirent, iteration)
+          workers = createEmptyWorkerMap()
+          PrepareTestsOrAttach.state.promise = undefined
+          needsRecovery = true
+        }
       }
     }
     const end = Time.now()
@@ -945,17 +1079,21 @@ export const runTestsWithCallback = async ({
       await VideoRecording.finalize(workers.videoRpc)
     }
     // TODO when in watch mode, dispose all workers except initialization worker to keep the application running
-    await disposeWorkers(workers)
-    workers = {
-      devtoolsWebSocketUrl: '',
-      functionTrackerRpc: emptyRpc,
-      initializationWorkerRpc: emptyRpc,
-      memoryRpc: emptyRpc,
-      pid: 0,
-      testWorkerRpc: emptyRpc,
-      videoRpc: emptyRpc,
-      webSocketUrl: '',
+    try {
+      await runPhase(
+        {
+          iteration: formattedPaths.length,
+          phase: 'dispose',
+          test: '<final>',
+          timeout: TimeoutConstants.Dispose,
+        },
+        () => disposeWorkers(workers),
+      )
+    } catch (error) {
+      await ForceKillProcessTree.forceKillProcessTree(workers.pid)
+      console.error(`final worker disposal failed`, error)
     }
+    workers = createEmptyWorkerMap()
     return {
       duration,
       failed,

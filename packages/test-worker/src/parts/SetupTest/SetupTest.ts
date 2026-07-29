@@ -1,5 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
+import * as PageWaitForIdle from '../PageWaitForIdle/PageWaitForIdle.ts'
 import * as SetupTestWithCallback from '../SetupTestWithCallback/SetupTestWithCallback.ts'
 
 export const setupTest = async (
@@ -16,6 +17,7 @@ export const setupTest = async (
   Assert.boolean(forceRun)
   Assert.boolean(isGithubActions)
   Assert.boolean(runNetworkTestsAnyway)
+  PageWaitForIdle.resetIdleTimeoutWarning()
   const pageObject = PageObjectState.getPageObject(connectionId)
   const result = await SetupTestWithCallback.setupTestWithCallback(
     pageObject,

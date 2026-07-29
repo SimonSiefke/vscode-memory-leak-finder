@@ -5,7 +5,11 @@ const events: string[] = []
 
 const rpc = {
   async dispose() {},
-  async invoke() {},
+  async invoke() {
+    return {
+      didTimeout: false,
+    }
+  },
   send() {},
 }
 
@@ -13,7 +17,11 @@ const memoryRpc = {
   async dispose() {
     events.push('memory-dispose')
   },
-  async invoke() {},
+  async invoke() {
+    return {
+      didTimeout: false,
+    }
+  },
   send() {},
 }
 
