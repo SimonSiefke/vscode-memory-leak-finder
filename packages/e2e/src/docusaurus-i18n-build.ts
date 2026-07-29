@@ -127,13 +127,13 @@ async function runControlledBuilds(params) {
 }`
 }
 
-const createPatchScriptSource = (): string => {
+const createPatchScriptSource = (buildPath: string): string => {
   const originalBuildLocaleCall = `    await (0, buildLocale_1.buildLocale)(params);
 }`
   const controlledBuildSource = createControlledBuildSource()
   return `import {readFile, writeFile} from 'node:fs/promises'
 
-const buildPath = new URL('./docusaurus-site/node_modules/@docusaurus/core/lib/commands/build/build.js', import.meta.url)
+const buildPath = new URL(${JSON.stringify(buildPath)}, import.meta.url)
 const configPath = new URL('./docusaurus-site/docusaurus.config.ts', import.meta.url)
 
 const buildSource = await readFile(buildPath, 'utf8')
@@ -185,13 +185,22 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
   await Explorer.focus()
 
   const { inspectPort, serverPort } = await ExternalRuntime.createPorts()
+  const localDocusaurusRepo = process.env.DOCUSAURUS_LOCAL_REPO
+  const localRepoLink = 'docusaurus-local'
+  const buildPath = localDocusaurusRepo
+    ? `./${localRepoLink}/packages/docusaurus/lib/commands/build/build.js`
+    : './docusaurus-site/node_modules/@docusaurus/core/lib/commands/build/build.js'
+  const docusaurusBin = localDocusaurusRepo
+    ? `../${localRepoLink}/packages/docusaurus/bin/docusaurus.mjs`
+    : 'node_modules/@docusaurus/core/bin/docusaurus.mjs'
+  const testDocusaurusVersion = localDocusaurusRepo ? '3.10.1' : docusaurusVersion
   socketPath = `/tmp/vscode-memory-leak-finder-docusaurus-${serverPort}.sock`
   nextLocaleIndex = 0
   await ExternalRuntime.startExternalRuntime({
     args: [
       `--inspect=127.0.0.1:${inspectPort}`,
       '--expose-gc',
-      'node_modules/@docusaurus/core/bin/docusaurus.mjs',
+      docusaurusBin,
       'build',
       '--locale',
       'en',
@@ -200,7 +209,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
     command: process.execPath,
     cwd: 'docusaurus-site',
     entryFile: 'patch-docusaurus.mjs',
-    entrySource: createPatchScriptSource(),
+    entrySource: createPatchScriptSource(buildPath),
     env: {
       DOCUSAURUS_SOCKET_PATH: socketPath,
     },
@@ -211,7 +220,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
       {
         args: [
           '--yes',
-          `create-docusaurus@${docusaurusVersion}`,
+          `create-docusaurus@${testDocusaurusVersion}`,
           'docusaurus-site',
           'classic',
           '--typescript',
@@ -231,6 +240,29 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
         command: 'npm',
         cwd: 'docusaurus-site',
       },
+      ...(localDocusaurusRepo
+        ? [
+            {
+              args: ['--symbolic', localDocusaurusRepo, localRepoLink],
+              command: 'ln',
+            },
+            {
+              args: [
+                'docusaurus-site/node_modules/@docusaurus',
+                'docusaurus-site/node_modules/@docusaurus-published',
+              ],
+              command: 'mv',
+            },
+            {
+              args: [
+                '--symbolic',
+                `${localDocusaurusRepo}/website/node_modules/@docusaurus`,
+                'docusaurus-site/node_modules/@docusaurus',
+              ],
+              command: 'ln',
+            },
+          ]
+        : []),
       {
         args: ['patch-docusaurus.mjs'],
         command: process.execPath,
