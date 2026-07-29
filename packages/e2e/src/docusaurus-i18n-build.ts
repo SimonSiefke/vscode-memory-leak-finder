@@ -260,7 +260,6 @@ export const teardown = async ({ Editor, ExternalRuntime, Workspace }: TestConte
     assert.deepStrictEqual(response, {
       ok: true,
     })
-    await ExternalRuntime.waitForExit()
   } finally {
     await ExternalRuntime.dispose()
     await Editor.closeAll()

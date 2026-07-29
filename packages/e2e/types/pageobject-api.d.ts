@@ -368,7 +368,6 @@ export interface ExternalRuntimeHandle {
   getNamedArrayCount(): Promise<Record<string, number>>
   request(path: any, init?: any): Promise<Response>
   takeSnapshot(name: any): Promise<string>
-  waitForExit(): Promise<void>
 }
 export interface ExternalRuntimeInfo {
   readonly args: readonly string[]
@@ -392,7 +391,6 @@ export interface ExternalRuntime {
   request(path: any, init?: any): Promise<Response>
   startExternalRuntime(options: any): Promise<void>
   takeSnapshot(name: any): Promise<string>
-  waitForExit(): Promise<void>
 }
 export interface Explorer {
   cancel(): Promise<void>
@@ -470,7 +468,6 @@ export interface ExternalRuntime {
   getRuntimeInfo(): Promise<void>
   getRuntimeName(): Promise<void>
   takeSnapshot(name: any): Promise<void>
-  waitForExit(): Promise<void>
   dispose(): Promise<void>
 }
 export interface Git {

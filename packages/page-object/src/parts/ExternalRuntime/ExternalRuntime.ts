@@ -92,7 +92,6 @@ export interface ExternalRuntimeHandle {
   readonly runtimeName: RuntimeName
   readonly serverPort: number
   takeSnapshot(name: string): Promise<string>
-  waitForExit(): Promise<void>
 }
 
 export interface ExternalRuntimeInfo {
@@ -865,18 +864,12 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
           await access(outFile)
           return outFile
         },
-        async waitForExit() {
-          await waitForExit(childProcess, 10_000)
-        },
       } satisfies ExternalRuntimeHandle
 
       return
     },
     takeSnapshot(name: string): Promise<string> {
       return getActiveRuntime().takeSnapshot(name)
-    },
-    waitForExit(): Promise<void> {
-      return getActiveRuntime().waitForExit()
     },
   }
 }
