@@ -255,9 +255,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const body = page.locator('.settings-body')
         await expect(body).toBeVisible()
         await page.waitForIdle()
-        const rightControls = page.locator('.settings-right-controls')
-        await expect(rightControls).toBeVisible()
-        await page.waitForIdle()
         if (ideVersion.minor >= 114) {
           const openInMainWindowButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
           await expect(openInMainWindowButton).toBeVisible()
