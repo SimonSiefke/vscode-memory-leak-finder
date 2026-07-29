@@ -26,6 +26,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     bisect: options.bisect,
     buildVscodeMinified: options.buildVscodeMinified,
     checkLeaks: options.checkLeaks,
+    color: options.color,
     // @ts-ignore
     commit: options.commit,
     continueValue: options.continueValue,
