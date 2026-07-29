@@ -111,6 +111,8 @@ jobs:
             args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
           - name: named-array-count
             args: --measure named-array-count
+          - name: named-array-count-extensions
+            args: --measure named-array-count --inspect-extensions
           - name: array-count
             args: --measure array-count
           - name: css-rule-count
@@ -302,6 +304,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-named-array-count
           path: ./vscode-memory-leak-finder-results-linux-named-array-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-array-count-extensions
+          path: ./vscode-memory-leak-finder-results-linux-named-array-count-extensions
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -581,6 +588,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-array-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-array-count-extensions
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
