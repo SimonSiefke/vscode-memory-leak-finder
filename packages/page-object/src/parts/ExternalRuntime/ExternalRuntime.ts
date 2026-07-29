@@ -323,7 +323,9 @@ const runSetupCommand = async ({
   await waitForExit(childProcess, 10 * 60_000)
 
   if (childProcess.exitCode !== 0) {
-    throw new Error(`Setup command failed: ${command} ${args.join(' ')}`)
+    throw new Error(
+      `Setup command failed: ${command} ${args.join(' ')}\nstdout:\n${stdout.join('')}\nstderr:\n${stderr.join('')}`,
+    )
   }
 }
 
