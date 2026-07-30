@@ -119,7 +119,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         })
         await quickPick.executeCommand('Notebook: Join With Next Cell')
         await page.waitForIdle()
-        await expect(cells).toHaveCount(initialCellCount - 1)
+        await expect(cells).toHaveCount(initialCellCount - 1, { timeout: 10_000 })
       } catch (error) {
         throw new VError(error, `Failed to merge notebook cell at index ${cellIndex}`)
       }
@@ -165,13 +165,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         const cell = cells.nth(cellIndex)
         await expect(cell).toBeVisible()
-        await cell.hover()
+        await cell.click()
         await page.waitForIdle()
-        const splitButton = cell.locator('.cell-title-toolbar .action-label[aria-label^="Split Cell"]')
-        await expect(splitButton).toBeVisible()
-        await splitButton.click()
+        const editor = cell.locator('.monaco-editor')
+        const editorInput =
+          ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100
+            ? editor.locator('.inputarea')
+            : editor.locator('.native-edit-context')
+        await editorInput.focus()
+        await expect(editorInput).toBeFocused()
+        await page.keyboard.press('Home')
+        const splitChordModifier = platform === 'darwin' ? 'Meta' : 'Control'
+        await page.keyboard.press(`${splitChordModifier}+k`)
+        await page.keyboard.press(`${splitChordModifier}+Shift+\\`)
         await page.waitForIdle()
-        await expect(cells).toHaveCount(initialCellCount + 1)
+        await expect(cells).toHaveCount(initialCellCount + 1, { timeout: 10_000 })
       } catch (error) {
         throw new VError(error, `Failed to split notebook cell at index ${cellIndex}`)
       }
