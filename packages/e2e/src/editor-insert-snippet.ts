@@ -14,6 +14,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   ])
   await Editor.closeAll()
   await Editor.open('test.html')
+  await Editor.shouldHaveBreadCrumb('test.html')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
