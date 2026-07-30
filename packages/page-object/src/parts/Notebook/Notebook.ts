@@ -120,11 +120,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           hasText: 'Join With Next Cell',
         })
         await expect(joinAction).toBeVisible()
-        await joinAction.clickExponential({
-          waitForHidden: contextMenu,
-        })
-        await page.waitForIdle()
+        await joinAction.click()
         await expect(cells).toHaveCount(initialCellCount - 1, { timeout: 10_000 })
+        if (await contextMenu.isVisible()) {
+          await page.keyboard.press('Escape')
+          await expect(contextMenu).toBeHidden({ timeout: 10_000 })
+        }
+        await page.waitForIdle()
         await expect(cells.nth(cellIndex).locator('.view-line').nth(1)).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to merge notebook cell at index ${cellIndex}`)
