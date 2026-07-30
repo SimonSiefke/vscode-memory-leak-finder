@@ -121,8 +121,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount - 1)
       } catch (error) {
-        console.log(error)
-        await new Promise((r) => {})
         throw new VError(error, `Failed to merge notebook cell at index ${cellIndex}`)
       }
     },
