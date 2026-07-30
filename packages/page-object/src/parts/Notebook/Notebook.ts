@@ -165,25 +165,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         const cell = cells.nth(cellIndex)
         await expect(cell).toBeVisible()
-        await cell.click()
+        await cell.hover()
         await page.waitForIdle()
-        const editor = cell.locator('.monaco-editor')
-        const editorInput =
-          ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100
-            ? editor.locator('.inputarea')
-            : editor.locator('.native-edit-context')
-        await editorInput.focus()
-        await expect(editorInput).toBeFocused()
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand('Notebook: Split Cell')
+        const splitButton = cell.locator('.cell-title-toolbar .action-label[aria-label^="Split Cell"]')
+        await expect(splitButton).toBeVisible()
+        await splitButton.click()
         await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount + 1)
       } catch (error) {
