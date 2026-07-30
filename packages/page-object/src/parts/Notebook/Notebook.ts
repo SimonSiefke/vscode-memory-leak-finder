@@ -222,7 +222,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           await cell.hover()
           await page.waitForIdle()
-          const splitAction = cell.locator('.cell-title-toolbar [aria-label="Split Cell"]')
+          const splitAction = cell.locator('.cell-title-toolbar [aria-label^="Split Cell"]')
           await expect(splitAction).toBeVisible({ timeout: 10_000 })
           await page.waitForIdle()
           await splitAction.click()
