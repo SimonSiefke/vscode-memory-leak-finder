@@ -98,7 +98,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const notebook = page.locator('[aria-label^="Notebook"]')
         await expect(notebook).toBeVisible()
-        const cells = notebook.locator('.notebook-cell')
+        const cells = notebook.locator('.code-cell-row, .markdown-cell-row')
         await expect(cells.first()).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
         const initialCellCount = await cells.count()
@@ -117,7 +117,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           platform,
           VError,
         })
-        await quickPick.executeCommand('Notebook: Merge Cell')
+        await quickPick.executeCommand('Notebook: Join With Next Cell')
         await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount - 1)
       } catch (error) {
@@ -156,7 +156,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const notebook = page.locator('[aria-label^="Notebook"]')
         await expect(notebook).toBeVisible()
-        const cells = notebook.locator('.notebook-cell')
+        const cells = notebook.locator('.code-cell-row, .markdown-cell-row')
         await expect(cells.first()).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
         const initialCellCount = await cells.count()
