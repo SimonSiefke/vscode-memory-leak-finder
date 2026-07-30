@@ -2012,6 +2012,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const list = notebookEditor.locator('.monaco-list')
       await expect(list).toBeVisible()
       await page.waitForIdle()
+      await list.focus()
+      await page.waitForIdle()
       await expect(list).toBeFocused()
       await page.waitForIdle()
     },

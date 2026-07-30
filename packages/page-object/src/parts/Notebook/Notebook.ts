@@ -221,9 +221,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await cell.hover()
           await page.waitForIdle()
           const splitAction = cell.locator('.cell-title-toolbar [aria-label^="Split Cell"]')
-          await expect(splitAction).toBeVisible({ timeout: 10_000 })
-          await page.waitForIdle()
-          await splitAction.click()
+          if (await splitAction.isVisible()) {
+            await page.waitForIdle()
+            await splitAction.click()
+          } else {
+            const quickPick = QuickPick.create({
+              electronApp,
+              expect,
+              ideVersion,
+              page,
+              platform,
+              VError,
+            })
+            await quickPick.executeCommand('Notebook: Split Cell')
+          }
           await page.waitForIdle()
           try {
             await expect(cells).toHaveCount(expectedCellCount, { timeout: 3000 })
