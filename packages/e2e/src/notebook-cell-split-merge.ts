@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace, SideBar }: TestContext): Promise<void> => {
   const notebook = {
     cells: [
       {
@@ -34,6 +34,7 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.shouldHaveItem('test.ipynb')
+  await SideBar.hide()
   await Editor.open('test.ipynb')
 }
 

@@ -96,7 +96,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async mergeCell(cellIndex = 0) {
       try {
         await page.waitForIdle()
-        const notebook = page.locator('[aria-label^="Notebook"]')
+        const notebook = page.locator('.notebook-editor')
         await expect(notebook).toBeVisible()
         const cells = notebook.locator('.code-cell-row, .markdown-cell-row')
         await expect(cells.first()).toBeVisible({ timeout: 10_000 })
@@ -121,6 +121,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount - 1)
       } catch (error) {
+        console.log(error)
+        await new Promise((r) => {})
         throw new VError(error, `Failed to merge notebook cell at index ${cellIndex}`)
       }
     },
@@ -133,7 +135,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async scrollDown() {
       try {
         await page.waitForIdle()
-        const scrollContainer = page.locator('[aria-label^="Notebook"] .monaco-scrollable-element')
+        const scrollContainer = page.locator('.notebook-editor .monaco-scrollable-element')
         await expect(scrollContainer).toBeVisible()
         await scrollContainer.scrollDown()
       } catch (error) {
@@ -143,7 +145,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async scrollUp() {
       try {
         await page.waitForIdle()
-        const scrollContainer = page.locator('[aria-label^="Notebook"] .monaco-scrollable-element')
+        const scrollContainer = page.locator('.notebook-editor .monaco-scrollable-element')
         await expect(scrollContainer).toBeVisible()
         await scrollContainer.scrollUp()
         await page.waitForIdle()
@@ -154,7 +156,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async splitCell(cellIndex = 0) {
       try {
         await page.waitForIdle()
-        const notebook = page.locator('[aria-label^="Notebook"]')
+        const notebook = page.locator('.notebook-editor')
         await expect(notebook).toBeVisible()
         const cells = notebook.locator('.code-cell-row, .markdown-cell-row')
         await expect(cells.first()).toBeVisible({ timeout: 10_000 })
