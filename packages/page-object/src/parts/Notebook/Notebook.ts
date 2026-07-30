@@ -200,7 +200,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (initialCellCount < cellIndex + 1) {
           throw new Error(`Cell at index ${cellIndex} does not exist`)
         }
-        const splitChordModifier = platform === 'darwin' ? 'Meta' : 'Control'
         const expectedCellCount = initialCellCount + 1
         for (let attempt = 0; attempt < 3; attempt++) {
           const cell = cells.nth(cellIndex)
@@ -221,8 +220,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await page.waitForIdle()
           await page.keyboard.press('Home')
           await page.waitForIdle()
-          await page.keyboard.press(`${splitChordModifier}+k`)
-          await page.keyboard.press(`${splitChordModifier}+Shift+\\`)
+          await cell.hover()
+          await page.waitForIdle()
+          const splitAction = cell.locator('.cell-title-toolbar [aria-label="Split Cell"]')
+          await expect(splitAction).toBeVisible({ timeout: 10_000 })
+          await page.waitForIdle()
+          await splitAction.click()
           await page.waitForIdle()
           try {
             await expect(cells).toHaveCount(expectedCellCount, { timeout: 3000 })
