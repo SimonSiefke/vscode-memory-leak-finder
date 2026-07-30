@@ -98,7 +98,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const notebook = page.locator('.notebook-editor')
         await expect(notebook).toBeVisible()
-        const cells = notebook.locator('.code-cell-row, .markdown-cell-row')
+        const cells = notebook.locator(':is(.code-cell-row, .markdown-cell-row)')
         await expect(cells.first()).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
         const initialCellCount = await cells.count()
@@ -107,19 +107,25 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         const cell = cells.nth(cellIndex)
         await expect(cell).toBeVisible()
-        await cell.click()
+        await cell.hover()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
+        const moreActions = cell.locator('.cell-title-toolbar [aria-label="More Actions..."]')
+        await expect(moreActions).toBeVisible()
+        await moreActions.click()
+        const contextMenu = page.locator(
+          '.monaco-dropdown.active .shadow-root-host:enter-shadow() .context-view.monaco-menu-container .actions-container',
+        )
+        await expect(contextMenu).toBeVisible()
+        const joinAction = contextMenu.locator('.action-item', {
+          hasText: 'Join With Next Cell',
         })
-        await quickPick.executeCommand('Notebook: Join With Next Cell')
+        await expect(joinAction).toBeVisible()
+        await joinAction.clickExponential({
+          waitForHidden: contextMenu,
+        })
         await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount - 1, { timeout: 10_000 })
+        await expect(cells.nth(cellIndex).locator('.view-line').nth(1)).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to merge notebook cell at index ${cellIndex}`)
       }
@@ -156,7 +162,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const notebook = page.locator('.notebook-editor')
         await expect(notebook).toBeVisible()
-        const cells = notebook.locator('.code-cell-row, .markdown-cell-row')
+        const cells = notebook.locator(':is(.code-cell-row, .markdown-cell-row)')
         await expect(cells.first()).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
         const initialCellCount = await cells.count()
@@ -165,14 +171,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         const cell = cells.nth(cellIndex)
         await expect(cell).toBeVisible()
-        await cell.click()
-        await page.waitForIdle()
         const editor = cell.locator('.monaco-editor')
         const editorInput =
           ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100
             ? editor.locator('.inputarea')
             : editor.locator('.native-edit-context')
-        await editorInput.focus()
+        const splitLine = editor.locator('.view-line').nth(1)
+        await expect(splitLine).toBeVisible()
+        await splitLine.click()
         await expect(editorInput).toBeFocused()
         await page.keyboard.press('Home')
         const splitChordModifier = platform === 'darwin' ? 'Meta' : 'Control'
