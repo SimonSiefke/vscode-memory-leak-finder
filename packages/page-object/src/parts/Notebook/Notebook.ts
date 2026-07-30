@@ -167,6 +167,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(cell).toBeVisible()
         await cell.click()
         await page.waitForIdle()
+        const editor = cell.locator('.monaco-editor')
+        const editorInput =
+          ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100
+            ? editor.locator('.inputarea')
+            : editor.locator('.native-edit-context')
+        await editorInput.focus()
+        await expect(editorInput).toBeFocused()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({
           electronApp,
           expect,
