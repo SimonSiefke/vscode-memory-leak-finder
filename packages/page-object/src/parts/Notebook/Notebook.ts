@@ -188,27 +188,38 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (initialCellCount < cellIndex + 1) {
           throw new Error(`Cell at index ${cellIndex} does not exist`)
         }
-        const cell = cells.nth(cellIndex)
-        await expect(cell).toBeVisible()
-        const editor = cell.locator('.monaco-editor')
-        const editorInput =
-          ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100
-            ? editor.locator('.inputarea')
-            : editor.locator('.native-edit-context')
-        const splitLine = editor.locator('.view-line').nth(1)
-        await expect(splitLine).toBeVisible()
-        await page.waitForIdle()
-        await splitLine.click()
-        await page.waitForIdle()
-        await expect(editorInput).toBeFocused()
-        await page.waitForIdle()
-        await page.keyboard.press('Home')
-        await page.waitForIdle()
         const splitChordModifier = platform === 'darwin' ? 'Meta' : 'Control'
-        await page.keyboard.press(`${splitChordModifier}+k`)
-        await page.keyboard.press(`${splitChordModifier}+Shift+\\`)
-        await page.waitForIdle()
-        await expect(cells).toHaveCount(initialCellCount + 1, { timeout: 10_000 })
+        const expectedCellCount = initialCellCount + 1
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const cell = cells.nth(cellIndex)
+          await expect(cell).toBeVisible()
+          const editor = cell.locator('.monaco-editor')
+          const editorInput =
+            ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100
+              ? editor.locator('.inputarea')
+              : editor.locator('.native-edit-context')
+          const splitLine = editor.locator('.view-line').nth(1)
+          await expect(splitLine).toBeVisible()
+          await page.waitForIdle()
+          await splitLine.click()
+          await page.waitForIdle()
+          await expect(editorInput).toBeFocused()
+          await page.waitForIdle()
+          await page.keyboard.press('Home')
+          await page.waitForIdle()
+          await page.keyboard.press(`${splitChordModifier}+k`)
+          await page.keyboard.press(`${splitChordModifier}+Shift+\\`)
+          await page.waitForIdle()
+          try {
+            await expect(cells).toHaveCount(expectedCellCount, { timeout: 3000 })
+            break
+          } catch {
+            if ((await cells.count()) !== initialCellCount) {
+              break
+            }
+          }
+        }
+        await expect(cells).toHaveCount(expectedCellCount, { timeout: 10_000 })
       } catch (error) {
         throw new VError(error, `Failed to split notebook cell at index ${cellIndex}`)
       }
