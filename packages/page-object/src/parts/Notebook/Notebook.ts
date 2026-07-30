@@ -111,19 +111,25 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const moreActions = cell.locator('.cell-title-toolbar [aria-label="More Actions..."]')
         await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
         await moreActions.click()
+        await page.waitForIdle()
         const contextMenu = page.locator(
           '.monaco-dropdown.active .shadow-root-host:enter-shadow() .context-view.monaco-menu-container .actions-container',
         )
         await expect(contextMenu).toBeVisible()
-        const joinAction = contextMenu.locator('.action-label[aria-label="Join With Next Cell"]')
+        await page.waitForIdle()
+        const joinAction = contextMenu.locator('.action-item', {
+          hasText: 'Join With Next Cell',
+        })
         await expect(joinAction).toBeVisible()
-        await joinAction.focus()
-        await expect(joinAction).toBeFocused()
-        await joinAction.press('Enter')
+        await page.waitForIdle()
+        await joinAction.click()
+        await page.waitForIdle()
         await expect(cells).toHaveCount(initialCellCount - 1, { timeout: 10_000 })
         if (await contextMenu.isVisible()) {
           await page.keyboard.press('Escape')
+          await page.waitForIdle()
           await expect(contextMenu).toBeHidden({ timeout: 10_000 })
         }
         await page.waitForIdle()
@@ -180,9 +186,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             : editor.locator('.native-edit-context')
         const splitLine = editor.locator('.view-line').nth(1)
         await expect(splitLine).toBeVisible()
+        await page.waitForIdle()
         await splitLine.click()
+        await page.waitForIdle()
         await expect(editorInput).toBeFocused()
+        await page.waitForIdle()
         await page.keyboard.press('Home')
+        await page.waitForIdle()
         const splitChordModifier = platform === 'darwin' ? 'Meta' : 'Control'
         await page.keyboard.press(`${splitChordModifier}+k`)
         await page.keyboard.press(`${splitChordModifier}+Shift+\\`)
