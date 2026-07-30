@@ -123,10 +123,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           hasText: 'Join With Next Cell',
         })
         await expect(joinAction).toBeVisible()
-        await page.waitForIdle()
-        await joinAction.click()
-        await page.waitForIdle()
-        await expect(cells).toHaveCount(initialCellCount - 1, { timeout: 10_000 })
+        const expectedCellCount = initialCellCount - 1
+        for (let attempt = 0; attempt < 3; attempt++) {
+          await page.waitForIdle()
+          await joinAction.click()
+          await page.waitForIdle()
+          try {
+            await expect(cells).toHaveCount(expectedCellCount, { timeout: 3000 })
+            break
+          } catch {
+            if (!(await contextMenu.isVisible())) {
+              break
+            }
+          }
+        }
+        await expect(cells).toHaveCount(expectedCellCount, { timeout: 10_000 })
         if (await contextMenu.isVisible()) {
           await page.keyboard.press('Escape')
           await page.waitForIdle()
