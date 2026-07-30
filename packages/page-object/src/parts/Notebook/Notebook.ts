@@ -98,6 +98,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const notebook = page.locator('.notebook-editor')
         await expect(notebook).toBeVisible()
+        if (cellIndex === 0) {
+          const scrollContainer = notebook.locator('.monaco-scrollable-element').first()
+          await expect(scrollContainer).toBeVisible({ timeout: 10_000 })
+          await scrollContainer.scrollUp()
+          await page.waitForIdle()
+        }
         const cells = notebook.locator(':is(.code-cell-row, .markdown-cell-row)')
         await expect(cells.first()).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
@@ -181,6 +187,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const notebook = page.locator('.notebook-editor')
         await expect(notebook).toBeVisible()
+        if (cellIndex === 0) {
+          const scrollContainer = notebook.locator('.monaco-scrollable-element').first()
+          await expect(scrollContainer).toBeVisible({ timeout: 10_000 })
+          await scrollContainer.scrollUp()
+          await page.waitForIdle()
+        }
         const cells = notebook.locator(':is(.code-cell-row, .markdown-cell-row)')
         await expect(cells.first()).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
@@ -198,12 +210,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100
               ? editor.locator('.inputarea')
               : editor.locator('.native-edit-context')
-          const splitLine = editor.locator('.view-line').nth(1)
-          await expect(splitLine).toBeVisible()
+          const editorLine = editor.locator('.view-line').first()
+          await expect(editorLine).toBeVisible({ timeout: 10_000 })
           await page.waitForIdle()
-          await splitLine.click()
+          await editorLine.click()
           await page.waitForIdle()
           await expect(editorInput).toBeFocused()
+          await page.waitForIdle()
+          await page.keyboard.press(platform === 'darwin' ? 'Meta+ArrowDown' : 'Control+End')
           await page.waitForIdle()
           await page.keyboard.press('Home')
           await page.waitForIdle()
