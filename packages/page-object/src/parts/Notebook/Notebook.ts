@@ -116,11 +116,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           '.monaco-dropdown.active .shadow-root-host:enter-shadow() .context-view.monaco-menu-container .actions-container',
         )
         await expect(contextMenu).toBeVisible()
-        const joinAction = contextMenu.locator('.action-item', {
-          hasText: 'Join With Next Cell',
-        })
+        const joinAction = contextMenu.locator('.action-label[aria-label="Join With Next Cell"]')
         await expect(joinAction).toBeVisible()
-        await joinAction.click()
+        await joinAction.focus()
+        await expect(joinAction).toBeFocused()
+        await joinAction.press('Enter')
         await expect(cells).toHaveCount(initialCellCount - 1, { timeout: 10_000 })
         if (await contextMenu.isVisible()) {
           await page.keyboard.press('Escape')
