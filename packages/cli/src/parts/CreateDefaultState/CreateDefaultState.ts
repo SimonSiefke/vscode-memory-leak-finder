@@ -10,6 +10,7 @@ export const createDefaultState = (): StdinDataState => ({
   buffering: false,
   checkLeaks: false,
   clearExtensions: true,
+  color: true,
   compressVideo: false,
   continueValue: '',
   cwd: '',
