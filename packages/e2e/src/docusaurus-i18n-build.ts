@@ -197,15 +197,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
   socketPath = `/tmp/vscode-memory-leak-finder-docusaurus-${serverPort}.sock`
   nextLocaleIndex = 0
   await ExternalRuntime.startExternalRuntime({
-    args: [
-      `--inspect=127.0.0.1:${inspectPort}`,
-      '--expose-gc',
-      docusaurusBin,
-      'build',
-      '--locale',
-      'en',
-      '--no-minify',
-    ],
+    args: [`--inspect=127.0.0.1:${inspectPort}`, '--expose-gc', docusaurusBin, 'build', '--locale', 'en', '--no-minify'],
     command: process.execPath,
     cwd: 'docusaurus-site',
     entryFile: 'patch-docusaurus.mjs',
@@ -247,18 +239,11 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
               command: 'ln',
             },
             {
-              args: [
-                'docusaurus-site/node_modules/@docusaurus',
-                'docusaurus-site/node_modules/@docusaurus-published',
-              ],
+              args: ['docusaurus-site/node_modules/@docusaurus', 'docusaurus-site/node_modules/@docusaurus-published'],
               command: 'mv',
             },
             {
-              args: [
-                '--symbolic',
-                `${localDocusaurusRepo}/website/node_modules/@docusaurus`,
-                'docusaurus-site/node_modules/@docusaurus',
-              ],
+              args: ['--symbolic', `${localDocusaurusRepo}/website/node_modules/@docusaurus`, 'docusaurus-site/node_modules/@docusaurus'],
               command: 'ln',
             },
           ]
