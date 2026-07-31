@@ -24,10 +24,16 @@ open .memory-leak-report/index.html
 ```
 
 The generator uses GitHub GraphQL to discover repositories with at least 5,000
-stars, filters them to projects with a root `package.json`, and searches each
-issue tracker's titles and bodies for the phrase `"memory leak"`. Docusaurus and
-Rspack are included as seed repositories. Authentication comes from
-`GITHUB_TOKEN`, `GH_TOKEN`, or the active `gh` CLI login.
+stars, filters them to projects with a root `package.json`, and scans up to 600
+repositories by default. It searches each issue tracker's titles and bodies for
+the phrase `"memory leak"`. Docusaurus and Rspack are included as seed
+repositories. Authentication comes from `GITHUB_TOKEN`, `GH_TOKEN`, or the
+active `gh` CLI login.
+
+GitHub requests are sequential and paced by 750 milliseconds. The generator
+automatically retries transient and secondary-rate-limit responses, and waits
+for the primary GraphQL limit to reset before it is exhausted. Use
+`--request-delay-ms` to adjust the pacing when needed.
 
 Repositories on the built-in denylist are skipped by owner or repository name,
 with case and punctuation ignored. Pass `--include-ignored` to include them;

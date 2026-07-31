@@ -46,6 +46,7 @@ test('parseMemoryLeakReportArgs parses report limits and keeps explicit reposito
     '--max-repos',
     '25',
     '--issues-per-state=10',
+    '--request-delay-ms=1000',
     '--repo',
     'example/tool',
     '--no-seed-repos',
@@ -55,6 +56,7 @@ test('parseMemoryLeakReportArgs parses report limits and keeps explicit reposito
     minStars: 1000,
     maxRepositories: 25,
     issuesPerState: 10,
+    requestDelayMs: 1000,
     seedRepositories: ['example/tool'],
     ignoredRepositories: DEFAULT_IGNORED_REPOSITORIES,
   })
@@ -68,10 +70,16 @@ test('parseMemoryLeakReportArgs can disable the default repository denylist', ()
   expect(parseMemoryLeakReportArgs(['--include-ignored']).ignoredRepositories).toEqual([])
 })
 
+test('parseMemoryLeakReportArgs permits disabling request pacing', () => {
+  expect(parseMemoryLeakReportArgs(['--request-delay-ms=0']).requestDelayMs).toBe(0)
+})
+
 test('isRepositoryIgnored matches owners and repository names without case or punctuation sensitivity', () => {
   expect(isRepositoryIgnored('openclaw/openclaw', DEFAULT_IGNORED_REPOSITORIES)).toBe(true)
   expect(isRepositoryIgnored('vercel/next.js', DEFAULT_IGNORED_REPOSITORIES)).toBe(true)
   expect(isRepositoryIgnored('modelcontextprotocol/typescript-sdk', DEFAULT_IGNORED_REPOSITORIES)).toBe(true)
+  expect(isRepositoryIgnored('coder/code-server', DEFAULT_IGNORED_REPOSITORIES)).toBe(true)
+  expect(isRepositoryIgnored('nestjs/nest', DEFAULT_IGNORED_REPOSITORIES)).toBe(true)
   expect(isRepositoryIgnored('facebook/docusaurus', DEFAULT_IGNORED_REPOSITORIES)).toBe(false)
 })
 

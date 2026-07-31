@@ -5,8 +5,9 @@ import { pathToFileURL } from 'node:url'
 import { renderMemoryLeakReport } from './memoryLeakReportHtml.ts'
 
 export const DEFAULT_MIN_STARS = 5_000
-export const DEFAULT_MAX_REPOSITORIES = 50
+export const DEFAULT_MAX_REPOSITORIES = 600
 export const DEFAULT_ISSUES_PER_STATE = 20
+export const DEFAULT_REQUEST_DELAY_MS = 750
 export const DEFAULT_SEED_REPOSITORIES = ['facebook/docusaurus', 'web-infra-dev/rspack'] as const
 export const DEFAULT_IGNORED_REPOSITORIES = [
   'openclaw',
@@ -23,6 +24,17 @@ export const DEFAULT_IGNORED_REPOSITORIES = [
   'gstack',
   'caveman',
   '30-seconds-of-code',
+  'n8n',
+  'developer-roadmap',
+  'dify',
+  'clash-verge-rev',
+  'uptime-kuma',
+  'lobehub',
+  'github-readme-stats',
+  'codeserver',
+  'worldmonitor',
+  'nestjs',
+  'json-server',
 ] as const
 
 const root = join(import.meta.dirname, '../../..')
@@ -31,6 +43,8 @@ const githubGraphqlUrl = 'https://api.github.com/graphql'
 const issueBatchSize = 5
 const repositoryBatchSize = 25
 const retryableStatusCodes = new Set([502, 503, 504])
+const githubRateLimitReserve = 100
+const githubSearchResultLimit = 1_000
 
 export interface MemoryLeakReportOptions {
   readonly minStars: number
@@ -39,6 +53,7 @@ export interface MemoryLeakReportOptions {
   readonly outputPath: string
   readonly seedRepositories: readonly string[]
   readonly ignoredRepositories: readonly string[]
+  readonly requestDelayMs: number
 }
 
 export interface RepositoryCandidate {
@@ -120,6 +135,19 @@ interface GraphqlResponse<T> {
   }[]
 }
 
+interface GithubClient {
+  readonly token: string
+  readonly requestDelayMs: number
+  nextRequestAt: number
+  rateLimitRemaining: number | undefined
+  rateLimitResetAt: number | undefined
+}
+
+interface PageInfo {
+  readonly endCursor: string | null
+  readonly hasNextPage: boolean
+}
+
 const parsePositiveInteger = (value: string, optionName: string, allowZero = false): number => {
   const parsed = Number(value)
   if (!Number.isInteger(parsed) || parsed < (allowZero ? 0 : 1)) {
@@ -140,6 +168,7 @@ export const parseMemoryLeakReportArgs = (args: readonly string[]): MemoryLeakRe
   let minStars = DEFAULT_MIN_STARS
   let maxRepositories = DEFAULT_MAX_REPOSITORIES
   let issuesPerState = DEFAULT_ISSUES_PER_STATE
+  let requestDelayMs = DEFAULT_REQUEST_DELAY_MS
   let outputPath = defaultOutputPath
   let includeDefaultSeeds = true
   let includeIgnoredRepositories = false
@@ -162,6 +191,11 @@ export const parseMemoryLeakReportArgs = (args: readonly string[]): MemoryLeakRe
       index++
     } else if (arg.startsWith('--issues-per-state=')) {
       issuesPerState = parsePositiveInteger(arg.slice('--issues-per-state='.length), '--issues-per-state')
+    } else if (arg === '--request-delay-ms') {
+      requestDelayMs = parsePositiveInteger(parseOptionValue(args, index, arg), arg, true)
+      index++
+    } else if (arg.startsWith('--request-delay-ms=')) {
+      requestDelayMs = parsePositiveInteger(arg.slice('--request-delay-ms='.length), '--request-delay-ms', true)
     } else if (arg === '--output') {
       outputPath = resolve(parseOptionValue(args, index, arg))
       index++
@@ -201,6 +235,7 @@ export const parseMemoryLeakReportArgs = (args: readonly string[]): MemoryLeakRe
     outputPath,
     seedRepositories: [...new Set(seedRepositories)],
     ignoredRepositories: includeIgnoredRepositories ? [] : DEFAULT_IGNORED_REPOSITORIES,
+    requestDelayMs,
   }
 }
 
@@ -213,6 +248,7 @@ Options:
   --min-stars <number>        Minimum stars for discovered repositories (default: ${DEFAULT_MIN_STARS})
   --max-repos <number>        Maximum repositories to scan, including seeds (default: ${DEFAULT_MAX_REPOSITORIES})
   --issues-per-state <number> Issue cards retained per open/closed column (default: ${DEFAULT_ISSUES_PER_STATE})
+  --request-delay-ms <number> Minimum delay between GitHub requests (default: ${DEFAULT_REQUEST_DELAY_MS})
   --output <path>             HTML output path (default: .memory-leak-report/index.html)
   --repo <owner/name>         Always include a repository; can be repeated
   --no-seed-repos             Do not include Docusaurus and Rspack automatically
@@ -279,24 +315,88 @@ const getGithubToken = (): string => {
   }
 }
 
-const graphql = async <T>(token: string, query: string): Promise<T> => {
+const delay = async (milliseconds: number): Promise<void> => {
+  await new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds))
+}
+
+const waitForGithubAvailability = async (client: GithubClient): Promise<void> => {
+  if (client.rateLimitRemaining !== undefined && client.rateLimitRemaining < githubRateLimitReserve) {
+    const waitMilliseconds = Math.max(1_000, (client.rateLimitResetAt || Date.now() + 60_000) - Date.now() + 1_000)
+    console.log(
+      `GitHub rate limit has ${client.rateLimitRemaining} points left; waiting ${Math.ceil(waitMilliseconds / 1_000)}s for reset...`,
+    )
+    await delay(waitMilliseconds)
+    client.rateLimitRemaining = undefined
+    client.rateLimitResetAt = undefined
+  }
+  const pacingDelay = client.nextRequestAt - Date.now()
+  if (pacingDelay > 0) {
+    await delay(pacingDelay)
+  }
+}
+
+const updateRateLimit = (client: GithubClient, response: Response): void => {
+  const remainingHeader = response.headers.get('x-ratelimit-remaining')
+  const resetHeader = response.headers.get('x-ratelimit-reset')
+  if (remainingHeader !== null) {
+    const remaining = Number(remainingHeader)
+    if (Number.isFinite(remaining)) {
+      client.rateLimitRemaining = remaining
+    }
+  }
+  if (resetHeader !== null) {
+    const reset = Number(resetHeader)
+    if (Number.isFinite(reset) && reset > 0) {
+      client.rateLimitResetAt = reset * 1_000
+    }
+  }
+  client.nextRequestAt = Date.now() + client.requestDelayMs
+}
+
+const getRetryDelay = (response: Response, attempt: number): number | undefined => {
+  const retryAfter = Number(response.headers.get('retry-after'))
+  if (Number.isFinite(retryAfter) && retryAfter > 0) {
+    return retryAfter * 1_000
+  }
+  if (response.status === 403 || response.status === 429) {
+    const remaining = response.headers.get('x-ratelimit-remaining')
+    const reset = Number(response.headers.get('x-ratelimit-reset'))
+    if (remaining === '0' && Number.isFinite(reset) && reset > 0) {
+      return Math.max(1_000, reset * 1_000 - Date.now() + 1_000)
+    }
+    return 60_000 * (attempt + 1)
+  }
+  if (retryableStatusCodes.has(response.status)) {
+    return 500 * 2 ** attempt
+  }
+  return undefined
+}
+
+const graphql = async <T>(client: GithubClient, query: string): Promise<T> => {
   let response: Response | undefined
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    await waitForGithubAvailability(client)
     response = await fetch(githubGraphqlUrl, {
       method: 'POST',
       headers: {
         Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${client.token}`,
         'Content-Type': 'application/json',
         'User-Agent': 'vscode-memory-leak-finder',
         'X-GitHub-Api-Version': '2022-11-28',
       },
       body: JSON.stringify({ query }),
     })
-    if (response.ok || !retryableStatusCodes.has(response.status)) {
+    updateRateLimit(client, response)
+    if (response.ok) {
       break
     }
-    await new Promise((resolveRetry) => setTimeout(resolveRetry, 500 * 2 ** attempt))
+    const retryDelay = getRetryDelay(response, attempt)
+    if (retryDelay === undefined || attempt === 4) {
+      break
+    }
+    console.log(`GitHub returned ${response.status}; retrying in ${Math.ceil(retryDelay / 1_000)}s...`)
+    await delay(retryDelay)
   }
   if (!response?.ok) {
     throw new Error(`GitHub GraphQL request failed: ${response?.status || 'unknown'} ${response?.statusText || ''}`.trim())
@@ -328,41 +428,54 @@ const repositoryFields = `
 `
 
 const discoverRepositories = async (
-  token: string,
+  client: GithubClient,
   maxRepositories: number,
   minStars: number,
   ignoredRepositories: readonly string[],
 ): Promise<RepositoryCandidate[]> => {
-  const candidatesPerSearch = Math.min(100, Math.max(maxRepositories * 2, 50))
+  const candidatesPerPage = 100
+  const candidateTarget = Math.min(githubSearchResultLimit * 3, Math.max(maxRepositories * 2, 100))
   const searches = [
     `language:JavaScript stars:>=${minStars} fork:false archived:false sort:stars-desc`,
     `language:TypeScript stars:>=${minStars} fork:false archived:false sort:stars-desc`,
     `topic:nodejs stars:>=${minStars} fork:false archived:false sort:stars-desc`,
   ]
-  const repositories: RepositorySummary[] = []
-  for (const search of searches) {
-    const data = await graphql<{ readonly search: { readonly nodes: readonly RepositorySummary[] } }>(
-      token,
-      `query { search(query: ${JSON.stringify(search)}, type: REPOSITORY, first: ${candidatesPerSearch}) {
-        nodes { ... on Repository { ${repositorySummaryFields} } }
-      } }`,
-    )
-    repositories.push(...data.search.nodes)
-  }
   const uniqueRepositories = new Map<string, RepositorySummary>()
-  for (const repository of repositories) {
-    uniqueRepositories.set(repository.nameWithOwner.toLowerCase(), repository)
+  const searchStates = searches.map((search) => ({ search, cursor: undefined as string | undefined, hasNextPage: true }))
+  for (let page = 0; page < githubSearchResultLimit / candidatesPerPage && uniqueRepositories.size < candidateTarget; page++) {
+    for (const state of searchStates) {
+      if (!state.hasNextPage) {
+        continue
+      }
+      const after = state.cursor ? `, after: ${JSON.stringify(state.cursor)}` : ''
+      const data = await graphql<{
+        readonly search: { readonly nodes: readonly RepositorySummary[]; readonly pageInfo: PageInfo }
+      }>(
+        client,
+        `query { search(query: ${JSON.stringify(state.search)}, type: REPOSITORY, first: ${candidatesPerPage}${after}) {
+          nodes { ... on Repository { ${repositorySummaryFields} } }
+          pageInfo { endCursor hasNextPage }
+        } }`,
+      )
+      for (const repository of data.search.nodes) {
+        if (!isRepositoryIgnored(repository.nameWithOwner, ignoredRepositories)) {
+          uniqueRepositories.set(repository.nameWithOwner.toLowerCase(), repository)
+        }
+      }
+      state.cursor = data.search.pageInfo.endCursor || undefined
+      state.hasNextPage = data.search.pageInfo.hasNextPage
+    }
+    console.log(`Discovered ${uniqueRepositories.size} candidate repositories...`)
   }
-  const metadataCandidateCount = Math.min(uniqueRepositories.size, Math.max(maxRepositories * 3, 100))
+  const metadataCandidateCount = Math.min(uniqueRepositories.size, candidateTarget)
   const names = [...uniqueRepositories.values()]
-    .filter((repository) => !isRepositoryIgnored(repository.nameWithOwner, ignoredRepositories))
     .sort((a, b) => b.stargazerCount - a.stargazerCount)
     .slice(0, metadataCandidateCount)
     .map((repository) => repository.nameWithOwner)
-  return loadRepositories(token, names)
+  return loadRepositories(client, names)
 }
 
-const loadRepositories = async (token: string, repositories: readonly string[]): Promise<RepositoryCandidate[]> => {
+const loadRepositories = async (client: GithubClient, repositories: readonly string[]): Promise<RepositoryCandidate[]> => {
   if (repositories.length === 0) {
     return []
   }
@@ -375,14 +488,14 @@ const loadRepositories = async (token: string, repositories: readonly string[]):
         return `repository${index}: repository(owner: ${JSON.stringify(owner)}, name: ${JSON.stringify(name)}) { ${repositoryFields} }`
       })
       .join('\n')
-    const data = await graphql<Record<string, RepositoryCandidate | null>>(token, `query { ${fields} }`)
+    const data = await graphql<Record<string, RepositoryCandidate | null>>(client, `query { ${fields} }`)
     results.push(...Object.values(data).filter((repository): repository is RepositoryCandidate => Boolean(repository)))
   }
   return results
 }
 
-const loadSeedRepositories = async (token: string, repositories: readonly string[]): Promise<RepositoryCandidate[]> => {
-  const results = await loadRepositories(token, repositories)
+const loadSeedRepositories = async (client: GithubClient, repositories: readonly string[]): Promise<RepositoryCandidate[]> => {
+  const results = await loadRepositories(client, repositories)
   const found = new Set(results.map((repository) => repository.nameWithOwner.toLowerCase()))
   const missing = repositories.filter((repository) => !found.has(repository.toLowerCase()))
   if (missing.length > 0) {
@@ -413,7 +526,7 @@ export const sortRepositoryResults = (repositories: readonly RepositoryIssueResu
 }
 
 const searchRepositoryIssues = async (
-  token: string,
+  client: GithubClient,
   repositories: readonly RepositoryCandidate[],
   issuesPerState: number,
 ): Promise<RepositoryIssueResult[]> => {
@@ -434,7 +547,7 @@ const searchRepositoryIssues = async (
         )
       })
       .join('\n')
-    const data = await graphql<Record<string, SearchConnection<MemoryLeakIssue>>>(token, `query { ${fields} }`)
+    const data = await graphql<Record<string, SearchConnection<MemoryLeakIssue>>>(client, `query { ${fields} }`)
     for (let index = 0; index < batch.length; index++) {
       const repository = batch[index]
       const open = data[`open${index}`]
@@ -481,17 +594,22 @@ export const createMemoryLeakReportData = (
 
 export const generateMemoryLeakReport = async (options: MemoryLeakReportOptions): Promise<MemoryLeakReportData> => {
   const token = getGithubToken()
+  const client: GithubClient = {
+    token,
+    requestDelayMs: options.requestDelayMs,
+    nextRequestAt: 0,
+    rateLimitRemaining: undefined,
+    rateLimitResetAt: undefined,
+  }
   console.log('Discovering popular JavaScript, TypeScript, and Node.js repositories...')
-  const [discovered, seeds] = await Promise.all([
-    discoverRepositories(token, options.maxRepositories, options.minStars, options.ignoredRepositories),
-    loadSeedRepositories(token, options.seedRepositories),
-  ])
+  const seeds = await loadSeedRepositories(client, options.seedRepositories)
+  const discovered = await discoverRepositories(client, options.maxRepositories, options.minStars, options.ignoredRepositories)
   const repositories = selectRepositories(discovered, seeds, options)
   if (repositories.length === 0) {
     throw new Error('No eligible repositories were found')
   }
   console.log(`Scanning ${repositories.length} repositories with a root package.json...`)
-  const results = await searchRepositoryIssues(token, repositories, options.issuesPerState)
+  const results = await searchRepositoryIssues(client, repositories, options.issuesPerState)
   const report = createMemoryLeakReportData(results, options)
   await mkdir(dirname(options.outputPath), { recursive: true })
   await writeFile(options.outputPath, renderMemoryLeakReport(report), 'utf8')
