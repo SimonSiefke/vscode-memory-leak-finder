@@ -28,6 +28,6 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@lvce-editor/assert": "^1.7.0"
+    "@lvce-editor/assert": "^1.9.0"
   }
 }
