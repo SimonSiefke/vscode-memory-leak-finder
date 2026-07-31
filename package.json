@@ -35,7 +35,7 @@
     "@jest/globals": "^30.4.1",
     "@lerna/legacy-package-management": "^8.2.4",
     "@types/node": "^26.1.1",
-    "execa": "^10.0.0",
+    "execa": "^10.0.1",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "lerna": "^8.2.4",
