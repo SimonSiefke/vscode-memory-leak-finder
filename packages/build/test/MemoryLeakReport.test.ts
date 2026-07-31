@@ -40,6 +40,13 @@ const createResult = (repository: RepositoryCandidate, openCount: number, closed
   }
 }
 
+test('parseMemoryLeakReportArgs uses the large, paced scan defaults', () => {
+  expect(parseMemoryLeakReportArgs([])).toMatchObject({
+    maxRepositories: 600,
+    requestDelayMs: 750,
+  })
+})
+
 test('parseMemoryLeakReportArgs parses report limits and keeps explicit repositories when defaults are disabled', () => {
   const options = parseMemoryLeakReportArgs([
     '--min-stars=1000',
