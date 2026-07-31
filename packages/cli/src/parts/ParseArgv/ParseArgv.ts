@@ -361,6 +361,13 @@ const parseClearExtensions = (argv: readonly string[]): boolean => {
   return argv.includes('--clear-extensions')
 }
 
+const parseColor = (argv: readonly string[]): boolean => {
+  if (argv.includes('--color')) {
+    return parseArgvString(argv, '--color') !== 'false'
+  }
+  return true
+}
+
 const parseUpdateUrl = (argv: readonly string[]): string => {
   if (argv.includes('--update-url')) {
     return parseArgvString(argv, '--update-url')
@@ -418,7 +425,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const buildVscodeMinified = parseBuildVscodeMinified(argv)
   const checkLeaks = parseCheckLeaks(argv)
   const clearExtensions = parseClearExtensions(argv)
-  const color = true
+  const color = parseColor(argv)
   const commit = parseCommit(argv)
   const convertRequestsToMocks = parseConvertRequestsToMocks(argv)
   const createAllMockDataZip = parseCreateAllMockDataZip(argv)

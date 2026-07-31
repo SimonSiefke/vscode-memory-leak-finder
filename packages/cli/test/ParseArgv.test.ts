@@ -22,6 +22,27 @@ test('parseArgv - headless mode', () => {
   })
 })
 
+test('parseArgv - color defaults to true', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: true,
+  })
+})
+
+test('parseArgv - color enabled', () => {
+  const argv = ['--color', 'true']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: true,
+  })
+})
+
+test('parseArgv - color disabled', () => {
+  const argv = ['--color', 'false']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: false,
+  })
+})
+
 test('parseArgv - run skipped tests anyway', () => {
   const argv = ['--run-skipped-tests-anyway']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({

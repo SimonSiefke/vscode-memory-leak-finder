@@ -10,6 +10,7 @@ export interface StdinDataState {
   readonly buffering: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
+  readonly color: boolean
   readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
@@ -66,6 +67,7 @@ let state: StdinDataState = {
   buffering: false,
   checkLeaks: false,
   clearExtensions: true,
+  color: true,
   compressVideo: false,
   continueValue: '',
   cwd: Character.EmptyString,
@@ -122,6 +124,7 @@ export const setState = (newState: StdinDataState): void => {
     bisect: newState.bisect,
     buildVscodeMinified: newState.buildVscodeMinified,
     checkLeaks: newState.checkLeaks,
+    color: newState.color,
     compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,
     cwd: newState.cwd,
