@@ -24,7 +24,7 @@
     }
   },
   "dependencies": {
-    "@lvce-editor/rpc": "^6.14.0",
+    "@lvce-editor/rpc": "^6.15.0",
     "@lvce-editor/verror": "^1.7.0",
     "@vscode/sqlite3": "^5.1.14-vscode"
   }

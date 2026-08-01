@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.9.0",
-    "@lvce-editor/rpc": "^6.14.0",
+    "@lvce-editor/rpc": "^6.15.0",
     "@lvce-editor/verror": "^1.7.0",
     "execa": "^10.0.1",
     "http-proxy-agent": "^9.1.0"
