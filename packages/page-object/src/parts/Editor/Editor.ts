@@ -1620,14 +1620,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
-        await page.waitForIdle()
-        const widgetText = await inspectWidget.textContent()
-        if (widgetText) {
-          const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
-          if (hasSemanticTokenType) {
-            throw new Error(`Semantic token information found but should not be present. Widget text: ${widgetText}`)
-          }
-        }
+        await expect(inspectWidget).toHaveText(/^(?!.*semantic token type)[\s\S]*$/i)
       } catch (error) {
         throw new VError(error, `Failed to verify semantic token ${type} is not present`)
       }
