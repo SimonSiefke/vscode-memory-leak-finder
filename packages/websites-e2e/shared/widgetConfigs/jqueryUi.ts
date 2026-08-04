@@ -4,7 +4,7 @@ const demoUrl = (widget: string, demo = 'default'): string => `https://jqueryui.
 
 const mouseDrag = `
       const drag = (element, fromX, fromY, toX, toY, modifier = {}) => {
-        element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: fromX, clientY: fromY, ...modifier }))
+        element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, buttons: 1, clientX: fromX, clientY: fromY, ...modifier }))
         document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, buttons: 1, clientX: fromX + (toX - fromX) / 3, clientY: fromY + (toY - fromY) / 3, ...modifier }))
         document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, buttons: 1, clientX: fromX + ((toX - fromX) * 2) / 3, clientY: fromY + ((toY - fromY) * 2) / 3, ...modifier }))
         document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, buttons: 1, clientX: toX, clientY: toY, ...modifier }))
@@ -185,12 +185,12 @@ export const jqueryUiWidgetConfigs = {
     name: 'jqueryui-slider-step-restore',
     url: demoUrl('slider'),
     ready: `await waitFor(() => document.querySelector('#slider .ui-slider-handle'), 'Expected jQuery UI slider')`,
-    run: `
+    run: `${mouseDrag}
       const handle = document.querySelector('#slider .ui-slider-handle')
       assert(handle instanceof HTMLElement, 'Expected slider handle')
       const initial = handle.getAttribute('aria-valuenow')
-      handle.focus()
-      handle.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, code: 'ArrowRight', key: 'ArrowRight', keyCode: 39, which: 39 }))
+      const rect = handle.getBoundingClientRect()
+      drag(handle, rect.left + rect.width / 2, rect.top + rect.height / 2, rect.left + rect.width / 2 + 30, rect.top + rect.height / 2)
       await waitFor(() => handle.getAttribute('aria-valuenow') !== initial, 'Expected incremented slider')`,
     reloadAfterRun: true,
   },
