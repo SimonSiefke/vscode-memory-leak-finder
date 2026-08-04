@@ -5,6 +5,8 @@ const demoUrl = (widget: string, demo = 'default'): string => `https://jqueryui.
 const mouseDrag = `
       const drag = (element, fromX, fromY, toX, toY, modifier = {}) => {
         element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: fromX, clientY: fromY, ...modifier }))
+        document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, buttons: 1, clientX: fromX + (toX - fromX) / 3, clientY: fromY + (toY - fromY) / 3, ...modifier }))
+        document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, buttons: 1, clientX: fromX + ((toX - fromX) * 2) / 3, clientY: fromY + ((toY - fromY) * 2) / 3, ...modifier }))
         document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, buttons: 1, clientX: toX, clientY: toY, ...modifier }))
         document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: toX, clientY: toY, ...modifier }))
       }`
@@ -131,9 +133,11 @@ export const jqueryUiWidgetConfigs = {
     run: `
       const item = document.querySelector('#menu [aria-haspopup="true"]')
       assert(item instanceof HTMLElement, 'Expected submenu item')
+      const submenu = item.closest('li')?.querySelector('ul')
+      assert(submenu instanceof HTMLElement, 'Expected nested submenu')
       item.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }))
       item.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
-      await waitFor(() => item.getAttribute('aria-expanded') === 'true', 'Expected open submenu')
+      await waitFor(() => submenu.offsetParent !== null, 'Expected open submenu')
       `,
     reloadAfterRun: true,
   },
@@ -173,9 +177,8 @@ export const jqueryUiWidgetConfigs = {
       const select = document.querySelector('#speed')
       assert(button instanceof HTMLElement && select instanceof HTMLSelectElement && select.value === 'Medium', 'Expected Medium selectmenu value')
       button.click()
-      const fast = await waitFor(() => Array.from(document.querySelectorAll('#speed-menu .ui-menu-item-wrapper')).find((item) => item.textContent === 'Fast'), 'Expected Fast option')
-      fast.click()
-      await waitFor(() => select.value === 'Fast', 'Expected Fast selectmenu value')`,
+      const fast = await waitFor(() => document.querySelector('#speed-menu')?.offsetParent !== null && Array.from(document.querySelectorAll('#speed-menu .ui-menu-item-wrapper')).find((item) => item.textContent === 'Fast'), 'Expected visible Fast option')
+      await clickUntil(fast, () => select.value === 'Fast', 'Expected Fast selectmenu value')`,
     reloadAfterRun: true,
   },
   'jqueryui-slider-step-restore': {
@@ -187,7 +190,7 @@ export const jqueryUiWidgetConfigs = {
       assert(handle instanceof HTMLElement, 'Expected slider handle')
       const initial = handle.getAttribute('aria-valuenow')
       handle.focus()
-      handle.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
+      handle.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, code: 'ArrowRight', key: 'ArrowRight', keyCode: 39, which: 39 }))
       await waitFor(() => handle.getAttribute('aria-valuenow') !== initial, 'Expected incremented slider')`,
     reloadAfterRun: true,
   },
@@ -221,10 +224,10 @@ export const jqueryUiWidgetConfigs = {
       const input = document.querySelector('#spinner')
       const wrapper = input?.closest('.ui-spinner')
       const up = wrapper?.querySelector('.ui-spinner-up')
-      const down = wrapper?.querySelector('.ui-spinner-down')
-      assert(input instanceof HTMLInputElement && up instanceof HTMLElement && down instanceof HTMLElement, 'Expected spinner controls')
+      assert(input instanceof HTMLInputElement && up instanceof HTMLElement, 'Expected spinner controls')
       const initial = input.value
-      up.click()
+      input.focus()
+      input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, code: 'ArrowUp', key: 'ArrowUp', keyCode: 38, which: 38 }))
       await waitFor(() => input.value !== initial, 'Expected incremented spinner')`,
     reloadAfterRun: true,
   },
@@ -237,7 +240,9 @@ export const jqueryUiWidgetConfigs = {
       const first = tabs[0]
       const second = tabs[1]
       assert(first instanceof HTMLElement && second instanceof HTMLElement, 'Expected tab controls')
-      second.click()
+      const secondLink = second.querySelector('a')
+      assert(secondLink instanceof HTMLElement, 'Expected second tab link')
+      secondLink.click()
       await waitFor(() => second.getAttribute('aria-selected') === 'true', 'Expected second tab')`,
     reloadAfterRun: true,
   },
