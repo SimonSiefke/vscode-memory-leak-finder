@@ -171,23 +171,40 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       try {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
+        const waitForQuickPick = async () => {
+          await expect(quickPick).toBeVisible({
+            timeout: 10_000,
+          })
+          await expect(quickPick).toBeVisible()
+          await page.waitForIdle()
+          await this.waitForInputVisible()
+        }
         // TODO there might be a conflict here when pressing the keyboard shortcut
         // too often, the quickpick opens, making the next statement pass
         // but then the keyboard shortcut is still processing, making the quickpick close again
         if (pressKeyOnce) {
-          await page.keyboard.press(key)
+          for (let attempt = 0; attempt < 3; attempt++) {
+            await page.keyboard.press(key)
+            try {
+              await waitForQuickPick()
+              return
+            } catch (error) {
+              if (attempt === 2) {
+                throw error
+              }
+              if (await quickPick.isVisible().catch(() => false)) {
+                await page.keyboard.press(KeyBindings.Escape)
+                await expect(quickPick).toBeHidden()
+              }
+            }
+          }
         } else {
           await page.pressKeyExponential({
             key: key,
             waitFor: quickPick,
           })
         }
-        await expect(quickPick).toBeVisible({
-          timeout: 10_000,
-        })
-        await expect(quickPick).toBeVisible()
-        await page.waitForIdle()
-        await this.waitForInputVisible()
+        await waitForQuickPick()
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }

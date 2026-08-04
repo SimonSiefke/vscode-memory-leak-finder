@@ -73,6 +73,34 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to close extensions suggestions`)
       }
     },
+    async disable({ id }: { id: string }) {
+      try {
+        if (!/^[a-z0-9.-]+$/i.test(id)) {
+          throw new Error(`id contains invalid characters`)
+        }
+        const editor = Editor.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await editor.closeAll()
+        await this.show()
+        await this.search(id)
+        const extensionRow = page.locator(`.monaco-list-row[data-extension-id*="${id}"]`).first()
+        await expect(extensionRow).toBeVisible({ timeout: 15_000 })
+        await extensionRow.click()
+        const extensionEditor = page.locator('.extension-editor')
+        await expect(extensionEditor).toBeVisible()
+        const extensionDetailView = ExtensionDetailView.create({ electronApp, expect, ideVersion, page, platform, VError })
+        const didDisable = await extensionDetailView.disableExtension()
+        if (didDisable) {
+          const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+          await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
+        }
+        const sideBar = SideBar.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await sideBar.hide()
+        await editor.closeAll()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to disable ${id}`)
+      }
+    },
     first: {
       async click() {
         // TODO select by data index

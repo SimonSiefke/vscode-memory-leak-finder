@@ -133,6 +133,7 @@ export const TogglePrimarySideBarPosition = 'View: Toggle Primary Side Bar Posit
 export const TogglePrimarySideBarVisibility = 'View: Toggle Primary Side Bar Visibility'
 export const ToggleProcessExplorer = 'Developer: Toggle Process Explorer'
 export const ToggleScreenCastMode = 'Developer: Toggle Screencast Mode'
+export const ToggleTitleBarMenu = 'View: Toggle Menu Bar'
 export const ToggleSecondarySideBarVisibility = 'Toggle Secondary Side Bar Visibility'
 export const ToggleScreenReaderAccessibilityMode = 'Toggle Screen Reader Accessibility Mode'
 export const ToggleZenMode = 'View: Toggle Zen Mode'

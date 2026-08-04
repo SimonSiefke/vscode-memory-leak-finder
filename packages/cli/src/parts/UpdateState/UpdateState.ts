@@ -33,7 +33,7 @@ export const updateState = async (newState: any): Promise<void> => {
       buildVscodeMinified: state.buildVscodeMinified,
       checkLeaks: state.checkLeaks,
       clearExtensions: state.clearExtensions,
-      color: true,
+      color: state.color,
       commit: '',
       compressVideo: state.compressVideo,
       continueValue: state.continueValue,

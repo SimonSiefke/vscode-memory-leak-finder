@@ -600,6 +600,8 @@ export const runTestsWithCallback = async ({
             failed++
           }
           const prettyError = await GetPrettyError.getPrettyError(error, color, root)
+          const end = Time.now()
+          const duration = end - start
           await callback(
             TestWorkerEventType.TestFailed,
             absolutePath,
@@ -608,6 +610,7 @@ export const runTestsWithCallback = async ({
             dirent,
             prettyError,
             wasOriginallySkipped,
+            duration,
           )
         }
       }
@@ -705,8 +708,8 @@ export const runTestsWithCallback = async ({
         await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
 
+      const start = i === 0 ? initialStart : Time.now()
       try {
-        const start = i === 0 ? initialStart : Time.now()
         if ((inspectIntegratedBrowser || inspectProcess) && workers.memoryRpc !== emptyRpc) {
           await workers.memoryRpc.dispose()
           workers.memoryRpc = emptyRpc
@@ -922,6 +925,8 @@ export const runTestsWithCallback = async ({
           failed++
         }
         const prettyError = await GetPrettyError.getPrettyError(error, color, root)
+        const end = Time.now()
+        const duration = end - start
         await callback(
           TestWorkerEventType.TestFailed,
           absolutePath,
@@ -930,6 +935,7 @@ export const runTestsWithCallback = async ({
           dirent,
           prettyError,
           wasOriginallySkipped,
+          duration,
         )
       }
     }

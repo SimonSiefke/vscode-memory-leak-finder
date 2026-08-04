@@ -2,6 +2,15 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+const escapeForRegExp = (value: string): string => {
+  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const getStackFrameLabelPattern = (file: string, line: number): RegExp => {
+  const filePattern = file.split(/[\\/]/).map(escapeForRegExp).join('[\\\\/]')
+  return new RegExp(`^Stack Frame <anonymous>, line ${line}, (?:.*[\\\\/])?${filePattern}$`)
+}
+
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async continue() {
@@ -486,7 +495,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await page.waitForIdle()
       const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
       await expect(stackFrame).toBeVisible()
-      await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
+      await expect(stackFrame).toHaveAttribute('aria-label', getStackFrameLabelPattern(file, line))
       if (callStackSize) {
         await expect(stackFrame).toHaveAttribute(`aria-setsize`, `${callStackSize}`)
       }

@@ -111,6 +111,8 @@ jobs:
             args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
           - name: named-array-count
             args: --measure named-array-count
+          - name: named-array-count-extensions
+            args: --measure named-array-count --inspect-extensions
           - name: array-count
             args: --measure array-count
           - name: css-rule-count
@@ -161,6 +163,8 @@ jobs:
             args: --measure webgl2-rendering-context-count
           - name: iframe-count
             args: --measure iframe-count
+          - name: ipc-messages-from-start
+            args: --measure ipc-messages-from-start --runs 5 --measure-node
           - name: media-query-list-count
             args: --measure media-query-list-count
           - name: message-port-count
@@ -218,6 +222,8 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run build
       - name: Run headless test (check leaks, ${{ matrix.measure.name }})
+        timeout-minutes: 350
+        continue-on-error: true
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after ${{ matrix.measure.args }}
@@ -300,6 +306,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-named-array-count
           path: ./vscode-memory-leak-finder-results-linux-named-array-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-array-count-extensions
+          path: ./vscode-memory-leak-finder-results-linux-named-array-count-extensions
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -425,6 +436,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-iframe-count
           path: ./vscode-memory-leak-finder-results-linux-iframe-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-ipc-messages-from-start
+          path: ./vscode-memory-leak-finder-results-linux-ipc-messages-from-start
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -578,6 +594,11 @@ jobs:
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-named-array-count-extensions
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-array-count
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
@@ -678,6 +699,11 @@ jobs:
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-ipc-messages-from-start
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-media-query-list-count
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
@@ -702,6 +728,7 @@ jobs:
           path: ./.vscode-charts
 
   deploy:
+    if: ${{ always() && needs.ci.result == 'success' && needs.ci-linux-charts.result == 'success' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

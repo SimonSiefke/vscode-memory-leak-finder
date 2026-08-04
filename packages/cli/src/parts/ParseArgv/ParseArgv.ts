@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { join, normalize, resolve } from 'node:path'
 import * as Ide from '../Ide/Ide.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
 import { root } from '../Root/Root.ts'
@@ -81,6 +81,10 @@ const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-skipped-tests-anyway')
 }
 
+const parseShowSkippedFailedTestDuration = (argv: readonly string[], env: NodeJS.ProcessEnv): boolean => {
+  return argv.includes('--show-skipped-failed-test-duration') || Boolean(env.CI || env.GITHUB_ACTIONS)
+}
+
 const parseRunNetworkTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-network-tests-anyway')
 }
@@ -154,6 +158,11 @@ const parseCwd = (cwd: string, argv: readonly string[]): string => {
     return parseArgvString(argv, '--cwd')
   }
   return join(root, 'packages/e2e')
+}
+
+const isWebsitesE2e = (cwd: string): boolean => {
+  const relativeWebsitesE2ePath = join('packages', 'websites-e2e')
+  return normalize(cwd) === relativeWebsitesE2ePath || resolve(cwd) === join(root, relativeWebsitesE2ePath)
 }
 
 const parseMeasure = (argv: readonly string[]): string => {
@@ -352,6 +361,13 @@ const parseClearExtensions = (argv: readonly string[]): boolean => {
   return argv.includes('--clear-extensions')
 }
 
+const parseColor = (argv: readonly string[]): boolean => {
+  if (argv.includes('--color')) {
+    return parseArgvString(argv, '--color') !== 'false'
+  }
+  return true
+}
+
 const parseUpdateUrl = (argv: readonly string[]): string => {
   if (argv.includes('--update-url')) {
     return parseArgvString(argv, '--update-url')
@@ -401,7 +417,7 @@ const parseResolveExtensionSourceMaps = (argv: readonly string[]): boolean => {
   return argv.includes('--resolve-extension-source-maps')
 }
 
-export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
+export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv = process.env) => {
   const platform = parsePlatform(processPlatform, argv)
   const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
@@ -409,7 +425,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const buildVscodeMinified = parseBuildVscodeMinified(argv)
   const checkLeaks = parseCheckLeaks(argv)
   const clearExtensions = parseClearExtensions(argv)
-  const color = true
+  const color = parseColor(argv)
   const commit = parseCommit(argv)
   const convertRequestsToMocks = parseConvertRequestsToMocks(argv)
   const createAllMockDataZip = parseCreateAllMockDataZip(argv)
@@ -440,6 +456,9 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const inspectSharedProcessPort = parseInspectSharedProcessPort(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  if (checkLeaks && isWebsitesE2e(cwd) && !inspectIntegratedBrowser) {
+    throw new Error('websites-e2e test measures can only be run with --inspect-integrated-browser')
+  }
   if (isIpcMessageCountMeasure(measure) && !measureNode) {
     throw new Error('--measure ipc-message-count requires --measure-node')
   }
@@ -459,6 +478,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     throw new Error('--startup-runs can only be used with --measure cpu-performance-counters-from-start')
   }
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
+  const showSkippedFailedTestDuration = parseShowSkippedFailedTestDuration(argv, env)
   const runNetworkTestsAnyway = parseRunNetworkTestsAnyway(argv)
   const allowCopilotAuthInCi = parseAllowCopilotAuthInCi(argv)
   const screencastQuality = parseScreencastQuality(argv)
@@ -527,6 +547,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     runNetworkTestsAnyway,
     runs,
     runSkippedTestsAnyway,
+    showSkippedFailedTestDuration,
     screencastQuality,
     setupOnly,
     startupRuns,

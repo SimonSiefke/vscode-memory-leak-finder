@@ -86,3 +86,47 @@ test('getMeasure resolves tracked timeouts public measure id', () => {
 
   expect(GetMeasure.getMeasure(MemoryLeakFinder, 'tracked-timeouts')).toBe(measure)
 })
+
+test('getMeasure resolves compiled code size public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'compiled-code-size',
+    ),
+  ).toBe(Measures.MeasureCompiledCodeSize)
+})
+
+test('getMeasure resolves concatenated error string count public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'concatenated-error-string-count',
+    ),
+  ).toBe(Measures.MeasureConcatenatedErrorStringCount)
+})
+
+test('getMeasure resolves concatenated strings public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'concatenated-strings',
+    ),
+  ).toBe(Measures.MeasureConcatenatedStrings)
+})
+
+test('getMeasure resolves duplicated strings public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'duplicated-strings',
+    ),
+  ).toBe(Measures.MeasureDuplicatedStrings)
+})

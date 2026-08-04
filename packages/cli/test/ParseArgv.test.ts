@@ -22,10 +22,59 @@ test('parseArgv - headless mode', () => {
   })
 })
 
+test('parseArgv - color defaults to true', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: true,
+  })
+})
+
+test('parseArgv - color enabled', () => {
+  const argv = ['--color', 'true']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: true,
+  })
+})
+
+test('parseArgv - color disabled', () => {
+  const argv = ['--color', 'false']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: false,
+  })
+})
+
 test('parseArgv - run skipped tests anyway', () => {
   const argv = ['--run-skipped-tests-anyway']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     runSkippedTestsAnyway: true,
+  })
+})
+
+test('parseArgv - hides skipped failed test duration locally by default', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, {})).toMatchObject({
+    showSkippedFailedTestDuration: false,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration when enabled', () => {
+  const argv = ['--show-skipped-failed-test-duration']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, {})).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration in ci', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, { CI: 'true' })).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration in GitHub Actions', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, { GITHUB_ACTIONS: 'true' })).toMatchObject({
+    showSkippedFailedTestDuration: true,
   })
 })
 
@@ -365,6 +414,32 @@ test('parseArgv - inspect-integrated-browser flag', () => {
 
 test('parseArgv - inspect-integrated-browser flag not present', () => {
   const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(false)
+})
+
+test('parseArgv - websites-e2e measure requires inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--measure', 'named-function-count-3']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    'websites-e2e test measures can only be run with --inspect-integrated-browser',
+  )
+})
+
+test('parseArgv - websites-e2e check-leaks requires inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--check-leaks']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    'websites-e2e test measures can only be run with --inspect-integrated-browser',
+  )
+})
+
+test('parseArgv - websites-e2e measure allows inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--measure', 'named-function-count-3', '--inspect-integrated-browser']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(true)
+})
+
+test('parseArgv - websites-e2e test without measure allows no inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.inspectIntegratedBrowser).toBe(false)
 })

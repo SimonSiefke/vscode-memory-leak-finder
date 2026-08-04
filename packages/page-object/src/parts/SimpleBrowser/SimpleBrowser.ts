@@ -1,3 +1,4 @@
+import { execFile } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
@@ -16,6 +17,54 @@ interface DeferredMockServer extends MockServer {
 }
 
 const workspacePath = join(Root.root, '.vscode-test-workspace')
+const usedPorts = new Set<number>()
+
+const getProcessIdsUsingPort = async (port: number): Promise<readonly number[]> => {
+  return new Promise((resolve, reject) => {
+    execFile('lsof', ['-nP', `-tiTCP:${port}`, '-sTCP:LISTEN'], (error, stdout) => {
+      if (error) {
+        if (error.code === 1) {
+          resolve([])
+          return
+        }
+        reject(error)
+        return
+      }
+      resolve(stdout.trim().split('\n').filter(Boolean).map(Number))
+    })
+  })
+}
+
+const allocateRandomPort = async (): Promise<number> => {
+  const server = createServer()
+  const { promise, reject, resolve } = Promise.withResolvers<void>()
+  server.once('error', reject)
+  server.listen(0, '127.0.0.1', resolve)
+  await promise
+  const address = server.address()
+  if (!address || typeof address === 'string') {
+    throw new Error('Failed to determine random port')
+  }
+  const port = address.port
+  await new Promise<void>((resolve) => server.close(() => resolve()))
+  usedPorts.add(port)
+  return port
+}
+
+const killUsedPorts = async (): Promise<void> => {
+  try {
+    const processIds = new Set((await Promise.all([...usedPorts].map(getProcessIdsUsingPort))).flat())
+    for (const processId of processIds) {
+      try {
+        process.kill(processId, 'SIGKILL')
+      } catch {
+        // The process already exited.
+      }
+    }
+  } finally {
+    usedPorts.clear()
+  }
+}
 
 const escapeRegExp = (value: string): string => {
   return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -786,6 +835,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
       return this.getContentFrameLegacy({ urlPattern })
     },
+    async getRandomPort() {
+      return allocateRandomPort()
+    },
     async getContentFrameLegacy({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
       const subFrame = await webView.shouldBeVisible2({
@@ -882,6 +934,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         .first()
         .isVisible()
         .catch(() => false)
+    },
+    async killAllPorts() {
+      await killUsedPorts()
+    },
+    async trackPort(port: number) {
+      usedPorts.add(port)
     },
     async mockElectronDebugger({ selector: _selector }: { selector: string }) {
       try {
@@ -1007,7 +1065,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             await expect(intermediate).toBeVisible()
             await expect(intermediate).toBeFocused()
             if (url) {
-              await intermediate.setValue(url)
+              await intermediate.fill('')
+              await intermediate.type(url)
               if (!isHttpUrl(url)) {
                 await page.waitForIdle()
               }
@@ -1015,6 +1074,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             }
             if (!url || isHttpUrl(url)) {
               await intermediate.press('Enter')
+              await expect(intermediate).toBeHidden()
             } else {
               await page.waitForIdle()
               await page.keyboard.press('Enter')
@@ -1377,9 +1437,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 timeout: Math.min(timeout, 2000),
                 urlPattern,
               })
-              const trackedEntry = await electron.getWebContents(trackedWebContentsId)
-              if (trackedEntry) {
-                return trackedEntry
+              try {
+                return await electron.waitForWebContentsUrl({
+                  timeout,
+                  urlPattern,
+                  webContentsId: trackedWebContentsId,
+                })
+              } catch {
+                // Fall back to finding the browser by URL below.
               }
             }
           }
@@ -1401,13 +1466,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           if (await quickInput.isVisible().catch(() => false)) {
             await quickInput.locator('.ibwrapper .input, input, textarea').first().focus()
             await page.keyboard.press('Enter')
+            await page.waitForIdle()
             if (await quickInput.isVisible().catch(() => false)) {
               const closeButton = quickInput.locator('[aria-label="Close"], .codicon-close, .quick-input-action').first()
               if (await closeButton.isVisible().catch(() => false)) {
                 await closeButton.click()
               }
             }
-            await expect(quickInput).toBeHidden({ timeout: 3000 })
+            if (await quickInput.isVisible().catch(() => false)) {
+              await page.keyboard.press('Escape')
+            }
+            await expect(quickInput).toBeHidden({ timeout: 10_000 })
           }
         })
       }

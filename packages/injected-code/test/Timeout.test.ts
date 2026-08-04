@@ -50,6 +50,16 @@ test('waitForMutation observes the passed target', async () => {
   await promise
 })
 
+test('waitForMutation waits for the timeout when the target is unavailable', async () => {
+  jest.useFakeTimers()
+
+  const promise = Timeout.waitForMutation(null, 100)
+
+  jest.advanceTimersByTime(100)
+  await expect(promise).resolves.toBeUndefined()
+  expect(jest.getTimerCount()).toBe(0)
+})
+
 test('waitForMutation disconnects when mutation wins', async () => {
   jest.useFakeTimers()
   globalThis.MutationObserver = FakeMutationObserver as unknown as typeof MutationObserver

@@ -1,14 +1,38 @@
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async disableExtension() {
       try {
         const extensionEditor = page.locator('.extension-editor')
-        const action = extensionEditor.locator('.action-label[aria-label^="Disable"]')
-        await action.click()
+        await expect(extensionEditor).toBeVisible()
         const disabledStatusLabel = extensionEditor.locator('.extension-status-label[aria-label="Disabled"]')
-        await expect(disabledStatusLabel).toBeVisible()
+        if (await disabledStatusLabel.isVisible().catch(() => false)) {
+          return false
+        }
+        const action = extensionEditor.locator('.action-label[aria-label^="Disable"]').first()
+        if ((await action.count()) === 0) {
+          return false
+        }
+        await expect(action).toBeVisible()
+        const actionLabel = await action.getAttribute('aria-label')
+        if (actionLabel?.startsWith('Disable AI Features')) {
+          const actionItem = extensionEditor.locator(
+            '.action-item.action-dropdown-item:has(.action-label[aria-label^="Disable AI Features"])',
+          )
+          const dropDown = actionItem.locator('.action-label.dropdown')
+          await expect(dropDown).toBeVisible()
+          await dropDown.click()
+          const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
+          await contextMenu.select('Disable AI Features (Workspace)')
+        } else {
+          await action.click()
+        }
+        const enableAction = extensionEditor.locator('.action-label[aria-label^="Enable"]')
+        await expect(enableAction).toBeVisible()
+        await page.waitForIdle()
+        return true
       } catch (error) {
         throw new VError(error, `Failed to disable extension`)
       }
@@ -52,6 +76,23 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await page.waitForIdle()
         await expect(installButton).toBeHidden()
         await page.waitForIdle()
+        const popup = page.locator('.monaco-dialog-box[aria-modal="true"]')
+        // TODO ugly timeout
+        await new Promise((r) => {
+          setTimeout(r, 300)
+        })
+        const popupCount = await popup.count()
+        if (popupCount > 0) {
+          const acceptButton = popup.locator('.dialog-buttons .monaco-button', { hasText: 'Trust Publisher & Install' })
+          await expect(acceptButton).toBeVisible()
+          await page.waitForIdle()
+
+          await acceptButton.click()
+          await page.waitForIdle()
+          await expect(popup).toBeHidden()
+          await page.waitForIdle()
+        }
+
         await expect(unInstallButton).toBeVisible({ timeout: 120_000 })
         await page.waitForIdle()
       } catch (error) {
@@ -79,8 +120,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await page.waitForIdle()
         await tab.click()
         await page.waitForIdle()
-        await expect(tab).toHaveAttribute('aria-checked', 'true')
-        await page.waitForIdle()
+        await this.verifyTabChecked(text)
         if (options && options.webView) {
           const webView = page.locator('.webview')
           await expect(webView).toBeVisible()
@@ -133,13 +173,27 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to verify extension detail heading ${text}`)
       }
     },
+    async verifyTabChecked(text: string) {
+      const tab = page.locator('.extension-editor .action-label', {
+        hasText: text,
+      })
+      if (ideVersion.minor >= 120) {
+        await expect(tab).toHaveAttribute('aria-pressed', 'true')
+        await page.waitForIdle()
+      } else {
+        await expect(tab).toHaveAttribute('aria-checked', 'true')
+        await page.waitForIdle()
+      }
+    },
     async shouldHaveTab(text: string) {
       try {
         const tab = page.locator('.extension-editor .action-label', {
           hasText: text,
         })
+        await page.waitForIdle()
         await expect(tab).toBeVisible()
-        await expect(tab).toHaveAttribute('aria-checked', 'true')
+        await page.waitForIdle()
+        await this.verifyTabChecked(text)
       } catch (error) {
         throw new VError(error, `Failed to verify extension detail tab ${text}`)
       }

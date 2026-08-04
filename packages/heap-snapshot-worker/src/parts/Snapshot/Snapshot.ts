@@ -73,6 +73,7 @@ export interface Snapshot {
   readonly strings: readonly string[]
   readonly traceFunctionInfos?: Uint32Array
   readonly traceTree?: Uint32Array
+  readonly traceTreeParents?: Uint32Array
 }
 
 export interface HeapSnapshotInput {

@@ -4,6 +4,9 @@
   "private": true,
   "license": "MIT",
   "type": "module",
+  "exports": {
+    "./retainer-river/report": "./src/retainerRiver/report.ts"
+  },
   "scripts": {
     "build": "tsc -b && vite build",
     "dev": "vite --host 0.0.0.0",
@@ -41,6 +44,7 @@
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.3",
     "d3-hierarchy": "^3.1.2",
+    "d3-sankey": "^0.12.3",
     "lucide-react": "^1.25.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
@@ -49,6 +53,7 @@
   },
   "devDependencies": {
     "@types/d3-hierarchy": "^3.1.7",
+    "@types/d3-sankey": "^0.12.4",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.182.0",

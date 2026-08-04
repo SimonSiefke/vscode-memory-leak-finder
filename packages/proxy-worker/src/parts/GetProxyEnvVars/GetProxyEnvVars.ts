@@ -2,7 +2,7 @@ import { getCACertPath } from '../GetCACertPath/GetCACertPath.ts'
 
 export const getProxyEnvVars = async (proxyUrl: string | null): Promise<Record<string, string>> => {
   const envVars: Record<string, string> = {}
-  const noProxy = 'localhost,127.0.0.1,0.0.0.0,::1'
+  const noProxy = 'localhost,127.0.0.1,0.0.0.0,::1,chatgpt.com,ab.chatgpt.com'
 
   if (proxyUrl) {
     envVars.HTTP_PROXY = proxyUrl

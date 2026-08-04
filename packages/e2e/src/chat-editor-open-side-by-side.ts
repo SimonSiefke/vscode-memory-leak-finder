@@ -9,7 +9,6 @@ export const setup = async ({ Editor, SideBar }: TestContext): Promise<void> => 
 
 export const run = async ({ ChatEditor, Editor }: TestContext): Promise<void> => {
   await ChatEditor.open()
-  // @ts-ignore
   await Editor.splitDown({ groupCount: 0, splitInto: true })
   await Editor.closeAll()
 }
