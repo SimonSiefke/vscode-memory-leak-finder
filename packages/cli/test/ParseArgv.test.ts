@@ -665,6 +665,13 @@ test('parseArgv - tracked allocations from start enables tracking transform', ()
   expect(options.trackFunctions).toBe(true)
 })
 
+test('parseArgv - tracked allocations with stack traces enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocations-with-stack-traces']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-allocations-with-stack-traces')
+  expect(options.trackFunctions).toBe(true)
+})
+
 test('parseArgv - tracked allocation timeline enables tracking transform', () => {
   const argv = ['--measure', 'tracked-allocation-timeline']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
