@@ -51,6 +51,36 @@ jobs:
         include:
           - test: chatgpt-ask-new-chat
             runs: 1
+          - test: ckeditor-find-fullscreen
+            runs: 2
+          - test: desmos-zoom-reset
+            runs: 2
+          - test: excalidraw-rectangle-undo
+            runs: 2
+          - test: fullcalendar-view-navigation
+            runs: 2
+          - test: hlsjs-play-detach-reload
+            runs: 2
+          - test: jupyterlite-run-clear
+            runs: 2
+          - test: mui-autocomplete-virtualized-select-clear
+            runs: 2
+          - test: mui-data-grid-virtual-scroll
+            runs: 2
+          - test: react-flow-stress-controls
+            runs: 2
+          - test: todomvc-angular-add-toggle-clear
+            runs: 2
+          - test: todomvc-backbone-add-toggle-clear
+            runs: 2
+          - test: todomvc-lit-add-toggle-clear
+            runs: 2
+          - test: todomvc-react-add-toggle-clear
+            runs: 2
+          - test: todomvc-svelte-add-toggle-clear
+            runs: 2
+          - test: todomvc-vue-add-toggle-clear
+            runs: 2
     steps:
       - uses: actions/checkout@v6
 
