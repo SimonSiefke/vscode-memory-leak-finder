@@ -90,6 +90,65 @@ test('isRepositoryIgnored matches owners and repository names without case or pu
   expect(isRepositoryIgnored('facebook/docusaurus', DEFAULT_IGNORED_REPOSITORIES)).toBe(false)
 })
 
+test('isRepositoryIgnored excludes the requested repositories', () => {
+  const repositories = [
+    'angular/angular',
+    'angular/components',
+    'tensorflow/tfjs',
+    'emberjs/ember.js',
+    'apollographql/apollo-client',
+    'ionic-team/ionic-framework',
+    'eclipse-theia/theia',
+    'RocketChat/Rocket.Chat',
+    'storybookjs/storybook',
+    'ant-design/ant-design',
+    'meteor/meteor',
+    'balderdashy/sails',
+    'gatsbyjs/gatsby',
+    'discordjs/discord.js',
+    'strapi/strapi',
+    'zen-browser/desktop',
+    'vuetifyjs/vuetify',
+    'webtorrent/webtorrent',
+    'Kilo-Org/kilocode',
+    'jquery/jquery',
+    'petkaantonov/bluebird',
+    'ant-design/ant-design-pro',
+    'ruvnet/ruflo',
+    'webpack/webpack',
+    'mui/material-ui',
+    'typeorm/typeorm',
+    'mastra-ai/mastra',
+    'node-red/node-red',
+    'mozilla/pdf.js',
+    'jashkenas/backbone',
+    'angular/angular-cli',
+    'mochajs/mocha',
+    'element-plus/element-plus',
+    'TryGhost/Ghost',
+    'wwebjs/whatsapp-web.js',
+    'mswjs/msw',
+    'code-yeongyu/oh-my-openagent',
+    'quasarframework/quasar',
+    'jaredpalmer/formik',
+    'darkreader/darkreader',
+    'CherryHQ/cherry-studio',
+    'directus/directus',
+    'parse-community/parse-server',
+    'jitsi/jitsi-meet',
+    'payloadcms/payload',
+    'lit/lit',
+    'lodash/lodash',
+    'danny-avila/LibreChat',
+    'knex/knex',
+    'FlowiseAI/Flowise',
+  ]
+
+  for (const repository of repositories) {
+    expect(isRepositoryIgnored(repository, DEFAULT_IGNORED_REPOSITORIES)).toBe(true)
+  }
+})
+
 test('selectRepositories prioritizes seeds, requires package.json for discovery, and deduplicates repositories', () => {
   const seed = createRepository('example/seed', 50)
   const discovered = [
@@ -162,4 +221,21 @@ test('renderMemoryLeakReport embeds data safely in a self-contained dashboard', 
   expect(html).toContain('Memory-leak issue radar')
   expect(html).toContain('\\u003c/script>')
   expect(html).not.toContain('</script><script>alert(1)</script>')
+})
+
+test('renderMemoryLeakReport omits repositories without matching issues', () => {
+  const report = createMemoryLeakReportData(
+    [
+      createResult(createRepository('example/with-issues', 1_000), 1, 0),
+      createResult(createRepository('example/without-issues', 2_000), 0, 0),
+    ],
+    { minStars: 1_000 },
+    '2026-07-31T00:00:00.000Z',
+  )
+
+  const html = renderMemoryLeakReport(report)
+
+  expect(html).toContain('example/with-issues')
+  expect(html).not.toContain('example/without-issues')
+  expect(html).not.toContain('All scanned')
 })

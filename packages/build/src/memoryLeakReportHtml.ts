@@ -5,7 +5,11 @@ const serializeForHtml = (value: unknown): string => {
 }
 
 export const renderMemoryLeakReport = (report: MemoryLeakReportData): string => {
-  const data = serializeForHtml(report)
+  const visibleReport = {
+    ...report,
+    repositories: report.repositories.filter((repository) => repository.openCount + repository.closedCount > 0),
+  }
+  const data = serializeForHtml(visibleReport)
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -78,7 +82,7 @@ export const renderMemoryLeakReport = (report: MemoryLeakReportData): string => 
     <section class="stats" id="stats"></section>
     <section class="toolbar" aria-label="Report filters">
       <input class="control" id="search" type="search" placeholder="Filter repositories, languages, topics…">
-      <select class="control" id="visibility" aria-label="Issue visibility"><option value="matches">With matches</option><option value="all">All scanned</option><option value="open">With open issues</option></select>
+      <select class="control" id="visibility" aria-label="Issue visibility"><option value="matches">All matches</option><option value="open">With open issues</option></select>
       <select class="control" id="sort" aria-label="Sort repositories"><option value="issues">Most issues</option><option value="open">Most open</option><option value="stars">Most stars</option><option value="name">Name</option></select>
     </section>
     <section class="layout">
@@ -181,7 +185,7 @@ export const renderMemoryLeakReport = (report: MemoryLeakReportData): string => 
       const mode = visibility.value
       const repositories = report.repositories.filter(item => {
         const haystack = [item.repository.nameWithOwner, item.repository.description || '', item.repository.primaryLanguage?.name || '', ...item.repository.repositoryTopics.nodes.map(node => node.topic.name)].join(' ').toLowerCase()
-        const visible = mode === 'all' || (mode === 'matches' && item.openCount + item.closedCount > 0) || (mode === 'open' && item.openCount > 0)
+        const visible = mode === 'matches' || (mode === 'open' && item.openCount > 0)
         return visible && haystack.includes(query)
       })
       const compare = {
