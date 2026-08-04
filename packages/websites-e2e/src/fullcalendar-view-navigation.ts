@@ -17,7 +17,7 @@ const expression = `(async () => {
       if (callback()) return
       await delay(100)
     }
-    throw new Error(\`${message}. url=\${location.href}; title=\${getTitle()}\`)
+    throw new Error(\`\${message}. url=\${location.href}; title=\${getTitle()}\`)
   }
   const previous = getButton('Previous Month')
   const next = getButton('Next Month')

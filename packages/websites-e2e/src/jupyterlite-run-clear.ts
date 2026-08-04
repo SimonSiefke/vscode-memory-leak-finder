@@ -24,7 +24,7 @@ const runExpression = `(async () => {
       if (value) return value
       await delay(100)
     }
-    throw new Error(\`${message}. url=\${location.href}; body=\${(document.body.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 500)}\`)
+    throw new Error(\`\${message}. url=\${location.href}; body=\${(document.body.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 500)}\`)
   }
   const prompt = await waitFor(() => {
     const candidates = Array.from(document.querySelectorAll('[contenteditable="true"], textarea'))

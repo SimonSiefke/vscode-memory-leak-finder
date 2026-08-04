@@ -17,7 +17,7 @@ const expression = `(async () => {
       if (value) return value
       await delay(100)
     }
-    throw new Error(\`${message}. url=\${location.href}; buttons=\${Array.from(document.querySelectorAll('button[aria-label]')).map((button) => button.getAttribute('aria-label')).filter(Boolean).slice(0, 30).join(' | ')}\`)
+    throw new Error(\`\${message}. url=\${location.href}; buttons=\${Array.from(document.querySelectorAll('button[aria-label]')).map((button) => button.getAttribute('aria-label')).filter(Boolean).slice(0, 30).join(' | ')}\`)
   }
   const zoomIn = await waitFor(() => getButton('Zoom In'), 'Expected Desmos Zoom In')
   zoomIn.click()

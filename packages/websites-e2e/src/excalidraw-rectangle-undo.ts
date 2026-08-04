@@ -17,7 +17,7 @@ const drawAndUndoExpression = `(async () => {
       if (value) return value
       await delay(100)
     }
-    throw new Error(\`${message}. url=\${location.href}\`)
+    throw new Error(\`\${message}. url=\${location.href}\`)
   }
   const rectangle = await waitFor(() => getButton('Rectangle'), 'Expected Excalidraw rectangle tool')
   const canvas = await waitFor(() => document.querySelector('canvas.excalidraw__canvas.interactive'), 'Expected Excalidraw interactive canvas')

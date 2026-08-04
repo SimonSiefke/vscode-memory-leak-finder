@@ -30,7 +30,7 @@ const expression = `(async () => {
       await delay(100)
     }
     const input = getInput()
-    throw new Error(\`${message}. url=\${location.href}; input=\${input instanceof HTMLInputElement ? input.value : '<missing>'}; expanded=\${input?.getAttribute('aria-expanded')}\`)
+    throw new Error(\`\${message}. url=\${location.href}; input=\${input instanceof HTMLInputElement ? input.value : '<missing>'}; expanded=\${input?.getAttribute('aria-expanded')}\`)
   }
   const input = await waitFor(() => {
     const candidate = getInput()

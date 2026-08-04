@@ -39,7 +39,7 @@ const runExpression = `(async () => {
       }
       await delay(100)
     }
-    throw new Error(\`${message}. url=\${location.href}; scroll=\${scroller.scrollLeft},\${scroller.scrollTop}; cells=\${getCells().slice(0, 20).join(' | ')}\`)
+    throw new Error(\`\${message}. url=\${location.href}; scroll=\${scroller.scrollLeft},\${scroller.scrollTop}; cells=\${getCells().slice(0, 20).join(' | ')}\`)
   }
   scroller.scrollTo({ left: scroller.scrollWidth, top: scroller.scrollHeight })
   await waitForCell('99, 1000', 'Expected bottom-right virtualized cell')

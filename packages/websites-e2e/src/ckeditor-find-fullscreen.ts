@@ -25,7 +25,7 @@ const expression = `(async () => {
       if (value) return value
       await delay(100)
     }
-    throw new Error(\`${message}. url=\${location.href}; visibleButtons=\${Array.from(document.querySelectorAll('button')).filter(isVisible).map((button) => button.getAttribute('aria-label') || button.textContent?.trim()).filter(Boolean).slice(0, 30).join(' | ')}\`)
+    throw new Error(\`\${message}. url=\${location.href}; visibleButtons=\${Array.from(document.querySelectorAll('button')).filter(isVisible).map((button) => button.getAttribute('aria-label') || button.textContent?.trim()).filter(Boolean).slice(0, 30).join(' | ')}\`)
   }
   const findAndReplace = await waitFor(() => getButton('Find and replace'), 'Expected CKEditor Find and replace')
   findAndReplace.click()

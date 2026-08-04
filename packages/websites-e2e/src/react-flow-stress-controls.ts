@@ -40,7 +40,7 @@ const runExpression = `(async () => {
       }
       await delay(100)
     }
-    throw new Error(\`${message}. url=\${location.href}; transform=\${viewport.style.transform}; nodeClass=\${firstNode.className}\`)
+    throw new Error(\`\${message}. url=\${location.href}; transform=\${viewport.style.transform}; nodeClass=\${firstNode.className}\`)
   }
   zoomIn.click()
   await waitFor(() => viewport.style.transform !== initialTransform, 'Expected React Flow viewport to zoom')
