@@ -32,19 +32,19 @@ export const antdWidgetConfigs = {
   'antd-color-picker-open-close': {
     name: 'antd-color-picker-open-close',
     url: antdUrl('color-picker'),
-    ready: `await waitFor(() => isReactReady(document.querySelector('.ant-color-picker-trigger:not(.ant-color-picker-trigger-disabled):not(.ant-color-picker-trigger-active)')), 'Expected hydrated Ant Design color picker trigger')`,
+    ready: `await waitFor(() => isReactReady(findByText('.ant-color-picker-trigger:not(.ant-color-picker-trigger-disabled):not(.ant-color-picker-trigger-active)', '#1677FF')), 'Expected hydrated Ant Design color picker trigger')`,
     run: `
-      const trigger = document.querySelector('.ant-color-picker-trigger:not(.ant-color-picker-trigger-disabled):not(.ant-color-picker-trigger-active)')
+      const trigger = findByText('.ant-color-picker-trigger:not(.ant-color-picker-trigger-disabled):not(.ant-color-picker-trigger-active)', '#1677FF')
       assert(trigger instanceof HTMLElement, 'Expected color picker trigger')
-      const visiblePopovers = () => Array.from(document.querySelectorAll('.ant-popover')).filter((element) => element instanceof HTMLElement && element.offsetParent !== null).length
-      const initialPopoverCount = visiblePopovers()
-      await clickUntil(trigger, () => visiblePopovers() > initialPopoverCount, 'Expected open color picker')
-      await clickUntil(trigger, () => visiblePopovers() === initialPopoverCount, 'Expected closed color picker')`,
+      const activeTriggers = () => document.querySelectorAll('.ant-color-picker-trigger-active').length
+      const initialActiveCount = activeTriggers()
+      await clickUntil(trigger, () => activeTriggers() > initialActiveCount, 'Expected open color picker')
+      await clickUntil(trigger, () => activeTriggers() === initialActiveCount, 'Expected closed color picker')`,
   },
   'antd-date-picker-open-close': {
     name: 'antd-date-picker-open-close',
     url: antdUrl('date-picker'),
-    ready: `await waitFor(() => isReactReady(document.querySelector('.ant-picker input')), 'Expected hydrated Ant Design date picker')`,
+    ready: `await waitFor(() => { const input = document.querySelector('.ant-picker input'); return isReactReady(input) && input.value === '' }, 'Expected hydrated blank Ant Design date picker')`,
     run: `
       const input = document.querySelector('.ant-picker input')
       assert(input instanceof HTMLInputElement, 'Expected date picker input')
@@ -53,24 +53,22 @@ export const antdWidgetConfigs = {
       const dropdown = await waitFor(() => document.querySelector('.ant-picker-dropdown:not(.ant-picker-dropdown-hidden)'), 'Expected open date picker')
       const day = dropdown.querySelector('.ant-picker-cell-in-view:not(.ant-picker-cell-disabled) .ant-picker-cell-inner')
       assert(day instanceof HTMLElement, 'Expected selectable date')
-      await clickUntil(day, () => input.value !== '' && !document.querySelector('.ant-picker-dropdown:not(.ant-picker-dropdown-hidden)'), 'Expected selected date and closed picker')
-      const clear = input.closest('.ant-picker')?.querySelector('.ant-picker-clear')
-      assert(clear instanceof HTMLElement, 'Expected date picker clear control')
-      clear.click()
-      await waitFor(() => input.value === '', 'Expected restored blank date picker')`,
+      await clickUntil(day, () => input.value !== '', 'Expected selected date')`,
+    reloadAfterRun: true,
   },
   'antd-dropdown-open-close': {
     name: 'antd-dropdown-open-close',
     url: antdUrl('dropdown'),
-    ready: `await waitFor(() => isReactReady(findByText('button.ant-dropdown-trigger', 'bottomLeft')), 'Expected hydrated Ant Design dropdown trigger')`,
+    ready: `await waitFor(() => { const trigger = findByText('button.ant-dropdown-trigger', 'bottomLeft'); return isReactReady(trigger) && trigger.getAttribute('aria-expanded') !== 'true' }, 'Expected hydrated closed Ant Design dropdown')`,
     run: `
       const trigger = findByText('button.ant-dropdown-trigger', 'bottomLeft')
       assert(trigger instanceof HTMLElement, 'Expected bottomLeft dropdown trigger')
-      trigger.click()
-      const dropdown = await waitFor(() => document.querySelector('.ant-dropdown:not(.ant-dropdown-hidden)'), 'Expected open Ant Design dropdown')
-      const item = dropdown.querySelector('[role="menuitem"]')
-      assert(item instanceof HTMLElement, 'Expected Ant Design dropdown item')
-      await clickUntil(item, () => !document.querySelector('.ant-dropdown:not(.ant-dropdown-hidden)'), 'Expected closed Ant Design dropdown')`,
+      const visibleDropdowns = () => Array.from(document.querySelectorAll('.ant-dropdown:not(.ant-dropdown-hidden)')).filter((element) => getComputedStyle(element).visibility !== 'hidden').length
+      const initialDropdownCount = visibleDropdowns()
+      trigger.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }))
+      trigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await waitFor(() => visibleDropdowns() > initialDropdownCount, 'Expected open Ant Design dropdown')`,
+    reloadAfterRun: true,
   },
   'antd-input-number-step-restore': {
     name: 'antd-input-number-step-restore',

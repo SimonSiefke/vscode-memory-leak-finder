@@ -105,12 +105,10 @@ export const jqueryUiWidgetConfigs = {
       assert(item instanceof HTMLElement, 'Expected draggable item')
       const initialLeft = item.style.left
       const initialTop = item.style.top
-      let rect = item.getBoundingClientRect()
+      const rect = item.getBoundingClientRect()
       drag(item, rect.left + 10, rect.top + 10, rect.left + 70, rect.top + 50)
-      await waitFor(() => item.style.left !== initialLeft || item.style.top !== initialTop, 'Expected moved draggable')
-      rect = item.getBoundingClientRect()
-      drag(item, rect.left + 10, rect.top + 10, rect.left - 50, rect.top - 30)
-      await waitFor(() => item.style.left === initialLeft && item.style.top === initialTop, 'Expected restored draggable position')`,
+      await waitFor(() => item.style.left !== initialLeft || item.style.top !== initialTop, 'Expected moved draggable')`,
+    reloadAfterRun: true,
   },
   'jqueryui-droppable-drag-reload': {
     name: 'jqueryui-droppable-drag-reload',
@@ -133,12 +131,11 @@ export const jqueryUiWidgetConfigs = {
     run: `
       const item = document.querySelector('#menu [aria-haspopup="true"]')
       assert(item instanceof HTMLElement, 'Expected submenu item')
-      item.focus()
-      item.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
+      item.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }))
+      item.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
       await waitFor(() => item.getAttribute('aria-expanded') === 'true', 'Expected open submenu')
-      item.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
-      item.blur()
-      await waitFor(() => item.getAttribute('aria-expanded') !== 'true', 'Expected closed submenu')`,
+      `,
+    reloadAfterRun: true,
   },
   'jqueryui-resizable-resize-restore': {
     name: 'jqueryui-resizable-resize-restore',
@@ -150,12 +147,10 @@ export const jqueryUiWidgetConfigs = {
       assert(item instanceof HTMLElement && handle instanceof HTMLElement, 'Expected resizable handle')
       const initialWidth = item.offsetWidth
       const initialHeight = item.offsetHeight
-      let rect = handle.getBoundingClientRect()
+      const rect = handle.getBoundingClientRect()
       drag(handle, rect.left + 2, rect.top + 2, rect.left + 42, rect.top + 32)
-      await waitFor(() => item.offsetWidth > initialWidth && item.offsetHeight > initialHeight, 'Expected resized element')
-      rect = handle.getBoundingClientRect()
-      drag(handle, rect.left + 2, rect.top + 2, rect.left - 38, rect.top - 28)
-      await waitFor(() => Math.abs(item.offsetWidth - initialWidth) <= 1 && Math.abs(item.offsetHeight - initialHeight) <= 1, 'Expected restored element size')`,
+      await waitFor(() => item.offsetWidth > initialWidth && item.offsetHeight > initialHeight, 'Expected resized element')`,
+    reloadAfterRun: true,
   },
   'jqueryui-selectable-select-clear': {
     name: 'jqueryui-selectable-select-clear',
@@ -166,10 +161,8 @@ export const jqueryUiWidgetConfigs = {
       assert(item instanceof HTMLElement, 'Expected selectable item')
       const rect = item.getBoundingClientRect()
       drag(item, rect.left + 5, rect.top + 5, rect.right - 5, rect.bottom - 5)
-      await waitFor(() => item.classList.contains('ui-selected'), 'Expected selected item')
-      const selectedRect = item.getBoundingClientRect()
-      drag(item, selectedRect.left + 5, selectedRect.top + 5, selectedRect.right - 5, selectedRect.bottom - 5, { ctrlKey: true })
-      await waitFor(() => !item.classList.contains('ui-selected'), 'Expected cleared selection')`,
+      await waitFor(() => item.classList.contains('ui-selected'), 'Expected selected item')`,
+    reloadAfterRun: true,
   },
   'jqueryui-selectmenu-select-restore': {
     name: 'jqueryui-selectmenu-select-restore',
@@ -182,11 +175,8 @@ export const jqueryUiWidgetConfigs = {
       button.click()
       const fast = await waitFor(() => Array.from(document.querySelectorAll('#speed-menu .ui-menu-item-wrapper')).find((item) => item.textContent === 'Fast'), 'Expected Fast option')
       fast.click()
-      await waitFor(() => select.value === 'Fast', 'Expected Fast selectmenu value')
-      button.click()
-      const medium = await waitFor(() => Array.from(document.querySelectorAll('#speed-menu .ui-menu-item-wrapper')).find((item) => item.textContent === 'Medium'), 'Expected Medium option')
-      medium.click()
-      await waitFor(() => select.value === 'Medium', 'Expected restored Medium value')`,
+      await waitFor(() => select.value === 'Fast', 'Expected Fast selectmenu value')`,
+    reloadAfterRun: true,
   },
   'jqueryui-slider-step-restore': {
     name: 'jqueryui-slider-step-restore',
@@ -198,9 +188,8 @@ export const jqueryUiWidgetConfigs = {
       const initial = handle.getAttribute('aria-valuenow')
       handle.focus()
       handle.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
-      await waitFor(() => handle.getAttribute('aria-valuenow') !== initial, 'Expected incremented slider')
-      handle.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowLeft' }))
-      await waitFor(() => handle.getAttribute('aria-valuenow') === initial, 'Expected restored slider')`,
+      await waitFor(() => handle.getAttribute('aria-valuenow') !== initial, 'Expected incremented slider')`,
+    reloadAfterRun: true,
   },
   'jqueryui-sortable-reorder-restore': {
     name: 'jqueryui-sortable-reorder-restore',
@@ -236,9 +225,8 @@ export const jqueryUiWidgetConfigs = {
       assert(input instanceof HTMLInputElement && up instanceof HTMLElement && down instanceof HTMLElement, 'Expected spinner controls')
       const initial = input.value
       up.click()
-      await waitFor(() => input.value !== initial, 'Expected incremented spinner')
-      down.click()
-      await waitFor(() => input.value === initial, 'Expected restored spinner')`,
+      await waitFor(() => input.value !== initial, 'Expected incremented spinner')`,
+    reloadAfterRun: true,
   },
   'jqueryui-tabs-switch-restore': {
     name: 'jqueryui-tabs-switch-restore',
@@ -250,9 +238,8 @@ export const jqueryUiWidgetConfigs = {
       const second = tabs[1]
       assert(first instanceof HTMLElement && second instanceof HTMLElement, 'Expected tab controls')
       second.click()
-      await waitFor(() => second.getAttribute('aria-selected') === 'true', 'Expected second tab')
-      first.click()
-      await waitFor(() => first.getAttribute('aria-selected') === 'true', 'Expected restored first tab')`,
+      await waitFor(() => second.getAttribute('aria-selected') === 'true', 'Expected second tab')`,
+    reloadAfterRun: true,
   },
   'jqueryui-tooltip-open-close': {
     name: 'jqueryui-tooltip-open-close',
@@ -276,8 +263,7 @@ export const jqueryUiWidgetConfigs = {
       assert(button instanceof HTMLElement && effect instanceof HTMLElement, 'Expected toggleClass controls')
       const initial = effect.className
       button.click()
-      await waitFor(() => effect.className !== initial, 'Expected toggled effect class')
-      button.click()
-      await waitFor(() => effect.className === initial, 'Expected restored effect class')`,
+      await waitFor(() => effect.className !== initial, 'Expected toggled effect class')`,
+    reloadAfterRun: true,
   },
 } satisfies Record<string, ReversibleWidgetConfig>

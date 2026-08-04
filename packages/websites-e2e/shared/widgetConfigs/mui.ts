@@ -21,11 +21,10 @@ export const muiWidgetConfigs = {
     ready: `await waitFor(() => findByText('button', 'Open alert dialog'), 'Expected MUI dialog trigger')`,
     run: `
       clickByText('button', 'Open alert dialog')
-      await waitFor(() => document.querySelector('[role="dialog"]'), 'Expected open MUI dialog')
-      const dialog = document.querySelector('[role="dialog"]')
-      const close = Array.from(dialog.querySelectorAll('button')).find((button) => /^(cancel|disagree|close)$/i.test((button.textContent || '').trim()))
-      assert(close instanceof HTMLElement, 'Expected dialog cancel control')
-      await clickUntil(close, () => !document.querySelector('[role="dialog"]'), 'Expected closed MUI dialog')`,
+      const close = await waitFor(() => findByText('button', 'Cancel') || findByText('button', 'Disagree'), 'Expected open MUI alert dialog')
+      const dialog = close.closest('[role="dialog"]')
+      assert(dialog instanceof HTMLElement, 'Expected alert dialog container')
+      await clickUntil(close, () => dialog.offsetParent === null || getComputedStyle(dialog).visibility === 'hidden', 'Expected closed MUI dialog')`,
   },
   'mui-drawer-open-close': {
     name: 'mui-drawer-open-close',
@@ -44,10 +43,11 @@ export const muiWidgetConfigs = {
     ready: `await waitFor(() => findByText('button', 'Dashboard'), 'Expected MUI menu trigger')`,
     run: `
       clickByText('button', 'Dashboard')
-      const menu = await waitFor(() => document.querySelector('[role="menu"]'), 'Expected open MUI menu')
-      const item = menu.querySelector('[role="menuitem"]')
-      assert(item instanceof HTMLElement, 'Expected MUI menu item')
-      await clickUntil(item, () => !document.querySelector('[role="menu"]'), 'Expected closed MUI menu')`,
+      const trigger = findByText('button', 'Dashboard')
+      assert(trigger instanceof HTMLElement, 'Expected MUI menu trigger')
+      const backdrop = await waitFor(() => Array.from(document.querySelectorAll('.MuiPopover-root .MuiBackdrop-root')).find((element) => getComputedStyle(element).visibility !== 'hidden'), 'Expected open MUI menu')
+      assert(backdrop instanceof HTMLElement, 'Expected MUI menu backdrop')
+      await clickUntil(backdrop, () => trigger.getAttribute('aria-expanded') !== 'true', 'Expected closed MUI menu')`,
   },
   'mui-rating-select-restore': {
     name: 'mui-rating-select-restore',
