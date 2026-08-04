@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({ ContextMenu, Editor, Explorer, ImagesPreview, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, ImagesPreview, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: 'text content',
@@ -29,8 +29,8 @@ export const setup = async ({ ContextMenu, Editor, Explorer, ImagesPreview, Work
   await Explorer.focus()
   await Explorer.shouldHaveItem('folder')
   await Explorer.focus()
-  await Explorer.openContextMenu('folder')
-  await ContextMenu.select('Open in Images Preview')
+  // @ts-ignore
+  await ImagesPreview.open('folder')
   await ImagesPreview.shouldHaveImage('file.svg')
 }
 

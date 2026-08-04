@@ -1,0 +1,851 @@
+:root {
+  color: #dce8f5;
+  background: #08111e;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% -8%, rgb(49 108 139 / 0.19), transparent 36rem),
+    radial-gradient(circle at 88% 15%, rgb(43 128 118 / 0.12), transparent 28rem), #08111e;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+.App {
+  width: min(1800px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0 28px 32px;
+}
+
+.TopBar {
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid #1c2b3e;
+}
+
+.Brand,
+.HeaderActions,
+.Brand > div:last-child,
+.Hero,
+.Toolbar,
+.RiverPanelHeader,
+.InspectorHeader,
+.InspectorHeader h2,
+.SourceLocation {
+  display: flex;
+  align-items: center;
+}
+
+.Brand {
+  gap: 13px;
+}
+
+.BrandMark {
+  width: 41px;
+  height: 41px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #2d6470;
+  border-radius: 11px;
+  color: #79d8c9;
+  background: linear-gradient(145deg, #143143, #0c202f);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.26);
+}
+
+.Brand > div:last-child {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.Eyebrow {
+  color: #6f879e;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  color: #f0f7ff;
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.HeaderActions {
+  gap: 9px;
+}
+
+.DataBadge {
+  max-width: 260px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  overflow: hidden;
+  padding: 7px 10px;
+  border: 1px solid #24364b;
+  border-radius: 999px;
+  color: #91a5ba;
+  background: #0c1726;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.SecondaryButton,
+.IconButton {
+  border: 1px solid #2a3c51;
+  cursor: pointer;
+  background: #101d2c;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    transform 140ms ease;
+}
+
+.SecondaryButton:hover,
+.IconButton:hover {
+  border-color: #4a817f;
+  background: #142536;
+}
+
+.SecondaryButton:active,
+.IconButton:active {
+  transform: translateY(1px);
+}
+
+.SecondaryButton:focus-visible,
+.IconButton:focus-visible,
+input:focus-visible {
+  outline: 2px solid #60c7b8;
+  outline-offset: 2px;
+}
+
+.SecondaryButton {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 7px;
+  color: #cbd9e8;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.IconButton {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  border-radius: 7px;
+}
+
+.HeaderIconButton {
+  width: 34px;
+  height: 34px;
+}
+
+.Hero {
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 28px 4px 24px;
+}
+
+.HeroLead {
+  max-width: 750px;
+  color: #dce8f5;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 440;
+  letter-spacing: -0.028em;
+  line-height: 1.25;
+}
+
+.HeroMeta {
+  margin-top: 9px;
+  color: #6f8499;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+}
+
+.SummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(106px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #1e3044;
+  border-radius: 10px;
+  background: #1e3044;
+}
+
+.SummaryGrid > div {
+  min-width: 120px;
+  padding: 11px 14px;
+  background: #0d1928;
+}
+
+.SummaryGrid span,
+.MetricGrid span {
+  display: block;
+  color: #657d94;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.SummaryGrid strong {
+  display: block;
+  margin-top: 4px;
+  color: #f2f7fc;
+  font-size: 18px;
+  font-weight: 620;
+}
+
+.ErrorNotice {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 14px;
+  padding: 10px 13px;
+  border: 1px solid #88483f;
+  border-radius: 8px;
+  color: #ffc2b7;
+  background: rgb(109 45 38 / 0.22);
+  font-size: 12px;
+}
+
+.Workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 15px;
+  align-items: start;
+}
+
+.RiverPanel,
+.Inspector {
+  border: 1px solid #1e3044;
+  border-radius: 12px;
+  background: rgb(11 22 36 / 0.92);
+  box-shadow: 0 22px 80px rgb(0 0 0 / 0.22);
+}
+
+.RiverPanel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.Toolbar {
+  min-height: 56px;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #192a3d;
+  background: #0d1928;
+}
+
+.SearchField {
+  width: min(390px, 100%);
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid #263b51;
+  border-radius: 7px;
+  color: #657e96;
+  background: #091421;
+}
+
+.SearchField:focus-within {
+  border-color: #49968d;
+  box-shadow: 0 0 0 3px rgb(73 150 141 / 0.12);
+}
+
+.SearchField input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #dce9f5;
+  background: transparent;
+  font-size: 12px;
+}
+
+.SearchField input::placeholder {
+  color: #526a80;
+}
+
+.Threshold {
+  display: grid;
+  grid-template-columns: auto 115px 62px;
+  gap: 10px;
+  align-items: center;
+  color: #768ca2;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.Threshold input {
+  accent-color: #45ad9f;
+}
+
+.Threshold output {
+  color: #a5bacd;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-align: right;
+}
+
+.RiverPanelHeader {
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px 0;
+  color: #60768d;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.RiverPanelHeader > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.LiveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #55b9aa;
+  box-shadow: 0 0 0 3px rgb(85 185 170 / 0.11);
+}
+
+.RiverScroll {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.River {
+  width: 100%;
+  min-width: 840px;
+  height: auto;
+  display: block;
+}
+
+.StageLabel {
+  fill: #6b8298;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.StageRule {
+  stroke: #1c3247;
+  stroke-width: 1;
+}
+
+.RiverLink {
+  fill: none;
+  stroke-opacity: 0.4;
+  cursor: pointer;
+  mix-blend-mode: screen;
+  transition:
+    stroke-opacity 140ms ease,
+    filter 140ms ease;
+}
+
+.RiverLink:hover,
+.RiverLink:focus-visible,
+.RiverLink.is-selected {
+  stroke-opacity: 0.94;
+  filter: drop-shadow(0 0 7px rgb(95 203 189 / 0.33));
+  outline: none;
+}
+
+.RiverLink.is-muted {
+  stroke-opacity: 0.07;
+}
+
+.RiverNode {
+  stroke: rgb(255 255 255 / 0.26);
+  stroke-width: 0.7;
+  filter: drop-shadow(0 4px 7px rgb(0 0 0 / 0.3));
+}
+
+.NodeLabel {
+  pointer-events: none;
+}
+
+.NodeName {
+  fill: #d9e6f3;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.NodeValue {
+  fill: #70879d;
+  font-size: 8px;
+  font-weight: 550;
+}
+
+.Inspector {
+  max-height: calc(100vh - 112px);
+  position: sticky;
+  top: 15px;
+  overflow-y: auto;
+  padding: 17px;
+  scrollbar-color: #284056 transparent;
+  scrollbar-width: thin;
+}
+
+.InspectorHeader {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #1c3044;
+}
+
+.InspectorHeader h2 {
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 5px;
+  color: #e4eef8;
+  font-size: 13px;
+  font-weight: 620;
+  line-height: 1.35;
+}
+
+.InspectorHeader h2 svg {
+  color: #5c7c97;
+}
+
+.MetricGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.EvidencePicker {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 15px;
+  color: #71879c;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.EvidencePicker select {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid #263b51;
+  border-radius: 7px;
+  color: #c8d8e7;
+  background: #0a1725;
+  font:
+    11px ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+}
+
+.MetricGrid > div {
+  padding: 10px 11px;
+  border: 1px solid #203448;
+  border-radius: 8px;
+  background: #0d1a29;
+}
+
+.MetricGrid strong {
+  display: block;
+  margin-top: 3px;
+  color: #dce8f4;
+  font-size: 15px;
+  font-weight: 630;
+}
+
+.InspectorSection {
+  margin-top: 18px;
+}
+
+.InspectorSection h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 9px;
+  color: #8097ac;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.InspectorSection h3 svg {
+  color: #51ae9f;
+}
+
+.PropertyCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid #2d4a50;
+  border-radius: 7px;
+  background: #10242d;
+}
+
+.PropertyCard code,
+.PropertyPath code {
+  color: #78d6c7;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+}
+
+.PropertyCard span {
+  overflow: hidden;
+  color: #8ca3b8;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.SourceLocation {
+  gap: 6px;
+  margin-top: 7px;
+  color: #657e94;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+}
+
+.SourceLocation span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.PropertyPath,
+.Stack {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.PropertyPath li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 13px 1fr;
+  gap: 6px;
+  min-height: 58px;
+}
+
+.PropertyPath li:not(:last-child)::before {
+  content: '';
+  width: 1px;
+  position: absolute;
+  top: 14px;
+  bottom: -1px;
+  left: 4px;
+  background: #294357;
+}
+
+.PathDot {
+  width: 9px;
+  height: 9px;
+  z-index: 1;
+  margin-top: 3px;
+  border: 2px solid #4eaa9d;
+  border-radius: 999px;
+  background: #0b1725;
+}
+
+.PropertyPath li > div {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.PropertyPath strong {
+  overflow: hidden;
+  max-width: 100%;
+  color: #cbd9e5;
+  font-size: 10px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.PropertyPath li > div > span {
+  color: #657c91;
+  font-size: 9px;
+}
+
+.Stack {
+  display: grid;
+  gap: 3px;
+}
+
+.Stack li {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 5px;
+  align-items: start;
+  padding: 7px 6px;
+  border-radius: 6px;
+}
+
+.Stack li:hover {
+  background: #101f2f;
+}
+
+.StackIndex {
+  color: #48647c;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+  text-align: center;
+}
+
+.Stack li div {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.Stack strong {
+  color: #bccdde;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.Stack li div > span {
+  overflow: hidden;
+  max-width: 100%;
+  color: #668197;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.Stack small {
+  color: #a1784b;
+  font-size: 7px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.Muted {
+  color: #687f95;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.InspectorEmpty,
+.EmptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.InspectorEmpty {
+  min-height: 380px;
+  padding: 44px 30px;
+}
+
+.InspectorEmptyIcon,
+.EmptyStateIcon {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+  border: 1px solid #28505b;
+  border-radius: 13px;
+  color: #62beaf;
+  background: #102630;
+}
+
+.InspectorEmpty h2,
+.EmptyState h2 {
+  color: #d5e2ef;
+  font-size: 14px;
+  font-weight: 630;
+}
+
+.InspectorEmpty p,
+.EmptyState p {
+  max-width: 270px;
+  margin-top: 7px;
+  color: #657d94;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.KeyboardHint {
+  margin-top: 18px;
+  padding: 5px 8px;
+  border: 1px solid #263a4e;
+  border-radius: 5px;
+  color: #60778d;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 8px;
+}
+
+.EmptyState {
+  min-height: 580px;
+}
+
+.EmptyState .SecondaryButton {
+  margin-top: 15px;
+}
+
+.VisuallyHidden {
+  width: 1px;
+  height: 1px;
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 1150px) {
+  .App {
+    padding-inline: 18px;
+  }
+
+  .Workspace {
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+
+  .Hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 850px) {
+  .App {
+    padding-inline: 12px;
+  }
+
+  .TopBar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 15px 0;
+  }
+
+  .HeaderActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .DataBadge {
+    max-width: 180px;
+    margin-right: auto;
+  }
+
+  .SummaryGrid {
+    width: 100%;
+  }
+
+  .SummaryGrid > div {
+    min-width: 0;
+  }
+
+  .Workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .Inspector {
+    max-height: none;
+    position: static;
+  }
+
+  .Toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .SearchField {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .HeroLead {
+    font-size: 20px;
+  }
+
+  .SummaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .Threshold {
+    grid-template-columns: auto minmax(80px, 1fr) 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

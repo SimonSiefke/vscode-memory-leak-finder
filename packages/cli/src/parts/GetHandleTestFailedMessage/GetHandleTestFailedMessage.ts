@@ -7,6 +7,8 @@ export const getHandleTestFailedMessage = (
   fileName: unknown,
   error: unknown,
   wasOriginallySkipped: unknown,
+  duration: unknown,
+  showDuration: unknown,
 ) => {
   return StdoutWorker.invoke(
     'Stdout.getHandleTestFailedMessage',
@@ -16,5 +18,7 @@ export const getHandleTestFailedMessage = (
     fileName,
     error,
     wasOriginallySkipped,
+    duration,
+    showDuration,
   )
 }

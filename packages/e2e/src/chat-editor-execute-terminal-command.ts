@@ -4,15 +4,19 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-export const setup = async ({ ChatEditor, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, SideBar, Editor }: TestContext): Promise<void> => {
+  await Editor.closeAll()
   await SideBar.hide()
   await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: `Run echo hello world in terminal.`,
-    model: ChatEditor.Models.GPT41,
+    model: ChatEditor.Models.Auto,
+    approveToolCalls: true,
+    // @ts-ignore
+    compactToolInvocations: true,
     toolInvocations: [
       {
         content: `echo hello world`,
@@ -21,6 +25,9 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     ],
     verify: true,
   })
+
+  await Terminal.killAll()
+  await ChatEditor.clearAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {

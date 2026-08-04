@@ -14,7 +14,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     await CreateAllMockDataZip.createAllMockDataZip()
     return
   }
-  const options = ParseArgv.parseArgv(platform, arch, argv)
+  const options = ParseArgv.parseArgv(platform, arch, argv, env)
 
   // Parse isGithubActions once at startup
   const isGithubActions = Boolean(env.GITHUB_ACTIONS)
@@ -26,6 +26,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     bisect: options.bisect,
     buildVscodeMinified: options.buildVscodeMinified,
     checkLeaks: options.checkLeaks,
+    color: options.color,
     // @ts-ignore
     commit: options.commit,
     continueValue: options.continueValue,
@@ -57,6 +58,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     runNetworkTestsAnyway: options.runNetworkTestsAnyway,
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
+    showSkippedFailedTestDuration: options.showSkippedFailedTestDuration,
     startupRuns: options.startupRuns,
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,

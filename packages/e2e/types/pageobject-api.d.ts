@@ -423,6 +423,7 @@ export interface Extensions {
   add(options: any): Promise<void>
   clear(): Promise<void>
   closeSuggest(): Promise<void>
+  disable(options: { id: string }): Promise<void>
   click(): Promise<void>
   openContextMenu(): Promise<void>
   shouldBe(name: any): Promise<void>
@@ -448,7 +449,7 @@ export interface Extensions {
   readonly second: any
 }
 export interface ExtensionDetailView {
-  disableExtension(): Promise<void>
+  disableExtension(): Promise<boolean>
   enableExtension(options?: any): Promise<void>
   installExtension(): Promise<void>
   openFeature(featureName: any): Promise<void>
@@ -510,7 +511,8 @@ export interface LanguageModelEditor {
   open(): Promise<void>
 }
 export interface MarkdownPreview {
-  shouldBeVisible(): Promise<void>
+  show(): Promise<any>
+  shouldBeVisible(index?: number): Promise<any>
   shouldHaveCodeBlocks(subFrame: any, count: any): Promise<void>
   shouldHaveCodeBlockWithLanguage(subFrame: any, language: any): Promise<void>
   shouldHaveHeading(subFrame: any, id: any): Promise<void>
@@ -715,6 +717,9 @@ export interface SideBar {
 }
 export interface SimpleBrowser {
   isSimpleBrowserTabLoading(): Promise<boolean>
+  getRandomPort(): Promise<number>
+  killAllPorts(): Promise<void>
+  trackPort(port: number): Promise<void>
   getBrowserNavigationButton(options: any): Promise<void>
   openIntegratedBrowser(): Promise<void>
   navigateIntegratedBrowser(options: any): Promise<void>

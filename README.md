@@ -56,6 +56,35 @@ Measures the total number of classes.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure class-count --only base
 ```
 
+### CompiledCodeSize
+
+Measures V8 compiled-code bytes from before and after heap snapshots. Results include the exact total, attributed/shared/unattributed buckets, and rankings by function size and growth.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure compiled-code-size --only base
+```
+
+### ConcatenatedErrorStringCount
+
+Measures V8 concatenated-string nodes whose bounded prefix is an `Error`-style
+stack trace. The result includes before/after matching counts and diagnostic
+totals for all concatenated strings; stack contents are not written to the
+result.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure concatenated-error-string-count --only base
+```
+
+### ConcatenatedStrings
+
+Measures V8 concatenated-string nodes and reconstructs their values when the
+heap snapshot contains enough rope data. The before/after data is an array of
+strings, with V8's node name used when a value cannot be reconstructed.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure concatenated-strings --only base
+```
+
 ### CpuPerformanceCounters
 
 Measures CPU instructions and cycles for the inspected process.
@@ -86,6 +115,15 @@ Measures the total number of dom nodes.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure dom-node-count --only base
+```
+
+### DuplicatedStrings
+
+Measures flat string values represented by more than one V8 heap node. Each
+duplicated value occurs once in the before/after string arrays.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure duplicated-strings --only base
 ```
 
 ### EditContextCount

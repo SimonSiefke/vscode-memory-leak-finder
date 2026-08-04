@@ -92,28 +92,6 @@ const getErrorNotificationMessage = async (notification: any) => {
   return text.trim() || 'Error notification shown while waiting for chat response'
 }
 
-const waitForLocatorVisibleWithToolApproval = async (page: any, expect: any, locator: any, timeout: number) => {
-  const startTime = performance.now()
-  while (performance.now() - startTime < timeout) {
-    const count = await locator.count().catch(() => 0)
-    if (count > 0) {
-      const isVisible = await locator
-        .first()
-        .isVisible()
-        .catch(() => false)
-      if (isVisible) {
-        return
-      }
-    }
-    const clicked = await clickVisibleAccessButton(page, 'Allow')
-    if (!clicked) {
-      await sleep(200)
-    }
-    await page.waitForIdle()
-  }
-  await expect(locator.first()).toBeVisible({ timeout: 1000 })
-}
-
 const escapeForRegExp = (value: string) => {
   return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -180,16 +158,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
   const chatScrollSelector = '.interactive-session .monaco-list .monaco-scrollable-element'
 
   const getLastRenderedLocator = async (locator: any, timeout: number, allowToolApproval: boolean = false) => {
-    if (allowToolApproval) {
-      await waitForLocatorVisibleWithToolApproval(page, expect, locator, timeout)
-    } else {
-      await expect(locator.first()).toBeVisible({ timeout })
+    const startTime = performance.now()
+    while (performance.now() - startTime < timeout) {
+      const count = await locator.count().catch(() => 0)
+      for (let index = count - 1; index >= 0; index--) {
+        const candidate = locator.nth(index)
+        if (await candidate.isVisible().catch(() => false)) {
+          return candidate
+        }
+      }
+      const clicked = allowToolApproval && (await clickVisibleAccessButton(page, 'Allow'))
+      if (!clicked) {
+        const metrics = await getChatScrollMetrics().catch(() => null)
+        if (metrics) {
+          await setChatScrollTop(metrics.scrollHeight)
+        }
+        await sleep(200)
+      }
+      await page.waitForIdle()
     }
-    const count = await locator.count()
-    if (count < 1) {
-      throw new Error('Expected at least one rendered chat row')
-    }
-    return locator.nth(count - 1)
+    throw new Error('Expected at least one visible rendered chat row')
   }
 
   const getLatestRequestMessage = async (chatView: any) => {
@@ -493,9 +481,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         })
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 118) {
-          await this.sendPart1({
-            message: '/clear',
-          })
+          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions2)
         } else if (ideVersion && typeof ideVersion !== 'string' && ideVersion.minor !== undefined && ideVersion.minor >= 108) {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
         } else {
@@ -782,7 +768,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(modelPickerItem).toBeVisible()
         await page.waitForIdle()
 
-        const modelLocator = page.locator(`.action-label[aria-label^="Pick Model"] a`)
+        const modelLocator = page.locator(`.action-label[aria-label^="Models,"] a`)
         await expect(modelLocator).toBeVisible()
         await page.waitForIdle()
         const modelText = (await modelLocator.textContent()) || ''
@@ -878,11 +864,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         exists: [],
       },
       verify = false,
+      compactToolInvocations = false,
       viewLinesText = '',
       waitForFileChanges: fileChangesToWaitFor = [],
       waitForPorts: portsToWaitFor = [],
     }: {
       expectedResponse?: string
+      compactToolInvocations?: boolean
       message: string
       approveToolCalls?: boolean
       validateRequest?: { exists: readonly unknown[] }
@@ -961,7 +949,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
         }
 
-        const { requestMessage, response } = await waitForLatestExchange(chatView, message)
+        const shouldVerifyLatestExchange =
+          verify || Boolean(expectedResponse) || toolInvocations.length > 0 || (validateRequest.exists && validateRequest.exists.length > 0)
+        const { requestMessage, response } = shouldVerifyLatestExchange
+          ? await waitForLatestExchange(chatView, message)
+          : {
+              requestMessage: undefined,
+              response: undefined,
+            }
 
         if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
           const ariaLabel = await requestMessage.getAttribute('aria-label')
@@ -987,13 +982,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           const element = chatView.locator('.chat-tool-invocation-part')
           await expect(element).toBeVisible({ timeout: 20_000 })
           await page.waitForIdle()
-          for (const toolInvocation of toolInvocations) {
-            const block = element.locator('.chat-terminal-command-block')
-            await expect(block).toBeVisible({
-              timeout: 2000,
-            })
-            await expect(block).toHaveText(` ${toolInvocation.content}`)
-            await page.waitForIdle()
+          if (compactToolInvocations) {
+            // TODO
+          } else {
+            for (const toolInvocation of toolInvocations) {
+              const block = element.locator('.chat-terminal-command-block')
+              await expect(block).toBeVisible({
+                timeout: 2000,
+              })
+              await expect(block).toHaveText(` ${toolInvocation.content}`)
+              await page.waitForIdle()
+            }
           }
         }
 

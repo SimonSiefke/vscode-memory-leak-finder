@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { parseFromJson } from '../src/parts/ParseFromJson/ParseFromJson.ts'
-import { parseTraceTree } from '../src/parts/ParseTraceTree/ParseTraceTree.ts'
+import { parseTraceTree, parseTraceTreeWithParents } from '../src/parts/ParseTraceTree/ParseTraceTree.ts'
 
 test('flattens nested allocation trace nodes without their children arrays', () => {
   const result = parseTraceTree(
@@ -25,6 +25,29 @@ test('handles malformed, childless, and field-only trace records', () => {
   expect([...parseTraceTree([1, 2], ['id', 'count'])]).toEqual([1, 2])
   expect([...parseTraceTree([1, 2, 'not-children'], ['id', 'count', 'children'])]).toEqual([1, 2])
   expect([...parseTraceTree([], [])]).toEqual([])
+})
+
+test('records each flattened trace node parent', () => {
+  const result = parseTraceTreeWithParents(
+    [
+      1,
+      4,
+      10,
+      100,
+      [
+        [2, 5, 6, 60, []],
+        [3, 6, 4, 40, [[4, 7, 1, 10, []]]],
+      ],
+    ],
+    ['id', 'function_info_index', 'count', 'size', 'children'],
+  )
+  expect([...result.parents]).toEqual([0, 1, 1, 3])
+})
+
+test('flattens compact child records', () => {
+  const result = parseTraceTreeWithParents([1, 0, 1, 16, [2, 1, 1, 8, []]], ['id', 'function_info_index', 'count', 'size', 'children'])
+  expect([...result.tree]).toEqual([1, 0, 1, 16, 2, 1, 1, 8])
+  expect([...result.parents]).toEqual([0, 1])
 })
 
 test('streams allocation function info and nested trace tree sections', async () => {
@@ -53,4 +76,5 @@ test('streams allocation function info and nested trace tree sections', async ()
 
   expect([...result.traceFunctionInfos]).toEqual([1, 1, 2, 10, 4, 8, 2, 1, 2, 10, 5, 9])
   expect([...result.traceTree]).toEqual([1, 0, 2, 48, 2, 1, 1, 48])
+  expect([...result.traceTreeParents]).toEqual([0, 1])
 })

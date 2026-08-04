@@ -1,6 +1,7 @@
 import * as CompressSvg from '../CompressSvg/CompressSvg.ts'
 import { createAllocationPerformanceChart } from '../CreateAllocationPerformanceChart/CreateAllocationPerformanceChart.ts'
 import { createBarChart } from '../CreateBarChart/CreateBarChart.ts'
+import { createCompiledCodeSizeChart } from '../CreateCompiledCodeSizeChart/CreateCompiledCodeSizeChart.ts'
 import { createCpuProfileFlameChart } from '../CreateCpuProfileFlameChart/CreateCpuProfileFlameChart.ts'
 import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
 import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
@@ -16,6 +17,9 @@ export const createChart = async (data: any, options: any): Promise<string> => {
       break
     case 'bar-chart':
       svg = createBarChart(data, options)
+      break
+    case 'compiled-code-size-chart':
+      svg = createCompiledCodeSizeChart(data, options)
       break
     case 'cpu-profile-flame-chart':
       svg = createCpuProfileFlameChart(data, options)

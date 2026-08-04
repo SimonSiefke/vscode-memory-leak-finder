@@ -23,9 +23,59 @@ export interface MeasureLocalVscodeComparisonOptions {
   readonly measureNode: boolean
   readonly runs: number
   readonly startupRuns: number
+  readonly proxyCaptureRuns: number
   readonly display: string
+  readonly extraTestArgs: readonly string[]
   readonly skipBuild: boolean
   readonly skipCharts: boolean
+}
+
+const isKnownFlagWithValue = (arg: string): boolean => {
+  return [
+    '--display',
+    '--measure',
+    '--new-label',
+    '--new-vscode-path',
+    '--old-label',
+    '--old-vscode-path',
+    '--only',
+    '--runs',
+    '--startup-runs',
+    '--vscode-path',
+    '--proxy-capture-runs',
+  ].includes(arg)
+}
+
+const isKnownFlagWithoutValue = (arg: string): boolean => {
+  return ['--measure-after', '--measure-node', '--skip-build', '--skip-charts'].includes(arg)
+}
+
+const isProxyPreparationEnabled = (extraTestArgs: readonly string[]): boolean => {
+  return extraTestArgs.includes('--enable-proxy') && extraTestArgs.includes('--use-proxy-mock')
+}
+
+const getExtraTestArgs = (argv: readonly string[]): readonly string[] => {
+  const extraTestArgs: string[] = []
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]
+    if (!arg.startsWith('--')) {
+      continue
+    }
+    if (isKnownFlagWithValue(arg)) {
+      i += 1
+      continue
+    }
+    if (isKnownFlagWithoutValue(arg)) {
+      continue
+    }
+    extraTestArgs.push(arg)
+    const nextArg = argv[i + 1]
+    if (nextArg && !nextArg.startsWith('--')) {
+      extraTestArgs.push(nextArg)
+      i += 1
+    }
+  }
+  return extraTestArgs
 }
 
 interface RunCommandOptions {
@@ -74,10 +124,27 @@ export const parseArgv = (argv: readonly string[]): MeasureLocalVscodeComparison
     oldVscodePath: getString('--old-vscode-path', defaultOldVscodePath),
     only: getString('--only', '^editor-open.ts'),
     runs: getNumber('--runs', 1),
+    proxyCaptureRuns: getNumber('--proxy-capture-runs', 3),
     startupRuns: getNumber('--startup-runs', 1),
     skipBuild: argv.includes('--skip-build'),
     skipCharts: argv.includes('--skip-charts'),
+    extraTestArgs: getExtraTestArgs(argv),
   }
+}
+
+const getMeasureCommandBaseArgs = (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): readonly string[] => {
+  return [
+    'packages/cli/bin/test.js',
+    '--run-skipped-tests-anyway',
+    '--only',
+    options.only,
+    '--runs',
+    String(options.runs),
+    '--startup-runs',
+    String(options.startupRuns),
+    '--vscode-path',
+    vscodeExecutablePath,
+  ]
 }
 
 const pathExists = async (path: string): Promise<boolean> => {
@@ -434,25 +501,54 @@ export const getMeasureCommandArgs = (options: MeasureLocalVscodeComparisonOptio
   const measureAfterArgs = options.measureAfter ? ['--measure-after'] : []
   const measureNodeArgs = options.measureNode ? ['--measure-node'] : []
   return [
+    ...getMeasureCommandBaseArgs(options, vscodeExecutablePath),
+    '--measure',
+    options.measure,
+    ...measureNodeArgs,
+    ...measureAfterArgs,
+    ...options.extraTestArgs,
+  ]
+}
+
+const getProxyCaptureCommandArgs = (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): readonly string[] => {
+  const noUseProxyMockArgs = options.extraTestArgs.filter((arg) => arg !== '--use-proxy-mock' && arg !== '--convert-requests-to-mocks')
+  return [
     'packages/cli/bin/test.js',
     '--run-skipped-tests-anyway',
     '--only',
     options.only,
     '--runs',
-    String(options.runs),
+    String(options.proxyCaptureRuns),
     '--startup-runs',
     String(options.startupRuns),
-    '--measure',
-    options.measure,
-    ...measureNodeArgs,
     '--vscode-path',
     vscodeExecutablePath,
-    ...measureAfterArgs,
+    ...noUseProxyMockArgs,
   ]
 }
 
 const runMeasure = async (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): Promise<void> => {
   await runCommand(process.execPath, getMeasureCommandArgs(options, vscodeExecutablePath), {
+    cwd: repositoryRoot,
+    env: {
+      ...process.env,
+      DISPLAY: options.display,
+    },
+  })
+}
+
+const prepareProxyMocksIfNeeded = async (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): Promise<void> => {
+  if (!isProxyPreparationEnabled(options.extraTestArgs)) {
+    return
+  }
+  await runCommand(process.execPath, getProxyCaptureCommandArgs(options, vscodeExecutablePath), {
+    cwd: repositoryRoot,
+    env: {
+      ...process.env,
+      DISPLAY: options.display,
+    },
+  })
+  await runCommand(process.execPath, ['packages/cli/bin/test.js', '--convert-requests-to-mocks', '--vscode-path', vscodeExecutablePath], {
     cwd: repositoryRoot,
     env: {
       ...process.env,
@@ -472,10 +568,12 @@ export const renameResult = async (resultPath: string, label: string): Promise<s
 export const measureLocalVscodeComparison = async (options: MeasureLocalVscodeComparisonOptions): Promise<void> => {
   const oldExecutablePath = await ensureLocalVscodeBuild(options.oldVscodePath, options.skipBuild)
   const resultPath = getResultPath(options.measure, options.only)
+  await prepareProxyMocksIfNeeded(options, oldExecutablePath)
   await runMeasure(options, oldExecutablePath)
   await renameResult(resultPath, options.oldLabel)
 
   const newExecutablePath = await ensureLocalVscodeBuild(options.newVscodePath, options.skipBuild)
+  await prepareProxyMocksIfNeeded(options, newExecutablePath)
   await runMeasure(options, newExecutablePath)
   await renameResult(resultPath, options.newLabel)
 

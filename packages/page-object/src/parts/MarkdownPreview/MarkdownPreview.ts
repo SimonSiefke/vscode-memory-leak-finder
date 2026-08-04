@@ -1,16 +1,25 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ expect, page, VError, electronApp, ideVersion, platform }: CreateParams) => {
   return {
-    async shouldBeVisible() {
+    async show() {
+      const index = await page.locator('.webview').count()
+      const quickPick = QuickPick.create({ page, expect, VError, electronApp, ideVersion, platform })
+      await quickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
+      return this.shouldBeVisible(index)
+    },
+    async shouldBeVisible(index = 0) {
       try {
         await page.waitForIdle()
-        const webView = page.locator('.webview')
+        const webView = page.locator('.webview').nth(index)
         await expect(webView).toBeVisible()
         await page.waitForIdle()
         await expect(webView).toHaveClass('ready')
         await page.waitForIdle()
         const childPage = await page.waitForIframe({
+          index,
           injectUtilityScript: false,
           url: /extensionId=vscode.markdown-language-features/,
         })
@@ -19,8 +28,10 @@ export const create = ({ expect, page, VError }: CreateParams) => {
           url: /extensionId=vscode.markdown-language-features/,
         })
         await subFrame.waitForIdle()
+        await page.waitForIdle()
         const markDown = subFrame.locator('.markdown-body')
         await expect(markDown).toBeVisible()
+        await subFrame.waitForIdle()
         await page.waitForIdle()
         return subFrame
       } catch (error) {
@@ -49,9 +60,11 @@ export const create = ({ expect, page, VError }: CreateParams) => {
     },
     async shouldHaveHeading(subFrame: any, id: string) {
       try {
+        await subFrame.waitForIdle()
         await page.waitForIdle()
         const heading = subFrame.locator(`#${id}`)
         await expect(heading).toBeVisible()
+        await subFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview has heading ${id}`)

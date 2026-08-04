@@ -40,7 +40,8 @@ test('bar chart highlights missing rows with full-width non-overlapping row boxe
   expect(result).toContain('data-highlight-label="gone-1|gone-2"')
   expect(result).toContain('x="8"')
   expect(result).toContain('width="624"')
-  expect(result).toMatch(/height="53\.333/)
+  expect(result).toContain('y="30.5"')
+  expect(result).toContain('height="45"')
 })
 
 test('bar chart keeps two CPU performance counter rows inside the viewBox', async () => {
@@ -77,7 +78,56 @@ test('dual bar chart highlights by row name instead of value', async () => {
   )
 
   expect(result).toContain('data-highlight-label="gone"')
-  expect(result).toContain('height="30"')
+  expect(result).toContain('y="22.5"')
+  expect(result).toContain('height="14"')
+})
+
+test('dual bar chart centers a highlight within the rendered row', async () => {
+  const result = await createChart(
+    Array.from({ length: 14 }, (_, index) => ({
+      count: 14 - index,
+      delta: 1,
+      name: index === 5 ? 'gone' : `kept-${index}`,
+    })),
+    {
+      highlightLabels: ['gone'],
+      type: 'dual-bar-chart',
+    },
+  )
+
+  const highlightTag = result.match(/<rect[^>]*data-highlight-label="gone"[^>]*>/)?.[0]
+  expect(highlightTag).toBeDefined()
+
+  const highlightY = Number(highlightTag?.match(/\by="([^"]+)"/)?.[1])
+  const highlightHeight = Number(highlightTag?.match(/\bheight="([^"]+)"/)?.[1])
+  const highlightCenter = highlightY + highlightHeight / 2
+  expect(highlightCenter).toBe(103)
+  expect(highlightY - 1.5).toBe(95)
+  expect(highlightY + highlightHeight + 1.5).toBe(111)
+})
+
+test('dual bar chart keeps a last-row highlight inside the resized viewBox', async () => {
+  const result = await createChart(
+    Array.from({ length: 14 }, (_, index) => ({
+      count: 14 - index,
+      delta: 1,
+      name: index === 13 ? 'gone' : `kept-${index}`,
+    })),
+    {
+      highlightLabels: ['gone'],
+      type: 'dual-bar-chart',
+    },
+  )
+
+  const svgTag = result.match(/^<svg[^>]*>/)?.[0]
+  const highlightTag = result.match(/<rect[^>]*data-highlight-label="gone"[^>]*>/)?.[0]
+  expect(svgTag).toBeDefined()
+  expect(highlightTag).toBeDefined()
+
+  const svgHeight = Number(svgTag?.match(/\bheight="([^"]+)"/)?.[1])
+  const highlightY = Number(highlightTag?.match(/\by="([^"]+)"/)?.[1])
+  const highlightHeight = Number(highlightTag?.match(/\bheight="([^"]+)"/)?.[1])
+  expect(highlightY + highlightHeight).toBeLessThan(svgHeight)
 })
 
 test('dual bar chart renders omitted entries footer', async () => {
@@ -133,6 +183,49 @@ test('grouped horizontal bar chart renders omitted entries footer', async () => 
   expect(result).toContain('3 entries omitted for brevity')
   expect(result).toContain('height="116"')
   expect(result).toContain('viewBox="0 0 640 116"')
+})
+
+test('compiled code size chart renders stacked bytes, totals, deltas, and omitted entries', async () => {
+  const result = await createChart(
+    [
+      {
+        after: {
+          bytecodeBytes: 1024,
+          instructionBytes: 2048,
+          metadataBytes: 1024,
+          totalBytes: 4096,
+        },
+        before: {
+          bytecodeBytes: 512,
+          instructionBytes: 1024,
+          metadataBytes: 512,
+          totalBytes: 2048,
+        },
+        delta: {
+          bytecodeBytes: 512,
+          instructionBytes: 1024,
+          metadataBytes: 512,
+          totalBytes: 2048,
+        },
+        name: 'render&lt;Workbench&gt; (src/workbench.ts:10:2)',
+      },
+    ],
+    {
+      omittedEntryCount: 5,
+      title: 'Largest compiled-code functions',
+      type: 'compiled-code-size-chart',
+      width: 1200,
+    },
+  )
+
+  expect(result).toContain('Largest compiled-code functions')
+  expect(result).toContain('Bytecode')
+  expect(result).toContain('Native instructions')
+  expect(result).toContain('Metadata')
+  expect(result).toContain('4.0 KiB')
+  expect(result).toContain('(+2.0 KiB)')
+  expect(result).toContain('render&amp;lt;Workbench&amp;gt;')
+  expect(result).toContain('5 entries omitted for brevity')
 })
 
 test('allocation performance chart renders churn and source CPU correlation', async () => {

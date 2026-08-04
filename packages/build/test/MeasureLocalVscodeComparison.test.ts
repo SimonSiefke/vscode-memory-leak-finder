@@ -60,6 +60,8 @@ test('parseArgv uses defaults', () => {
     startupRuns: 1,
     skipBuild: false,
     skipCharts: false,
+    proxyCaptureRuns: 3,
+    extraTestArgs: [],
   })
 })
 
@@ -103,6 +105,8 @@ test('parseArgv uses overrides', () => {
     startupRuns: 30,
     skipBuild: true,
     skipCharts: true,
+    proxyCaptureRuns: 3,
+    extraTestArgs: [],
   })
 })
 
@@ -137,6 +141,8 @@ test('getMeasureCommandArgs forwards measure-after to cli', () => {
         startupRuns: 30,
         skipBuild: true,
         skipCharts: true,
+        extraTestArgs: [],
+        proxyCaptureRuns: 0,
       },
       '/tmp/code-oss',
     ),
@@ -149,11 +155,12 @@ test('getMeasureCommandArgs forwards measure-after to cli', () => {
     '97',
     '--startup-runs',
     '30',
+    '--vscode-path',
+    '/tmp/code-oss',
     '--measure',
     'gc-statistics',
     '--measure-node',
-    '--vscode-path',
-    '/tmp/code-oss',
+
     '--measure-after',
   ])
 })
