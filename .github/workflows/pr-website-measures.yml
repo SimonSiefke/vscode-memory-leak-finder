@@ -76,6 +76,106 @@ jobs:
             runs: 2
           - test: todomvc-vue-add-toggle-clear
             runs: 2
+          - test: antd-checkbox-toggle-restore
+            runs: 2
+          - test: antd-collapse-toggle-restore
+            runs: 2
+          - test: antd-color-picker-open-close
+            runs: 2
+          - test: antd-date-picker-open-close
+            runs: 2
+          - test: antd-dropdown-open-close
+            runs: 2
+          - test: antd-input-number-step-restore
+            runs: 2
+          - test: antd-pagination-next-previous
+            runs: 2
+          - test: antd-segmented-switch-restore
+            runs: 2
+          - test: antd-slider-step-restore
+            runs: 2
+          - test: antd-switch-toggle-restore
+            runs: 2
+          - test: antd-tabs-switch-restore
+            runs: 2
+          - test: bootstrap-accordion-toggle-restore
+            runs: 2
+          - test: bootstrap-carousel-next-previous
+            runs: 2
+          - test: bootstrap-collapse-toggle
+            runs: 2
+          - test: bootstrap-dropdown-open-close
+            runs: 2
+          - test: bootstrap-list-group-tab-restore
+            runs: 2
+          - test: bootstrap-modal-open-close
+            runs: 2
+          - test: bootstrap-offcanvas-open-close
+            runs: 2
+          - test: bootstrap-popover-open-close
+            runs: 2
+          - test: bootstrap-range-change-restore
+            runs: 2
+          - test: bootstrap-tabs-switch-restore
+            runs: 2
+          - test: bootstrap-toast-show-close
+            runs: 2
+          - test: jqueryui-accordion-switch-restore
+            runs: 2
+          - test: jqueryui-autocomplete-select-clear
+            runs: 2
+          - test: jqueryui-checkboxradio-toggle
+            runs: 2
+          - test: jqueryui-controlgroup-toggle
+            runs: 2
+          - test: jqueryui-datepicker-select-clear
+            runs: 2
+          - test: jqueryui-dialog-close-reload
+            runs: 2
+          - test: jqueryui-draggable-move-restore
+            runs: 2
+          - test: jqueryui-droppable-drag-reload
+            runs: 2
+          - test: jqueryui-menu-submenu-open-close
+            runs: 2
+          - test: jqueryui-resizable-resize-restore
+            runs: 2
+          - test: jqueryui-selectable-select-clear
+            runs: 2
+          - test: jqueryui-selectmenu-select-restore
+            runs: 2
+          - test: jqueryui-slider-step-restore
+            runs: 2
+          - test: jqueryui-sortable-reorder-restore
+            runs: 2
+          - test: jqueryui-spinner-step-restore
+            runs: 2
+          - test: jqueryui-tabs-switch-restore
+            runs: 2
+          - test: jqueryui-toggleclass-run-restore
+            runs: 2
+          - test: jqueryui-tooltip-open-close
+            runs: 2
+          - test: mui-accordion-toggle-restore
+            runs: 2
+          - test: mui-dialog-open-close
+            runs: 2
+          - test: mui-drawer-open-close
+            runs: 2
+          - test: mui-menu-open-close
+            runs: 2
+          - test: mui-rating-select-restore
+            runs: 2
+          - test: mui-select-select-restore
+            runs: 2
+          - test: mui-slider-step-restore
+            runs: 2
+          - test: mui-switch-toggle-restore
+            runs: 2
+          - test: mui-tabs-switch-restore
+            runs: 2
+          - test: mui-tooltip-open-close
+            runs: 2
     steps:
       - uses: actions/checkout@v6
 
