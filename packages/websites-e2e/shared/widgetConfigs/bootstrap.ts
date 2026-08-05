@@ -10,12 +10,10 @@ export const bootstrapWidgetConfigs = {
     run: `
       const button = document.querySelector('#accordionExample button[aria-controls="collapseOne"]')
       assert(button instanceof HTMLElement && button.getAttribute('aria-expanded') === 'true', 'Expected expanded first accordion item')
-      button.click()
-      await waitFor(() => button.getAttribute('aria-expanded') === 'false', 'Expected collapsed accordion item')
+      await clickUntil(button, () => button.getAttribute('aria-expanded') === 'false', 'Expected collapsed accordion item')
       const panel = document.querySelector('#collapseOne')
       await waitFor(() => panel instanceof HTMLElement && !panel.classList.contains('collapsing'), 'Expected completed accordion collapse')
-      button.click()
-      await waitFor(() => button.getAttribute('aria-expanded') === 'true', 'Expected restored accordion item')`,
+      await clickUntil(button, () => button.getAttribute('aria-expanded') === 'true', 'Expected restored accordion item')`,
   },
   'bootstrap-carousel-next-previous': {
     name: 'bootstrap-carousel-next-previous',
