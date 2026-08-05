@@ -9,8 +9,11 @@ const urlPattern = /^https:\/\/fullcalendar\.io\/docs\/event-dragging-resizing-d
 
 const expression = `(async () => {
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-  const getButton = (title) => document.querySelector(\`button[title="\${title}"]\`)
-  const getTitle = () => (document.querySelector('h2')?.textContent || '').trim()
+  const getButton = (label) => document.querySelector(\`button[aria-label="\${label}"], button[title="\${label}"]\`)
+  const getTitle = () => {
+    const candidate = Array.from(document.querySelectorAll('div')).find((element) => element.children.length === 0 && /^[A-Z][a-z]+ 20\\d\\d$/.test((element.textContent || '').trim()))
+    return (candidate?.textContent || '').trim()
+  }
   const waitFor = async (callback, message) => {
     const start = Date.now()
     while (Date.now() - start < 10000) {
@@ -33,9 +36,9 @@ const expression = `(async () => {
   previous.click()
   await waitFor(() => getTitle() === initialTitle, 'Expected FullCalendar to restore the initial month')
   week.click()
-  await waitFor(() => week.getAttribute('aria-pressed') === 'true' || week.classList.contains('fc-button-active'), 'Expected FullCalendar week view')
+  await waitFor(() => week.getAttribute('aria-selected') === 'true' || week.getAttribute('aria-pressed') === 'true' || week.classList.contains('fc-button-active'), 'Expected FullCalendar week view')
   month.click()
-  await waitFor(() => month.getAttribute('aria-pressed') === 'true' || month.classList.contains('fc-button-active'), 'Expected FullCalendar month view to be restored')
+  await waitFor(() => month.getAttribute('aria-selected') === 'true' || month.getAttribute('aria-pressed') === 'true' || month.classList.contains('fc-button-active'), 'Expected FullCalendar month view to be restored')
   await waitFor(() => getTitle() === initialTitle, 'Expected FullCalendar title to remain restored')
 })()`
 
@@ -45,7 +48,7 @@ export const setup = async ({ Editor, Notification, SideBar, SimpleBrowser, Work
   await SideBar.hide()
   await Notification.closeAll({ force: true })
   await SimpleBrowser.show({ url })
-  await SimpleBrowser.shouldHaveText({ text: 'Month view', timeout: 20_000, urlPattern })
+  await SimpleBrowser.shouldHaveText({ text: 'Today', timeout: 20_000, urlPattern })
 }
 
 export const run = async ({ SimpleBrowser }: TestContext): Promise<void> => {

@@ -47,19 +47,26 @@ const expression = `(async () => {
     const candidate = document.querySelector('[role="listbox"]')
     return candidate instanceof HTMLElement && isVisible(candidate) ? candidate : undefined
   }, 'Expected MUI virtualized listbox')
-  listbox.scrollTop = listbox.scrollHeight
-  await waitFor(() => listbox.scrollTop > 0, 'Expected MUI virtualized listbox to scroll down')
-  listbox.scrollTop = 0
-  await waitFor(() => listbox.scrollTop === 0, 'Expected MUI virtualized listbox to return to the top')
-  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
-  if (!setter) throw new Error('Expected native input value setter')
-  setter.call(input, '#123')
-  input.dispatchEvent(new InputEvent('input', { bubbles: true, data: '#123', inputType: 'insertText' }))
+  const scrollContainer = listbox.querySelector('[role="list"]')
+  if (!(scrollContainer instanceof HTMLElement) || scrollContainer.scrollHeight <= scrollContainer.clientHeight) {
+    throw new Error('Expected scrollable MUI virtualized options container')
+  }
+  scrollContainer.scrollTop = scrollContainer.scrollHeight
+  await waitFor(() => scrollContainer.scrollTop > 0 && Array.from(document.querySelectorAll('[role="option"]')).some((option) => /^#(?:999\\d|10000) -/.test(option.textContent || '')), 'Expected MUI virtualized listbox to scroll down')
+  scrollContainer.scrollTop = 0
+  await waitFor(() => scrollContainer.scrollTop === 0 && Array.from(document.querySelectorAll('[role="option"]')).some((option) => (option.textContent || '').startsWith('#1 -')), 'Expected MUI virtualized listbox to return to the top')
   const option = await waitFor(() => {
-    return Array.from(document.querySelectorAll('[role="option"]')).find((candidate) => (candidate.textContent || '').startsWith('#123 -'))
+    const rendered = Array.from(document.querySelectorAll('[role="option"]'))
+    const target = rendered.find((candidate) => (candidate.textContent || '').startsWith('#123 -'))
+    if (target) return target
+    const indices = rendered.map((candidate) => Number((candidate.textContent || '').match(/^#(\\d+) -/)?.[1])).filter(Number.isFinite)
+    const middle = indices[Math.floor(indices.length / 2)] || 1
+    scrollContainer.scrollTop += (123 - middle) * 36
+    return undefined
   }, 'Expected virtualized option #123')
+  const selectedValue = (option.textContent || '').replace(/^#123 - /, '')
   option.click()
-  await waitFor(() => input.value.startsWith('#123 -'), 'Expected option #123 to be selected')
+  await waitFor(() => input.value === selectedValue, 'Expected option #123 to be selected')
   const clear = await waitFor(() => {
     const candidate = getRoot()?.querySelector('button[title="Clear"], button[aria-label="Clear"]')
     return candidate instanceof HTMLElement ? candidate : undefined

@@ -22,16 +22,26 @@ const getRootExpression = (shadowHostSelector: string | undefined): string => {
   return `document.querySelector(${JSON.stringify(shadowHostSelector)})?.shadowRoot`
 }
 
-const getWaitForReadyExpression = (shadowHostSelector: string | undefined): string => {
+const getWaitForReadyExpression = (heading: string, shadowHostSelector: string | undefined): string => {
   const rootExpression = getRootExpression(shadowHostSelector)
   return `(async () => {
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
   const getRoot = () => ${rootExpression}
+  const queryDeep = (root, selector) => {
+    const direct = root?.querySelector(selector)
+    if (direct) return direct
+    for (const element of root?.querySelectorAll('*') || []) {
+      const nested = element.shadowRoot && queryDeep(element.shadowRoot, selector)
+      if (nested) return nested
+    }
+    return undefined
+  }
   const start = Date.now()
   while (Date.now() - start < 20000) {
     const root = getRoot()
-    const input = root?.querySelector('.new-todo, input[placeholder="What needs to be done?"]')
-    if (input instanceof HTMLInputElement) {
+    const input = queryDeep(root, '.new-todo, input[placeholder="What needs to be done?"]')
+    const pageHeading = queryDeep(root, 'h1')
+    if (input instanceof HTMLInputElement && pageHeading?.textContent?.trim() === ${JSON.stringify(heading)}) {
       return
     }
     await delay(100)
@@ -46,8 +56,16 @@ const getRunExpression = (shadowHostSelector: string | undefined): string => {
   const taskTitle = ${JSON.stringify(taskTitle)}
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
   const getRoot = () => ${rootExpression}
-  const getInput = () => getRoot()?.querySelector('.new-todo, input[placeholder="What needs to be done?"]')
-  const getItems = () => Array.from(getRoot()?.querySelectorAll('.todo-list li') || [])
+  const queryAllDeep = (root, selector) => {
+    const matches = Array.from(root?.querySelectorAll(selector) || [])
+    for (const element of root?.querySelectorAll('*') || []) {
+      if (element.shadowRoot) matches.push(...queryAllDeep(element.shadowRoot, selector))
+    }
+    return matches
+  }
+  const queryDeep = (root, selector) => queryAllDeep(root, selector)[0]
+  const getInput = () => queryDeep(getRoot(), '.new-todo, input[placeholder="What needs to be done?"]')
+  const getItems = () => queryAllDeep(getRoot(), '.todo-list li, li.todo')
   const getSummary = () => {
     const root = getRoot()
     const input = getInput()
@@ -90,14 +108,20 @@ const getRunExpression = (shadowHostSelector: string | undefined): string => {
   const item = await waitFor(() => {
     return getItems().find((candidate) => candidate.textContent?.includes(taskTitle))
   }, 'Expected newly created TodoMVC item')
-  const toggle = item.querySelector('.toggle, input[type="checkbox"]')
+  if (input.value !== '') {
+    setter.call(input, '')
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, data: null, inputType: 'deleteContentBackward' }))
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+  }
+  await waitFor(() => input.value === '', 'Expected TodoMVC input to reset after adding an item')
+  const toggle = queryDeep(item, '.toggle, input[type="checkbox"]')
   if (!(toggle instanceof HTMLInputElement)) {
     throw new Error(\`Expected TodoMVC item toggle. \${getSummary()}\`)
   }
   toggle.click()
   await waitFor(() => toggle.checked || item.classList.contains('completed'), 'Expected TodoMVC item to be completed')
   const clearCompleted = await waitFor(() => {
-    const candidate = getRoot()?.querySelector('.clear-completed')
+    const candidate = queryDeep(getRoot(), '.clear-completed')
     return candidate instanceof HTMLElement ? candidate : undefined
   }, 'Expected TodoMVC clear-completed control')
   clearCompleted.click()
@@ -126,14 +150,16 @@ export const createTodoMvcTest = ({ heading, shadowHostSelector, url, urlPattern
         url,
         waitForContentFrame: true,
       })
-      await SimpleBrowser.shouldHaveText({
-        selector: 'h1',
-        text: heading,
-        timeout: 20_000,
-        urlPattern,
-      })
+      if (!shadowHostSelector) {
+        await SimpleBrowser.shouldHaveText({
+          selector: 'h1',
+          text: heading,
+          timeout: 20_000,
+          urlPattern,
+        })
+      }
       await SimpleBrowser.executeJavaScript({
-        expression: getWaitForReadyExpression(shadowHostSelector),
+        expression: getWaitForReadyExpression(heading, shadowHostSelector),
         timeout: 25_000,
       })
     },

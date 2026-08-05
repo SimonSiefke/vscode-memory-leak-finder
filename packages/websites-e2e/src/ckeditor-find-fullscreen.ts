@@ -15,7 +15,7 @@ const expression = `(async () => {
     const rect = element.getBoundingClientRect()
     return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0
   }
-  const getButton = (label) => Array.from(document.querySelectorAll('button[aria-label]')).find((button) => button.getAttribute('aria-label') === label && isVisible(button))
+  const getButton = (label) => Array.from(document.querySelectorAll('button')).find((button) => (button.getAttribute('aria-label') || button.textContent || '').trim() === label && isVisible(button))
   const consent = Array.from(document.querySelectorAll('button')).find((button) => /allow all cookies/i.test(button.textContent || ''))
   consent?.click()
   const waitFor = async (callback, message) => {
@@ -30,17 +30,17 @@ const expression = `(async () => {
   const findAndReplace = await waitFor(() => getButton('Find and replace'), 'Expected CKEditor Find and replace')
   findAndReplace.click()
   const findInput = await waitFor(() => {
-    const candidate = document.querySelector('input[placeholder="Find in text…"]')
+    const candidate = document.querySelector('.ck-find-and-replace-form__inputs input:not([readonly])')
     return candidate instanceof HTMLInputElement && isVisible(candidate) ? candidate : undefined
   }, 'Expected CKEditor find input')
-  const findPanel = findInput.closest('.ck-find-and-replace-form, .ck-balloon-panel, .ck')
-  const close = Array.from((findPanel || document).querySelectorAll('button[aria-label="Close"]')).find(isVisible) || getButton('Close')
+  const findPanel = findInput.closest('.ck-find-and-replace-form, .ck-balloon-panel')
+  const close = Array.from((findPanel || document).querySelectorAll('button')).find((button) => (button.getAttribute('aria-label') || button.textContent || '').trim() === 'Close' && isVisible(button)) || getButton('Close')
   if (!(close instanceof HTMLElement)) throw new Error('Expected CKEditor find panel close control')
   close.click()
-  await waitFor(() => !isVisible(document.querySelector('input[placeholder="Find in text…"]')), 'Expected CKEditor find panel to close')
+  await waitFor(() => !isVisible(document.querySelector('.ck-find-and-replace-form__inputs input:not([readonly])')), 'Expected CKEditor find panel to close')
   const enterFullscreen = await waitFor(() => getButton('Enter fullscreen mode'), 'Expected CKEditor fullscreen control')
   enterFullscreen.click()
-  const exitFullscreen = await waitFor(() => getButton('Exit fullscreen mode'), 'Expected CKEditor to enter fullscreen')
+  const exitFullscreen = await waitFor(() => getButton('Leave fullscreen mode'), 'Expected CKEditor to enter fullscreen')
   exitFullscreen.click()
   await waitFor(() => getButton('Enter fullscreen mode'), 'Expected CKEditor to exit fullscreen')
 })()`

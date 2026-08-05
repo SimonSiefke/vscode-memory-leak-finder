@@ -739,6 +739,7 @@ export interface SimpleBrowser {
   addElementToChat(options: any): Promise<void>
   clickLink(options: any): Promise<void>
   clickPageLink(options: any): Promise<void>
+  dragBrowserWebContents(options: { deltaX: number; deltaY: number; selector: string }): Promise<void>
   back(options?: any): Promise<void>
   createMockServer(options: any): Promise<void>
   createDeferredMockServer(options: any): Promise<void>
