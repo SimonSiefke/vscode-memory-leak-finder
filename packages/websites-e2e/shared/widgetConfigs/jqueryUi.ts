@@ -145,14 +145,23 @@ export const jqueryUiWidgetConfigs = {
     name: 'jqueryui-resizable-resize-restore',
     url: demoUrl('resizable'),
     ready: `await waitFor(() => document.querySelector('#resizable .ui-resizable-se'), 'Expected jQuery UI resizable')`,
-    run: `${mouseDrag}
+    run: `
       const item = document.querySelector('#resizable')
       const handle = item?.querySelector('.ui-resizable-se')
       assert(item instanceof HTMLElement && handle instanceof HTMLElement, 'Expected resizable handle')
       const initialWidth = item.offsetWidth
       const initialHeight = item.offsetHeight
       const rect = handle.getBoundingClientRect()
-      drag(handle, rect.left + 2, rect.top + 2, rect.left + 42, rect.top + 32)
+      const fromX = rect.left + rect.width / 2
+      const fromY = rect.top + rect.height / 2
+      const instance = globalThis.jQuery(item).resizable('instance')
+      assert(instance, 'Expected initialized resizable instance')
+      instance.axis = 'se'
+      const start = globalThis.jQuery.Event('mousedown', { target: handle, which: 1, pageX: fromX, pageY: fromY })
+      const end = globalThis.jQuery.Event('mousemove', { target: handle, which: 1, pageX: fromX + 40, pageY: fromY + 30 })
+      instance._mouseStart(start)
+      instance._mouseDrag(end)
+      instance._mouseStop(end)
       await waitFor(() => item.offsetWidth > initialWidth && item.offsetHeight > initialHeight, 'Expected resized element')`,
     reloadAfterRun: true,
   },
@@ -185,13 +194,15 @@ export const jqueryUiWidgetConfigs = {
     name: 'jqueryui-slider-step-restore',
     url: demoUrl('slider'),
     ready: `await waitFor(() => document.querySelector('#slider .ui-slider-handle'), 'Expected jQuery UI slider')`,
-    run: `${mouseDrag}
+    run: `
       const handle = document.querySelector('#slider .ui-slider-handle')
       assert(handle instanceof HTMLElement, 'Expected slider handle')
-      const initial = handle.getAttribute('aria-valuenow')
-      const rect = handle.getBoundingClientRect()
-      drag(handle, rect.left + rect.width / 2, rect.top + rect.height / 2, rect.left + rect.width / 2 + 30, rect.top + rect.height / 2)
-      await waitFor(() => handle.getAttribute('aria-valuenow') !== initial, 'Expected incremented slider')`,
+      const slider = globalThis.jQuery('#slider')
+      const initial = slider.slider('value')
+      handle.focus()
+      globalThis.jQuery(handle).trigger(globalThis.jQuery.Event('keydown', { key: 'ArrowRight', keyCode: 39, which: 39 }))
+      globalThis.jQuery(handle).trigger(globalThis.jQuery.Event('keyup', { key: 'ArrowRight', keyCode: 39, which: 39 }))
+      await waitFor(() => slider.slider('value') > initial && handle.style.left !== '0%', 'Expected incremented slider')`,
     reloadAfterRun: true,
   },
   'jqueryui-sortable-reorder-restore': {

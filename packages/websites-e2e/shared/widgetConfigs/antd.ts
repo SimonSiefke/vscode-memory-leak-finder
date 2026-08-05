@@ -6,7 +6,13 @@ export const antdWidgetConfigs = {
   'antd-checkbox-toggle-restore': {
     name: 'antd-checkbox-toggle-restore',
     url: antdUrl('checkbox'),
-    ready: `await waitFor(() => isReactReady(document.querySelector('.ant-checkbox-input')), 'Expected hydrated Ant Design checkbox')`,
+    ready: `
+      await waitFor(() => isReactReady(document.querySelector('.ant-checkbox-input')), 'Expected hydrated Ant Design checkbox')
+      await waitFor(() => {
+        const demoActions = Array.from(document.querySelectorAll('.code-box-code-action'))
+        return demoActions.length > 0 && demoActions.every(isReactReady)
+      }, 'Expected hydrated Ant Design demo actions', 30000)
+      await waitForStableReact()`,
     run: `
       const input = document.querySelector('.ant-checkbox-input')
       assert(input instanceof HTMLInputElement, 'Expected Ant Design checkbox input')

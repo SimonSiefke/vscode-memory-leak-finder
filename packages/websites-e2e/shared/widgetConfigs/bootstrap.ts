@@ -10,12 +10,10 @@ export const bootstrapWidgetConfigs = {
     run: `
       const button = document.querySelector('#accordionExample button[aria-controls="collapseOne"]')
       assert(button instanceof HTMLElement && button.getAttribute('aria-expanded') === 'true', 'Expected expanded first accordion item')
-      button.click()
-      await waitFor(() => button.getAttribute('aria-expanded') === 'false', 'Expected collapsed accordion item')
+      await clickUntil(button, () => button.getAttribute('aria-expanded') === 'false', 'Expected collapsed accordion item')
       const panel = document.querySelector('#collapseOne')
       await waitFor(() => panel instanceof HTMLElement && !panel.classList.contains('collapsing'), 'Expected completed accordion collapse')
-      button.click()
-      await waitFor(() => button.getAttribute('aria-expanded') === 'true', 'Expected restored accordion item')`,
+      await clickUntil(button, () => button.getAttribute('aria-expanded') === 'true', 'Expected restored accordion item')`,
   },
   'bootstrap-carousel-next-previous': {
     name: 'bootstrap-carousel-next-previous',
@@ -41,10 +39,8 @@ export const bootstrapWidgetConfigs = {
       const button = document.querySelector('[data-bs-target="#collapseExample"]')
       const panel = document.querySelector('#collapseExample')
       assert(button instanceof HTMLElement && panel instanceof HTMLElement && !panel.classList.contains('show'), 'Expected collapsed panel')
-      button.click()
-      await waitFor(() => panel.classList.contains('show'), 'Expected visible collapse panel')
-      button.click()
-      await waitFor(() => !panel.classList.contains('show'), 'Expected restored collapsed panel')`,
+      await clickUntil(button, () => panel.classList.contains('show'), 'Expected visible collapse panel')
+      await clickUntil(button, () => !panel.classList.contains('show'), 'Expected restored collapsed panel')`,
   },
   'bootstrap-dropdown-open-close': {
     name: 'bootstrap-dropdown-open-close',
@@ -79,8 +75,7 @@ export const bootstrapWidgetConfigs = {
       const trigger = document.querySelector('[data-bs-target="#exampleModal"]')
       const modal = document.querySelector('#exampleModal')
       assert(trigger instanceof HTMLElement && modal instanceof HTMLElement, 'Expected modal controls')
-      trigger.click()
-      await waitFor(() => modal.classList.contains('show'), 'Expected open modal')
+      await clickUntil(trigger, () => modal.classList.contains('show'), 'Expected open modal')
       await waitFor(() => getComputedStyle(modal).opacity === '1', 'Expected completed modal opening transition')
       const close = Array.from(modal.querySelectorAll('[data-bs-dismiss="modal"]')).find((element) => (element.textContent || '').trim() === 'Close')
       assert(close instanceof HTMLElement, 'Expected modal close control')
