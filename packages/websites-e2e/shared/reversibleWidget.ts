@@ -41,6 +41,21 @@ export const createReversibleWidgetExpression = (config: ReversibleWidgetConfig,
     }
     throw new Error(\`\${message}. \${details()}\`)
   }
+  const waitForStableReact = async (stableFor = 5000, timeout = 30000) => {
+    let signature = ''
+    let stableSince = Date.now()
+    await waitFor(() => {
+      const reactElements = Array.from(document.querySelectorAll('*')).filter((element) =>
+        Object.keys(element).some((key) => key.startsWith('__react'))
+      ).length
+      const nextSignature = String(reactElements) + ':' + document.scripts.length
+      if (nextSignature !== signature) {
+        signature = nextSignature
+        stableSince = Date.now()
+      }
+      return Date.now() - stableSince >= stableFor
+    }, 'Expected stable React hydration', timeout)
+  }
   const assert = (value, message) => {
     if (!value) throw new Error(\`\${message}. \${details()}\`)
   }
