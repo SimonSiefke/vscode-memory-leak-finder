@@ -6,8 +6,12 @@ import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/Deb
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
+import * as SetWindowContentSize from '../SetWindowContentSize/SetWindowContentSize.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
+
+const windowWidth = 1024
+const windowHeight = 768
 
 export const prepareBoth = async (
   secretsPath: string,
@@ -57,6 +61,8 @@ export const prepareBoth = async (
 
   // Wait for the page to be created by the initialization worker's connectDevtools
   const { dispose, sessionId, targetId } = await connectDevtoolsPromise
+
+  await SetWindowContentSize.setWindowContentSize(electronRpc, electronObjectId, targetId, windowWidth, windowHeight)
 
   await Promise.all([electronRpc.dispose(), dispose()])
 
