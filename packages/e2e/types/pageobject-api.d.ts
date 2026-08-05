@@ -331,7 +331,7 @@ export interface EditorFind {
   setSearchValue(value: any): Promise<void>
 }
 export interface Electron {
-  evaluate(expression: any): Promise<void>
+  evaluate(expression: any): Promise<unknown>
   getWindowCount(): Promise<number>
   getWindowIsVisible(windowId: any): Promise<boolean>
   getWindowIds(): Promise<readonly number[]>
@@ -346,6 +346,8 @@ export interface Electron {
   getNewWindowId(): Promise<number | null>
   waitForWindowVisible(windowId: any): Promise<void>
   closeWindow(windowId: any): Promise<void>
+  resizeWindowWidth(options: { readonly stepDelay?: number; readonly width: number }): Promise<void>
+  setWindowWidth(width: number): Promise<void>
   mockDialog(response: any): Promise<void>
   mockElectron(namespace: any, key: any, implementationCode: any): Promise<void>
   mockOpenDialog(response: any): Promise<void>
