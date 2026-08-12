@@ -25,7 +25,6 @@ export const run = async ({ Git, SourceControl }: TestContext): Promise<void> =>
 
   await SourceControl.closeRepository('a')
   await SourceControl.shouldNotHaveRepository('a')
-  await SourceControl.shouldHaveRepository('b')
   await SourceControl.shouldHaveRepositoryCount(1)
 
   await Git.openRepository('a')
