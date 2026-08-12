@@ -53,11 +53,7 @@ const getDecorationContent = (text: string, className: string): string => {
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const getRepository = (name: string) => {
-    return page
-      .locator(
-        `.sidebar .scm-repositories-view .monaco-list-row[aria-label*="${name}"], .sidebar .scm-repositories-view .monaco-list-row:has-text("${name}")`,
-      )
-      .first()
+    return page.locator('.sidebar .scm-provider .label-name', { hasExactText: name }).first()
   }
 
   return {
@@ -342,29 +338,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveRepository(name: string) {
       try {
         const repository = getRepository(name)
-        await expect(repository).toBeVisible({ timeout: 1000 })
+        await expect(repository).toBeVisible()
       } catch (error) {
-        const repositoryRows = page.locator('.sidebar .scm-repositories-view .monaco-list-row')
-        const repositoryProviders = page.locator('.sidebar .scm-provider')
-        const repositoryRowCount = await repositoryRows.count()
-        const repositoryProviderCount = await repositoryProviders.count()
-        const rows = []
-        for (let i = 0; i < repositoryRowCount; i++) {
-          const row = repositoryRows.nth(i)
-          rows.push({
-            ariaLabel: await row.getAttribute('aria-label'),
-            text: await row.textContent({ allowHidden: true }),
-          })
-        }
-        const providers = []
-        for (let i = 0; i < repositoryProviderCount; i++) {
-          const provider = repositoryProviders.nth(i)
-          providers.push({
-            ariaLabel: await provider.getAttribute('aria-label'),
-            text: await provider.textContent({ allowHidden: true }),
-          })
-        }
-        throw new VError(error, `Failed to verify repository "${name}": ${JSON.stringify({ providers, rows })}`)
+        throw new VError(error, `Failed to verify repository "${name}"`)
       }
     },
     async shouldHaveUnstagedFile(name: string) {
