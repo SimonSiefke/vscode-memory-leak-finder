@@ -13,13 +13,15 @@ export const setup = async ({ ActivityBar, Git, Workspace }: TestContext): Promi
   ])
   await Git.initRepository('a')
   await Git.initRepository('b')
+  await Git.openRepository('a')
+  await Git.openRepository('b')
   await ActivityBar.showSourceControl()
 }
 
 export const run = async ({ Git, SourceControl }: TestContext): Promise<void> => {
+  await SourceControl.shouldHaveRepositoryCount(2)
   await SourceControl.shouldHaveRepository('a')
   await SourceControl.shouldHaveRepository('b')
-  await SourceControl.shouldHaveRepositoryCount(2)
 
   await SourceControl.closeRepository('a')
   await SourceControl.shouldNotHaveRepository('a')
