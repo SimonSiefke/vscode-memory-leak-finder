@@ -91,7 +91,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           filePaths: [repositoryPath],
         })
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.GitOpenRepository)
+        await quickPick.executeCommand(WellKnownCommands.GitOpenRepository, { pressKeyOnce: true })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open repository at ${relativePath}`)
@@ -101,6 +101,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.GitReopenClosedRepositories, {
+          pressKeyOnce: true,
           stayVisible: true,
         })
         await quickPick.select(` ${relativePath}`)

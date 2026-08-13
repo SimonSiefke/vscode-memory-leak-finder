@@ -248,7 +248,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const deadline = performance.now() + timeout
         const quickPick = page.locator('.quick-input-widget')
         while (performance.now() < deadline) {
-          await this.showCommands()
+          await this.showCommands({ pressKeyOnce: true })
           await this.type(command)
           const option = quickPick.locator('.label-name', {
             hasExactText: command,
