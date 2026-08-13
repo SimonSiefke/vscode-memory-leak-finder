@@ -97,6 +97,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open repository at ${relativePath}`)
       }
     },
+    async reopenClosedRepository(relativePath: string) {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitReopenClosedRepositories, {
+          stayVisible: true,
+        })
+        await quickPick.select(` ${relativePath}`)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to reopen repository at ${relativePath}`)
+      }
+    },
     async shouldHaveNoStagedDiff(fileName: string) {
       try {
         const result = await Exec.exec('git', ['diff', '--cached', '--', fileName], { cwd: workspace, env: { ...process.env } })

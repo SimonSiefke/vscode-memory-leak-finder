@@ -256,6 +256,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           if (await option.isVisible().catch(() => false)) {
             await page.keyboard.press(KeyBindings.Escape)
             await expect(quickPick).toBeHidden()
+            await page.waitForIdle()
             return
           }
           await page.keyboard.press(KeyBindings.Escape)

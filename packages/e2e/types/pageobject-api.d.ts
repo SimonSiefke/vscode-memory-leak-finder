@@ -481,6 +481,7 @@ export interface Git {
   init(): Promise<void>
   initRepository(relativePath: any): Promise<void>
   openRepository(relativePath: any): Promise<void>
+  reopenClosedRepository(relativePath: any): Promise<void>
   shouldHaveNoStagedDiff(fileName: any): Promise<void>
   shouldHaveStagedDiffContaining(fileName: any, text: any): Promise<void>
   shouldHaveWorkingTreeDiffContaining(fileName: any, text: any): Promise<void>

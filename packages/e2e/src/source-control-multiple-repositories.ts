@@ -1,7 +1,5 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = 1
-
 export const setup = async ({ ActivityBar, Git, QuickPick, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -30,8 +28,8 @@ export const run = async ({ Git, SourceControl }: TestContext): Promise<void> =>
   await SourceControl.shouldNotHaveRepository('a')
   await SourceControl.shouldHaveRepositoryCount(1)
 
-  await Git.openRepository('a')
+  await Git.reopenClosedRepository('a')
+  await SourceControl.shouldHaveRepositoryCount(2)
   await SourceControl.shouldHaveRepository('a')
   await SourceControl.shouldHaveRepository('b')
-  await SourceControl.shouldHaveRepositoryCount(2)
 }
