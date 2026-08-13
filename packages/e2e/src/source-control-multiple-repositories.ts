@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ ActivityBar, Git, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Git, QuickPick, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: '# Repository A',
@@ -13,6 +13,7 @@ export const setup = async ({ ActivityBar, Git, Workspace }: TestContext): Promi
   ])
   await Git.initRepository('a')
   await Git.initRepository('b')
+  await QuickPick.waitForCommand('Git: Open Repository')
   await Git.openRepository('a')
   await Git.openRepository('b')
   await ActivityBar.showSourceControl()
