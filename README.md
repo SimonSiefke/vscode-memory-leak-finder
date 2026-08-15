@@ -15,6 +15,14 @@ npm run e2e
 
 ## Measures
 
+### ObjectShapeDifference
+
+Compares V8 object shapes before and after a test. Results identify constructor, prototype, elements kind, descriptor names, shape-count delta, and live-instance delta.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-difference --only base
+```
+
 ### MemoryCity
 
 Captures allocation-aware renderer and extension-host heap snapshots, computes
