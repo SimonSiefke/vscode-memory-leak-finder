@@ -79,3 +79,68 @@ test('handles cycles, ignored weak edges, non-root shortcuts, and orphans', () =
   expect(result.dominators[4]).toBe(0)
   expect(result.retainedSizes[0]).toBe(100)
 })
+
+const computeReferenceDominators = (outgoing: readonly (readonly { readonly to: number }[])[]): readonly number[] => {
+  const nodeCount = outgoing.length
+  const predecessors = Array.from({ length: nodeCount }, () => [] as number[])
+  for (let source = 0; source < nodeCount; source++) {
+    for (const edge of outgoing[source]) {
+      predecessors[edge.to].push(source)
+    }
+  }
+  const allNodes = new Set(Array.from({ length: nodeCount }, (_, index) => index))
+  const dominatorSets = Array.from({ length: nodeCount }, (_, index) => (index === 0 ? new Set([0]) : new Set(allNodes)))
+  let changed = true
+  while (changed) {
+    changed = false
+    for (let node = 1; node < nodeCount; node++) {
+      const [first, ...rest] = predecessors[node]
+      const next = new Set(dominatorSets[first])
+      for (const predecessor of rest) {
+        for (const candidate of next) {
+          if (!dominatorSets[predecessor].has(candidate)) {
+            next.delete(candidate)
+          }
+        }
+      }
+      next.add(node)
+      if (next.size !== dominatorSets[node].size || [...next].some((candidate) => !dominatorSets[node].has(candidate))) {
+        dominatorSets[node] = next
+        changed = true
+      }
+    }
+  }
+  return dominatorSets.map((dominators, node) => {
+    if (node === 0) {
+      return 0
+    }
+    const strictDominators = [...dominators].filter((candidate) => candidate !== node)
+    return strictDominators.find((candidate) =>
+      strictDominators.every((other) => other === candidate || !dominatorSets[other].has(candidate)),
+    )!
+  })
+}
+
+test('matches a reference implementation across deterministic cyclic graphs', () => {
+  let seed = 0x12345678
+  const random = (): number => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0
+    return seed / 0x100000000
+  }
+  for (let iteration = 0; iteration < 100; iteration++) {
+    const nodeCount = 10
+    const outgoing = Array.from({ length: nodeCount }, () => [] as Array<{ to: number }>)
+    for (let node = 1; node < nodeCount; node++) {
+      outgoing[node - 1].push({ to: node })
+    }
+    for (let source = 0; source < nodeCount; source++) {
+      for (let target = 0; target < nodeCount; target++) {
+        if (source !== target && random() < 0.2) {
+          outgoing[source].push({ to: target })
+        }
+      }
+    }
+    const snapshot = createSnapshot(new Array(nodeCount).fill(1), outgoing)
+    expect([...computeMemoryCityDominators(snapshot).dominators]).toEqual(computeReferenceDominators(outgoing))
+  }
+})
