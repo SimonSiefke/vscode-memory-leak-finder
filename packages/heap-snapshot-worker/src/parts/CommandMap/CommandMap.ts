@@ -11,6 +11,7 @@ import * as CompareNamedClosureCount from '../CompareNamedClosureCount/CompareNa
 import * as CompareNamedClosureCountWithReferences2 from '../CompareNamedClosureCountWithReferences2/CompareNamedClosureCountWithReferences2.ts'
 import * as CompareStringCount from '../CompareStringCount/CompareStringCount.ts'
 import * as CreateMemoryCitySnapshot from '../CreateMemoryCitySnapshot/CreateMemoryCitySnapshot.ts'
+import * as CreatePendingPromiseRetainers from '../CreatePendingPromiseRetainers/CreatePendingPromiseRetainers.ts'
 import { compareStrings2 } from '../CompareStrings2/CompareStrings2.ts'
 import * as GetArraysByClosureLocationFromHeapSnapshotCommand from '../GetArraysByClosureLocationFromHeapSnapshotCommand/GetArraysByClosureLocationFromHeapSnapshotCommand.ts'
 import * as GetDomTimerCountFromHeapSnapshot from '../GetDomTimerCountFromHeapSnapshot/GetDomTimerCountFromHeapSnapshot.ts'
@@ -48,6 +49,7 @@ export const commandMap = {
   'HeapSnapshot.compareStringCount': CompareStringCount.compareStringCount,
   'HeapSnapshot.compareStrings2': compareStrings2,
   'HeapSnapshot.createMemoryCitySnapshot': CreateMemoryCitySnapshot.createMemoryCitySnapshot,
+  'HeapSnapshot.createPendingPromiseRetainers': CreatePendingPromiseRetainers.createPendingPromiseRetainers,
   'HeapSnapshot.dispose': HeapSnapshotState.dispose,
   'HeapSnapshot.getArraysByClosureLocation':
     GetArraysByClosureLocationFromHeapSnapshotCommand.getArraysByClosureLocationFromHeapSnapshotCommand,
