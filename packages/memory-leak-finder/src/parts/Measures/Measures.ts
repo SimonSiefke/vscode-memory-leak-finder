@@ -93,6 +93,7 @@ export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/M
 export * as MeasureMutationObserversWithStackTraces from '../MeasureMutationObserversWithStackTraces/MeasureMutationObserversWithStackTraces.ts'
 export * as MeasureMutationObserversWithStackTracesWithSourceMaps from '../MeasureMutationObserversWithStackTracesWithSourceMaps/MeasureMutationObserversWithStackTracesWithSourceMaps.ts'
 export * as MeasureNativeAllocationProfile from '../MeasureNativeAllocationProfile/MeasureNativeAllocationProfile.ts'
+export * as MeasureNativeContextCount from '../MeasureNativeContextCount/MeasureNativeContextCount.ts'
 export * as MeasureNamedArrayCount from '../MeasureNamedArrayCount/MeasureNamedArrayCount.ts'
 export * as MeasureNamedArrayCountDifference from '../MeasureNamedArrayCountDifference/MeasureNamedArrayCountDifference.ts'
 export * as MeasureNamedClosureCount from '../MeasureNamedClosureCount/MeasureNamedClosureCount.ts'
