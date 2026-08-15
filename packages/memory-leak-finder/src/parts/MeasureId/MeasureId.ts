@@ -1,6 +1,7 @@
 export const AbortControllerCount = 'abortControllerCount'
 export const AbortSignalCount = 'abortSignalCount'
 export const ArrayCount = 'arrayCount'
+export const ArrayBufferBytes = 'arrayBufferBytes'
 export const ArrayElementCount = 'arrayElementCount'
 export const AttachedDomNodeCount = 'attachedDomNodeCount'
 export const BlobCount = 'blobCount'

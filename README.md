@@ -15,6 +15,14 @@ npm run e2e
 
 ## Measures
 
+### ArrayBufferBytes
+
+Measures the native backing-store bytes retained by live `ArrayBuffer` objects. The result includes before, after, and delta byte and backing-store counts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure array-buffer-bytes --only base
+```
+
 ### MemoryCity
 
 Captures allocation-aware renderer and extension-host heap snapshots, computes
