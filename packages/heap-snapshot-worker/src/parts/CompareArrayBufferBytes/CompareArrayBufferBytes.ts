@@ -9,7 +9,10 @@ export interface ArrayBufferBytesComparison {
 }
 
 export const compareArrayBufferBytes = async (beforePath: string, afterPath: string): Promise<ArrayBufferBytesComparison> => {
-  const [beforeSnapshot, afterSnapshot] = await Promise.all([prepareHeapSnapshot(beforePath, {}), prepareHeapSnapshot(afterPath, {})])
+  const [beforeSnapshot, afterSnapshot] = await Promise.all([
+    prepareHeapSnapshot(beforePath, { parseStrings: true }),
+    prepareHeapSnapshot(afterPath, { parseStrings: true }),
+  ])
   const before = getArrayBufferBytes(beforeSnapshot)
   const after = getArrayBufferBytes(afterSnapshot)
   const delta = {
