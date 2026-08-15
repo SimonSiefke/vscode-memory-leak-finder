@@ -1,4 +1,5 @@
 import { getObjectShapes, type ObjectShape } from '../GetObjectShapes/GetObjectShapes.ts'
+import { isObjectShapeDifferenceLeak } from '../IsObjectShapeDifferenceLeak/IsObjectShapeDifferenceLeak.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 interface ShapeCounts {
@@ -30,7 +31,10 @@ export const compareObjectShapeDifference = async (
   afterPath: string,
   minimumCount = 1,
 ): Promise<ObjectShapeDifferenceReport> => {
-  const [beforeSnapshot, afterSnapshot] = await Promise.all([prepareHeapSnapshot(beforePath, {}), prepareHeapSnapshot(afterPath, {})])
+  const [beforeSnapshot, afterSnapshot] = await Promise.all([
+    prepareHeapSnapshot(beforePath, { parseStrings: true }),
+    prepareHeapSnapshot(afterPath, { parseStrings: true }),
+  ])
   const beforeShapes = new Map(getObjectShapes(beforeSnapshot).map((shape) => [shape.signature, shape]))
   const afterShapes = new Map(getObjectShapes(afterSnapshot).map((shape) => [shape.signature, shape]))
   const signatures = new Set([...beforeShapes.keys(), ...afterShapes.keys()])
@@ -53,5 +57,5 @@ export const compareObjectShapeDifference = async (
     })
     .filter((item) => item.delta.shapeCount !== 0 || item.delta.instanceCount !== 0)
     .sort((a, b) => b.delta.shapeCount - a.delta.shapeCount || b.delta.instanceCount - a.delta.instanceCount)
-  return { differences, isLeak: differences.some((item) => item.delta.shapeCount >= minimumCount) }
+  return { differences, isLeak: isObjectShapeDifferenceLeak(differences, minimumCount) }
 }
