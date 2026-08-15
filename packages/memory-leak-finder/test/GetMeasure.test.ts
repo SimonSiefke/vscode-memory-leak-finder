@@ -37,6 +37,17 @@ test('getMeasure resolves tracked allocations with stack traces public measure i
   ).toBe(Measures.MeasureTrackedAllocationsWithStackTraces)
 })
 
+test('getMeasure resolves symbols with stack traces public measure id', () => {
+  expect(
+    GetMeasure.getMeasure(
+      {
+        Measures,
+      },
+      'symbols-with-stack-traces',
+    ),
+  ).toBe(Measures.MeasureSymbolsWithStackTraces)
+})
+
 test('getMeasure resolves ipc messages from start public measure id', () => {
   const measure = {
     id: 'ipcMessagesFromStart',

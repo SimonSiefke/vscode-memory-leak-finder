@@ -131,6 +131,7 @@ export * as MeasureStringDifference from '../MeasureStringDifference/MeasureStri
 export * as MeasureStyleElementCount from '../MeasureStyleElementCount/MeasureStyleElementCount.ts'
 export * as MeasureSymbolCount from '../MeasureSymbolCount/MeasureSymbolCount.ts'
 export * as MeasureSymbols from '../MeasureSymbols/MeasureSymbols.ts'
+export * as MeasureSymbolsWithStackTraces from '../MeasureSymbolsWithStackTraces/MeasureSymbolsWithStackTraces.ts'
 export * as MeasureTextDecoderCount from '../MeasureTextDecoderCount/MeasureTextDecoderCount.ts'
 export * as MeasureTextEncoderCount from '../MeasureTextEncoderCount/MeasureTextEncoderCount.ts'
 export * as MeasureTrackedAllocationLeaks from '../MeasureTrackedAllocationLeaks/MeasureTrackedAllocationLeaks.ts'
