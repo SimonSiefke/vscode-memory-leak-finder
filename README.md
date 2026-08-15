@@ -23,6 +23,14 @@ Measures the native backing-store bytes retained by live `ArrayBuffer` objects. 
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure array-buffer-bytes --only base
 ```
 
+### ActiveAsyncResourcesWithStackTraces
+
+Tracks Node async resources created during the test and reports resources that remain active, grouped by resource type and creation stack. The tracker stores metadata only and removes its hook during capture.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure active-async-resources-with-stack-traces --only base
+```
+
 ### MemoryCity
 
 Captures allocation-aware renderer and extension-host heap snapshots, computes
@@ -158,6 +166,14 @@ Measures the event listeners.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure event-listeners --only base
 ```
 
+### FinalizationRegistryCount
+
+Measures the total number of live `FinalizationRegistry` instances.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure finalization-registry-count --only base
+```
+
 ### FunctionCount
 
 Measures the total number of functions.
@@ -172,6 +188,14 @@ Measures global variables / global lexical scope names.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure global-lexical-scope-names --only base
+```
+
+### GlobalPropertyDifference
+
+Reports own string-named properties added to `globalThis` during the measured scenario. Global lexical bindings are covered separately by `global-lexical-scope-names`.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure global-property-difference --only base
 ```
 
 ### HeapUsage
