@@ -15,6 +15,14 @@ npm run e2e
 
 ## Measures
 
+### NativeContextCount
+
+Measures live V8 native contexts from before and after heap snapshots. A growing count can reveal leaked windows, workers, realms, or VM contexts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure native-context-count --only base
+```
+
 ### MemoryCity
 
 Captures allocation-aware renderer and extension-host heap snapshots, computes
