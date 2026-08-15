@@ -15,12 +15,12 @@ npm run e2e
 
 ## Measures
 
-### ObjectShapeDifference
+### PendingPromisesWithRetainers
 
-Compares V8 object shapes before and after a test. Results identify constructor, prototype, elements kind, descriptor names, shape-count delta, and live-instance delta.
+Finds pending Promises added during a test and reports their shortest strong path from a GC root, together with per-path counts and retained bytes. Inspector query handles are released before the final heap snapshot.
 
 ```sh
-node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-difference --only base
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure pending-promises-with-retainers --only base
 ```
 
 ### RetainedBytesBySource
@@ -45,6 +45,14 @@ Tracks Node async resources created during the test and reports resources that r
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure active-async-resources-with-stack-traces --only base
+```
+
+### ObjectShapeDifference
+
+Compares V8 object shapes before and after a test. Results identify constructor, prototype, elements kind, descriptor names, shape-count delta, and live-instance delta.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-difference --only base
 ```
 
 ### MemoryCity

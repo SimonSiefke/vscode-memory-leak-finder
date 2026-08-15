@@ -15,7 +15,14 @@ export const unwrapResult = (rawResult) => {
   if ('result' in rawResult) {
     rawResult = rawResult.result
   }
-  if ('documents' in rawResult || 'usedSize' in rawResult || 'names' in rawResult || 'metrics' in rawResult || 'profile' in rawResult) {
+  if (
+    'documents' in rawResult ||
+    'usedSize' in rawResult ||
+    'names' in rawResult ||
+    'metrics' in rawResult ||
+    'profile' in rawResult ||
+    'heapSnapshotObjectId' in rawResult
+  ) {
     return rawResult
   }
   if ('error' in rawResult) {
