@@ -40,6 +40,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await Exec.exec('git', ['clone', repoUrl, '.'], { cwd: workspace, env: { ...process.env } })
       await page.waitForIdle()
     },
+    async closeRepository() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitCloseRepository, { pressKeyOnce: true })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close repository`)
+      }
+    },
     async commit(message: string) {
       try {
         await page.waitForIdle()
