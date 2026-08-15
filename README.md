@@ -47,6 +47,14 @@ Tracks Node async resources created during the test and reports resources that r
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure active-async-resources-with-stack-traces --only base
 ```
 
+### ObjectShapeDifference
+
+Compares V8 object shapes before and after a test. Results identify constructor, prototype, elements kind, descriptor names, shape-count delta, and live-instance delta.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-difference --only base
+```
+
 ### MemoryCity
 
 Captures allocation-aware renderer and extension-host heap snapshots, computes
