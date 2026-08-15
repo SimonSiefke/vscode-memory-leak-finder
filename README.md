@@ -150,6 +150,14 @@ Measures the event listeners.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure event-listeners --only base
 ```
 
+### FinalizationRegistryCount
+
+Measures the total number of live `FinalizationRegistry` instances.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure finalization-registry-count --only base
+```
+
 ### FunctionCount
 
 Measures the total number of functions.
