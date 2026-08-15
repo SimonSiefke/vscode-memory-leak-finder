@@ -15,6 +15,14 @@ npm run e2e
 
 ## Measures
 
+### RetainedBytesBySource
+
+Ranks allocation sources by the bytes they still own after garbage collection. Source-map-aware results include surviving allocation count, dominated object count, and retained bytes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure retained-bytes-by-source --only base
+```
+
 ### NativeContextCount
 
 Measures live V8 native contexts from before and after heap snapshots. A growing count can reveal leaked windows, workers, realms, or VM contexts.
