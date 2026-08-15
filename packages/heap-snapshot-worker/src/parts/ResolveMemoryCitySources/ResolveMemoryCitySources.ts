@@ -147,18 +147,29 @@ const resolveOriginalPositions = async (positions: readonly SourcePosition[]): P
   return resolved
 }
 
+const toSourceMap = (positions: readonly SourcePosition[], resolved: ReadonlyMap<SourcePosition, string>): ReadonlyMap<number, string> => {
+  const sources = new Map<number, string>()
+  for (const position of positions) {
+    sources.set(position.key, resolved.get(position) || 'runtime/unattributed/unknown')
+  }
+  return sources
+}
+
+export const resolveMemoryCityAllocationSources = async (
+  snapshot: Snapshot,
+  scriptMap: MemoryCityScriptMap,
+): Promise<ReadonlyMap<number, string>> => {
+  const positions = getAllocationPositions(snapshot, scriptMap)
+  const resolved = await resolveOriginalPositions(positions)
+  return toSourceMap(positions, resolved)
+}
+
 export const resolveMemoryCitySources = async (snapshot: Snapshot, scriptMap: MemoryCityScriptMap): Promise<ResolvedMemoryCitySources> => {
   const allocationPositions = getAllocationPositions(snapshot, scriptMap)
   const locationPositions = getLocationPositions(snapshot, scriptMap)
   const positions = [...allocationPositions, ...locationPositions]
   const resolved = await resolveOriginalPositions(positions)
-  const allocationSources = new Map<number, string>()
-  const locationSources = new Map<number, string>()
-  for (const position of allocationPositions) {
-    allocationSources.set(position.key, resolved.get(position) || 'runtime/unattributed/unknown')
-  }
-  for (const position of locationPositions) {
-    locationSources.set(position.key, resolved.get(position) || 'runtime/unattributed/unknown')
-  }
+  const allocationSources = toSourceMap(allocationPositions, resolved)
+  const locationSources = toSourceMap(locationPositions, resolved)
   return { allocationSources, locationSources }
 }

@@ -1,6 +1,6 @@
 import { computeMemoryCityDominators } from '../ComputeMemoryCityDominators/ComputeMemoryCityDominators.ts'
 import type { MemoryCityScriptMap } from '../MemoryCityTypes/MemoryCityTypes.ts'
-import { resolveMemoryCitySources } from '../ResolveMemoryCitySources/ResolveMemoryCitySources.ts'
+import { resolveMemoryCityAllocationSources } from '../ResolveMemoryCitySources/ResolveMemoryCitySources.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 export interface RetainedBytesSource {
@@ -27,21 +27,13 @@ interface MutableSource {
   source: string
 }
 
-const buildDominatorChildren = (dominators: Uint32Array): readonly number[][] => {
-  const children = Array.from({ length: dominators.length }, () => [] as number[])
-  for (let ordinal = 1; ordinal < dominators.length; ordinal++) {
-    children[dominators[ordinal]].push(ordinal)
-  }
-  return children
-}
-
 export const getRetainedBytesBySource = async (
   snapshot: Snapshot,
   scriptMap: MemoryCityScriptMap,
   minimumCount = 1,
 ): Promise<RetainedBytesBySourceReport> => {
-  const { dominators } = computeMemoryCityDominators(snapshot)
-  const { allocationSources } = await resolveMemoryCitySources(snapshot, scriptMap)
+  const { dominators, postOrder } = computeMemoryCityDominators(snapshot)
+  const allocationSources = await resolveMemoryCityAllocationSources(snapshot, scriptMap)
   const nodeFields = snapshot.meta.node_fields
   const nodeFieldCount = nodeFields.length
   const selfSizeOffset = nodeFields.indexOf('self_size')
@@ -59,16 +51,10 @@ export const getRetainedBytesBySource = async (
     }
   }
 
-  const children = buildDominatorChildren(dominators)
-  const stack: Array<{ inheritedSource?: string; ordinal: number }> = [{ ordinal: 0 }]
-  while (stack.length > 0) {
-    const { inheritedSource, ordinal } = stack.pop()!
-    const source = sourceByOrdinal[ordinal] || inheritedSource
-    if (!sourceByOrdinal[ordinal] && source) {
-      sourceByOrdinal[ordinal] = source
-    }
-    for (const child of children[ordinal]) {
-      stack.push(source ? { inheritedSource: source, ordinal: child } : { ordinal: child })
+  for (let index = postOrder.length - 1; index >= 0; index--) {
+    const ordinal = postOrder[index]
+    if (!sourceByOrdinal[ordinal] && ordinal !== dominators[ordinal]) {
+      sourceByOrdinal[ordinal] = sourceByOrdinal[dominators[ordinal]]
     }
   }
 
