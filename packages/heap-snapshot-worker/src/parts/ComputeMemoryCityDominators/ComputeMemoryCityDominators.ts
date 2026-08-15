@@ -6,6 +6,16 @@ export interface MemoryCityDominatorResult {
   readonly retainedSizes: Float64Array
 }
 
+interface DfsOrder {
+  readonly dfsIndex: Uint32Array
+  readonly parent: Uint32Array
+  readonly postOrder: Uint32Array
+  readonly reachableCount: number
+  readonly vertex: Uint32Array
+}
+
+const MissingNode = 0xffffffff
+
 const buildFirstEdgeIndexes = (
   snapshot: Snapshot,
   edgeCountOffset: number,
@@ -26,7 +36,7 @@ const isEssentialEdge = (fromOrdinal: number, rootOrdinal: number, edgeType: num
   return edgeType !== weakType && (edgeType !== shortcutType || fromOrdinal === rootOrdinal)
 }
 
-const buildPostOrder = (
+const buildDfsOrder = (
   snapshot: Snapshot,
   firstEdgeIndexes: Uint32Array,
   edgeFieldCount: number,
@@ -36,52 +46,60 @@ const buildPostOrder = (
   weakType: number,
   shortcutType: number,
   rootOrdinal: number,
-): Uint32Array => {
-  const visited = new Uint8Array(snapshot.node_count)
+): DfsOrder => {
+  const dfsIndex = new Uint32Array(snapshot.node_count)
+  const parent = new Uint32Array(snapshot.node_count)
+  parent.fill(MissingNode)
+  const vertex = new Uint32Array(snapshot.node_count + 1)
+  if (snapshot.node_count === 0) {
+    return { dfsIndex, parent, postOrder: new Uint32Array(), reachableCount: 0, vertex }
+  }
   const reachablePostOrder: number[] = []
-  const orphanPostOrder: number[] = []
-
-  const visit = (start: number, output: number[]): void => {
-    const nodes: number[] = [start]
-    const cursors: number[] = [firstEdgeIndexes[start]]
-    visited[start] = 1
-    while (nodes.length > 0) {
-      const stackIndex = nodes.length - 1
-      const ordinal = nodes[stackIndex]
-      const edgeIndex = cursors[stackIndex]
-      if (edgeIndex >= firstEdgeIndexes[ordinal + 1]) {
-        output.push(ordinal)
-        nodes.pop()
-        cursors.pop()
-        continue
-      }
-      cursors[stackIndex] += edgeFieldCount
-      const edgeType = snapshot.edges[edgeIndex + edgeTypeOffset]
-      if (!isEssentialEdge(ordinal, rootOrdinal, edgeType, weakType, shortcutType)) {
-        continue
-      }
-      const childOrdinal = snapshot.edges[edgeIndex + edgeToNodeOffset] / nodeFieldCount
-      if (visited[childOrdinal]) {
-        continue
-      }
-      visited[childOrdinal] = 1
-      nodes.push(childOrdinal)
-      cursors.push(firstEdgeIndexes[childOrdinal])
+  const nodes: number[] = [rootOrdinal]
+  const cursors: number[] = [firstEdgeIndexes[rootOrdinal]]
+  let reachableCount = 1
+  dfsIndex[rootOrdinal] = reachableCount
+  parent[rootOrdinal] = rootOrdinal
+  vertex[reachableCount] = rootOrdinal
+  while (nodes.length > 0) {
+    const stackIndex = nodes.length - 1
+    const ordinal = nodes[stackIndex]
+    const edgeIndex = cursors[stackIndex]
+    if (edgeIndex >= firstEdgeIndexes[ordinal + 1]) {
+      reachablePostOrder.push(ordinal)
+      nodes.pop()
+      cursors.pop()
+      continue
     }
+    cursors[stackIndex] += edgeFieldCount
+    const edgeType = snapshot.edges[edgeIndex + edgeTypeOffset]
+    if (!isEssentialEdge(ordinal, rootOrdinal, edgeType, weakType, shortcutType)) {
+      continue
+    }
+    const childOrdinal = snapshot.edges[edgeIndex + edgeToNodeOffset] / nodeFieldCount
+    if (dfsIndex[childOrdinal] !== 0) {
+      continue
+    }
+    reachableCount++
+    dfsIndex[childOrdinal] = reachableCount
+    parent[childOrdinal] = ordinal
+    vertex[reachableCount] = childOrdinal
+    nodes.push(childOrdinal)
+    cursors.push(firstEdgeIndexes[childOrdinal])
   }
-
-  visit(rootOrdinal, reachablePostOrder)
+  const orphanOrdinals: number[] = []
   for (let ordinal = 0; ordinal < snapshot.node_count; ordinal++) {
-    if (!visited[ordinal]) {
-      visit(ordinal, orphanPostOrder)
+    if (dfsIndex[ordinal] === 0) {
+      orphanOrdinals.push(ordinal)
     }
   }
-  const rootIndex = reachablePostOrder.indexOf(rootOrdinal)
-  if (rootIndex !== reachablePostOrder.length - 1) {
-    reachablePostOrder.splice(rootIndex, 1)
-    reachablePostOrder.push(rootOrdinal)
+  return {
+    dfsIndex,
+    parent,
+    postOrder: Uint32Array.from([...orphanOrdinals, ...reachablePostOrder]),
+    reachableCount,
+    vertex,
   }
-  return Uint32Array.from([...orphanPostOrder, ...reachablePostOrder])
 }
 
 const buildRetainers = (
@@ -125,24 +143,31 @@ const buildRetainers = (
   return { firstRetainerIndexes, retainingNodes }
 }
 
-const intersect = (left: number, right: number, idom: Uint32Array, noEntry: number): number => {
-  let a = left
-  let b = right
-  while (a !== b) {
-    while (a < b && idom[a] !== noEntry) {
-      a = idom[a]
-    }
-    while (b < a && idom[b] !== noEntry) {
-      b = idom[b]
-    }
-    if (idom[a] === noEntry || idom[b] === noEntry) {
-      return noEntry
-    }
+const evaluate = (start: number, ancestor: Uint32Array, label: Uint32Array, semiDominator: Uint32Array, path: Uint32Array): number => {
+  if (ancestor[start] === MissingNode) {
+    return label[start]
   }
-  return a
+  let current = start
+  let pathLength = 0
+  while (ancestor[current] !== MissingNode && ancestor[ancestor[current]] !== MissingNode) {
+    path[pathLength++] = current
+    current = ancestor[current]
+  }
+  while (pathLength > 0) {
+    const node = path[--pathLength]
+    const parent = ancestor[node]
+    if (semiDominator[label[parent]] < semiDominator[label[node]]) {
+      label[node] = label[parent]
+    }
+    ancestor[node] = ancestor[parent]
+  }
+  return label[start]
 }
 
 export const computeMemoryCityDominators = (snapshot: Snapshot): MemoryCityDominatorResult => {
+  if (snapshot.node_count === 0) {
+    return { dominators: new Uint32Array(), postOrder: new Uint32Array(), retainedSizes: new Float64Array() }
+  }
   const { edge_fields: edgeFields, edge_types: edgeTypesList, node_fields: nodeFields } = snapshot.meta
   const nodeFieldCount = nodeFields.length
   const edgeFieldCount = edgeFields.length
@@ -155,7 +180,7 @@ export const computeMemoryCityDominators = (snapshot: Snapshot): MemoryCityDomin
   const shortcutType = edgeTypes.indexOf('shortcut')
   const rootOrdinal = 0
   const firstEdgeIndexes = buildFirstEdgeIndexes(snapshot, edgeCountOffset, nodeFieldCount, edgeFieldCount)
-  const postOrder = buildPostOrder(
+  const { dfsIndex, parent, postOrder, reachableCount, vertex } = buildDfsOrder(
     snapshot,
     firstEdgeIndexes,
     edgeFieldCount,
@@ -166,10 +191,6 @@ export const computeMemoryCityDominators = (snapshot: Snapshot): MemoryCityDomin
     shortcutType,
     rootOrdinal,
   )
-  const nodeToPostOrder = new Uint32Array(snapshot.node_count)
-  for (let index = 0; index < postOrder.length; index++) {
-    nodeToPostOrder[postOrder[index]] = index
-  }
   const { firstRetainerIndexes, retainingNodes } = buildRetainers(
     snapshot,
     firstEdgeIndexes,
@@ -181,38 +202,53 @@ export const computeMemoryCityDominators = (snapshot: Snapshot): MemoryCityDomin
     shortcutType,
     rootOrdinal,
   )
-  const rootPostOrder = nodeToPostOrder[rootOrdinal]
-  const noEntry = snapshot.node_count
-  const idom = new Uint32Array(snapshot.node_count)
-  idom.fill(noEntry)
-  idom[rootPostOrder] = rootPostOrder
-
-  let changed = true
-  while (changed) {
-    changed = false
-    for (let postIndex = rootPostOrder - 1; postIndex >= 0; postIndex--) {
-      const ordinal = postOrder[postIndex]
-      let newDominator = noEntry
-      for (let index = firstRetainerIndexes[ordinal]; index < firstRetainerIndexes[ordinal + 1]; index++) {
-        const predecessorPostIndex = nodeToPostOrder[retainingNodes[index]]
-        if (idom[predecessorPostIndex] === noEntry) {
-          continue
-        }
-        newDominator = newDominator === noEntry ? predecessorPostIndex : intersect(predecessorPostIndex, newDominator, idom, noEntry)
+  const ancestor = new Uint32Array(snapshot.node_count)
+  ancestor.fill(MissingNode)
+  const bucketHead = new Uint32Array(snapshot.node_count)
+  bucketHead.fill(MissingNode)
+  const bucketNext = new Uint32Array(snapshot.node_count)
+  bucketNext.fill(MissingNode)
+  const dominators = new Uint32Array(snapshot.node_count)
+  dominators.fill(rootOrdinal)
+  const label = new Uint32Array(snapshot.node_count)
+  const semiDominator = new Uint32Array(snapshot.node_count)
+  for (let index = 1; index <= reachableCount; index++) {
+    const ordinal = vertex[index]
+    label[ordinal] = ordinal
+    semiDominator[ordinal] = index
+  }
+  const path = new Uint32Array(snapshot.node_count)
+  for (let index = reachableCount; index >= 2; index--) {
+    const ordinal = vertex[index]
+    for (let retainerIndex = firstRetainerIndexes[ordinal]; retainerIndex < firstRetainerIndexes[ordinal + 1]; retainerIndex++) {
+      const predecessor = retainingNodes[retainerIndex]
+      if (dfsIndex[predecessor] === 0) {
+        continue
       }
-      if (newDominator === noEntry) {
-        newDominator = rootPostOrder
-      }
-      if (idom[postIndex] !== newDominator) {
-        idom[postIndex] = newDominator
-        changed = true
+      const candidate = evaluate(predecessor, ancestor, label, semiDominator, path)
+      if (semiDominator[candidate] < semiDominator[ordinal]) {
+        semiDominator[ordinal] = semiDominator[candidate]
       }
     }
+    const semiDominatorOrdinal = vertex[semiDominator[ordinal]]
+    bucketNext[ordinal] = bucketHead[semiDominatorOrdinal]
+    bucketHead[semiDominatorOrdinal] = ordinal
+    const parentOrdinal = parent[ordinal]
+    ancestor[ordinal] = parentOrdinal
+    let bucketEntry = bucketHead[parentOrdinal]
+    while (bucketEntry !== MissingNode) {
+      const next = bucketNext[bucketEntry]
+      const candidate = evaluate(bucketEntry, ancestor, label, semiDominator, path)
+      dominators[bucketEntry] = semiDominator[candidate] < semiDominator[bucketEntry] ? candidate : parentOrdinal
+      bucketEntry = next
+    }
+    bucketHead[parentOrdinal] = MissingNode
   }
-
-  const dominators = new Uint32Array(snapshot.node_count)
-  for (let postIndex = 0; postIndex < postOrder.length; postIndex++) {
-    dominators[postOrder[postIndex]] = postOrder[idom[postIndex]]
+  for (let index = 2; index <= reachableCount; index++) {
+    const ordinal = vertex[index]
+    if (dominators[ordinal] !== vertex[semiDominator[ordinal]]) {
+      dominators[ordinal] = dominators[dominators[ordinal]]
+    }
   }
   dominators[rootOrdinal] = rootOrdinal
 
