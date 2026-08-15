@@ -1,5 +1,6 @@
 export const AbortControllerCount = 'abortControllerCount'
 export const AbortSignalCount = 'abortSignalCount'
+export const ActiveAsyncResourcesWithStackTraces = 'activeAsyncResourcesWithStackTraces'
 export const ArrayCount = 'arrayCount'
 export const ArrayElementCount = 'arrayElementCount'
 export const AttachedDomNodeCount = 'attachedDomNodeCount'
