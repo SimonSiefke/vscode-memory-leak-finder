@@ -15,12 +15,12 @@ npm run e2e
 
 ## Measures
 
-### ArrayBufferBytes
+### PendingPromisesWithRetainers
 
-Measures the native backing-store bytes retained by live `ArrayBuffer` objects. The result includes before, after, and delta byte and backing-store counts.
+Finds pending Promises added during a test and reports their shortest strong path from a GC root, together with per-path counts and retained bytes. Inspector query handles are released before the final heap snapshot.
 
 ```sh
-node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure array-buffer-bytes --only base
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure pending-promises-with-retainers --only base
 ```
 
 ### RetainedBytesBySource
@@ -62,6 +62,14 @@ Build or preview the standalone viewer:
 ```sh
 npm --prefix packages/visualizations run build
 npm --prefix packages/visualizations run dev
+```
+
+### ArrayBufferBytes
+
+Measures the native backing-store bytes retained by live `ArrayBuffer` objects. The result includes before, after, and delta byte and backing-store counts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure array-buffer-bytes --only base
 ```
 
 ### ArrayCount
