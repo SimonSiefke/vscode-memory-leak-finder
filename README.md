@@ -166,6 +166,14 @@ Measures global variables / global lexical scope names.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure global-lexical-scope-names --only base
 ```
 
+### GlobalPropertyDifference
+
+Reports own string-named properties added to `globalThis` during the measured scenario. Global lexical bindings are covered separately by `global-lexical-scope-names`.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure global-property-difference --only base
+```
+
 ### HeapUsage
 
 Measures heap usage.
