@@ -55,6 +55,7 @@ export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersW
 export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEventTargetCount.ts'
 export * as MeasureEventTargetDifference from '../MeasureEventTargetDifference/MeasureEventTargetDifference.ts'
 export * as MeasureEventTargets from '../MeasureEventTargets/MeasureEventTargets.ts'
+export * as MeasureFinalizationRegistryCount from '../MeasureFinalizationRegistryCount/MeasureFinalizationRegistryCount.ts'
 export * as MeasureFileDescriptorCount from '../MeasureFileDescriptorCount/MeasureFileDescriptorCount.ts'
 export * as MeasureFileDescriptors from '../MeasureFileDescriptors/MeasureFileDescriptors.ts'
 export * as MeasureFileWatcherCount from '../MeasureFileWatcherCount/MeasureFileWatcherCount.ts'
