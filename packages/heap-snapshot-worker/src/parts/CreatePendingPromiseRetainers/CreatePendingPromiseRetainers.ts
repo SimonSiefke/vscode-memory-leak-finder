@@ -7,6 +7,6 @@ export const createPendingPromiseRetainers = async (
   afterHeapObjectIds: readonly string[],
   minimumCount = 1,
 ): Promise<PendingPromiseRetainerReport> => {
-  const snapshot = await prepareHeapSnapshot(path, {})
+  const snapshot = await prepareHeapSnapshot(path, { parseStrings: true })
   return getPendingPromiseRetainers(snapshot, beforeHeapObjectIds, afterHeapObjectIds, minimumCount)
 }
