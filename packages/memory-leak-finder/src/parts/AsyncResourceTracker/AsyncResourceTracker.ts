@@ -21,7 +21,7 @@ const startExpression = `(() => {
       const holder = {}
       Error.captureStackTrace(holder, hook.callbacks?.init)
       const stackTrace = String(holder.stack || new Error().stack || '')
-        .split('\n')
+        .split('\\n')
         .slice(1)
         .filter(line => !line.includes('node:internal/async_hooks'))
       resources.set(asyncId, { asyncId, stackTrace, triggerAsyncId, type })
