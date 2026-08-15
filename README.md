@@ -23,6 +23,14 @@ Finds pending Promises added during a test and reports their shortest strong pat
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure pending-promises-with-retainers --only base
 ```
 
+### NativeContextCount
+
+Measures live V8 native contexts from before and after heap snapshots. A growing count can reveal leaked windows, workers, realms, or VM contexts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure native-context-count --only base
+```
+
 ### ActiveAsyncResourcesWithStackTraces
 
 Tracks Node async resources created during the test and reports resources that remain active, grouped by resource type and creation stack. The tracker stores metadata only and removes its hook during capture.
