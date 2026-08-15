@@ -15,6 +15,14 @@ npm run e2e
 
 ## Measures
 
+### RetainedBytesBySource
+
+Ranks allocation sources by the bytes they still own after garbage collection. Source-map-aware results include surviving allocation count, dominated object count, and retained bytes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure retained-bytes-by-source --only base
+```
+
 ### MemoryCity
 
 Captures allocation-aware renderer and extension-host heap snapshots, computes
