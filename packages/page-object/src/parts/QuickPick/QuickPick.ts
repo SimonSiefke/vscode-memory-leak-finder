@@ -248,7 +248,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         const deadline = performance.now() + timeout
         const quickPick = page.locator('.quick-input-widget')
         while (performance.now() < deadline) {
-          await this.showCommands()
+          await this.showCommands({ pressKeyOnce: true })
           await this.type(command)
           const option = quickPick.locator('.label-name', {
             hasExactText: command,
@@ -256,6 +256,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
           if (await option.isVisible().catch(() => false)) {
             await page.keyboard.press(KeyBindings.Escape)
             await expect(quickPick).toBeHidden()
+            await page.waitForIdle()
             return
           }
           await page.keyboard.press(KeyBindings.Escape)

@@ -52,6 +52,10 @@ const getDecorationContent = (text: string, className: string): string => {
 }
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const getRepository = (name: string) => {
+    return page.locator('.sidebar .scm-provider .label-name', { hasExactText: name }).first()
+  }
+
   return {
     async checkoutBranch(branchName: string) {
       try {
@@ -69,14 +73,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async closeRepository(name: string) {
       try {
-        const repositoryRows = page.locator('.sidebar .scm-repositories-view .monaco-list-row')
-        const namedRepository = page
-          .locator(
-            `.sidebar .scm-repositories-view .monaco-list-row[aria-label*="${name}"], .sidebar .scm-repositories-view .monaco-list-row:has-text("${name}")`,
-          )
-          .first()
-        const repositoryProviders = page.locator('.sidebar .scm-provider')
-        const repository = (await repositoryRows.count()) > 0 ? namedRepository : repositoryProviders.nth(1)
+        const repository = getRepository(name)
         await expect(repository).toBeVisible()
         const contextMenu = ContextMenu.create({
           electronApp,
@@ -338,6 +335,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify repository count ${count}`)
       }
     },
+    async shouldHaveRepository(name: string) {
+      try {
+        const repository = getRepository(name)
+        await expect(repository).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify repository "${name}"`)
+      }
+    },
     async shouldHaveUnstagedFile(name: string) {
       try {
         const changesPart = page.locator('[role="treeitem"][aria-label="Changes"]')
@@ -356,6 +361,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(item).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to verify that history item is hidden`)
+      }
+    },
+    async shouldNotHaveRepository(name: string) {
+      try {
+        const repository = getRepository(name)
+        await expect(repository).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that repository "${name}" is hidden`)
       }
     },
     async show() {

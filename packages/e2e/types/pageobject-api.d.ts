@@ -476,11 +476,13 @@ export interface Git {
   add(): Promise<void>
   checkoutBranch(branchName: any): Promise<void>
   cloneRepository(repoUrl: any): Promise<void>
+  closeRepository(relativePath?: any): Promise<void>
   commit(message: any): Promise<void>
   createBranch(branchName: any): Promise<void>
   init(): Promise<void>
   initRepository(relativePath: any): Promise<void>
   openRepository(relativePath: any): Promise<void>
+  reopenClosedRepository(relativePath: any): Promise<void>
   shouldHaveNoStagedDiff(fileName: any): Promise<void>
   shouldHaveStagedDiffContaining(fileName: any, text: any): Promise<void>
   shouldHaveWorkingTreeDiffContaining(fileName: any, text: any): Promise<void>
@@ -782,9 +784,11 @@ export interface SourceControl {
   openChange(name: any): Promise<void>
   show(): Promise<void>
   shouldHaveHistoryItem(name: any): Promise<void>
+  shouldHaveRepository(name: any): Promise<void>
   shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
   shouldNotHaveHistoryItem(name: any): Promise<void>
+  shouldNotHaveRepository(name: any): Promise<void>
   showBranchPicker(): Promise<void>
   showGraph(): Promise<void>
   stageFile(name: any, parentFolder?: any): Promise<void>
