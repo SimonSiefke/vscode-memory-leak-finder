@@ -56,19 +56,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     return page.locator('.sidebar .scm-provider .label-name', { hasExactText: name }).first()
   }
 
-  const getRepositoryProvider = async (name: string) => {
-    const repositoryProviders = page.locator('.sidebar .scm-provider')
-    const repositoryProviderCount = await repositoryProviders.count()
-    for (let index = 0; index < repositoryProviderCount; index++) {
-      const repositoryProvider = repositoryProviders.nth(index)
-      const matchingLabels = repositoryProvider.locator('.label-name', { hasExactText: name })
-      if ((await matchingLabels.count()) > 0) {
-        return repositoryProvider
-      }
-    }
-    throw new Error(`Repository provider "${name}" was not found`)
-  }
-
   return {
     async checkoutBranch(branchName: string) {
       try {
@@ -86,7 +73,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async closeRepository(name: string) {
       try {
-        const repository = await getRepositoryProvider(name)
+        const repository = getRepository(name)
         await expect(repository).toBeVisible()
         const contextMenu = ContextMenu.create({
           electronApp,

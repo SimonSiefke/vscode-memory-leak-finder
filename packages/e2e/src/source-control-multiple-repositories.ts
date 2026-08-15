@@ -24,7 +24,7 @@ export const run = async ({ Git, SourceControl }: TestContext): Promise<void> =>
   await SourceControl.shouldHaveRepository('a')
   await SourceControl.shouldHaveRepository('b')
 
-  await SourceControl.closeRepository('a')
+  await Git.closeRepository('a')
   await SourceControl.shouldNotHaveRepository('a')
   await SourceControl.shouldHaveRepositoryCount(1)
 
@@ -35,7 +35,7 @@ export const run = async ({ Git, SourceControl }: TestContext): Promise<void> =>
 }
 
 export const teardown = async ({ Git, SourceControl, Workspace }: TestContext): Promise<void> => {
-  await SourceControl.closeRepository('a')
+  await Git.closeRepository('a')
   await Git.closeRepository()
   await SourceControl.shouldHaveRepositoryCount(0)
   await Workspace.setFiles([])

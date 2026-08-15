@@ -476,7 +476,7 @@ export interface Git {
   add(): Promise<void>
   checkoutBranch(branchName: any): Promise<void>
   cloneRepository(repoUrl: any): Promise<void>
-  closeRepository(): Promise<void>
+  closeRepository(relativePath?: any): Promise<void>
   commit(message: any): Promise<void>
   createBranch(branchName: any): Promise<void>
   init(): Promise<void>
