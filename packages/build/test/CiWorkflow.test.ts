@@ -9,6 +9,14 @@ const getWorkflowPath = (): string => {
   return join(testDir, '..', '..', '..', '.github', 'workflows', 'ci.yml')
 }
 
+test('ci cancels superseded runs before starting the measure matrix', async () => {
+  const workflow = await readFile(getWorkflowPath(), 'utf8')
+
+  expect(workflow).toContain(`concurrency:
+  group: ci-\${{ github.ref }}
+  cancel-in-progress: true`)
+})
+
 test('ci measure failures do not block the Pages deployment', async () => {
   const workflow = await readFile(getWorkflowPath(), 'utf8')
 
