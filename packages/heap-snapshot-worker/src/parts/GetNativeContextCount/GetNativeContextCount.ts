@@ -12,7 +12,7 @@ export const getNativeContextCount = (snapshot: Snapshot): number => {
       continue
     }
     const name = snapshot.strings[snapshot.nodes[index + nameOffset]]
-    if (name === 'system / NativeContext' || name.startsWith('system / NativeContext / ')) {
+    if (typeof name === 'string' && (name === 'system / NativeContext' || name.startsWith('system / NativeContext / '))) {
       count++
     }
   }
