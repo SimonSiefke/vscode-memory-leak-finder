@@ -108,6 +108,7 @@ export * as MeasureNumberCount from '../MeasureNumberCount/MeasureNumberCount.ts
 export * as MeasureNumbers from '../MeasureNumbers/MeasureNumbers.ts'
 export * as MeasureObjectCount from '../MeasureObjectCount/MeasureObjectCount.ts'
 export * as MeasureObjectShapeCount from '../MeasureObjectShapeCount/MeasureObjectShapeCount.ts'
+export * as MeasureObjectShapeDifference from '../MeasureObjectShapeDifference/MeasureObjectShapeDifference.ts'
 export * as MeasureOffscreenCanvasCount from '../MeasureOffscreenCanvasCount/MeasureOffscreenCanvasCount.ts'
 export * as MeasurePaintEvents from '../MeasurePaintEvents/MeasurePaintEvents.ts'
 export * as MeasurePendingPromiseCount from '../MeasurePendingPromiseCount/MeasurePendingPromiseCount.ts'

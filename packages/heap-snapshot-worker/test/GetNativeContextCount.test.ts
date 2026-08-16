@@ -15,8 +15,8 @@ test('counts hidden V8 NativeContext nodes, including URL-qualified contexts', (
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
       node_types: [['hidden', 'string']],
     },
-    node_count: 4,
-    nodes: new Uint32Array([0, 1, 1, 1244, 0, 0, 2, 3, 1244, 0, 0, 3, 5, 64, 0, 1, 4, 7, 0, 0]),
+    node_count: 5,
+    nodes: new Uint32Array([0, 1, 1, 1244, 0, 0, 2, 3, 1244, 0, 0, 3, 5, 64, 0, 1, 4, 7, 0, 0, 0, 99, 9, 0, 0]),
     strings: ['', 'system / NativeContext', 'system / NativeContext / vscode-file://vscode-app', 'system / Context', 'NativeContext'],
   }
   expect(getNativeContextCount(snapshot)).toBe(2)

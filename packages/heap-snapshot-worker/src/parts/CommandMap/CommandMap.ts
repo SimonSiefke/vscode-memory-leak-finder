@@ -10,6 +10,7 @@ import * as CompareHeapsnapshotArrays2 from '../CompareHeapsnapshotArrays2/Compa
 import * as CompareHeapSnapshotsFunctions2 from '../CompareHeapSnapshotsFunctions2/CompareHeapSnapshotsFunctions2.ts'
 import * as CompareHeapSnapshotsFunctions from '../CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.ts'
 import * as CompareNamedClosureCount from '../CompareNamedClosureCount/CompareNamedClosureCount.ts'
+import * as CompareObjectShapeDifference from '../CompareObjectShapeDifference/CompareObjectShapeDifference.ts'
 import * as CompareNamedClosureCountWithReferences2 from '../CompareNamedClosureCountWithReferences2/CompareNamedClosureCountWithReferences2.ts'
 import * as CompareStringCount from '../CompareStringCount/CompareStringCount.ts'
 import * as CreateMemoryCitySnapshot from '../CreateMemoryCitySnapshot/CreateMemoryCitySnapshot.ts'
@@ -49,6 +50,7 @@ export const commandMap = {
   'HeapSnapshot.compareFunctions2': CompareHeapSnapshotsFunctions2.compareHeapSnapshotFunctions2,
   'HeapSnapshot.compareGrowingArrays': CompareGrowingArrays.compareGrowingArrays,
   'HeapSnapshot.compareNamedClosureCount': CompareNamedClosureCount.compareNamedClosureCountFromHeapSnapshot,
+  'HeapSnapshot.compareObjectShapeDifference': CompareObjectShapeDifference.compareObjectShapeDifference,
   'HeapSnapshot.compareNamedClosureCountWithReferences2':
     CompareNamedClosureCountWithReferences2.compareNamedClosureCountWithReferencesFromHeapSnapshot2,
   'HeapSnapshot.compareStringCount': CompareStringCount.compareStringCount,

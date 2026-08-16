@@ -9,7 +9,10 @@ export interface NativeContextCountComparison {
 }
 
 export const compareNativeContextCount = async (beforePath: string, afterPath: string): Promise<NativeContextCountComparison> => {
-  const [beforeSnapshot, afterSnapshot] = await Promise.all([prepareHeapSnapshot(beforePath, {}), prepareHeapSnapshot(afterPath, {})])
+  const [beforeSnapshot, afterSnapshot] = await Promise.all([
+    prepareHeapSnapshot(beforePath, { parseStrings: true }),
+    prepareHeapSnapshot(afterPath, { parseStrings: true }),
+  ])
   const before = getNativeContextCount(beforeSnapshot)
   const after = getNativeContextCount(afterSnapshot)
   const delta = after - before
