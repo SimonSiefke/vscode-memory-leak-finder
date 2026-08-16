@@ -72,6 +72,14 @@ npm --prefix packages/visualizations run build
 npm --prefix packages/visualizations run dev
 ```
 
+### ArrayBufferBytes
+
+Measures the native backing-store bytes retained by live `ArrayBuffer` objects. The result includes before, after, and delta byte and backing-store counts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure array-buffer-bytes --only base
+```
+
 ### ArrayCount
 
 Measures the total number of arrays.
