@@ -106,7 +106,7 @@ jobs:
           - name: dom-counters
             args: --measure dom-counters
           - name: detached-dom-node-count
-            args: --measure detached-dom-node-count
+            args: --measure detached-dom-node-count --timeout-between 10000
           - name: promise-count
             args: --measure promise-count
           - name: promises-with-stack-trace

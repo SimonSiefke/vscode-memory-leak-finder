@@ -893,10 +893,6 @@ export const runTestsWithCallback = async ({
               }
               await MemoryLeakFinder.stop(memoryRpc, connectionId)
 
-              if (measureAfter) {
-                await Timeout.setTimeout(3000)
-              }
-
               result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
             }
             if (result.isLeak) {
