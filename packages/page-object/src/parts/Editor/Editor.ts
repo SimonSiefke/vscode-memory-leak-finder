@@ -1583,16 +1583,31 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         await page.waitForIdle()
         const baseName = fileName ? basename(fileName) : ''
-        const editor = fileName ? page.locator(`.monaco-editor[data-uri$="${baseName}"]`) : page.locator('.editor-instance').first()
+        const editors = fileName ? page.locator(`.monaco-editor[data-uri$="${baseName}"]`) : page.locator('.editor-instance')
+        let editor = editors.first()
+        for (let i = (await editors.count()) - 1; i >= 0; i--) {
+          const candidate = editors.nth(i)
+          if (await candidate.isVisible()) {
+            editor = candidate
+            break
+          }
+        }
         await expect(editor).toBeVisible()
         await page.waitForIdle()
         const whitespace = editor.locator(
           '.view-lines .mtkw, .view-lines .mtkz, .view-overlays .mwh, .view-overlays svg path, .view-overlays svg circle',
         )
-        await expect(whitespace.first()).toBeVisible({
-          timeout: 5000,
-        })
-        await page.waitForIdle()
+        const deadline = performance.now() + 5000
+        while (performance.now() < deadline) {
+          for (let i = (await whitespace.count()) - 1; i >= 0; i--) {
+            if (await whitespace.nth(i).isVisible()) {
+              await page.waitForIdle()
+              return
+            }
+          }
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+        throw new Error(`No visible whitespace rendering found`)
       } catch (error) {
         throw new VError(error, `Failed to verify visible whitespace rendering`)
       }
@@ -1644,14 +1659,36 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         await page.waitForIdle()
         const baseName = fileName ? basename(fileName) : ''
-        const editor = fileName ? page.locator(`.monaco-editor[data-uri$="${baseName}"]`) : page.locator('.editor-instance').first()
+        const editors = fileName ? page.locator(`.monaco-editor[data-uri$="${baseName}"]`) : page.locator('.editor-instance')
+        let editor = editors.first()
+        for (let i = (await editors.count()) - 1; i >= 0; i--) {
+          const candidate = editors.nth(i)
+          if (await candidate.isVisible()) {
+            editor = candidate
+            break
+          }
+        }
         await expect(editor).toBeVisible()
         await page.waitForIdle()
         const whitespace = editor.locator(
           '.view-lines .mtkw, .view-lines .mtkz, .view-overlays .mwh, .view-overlays svg path, .view-overlays svg circle',
         )
-        await expect(whitespace).toHaveCount(0)
-        await page.waitForIdle()
+        const deadline = performance.now() + 5000
+        while (performance.now() < deadline) {
+          let hasVisibleWhitespace = false
+          for (let i = 0; i < (await whitespace.count()); i++) {
+            if (await whitespace.nth(i).isVisible()) {
+              hasVisibleWhitespace = true
+              break
+            }
+          }
+          if (!hasVisibleWhitespace) {
+            await page.waitForIdle()
+            return
+          }
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+        throw new Error(`Visible whitespace rendering did not disappear`)
       } catch (error) {
         throw new VError(error, `Failed to verify whitespace rendering is hidden`)
       }

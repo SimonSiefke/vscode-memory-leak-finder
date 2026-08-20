@@ -353,12 +353,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(select).toBeVisible()
         await select.click()
         await page.waitForIdle()
-        const dropdown = page.locator('.monaco-select-box-dropdown-container')
+        const dropdowns = page.locator('.monaco-select-box-dropdown-container')
+        const dropdown = dropdowns.nth((await dropdowns.count()) - 1)
         await expect(dropdown).toBeVisible()
         const option = dropdown.locator('[role="option"]', {
           hasText: value,
         })
         await option.click()
+        await expect(dropdown).toBeHidden()
+        await expect(select).toHaveValue(value)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open select`)
       }
