@@ -328,6 +328,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const searchInput = page.locator('.search-container [role="textbox"]')
         await expect(searchInput).toBeVisible()
         await page.waitForIdle()
+        await searchInput.focus()
         await expect(searchInput).toBeFocused()
         await page.waitForIdle()
         await searchInput.type(value)
