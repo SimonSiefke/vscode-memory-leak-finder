@@ -50,22 +50,9 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await page.waitForIdle()
         const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
         await expect(contextMenu).toBeHidden()
-        let tries = 0
-        const maxTries = 11
-        while (true) {
-          await page.waitForIdle()
-          await locator.click({
-            button: 'right',
-          })
-          const isVisible = await contextMenu.isVisible()
-          if (isVisible) {
-            break
-          }
-          await page.waitForIdle()
-          if (tries++ === maxTries) {
-            throw new Error(`failed to open`)
-          }
-        }
+        await locator.click({
+          button: 'right',
+        })
         await expect(contextMenu).toBeVisible()
         await expect(contextMenu).toBeFocused()
       } catch (error) {
