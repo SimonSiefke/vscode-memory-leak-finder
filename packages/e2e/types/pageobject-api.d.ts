@@ -568,6 +568,7 @@ export interface Output {
 }
 export interface Panel {
   hide(): Promise<void>
+  openTabsContextMenu(): Promise<void>
   show(): Promise<void>
   toggle(): Promise<void>
 }

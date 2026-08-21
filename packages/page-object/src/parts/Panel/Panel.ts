@@ -1,4 +1,5 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
@@ -19,6 +20,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(group).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to hide panel`)
+      }
+    },
+    async openTabsContextMenu() {
+      try {
+        const panelTabs = page.locator('.part.panel .composite-bar-container')
+        await expect(panelTabs).toBeVisible()
+        const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await contextMenu.open(panelTabs)
+      } catch (error) {
+        throw new VError(error, `Failed to open panel tabs context menu`)
       }
     },
     async show() {
