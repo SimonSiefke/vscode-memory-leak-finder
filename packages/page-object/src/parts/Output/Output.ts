@@ -127,8 +127,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await quickPick.select(channelName)
         await expect(select).toHaveValue(channelName)
 
-        const nameLower = channelName.toLowerCase()
-        const editor = page.locator(`.monaco-editor[data-uri^="output:${nameLower}"]`)
+        const editor = outputView.locator('.monaco-editor')
         await expect(editor).toBeVisible()
         await page.waitForIdle()
 
