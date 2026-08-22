@@ -182,7 +182,7 @@ jobs:
           - name: worker-count
             args: --measure worker-count
           - name: detached-dom-nodes-with-stack-traces
-            args: --measure detached-dom-nodes-with-stack-traces --runs 37 --restart-between --run-skipped-tests-anyway
+            args: --measure detached-dom-nodes-with-stack-traces --runs 37 --restart-between --run-skipped-tests-anyway --enable-extensions
           - name: file-descriptor-count
             args: --measure file-descriptor-count --runs 37 --restart-between --run-skipped-tests-anyway
           - name: file-descriptors
