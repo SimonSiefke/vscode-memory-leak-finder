@@ -6,7 +6,7 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    resultCount: 1,
+    resultCount: 'many',
     value: modernUiSetting,
   })
   await SettingsEditor.disableCheckBox({
