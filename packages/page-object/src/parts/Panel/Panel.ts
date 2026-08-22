@@ -24,7 +24,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async openTabsContextMenu() {
       try {
-        const panelTabs = page.locator('.part.panel > .title > .composite-bar-container')
+        const panelTabs = page.locator('.part.panel > .title > .composite-bar-container > .composite-bar')
         await expect(panelTabs).toBeVisible()
         const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
         await contextMenu.open(panelTabs)
