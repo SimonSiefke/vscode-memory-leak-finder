@@ -6,7 +6,9 @@ export const setup = async ({ Panel }: TestContext): Promise<void> => {
 
 export const run = async ({ ContextMenu, Panel }: TestContext): Promise<void> => {
   await Panel.openTabsContextMenu()
-  await ContextMenu.select('Show Icons')
+  await ContextMenu.selectAndClose('Show Icons')
+  await Panel.shouldShowIcons()
   await Panel.openTabsContextMenu()
-  await ContextMenu.select('Show Labels')
+  await ContextMenu.selectAndClose('Show Labels')
+  await Panel.shouldShowLabels()
 }

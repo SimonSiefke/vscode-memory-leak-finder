@@ -24,7 +24,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async openTabsContextMenu() {
       try {
-        const panelTabs = page.locator('.part.panel .composite-bar-container')
+        const panelTabs = page.locator('.part.panel > .title > .composite-bar-container')
         await expect(panelTabs).toBeVisible()
         const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
         await contextMenu.open(panelTabs)
@@ -35,11 +35,32 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async show() {
       try {
         const panel = page.locator('.part.panel')
+        const isVisible = await panel.isVisible()
+        if (isVisible) {
+          await expect(panel).toBeVisible()
+          return
+        }
         await expect(panel).toBeHidden()
         await this.toggle()
         await expect(panel).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to show panel`)
+      }
+    },
+    async shouldShowIcons() {
+      try {
+        const activePanelTab = page.locator('.part.panel > .title > .composite-bar-container .action-item.checked.icon')
+        await expect(activePanelTab).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that panel tabs show icons`)
+      }
+    },
+    async shouldShowLabels() {
+      try {
+        const activePanelTab = page.locator('.part.panel > .title > .composite-bar-container .action-item.checked:not(.icon)')
+        await expect(activePanelTab).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that panel tabs show labels`)
       }
     },
     async toggle() {

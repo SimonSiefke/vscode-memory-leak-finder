@@ -128,6 +128,7 @@ export interface ContextMenu {
   open(locator: any): Promise<void>
   openSubMenu(option: any, expands?: any): Promise<void>
   select(option: any, needsFocus?: any): Promise<void>
+  selectAndClose(option: any): Promise<void>
   shouldHaveItem(option: any): Promise<void>
   uncheck(name: any): Promise<void>
 }
@@ -570,6 +571,8 @@ export interface Panel {
   hide(): Promise<void>
   openTabsContextMenu(): Promise<void>
   show(): Promise<void>
+  shouldShowIcons(): Promise<void>
+  shouldShowLabels(): Promise<void>
   toggle(): Promise<void>
 }
 export interface PortsView {
