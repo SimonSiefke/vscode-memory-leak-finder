@@ -1,5 +1,7 @@
 import { expect, jest, test } from '@jest/globals'
 
+const mockSetWindowContentSize = jest.fn(async (..._args: unknown[]) => {})
+
 jest.unstable_mockModule('../src/parts/WaitForDebuggerListening/WaitForDebuggerListening.ts', () => {
   return {
     WaitForDebuggerListening: {},
@@ -59,6 +61,12 @@ jest.unstable_mockModule('../src/parts/DevtoolsProtocol/DevtoolsProtocol.ts', ()
   }
 })
 
+jest.unstable_mockModule('../src/parts/SetWindowContentSize/SetWindowContentSize.ts', () => {
+  return {
+    setWindowContentSize: mockSetWindowContentSize,
+  }
+})
+
 const { prepareBoth } = await import('../src/parts/PrepareBoth/PrepareBoth.ts')
 
 test('prepareBoth returns real electron process id from runtime evaluation', async () => {
@@ -79,4 +87,5 @@ test('prepareBoth returns real electron process id from runtime evaluation', asy
   )
 
   expect(result.pid).toBe(9876)
+  expect(mockSetWindowContentSize).toHaveBeenCalledWith(expect.anything(), 'electron-object', 'target-id', 1024, 768)
 })
