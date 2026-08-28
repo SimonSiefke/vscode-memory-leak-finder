@@ -8,21 +8,14 @@ export const setup = async ({ ChatEditor, SideBar, Editor }: TestContext): Promi
   await Editor.closeAll()
   await SideBar.hide()
   await ChatEditor.open()
+  await ChatEditor.clearAll()
 }
 
 export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
-    message: `Run echo hello world in terminal.`,
+    message: `Use the terminal tool to run exactly: echo hello world`,
     model: ChatEditor.Models.Auto,
     approveToolCalls: true,
-    // @ts-ignore
-    compactToolInvocations: true,
-    toolInvocations: [
-      {
-        content: `echo hello world`,
-        type: 'terminal',
-      },
-    ],
     verify: true,
   })
 

@@ -3,10 +3,10 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { expect, test } from '@jest/globals'
 
-const getWorkflowPath = (): string => {
+const getWorkflowPath = (workflowName = 'ci.yml'): string => {
   const currentFilePath = fileURLToPath(import.meta.url)
   const testDir = dirname(currentFilePath)
-  return join(testDir, '..', '..', '..', '.github', 'workflows', 'ci.yml')
+  return join(testDir, '..', '..', '..', '.github', 'workflows', workflowName)
 }
 
 test('ci cancels superseded runs before starting the measure matrix', async () => {
@@ -26,4 +26,12 @@ test('ci measure failures do not block the Pages deployment', async () => {
         uses: coactions/setup-xvfb@v1`)
   expect(workflow).toContain(`  deploy:
     if: \${{ always() && needs.ci.result == 'success' && needs.ci-linux-charts.result == 'success' }}`)
+})
+
+test('pr bounds the Memory City smoke test without the setup-xvfb action wrapper', async () => {
+  const workflow = await readFile(getWorkflowPath('pr.yml'), 'utf8')
+
+  expect(workflow).toContain(`      - name: Run Memory City smoke test
+        if: matrix.os == 'ubuntu-24.04'
+        run: timeout 5m xvfb-run --auto-servernum node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure memory-city --only ^editor-open.ts --workers 1`)
 })
