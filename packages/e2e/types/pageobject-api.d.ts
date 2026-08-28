@@ -884,6 +884,7 @@ export interface TerminalInlineChat {
   show(): Promise<void>
 }
 export interface Testing {
+  clearAllResults(): Promise<void>
   focusOnTestExplorerView(): Promise<void>
   runAllTests(options: any): Promise<void>
   runTask(taskName: any): Promise<void>
