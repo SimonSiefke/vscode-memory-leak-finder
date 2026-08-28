@@ -23,6 +23,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await input.focus()
         await expect(input).toBeFocused()
         await input.setValue(searchValue)
+        await expect(input).toHaveValue(searchValue)
+        const rows = keyBindingsEditor.locator('.keybindings-body .monaco-list-row')
+        await expect(rows.first()).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to search for ${searchValue}`)
       }
