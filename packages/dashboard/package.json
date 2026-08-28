@@ -11,21 +11,21 @@
   },
   "dependencies": {
     "@octokit/rest": "^22.0.1",
-    "@vitejs/plugin-react": "^6.0.5",
-    "lucide-react": "^1.31.0",
+    "@vitejs/plugin-react": "^6.1.0",
+    "lucide-react": "^1.34.0",
     "prismjs": "^1.30.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-markdown": "^10.1.0",
     "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "vite": "^8.2.1"
+    "vite": "^8.2.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@types/prismjs": "^1.26.6",
     "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
+    "@types/react-dom": "^19.2.5",
     "autoprefixer": "^10.5.4",
     "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3",

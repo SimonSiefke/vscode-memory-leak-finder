@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.9.0",
-    "@lvce-editor/rpc": "^6.18.0",
+    "@lvce-editor/rpc": "^6.19.3",
     "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {}
