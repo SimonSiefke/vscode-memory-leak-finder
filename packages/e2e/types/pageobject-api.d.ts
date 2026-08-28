@@ -73,6 +73,12 @@ export interface ActivityBar {
   showSearch(): Promise<void>
   showSourceControl(): Promise<void>
 }
+export interface CallHierarchy {
+  close(): Promise<void>
+  focusNext(): Promise<void>
+  focusPrevious(): Promise<void>
+  open(): Promise<void>
+}
 export interface ChatEditor {
   readonly Models: ChatEditorModels
   addAllProblemsAsContext(): Promise<void>
@@ -893,6 +899,12 @@ export interface TitleBar {
   showMenuEdit(): Promise<void>
   showMenuFile(): Promise<void>
 }
+export interface TypeHierarchy {
+  close(): Promise<void>
+  focusNext(): Promise<void>
+  focusPrevious(): Promise<void>
+  open(): Promise<void>
+}
 export interface View {
   enterZenMode(): Promise<void>
   leaveZenMode(): Promise<void>
@@ -953,6 +965,7 @@ export interface Workspace {
 
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
+  readonly CallHierarchy: CallHierarchy
   readonly ChatEditor: ChatEditor
   readonly ColorPicker: ColorPicker
   readonly Colors: any
@@ -1014,6 +1027,7 @@ export interface PageObjectApi {
   readonly Timeline: Timeline
   readonly Timeout: Timeout
   readonly TitleBar: TitleBar
+  readonly TypeHierarchy: TypeHierarchy
   readonly View: View
   readonly WaitForApplicationToBeReady: WaitForApplicationToBeReady
   readonly WebView: WebView
