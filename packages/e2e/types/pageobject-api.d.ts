@@ -510,6 +510,7 @@ export interface Hover {
   shouldHaveActions(): Promise<void>
 }
 export interface ImagesPreview {
+  open(folderName: string): Promise<void>
   shouldHaveImage(src: any): Promise<void>
   close(): Promise<void>
   next(): Promise<void>
