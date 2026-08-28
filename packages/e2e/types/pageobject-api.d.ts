@@ -73,6 +73,10 @@ export interface ActivityBar {
   showSearch(): Promise<void>
   showSourceControl(): Promise<void>
 }
+export interface AccessibilityHelp {
+  close(): Promise<void>
+  open(): Promise<void>
+}
 export interface CallHierarchy {
   close(): Promise<void>
   focusNext(): Promise<void>
@@ -966,6 +970,7 @@ export interface Workspace {
 
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
+  readonly AccessibilityHelp: AccessibilityHelp
   readonly CallHierarchy: CallHierarchy
   readonly ChatEditor: ChatEditor
   readonly ColorPicker: ColorPicker
