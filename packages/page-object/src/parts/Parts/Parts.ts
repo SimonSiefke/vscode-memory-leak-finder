@@ -1,4 +1,5 @@
 export * as ActivityBar from '../ActivityBar/ActivityBar.ts'
+export * as AccessibilityHelp from '../AccessibilityHelp/AccessibilityHelp.ts'
 export * as CallHierarchy from '../CallHierarchy/CallHierarchy.ts'
 export * as ChatEditor from '../ChatEditor/ChatEditor.ts'
 export * as ColorPicker from '../ColorPicker/ColorPicker.ts'
