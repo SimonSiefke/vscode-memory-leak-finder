@@ -547,6 +547,7 @@ export interface Notebook {
   removeMarkdownCell(): Promise<void>
   scrollDown(): Promise<void>
   scrollUp(): Promise<void>
+  shouldHaveOutput(expectedOutput: string): Promise<void>
   splitCell(cellIndex?: any): Promise<void>
 }
 export interface NotebookInlineChat {
