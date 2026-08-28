@@ -35,3 +35,23 @@ test('pr bounds the Memory City smoke test without the setup-xvfb action wrapper
         if: matrix.os == 'ubuntu-24.04'
         run: timeout 5m xvfb-run --auto-servernum node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure memory-city --only ^editor-open.ts --workers 1`)
 })
+
+test('ci runs promises-with-stack-trace in two shards and downloads both results', async () => {
+  const workflow = await readFile(getWorkflowPath(), 'utf8')
+
+  expect(workflow).toContain('name: promises-with-stack-trace-shard-1')
+  expect(workflow).toContain('--measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --shard=1/2')
+  expect(workflow).toContain('name: promises-with-stack-trace-shard-2')
+  expect(workflow).toContain('--measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --shard=2/2')
+  expect(workflow).toContain('name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-1')
+  expect(workflow).toContain('name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2')
+})
+
+test('pr exercises and validates merging the two promises-with-stack-trace shards', async () => {
+  const workflow = await readFile(getWorkflowPath('pr.yml'), 'utf8')
+
+  expect(workflow).toContain('shard: [1, 2]')
+  expect(workflow).toContain('--shard=${{ matrix.shard }}/2')
+  expect(workflow).toContain('pr-promises-with-stack-trace-merge:')
+  expect(workflow).toContain('test "$merged_count" -eq "$((first_count + second_count))"')
+})

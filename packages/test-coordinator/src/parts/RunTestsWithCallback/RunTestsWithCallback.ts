@@ -244,6 +244,8 @@ export const runTestsWithCallback = async ({
   runSkippedTestsAnyway,
   screencastQuality,
   setupOnly,
+  shardCount = 1,
+  shardIndex = 1,
   startupRuns,
   timeoutBetween,
   timeouts,
@@ -277,6 +279,8 @@ export const runTestsWithCallback = async ({
     Assert.boolean(setupOnly)
     Assert.boolean(login)
     Assert.boolean(enableExtensions)
+    Assert.number(shardCount)
+    Assert.number(shardIndex)
     Assert.number(startupRuns)
 
     const connectionId = Id.create()
@@ -377,7 +381,7 @@ export const runTestsWithCallback = async ({
     let skipped = 0
     let skippedFailed = 0
     let leaking = 0
-    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue, continueValue)
+    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue, continueValue, shardIndex, shardCount)
     const total = formattedPaths.length
     if (total === 0) {
       return {

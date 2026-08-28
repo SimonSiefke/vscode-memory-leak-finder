@@ -154,6 +154,46 @@ test('parseArgv - runs', () => {
   })
 })
 
+test('parseArgv - shard with equals syntax', () => {
+  const argv = ['--shard=1/2']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    shardCount: 2,
+    shardIndex: 1,
+  })
+})
+
+test('parseArgv - shard with separate value', () => {
+  const argv = ['--shard', '2/3']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    shardCount: 3,
+    shardIndex: 2,
+  })
+})
+
+test('parseArgv - shard uses last value', () => {
+  const argv = ['--shard=1/2', '--shard', '3/4']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    shardCount: 4,
+    shardIndex: 3,
+  })
+})
+
+test('parseArgv - shard is omitted by default', () => {
+  expect(ParseArgv.parseArgv('linux', 'x64', [])).not.toHaveProperty('shardIndex')
+})
+
+test.each(['', '1', '1/', '/2', 'a/2'])('parseArgv - rejects invalid shard format %s', (value) => {
+  expect(() => ParseArgv.parseArgv('linux', 'x64', [`--shard=${value}`])).toThrow(
+    '--shard must use the format <index>/<count>, for example --shard=1/2',
+  )
+})
+
+test.each(['0/2', '1/0', '3/2'])('parseArgv - rejects invalid shard range %s', (value) => {
+  expect(() => ParseArgv.parseArgv('linux', 'x64', [`--shard=${value}`])).toThrow(
+    '--shard index and count must be positive integers, and index must not exceed count',
+  )
+})
+
 test('parseArgv - startup runs', () => {
   const argv = ['--measure', 'cpu-performance-counters-from-start', '--startup-runs', '30']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({

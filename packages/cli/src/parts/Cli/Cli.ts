@@ -59,6 +59,8 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     showSkippedFailedTestDuration: options.showSkippedFailedTestDuration,
+    shardCount: options.shardCount,
+    shardIndex: options.shardIndex,
     startupRuns: options.startupRuns,
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,

@@ -146,6 +146,44 @@ const parseRuns = (argv: readonly string[]): number => {
   return 1
 }
 
+const parseShard = (argv: readonly string[]): { readonly shardCount: number; readonly shardIndex: number } | undefined => {
+  let found = false
+  let value: string | undefined
+  for (let index = 0; index < argv.length; index++) {
+    const argument = argv[index]
+    if (argument === '--shard') {
+      found = true
+      value = argv[index + 1]
+    } else if (argument.startsWith('--shard=')) {
+      found = true
+      value = argument.slice('--shard='.length)
+    }
+  }
+  if (!found) {
+    return undefined
+  }
+  value ||= ''
+  const match = /^(\d+)\/(\d+)$/.exec(value)
+  if (!match) {
+    throw new Error('--shard must use the format <index>/<count>, for example --shard=1/2')
+  }
+  const shardIndex = Number.parseInt(match[1])
+  const shardCount = Number.parseInt(match[2])
+  if (
+    !Number.isSafeInteger(shardIndex) ||
+    !Number.isSafeInteger(shardCount) ||
+    shardIndex < 1 ||
+    shardCount < 1 ||
+    shardIndex > shardCount
+  ) {
+    throw new Error('--shard index and count must be positive integers, and index must not exceed count')
+  }
+  return {
+    shardCount,
+    shardIndex,
+  }
+}
+
 const parseStartupRuns = (argv: readonly string[]): number => {
   if (argv.includes('--startup-runs')) {
     return parseArgvNumber(argv, '--startup-runs')
@@ -475,6 +513,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const restartBetween = parseRestartBetween(argv)
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
+  const shard = parseShard(argv)
   const startupRuns = parseStartupRuns(argv)
   if (startupRuns > 1 && !isCpuPerformanceCountersFromStartMeasure(measure)) {
     throw new Error('--startup-runs can only be used with --measure cpu-performance-counters-from-start')
@@ -564,5 +603,6 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     vscodeVersion,
     watch,
     workers,
+    ...(shard || {}),
   }
 }
