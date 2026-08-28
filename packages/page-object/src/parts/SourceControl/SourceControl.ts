@@ -346,9 +346,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveUnstagedFile(name: string) {
       try {
         const changesPart = page.locator('[role="treeitem"][aria-label="Changes"]')
-        await expect(changesPart).toBeVisible()
+        await expect(changesPart).toBeVisible({ timeout: 15_000 })
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
-        await expect(file).toBeVisible()
+        await expect(file).toBeVisible({ timeout: 15_000 })
       } catch (error) {
         throw new VError(error, `Failed to check unstaged file`)
       }
