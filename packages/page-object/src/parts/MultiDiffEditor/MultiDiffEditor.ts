@@ -1,9 +1,12 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const getEditor = () => page.locator('.monaco-component.multiDiffEditor')
+
   return {
     async close() {
       try {
@@ -55,12 +58,29 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open multi-diff editor`)
       }
     },
+    async openSourceControlChanges() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand('Test: Open SCM Changes in Multi Diff')
+        await expect(getEditor()).toBeVisible({ timeout: 15_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open Source Control changes in the multi diff editor`)
+      }
+    },
+    async shouldHaveFileCount(count: number) {
+      try {
+        const entries = getEditor().locator('.multiDiffEntry')
+        await expect(entries).toHaveCount(count)
+      } catch (error) {
+        throw new VError(error, `Expected multi diff editor to have ${count} files`)
+      }
+    },
     async shouldBeVisible() {
       try {
-        const diffEditor = page.locator('.diff-editor')
-        await expect(diffEditor).toBeVisible()
+        await expect(getEditor()).toBeVisible()
       } catch (error) {
-        throw new VError(error, `Expected diff editor to be visible`)
+        throw new VError(error, `Expected multi diff editor to be visible`)
       }
     },
   }

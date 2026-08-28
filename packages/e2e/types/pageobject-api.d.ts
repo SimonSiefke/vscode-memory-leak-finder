@@ -542,6 +542,8 @@ export interface MCP {
 export interface MultiDiffEditor {
   close(): Promise<void>
   open(options: any): Promise<void>
+  openSourceControlChanges(): Promise<void>
+  shouldHaveFileCount(count: number): Promise<void>
   shouldBeVisible(): Promise<void>
 }
 export interface Notebook {
