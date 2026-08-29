@@ -939,11 +939,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
-        await expect(renameInput).toBeVisible()
+        await expect(renameInput).toBeVisible({
+          timeout: 10_000,
+        })
         await expect(renameInput).toBeFocused()
         await renameInput.type(newText)
         await page.waitForIdle()
         await page.keyboard.press('Enter')
+        await expect(renameInput).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to rename text ${newText}`)
       }
