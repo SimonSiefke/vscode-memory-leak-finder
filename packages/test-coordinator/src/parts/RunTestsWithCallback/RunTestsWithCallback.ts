@@ -40,10 +40,37 @@ interface WorkerMap {
   webSocketUrl: string
 }
 
+const WorkerDisposeTimeout = 10_000
+
+const disposeWorker = async (name: string, rpc: Rpc): Promise<void> => {
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  let didTimeOut: boolean
+  try {
+    didTimeOut = await Promise.race([
+      rpc.dispose().then(() => false),
+      new Promise<true>((resolve) => {
+        timeout = setTimeout(() => resolve(true), WorkerDisposeTimeout)
+      }),
+    ])
+  } finally {
+    if (timeout) {
+      clearTimeout(timeout)
+    }
+  }
+  if (didTimeOut) {
+    console.warn(`Timed out disposing ${name} worker after ${WorkerDisposeTimeout}ms`)
+  }
+}
+
 const disposeWorkers = async (workers: WorkerMap): Promise<void> => {
   const { functionTrackerRpc, initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
-  await Promise.all([functionTrackerRpc.dispose(), memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
-  await initializationWorkerRpc.dispose()
+  await Promise.all([
+    disposeWorker('function tracker', functionTrackerRpc),
+    disposeWorker('memory', memoryRpc),
+    disposeWorker('test', testWorkerRpc),
+    disposeWorker('video', videoRpc),
+  ])
+  await disposeWorker('initialization', initializationWorkerRpc)
 }
 
 const getProcessResultFolder = (inspectProcess: string): string => {
