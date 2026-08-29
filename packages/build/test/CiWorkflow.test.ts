@@ -47,11 +47,10 @@ test('ci runs promises-with-stack-trace in two shards and downloads both results
   expect(workflow).toContain('name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2')
 })
 
-test('pr reproduces the worker restart boundary with promises-with-stack-trace', async () => {
+test('pr validates the full second promises-with-stack-trace shard', async () => {
   const workflow = await readFile(getWorkflowPath('pr.yml'), 'utf8')
 
-  expect(workflow).toContain('pr-promises-with-stack-trace-restart-repro:')
-  expect(workflow).toContain('cp packages/e2e/src/editor-toggle-sticky-scroll.ts .tmp/restart-repro/src/')
-  expect(workflow).toContain('cp packages/e2e/src/editor-type-many-characters.ts .tmp/restart-repro/src/')
-  expect(workflow).toContain('--measure promises-with-stack-trace --runs 1 --restart-between --run-skipped-tests-anyway')
+  expect(workflow).toContain('pr-promises-with-stack-trace-shard-2:')
+  expect(workflow).toContain('--measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --shard=2/2')
+  expect(workflow).not.toContain('continue-on-error: true')
 })

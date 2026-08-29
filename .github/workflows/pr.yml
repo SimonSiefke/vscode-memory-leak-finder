@@ -96,9 +96,9 @@ jobs:
           path: ./.vscode-videos
           include-hidden-files: true
 
-  pr-promises-with-stack-trace-restart-repro:
+  pr-promises-with-stack-trace-shard-2:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -132,16 +132,13 @@ jobs:
         run: npm ci --ignore-scripts && npm run postinstall
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run build
-      - name: Prepare restart-boundary reproduction
-        run: |
-          mkdir -p .tmp/restart-repro/src
-          cp packages/e2e/src/editor-toggle-sticky-scroll.ts .tmp/restart-repro/src/
-          cp packages/e2e/src/editor-type-many-characters.ts .tmp/restart-repro/src/
-      - name: Run promises-with-stack-trace restart-boundary reproduction
+      - name: Run promises-with-stack-trace shard 2/2
         uses: coactions/setup-xvfb@v1
         with:
-          run: node packages/cli/bin/test.js --cwd .tmp/restart-repro --check-leaks --measure-after --measure promises-with-stack-trace --runs 1 --restart-between --run-skipped-tests-anyway
-      - name: Validate restart-boundary results
-        run: |
-          test -f .vscode-memory-leak-finder-results/promises-with-stack-trace/editor-toggle-sticky-scroll.json
-          test -f .vscode-memory-leak-finder-results/promises-with-stack-trace/editor-type-many-characters.json
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --shard=2/2
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2
+          path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
