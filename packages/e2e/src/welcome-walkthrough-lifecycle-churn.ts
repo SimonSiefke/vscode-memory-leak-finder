@@ -9,8 +9,6 @@ export const setup = async ({ Editor }: TestContext): Promise<void> => {
 export const run = async ({ WelcomePage }: TestContext): Promise<void> => {
   await WelcomePage.show()
   await WelcomePage.showFundamentals()
-  await WelcomePage.expandStep('extensions')
-  await WelcomePage.expandStep('terminal')
   await WelcomePage.hide()
 }
 
