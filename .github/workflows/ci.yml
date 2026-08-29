@@ -109,8 +109,10 @@ jobs:
             args: --measure detached-dom-node-count --timeout-between 10000
           - name: promise-count
             args: --measure promise-count
-          - name: promises-with-stack-trace
-            args: --measure promises-with-stack-trace --runs 37  --restart-between --run-skipped-tests-anyway
+          - name: promises-with-stack-trace-shard-1
+            args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --shard=1/2
+          - name: promises-with-stack-trace-shard-2
+            args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --shard=2/2
           - name: promises-with-stack-trace-extensions
             args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
           - name: named-array-count
@@ -298,8 +300,13 @@ jobs:
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
-          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace
-          path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-1
+          path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-1
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2
+          path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -583,7 +590,12 @@ jobs:
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
-          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-1
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true

@@ -11,6 +11,22 @@ npm ci &&
 npm run e2e
 ```
 
+## Sharding
+
+Split the selected test files across parallel jobs with the Jest-compatible, one-based `--shard=<index>/<count>` option:
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure promises-with-stack-trace --shard=1/2
+node packages/cli/bin/test.js --cwd packages/e2e --measure promises-with-stack-trace --shard=2/2
+```
+
+Each test file belongs to exactly one shard. Results from separate jobs can be downloaded into directories whose names start with
+`vscode-memory-leak-finder-results-linux-` and combined with:
+
+```sh
+node packages/build/src/mergeArtifacts.ts
+```
+
 <!--  -->
 
 ## Measures
