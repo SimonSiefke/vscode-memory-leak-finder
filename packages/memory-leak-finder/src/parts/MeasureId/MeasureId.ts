@@ -109,6 +109,7 @@ export const NamedFunctionDifferenceWithSourceMap = 'namedFunctionDifferenceWith
 export const NumberCount = 'numberCount'
 export const Numbers = 'numbers'
 export const ObjectCount = 'objectCount'
+export const ObjectUrlCount = 'objectUrlCount'
 export const ObjectShapeCount = 'objectShapeCount'
 export const ObjectShapeDifference = 'objectShapeDifference'
 export const Observers = 'observers'

@@ -107,6 +107,7 @@ export * as MeasureNamedFunctionDifferenceWithSourceMap from '../MeasureNamedFun
 export * as MeasureNumberCount from '../MeasureNumberCount/MeasureNumberCount.ts'
 export * as MeasureNumbers from '../MeasureNumbers/MeasureNumbers.ts'
 export * as MeasureObjectCount from '../MeasureObjectCount/MeasureObjectCount.ts'
+export * as MeasureObjectUrlCount from '../MeasureObjectUrlCount/MeasureObjectUrlCount.ts'
 export * as MeasureObjectShapeCount from '../MeasureObjectShapeCount/MeasureObjectShapeCount.ts'
 export * as MeasureObjectShapeDifference from '../MeasureObjectShapeDifference/MeasureObjectShapeDifference.ts'
 export * as MeasureOffscreenCanvasCount from '../MeasureOffscreenCanvasCount/MeasureOffscreenCanvasCount.ts'

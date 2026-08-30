@@ -71,6 +71,14 @@ Compares V8 object shapes before and after a test. Results identify constructor,
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-difference --only base
 ```
 
+### ObjectUrlCount
+
+Spies on `URL.createObjectURL` and `URL.revokeObjectURL` during a test and reports the number of calls plus the number of created object URLs that were not revoked.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-url-count --only base
+```
+
 ### MemoryCity
 
 Captures allocation-aware renderer and extension-host heap snapshots, computes
