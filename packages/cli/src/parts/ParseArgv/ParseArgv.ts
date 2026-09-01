@@ -234,8 +234,13 @@ const isIpcMessageCountMeasure = (measure: string): boolean => {
   return measure === 'ipc-message-count' || measure === 'ipcMessageCount' || measure === 'ipcmessagecount'
 }
 
-const isCpuPerformanceCountersFromStartMeasure = (measure: string): boolean => {
-  return measure === 'cpu-performance-counters-from-start' || measure === 'cpuPerformanceCountersFromStart'
+const isFromStartMeasure = (measure: string): boolean => {
+  return (
+    measure === 'cpu-performance-counters-from-start' ||
+    measure === 'cpuPerformanceCountersFromStart' ||
+    measure === 'linux-process-tree-resources-from-start' ||
+    measure === 'linuxProcessTreeResourcesFromStart'
+  )
 }
 
 const parseProcessRootStrategy = (argv: readonly string[]): string => {
@@ -515,8 +520,8 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const runs = parseRuns(argv)
   const shard = parseShard(argv)
   const startupRuns = parseStartupRuns(argv)
-  if (startupRuns > 1 && !isCpuPerformanceCountersFromStartMeasure(measure)) {
-    throw new Error('--startup-runs can only be used with --measure cpu-performance-counters-from-start')
+  if (startupRuns > 1 && !isFromStartMeasure(measure)) {
+    throw new Error('--startup-runs can only be used with a from-start measure')
   }
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
   const showSkippedFailedTestDuration = parseShowSkippedFailedTestDuration(argv, env)

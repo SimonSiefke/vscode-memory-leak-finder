@@ -26,6 +26,7 @@
     { "path": "./packages/initialization-worker" },
     { "path": "./packages/injected-code" },
     { "path": "./packages/launch-worker" },
+    { "path": "./packages/linux-process-tree-worker" },
     { "path": "./packages/load-source-map-worker" },
     { "path": "./packages/memory-leak-finder" },
     { "path": "./packages/network-worker" },

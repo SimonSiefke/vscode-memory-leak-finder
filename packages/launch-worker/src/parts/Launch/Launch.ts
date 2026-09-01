@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as CallgrindConfig from '../CallgrindConfig/CallgrindConfig.ts'
 import * as CpuPerformanceCountersFromStart from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
+import * as LinuxProcessTreeResourcesFromStart from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.ts'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
@@ -108,6 +109,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodeVersion,
   } = options
   const cpuPerformanceCountersFromStartConfig = CpuPerformanceCountersFromStart.getConfig(measureId, connectionId)
+  const linuxProcessTreeResourcesFromStartConfig = LinuxProcessTreeResourcesFromStart.getConfig(measureId, connectionId)
   const trackingMode = getTrackingMode(measureId)
   const {
     child,
@@ -136,6 +138,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    linuxProcessTreeResourcesFromStartConfig,
     platform,
     preparedVscodePath,
     proxyTestFolderName,

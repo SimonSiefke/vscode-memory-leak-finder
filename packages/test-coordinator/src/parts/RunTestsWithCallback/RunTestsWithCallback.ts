@@ -23,6 +23,7 @@ import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTests from '../TestWorkerRunTests/TestWorkerRunTests.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
+import * as StartupMeasure from '../StartupMeasure/StartupMeasure.ts'
 import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
@@ -89,83 +90,8 @@ const getResultRelativePath = (fileName: string, testName: string): string => {
   return fileName
 }
 
-const StartupCounterMeasureId = 'cpu-performance-counters-from-start'
-const StartupCounterMeasureResultId = 'cpuPerformanceCountersFromStart'
-
-const isStartupCounterMeasure = (measure: string): boolean => {
-  return measure === StartupCounterMeasureId || measure === StartupCounterMeasureResultId
-}
-
 const isMemoryCityMeasure = (measure: string): boolean => {
   return measure === 'memory-city' || measure === 'memoryCity'
-}
-
-const round = (value: number): number => {
-  return Math.round((value + Number.EPSILON) * 1000) / 1000
-}
-
-const getMedian = (values: readonly number[]): number => {
-  const middle = Math.floor(values.length / 2)
-  if (values.length % 2 === 1) {
-    return values[middle]
-  }
-  return (values[middle - 1] + values[middle]) / 2
-}
-
-interface AggregateMetric {
-  readonly count: number
-  readonly max: number
-  readonly mean: number
-  readonly median: number
-  readonly min: number
-  readonly name: string
-  readonly unit: string
-}
-
-const getAggregateMetric = (samples: readonly any[], name: string, unit: string) => {
-  const values = samples
-    .map((sample) => sample[name])
-    .filter((value) => typeof value === 'number' && Number.isFinite(value))
-    .sort((a, b) => a - b)
-  if (values.length === 0) {
-    return undefined
-  }
-  const total = values.reduce((sum, value) => sum + value, 0)
-  return {
-    count: values.length,
-    max: round(values[values.length - 1]),
-    mean: round(total / values.length),
-    median: round(getMedian(values)),
-    min: round(values[0]),
-    name,
-    unit,
-  }
-}
-
-const isAggregateMetric = (metric: AggregateMetric | undefined): metric is AggregateMetric => {
-  return metric !== undefined
-}
-
-const getStartupCounterAggregate = (samples: readonly any[]) => {
-  const metrics = [
-    getAggregateMetric(samples, 'instructions', 'count'),
-    getAggregateMetric(samples, 'cycles', 'count'),
-    getAggregateMetric(samples, 'instructionsPerCycle', 'ratio'),
-  ].filter(isAggregateMetric)
-  const lines = ['CPU performance counters from start:', 'metric | count | median | mean | min | max | unit']
-  for (const metric of metrics) {
-    lines.push(`${metric.name} | ${metric.count} | ${metric.median} | ${metric.mean} | ${metric.min} | ${metric.max} | ${metric.unit}`)
-  }
-  return {
-    [StartupCounterMeasureResultId]: {
-      isLeak: false,
-      metrics,
-      samples,
-    },
-    isLeak: false,
-    samples,
-    summary: metrics.length === 0 ? 'No CPU performance counters from start were available' : lines.join('\n'),
-  }
 }
 
 const readJson = async (path: string): Promise<any> => {
@@ -466,7 +392,8 @@ export const runTestsWithCallback = async ({
       webSocketUrl: '',
     }
 
-    if (isStartupCounterMeasure(measure) && startupRuns > 1) {
+    const startupMeasureInfo = StartupMeasure.getStartupMeasureInfo(measure)
+    if (startupMeasureInfo && startupRuns > 1) {
       for (let i = 0; i < formattedPaths.length; i++) {
         const formattedPath = formattedPaths[i]
         const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
@@ -604,7 +531,7 @@ export const runTestsWithCallback = async ({
               sampleResultPath,
             )
             const sampleResult = await readJson(sampleResultPath)
-            samples.push(sampleResult[StartupCounterMeasureResultId] ?? sampleResult)
+            samples.push(sampleResult[startupMeasureInfo.resultId] ?? sampleResult)
             await TestWorkerTeardownTest.testWorkerTearDownTest(workers.testWorkerRpc, sampleConnectionId, absolutePath)
           }
           const resultPath = getResultPath({
@@ -617,7 +544,7 @@ export const runTestsWithCallback = async ({
             measure,
             measureNode,
           })
-          const aggregateResult = getStartupCounterAggregate(samples)
+          const aggregateResult = StartupMeasure.getStartupMeasureAggregate(samples, startupMeasureInfo)
           await writeJson(resultPath, aggregateResult)
           console.log(aggregateResult.summary)
           const end = Time.now()
