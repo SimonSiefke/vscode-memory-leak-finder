@@ -96,6 +96,17 @@ npm --prefix packages/visualizations run build
 npm --prefix packages/visualizations run dev
 ```
 
+### ChromiumMemoryDump
+
+Captures two detailed Chromium MemoryInfra snapshots around a browser scenario. The informational result compares per-process private footprint and detailed allocator paths, retains normalized allocator attributes and ownership edges, and reports trace completeness without storing the full raw trace. Because allocator paths are hierarchical, their sizes are not additive.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure chromium-memory-dump --only base
+npm run build-charts
+```
+
+The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
+
 ### ArrayBufferBytes
 
 Measures the native backing-store bytes retained by live `ArrayBuffer` objects. The result includes before, after, and delta byte and backing-store counts.

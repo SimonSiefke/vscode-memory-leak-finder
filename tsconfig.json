@@ -6,6 +6,7 @@
     { "path": "./packages/bot" },
     { "path": "./packages/chart-worker" },
     { "path": "./packages/charts" },
+    { "path": "./packages/chromium-memory-dump-worker" },
     { "path": "./packages/cli" },
     { "path": "./packages/compression-worker" },
     { "path": "./packages/cryptography-worker" },

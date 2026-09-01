@@ -91,6 +91,8 @@ export const TracingStart = 'Tracing.start'
 
 export const TracingEnd = 'Tracing.end'
 
+export const TracingRequestMemoryDump = 'Tracing.requestMemoryDump'
+
 export const DebuggerStepInto = 'Debugger.stepInto'
 
 export const DebuggerStepOut = 'Debugger.stepOut'
