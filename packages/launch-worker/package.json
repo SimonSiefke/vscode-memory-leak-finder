@@ -9,7 +9,7 @@
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "dependencies": {
-    "@vscode-memory-leak-finder/linux-process-tree-worker": "file:../linux-process-tree-worker",
+    "@vscode-memory-leak-finder/linux-process-tree-worker": "0.0.0-dev",
     "@lvce-editor/rpc": "^6.19.3",
     "@lvce-editor/verror": "^1.7.0",
     "jszip": "^3.10.1"
