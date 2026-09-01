@@ -21,6 +21,7 @@ export const unwrapResult = (rawResult) => {
     'names' in rawResult ||
     'metrics' in rawResult ||
     'profile' in rawResult ||
+    'dumpGuid' in rawResult ||
     'heapSnapshotObjectId' in rawResult
   ) {
     return rawResult
