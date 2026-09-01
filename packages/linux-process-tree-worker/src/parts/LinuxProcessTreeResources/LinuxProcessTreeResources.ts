@@ -45,7 +45,7 @@ interface SamplerDependencies {
   readonly readPssKiB?: (pid: number) => Promise<number>
 }
 
-interface PerfCounters {
+export interface PerfCounters {
   readonly averageCpuCores: number
   readonly contextSwitches: number
   readonly cpuMigrations: number

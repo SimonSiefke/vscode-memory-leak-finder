@@ -1,4 +1,4 @@
-import type { ProcessTreeSample, ProcessTreeSamplerResult } from './LinuxProcessTreeResources.ts'
+import type { PerfCounters, ProcessTreeSample, ProcessTreeSamplerResult } from './LinuxProcessTreeResources.ts'
 import { parsePerfStatOutput, PssSampleIntervalMs } from './LinuxProcessTreeResources.ts'
 
 interface MetricRow {
@@ -18,6 +18,22 @@ interface ProcessResult {
   readonly endingProcessCount: number
   readonly peakProcessCount: number
   readonly startingProcessCount: number
+}
+
+interface SamplingResult {
+  readonly droppedSampleCount: number
+  readonly intervalMs: number
+  readonly validSampleCount: number
+}
+
+export interface Result {
+  readonly cpu: PerfCounters
+  readonly isLeak: false
+  readonly memory: MemoryResult
+  readonly metrics: readonly MetricRow[]
+  readonly processes: ProcessResult
+  readonly sampling: SamplingResult
+  readonly window: 'fromStart' | 'scenario'
 }
 
 const round = (value: number): number => {
@@ -42,7 +58,7 @@ const toMetrics = (
   cpu: ReturnType<typeof parsePerfStatOutput>,
   memory: MemoryResult,
   processes: ProcessResult,
-  sampling: { readonly droppedSampleCount: number; readonly intervalMs: number; readonly validSampleCount: number },
+  sampling: SamplingResult,
 ): readonly MetricRow[] => {
   return [
     { name: 'durationSeconds', unit: 'seconds', value: cpu.durationSeconds },
@@ -81,7 +97,7 @@ export const createResult = ({
   readonly perfRawOutput: string
   readonly samples: readonly ProcessTreeSample[]
   readonly window: 'fromStart' | 'scenario'
-}) => {
+}): Result => {
   if (samples.length === 0) {
     throw new Error('No valid process-tree PSS samples were recorded')
   }
@@ -121,7 +137,7 @@ export const createResultFromSampler = (
   perfRawOutput: string,
   samplerResult: ProcessTreeSamplerResult,
   window: 'fromStart' | 'scenario',
-) => {
+): Result => {
   return createResult({
     droppedSampleCount: samplerResult.droppedSampleCount,
     perfRawOutput,
@@ -130,7 +146,7 @@ export const createResultFromSampler = (
   })
 }
 
-export const formatSummary = (result: ReturnType<typeof createResult>): string => {
+export const formatSummary = (result: Result): string => {
   return [
     `Linux process-tree resources (${result.window}):`,
     'metric | value | unit',

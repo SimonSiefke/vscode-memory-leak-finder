@@ -5,8 +5,6 @@ export interface LinuxProcessTreeResourcesFromStartConfig {
   readonly enabled: boolean
   readonly metadataPath: string
   readonly perfOutputPath: string
-  readonly sampleOutputPath: string
-  readonly samplerPath: string
 }
 
 export const isLinuxProcessTreeResourcesFromStart = (measureId: string): boolean => {
@@ -24,7 +22,5 @@ export const getConfig = (measureId: string, connectionId: number): LinuxProcess
     enabled,
     metadataPath: enabled ? join(outputDirectory, `${connectionId}.json`) : '',
     perfOutputPath: enabled ? join(outputDirectory, `${connectionId}.perf.txt`) : '',
-    sampleOutputPath: enabled ? join(outputDirectory, `${connectionId}.samples.json`) : '',
-    samplerPath: enabled ? join(Root.root, 'packages', 'memory-leak-finder', 'bin', 'linux-process-tree-sampler.js') : '',
   }
 }

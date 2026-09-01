@@ -1,18 +1,10 @@
+import * as LinuxProcessTreeWorker from '@vscode-memory-leak-finder/linux-process-tree-worker'
 import type { Dynamic } from '../Types/Types.ts'
-import { setTimeout } from 'node:timers/promises'
-import {
-  createProcessTreeSampler,
-  getProcessTable,
-  updateTrackedProcesses,
-} from '../LinuxProcessTreeResources/LinuxProcessTreeResources.ts'
-import * as LinuxProcessTreeResourceResult from '../LinuxProcessTreeResources/LinuxProcessTreeResourceResult.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
-import * as PerfStat from '../PerfStat/PerfStat.ts'
 
 interface State {
+  measurement: LinuxProcessTreeWorker.MeasurementHandle | undefined
   readonly pid: number
-  perfSession?: PerfStat.LinuxProcessTreePerfStatSession
-  sampler?: ReturnType<typeof createProcessTreeSampler>
 }
 
 export const id = MeasureId.LinuxProcessTreeResources
@@ -20,84 +12,38 @@ export const id = MeasureId.LinuxProcessTreeResources
 export const targets: readonly Dynamic[] = []
 
 export const create = ({ pid }: { pid: number }) => {
-  return [
-    {
-      pid,
-    } satisfies State,
-  ]
-}
-
-const getInitialPids = async (pid: number): Promise<readonly number[]> => {
-  const table = await getProcessTable()
-  return [...updateTrackedProcesses(pid, new Map(), table).keys()].sort((a, b) => a - b)
-}
-
-const startPerfForStableProcessTree = async (pid: number) => {
-  let lastResult: PerfStat.PerfStatResult | undefined
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const pids = await getInitialPids(pid)
-    if (pids.length === 0) {
-      throw new Error(`No live processes found for Electron PID ${pid}`)
-    }
-    const session = await PerfStat.startLinuxProcessTreePerfStat(pids)
-    const earlyResult = await Promise.race([session.resultPromise, setTimeout(25).then(() => undefined)])
-    if (!earlyResult) {
-      return { perfSession: session, pids }
-    }
-    lastResult = earlyResult
-  }
-  throw new Error(`perf stat could not attach to the Electron process tree: ${lastResult?.stderr.trim() || 'unknown error'}`)
+  return [{ measurement: undefined, pid } satisfies State]
 }
 
 export const start = async (state: State) => {
-  if (process.platform !== 'linux') {
-    throw new Error('linux-process-tree-resources is only supported on Linux')
-  }
-  const { perfSession, pids } = await startPerfForStableProcessTree(state.pid)
-  state.perfSession = perfSession
-  try {
-    const sampler = createProcessTreeSampler(state.pid)
-    state.sampler = sampler
-    const firstSample = await sampler.start()
-    return {
-      firstSample,
-      perfCommand: ['perf', ...perfSession.args],
-      perfPid: perfSession.process.pid,
-      pids,
-      rootPid: state.pid,
-    }
-  } catch (error) {
-    await PerfStat.stopLinuxProcessTreePerfStat(perfSession)
-    throw error
+  const measurement = await LinuxProcessTreeWorker.start(state.pid, { window: 'scenario' })
+  state.measurement = measurement
+  return {
+    pid: state.pid,
+    workerPid: measurement.workerPid,
   }
 }
 
-export const stop = async (state: State) => {
-  if (!state.perfSession || !state.sampler) {
+export const stop = async (state: State): Promise<LinuxProcessTreeWorker.Result> => {
+  if (!state.measurement) {
     throw new Error('Linux process-tree resource measurement was not started')
   }
-  const [perfResult, samplerResult] = await Promise.all([PerfStat.stopLinuxProcessTreePerfStat(state.perfSession), state.sampler.stop()])
-  if (perfResult.code !== 0 && perfResult.code !== 130 && perfResult.signal !== 'SIGINT') {
-    throw new Error(`perf stat failed with exit code ${perfResult.code}: ${perfResult.stderr.trim()}`)
+  try {
+    return await LinuxProcessTreeWorker.stop(state.measurement)
+  } finally {
+    state.measurement = undefined
   }
-  return LinuxProcessTreeResourceResult.createResultFromSampler(perfResult.stderr, samplerResult, 'scenario')
 }
 
 export const releaseResources = async (state: State) => {
-  if (state.perfSession && state.perfSession.process.exitCode === null && !state.perfSession.process.killed) {
-    await PerfStat.stopLinuxProcessTreePerfStat(state.perfSession)
-  }
-  if (state.sampler) {
-    await state.sampler.stop()
+  if (state.measurement) {
+    await LinuxProcessTreeWorker.dispose(state.measurement)
+    state.measurement = undefined
   }
 }
 
-export const compare = (_before: Dynamic, after: Dynamic) => {
-  return after
-}
+export const compare = (_before: Dynamic, after: Dynamic) => after
 
-export const isLeak = () => {
-  return false
-}
+export const isLeak = () => false
 
-export const summary = LinuxProcessTreeResourceResult.formatSummary
+export const summary = (result: LinuxProcessTreeWorker.Result): string => LinuxProcessTreeWorker.formatSummary(result)

@@ -1,3 +1,4 @@
+import * as LinuxProcessTreeWorker from '@vscode-memory-leak-finder/linux-process-tree-worker'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
@@ -31,8 +32,6 @@ export const launchElectron = async ({
     enabled: false,
     metadataPath: '',
     perfOutputPath: '',
-    sampleOutputPath: '',
-    samplerPath: '',
   },
   platform = process.platform,
   cpuPerformanceCountersFromStartConfig = {
@@ -104,7 +103,6 @@ export const launchElectron = async ({
       }
       await mkdir(dirname(linuxProcessTreeResourcesFromStartConfig.perfOutputPath), { recursive: true })
       await rm(linuxProcessTreeResourcesFromStartConfig.perfOutputPath, { force: true })
-      await rm(linuxProcessTreeResourcesFromStartConfig.sampleOutputPath, { force: true })
       await rm(linuxProcessTreeResourcesFromStartConfig.metadataPath, { force: true })
       const measuredPath = spawnPath
       const measuredArgs = spawnArgs
@@ -146,28 +144,19 @@ export const launchElectron = async ({
       )
     }
     if (linuxProcessTreeResourcesFromStartConfig.enabled) {
-      const sampler = Spawn.spawn(
-        process.execPath,
-        [linuxProcessTreeResourcesFromStartConfig.samplerPath, `${child.pid}`, linuxProcessTreeResourcesFromStartConfig.sampleOutputPath],
-        {
-          cwd,
-          env,
-        },
-      )
-      if (sampler.pid === undefined) {
-        throw new Error('Failed to get PID from process-tree sampler')
-      }
+      const measurement = await LinuxProcessTreeWorker.start(child.pid, {
+        perfOutputPath: linuxProcessTreeResourcesFromStartConfig.perfOutputPath,
+        window: 'fromStart',
+      })
       addDisposable(() => {
-        sampler.kill('SIGKILL')
+        return LinuxProcessTreeWorker.dispose(measurement)
       })
       await writeFile(
         linuxProcessTreeResourcesFromStartConfig.metadataPath,
         JSON.stringify({
           command: [spawnPath, ...spawnArgs],
-          perfOutputPath: linuxProcessTreeResourcesFromStartConfig.perfOutputPath,
+          measurement,
           perfPid: child.pid,
-          sampleOutputPath: linuxProcessTreeResourcesFromStartConfig.sampleOutputPath,
-          samplerPid: sampler.pid,
         }),
       )
     }

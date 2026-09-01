@@ -181,7 +181,7 @@ Measures the same process-tree resources from Electron launch through scenario c
 node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-tree-resources-from-start --startup-runs 5 --only base
 ```
 
-Both measures require Linux, `perf`, access to the requested perf events, and readable `smaps_rollup` files. Missing facilities or permissions fail the measure instead of producing zero-valued counters. GNU `time` is intentionally not used because its maximum RSS is not the simultaneous sum of Electron's processes.
+Both measures run collection and parsing in a dedicated Linux process-tree worker. The caller starts it with the process-tree root PID, receives the parsed result when stopping it, and disposes the worker immediately after measurement. They require Linux, `perf`, access to the requested perf events, and readable `smaps_rollup` files. Missing facilities or permissions fail the measure instead of producing zero-valued counters. GNU `time` is intentionally not used because its maximum RSS is not the simultaneous sum of Electron's processes.
 
 ### DetachedDomNodeCount
 

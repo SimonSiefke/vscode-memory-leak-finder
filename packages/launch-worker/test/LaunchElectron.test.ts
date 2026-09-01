@@ -1,6 +1,9 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
 import EventEmitter from 'node:events'
 
+const mockDisposeLinuxProcessTreeWorker = jest.fn()
+const mockStartLinuxProcessTreeWorker = jest.fn<(pid: number, options: unknown) => Promise<unknown>>()
+
 beforeEach(() => {
   jest.resetAllMocks()
 })
@@ -16,6 +19,13 @@ jest.unstable_mockModule('../src/parts/Spawn/Spawn.ts', () => {
 jest.unstable_mockModule('../src/parts/AssertCallgrindAvailable/AssertCallgrindAvailable.ts', () => {
   return {
     assertCallgrindAvailable: jest.fn(),
+  }
+})
+
+jest.unstable_mockModule('@vscode-memory-leak-finder/linux-process-tree-worker', () => {
+  return {
+    dispose: mockDisposeLinuxProcessTreeWorker,
+    start: mockStartLinuxProcessTreeWorker,
   }
 })
 
@@ -146,13 +156,22 @@ test('launch - cpu performance counters from start spawn command', async () => {
   )
 })
 
-test('launch - Linux process-tree resources from start wraps Electron and starts the sampler', async () => {
+test('launch - Linux process-tree resources from start wraps Electron and starts the measurement worker', async () => {
   const perfChild = createChild(123)
-  const samplerChild = createChild(456)
+  const disposables: Array<() => Promise<void> | void> = []
+  const measurement = {
+    outputDirectory: '/tmp/vmlf-linux-process-tree-worker',
+    resultPath: '/tmp/vmlf-linux-process-tree-worker/result.json',
+    workerPid: 456,
+    workerStartTimeTicks: '789',
+  }
   // @ts-ignore
-  Spawn.spawn.mockImplementationOnce(() => perfChild).mockImplementationOnce(() => samplerChild)
+  Spawn.spawn.mockImplementationOnce(() => perfChild)
+  mockStartLinuxProcessTreeWorker.mockResolvedValue(measurement)
   await LaunchElectron.launchElectron({
-    addDisposable() {},
+    addDisposable(disposable) {
+      disposables.push(disposable)
+    },
     args: ['--user-data-dir', '/tmp/user-data'],
     cliPath: '/usr/bin/code',
     cwd: '/tmp',
@@ -162,8 +181,6 @@ test('launch - Linux process-tree resources from start wraps Electron and starts
       enabled: true,
       metadataPath: '/tmp/vmlf-linux-resources.json',
       perfOutputPath: '/tmp/vmlf-linux-resources.perf.txt',
-      sampleOutputPath: '/tmp/vmlf-linux-resources.samples.json',
-      samplerPath: '/repo/packages/memory-leak-finder/bin/linux-process-tree-sampler.js',
     },
     platform: 'linux',
   })
@@ -190,12 +207,13 @@ test('launch - Linux process-tree resources from start wraps Electron and starts
     ],
     { cwd: '/tmp', env: {} },
   )
-  expect(Spawn.spawn).toHaveBeenNthCalledWith(
-    2,
-    process.execPath,
-    ['/repo/packages/memory-leak-finder/bin/linux-process-tree-sampler.js', '123', '/tmp/vmlf-linux-resources.samples.json'],
-    { cwd: '/tmp', env: {} },
-  )
+  expect(mockStartLinuxProcessTreeWorker).toHaveBeenCalledWith(123, {
+    perfOutputPath: '/tmp/vmlf-linux-resources.perf.txt',
+    window: 'fromStart',
+  })
+  expect(Spawn.spawn).toHaveBeenCalledTimes(1)
+  await disposables[1]()
+  expect(mockDisposeLinuxProcessTreeWorker).toHaveBeenCalledWith(measurement)
 })
 
 test('launch - Linux process-tree resources from start rejects other platforms', async () => {
@@ -211,8 +229,6 @@ test('launch - Linux process-tree resources from start rejects other platforms',
         enabled: true,
         metadataPath: '/tmp/vmlf-linux-resources.json',
         perfOutputPath: '/tmp/vmlf-linux-resources.perf.txt',
-        sampleOutputPath: '/tmp/vmlf-linux-resources.samples.json',
-        samplerPath: '/repo/packages/memory-leak-finder/bin/linux-process-tree-sampler.js',
       },
       platform: 'darwin',
     }),

@@ -1,4 +1,5 @@
 import { spawn, type ChildProcess } from 'node:child_process'
+import { PerfEvents } from '../LinuxProcessTreeResources/LinuxProcessTreeResources.ts'
 
 const perfInstallCommand = 'sudo apt install -y linux-tools-common linux-tools-generic linux-tools-$(uname -r)'
 
@@ -10,28 +11,26 @@ export interface PerfStatResult {
 
 export interface PerfStatSession {
   readonly args: readonly string[]
-  readonly pid: number
   readonly process: ChildProcess
   readonly resultPromise: Promise<PerfStatResult>
 }
 
-export const getPerfStatArgs = (pid: number): readonly string[] => {
-  return ['stat', '--no-big-num', '-x', ',', '-e', 'instructions:u,cycles:u', '-p', `${pid}`]
-}
-
-const isNodeError = (error: unknown): error is NodeJS.ErrnoException => {
-  return error instanceof Error && 'code' in error
+export const getPerfStatArgs = (pids: readonly number[]): readonly string[] => {
+  return ['stat', '--no-big-num', '-x', ',', '-e', PerfEvents.join(','), '-p', pids.join(',')]
 }
 
 const toPerfSpawnError = (error: unknown): unknown => {
-  if (isNodeError(error) && error.code === 'ENOENT') {
+  if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
     return new Error(`The perf program is not available. Install it with: ${perfInstallCommand}`)
   }
   return error
 }
 
-export const startPerfStat = async (pid: number): Promise<PerfStatSession> => {
-  const args = getPerfStatArgs(pid)
+export const start = async (pids: readonly number[]): Promise<PerfStatSession> => {
+  if (pids.length === 0) {
+    throw new Error('Cannot start perf stat without process IDs')
+  }
+  const args = getPerfStatArgs(pids)
   const perfProcess = spawn('perf', args, {
     stdio: ['ignore', 'ignore', 'pipe'],
   })
@@ -45,20 +44,14 @@ export const startPerfStat = async (pid: number): Promise<PerfStatSession> => {
       reject(toPerfSpawnError(error))
     })
     perfProcess.once('close', (code, signal) => {
-      resolve({
-        code,
-        signal,
-        stderr,
-      })
+      resolve({ code, signal, stderr })
     })
   })
   const spawnPromise = new Promise<void>((resolve, reject) => {
     perfProcess.once('error', (error) => {
       reject(toPerfSpawnError(error))
     })
-    perfProcess.once('spawn', () => {
-      resolve()
-    })
+    perfProcess.once('spawn', resolve)
   })
   try {
     await spawnPromise
@@ -68,13 +61,12 @@ export const startPerfStat = async (pid: number): Promise<PerfStatSession> => {
   }
   return {
     args,
-    pid,
     process: perfProcess,
     resultPromise,
   }
 }
 
-export const stopPerfStat = async (session: PerfStatSession): Promise<PerfStatResult> => {
+export const stop = async (session: PerfStatSession): Promise<PerfStatResult> => {
   if (session.process.exitCode === null && !session.process.killed) {
     session.process.kill('SIGINT')
   }
