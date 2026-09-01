@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@octokit/rest": "^22.0.1",
-    "@vitejs/plugin-react": "^6.1.0",
-    "lucide-react": "^1.34.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "lucide-react": "^1.39.0",
     "prismjs": "^1.30.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
