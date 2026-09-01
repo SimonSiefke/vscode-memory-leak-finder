@@ -44,3 +44,18 @@ test('startPerfStat handles missing perf program', async () => {
     stdio: ['ignore', 'ignore', 'pipe'],
   })
 })
+
+test('Linux process-tree perf stat attaches to every current process and keeps inheritance enabled', () => {
+  const args = PerfStat.getLinuxProcessTreePerfStatArgs([10, 20])
+  expect(args).toEqual([
+    'stat',
+    '--no-big-num',
+    '-x',
+    ',',
+    '-e',
+    'duration_time,user_time,system_time,task-clock,instructions:u,cycles:u,context-switches,cpu-migrations,page-faults,minor-faults,major-faults',
+    '-p',
+    '10,20',
+  ])
+  expect(args).not.toContain('--no-inherit')
+})

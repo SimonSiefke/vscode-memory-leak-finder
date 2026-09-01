@@ -2,6 +2,7 @@ import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
+import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as AssertCallgrindAvailable from '../AssertCallgrindAvailable/AssertCallgrindAvailable.ts'
 import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.ts'
 import * as Spawn from '../Spawn/Spawn.ts'
@@ -26,6 +27,13 @@ export const launchElectron = async ({
   cwd,
   env,
   headlessMode,
+  linuxProcessTreeResourcesFromStartConfig = {
+    enabled: false,
+    metadataPath: '',
+    perfOutputPath: '',
+    sampleOutputPath: '',
+    samplerPath: '',
+  },
   platform = process.platform,
   cpuPerformanceCountersFromStartConfig = {
     enabled: false,
@@ -41,6 +49,7 @@ export const launchElectron = async ({
   cwd: string
   env: NodeJS.ProcessEnv
   headlessMode: boolean
+  linuxProcessTreeResourcesFromStartConfig?: LinuxProcessTreeResourcesFromStartConfig
   platform?: string
 }) => {
   try {
@@ -89,6 +98,33 @@ export const launchElectron = async ({
         ...measuredArgs,
       ]
     }
+    if (linuxProcessTreeResourcesFromStartConfig.enabled) {
+      if (platform !== 'linux') {
+        throw new Error('linux-process-tree-resources-from-start is only supported on Linux')
+      }
+      await mkdir(dirname(linuxProcessTreeResourcesFromStartConfig.perfOutputPath), { recursive: true })
+      await rm(linuxProcessTreeResourcesFromStartConfig.perfOutputPath, { force: true })
+      await rm(linuxProcessTreeResourcesFromStartConfig.sampleOutputPath, { force: true })
+      await rm(linuxProcessTreeResourcesFromStartConfig.metadataPath, { force: true })
+      const measuredPath = spawnPath
+      const measuredArgs = spawnArgs
+      spawnPath = 'perf'
+      spawnArgs = [
+        'stat',
+        '--no-big-num',
+        '-x',
+        ',',
+        '-I',
+        '100',
+        '-e',
+        'duration_time,user_time,system_time,task-clock,instructions:u,cycles:u,context-switches,cpu-migrations,page-faults,minor-faults,major-faults',
+        '-o',
+        linuxProcessTreeResourcesFromStartConfig.perfOutputPath,
+        '--',
+        measuredPath,
+        ...measuredArgs,
+      ]
+    }
     const child = Spawn.spawn(spawnPath, spawnArgs, {
       cwd,
       env,
@@ -96,6 +132,9 @@ export const launchElectron = async ({
     if (child.pid === undefined) {
       throw new Error(`Failed to get PID from spawned process`)
     }
+    addDisposable(() => {
+      child.kill('SIGKILL')
+    })
     if (cpuPerformanceCountersFromStartConfig.enabled) {
       await writeFile(
         cpuPerformanceCountersFromStartConfig.metadataPath,
@@ -106,9 +145,32 @@ export const launchElectron = async ({
         }),
       )
     }
-    addDisposable(() => {
-      child.kill('SIGKILL')
-    })
+    if (linuxProcessTreeResourcesFromStartConfig.enabled) {
+      const sampler = Spawn.spawn(
+        process.execPath,
+        [linuxProcessTreeResourcesFromStartConfig.samplerPath, `${child.pid}`, linuxProcessTreeResourcesFromStartConfig.sampleOutputPath],
+        {
+          cwd,
+          env,
+        },
+      )
+      if (sampler.pid === undefined) {
+        throw new Error('Failed to get PID from process-tree sampler')
+      }
+      addDisposable(() => {
+        sampler.kill('SIGKILL')
+      })
+      await writeFile(
+        linuxProcessTreeResourcesFromStartConfig.metadataPath,
+        JSON.stringify({
+          command: [spawnPath, ...spawnArgs],
+          perfOutputPath: linuxProcessTreeResourcesFromStartConfig.perfOutputPath,
+          perfPid: child.pid,
+          sampleOutputPath: linuxProcessTreeResourcesFromStartConfig.sampleOutputPath,
+          samplerPid: sampler.pid,
+        }),
+      )
+    }
     if (child.stdout) {
       child.stdout.setEncoding('utf-8')
       child.stdout.on('data', handleStdout)

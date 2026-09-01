@@ -165,6 +165,24 @@ Measures CPU instructions and cycles for the inspected process.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
 ```
 
+### LinuxProcessTreeResources
+
+On Linux, measures CPU activity and aggregate proportional memory for the Electron main process and its descendants during the scenario. CPU data comes from inherited `perf stat` counters. Memory data comes from the sum of `/proc/<pid>/smaps_rollup` PSS sampled every 250 ms, so `sampledPeakPssMiB` can miss shorter spikes. The result is informational and never reports a leak.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-tree-resources --only base
+```
+
+### LinuxProcessTreeResourcesFromStart
+
+Measures the same process-tree resources from Electron launch through scenario completion. Use `--startup-runs` to restart Electron and aggregate every numeric metric across independent samples.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-tree-resources-from-start --startup-runs 5 --only base
+```
+
+Both measures require Linux, `perf`, access to the requested perf events, and readable `smaps_rollup` files. Missing facilities or permissions fail the measure instead of producing zero-valued counters. GNU `time` is intentionally not used because its maximum RSS is not the simultaneous sum of Electron's processes.
+
 ### DetachedDomNodeCount
 
 Measures the total number of detached dom nodes.

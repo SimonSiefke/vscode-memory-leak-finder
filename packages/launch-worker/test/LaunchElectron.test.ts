@@ -23,7 +23,7 @@ const LaunchElectron = await import('../src/parts/LaunchElectron/LaunchElectron.
 const AssertCallgrindAvailable = await import('../src/parts/AssertCallgrindAvailable/AssertCallgrindAvailable.ts')
 const Spawn = await import('../src/parts/Spawn/Spawn.ts')
 
-const createChild = () => {
+const createChild = (pid = 123) => {
   const stdout = new EventEmitter()
   // @ts-ignore
   stdout.setEncoding = () => {}
@@ -31,7 +31,7 @@ const createChild = () => {
   // @ts-ignore
   stderr.setEncoding = () => {}
   return {
-    pid: 123,
+    pid,
     stderr,
     stdout,
     kill: jest.fn(),
@@ -144,6 +144,80 @@ test('launch - cpu performance counters from start spawn command', async () => {
       env: {},
     },
   )
+})
+
+test('launch - Linux process-tree resources from start wraps Electron and starts the sampler', async () => {
+  const perfChild = createChild(123)
+  const samplerChild = createChild(456)
+  // @ts-ignore
+  Spawn.spawn.mockImplementationOnce(() => perfChild).mockImplementationOnce(() => samplerChild)
+  await LaunchElectron.launchElectron({
+    addDisposable() {},
+    args: ['--user-data-dir', '/tmp/user-data'],
+    cliPath: '/usr/bin/code',
+    cwd: '/tmp',
+    env: {},
+    headlessMode: false,
+    linuxProcessTreeResourcesFromStartConfig: {
+      enabled: true,
+      metadataPath: '/tmp/vmlf-linux-resources.json',
+      perfOutputPath: '/tmp/vmlf-linux-resources.perf.txt',
+      sampleOutputPath: '/tmp/vmlf-linux-resources.samples.json',
+      samplerPath: '/repo/packages/memory-leak-finder/bin/linux-process-tree-sampler.js',
+    },
+    platform: 'linux',
+  })
+  expect(Spawn.spawn).toHaveBeenNthCalledWith(
+    1,
+    'perf',
+    [
+      'stat',
+      '--no-big-num',
+      '-x',
+      ',',
+      '-I',
+      '100',
+      '-e',
+      'duration_time,user_time,system_time,task-clock,instructions:u,cycles:u,context-switches,cpu-migrations,page-faults,minor-faults,major-faults',
+      '-o',
+      '/tmp/vmlf-linux-resources.perf.txt',
+      '--',
+      '/usr/bin/code',
+      '--inspect-brk=0',
+      '--remote-debugging-port=0',
+      '--user-data-dir',
+      '/tmp/user-data',
+    ],
+    { cwd: '/tmp', env: {} },
+  )
+  expect(Spawn.spawn).toHaveBeenNthCalledWith(
+    2,
+    process.execPath,
+    ['/repo/packages/memory-leak-finder/bin/linux-process-tree-sampler.js', '123', '/tmp/vmlf-linux-resources.samples.json'],
+    { cwd: '/tmp', env: {} },
+  )
+})
+
+test('launch - Linux process-tree resources from start rejects other platforms', async () => {
+  await expect(
+    LaunchElectron.launchElectron({
+      addDisposable() {},
+      args: [],
+      cliPath: '/usr/bin/code',
+      cwd: '/tmp',
+      env: {},
+      headlessMode: false,
+      linuxProcessTreeResourcesFromStartConfig: {
+        enabled: true,
+        metadataPath: '/tmp/vmlf-linux-resources.json',
+        perfOutputPath: '/tmp/vmlf-linux-resources.perf.txt',
+        sampleOutputPath: '/tmp/vmlf-linux-resources.samples.json',
+        samplerPath: '/repo/packages/memory-leak-finder/bin/linux-process-tree-sampler.js',
+      },
+      platform: 'darwin',
+    }),
+  ).rejects.toThrow('linux-process-tree-resources-from-start is only supported on Linux')
+  expect(Spawn.spawn).not.toHaveBeenCalled()
 })
 
 test.skip('launch - error - address already in use', async () => {
