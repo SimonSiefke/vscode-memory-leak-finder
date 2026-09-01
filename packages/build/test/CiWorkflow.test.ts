@@ -54,3 +54,20 @@ test('ci measures frontend object URLs for 37 runs and downloads the results for
   expect(workflow).toContain('name: vscode-memory-leak-finder-results-linux-object-url-count')
   expect(workflow).toContain('path: ./vscode-memory-leak-finder-results-linux-object-url-count')
 })
+
+test('ci measures total array length and downloads the results for Pages charts', async () => {
+  const workflow = await readFile(getWorkflowPath(), 'utf8')
+
+  expect(workflow).toContain(`          - name: array-element-count
+            args: --measure array-element-count`)
+  expect(workflow).toContain(`      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-element-count
+          path: ./vscode-memory-leak-finder-results-linux-array-element-count`)
+  expect(workflow).toContain(`      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-element-count`)
+})

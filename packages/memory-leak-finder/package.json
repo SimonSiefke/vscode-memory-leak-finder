@@ -61,7 +61,7 @@
     "@lvce-editor/rpc": "^6.19.3",
     "@lvce-editor/verror": "^1.7.0",
     "@types/babel__code-frame": "^7.27.0",
-    "pretty-bytes": "^7.1.1",
+    "pretty-bytes": "^7.1.2",
     "wait-for-localhost": "^5.0.2"
   }
 }
