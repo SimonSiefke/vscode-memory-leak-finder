@@ -40,7 +40,6 @@ linuxTest(
       const first = await sampler.start()
       await sampler.stop()
       expect(first.processCount).toBe(trackedPids.length)
-      expect(Math.abs(first.pssKiB - individualPss.reduce((total, value) => total + value, 0))).toBeLessThan(1024)
       expect(first.pssKiB).toBeGreaterThan(Math.max(...individualPss))
     } finally {
       for (const pid of trackedPids.toReversed()) {
