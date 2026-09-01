@@ -194,6 +194,7 @@ export interface Editor {
   addCursorBelow(): Promise<void>
   autoFix(options: any): Promise<void>
   click(text: any): Promise<void>
+  clickCodeLens(text: any, timeout?: any): Promise<void>
   clickLink(text: any): Promise<void>
   close(): Promise<void>
   closeAll(): Promise<void>
