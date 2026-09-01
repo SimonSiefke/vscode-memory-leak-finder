@@ -1,23 +1,18 @@
 {
-  "name": "@vscode-memory-leak-finder/chart-worker",
-  "version": "1.0.0",
+  "name": "@vscode-memory-leak-finder/chromium-memory-dump-worker",
+  "version": "0.0.0-dev",
   "license": "MIT",
   "type": "module",
   "main": "src/main.ts",
+  "bin": {
+    "chromium-memory-dump-worker": "bin/chromium-memory-dump-worker.js"
+  },
   "scripts": {
-    "dev": "node src/main.ts",
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "dependencies": {
-    "@lvce-editor/rpc": "^6.19.3",
-    "@observablehq/plot": "^0.6.17",
-    "escape-html": "^1.0.3",
-    "jsdom": "^26.1.0",
-    "pretty-bytes": "^7.1.1",
-    "svgo": "^4.1.0"
+    "@lvce-editor/rpc": "^6.19.3"
   },
-  "devDependencies": {
-    "@types/escape-html": "^1.0.4"
-  }
+  "devDependencies": {}
 }

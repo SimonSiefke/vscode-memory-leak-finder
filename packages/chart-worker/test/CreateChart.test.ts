@@ -64,16 +64,17 @@ test('memory comparison chart renders growth, shrinkage, byte formatting, inspec
     ],
     {
       omittedEntryCount: 7,
-      subtitle: 'Hierarchical allocator rows are not additive.',
+      subtitle: 'Hierarchical allocator rows are not additive & ownership <graph>.',
       title: 'Chromium memory',
       type: 'memory-comparison-chart',
     },
   )
 
   expect(result).toContain('Chromium memory')
-  expect(result).toContain('Hierarchical allocator rows are not additive.')
+  expect(result).toContain('Hierarchical allocator rows are not additive')
+  expect(result).toContain('&amp; ownership &lt;graph&gt;')
   expect(result).toContain('data-row-label="Renderer (PID 12)"')
-  expect(result).toContain('+1.00 MiB')
+  expect(result).toContain('+1 MiB')
   expect(result).toContain('-512 KiB')
   expect(result).toContain('inspected renderer')
   expect(result).toContain('7 rows omitted')

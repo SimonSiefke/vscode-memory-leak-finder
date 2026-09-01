@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { expect, jest, test } from '@jest/globals'
 import * as GetMeasure from '../src/parts/GetMeasure/GetMeasure.ts'
 import * as MeasureChromiumMemoryDump from '../src/parts/MeasureChromiumMemoryDump/MeasureChromiumMemoryDump.ts'
@@ -106,7 +107,7 @@ test('measure captures two deterministic detailed dumps through the root browser
 
   const before = await MeasureChromiumMemoryDump.start(...args)
   const after = await MeasureChromiumMemoryDump.stop(...args)
-  const result = MeasureChromiumMemoryDump.compare(before, after)
+  const result = await MeasureChromiumMemoryDump.compare(before, after)
   await MeasureChromiumMemoryDump.releaseResources(...args)
 
   expect(result).toMatchObject({
@@ -116,6 +117,8 @@ test('measure captures two deterministic detailed dumps through the root browser
     processCount: 1,
     supported: true,
   })
+  expect(existsSync(args[1].capturePath)).toBe(false)
+  expect(MeasureChromiumMemoryDump.summary(result)).toContain('+128 B')
   expect(calls).toEqual([
     [
       'Tracing.start',
@@ -138,8 +141,9 @@ test('measure reports trace data loss as incomplete', async () => {
   const { session } = createSession({ dataLossOccurred: true })
   const args = MeasureChromiumMemoryDump.create(session)
 
-  await MeasureChromiumMemoryDump.start(...args)
-  const result = await MeasureChromiumMemoryDump.stop(...args)
+  const before = await MeasureChromiumMemoryDump.start(...args)
+  const after = await MeasureChromiumMemoryDump.stop(...args)
+  const result = await MeasureChromiumMemoryDump.compare(before, after)
 
   expect(result).toMatchObject({
     complete: false,
@@ -164,14 +168,14 @@ test('measure reports unsupported root sessions and failed dump requests', async
   const unsupported = await MeasureChromiumMemoryDump.start(...unsupportedArgs)
 
   expect(unsupported).toMatchObject({ supported: false })
-  expect(unsupported.unsupportedReason).toContain('root Chromium browser connection')
+  expect(unsupported?.unsupportedReason).toContain('root Chromium browser connection')
 
   const { session } = createSession({ dumpSuccess: false })
   const failedArgs = MeasureChromiumMemoryDump.create(session)
   const failed = await MeasureChromiumMemoryDump.start(...failedArgs)
 
   expect(failed).toMatchObject({ supported: false })
-  expect(failed.unsupportedReason).toContain('did not complete')
+  expect(failed?.unsupportedReason).toContain('did not complete')
 })
 
 test('measure reports an unsupported Chromium method and ends the trace', async () => {

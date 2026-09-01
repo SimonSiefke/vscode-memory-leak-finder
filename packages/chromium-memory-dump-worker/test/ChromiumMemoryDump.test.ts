@@ -2,7 +2,6 @@ import { expect, test } from '@jest/globals'
 import {
   createChromiumMemoryDumpResult,
   createUnsupportedResult,
-  formatChromiumMemoryDumpSummary,
   getDetailedDumpSnapshots,
 } from '../src/parts/ChromiumMemoryDump/ChromiumMemoryDump.ts'
 
@@ -190,7 +189,7 @@ test('data loss and missing dumps produce incomplete results', () => {
   })
 })
 
-test('unsupported results and summaries explain why no data is available', () => {
+test('unsupported results explain why no data is available', () => {
   const unsupported = createUnsupportedResult('Tracing.requestMemoryDump was not found')
 
   expect(unsupported).toMatchObject({
@@ -198,6 +197,5 @@ test('unsupported results and summaries explain why no data is available', () =>
     isLeak: false,
     supported: false,
   })
-  expect(formatChromiumMemoryDumpSummary(unsupported)).toContain('Tracing.requestMemoryDump was not found')
-  expect(formatChromiumMemoryDumpSummary(createChromiumMemoryDumpResult(createTrace(), false))).toContain('Largest allocator growth:')
+  expect(unsupported.unsupportedReason).toBe('Tracing.requestMemoryDump was not found')
 })

@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
+import prettyBytes from 'pretty-bytes'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
 interface ProcessTotals {
@@ -56,15 +57,7 @@ const formatBytes = (value: number | null | undefined): string => {
   if (!isNumber(value)) {
     return 'unavailable'
   }
-  const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']
-  let scaled = value
-  let unitIndex = 0
-  while (Math.abs(scaled) >= 1024 && unitIndex < units.length - 1) {
-    scaled /= 1024
-    unitIndex++
-  }
-  const digits = Math.abs(scaled) >= 100 || unitIndex === 0 ? 0 : Math.abs(scaled) >= 10 ? 1 : 2
-  return `${scaled.toFixed(digits)} ${units[unitIndex]}`
+  return prettyBytes(value, { binary: true })
 }
 
 const getProcessRows = (result: ChromiumMemoryDumpResult): { data: MemoryComparisonRow[]; omittedEntryCount: number } => {

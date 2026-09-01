@@ -1,3 +1,6 @@
+import escapeHtml from 'escape-html'
+import prettyBytes from 'pretty-bytes'
+
 interface MemoryComparisonRow {
   readonly afterBytes: number
   readonly beforeBytes: number
@@ -7,21 +10,12 @@ interface MemoryComparisonRow {
   readonly name: string
 }
 
-const escapeXml = (value: unknown): string =>
-  String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;')
+export function formatBytes(value: number): string {
+  return prettyBytes(value, { binary: true })
+}
 
-export const formatBytes = (value: number): string => {
-  const absolute = Math.abs(value)
-  const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']
-  let unitIndex = 0
-  let scaled = absolute
-  while (scaled >= 1024 && unitIndex < units.length - 1) {
-    scaled /= 1024
-    unitIndex++
-  }
-  const digits = scaled >= 100 || unitIndex === 0 ? 0 : scaled >= 10 ? 1 : 2
-  const formatted = scaled.toFixed(digits)
-  return `${value < 0 ? '-' : ''}${formatted} ${units[unitIndex]}`
+function formatSignedBytes(value: number): string {
+  return prettyBytes(value, { binary: true, signed: true }).trimStart()
 }
 
 const truncate = (value: string, limit: number): string => (value.length > limit ? `${value.slice(0, limit - 1)}…` : value)
@@ -37,23 +31,23 @@ export const createMemoryComparisonChart = (data: readonly MemoryComparisonRow[]
   const footerHeight = options.omittedEntryCount > 0 ? 28 : 0
   const height = headerHeight + Math.max(rows.length, 1) * rowHeight + footerHeight + 16
   const maximum = Math.max(1, ...rows.flatMap((row) => [row.beforeBytes, row.afterBytes]))
-  const title = escapeXml(options.title || 'Memory comparison')
-  const subtitle = escapeXml(options.subtitle || '')
+  const title = escapeHtml(options.title || 'Memory comparison')
+  const subtitle = escapeHtml(options.subtitle || '')
   const body = rows
     .map((row, index) => {
       const y = headerHeight + index * rowHeight
       const beforeWidth = Math.max(0, (row.beforeBytes / maximum) * plotWidth)
       const afterWidth = Math.max(0, (row.afterBytes / maximum) * plotWidth)
-      const delta = `${row.deltaBytes >= 0 ? '+' : ''}${formatBytes(row.deltaBytes)}`
-      const tooltip = escapeXml(
+      const delta = formatSignedBytes(row.deltaBytes)
+      const tooltip = escapeHtml(
         `${row.name}\nBefore: ${formatBytes(row.beforeBytes)}\nAfter: ${formatBytes(row.afterBytes)}\nDelta: ${delta}${row.detail ? `\n${row.detail}` : ''}`,
       )
-      const label = escapeXml(truncate(row.name, 78))
+      const label = escapeHtml(truncate(row.name, 78))
       const outline = row.isInspected
         ? `<rect x="2" y="${y - 2}" width="${width - 4}" height="${rowHeight - 2}" rx="4" fill="none" stroke="#8b5cf6" stroke-width="2"/>`
         : ''
       const inspected = row.isInspected ? ' • inspected renderer' : ''
-      return `<g data-row-label="${escapeXml(row.name)}"><title>${tooltip}</title>${outline}<text x="12" y="${y + 14}" font-weight="${row.isInspected ? 700 : 400}">${label}${escapeXml(inspected)}</text><rect x="${labelWidth}" y="${y + 3}" width="${beforeWidth}" height="10" rx="2" fill="#94a3b8"/><rect x="${labelWidth}" y="${y + 17}" width="${afterWidth}" height="10" rx="2" fill="#2563eb"/><text x="${width - rightWidth + 12}" y="${y + 19}" fill="${row.deltaBytes >= 0 ? '#b91c1c' : '#15803d'}" font-weight="600">${escapeXml(delta)}</text></g>`
+      return `<g data-row-label="${escapeHtml(row.name)}"><title>${tooltip}</title>${outline}<text x="12" y="${y + 14}" font-weight="${row.isInspected ? 700 : 400}">${label}${escapeHtml(inspected)}</text><rect x="${labelWidth}" y="${y + 3}" width="${beforeWidth}" height="10" rx="2" fill="#94a3b8"/><rect x="${labelWidth}" y="${y + 17}" width="${afterWidth}" height="10" rx="2" fill="#2563eb"/><text x="${width - rightWidth + 12}" y="${y + 19}" fill="${row.deltaBytes >= 0 ? '#b91c1c' : '#15803d'}" font-weight="600">${escapeHtml(delta)}</text></g>`
     })
     .join('')
   const empty = rows.length === 0 ? `<text x="12" y="${headerHeight + 20}" fill="#64748b">No comparable memory rows</text>` : ''
