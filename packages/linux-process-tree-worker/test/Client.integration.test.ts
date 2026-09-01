@@ -1,16 +1,47 @@
 import { expect, test } from '@jest/globals'
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { once } from 'node:events'
 import { mkdtemp, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { setTimeout } from 'node:timers/promises'
 import * as Client from '../src/parts/Client/Client.ts'
-import { PerfEvents } from '../src/parts/LinuxProcessTreeResources/LinuxProcessTreeResources.ts'
+import { parsePerfStatOutput, PerfEvents } from '../src/parts/LinuxProcessTreeResources/LinuxProcessTreeResources.ts'
 
-const linuxTest = process.platform === 'linux' ? test : test.skip
+const canUseRequiredPerfCounters = (): boolean => {
+  if (process.platform !== 'linux') {
+    return false
+  }
+  const result = spawnSync(
+    'perf',
+    [
+      'stat',
+      '--no-big-num',
+      '-x',
+      ',',
+      '-e',
+      PerfEvents.join(','),
+      '--',
+      process.execPath,
+      '-e',
+      'const end = Date.now() + 100; while (Date.now() < end) {}',
+    ],
+    { encoding: 'utf8' },
+  )
+  if (result.status !== 0) {
+    return false
+  }
+  try {
+    parsePerfStatOutput(result.stderr)
+    return true
+  } catch {
+    return false
+  }
+}
 
-linuxTest(
+const perfTest = canUseRequiredPerfCounters() ? test : test.skip
+
+perfTest(
   'returns parsed scenario data and disposes the worker after stop',
   async () => {
     const target = spawn(
@@ -51,7 +82,7 @@ linuxTest(
   15_000,
 )
 
-linuxTest(
+perfTest(
   'stops a from-start worker through a serialized handle',
   async () => {
     const outputDirectory = await mkdtemp(join(tmpdir(), 'vmlf-linux-process-tree-from-start-test-'))
