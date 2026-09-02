@@ -115,6 +115,24 @@ Measures the native backing-store bytes retained by live `ArrayBuffer` objects. 
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure array-buffer-bytes --only base
 ```
 
+### PerformanceMarkCounts
+
+Measures the number of native Chromium `PerformanceMark` objects before and after a browser scenario. The generated chart shows the initial count in black and growth in red.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure performance-mark-counts --only base
+npm run build-charts
+```
+
+### PerformanceMarkBytes
+
+Measures the native self-size bytes retained by Chromium `PerformanceMark` objects before and after a browser scenario. The generated chart shows the initial bytes in black and growth in red.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure performance-mark-bytes --only base
+npm run build-charts
+```
+
 ### ArrayCount
 
 Measures the total number of arrays.

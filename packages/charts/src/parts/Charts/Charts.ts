@@ -37,6 +37,8 @@ export * as NumberCount from '../CreateNumberCountChart/CreateNumberCountChart.t
 export * as ObjectCount from '../CreateObjectCountChart/CreateObjectCountChart.ts'
 export * as ObjectUrlCount from '../CreateObjectUrlCountChart/CreateObjectUrlCountChart.ts'
 export * as PaintEvents from '../CreatePaintEventsChart/CreatePaintEventsChart.ts'
+export * as PerformanceMarkBytes from '../CreatePerformanceMarkBytesChart/CreatePerformanceMarkBytesChart.ts'
+export * as PerformanceMarkCounts from '../CreatePerformanceMarkCountsChart/CreatePerformanceMarkCountsChart.ts'
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.ts'
 export * as ProxyCount from '../CreateProxyCountChart/CreateProxyCountChart.ts'
 export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.ts'
