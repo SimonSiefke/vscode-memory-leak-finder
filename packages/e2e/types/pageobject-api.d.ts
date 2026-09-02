@@ -257,6 +257,7 @@ export interface Editor {
   rename(newText: any): Promise<void>
   renameCancel(newText: any): Promise<void>
   renameWithPreview(newText: any): Promise<void>
+  replaceActiveLineAndSave(options: { replacement: string }): Promise<void>
   replaceText(options: any): Promise<void>
   save(options: any): Promise<void>
   saveAll(): Promise<void>
