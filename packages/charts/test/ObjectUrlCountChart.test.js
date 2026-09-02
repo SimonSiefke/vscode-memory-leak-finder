@@ -28,9 +28,14 @@ test('getObjectUrlCountData returns active object URL counts per frontend test',
 
     expect(result).toEqual([
       {
-        count: 3,
-        index: 0,
-        name: 'editor-open.json',
+        data: [
+          {
+            count: 5,
+            delta: 3,
+            name: 'Object URLs',
+          },
+        ],
+        filename: 'editor-open',
       },
     ])
   } finally {
@@ -38,14 +43,19 @@ test('getObjectUrlCountData returns active object URL counts per frontend test',
   }
 })
 
-test('createObjectUrlCountChart creates one homepage chart for active URLs', () => {
+test('createObjectUrlCountChart creates one black/red chart per result', () => {
   expect(Charts.ObjectUrlCount).toBe(CreateObjectUrlCountChart)
   expect(CreateObjectUrlCountChart.name).toBe('object-url-count')
-  expect('multiple' in CreateObjectUrlCountChart).toBe(false)
+  expect(CreateObjectUrlCountChart.multiple).toBe(true)
   expect(CreateObjectUrlCountChart.createChart()).toEqual({
+    fontSize: 12,
+    marginLeft: 180,
+    marginRight: 180,
+    type: 'dual-bar-chart',
+    width: 900,
     x: 'index',
-    xLabel: 'Frontend Test',
+    xLabel: 'Index',
     y: 'count',
-    yLabel: 'Active Object URLs',
+    yLabel: 'Object URLs',
   })
 })

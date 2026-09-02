@@ -1,14 +1,20 @@
 import * as GetObjectUrlCountData from '../GetObjectUrlCountData/GetObjectUrlCountData.ts'
 
 export const name = 'object-url-count'
+export const multiple = true
 
 export const getData = (basePath: string): Promise<any[]> => GetObjectUrlCountData.getObjectUrlCountData(basePath)
 
-export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
+export const createChart = () => {
   return {
+    fontSize: 12,
+    marginLeft: 180,
+    marginRight: 180,
+    type: 'dual-bar-chart',
+    width: 900,
     x: 'index',
-    xLabel: 'Frontend Test',
+    xLabel: 'Index',
     y: 'count',
-    yLabel: 'Active Object URLs',
+    yLabel: 'Object URLs',
   }
 }

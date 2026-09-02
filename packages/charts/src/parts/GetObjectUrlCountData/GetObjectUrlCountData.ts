@@ -11,13 +11,18 @@ export const getObjectUrlCountData = async (basePath: string): Promise<any[]> =>
 
   const dirents = await readdir(resultsPath)
   const allData: any[] = []
-  for (const [index, dirent] of dirents.toSorted().entries()) {
+  for (const dirent of dirents.toSorted()) {
     const absolutePath = join(resultsPath, dirent)
     const data = await ReadJson.readJson(absolutePath)
     allData.push({
-      count: data.objectUrlCount?.unreleased || 0,
-      index,
-      name: dirent,
+      data: [
+        {
+          count: data.objectUrlCount?.created || 0,
+          delta: data.objectUrlCount?.unreleased || 0,
+          name: 'Object URLs',
+        },
+      ],
+      filename: dirent.replace(/\.json$/, ''),
     })
   }
   return allData
