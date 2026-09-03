@@ -1,5 +1,11 @@
 import { expect, jest, test } from '@jest/globals'
 
+const connectDevtools = jest.fn(async (_devtoolsWebSocketUrl: string, _attachedToPageTimeout: number, _measureId: string) => ({
+  dispose: async () => {},
+  sessionId: 'session-id',
+  targetId: 'target-id',
+}))
+
 jest.unstable_mockModule('../src/parts/WaitForDebuggerListening/WaitForDebuggerListening.ts', () => {
   return {
     WaitForDebuggerListening: {},
@@ -39,11 +45,7 @@ jest.unstable_mockModule('../src/parts/ConnectElectron/ConnectElectron.ts', () =
 
 jest.unstable_mockModule('../src/parts/ConnectDevtools/ConnectDevtools.ts', () => {
   return {
-    connectDevtools: async () => ({
-      dispose: async () => {},
-      sessionId: 'session-id',
-      targetId: 'target-id',
-    }),
+    connectDevtools,
   }
 })
 
@@ -79,4 +81,5 @@ test('prepareBoth returns real electron process id from runtime evaluation', asy
   )
 
   expect(result.pid).toBe(9876)
+  expect(connectDevtools).toHaveBeenCalledWith('ws://devtools', 1000, 'cpuPerformanceCountersFromStart')
 })

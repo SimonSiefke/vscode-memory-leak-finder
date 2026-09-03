@@ -104,7 +104,7 @@ jobs:
           - name: event-listener-count
             args: --measure event-listener-count
           - name: object-url-count
-            args: --measure object-url-count --runs 37 --restart-between --run-skipped-tests-anyway
+            args: --measure object-url-count --runs 37 --run-skipped-tests-anyway
           - name: dom-counters
             args: --measure dom-counters
           - name: detached-dom-node-count

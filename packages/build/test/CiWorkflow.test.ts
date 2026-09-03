@@ -50,7 +50,8 @@ test('ci runs promises-with-stack-trace in two shards and downloads both results
 test('ci measures frontend object URLs for 37 runs and downloads the results for Pages', async () => {
   const workflow = await readFile(getWorkflowPath(), 'utf8')
 
-  expect(workflow).toContain('args: --measure object-url-count --runs 37 --restart-between --run-skipped-tests-anyway')
+  expect(workflow).toContain('args: --measure object-url-count --runs 37 --run-skipped-tests-anyway')
+  expect(workflow).not.toContain('args: --measure object-url-count --runs 37 --restart-between')
   expect(workflow).toContain('name: vscode-memory-leak-finder-results-linux-object-url-count')
   expect(workflow).toContain('path: ./vscode-memory-leak-finder-results-linux-object-url-count')
 })

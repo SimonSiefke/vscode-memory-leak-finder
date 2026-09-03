@@ -31,10 +31,20 @@ test('measures object URL lifecycle calls in the browser', async () => {
   expect(MeasureObjectUrlCount.id).toBe('objectUrlCount')
   expect(MeasureObjectUrlCount.targets).toEqual([1])
   expect(startTracking).toHaveBeenCalledWith(session)
-  expect(cleanup).toHaveBeenCalledWith(session)
+  expect(cleanup).not.toHaveBeenCalled()
   expect(result).toEqual({ created: 3, revoked: 1, unreleased: 2 })
   expect(MeasureObjectUrlCount.isLeak(result)).toBe(true)
   expect(MeasureObjectUrlCount.summary(result)).toBe('Object URLs: 3 created, 1 revoked, 2 unreleased')
+})
+
+test('uses an empty baseline so results remain cumulative from renderer startup', async () => {
+  const session = {} as any
+
+  await expect(MeasureObjectUrlCount.start(session)).resolves.toEqual({
+    created: 0,
+    revoked: 0,
+    unreleased: 0,
+  })
 })
 
 test('does not report a leak when every created object URL is revoked', () => {

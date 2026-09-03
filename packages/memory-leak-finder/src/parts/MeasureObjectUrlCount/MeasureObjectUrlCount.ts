@@ -27,9 +27,7 @@ export const stop = (session: Session): Promise<ObjectUrlCounts> => {
   return ObjectUrlTracker.getCounts(session)
 }
 
-export const releaseResources = async (session: Session): Promise<void> => {
-  await ObjectUrlTracker.cleanup(session)
-}
+export const releaseResources = async (_session: Session): Promise<void> => {}
 
 export const compare = (before: ObjectUrlCounts, after: ObjectUrlCounts): ObjectUrlCounts => {
   return {
