@@ -1,20 +1,11 @@
-import type { Session } from '../Session/Session.ts'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-
-export interface ObjectUrlCounts {
-  readonly created: number
-  readonly revoked: number
-  readonly unreleased: number
-}
-
-const startExpression = `(() => {
+export const objectUrlTrackerScript = `(() => {
   if (globalThis.___memoryLeakFinderObjectUrlTracker) {
     return
   }
 
   const url = globalThis.URL
   if (typeof url?.createObjectURL !== 'function' || typeof url?.revokeObjectURL !== 'function') {
-    throw new Error('object-url-count requires URL.createObjectURL and URL.revokeObjectURL')
+    return
   }
 
   const originalCreateObjectURL = url.createObjectURL
@@ -54,24 +45,3 @@ const startExpression = `(() => {
     },
   }
 })()`
-
-const getCountsExpression = `(() => {
-  const tracker = globalThis.___memoryLeakFinderObjectUrlTracker
-  return tracker ? tracker.getCounts() : { created: 0, revoked: 0, unreleased: 0 }
-})()`
-
-const cleanupExpression = `(() => {
-  globalThis.___memoryLeakFinderObjectUrlTracker?.dispose()
-})()`
-
-export const start = async (session: Session): Promise<void> => {
-  await DevtoolsProtocolRuntime.evaluate(session, { expression: startExpression, returnByValue: true })
-}
-
-export const getCounts = async (session: Session): Promise<ObjectUrlCounts> => {
-  return DevtoolsProtocolRuntime.evaluate(session, { expression: getCountsExpression, returnByValue: true })
-}
-
-export const cleanup = async (session: Session): Promise<void> => {
-  await DevtoolsProtocolRuntime.evaluate(session, { expression: cleanupExpression, returnByValue: true })
-}

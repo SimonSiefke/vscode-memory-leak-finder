@@ -51,14 +51,20 @@ test('does not count revocation of an object URL created before tracking as an u
   })
 })
 
-test('restarting tracking restores the previous spy before installing a new one', async () => {
+test('starting tracking again preserves the process-lifetime tracker', async () => {
   const originalCreateObjectURL = URL.createObjectURL
   await ObjectUrlTracker.start(session)
   const firstSpy = URL.createObjectURL
+  URL.createObjectURL(new Blob(['first']))
 
   await ObjectUrlTracker.start(session)
 
-  expect(URL.createObjectURL).not.toBe(firstSpy)
+  expect(URL.createObjectURL).toBe(firstSpy)
+  await expect(ObjectUrlTracker.getCounts(session)).resolves.toEqual({
+    created: 1,
+    revoked: 0,
+    unreleased: 1,
+  })
   await ObjectUrlTracker.cleanup(session)
   expect(URL.createObjectURL).toBe(originalCreateObjectURL)
 })

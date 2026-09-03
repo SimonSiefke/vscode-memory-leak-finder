@@ -73,7 +73,7 @@ node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after -
 
 ### ObjectUrlCount
 
-Spies on `URL.createObjectURL` and `URL.revokeObjectURL` during a test and reports the number of calls plus the number of created object URLs that were not revoked.
+Spies on `URL.createObjectURL` and `URL.revokeObjectURL` from renderer startup and reports cumulative call counts plus the number of created object URLs that are still active after each test.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-url-count --only base
