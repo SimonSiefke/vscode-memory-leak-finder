@@ -29,6 +29,42 @@ node packages/build/src/mergeArtifacts.ts
 
 <!--  -->
 
+## Memory-leak issue radar
+
+Generate a self-contained HTML overview of memory-leak issues across popular
+JavaScript, TypeScript, and Node.js repositories:
+
+```sh
+npm run memory-leak-report
+open .memory-leak-report/index.html
+```
+
+The generator uses GitHub GraphQL to discover repositories with at least 5,000
+stars, filters them to projects with a root `package.json`, and scans up to 600
+repositories by default. It searches each issue tracker's titles and bodies for
+the phrase `"memory leak"`. Docusaurus and Rspack are included as seed
+repositories. Authentication comes from `GITHUB_TOKEN`, `GH_TOKEN`, or the
+active `gh` CLI login.
+
+GitHub requests are sequential and paced by 750 milliseconds. The generator
+automatically retries transient and secondary-rate-limit responses, and waits
+for the primary GraphQL limit to reset before it is exhausted. Use
+`--request-delay-ms` to adjust the pacing when needed.
+
+Repositories on the built-in denylist are skipped by owner or repository name,
+with case and punctuation ignored. Pass `--include-ignored` to include them;
+passing one explicitly with `--repo owner/name` also overrides the denylist.
+
+The HTML report works directly from disk. It includes repository search and
+sorting, exact open/closed match counts, and a two-column issue board. Common
+options include:
+
+```sh
+npm run memory-leak-report -- --min-stars 1000 --max-repos 100
+npm run memory-leak-report -- --repo owner/project --issues-per-state 50
+npm run memory-leak-report -- --no-seed-repos --output /tmp/memory-leaks.html
+```
+
 ## Measures
 
 ### PendingPromisesWithRetainers

@@ -54,6 +54,7 @@ ffmpeg-linux
 .vscode-resolve-source-map-cache
 .vscode-charts
 .tmp
+.memory-leak-report
 
 # Logs
 logs
