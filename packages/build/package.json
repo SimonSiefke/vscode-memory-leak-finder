@@ -9,6 +9,7 @@
     "build:watch": "rollup -c rollup.config.js -w",
     "backport-prs": "node src/backportMergedPrs.ts",
     "analyze-heap-retainers": "node --max-old-space-size=8192 src/analyzeHeapRetainers.ts",
+    "analyze-ipc-message-patterns": "node src/analyzeIpcMessagePatterns.ts",
     "analyze-ipc-messages-from-start": "node src/analyzeIpcMessagesFromStart.ts",
     "generate-api-types": "node src/generate-api-types.ts",
     "measure-local-vscode-comparison": "node src/measureLocalVscodeComparison.ts",
