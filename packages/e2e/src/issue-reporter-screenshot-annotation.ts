@@ -18,6 +18,9 @@ export const run = async ({ IssueReporter }: TestContext): Promise<void> => {
     await IssueReporter.reopenScreenshot()
     await IssueReporter.editAnnotationText('Discarded annotation', 'commit')
     await IssueReporter.finishAnnotation('Discard')
+  } catch (error) {
+    console.info('[annotation-debug]', String(error))
+    throw error
   } finally {
     await IssueReporter.close()
   }

@@ -41,7 +41,7 @@ export const create = (params: CreateParams) => {
         await quickPick.executeCommand('Help: Report Issue...', { pressKeyOnce: true })
         await expect(reporter()).toBeVisible()
       } catch (error) {
-        throw new VError(error, 'Failed to open issue reporter')
+        throw new VError(error, 'Failed to open issue reporter ' + await page.evaluate({ expression: 'document.body.innerText', returnByValue: true }))
       }
     },
     async captureScreenshot() {
@@ -109,11 +109,16 @@ export const create = (params: CreateParams) => {
         await expect(reporter().locator('img[alt="Screenshot 1"]')).toHaveCount(0)
         const quickPick = QuickPick.create(params)
         await quickPick.executeCommand('View: Close Editor', { pressKeyOnce: true })
+        const discardDialog = page.locator('.monaco-dialog-box', { hasText: 'Discard issue report?' })
+        if (await discardDialog.isVisible()) {
+          await discardDialog.locator('.monaco-button', { hasText: 'Discard' }).click()
+          await expect(discardDialog).toBeHidden()
+        }
         await expect(reporter()).toHaveCount(0)
         await expect(textEditor()).toHaveCount(0)
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, 'Failed to close issue reporter')
+        throw new VError(error, 'Failed to close issue reporter ' + await page.evaluate({ expression: 'document.body.innerText', returnByValue: true }))
       }
     },
   }
