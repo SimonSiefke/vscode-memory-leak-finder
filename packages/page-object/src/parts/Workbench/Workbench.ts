@@ -312,30 +312,24 @@ export const createWithDependencies = (
       try {
         await page.waitForIdle()
 
-        const timeOrigin = await page.evaluate({ expression: 'performance.timeOrigin', returnByValue: true })
-        await page.reload()
-        const deadline = Date.now() + 15_000
-        while (Date.now() < deadline) {
-          try {
-            const refreshedPage = await page.refresh()
-            await page.rebind(refreshedPage)
-            const nextTimeOrigin = await page.evaluate({ expression: 'performance.timeOrigin', returnByValue: true })
-            if (nextTimeOrigin !== timeOrigin) {
-              await expect(page.locator('.monaco-workbench')).toBeVisible({ timeout: 15_000 })
-              return
-            }
-          } catch (error) {
-            if (
-              !/uniqueContextId not found|Cannot find context|Execution context was destroyed|Please wait for window to be loaded/.test(
-                String(error),
-              )
-            ) {
-              throw error
-            }
-          }
-          await new Promise((resolve) => setTimeout(resolve, 50))
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+
+        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
+        try {
+          await page.waitForIdle()
+        } catch {
+          // The renderer can be in flux immediately after reload. Visibility check below is the real readiness gate.
         }
-        throw new Error('Timed out waiting for the reloaded workbench')
+        await this.shouldBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to reload window`)
       }

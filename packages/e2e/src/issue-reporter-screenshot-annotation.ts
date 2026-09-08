@@ -1,10 +1,7 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, IssueReporter, Workbench }: TestContext): Promise<void> => {
-  await Editor.closeAll()
+export const setup = async ({ IssueReporter }: TestContext): Promise<void> => {
   await IssueReporter.configure()
-  // Reporter commands are registered at startup, so enabling feedback requires a reload.
-  await Workbench.reload()
 }
 
 export const run = async ({ IssueReporter }: TestContext): Promise<void> => {
@@ -26,7 +23,6 @@ export const run = async ({ IssueReporter }: TestContext): Promise<void> => {
   }
 }
 
-export const teardown = async ({ IssueReporter, Workbench }: TestContext): Promise<void> => {
+export const teardown = async ({ IssueReporter }: TestContext): Promise<void> => {
   await IssueReporter.restoreSettings()
-  await Workbench.reload()
 }
