@@ -1,0 +1,5 @@
+{
+  "telemetry.feedback.enabled": true,
+  "issueReporter.wizard.enabled": true,
+  "window.dialogStyle": "custom"
+}

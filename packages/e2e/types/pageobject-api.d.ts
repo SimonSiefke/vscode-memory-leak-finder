@@ -975,8 +975,6 @@ export interface Workspace {
 }
 
 export interface IssueReporter {
-  configure(): Promise<void>
-  restoreSettings(): Promise<void>
   open(): Promise<void>
   captureScreenshot(): Promise<void>
   editAnnotationText(text: string, finish: 'commit' | 'cancel' | 'blur'): Promise<void>

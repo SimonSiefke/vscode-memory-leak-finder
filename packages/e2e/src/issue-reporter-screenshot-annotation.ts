@@ -1,9 +1,5 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ IssueReporter }: TestContext): Promise<void> => {
-  await IssueReporter.configure()
-}
-
 export const run = async ({ IssueReporter }: TestContext): Promise<void> => {
   await IssueReporter.open()
   try {
@@ -15,14 +11,7 @@ export const run = async ({ IssueReporter }: TestContext): Promise<void> => {
     await IssueReporter.reopenScreenshot()
     await IssueReporter.editAnnotationText('Discarded annotation', 'commit')
     await IssueReporter.finishAnnotation('Discard')
-  } catch (error) {
-    console.info('[annotation-debug]', String(error))
-    throw error
   } finally {
     await IssueReporter.close()
   }
-}
-
-export const teardown = async ({ IssueReporter }: TestContext): Promise<void> => {
-  await IssueReporter.restoreSettings()
 }
