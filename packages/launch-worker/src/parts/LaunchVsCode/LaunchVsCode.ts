@@ -3,8 +3,8 @@ import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
-import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as ApplyScenarioSettings from '../ApplyScenarioSettings/ApplyScenarioSettings.ts'
+import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.ts'
@@ -304,7 +304,9 @@ export const launchVsCode = async ({
       binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
     }
 
-    addDisposable(await ApplyScenarioSettings.applyScenarioSettings(settingsPath, join(cwd, 'fixtures', proxyTestFolderName, 'settings.json')))
+    addDisposable(
+      await ApplyScenarioSettings.applyScenarioSettings(settingsPath, join(cwd, 'fixtures', proxyTestFolderName, 'settings.json')),
+    )
 
     // Start proxy server if enabled
     // Note: enableProxy might be undefined if RPC call doesn't pass it correctly

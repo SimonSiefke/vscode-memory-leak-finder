@@ -597,6 +597,7 @@ export const runTestsWithCallback = async ({
       const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
 
       const hasScenarioSettings = existsSync(join(cwd, 'fixtures', proxyTestFolderName, 'settings.json'))
+      // Startup-only settings must not carry into the next scenario when the suite normally reuses a window.
       const needsSetup = i === 0 || restartBetween || hasScenarioSettings || previousHadScenarioSettings
       previousHadScenarioSettings = hasScenarioSettings
 

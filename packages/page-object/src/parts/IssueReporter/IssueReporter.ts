@@ -8,6 +8,7 @@ export const create = (params: CreateParams) => {
   const modifier = platform === 'darwin' ? 'Meta' : 'Control'
 
   const click = async (locator: any): Promise<void> => {
+    // Canvas text placement uses pointer capture, which requires native pointer input.
     await expect(locator).toBeVisible()
     const { x, y, width, height } = await locator.boundingBox()
     const position = { x: x + width / 2, y: y + height / 2, button: 'left', clickCount: 1 }
@@ -107,11 +108,12 @@ export const create = (params: CreateParams) => {
         }
         const hasScreenshot = (await reporter().locator('img[alt="Screenshot 1"]').count()) > 0
         await closeEditor()
-        const discardDialog = page.locator('.monaco-dialog-box', { hasText: 'Discard issue report?' })
+        const discardDialog = page.locator('.monaco-dialog-box')
         if (hasScreenshot) {
           await expect(discardDialog).toBeVisible()
         }
         if (hasScreenshot || (await discardDialog.isVisible())) {
+          await expect(discardDialog.locator('.dialog-message-text')).toHaveText('Discard issue report?')
           await click(discardDialog.locator('.monaco-button', { hasText: 'Discard' }))
           await expect(discardDialog).toBeHidden()
         }
