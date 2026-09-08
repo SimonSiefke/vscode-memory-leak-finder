@@ -18,13 +18,28 @@ export const create = (params: CreateParams) => {
 
   const executeCommand = async (name: string): Promise<void> => {
     const key = { key: 'P', code: 'KeyP', windowsVirtualKeyCode: 80, modifiers: platform === 'darwin' ? 12 : 10 }
-    await page.sessionRpc.invoke('Input.dispatchKeyEvent', { ...key, type: 'keyDown' })
-    await page.sessionRpc.invoke('Input.dispatchKeyEvent', { ...key, type: 'keyUp' })
     const input = page.locator('.quick-input-widget input')
-    await expect(input).toBeVisible()
-    await input.fill(`>${name}`)
     const command = page.locator('.quick-input-widget .label-name', { hasExactText: name })
-    await expect(command).toBeVisible({ timeout: 15_000 })
+    const deadline = Date.now() + 15_000
+    while (true) {
+      await page.sessionRpc.invoke('Input.dispatchKeyEvent', { ...key, type: 'keyDown' })
+      await page.sessionRpc.invoke('Input.dispatchKeyEvent', { ...key, type: 'keyUp' })
+      await expect(input).toBeVisible()
+      await input.fill(`>${name}`)
+      try {
+        await expect(command).toBeVisible({ timeout: 1000 })
+        break
+      } catch (error) {
+        if (Date.now() >= deadline) {
+          throw error
+        }
+        // Reopen the palette to include commands registered by deferred startup contributions.
+        const escape = { key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }
+        await page.sessionRpc.invoke('Input.dispatchKeyEvent', { ...escape, type: 'keyDown' })
+        await page.sessionRpc.invoke('Input.dispatchKeyEvent', { ...escape, type: 'keyUp' })
+        await expect(input).toBeHidden()
+      }
+    }
     await click(command)
     await expect(input).toBeHidden()
   }
