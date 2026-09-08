@@ -1,10 +1,8 @@
 import type { TestContext } from '../types.ts'
 
-let feedbackEnabled: boolean | undefined
-
 export const setup = async ({ Editor, IssueReporter, Workbench }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  feedbackEnabled = await IssueReporter.setFeedbackEnabled(true)
+  await IssueReporter.configure()
   // Reporter commands are registered at startup, so enabling feedback requires a reload.
   await Workbench.reload()
 }
@@ -26,6 +24,6 @@ export const run = async ({ IssueReporter }: TestContext): Promise<void> => {
 }
 
 export const teardown = async ({ IssueReporter, Workbench }: TestContext): Promise<void> => {
-  await IssueReporter.setFeedbackEnabled(feedbackEnabled)
+  await IssueReporter.restoreSettings()
   await Workbench.reload()
 }

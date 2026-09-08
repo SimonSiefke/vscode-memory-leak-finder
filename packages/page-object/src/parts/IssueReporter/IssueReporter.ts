@@ -11,18 +11,29 @@ export const create = (params: CreateParams) => {
   const textEditor = () => annotation().locator('textarea[aria-label="Type text"]')
   const modifier = platform === 'darwin' ? 'Meta' : 'Control'
 
+  const settingsPath = join(Root.root, '.vscode-user-data-dir', 'User', 'settings.json')
+  const reporterSettings = ['telemetry.feedback.enabled', 'issueReporter.wizard.enabled']
+  const originalSettings: Record<string, unknown> = {}
+
   return {
-    async setFeedbackEnabled(enabled: boolean | undefined): Promise<boolean | undefined> {
-      const settingsPath = join(Root.root, '.vscode-user-data-dir', 'User', 'settings.json')
+    async configure() {
       const settings = JSON.parse(await readFile(settingsPath, 'utf8'))
-      const previous = settings['telemetry.feedback.enabled']
-      if (enabled === undefined) {
-        delete settings['telemetry.feedback.enabled']
-      } else {
-        settings['telemetry.feedback.enabled'] = enabled
+      for (const key of reporterSettings) {
+        originalSettings[key] = settings[key]
+        settings[key] = true
       }
       await writeFile(settingsPath, JSON.stringify(settings, null, 2) + '\n')
-      return previous
+    },
+    async restoreSettings() {
+      const settings = JSON.parse(await readFile(settingsPath, 'utf8'))
+      for (const key of reporterSettings) {
+        if (originalSettings[key] === undefined) {
+          delete settings[key]
+        } else {
+          settings[key] = originalSettings[key]
+        }
+      }
+      await writeFile(settingsPath, JSON.stringify(settings, null, 2) + '\n')
     },
     async open() {
       try {
@@ -52,12 +63,12 @@ export const create = (params: CreateParams) => {
         await expect(textEditor()).toBeFocused()
         await page.keyboard.type(text)
         await expect(textEditor()).toHaveValue(text)
-        await page.keyboard.press(`${modifier}+a`)
+        await textEditor().selectText()
         await page.keyboard.type(`${text} edited`)
         await expect(textEditor()).toHaveValue(`${text} edited`)
         await page.keyboard.press('ArrowLeft')
         if (finish === 'blur') {
-          await annotation().locator('button[aria-label="Draw"]').click()
+          await annotation().locator('button[aria-label="Draw"]').focus()
         } else {
           await page.keyboard.press(finish === 'commit' ? `${modifier}+Enter` : 'Escape')
         }

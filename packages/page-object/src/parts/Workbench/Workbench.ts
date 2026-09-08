@@ -321,11 +321,15 @@ export const createWithDependencies = (
             await page.rebind(refreshedPage)
             const nextTimeOrigin = await page.evaluate({ expression: 'performance.timeOrigin', returnByValue: true })
             if (nextTimeOrigin !== timeOrigin) {
-              await this.shouldBeVisible()
+              await expect(page.locator('.monaco-workbench')).toBeVisible({ timeout: 15_000 })
               return
             }
           } catch (error) {
-            if (!/uniqueContextId not found|Cannot find context|Execution context was destroyed|Please wait for window to be loaded/.test(String(error))) {
+            if (
+              !/uniqueContextId not found|Cannot find context|Execution context was destroyed|Please wait for window to be loaded/.test(
+                String(error),
+              )
+            ) {
               throw error
             }
           }
