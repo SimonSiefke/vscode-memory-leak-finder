@@ -1,10 +1,10 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, SettingsEditor, Workbench }: TestContext): Promise<void> => {
-  await SettingsEditor.open()
-  await SettingsEditor.search({ value: 'telemetry.feedback.enabled', resultCount: 1 })
-  await SettingsEditor.enableCheckBox({ name: 'telemetry.feedback.enabled' })
+let feedbackEnabled: boolean | undefined
+
+export const setup = async ({ Editor, IssueReporter, Workbench }: TestContext): Promise<void> => {
   await Editor.closeAll()
+  feedbackEnabled = await IssueReporter.setFeedbackEnabled(true)
   // Reporter commands are registered at startup, so enabling feedback requires a reload.
   await Workbench.reload()
 }
@@ -25,10 +25,7 @@ export const run = async ({ IssueReporter }: TestContext): Promise<void> => {
   }
 }
 
-export const teardown = async ({ Editor, SettingsEditor, Workbench }: TestContext): Promise<void> => {
-  await SettingsEditor.open()
-  await SettingsEditor.search({ value: 'telemetry.feedback.enabled', resultCount: 1 })
-  await SettingsEditor.disableCheckBox({ name: 'telemetry.feedback.enabled' })
-  await Editor.closeAll()
+export const teardown = async ({ IssueReporter, Workbench }: TestContext): Promise<void> => {
+  await IssueReporter.setFeedbackEnabled(feedbackEnabled)
   await Workbench.reload()
 }

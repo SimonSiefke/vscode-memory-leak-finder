@@ -976,6 +976,7 @@ export interface Workspace {
 }
 
 export interface IssueReporter {
+  setFeedbackEnabled(enabled: boolean | undefined): Promise<boolean | undefined>
   open(): Promise<void>
   captureScreenshot(): Promise<void>
   editAnnotationText(text: string, finish: 'commit' | 'cancel' | 'blur'): Promise<void>
