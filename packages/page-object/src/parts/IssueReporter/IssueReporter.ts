@@ -12,7 +12,8 @@ export const create = (params: CreateParams) => {
     async open() {
       try {
         const quickPick = QuickPick.create(params)
-        await quickPick.executeCommand('Help: Report Issue...')
+        // This entry point is available when the harness disables telemetry feedback.
+        await quickPick.executeCommand('Help: Report Performance Issue...')
         await expect(reporter).toBeVisible()
       } catch (error) {
         throw new VError(error, 'Failed to open issue reporter')
