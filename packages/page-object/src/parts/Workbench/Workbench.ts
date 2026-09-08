@@ -312,17 +312,8 @@ export const createWithDependencies = (
       try {
         await page.waitForIdle()
 
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-
         const timeOrigin = await page.evaluate({ expression: 'performance.timeOrigin', returnByValue: true })
-        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow, { pressKeyOnce: true, stopsApplication: true })
+        await page.reload()
         const deadline = Date.now() + 15_000
         while (Date.now() < deadline) {
           try {
@@ -338,7 +329,7 @@ export const createWithDependencies = (
               throw error
             }
           }
-          await page.waitForIdle()
+          await new Promise((resolve) => setTimeout(resolve, 50))
         }
         throw new Error('Timed out waiting for the reloaded workbench')
       } catch (error) {
