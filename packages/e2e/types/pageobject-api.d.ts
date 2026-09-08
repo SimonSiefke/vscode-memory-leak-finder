@@ -974,6 +974,15 @@ export interface Workspace {
   waitForFile(fileName: any): Promise<boolean>
 }
 
+export interface IssueReporter {
+  open(): Promise<void>
+  captureScreenshot(): Promise<void>
+  editAnnotationText(text: string, finish: 'commit' | 'cancel' | 'blur'): Promise<void>
+  finishAnnotation(action: 'Save' | 'Discard'): Promise<void>
+  reopenScreenshot(): Promise<void>
+  close(): Promise<void>
+}
+
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
   readonly AccessibilityHelp: AccessibilityHelp
@@ -1000,6 +1009,7 @@ export interface PageObjectApi {
   readonly GitHubPullRequests: GitHubPullRequests
   readonly Hover: Hover
   readonly ImagesPreview: ImagesPreview
+  readonly IssueReporter: IssueReporter
   readonly KeyBindingsEditor: KeyBindingsEditor
   readonly LanguageModelEditor: LanguageModelEditor
   readonly MarkdownPreview: MarkdownPreview
