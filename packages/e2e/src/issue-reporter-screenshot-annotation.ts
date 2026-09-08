@@ -1,16 +1,12 @@
 import type { TestContext } from '../types.ts'
 
-let originalSettings: Record<string, unknown>
-
-export const setup = async ({ Editor, QuickPick, Workbench, Workspace }: TestContext): Promise<void> => {
-  originalSettings = await Workspace.readWorkspaceSettings()
-  await Workspace.updateWorkspaceSettings({ 'telemetry.feedback.enabled': true })
-  // Reporter commands are registered at startup, so enabling feedback requires a reload.
-  await QuickPick.showCommands()
-  await QuickPick.type('Reload Window')
-  throw new Error(JSON.stringify(await Workbench.evaluate({ expression: `JSON.stringify([...document.querySelectorAll('.quick-input-widget .label-name')].map(e => ({text: e.textContent, visible: e.checkVisibility(), display: getComputedStyle(e).display, bounds: e.getBoundingClientRect().toJSON()})))`, returnByValue: true })))
-  await Workbench.reload()
+export const setup = async ({ Editor, SettingsEditor, Workbench }: TestContext): Promise<void> => {
+  await SettingsEditor.open()
+  await SettingsEditor.search({ value: 'telemetry.feedback.enabled', resultCount: 1 })
+  await SettingsEditor.enableCheckBox({ name: 'telemetry.feedback.enabled' })
   await Editor.closeAll()
+  // Reporter commands are registered at startup, so enabling feedback requires a reload.
+  await Workbench.reload()
 }
 
 export const run = async ({ IssueReporter }: TestContext): Promise<void> => {
@@ -29,7 +25,10 @@ export const run = async ({ IssueReporter }: TestContext): Promise<void> => {
   }
 }
 
-export const teardown = async ({ Workbench, Workspace }: TestContext): Promise<void> => {
-  await Workspace.writeWorkspaceSettings(originalSettings)
+export const teardown = async ({ Editor, SettingsEditor, Workbench }: TestContext): Promise<void> => {
+  await SettingsEditor.open()
+  await SettingsEditor.search({ value: 'telemetry.feedback.enabled', resultCount: 1 })
+  await SettingsEditor.disableCheckBox({ name: 'telemetry.feedback.enabled' })
+  await Editor.closeAll()
   await Workbench.reload()
 }

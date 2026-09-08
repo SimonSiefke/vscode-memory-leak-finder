@@ -12,7 +12,7 @@ export const create = (params: CreateParams) => {
     async open() {
       try {
         const quickPick = QuickPick.create(params)
-        await quickPick.executeCommand('Help: Report Issue...')
+        await quickPick.executeCommand('Help: Report Issue...', { pressKeyOnce: true })
         await expect(reporter).toBeVisible()
       } catch (error) {
         throw new VError(error, 'Failed to open issue reporter')
@@ -82,7 +82,7 @@ export const create = (params: CreateParams) => {
         }
         await expect(reporter.locator('img[alt="Screenshot 1"]')).toHaveCount(0)
         const quickPick = QuickPick.create(params)
-        await quickPick.executeCommand('View: Close Editor')
+        await quickPick.executeCommand('View: Close Editor', { pressKeyOnce: true })
         await expect(reporter).toHaveCount(0)
         await expect(textEditor).toHaveCount(0)
         await page.waitForIdle()

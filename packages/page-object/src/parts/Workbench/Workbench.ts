@@ -321,7 +321,7 @@ export const createWithDependencies = (
           VError,
         })
 
-        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
+        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow, { pressKeyOnce: true })
         const refreshedPage = await page.refresh()
         await page.rebind(refreshedPage)
         try {
