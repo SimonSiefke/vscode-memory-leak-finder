@@ -105,14 +105,13 @@ export const create = (params: CreateParams) => {
           await click(annotation().locator('.monaco-button', { hasText: 'Discard' }))
           await expect(annotation()).toHaveCount(0)
         }
-        const deleteScreenshot = reporter().locator('[aria-label="Delete screenshot"]')
-        if (await deleteScreenshot.isVisible()) {
-          await click(deleteScreenshot)
-        }
-        await expect(reporter().locator('img[alt="Screenshot 1"]')).toHaveCount(0)
+        const hasScreenshot = (await reporter().locator('img[alt="Screenshot 1"]').count()) > 0
         await closeEditor()
         const discardDialog = page.locator('.monaco-dialog-box', { hasText: 'Discard issue report?' })
-        if (await discardDialog.isVisible()) {
+        if (hasScreenshot) {
+          await expect(discardDialog).toBeVisible()
+        }
+        if (hasScreenshot || (await discardDialog.isVisible())) {
           await click(discardDialog.locator('.monaco-button', { hasText: 'Discard' }))
           await expect(discardDialog).toBeHidden()
         }
