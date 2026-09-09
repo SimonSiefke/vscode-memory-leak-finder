@@ -101,6 +101,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
       await page.waitForIdle()
       if (needsFocus) {
         await expect(contextMenu).toBeFocused()
+        await page.waitForIdle()
       }
       const contextMenuItem = contextMenu.locator('.action-item', {
         hasText: option,
