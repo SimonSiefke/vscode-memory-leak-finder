@@ -22,7 +22,7 @@
     "@lvce-editor/rpc": "^6.19.3",
     "@lvce-editor/verror": "^1.7.0",
     "dotenv": "^17.4.2",
-    "jszip": "^3.10.1",
+    "jszip": "^3.10.2",
     "probot": "^14.3.2"
   }
 }
