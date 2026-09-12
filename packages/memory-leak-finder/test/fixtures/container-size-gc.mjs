@@ -23,7 +23,7 @@ try {
   await inspector.post('HeapProfiler.collectGarbage')
   await inspector.post('HeapProfiler.collectGarbage')
   const result = await evaluate('references.filter(ref => ref.deref() !== undefined).length')
-  console.log(result.result.value)
+  process.stdout.write(`${result.result.value}\n`)
 } finally {
   inspector.disconnect()
 }
