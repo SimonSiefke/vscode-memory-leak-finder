@@ -18,6 +18,7 @@
     "measure-codex-webview-load-time": "npm --prefix packages/build run measure-codex-webview-load-time --",
     "measure-warm-codex-webview-load-time": "npm --prefix packages/build run measure-warm-codex-webview-load-time --",
     "measure-webview-memory": "npm --prefix packages/build run measure-webview-memory --",
+    "memory-leak-report": "npm --prefix packages/build run memory-leak-report --",
     "backport-prs": "npm --prefix packages/build run backport-prs --"
   },
   "repository": {
