@@ -12,7 +12,7 @@
     "@vscode-memory-leak-finder/linux-process-tree-worker": "0.0.0-dev",
     "@lvce-editor/rpc": "^6.19.3",
     "@lvce-editor/verror": "^1.7.0",
-    "jszip": "^3.10.1"
+    "jszip": "^3.10.2"
   },
   "devDependencies": {}
 }
