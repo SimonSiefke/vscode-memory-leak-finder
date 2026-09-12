@@ -13,9 +13,9 @@ export const run = async ({ Workbench }: TestContext): Promise<void> => {
     await newWindow.QuickPick.executeCommand('Help: About')
     await newWindow.waitForIdle()
     await new Promise((resolve) => setTimeout(resolve, 500))
-	} finally {
-		await newWindow.closeGracefully()
-	}
+  } finally {
+    await newWindow.closeGracefully()
+  }
 }
 
 export const teardown = async ({ Electron }: TestContext): Promise<void> => {

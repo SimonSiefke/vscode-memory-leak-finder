@@ -50,12 +50,9 @@ exports.activate = (context) => {
     }),
   )
 
-  const participant = vscode.chat.createChatParticipant(
-    'speech-session-race.participant',
-    async (_request, _context, progress) => {
-      progress.markdown('A local response used to test cancellation while a speech session is starting.')
-    },
-  )
+  const participant = vscode.chat.createChatParticipant('speech-session-race.participant', async (_request, _context, progress) => {
+    progress.markdown('A local response used to test cancellation while a speech session is starting.')
+  })
   context.subscriptions.push(participant)
 
   context.subscriptions.push(
