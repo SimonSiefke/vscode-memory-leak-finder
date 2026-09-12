@@ -37,10 +37,9 @@ export const getVscodeArgs = ({
     '--skip-welcome',
     '--skip-release-notes',
     '--disable-workspace-trust',
-    '--extensions-dir',
-    extensionsDir,
-    '--user-data-dir',
-    userDataDir,
+    `--extensions-dir=${extensionsDir}`,
+    `--user-data-dir=${userDataDir}`,
+    '--enable-proposed-api=simon.speech-session-race-sample',
   ]
   if (platform === 'linux') {
     args.push('--ozone-platform=x11')

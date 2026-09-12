@@ -46,6 +46,7 @@ export interface ChatEditorSendMessageOptions extends ChatEditorSendOptions {
 }
 
 export interface PageObjectWindowHandle extends NewWindowHandle {
+  closeGracefully(): Promise<void>
   sessionRpc?: any
   evaluate(options: any): Promise<unknown>
   locator?: (selector: string) => any
