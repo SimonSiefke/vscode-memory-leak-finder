@@ -52,10 +52,43 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npx lerna run test --since origin/main
-      - name: Diagnose issue reporter close
+      - name: Run headless test (with videos)
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --only issue-reporter-screenshot-annotation --workers 1
+          run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
+      - name: Run headless test
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm run e2e
+      - name: Run headless test (flakyness check)
+        if: matrix.os != 'macos-26'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm run e2e:check-flakyness
+      - name: Run headless test (second flakyness check)
+        if: matrix.os != 'macos-26'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm run e2e:check-flakyness
+      - name: Run headless test (check leaks, event listener count)
+        if: matrix.os != 'macos-26'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
+      - name: Run headless test (check leaks, event listeners)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
+      - name: Run Memory City smoke test
+        if: matrix.os == 'ubuntu-24.04'
+        run: timeout 5m xvfb-run --auto-servernum node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure memory-city --only ^editor-open.ts --workers 1
+      - name: Generate charts
+        run: node packages/charts/src/main.ts
+      - name: Validate Memory City artifact
+        if: matrix.os == 'ubuntu-24.04'
+        run: node packages/visualizations/src/validate.ts
       - uses: actions/upload-artifact@v7
         if: always()
         with:

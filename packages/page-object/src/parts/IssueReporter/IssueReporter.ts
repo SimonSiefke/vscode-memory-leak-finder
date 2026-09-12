@@ -1,6 +1,5 @@
-import { mkdir, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as Electron from '../Electron/Electron.ts'
 
 export const create = (params: CreateParams) => {
   const { expect, page, platform, VError } = params
@@ -123,33 +122,32 @@ export const create = (params: CreateParams) => {
           await click(annotation().locator('.monaco-button', { hasText: 'Discard' }))
           await expect(annotation()).toHaveCount(0)
         }
-        const hasScreenshot = (await reporter().locator('img[alt="Screenshot 1"]').count()) > 0
-        await closeEditor()
-        const discardDialog = page.locator('.monaco-dialog-box')
-        if (hasScreenshot) {
-          await expect(discardDialog).toBeVisible()
+        const electron = Electron.create(params)
+        await electron.mockElectron(
+          'dialog',
+          'showMessageBox',
+          `async (...args) => {
+            const options = args.at(-1)
+            if (options.message !== 'Discard issue report?') {
+              throw new Error('Unexpected issue reporter close dialog: ' + options.message)
+            }
+            const response = options.buttons.findIndex(button => button.replaceAll('&', '') === 'Discard')
+            if (response === -1) {
+              throw new Error('Issue reporter close dialog has no Discard button')
+            }
+            return { response, checkboxChecked: false }
+          }`,
+        )
+        try {
+          await closeEditor()
+          await expect(reporter()).toBeHidden()
+        } finally {
+          await electron.unmockElectron('dialog', 'showMessageBox')
         }
-        if (hasScreenshot || (await discardDialog.isVisible())) {
-          await expect(discardDialog.locator('.dialog-message-text')).toHaveText('Discard issue report?')
-          await click(discardDialog.locator('.monaco-button', { hasText: 'Discard' }))
-          await expect(discardDialog).toBeHidden()
-        }
-        await expect(reporter()).toBeHidden()
         await expect(page.locator('.tab[aria-label="Report Issue"]')).toHaveCount(0)
         await expect(textEditor()).toHaveCount(0)
         await page.waitForIdle()
       } catch (error) {
-        console.log(
-          '[DEBUG-pr3252]',
-          await page.evaluate({
-            expression: `JSON.stringify({reporter: !!document.querySelector('.issue-reporter-wizard'), dialogs: [...document.querySelectorAll('.monaco-dialog-box')].map(x => x.outerHTML), tabs: [...document.querySelectorAll('.tab')].map(x => x.outerHTML), text: document.body.innerText.slice(-5000)})`,
-            returnByValue: true,
-          }),
-        )
-        const screenshot = await page.sessionRpc.invoke('Page.captureScreenshot', { format: 'png' })
-        const directory = join(import.meta.dirname, '../../../../../.vscode-videos')
-        await mkdir(directory, { recursive: true })
-        await writeFile(join(directory, `issue-reporter-close-${platform}.png`), Buffer.from(screenshot.data, 'base64'))
         throw new VError(error, 'Failed to close issue reporter')
       }
     },
