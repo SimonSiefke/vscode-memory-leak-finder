@@ -70,3 +70,34 @@ test('mergeArtifacts merges nested and direct linux results into one folder', as
     await rm(workspaceRoot, { recursive: true, force: true })
   }
 })
+
+test('mergeArtifacts combines disjoint files from overlapping shard result trees', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'merge-shard-artifacts-'))
+  const targetDir = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const firstShard = join(
+    workspaceRoot,
+    'vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-1',
+    '.vscode-memory-leak-finder-results',
+    'promisesWithStackTrace',
+  )
+  const secondShard = join(
+    workspaceRoot,
+    'vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2',
+    '.vscode-memory-leak-finder-results',
+    'promisesWithStackTrace',
+  )
+
+  try {
+    await mkdir(firstShard, { recursive: true })
+    await mkdir(secondShard, { recursive: true })
+    await writeFile(join(firstShard, 'alpha.json'), 'first shard result')
+    await writeFile(join(secondShard, 'bravo.json'), 'second shard result')
+
+    await mergeArtifacts({ root: workspaceRoot, targetDir })
+
+    expect(await readFile(join(targetDir, 'promisesWithStackTrace', 'alpha.json'), 'utf8')).toEqual('first shard result')
+    expect(await readFile(join(targetDir, 'promisesWithStackTrace', 'bravo.json'), 'utf8')).toEqual('second shard result')
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})

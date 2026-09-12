@@ -6,11 +6,127 @@ const TitleBarMenuItems = {
   Selection: 'Selection',
   View: 'View',
 }
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ expect, platform, page, VError, electronApp, ideVersion }: CreateParams) => {
+  const toggleTitleBarItem = async (text: string) => {
+    const titleBar = page.locator('.part.titlebar')
+    await expect(titleBar).toBeVisible()
+    await page.waitForIdle()
+    const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
+    await contextMenu.open(titleBar.locator('.titlebar-container'))
+    await contextMenu.select(text)
+    await page.waitForIdle()
+  }
+
   return {
+    async ensureCommandCenterVisible() {
+      try {
+        const commandCenter = page.locator('.part.titlebar .command-center')
+        if (!(await commandCenter.isVisible())) {
+          await toggleTitleBarItem('Command Center')
+        }
+        await expect(commandCenter).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to ensure title bar command center is visible`)
+      }
+    },
+    async ensureLayoutControlsVisible() {
+      try {
+        const layoutControl = page.locator('.part.titlebar .action-toolbar-container .action-label[aria-label^="Toggle Primary Side Bar"]')
+        if (!(await layoutControl.isVisible())) {
+          await toggleTitleBarItem('Layout Controls')
+        }
+        await expect(layoutControl).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to ensure title bar layout controls are visible`)
+      }
+    },
+    async hideCommandCenter() {
+      try {
+        const commandCenter = page.locator('.part.titlebar .command-center')
+        await expect(commandCenter).toBeVisible()
+        await toggleTitleBarItem('Command Center')
+        await expect(commandCenter).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide title bar command center`)
+      }
+    },
+    async hideLayoutControls() {
+      try {
+        const layoutControl = page.locator('.part.titlebar .action-toolbar-container .action-label[aria-label^="Toggle Primary Side Bar"]')
+        await expect(layoutControl).toBeVisible()
+        await toggleTitleBarItem('Layout Controls')
+        await expect(layoutControl).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide title bar layout controls`)
+      }
+    },
+    async toggleMenuBar() {
+      try {
+        const titleBar = page.locator('.part.titlebar')
+        await expect(titleBar).toBeVisible()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ platform, page, expect, VError, electronApp, ideVersion })
+        await quickPick.executeCommand(WellKnownCommands.ToggleTitleBarMenu)
+      } catch (error) {
+        throw new VError(error, `Failed to toggle title bar menu bar`)
+      }
+    },
+    async hideMenuBar() {
+      try {
+        const titleBar = page.locator('.part.titlebar')
+        await expect(titleBar).toBeVisible()
+        await page.waitForIdle()
+        const menuBar = titleBar.locator('.menubar')
+        await expect(menuBar).toBeVisible()
+        await page.waitForIdle()
+        await this.toggleMenuBar()
+        await page.waitForIdle()
+        await expect(menuBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide title bar menu bar`)
+      }
+    },
+    async showMenuBar() {
+      try {
+        const titleBar = page.locator('.part.titlebar')
+        await expect(titleBar).toBeVisible()
+        await page.waitForIdle()
+        const menuBar = titleBar.locator('.menubar')
+        await expect(menuBar).toBeHidden()
+        await page.waitForIdle()
+        await this.toggleMenuBar()
+        await expect(menuBar).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show title bar menu bar`)
+      }
+    },
+    async showCommandCenter() {
+      try {
+        const commandCenter = page.locator('.part.titlebar .command-center')
+        await expect(commandCenter).toBeHidden()
+        await toggleTitleBarItem('Command Center')
+        await expect(commandCenter).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show title bar command center`)
+      }
+    },
+    async showLayoutControls() {
+      try {
+        const layoutControl = page.locator('.part.titlebar .action-toolbar-container .action-label[aria-label^="Toggle Primary Side Bar"]')
+        await expect(layoutControl).toBeHidden()
+        await toggleTitleBarItem('Layout Controls')
+        await expect(layoutControl).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show title bar layout controls`)
+      }
+    },
     async hideMenu(text: string) {
       try {
         const titleBar = page.locator('.part.titlebar')

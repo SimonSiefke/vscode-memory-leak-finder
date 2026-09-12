@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import * as FormatDuration from '../FormatDuration/FormatDuration.ts'
 import * as FormatStack from '../FormatStack/FormatStack.ts'
 import * as Indent from '../Indent/Indent.ts'
 import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
@@ -17,12 +18,15 @@ export const getHandleTestFailedMessage = (
   fileName: string,
   error: TestError,
   wasOriginallySkipped: boolean,
+  duration: number,
+  showDuration: boolean,
 ): string => {
   const formattedStack: string = FormatStack.formatStack(error.stack, relativeFilePath)
   const messageRelativeDirName: string = chalk.dim(relativeDirName + '/')
   const messageFileName: string = chalk.bold(fileName)
   const prefix = wasOriginallySkipped ? TestPrefix.SkipFail : TestPrefix.Fail
-  return `${prefix} ${messageRelativeDirName}${messageFileName}
+  const messageDuration = wasOriginallySkipped && showDuration ? ` ${FormatDuration.formatDuration(duration)}` : ''
+  return `${prefix} ${messageRelativeDirName}${messageFileName}${messageDuration}
 
       ${error.type}: ${error.message}
 

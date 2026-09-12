@@ -9,6 +9,9 @@ export const createSessionRpcConnection = (rpc: Dynamic, sessionId: string, targ
     invoke(method: string, params?: Dynamic): Promise<Dynamic> {
       return rpc.invokeWithSession(sessionId, method, params)
     },
+    invokeBrowser(method: string, params?: Dynamic): Promise<Dynamic> {
+      return rpc.invoke(method, params)
+    },
     listeners: rpc.listeners,
     off: rpc.off,
     on: rpc.on,

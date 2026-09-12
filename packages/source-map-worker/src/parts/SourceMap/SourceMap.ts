@@ -74,6 +74,16 @@ export const getOriginalPositions = async (
     return intermediateItems
   })
 
+  if (!classNames && !constructorNames) {
+    return intermediateItems.map((item) => ({
+      column: item.column,
+      line: item.line,
+      name: item.name || '',
+      source: item.source,
+      sourcesHash: item.sourcesHash,
+    }))
+  }
+
   const finalResults: readonly OriginalPosition[] = await AddOriginalNames.addOriginalNames(intermediateItems, constructorNames)
 
   return finalResults

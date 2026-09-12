@@ -44,6 +44,8 @@ export interface StartRunningOptions {
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
   readonly setupOnly: boolean
+  readonly shardCount?: number | undefined
+  readonly shardIndex?: number | undefined
   readonly startupRuns: number
   readonly timeoutBetween: number
   readonly timeouts: boolean

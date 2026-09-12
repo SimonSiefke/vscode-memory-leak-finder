@@ -76,6 +76,23 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await expect(installButton).toBeHidden()
         await page.waitForIdle()
+        const popup = page.locator('.monaco-dialog-box[aria-modal="true"]')
+        // TODO ugly timeout
+        await new Promise((r) => {
+          setTimeout(r, 300)
+        })
+        const popupCount = await popup.count()
+        if (popupCount > 0) {
+          const acceptButton = popup.locator('.dialog-buttons .monaco-button', { hasText: 'Trust Publisher & Install' })
+          await expect(acceptButton).toBeVisible()
+          await page.waitForIdle()
+
+          await acceptButton.click()
+          await page.waitForIdle()
+          await expect(popup).toBeHidden()
+          await page.waitForIdle()
+        }
+
         await expect(unInstallButton).toBeVisible({ timeout: 120_000 })
         await page.waitForIdle()
       } catch (error) {
@@ -103,8 +120,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await tab.click()
         await page.waitForIdle()
-        await expect(tab).toHaveAttribute('aria-checked', 'true')
-        await page.waitForIdle()
+        await this.verifyTabChecked(text)
         if (options && options.webView) {
           const webView = page.locator('.webview')
           await expect(webView).toBeVisible()
@@ -157,13 +173,27 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify extension detail heading ${text}`)
       }
     },
+    async verifyTabChecked(text: string) {
+      const tab = page.locator('.extension-editor .action-label', {
+        hasText: text,
+      })
+      if (ideVersion.minor >= 120) {
+        await expect(tab).toHaveAttribute('aria-pressed', 'true')
+        await page.waitForIdle()
+      } else {
+        await expect(tab).toHaveAttribute('aria-checked', 'true')
+        await page.waitForIdle()
+      }
+    },
     async shouldHaveTab(text: string) {
       try {
         const tab = page.locator('.extension-editor .action-label', {
           hasText: text,
         })
+        await page.waitForIdle()
         await expect(tab).toBeVisible()
-        await expect(tab).toHaveAttribute('aria-checked', 'true')
+        await page.waitForIdle()
+        await this.verifyTabChecked(text)
       } catch (error) {
         throw new VError(error, `Failed to verify extension detail tab ${text}`)
       }

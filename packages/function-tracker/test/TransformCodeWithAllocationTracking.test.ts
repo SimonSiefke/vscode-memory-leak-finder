@@ -120,3 +120,63 @@ test('TransformCodeWithAllocationTracking - should record allocation run deltas'
 
   expect((context as any).getAllocationRuns()).toEqual([])
 })
+
+test('TransformCodeWithAllocationTracking - should aggregate allocation stack traces when enabled', async () => {
+  const code = `
+    globalThis.createValue = () => ({ ok: true })
+  `
+
+  const transformed = await transformCode(code, { scriptId: 7, trackingMode: 'allocations' })
+  const context = { Error, WeakRef }
+  runInNewContext(transformed, context)
+
+  ;(context as any).setAllocationStackTrackingEnabled(true)
+  for (let i = 0; i < 2; i++) {
+    ;(context as any).createValue()
+  }
+
+  expect((context as any).getAllocationStackStatistics()).toEqual([
+    expect.objectContaining({
+      createdCount: 2,
+      location: '7:2:36',
+      stack: expect.stringContaining('createValue'),
+      type: 'Object',
+    }),
+  ])
+
+  ;(context as any).setAllocationStackTrackingEnabled(false)
+  ;(context as any).createValue()
+
+  expect((context as any).getAllocationStackStatistics()).toEqual([
+    expect.objectContaining({
+      createdCount: 2,
+    }),
+  ])
+
+  ;(context as any).resetAllocationStatistics()
+  expect((context as any).getAllocationStackStatistics()).toEqual([])
+})
+
+test('TransformCodeWithAllocationTracking - should capture stacks only for selected allocation locations', async () => {
+  const code = `
+    globalThis.createObject = () => ({ ok: true })
+    globalThis.createArray = () => []
+  `
+
+  const transformed = await transformCode(code, { scriptId: 7, trackingMode: 'allocations' })
+  const context = { Error, WeakRef }
+  runInNewContext(transformed, context)
+
+  ;(context as any).setAllocationStackTrackingEnabled(true, ['7:2:37'])
+  ;(context as any).createObject()
+  ;(context as any).createArray()
+
+  expect((context as any).getAllocationStackStatistics()).toEqual([
+    expect.objectContaining({
+      createdCount: 1,
+      location: '7:2:37',
+      type: 'Object',
+    }),
+  ])
+  expect((context as any).getAllocationStatistics()).toEqual({})
+})

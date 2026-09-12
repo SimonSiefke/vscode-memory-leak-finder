@@ -16,10 +16,11 @@ export const setup = async ({ ChatEditor, Editor, Electron, SideBar }: TestConte
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message: 'What are some facts about Benjamin Franklin',
-    model: ChatEditor.Models.DefaultFree,
+    model: ChatEditor.Models.Auto,
     verify: true,
 
     // TODO should pass in some parameters to verify it calls the wikipedia website
+    // TODO maybe ask it to fetch data from a custom localhost url instead...
   })
 
   await ChatEditor.clearAll()

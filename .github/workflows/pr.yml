@@ -83,9 +83,7 @@ jobs:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
       - name: Run Memory City smoke test
         if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure memory-city --only ^editor-open.ts --workers 1
+        run: timeout 5m xvfb-run --auto-servernum node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure memory-city --only ^editor-open.ts --workers 1
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Validate Memory City artifact

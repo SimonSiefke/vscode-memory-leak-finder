@@ -5,6 +5,8 @@ const useSingleIframeWebview = process.env.VSCODE_MEMORY_LEAK_FINDER_WEBVIEW_NO_
 
 export const skip = 1
 
+export const requiresNetwork = 1
+
 export const setup = async ({ Editor, Extensions, SideBar, Workspace }: TestContext) => {
   // if (!process.env.VSCODE_CODEX_EXTENSION_PATH) {
   //   return

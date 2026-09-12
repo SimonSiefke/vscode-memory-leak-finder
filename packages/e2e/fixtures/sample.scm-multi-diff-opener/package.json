@@ -1,0 +1,22 @@
+{
+  "name": "scm-multi-diff-opener-sample",
+  "displayName": "scm-multi-diff-opener-sample",
+  "publisher": "vscode-memory-leak-finder",
+  "version": "0.0.0-dev",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "activationEvents": [
+    "onCommand:vscode-memory-leak-finder.openScmMultiDiff"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-memory-leak-finder.openScmMultiDiff",
+        "title": "Open SCM Changes in Multi Diff",
+        "category": "Test"
+      }
+    ]
+  }
+}

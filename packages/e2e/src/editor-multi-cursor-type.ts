@@ -17,22 +17,22 @@ cherry`,
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await Editor.addCursorBelow()
-  // @ts-ignore
   await Editor.addCursorBelow()
   await Editor.type('prefix ')
   await Editor.shouldHaveText(`prefix apple
 prefix banana
 prefix cherry`)
   await Editor.save({ viaKeyBoard: false })
-  await Editor.closeAll()
-  await Editor.open('file.txt')
-  await Editor.shouldHaveText(`prefix apple
-prefix banana
-prefix cherry`)
+  await Editor.undo()
+  await Editor.undo()
+  await Editor.shouldHaveText(`apple
+banana
+cherry`)
+  await Editor.setCursor(1, 1)
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.save({ viaKeyBoard: false })
   await Editor.closeAll()
 }

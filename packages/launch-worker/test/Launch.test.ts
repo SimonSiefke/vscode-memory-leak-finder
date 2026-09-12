@@ -5,6 +5,7 @@ test('getTrackingMode - tracked allocations measures use allocation tracking', (
   expect(getTrackingMode('tracked-allocations')).toBe('allocations')
   expect(getTrackingMode('trackedAllocations')).toBe('allocations')
   expect(getTrackingMode('tracked-allocations-from-start')).toBe('allocations')
+  expect(getTrackingMode('tracked-allocations-with-stack-traces')).toBe('allocations')
   expect(getTrackingMode('trackedAllocationsFromStart')).toBe('allocations')
   expect(getTrackingMode('tracked-allocation-leaks')).toBe('allocations')
   expect(getTrackingMode('trackedAllocationLeaks')).toBe('allocations')

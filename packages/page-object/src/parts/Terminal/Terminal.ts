@@ -3,6 +3,10 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as Workspace from '../Workspace/Workspace.ts'
 
+const escapeRegExp = (value: string): string => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 const cleanup = async ({ page, row1 }: { page: any; row1: any }) => {
   for (let i = 0; i < 50; i++) {
     await page.waitForIdle()
@@ -282,14 +286,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set terminal find input`)
       }
     },
-    async shouldContainText(text: string, timeout = 30_000) {
+    async shouldContainText(text: string | RegExp, timeout = 30_000) {
       try {
         await page.waitForIdle()
         const terminal = page.locator('.terminal.xterm')
         await expect(terminal).toBeVisible()
         const rows = terminal.locator('.xterm-rows')
         await expect(rows).toBeVisible()
-        await expect(rows).toContainText(text, { timeout })
+        const pattern = typeof text === 'string' ? new RegExp(escapeRegExp(text)) : text
+        await expect(rows).toHaveText(pattern, { timeout })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify terminal contains text ${text}`)

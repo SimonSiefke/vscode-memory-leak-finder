@@ -280,14 +280,6 @@ const getStaticMockResponse = (parsedUrl: URL, method: string): MockResponse | n
     }
   }
 
-  if (normalizedMethod === 'POST' && hostname === 'api.individual.githubcopilot.com' && pathname === '/v1/messages') {
-    return {
-      body: JSON.stringify({ status: 'ok' }),
-      headers: { 'content-type': 'application/json' },
-      statusCode: 200,
-    }
-  }
-
   if (normalizedMethod === 'GET' && hostname === 'www.githubstatus.com' && pathname === '/api/v2/status.json') {
     return {
       body: JSON.stringify({

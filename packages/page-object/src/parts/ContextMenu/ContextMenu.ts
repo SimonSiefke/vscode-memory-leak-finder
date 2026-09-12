@@ -101,6 +101,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
       await page.waitForIdle()
       if (needsFocus) {
         await expect(contextMenu).toBeFocused()
+        await page.waitForIdle()
       }
       const contextMenuItem = contextMenu.locator('.action-item', {
         hasText: option,
@@ -109,6 +110,27 @@ export const create = ({ expect, page, VError }: CreateParams) => {
       await contextMenuItem.clickExponential({
         waitForHidden: contextMenu,
       })
+    },
+    async selectAndClose(option: string) {
+      await page.waitForIdle()
+      const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
+      await expect(contextMenu).toBeVisible()
+      await expect(contextMenu).toBeFocused()
+      const contextMenuItem = contextMenu.locator('.action-item', {
+        hasText: option,
+      })
+      try {
+        await contextMenuItem.clickExponential({
+          waitForHidden: contextMenu,
+        })
+      } catch (error) {
+        if (!(await contextMenu.isVisible())) {
+          throw error
+        }
+        await page.keyboard.press('Escape')
+      }
+      await expect(contextMenu).toBeHidden()
+      await page.waitForIdle()
     },
     async shouldHaveItem(option: string) {
       await page.waitForIdle()

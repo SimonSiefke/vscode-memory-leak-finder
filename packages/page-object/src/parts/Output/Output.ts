@@ -15,7 +15,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(findMatch).toBeVisible()
         const outputActions = page.locator('[aria-label="Output actions"]')
         await expect(outputActions).toBeVisible()
-        const input = outputActions.locator('.input[placeholder="Filter"]')
+        const input = outputActions.locator('input[placeholder^="Filter"]')
         await expect(input).toBeVisible()
         await input.focus()
         await page.waitForIdle()
@@ -38,7 +38,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const outputActions = page.locator('[aria-label="Output actions"]')
         await expect(outputActions).toBeVisible()
         await page.waitForIdle()
-        const input = outputActions.locator('.input[placeholder^="Filter"]')
+        const input = outputActions.locator('input[placeholder^="Filter"]')
         await expect(input).toBeVisible()
         await page.waitForIdle()
         await input.focus()
@@ -127,8 +127,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await quickPick.select(channelName)
         await expect(select).toHaveValue(channelName)
 
-        const nameLower = channelName.toLowerCase()
-        const editor = page.locator(`.monaco-editor[data-uri^="output:${nameLower}"]`)
+        const editor = outputView.locator('.monaco-editor[data-uri^="output:"]')
         await expect(editor).toBeVisible()
         await page.waitForIdle()
 

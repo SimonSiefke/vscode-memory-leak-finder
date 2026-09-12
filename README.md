@@ -11,9 +11,73 @@ npm ci &&
 npm run e2e
 ```
 
+## Sharding
+
+Split the selected test files across parallel jobs with the Jest-compatible, one-based `--shard=<index>/<count>` option:
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure promises-with-stack-trace --shard=1/2
+node packages/cli/bin/test.js --cwd packages/e2e --measure promises-with-stack-trace --shard=2/2
+```
+
+Each test file belongs to exactly one shard. Results from separate jobs can be downloaded into directories whose names start with
+`vscode-memory-leak-finder-results-linux-` and combined with:
+
+```sh
+node packages/build/src/mergeArtifacts.ts
+```
+
 <!--  -->
 
 ## Measures
+
+### PendingPromisesWithRetainers
+
+Finds pending Promises added during a test and reports their shortest strong path from a GC root, together with per-path counts and retained bytes. Inspector query handles are released before the final heap snapshot.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure pending-promises-with-retainers --only base
+```
+
+### RetainedBytesBySource
+
+Ranks allocation sources by the bytes they still own after garbage collection. Source-map-aware results include surviving allocation count, dominated object count, and retained bytes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure retained-bytes-by-source --only base
+```
+
+### NativeContextCount
+
+Measures live V8 native contexts from before and after heap snapshots. A growing count can reveal leaked windows, workers, realms, or VM contexts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure native-context-count --only base
+```
+
+### ActiveAsyncResourcesWithStackTraces
+
+Tracks Node async resources created during the test and reports resources that remain active, grouped by resource type and creation stack. The tracker stores metadata only and removes its hook during capture.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure active-async-resources-with-stack-traces --only base
+```
+
+### ObjectShapeDifference
+
+Compares V8 object shapes before and after a test. Results identify constructor, prototype, elements kind, descriptor names, shape-count delta, and live-instance delta.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-difference --only base
+```
+
+### ObjectUrlCount
+
+Spies on `URL.createObjectURL` and `URL.revokeObjectURL` from renderer startup and reports cumulative call counts plus the number of created object URLs that are still active after each test.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-url-count --only base
+```
 
 ### MemoryCity
 
@@ -30,6 +94,43 @@ Build or preview the standalone viewer:
 ```sh
 npm --prefix packages/visualizations run build
 npm --prefix packages/visualizations run dev
+```
+
+### ChromiumMemoryDump
+
+Captures two detailed Chromium MemoryInfra snapshots around a browser scenario. The informational result compares per-process private footprint and detailed allocator paths, retains normalized allocator attributes and ownership edges, and reports trace completeness without storing the full raw trace. Because allocator paths are hierarchical, their sizes are not additive.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure chromium-memory-dump --only base
+npm run build-charts
+```
+
+The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
+
+### ArrayBufferBytes
+
+Measures the native backing-store bytes retained by live `ArrayBuffer` objects. The result includes before, after, and delta byte and backing-store counts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure array-buffer-bytes --only base
+```
+
+### PerformanceMarkCounts
+
+Measures the number of native Chromium `PerformanceMark` objects before and after a browser scenario. The generated chart shows the initial count in black and growth in red.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure performance-mark-counts --only base
+npm run build-charts
+```
+
+### PerformanceMarkBytes
+
+Measures the native self-size bytes retained by Chromium `PerformanceMark` objects before and after a browser scenario. The generated chart shows the initial bytes in black and growth in red.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure performance-mark-bytes --only base
+npm run build-charts
 ```
 
 ### ArrayCount
@@ -56,6 +157,35 @@ Measures the total number of classes.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure class-count --only base
 ```
 
+### CompiledCodeSize
+
+Measures V8 compiled-code bytes from before and after heap snapshots. Results include the exact total, attributed/shared/unattributed buckets, and rankings by function size and growth.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure compiled-code-size --only base
+```
+
+### ConcatenatedErrorStringCount
+
+Measures V8 concatenated-string nodes whose bounded prefix is an `Error`-style
+stack trace. The result includes before/after matching counts and diagnostic
+totals for all concatenated strings; stack contents are not written to the
+result.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure concatenated-error-string-count --only base
+```
+
+### ConcatenatedStrings
+
+Measures V8 concatenated-string nodes and reconstructs their values when the
+heap snapshot contains enough rope data. The before/after data is an array of
+strings, with V8's node name used when a value cannot be reconstructed.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure concatenated-strings --only base
+```
+
 ### CpuPerformanceCounters
 
 Measures CPU instructions and cycles for the inspected process.
@@ -63,6 +193,24 @@ Measures CPU instructions and cycles for the inspected process.
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
 ```
+
+### LinuxProcessTreeResources
+
+On Linux, measures CPU activity and aggregate proportional memory for the Electron main process and its descendants during the scenario. CPU data comes from inherited `perf stat` counters. Memory data comes from the sum of `/proc/<pid>/smaps_rollup` PSS sampled every 250 ms, so `sampledPeakPssMiB` can miss shorter spikes. The result is informational and never reports a leak.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-tree-resources --only base
+```
+
+### LinuxProcessTreeResourcesFromStart
+
+Measures the same process-tree resources from Electron launch through scenario completion. Use `--startup-runs` to restart Electron and aggregate every numeric metric across independent samples.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-tree-resources-from-start --startup-runs 5 --only base
+```
+
+Both measures run collection and parsing in a dedicated Linux process-tree worker. The caller starts it with the process-tree root PID, receives the parsed result when stopping it, and disposes the worker immediately after measurement. They require Linux, `perf`, access to the requested perf events, and readable `smaps_rollup` files. Missing facilities or permissions fail the measure instead of producing zero-valued counters. GNU `time` is intentionally not used because its maximum RSS is not the simultaneous sum of Electron's processes.
 
 ### DetachedDomNodeCount
 
@@ -86,6 +234,15 @@ Measures the total number of dom nodes.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure dom-node-count --only base
+```
+
+### DuplicatedStrings
+
+Measures flat string values represented by more than one V8 heap node. Each
+duplicated value occurs once in the before/after string arrays.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure duplicated-strings --only base
 ```
 
 ### EditContextCount
@@ -112,6 +269,14 @@ Measures the event listeners.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure event-listeners --only base
 ```
 
+### FinalizationRegistryCount
+
+Measures the total number of live `FinalizationRegistry` instances.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure finalization-registry-count --only base
+```
+
 ### FunctionCount
 
 Measures the total number of functions.
@@ -126,6 +291,14 @@ Measures global variables / global lexical scope names.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure global-lexical-scope-names --only base
+```
+
+### GlobalPropertyDifference
+
+Reports own string-named properties added to `globalThis` during the measured scenario. Global lexical bindings are covered separately by `global-lexical-scope-names`.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure global-property-difference --only base
 ```
 
 ### HeapUsage

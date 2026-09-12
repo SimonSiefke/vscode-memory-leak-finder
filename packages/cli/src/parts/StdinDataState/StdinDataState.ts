@@ -10,6 +10,7 @@ export interface StdinDataState {
   readonly buffering: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
+  readonly color: boolean
   readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
@@ -46,7 +47,10 @@ export interface StdinDataState {
   readonly runNetworkTestsAnyway: boolean
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
+  readonly showSkippedFailedTestDuration: boolean
   readonly screencastQuality: number
+  readonly shardCount?: number | undefined
+  readonly shardIndex?: number | undefined
   readonly startupRuns: number
   readonly stdout: string[]
   readonly timeoutBetween: number
@@ -65,6 +69,7 @@ let state: StdinDataState = {
   buffering: false,
   checkLeaks: false,
   clearExtensions: true,
+  color: true,
   compressVideo: false,
   continueValue: '',
   cwd: Character.EmptyString,
@@ -101,6 +106,7 @@ let state: StdinDataState = {
   runNetworkTestsAnyway: false,
   runs: 1,
   runSkippedTestsAnyway: false,
+  showSkippedFailedTestDuration: false,
   screencastQuality: 90,
   startupRuns: 1,
   stdout: [],
@@ -120,6 +126,7 @@ export const setState = (newState: StdinDataState): void => {
     bisect: newState.bisect,
     buildVscodeMinified: newState.buildVscodeMinified,
     checkLeaks: newState.checkLeaks,
+    color: newState.color,
     compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,
     cwd: newState.cwd,
@@ -153,7 +160,10 @@ export const setState = (newState: StdinDataState): void => {
     runNetworkTestsAnyway: newState.runNetworkTestsAnyway,
     runs: newState.runs,
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
+    showSkippedFailedTestDuration: newState.showSkippedFailedTestDuration,
     screencastQuality: newState.screencastQuality,
+    shardCount: newState.shardCount,
+    shardIndex: newState.shardIndex,
     startupRuns: newState.startupRuns,
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
@@ -212,6 +222,10 @@ export const isWindows = (): boolean => {
 
 export const shouldCheckLeaks = (): boolean => {
   return state.checkLeaks
+}
+
+export const shouldShowSkippedFailedTestDuration = (): boolean => {
+  return state.showSkippedFailedTestDuration
 }
 
 export const getRuns = (): number => {

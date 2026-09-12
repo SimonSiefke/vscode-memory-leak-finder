@@ -73,6 +73,16 @@ export interface ActivityBar {
   showSearch(): Promise<void>
   showSourceControl(): Promise<void>
 }
+export interface AccessibilityHelp {
+  close(): Promise<void>
+  open(): Promise<void>
+}
+export interface CallHierarchy {
+  close(): Promise<void>
+  focusNext(): Promise<void>
+  focusPrevious(): Promise<void>
+  open(): Promise<void>
+}
 export interface ChatEditor {
   readonly Models: ChatEditorModels
   addAllProblemsAsContext(): Promise<void>
@@ -128,6 +138,7 @@ export interface ContextMenu {
   open(locator: any): Promise<void>
   openSubMenu(option: any, expands?: any): Promise<void>
   select(option: any, needsFocus?: any): Promise<void>
+  selectAndClose(option: any): Promise<void>
   shouldHaveItem(option: any): Promise<void>
   uncheck(name: any): Promise<void>
 }
@@ -183,6 +194,7 @@ export interface Editor {
   addCursorBelow(): Promise<void>
   autoFix(options: any): Promise<void>
   click(text: any): Promise<void>
+  clickCodeLens(text: any, timeout?: any): Promise<void>
   clickLink(text: any): Promise<void>
   close(): Promise<void>
   closeAll(): Promise<void>
@@ -245,6 +257,7 @@ export interface Editor {
   rename(newText: any): Promise<void>
   renameCancel(newText: any): Promise<void>
   renameWithPreview(newText: any): Promise<void>
+  replaceActiveLineAndSave(options: { replacement: string }): Promise<void>
   replaceText(options: any): Promise<void>
   save(options: any): Promise<void>
   saveAll(): Promise<void>
@@ -331,7 +344,7 @@ export interface EditorFind {
   setSearchValue(value: any): Promise<void>
 }
 export interface Electron {
-  evaluate(expression: any): Promise<void>
+  evaluate(expression: any): Promise<unknown>
   getWindowCount(): Promise<number>
   getWindowIsVisible(windowId: any): Promise<boolean>
   getWindowIds(): Promise<readonly number[]>
@@ -346,6 +359,8 @@ export interface Electron {
   getNewWindowId(): Promise<number | null>
   waitForWindowVisible(windowId: any): Promise<void>
   closeWindow(windowId: any): Promise<void>
+  resizeWindowWidth(options: { readonly stepDelay?: number; readonly width: number }): Promise<void>
+  setWindowWidth(width: number): Promise<void>
   mockDialog(response: any): Promise<void>
   mockElectron(namespace: any, key: any, implementationCode: any): Promise<void>
   mockOpenDialog(response: any): Promise<void>
@@ -474,11 +489,13 @@ export interface Git {
   add(): Promise<void>
   checkoutBranch(branchName: any): Promise<void>
   cloneRepository(repoUrl: any): Promise<void>
+  closeRepository(relativePath?: any): Promise<void>
   commit(message: any): Promise<void>
   createBranch(branchName: any): Promise<void>
   init(): Promise<void>
   initRepository(relativePath: any): Promise<void>
   openRepository(relativePath: any): Promise<void>
+  reopenClosedRepository(relativePath: any): Promise<void>
   shouldHaveNoStagedDiff(fileName: any): Promise<void>
   shouldHaveStagedDiffContaining(fileName: any, text: any): Promise<void>
   shouldHaveWorkingTreeDiffContaining(fileName: any, text: any): Promise<void>
@@ -495,6 +512,7 @@ export interface Hover {
   shouldHaveActions(): Promise<void>
 }
 export interface ImagesPreview {
+  open(folderName: string): Promise<void>
   shouldHaveImage(src: any): Promise<void>
   close(): Promise<void>
   next(): Promise<void>
@@ -531,6 +549,8 @@ export interface MCP {
 export interface MultiDiffEditor {
   close(): Promise<void>
   open(options: any): Promise<void>
+  openSourceControlChanges(): Promise<void>
+  shouldHaveFileCount(count: number): Promise<void>
   shouldBeVisible(): Promise<void>
 }
 export interface Notebook {
@@ -542,6 +562,7 @@ export interface Notebook {
   removeMarkdownCell(): Promise<void>
   scrollDown(): Promise<void>
   scrollUp(): Promise<void>
+  shouldHaveOutput(expectedOutput: string): Promise<void>
   splitCell(cellIndex?: any): Promise<void>
 }
 export interface NotebookInlineChat {
@@ -564,7 +585,10 @@ export interface Output {
 }
 export interface Panel {
   hide(): Promise<void>
+  openTabsContextMenu(): Promise<void>
   show(): Promise<void>
+  shouldShowIcons(): Promise<void>
+  shouldShowLabels(): Promise<void>
   toggle(): Promise<void>
 }
 export interface PortsView {
@@ -717,6 +741,9 @@ export interface SideBar {
 }
 export interface SimpleBrowser {
   isSimpleBrowserTabLoading(): Promise<boolean>
+  getRandomPort(): Promise<number>
+  killAllPorts(): Promise<void>
+  trackPort(port: number): Promise<void>
   getBrowserNavigationButton(options: any): Promise<void>
   openIntegratedBrowser(): Promise<void>
   navigateIntegratedBrowser(options: any): Promise<void>
@@ -736,6 +763,7 @@ export interface SimpleBrowser {
   addElementToChat(options: any): Promise<void>
   clickLink(options: any): Promise<void>
   clickPageLink(options: any): Promise<void>
+  dragBrowserWebContents(options: { deltaX: number; deltaY: number; selector: string }): Promise<void>
   back(options?: any): Promise<void>
   createMockServer(options: any): Promise<void>
   createDeferredMockServer(options: any): Promise<void>
@@ -776,9 +804,11 @@ export interface SourceControl {
   openChange(name: any): Promise<void>
   show(): Promise<void>
   shouldHaveHistoryItem(name: any): Promise<void>
+  shouldHaveRepository(name: any): Promise<void>
   shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
   shouldNotHaveHistoryItem(name: any): Promise<void>
+  shouldNotHaveRepository(name: any): Promise<void>
   showBranchPicker(): Promise<void>
   showGraph(): Promise<void>
   stageFile(name: any, parentFolder?: any): Promise<void>
@@ -857,6 +887,7 @@ export interface TerminalInlineChat {
   show(): Promise<void>
 }
 export interface Testing {
+  clearAllResults(): Promise<void>
   focusOnTestExplorerView(): Promise<void>
   runAllTests(options: any): Promise<void>
   runTask(taskName: any): Promise<void>
@@ -878,6 +909,12 @@ export interface TitleBar {
   selectMenuItem(text: any): Promise<void>
   showMenuEdit(): Promise<void>
   showMenuFile(): Promise<void>
+}
+export interface TypeHierarchy {
+  close(): Promise<void>
+  focusNext(): Promise<void>
+  focusPrevious(): Promise<void>
+  open(): Promise<void>
 }
 export interface View {
   enterZenMode(): Promise<void>
@@ -939,6 +976,8 @@ export interface Workspace {
 
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
+  readonly AccessibilityHelp: AccessibilityHelp
+  readonly CallHierarchy: CallHierarchy
   readonly ChatEditor: ChatEditor
   readonly ColorPicker: ColorPicker
   readonly Colors: any
@@ -1000,6 +1039,7 @@ export interface PageObjectApi {
   readonly Timeline: Timeline
   readonly Timeout: Timeout
   readonly TitleBar: TitleBar
+  readonly TypeHierarchy: TypeHierarchy
   readonly View: View
   readonly WaitForApplicationToBeReady: WaitForApplicationToBeReady
   readonly WebView: WebView

@@ -2,6 +2,7 @@ import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
+import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
@@ -237,6 +238,7 @@ export const launchVsCode = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  linuxProcessTreeResourcesFromStartConfig,
   platform,
   preparedVscodePath,
   proxyTestFolderName,
@@ -267,6 +269,7 @@ export const launchVsCode = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  linuxProcessTreeResourcesFromStartConfig: LinuxProcessTreeResourcesFromStartConfig
   platform: string
   preparedVscodePath: string
   proxyTestFolderName: string
@@ -364,6 +367,7 @@ export const launchVsCode = async ({
       cwd,
       env,
       headlessMode,
+      linuxProcessTreeResourcesFromStartConfig,
       platform,
     })
     return {

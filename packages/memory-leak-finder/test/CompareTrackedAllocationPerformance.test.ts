@@ -1,6 +1,7 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import type { getCpuProfileSourceSummary } from '../src/parts/CpuProfileSourceSummary/CpuProfileSourceSummary.ts'
 
-const mockGetCpuProfileSourceSummary = jest.fn<any>()
+const mockGetCpuProfileSourceSummary = jest.fn<typeof getCpuProfileSourceSummary>()
 
 jest.unstable_mockModule('../src/parts/CpuProfileSourceSummary/CpuProfileSourceSummary.ts', () => ({
   getCpuProfileSourceSummary: mockGetCpuProfileSourceSummary,

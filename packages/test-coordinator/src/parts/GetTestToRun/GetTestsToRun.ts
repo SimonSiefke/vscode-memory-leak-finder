@@ -6,7 +6,14 @@ import * as GetMatchingFiles from '../GetMatchingFiles/GetMatchingFiles.ts'
 import * as Path from '../Path/Path.ts'
 import { VError } from '../VError/VError.ts'
 
-export const getTestsToRun = async (root, cwd, filterValue, continueValue) => {
+export const getTestsToRun = async (
+  root: string,
+  cwd: string,
+  filterValue: string,
+  continueValue: string,
+  shardIndex = 1,
+  shardCount = 1,
+) => {
   try {
     Assert.string(root)
     Assert.string(cwd)
@@ -17,7 +24,9 @@ export const getTestsToRun = async (root, cwd, filterValue, continueValue) => {
     }
     const testDirents = await FileSystem.readDir(testsPath)
     const matchingDirents = GetMatchingFiles.getMatchingFiles(testDirents, filterValue)
+    matchingDirents.sort()
     let formattedPaths = FormatPaths.formatPaths(cwd, testsPath, matchingDirents)
+    formattedPaths = formattedPaths.filter((_, index) => index % shardCount === shardIndex - 1)
     if (continueValue) {
       formattedPaths = formattedPaths.filter((formattedPath) => {
         return formattedPath.dirent >= continueValue

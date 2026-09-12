@@ -11,6 +11,7 @@ export interface RpcConnection {
   readonly sessionId?: string
   dispose(): void | Promise<void>
   invoke<T = unknown>(method: string, ...params: readonly unknown[]): Promise<T>
+  invokeBrowser?<T = unknown>(method: string, ...params: readonly unknown[]): Promise<T>
   invokeWithSession?<T = unknown>(sessionId: string, method: string, ...params: readonly unknown[]): Promise<T>
   off?(event: string, listener: unknown): void
   on?(event: string, listener: unknown): void

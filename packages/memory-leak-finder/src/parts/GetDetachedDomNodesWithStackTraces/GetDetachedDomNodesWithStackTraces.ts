@@ -2,6 +2,7 @@ import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as CleanDetachedDomNodesWithStackTraces from '../CleanDetachedDomNodesWithStackTraces/CleanDetachedDomNodesWithStackTraces.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as ExpandStackTraceTable from '../ExpandStackTraceTable/ExpandStackTraceTable.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as GetDetachedDomNodeRoots from '../GetDetachedDomNodeRoots/GetDetachedDomNodeRoots.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
@@ -12,7 +13,7 @@ export const getDetachedDomNodesWithStackTraces = async (session: Session, objec
     ownProperties: true,
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult2.result)
-  const stackTraces = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+  const stackTraceTable = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
 const detachedRoots = this
 
@@ -20,26 +21,34 @@ const getStackTrace = (detachedNode) => {
   return detachedNode.___stackTrace || ''
 }
 
-const getStackTraces = (detachedNodes) => {
+const getStackTraceTable = (detachedNodes) => {
+  const stackTraceIndexes = []
   const stackTraces = []
+  const stackTraceMap = new Map()
   for(const detachedNode of detachedNodes){
     const stackTrace = getStackTrace(detachedNode)
-    stackTraces.push(stackTrace)
+    let stackTraceIndex = stackTraceMap.get(stackTrace)
+    if (stackTraceIndex === undefined) {
+      stackTraceIndex = stackTraces.length
+      stackTraceMap.set(stackTrace, stackTraceIndex)
+      stackTraces.push(stackTrace)
+    }
+    stackTraceIndexes.push(stackTraceIndex)
   }
-  return stackTraces
+  return {
+    stackTraceIndexes,
+    stackTraces,
+  }
 }
 
-const stackTraces = getStackTraces(detachedRoots)
-return stackTraces
+return getStackTraceTable(detachedRoots)
 }`,
     objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: true,
   })
+  const stackTraces = ExpandStackTraceTable.expandStackTraceTable(stackTraceTable, descriptors.length)
   const merged: Dynamic[] = []
-  if (descriptors.length !== stackTraces.length) {
-    throw new Error(`descriptor length mismatch`)
-  }
   for (let i = 0; i < descriptors.length; i++) {
     const descriptor = descriptors[i]
     const stackTrace = stackTraces[i]

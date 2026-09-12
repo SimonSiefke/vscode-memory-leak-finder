@@ -4,6 +4,18 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
+    async clearAllResults() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ClearAllTestResults)
+        const outputPeek = page.locator('.test-output-peek-tree')
+        const rows = outputPeek.locator('.monaco-list-row')
+        await expect(rows).toHaveCount(0)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, 'Failed to clear all test results')
+      }
+    },
     async focusOnTestExplorerView() {
       try {
         const quickPick = QuickPick.create({
@@ -50,6 +62,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const otherRows = page.locator('.test-output-peek-tree .monaco-list-row')
         await expect(otherRows).toHaveCount(expectedTestOutputRowCount, {
+          timeout: 30_000,
+        })
+        const runningStatus = summary.locator('.codicon-loading')
+        await expect(runningStatus).toHaveCount(0, {
           timeout: 30_000,
         })
         await page.waitForIdle()

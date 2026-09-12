@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 
 const COPILOT_HOSTNAMES = new Set(['api.githubcopilot.com', 'api.individual.githubcopilot.com'])
-const COPILOT_PATHNAMES = new Set(['/chat/completions', '/responses'])
+const COPILOT_PATHNAMES = new Set(['/chat/completions', '/responses', '/v1/messages'])
 const STRIPPED_TAGS = [
   'context',
   'environment_info',
