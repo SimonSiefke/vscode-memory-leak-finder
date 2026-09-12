@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = (params: CreateParams) => {
@@ -137,6 +139,17 @@ export const create = (params: CreateParams) => {
         await expect(textEditor()).toHaveCount(0)
         await page.waitForIdle()
       } catch (error) {
+        console.log(
+          '[DEBUG-pr3252]',
+          await page.evaluate({
+            expression: `JSON.stringify({reporter: !!document.querySelector('.issue-reporter-wizard'), dialogs: [...document.querySelectorAll('.monaco-dialog-box')].map(x => x.outerHTML), tabs: [...document.querySelectorAll('.tab')].map(x => x.outerHTML), text: document.body.innerText.slice(-5000)})`,
+            returnByValue: true,
+          }),
+        )
+        const screenshot = await page.sessionRpc.invoke('Page.captureScreenshot', { format: 'png' })
+        const directory = join(import.meta.dirname, '../../../../../.vscode-videos')
+        await mkdir(directory, { recursive: true })
+        await writeFile(join(directory, `issue-reporter-close-${platform}.png`), Buffer.from(screenshot.data, 'base64'))
         throw new VError(error, 'Failed to close issue reporter')
       }
     },
