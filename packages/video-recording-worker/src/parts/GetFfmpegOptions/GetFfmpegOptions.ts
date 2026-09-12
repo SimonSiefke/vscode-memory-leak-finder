@@ -1,9 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 
-export const getFfmpegOptions = (fps: number, width: number, height: number, outFile: string): readonly string[] => {
+export const getFfmpegOptions = (fps: number, outFile: string): readonly string[] => {
   Assert.number(fps)
-  Assert.number(width)
-  Assert.number(height)
   Assert.string(outFile)
   const args = [
     '-loglevel',
@@ -42,8 +40,6 @@ export const getFfmpegOptions = (fps: number, width: number, height: number, out
     '1M',
     '-threads',
     '1',
-    '-vf',
-    `pad=${width}:${height}:0:0:gray,crop=${width}:${height}:0:0`,
     outFile,
   ]
   return args
