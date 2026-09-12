@@ -12,7 +12,7 @@ export const createNameMap = (parsedNodes: readonly CleanedNode[], graph: HeapSn
     for (const edge of edges) {
       const toNode = parsedNodes[edge.index]
       nameMap[toNode.id] ||= {
-        edgeName: edge.name,
+        edgeName: String(edge.name),
         nodeName: toNode.name,
       }
     }
