@@ -1,5 +1,6 @@
 export * as AbortControllerCount from '../CreateAbortControllerCountChart/CreateAbortControllerCountChart.ts'
 export * as AbortSignalCount from '../CreateAbortSignalCountChart/CreateAbortSignalCountChart.ts'
+export * as ArrayBufferBytes from '../CreateArrayBufferBytesChart/CreateArrayBufferBytesChart.ts'
 export * as ArrayCount from '../CreateArrayCountChart/CreateArrayCountChart.ts'
 export * as ArrayElementCount from '../CreateArrayElementCountChart/CreateArrayElementCountChart.ts'
 export * as AttachedDomNodeCount from '../CreateAttachedDomNodeCountChart/CreateAttachedDomNodeCountChart.ts'
