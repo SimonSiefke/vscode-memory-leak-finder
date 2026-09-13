@@ -23,7 +23,9 @@ export const createHeapSnapshotNode = (
         break
       }
       case nameKey: {
-        node[key] = strings[value]
+        const type = nameKey === 'nameOrIndex' ? valueTypes[array[startIndex + nodeFields.indexOf(typeKey)]] : undefined
+        // V8 stores numeric indices for element and hidden edges, not string-table offsets.
+        node[key] = type === 'element' || type === 'hidden' ? value : strings[value]
 
         break
       }

@@ -18,7 +18,7 @@ export interface CleanedNode {
 }
 
 export interface ParsedEdge extends HeapSnapshotRecord {
-  readonly nameOrIndex: string
+  readonly nameOrIndex: string | number
   readonly toNode: number
   readonly type: string
 }
