@@ -19,6 +19,7 @@ interface Options {
   readonly names: readonly string[]
   readonly path: string
   readonly pathsPerName: number
+  readonly properties: readonly string[]
   readonly type: string
 }
 
@@ -27,10 +28,17 @@ const parseArgs = (args: readonly string[]): Options => {
   let pathsPerName = 3
   let type = 'object'
   const names: string[] = []
+  const properties: string[] = []
   for (let index = 0; index < args.length; index++) {
     const arg = args[index]
     if (arg === '--name') {
       names.push(args[++index] || '')
+    } else if (arg === '--property') {
+      const property = args[++index]
+      if (!property || property.startsWith('--')) {
+        throw new Error('--property requires a property name')
+      }
+      properties.push(property)
     } else if (arg === '--paths-per-name') {
       pathsPerName = Number.parseInt(args[++index] || '', 10)
     } else if (arg === '--type') {
@@ -41,15 +49,15 @@ const parseArgs = (args: readonly string[]): Options => {
       throw new Error(`Unexpected argument: ${arg}`)
     }
   }
-  if (!path || !type || names.length === 0 || names.some((name) => !name)) {
+  if (!path || !type || (names.length === 0 && properties.length === 0) || names.some((name) => !name)) {
     throw new Error(
-      'Usage: analyze-heap-retainers <snapshot> --name <constructor> [--name <constructor>] [--type <node-type>] [--paths-per-name <count>]',
+      'Usage: analyze-heap-retainers <snapshot> (--name <constructor> | --property <own-property>) [--name <constructor>] [--property <own-property>] [--type <node-type>] [--paths-per-name <count>]',
     )
   }
   if (!Number.isInteger(pathsPerName) || pathsPerName < 1) {
     throw new Error('--paths-per-name must be a positive integer')
   }
-  return { names, path, pathsPerName, type }
+  return { names, path, pathsPerName, properties, type }
 }
 
 const findOffset = (fields: readonly string[], field: string): number => {
@@ -60,7 +68,7 @@ const findOffset = (fields: readonly string[], field: string): number => {
   return offset
 }
 
-const analyze = async ({ names, path, pathsPerName, type: requestedType }: Options): Promise<void> => {
+const analyze = async ({ names, path, pathsPerName, properties, type: requestedType }: Options): Promise<void> => {
   const snapshot = JSON.parse(await readFile(path, 'utf8')) as HeapSnapshot
   const { edge_fields: edgeFields, edge_types: edgeTypes, node_fields: nodeFields, node_types: nodeTypes } = snapshot.snapshot.meta
   const nodeFieldCount = nodeFields.length
@@ -73,16 +81,34 @@ const analyze = async ({ names, path, pathsPerName, type: requestedType }: Optio
   const edgeNameOffset = findOffset(edgeFields, 'name_or_index')
   const edgeTargetOffset = findOffset(edgeFields, 'to_node')
   const weakEdgeType = edgeTypes[0]?.indexOf('weak') ?? -1
+  const propertyEdgeType = edgeTypes[0]?.indexOf('property') ?? -1
   const requestedNames = new Set(names)
   const targetsByName = new Map<string, number[]>()
   const targets = new Set<number>()
+
+  const edgeStarts = new Uint32Array(nodeCount + 1)
+  for (let node = 0; node < nodeCount; node++) {
+    edgeStarts[node + 1] = edgeStarts[node] + snapshot.nodes[node * nodeFieldCount + edgeCountOffset]
+  }
 
   for (let node = 0; node < nodeCount; node++) {
     const offset = node * nodeFieldCount
     const name = snapshot.strings[snapshot.nodes[offset + nameOffset]] || '(anonymous)'
     const type = nodeTypes[0]?.[snapshot.nodes[offset + typeOffset]] || 'unknown'
-    if (!requestedNames.has(name) || type !== requestedType) {
+    if ((requestedNames.size > 0 && !requestedNames.has(name)) || type !== requestedType) {
       continue
+    }
+    if (properties.length > 0) {
+      const missing = new Set(properties)
+      for (let edge = edgeStarts[node]; edge < edgeStarts[node + 1] && missing.size > 0; edge++) {
+        const edgeOffset = edge * edgeFieldCount
+        if (snapshot.edges[edgeOffset + edgeTypeOffset] === propertyEdgeType) {
+          missing.delete(snapshot.strings[snapshot.edges[edgeOffset + edgeNameOffset]])
+        }
+      }
+      if (missing.size > 0) {
+        continue
+      }
     }
     const matches = targetsByName.get(name) || []
     if (matches.length < pathsPerName) {
@@ -90,11 +116,6 @@ const analyze = async ({ names, path, pathsPerName, type: requestedType }: Optio
       targetsByName.set(name, matches)
       targets.add(node)
     }
-  }
-
-  const edgeStarts = new Uint32Array(nodeCount + 1)
-  for (let node = 0; node < nodeCount; node++) {
-    edgeStarts[node + 1] = edgeStarts[node] + snapshot.nodes[node * nodeFieldCount + edgeCountOffset]
   }
 
   const parent = new Int32Array(nodeCount)
@@ -140,7 +161,7 @@ const analyze = async ({ names, path, pathsPerName, type: requestedType }: Optio
     return type === 'element' ? `[${nameOrIndex}]` : snapshot.strings[nameOrIndex] || type
   }
 
-  for (const name of names) {
+  for (const name of names.length > 0 ? names : targetsByName.keys()) {
     const matches = targetsByName.get(name) || []
     console.log(`\n${name}: ${matches.length} path(s)`)
     for (const target of matches) {
