@@ -42,6 +42,7 @@ export * as PerformanceMarkCounts from '../CreatePerformanceMarkCountsChart/Crea
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.ts'
 export * as ProxyCount from '../CreateProxyCountChart/CreateProxyCountChart.ts'
 export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.ts'
+export * as SetSize from '../CreateSetSizeChart/CreateSetSizeChart.ts'
 export * as StringCount from '../CreateStringCountChart/CreateStringCountChart.ts'
 export * as SymbolCount from '../CreateSymbolCountChart/CreateSymbolCountChart.ts'
 export * as TrackedAllocationLeaks from '../CreateTrackedAllocationLeaksChart/CreateTrackedAllocationLeaksChart.ts'
