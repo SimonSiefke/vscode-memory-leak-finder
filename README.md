@@ -212,6 +212,16 @@ node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux
 
 Both measures run collection and parsing in a dedicated Linux process-tree worker. The caller starts it with the process-tree root PID, receives the parsed result when stopping it, and disposes the worker immediately after measurement. They require Linux, `perf`, access to the requested perf events, and readable `smaps_rollup` files. Missing facilities or permissions fail the measure instead of producing zero-valued counters. GNU `time` is intentionally not used because its maximum RSS is not the simultaneous sum of Electron's processes.
 
+### Poolmon
+
+On Windows, captures PoolMon before and after each measured e2e scenario and compares pool-tag byte growth. It also captures `tasklist` memory for a best-effort view of process working-set growth; PoolMon itself attributes kernel pool allocations to tags and drivers, not processes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure poolmon --only base
+```
+
+The measure fails on non-Windows systems or when `poolmon.exe` cannot be found. Set `POOLMON_PATH` to override discovery and `POOLTAG_PATH` to provide the WDK `pooltag.txt` mapping file. Set `POOLMON_LEAK_THRESHOLD_BYTES` to change the default 64 KiB growth threshold used for `isLeak`.
+
 ### DetachedDomNodeCount
 
 Measures the total number of detached dom nodes.

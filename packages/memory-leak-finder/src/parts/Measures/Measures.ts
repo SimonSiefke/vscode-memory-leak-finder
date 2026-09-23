@@ -120,6 +120,7 @@ export * as MeasurePendingPromisesWithRetainers from '../MeasurePendingPromisesW
 export * as MeasurePerformanceMarkBytes from '../MeasurePerformanceMarkBytes/MeasurePerformanceMarkBytes.ts'
 export * as MeasurePerformanceMarkCounts from '../MeasurePerformanceMarkCounts/MeasurePerformanceMarkCounts.ts'
 export * as MeasureProcessCount from '../MeasureProcessCount/MeasureProcessCount.ts'
+export * as MeasurePoolmon from '../MeasurePoolmon/MeasurePoolmon.ts'
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.ts'
 export * as MeasurePromises from '../MeasurePromises/MeasurePromises.ts'
 export * as MeasurePromisesWithStackTrace from '../MeasurePromisesWithStackTrace/MeasurePromisesWithStackTrace.ts'
