@@ -22,6 +22,7 @@ const runNpmCommand = (args) => {
   const result = spawnSync(npmCommand, args, {
     cwd: repositoryRoot,
     stdio: 'inherit',
+    shell: process.platform === 'win32',
     windowsHide: true,
   })
 
