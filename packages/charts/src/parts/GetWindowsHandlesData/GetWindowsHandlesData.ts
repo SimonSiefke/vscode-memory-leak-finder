@@ -30,16 +30,19 @@ export const getWindowsHandlesData = async (basePath: string) => {
     const data = (result.topGrowth || [])
       .filter(
         (process: WindowsHandleGrowth) =>
-          isFiniteNumber(process.beforeHandles) && isFiniteNumber(process.afterHandles) &&
-          isFiniteNumber(process.deltaHandles) && process.deltaHandles > 0,
+          isFiniteNumber(process.beforeHandles) &&
+          isFiniteNumber(process.afterHandles) &&
+          isFiniteNumber(process.deltaHandles) &&
+          process.deltaHandles > 0,
       )
       .map((process: WindowsHandleGrowth) => ({
         count: process.afterHandles!,
         delta: process.deltaHandles!,
         name: `${process.name || 'Unknown process'} (PID ${process.pid ?? 'unknown'})`,
       }))
-      .sort((a: { count: number; delta: number; name: string }, b: { count: number; delta: number; name: string }) =>
-        b.count - a.count || b.delta - a.delta || a.name.localeCompare(b.name),
+      .sort(
+        (a: { count: number; delta: number; name: string }, b: { count: number; delta: number; name: string }) =>
+          b.count - a.count || b.delta - a.delta || a.name.localeCompare(b.name),
       )
     results.push({
       data,
