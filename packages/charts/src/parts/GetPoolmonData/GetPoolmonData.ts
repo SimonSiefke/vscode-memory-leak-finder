@@ -16,13 +16,14 @@ export const getPoolmonData = async (basePath: string) => {
       continue
     }
     const result = await readJson(join(resultsPath, entry.name))
-    if (!Number.isFinite(result.pool?.beforeBytes) || !Number.isFinite(result.pool?.afterBytes)) {
+    const poolmonResult = result.poolmon ?? result
+    if (!Number.isFinite(poolmonResult.pool?.beforeBytes) || !Number.isFinite(poolmonResult.pool?.afterBytes)) {
       throw new Error(`Missing finite before/after PoolMon bytes in ${entry.name}`)
     }
     results.push({
       data: [
-        { name: 'Before iterations', value: result.pool.beforeBytes },
-        { name: 'After iterations', value: result.pool.afterBytes },
+        { name: 'Before iterations', value: poolmonResult.pool.beforeBytes },
+        { name: 'After iterations', value: poolmonResult.pool.afterBytes },
       ],
       filename: entry.name.slice(0, -'.json'.length),
     })
