@@ -166,3 +166,4 @@ export * as MeasureWeakSetCount from '../MeasureWeakSetCount/MeasureWeakSetCount
 export * as MeasureWebGl2RenderingContextCount from '../MeasureWebGl2RenderingContextCount/MeasureWebGl2RenderingContextCount.ts'
 export * as MeasureWidgetCount from '../MeasureWidgetCount/MeasureWidgetCount.ts'
 export * as MeasureWorkerCount from '../MeasureWorkerCount/MeasureWorkerCount.ts'
+export * as MeasureWindowsHandles from '../MeasureWindowsHandles/MeasureWindowsHandles.ts'
