@@ -59,3 +59,4 @@ export * as WeakRefCount from '../CreateWeakRefCountChart/CreateWeakRefCountChar
 export * as WeakSetCount from '../CreateWeakSetCountChart/CreateWeakSetCountChart.ts'
 export * as Webgl2RenderingContextCount from '../CreateWebgl2RenderingContextCountChart/CreateWebgl2RenderingContextCountChart.ts'
 export * as WorkerCount from '../CreateWorkerCountChart/CreateWorkerCountChart.ts'
+export * as WindowsHandles from '../CreateWindowsHandlesChart/CreateWindowsHandlesChart.ts'
