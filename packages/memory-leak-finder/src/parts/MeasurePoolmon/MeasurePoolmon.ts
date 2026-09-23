@@ -214,7 +214,8 @@ const captureProcesses = async (): Promise<{ readonly processes: readonly Proces
       maxBuffer: 4 * 1024 * 1024,
       windowsHide: true,
     })
-    return { error: '', processes: parseTasklist(stdout) }
+    const processes = parseTasklist(stdout).filter((process) => !/^(poolmon|tasklist)\.exe$/i.test(process.imageName))
+    return { error: '', processes }
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error), processes: [] }
   }
@@ -243,7 +244,8 @@ const capturePoolmon = async (state: State): Promise<string> => {
 }
 
 const capture = async (state: State): Promise<PoolmonSnapshot> => {
-  const [raw, processSnapshot] = await Promise.all([capturePoolmon(state), captureProcesses()])
+  const raw = await capturePoolmon(state)
+  const processSnapshot = await captureProcesses()
   return {
     capturedAt: new Date().toISOString(),
     poolmonPath: state.poolmonPath,
