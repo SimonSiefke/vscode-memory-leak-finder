@@ -26,6 +26,27 @@ test('getPoolmonData reads before and after pool sizes', async () => {
   }
 })
 
+test('getPoolmonData reads wrapped PoolMon results', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'poolmon-chart-wrapped-'))
+  try {
+    const results = join(root, 'poolmon')
+    await mkdir(results)
+    await writeFile(join(results, 'editor-open.json'), JSON.stringify({ poolmon: { pool: { beforeBytes: 10, afterBytes: 20 } } }))
+
+    await expect(getPoolmonData(root)).resolves.toEqual([
+      {
+        data: [
+          { name: 'Before iterations', value: 10 },
+          { name: 'After iterations', value: 20 },
+        ],
+        filename: 'editor-open',
+      },
+    ])
+  } finally {
+    await rm(root, { force: true, recursive: true })
+  }
+})
+
 test('getPoolmonData rejects incomplete results', async () => {
   const root = await mkdtemp(join(tmpdir(), 'poolmon-chart-incomplete-'))
   try {
