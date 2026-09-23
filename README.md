@@ -212,7 +212,6 @@ node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux
 
 Both measures run collection and parsing in a dedicated Linux process-tree worker. The caller starts it with the process-tree root PID, receives the parsed result when stopping it, and disposes the worker immediately after measurement. They require Linux, `perf`, access to the requested perf events, and readable `smaps_rollup` files. Missing facilities or permissions fail the measure instead of producing zero-valued counters. GNU `time` is intentionally not used because its maximum RSS is not the simultaneous sum of Electron's processes.
 
-<<<<<<< HEAD
 ### WindowsHandles
 
 On Windows, captures the `HandleCount` of the root VS Code process and all of its descendants before and after each measured e2e scenario. This follows the process tree, so unrelated processes are excluded. A positive total handle delta is reported as a potential leak by default; set `WINDOWS_HANDLES_LEAK_THRESHOLD` to require a larger increase.
@@ -222,7 +221,7 @@ node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure windo
 ```
 
 The result includes the total before/after counts, total delta, and per-process handle deltas. It uses Windows `Win32_Process.HandleCount`, which corresponds to Task Manager's Handles column; it does not identify which individual kernel objects were leaked.
-=======
+
 ### Poolmon
 
 On Windows, captures PoolMon before and after each measured e2e scenario and compares pool-tag byte growth. It also captures `tasklist` memory for a best-effort view of process working-set growth; PoolMon itself attributes kernel pool allocations to tags and drivers, not processes.
@@ -232,7 +231,6 @@ node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure poolm
 ```
 
 The measure fails on non-Windows systems or when `poolmon.exe` cannot be found. Set `POOLMON_PATH` to override discovery and `POOLTAG_PATH` to provide the WDK `pooltag.txt` mapping file. Set `POOLMON_LEAK_THRESHOLD_BYTES` to change the default 64 KiB growth threshold used for `isLeak`.
->>>>>>> origin/main
 
 ### DetachedDomNodeCount
 
