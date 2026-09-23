@@ -8,9 +8,10 @@ export const getData = (basePath: string) => GetPoolmonData.getPoolmonData(baseP
 export const createChart = () => {
   return {
     fontSize: 12,
-    marginLeft: 160,
-    marginRight: 60,
-    type: 'bar-chart',
-    width: 800,
+    marginLeft: 260,
+    marginRight: 120,
+    type: 'dual-bar-chart',
+    width: 1000,
+    yLabel: 'Process Memory (KiB)',
   }
 }

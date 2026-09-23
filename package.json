@@ -9,6 +9,7 @@
     "e2e:check-flakyness": "lerna run e2e:check-flakyness",
     "e2e": "lerna run e2e",
     "format": "prettier --write .",
+    "install:ci": "node packages/build/src/parts/Install/Install.js",
     "lint": "prettier --check .",
     "postinstall": "lerna bootstrap --ci --concurrency 1",
     "test": "lerna run test",

@@ -223,7 +223,7 @@ jobs:
           key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
 
       - name: npm ci
-        run: npm ci --ignore-scripts && npm run postinstall
+        run: npm run install:ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
 
       - run: npm run build
@@ -279,7 +279,7 @@ jobs:
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
 
       - name: npm ci
-        run: npm ci --ignore-scripts && npm run postinstall
+        run: npm run install:ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
 
       - run: npm run build
