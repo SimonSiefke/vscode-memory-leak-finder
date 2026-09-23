@@ -72,3 +72,17 @@ test('ci measures total array length and downloads the results for Pages charts'
         with:
           name: vscode-memory-leak-finder-results-linux-array-element-count`)
 })
+
+test('ci and pr run the Windows handles measure with restart-between and upload charts', async () => {
+  for (const workflowName of ['ci.yml', 'pr.yml']) {
+    const workflow = await readFile(getWorkflowPath(workflowName), 'utf8')
+
+    expect(workflow).toContain('windows-handles:')
+    expect(workflow).toContain(
+      'node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure windows-handles --runs 37 --restart-between --run-skipped-tests-anyway',
+    )
+    expect(workflow).toContain('name: vscode-memory-leak-finder-results-windows-handles')
+    expect(workflow).toContain('name: vscode-memory-leak-finder-charts-windows-handles')
+    expect(workflow).toContain('name: Generate Windows handles charts')
+  }
+})
