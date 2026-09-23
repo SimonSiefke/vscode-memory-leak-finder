@@ -13,7 +13,43 @@ interface ProcessMemoryGrowth {
   readonly processName?: string
 }
 
-const ignoredProcessNamePrefixes = ['firefox', 'chatgpt', 'onedrive', 'msedgewebview', 'svchost']
+const ignoredProcessNamePrefixes = [
+  'applicationframehost',
+  'audiodg',
+  'backgroundtaskhost',
+  'chatgpt',
+  'codex',
+  'crossdeviceresume',
+  'csrss',
+  'ctfmon',
+  'dwm',
+  'explorer',
+  'firefox',
+  'lsass',
+  'memory compression',
+  'microsoftstartfeedprovider',
+  'mpdefendercoreservice',
+  'msedgewebview',
+  'ngciso',
+  'nissrv',
+  'onedrive',
+  'registry',
+  'runtimebroker',
+  'searchhost',
+  'searchindexer',
+  'searchprotocolhost',
+  'securityhealthservice',
+  'shellhost',
+  'sihost',
+  'startmenuexperiencehost',
+  'svchost',
+  'taskhostw',
+  'taskmgr',
+  'widgetboard',
+  'widgetservice',
+  'wmiprvse',
+  'wslservice',
+]
 
 const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
 

@@ -63,6 +63,44 @@ test('getPoolmonData returns no bars when there are no leaking processes', async
   }
 })
 
+test('getPoolmonData excludes unrelated Windows and tooling processes', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'poolmon-chart-ignored-processes-'))
+  try {
+    const results = join(root, 'poolmon')
+    await mkdir(results)
+    const ignoredNames = [
+      'ApplicationFrameHost.exe',
+      'backgroundTaskHost.exe',
+      'codex-code-mode-host.exe',
+      'csrss.exe',
+      'dwm.exe',
+      'explorer.exe',
+      'RuntimeBroker.exe',
+      'SearchIndexer.exe',
+      'Taskmgr.exe',
+      'WmiPrvSE.exe',
+    ]
+    await writeFile(
+      join(results, 'editor-open.json'),
+      JSON.stringify({
+        poolmon: {
+          processMemoryGrowth: ignoredNames.map((imageName, index) => ({
+            afterMemoryKb: 10_000 - index,
+            beforeMemoryKb: 0,
+            deltaMemoryKb: 10_000 - index,
+            imageName,
+            pid: index + 1,
+          })),
+        },
+      }),
+    )
+
+    await expect(getPoolmonData(root)).resolves.toEqual([{ data: [], filename: 'editor-open' }])
+  } finally {
+    await rm(root, { force: true, recursive: true })
+  }
+})
+
 test('getPoolmonData ignores incomplete process rows', async () => {
   const root = await mkdtemp(join(tmpdir(), 'poolmon-chart-incomplete-'))
   try {
