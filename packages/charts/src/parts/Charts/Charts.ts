@@ -41,6 +41,7 @@ export * as ObjectUrlCount from '../CreateObjectUrlCountChart/CreateObjectUrlCou
 export * as PaintEvents from '../CreatePaintEventsChart/CreatePaintEventsChart.ts'
 export * as PerformanceMarkBytes from '../CreatePerformanceMarkBytesChart/CreatePerformanceMarkBytesChart.ts'
 export * as PerformanceMarkCounts from '../CreatePerformanceMarkCountsChart/CreatePerformanceMarkCountsChart.ts'
+export * as Poolmon from '../CreatePoolmonChart/CreatePoolmonChart.ts'
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.ts'
 export * as ProxyCount from '../CreateProxyCountChart/CreateProxyCountChart.ts'
 export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.ts'
