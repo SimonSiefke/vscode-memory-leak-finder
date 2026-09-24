@@ -1,0 +1,45 @@
+name: Markdown PoolMon investigation
+
+on:
+  push:
+    branches:
+      - diagnostic/poolmon-markdown
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: poolmon-markdown-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  markdown:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm run install:ci
+      - run: npm run build
+      - name: Locate PoolMon
+        shell: pwsh
+        run: |
+          $poolmon = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Tools" -Recurse -Filter poolmon.exe -File |
+            Where-Object { $_.Directory.Name -eq 'x64' } | Select-Object -First 1
+          if ($null -eq $poolmon) { throw 'x64 PoolMon was not found' }
+          "POOLMON_PATH=$($poolmon.FullName)" >> $env:GITHUB_ENV
+      - name: Measure Markdown with fresh profiles
+        env:
+          POOLMON_IDLE_SECONDS: 5,30,60
+        run: node scripts/poolmon-markdown.ts
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: poolmon-markdown-evidence
+          path: .tmp/poolmon-markdown
+          include-hidden-files: true
+          if-no-files-found: error
