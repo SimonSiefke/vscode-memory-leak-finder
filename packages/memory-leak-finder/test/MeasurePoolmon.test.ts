@@ -174,3 +174,15 @@ test('idle delay configuration rejects invalid or unordered offsets', () => {
     expect(() => MeasurePoolmon.parseIdleSeconds(value)).toThrow('POOLMON_IDLE_SECONDS')
   }
 })
+
+test('parseProcessList preserves resource counters and rejects invalid counts', () => {
+  const row = { ...processIdentity, handleCount: 123, threadCount: 7 }
+  expect(MeasurePoolmon.parseProcessList(JSON.stringify([row]))).toEqual([row])
+  const unavailable = { ...processIdentity, handleCount: null, threadCount: null }
+  expect(MeasurePoolmon.parseProcessList(JSON.stringify([unavailable]))).toEqual([unavailable])
+  for (const field of ['handleCount', 'threadCount']) {
+    for (const value of [-1, 1.5, '10']) {
+      expect(() => MeasurePoolmon.parseProcessList(JSON.stringify([{ ...row, [field]: value }]))).toThrow(`Invalid process ${field}`)
+    }
+  }
+})

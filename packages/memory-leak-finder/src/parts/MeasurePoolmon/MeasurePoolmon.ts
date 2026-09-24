@@ -31,6 +31,8 @@ export interface ProcessMemoryRow {
   readonly commandLine?: string | null
   readonly executablePath?: string | null
   readonly privateMemoryKb?: number | null
+  readonly handleCount?: number | null
+  readonly threadCount?: number | null
 }
 
 export interface PoolmonSnapshot {
@@ -225,10 +227,12 @@ export const parseTasklist = (raw: string): readonly ProcessMemoryRow[] => {
 export const processQuery = `
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
-$processes = @(Get-CimInstance Win32_Process -Property ProcessId,ParentProcessId,Name,CreationDate,CommandLine,ExecutablePath,WorkingSetSize,PrivatePageCount |
+$processes = @(Get-CimInstance Win32_Process -Property ProcessId,ParentProcessId,Name,CreationDate,CommandLine,ExecutablePath,WorkingSetSize,PrivatePageCount,HandleCount,ThreadCount |
   Where-Object { $_.ProcessId -ne $PID -and $_.Name -ne 'poolmon.exe' } |
   ForEach-Object {
     [pscustomobject]@{
+      handleCount = if ($null -eq $_.HandleCount) { $null } else { [int]$_.HandleCount }
+      threadCount = if ($null -eq $_.ThreadCount) { $null } else { [int]$_.ThreadCount }
       pid = [int]$_.ProcessId
       parentPid = [int]$_.ParentProcessId
       imageName = [string]$_.Name
@@ -263,6 +267,11 @@ export const parseProcessList = (raw: string): readonly ProcessMemoryRow[] => {
     }
     for (const field of ['createdAt', 'commandLine', 'executablePath']) {
       if (row[field] !== null && typeof row[field] !== 'string') {
+        throw new Error(`Invalid process ${field} in Win32_Process result`)
+      }
+    }
+    for (const field of ['handleCount', 'threadCount']) {
+      if (row[field] != null && (!Number.isInteger(row[field]) || row[field] < 0)) {
         throw new Error(`Invalid process ${field} in Win32_Process result`)
       }
     }
