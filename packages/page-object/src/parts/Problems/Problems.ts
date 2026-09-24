@@ -67,12 +67,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const markersPanel = getMarkersPanel()
         await expect(markersPanel).toBeVisible()
-        const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
-        await expect(moreActions).toBeVisible()
-        await moreActions.click()
+        const problemsTab = page.locator('.part.panel [role="tab"]', {
+          hasText: 'Problems',
+        })
+        await expect(problemsTab).toBeVisible()
+        await page.waitForIdle()
+        await problemsTab.click({
+          button: 'right',
+        })
         const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
         await contextMenu.openSubMenu('Move To', false)
-        await contextMenu.select('Sidebar', false)
+        const primarySideBar = page.locator('.monaco-submenu .action-menu-item:has(.action-label[aria-label="Primary Side Bar"])')
+        await expect(primarySideBar).toBeVisible()
+        await primarySideBar.click()
+        await page.waitForIdle()
+        const sideBarMarkersPanel = page.locator('.part.sidebar .markers-panel')
+        await expect(sideBarMarkersPanel).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to move problems to sidebar`)
       }
