@@ -5,6 +5,11 @@ on:
     branches:
       - diagnostic/poolmon-terminal
   workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [heap, poolmon]
+        default: heap
 
 permissions:
   contents: read
@@ -34,6 +39,7 @@ jobs:
           "POOLMON_PATH=$($poolmon.FullName)" >> $env:GITHUB_ENV
       - name: Measure Terminal with fresh profiles
         env:
+          TERMINAL_DIAGNOSTIC_MODE: ${{ inputs.mode || 'heap' }}
           POOLMON_IDLE_SECONDS: 5,30,60
         run: node scripts/poolmon-terminal.ts
       - uses: actions/upload-artifact@v7

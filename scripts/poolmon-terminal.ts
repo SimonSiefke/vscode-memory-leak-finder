@@ -32,6 +32,7 @@ const stopDiagnosticVscode = async () => {
   )
 }
 
+const heapMode = process.env.TERMINAL_DIAGNOSTIC_MODE === 'heap'
 const evidence = join('.tmp', 'poolmon-terminal')
 await mkdir(evidence, { recursive: true })
 
@@ -73,14 +74,18 @@ const summary = [
   '|---|---:|---|---:|---:|---:|',
 ]
 
-const trials = [
-  { scenario: 'terminal-poolmon-idle', runs: 37 },
-  { scenario: 'terminal-split', runs: 1 },
-  { scenario: 'terminal-split', runs: 37 },
-  { scenario: 'terminal-poolmon-dispose-all', runs: 37 },
-]
+const trials = heapMode
+  ? [{ scenario: 'terminal-split', runs: 37 }]
+  : [
+      { scenario: 'terminal-poolmon-idle', runs: 37 },
+      { scenario: 'terminal-split', runs: 1 },
+      { scenario: 'terminal-split', runs: 37 },
+      { scenario: 'terminal-poolmon-dispose-all', runs: 37 },
+    ]
 for (const [index, { scenario, runs }] of trials.entries()) {
-  const resultPath = join('.vscode-memory-leak-finder-results', 'poolmon', `${scenario}.json`)
+  const resultPath = heapMode
+    ? join('.vscode-memory-leak-finder-results', 'pty-host', 'named-function-count3', `${scenario}.json`)
+    : join('.vscode-memory-leak-finder-results', 'poolmon', `${scenario}.json`)
   for (let attempt = 1; attempt <= 3; attempt++) {
     const trial = `${index + 1}-${scenario}-${runs}-runs-attempt-${attempt}`
     const directory = join(evidence, trial)
@@ -105,7 +110,8 @@ for (const [index, { scenario, runs }] of trials.entries()) {
       '--check-leaks',
       '--measure-after',
       '--measure',
-      'poolmon',
+      heapMode ? 'named-function-count3' : 'poolmon',
+      ...(heapMode ? ['--inspect-ptyhost', '--timeout-between', '10000'] : []),
     ]
     const startedAt = new Date().toISOString()
     await writeFile(
@@ -115,6 +121,7 @@ for (const [index, { scenario, runs }] of trials.entries()) {
     const code = await run(args, join(directory, 'run.log'))
     const hasResult = await exists(resultPath)
     if (hasResult) await copyFile(resultPath, join(directory, 'result.json'))
+    if (heapMode && hasResult) await cp('.vscode-heapsnapshots', join(directory, 'heaps'), { recursive: true })
     await stopDiagnosticVscode()
     if (await exists('.vscode-user-data-dir/logs')) {
       await cp('.vscode-user-data-dir/logs', join(directory, 'application-logs'), { recursive: true })
@@ -125,6 +132,7 @@ for (const [index, { scenario, runs }] of trials.entries()) {
       if (attempt === 3) throw new Error(`${trial}: no valid measurement after three attempts`)
       continue
     }
+    if (heapMode) break
     const data = JSON.parse(await readFile(resultPath, 'utf8')).poolmon
     const snapshots = [
       ['before', data.snapshots.before],
