@@ -75,9 +75,15 @@ test('getPoolmonData excludes unrelated Windows and tooling processes', async ()
       'csrss.exe',
       'dwm.exe',
       'explorer.exe',
+      'Runner.Listener.exe',
+      'Runner.Worker.exe',
       'RuntimeBroker.exe',
       'SearchIndexer.exe',
       'Taskmgr.exe',
+      'TiWorker.exe',
+      'TrustedInstaller.exe',
+      'WaAppAgent.exe',
+      'WindowsAzureGuestAgent.exe',
       'WmiPrvSE.exe',
     ]
     await writeFile(
