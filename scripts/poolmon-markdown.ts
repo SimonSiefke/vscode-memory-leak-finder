@@ -76,62 +76,69 @@ const summary = [
 ]
 
 for (const [index, runs] of [1, 10, 37, 37].entries()) {
-  const trial = `${index + 1}-${runs}-runs`
-  const directory = join(evidence, trial)
-  const archivedState = join('.tmp', 'poolmon-markdown-state', trial)
-  await mkdir(directory, { recursive: true })
-  await mkdir(archivedState, { recursive: true })
-  // This script owns its fresh CI workspace. Archive state instead of sharing it between trials.
-  for (const name of ['.vscode-user-data-dir', '.vscode-test-workspace', '.vscode-memory-leak-finder-results']) {
-    if (await exists(name)) await rename(name, join(archivedState, name))
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const trial = `${index + 1}-${runs}-runs-attempt-${attempt}`
+    const directory = join(evidence, trial)
+    const archivedState = join('.tmp', 'poolmon-markdown-state', trial)
+    await mkdir(directory, { recursive: true })
+    await mkdir(archivedState, { recursive: true })
+    // This script owns its fresh CI workspace. Archive state instead of sharing it between trials.
+    for (const name of ['.vscode-user-data-dir', '.vscode-test-workspace', '.vscode-memory-leak-finder-results']) {
+      if (await exists(name)) await rename(name, join(archivedState, name))
+    }
+    const args = [
+      'packages/cli/bin/test.js',
+      '--cwd',
+      'packages/e2e',
+      '--only',
+      scenario,
+      '--vscode-version',
+      '1.137.0',
+      '--runs',
+      String(runs),
+      '--run-skipped-tests-anyway',
+      '--check-leaks',
+      '--measure-after',
+      '--measure',
+      'poolmon',
+    ]
+    const startedAt = new Date().toISOString()
+    await writeFile(
+      join(directory, 'invocation.json'),
+      JSON.stringify({ startedAt, runs, args, harnessSha: process.env.GITHUB_SHA }, null, 2),
+    )
+    const code = await run(args, join(directory, 'run.log'))
+    const hasResult = await exists(resultPath)
+    if (hasResult) await copyFile(resultPath, join(directory, 'result.json'))
+    await stopDiagnosticVscode()
+    if (await exists('.vscode-user-data-dir/logs')) {
+      await cp('.vscode-user-data-dir/logs', join(directory, 'application-logs'), { recursive: true })
+    }
+    const log = await readFile(join(directory, 'run.log'), 'utf8')
+    if (!hasResult || /SKIP \(FAIL\)|Test Suites:.*\b[1-9]\d* failed/.test(log)) {
+      await writeFile(join(directory, 'invalid-attempt.txt'), `Scenario failed or no fresh result; exit ${code}.\n`)
+      if (attempt === 3) throw new Error(`${trial}: no valid measurement after three attempts`)
+      continue
+    }
+    const data = JSON.parse(await readFile(resultPath, 'utf8')).poolmon
+    const snapshots = [
+      ['before', data.snapshots.before],
+      ['immediate', data.snapshots.after],
+      ...data.idleSnapshots.map((entry) => [`idle-${entry.idleSeconds}s`, entry.snapshot]),
+    ]
+    if (data.idleSnapshots.length !== 3) throw new Error(`${trial}: missing idle snapshots`)
+    for (const [phase, snapshot] of snapshots) {
+      if (snapshot.processError) throw new Error(`${trial} ${phase}: ${snapshot.processError}`)
+      if (!snapshot.processes.length) throw new Error(`${trial} ${phase}: empty process snapshot`)
+      const rows = snapshot.processes.filter((row) => row.imageName.toLowerCase() === 'code.exe')
+      const memory = rows.reduce((sum, row) => sum + row.memoryKb, 0) / 1024
+      const privateMemory = rows.reduce((sum, row) => sum + (row.privateMemoryKb ?? 0), 0) / 1024
+      summary.push(`| ${trial} | ${runs} | ${phase} | ${rows.length} | ${memory.toFixed(1)} | ${privateMemory.toFixed(1)} |`)
+    }
+    await writeFile(join(evidence, 'summary.md'), summary.join('\n') + '\n')
+    // A leak verdict is data; failure to complete the scenario is not a valid measurement.
+    if (code !== 0 && !data.isLeak) throw new Error(`${trial}: unexpected exit ${code}`)
+    break
   }
-  const args = [
-    'packages/cli/bin/test.js',
-    '--cwd',
-    'packages/e2e',
-    '--only',
-    scenario,
-    '--vscode-version',
-    '1.137.0',
-    '--runs',
-    String(runs),
-    '--run-skipped-tests-anyway',
-    '--check-leaks',
-    '--measure-after',
-    '--measure',
-    'poolmon',
-  ]
-  const startedAt = new Date().toISOString()
-  await writeFile(
-    join(directory, 'invocation.json'),
-    JSON.stringify({ startedAt, runs, args, harnessSha: process.env.GITHUB_SHA }, null, 2),
-  )
-  const code = await run(args, join(directory, 'run.log'))
-  if (!(await exists(resultPath))) throw new Error(`${trial}: measurement did not produce a fresh result (exit ${code})`)
-  await copyFile(resultPath, join(directory, 'result.json'))
-  await stopDiagnosticVscode()
-  if (await exists('.vscode-user-data-dir/logs')) {
-    await cp('.vscode-user-data-dir/logs', join(directory, 'application-logs'), { recursive: true })
-  }
-  const data = JSON.parse(await readFile(resultPath, 'utf8')).poolmon
-  const snapshots = [
-    ['before', data.snapshots.before],
-    ['immediate', data.snapshots.after],
-    ...data.idleSnapshots.map((entry) => [`idle-${entry.idleSeconds}s`, entry.snapshot]),
-  ]
-  if (data.idleSnapshots.length !== 3) throw new Error(`${trial}: missing idle snapshots`)
-  for (const [phase, snapshot] of snapshots) {
-    if (snapshot.processError) throw new Error(`${trial} ${phase}: ${snapshot.processError}`)
-    if (!snapshot.processes.length) throw new Error(`${trial} ${phase}: empty process snapshot`)
-    const rows = snapshot.processes.filter((row) => row.imageName.toLowerCase() === 'code.exe')
-    const memory = rows.reduce((sum, row) => sum + row.memoryKb, 0) / 1024
-    const privateMemory = rows.reduce((sum, row) => sum + (row.privateMemoryKb ?? 0), 0) / 1024
-    summary.push(`| ${trial} | ${runs} | ${phase} | ${rows.length} | ${memory.toFixed(1)} | ${privateMemory.toFixed(1)} |`)
-  }
-  await writeFile(join(evidence, 'summary.md'), summary.join('\n') + '\n')
-  // A leak verdict is data; failure to complete the scenario is not a valid measurement.
-  const log = await readFile(join(directory, 'run.log'), 'utf8')
-  if (/SKIP \(FAIL\)|Test Suites:.*\b[1-9]\d* failed/.test(log)) throw new Error(`${trial}: scenario failed`)
-  if (code !== 0 && !data.isLeak) throw new Error(`${trial}: unexpected exit ${code}`)
 }
 if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary.join('\n') + '\n')
