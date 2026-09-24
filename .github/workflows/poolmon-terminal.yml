@@ -8,8 +8,8 @@ on:
     inputs:
       mode:
         type: choice
-        options: [heap, poolmon]
-        default: heap
+        options: [comparison, heap, poolmon]
+        default: comparison
 
 permissions:
   contents: read
@@ -30,6 +30,8 @@ jobs:
           cache: npm
       - run: npm run install:ci
       - run: npm run build
+      - name: Install archive tool for controlled dependency patch
+        run: npm install --prefix .tmp/asar-tools --no-save --package-lock=false --ignore-scripts @electron/asar@4.3.0
       - name: Locate PoolMon
         shell: pwsh
         run: |
@@ -39,7 +41,7 @@ jobs:
           "POOLMON_PATH=$($poolmon.FullName)" >> $env:GITHUB_ENV
       - name: Measure Terminal with fresh profiles
         env:
-          TERMINAL_DIAGNOSTIC_MODE: ${{ inputs.mode || 'heap' }}
+          TERMINAL_DIAGNOSTIC_MODE: ${{ inputs.mode || 'comparison' }}
           POOLMON_IDLE_SECONDS: 5,30,60
         run: node scripts/poolmon-terminal.ts
       - uses: actions/upload-artifact@v7

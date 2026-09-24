@@ -3,7 +3,9 @@ import { promisify } from 'node:util'
 import { createWriteStream } from 'node:fs'
 import { finished } from 'node:stream/promises'
 import { appendFile, copyFile, cp, mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { glob } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 
 const execFileAsync = promisify(execFile)
 
@@ -32,7 +34,7 @@ const stopDiagnosticVscode = async () => {
   )
 }
 
-const heapMode = process.env.TERMINAL_DIAGNOSTIC_MODE === 'heap'
+const mode = process.env.TERMINAL_DIAGNOSTIC_MODE || 'heap'
 const evidence = join('.tmp', 'poolmon-terminal')
 await mkdir(evidence, { recursive: true })
 
@@ -74,20 +76,78 @@ const summary = [
   '|---|---:|---|---:|---:|---:|',
 ]
 
-const trials = heapMode
-  ? [{ scenario: 'terminal-split', runs: 37 }]
-  : [
-      { scenario: 'terminal-poolmon-idle', runs: 37 },
-      { scenario: 'terminal-split', runs: 1 },
-      { scenario: 'terminal-split', runs: 37 },
-      { scenario: 'terminal-poolmon-dispose-all', runs: 37 },
-    ]
-for (const [index, { scenario, runs }] of trials.entries()) {
+let patchPath = ''
+if (mode === 'comparison') {
+  const smokeCode = await run(
+    [
+      'packages/cli/bin/test.js',
+      '--cwd',
+      'packages/e2e',
+      '--only',
+      'terminal-split',
+      '--runs',
+      '1',
+      '--run-skipped-tests-anyway',
+      '--vscode-version',
+      '1.137.0',
+    ],
+    join(evidence, 'prepare.log'),
+  )
+  await stopDiagnosticVscode()
+  const smokeLog = await readFile(join(evidence, 'prepare.log'), 'utf8')
+  if (smokeCode !== 0 || !smokeLog.includes('SKIP (PASS)')) throw new Error('Product preparation smoke failed')
+  const archives = []
+  for await (const path of glob('.vscode-test/**/node_modules.asar')) archives.push(path)
+  if (archives.length !== 1) throw new Error(`Expected one dependency archive, found ${archives.length}`)
+  const { extractAll } = await import('../.tmp/asar-tools/node_modules/@electron/asar/lib/asar.js')
+  const modules = join(dirname(archives[0]), 'node_modules')
+  extractAll(archives[0], modules)
+  await rename(archives[0], `${archives[0]}.original`)
+  patchPath = join(modules, 'node-pty', 'lib', 'windowsPtyAgent.js')
+  await copyFile(patchPath, join(evidence, 'windowsPtyAgent.before.js'))
+  await copyFile(join(modules, 'node-pty', 'package.json'), join(evidence, 'node-pty-package.json'))
+}
+const trials =
+  mode === 'comparison'
+    ? [
+        { scenario: 'terminal-split', runs: 37, heap: false, fixed: false },
+        { scenario: 'terminal-split', runs: 37, heap: false, fixed: true },
+        { scenario: 'terminal-split', runs: 37, heap: true, fixed: true },
+      ]
+    : mode === 'heap'
+      ? [{ scenario: 'terminal-split', runs: 37, heap: true, fixed: false }]
+      : [
+          { scenario: 'terminal-poolmon-idle', runs: 37, heap: false, fixed: false },
+          { scenario: 'terminal-split', runs: 1, heap: false, fixed: false },
+          { scenario: 'terminal-split', runs: 37, heap: false, fixed: false },
+          { scenario: 'terminal-poolmon-dispose-all', runs: 37, heap: false, fixed: false },
+        ]
+let patched = false
+for (const [index, { scenario, runs, heap: heapMode, fixed }] of trials.entries()) {
+  if (fixed && !patched) {
+    const before = await readFile(patchPath, 'utf8')
+    const needle = `            this._outSocket.on('data', function () {
+                _this._conoutSocketWorker.dispose();
+            });`
+    if (before.split(needle).length !== 2) throw new Error('Unexpected bundled node-pty implementation')
+    const after = before.replace(needle, needle + '\n            this._conoutSocketWorker.dispose();')
+    await writeFile(patchPath, after)
+    await writeFile(join(evidence, 'windowsPtyAgent.after.js'), after)
+    await writeFile(
+      join(evidence, 'patch-hashes.json'),
+      JSON.stringify(
+        { before: createHash('sha256').update(before).digest('hex'), after: createHash('sha256').update(after).digest('hex') },
+        null,
+        2,
+      ),
+    )
+    patched = true
+  }
   const resultPath = heapMode
     ? join('.vscode-memory-leak-finder-results', 'pty-host', 'named-function-count3', `${scenario}.json`)
     : join('.vscode-memory-leak-finder-results', 'poolmon', `${scenario}.json`)
   for (let attempt = 1; attempt <= 3; attempt++) {
-    const trial = `${index + 1}-${scenario}-${runs}-runs-attempt-${attempt}`
+    const trial = `${index + 1}-${scenario}-${runs}-runs-${fixed ? 'fixed' : 'baseline'}-${heapMode ? 'heap' : 'poolmon'}-attempt-${attempt}`
     const directory = join(evidence, trial)
     const archivedState = join('.tmp', 'poolmon-terminal-state', trial)
     await mkdir(directory, { recursive: true })
@@ -116,7 +176,7 @@ for (const [index, { scenario, runs }] of trials.entries()) {
     const startedAt = new Date().toISOString()
     await writeFile(
       join(directory, 'invocation.json'),
-      JSON.stringify({ startedAt, runs, args, harnessSha: process.env.GITHUB_SHA }, null, 2),
+      JSON.stringify({ startedAt, runs, fixed, args, harnessSha: process.env.GITHUB_SHA }, null, 2),
     )
     const code = await run(args, join(directory, 'run.log'))
     const hasResult = await exists(resultPath)
