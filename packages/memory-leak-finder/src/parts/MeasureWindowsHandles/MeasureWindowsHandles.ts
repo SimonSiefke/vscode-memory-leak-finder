@@ -5,6 +5,7 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 const execFileAsync = promisify(execFile)
 const DefaultLeakThreshold = 0
+const ProcessQueryTimeout = 5 * 60 * 1000
 
 export interface WindowsHandleProcess {
   readonly name: string
@@ -125,6 +126,8 @@ const capture = async (state: State): Promise<WindowsHandlesSnapshot> => {
       {
         encoding: 'utf8',
         maxBuffer: 8 * 1024 * 1024,
+        timeout: ProcessQueryTimeout,
+        killSignal: 'SIGKILL',
         windowsHide: true,
       },
     )
