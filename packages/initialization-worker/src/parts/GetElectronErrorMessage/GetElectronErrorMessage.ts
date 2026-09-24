@@ -32,7 +32,7 @@ interface ReadableStreamLike {
   on(event: 'data', listener: (data: string) => void): unknown
 }
 
-export const getElectronErrorMessage = async (firstData: string, stream?: ReadableStreamLike): Promise<Error> => {
+export const getElectronErrorMessage = async (firstData: string, stream?: ReadableStreamLike, signal?: AbortSignal): Promise<Error> => {
   if (firstData.includes('Error launching app')) {
     const normalData = stripAnsi(firstData)
     const lines = normalData.split('\n')
@@ -43,7 +43,7 @@ export const getElectronErrorMessage = async (firstData: string, stream?: Readab
     if (!stream) {
       throw new Error('Stream is required when App threw an error during load')
     }
-    const dataEvents = await once(stream as NodeJS.ReadableStream, 'data')
+    const dataEvents = await once(stream as NodeJS.ReadableStream, 'data', signal ? { signal } : {})
     const secondData = dataEvents[0] as string
     const lines = secondData.trim().split('\n')
     if (RE_ES_MODULES_NOT_SUPPORTED.test(secondData)) {
