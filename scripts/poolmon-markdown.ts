@@ -62,7 +62,7 @@ for (const [index, runs] of [1, 10, 37, 37].entries()) {
     '--cwd',
     'packages/e2e',
     '--only',
-    `^${scenario}.ts$`,
+    scenario,
     '--vscode-version',
     '1.137.0',
     '--runs',
