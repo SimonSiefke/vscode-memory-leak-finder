@@ -1,8 +1,36 @@
-import { spawn } from 'node:child_process'
+import { execFile, spawn } from 'node:child_process'
+import { promisify } from 'node:util'
 import { createWriteStream } from 'node:fs'
 import { finished } from 'node:stream/promises'
-import { appendFile, copyFile, mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises'
+import { appendFile, copyFile, cp, mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+
+const execFileAsync = promisify(execFile)
+
+const stopDiagnosticVscode = async () => {
+  const prefix = (join(process.cwd(), '.vscode-test') + '\\').replaceAll("'", "''")
+  await execFileAsync(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-NonInteractive',
+      '-Command',
+      `
+    $ErrorActionPreference = 'Stop'
+    $owned = @(Get-CimInstance Win32_Process -Filter \"Name = 'Code.exe'\" |
+      Where-Object { $_.ExecutablePath -and $_.ExecutablePath.StartsWith('${prefix}', [StringComparison]::OrdinalIgnoreCase) })
+    foreach ($process in $owned) {
+      $current = Get-CimInstance Win32_Process -Filter \"ProcessId = $($process.ProcessId)\"
+      if ($current -and $current.CreationDate -eq $process.CreationDate) {
+        taskkill.exe /PID $process.ProcessId /T /F | Out-Null
+      }
+    }
+    Start-Sleep -Seconds 2
+  `,
+    ],
+    { timeout: 60_000, windowsHide: true },
+  )
+}
 
 const scenario = 'markdown-preview-side-by-side'
 const evidence = join('.tmp', 'poolmon-markdown')
@@ -79,11 +107,12 @@ for (const [index, runs] of [1, 10, 37, 37].entries()) {
     JSON.stringify({ startedAt, runs, args, harnessSha: process.env.GITHUB_SHA }, null, 2),
   )
   const code = await run(args, join(directory, 'run.log'))
-  if (await exists('.vscode-user-data-dir/logs')) {
-    await rename('.vscode-user-data-dir/logs', join(directory, 'application-logs'))
-  }
   if (!(await exists(resultPath))) throw new Error(`${trial}: measurement did not produce a fresh result (exit ${code})`)
   await copyFile(resultPath, join(directory, 'result.json'))
+  await stopDiagnosticVscode()
+  if (await exists('.vscode-user-data-dir/logs')) {
+    await cp('.vscode-user-data-dir/logs', join(directory, 'application-logs'), { recursive: true })
+  }
   const data = JSON.parse(await readFile(resultPath, 'utf8')).poolmon
   const snapshots = [
     ['before', data.snapshots.before],
