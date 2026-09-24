@@ -38,14 +38,20 @@ Resource growth persisted in the host: approximately +384 MiB / +290 handles / +
 
 PoolMon adds a correlated kernel signal. The `NpFc` paged-pool tag (named-pipe client control blocks) remained +69,600 bytes / +145 outstanding allocations after 37 splits, and +63,360 bytes / +132 allocations after dispose-all. The idle control had no `NpFc` growth. These deltas were stable from 5 through 60 seconds. The system-wide thread-object and object-table deltas largely recovered, so looking only at total pool bytes or the immediate chart would miss the distinction.
 
-## Next isolation steps
+## Windows heap and candidate fix
 
-1. Capture the Windows pty-host JavaScript heap after cleanup, looking for surviving Worker, MessagePort, pipe/socket and `node-pty` connection objects and their owners. A Linux heap cannot answer this Windows-specific question.
-2. Reproduce spawn/kill cycles directly with the exact bundled `node-pty` and ConPTY versions, outside VS Code, recording the same handles, threads and private memory. This can distinguish a `node-pty`/ConPTY issue from VS Code lifecycle handling without rebuilding VS Code.
-3. If handles or native allocations remain without a JavaScript retaining path, capture handle types and native allocation stacks for the identified pty-host PID. Pool tags alone are not sufficient attribution.
-4. Follow with output-heavy disposal and rapid resize tests if simple lifecycle retention is resolved; these exercise different buffering and cancellation paths.
+[Run 36045871171](https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/36045871171) repeated 37 splits while inspecting the Windows pty host, with ten seconds of settling before the final heap measurement. It retained exactly 37 additional `Worker`, `ConoutConnection`, `WindowsPtyAgent`, and `WindowsTerminal` objects, plus 74 sockets. Retaining paths start at live worker handles and reach the connection through the worker error listener. This identifies live resources rather than merely unused allocator capacity.
 
-No VS Code or `node-pty` production fix is claimed by this diagnostic branch.
+The bundled `node-pty` version is `1.2.0-beta.15`. Its bundled-ConPTY branch of `WindowsPtyAgent.kill()` calls `ConoutConnection.dispose()` only from a subsequent output `data` listener. A quiet terminal can produce no further data, so its output worker never starts the existing one-second drain timeout. The worker keeps its pipe server alive.
+
+[Draft fix: SimonSiefke/node-pty#1](https://github.com/SimonSiefke/node-pty/pull/1) starts that drain timeout immediately after kill and preserves the listener that resets it for trailing output. It includes a focused lifecycle test and a real quiet-terminal worker-exit test. The production change is one call plus a comment; native binaries are unchanged.
+
+Validation jobs are pending at the time of this report:
+
+- [Standalone Windows baseline/fixed comparison](https://github.com/SimonSiefke/node-pty/actions/runs/36047610013): the same regression tests against both source versions, the candidate's full suite, and 37 spawn/kill cycles recording worker exits, private memory, handles, and threads after 30 seconds idle.
+- [VS Code comparison](https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/36046942326): official 1.137.0 with identical native binaries and unpacked dependencies for both trials, changing only the cleanup call. Records PoolMon/process measurements and the fixed pty-host heap.
+
+The candidate builds and passes lint locally. The Linux suite passed 19 tests; its existing descriptor-count test failed to parse interactive shell output on both the unchanged baseline and candidate. Windows before/after validation is still required before attributing the measured resource recovery to this change.
 
 ## Linux pty-host cross-check
 
