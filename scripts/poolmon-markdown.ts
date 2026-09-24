@@ -32,7 +32,8 @@ const stopDiagnosticVscode = async () => {
   )
 }
 
-const scenario = 'markdown-preview-side-by-side'
+const gcDiagnostic = process.env.MARKDOWN_DIAGNOSTIC_MODE === 'gc'
+const scenario = gcDiagnostic ? 'markdown-preview-gc-diagnostic' : 'markdown-preview-side-by-side'
 const evidence = join('.tmp', 'poolmon-markdown')
 const resultPath = join('.vscode-memory-leak-finder-results', 'poolmon', `${scenario}.json`)
 await mkdir(evidence, { recursive: true })
@@ -75,9 +76,10 @@ const summary = [
   '|---|---:|---|---:|---:|---:|',
 ]
 
-for (const [index, runs] of [1, 10, 37, 37].entries()) {
+for (const [index, runs] of (gcDiagnostic ? [37, 37] : [1, 10, 37, 37]).entries()) {
+  process.env.MARKDOWN_PREVIEW_FORCE_GC = gcDiagnostic && index === 1 ? '1' : '0'
   for (let attempt = 1; attempt <= 3; attempt++) {
-    const trial = `${index + 1}-${runs}-runs-attempt-${attempt}`
+    const trial = `${index + 1}-${runs}-runs${gcDiagnostic ? (index === 1 ? '-gc' : '-no-gc') : ''}-attempt-${attempt}`
     const directory = join(evidence, trial)
     const archivedState = join('.tmp', 'poolmon-markdown-state', trial)
     await mkdir(directory, { recursive: true })
@@ -105,7 +107,11 @@ for (const [index, runs] of [1, 10, 37, 37].entries()) {
     const startedAt = new Date().toISOString()
     await writeFile(
       join(directory, 'invocation.json'),
-      JSON.stringify({ startedAt, runs, args, harnessSha: process.env.GITHUB_SHA }, null, 2),
+      JSON.stringify(
+        { startedAt, runs, args, forceGc: process.env.MARKDOWN_PREVIEW_FORCE_GC, harnessSha: process.env.GITHUB_SHA },
+        null,
+        2,
+      ),
     )
     const code = await run(args, join(directory, 'run.log'))
     const hasResult = await exists(resultPath)

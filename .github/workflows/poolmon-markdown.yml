@@ -5,6 +5,12 @@ on:
     branches:
       - diagnostic/poolmon-markdown
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Baseline scaling or controlled GC comparison
+        type: choice
+        options: [baseline, gc]
+        default: gc
 
 permissions:
   contents: read
@@ -35,6 +41,7 @@ jobs:
       - name: Measure Markdown with fresh profiles
         env:
           POOLMON_IDLE_SECONDS: 5,30,60
+          MARKDOWN_DIAGNOSTIC_MODE: ${{ inputs.mode || 'gc' }}
         run: node scripts/poolmon-markdown.ts
       - uses: actions/upload-artifact@v7
         if: always()
