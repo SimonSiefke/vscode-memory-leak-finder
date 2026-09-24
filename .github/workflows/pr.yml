@@ -137,15 +137,25 @@ jobs:
       - name: Locate PoolMon
         shell: pwsh
         run: |
-          $poolmon = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Tools" -Recurse -Filter poolmon.exe -File -ErrorAction SilentlyContinue | Select-Object -First 1
+          $poolmon = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Tools" -Recurse -Filter poolmon.exe -File -ErrorAction SilentlyContinue | Where-Object { $_.Directory.Name -eq 'x64' } | Select-Object -First 1
           if ($null -eq $poolmon) {
-            $poolmon = Get-ChildItem "$env:ProgramFiles\Windows Kits\10\Tools" -Recurse -Filter poolmon.exe -File -ErrorAction SilentlyContinue | Select-Object -First 1
+            $poolmon = Get-ChildItem "$env:ProgramFiles\Windows Kits\10\Tools" -Recurse -Filter poolmon.exe -File -ErrorAction SilentlyContinue | Where-Object { $_.Directory.Name -eq 'x64' } | Select-Object -First 1
           }
           if ($null -eq $poolmon) {
-            throw 'PoolMon was not found on the Windows runner. The WDK installation is missing.'
+            throw 'x64 PoolMon was not found on the Windows runner. Install the x64 WDK tools.'
           }
           Write-Host "Using PoolMon at $($poolmon.FullName)"
           "POOLMON_PATH=$($poolmon.FullName)" >> $env:GITHUB_ENV
+      - name: Verify PoolMon snapshot
+        shell: pwsh
+        timeout-minutes: 2
+        run: |
+          node --input-type=module -e "
+            import { start } from './packages/memory-leak-finder/src/parts/MeasurePoolmon/MeasurePoolmon.ts';
+            const snapshot = await start({ poolmonPath: process.env.POOLMON_PATH, pooltagPath: '' });
+            if (snapshot.rows.length === 0) throw new Error('PoolMon snapshot contains no pool tags');
+            console.log('PoolMon snapshot verified:', snapshot.rows.length, 'pool tags');
+          "
       - name: Run PoolMon measure
         continue-on-error: true
         run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure poolmon --runs 37 --run-skipped-tests-anyway
@@ -162,62 +172,5 @@ jobs:
         if: always()
         with:
           name: vscode-memory-leak-finder-charts-windows-poolmon
-          path: ./.vscode-charts
-          include-hidden-files: true
-
-  pr-windows-handles:
-    runs-on: windows-2022
-    needs: pr
-    timeout-minutes: 360
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: '.nvmrc'
-      - name: Compute node modules cache key
-        id: nodeModulesCacheKey
-        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
-        shell: bash
-      - uses: actions/cache@v6
-        id: npm-cache
-        with:
-          path: |
-            **/node_modules
-            **/.vscode-test
-            **/.vscode-user-data-dir
-            **/.vscode-ffmpeg
-            **/.vscode-resolve-source-map-cache
-          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
-      - name: Compute source maps cache key
-        id: sourceMapsCacheKey
-        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
-        shell: bash
-      - uses: actions/cache@v6
-        id: source-maps-cache
-        with:
-          path: |
-            **/.vscode-source-maps
-            **/.vscode-sources
-          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
-      - name: npm ci
-        run: npm ci --ignore-scripts && npm run postinstall
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-      - run: npm run build
-      - name: Run Windows handles measure
-        continue-on-error: true
-        run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure windows-handles --runs 37 --restart-between --run-skipped-tests-anyway
-      - name: Generate Windows handles charts
-        if: always()
-        run: node packages/charts/src/main.ts
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: vscode-memory-leak-finder-results-windows-handles
-          path: ./.vscode-memory-leak-finder-results
-          include-hidden-files: true
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: vscode-memory-leak-finder-charts-windows-handles
           path: ./.vscode-charts
           include-hidden-files: true
