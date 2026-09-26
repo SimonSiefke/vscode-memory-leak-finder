@@ -15,8 +15,13 @@ linuxTest('joins before exec and preserves literal command arguments', async () 
     await writeFile(join(path, 'cgroup.events'), 'populated 0\n')
     await writeFile(join(path, 'cgroup.procs'), '')
     const arg = '$(false); literal argument'
-    const command = await Command.wrap(process.execPath, ['-e', 'console.log(process.pid, process.argv[1])', arg], path, 'linux')
-    const result = await promisify(execFile)(command.command, command.args)
+    const command = await Command.wrap(
+      process.execPath,
+      ['-e', 'process.stdout.write(`${process.pid} ${process.argv[1]}`)', arg],
+      path,
+      'linux',
+    )
+    const result = await promisify(execFile)(command.command, command.args, { env: { ...process.env, FORCE_COLOR: '1' } })
     const pid = (await readFile(join(path, 'cgroup.procs'), 'utf8')).trim()
     expect(result.stdout.trim()).toBe(`${pid} ${arg}`)
     await expect(Command.wrap('code', [], path, 'linux')).rejects.toThrow('empty')
