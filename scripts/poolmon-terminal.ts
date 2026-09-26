@@ -3,9 +3,10 @@ import { promisify } from 'node:util'
 import { createWriteStream } from 'node:fs'
 import { finished } from 'node:stream/promises'
 import { appendFile, copyFile, cp, mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import { glob } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
+import { patchConptyArchive } from './patch-conpty-archive.ts'
 
 const execFileAsync = promisify(execFile)
 
@@ -76,7 +77,7 @@ const summary = [
   '|---|---:|---|---:|---:|---:|',
 ]
 
-let patchPath = ''
+let archivePath = ''
 if (mode === 'comparison') {
   const smokeCode = await run(
     [
@@ -99,13 +100,9 @@ if (mode === 'comparison') {
   const archives = []
   for await (const path of glob('.vscode-test/**/node_modules.asar')) archives.push(path)
   if (archives.length !== 1) throw new Error(`Expected one dependency archive, found ${archives.length}`)
-  const { extractAll } = await import('../.tmp/asar-tools/node_modules/@electron/asar/lib/asar.js')
-  const modules = join(dirname(archives[0]), 'node_modules')
-  extractAll(archives[0], modules)
-  await rename(archives[0], `${archives[0]}.original`)
-  patchPath = join(modules, 'node-pty', 'lib', 'windowsPtyAgent.js')
-  await copyFile(patchPath, join(evidence, 'windowsPtyAgent.before.js'))
-  await copyFile(join(modules, 'node-pty', 'package.json'), join(evidence, 'node-pty-package.json'))
+  archivePath = archives[0]
+  const { extractFile } = await import('../.tmp/asar-tools/node_modules/@electron/asar/lib/asar.js')
+  await writeFile(join(evidence, 'node-pty-package.json'), extractFile(archivePath, 'node-pty/package.json'))
 }
 const trials =
   mode === 'comparison'
@@ -125,18 +122,23 @@ const trials =
 let patched = false
 for (const [index, { scenario, runs, heap: heapMode, fixed }] of trials.entries()) {
   if (fixed && !patched) {
-    const before = await readFile(patchPath, 'utf8')
-    const needle = `            this._outSocket.on('data', function () {
-                _this._conoutSocketWorker.dispose();
-            });`
-    if (before.split(needle).length !== 2) throw new Error('Unexpected bundled node-pty implementation')
-    const after = before.replace(needle, needle + '\n            this._conoutSocketWorker.dispose();')
-    await writeFile(patchPath, after)
+    const candidateArchive = join('.tmp', 'node_modules.candidate.asar')
+    const { before, after, verifiedFiles } = await patchConptyArchive(archivePath, candidateArchive)
+    // Keep the archive path used by VS Code's dependency resolver. Every other file
+    // is byte-for-byte verified, and the original .asar.unpacked native files stay in place.
+    await rename(archivePath, `${archivePath}.original`)
+    await rename(candidateArchive, archivePath)
+    await writeFile(join(evidence, 'windowsPtyAgent.before.js'), before)
     await writeFile(join(evidence, 'windowsPtyAgent.after.js'), after)
     await writeFile(
       join(evidence, 'patch-hashes.json'),
       JSON.stringify(
-        { before: createHash('sha256').update(before).digest('hex'), after: createHash('sha256').update(after).digest('hex') },
+        {
+          before: createHash('sha256').update(before).digest('hex'),
+          after: createHash('sha256').update(after).digest('hex'),
+          verifiedFiles,
+          unchangedNativeFiles: true,
+        },
         null,
         2,
       ),

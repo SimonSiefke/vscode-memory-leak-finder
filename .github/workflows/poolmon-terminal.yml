@@ -32,6 +32,8 @@ jobs:
       - run: npm run build
       - name: Install archive tool for controlled dependency patch
         run: npm install --prefix .tmp/asar-tools --no-save --package-lock=false --ignore-scripts @electron/asar@4.3.0
+      - name: Test dependency archive patch
+        run: node --test scripts/patch-conpty-archive.test.ts
       - name: Locate PoolMon
         shell: pwsh
         run: |
