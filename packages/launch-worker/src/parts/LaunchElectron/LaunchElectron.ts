@@ -5,6 +5,7 @@ import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as AssertCallgrindAvailable from '../AssertCallgrindAvailable/AssertCallgrindAvailable.ts'
+import * as LinuxCgroupCommand from '../LinuxCgroupCommand/LinuxCgroupCommand.ts'
 import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.ts'
 import * as Spawn from '../Spawn/Spawn.ts'
 import { VError } from '../VError/VError.ts'
@@ -122,6 +123,11 @@ export const launchElectron = async ({
         measuredPath,
         ...measuredArgs,
       ]
+    }
+    if (env.LINUX_CGROUP_PATH) {
+      const wrapped = await LinuxCgroupCommand.wrap(spawnPath, spawnArgs, env.LINUX_CGROUP_PATH, platform)
+      spawnPath = wrapped.command
+      spawnArgs = wrapped.args
     }
     const child = Spawn.spawn(spawnPath, spawnArgs, {
       cwd,
