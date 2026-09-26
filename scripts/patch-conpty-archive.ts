@@ -11,7 +11,7 @@ export const patchConptyArchive = async (source: string, destination: string) =>
             });`
   assert.equal(before.split(needle).length, 2, 'Unexpected bundled node-pty implementation')
   const after = before.replace(needle, needle + '\n            this._conoutSocketWorker.dispose();')
-  const paths = listPackage(source).map((path) => path.replaceAll('\\', '/').replace(/^\//, ''))
+  const paths = listPackage(source, { isPack: false }).map((path) => path.replaceAll('\\', '/').replace(/^\//, ''))
   const streams = paths.map((path) => {
     const entry = statFile(source, path, false)
     const unpacked = !!entry.unpacked
@@ -28,7 +28,7 @@ export const patchConptyArchive = async (source: string, destination: string) =>
     }
   })
   await createPackageFromStreams(destination, streams)
-  assert.deepEqual(listPackage(destination), listPackage(source), 'Archive entries changed')
+  assert.deepEqual(listPackage(destination, { isPack: false }), listPackage(source, { isPack: false }), 'Archive entries changed')
   let verifiedFiles = 0
   for (const path of paths) {
     const original = statFile(source, path, false)
