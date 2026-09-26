@@ -683,3 +683,15 @@ It seems there is memory leak when opening and closing a notebook. But just look
 ## Credits
 
 This project is based on the [jest cli](https://github.com/jestjs/jest), [playwright](https://github.com/microsoft/playwright/) and [fuite](https://github.com/nolanlawson/fuite).
+
+### Linux process memory
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-memory --only base
+```
+
+This Linux-only measure snapshots `/proc/<pid>/smaps_rollup` for the root application and its current descendants. It records PSS, RSS, private bytes (including private huge pages), and proportional swap usage. PSS apportions shared resident pages instead of counting them fully in each process. PID plus kernel start time distinguishes restarted processes; comparisons include started and exited processes and preserve both snapshots.
+
+At least 64 KiB PSS growth in any process signals a suspected leak. Caching, allocator retention, and changes in page sharing can also change PSS. Compare repeated warmed-up scenarios. These are resident-memory snapshots, not an allocation census: growth within existing resident arenas may be invisible. Processes that exit between snapshots, or descendants reparented outside the tree, may be missed.
+
+Reading smaps requires procfs access to the application processes. An unreadable descendant is recorded as a snapshot error and suppresses automatic leak classification; the summary marks the result incomplete. Failure to read the root process fails the measure. Kernel slab memory is outside this measure's scope.
