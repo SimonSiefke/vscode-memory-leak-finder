@@ -8,7 +8,7 @@ on:
     inputs:
       mode:
         type: choice
-        options: [comparison, heap, poolmon]
+        options: [comparison, heap, poolmon, video]
         default: comparison
 
 permissions:

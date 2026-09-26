@@ -36,6 +36,7 @@ const stopDiagnosticVscode = async () => {
 }
 
 const mode = process.env.TERMINAL_DIAGNOSTIC_MODE || 'heap'
+const videoMode = mode === 'video'
 const evidence = join('.tmp', 'poolmon-terminal')
 await mkdir(evidence, { recursive: true })
 
@@ -78,7 +79,7 @@ const summary = [
 ]
 
 let archivePath = ''
-if (mode === 'comparison') {
+if (mode === 'comparison' || videoMode) {
   const smokeCode = await run(
     [
       'packages/cli/bin/test.js',
@@ -104,8 +105,9 @@ if (mode === 'comparison') {
   const { extractFile } = await import('../.tmp/asar-tools/node_modules/@electron/asar/lib/asar.js')
   await writeFile(join(evidence, 'node-pty-package.json'), extractFile(archivePath, join('node-pty', 'package.json')))
 }
-const trials =
-  mode === 'comparison'
+const trials = videoMode
+  ? [{ scenario: 'terminal-split', runs: 7, heap: false, fixed: true }]
+  : mode === 'comparison'
     ? [
         { scenario: 'terminal-split', runs: 37, heap: false, fixed: false },
         { scenario: 'terminal-split', runs: 37, heap: false, fixed: true },
@@ -145,17 +147,19 @@ for (const [index, { scenario, runs, heap: heapMode, fixed }] of trials.entries(
     )
     patched = true
   }
-  const resultPath = heapMode
-    ? join('.vscode-memory-leak-finder-results', 'pty-host', 'named-function-count3', `${scenario}.json`)
-    : join('.vscode-memory-leak-finder-results', 'poolmon', `${scenario}.json`)
+  const resultPath = videoMode
+    ? join('.vscode-videos', 'video.webm')
+    : heapMode
+      ? join('.vscode-memory-leak-finder-results', 'pty-host', 'named-function-count3', `${scenario}.json`)
+      : join('.vscode-memory-leak-finder-results', 'poolmon', `${scenario}.json`)
   for (let attempt = 1; attempt <= 3; attempt++) {
-    const trial = `${index + 1}-${scenario}-${runs}-runs-${fixed ? 'fixed' : 'baseline'}-${heapMode ? 'heap' : 'poolmon'}-attempt-${attempt}`
+    const trial = `${index + 1}-${scenario}-${runs}-runs-${fixed ? 'fixed' : 'baseline'}-${videoMode ? 'video' : heapMode ? 'heap' : 'poolmon'}-attempt-${attempt}`
     const directory = join(evidence, trial)
     const archivedState = join('.tmp', 'poolmon-terminal-state', trial)
     await mkdir(directory, { recursive: true })
     await mkdir(archivedState, { recursive: true })
     // This script owns its fresh CI workspace. Archive state instead of sharing it between trials.
-    for (const name of ['.vscode-user-data-dir', '.vscode-test-workspace', '.vscode-memory-leak-finder-results']) {
+    for (const name of ['.vscode-user-data-dir', '.vscode-test-workspace', '.vscode-memory-leak-finder-results', '.vscode-videos']) {
       if (await exists(name)) await rename(name, join(archivedState, name))
     }
     const args = [
@@ -169,10 +173,9 @@ for (const [index, { scenario, runs, heap: heapMode, fixed }] of trials.entries(
       '--runs',
       String(runs),
       '--run-skipped-tests-anyway',
-      '--check-leaks',
-      '--measure-after',
-      '--measure',
-      heapMode ? 'named-function-count3' : 'poolmon',
+      ...(videoMode
+        ? ['--record-video']
+        : ['--check-leaks', '--measure-after', '--measure', heapMode ? 'named-function-count3' : 'poolmon']),
       ...(heapMode ? ['--inspect-ptyhost', '--timeout-between', '10000'] : []),
     ]
     const startedAt = new Date().toISOString()
@@ -182,13 +185,20 @@ for (const [index, { scenario, runs, heap: heapMode, fixed }] of trials.entries(
     )
     const code = await run(args, join(directory, 'run.log'))
     const hasResult = await exists(resultPath)
-    if (hasResult) await copyFile(resultPath, join(directory, 'result.json'))
+    if (hasResult && !videoMode) await copyFile(resultPath, join(directory, 'result.json'))
     if (heapMode && hasResult) await cp('.vscode-heapsnapshots', join(directory, 'heaps'), { recursive: true })
     await stopDiagnosticVscode()
     if (await exists('.vscode-user-data-dir/logs')) {
       await cp('.vscode-user-data-dir/logs', join(directory, 'application-logs'), { recursive: true })
     }
     const log = await readFile(join(directory, 'run.log'), 'utf8')
+    if (videoMode) {
+      if (code !== 0 || !hasResult || !log.includes('SKIP (PASS)') || !(await stat(resultPath)).size) {
+        throw new Error(`${trial}: video scenario failed or no fresh recording`)
+      }
+      await copyFile(resultPath, join(directory, 'terminal-split.webm'))
+      break
+    }
     if (!hasResult || /SKIP \(FAIL\)|Test Suites:.*\b[1-9]\d* failed/.test(log)) {
       await writeFile(join(directory, 'invalid-attempt.txt'), `Scenario failed or no fresh result; exit ${code}.\n`)
       if (attempt === 3) throw new Error(`${trial}: no valid measurement after three attempts`)
