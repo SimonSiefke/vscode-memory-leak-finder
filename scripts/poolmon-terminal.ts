@@ -106,7 +106,7 @@ if (mode === 'comparison' || videoMode) {
   await writeFile(join(evidence, 'node-pty-package.json'), extractFile(archivePath, join('node-pty', 'package.json')))
 }
 const trials = videoMode
-    ? [{ scenario: 'terminal-conpty-demo', runs: 7, heap: false, fixed: true }]
+  ? [{ scenario: 'terminal-conpty-demo', runs: 7, heap: false, fixed: true }]
   : mode === 'comparison'
     ? [
         { scenario: 'terminal-split', runs: 37, heap: false, fixed: false },
