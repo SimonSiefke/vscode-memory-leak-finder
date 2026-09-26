@@ -46,12 +46,36 @@ The bundled `node-pty` version is `1.2.0-beta.15`. Its bundled-ConPTY branch of 
 
 [Draft fix: SimonSiefke/node-pty#1](https://github.com/SimonSiefke/node-pty/pull/1) starts that drain timeout immediately after kill and preserves the listener that resets it for trailing output. It includes a focused lifecycle test and a real quiet-terminal worker-exit test. The production change is one call plus a comment; native binaries are unchanged.
 
-Validation jobs are pending at the time of this report:
+## Validation and CI repairs
 
-- [Standalone Windows baseline/fixed comparison](https://github.com/SimonSiefke/node-pty/actions/runs/36047610013): the same regression tests against both source versions, the candidate's full suite, and 37 spawn/kill cycles recording worker exits, private memory, handles, and threads after 30 seconds idle.
-- [VS Code comparison](https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/36046942326): official 1.137.0 with identical native binaries and unpacked dependencies for both trials, changing only the cleanup call. Records PoolMon/process measurements and the fixed pty-host heap.
+[PR checks](https://github.com/SimonSiefke/node-pty/actions/runs/36230304004) pass on Linux x64/ARM64, macOS Intel/ARM64, and Windows x64/ARM64. The Windows process-tree test now waits for the expected shell processes instead of accepting any three descendants: a `vctip.exe` entry previously satisfied the count before Node had started.
 
-The candidate builds and passes lint locally. The Linux suite passed 19 tests; its existing descriptor-count test failed to parse interactive shell output on both the unchanged baseline and candidate. Windows before/after validation is still required before attributing the measured resource recovery to this change.
+The [standalone Windows comparison](https://github.com/SimonSiefke/node-pty/actions/runs/36230639432) passes. Both cleanup regression tests fail against the unchanged baseline; all 60 tests pass against candidate `e82a8204981c`. After two warmups and 37 measured spawn/kill cycles, the final snapshot at 30 seconds records:
+
+| Resource            | Baseline, before → idle 30s | Candidate, before → idle 30s |
+| ------------------- | --------------------------: | ---------------------------: |
+| Live output workers |                      2 → 39 |                        0 → 0 |
+| Private memory      |            49.2 → 547.6 MiB |              19.6 → 22.6 MiB |
+| Handles             |                   218 → 514 |                    202 → 202 |
+| Threads             |                     15 → 50 |                      13 → 11 |
+
+All 39 candidate workers exited. The standalone workflow uses Windows 2022 because the installed node-gyp could not discover the Windows 2025 Visual Studio toolchain. It also forces TypeScript compilation after restoring candidate source: PowerShell preserves the saved file timestamp, and an incremental build otherwise reused baseline JavaScript. Run 36230326153 is invalid as a candidate comparison for that reason.
+
+The VS Code comparison preserves `node_modules.asar` at the path used by VS Code's dependency resolver. The previous extraction into `node_modules` broke terminal startup even before applying the fix. The repaired workflow repacks the archive, verifies every dependency file's bytes and packed/unpacked status, and retains the original native files. Local validation against the exact Windows 1.137.0 package verified 5,117 files, with only `windowsPtyAgent.js` changed. The archive tests also cover native Windows path separators and reject an unexpected cleanup implementation.
+
+The [VS Code Windows comparison](https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/36230756433) passed at harness revision `36a6afe06110`. The preparation smoke, both 37-split resource trials, and the 37-split candidate heap trial completed on their first attempt with fresh profiles and fresh results. The candidate heap result is `{"namedFunctionCount3": [], "isLeak": false}` after ten seconds of settling.
+
+The pty host was identified through its OpenConsole children and matched across snapshots by PID plus creation timestamp: baseline PID 6020 (`2026-09-26T08:50:08.3789330Z`), candidate PID 4648 (`2026-09-26T08:51:31.1934200Z`). At 60 seconds idle:
+
+| Pty-host resource | Baseline, before → idle 60s | Candidate, before → idle 60s |
+| ----------------- | --------------------------: | ---------------------------: |
+| Private memory    |           107.4 → 488.3 MiB |             113.6 → 96.5 MiB |
+| Handles           |                   340 → 630 |                    340 → 326 |
+| Threads           |                     30 → 64 |                      30 → 26 |
+
+System-wide `NpFc` outstanding allocations changed by +143 (+68,640 bytes) on the baseline and −7 (−3,360 bytes) on the candidate. Both resource trials still report an overall PoolMon leak flag because other system counters grow; this does not negate the completed measurements or the recovery of the targeted pty-host resources. The fresh candidate heap has no growing rows, including the four worker/terminal constructors that grew by 37 in the earlier baseline capture.
+
+The archived `patch-hashes.json` confirms that all 5,117 files were verified and the native files remained unchanged. `windowsPtyAgent.js` SHA-256 changed from `bcd9e8aaee138601d8e2e11fb5abec415cbef9525ea67c7307633263ea584256` to `46dcfe29a3ef10b0a45add5628b8fff296ecd3abbd193b0762b2008db46d45e8`. These VS Code results validate the one-call cleanup change against the bundled `node-pty` version; the standalone comparison separately validates the PR source revision.
 
 ## Linux pty-host cross-check
 
