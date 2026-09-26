@@ -102,7 +102,7 @@ if (mode === 'comparison') {
   if (archives.length !== 1) throw new Error(`Expected one dependency archive, found ${archives.length}`)
   archivePath = archives[0]
   const { extractFile } = await import('../.tmp/asar-tools/node_modules/@electron/asar/lib/asar.js')
-  await writeFile(join(evidence, 'node-pty-package.json'), extractFile(archivePath, 'node-pty/package.json'))
+  await writeFile(join(evidence, 'node-pty-package.json'), extractFile(archivePath, join('node-pty', 'package.json')))
 }
 const trials =
   mode === 'comparison'

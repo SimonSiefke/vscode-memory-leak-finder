@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict'
+import { join } from 'node:path'
 import { Readable } from 'node:stream'
 import { createPackageFromStreams, extractFile, listPackage, statFile } from '../.tmp/asar-tools/node_modules/@electron/asar/lib/asar.js'
 
-export const agentPath = 'node-pty/lib/windowsPtyAgent.js'
+export const agentPath = join('node-pty', 'lib', 'windowsPtyAgent.js')
 
 export const patchConptyArchive = async (source: string, destination: string) => {
   const before = extractFile(source, agentPath).toString('utf8')
@@ -11,7 +12,7 @@ export const patchConptyArchive = async (source: string, destination: string) =>
             });`
   assert.equal(before.split(needle).length, 2, 'Unexpected bundled node-pty implementation')
   const after = before.replace(needle, needle + '\n            this._conoutSocketWorker.dispose();')
-  const paths = listPackage(source, { isPack: false }).map((path) => path.replaceAll('\\', '/').replace(/^\//, ''))
+  const paths = listPackage(source, { isPack: false }).map((path) => path.replace(/^[/\\]/, ''))
   const streams = paths.map((path) => {
     const entry = statFile(source, path, false)
     const unpacked = !!entry.unpacked

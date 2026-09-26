@@ -40,9 +40,9 @@ test('patches a loadable archive while preserving packed dependencies and unpack
     assert.equal(disposals, 0)
     load(extractFile(candidate, agentPath).toString()).call(receiver)
     assert.equal(disposals, 1)
-    assert.equal(statFile(candidate, 'node-pty/build/conpty.node').unpacked, true)
+    assert.equal(statFile(candidate, join('node-pty', 'build', 'conpty.node')).unpacked, true)
     assert.deepEqual(await readFile(`${candidate}.unpacked/node-pty/build/conpty.node`), native)
-    assert.deepEqual(extractFile(candidate, 'node-pty/package.json'), extractFile(baseline, 'node-pty/package.json'))
+    assert.deepEqual(extractFile(candidate, join('node-pty', 'package.json')), extractFile(baseline, join('node-pty', 'package.json')))
   } finally {
     await rm(directory, { recursive: true, force: true })
   }
