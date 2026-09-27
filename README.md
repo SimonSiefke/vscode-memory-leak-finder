@@ -684,6 +684,28 @@ It seems there is memory leak when opening and closing a notebook. But just look
 
 This project is based on the [jest cli](https://github.com/jestjs/jest), [playwright](https://github.com/microsoft/playwright/) and [fuite](https://github.com/nolanlawson/fuite).
 
+### Linux slab memory
+
+`--measure linux-slab-memory` snapshots `/proc/slabinfo` before and after the scenario. This Linux-only measure reports system-wide kernel slab caches, including active object counts, active bytes, and reserved object capacity. It retains both raw snapshots and reports added and removed caches. Reading this file commonly requires elevated privileges; permission errors fail the measurement rather than reporting zero usage.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-slab-memory --only base
+```
+
+A cache growing by at least 64 KiB of active objects sets the suspected-leak signal. Repeat a warmed-up scenario to distinguish sustained growth from cache population and unrelated machine activity. This is not per-process attribution or a complete kernel-memory census. Capacity bytes count object slots, excluding slab metadata and padding; they are not total allocated slab pages.
+
+### Linux process memory
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-memory --only base
+```
+
+This Linux-only measure snapshots `/proc/<pid>/smaps_rollup` for the root application and its current descendants. It records PSS, RSS, private bytes (including private huge pages), and proportional swap usage. PSS apportions shared resident pages instead of counting them fully in each process. PID plus kernel start time distinguishes restarted processes; comparisons include started and exited processes and preserve both snapshots.
+
+At least 64 KiB PSS growth in any process signals a suspected leak. Caching, allocator retention, and changes in page sharing can also change PSS. Compare repeated warmed-up scenarios. These are resident-memory snapshots, not an allocation census: growth within existing resident arenas may be invisible. Processes that exit between snapshots, or descendants reparented outside the tree, may be missed.
+
+Reading smaps requires procfs access to the application processes. An unreadable descendant is recorded as a snapshot error and suppresses automatic leak classification; the summary marks the result incomplete. Failure to read the root process fails the measure. Kernel slab memory is outside this measure's scope.
+
 ### Linux cgroup memory
 
 `--measure linux-cgroup-memory` reads cgroup v2 `memory.current`, `memory.stat`, and optional `memory.swap.current`. It measures charged memory across the application's cgroup and descendant cgroups, including anonymous memory, file cache, and accounted kernel memory. Fields in `memory.stat` retain their kernel-defined units: some are bytes and others are event counts, and overlapping categories must not be summed.
