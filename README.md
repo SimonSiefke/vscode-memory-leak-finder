@@ -683,3 +683,13 @@ It seems there is memory leak when opening and closing a notebook. But just look
 ## Credits
 
 This project is based on the [jest cli](https://github.com/jestjs/jest), [playwright](https://github.com/microsoft/playwright/) and [fuite](https://github.com/nolanlawson/fuite).
+
+### Linux slab memory
+
+`--measure linux-slab-memory` snapshots `/proc/slabinfo` before and after the scenario. This Linux-only measure reports system-wide kernel slab caches, including active object counts, active bytes, and reserved object capacity. It retains both raw snapshots and reports added and removed caches. Reading this file commonly requires elevated privileges; permission errors fail the measurement rather than reporting zero usage.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-slab-memory --only base
+```
+
+A cache growing by at least 64 KiB of active objects sets the suspected-leak signal. Repeat a warmed-up scenario to distinguish sustained growth from cache population and unrelated machine activity. This is not per-process attribution or a complete kernel-memory census. Capacity bytes count object slots, excluding slab metadata and padding; they are not total allocated slab pages.
