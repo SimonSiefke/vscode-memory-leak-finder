@@ -705,3 +705,18 @@ This Linux-only measure snapshots `/proc/<pid>/smaps_rollup` for the root applic
 At least 64 KiB PSS growth in any process signals a suspected leak. Caching, allocator retention, and changes in page sharing can also change PSS. Compare repeated warmed-up scenarios. These are resident-memory snapshots, not an allocation census: growth within existing resident arenas may be invisible. Processes that exit between snapshots, or descendants reparented outside the tree, may be missed.
 
 Reading smaps requires procfs access to the application processes. An unreadable descendant is recorded as a snapshot error and suppresses automatic leak classification; the summary marks the result incomplete. Failure to read the root process fails the measure. Kernel slab memory is outside this measure's scope.
+
+### Linux cgroup memory
+
+`--measure linux-cgroup-memory` reads cgroup v2 `memory.current`, `memory.stat`, and optional `memory.swap.current`. It measures charged memory across the application's cgroup and descendant cgroups, including anonymous memory, file cache, and accounted kernel memory. Fields in `memory.stat` retain their kernel-defined units: some are bytes and others are event counts, and overlapping categories must not be summed.
+
+Set `LINUX_CGROUP_PATH` to an **existing empty cgroup v2 directory** with the memory controller enabled and permission to write `cgroup.procs` and migrate processes from the launching cgroup (including the required common-ancestor permissions). Provision this through your machine's cgroup delegation/systemd setup; the harness does not change controllers, limits, or ownership. Use a separate directory for each concurrent application launch.
+
+```sh
+LINUX_CGROUP_PATH=/sys/fs/cgroup/my-delegated-group/vscode \
+  node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-cgroup-memory --only base --workers 1
+```
+
+When this variable is set, the Electron launcher joins that cgroup before executing the application, so descendants inherit membership and startup allocations are charged there. The harness itself stays outside. The caller owns the directory's lifecycle and must ensure it is empty before reuse. The measure verifies application membership and cgroup identity; missing counters or permissions fail explicitly. This requires the normal local Electron launcher, not an externally launched browser.
+
+Results retain before/after counters and their deltas. At least 64 KiB growth in `memory.current` signals a suspected leak; repeat warmed-up scenarios to distinguish retention from cache population. Accounting is not an individual-allocation trace or complete GPU-memory census. Shared-memory charging follows cgroup ownership rather than PSS, swap is separate, and kernel counters are read sequentially rather than atomically.
