@@ -71,6 +71,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           timeout: 3000,
         })
         await page.waitForIdle()
+        const openInMainWindowButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
+        if (await openInMainWindowButton.isVisible()) {
+          await openInMainWindowButton.click()
+          await expect(openInMainWindowButton).toBeHidden()
+          await page.waitForIdle()
+        }
         const body = page.locator('.keybindings-body')
         await expect(body).toBeVisible()
         await page.waitForIdle()

@@ -145,12 +145,17 @@ jobs:
           "POOLMON_PATH=$($poolmon.FullName)" >> $env:GITHUB_ENV
       - name: Verify PoolMon snapshot
         shell: pwsh
-        timeout-minutes: 2
+        timeout-minutes: 3
         run: |
           node --input-type=module -e "
             import { start } from './packages/memory-leak-finder/src/parts/MeasurePoolmon/MeasurePoolmon.ts';
             const snapshot = await start({ poolmonPath: process.env.POOLMON_PATH, pooltagPath: '' });
             if (snapshot.rows.length === 0) throw new Error('PoolMon snapshot contains no pool tags');
+            if (snapshot.processError) throw new Error(snapshot.processError);
+            const self = snapshot.processes.find(row => row.pid === process.pid);
+            if (!self?.createdAt || !self.commandLine || !self.executablePath || !Number.isInteger(self.parentPid) || !Number.isFinite(self.privateMemoryKb)) {
+              throw new Error('PoolMon snapshot is missing process identity or private memory');
+            }
             console.log('PoolMon snapshot verified:', snapshot.rows.length, 'pool tags');
           "
       - name: Run PoolMon measure

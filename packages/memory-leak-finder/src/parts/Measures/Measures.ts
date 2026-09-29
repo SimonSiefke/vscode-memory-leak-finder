@@ -167,3 +167,6 @@ export * as MeasureWebGl2RenderingContextCount from '../MeasureWebGl2RenderingCo
 export * as MeasureWidgetCount from '../MeasureWidgetCount/MeasureWidgetCount.ts'
 export * as MeasureWorkerCount from '../MeasureWorkerCount/MeasureWorkerCount.ts'
 export * as MeasureWindowsHandles from '../MeasureWindowsHandles/MeasureWindowsHandles.ts'
+export * as MeasureLinuxSlabMemory from '../MeasureLinuxSlabMemory/MeasureLinuxSlabMemory.ts'
+export * as MeasureLinuxProcessMemory from '../MeasureLinuxProcessMemory/MeasureLinuxProcessMemory.ts'
+export * as MeasureLinuxCgroupMemory from '../MeasureLinuxCgroupMemory/MeasureLinuxCgroupMemory.ts'

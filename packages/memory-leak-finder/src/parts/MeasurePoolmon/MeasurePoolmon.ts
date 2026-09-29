@@ -26,19 +26,33 @@ export interface ProcessMemoryRow {
   readonly imageName: string
   readonly pid: number
   readonly memoryKb: number
+  readonly parentPid?: number
+  readonly createdAt?: string | null
+  readonly commandLine?: string | null
+  readonly executablePath?: string | null
+  readonly privateMemoryKb?: number | null
 }
 
 export interface PoolmonSnapshot {
   readonly capturedAt: string
+  readonly rootPid?: number | null
   readonly poolmonPath: string
   readonly pooltagPath: string
   readonly raw: string
   readonly rows: readonly PoolmonRow[]
   readonly processes: readonly ProcessMemoryRow[]
   readonly processError: string
+  readonly idleSnapshots?: readonly IdleSnapshot[]
+}
+
+interface IdleSnapshot {
+  readonly idleSeconds: number
+  readonly elapsedMs: number
+  readonly snapshot: PoolmonSnapshot
 }
 
 interface State {
+  readonly rootPid?: number | null
   readonly poolmonPath: string
   readonly pooltagPath: string
 }
@@ -207,15 +221,64 @@ export const parseTasklist = (raw: string): readonly ProcessMemoryRow[] => {
   return processes
 }
 
+// Collect identity and memory together to avoid joining two queries across PID reuse.
+export const processQuery = `
+$ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$processes = @(Get-CimInstance Win32_Process -Property ProcessId,ParentProcessId,Name,CreationDate,CommandLine,ExecutablePath,WorkingSetSize,PrivatePageCount |
+  Where-Object { $_.ProcessId -ne $PID -and $_.Name -ne 'poolmon.exe' } |
+  ForEach-Object {
+    [pscustomobject]@{
+      pid = [int]$_.ProcessId
+      parentPid = [int]$_.ParentProcessId
+      imageName = [string]$_.Name
+      createdAt = if ($null -eq $_.CreationDate) { $null } else { $_.CreationDate.ToUniversalTime().ToString('o') }
+      commandLine = $_.CommandLine
+      executablePath = $_.ExecutablePath
+      memoryKb = if ($null -eq $_.WorkingSetSize) { $null } else { [double]$_.WorkingSetSize / 1024 }
+      privateMemoryKb = if ($null -eq $_.PrivatePageCount) { $null } else { [double]$_.PrivatePageCount / 1024 }
+    }
+  })
+ConvertTo-Json -InputObject $processes -Compress
+`
+
+export const parseProcessList = (raw: string): readonly ProcessMemoryRow[] => {
+  const value = JSON.parse(raw.replace(/^\uFEFF/, ''))
+  const rows = Array.isArray(value) ? value : [value]
+  return rows.map((row) => {
+    if (
+      !row ||
+      !Number.isInteger(row.pid) ||
+      row.pid < 0 ||
+      !Number.isInteger(row.parentPid) ||
+      row.parentPid < 0 ||
+      typeof row.imageName !== 'string' ||
+      typeof row.memoryKb !== 'number' ||
+      !Number.isFinite(row.memoryKb) ||
+      row.memoryKb < 0 ||
+      (row.privateMemoryKb !== null &&
+        (typeof row.privateMemoryKb !== 'number' || !Number.isFinite(row.privateMemoryKb) || row.privateMemoryKb < 0))
+    ) {
+      throw new Error('Invalid process identity or memory in Win32_Process result')
+    }
+    for (const field of ['createdAt', 'commandLine', 'executablePath']) {
+      if (row[field] !== null && typeof row[field] !== 'string') {
+        throw new Error(`Invalid process ${field} in Win32_Process result`)
+      }
+    }
+    return row as ProcessMemoryRow
+  })
+}
+
 const captureProcesses = async (): Promise<{ readonly processes: readonly ProcessMemoryRow[]; readonly error: string }> => {
   try {
-    const { stdout } = await execFileAsync('tasklist.exe', ['/FO', 'CSV', '/NH'], {
+    const { stdout } = await execFileAsync('powershell.exe', ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', processQuery], {
       encoding: 'utf8',
-      maxBuffer: 4 * 1024 * 1024,
+      maxBuffer: 16 * 1024 * 1024,
+      timeout: 60_000,
       windowsHide: true,
     })
-    const processes = parseTasklist(stdout).filter((process) => !/^(poolmon|tasklist)\.exe$/i.test(process.imageName))
-    return { error: '', processes }
+    return { error: '', processes: parseProcessList(stdout) }
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error), processes: [] }
   }
@@ -248,6 +311,7 @@ const capture = async (state: State): Promise<PoolmonSnapshot> => {
   const processSnapshot = await captureProcesses()
   return {
     capturedAt: new Date().toISOString(),
+    rootPid: state.rootPid ?? null,
     poolmonPath: state.poolmonPath,
     pooltagPath: state.pooltagPath,
     processError: processSnapshot.error,
@@ -266,35 +330,52 @@ interface PoolmonRowDelta extends PoolmonRow {
   readonly afterBytes: number
 }
 
-interface ProcessMemoryDelta {
+interface ProcessMemoryDelta extends Omit<ProcessMemoryRow, 'memoryKb'> {
   readonly imageName: string
   readonly pid: number
   readonly beforeMemoryKb: number
   readonly afterMemoryKb: number
   readonly deltaMemoryKb: number
+  readonly beforePrivateMemoryKb: number | null
+  readonly afterPrivateMemoryKb: number | null
+  readonly deltaPrivateMemoryKb: number | null
+  readonly status: 'started' | 'exited' | 'running'
 }
 
 const getRowKey = (row: PoolmonRow): string => `${row.type}:${row.tag}`
 
+const getProcessKey = (process: ProcessMemoryRow): string =>
+  JSON.stringify([process.pid, process.createdAt ?? null, process.imageName.toLowerCase()])
+
 const getProcessDeltas = (before: PoolmonSnapshot, after: PoolmonSnapshot): readonly ProcessMemoryDelta[] => {
-  const beforeByPid = new Map(before.processes.map((process) => [process.pid, process]))
-  const afterByPid = new Map(after.processes.map((process) => [process.pid, process]))
-  const pids = new Set([...beforeByPid.keys(), ...afterByPid.keys()])
-  return [...pids]
-    .map((pid) => {
-      const beforeProcess = beforeByPid.get(pid)
-      const afterProcess = afterByPid.get(pid)
-      const beforeMemoryKb = beforeProcess?.memoryKb || 0
-      const afterMemoryKb = afterProcess?.memoryKb || 0
+  // A failed query must not make all processes appear to start or exit.
+  if (before.processError || after.processError) {
+    return []
+  }
+  const beforeByKey = new Map(before.processes.map((process) => [getProcessKey(process), process]))
+  const afterByKey = new Map(after.processes.map((process) => [getProcessKey(process), process]))
+  const keys = new Set([...beforeByKey.keys(), ...afterByKey.keys()])
+  return [...keys]
+    .map((key): ProcessMemoryDelta => {
+      const beforeProcess = beforeByKey.get(key)
+      const afterProcess = afterByKey.get(key)
+      const { memoryKb: _memoryKb, ...identity } = (afterProcess || beforeProcess)!
+      const beforeMemoryKb = beforeProcess?.memoryKb ?? 0
+      const afterMemoryKb = afterProcess?.memoryKb ?? 0
+      const beforePrivateMemoryKb = beforeProcess ? (beforeProcess.privateMemoryKb ?? null) : 0
+      const afterPrivateMemoryKb = afterProcess ? (afterProcess.privateMemoryKb ?? null) : 0
       return {
+        ...identity,
         afterMemoryKb,
         beforeMemoryKb,
         deltaMemoryKb: afterMemoryKb - beforeMemoryKb,
-        imageName: afterProcess?.imageName || beforeProcess?.imageName || 'unknown',
-        pid,
+        beforePrivateMemoryKb,
+        afterPrivateMemoryKb,
+        deltaPrivateMemoryKb:
+          beforePrivateMemoryKb === null || afterPrivateMemoryKb === null ? null : afterPrivateMemoryKb - beforePrivateMemoryKb,
+        status: !beforeProcess ? 'started' : !afterProcess ? 'exited' : 'running',
       }
     })
-    .filter((process) => process.deltaMemoryKb !== 0)
     .sort((a, b) => b.deltaMemoryKb - a.deltaMemoryKb)
 }
 
@@ -322,7 +403,7 @@ const getRows = (before: PoolmonSnapshot, after: PoolmonSnapshot): readonly Pool
 
 const getTotalBytes = (snapshot: PoolmonSnapshot): number => snapshot.rows.reduce((total, row) => total + row.bytes, 0)
 
-export const compareSnapshots = (before: PoolmonSnapshot, after: PoolmonSnapshot) => {
+const compareSnapshotPair = (before: PoolmonSnapshot, after: PoolmonSnapshot) => {
   const rows = getRows(before, after)
   const thresholdBytes = Number(process.env.POOLMON_LEAK_THRESHOLD_BYTES) || DefaultLeakThresholdBytes
   const growth = rows.filter((row) => row.deltaBytes >= thresholdBytes).slice(0, MaxRows)
@@ -336,8 +417,8 @@ export const compareSnapshots = (before: PoolmonSnapshot, after: PoolmonSnapshot
       beforeBytes: totalBeforeBytes,
       deltaBytes: totalAfterBytes - totalBeforeBytes,
     },
-    processMemoryGrowth: processDeltas.filter((process) => process.deltaMemoryKb > 0).slice(0, MaxRows),
-    processMemoryRows: processDeltas.slice(0, MaxRows),
+    processMemoryGrowth: processDeltas.filter((process) => process.deltaMemoryKb > 0),
+    processMemoryRows: processDeltas,
     processSnapshotErrors: [before.processError, after.processError].filter(Boolean),
     rawSnapshots: {
       after: after.raw,
@@ -347,6 +428,51 @@ export const compareSnapshots = (before: PoolmonSnapshot, after: PoolmonSnapshot
     thresholdBytes,
     topGrowth: growth,
   }
+}
+
+export const compareSnapshots = (before: PoolmonSnapshot, after: PoolmonSnapshot) => {
+  const { idleSnapshots = [], ...immediate } = after
+  return {
+    ...compareSnapshotPair(before, immediate),
+    snapshots: { before, after: immediate },
+    idleSnapshots: idleSnapshots.map(({ snapshot, ...timing }) => ({
+      ...timing,
+      snapshot,
+      comparison: compareSnapshotPair(before, snapshot),
+    })),
+  }
+}
+
+export const parseIdleSeconds = (value = process.env.POOLMON_IDLE_SECONDS): readonly number[] => {
+  if (value === undefined) {
+    return [5, 30, 60]
+  }
+  if (value.trim() === '0') {
+    return []
+  }
+  const seconds = value.split(',').map((part) => Number(part.trim()))
+  if (
+    seconds.some((second, index) => !Number.isFinite(second) || second <= 0 || second > 60 || (index > 0 && second <= seconds[index - 1]))
+  ) {
+    throw new Error('POOLMON_IDLE_SECONDS must be 0 or increasing comma-separated seconds in (0, 60]')
+  }
+  return seconds
+}
+
+export const captureAfterSnapshots = async (
+  captureSnapshot: () => Promise<PoolmonSnapshot>,
+  idleSeconds: readonly number[],
+): Promise<PoolmonSnapshot> => {
+  const immediate = await captureSnapshot()
+  const startedAt = performance.now()
+  const idleSnapshots: IdleSnapshot[] = []
+  for (const seconds of idleSeconds) {
+    // Offsets are relative to the immediate snapshot, not cumulative waits.
+    await new Promise<void>((resolve) => setTimeout(resolve, Math.max(0, seconds * 1000 - (performance.now() - startedAt))))
+    const snapshot = await captureSnapshot()
+    idleSnapshots.push({ idleSeconds: seconds, elapsedMs: performance.now() - startedAt, snapshot })
+  }
+  return { ...immediate, idleSnapshots }
 }
 
 const formatBytes = (bytes: number): string => {
@@ -364,13 +490,14 @@ const formatBytes = (bytes: number): string => {
 export const id = MeasureId.Poolmon
 export const targets: readonly Dynamic[] = []
 
-export const create = () => {
+export const create = ({ pid }: { readonly pid?: number } = {}) => {
+  parseIdleSeconds()
   const poolmonPath = resolvePoolmonPath()
-  return [{ poolmonPath, pooltagPath: resolvePooltagPath(poolmonPath) } satisfies State]
+  return [{ poolmonPath, pooltagPath: resolvePooltagPath(poolmonPath), rootPid: pid ?? null } satisfies State]
 }
 
 export const start = async (state: State): Promise<PoolmonSnapshot> => capture(state)
-export const stop = async (state: State): Promise<PoolmonSnapshot> => capture(state)
+export const stop = async (state: State): Promise<PoolmonSnapshot> => captureAfterSnapshots(() => capture(state), parseIdleSeconds())
 export const releaseResources = () => undefined
 export const compare = compareSnapshots
 export const isLeak = (result: Dynamic): boolean => result?.isLeak === true
