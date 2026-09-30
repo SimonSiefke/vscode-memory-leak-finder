@@ -720,3 +720,12 @@ LINUX_CGROUP_PATH=/sys/fs/cgroup/my-delegated-group/vscode \
 When this variable is set, the Electron launcher joins that cgroup before executing the application, so descendants inherit membership and startup allocations are charged there. The harness itself stays outside. The caller owns the directory's lifecycle and must ensure it is empty before reuse. The measure verifies application membership and cgroup identity; missing counters or permissions fail explicitly. This requires the normal local Electron launcher, not an externally launched browser.
 
 Results retain before/after counters and their deltas. At least 64 KiB growth in `memory.current` signals a suspected leak; repeat warmed-up scenarios to distinguish retention from cache population. Accounting is not an individual-allocation trace or complete GPU-memory census. Shared-memory charging follows cgroup ownership rather than PSS, swap is separate, and kernel counters are read sequentially rather than atomically.
+
+## Forced layout count
+
+See [the forced-layout-count measure](docs/measures/forced-layout-count.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure forced-layout-count --only base
+npm run build-charts
+```
