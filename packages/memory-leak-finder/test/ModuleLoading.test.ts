@@ -1,5 +1,5 @@
-import { expect, test } from '@jest/globals'
 import { runInNewContext } from 'node:vm'
+import { expect, test } from '@jest/globals'
 import { install } from '../src/parts/ModuleLoadingTracker/ModuleLoadingTracker.ts'
 const make = (module: any, binding: any = {}) => {
   let time = 0n
