@@ -1,3 +1,4 @@
+import { getCpuProfileSourceSummary } from '../CpuProfileSourceSummary/CpuProfileSourceSummary.ts'
 import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as CpuProfile from '../CpuProfile/CpuProfile.ts'
@@ -28,9 +29,15 @@ export const releaseResources = async (session: Session) => {
   await DevtoolsProtocolProfiler.disable(session, {})
 }
 
-export const compare = (_before: Dynamic, after: Dynamic) => {
+export const compare = async (_before: Dynamic, after: Dynamic) => {
   const summary = CpuProfile.getCpuProfileSummary(after)
+  const sourceSummary = await getCpuProfileSourceSummary(after, undefined)
+  const rows = Object.entries(sourceSummary.sourceSelfTime)
+    .map(([name, durationMs]) => ({ name, durationMs }))
+    .sort((a, b) => b.durationMs - a.durationMs)
   return {
+    rows,
+    sourceSelfTime: sourceSummary.sourceSelfTime,
     isLeak: false,
     metrics: summary.metrics,
     raw: {
@@ -46,6 +53,10 @@ export const isLeak = () => {
   return false
 }
 
-export const summary = ({ metrics, topSelfTime, topTotalTime }: Dynamic) => {
-  return CpuProfile.formatCpuProfileSummary({ metrics, topSelfTime, topTotalTime })
+export const summary = ({ metrics, topSelfTime, topTotalTime, rows = [] }: Dynamic) => {
+  return [
+    CpuProfile.formatCpuProfileSummary({ metrics, topSelfTime, topTotalTime }),
+    'Source self time (ms):',
+    ...rows.slice(0, 20).map((row: Dynamic) => `${row.name} | ${row.durationMs}`),
+  ].join('\n')
 }
