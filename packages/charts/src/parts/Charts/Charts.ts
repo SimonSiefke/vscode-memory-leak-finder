@@ -49,6 +49,7 @@ export * as ScriptCompilationEvaluation from '../CreateScriptCompilationEvaluati
 export * as SetSize from '../CreateSetSizeChart/CreateSetSizeChart.ts'
 export * as StringCount from '../CreateStringCountChart/CreateStringCountChart.ts'
 export * as SymbolCount from '../CreateSymbolCountChart/CreateSymbolCountChart.ts'
+export * as SynchronousDomReadCount from '../CreateSynchronousDomReadCountChart/CreateSynchronousDomReadCountChart.ts'
 export * as TrackedAllocationLeaks from '../CreateTrackedAllocationLeaksChart/CreateTrackedAllocationLeaksChart.ts'
 export * as TrackedAllocationPerformance from '../CreateTrackedAllocationPerformanceChart/CreateTrackedAllocationPerformanceChart.ts'
 export * as TrackedAllocations from '../CreateTrackedAllocationsChart/CreateTrackedAllocationsChart.ts'
