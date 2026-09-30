@@ -1,5 +1,5 @@
-import { expect, test } from '@jest/globals'
 import { runInNewContext } from 'node:vm'
+import { expect, test } from '@jest/globals'
 import { install } from '../src/parts/StartupPhaseDurationsTracker/StartupPhaseDurationsTracker.ts'
 test('reads retained startup marks and only new measures without clearing them', () => {
   const marks = [
