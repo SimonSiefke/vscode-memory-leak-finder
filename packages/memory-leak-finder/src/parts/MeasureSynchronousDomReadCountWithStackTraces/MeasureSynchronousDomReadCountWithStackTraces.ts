@@ -1,8 +1,8 @@
 import { resolveTrackedLocationSourceMaps } from '../ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts'
-import type { Session } from '../Session/Session.ts'
 import * as Diagnostic from '../RuntimePerformanceDiagnostic/RuntimePerformanceDiagnostic.ts'
-import * as TargetId from '../TargetId/TargetId.ts'
+import type { Session } from '../Session/Session.ts'
 import { install } from '../SynchronousDomReadCountWithStackTracesTracker/SynchronousDomReadCountWithStackTracesTracker.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 export const id = 'synchronousDomReadCountWithStackTraces'
 export const targets = [TargetId.Browser]
 const key = '__memoryLeakFinderSynchronousDomReadCountWithStackTraces'

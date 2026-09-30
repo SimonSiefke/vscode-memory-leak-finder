@@ -1,5 +1,5 @@
-import type { Dynamic, Session } from '../Types/Types.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import type { Dynamic, Session } from '../Types/Types.ts'
 
 export const create = (session: Session) => [session]
 export const start = async (session: Session, key: string, install: Function) => {

@@ -1,5 +1,5 @@
-import { expect, test } from '@jest/globals'
 import { runInNewContext } from 'node:vm'
+import { expect, test } from '@jest/globals'
 import { install } from '../src/parts/SynchronousDomReadCountWithStackTracesTracker/SynchronousDomReadCountWithStackTracesTracker.ts'
 
 test('counts reads, preserves setters and exceptions, restores descriptors', () => {
