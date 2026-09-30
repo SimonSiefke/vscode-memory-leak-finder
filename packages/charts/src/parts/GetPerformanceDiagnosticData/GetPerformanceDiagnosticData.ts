@@ -11,11 +11,17 @@ export const getData = async (basePath: string, folder: string, id: string): Pro
     const result = JSON.parse(await readFile(join(path, file), 'utf8'))[id]
     if (!result) continue
     const status = result.available === false ? 'unavailable' : result.incomplete ? 'incomplete' : ''
-    const groups = new Map<string, { name: string; value: number }[]>()
+    const groups = new Map<string, { name: string; title?: string; value: number }[]>()
     const add = (group: string, name: string, value: unknown) => {
       if (typeof value !== 'number' || !Number.isFinite(value)) return
       const rows = groups.get(group) || []
-      rows.push({ name, value })
+      const compact = name
+        .split(/\r?\n/)
+        .slice(0, 2)
+        .map((line) => line.trim().replace(/(?:[\w+.-]+:\/\/|\/)[^\s)]+/g, (url) => url.split('/').at(-1) || url))
+        .join(' — ')
+      const short = compact.length > 70 ? `${compact.slice(0, 32)}…${compact.slice(-35)}` : compact
+      rows.push(name === short ? { name, value } : { name: `${rows.length + 1}. ${short}`, title: name, value })
       groups.set(group, rows)
     }
     if (result.available !== false) {
