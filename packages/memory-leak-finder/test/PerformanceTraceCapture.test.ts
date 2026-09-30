@@ -80,3 +80,34 @@ test('times out incomplete traces without sending end twice and releases listene
     jest.useRealTimers()
   }
 })
+
+test('ignores unmatched events outside the measured interval', () => {
+  const event = (name: string, ts: number, ph: string, args = {}) => ({ name, ts, ph, args, pid: 1, tid: 2 })
+  const result = selectEvents({
+    marker: 'a',
+    events: [
+      event('RunTask', -1, 'E'),
+      event('TimeStamp', 0, 'I', { data: { message: 'a:start' } }),
+      event('Layout', 1, 'B'),
+      event('Layout', 3, 'E'),
+      event('TimeStamp', 4, 'I', { data: { message: 'a:end' } }),
+      event('RunTask', 5, 'B'),
+      event('TimerFire', 6, 'B'),
+    ],
+  })
+  expect(result.events).toHaveLength(1)
+  expect(result.events[0]).toMatchObject({ name: 'Layout', ts: 1, dur: 2 })
+  expect(result.incomplete).toBe(false)
+})
+
+test('still marks unmatched events within the measured interval incomplete', () => {
+  const result = selectEvents({
+    marker: 'a',
+    events: [
+      { name: 'TimeStamp', ts: 0, ph: 'I', pid: 1, tid: 2, args: { data: { message: 'a:start' } } },
+      { name: 'Layout', ts: 1, ph: 'B', pid: 1, tid: 2 },
+      { name: 'TimeStamp', ts: 4, ph: 'I', pid: 1, tid: 2, args: { data: { message: 'a:end' } } },
+    ],
+  })
+  expect(result.incomplete).toBe(true)
+})
