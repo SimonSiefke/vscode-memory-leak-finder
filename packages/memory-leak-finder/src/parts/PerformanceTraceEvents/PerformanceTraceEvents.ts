@@ -34,10 +34,10 @@ export const selectEvents = (capture: Dynamic): { available: boolean; incomplete
     else if (event.ph === 'E') {
       const begin = stack.pop()
       if (begin) append({ ...begin, args: { ...begin.args, ...event.args }, dur: event.ts - begin.ts })
-      else incomplete = true
+      else if (event.ts >= start.ts && event.ts <= end.ts) incomplete = true
     }
   }
-  if (stack.length) incomplete = true
+  if (stack.some((event) => event.ts >= start.ts && event.ts <= end.ts)) incomplete = true
   return { available: true, incomplete, events: events.sort((a, b) => a.ts - b.ts || b.dur - a.dur) }
 }
 export const location = (event: TraceEvent): string => {
