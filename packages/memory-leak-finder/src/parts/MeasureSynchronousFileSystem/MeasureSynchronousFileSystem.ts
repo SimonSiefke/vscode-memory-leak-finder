@@ -1,7 +1,7 @@
-import type { Session } from '../Session/Session.ts'
 import * as Diagnostic from '../RuntimePerformanceDiagnostic/RuntimePerformanceDiagnostic.ts'
-import * as TargetId from '../TargetId/TargetId.ts'
+import type { Session } from '../Session/Session.ts'
 import { install } from '../SynchronousFileSystemTracker/SynchronousFileSystemTracker.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 export const id = 'synchronousFileSystem'
 export const targets = [TargetId.Node]
 const key = '__memoryLeakFinderSynchronousFileSystem'
