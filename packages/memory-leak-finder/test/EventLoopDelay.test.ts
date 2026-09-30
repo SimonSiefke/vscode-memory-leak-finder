@@ -1,5 +1,5 @@
-import { expect, test } from '@jest/globals'
 import { runInNewContext } from 'node:vm'
+import { expect, test } from '@jest/globals'
 import { install } from '../src/parts/EventLoopDelayTracker/EventLoopDelayTracker.ts'
 test('converts histogram nanoseconds and preserves no-sample state', () => {
   let disabled = false,
