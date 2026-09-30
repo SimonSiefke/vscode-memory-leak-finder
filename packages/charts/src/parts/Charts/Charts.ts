@@ -60,3 +60,4 @@ export * as WeakSetCount from '../CreateWeakSetCountChart/CreateWeakSetCountChar
 export * as Webgl2RenderingContextCount from '../CreateWebgl2RenderingContextCountChart/CreateWebgl2RenderingContextCountChart.ts'
 export * as WorkerCount from '../CreateWorkerCountChart/CreateWorkerCountChart.ts'
 export * as WindowsHandles from '../CreateWindowsHandlesChart/CreateWindowsHandlesChart.ts'
+export * as SynchronousFileSystem from '../CreateSynchronousFileSystemChart/CreateSynchronousFileSystemChart.ts'
