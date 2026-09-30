@@ -729,3 +729,12 @@ See [the event-loop-delay measure](docs/measures/event-loop-delay.md) for covera
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure event-loop-delay --only base
 npm run build-charts
 ```
+
+## Synchronous dom read count
+
+See [the synchronous-dom-read-count measure](docs/measures/synchronous-dom-read-count.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure synchronous-dom-read-count --only base
+npm run build-charts
+```
