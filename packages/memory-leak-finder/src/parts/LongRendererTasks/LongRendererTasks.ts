@@ -1,5 +1,5 @@
+import { selectEvents, type TraceEvent, unionDuration } from '../PerformanceTraceEvents/PerformanceTraceEvents.ts'
 import type { Dynamic } from '../Types/Types.ts'
-import { selectEvents, unionDuration, type TraceEvent } from '../PerformanceTraceEvents/PerformanceTraceEvents.ts'
 export const analyze = (capture: Dynamic) => {
   const selected = selectEvents(capture)
   if (!selected.available) return { ...selected, metrics: {}, rows: [] }
