@@ -1,5 +1,5 @@
+import { createContext, runInNewContext } from 'node:vm'
 import { expect, test } from '@jest/globals'
-import { runInNewContext, createContext } from 'node:vm'
 import * as Diagnostic from '../src/parts/RuntimePerformanceDiagnostic/RuntimePerformanceDiagnostic.ts'
 test('installs once, snapshots, cleans up, and reports a lost context', async () => {
   const context = createContext({})
