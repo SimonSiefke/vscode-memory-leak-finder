@@ -1,5 +1,5 @@
-import type { Dynamic, Session } from '../Types/Types.ts'
 import { DevtoolsProtocolRuntime, DevtoolsProtocolTracing } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import type { Dynamic, Session } from '../Types/Types.ts'
 
 export const create = (session: Session): [Session, Dynamic] => [
   session,

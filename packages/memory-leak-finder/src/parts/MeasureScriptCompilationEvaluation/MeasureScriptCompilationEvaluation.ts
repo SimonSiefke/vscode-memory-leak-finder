@@ -1,7 +1,7 @@
-import type { Dynamic, Session } from '../Types/Types.ts'
 import * as Capture from '../PerformanceTraceCapture/PerformanceTraceCapture.ts'
 import { analyze } from '../ScriptCompilationEvaluation/ScriptCompilationEvaluation.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import type { Dynamic, Session } from '../Types/Types.ts'
 export const id = 'scriptCompilationEvaluation'
 export const targets = [TargetId.Browser]
 export const create = Capture.create
