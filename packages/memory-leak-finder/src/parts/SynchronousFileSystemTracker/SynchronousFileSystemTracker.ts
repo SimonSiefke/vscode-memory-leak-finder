@@ -1,3 +1,5 @@
+// Serialized into a separate realm; coverage counters would reference the host scope.
+/* istanbul ignore next */
 export const install = () => {
   'use strict'
   const realm = globalThis as any
