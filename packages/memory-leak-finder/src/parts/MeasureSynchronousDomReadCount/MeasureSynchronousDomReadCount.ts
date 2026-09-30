@@ -1,7 +1,7 @@
-import type { Session } from '../Session/Session.ts'
 import * as Diagnostic from '../RuntimePerformanceDiagnostic/RuntimePerformanceDiagnostic.ts'
-import * as TargetId from '../TargetId/TargetId.ts'
+import type { Session } from '../Session/Session.ts'
 import { install } from '../SynchronousDomReadCountTracker/SynchronousDomReadCountTracker.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 export const id = 'synchronousDomReadCount'
 export const targets = [TargetId.Browser]
 const key = '__memoryLeakFinderSynchronousDomReadCount'
