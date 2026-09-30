@@ -1,0 +1,33 @@
+{
+  "name": "notebook-serializer-disposal-sample",
+  "displayName": "notebook-serializer-disposal-sample",
+  "publisher": "vscode-memory-leak-finder",
+  "version": "0.0.0",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "notebook_serializer_disposal.run",
+        "title": "Notebook Serializer: Run"
+      },
+      {
+        "command": "notebook_serializer_disposal.cleanup",
+        "title": "Notebook Serializer: Cleanup"
+      }
+    ],
+    "notebooks": [
+      {
+        "type": "resource-disposal-notebook",
+        "displayName": "Resource Disposal Notebook",
+        "selector": [
+          {
+            "filenamePattern": "*.resource-disposal-notebook"
+          }
+        ]
+      }
+    ]
+  }
+}
