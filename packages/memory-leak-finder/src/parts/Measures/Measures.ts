@@ -170,3 +170,4 @@ export * as MeasureWindowsHandles from '../MeasureWindowsHandles/MeasureWindowsH
 export * as MeasureLinuxSlabMemory from '../MeasureLinuxSlabMemory/MeasureLinuxSlabMemory.ts'
 export * as MeasureLinuxProcessMemory from '../MeasureLinuxProcessMemory/MeasureLinuxProcessMemory.ts'
 export * as MeasureLinuxCgroupMemory from '../MeasureLinuxCgroupMemory/MeasureLinuxCgroupMemory.ts'
+export * as MeasureEventLoopDelay from '../MeasureEventLoopDelay/MeasureEventLoopDelay.ts'
