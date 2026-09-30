@@ -1,10 +1,10 @@
-import { getCpuProfileSourceSummary } from '../CpuProfileSourceSummary/CpuProfileSourceSummary.ts'
-import type { Dynamic } from '../Types/Types.ts'
-import type { Session } from '../Session/Session.ts'
 import * as CpuProfile from '../CpuProfile/CpuProfile.ts'
-import * as MeasureId from '../MeasureId/MeasureId.ts'
-import * as TargetId from '../TargetId/TargetId.ts'
+import { getCpuProfileSourceSummary } from '../CpuProfileSourceSummary/CpuProfileSourceSummary.ts'
 import { DevtoolsProtocolProfiler } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import type { Session } from '../Session/Session.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
+import type { Dynamic } from '../Types/Types.ts'
 
 export const id = MeasureId.CpuProfile
 
