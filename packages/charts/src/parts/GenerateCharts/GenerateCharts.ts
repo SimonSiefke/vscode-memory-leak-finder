@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html'
 import { execFile } from 'node:child_process'
 import { access, mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -98,13 +99,16 @@ export const generateCharts = async () => {
           const filename = item.filename || i.toString()
           const comparisonChartData = comparisonDataByFilename.get(filename) || []
 
-          if (chartData.length > 0) {
-            const svg = await rpc.invoke('Chart.create', chartData, {
-              ...chartMetaData,
-              compress: config.compress,
-              highlightLabels: getHighlightLabels(chartData, comparisonChartData, shouldHighlightChanges),
-              omittedEntryCount: item.omittedEntryCount || 0,
-            })
+          if (chartData.length > 0 || item.status) {
+            const svg =
+              chartData.length === 0
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="90"><rect width="1200" height="90" fill="white"/><text x="20" y="45" font-family="sans-serif" font-size="16">${escapeHtml(item.status)}</text></svg>`
+                : await rpc.invoke('Chart.create', chartData, {
+                    ...chartMetaData,
+                    compress: config.compress,
+                    highlightLabels: getHighlightLabels(chartData, comparisonChartData, shouldHighlightChanges),
+                    omittedEntryCount: item.omittedEntryCount || 0,
+                  })
             let outPath
             if (basePathInfo.isNode) {
               if (visitor.name === 'named-function-count-3') {
