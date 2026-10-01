@@ -425,6 +425,15 @@ Measures the total number of Timeouts.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-timeout --only base
 ```
 
+### Startup phase durations
+
+See [the startup-phase-durations measure](docs/measures/startup-phase-durations.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure startup-phase-durations --only base
+npm run build-charts
+```
+
 ### TrackedTimeouts
 
 Measures active timeouts using workbench instrumentation installed at application startup.
@@ -721,12 +730,12 @@ When this variable is set, the Electron launcher joins that cgroup before execut
 
 Results retain before/after counters and their deltas. At least 64 KiB growth in `memory.current` signals a suspected leak; repeat warmed-up scenarios to distinguish retention from cache population. Accounting is not an individual-allocation trace or complete GPU-memory census. Shared-memory charging follows cgroup ownership rather than PSS, swap is separate, and kernel counters are read sequentially rather than atomically.
 
-## Startup phase durations
+## Forced layout count
 
-See [the startup-phase-durations measure](docs/measures/startup-phase-durations.md) for coverage, result fields, and limitations.
+See [the forced-layout-count measure](docs/measures/forced-layout-count.md) for coverage, result fields, and limitations.
 
 ```sh
-node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure startup-phase-durations --only base
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure forced-layout-count --only base
 npm run build-charts
 ```
 
