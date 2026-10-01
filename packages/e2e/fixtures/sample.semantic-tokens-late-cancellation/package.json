@@ -1,0 +1,26 @@
+{
+  "name": "semantic-tokens-late-cancellation",
+  "displayName": "Semantic Tokens Late Cancellation",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "semantic-tokens-late-cancellation.setup",
+        "title": "Semantic Tokens Late Cancellation: Setup"
+      },
+      {
+        "command": "semantic-tokens-late-cancellation.run",
+        "title": "Semantic Tokens Late Cancellation: Run"
+      },
+      {
+        "command": "semantic-tokens-late-cancellation.cleanup",
+        "title": "Semantic Tokens Late Cancellation: Cleanup"
+      }
+    ]
+  }
+}
