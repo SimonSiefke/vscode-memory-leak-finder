@@ -1,0 +1,26 @@
+{
+  "name": "code-action-provider-command-disposal",
+  "displayName": "Code Action Provider Command Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "code-action-provider-command-disposal.setup",
+        "title": "Code Action Provider Command Disposal: Setup"
+      },
+      {
+        "command": "code-action-provider-command-disposal.run",
+        "title": "Code Action Provider Command Disposal: Run"
+      },
+      {
+        "command": "code-action-provider-command-disposal.cleanup",
+        "title": "Code Action Provider Command Disposal: Cleanup"
+      }
+    ]
+  }
+}
