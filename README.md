@@ -194,6 +194,20 @@ Measures CPU instructions and cycles for the inspected process.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
 ```
 
+### Linux allocation stacks (BCC)
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-allocation-stacks --only base
+```
+
+Requires Linux, BCC's `memleak-bpfcc` executable (or `BCC_MEMLEAK_PATH` pointing to the BCC `memleak` script), matching kernel support/headers, and privileges to load BPF programs and attach probes. The measure does not invoke sudo. Missing tools, failed probes, malformed output, and startup timeouts fail explicitly.
+
+By default this traces **system-wide kernel allocations**. Set `BCC_MEMLEAK_PID=root` to trace the application's root process, or set it to a positive PID to investigate a specific native process. Userspace mode follows the selected process's supported allocator functions; it does not automatically trace its children or every userspace heap. Internal Chromium/V8 allocators, direct system calls, and unresolved stacks can limit coverage. Kernel mode observes unrelated machine activity too.
+
+The collector starts before the scenario and remains attached through the final report. It uses one-second reporting, a 500 ms allocation-age filter, and the top 100 outstanding stacks. Startup waits for a complete baseline report. Stop waits for a complete post-scenario report, adding roughly two reporting intervals, then terminates the collector; cleanup also handles failed scenarios. Raw baseline/final reports and stderr diagnostics are retained. Output above 64 MiB fails rather than silently dropping data.
+
+This diagnostic measure always returns `isLeak: false`: outstanding allocations can still be live, and top-100 reports are not complete allocation totals. Per-stack deltas are provided only when a stack exists in both reports; an absent stack is unknown, not zero. Compare repeated scenarios and investigate stacks whose retained bytes keep growing. Allocations predating attachment cannot be reconstructed.
+
 ### LinuxProcessTreeResources
 
 On Linux, measures CPU activity and aggregate proportional memory for the Electron main process and its descendants during the scenario. CPU data comes from inherited `perf stat` counters. Memory data comes from the sum of `/proc/<pid>/smaps_rollup` PSS sampled every 250 ms, so `sampledPeakPssMiB` can miss shorter spikes. The result is informational and never reports a leak.
