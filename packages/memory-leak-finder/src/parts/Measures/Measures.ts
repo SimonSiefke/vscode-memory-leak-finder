@@ -63,6 +63,7 @@ export * as MeasureFileDescriptorCount from '../MeasureFileDescriptorCount/Measu
 export * as MeasureFileDescriptors from '../MeasureFileDescriptors/MeasureFileDescriptors.ts'
 export * as MeasureFileWatcherCount from '../MeasureFileWatcherCount/MeasureFileWatcherCount.ts'
 export * as MeasureFinalizationRegistryCount from '../MeasureFinalizationRegistryCount/MeasureFinalizationRegistryCount.ts'
+export * as MeasureForcedLayoutCount from '../MeasureForcedLayoutCount/MeasureForcedLayoutCount.ts'
 export * as MeasureFrontendStartupPerformance from '../MeasureFrontendStartupPerformance/MeasureFrontendStartupPerformance.ts'
 export * as MeasureFunctionCount from '../MeasureFunctionCount/MeasureFunctionCount.ts'
 export * as MeasureGcStatistics from '../MeasureGcStatistics/MeasureGcStatistics.ts'
