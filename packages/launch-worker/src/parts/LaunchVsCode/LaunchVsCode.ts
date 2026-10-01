@@ -1,4 +1,5 @@
 import * as GetScenarioExtensionArgs from '../GetScenarioExtensionArgs/GetScenarioExtensionArgs.ts'
+import * as ApplyScenarioSettings from '../ApplyScenarioSettings/ApplyScenarioSettings.ts'
 import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
@@ -303,6 +304,13 @@ export const launchVsCode = async ({
     if (trackFunctions) {
       binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
     }
+
+    await ApplyScenarioSettings.applyScenarioSettings(
+      join(Root.root, 'packages', 'e2e', 'fixtures'),
+      proxyTestFolderName,
+      enableExtensions,
+      settingsPath,
+    )
 
     // Start proxy server if enabled
     // Note: enableProxy might be undefined if RPC call doesn't pass it correctly
