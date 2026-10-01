@@ -361,6 +361,15 @@ Measures the total number of MediaQueryLists.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure media-query-list-count --only base
 ```
 
+### Module resolution lookups
+
+See [the module-resolution-lookups measure](docs/measures/module-resolution-lookups.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure module-resolution-lookups --only base
+npm run build-charts
+```
+
 ### MutationObserverCount
 
 Measures the total number of MutationObservers.
@@ -721,12 +730,12 @@ When this variable is set, the Electron launcher joins that cgroup before execut
 
 Results retain before/after counters and their deltas. At least 64 KiB growth in `memory.current` signals a suspected leak; repeat warmed-up scenarios to distinguish retention from cache population. Accounting is not an individual-allocation trace or complete GPU-memory census. Shared-memory charging follows cgroup ownership rather than PSS, swap is separate, and kernel counters are read sequentially rather than atomically.
 
-## Module resolution lookups
+## Forced layout count
 
-See [the module-resolution-lookups measure](docs/measures/module-resolution-lookups.md) for coverage, result fields, and limitations.
+See [the forced-layout-count measure](docs/measures/forced-layout-count.md) for coverage, result fields, and limitations.
 
 ```sh
-node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure module-resolution-lookups --only base
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure forced-layout-count --only base
 npm run build-charts
 ```
 
