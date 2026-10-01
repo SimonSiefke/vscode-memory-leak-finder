@@ -16,7 +16,7 @@ multiple scenarios, use `--restart-between` so each fixture loads at startup.
 xvfb-run -a node packages/cli/bin/test.js \
   --only web-page-loader-disposal --runs 7 \
   --enable-extensions --run-skipped-tests-anyway \
-  --measure named-function-count3 --check-leaks --measure-after \
+  --measure named-function-count3 --check-leaks --measure-after --measure-node \
   --vscode-path /absolute/path/to/vscode/code
 ```
 
