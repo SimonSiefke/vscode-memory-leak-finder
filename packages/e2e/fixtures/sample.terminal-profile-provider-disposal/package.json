@@ -1,0 +1,34 @@
+{
+  "name": "terminal-profile-provider-disposal",
+  "displayName": "Terminal Profile Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "terminal": {
+      "profiles": [
+        {
+          "id": "terminal-profile-provider-disposal.profile",
+          "title": "Disposal profile"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "terminal-profile-provider-disposal.setup",
+        "title": "Terminal Profile Provider Disposal: Setup"
+      },
+      {
+        "command": "terminal-profile-provider-disposal.run",
+        "title": "Terminal Profile Provider Disposal: Run"
+      },
+      {
+        "command": "terminal-profile-provider-disposal.cleanup",
+        "title": "Terminal Profile Provider Disposal: Cleanup"
+      }
+    ]
+  }
+}
