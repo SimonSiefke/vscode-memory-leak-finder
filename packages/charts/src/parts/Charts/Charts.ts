@@ -22,6 +22,7 @@ export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChar
 export * as ErrorCount from '../CreateErrorCountChart/CreateErrorCountChart.ts'
 export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEventListenerCountChart.ts'
 export * as FileDescriptorCount from '../CreateFileDescriptorCountChart/CreateFileDescriptorCountChart.ts'
+export * as ForcedLayoutCount from '../CreateForcedLayoutCountChart/CreateForcedLayoutCountChart.ts'
 export * as FrontendStartupPerformance from '../CreateFrontendStartupPerformanceChart/CreateFrontendStartupPerformanceChart.ts'
 export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountChart.ts'
 export * as GpuCanvasContextCount from '../CreateGpuCanvasContextCountChart/CreateGpuCanvasContextCountChart.ts'

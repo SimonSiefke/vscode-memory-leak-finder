@@ -409,6 +409,15 @@ Measures the total number of ResizeObservers.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure resize-observer-count --only base
 ```
 
+### Script compilation evaluation
+
+See [the script-compilation-evaluation measure](docs/measures/script-compilation-evaluation.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure script-compilation-evaluation --only base
+npm run build-charts
+```
+
 ### SetSize
 
 Measures the total number of elements in all Sets.
@@ -721,12 +730,12 @@ When this variable is set, the Electron launcher joins that cgroup before execut
 
 Results retain before/after counters and their deltas. At least 64 KiB growth in `memory.current` signals a suspected leak; repeat warmed-up scenarios to distinguish retention from cache population. Accounting is not an individual-allocation trace or complete GPU-memory census. Shared-memory charging follows cgroup ownership rather than PSS, swap is separate, and kernel counters are read sequentially rather than atomically.
 
-## Script compilation evaluation
+## Forced layout count
 
-See [the script-compilation-evaluation measure](docs/measures/script-compilation-evaluation.md) for coverage, result fields, and limitations.
+See [the forced-layout-count measure](docs/measures/forced-layout-count.md) for coverage, result fields, and limitations.
 
 ```sh
-node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure script-compilation-evaluation --only base
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure forced-layout-count --only base
 npm run build-charts
 ```
 
