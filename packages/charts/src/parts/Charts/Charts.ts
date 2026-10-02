@@ -30,6 +30,7 @@ export * as GpuCanvasContextCount from '../CreateGpuCanvasContextCountChart/Crea
 export * as IframeCount from '../CreateIframeCountChart/CreateIframeCountChart.ts'
 export * as ImageBitmapCount from '../CreateImageBitmapCountChart/CreateImageBitmapCountChart.ts'
 export * as IntersectionObserverCount from '../CreateIntersectionObserverCountChart/CreateIntersectionObserverCountChart.ts'
+export * as LongRendererTasks from '../CreateLongRendererTasksChart/CreateLongRendererTasksChart.ts'
 export * as MapCount from '../CreateMapCountChart/CreateMapCountChart.ts'
 export * as MapSize from '../CreateMapSizeChart/CreateMapSizeChart.ts'
 export * as MediaQueryListCount from '../CreateMediaQueryListCountChart/CreateMediaQueryListCountChart.ts'
