@@ -55,6 +55,7 @@ export * as MeasureEventListenerCount from '../MeasureEventListenerCount/Measure
 export * as MeasureEventListeners from '../MeasureEventListeners/MeasureEventListeners.ts'
 export * as MeasureEventListenersWithFullStackTraces from '../MeasureEventListenersWithFullStackTraces/MeasureEventListenersWithFullStackTraces.ts'
 export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersWithStackTraces/MeasureEventListenersWithStackTraces.ts'
+export * as MeasureEventLoopDelay from '../MeasureEventLoopDelay/MeasureEventLoopDelay.ts'
 export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEventTargetCount.ts'
 export * as MeasureEventTargetDifference from '../MeasureEventTargetDifference/MeasureEventTargetDifference.ts'
 export * as MeasureEventTargets from '../MeasureEventTargets/MeasureEventTargets.ts'
