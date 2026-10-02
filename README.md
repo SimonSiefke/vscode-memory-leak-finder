@@ -359,6 +359,15 @@ Measures the number of intersection observers.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure intersection-observer-count --only base
 ```
 
+### Long renderer tasks
+
+See [the long-renderer-tasks measure](docs/measures/long-renderer-tasks.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure long-renderer-tasks --only base
+npm run build-charts
+```
+
 ### MapSize
 
 Measures the total number of elements in all Maps.

@@ -92,6 +92,7 @@ export * as MeasureLinuxProcessMemory from '../MeasureLinuxProcessMemory/Measure
 export * as MeasureLinuxProcessTreeResources from '../MeasureLinuxProcessTreeResources/MeasureLinuxProcessTreeResources.ts'
 export * as MeasureLinuxProcessTreeResourcesFromStart from '../MeasureLinuxProcessTreeResourcesFromStart/MeasureLinuxProcessTreeResourcesFromStart.ts'
 export * as MeasureLinuxSlabMemory from '../MeasureLinuxSlabMemory/MeasureLinuxSlabMemory.ts'
+export * as MeasureLongRendererTasks from '../MeasureLongRendererTasks/MeasureLongRendererTasks.ts'
 export * as MeasureMapCount from '../MeasureMapCount/MeasureMapCount.ts'
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.ts'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.ts'
