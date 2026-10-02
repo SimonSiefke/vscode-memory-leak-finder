@@ -21,6 +21,7 @@ export * as EditContextCount from '../CreateEditContextCountChart/CreateEditCont
 export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChart.ts'
 export * as ErrorCount from '../CreateErrorCountChart/CreateErrorCountChart.ts'
 export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEventListenerCountChart.ts'
+export * as EventLoopDelay from '../CreateEventLoopDelayChart/CreateEventLoopDelayChart.ts'
 export * as FileDescriptorCount from '../CreateFileDescriptorCountChart/CreateFileDescriptorCountChart.ts'
 export * as ForcedLayoutCount from '../CreateForcedLayoutCountChart/CreateForcedLayoutCountChart.ts'
 export * as FrontendStartupPerformance from '../CreateFrontendStartupPerformanceChart/CreateFrontendStartupPerformanceChart.ts'
