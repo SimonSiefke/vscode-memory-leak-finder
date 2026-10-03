@@ -100,6 +100,7 @@ export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/Measu
 export * as MeasureMemoryCity from '../MeasureMemoryCity/MeasureMemoryCity.ts'
 export * as MeasureMessagePortCount from '../MeasureMessagePortCount/MeasureMessagePortCount.ts'
 export * as MeasureMinimapCount from '../MeasureMinimapCount/MeasureMinimapCount.ts'
+export * as MeasureModuleResolutionLookups from '../MeasureModuleResolutionLookups/MeasureModuleResolutionLookups.ts'
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.ts'
 export * as MeasureMutationObserversWithStackTraces from '../MeasureMutationObserversWithStackTraces/MeasureMutationObserversWithStackTraces.ts'
 export * as MeasureMutationObserversWithStackTracesWithSourceMaps from '../MeasureMutationObserversWithStackTracesWithSourceMaps/MeasureMutationObserversWithStackTracesWithSourceMaps.ts'
