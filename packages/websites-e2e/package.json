@@ -7,6 +7,7 @@
     "#e2e": "node ../cli/bin/test.js --cwd .",
     "#e2e:check-flakyness": "node ../cli/bin/test.js --cwd . --runs 10",
     "#e2e:headless": "node ../cli/bin/test.js --cwd . --headless",
+    "e2e:minimal-reproduction": "node ../cli/bin/test.js --cwd . --only minimal-reproduction --inspect-integrated-browser --check-leaks --run-skipped-tests-anyway",
     "test:watch": "node ../cli/bin/test.js --cwd . --watch"
   }
 }

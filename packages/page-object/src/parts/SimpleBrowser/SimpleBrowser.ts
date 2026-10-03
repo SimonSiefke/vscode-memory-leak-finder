@@ -1,3 +1,4 @@
+import { execFile } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
@@ -16,6 +17,54 @@ interface DeferredMockServer extends MockServer {
 }
 
 const workspacePath = join(Root.root, '.vscode-test-workspace')
+const usedPorts = new Set<number>()
+
+const getProcessIdsUsingPort = async (port: number): Promise<readonly number[]> => {
+  return new Promise((resolve, reject) => {
+    execFile('lsof', ['-nP', `-tiTCP:${port}`, '-sTCP:LISTEN'], (error, stdout) => {
+      if (error) {
+        if (error.code === 1) {
+          resolve([])
+          return
+        }
+        reject(error)
+        return
+      }
+      resolve(stdout.trim().split('\n').filter(Boolean).map(Number))
+    })
+  })
+}
+
+const allocateRandomPort = async (): Promise<number> => {
+  const server = createServer()
+  const { promise, reject, resolve } = Promise.withResolvers<void>()
+  server.once('error', reject)
+  server.listen(0, '127.0.0.1', resolve)
+  await promise
+  const address = server.address()
+  if (!address || typeof address === 'string') {
+    throw new Error('Failed to determine random port')
+  }
+  const port = address.port
+  await new Promise<void>((resolve) => server.close(() => resolve()))
+  usedPorts.add(port)
+  return port
+}
+
+const killUsedPorts = async (): Promise<void> => {
+  try {
+    const processIds = new Set((await Promise.all([...usedPorts].map(getProcessIdsUsingPort))).flat())
+    for (const processId of processIds) {
+      try {
+        process.kill(processId, 'SIGKILL')
+      } catch {
+        // The process already exited.
+      }
+    }
+  } finally {
+    usedPorts.clear()
+  }
+}
 
 const escapeRegExp = (value: string): string => {
   return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -357,7 +406,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(button).toBeVisible()
         await button.click()
         await page.waitForIdle()
-        await this.getContentFrame({ urlPattern })
+        if (ideVersion.minor >= 118) {
+          await this.waitForContentFrameModern({ urlPattern })
+        } else {
+          await this.getContentFrame({ urlPattern })
+        }
       } catch (error) {
         throw new VError(error, `Failed to navigate simple browser back`)
       }
@@ -398,24 +451,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           if (!this.modernBrowserWebContentsId) {
             throw new Error('No tracked browser web contents available')
           }
-          await electron.executeJavaScriptInWebContents({
-            expression: `(() => {
-  const target = document.querySelector(${JSON.stringify(selector)})
-  if (!(target instanceof HTMLElement)) {
-    throw new Error('Expected element matching selector ' + ${JSON.stringify(selector)})
-  }
-  const link = target instanceof HTMLAnchorElement ? target : target.closest('a')
-  if (!(link instanceof HTMLAnchorElement)) {
-    throw new Error('Expected link matching selector ' + ${JSON.stringify(selector)})
-  }
-  target.scrollIntoView({
-    block: 'center',
-    inline: 'center',
-  })
-  target.click()
-})()`,
-            webContentsId: this.modernBrowserWebContentsId,
-          })
+          await this.clickBrowserWebContentsLink({ selector })
           await page.waitForIdle()
           await this.waitForContentFrameModern({
             urlPattern,
@@ -471,6 +507,186 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to click page link ${selector}`)
       }
     },
+    async clickBrowserWebContentsLink({ selector }: { selector: string }) {
+      if (!this.modernBrowserWebContentsId) {
+        throw new Error('No tracked browser web contents available')
+      }
+      const electron = this.getElectron()
+      const point = await electron.executeJavaScriptInWebContents({
+        expression: `(async () => {
+  const targets = Array.from(document.querySelectorAll(${JSON.stringify(selector)}))
+  if (targets.length === 0) {
+    throw new Error('Expected element matching selector ' + ${JSON.stringify(selector)})
+  }
+  const getClickPoint = (link, element) => {
+    const style = getComputedStyle(element)
+    if (style.display === 'none' || style.visibility === 'hidden') {
+      return undefined
+    }
+    for (const rect of element.getClientRects()) {
+      if (rect.width > 0 && rect.height > 0) {
+        const xValues = [0.25, 0.5, 0.75]
+        const yValues = [0.25, 0.5, 0.75]
+        for (const yRatio of yValues) {
+          for (const xRatio of xValues) {
+            const x = Math.round(rect.left + rect.width * xRatio)
+            const y = Math.round(rect.top + rect.height * yRatio)
+            const hit = document.elementFromPoint(x, y)
+            if (hit === link || link.contains(hit)) {
+              return {
+                x,
+                y,
+              }
+            }
+          }
+        }
+      }
+    }
+    return undefined
+  }
+  for (const target of targets) {
+    if (!(target instanceof HTMLElement)) {
+      continue
+    }
+    const link = target instanceof HTMLAnchorElement ? target : target.closest('a')
+    if (!(link instanceof HTMLElement)) {
+      continue
+    }
+    link.scrollIntoView({
+      block: 'center',
+      inline: 'center',
+    })
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    const elements = [link, ...link.querySelectorAll('*')]
+    for (const element of elements) {
+      if (!(element instanceof HTMLElement)) {
+        continue
+      }
+      const point = getClickPoint(link, element)
+      if (point) {
+        return point
+      }
+    }
+  }
+  throw new Error('Expected visible link matching selector ' + ${JSON.stringify(selector)})
+})()`,
+        webContentsId: this.modernBrowserWebContentsId,
+      })
+      if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
+        throw new Error(`Failed to compute click point for ${selector}`)
+      }
+      await electron.evaluate(`(async () => {
+  const { webContents } = globalThis._____electron
+  const targetWebContents = webContents.fromId(${this.modernBrowserWebContentsId})
+  if (!targetWebContents || targetWebContents.isDestroyed()) {
+    throw new Error('webcontents not found')
+  }
+  const point = ${JSON.stringify(point)}
+  const wasAttached = targetWebContents.debugger.isAttached()
+  if (!wasAttached) {
+    targetWebContents.debugger.attach('1.3')
+  }
+  try {
+    const dispatchMouseEvent = (params) => {
+      return targetWebContents.debugger.sendCommand('Input.dispatchMouseEvent', params)
+    }
+    await dispatchMouseEvent({
+      type: 'mouseMoved',
+      x: point.x,
+      y: point.y,
+    })
+    await dispatchMouseEvent({
+      button: 'left',
+      buttons: 1,
+      clickCount: 1,
+      type: 'mousePressed',
+      x: point.x,
+      y: point.y,
+    })
+    await dispatchMouseEvent({
+      button: 'left',
+      buttons: 0,
+      clickCount: 1,
+      type: 'mouseReleased',
+      x: point.x,
+      y: point.y,
+    })
+  } finally {
+    if (!wasAttached && targetWebContents.debugger.isAttached()) {
+      targetWebContents.debugger.detach()
+    }
+  }
+})()`)
+      await page.waitForIdle()
+    },
+    async dragBrowserWebContents({ deltaX, deltaY, selector }: { deltaX: number; deltaY: number; selector: string }) {
+      if (!this.modernBrowserWebContentsId) {
+        throw new Error('No tracked browser web contents available')
+      }
+      const electron = this.getElectron()
+      const point = await electron.executeJavaScriptInWebContents({
+        expression: `(() => {
+  const element = document.querySelector(${JSON.stringify(selector)})
+  if (!(element instanceof HTMLElement)) {
+    throw new Error('Expected element matching selector ' + ${JSON.stringify(selector)})
+  }
+  element.scrollIntoView({ block: 'center', inline: 'center' })
+  const rect = element.getBoundingClientRect()
+  if (rect.width <= 0 || rect.height <= 0) {
+    throw new Error('Expected visible element matching selector ' + ${JSON.stringify(selector)})
+  }
+  return {
+    x: Math.round(rect.left + rect.width / 2 - ${deltaX} / 2),
+    y: Math.round(rect.top + rect.height / 2 - ${deltaY} / 2),
+  }
+})()`,
+        webContentsId: this.modernBrowserWebContentsId,
+      })
+      if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
+        throw new Error(`Failed to compute drag point for ${selector}`)
+      }
+      await electron.evaluate(`(async () => {
+  const { webContents } = globalThis._____electron
+  const targetWebContents = webContents.fromId(${this.modernBrowserWebContentsId})
+  if (!targetWebContents || targetWebContents.isDestroyed()) {
+    throw new Error('webcontents not found')
+  }
+  const point = ${JSON.stringify(point)}
+  const deltaX = ${deltaX}
+  const deltaY = ${deltaY}
+  const wasAttached = targetWebContents.debugger.isAttached()
+  if (!wasAttached) {
+    targetWebContents.debugger.attach('1.3')
+  }
+  try {
+    const dispatchMouseEvent = (params) => targetWebContents.debugger.sendCommand('Input.dispatchMouseEvent', params)
+    await dispatchMouseEvent({ type: 'mouseMoved', x: point.x, y: point.y })
+    await dispatchMouseEvent({ button: 'left', buttons: 1, clickCount: 1, type: 'mousePressed', x: point.x, y: point.y })
+    for (let index = 1; index <= 5; index++) {
+      await dispatchMouseEvent({
+        button: 'left',
+        buttons: 1,
+        type: 'mouseMoved',
+        x: point.x + deltaX * index / 5,
+        y: point.y + deltaY * index / 5,
+      })
+    }
+    await dispatchMouseEvent({
+      button: 'left',
+      buttons: 0,
+      clickCount: 1,
+      type: 'mouseReleased',
+      x: point.x + deltaX,
+      y: point.y + deltaY,
+    })
+  } finally {
+    if (!wasAttached && targetWebContents.debugger.isAttached()) {
+      targetWebContents.debugger.detach()
+    }
+  }
+})()`)
+      await page.waitForIdle()
+    },
     async createDeferredMockServer({ id, port }: { id: string; port: number }) {
       try {
         await page.waitForIdle()
@@ -510,7 +726,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to dispose mock server`)
       }
     },
-    async executeJavaScript({ expression }: { expression: string }) {
+    async executeJavaScript({ expression, timeout }: { expression: string; timeout?: number }) {
       try {
         if (ideVersion.minor >= 118) {
           const electron = this.getElectron()
@@ -519,6 +735,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           }
           await electron.executeJavaScriptInWebContents({
             expression,
+            ...(timeout === undefined ? {} : { timeout }),
             webContentsId: this.modernBrowserWebContentsId,
           })
           await page.waitForIdle()
@@ -590,7 +807,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(button).toBeVisible()
         await button.click()
         await page.waitForIdle()
-        await this.getContentFrame({ urlPattern })
+        if (ideVersion.minor >= 118) {
+          await this.waitForContentFrameModern({ urlPattern })
+        } else {
+          await this.getContentFrame({ urlPattern })
+        }
       } catch (error) {
         throw new VError(error, `Failed to navigate simple browser forward`)
       }
@@ -620,13 +841,18 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async getBrowserNavigationButton({ names }: { names: readonly string[] }) {
       for (const name of names) {
-        const button = page.getByRole('button', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }).first()
-        if (await button.isVisible().catch(() => false)) {
-          return button
-        }
-      }
-      for (const name of names) {
-        const button = page.locator(`[aria-label="${name}"], [title="${name}"]`).first()
+        const button = page
+          .locator(
+            [
+              `.part.editor [role="button"][aria-label^="${name}"]`,
+              `.part.editor [role="button"][title^="${name}"]`,
+              `.part.editor button[aria-label^="${name}"]`,
+              `.part.editor button[title^="${name}"]`,
+              `.part.editor .action-label[aria-label^="${name}"]`,
+              `.part.editor .action-label[title^="${name}"]`,
+            ].join(', '),
+          )
+          .first()
         if (await button.isVisible().catch(() => false)) {
           return button
         }
@@ -676,6 +902,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         return this.getContentFrameModern({ urlPattern })
       }
       return this.getContentFrameLegacy({ urlPattern })
+    },
+    async getRandomPort() {
+      return allocateRandomPort()
     },
     async getContentFrameLegacy({ urlPattern = /http:\/\/localhost/ }: { urlPattern?: RegExp } = {}) {
       const webView = WebView.create({ electronApp, expect, ideVersion, page, platform, VError })
@@ -773,6 +1002,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         .first()
         .isVisible()
         .catch(() => false)
+    },
+    async killAllPorts() {
+      await killUsedPorts()
+    },
+    async trackPort(port: number) {
+      usedPorts.add(port)
     },
     async mockElectronDebugger({ selector: _selector }: { selector: string }) {
       try {
@@ -898,7 +1133,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             await expect(intermediate).toBeVisible()
             await expect(intermediate).toBeFocused()
             if (url) {
-              await intermediate.setValue(url)
+              await intermediate.fill('')
+              await intermediate.type(url)
               if (!isHttpUrl(url)) {
                 await page.waitForIdle()
               }
@@ -906,6 +1142,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             }
             if (!url || isHttpUrl(url)) {
               await intermediate.press('Enter')
+              await expect(intermediate).toBeHidden()
             } else {
               await page.waitForIdle()
               await page.keyboard.press('Enter')
@@ -1082,10 +1319,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveText({
       selector = 'body',
       text,
+      timeout = 10_000,
       urlPattern = /http:\/\/localhost/,
     }: {
       selector?: string
       text: string
+      timeout?: number
       urlPattern?: RegExp
     }) {
       try {
@@ -1096,12 +1335,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             ? {
                 selector,
                 text,
+                timeout,
                 urlPattern,
                 webContentsId: this.modernBrowserWebContentsId,
               }
             : {
                 selector,
                 text,
+                timeout,
                 urlPattern,
               }
           await electron.waitForWebContentsText(webContentsTextOptions)
@@ -1110,7 +1351,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
         const innerFrame = await this.getContentFrame({ urlPattern })
         const locator = innerFrame.locator(selector)
-        await expect(locator).toContainText(text)
+        await expect(locator).toContainText(text, { timeout })
         await innerFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
@@ -1264,9 +1505,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
                 timeout: Math.min(timeout, 2000),
                 urlPattern,
               })
-              const trackedEntry = await electron.getWebContents(trackedWebContentsId)
-              if (trackedEntry) {
-                return trackedEntry
+              try {
+                return await electron.waitForWebContentsUrl({
+                  timeout,
+                  urlPattern,
+                  webContentsId: trackedWebContentsId,
+                })
+              } catch {
+                // Fall back to finding the browser by URL below.
               }
             }
           }
@@ -1288,13 +1534,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           if (await quickInput.isVisible().catch(() => false)) {
             await quickInput.locator('.ibwrapper .input, input, textarea').first().focus()
             await page.keyboard.press('Enter')
+            await page.waitForIdle()
             if (await quickInput.isVisible().catch(() => false)) {
               const closeButton = quickInput.locator('[aria-label="Close"], .codicon-close, .quick-input-action').first()
               if (await closeButton.isVisible().catch(() => false)) {
                 await closeButton.click()
               }
             }
-            await expect(quickInput).toBeHidden({ timeout: 3000 })
+            if (await quickInput.isVisible().catch(() => false)) {
+              await page.keyboard.press('Escape')
+            }
+            await expect(quickInput).toBeHidden({ timeout: 10_000 })
           }
         })
       }
