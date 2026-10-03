@@ -1,0 +1,26 @@
+{
+  "name": "notebook-image-attachment-diagnostics",
+  "displayName": "Notebook Image Attachment Diagnostics",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "notebook-image-attachment-diagnostics.setup",
+        "title": "Notebook Image Attachment Diagnostics: Setup"
+      },
+      {
+        "command": "notebook-image-attachment-diagnostics.run",
+        "title": "Notebook Image Attachment Diagnostics: Run"
+      },
+      {
+        "command": "notebook-image-attachment-diagnostics.cleanup",
+        "title": "Notebook Image Attachment Diagnostics: Cleanup"
+      }
+    ]
+  }
+}
