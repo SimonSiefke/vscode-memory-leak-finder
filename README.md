@@ -466,6 +466,15 @@ Measures the total number of Timeouts.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-timeout --only base
 ```
 
+### Synchronous file system
+
+See [the synchronous-file-system measure](docs/measures/synchronous-file-system.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure synchronous-file-system --only base
+npm run build-charts
+```
+
 ### TrackedTimeouts
 
 Measures active timeouts using workbench instrumentation installed at application startup.

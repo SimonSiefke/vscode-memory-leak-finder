@@ -7,6 +7,8 @@ test('registers performance measures with kebab-case and camelCase names', () =>
   expect(getMeasure(module, 'forcedLayoutCount').id).toBe('forcedLayoutCount')
   expect(getMeasure(module, 'module-resolution-lookups').id).toBe('moduleResolutionLookups')
   expect(getMeasure(module, 'moduleResolutionLookups').id).toBe('moduleResolutionLookups')
+  expect(getMeasure(module, 'synchronous-file-system').id).toBe('synchronousFileSystem')
+  expect(getMeasure(module, 'synchronousFileSystem').id).toBe('synchronousFileSystem')
   expect(getMeasure(module, 'event-loop-delay').id).toBe('eventLoopDelay')
   expect(getMeasure(module, 'eventLoopDelay').id).toBe('eventLoopDelay')
   expect(getMeasure(module, 'long-renderer-tasks').id).toBe('longRendererTasks')
