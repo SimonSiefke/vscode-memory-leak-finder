@@ -1,0 +1,26 @@
+{
+  "name": "terminal-content-width-toggle",
+  "displayName": "Terminal Content Width Toggle",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "terminal-content-width-toggle.setup",
+        "title": "Terminal Content Width Toggle: Setup"
+      },
+      {
+        "command": "terminal-content-width-toggle.run",
+        "title": "Terminal Content Width Toggle: Run"
+      },
+      {
+        "command": "terminal-content-width-toggle.cleanup",
+        "title": "Terminal Content Width Toggle: Cleanup"
+      }
+    ]
+  }
+}
