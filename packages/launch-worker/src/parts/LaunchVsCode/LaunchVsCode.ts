@@ -4,6 +4,7 @@ import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
+import * as AssertLocalVsCodeBuildReady from '../AssertLocalVsCodeBuildReady/AssertLocalVsCodeBuildReady.ts'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
@@ -139,6 +140,7 @@ const prepareVsCodeLaunch = async ({
     updateUrl,
     buildVscodeMinified,
   )
+  await AssertLocalVsCodeBuildReady.assertLocalVsCodeBuildReady(binaryPath, enableExtensions)
   const userDataDir = GetUserDataDir.getUserDataDir()
   const extensionsDir = GetExtensionsDir.getExtensionsDir()
   if (downloadUserDataZipFileUrl) {
