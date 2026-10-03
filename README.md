@@ -11,9 +11,127 @@ npm ci &&
 npm run e2e
 ```
 
+## Sharding
+
+Split the selected test files across parallel jobs with the Jest-compatible, one-based `--shard=<index>/<count>` option:
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure promises-with-stack-trace --shard=1/2
+node packages/cli/bin/test.js --cwd packages/e2e --measure promises-with-stack-trace --shard=2/2
+```
+
+Each test file belongs to exactly one shard. Results from separate jobs can be downloaded into directories whose names start with
+`vscode-memory-leak-finder-results-linux-` and combined with:
+
+```sh
+node packages/build/src/mergeArtifacts.ts
+```
+
 <!--  -->
 
 ## Measures
+
+### PendingPromisesWithRetainers
+
+Finds pending Promises added during a test and reports their shortest strong path from a GC root, together with per-path counts and retained bytes. Inspector query handles are released before the final heap snapshot.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure pending-promises-with-retainers --only base
+```
+
+### RetainedBytesBySource
+
+Ranks allocation sources by the bytes they still own after garbage collection. Source-map-aware results include surviving allocation count, dominated object count, and retained bytes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure retained-bytes-by-source --only base
+```
+
+### NativeContextCount
+
+Measures live V8 native contexts from before and after heap snapshots. A growing count can reveal leaked windows, workers, realms, or VM contexts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure native-context-count --only base
+```
+
+### ActiveAsyncResourcesWithStackTraces
+
+Tracks Node async resources created during the test and reports resources that remain active, grouped by resource type and creation stack. The tracker stores metadata only and removes its hook during capture.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure active-async-resources-with-stack-traces --only base
+```
+
+### ObjectShapeDifference
+
+Compares V8 object shapes before and after a test. Results identify constructor, prototype, elements kind, descriptor names, shape-count delta, and live-instance delta.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-difference --only base
+```
+
+### ObjectUrlCount
+
+Spies on `URL.createObjectURL` and `URL.revokeObjectURL` from renderer startup and reports cumulative call counts plus the number of created object URLs that are still active after each test.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-url-count --only base
+```
+
+### MemoryCity
+
+Captures allocation-aware renderer and extension-host heap snapshots, computes
+source-mapped retained ownership, and generates the interactive VS Code Memory
+City visualization.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure memory-city --only base
+```
+
+Build or preview the standalone viewer:
+
+```sh
+npm --prefix packages/visualizations run build
+npm --prefix packages/visualizations run dev
+```
+
+### ChromiumMemoryDump
+
+Captures two detailed Chromium MemoryInfra snapshots around a browser scenario. The informational result compares per-process private footprint and detailed allocator paths, retains normalized allocator attributes and ownership edges, and reports trace completeness without storing the full raw trace. Because allocator paths are hierarchical, their sizes are not additive.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure chromium-memory-dump --only base
+npm run build-charts
+```
+
+The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
+
+### ArrayBufferBytes
+
+Measures the native backing-store bytes retained by live `ArrayBuffer` objects. The result includes before, after, and delta byte and backing-store counts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure array-buffer-bytes --only base
+```
+
+### PerformanceMarkCounts
+
+Measures the number of native Chromium `PerformanceMark` objects before and after a browser scenario. The generated chart shows the initial count in black and growth in red.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure performance-mark-counts --only base
+npm run build-charts
+```
+
+### PerformanceMarkBytes
+
+Measures the native self-size bytes retained by Chromium `PerformanceMark` objects before and after a browser scenario. The generated chart shows the initial bytes in black and growth in red.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure performance-mark-bytes --only base
+npm run build-charts
+```
 
 ### ArrayCount
 
@@ -39,6 +157,35 @@ Measures the total number of classes.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure class-count --only base
 ```
 
+### CompiledCodeSize
+
+Measures V8 compiled-code bytes from before and after heap snapshots. Results include the exact total, attributed/shared/unattributed buckets, and rankings by function size and growth.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure compiled-code-size --only base
+```
+
+### ConcatenatedErrorStringCount
+
+Measures V8 concatenated-string nodes whose bounded prefix is an `Error`-style
+stack trace. The result includes before/after matching counts and diagnostic
+totals for all concatenated strings; stack contents are not written to the
+result.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure concatenated-error-string-count --only base
+```
+
+### ConcatenatedStrings
+
+Measures V8 concatenated-string nodes and reconstructs their values when the
+heap snapshot contains enough rope data. The before/after data is an array of
+strings, with V8's node name used when a value cannot be reconstructed.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure concatenated-strings --only base
+```
+
 ### CpuPerformanceCounters
 
 Measures CPU instructions and cycles for the inspected process.
@@ -46,6 +193,58 @@ Measures CPU instructions and cycles for the inspected process.
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
 ```
+
+### Linux allocation stacks (BCC)
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-allocation-stacks --only base
+```
+
+Requires Linux, BCC's `memleak-bpfcc` executable (or `BCC_MEMLEAK_PATH` pointing to the BCC `memleak` script), matching kernel support/headers, and privileges to load BPF programs and attach probes. The measure does not invoke sudo. Missing tools, failed probes, malformed output, and startup timeouts fail explicitly.
+
+By default this traces **system-wide kernel allocations**. Set `BCC_MEMLEAK_PID=root` to trace the application's root process, or set it to a positive PID to investigate a specific native process. Userspace mode follows the selected process's supported allocator functions; it does not automatically trace its children or every userspace heap. Internal Chromium/V8 allocators, direct system calls, and unresolved stacks can limit coverage. Kernel mode observes unrelated machine activity too.
+
+The collector starts before the scenario and remains attached through the final report. It uses one-second reporting, a 500 ms allocation-age filter, and the top 100 outstanding stacks. Startup waits for a complete baseline report. Stop waits for a complete post-scenario report, adding roughly two reporting intervals, then terminates the collector; cleanup also handles failed scenarios. Raw baseline/final reports and stderr diagnostics are retained. Output above 64 MiB fails rather than silently dropping data.
+
+This diagnostic measure always returns `isLeak: false`: outstanding allocations can still be live, and top-100 reports are not complete allocation totals. Per-stack deltas are provided only when a stack exists in both reports; an absent stack is unknown, not zero. Compare repeated scenarios and investigate stacks whose retained bytes keep growing. Allocations predating attachment cannot be reconstructed.
+
+### LinuxProcessTreeResources
+
+On Linux, measures CPU activity and aggregate proportional memory for the Electron main process and its descendants during the scenario. CPU data comes from inherited `perf stat` counters. Memory data comes from the sum of `/proc/<pid>/smaps_rollup` PSS sampled every 250 ms, so `sampledPeakPssMiB` can miss shorter spikes. The result is informational and never reports a leak.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-tree-resources --only base
+```
+
+### LinuxProcessTreeResourcesFromStart
+
+Measures the same process-tree resources from Electron launch through scenario completion. Use `--startup-runs` to restart Electron and aggregate every numeric metric across independent samples.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-tree-resources-from-start --startup-runs 5 --only base
+```
+
+Both measures run collection and parsing in a dedicated Linux process-tree worker. The caller starts it with the process-tree root PID, receives the parsed result when stopping it, and disposes the worker immediately after measurement. They require Linux, `perf`, access to the requested perf events, and readable `smaps_rollup` files. Missing facilities or permissions fail the measure instead of producing zero-valued counters. GNU `time` is intentionally not used because its maximum RSS is not the simultaneous sum of Electron's processes.
+
+### WindowsHandles
+
+On Windows, captures the `HandleCount` of the root VS Code process and all of its descendants before and after each measured e2e scenario. This follows the process tree, so unrelated processes are excluded. A positive total handle delta is reported as a potential leak by default; set `WINDOWS_HANDLES_LEAK_THRESHOLD` to require a larger increase.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure windows-handles --only base
+```
+
+The result includes the total before/after counts, total delta, and per-process handle deltas. It uses Windows `Win32_Process.HandleCount`, which corresponds to Task Manager's Handles column; it does not identify which individual kernel objects were leaked.
+
+### Poolmon
+
+On Windows, captures PoolMon before and after each measured e2e scenario and compares pool-tag byte growth. It also captures `tasklist` memory for a best-effort view of process working-set growth; PoolMon itself attributes kernel pool allocations to tags and drivers, not processes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure poolmon --only base
+```
+
+The measure fails on non-Windows systems or when `poolmon.exe` cannot be found. Set `POOLMON_PATH` to override discovery and `POOLTAG_PATH` to provide the WDK `pooltag.txt` mapping file. Set `POOLMON_LEAK_THRESHOLD_BYTES` to change the default 64 KiB growth threshold used for `isLeak`.
 
 ### DetachedDomNodeCount
 
@@ -69,6 +268,15 @@ Measures the total number of dom nodes.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure dom-node-count --only base
+```
+
+### DuplicatedStrings
+
+Measures flat string values represented by more than one V8 heap node. Each
+duplicated value occurs once in the before/after string arrays.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure duplicated-strings --only base
 ```
 
 ### EditContextCount
@@ -95,6 +303,23 @@ Measures the event listeners.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure event-listeners --only base
 ```
 
+### Event loop delay
+
+See [the event-loop-delay measure](docs/measures/event-loop-delay.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure event-loop-delay --only base
+npm run build-charts
+```
+
+### FinalizationRegistryCount
+
+Measures the total number of live `FinalizationRegistry` instances.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure finalization-registry-count --only base
+```
+
 ### FunctionCount
 
 Measures the total number of functions.
@@ -109,6 +334,14 @@ Measures global variables / global lexical scope names.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure global-lexical-scope-names --only base
+```
+
+### GlobalPropertyDifference
+
+Reports own string-named properties added to `globalThis` during the measured scenario. Global lexical bindings are covered separately by `global-lexical-scope-names`.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure global-property-difference --only base
 ```
 
 ### HeapUsage
@@ -133,6 +366,15 @@ Measures the number of intersection observers.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure intersection-observer-count --only base
+```
+
+### Long renderer tasks
+
+See [the long-renderer-tasks measure](docs/measures/long-renderer-tasks.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure long-renderer-tasks --only base
+npm run build-charts
 ```
 
 ### MapSize
@@ -215,12 +457,37 @@ Measures the total number of Timeouts.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-timeout --only base
 ```
 
+### Synchronous file system
+
+See [the synchronous-file-system measure](docs/measures/synchronous-file-system.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure synchronous-file-system --only base
+npm run build-charts
+```
+
 ### TrackedTimeouts
 
 Measures active timeouts using workbench instrumentation installed at application startup.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --runs 1 --measure-after --measure tracked-timeouts --timeout-between 5000 --only base
+```
+
+### TrackedAllocationLeaks
+
+Reports allocation sites that retain instances after forced garbage collection. Results are informational potential leak candidates.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure tracked-allocation-leaks --only editor-open
+```
+
+### TrackedAllocationPerformance
+
+Correlates allocation churn with sampled JavaScript CPU self-time by source file. The CPU percentage describes the source file, not the cost of allocation itself.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure tracked-allocation-performance --only editor-type-many-characters
 ```
 
 ### V8TurbofanStats
@@ -269,6 +536,7 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 - packages/source-map-worker: Functions for querying original positions and function names using source maps
 - packages/test-coordinator: Determines which tests to run, launches VSCode, file-watcher-worker, test-worker, memory-leak-worker, video-recording-worker
 - packages/test-worker: Runs tests
+- packages/visualizations: Interactive source-mapped memory visualizations
 - packages/test-worker-commands: Functions used by test-worker
 - packages/video-recording-worker: Record screencasts of the tests
 
@@ -456,3 +724,58 @@ It seems there is memory leak when opening and closing a notebook. But just look
 ## Credits
 
 This project is based on the [jest cli](https://github.com/jestjs/jest), [playwright](https://github.com/microsoft/playwright/) and [fuite](https://github.com/nolanlawson/fuite).
+
+### Linux slab memory
+
+`--measure linux-slab-memory` snapshots `/proc/slabinfo` before and after the scenario. This Linux-only measure reports system-wide kernel slab caches, including active object counts, active bytes, and reserved object capacity. It retains both raw snapshots and reports added and removed caches. Reading this file commonly requires elevated privileges; permission errors fail the measurement rather than reporting zero usage.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-slab-memory --only base
+```
+
+A cache growing by at least 64 KiB of active objects sets the suspected-leak signal. Repeat a warmed-up scenario to distinguish sustained growth from cache population and unrelated machine activity. This is not per-process attribution or a complete kernel-memory census. Capacity bytes count object slots, excluding slab metadata and padding; they are not total allocated slab pages.
+
+### Linux process memory
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-memory --only base
+```
+
+This Linux-only measure snapshots `/proc/<pid>/smaps_rollup` for the root application and its current descendants. It records PSS, RSS, private bytes (including private huge pages), and proportional swap usage. PSS apportions shared resident pages instead of counting them fully in each process. PID plus kernel start time distinguishes restarted processes; comparisons include started and exited processes and preserve both snapshots.
+
+At least 64 KiB PSS growth in any process signals a suspected leak. Caching, allocator retention, and changes in page sharing can also change PSS. Compare repeated warmed-up scenarios. These are resident-memory snapshots, not an allocation census: growth within existing resident arenas may be invisible. Processes that exit between snapshots, or descendants reparented outside the tree, may be missed.
+
+Reading smaps requires procfs access to the application processes. An unreadable descendant is recorded as a snapshot error and suppresses automatic leak classification; the summary marks the result incomplete. Failure to read the root process fails the measure. Kernel slab memory is outside this measure's scope.
+
+### Linux cgroup memory
+
+`--measure linux-cgroup-memory` reads cgroup v2 `memory.current`, `memory.stat`, and optional `memory.swap.current`. It measures charged memory across the application's cgroup and descendant cgroups, including anonymous memory, file cache, and accounted kernel memory. Fields in `memory.stat` retain their kernel-defined units: some are bytes and others are event counts, and overlapping categories must not be summed.
+
+Set `LINUX_CGROUP_PATH` to an **existing empty cgroup v2 directory** with the memory controller enabled and permission to write `cgroup.procs` and migrate processes from the launching cgroup (including the required common-ancestor permissions). Provision this through your machine's cgroup delegation/systemd setup; the harness does not change controllers, limits, or ownership. Use a separate directory for each concurrent application launch.
+
+```sh
+LINUX_CGROUP_PATH=/sys/fs/cgroup/my-delegated-group/vscode \
+  node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-cgroup-memory --only base --workers 1
+```
+
+When this variable is set, the Electron launcher joins that cgroup before executing the application, so descendants inherit membership and startup allocations are charged there. The harness itself stays outside. The caller owns the directory's lifecycle and must ensure it is empty before reuse. The measure verifies application membership and cgroup identity; missing counters or permissions fail explicitly. This requires the normal local Electron launcher, not an externally launched browser.
+
+Results retain before/after counters and their deltas. At least 64 KiB growth in `memory.current` signals a suspected leak; repeat warmed-up scenarios to distinguish retention from cache population. Accounting is not an individual-allocation trace or complete GPU-memory census. Shared-memory charging follows cgroup ownership rather than PSS, swap is separate, and kernel counters are read sequentially rather than atomically.
+
+## Forced layout count
+
+See [the forced-layout-count measure](docs/measures/forced-layout-count.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure forced-layout-count --only base
+npm run build-charts
+```
+
+## Synchronous dom read count
+
+See [the synchronous-dom-read-count measure](docs/measures/synchronous-dom-read-count.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure synchronous-dom-read-count --only base
+npm run build-charts
+```

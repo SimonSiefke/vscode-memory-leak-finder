@@ -1,5 +1,8 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { execFile } from 'node:child_process'
+import { access, mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
+import { promisify } from 'node:util'
+import escapeHtml from 'escape-html'
 import * as Charts from '../Charts/Charts.ts'
 import * as GetChartConfig from '../GetChartConfig/GetChartConfig.ts'
 import { launchChartWorker } from '../LaunchChartWorker/LaunchChartWorker.ts'
@@ -16,6 +19,8 @@ const visitors = Object.values(Charts).map((value) => {
     skip: value.skip,
   }
 })
+
+const execFileAsync = promisify(execFile)
 
 const getComparisonBasePath = (
   highlightChangesPath: string | undefined,
@@ -94,13 +99,16 @@ export const generateCharts = async () => {
           const filename = item.filename || i.toString()
           const comparisonChartData = comparisonDataByFilename.get(filename) || []
 
-          if (chartData.length > 0) {
-            const svg = await rpc.invoke('Chart.create', chartData, {
-              ...chartMetaData,
-              compress: config.compress,
-              highlightLabels: getHighlightLabels(chartData, comparisonChartData, shouldHighlightChanges),
-              omittedEntryCount: item.omittedEntryCount || 0,
-            })
+          if (chartData.length > 0 || item.status) {
+            const svg =
+              chartData.length === 0
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="90"><rect width="1200" height="90" fill="white"/><text x="20" y="45" font-family="sans-serif" font-size="16">${escapeHtml(item.status)}</text></svg>`
+                : await rpc.invoke('Chart.create', chartData, {
+                    ...chartMetaData,
+                    compress: config.compress,
+                    highlightLabels: getHighlightLabels(chartData, comparisonChartData, shouldHighlightChanges),
+                    omittedEntryCount: item.omittedEntryCount || 0,
+                  })
             let outPath
             if (basePathInfo.isNode) {
               if (visitor.name === 'named-function-count-3') {
@@ -134,6 +142,26 @@ export const generateCharts = async () => {
         await mkdir(dirname(outPath), { recursive: true })
         await writeFile(outPath, svg)
       }
+    }
+  }
+
+  const memoryCityResults = join(Root.root, '.vscode-memory-leak-finder-results', 'memory-city')
+  try {
+    await access(memoryCityResults)
+    await execFileAsync(process.execPath, [
+      join(Root.root, 'packages', 'visualizations', 'src', 'generate.ts'),
+      '--revision',
+      `${process.env.MEMORY_CITY_REVISION_LABEL || 'Current revision'}=${memoryCityResults}`,
+      '--scenario',
+      process.env.MEMORY_CITY_SCENARIO || 'VS Code memory scenario',
+      '--assets',
+      join(Root.root, 'packages', 'visualizations', 'dist'),
+      '--out',
+      join(Root.root, '.vscode-charts', 'memory-city'),
+    ])
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error
     }
   }
 }

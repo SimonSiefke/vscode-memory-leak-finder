@@ -2,7 +2,9 @@ import http from 'node:http'
 import https from 'node:https'
 import type { Socket } from 'node:net'
 
-const maxSocketListeners = 20
+// Source-map batches can legitimately share a keep-alive socket across many
+// in-flight requests while a full heap is being attributed.
+const maxSocketListeners = 100
 const configuredAgents = new WeakSet<object>()
 
 const setSocketMaxListeners = (socket: Socket): void => {

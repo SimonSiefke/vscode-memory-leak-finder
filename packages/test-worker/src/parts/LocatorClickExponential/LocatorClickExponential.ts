@@ -14,7 +14,7 @@ export const clickExponential = async (locator, options) => {
         },
       ],
       awaitPromise: true,
-      functionDeclaration: '(options) => test.clickExponential(options)',
+      functionDeclaration: 'async (options) => test.clickExponential(options)',
     },
     locator,
   )
