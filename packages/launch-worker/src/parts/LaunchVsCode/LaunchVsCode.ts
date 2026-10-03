@@ -3,6 +3,7 @@ import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
+import * as ApplyPerformanceSettings from '../ApplyPerformanceSettings/ApplyPerformanceSettings.ts'
 import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
@@ -161,6 +162,7 @@ const prepareVsCodeLaunch = async ({
   if (!shouldRestoreUserDataDir || !(await pathExists(settingsPath))) {
     await copyFile(defaultSettingsSourcePath, settingsPath)
   }
+  await ApplyPerformanceSettings.applyPerformanceSettings(settingsPath)
   return {
     binaryPath,
     extensionsDir,

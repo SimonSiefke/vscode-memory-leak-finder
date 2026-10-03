@@ -76,11 +76,21 @@ export const releaseResources = async (state: CpuPerformanceCountersState) => {
   }
 }
 
-export const compare = (_before: Dynamic, after: Dynamic) => {
+const getPerformanceSamples = (context: Dynamic): readonly Dynamic[] => {
+  if (!Array.isArray(context?.testRunResults)) {
+    return []
+  }
+  return context.testRunResults
+    .map((result: Dynamic) => result?.performanceScenario)
+    .filter((result: Dynamic) => result && typeof result.latencyMs === 'number')
+}
+
+export const compare = (_before: Dynamic, after: Dynamic, context?: Dynamic) => {
   const metrics = toCpuPerformanceCounterRows(after)
   return {
     isLeak: false,
     metrics,
+    performanceSamples: getPerformanceSamples(context),
     raw: {
       after,
       before: _before,

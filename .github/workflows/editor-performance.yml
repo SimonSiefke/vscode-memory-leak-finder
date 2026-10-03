@@ -1,0 +1,316 @@
+name: Editor Performance
+
+on:
+  workflow_dispatch:
+    inputs:
+      baseline_sha:
+        description: Exact baseline VS Code commit SHA
+        required: true
+        type: string
+      candidate_sha:
+        description: Exact candidate VS Code commit SHA
+        required: true
+        type: string
+      scenario:
+        description: Editor-open scenario
+        required: true
+        type: choice
+        default: warm
+        options:
+          - cold
+          - warm
+      tier:
+        description: Measurement tier
+        required: true
+        type: choice
+        default: quick
+        options:
+          - quick
+          - confirmation
+  schedule:
+    - cron: '17 3 * * 0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: editor-performance-${{ github.event_name }}-${{ inputs.baseline_sha || 'calibration' }}-${{ inputs.candidate_sha || 'calibration' }}
+  cancel-in-progress: false
+
+jobs:
+  initialize:
+    runs-on: ubuntu-24.04
+    outputs:
+      baselineSha: ${{ steps.settings.outputs.baselineSha }}
+      blocks: ${{ steps.settings.outputs.blocks }}
+      candidateSha: ${{ steps.settings.outputs.candidateSha }}
+      expectedReplicas: ${{ steps.settings.outputs.expectedReplicas }}
+      replicas: ${{ steps.settings.outputs.replicas }}
+      scenario: ${{ steps.settings.outputs.scenario }}
+      tier: ${{ steps.settings.outputs.tier }}
+    steps:
+      - name: Validate caller and resolve settings
+        id: settings
+        env:
+          BASELINE_SHA: ${{ inputs.baseline_sha }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          REQUESTED_SCENARIO: ${{ inputs.scenario }}
+          REQUESTED_TIER: ${{ inputs.tier }}
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.actor }}" != "SimonSiefke" ]]; then
+            echo "Only SimonSiefke may dispatch editor performance measurements"
+            exit 1
+          fi
+
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            BASELINE_SHA="$(git ls-remote https://github.com/microsoft/vscode.git refs/heads/main | cut -f1)"
+            CANDIDATE_SHA="$BASELINE_SHA"
+            REQUESTED_SCENARIO=warm
+            REQUESTED_TIER=confirmation
+          fi
+
+          if [[ ! "$BASELINE_SHA" =~ ^[0-9a-fA-F]{40}$ || ! "$CANDIDATE_SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "baseline_sha and candidate_sha must be exact 40-character commit SHAs"
+            exit 1
+          fi
+
+          case "$REQUESTED_SCENARIO" in
+            cold) scenario=editor-open-text-file-cold-performance ;;
+            warm) scenario=editor-open-text-file-warm-performance ;;
+            *) echo "Unsupported scenario: $REQUESTED_SCENARIO"; exit 1 ;;
+          esac
+
+          case "$REQUESTED_TIER" in
+            quick)
+              blocks=12
+              replicas='[0,1,2]'
+              expected_replicas=3
+              ;;
+            confirmation)
+              blocks=50
+              replicas='[0,1,2,3,4]'
+              expected_replicas=5
+              ;;
+            *) echo "Unsupported tier: $REQUESTED_TIER"; exit 1 ;;
+          esac
+
+          {
+            echo "baselineSha=${BASELINE_SHA,,}"
+            echo "blocks=$blocks"
+            echo "candidateSha=${CANDIDATE_SHA,,}"
+            echo "expectedReplicas=$expected_replicas"
+            echo "replicas=$replicas"
+            echo "scenario=$scenario"
+            echo "tier=$REQUESTED_TIER"
+          } >> "$GITHUB_OUTPUT"
+
+  measure:
+    needs: initialize
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        replica: ${{ fromJSON(needs.initialize.outputs.replicas) }}
+    env:
+      BASELINE_SHA: ${{ needs.initialize.outputs.baselineSha }}
+      BLOCKS: ${{ needs.initialize.outputs.blocks }}
+      CANDIDATE_SHA: ${{ needs.initialize.outputs.candidateSha }}
+      REPLICA: ${{ matrix.replica }}
+      SCENARIO: ${{ needs.initialize.outputs.scenario }}
+      TIER: ${{ needs.initialize.outputs.tier }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install native and performance dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev linux-tools-common linux-tools-generic pkg-config xvfb x11-xserver-utils
+          sudo sysctl -w kernel.perf_event_paranoid=-1
+          perf --version
+
+      - name: Compute dependency cache key
+        id: cache-key
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v6
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            .vscode-node-modules-cache
+          key: ${{ runner.os }}-editor-performance-${{ steps.cache-key.outputs.value }}
+
+      - name: Install harness dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci --ignore-scripts && npm run postinstall
+
+      - name: Build harness
+        run: npm run build
+
+      - name: Build optimized VS Code revisions
+        run: |
+          for commit in "$BASELINE_SHA" "$CANDIDATE_SHA"; do
+            xvfb-run --auto-servernum node packages/cli/bin/test.js \
+              --cwd packages/e2e \
+              --run-skipped-tests-anyway \
+              --commit "$commit" \
+              --setup-only \
+              --build-vscode-minified \
+              --measure cpu-performance-counters \
+              --only "$SCENARIO"
+          done
+
+      - name: Resolve optimized build paths
+        id: builds
+        run: |
+          find_build() {
+            local expected="$1"
+            for source in .vscode-repos/*-minified/source; do
+              if [[ -d "$source/.git" && "$(git -C "$source" rev-parse HEAD)" == "$expected" ]]; then
+                local binary
+                binary="$(dirname "$source")/VSCode-linux-x64/code-oss"
+                if [[ ! -x "$binary" || ! -d "$source/out-vscode-min" ]]; then
+                  echo "Incomplete optimized build for $expected" >&2
+                  return 1
+                fi
+                echo "$source|$binary"
+                return 0
+              fi
+            done
+            echo "Unable to find optimized build for $expected" >&2
+            return 1
+          }
+
+          base="$(find_build "$BASELINE_SHA")"
+          candidate="$(find_build "$CANDIDATE_SHA")"
+          {
+            echo "baselineSource=${base%%|*}"
+            echo "baselineBinary=${base#*|}"
+            echo "candidateSource=${candidate%%|*}"
+            echo "candidateBinary=${candidate#*|}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run same-runner blocked comparison
+        run: |
+          cpu_count="$(nproc)"
+          if (( cpu_count > 2 )); then
+            cpu_list="1-$((cpu_count - 1))"
+          else
+            cpu_list="0-$((cpu_count - 1))"
+          fi
+          order_seed="$((0x51f15e + REPLICA * 7919))"
+          output=".measure-runs/replica-$REPLICA"
+
+          xvfb-run --auto-servernum node packages/performance-lab/src/main.ts compare \
+            --baseline-vscode-path "${{ steps.builds.outputs.baselineBinary }}" \
+            --baseline-vscode-source-path "${{ steps.builds.outputs.baselineSource }}" \
+            --candidate-vscode-path "${{ steps.builds.outputs.candidateBinary }}" \
+            --candidate-vscode-source-path "${{ steps.builds.outputs.candidateSource }}" \
+            --scenario "$SCENARIO" \
+            --tier "$TIER" \
+            --blocks "$BLOCKS" \
+            --cpu-list "$cpu_list" \
+            --order-seed "$order_seed" \
+            --replica-id "$REPLICA" \
+            --defer-calibration-verdict \
+            --collect-work \
+            --work-samples 3 \
+            --track-include 'vs/base/browser/ui/breadcrumbs/breadcrumbsWidget.ts' \
+            --track-include 'vs/editor/browser/config/editorConfiguration.ts' \
+            --track-include 'vs/editor/browser/config/migrateOptions.ts' \
+            --track-include 'vs/editor/contrib/inlineCompletions/' \
+            --track-include 'vs/workbench/contrib/files/browser/editors/textFileEditor.ts' \
+            --track-include 'vs/workbench/contrib/inlineCompletions/' \
+            --goal latency:-5% \
+            --output "$output"
+
+      - name: Upload replica experiment
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: editor-performance-replica-${{ matrix.replica }}
+          path: .measure-runs/replica-${{ matrix.replica }}
+          include-hidden-files: true
+
+  aggregate:
+    if: always()
+    needs:
+      - initialize
+      - measure
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install harness dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Restore A/A calibration history
+        uses: actions/cache/restore@v4
+        with:
+          path: .measure-runs/calibration-history.json
+          key: editor-performance-aa-history-${{ github.run_id }}
+          restore-keys: |
+            editor-performance-aa-history-
+
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: editor-performance-replica-*
+          path: .measure-runs/replicas
+
+      - name: Aggregate within-runner effects
+        run: |
+          mkdir -p .measure-runs/replicas
+          node packages/performance-lab/src/main.ts aggregate \
+            --input .measure-runs/replicas \
+            --output .measure-runs/aggregate \
+            --calibration-history .measure-runs/calibration-history.json \
+            --expected-replicas "${{ needs.initialize.outputs.expectedReplicas }}"
+
+      - name: Publish summary
+        run: |
+          node <<'EOF'
+          const { readFileSync, appendFileSync } = require('node:fs')
+          const experiment = JSON.parse(readFileSync('.measure-runs/aggregate/experiment.json', 'utf8'))
+          const percent = value => `${(value * 100).toFixed(2)}%`
+          const latency = experiment.comparisons.latencyMs
+          const lines = [
+            '# Editor performance',
+            '',
+            `- Verdict: **${experiment.status}**`,
+            `- Median blocked effect: ${percent(latency.relativeChange)}`,
+            `- Hierarchical 95% CI: [${percent(latency.confidenceInterval.lower)}, ${percent(latency.confidenceInterval.upper)}]`,
+            `- Minimum detectable effect: ${percent(experiment.minimumDetectableEffect)}`,
+            `- Deterministic work improved in every replica: ${experiment.workEvidence.improvedInEveryReplica}`,
+            `- A/A calibration: ${experiment.calibration.isIdenticalBuild ? (experiment.calibration.falsePositive ? 'false-positive winner' : 'inconclusive as expected') : 'not an A/A run'}`,
+            `- Calibration false-positive rate: ${percent(experiment.calibration.falsePositiveRate)}`,
+            `- Measurement system valid: ${experiment.calibration.systemValid}`,
+          ]
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`)
+          if (experiment.status === 'invalid' || experiment.status === 'rejected') {
+            process.exitCode = 1
+          }
+          EOF
+
+      - name: Save A/A calibration history
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .measure-runs/calibration-history.json
+          key: editor-performance-aa-history-${{ github.run_id }}
+
+      - name: Upload aggregate experiment
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: editor-performance-aggregate
+          path: .measure-runs/aggregate

@@ -68,6 +68,9 @@ export const createAllocationWrapperPlugin = (options: CreateAllocationWrapperPl
 
   const wrapAllocation = (path: NodePath<t.Expression>, type: string) => {
     const node = path.node
+    if (!allocationLocations.has(node)) {
+      return
+    }
     const location = getLocation(node, allocationLocations)
     const wrapped = t.callExpression(t.identifier('trackAllocation'), [
       node,

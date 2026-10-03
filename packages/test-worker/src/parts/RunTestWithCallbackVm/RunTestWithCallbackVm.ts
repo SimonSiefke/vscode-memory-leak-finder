@@ -7,6 +7,6 @@ export const runTest = async (pageObject: any, file: string, forceRun: boolean, 
   if (module.skip && !forceRun) {
     return { skipped: true, wasOriginallySkipped }
   }
-  await TestStage.run(module, pageObject)
-  return { skipped: false, wasOriginallySkipped }
+  const stageResult = await TestStage.run(module, pageObject)
+  return { ...stageResult, skipped: false, wasOriginallySkipped }
 }

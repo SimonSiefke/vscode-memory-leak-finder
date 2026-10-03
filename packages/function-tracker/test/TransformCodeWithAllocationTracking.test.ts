@@ -20,6 +20,17 @@ const set = trackAllocation(new Set(), 7, 5, 16, "Set");`
   expect(transformed).toBe(expected)
 })
 
+test('TransformCodeWithAllocationTracking - only instruments included generated locations', () => {
+  const code = `const included = {}\nconst excluded = {}`
+  const transformed = transformCodeWithAllocationTracking(code, {
+    includeGeneratedLocation: (line) => line === 1,
+    scriptId: 7,
+  })
+
+  expect(transformed).toContain('trackAllocation({}, 7, 1, 17, "Object")')
+  expect(transformed).not.toContain('trackAllocation({}, 7, 2, 17, "Object")')
+})
+
 test('TransformCodeWithAllocationTracking - should transform known allocation factories', () => {
   const code = `
     const array = Array.from(items)

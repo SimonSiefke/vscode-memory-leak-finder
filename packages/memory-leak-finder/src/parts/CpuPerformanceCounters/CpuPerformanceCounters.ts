@@ -8,11 +8,14 @@ export interface CpuPerformanceCounter {
 
 export interface CpuPerformanceCountersSample {
   readonly command: readonly string[]
+  readonly contextSwitches: number | null
   readonly cycles: number | null
   readonly instructions: number | null
+  readonly pageFaults: number | null
   readonly perfPid?: number
   readonly pid: number
   readonly rawOutput: string
+  readonly taskClockMs: number | null
 }
 
 const counterSpecs = [
@@ -24,6 +27,21 @@ const counterSpecs = [
   {
     event: 'cycles:u',
     name: 'cycles',
+    unit: 'count',
+  },
+  {
+    event: 'task-clock',
+    name: 'taskClockMs',
+    unit: 'ms',
+  },
+  {
+    event: 'context-switches',
+    name: 'contextSwitches',
+    unit: 'count',
+  },
+  {
+    event: 'page-faults',
+    name: 'pageFaults',
     unit: 'count',
   },
 ] as const
@@ -44,7 +62,11 @@ const normalizeEventName = (eventName: string): string => {
   return eventName.trim().split(':')[0]
 }
 
-export const parsePerfStatOutput = (rawOutput: string): Pick<CpuPerformanceCountersSample, 'cycles' | 'instructions'> => {
+const knownEvents = new Set(counterSpecs.map(({ event }) => normalizeEventName(event)))
+
+export const parsePerfStatOutput = (
+  rawOutput: string,
+): Pick<CpuPerformanceCountersSample, 'contextSwitches' | 'cycles' | 'instructions' | 'pageFaults' | 'taskClockMs'> => {
   const counters: Record<string, number | null> = Object.create(null)
   const addCounter = (eventName: string, rawValue: string): void => {
     const normalizedEventName = normalizeEventName(eventName)
@@ -62,11 +84,11 @@ export const parsePerfStatOutput = (rawOutput: string): Pick<CpuPerformanceCount
       continue
     }
     const csvParts = trimmed.split(',')
-    if (csvParts.length >= 4 && csvParts[2] === '' && csvParts[3]) {
+    if (csvParts.length >= 4 && csvParts[3] && knownEvents.has(normalizeEventName(csvParts[3]))) {
       addCounter(csvParts[3], csvParts[1])
       continue
     }
-    if (csvParts.length >= 3 && csvParts[1] === '' && csvParts[2]) {
+    if (csvParts.length >= 3 && csvParts[2] && knownEvents.has(normalizeEventName(csvParts[2]))) {
       addCounter(csvParts[2], csvParts[0])
       continue
     }
@@ -76,8 +98,11 @@ export const parsePerfStatOutput = (rawOutput: string): Pick<CpuPerformanceCount
     }
   }
   return {
+    contextSwitches: counters['context-switches'] ?? null,
     cycles: counters.cycles ?? null,
     instructions: counters.instructions ?? null,
+    pageFaults: counters['page-faults'] ?? null,
+    taskClockMs: counters['task-clock'] ?? null,
   }
 }
 

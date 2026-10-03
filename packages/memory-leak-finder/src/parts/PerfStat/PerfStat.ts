@@ -16,7 +16,7 @@ export interface PerfStatSession {
 }
 
 export const getPerfStatArgs = (pid: number): readonly string[] => {
-  return ['stat', '--no-big-num', '-x', ',', '-e', 'instructions:u,cycles:u', '-p', `${pid}`]
+  return ['stat', '--no-big-num', '-x', ',', '-e', 'instructions:u,cycles:u,task-clock,context-switches,page-faults', '-p', `${pid}`]
 }
 
 const isNodeError = (error: unknown): error is NodeJS.ErrnoException => {

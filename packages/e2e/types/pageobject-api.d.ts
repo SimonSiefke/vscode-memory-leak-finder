@@ -274,6 +274,7 @@ export interface Editor {
   setLanguageMode(languageId: any): Promise<void>
   setLogpoint(lineNumber: any, logMessage: any): Promise<void>
   shouldHaveActiveLineNumber(value: any): Promise<void>
+  shouldBeFocused(): Promise<void>
   shouldHaveBreadCrumb(text: any): Promise<void>
   shouldHaveCodeLens(options: any): Promise<void>
   shouldHaveCodeLensWithVersion(options: any): Promise<void>
@@ -332,6 +333,7 @@ export interface Editor {
   waitForImageReady(): Promise<void>
   waitForNoteBookReady(): Promise<void>
   waitforTextFileReady(fileName: any): Promise<void>
+  waitForTextFileRendered(fileName: string, text: string): Promise<void>
   waitForVideoReady(hasError: any): Promise<void>
   waitForWarning(): Promise<void>
   moveToNewWindow(): Promise<NewWindowHandle>
@@ -626,6 +628,8 @@ export interface Profile {
   removeOtherProfiles(): Promise<void>
 }
 export interface QuickPick {
+  acceptSelected(): Promise<void>
+  clearInput(): Promise<void>
   close(): Promise<void>
   executeCommand(command: any, options?: any): Promise<void>
   focusNext(): Promise<void>
@@ -644,6 +648,26 @@ export interface QuickPick {
   waitForInputVisible(): Promise<void>
   type(value: any): Promise<void>
   waitForCommand(command: any, timeout?: any): Promise<void>
+}
+export interface Performance {
+  armActionTiming(options: {
+    readonly expectedText: string
+    readonly fileName: string
+    readonly quietTimeoutMs?: number
+    readonly quietWindowMs?: number
+    readonly readyTimeoutMs?: number
+  }): Promise<void>
+  getCodeMarks(): Promise<readonly { readonly name: string; readonly startTime: number }[]>
+  readActionTiming(): Promise<{
+    readonly actionStartMs: number
+    readonly domReadyMs: number
+    readonly paintReadyMs: number
+    readonly work: {
+      readonly allocations: Readonly<Record<string, number>>
+      readonly functions: Readonly<Record<string, number>>
+    }
+  }>
+  waitForAnimationFrames(count?: number): Promise<void>
 }
 export interface References {
   clear(): Promise<void>
@@ -1011,6 +1035,7 @@ export interface PageObjectApi {
   readonly Notification: Notification
   readonly Output: Output
   readonly Panel: Panel
+  readonly Performance: Performance
   readonly PortsView: PortsView
   readonly Problems: Problems
   readonly ProcessExplorer: ProcessExplorer
