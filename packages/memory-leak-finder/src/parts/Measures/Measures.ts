@@ -141,6 +141,7 @@ export * as MeasureRetainerRiver from '../MeasureRetainerRiver/MeasureRetainerRi
 export * as MeasureScopeCount from '../MeasureScopeCount/MeasureScopeCount.ts'
 export * as MeasureScopeCount2 from '../MeasureScopeCount2/MeasureScopeCount2.ts'
 export * as MeasureScopes from '../MeasureScopes/MeasureScopes.ts'
+export * as MeasureScriptCompilationEvaluation from '../MeasureScriptCompilationEvaluation/MeasureScriptCompilationEvaluation.ts'
 export * as MeasureSetCount from '../MeasureSetCount/MeasureSetCount.ts'
 export * as MeasureSetSize from '../MeasureSetSize/MeasureSetSize.ts'
 export * as MeasureSetTimeout from '../MeasureSetTimeout/MeasureSetTimeout.ts'
