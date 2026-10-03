@@ -73,6 +73,7 @@ test('tracked allocation leak summary is informational and compact', async () =>
         originalLine: 10,
         originalLocation: 'src/a.ts:10:2',
         originalSource: 'src/a.ts',
+        originalType: 'Array',
         type: 'Array',
       },
     ]),
