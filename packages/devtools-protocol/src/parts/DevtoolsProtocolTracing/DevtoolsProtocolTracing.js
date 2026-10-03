@@ -8,3 +8,7 @@ export const start = (session, options = {}) => {
 export const end = (session, options = {}) => {
   return Invoke.invoke(session, DevtoolsCommandType.TracingEnd, options)
 }
+
+export const requestMemoryDump = (session, options = {}) => {
+  return Invoke.invoke(session, DevtoolsCommandType.TracingRequestMemoryDump, options)
+}

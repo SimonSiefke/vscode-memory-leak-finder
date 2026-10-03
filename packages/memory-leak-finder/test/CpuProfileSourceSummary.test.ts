@@ -1,6 +1,7 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import type { resolveTrackedLocationSourceMaps } from '../src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts'
 
-const mockResolveTrackedLocationSourceMaps = jest.fn<any>()
+const mockResolveTrackedLocationSourceMaps = jest.fn<typeof resolveTrackedLocationSourceMaps>()
 
 jest.unstable_mockModule('../src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts', () => ({
   resolveTrackedLocationSourceMaps: mockResolveTrackedLocationSourceMaps,
@@ -10,9 +11,17 @@ beforeEach(() => {
   mockResolveTrackedLocationSourceMaps.mockReset()
   mockResolveTrackedLocationSourceMaps.mockResolvedValue({
     'file:///bundle.js:3:2': {
+      originalColumn: null,
+      originalLine: null,
+      originalLocation: null,
+      originalName: null,
       originalSource: 'src/a.ts',
     },
     'file:///bundle.js:5:4': {
+      originalColumn: null,
+      originalLine: null,
+      originalLocation: null,
+      originalName: null,
       originalSource: 'src/b.ts',
     },
   })
