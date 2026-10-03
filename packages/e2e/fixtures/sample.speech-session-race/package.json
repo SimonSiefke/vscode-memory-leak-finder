@@ -1,0 +1,45 @@
+{
+  "name": "speech-session-race-sample",
+  "displayName": "speech-session-race-sample",
+  "publisher": "simon",
+  "version": "0.0.0-dev",
+  "engines": {
+    "vscode": "^1.106.0"
+  },
+  "categories": [],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "enabledApiProposals": [
+    "speech",
+    "defaultChatParticipant"
+  ],
+  "contributes": {
+    "languageModelChatProviders": [
+      {
+        "vendor": "copilot",
+        "displayName": "Speech Session Race Model"
+      }
+    ],
+    "commands": [
+      {
+        "command": "speechSessionRace.setup",
+        "title": "Speech Session Race: Setup"
+      },
+      {
+        "command": "speechSessionRace.churn",
+        "title": "Speech Session Race: Churn"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "speech-session-race.participant",
+        "name": "speech-race",
+        "description": "Provides a local response for exercising text to speech",
+        "commands": [],
+        "modes": [
+          "ask"
+        ]
+      }
+    ]
+  }
+}

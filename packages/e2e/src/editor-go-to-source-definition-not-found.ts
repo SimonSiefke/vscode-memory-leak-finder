@@ -17,6 +17,7 @@ def`,
   ])
   await Editor.open('file.ts')
   await Editor.shouldHaveSquigglyError()
+  await Editor.shouldHaveBreadCrumb('file.ts')
 }
 
 export const run = async ({ Editor, Notification }: TestContext): Promise<void> => {

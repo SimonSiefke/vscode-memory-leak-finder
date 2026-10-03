@@ -8,6 +8,13 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+const removeOptions = {
+  force: true,
+  maxRetries: 10,
+  recursive: true,
+  retryDelay: 100,
+} as const
+
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
   return {
@@ -73,14 +80,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async remove(file: string) {
       const absolutePath = join(workspace, file)
-      await rm(absolutePath, { force: true, recursive: true })
+      await rm(absolutePath, removeOptions)
     },
     async setFiles(files: Array<{ name: string; content: string }>) {
       await page.waitForIdle()
       const dirents = await readdir(workspace)
       for (const dirent of dirents) {
         const absolutePath = join(workspace, dirent)
-        await rm(absolutePath, { force: true, recursive: true })
+        await rm(absolutePath, removeOptions)
       }
       for (const file of files) {
         const absolutePath = join(workspace, file.name)
@@ -93,7 +100,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const dirents = await readdir(workspace).catch(() => [])
       for (const dirent of dirents) {
         const absolutePath = join(workspace, dirent)
-        await rm(absolutePath, { force: true, recursive: true })
+        await rm(absolutePath, removeOptions)
       }
       for (const file of files) {
         const absolutePath = join(workspace, file.name)

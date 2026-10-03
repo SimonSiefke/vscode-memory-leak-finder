@@ -12,6 +12,7 @@ export interface TrackedAllocationResult {
   readonly originalLine: number | null
   readonly originalLocation: string | null
   readonly originalSource: string | null
+  readonly originalType: string
   readonly type: string
 }
 
@@ -70,6 +71,7 @@ export const compareTrackedAllocations = async (
       originalLine: resolved.originalLine,
       originalLocation: resolved.originalLocation,
       originalSource: resolved.originalSource,
+      originalType: resolved.originalName || afterEntry.type,
       type: afterEntry.type,
     })
   }
