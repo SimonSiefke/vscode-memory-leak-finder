@@ -47,7 +47,6 @@ export const waitForIframe = async ({
   electronObjectId,
   electronRpc,
   idleTimeout,
-  index = 0,
   injectUtilityScript,
   index = 0,
   sessionRpc,
