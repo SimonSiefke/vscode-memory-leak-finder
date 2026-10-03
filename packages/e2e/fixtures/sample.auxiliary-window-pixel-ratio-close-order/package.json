@@ -1,0 +1,26 @@
+{
+  "name": "auxiliary-window-pixel-ratio-close-order",
+  "displayName": "Auxiliary Window Pixel Ratio Close Order",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "auxiliary-window-pixel-ratio-close-order.setup",
+        "title": "Auxiliary Window Pixel Ratio Close Order: Setup"
+      },
+      {
+        "command": "auxiliary-window-pixel-ratio-close-order.run",
+        "title": "Auxiliary Window Pixel Ratio Close Order: Run"
+      },
+      {
+        "command": "auxiliary-window-pixel-ratio-close-order.cleanup",
+        "title": "Auxiliary Window Pixel Ratio Close Order: Cleanup"
+      }
+    ]
+  }
+}
