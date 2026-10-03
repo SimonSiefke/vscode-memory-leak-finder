@@ -135,6 +135,17 @@ test('unwrapResult - heap usage', () => {
   })
 })
 
+test('unwrapResult - heap snapshot object id', () => {
+  const rawResult = {
+    id: 9,
+    result: { heapSnapshotObjectId: '123' },
+    sessionId: '1E8CFE6179C022F428E3CCF6C2E0E7D4',
+  }
+  expect(UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)).toEqual({
+    heapSnapshotObjectId: '123',
+  })
+})
+
 test('unwrapResult - global lexical scope names', () => {
   const rawResult = {
     id: 9,
