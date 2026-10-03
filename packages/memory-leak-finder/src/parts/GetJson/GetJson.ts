@@ -1,6 +1,11 @@
 import type { Dynamic } from '../Types/Types.ts'
 import waitForLocalhost from 'wait-for-localhost'
+import * as ConfigureHttpAgentMaxListeners from '../ConfigureHttpAgentMaxListeners/ConfigureHttpAgentMaxListeners.ts'
 import { VError } from '../VError/VError.ts'
+
+// TODO find better solution if possible
+ConfigureHttpAgentMaxListeners.configureHttpAgentMaxListeners()
+
 export const getJson = async (port: number): Promise<Dynamic[]> => {
   try {
     await waitForLocalhost({

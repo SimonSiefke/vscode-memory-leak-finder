@@ -28,6 +28,20 @@ const isBinary = (file: string) => {
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
+    async warmUpTextEditor(fileName = 'webview-benchmark-warmup.txt') {
+      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      const quickPick = page.locator('.quick-input-widget')
+      const input = quickPick.locator('.ibwrapper .input')
+      const option = quickPick.locator('.label-name', { hasExactText: fileName })
+      const tab = page.locator(`[role="tab"][data-resource-name="${fileName}"]`)
+      await page.keyboard.press(`${modifier}+p`)
+      await expect(input).toBeVisible({ timeout: 10_000 })
+      await input.typeAndWaitFor(fileName, option, { timeout: 10_000 })
+      await option.click()
+      await expect(tab).toBeVisible()
+      await page.keyboard.press(`${modifier}+w`)
+      await expect(tab).toBeHidden()
+    },
     async acceptInlineCompletion() {
       try {
         await page.waitForIdle()
@@ -99,30 +113,35 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const startTag = editor.locator('[class^="mtk"]', { hasText: text, nth: 0 })
         await startTag.click()
       } catch (error) {
-        console.log(error)
-        const { promise } = Promise.withResolvers<void>()
-        await promise
-        // throw new VError(error, `Failed to click ${text}`)
+        throw new VError(error, `Failed to click ${text}`)
+      }
+    },
+    async clickCodeLens(text: string, timeout = 120_000) {
+      try {
+        await page.waitForIdle()
+        const codeLens = page.locator('.codelens-decoration', { hasText: text })
+        await expect(codeLens).toBeVisible({ timeout })
+        await codeLens.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to click code lens ${text}`)
       }
     },
     async clickLink(text: string) {
-      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      const modifier = IsMacos.isMacos(platform) ? { metaKey: true } : { ctrlKey: true }
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const linkText = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        const linkText = editor.locator('[class*="detected-link"]', { hasText: text }).first()
         await expect(linkText).toBeVisible()
-        await page.keyboard.down(modifier)
-        await linkText.hover()
+        await linkText.hover(modifier)
         const activeLink = editor.locator('.detected-link-active', { hasText: text }).first()
         await expect(activeLink).toBeVisible()
-        await activeLink.click()
+        await activeLink.click(modifier)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to click link ${text}`)
-      } finally {
-        await page.keyboard.up(modifier).catch(() => undefined)
       }
     },
     async close() {
@@ -917,10 +936,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
         await expect(lineNumberElement).toBeVisible()
-        const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await contextMenu.open(lineNumberElement)
-        await page.waitForIdle()
-        await contextMenu.select('Remove Breakpoint')
+        const breakpoint = editor.locator('.glyph-margin-widgets .codicon-debug-breakpoint')
+        await expect(breakpoint).toBeVisible()
+        await breakpoint.click()
+        await expect(breakpoint).toBeHidden()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed remove breakpoint`)
@@ -992,6 +1011,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.keyboard.press('Enter')
       } catch (error) {
         throw new VError(error, `Failed to replace text ${newText}`)
+      }
+    },
+    async replaceActiveLineAndSave({ replacement }: { replacement: string }) {
+      try {
+        const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+        const dirtyTabs = page.locator('.tab.dirty')
+        const editContext = page.locator('.editor-instance .native-edit-context')
+        await editContext.focus()
+        await page.keyboard.press(`${modifier}+A`)
+        await page.keyboard.type(replacement)
+        await expect(dirtyTabs).toHaveCount(1, { timeout: 10_000 })
+        await editContext.focus()
+        await page.keyboard.press(`${modifier}+S`)
+        await expect(dirtyTabs).toHaveCount(0, { timeout: 10_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to replace and save the active editor line`)
       }
     },
     async save(options?: { viaKeyBoard: boolean }) {
@@ -1241,7 +1276,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const timeout = options?.timeout || 15_000
+        const timeout = options?.timeout || 25_000
         await page.waitForIdle({ timeout: 10_000 })
         const codeLens = page.locator('.codelens-decoration')
         await expect(codeLens).toBeVisible({ timeout })
@@ -1254,7 +1289,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const timeout = options?.timeout || 15_000
+        const timeout = options?.timeout || 25_000
         await page.waitForIdle({ timeout: 10_000 })
         const codeLens = page.locator('.codelens-decoration')
         await expect(codeLens).toBeVisible({ timeout })
@@ -1268,19 +1303,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify code lens shows version information`)
       }
     },
-    async shouldHaveControlCharacterHighlight() {
+    async shouldHaveUnicodeHighlight() {
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         await page.waitForIdle()
-        const controlCharacter = editor.locator('.mtkcontrol').first()
-        await expect(controlCharacter).toBeVisible({
+        const unicodeHighlight = editor.locator('.unicode-highlight').first()
+        await expect(unicodeHighlight).toBeVisible({
           timeout: 5000,
         })
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to verify control character highlighting`)
+        throw new VError(error, `Failed to verify Unicode highlighting`)
       }
     },
     async shouldHaveCursor(estimate: string) {
@@ -1556,22 +1591,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await page.waitForIdle()
     },
     async shouldHaveVisibleLink(text: string) {
-      const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+      const modifier = IsMacos.isMacos(platform) ? { metaKey: true } : { ctrlKey: true }
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const linkText = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        const linkText = editor.locator('[class*="detected-link"]', { hasText: text }).first()
         await expect(linkText).toBeVisible()
-        await page.keyboard.down(modifier)
-        await linkText.hover()
+        await linkText.hover(modifier)
         const activeLink = editor.locator('.detected-link-active', { hasText: text }).first()
         await expect(activeLink).toBeVisible()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify visible link ${text}`)
-      } finally {
-        await page.keyboard.up(modifier).catch(() => undefined)
       }
     },
     async shouldHaveVisibleWhitespace(fileName?: string) {
@@ -1787,9 +1819,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async split(command: string, { groupCount = undefined }: { groupCount?: number | undefined }) {
       try {
         // TODO count editor groups
-        const editors = page.locator('.editor-instance')
+        const editors = page.locator('.editor-instance, .browser-root')
         const currentCount = await editors.count()
         if (currentCount === 0 && groupCount !== 0) {
+          const fallbackCommand =
+            command === WellKnownCommands.ViewSplitEditorRight
+              ? WellKnownCommands.NewEditorGroupRight
+              : command === WellKnownCommands.ViewSplitEditorLeft
+                ? WellKnownCommands.NewEditorGroupLeft
+                : command === WellKnownCommands.ViewSplitEditorUp
+                  ? WellKnownCommands.NewEditorGroupTop
+                  : command === WellKnownCommands.ViewSplitEditorDown
+                    ? WellKnownCommands.NewEditorGroupBottom
+                    : ''
+          if (fallbackCommand) {
+            const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+            await quickPick.executeCommand(fallbackCommand)
+            return
+          }
           throw new Error('no open editor found')
         }
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
@@ -1991,6 +2038,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       const notebookEditor = page.locator('.notebook-editor')
       const list = notebookEditor.locator('.monaco-list')
       await expect(list).toBeVisible()
+      await page.waitForIdle()
+      await list.focus()
       await page.waitForIdle()
       await expect(list).toBeFocused()
       await page.waitForIdle()

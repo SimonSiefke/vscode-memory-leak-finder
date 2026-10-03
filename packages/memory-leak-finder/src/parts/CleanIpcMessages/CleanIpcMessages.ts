@@ -116,69 +116,78 @@ function bufferFromContent(content: string): Buffer {
     return Buffer.from(content, 'utf8')
   }
 }
+
+function bufferFromSerializedArg(arg: Dynamic): Buffer {
+  if (arg.encoding === 'latin1') {
+    return Buffer.from(arg.content, 'latin1')
+  }
+  return bufferFromContent(arg.content)
+}
+
+function deserializeAll(buffer: Buffer): Dynamic {
+  const values: Dynamic[] = []
+  let offset = 0
+  while (offset < buffer.length) {
+    const { bytesRead, value } = deserialize(buffer, offset)
+    if (bytesRead <= 0) {
+      break
+    }
+    if (value !== undefined) {
+      values.push(value)
+    }
+    offset += bytesRead
+  }
+  if (values.length === 0) {
+    return undefined
+  }
+  if (values.length === 1) {
+    return values[0]
+  }
+  const [header, ...body] = values
+  if (Array.isArray(header)) {
+    return [...header, ...body]
+  }
+  return values
+}
+
+function cleanSerializedArg(arg: Dynamic): Dynamic {
+  if (arg && (arg.type === 'uint8array' || arg.type === 'buffer') && arg.content) {
+    try {
+      const buffer = bufferFromSerializedArg(arg)
+      const value = deserializeAll(buffer)
+      if (value !== undefined) {
+        return value
+      }
+      try {
+        return JSON.parse(buffer.toString('utf8'))
+      } catch {
+        return arg
+      }
+    } catch {
+      return arg
+    }
+  }
+  if (typeof arg === 'string') {
+    try {
+      return JSON.parse(arg)
+    } catch {
+      return arg
+    }
+  }
+  return arg
+}
+
 // Clean up the IPC messages by deserializing VSCode binary data
 export function cleanMessages(messages: Dynamic[]): Dynamic[] {
   return messages.map((msg: Dynamic) => {
     const cleanedMsg = { ...msg }
     // Clean args
     if (msg.args && Array.isArray(msg.args)) {
-      cleanedMsg.args = msg.args.map((arg: Dynamic) => {
-        // If it's a uint8array or buffer with VSCode binary data, try to deserialize it
-        if (arg && (arg.type === 'uint8array' || arg.type === 'buffer') && arg.content) {
-          // Convert the content string back to a buffer, prefer 'latin1' to preserve raw bytes
-          try {
-            const buffer = bufferFromContent(arg.content)
-            const { bytesRead, value } = deserialize(buffer)
-            if (bytesRead > 0 && value !== undefined) {
-              return value
-            }
-            // Fallback: try to parse the raw content as JSON (utf8)
-            try {
-              return JSON.parse(buffer.toString('utf8'))
-            } catch {
-              return arg
-            }
-          } catch {
-            return arg
-          }
-        }
-        // If it's a JSON string produced by the monkey-patch (JSON.stringify), try to parse it
-        if (typeof arg === 'string') {
-          try {
-            return JSON.parse(arg)
-          } catch {
-            return arg
-          }
-        }
-        return arg
-      })
+      cleanedMsg.args = msg.args.map(cleanSerializedArg)
     }
     // Clean result (for handle-response)
     if (msg.result) {
-      // If it's a typed binary result, try to deserialize
-      if (msg.result.type && (msg.result.type === 'uint8array' || msg.result.type === 'buffer') && msg.result.content) {
-        try {
-          const buffer = bufferFromContent(msg.result.content)
-          const { bytesRead, value } = deserialize(buffer)
-          if (bytesRead > 0 && value !== undefined) {
-            cleanedMsg.result = value
-          } else {
-            try {
-              cleanedMsg.result = JSON.parse(buffer.toString('utf8'))
-            } catch {
-              // keep original
-            }
-          }
-        } catch {
-          // keep original
-        }
-      } else if (typeof msg.result === 'string') {
-        try {
-          cleanedMsg.result = JSON.parse(msg.result)
-        } catch {
-          // keep original
-        }
-      }
+      cleanedMsg.result = cleanSerializedArg(msg.result)
     }
     return cleanedMsg
   })

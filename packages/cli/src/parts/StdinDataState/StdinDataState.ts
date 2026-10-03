@@ -10,6 +10,7 @@ export interface StdinDataState {
   readonly buffering: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
+  readonly color: boolean
   readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
@@ -43,9 +44,14 @@ export interface StdinDataState {
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
+  readonly runNetworkTestsAnyway: boolean
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
+  readonly showSkippedFailedTestDuration: boolean
   readonly screencastQuality: number
+  readonly shardCount?: number | undefined
+  readonly shardIndex?: number | undefined
+  readonly startupRuns: number
   readonly stdout: string[]
   readonly timeoutBetween: number
   readonly timeouts: boolean
@@ -63,6 +69,7 @@ let state: StdinDataState = {
   buffering: false,
   checkLeaks: false,
   clearExtensions: true,
+  color: true,
   compressVideo: false,
   continueValue: '',
   cwd: Character.EmptyString,
@@ -96,9 +103,12 @@ let state: StdinDataState = {
   recordVideo: false,
   restartBetween: false,
   runMode: TestRunMode.Auto,
+  runNetworkTestsAnyway: false,
   runs: 1,
   runSkippedTestsAnyway: false,
+  showSkippedFailedTestDuration: false,
   screencastQuality: 90,
+  startupRuns: 1,
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
@@ -116,6 +126,7 @@ export const setState = (newState: StdinDataState): void => {
     bisect: newState.bisect,
     buildVscodeMinified: newState.buildVscodeMinified,
     checkLeaks: newState.checkLeaks,
+    color: newState.color,
     compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,
     cwd: newState.cwd,
@@ -146,9 +157,14 @@ export const setState = (newState: StdinDataState): void => {
     recordVideo: newState.recordVideo,
     restartBetween: newState.restartBetween,
     runMode: newState.runMode,
+    runNetworkTestsAnyway: newState.runNetworkTestsAnyway,
     runs: newState.runs,
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
+    showSkippedFailedTestDuration: newState.showSkippedFailedTestDuration,
     screencastQuality: newState.screencastQuality,
+    shardCount: newState.shardCount,
+    shardIndex: newState.shardIndex,
+    startupRuns: newState.startupRuns,
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
     timeouts: newState.timeouts,
@@ -206,6 +222,10 @@ export const isWindows = (): boolean => {
 
 export const shouldCheckLeaks = (): boolean => {
   return state.checkLeaks
+}
+
+export const shouldShowSkippedFailedTestDuration = (): boolean => {
+  return state.showSkippedFailedTestDuration
 }
 
 export const getRuns = (): number => {

@@ -1,5 +1,5 @@
 import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUtilityExecutionContext.ts'
-import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
 import * as Locator from '../Locator/Locator.ts'
 import * as PageBlur from '../PageBlur/PageBlur.ts'
@@ -83,6 +83,23 @@ export const create = ({
         replMode,
       })
     },
+    async evaluateInMainWorld({ awaitPromise = false, expression, replMode = false }) {
+      return DevtoolsProtocolRuntime.evaluate(this.rpc, {
+        awaitPromise,
+        expression,
+        replMode,
+        returnByValue: true,
+      })
+    },
+    async evaluateInUtilityWorld({ awaitPromise = false, expression, replMode = false }) {
+      return DevtoolsProtocolRuntime.evaluate(this.rpc, {
+        awaitPromise,
+        expression,
+        replMode,
+        returnByValue: true,
+        ...(this.utilityContext.uniqueId ? { uniqueContextId: this.utilityContext.uniqueId } : { contextId: this.utilityContext.id }),
+      })
+    },
     focus() {
       return PageFocus.focus({
         electronRpc: this.electronRpc,
@@ -127,13 +144,14 @@ export const create = ({
     async waitForIdle() {
       return PageWaitForIdle.waitForIdle(this.rpc, this.electronRpc.canUseIdleCallback, idleTimeout)
     },
-    waitForIframe({ injectUtilityScript = true, url }) {
+    waitForIframe({ index = 0, injectUtilityScript = true, url }) {
       return WaitForIframe.waitForIframe({
         browserRpc,
         createPage: create,
         electronObjectId,
         electronRpc,
         idleTimeout,
+        index,
         injectUtilityScript,
         sessionRpc,
         url,

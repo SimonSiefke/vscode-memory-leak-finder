@@ -90,9 +90,19 @@ test('installDependencies - throws VError when exec fails without nice', async (
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(installDependencies('/test/path', false)).rejects.toThrow(VError)
-  await expect(installDependencies('/test/path', false)).rejects.toThrow("Failed to install dependencies in directory '/test/path'")
-  expect(mockInvoke).toHaveBeenCalled()
+  jest.useFakeTimers()
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+  try {
+    const promise = installDependencies('/test/path', false).catch((error) => error)
+    await jest.advanceTimersByTimeAsync(4000)
+    const error = await promise
+    expect(error).toBeInstanceOf(VError)
+    expect(error.message).toContain("Failed to install dependencies in directory '/test/path'")
+    expect(mockInvoke).toHaveBeenCalled()
+  } finally {
+    consoleSpy.mockRestore()
+    jest.useRealTimers()
+  }
 })
 
 test('installDependencies - throws VError when exec fails with nice', async () => {
@@ -118,9 +128,101 @@ test('installDependencies - throws VError when exec fails with nice', async () =
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(installDependencies('/test/path', true)).rejects.toThrow(VError)
-  await expect(installDependencies('/test/path', true)).rejects.toThrow("Failed to install dependencies in directory '/test/path'")
-  expect(mockInvoke).toHaveBeenCalled()
+  jest.useFakeTimers()
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+  try {
+    const promise = installDependencies('/test/path', true).catch((error) => error)
+    await jest.advanceTimersByTimeAsync(4000)
+    const error = await promise
+    expect(error).toBeInstanceOf(VError)
+    expect(error.message).toContain("Failed to install dependencies in directory '/test/path'")
+    expect(mockInvoke).toHaveBeenCalled()
+  } finally {
+    consoleSpy.mockRestore()
+    jest.useRealTimers()
+  }
+})
+
+test('installDependencies - retries npm ci and succeeds', async () => {
+  const mockInvoke = jest.fn()
+  mockInvoke.mockImplementation((method) => {
+    if (method === 'FileSystem.readFileContent') {
+      return '20'
+    }
+    if (method === 'FileSystem.exists') {
+      return true
+    }
+    if (method === 'FileSystem.findFiles') {
+      return []
+    }
+    if (method === 'FileSystem.exec') {
+      const execCalls = mockInvoke.mock.calls.filter((call) => call[0] === 'FileSystem.exec')
+      if (execCalls.length < 3) {
+        return { exitCode: 1, stderr: 'temporary registry error', stdout: '' }
+      }
+      return { exitCode: 0, stderr: '', stdout: '' }
+    }
+    throw new Error(`unexpected method ${method}`)
+  })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  jest.useFakeTimers()
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+  try {
+    const promise = installDependencies('/test/path', false)
+    await jest.advanceTimersByTimeAsync(4000)
+    await expect(promise).resolves.toBeUndefined()
+    const execCalls = mockInvoke.mock.calls.filter((call) => call[0] === 'FileSystem.exec')
+    expect(execCalls).toHaveLength(3)
+  } finally {
+    consoleSpy.mockRestore()
+    jest.useRealTimers()
+  }
+})
+
+test('installDependencies - includes npm stderr after retry failures', async () => {
+  const mockInvoke = jest.fn()
+  mockInvoke.mockImplementation((method) => {
+    if (method === 'FileSystem.readFileContent') {
+      return '20'
+    }
+    if (method === 'FileSystem.exists') {
+      return true
+    }
+    if (method === 'FileSystem.findFiles') {
+      return []
+    }
+    if (method === 'FileSystem.exec') {
+      return { exitCode: 1, stderr: 'npm ERR! registry timeout', stdout: 'fallback output' }
+    }
+    throw new Error(`unexpected method ${method}`)
+  })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  jest.useFakeTimers()
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+  try {
+    const promise = installDependencies('/test/path', false).catch((error) => error)
+    await jest.advanceTimersByTimeAsync(4000)
+    const error = await promise
+    expect(error.message).toContain('after 3 attempts')
+    expect(error.message).toContain('npm ERR! registry timeout')
+    const execCalls = mockInvoke.mock.calls.filter((call) => call[0] === 'FileSystem.exec')
+    expect(execCalls).toHaveLength(3)
+  } finally {
+    consoleSpy.mockRestore()
+    jest.useRealTimers()
+  }
 })
 
 test('installDependencies - installs missing node version from .nvmrc before npm ci', async () => {
@@ -193,7 +295,7 @@ test('installDependencies - installs missing node version from .nvmrc before npm
           env: expect.objectContaining({
             PATH: expect.stringContaining(binPath),
           }),
-          stdio: 'inherit',
+          reject: false,
         },
       ],
       [
@@ -283,7 +385,7 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
           env: expect.objectContaining({
             PATH: expect.stringContaining('/test/.nvm/versions/node/v20.0.0/bin'),
           }),
-          stdio: 'inherit',
+          reject: false,
         },
       ],
       [
@@ -307,7 +409,7 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
           env: expect.objectContaining({
             PATH: expect.stringContaining('/test/.nvm/versions/node/v20.0.0/bin'),
           }),
-          stdio: 'inherit',
+          reject: false,
         },
       ],
       ['FileSystem.exists', `${extensionPath}/package.json`],
@@ -327,7 +429,7 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
           env: expect.objectContaining({
             PATH: expect.stringContaining('/test/.nvm/versions/node/v20.0.0/bin'),
           }),
-          stdio: 'inherit',
+          reject: false,
         },
       ],
     ])
@@ -453,7 +555,7 @@ test('ensureNestedDependencies - reinstalls nested dependencies when existing no
         env: expect.objectContaining({
           PATH: expect.stringContaining('/test/.nvm/versions/node/v20.0.0/bin'),
         }),
-        stdio: 'inherit',
+        reject: false,
       },
     ])
   } finally {
@@ -552,7 +654,7 @@ test('ensureNestedDependencies - installs copilot and chat-lib dependencies with
           env: expect.objectContaining({
             PATH: expect.stringContaining('/test/.nvm/versions/node/v20.0.0/bin'),
           }),
-          stdio: 'inherit',
+          reject: false,
         },
       ],
       ['FileSystem.exists', `${copilotNestedPath}/package.json`],
@@ -573,7 +675,7 @@ test('ensureNestedDependencies - installs copilot and chat-lib dependencies with
           env: expect.objectContaining({
             PATH: expect.stringContaining('/test/.nvm/versions/node/v20.0.0/bin'),
           }),
-          stdio: 'inherit',
+          reject: false,
         },
       ],
     ])

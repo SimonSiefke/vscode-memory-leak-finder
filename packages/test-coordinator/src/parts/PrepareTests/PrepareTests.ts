@@ -29,6 +29,7 @@ export interface PrepareTestsOptions {
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
+  readonly preparedVscodePath: string
   readonly proxyTestFolderName: string
   readonly recordVideo: boolean
   readonly runMode: number
@@ -65,6 +66,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     measureId,
     openDevtools,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
     trackFunctions,
     updateUrl,
@@ -102,6 +104,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       measureId,
       openDevtools,
       platform,
+      preparedVscodePath,
       proxyTestFolderName,
       trackFunctions,
       updateUrl,

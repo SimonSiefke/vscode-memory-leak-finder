@@ -27,7 +27,10 @@ export const compare = async (
   if (!after) {
     throw new Error(`after missing`)
   }
-  const result = await measure.compare(before, after, context)
+  const result = await measure.compare(before, after, {
+    ...context,
+    resultPath,
+  })
 
   await JsonFile.writeJson(resultPath, result)
   return {

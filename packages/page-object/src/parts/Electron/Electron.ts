@@ -9,11 +9,47 @@ type WebContentsEntry = {
   readonly url: string
 }
 
+type ResizeWindowWidthOptions = {
+  readonly stepDelay?: number
+  readonly width: number
+}
+
+type WindowResizeState = {
+  readonly message?: string
+  readonly status: 'pending' | 'rejected' | 'resolved'
+  readonly width?: number
+}
+
+let windowResizeOperationId = 0
+
+const validateWindowWidth = (width: number): void => {
+  if (!Number.isInteger(width) || width <= 0) {
+    throw new TypeError(`Window width must be a positive integer`)
+  }
+}
+
+const validateStepDelay = (stepDelay: number): void => {
+  if (!Number.isInteger(stepDelay) || stepDelay < 0) {
+    throw new TypeError(`Window resize step delay must be a non-negative integer`)
+  }
+}
+
+const getWindowExpression = (body: string): string => {
+  return `(() => {
+  const { BrowserWindow } = globalThis._____electron
+  const window = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows().find((candidate) => candidate.isVisible())
+  if (!window || window.isDestroyed()) {
+    throw new Error('Expected visible Electron window')
+  }
+  ${body}
+})()`
+}
+
 const getWebContentsSummary = (entries: readonly WebContentsEntry[]): string => {
   return entries.map((entry) => `${entry.id}:${entry.type}:${entry.url || '<empty>'}`).join(', ')
 }
 
-export const create = ({ electronApp, VError }: CreateParams) => {
+export const create = ({ electronApp, page, VError }: CreateParams) => {
   return {
     async closeWindow(windowId: number) {
       try {
@@ -175,6 +211,91 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get window visibility`)
       }
     },
+    async resizeWindowWidth({ stepDelay = 16, width }: ResizeWindowWidthOptions): Promise<void> {
+      try {
+        validateWindowWidth(width)
+        validateStepDelay(stepDelay)
+
+        const stateKey = `_____windowResizeState${++windowResizeOperationId}`
+        const stateKeyLiteral = JSON.stringify(stateKey)
+        await this.evaluate(
+          getWindowExpression(`const targetWidth = ${width}
+  const stepDelay = ${stepDelay}
+  const initialBounds = window.getBounds()
+  globalThis[${stateKeyLiteral}] = { status: 'pending' }
+  const resize = async () => {
+    const direction = Math.sign(targetWidth - initialBounds.width)
+    for (let width = initialBounds.width + direction; direction !== 0 && width !== targetWidth + direction; width += direction) {
+      window.setBounds({
+        ...initialBounds,
+        width,
+      })
+      await new Promise((resolve) => setTimeout(resolve, stepDelay))
+    }
+    return window.getBounds().width
+  }
+  resize().then(
+    (actualWidth) => {
+      globalThis[${stateKeyLiteral}] = { status: 'resolved', width: actualWidth }
+    },
+    (error) => {
+      globalThis[${stateKeyLiteral}] = {
+        message: String(error && error.message ? error.message : error),
+        status: 'rejected',
+      }
+    },
+  )`),
+        )
+
+        const timeout = Math.max(10_000, stepDelay * 10_000)
+        const startTime = performance.now()
+        try {
+          while (true) {
+            const state = (await this.evaluate(`globalThis[${stateKeyLiteral}]`)) as WindowResizeState
+            if (state?.status === 'resolved') {
+              if (state.width !== width) {
+                throw new Error(`Expected window width ${width}, got ${state.width}`)
+              }
+              await page.waitForIdle()
+              return
+            }
+            if (state?.status === 'rejected') {
+              throw new Error(state.message || `Window resize failed`)
+            }
+            if (performance.now() - startTime > timeout) {
+              throw new Error(`Window resize did not finish within ${timeout}ms`)
+            }
+            await new Promise((resolve) => setTimeout(resolve, 50))
+          }
+        } finally {
+          await this.evaluate(`delete globalThis[${stateKeyLiteral}]`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to resize window to width ${width}`)
+      }
+    },
+    async setWindowWidth(width: number): Promise<void> {
+      try {
+        validateWindowWidth(width)
+        const actualWidth = await this.evaluate(
+          getWindowExpression(`if (window.isMaximized()) {
+    window.unmaximize()
+  }
+  const bounds = window.getBounds()
+  window.setBounds({
+    ...bounds,
+    width: ${width},
+  })
+  return window.getBounds().width`),
+        )
+        if (actualWidth !== width) {
+          throw new Error(`Expected window width ${width}, got ${actualWidth}`)
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set window width to ${width}`)
+      }
+    },
     async mockDialog(response: any) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
@@ -240,9 +361,11 @@ export const create = ({ electronApp, VError }: CreateParams) => {
     async waitForNewWebContentsView({
       existingIds,
       timeout = 10_000,
+      urlPattern,
     }: {
       existingIds: readonly number[]
       timeout?: number
+      urlPattern?: RegExp
     }): Promise<WebContentsEntry> {
       try {
         const existingIdSet = new Set(existingIds)
@@ -250,14 +373,19 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         while (true) {
           const entries = await this.getAllWebContents()
           const match = entries.find((entry) => {
-            return !existingIdSet.has(entry.id) && entry.ownerWindowVisible !== false && !entry.url.startsWith('devtools://')
+            return (
+              !existingIdSet.has(entry.id) &&
+              entry.ownerWindowVisible !== false &&
+              !entry.url.startsWith('devtools://') &&
+              (!urlPattern || urlPattern.test(entry.url))
+            )
           })
           if (match) {
             return match
           }
           if (performance.now() - startTime > timeout) {
             throw new Error(
-              `No new visible web contents found. Existing ids: ${existingIds.join(', ')}. Found: ${getWebContentsSummary(entries)}`,
+              `No new visible web contents found${urlPattern ? ` matching ${urlPattern}` : ''}. Existing ids: ${existingIds.join(', ')}. Found: ${getWebContentsSummary(entries)}`,
             )
           }
           await new Promise((resolve) => setTimeout(resolve, 100))
