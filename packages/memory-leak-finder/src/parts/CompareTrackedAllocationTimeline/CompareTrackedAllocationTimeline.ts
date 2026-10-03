@@ -10,6 +10,7 @@ export interface TrackedAllocationTimelineResultEntry {
   readonly originalLine: number | null
   readonly originalLocation: string | null
   readonly originalSource: string | null
+  readonly originalType: string
   readonly type: string
 }
 
@@ -46,6 +47,7 @@ export const compareTrackedAllocationTimeline = async (
         originalLine: resolved.originalLine,
         originalLocation: resolved.originalLocation,
         originalSource: resolved.originalSource,
+        originalType: resolved.originalName || allocation.type,
         type: allocation.type,
       }
     })
