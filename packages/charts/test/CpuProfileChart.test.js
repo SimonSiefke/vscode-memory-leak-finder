@@ -103,3 +103,48 @@ test('createCpuProfileChart uses flame chart multi-chart configuration', () => {
     }),
   )
 })
+
+test('getCpuProfileData includes raw profiles from tracked allocation performance results', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'tracked-allocation-cpu-profile-data-'))
+  const basePath = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const resultsPath = join(basePath, 'tracked-allocation-performance')
+
+  await mkdir(resultsPath, { recursive: true })
+  await writeFile(
+    join(resultsPath, 'editor-type.json'),
+    JSON.stringify({
+      trackedAllocationPerformance: {
+        cpuProfile: {
+          nodes: [
+            {
+              callFrame: {
+                columnNumber: 4,
+                functionName: 'type',
+                lineNumber: 10,
+                url: 'file:///editor.js',
+              },
+              id: 1,
+            },
+          ],
+          samples: [1],
+          timeDeltas: [2000],
+        },
+      },
+    }),
+  )
+
+  try {
+    const result = await getCpuProfileData(basePath)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toMatchObject({
+      filename: 'tracked-allocation-performance/editor-type',
+    })
+    expect(result[0].data[0]).toMatchObject({
+      durationMs: 2,
+      name: 'type',
+      selfTimeMs: 2,
+    })
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})
