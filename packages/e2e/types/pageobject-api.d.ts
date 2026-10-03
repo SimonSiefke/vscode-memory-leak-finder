@@ -531,7 +531,7 @@ export interface LanguageModelEditor {
 }
 export interface MarkdownPreview {
   show(): Promise<any>
-  shouldBeVisible(index?: number): Promise<any>
+  shouldBeVisible(indexOrOptions?: number | { useSingleIframe?: boolean }): Promise<any>
   shouldHaveCodeBlocks(subFrame: any, count: any): Promise<void>
   shouldHaveCodeBlockWithLanguage(subFrame: any, language: any): Promise<void>
   shouldHaveHeading(subFrame: any, id: any): Promise<void>
