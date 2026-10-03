@@ -22,6 +22,7 @@ export const createBarChart = (data: any, options: any): string => {
         rx1: 2,
         rx2: 2,
         strokeWidth: 2,
+        title: 'title',
         x: 'value',
         y: 'name',
       }),
@@ -39,7 +40,7 @@ export const createBarChart = (data: any, options: any): string => {
     ],
     style: 'overflow: visible; background:white',
     width: chartOptions.width,
-    x: { axis: null },
+    x: { axis: null, ...(orderedData.every((item: any) => item.value === 0) ? { domain: [0, 1] } : {}) },
     y: { domain: orderedData.map((item: any) => item.name), label: null },
   }).outerHTML
 
