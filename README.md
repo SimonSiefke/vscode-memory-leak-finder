@@ -303,6 +303,15 @@ Measures the event listeners.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure event-listeners --only base
 ```
 
+### Event loop delay
+
+See [the event-loop-delay measure](docs/measures/event-loop-delay.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure event-loop-delay --only base
+npm run build-charts
+```
+
 ### FinalizationRegistryCount
 
 Measures the total number of live `FinalizationRegistry` instances.
@@ -446,6 +455,15 @@ Measures the total number of Timeouts.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-timeout --only base
+```
+
+### Synchronous file system
+
+See [the synchronous-file-system measure](docs/measures/synchronous-file-system.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure synchronous-file-system --only base
+npm run build-charts
 ```
 
 ### TrackedTimeouts
