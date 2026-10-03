@@ -752,3 +752,11 @@ test('parseArgv - explicit --check-leaks takes precedence', () => {
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.checkLeaks).toBe(true)
 })
+
+test('parseArgv - tracked everything enables tracking transform', () => {
+  for (const measure of ['tracked-everything', 'trackedEverything']) {
+    const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', measure])
+    expect(options.measure).toBe(measure)
+    expect(options.trackFunctions).toBe(true)
+  }
+})

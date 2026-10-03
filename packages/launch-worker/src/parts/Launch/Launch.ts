@@ -48,6 +48,9 @@ export interface LaunchOptions {
 let proxyWorkerRpc: any = null
 
 export const getTrackingMode = (measureId: string): string => {
+  if (measureId === 'tracked-everything' || measureId === 'trackedEverything') {
+    return 'everything'
+  }
   if (measureId === 'tracked-timeouts' || measureId === 'trackedTimeouts') {
     return 'timeouts'
   }

@@ -160,6 +160,7 @@ export * as MeasureTrackedAllocationLeaks from '../MeasureTrackedAllocationLeaks
 export * as MeasureTrackedAllocationPerformance from '../MeasureTrackedAllocationPerformance/MeasureTrackedAllocationPerformance.ts'
 export * as MeasureTrackedAllocations from '../MeasureTrackedAllocations/MeasureTrackedAllocations.ts'
 export * as MeasureTrackedAllocationsFromStart from '../MeasureTrackedAllocationsFromStart/MeasureTrackedAllocationsFromStart.ts'
+export * as MeasureTrackedEverything from '../MeasureTrackedEverything/MeasureTrackedEverything.ts'
 export * as MeasureTrackedAllocationsWithStackTraces from '../MeasureTrackedAllocationsWithStackTraces/MeasureTrackedAllocationsWithStackTraces.ts'
 export * as MeasureTrackedAllocationTimeline from '../MeasureTrackedAllocationTimeline/MeasureTrackedAllocationTimeline.ts'
 export * as MeasureTrackedFunctions from '../MeasureTrackedFunctions/MeasureTrackedFunctions.ts'

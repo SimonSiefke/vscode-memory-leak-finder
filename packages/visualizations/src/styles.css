@@ -447,6 +447,105 @@ h1 {
   box-shadow: 0 -14px 50px rgb(0 0 0 / 20%);
 }
 
+.EverythingApp .Viewport {
+  min-height: 0;
+}
+
+.TypeSelect {
+  background: #101b2e;
+  border: 1px solid #29405f;
+  border-radius: 7px;
+  color: #dce9fa;
+  min-width: 145px;
+  padding: 8px 10px;
+}
+
+.EverythingPath {
+  align-items: center;
+  color: #7891b2;
+  display: flex;
+  font-size: 12px;
+  gap: 5px;
+  min-height: 18px;
+}
+
+.EverythingPath button {
+  background: none;
+  border: 0;
+  color: #a5bddb;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.EverythingInspector {
+  max-height: calc(100% - 42px);
+  overflow: auto;
+  width: min(360px, 34vw);
+}
+
+.EverythingInspector ol {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.EverythingInspector li {
+  border-top: 1px solid #243752;
+  display: grid;
+  gap: 2px;
+  padding: 8px 0;
+}
+
+.EverythingInspector li span {
+  color: #8ca2c0;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.EverythingSiteDetail {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.EverythingSiteDetail span {
+  color: #8ca2c0;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.EverythingTimeline {
+  min-height: 112px;
+}
+
+.EverythingTrack {
+  display: grid;
+  flex: 1;
+  grid-template-rows: 52px 18px 16px;
+  min-width: 0;
+}
+
+.EverythingDensity {
+  height: 52px;
+  opacity: 0.82;
+  width: 100%;
+}
+
+.EverythingTrack input {
+  margin: -8px 0 0;
+  position: relative;
+  width: 100%;
+  z-index: 2;
+}
+
+.EverythingScale {
+  color: #7891b2;
+  display: flex;
+  font-size: 10px;
+  justify-content: space-between;
+}
+
 .PlayButton {
   display: grid;
   width: 38px;
