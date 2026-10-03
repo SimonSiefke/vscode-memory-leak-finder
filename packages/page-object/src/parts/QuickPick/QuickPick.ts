@@ -15,16 +15,19 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
       command: string,
       {
         pressKeyOnce = false,
+        skipIdle = false,
         stayVisible = false,
         stopsApplication = false,
-      }: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care'; stopsApplication?: boolean } = {},
+      }: { pressKeyOnce?: boolean; skipIdle?: boolean; stayVisible?: boolean | 'dont-care'; stopsApplication?: boolean } = {},
     ) {
       try {
-        await page.waitForIdle()
-        await this.showCommands({ pressKeyOnce })
-        await this.type(command)
-        await this.select(command, stayVisible, stopsApplication)
-        if (!stopsApplication) {
+        if (!skipIdle) {
+          await page.waitForIdle()
+        }
+        await this.showCommands({ pressKeyOnce, skipIdle })
+        await this.type(command, { skipIdle })
+        await this.select(command, stayVisible, stopsApplication, { skipIdle })
+        if (!stopsApplication && !skipIdle) {
           await page.waitForIdle()
         }
       } catch (error) {
@@ -133,9 +136,16 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to press Enter`)
       }
     },
-    async select(text: string | RegExp, stayVisible: boolean | 'dont-care' = false, stopsApplication = false) {
+    async select(
+      text: string | RegExp,
+      stayVisible: boolean | 'dont-care' = false,
+      stopsApplication = false,
+      { skipIdle = false }: { skipIdle?: boolean } = {},
+    ) {
       try {
-        await page.waitForIdle()
+        if (!skipIdle) {
+          await page.waitForIdle()
+        }
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         let selectedAt: number
@@ -144,14 +154,18 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
             hasExactText: text,
           })
           await expect(option).toBeVisible()
-          await page.waitForIdle()
+          if (!skipIdle) {
+            await page.waitForIdle()
+          }
           selectedAt = performance.timeOrigin + performance.now()
           await option.click()
         } else {
           const normal = `${text}`.slice(1, -1)
           const item = quickPick.locator(`.monaco-list-row[aria-label*="${normal}"]`)
           await expect(item).toBeVisible()
-          await page.waitForIdle()
+          if (!skipIdle) {
+            await page.waitForIdle()
+          }
           const label = item.locator('.label-name')
           selectedAt = performance.timeOrigin + performance.now()
           await label.click()
@@ -159,7 +173,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()
         }
-        if (!stopsApplication) {
+        if (!stopsApplication && !skipIdle) {
           await page.waitForIdle()
         }
         return selectedAt
@@ -167,16 +181,20 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to select "${text}"`)
       }
     },
-    async show({ key = KeyBindings.getOpenQuickPickFiles(platform), pressKeyOnce = false } = {}) {
+    async show({ key = KeyBindings.getOpenQuickPickFiles(platform), pressKeyOnce = false, skipIdle = false } = {}) {
       try {
-        await page.waitForIdle()
+        if (!skipIdle) {
+          await page.waitForIdle()
+        }
         const quickPick = page.locator('.quick-input-widget')
         const waitForQuickPick = async () => {
           await expect(quickPick).toBeVisible({
             timeout: 10_000,
           })
           await expect(quickPick).toBeVisible()
-          await page.waitForIdle()
+          if (!skipIdle) {
+            await page.waitForIdle()
+          }
           await this.waitForInputVisible()
         }
         // TODO there might be a conflict here when pressing the keyboard shortcut
@@ -218,9 +236,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to show quick pick color theme`)
       }
     },
-    async showCommands({ pressKeyOnce = false } = {}) {
+    async showCommands({ pressKeyOnce = false, skipIdle = false } = {}) {
       try {
-        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform || ''), pressKeyOnce })
+        return this.show({ key: KeyBindings.getOpenQuickPickCommands(platform || ''), pressKeyOnce, skipIdle })
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }
@@ -234,11 +252,13 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
         throw new VError(error, `Failed to show quick pick file icon theme`)
       }
     },
-    async type(value: string) {
+    async type(value: string, { skipIdle = false }: { skipIdle?: boolean } = {}) {
       try {
         const quickPickInput = await this.waitForInputVisible()
         await quickPickInput.type(value)
-        await page.waitForIdle()
+        if (!skipIdle) {
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to type ${value}`)
       }
