@@ -53,7 +53,7 @@ jobs:
 
   pr-windows-poolmon:
     runs-on: windows-2022
-    needs: pr
+    needs: reproduce-mcp-detail-view
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v7
