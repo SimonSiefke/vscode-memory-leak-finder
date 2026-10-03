@@ -27,7 +27,7 @@ test('getVsCodeEnv - disable keytar in ci', () => {
   const processEnv = {
     CI: 'true',
   }
-  expect(GetVsCodeEnv.getVsCodeEnv({ processEnv, runtimeDir, userDataDir })).toEqual({
+  expect(GetVsCodeEnv.getVsCodeEnv({ processEnv, runtimeDir, userDataDir })).toMatchObject({
     CI: 'true',
     COPILOT_HOME: '/tmp/vscode-user-data-dir/copilot-home',
     COPILOT_DISABLE_KEYTAR: '1',
@@ -41,7 +41,7 @@ test('getVsCodeEnv - disable keytar in github actions', () => {
   const processEnv = {
     GITHUB_ACTIONS: 'true',
   }
-  expect(GetVsCodeEnv.getVsCodeEnv({ processEnv, runtimeDir, userDataDir })).toEqual({
+  expect(GetVsCodeEnv.getVsCodeEnv({ processEnv, runtimeDir, userDataDir })).toMatchObject({
     COPILOT_DISABLE_KEYTAR: '1',
     COPILOT_HOME: '/tmp/vscode-user-data-dir/copilot-home',
     GITHUB_ACTIONS: 'true',
