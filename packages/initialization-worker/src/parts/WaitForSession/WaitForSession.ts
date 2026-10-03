@@ -11,7 +11,24 @@ interface BrowserRpc {
 }
 
 export const waitForSession = async (browserRpc: BrowserRpc, attachedToPageTimeout: number) => {
-  const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
+  const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout, async (message) => {
+    const { sessionId, targetInfo } = message.params
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const targets = await DevtoolsProtocolTarget.getTargets(browserRpc)
+      const currentTarget = targets.find((target: any) => target.targetId === targetInfo.targetId)
+      if (currentTarget?.url) {
+        console.error('[WaitForSession] classified target', targetInfo.targetId, currentTarget.url)
+        if (currentTarget.url.startsWith('devtools://')) {
+          const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+          DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc).catch(() => {})
+          return false
+        }
+        return true
+      }
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    }
+    return false
+  })
 
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
     autoAttach: true,

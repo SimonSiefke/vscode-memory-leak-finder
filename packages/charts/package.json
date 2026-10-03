@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@babel/code-frame": "^7.29.7",
-    "@lvce-editor/rpc": "^6.19.3",
+    "@lvce-editor/rpc": "^6.21.0",
     "escape-html": "^1.0.3",
     "pretty-bytes": "^7.1.3"
   },
