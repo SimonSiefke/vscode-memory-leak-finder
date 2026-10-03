@@ -1,6 +1,7 @@
 import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
 import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
+import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as Ide from '../Ide/Ide.ts'
 import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
@@ -104,6 +105,7 @@ export const launchIde = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  linuxProcessTreeResourcesFromStartConfig,
   platform,
   preparedVscodePath,
   proxyTestFolderName,
@@ -135,6 +137,7 @@ export const launchIde = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  linuxProcessTreeResourcesFromStartConfig: LinuxProcessTreeResourcesFromStartConfig
   platform: string
   preparedVscodePath: string
   proxyTestFolderName: string
@@ -165,6 +168,7 @@ export const launchIde = async ({
       inspectPtyHostPort,
       inspectSharedProcess,
       inspectSharedProcessPort,
+      linuxProcessTreeResourcesFromStartConfig,
       proxyTestFolderName,
       useProxyMock,
       vscodePath,
@@ -205,6 +209,7 @@ export const launchIde = async ({
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    linuxProcessTreeResourcesFromStartConfig,
     platform,
     preparedVscodePath,
     proxyTestFolderName,

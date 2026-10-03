@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { join } from 'path'
 
 export const getVsCodeEnv = ({
@@ -13,6 +14,13 @@ export const getVsCodeEnv = ({
 }): NodeJS.ProcessEnv => {
   const env = {
     ...processEnv,
+  }
+  if (process.platform === 'linux') {
+    if (existsSync('/bin/bash')) {
+      env.SHELL = '/bin/bash'
+    } else if (existsSync('/usr/bin/bash')) {
+      env.SHELL = '/usr/bin/bash'
+    }
   }
   if (runtimeDir) {
     env.XDG_RUNTIME_DIR = runtimeDir
