@@ -21,5 +21,5 @@ export const stop = async (session: Session, objectGroup: string) => {
 }
 export const compare = CompareLargestArrayCount.compareLargestArrayCount
 export const isLeak = (leaked: Dynamic) => {
-  return true
+  return leaked.length > 0
 }

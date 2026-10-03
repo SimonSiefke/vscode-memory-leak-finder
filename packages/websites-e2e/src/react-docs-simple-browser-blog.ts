@@ -18,7 +18,7 @@ export const setup = async ({ Editor, SimpleBrowser, Workspace, Notification, Si
   await new Promise((r) => {
     setTimeout(r, 3000)
   })
-  await Notification.closeAll()
+  await Notification.closeAll({ force: true })
   await SimpleBrowser.show({
     url: blogUrl,
   })
