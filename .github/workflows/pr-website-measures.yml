@@ -1,0 +1,314 @@
+name: PR Website Measures
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  website-measures:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - airbnb-all-homes
+          - astro-docs-installation
+          - docusaurus-docs-installation
+          - google-maps-search-clear
+          - google-translate-text-clear
+          - github-vscode-issue-navigation
+          - github-vscode-issues-assigned-to-me
+          - github-vscode-issues-search
+          - github-vscode-repository-issues-navigation
+          - github-vscode-repository-more-menu
+          - jest-docs-using-matchers
+          - nextjs-docs-project-structure
+          - npm-package-search-clear
+          - nuxt-docs-installation
+          - openstreetmap-search-clear
+          - playwright-docs-writing-tests
+          - prisma-docs-getting-started
+          - qwik-docs-project-structure
+          - react-docs-simple-browser-blog
+          - react-native-docs-core-components
+          - react-router-docs-routing
+          - redux-docs-installation
+          - sentry-docs-installation-methods
+          - storybook-docs-install
+          - supabase-docs-getting-started
+          - svelte-docs-getting-started
+          - syntax-fm-simple-browser-videos-shows
+          - tailwind-docs-styling-with-utility-classes
+          - vercel-docs-getting-started
+          - vite-docs-guide-features
+          - vitest-docs-features
+          - vue-docs-reactivity-fundamentals
+        runs:
+          - 1997
+        include:
+          - test: chatgpt-ask-new-chat
+            runs: 1
+          - test: ckeditor-find-fullscreen
+            runs: 2
+          - test: desmos-zoom-reset
+            runs: 2
+          - test: excalidraw-rectangle-undo
+            runs: 2
+          - test: fullcalendar-view-navigation
+            runs: 2
+          - test: hlsjs-play-detach-reload
+            runs: 2
+          - test: jupyterlite-run-clear
+            runs: 2
+          - test: mui-autocomplete-virtualized-select-clear
+            runs: 2
+          - test: mui-data-grid-virtual-scroll
+            runs: 2
+          - test: react-flow-stress-controls
+            runs: 2
+          - test: todomvc-angular-add-toggle-clear
+            runs: 2
+          - test: todomvc-backbone-add-toggle-clear
+            runs: 2
+          - test: todomvc-lit-add-toggle-clear
+            runs: 2
+          - test: todomvc-react-add-toggle-clear
+            runs: 2
+          - test: todomvc-svelte-add-toggle-clear
+            runs: 2
+          - test: todomvc-vue-add-toggle-clear
+            runs: 2
+          - test: antd-checkbox-toggle-restore
+            runs: 2
+          - test: antd-collapse-toggle-restore
+            runs: 2
+          - test: antd-color-picker-open-close
+            runs: 2
+          - test: antd-date-picker-open-close
+            runs: 2
+          - test: antd-dropdown-open-close
+            runs: 2
+          - test: antd-input-number-step-restore
+            runs: 2
+          - test: antd-pagination-next-previous
+            runs: 2
+          - test: antd-segmented-switch-restore
+            runs: 2
+          - test: antd-slider-step-restore
+            runs: 2
+          - test: antd-switch-toggle-restore
+            runs: 2
+          - test: antd-tabs-switch-restore
+            runs: 2
+          - test: bootstrap-accordion-toggle-restore
+            runs: 2
+          - test: bootstrap-carousel-next-previous
+            runs: 2
+          - test: bootstrap-collapse-toggle
+            runs: 2
+          - test: bootstrap-dropdown-open-close
+            runs: 2
+          - test: bootstrap-list-group-tab-restore
+            runs: 2
+          - test: bootstrap-modal-open-close
+            runs: 2
+          - test: bootstrap-offcanvas-open-close
+            runs: 2
+          - test: bootstrap-popover-open-close
+            runs: 2
+          - test: bootstrap-range-change-restore
+            runs: 2
+          - test: bootstrap-tabs-switch-restore
+            runs: 2
+          - test: bootstrap-toast-show-close
+            runs: 2
+          - test: jqueryui-accordion-switch-restore
+            runs: 2
+          - test: jqueryui-autocomplete-select-clear
+            runs: 2
+          - test: jqueryui-checkboxradio-toggle
+            runs: 2
+          - test: jqueryui-controlgroup-toggle
+            runs: 2
+          - test: jqueryui-datepicker-select-clear
+            runs: 2
+          - test: jqueryui-dialog-close-reload
+            runs: 2
+          - test: jqueryui-draggable-move-restore
+            runs: 2
+          - test: jqueryui-droppable-drag-reload
+            runs: 2
+          - test: jqueryui-menu-submenu-open-close
+            runs: 2
+          - test: jqueryui-resizable-resize-restore
+            runs: 2
+          - test: jqueryui-selectable-select-clear
+            runs: 2
+          - test: jqueryui-selectmenu-select-restore
+            runs: 2
+          - test: jqueryui-slider-step-restore
+            runs: 2
+          - test: jqueryui-sortable-reorder-restore
+            runs: 2
+          - test: jqueryui-spinner-step-restore
+            runs: 2
+          - test: jqueryui-tabs-switch-restore
+            runs: 2
+          - test: jqueryui-toggleclass-run-restore
+            runs: 2
+          - test: jqueryui-tooltip-open-close
+            runs: 2
+          - test: mui-accordion-toggle-restore
+            runs: 2
+          - test: mui-dialog-open-close
+            runs: 2
+          - test: mui-drawer-open-close
+            runs: 2
+          - test: mui-menu-open-close
+            runs: 2
+          - test: mui-rating-select-restore
+            runs: 2
+          - test: mui-select-select-restore
+            runs: 2
+          - test: mui-slider-step-restore
+            runs: 2
+          - test: mui-switch-toggle-restore
+            runs: 2
+          - test: mui-tabs-switch-restore
+            runs: 2
+          - test: mui-tooltip-open-close
+            runs: 2
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config xvfb x11-xserver-utils
+
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - uses: actions/cache@v5
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-insiders-versions
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - uses: actions/cache@v5
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
+
+      - name: npm ci
+        run: npm run install:ci
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+
+      - run: npm run build
+
+      - name: Run website measure (${{ matrix.test }})
+        continue-on-error: true
+        run: |
+          timeout 29m xvfb-run --auto-servernum node packages/cli/bin/test.js \
+            --cwd packages/websites-e2e \
+            --check-leaks \
+            --measure named-function-count3 \
+            --inspect-integrated-browser \
+            --runs "${{ matrix.runs }}" \
+            --run-skipped-tests-anyway \
+            --run-network-tests-anyway \
+            --only "${{ matrix.test }}"
+
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-results-website-${{ matrix.test }}
+          path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  website-charts:
+    runs-on: ubuntu-24.04
+    needs: website-measures
+    if: always()
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - uses: actions/cache@v5
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-insiders-versions
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+
+      - name: npm ci
+        run: npm run install:ci
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+
+      - run: npm run build
+
+      - name: Download all website measure results
+        uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          pattern: vscode-memory-leak-finder-results-website-*
+          path: .
+
+      - name: Merge all website measure results
+        run: |
+          node --input-type=module <<'EOF'
+          import { mergeArtifacts } from './packages/build/src/mergeArtifacts.ts'
+
+          await mergeArtifacts({
+            pattern: 'vscode-memory-leak-finder-results-website-',
+          })
+          EOF
+
+      - name: Generate charts
+        run: node packages/charts/src/main.ts
+
+      - name: Upload charts artifact
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: vscode-website-memory-leak-finder-charts
+          path: ./.vscode-charts
+          include-hidden-files: true
+          if-no-files-found: warn

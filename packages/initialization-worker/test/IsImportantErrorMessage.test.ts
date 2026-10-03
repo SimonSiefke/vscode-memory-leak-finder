@@ -63,6 +63,14 @@ test('floss error', () => {
   ).toBe(false)
 })
 
+test('invalid MIT-MAGIC-COOKIE key', () => {
+  expect(
+    IsImportantError.isImportantErrorMessage(
+      'C0E67F8375720000:error:0A000416:SSL routines:ssl3_read_bytes:ssl/tls alert certificate unknown:../ssl/record/rec_layer_s3.c:918:SSL alert number 46 Invalid MIT-MAGIC-COOKIE-1 key',
+    ),
+  ).toBe(false)
+})
+
 test('mesa error', () => {
   expect(IsImportantError.isImportantErrorMessage(`MESA: error: ZINK: vkCreateInstance failed (VK_ERROR_INCOMPATIBLE_DRIVER)`)).toBe(false)
 })
