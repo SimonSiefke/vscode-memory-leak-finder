@@ -62,11 +62,11 @@ export const create = ({ expect, page, VError, electronApp, ideVersion, platform
     },
     async shouldHaveHeading(subFrame: any, id: string) {
       try {
-        await contentFrame.waitForIdle()
+        await subFrame.waitForIdle()
         await page.waitForIdle()
         const heading = subFrame.locator(`#${id}`)
         await expect(heading).toBeVisible()
-        await contentFrame.waitForIdle()
+        await subFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
