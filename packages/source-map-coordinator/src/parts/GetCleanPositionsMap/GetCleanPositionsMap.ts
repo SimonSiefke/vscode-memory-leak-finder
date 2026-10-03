@@ -15,7 +15,11 @@ const getUnresolvedPositions = (positions: readonly number[]): any[] => {
   return new Array(positions.length / 2).fill(undefined)
 }
 
-export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, classNames: boolean): Promise<CleanPositionMap> => {
+export const getCleanPositionsMap = async (
+  sourceMapUrlMap: SourceMapUrlMap,
+  classNames: boolean,
+  constructorNames = false,
+): Promise<CleanPositionMap> => {
   await using sourceMapWorker = await launchSourceMapWorker()
   const cleanPositionMap: CleanPositionMap = Object.create(null)
   for (const [key, value] of Object.entries(sourceMapUrlMap)) {
@@ -26,7 +30,15 @@ export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, cla
     try {
       const hash = Hash.hash(key)
       const sourceMap = await LoadSourceMap.loadSourceMap(key, hash)
-      const originalPositions = await sourceMapWorker.invoke('SourceMap.getCleanPositionsMap2', sourceMap, value, classNames, hash, key)
+      const originalPositions = await sourceMapWorker.invoke(
+        'SourceMap.getCleanPositionsMap2',
+        sourceMap,
+        value,
+        classNames,
+        hash,
+        key,
+        constructorNames,
+      )
       const cleanPositions = originalPositions.map(GetCleanPosition.getCleanPosition)
       cleanPositionMap[key] = cleanPositions
     } catch (error) {

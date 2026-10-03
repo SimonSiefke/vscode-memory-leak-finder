@@ -221,7 +221,7 @@ jobs:
 
       - name: npm ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: npm ci --ignore-scripts && npm run postinstall
+        run: npm run install:ci
 
       - name: Build workspace
         run: npm run build
@@ -439,7 +439,7 @@ jobs:
 
       - name: npm ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: npm ci --ignore-scripts && npm run postinstall
+        run: npm run install:ci
 
       - name: Build workspace
         run: npm run build
