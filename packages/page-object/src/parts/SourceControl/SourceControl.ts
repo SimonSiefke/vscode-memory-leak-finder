@@ -333,7 +333,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const actualCount = await getRepositoryCount()
         throw new Error(`expected repository count ${expectedCount} but got ${actualCount}`)
       } catch (error) {
-          throw new VError(error, `Failed to verify repository count ${expectedCount}`)
+        throw new VError(error, `Failed to verify repository count ${expectedCount}`)
       }
     },
     async shouldHaveRepository(name: string) {
