@@ -40,6 +40,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await Exec.exec('git', ['clone', repoUrl, '.'], { cwd: workspace, env: { ...process.env } })
       await page.waitForIdle()
     },
+    async closeRepository(relativePath?: string) {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitCloseRepository, {
+          pressKeyOnce: true,
+          stayVisible: Boolean(relativePath),
+        })
+        if (relativePath) {
+          await quickPick.select(relativePath)
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close repository${relativePath ? ` at ${relativePath}` : ''}`)
+      }
+    },
     async commit(message: string) {
       try {
         await page.waitForIdle()
@@ -91,10 +106,23 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           filePaths: [repositoryPath],
         })
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.GitOpenRepository)
+        await quickPick.executeCommand(WellKnownCommands.GitOpenRepository, { pressKeyOnce: true })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open repository at ${relativePath}`)
+      }
+    },
+    async reopenClosedRepository(relativePath: string) {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitReopenClosedRepositories, {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
+        await quickPick.select(` ${relativePath}`)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to reopen repository at ${relativePath}`)
       }
     },
     async shouldHaveNoStagedDiff(fileName: string) {
