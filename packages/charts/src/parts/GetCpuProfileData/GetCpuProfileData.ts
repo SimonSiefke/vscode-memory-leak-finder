@@ -36,6 +36,7 @@ export interface CpuProfileFrame {
 const MicrosecondToMillisecond = 1000
 const MillisecondPrecision = 1000
 const AnonymousFunctionName = '(anonymous)'
+const resultFolders = ['cpu-profile', 'tracked-allocation-performance']
 
 const toArray = (value: Dynamic): readonly Dynamic[] => {
   return Array.isArray(value) ? value : []
@@ -68,6 +69,9 @@ const getLocation = (node: Dynamic): string => {
 }
 
 const getProfile = (rawData: Dynamic): Dynamic => {
+  if (rawData?.trackedAllocationPerformance?.cpuProfile?.nodes) {
+    return rawData.trackedAllocationPerformance.cpuProfile
+  }
   if (rawData?.cpuProfile?.raw?.after?.nodes) {
     return rawData.cpuProfile.raw.after
   }
@@ -253,25 +257,27 @@ export const getCpuProfileFrames = (profile: Dynamic): readonly CpuProfileFrame[
 export const getCpuProfileData = async (
   basePath: string,
 ): Promise<readonly { readonly data: readonly CpuProfileFrame[]; readonly filename: string }[]> => {
-  const resultsPath = join(basePath, 'cpu-profile')
-  if (!existsSync(resultsPath)) {
-    return []
-  }
-
-  const dirents = (await readdir(resultsPath)).filter((dirent) => dirent.endsWith('.json')).toSorted()
   const allData = []
-  for (const dirent of dirents) {
-    const filePath = join(resultsPath, dirent)
-    const rawData = await readJson(filePath)
-    const profile = getProfile(rawData)
-    const data = getCpuProfileFrames(profile)
-    if (data.length === 0) {
+  for (const folder of resultFolders) {
+    const resultsPath = join(basePath, folder)
+    if (!existsSync(resultsPath)) {
       continue
     }
-    allData.push({
-      data,
-      filename: dirent.replace('.json', ''),
-    })
+    const dirents = (await readdir(resultsPath)).filter((dirent) => dirent.endsWith('.json')).toSorted()
+    for (const dirent of dirents) {
+      const filePath = join(resultsPath, dirent)
+      const rawData = await readJson(filePath)
+      const profile = getProfile(rawData)
+      const data = getCpuProfileFrames(profile)
+      if (data.length === 0) {
+        continue
+      }
+      const name = dirent.replace('.json', '')
+      allData.push({
+        data,
+        filename: folder === 'cpu-profile' ? name : `${folder}/${name}`,
+      })
+    }
   }
   return allData
 }
