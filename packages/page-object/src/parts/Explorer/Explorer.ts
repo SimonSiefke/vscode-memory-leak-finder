@@ -131,8 +131,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const folder = explorer.locator(`.monaco-list-row[aria-label="${folderName}"]`)
         await expect(folder).toBeVisible()
         await page.waitForIdle()
-        await folder.click()
-        await page.waitForIdle()
+        const expanded = await folder.getAttribute('aria-expanded')
+        if (expanded !== 'true') {
+          await folder.click()
+          await page.waitForIdle()
+        }
         await expect(folder).toHaveAttribute('aria-expanded', 'true')
         await page.waitForIdle()
       } catch (error) {
