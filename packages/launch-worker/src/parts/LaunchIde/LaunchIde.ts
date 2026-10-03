@@ -3,6 +3,7 @@ import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
 import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
 import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as Ide from '../Ide/Ide.ts'
+import * as GetVscodeVersionFromPath from '../GetVscodeVersionFromPath/GetVscodeVersionFromPath.ts'
 import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
 import * as ParseVersion from '../ParseVersion/ParseVersion.ts'
@@ -185,6 +186,9 @@ export const launchIde = async ({
     const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(platform, arch, insidersCommit, updateUrl)
     const { productVersion } = metadata
     versionToParse = productVersion.replace('-insider', '')
+  } else if (vscodePath) {
+    const resolvedVersion = GetVscodeVersionFromPath.getVscodeVersionFromPath(vscodePath)
+    versionToParse = resolvedVersion || vscodeVersion
   } else {
     versionToParse = vscodeVersion
   }

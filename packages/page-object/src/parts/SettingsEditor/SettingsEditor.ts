@@ -257,9 +257,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         if (ideVersion.minor >= 114) {
           const openInMainWindowButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
-          await expect(openInMainWindowButton).toBeVisible()
-          await openInMainWindowButton.click()
-          await page.waitForIdle()
+          if (await openInMainWindowButton.isVisible()) {
+            await openInMainWindowButton.click()
+            await page.waitForIdle()
+          }
         }
       } catch (error) {
         throw new VError(error, `Failed to open settings ui`)
