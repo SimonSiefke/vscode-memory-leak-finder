@@ -40,6 +40,8 @@ const getMiddleHtml = (dirents: string[]) => {
 }
 
 const singleColumnFolders = new Set([
+  'compiled-code-size-by-file',
+  'compiled-code-size-by-function',
   'cpu-profile',
   'file-descriptor-count',
   'named-function-count-3',
