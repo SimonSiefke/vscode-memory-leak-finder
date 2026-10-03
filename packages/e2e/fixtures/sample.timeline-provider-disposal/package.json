@@ -1,0 +1,29 @@
+{
+  "name": "timeline-provider-disposal",
+  "displayName": "Timeline Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "timeline-provider-disposal.setup",
+        "title": "Timeline Provider Disposal: Setup"
+      },
+      {
+        "command": "timeline-provider-disposal.run",
+        "title": "Timeline Provider Disposal: Run"
+      },
+      {
+        "command": "timeline-provider-disposal.cleanup",
+        "title": "Timeline Provider Disposal: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "timeline"
+  ]
+}
