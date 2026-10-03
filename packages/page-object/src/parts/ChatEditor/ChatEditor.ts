@@ -356,6 +356,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     }
   }
 
+  const waitForLatestExchangeToFinish = async (chatView: any, response: any) => {
+    const progress = chatView.locator('.rendered-markdown.progress-step')
+    await expect(progress).toBeHidden({ timeout: 45_000 })
+    await page.waitForIdle()
+    await expect(response).toBeVisible({ timeout: 30_000 })
+    await page.waitForIdle()
+  }
+
   const getChatScrollMetrics = async () => {
     return page.evaluate({
       expression: `(() => {
@@ -507,11 +515,38 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to clear chat context`)
       }
     },
-    async clickAccessButton(buttonText: string = 'Allow') {
+    async clickAccessButton(buttonText: string = 'Allow', timeout = 0) {
       try {
         const accessButton = getAccessButtons(page, buttonText)
-        const buttonCount = await accessButton.count()
+        if (timeout > 0) {
+          try {
+            await expect(accessButton.first()).toBeVisible({ timeout })
+            await accessButton.first().click()
+            await page.waitForIdle()
+            return
+          } catch (error) {
+            const availableButtons = await page.evaluate({
+              expression: `(() => {
+  const elements = Array.from(document.querySelectorAll('button, [role="button"], .action-label'))
+  return elements
+    .map((element) => {
+      const text = (element.textContent || element.getAttribute('value') || '').trim().replace(/\s+/g, ' ')
+      return text
+    })
+    .filter(Boolean)
+    .slice(0, 20)
+})()`,
+              returnByValue: true,
+            })
+            const availableButtonsText =
+              Array.isArray(availableButtons) && availableButtons.length > 0 ? availableButtons.join(', ') : 'none'
+            throw new Error(
+              `Access button "${buttonText}" was not visible within ${timeout}ms. Available interactive-session buttons: ${availableButtonsText}`,
+            )
+          }
+        }
 
+        const buttonCount = await accessButton.count()
         if (buttonCount > 0) {
           await expect(accessButton.first()).toBeVisible()
           await accessButton.first().click()
@@ -854,6 +889,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     async sendMessage({
+      accessButton = '',
+      waitForCompletion = true,
       approveToolCalls = false,
       expectedResponse,
       image = '',
@@ -869,6 +906,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       waitForFileChanges: fileChangesToWaitFor = [],
       waitForPorts: portsToWaitFor = [],
     }: {
+      accessButton?: string
+      waitForCompletion?: boolean
       expectedResponse?: string
       compactToolInvocations?: boolean
       message: string
@@ -950,7 +989,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
 
         const shouldVerifyLatestExchange =
-          verify || Boolean(expectedResponse) || toolInvocations.length > 0 || (validateRequest.exists && validateRequest.exists.length > 0)
+          waitForCompletion ||
+          verify ||
+          Boolean(expectedResponse) ||
+          toolInvocations.length > 0 ||
+          (validateRequest.exists && validateRequest.exists.length > 0)
         const { requestMessage, response } = shouldVerifyLatestExchange
           ? await waitForLatestExchange(chatView, message)
           : {
@@ -994,6 +1037,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
               await page.waitForIdle()
             }
           }
+        }
+
+        if (accessButton) {
+          await this.clickAccessButton(accessButton, 60_000)
+        }
+        if (waitForCompletion) {
+          await waitForLatestExchangeToFinish(chatView, response)
         }
 
         const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
