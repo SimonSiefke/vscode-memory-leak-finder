@@ -1,0 +1,22 @@
+{
+  "name": "output-channel-disposal-sample",
+  "displayName": "output-channel-disposal-sample",
+  "publisher": "vscode-memory-leak-finder",
+  "version": "0.0.0",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "output_channel_disposal.run",
+        "title": "Output Channel: Run"
+      },
+      {
+        "command": "output_channel_disposal.cleanup",
+        "title": "Output Channel: Cleanup"
+      }
+    ]
+  }
+}

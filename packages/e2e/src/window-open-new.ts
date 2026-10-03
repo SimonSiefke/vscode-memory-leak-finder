@@ -63,6 +63,5 @@ export const run = async ({ Workbench }: TestContext): Promise<void> => {
     expression: appendFrontendStartupPerformanceSample(sample),
     returnByValue: true,
   })
-  // @ts-ignore
   await newWindow.closeGracefully()
 }

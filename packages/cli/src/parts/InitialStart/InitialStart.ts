@@ -86,6 +86,8 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     screencastQuality: options.screencastQuality,
     setupOnly: options.setupOnly,
+    shardCount: options.shardCount,
+    shardIndex: options.shardIndex,
     startupRuns: options.startupRuns,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,

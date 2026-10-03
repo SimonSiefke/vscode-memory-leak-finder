@@ -31,6 +31,9 @@ const ALLOCATION_PREAMBLE_CODE = `(() => {
   }
   let allocationStatistics = Object.create(null)
   let allocationRuns = []
+  let allocationStackLocations = null
+  let allocationStackStatistics = Object.create(null)
+  let allocationStackTrackingEnabled = false
   let previousRunCreatedCounts = Object.create(null)
 
   const trackAllocation = (value, scriptId, line, column, type) => {
@@ -42,6 +45,26 @@ const ALLOCATION_PREAMBLE_CODE = `(() => {
     }
     const location = \`\${scriptId}:\${line}:\${column}\`
     const key = \`\${location}:\${type}\`
+    if(allocationStackTrackingEnabled){
+      if(!allocationStackLocations || allocationStackLocations.has(location)){
+        const error = new Error()
+        if(typeof Error.captureStackTrace === 'function'){
+          Error.captureStackTrace(error, trackAllocation)
+        }
+        const rawStack = error.stack || ''
+        const firstNewline = rawStack.indexOf('\\n')
+        const stack = firstNewline === -1 ? rawStack : rawStack.slice(firstNewline + 1)
+        const stackKey = \`\${key}:\${stack}\`
+        const stackEntry = allocationStackStatistics[stackKey] ||= {
+          createdCount: 0,
+          location,
+          stack,
+          type,
+        }
+        stackEntry.createdCount++
+      }
+      return value
+    }
     const entry = allocationStatistics[key] ||= {
       aliveCount: 0,
       collectedCount: 0,
@@ -56,6 +79,15 @@ const ALLOCATION_PREAMBLE_CODE = `(() => {
   }
 
   globalThis.trackAllocation = trackAllocation
+
+  globalThis.setAllocationStackTrackingEnabled = (enabled, locations) => {
+    allocationStackTrackingEnabled = enabled === true
+    allocationStackLocations = Array.isArray(locations) ? new Set(locations) : null
+  }
+
+  globalThis.getAllocationStackStatistics = () => {
+    return Object.values(allocationStackStatistics)
+  }
 
   globalThis.getAllocationStatistics = () => {
     const result = Object.create(null)
@@ -108,6 +140,7 @@ const ALLOCATION_PREAMBLE_CODE = `(() => {
   globalThis.resetAllocationStatistics = () => {
     allocationStatistics = Object.create(null)
     allocationRuns = []
+    allocationStackStatistics = Object.create(null)
     previousRunCreatedCounts = Object.create(null)
   }
 })();

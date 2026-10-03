@@ -56,6 +56,8 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       runs: options.runs,
       runSkippedTestsAnyway: options.runSkippedTestsAnyway,
       setupOnly: options.setupOnly,
+      shardCount: options.shardCount ?? 1,
+      shardIndex: options.shardIndex ?? 1,
       startupRuns: options.startupRuns,
       timeoutBetween: options.timeoutBetween,
       timeouts: options.timeouts,
