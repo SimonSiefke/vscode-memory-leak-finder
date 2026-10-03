@@ -2,6 +2,8 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
+export const requiresNetwork = true
+
 const testId = 'simple-browser-add-console-logs-to-chat'
 const testUrl = 'http://localhost:3001/console-errors.html'
 const consoleErrorText = 'Simple browser console error for chat context'
@@ -25,7 +27,7 @@ const errorPageHtml = `<!doctype html>
   </body>
 </html>`
 
-export const setup = async ({ SideBar, ChatEditor, SimpleBrowser, Workspace, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, SideBar, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: errorPageHtml,

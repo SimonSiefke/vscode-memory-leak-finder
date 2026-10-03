@@ -3,11 +3,10 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
 const ITEMS_PER_NODE = 7
 
-export const getObjectShapeCountFromHeapSnapshot = (id) => {
+export const getObjectShapeCountFromHeapSnapshot = (id: string): number => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
-  const { nodes, snapshot } = heapsnapshot
-  const { meta } = snapshot
+  const { meta, nodes } = heapsnapshot
   const { node_types } = meta
   const objectShapeIndex = node_types[0].indexOf('object shape')
   const nodesArray = new Uint32Array(nodes)

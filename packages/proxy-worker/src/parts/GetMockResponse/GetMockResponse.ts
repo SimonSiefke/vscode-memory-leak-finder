@@ -3,10 +3,10 @@ import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { URL } from 'node:url'
-import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
-import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import type { MockResponse } from '../MockResponse/MockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
+import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
 import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
@@ -40,7 +40,7 @@ const isExpiredSignedCopilotTokenPayload = (body: unknown): boolean => {
   if (!body || typeof body !== 'object') {
     return false
   }
-  const token = (body as { token?: unknown }).token
+  const { token } = body as { token?: unknown }
   const expiresAt = (body as { expires_at?: unknown }).expires_at
   const expiration = typeof token === 'string' ? getSignedCopilotTokenExpiration(token) : undefined
   const fallbackExpiration = typeof expiresAt === 'number' ? expiresAt : undefined
@@ -226,7 +226,7 @@ const getResponsesInputItems = (requestBody: unknown): readonly unknown[] => {
   if (!requestBody || typeof requestBody !== 'object') {
     return []
   }
-  const input = (requestBody as { input?: unknown }).input
+  const { input } = requestBody as { input?: unknown }
   return Array.isArray(input) ? input : []
 }
 
@@ -268,11 +268,57 @@ const compareResponsesRequestShape = (requestedRequestBody: unknown, candidateRe
   ]
 }
 
+const getStaticMockResponse = (parsedUrl: URL, method: string): MockResponse | null => {
+  const normalizedMethod = method.toUpperCase()
+  const { hostname, pathname } = parsedUrl
+
+  if (normalizedMethod === 'GET' && hostname === 'api.individual.githubcopilot.com' && pathname === '/_ping') {
+    return {
+      body: 'OK',
+      headers: { 'content-type': 'text/plain' },
+      statusCode: 200,
+    }
+  }
+
+  if (normalizedMethod === 'GET' && hostname === 'www.githubstatus.com' && pathname === '/api/v2/status.json') {
+    return {
+      body: JSON.stringify({
+        page: {
+          id: 'kctbh9vrtdwd',
+          name: 'GitHub',
+          url: 'https://www.githubstatus.com',
+          time_zone: 'Etc/UTC',
+        },
+        status: {
+          description: 'All Systems Operational',
+          indicator: 'none',
+        },
+      }),
+      headers: { 'content-type': 'application/json' },
+      statusCode: 200,
+    }
+  }
+
+  if (
+    normalizedMethod === 'POST' &&
+    (hostname === 'applicationinsights.azure.com' || hostname.endsWith('.in.applicationinsights.azure.com')) &&
+    pathname === '/v2.1/track'
+  ) {
+    return {
+      body: '',
+      headers: { 'content-type': 'application/json' },
+      statusCode: 200,
+    }
+  }
+
+  return null
+}
+
 const getChatCompletionsMessages = (requestBody: unknown): readonly unknown[] => {
   if (!requestBody || typeof requestBody !== 'object') {
     return []
   }
-  const messages = (requestBody as { messages?: unknown }).messages
+  const { messages } = requestBody as { messages?: unknown }
   return Array.isArray(messages) ? messages : []
 }
 
@@ -483,6 +529,10 @@ export const getMockResponse = async (method: string, url: string, requestBody?:
       scopedMockRequestsDir === sharedMockRequestsDir ? [scopedMockRequestsDir] : [scopedMockRequestsDir, sharedMockRequestsDir]
     const parsedUrl = new URL(url)
     const { hostname, pathname } = parsedUrl
+    const staticMockResponse = getStaticMockResponse(parsedUrl, method)
+    if (staticMockResponse) {
+      return staticMockResponse
+    }
 
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {
@@ -628,7 +678,7 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
       lowerKey !== 'content-encoding' &&
       !((isZipFile || isSseFile || isImageFile) && lowerKey === 'content-encoding')
     ) {
-      headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
+      headers[key] = Array.isArray(value) ? value.join(', ') : value
       lowerCaseHeaders.add(lowerKey)
     }
   }

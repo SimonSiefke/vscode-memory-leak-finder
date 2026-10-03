@@ -1,5 +1,4 @@
 import { addRowHighlights } from '../AddRowHighlights/AddRowHighlights.ts'
-import { fixSvgHeight } from '../FixSvgHeight/FixSvgHeight.ts'
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import { getCommonBarChartOptions } from '../GetCommonBarChartOptions/GetCommonBarChartOptions.ts'
 import * as Plot from '../Plot/Plot.ts'
@@ -23,6 +22,7 @@ export const createBarChart = (data: any, options: any): string => {
         rx1: 2,
         rx2: 2,
         strokeWidth: 2,
+        title: 'title',
         x: 'value',
         y: 'name',
       }),
@@ -40,11 +40,10 @@ export const createBarChart = (data: any, options: any): string => {
     ],
     style: 'overflow: visible; background:white',
     width: chartOptions.width,
-    x: { axis: null },
+    x: { axis: null, ...(orderedData.every((item: any) => item.value === 0) ? { domain: [0, 1] } : {}) },
     y: { domain: orderedData.map((item: any) => item.name), label: null },
   }).outerHTML
 
   const finalHtml = fixHtmlNamespace(baseHtml)
-  const resizedHtml = fixSvgHeight(finalHtml, dataCount)
-  return addRowHighlights(resizedHtml, orderedData, chartOptions, options)
+  return addRowHighlights(finalHtml, orderedData, chartOptions, options)
 }

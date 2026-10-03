@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ SshServer, Workbench, Extensions, Electron }: TestContext): Promise<void> => {
+export const setup = async ({ Electron, Extensions, SshServer, Workbench }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
   })

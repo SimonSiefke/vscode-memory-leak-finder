@@ -9,6 +9,7 @@ export type ParsedCommandFlags = {
   readonly only: string
   readonly processRootStrategy?: string
   readonly restartBetween: boolean
+  readonly runNetworkTestsAnyway: boolean
   readonly runSkippedTestsAnyway: boolean
   readonly runs?: number
 }
@@ -79,6 +80,7 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
     measureNode: false,
     only: '',
     restartBetween: false,
+    runNetworkTestsAnyway: false,
     runSkippedTestsAnyway: false,
   }
 
@@ -105,6 +107,9 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
           break
         case '--restart-between':
           flags.restartBetween = true
+          break
+        case '--run-network-tests-anyway':
+          flags.runNetworkTestsAnyway = true
           break
         case '--run-skipped-tests-anyway':
           flags.runSkippedTestsAnyway = true

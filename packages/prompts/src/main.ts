@@ -9,9 +9,9 @@ const root = join(dirname, '..', '..', '..')
 
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
-const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/extension-host/named-function-count3/chat-editor-fix-node-built-in-test.0.json`
+const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/node/named-function-count3/window-open-new.json`
 const ourPath = `/home/simon/.cache/repos/vscode-memory-leak-finder`
-const only = 'chat-editor-fix-node-built-in-test'
+const only = 'window-open-new'
 const runs = 17
 const measure = 'named-function-count3'
 const extraArgs = ''

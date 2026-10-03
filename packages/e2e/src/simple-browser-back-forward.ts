@@ -2,6 +2,8 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
+export const requiresNetwork = true
+
 const testId = 'simple-browser-back-forward'
 
 export const setup = async ({ Editor, SimpleBrowser, Workspace }: TestContext): Promise<void> => {

@@ -15,6 +15,7 @@ export interface PrepareBothResult {
 export interface PrepareBothOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly canUseIdleCallback: boolean
   readonly clearExtensions: boolean
   readonly commit: string
@@ -37,6 +38,7 @@ export interface PrepareBothOptions {
   readonly measureId: string
   readonly openDevtools: boolean
   readonly platform: string
+  readonly preparedVscodePath: string
   readonly proxyTestFolderName: string
   readonly trackFunctions: boolean
   readonly updateUrl: string
@@ -49,6 +51,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
   const {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     canUseIdleCallback,
     clearExtensions,
     commit,
@@ -71,6 +74,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     measureId,
     openDevtools,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
     trackFunctions,
     updateUrl,
@@ -82,6 +86,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
   const launchResult = await initializationWorkerRpc.invoke('Launch.launch', {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     canUseIdleCallback,
     clearExtensions,
     commit,
@@ -104,6 +109,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     measureId,
     openDevtools,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
     trackFunctions,
     updateUrl,

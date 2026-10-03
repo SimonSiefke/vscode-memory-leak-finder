@@ -43,8 +43,8 @@ export const signatureFor = (node: AstNode, depth: number): string => {
       if (depth <= 0) {
         return `o{${names}}`
       }
-      const nested = [...node.properties]
-        .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+      const nested = node.properties
+        .toSorted((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
         .map((p) => `${p.name}:${signatureFor(p.value, depth - 1)}`)
         .join(',')
       return `o${name}{${names}}[${nested}]`

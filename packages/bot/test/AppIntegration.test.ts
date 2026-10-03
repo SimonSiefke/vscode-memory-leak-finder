@@ -762,6 +762,94 @@ test('app streams a workflow chart artifact through the public chart route', asy
   }
 })
 
+test('app streams a workflow chart artifact from the repository encoded in the public chart route', async () => {
+  const server = await createTestServer()
+  const zip = new JSZip()
+  const chartPath = 'base-charts/named-function-count-3/move-explorer-to-panel.svg'
+  const chartContent = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><path /></svg>')
+  zip.file(chartPath, chartContent)
+  const artifactArchive = await zip.generateAsync({ type: 'nodebuffer' })
+
+  const installationRequest = nock('https://api.github.com').get('/repos/SimonSiefke/vscode-memory-leak-finder-2/installation').reply(200, {
+    id: 2,
+  })
+
+  const tokenRequest = nock('https://api.github.com').post('/app/installations/2/access_tokens').reply(201, {
+    expires_at: '2099-01-01T00:00:00Z',
+    permissions: {},
+    repository_selection: 'selected',
+    token: 'test-installation-token',
+  })
+
+  const githubApi = nock('https://api.github.com')
+    .get('/repos/SimonSiefke/vscode-memory-leak-finder-2/actions/artifacts/7315597069')
+    .reply(200, {
+      archive_download_url: 'https://api.github.com/repos/SimonSiefke/vscode-memory-leak-finder-2/actions/artifacts/7315597069/zip',
+      expired: false,
+      id: 7315597069,
+      name: 'measure-run-119-4586236010-base-charts',
+    })
+    .get('/repos/SimonSiefke/vscode-memory-leak-finder-2/actions/artifacts/7315597069/zip')
+    .reply(200, artifactArchive, {
+      'content-type': 'application/zip',
+    })
+
+  try {
+    const response = await fetch(
+      `${server.url}/api/workflow-artifacts/chart/SimonSiefke/vscode-memory-leak-finder-2/26708328541/7315597069/${chartPath}`,
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('image/svg+xml')
+    expect(Buffer.from(await response.arrayBuffer())).toEqual(chartContent)
+    expect(installationRequest.isDone()).toBe(true)
+    expect(tokenRequest.isDone()).toBe(true)
+    expect(githubApi.isDone()).toBe(true)
+  } finally {
+    await server.close()
+  }
+})
+
+test('app keeps legacy workflow chart path urls resolving against the configured workflow repository', async () => {
+  const server = await createTestServer()
+  const zip = new JSZip()
+  const chartPath = 'base-charts/named-function-count-3/chat-editor-fix.svg'
+  const chartContent = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><circle /></svg>')
+  zip.file(chartPath, chartContent)
+  const artifactArchive = await zip.generateAsync({ type: 'nodebuffer' })
+
+  nock('https://api.github.com').persist().post('/app/installations/1/access_tokens').reply(201, {
+    expires_at: '2099-01-01T00:00:00Z',
+    permissions: {},
+    repository_selection: 'selected',
+    token: 'test-installation-token',
+  })
+
+  const githubApi = nock('https://api.github.com')
+    .get('/repos/SimonSiefke/vscode-memory-leak-finder/actions/artifacts/124')
+    .reply(200, {
+      archive_download_url: 'https://api.github.com/repos/SimonSiefke/vscode-memory-leak-finder/actions/artifacts/124/zip',
+      expired: false,
+      id: 124,
+      name: 'measure-run-123-base-charts',
+    })
+    .get('/repos/SimonSiefke/vscode-memory-leak-finder/actions/artifacts/124/zip')
+    .reply(200, artifactArchive, {
+      'content-type': 'application/zip',
+    })
+
+  try {
+    const response = await fetch(`${server.url}/api/workflow-artifacts/chart/42/124/${chartPath}?installation_id=1`)
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('image/svg+xml')
+    expect(Buffer.from(await response.arrayBuffer())).toEqual(chartContent)
+    expect(githubApi.isDone()).toBe(true)
+  } finally {
+    await server.close()
+  }
+})
+
 test('app returns 404 when a workflow artifact is not found', async () => {
   const server = await createTestServer()
 

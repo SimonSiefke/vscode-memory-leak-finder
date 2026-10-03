@@ -39,7 +39,17 @@ const getMiddleHtml = (dirents: string[]) => {
   return html
 }
 
-const singleColumnFolders = new Set(['file-descriptor-count', 'named-function-count-3'])
+const singleColumnFolders = new Set([
+  'compiled-code-size-by-file',
+  'compiled-code-size-by-function',
+  'cpu-profile',
+  'file-descriptor-count',
+  'named-function-count-3',
+  'paint-events',
+  'tracked-allocation-leaks',
+  'tracked-allocation-performance',
+  'tracked-allocations-by-file',
+])
 
 export const getFolderContentHtml = (folderName: string, dirents: string[]): string => {
   if (singleColumnFolders.has(folderName)) {

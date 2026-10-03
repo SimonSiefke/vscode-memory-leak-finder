@@ -1,5 +1,5 @@
 import type { Dynamic } from '../Types/Types.ts'
-export const createSessionRpcConnection = (rpc: Dynamic, sessionId: string): Dynamic => {
+export const createSessionRpcConnection = (rpc: Dynamic, sessionId: string, targetId = ''): Dynamic => {
   return {
     callbacks: rpc.callbacks,
     connectionClosed: rpc.connectionClosed,
@@ -9,10 +9,14 @@ export const createSessionRpcConnection = (rpc: Dynamic, sessionId: string): Dyn
     invoke(method: string, params?: Dynamic): Promise<Dynamic> {
       return rpc.invokeWithSession(sessionId, method, params)
     },
+    invokeBrowser(method: string, params?: Dynamic): Promise<Dynamic> {
+      return rpc.invoke(method, params)
+    },
     listeners: rpc.listeners,
     off: rpc.off,
     on: rpc.on,
     once: rpc.once,
     sessionId,
+    targetId,
   }
 }

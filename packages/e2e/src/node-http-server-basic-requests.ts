@@ -52,7 +52,7 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Terminal, Works
 
 export const run = async ({ ExternalRuntime }: TestContext): Promise<void> => {
   const runtime = await ExternalRuntime.getRuntimeName()
-  const body = (await ExternalRuntime.getJson('/data')) as DataResponse
+  const body = await ExternalRuntime.getJson<DataResponse>('/data')
   assert.deepStrictEqual(body, { ok: true, runtime })
 }
 

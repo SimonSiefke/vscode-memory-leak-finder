@@ -7,9 +7,11 @@ export interface StdinDataState {
   readonly arch: string
   readonly bailOnFailure: boolean
   readonly bisect: boolean
+  readonly buildVscodeMinified: boolean
   readonly buffering: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
+  readonly color: boolean
   readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
@@ -23,6 +25,8 @@ export interface StdinDataState {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -32,18 +36,23 @@ export interface StdinDataState {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
-  readonly processRootStrategy: string
   readonly mode: number
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
   readonly previousFilters: string[]
+  readonly processRootStrategy: string
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
+  readonly runNetworkTestsAnyway: boolean
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
+  readonly showSkippedFailedTestDuration: boolean
   readonly screencastQuality: number
+  readonly shardCount?: number | undefined
+  readonly shardIndex?: number | undefined
+  readonly startupRuns: number
   readonly stdout: string[]
   readonly timeoutBetween: number
   readonly timeouts: boolean
@@ -58,9 +67,11 @@ let state: StdinDataState = {
   arch: '',
   bailOnFailure: false,
   bisect: false,
+  buildVscodeMinified: false,
   buffering: false,
   checkLeaks: false,
   clearExtensions: true,
+  color: true,
   compressVideo: false,
   continueValue: '',
   cwd: Character.EmptyString,
@@ -74,6 +85,8 @@ let state: StdinDataState = {
   insidersCommit: '',
   inspectExtensions: false,
   inspectExtensionsPort: 5870,
+  inspectIntegratedBrowser: false,
+  inspectProcess: '',
   inspectPtyHost: false,
   inspectPtyHostPort: 5877,
   inspectSharedProcess: false,
@@ -83,18 +96,21 @@ let state: StdinDataState = {
   measure: Character.EmptyString,
   measureAfter: false,
   measureNode: false,
-  processRootStrategy: 'launch-pid',
   mode: ModeType.Waiting,
   openDevtools: false,
   pageObjectPath: '',
   platform: '',
   previousFilters: [],
+  processRootStrategy: 'launch-pid',
   recordVideo: false,
   restartBetween: false,
   runMode: TestRunMode.Auto,
+  runNetworkTestsAnyway: false,
   runs: 1,
   runSkippedTestsAnyway: false,
+  showSkippedFailedTestDuration: false,
   screencastQuality: 90,
+  startupRuns: 1,
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
@@ -111,7 +127,9 @@ export const setState = (newState: StdinDataState): void => {
     arch: newState.arch,
     bailOnFailure: newState.bailOnFailure,
     bisect: newState.bisect,
+    buildVscodeMinified: newState.buildVscodeMinified,
     checkLeaks: newState.checkLeaks,
+    color: newState.color,
     compressVideo: newState.compressVideo,
     continueValue: newState.continueValue,
     cwd: newState.cwd,
@@ -123,6 +141,8 @@ export const setState = (newState: StdinDataState): void => {
     insidersCommit: newState.insidersCommit,
     inspectExtensions: newState.inspectExtensions,
     inspectExtensionsPort: newState.inspectExtensionsPort,
+    inspectIntegratedBrowser: newState.inspectIntegratedBrowser,
+    inspectProcess: newState.inspectProcess,
     inspectPtyHost: newState.inspectPtyHost,
     inspectPtyHostPort: newState.inspectPtyHostPort,
     inspectSharedProcess: newState.inspectSharedProcess,
@@ -132,17 +152,22 @@ export const setState = (newState: StdinDataState): void => {
     measure: newState.measure,
     measureAfter: newState.measureAfter,
     measureNode: newState.measureNode,
-    processRootStrategy: newState.processRootStrategy,
     mode: newState.mode,
     pageObjectPath: newState.pageObjectPath,
     platform: newState.platform,
     previousFilters: newState.previousFilters,
+    processRootStrategy: newState.processRootStrategy,
     recordVideo: newState.recordVideo,
     restartBetween: newState.restartBetween,
     runMode: newState.runMode,
+    runNetworkTestsAnyway: newState.runNetworkTestsAnyway,
     runs: newState.runs,
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
+    showSkippedFailedTestDuration: newState.showSkippedFailedTestDuration,
     screencastQuality: newState.screencastQuality,
+    shardCount: newState.shardCount,
+    shardIndex: newState.shardIndex,
+    startupRuns: newState.startupRuns,
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
     timeouts: newState.timeouts,
@@ -200,6 +225,10 @@ export const isWindows = (): boolean => {
 
 export const shouldCheckLeaks = (): boolean => {
   return state.checkLeaks
+}
+
+export const shouldShowSkippedFailedTestDuration = (): boolean => {
+  return state.showSkippedFailedTestDuration
 }
 
 export const getRuns = (): number => {

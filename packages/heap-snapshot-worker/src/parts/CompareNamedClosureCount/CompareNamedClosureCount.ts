@@ -236,7 +236,7 @@ export const compareNamedClosureCountFromHeapSnapshot = async (pathA: string, pa
   // Find leaked closures (where count increased)
   const leakedClosures: any[] = []
 
-  for (const [name, countB] of countsB.entries()) {
+  for (const [name, countB] of countsB) {
     const countA = countsA.get(name) || 0
     const delta = countB - countA
     if (delta > 0) {

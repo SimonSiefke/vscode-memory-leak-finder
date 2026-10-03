@@ -1,8 +1,7 @@
 import { setTimeout as delay } from 'node:timers/promises'
-
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ VError, page }: CreateParams) => {
+export const create = ({ page, VError }: CreateParams) => {
   return {
     async waitMinutes(minutes: number): Promise<void> {
       try {
