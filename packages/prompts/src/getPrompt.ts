@@ -76,7 +76,7 @@ Additionally there are some stylistic rules:
 
 
 Additional information:
-- You can compile the whole VS Code checkout by running \`npm run compile\` in \`${localVscodePath}\`.
+- You can compile the whole VS Code checkout by running \`npm run build-fast\` in \`${localVscodePath}\`.
 - If you need the built-in Copilot extension in that checkout, run \`npm --prefix extensions/copilot run compile\` in \`${localVscodePath}\` as well.
 - When using a local VS Code checkout via \`--vscode-path "${localVscodePath}/scripts/code.sh"\`, this harness runs those commands before launch when the built-in Copilot extension is present and extensions are enabled.
 - You can run the measure by running \` xvfb-run -a node packages/cli/bin/test.js  --run-skipped-tests-anyway    --only ${only}    --runs ${runs} --measure ${measure} --check-leaks --measure-after  --enable-extensions --vscode-path "${localVscodePath}/scripts/code.sh" ${extraArgs}\` in the vscode-memory-leak-finder repository at ${ourPath}

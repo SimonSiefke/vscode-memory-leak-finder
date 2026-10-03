@@ -11,6 +11,6 @@ import { createReadableString } from '../ReadableString/ReadableString.ts'
 export const parseFromJson = async (json: unknown, options: { parseStrings?: boolean } = { parseStrings: false }) => {
   const string = JSON.stringify(json)
   const stream = createReadableString(string)
-  const result = await parseFromStream(stream, options)
+  const result = await parseFromStream(stream, { parseStrings: options.parseStrings ?? false })
   return result
 }

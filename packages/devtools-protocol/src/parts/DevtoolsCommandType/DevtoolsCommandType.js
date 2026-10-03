@@ -7,12 +7,15 @@ export const CssEnable = 'Css.enable'
 export const CssDisable = 'Css.disable'
 
 export const HeapProfilerTakeHeapSnapshot = 'HeapProfiler.takeHeapSnapshot'
+export const HeapProfilerStartTrackingHeapObjects = 'HeapProfiler.startTrackingHeapObjects'
+export const HeapProfilerStopTrackingHeapObjects = 'HeapProfiler.stopTrackingHeapObjects'
 
 export const HeapProfilerEnable = 'HeapProfiler.enable'
 
 export const HeapProfilerDisable = 'HeapProfiler.disable'
 
 export const HeapProfilerCollectGarbage = 'HeapProfiler.collectGarbage'
+export const HeapProfilerGetHeapObjectId = 'HeapProfiler.getHeapObjectId'
 
 export const RuntimeEvaluate = 'Runtime.evaluate'
 
@@ -87,6 +90,8 @@ export const ProfilerDisable = 'Profiler.disable'
 export const TracingStart = 'Tracing.start'
 
 export const TracingEnd = 'Tracing.end'
+
+export const TracingRequestMemoryDump = 'Tracing.requestMemoryDump'
 
 export const DebuggerStepInto = 'Debugger.stepInto'
 
