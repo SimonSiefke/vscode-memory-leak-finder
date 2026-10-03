@@ -25,6 +25,7 @@ type WorkbenchDependencies = {
 
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
+  readonly closeGracefully: () => Promise<void>
   readonly locator?: (selector: string) => any
   readonly sessionRpc?: any
   readonly shouldBeVisible: () => Promise<void>
