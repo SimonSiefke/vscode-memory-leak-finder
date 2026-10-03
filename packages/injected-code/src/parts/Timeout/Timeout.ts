@@ -39,11 +39,15 @@ const waitForMutationInternal = (element: Node) => {
   return { promise, [Symbol.dispose]: dispose }
 }
 
-export const waitForMutation = async (element: Node, maxDelay: number) => {
+export const waitForMutation = async (element: Node | null, maxDelay: number) => {
   let timeout: ReturnType<typeof waitForTimeout> | undefined
   let mutation: ReturnType<typeof waitForMutationInternal> | undefined
   try {
     timeout = waitForTimeout(maxDelay)
+    if (!element) {
+      await timeout.promise
+      return
+    }
     mutation = waitForMutationInternal(element)
     await Promise.race([timeout.promise, mutation.promise])
   } finally {
