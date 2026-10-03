@@ -8,57 +8,64 @@ export const requiresNetwork = true
 
 const workspacePath = join(import.meta.dirname, '..', '..', '..', '.vscode-test-workspace')
 const indexHtmlPath = join(workspacePath, 'index.html')
-const appUrl = 'http://localhost:3001'
 const expectedInitialTodoText = 'Ship this todo app'
+const appPort = 3001
+const appUrl = `http://localhost:${appPort}`
 
-const prompt = `Build a small todo app using plain HTML, CSS, and JavaScript in the current workspace. Use a single page served at http://localhost:3001 and enable auto approval for any commands you need to run. The app must include:
+const prompt = `Build a small todo app using plain HTML, CSS, and JavaScript in the exact workspace directory ${workspacePath}. Do not create or modify files outside ${workspacePath}. Use a single page served at ${appUrl} and enable auto approval for any commands you need to run. The app must include:
 - an h1 with the exact text "Todo App"
 - a div with id="todo-list"
 - an initial todo item with the exact text "${expectedInitialTodoText}"
 - an input with id="todo-input"
 - a button with id="add-todo-button" and the exact text "Add Todo"
 
-Create index.html in the workspace. Inline CSS and JavaScript are fine. Start the server on localhost:3001 from the workspace and finish only after the server is running.`
+Create ${indexHtmlPath}. Inline CSS and JavaScript are fine. Start the server on localhost:${appPort} with ${workspacePath} as its working directory and finish only after the server is running.`
 
-const assertIndexHtmlContainsExpectedSelectors = (): void => {
+const assertIndexHtmlContainsExpectedSelectors = (): string => {
   const indexHtmlContent = readFileSync(indexHtmlPath, 'utf8')
   if (!indexHtmlContent.includes('id="todo-list"')) {
-    throw new Error('Expected index.html to include a #todo-list element')
+    return 'Expected index.html to include a #todo-list element'
   }
   if (!indexHtmlContent.includes('id="todo-input"')) {
-    throw new Error('Expected index.html to include a #todo-input element')
+    return 'Expected index.html to include a #todo-input element'
   }
   if (!indexHtmlContent.includes('id="add-todo-button"')) {
-    throw new Error('Expected index.html to include a #add-todo-button element')
+    return 'Expected index.html to include a #add-todo-button element'
   }
   if (!indexHtmlContent.includes(expectedInitialTodoText)) {
-    throw new Error(`Expected index.html to include the initial todo text "${expectedInitialTodoText}"`)
+    return `Expected index.html to include the initial todo text "${expectedInitialTodoText}"`
   }
+  return ''
 }
 
-export const setup = async ({ ChatEditor, Editor, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
   await SideBar.hide()
   await Workspace.setFiles([])
   await Terminal.killAll()
   await Editor.closeAll()
-  await ChatEditor.open()
-  await ChatEditor.clearAll()
 }
 
-export const run = async ({ ChatEditor, Editor, SimpleBrowser, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor, Editor, SimpleBrowser, Terminal, Workspace }: TestContext): Promise<void> => {
+  await SimpleBrowser.trackPort(appPort)
+
+  await ChatEditor.open()
+  await ChatEditor.clearAll()
   await ChatEditor.setMode('Agent')
 
   await ChatEditor.sendMessage({
     approveToolCalls: true,
     message: prompt,
-    model: ChatEditor.Models.GPT41,
-    verify: true,
+    model: ChatEditor.Models.Auto,
+    viewLinesText: /running\.$/,
     waitForFileChanges: ['index.html'],
-    waitForPorts: [3001],
+    waitForPorts: [appPort],
   })
 
   await Workspace.waitForFile('index.html')
-  assertIndexHtmlContainsExpectedSelectors()
+  const errorMessage = assertIndexHtmlContainsExpectedSelectors()
+  if (errorMessage) {
+    throw new Error(`Workspace error: ${errorMessage}`)
+  }
 
   await SimpleBrowser.show({
     url: appUrl,
@@ -77,7 +84,10 @@ export const run = async ({ ChatEditor, Editor, SimpleBrowser, Workspace }: Test
     text: 'Add Todo',
   })
 
+  await SimpleBrowser.killAllPorts()
+  await Terminal.killAll()
   await Editor.closeAll()
+  await Workspace.setFiles([])
 }
 
 export const teardown = async ({ Editor, Terminal, Workspace }: TestContext): Promise<void> => {
