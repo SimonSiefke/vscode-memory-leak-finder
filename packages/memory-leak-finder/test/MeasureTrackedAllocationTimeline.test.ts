@@ -124,6 +124,7 @@ test('MeasureTrackedAllocationTimeline.compare enriches timeline rows', async ()
           originalLine: null,
           originalLocation: null,
           originalSource: null,
+          originalType: 'Array',
           type: 'Array',
         },
       ],
