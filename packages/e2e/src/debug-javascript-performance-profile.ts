@@ -63,7 +63,7 @@ setInterval(() => {
   await Explorer.refresh()
   await Explorer.shouldHaveItem('index.js')
   await RunAndDebug.removeAllBreakpoints()
-  await Editor.open('index.js')
+  await Explorer.openItem('index.js')
   await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused({
     callStackSize: 6,
