@@ -71,7 +71,7 @@ test('addOriginalSources attaches original locations from relative source maps',
   const scriptMap = {
     91003: {
       sourceMapUrl: 'bundle.js.map',
-      url: pathToFileURL(generatedPath).toString(),
+      url: generatedPath,
     },
   }
   await writeFile(mapPath, JSON.stringify(scriptMap), 'utf8')
@@ -81,7 +81,7 @@ test('addOriginalSources attaches original locations from relative source maps',
   expect(result[0]).toMatchObject({
     originalLocation: 'node_modules/.pnpm/pkg/source.ts:7:3',
     originalName: 'makeLeak',
-    sourceLocation: `${pathToFileURL(generatedPath).toString()}:1:10`,
+    sourceLocation: `${generatedPath}:1:10`,
     sourceMapUrl: pathToFileURL(join(tempDir, 'bundle.js.map')).toString(),
   })
 
