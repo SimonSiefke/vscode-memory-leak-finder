@@ -1,0 +1,26 @@
+{
+  "name": "pty-workspace-layout-disposal",
+  "displayName": "Pty Workspace Layout Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pty-workspace-layout-disposal.setup",
+        "title": "Pty Workspace Layout Disposal: Setup"
+      },
+      {
+        "command": "pty-workspace-layout-disposal.run",
+        "title": "Pty Workspace Layout Disposal: Run"
+      },
+      {
+        "command": "pty-workspace-layout-disposal.cleanup",
+        "title": "Pty Workspace Layout Disposal: Cleanup"
+      }
+    ]
+  }
+}
