@@ -393,6 +393,15 @@ Measures the total number of MediaQueryLists.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure media-query-list-count --only base
 ```
 
+### Module loading
+
+See [the module-loading measure](docs/measures/module-loading.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure module-loading --only base
+npm run build-charts
+```
+
 ### MutationObserverCount
 
 Measures the total number of MutationObservers.
