@@ -9,6 +9,7 @@
     "build:watch": "rollup -c rollup.config.js -w",
     "backport-prs": "node src/backportMergedPrs.ts",
     "analyze-heap-retainers": "node --max-old-space-size=8192 src/analyzeHeapRetainers.ts",
+    "analyze-ipc-message-patterns": "node src/analyzeIpcMessagePatterns.ts",
     "analyze-ipc-messages-from-start": "node src/analyzeIpcMessagesFromStart.ts",
     "generate-api-types": "node src/generate-api-types.ts",
     "measure-local-vscode-comparison": "node src/measureLocalVscodeComparison.ts",
@@ -25,7 +26,7 @@
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "dts-bundle-generator": "^9.5.1",
-    "rollup": "^4.62.4",
+    "rollup": "^4.63.3",
     "typescript": "^6.0.3"
   },
   "dependencies": {

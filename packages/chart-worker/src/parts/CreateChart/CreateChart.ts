@@ -7,6 +7,7 @@ import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
 import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
 import { createGroupedHorizontalBarChart } from '../CreateGroupedHorizontalBarChart/CreateGroupedHorizontalBarChart.ts'
 import { createLineChart } from '../CreateLineChart/CreateLineChart.ts'
+import { createMemoryComparisonChart } from '../CreateMemoryComparisonChart/CreateMemoryComparisonChart.ts'
 import { createPaintEventsChart } from '../CreatePaintEventsChart/CreatePaintEventsChart.ts'
 
 export const createChart = async (data: any, options: any): Promise<string> => {
@@ -32,6 +33,9 @@ export const createChart = async (data: any, options: any): Promise<string> => {
       break
     case 'line-chart':
       svg = createLineChart(data, options)
+      break
+    case 'memory-comparison-chart':
+      svg = createMemoryComparisonChart(data, options)
       break
     case 'paint-events-chart':
       svg = createPaintEventsChart(data, options)

@@ -116,6 +116,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to click ${text}`)
       }
     },
+    async clickCodeLens(text: string, timeout = 120_000) {
+      try {
+        await page.waitForIdle()
+        const codeLens = page.locator('.codelens-decoration', { hasText: text })
+        await expect(codeLens).toBeVisible({ timeout })
+        await codeLens.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to click code lens ${text}`)
+      }
+    },
     async clickLink(text: string) {
       const modifier = IsMacos.isMacos(platform) ? { metaKey: true } : { ctrlKey: true }
       try {
@@ -1000,6 +1011,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.keyboard.press('Enter')
       } catch (error) {
         throw new VError(error, `Failed to replace text ${newText}`)
+      }
+    },
+    async replaceActiveLineAndSave({ replacement }: { replacement: string }) {
+      try {
+        const modifier = IsMacos.isMacos(platform) ? 'Meta' : 'Control'
+        const dirtyTabs = page.locator('.tab.dirty')
+        const editContext = page.locator('.editor-instance .native-edit-context')
+        await editContext.focus()
+        await page.keyboard.press(`${modifier}+A`)
+        await page.keyboard.type(replacement)
+        await expect(dirtyTabs).toHaveCount(1, { timeout: 10_000 })
+        await editContext.focus()
+        await page.keyboard.press(`${modifier}+S`)
+        await expect(dirtyTabs).toHaveCount(0, { timeout: 10_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to replace and save the active editor line`)
       }
     },
     async save(options?: { viaKeyBoard: boolean }) {

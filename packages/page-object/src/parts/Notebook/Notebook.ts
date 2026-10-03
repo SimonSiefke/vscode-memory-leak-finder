@@ -182,6 +182,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to scroll up in notebook`)
       }
     },
+    async shouldHaveOutput(expectedOutput: string) {
+      try {
+        const notebook = page.locator('.notebook-editor')
+        await expect(notebook).toBeVisible()
+        const outputContainer = page.locator('.notebookOverlay .output-inner-container')
+        await expect(outputContainer).toBeVisible({ timeout: 15_000 })
+        const url = /purpose=notebookRenderer/
+        const childPage = await page.waitForIframe({
+          injectUtilityScript: false,
+          url,
+        })
+        const notebookOutput = await childPage.waitForSubIframe({ url })
+        await expect(notebookOutput.locator('.output_container')).toHaveText(expectedOutput, { timeout: 15_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify notebook output ${expectedOutput}`)
+      }
+    },
     async splitCell(cellIndex = 0) {
       try {
         await page.waitForIdle()

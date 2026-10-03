@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -51,7 +55,7 @@ jobs:
             **/.vscode-sources
           key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
-        run: npm ci --ignore-scripts && npm run postinstall
+        run: npm run install:ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run type-check
       - run: npm run lint
@@ -88,6 +92,91 @@ jobs:
           path: ./.vscode-videos
           include-hidden-files: true
 
+  ci-windows-poolmon:
+    runs-on: windows-2022
+    needs: ci
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v6
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-insiders-versions
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v6
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm ci --ignore-scripts && npm run postinstall
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm run build
+      - name: Locate PoolMon
+        shell: pwsh
+        run: |
+          $poolmon = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Tools" -Recurse -Filter poolmon.exe -File -ErrorAction SilentlyContinue | Where-Object { $_.Directory.Name -eq 'x64' } | Select-Object -First 1
+          if ($null -eq $poolmon) {
+            $poolmon = Get-ChildItem "$env:ProgramFiles\Windows Kits\10\Tools" -Recurse -Filter poolmon.exe -File -ErrorAction SilentlyContinue | Where-Object { $_.Directory.Name -eq 'x64' } | Select-Object -First 1
+          }
+          if ($null -eq $poolmon) {
+            throw 'x64 PoolMon was not found on the Windows runner. Install the x64 WDK tools.'
+          }
+          Write-Host "Using PoolMon at $($poolmon.FullName)"
+          "POOLMON_PATH=$($poolmon.FullName)" >> $env:GITHUB_ENV
+      - name: Verify PoolMon snapshot
+        shell: pwsh
+        timeout-minutes: 3
+        run: |
+          node --input-type=module -e "
+            import { start } from './packages/memory-leak-finder/src/parts/MeasurePoolmon/MeasurePoolmon.ts';
+            const snapshot = await start({ poolmonPath: process.env.POOLMON_PATH, pooltagPath: '' });
+            if (snapshot.rows.length === 0) throw new Error('PoolMon snapshot contains no pool tags');
+            if (snapshot.processError) throw new Error(snapshot.processError);
+            const self = snapshot.processes.find(row => row.pid === process.pid);
+            if (!self?.createdAt || !self.commandLine || !self.executablePath || !Number.isInteger(self.parentPid) || !Number.isFinite(self.privateMemoryKb)) {
+              throw new Error('PoolMon snapshot is missing process identity or private memory');
+            }
+            console.log('PoolMon snapshot verified:', snapshot.rows.length, 'pool tags');
+          "
+      - name: Run PoolMon measure
+        continue-on-error: true
+        run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure poolmon --runs 37 --run-skipped-tests-anyway
+      - name: Generate PoolMon charts
+        if: always()
+        run: node packages/charts/src/main.ts
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-results-windows-poolmon
+          path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-charts-windows-poolmon
+          path: ./.vscode-charts
+          include-hidden-files: true
+
   ci-linux-measures:
     runs-on: ubuntu-24.04
     needs: ci
@@ -99,14 +188,18 @@ jobs:
             args: --measure event-listeners --runs 17
           - name: event-listener-count
             args: --measure event-listener-count
+          - name: object-url-count
+            args: --measure object-url-count --runs 37 --run-skipped-tests-anyway
           - name: dom-counters
             args: --measure dom-counters
           - name: detached-dom-node-count
-            args: --measure detached-dom-node-count
+            args: --measure detached-dom-node-count --timeout-between 10000
           - name: promise-count
             args: --measure promise-count
-          - name: promises-with-stack-trace
-            args: --measure promises-with-stack-trace --runs 37  --restart-between --run-skipped-tests-anyway
+          - name: promises-with-stack-trace-shard-1
+            args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --shard=1/2
+          - name: promises-with-stack-trace-shard-2
+            args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --shard=2/2
           - name: promises-with-stack-trace-extensions
             args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
           - name: named-array-count
@@ -115,6 +208,8 @@ jobs:
             args: --measure named-array-count --inspect-extensions
           - name: array-count
             args: --measure array-count
+          - name: array-element-count
+            args: --measure array-element-count
           - name: css-rule-count
             args: --measure css-rule-count
           - name: regex-count
@@ -218,7 +313,7 @@ jobs:
             **/.vscode-sources
           key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
-        run: npm ci --ignore-scripts && npm run postinstall
+        run: npm run install:ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run build
       - name: Run headless test (check leaks, ${{ matrix.measure.name }})
@@ -260,7 +355,7 @@ jobs:
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
       - name: npm ci
-        run: npm ci --ignore-scripts && npm run postinstall
+        run: npm run install:ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run type-check
       - run: npm run lint
@@ -279,6 +374,11 @@ jobs:
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-object-url-count
+          path: ./vscode-memory-leak-finder-results-linux-object-url-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-dom-counters
           path: ./vscode-memory-leak-finder-results-linux-dom-counters
       - uses: actions/download-artifact@v8
@@ -294,8 +394,13 @@ jobs:
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
-          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace
-          path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-1
+          path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-1
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2
+          path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -316,6 +421,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-array-count
           path: ./vscode-memory-leak-finder-results-linux-array-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-element-count
+          path: ./vscode-memory-leak-finder-results-linux-array-element-count
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -564,6 +674,11 @@ jobs:
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-object-url-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-dom-counters
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
@@ -579,7 +694,12 @@ jobs:
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
-          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-1
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-shard-2
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
@@ -600,6 +720,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-array-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-element-count
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true

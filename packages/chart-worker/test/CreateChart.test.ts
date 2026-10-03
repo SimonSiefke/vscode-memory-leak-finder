@@ -44,6 +44,49 @@ test('bar chart highlights missing rows with full-width non-overlapping row boxe
   expect(result).toContain('height="45"')
 })
 
+test('memory comparison chart renders growth, shrinkage, byte formatting, inspected rows, and omissions', async () => {
+  const result = await createChart(
+    [
+      {
+        afterBytes: 3 * 1024 * 1024,
+        beforeBytes: 2 * 1024 * 1024,
+        deltaBytes: 1024 * 1024,
+        detail: 'Peak RSS: 4 MiB',
+        isInspected: true,
+        name: 'Renderer (PID 12)',
+      },
+      {
+        afterBytes: 512 * 1024,
+        beforeBytes: 1024 * 1024,
+        deltaBytes: -512 * 1024,
+        name: 'GPU Process (PID 13)',
+      },
+    ],
+    {
+      omittedEntryCount: 7,
+      subtitle: 'Hierarchical allocator rows are not additive & ownership <graph>.',
+      title: 'Chromium memory',
+      type: 'memory-comparison-chart',
+    },
+  )
+
+  expect(result).toContain('Chromium memory')
+  expect(result).toContain('Hierarchical allocator rows are not additive')
+  expect(result).toContain('&amp; ownership &lt;graph&gt;')
+  expect(result).toContain('data-row-label="Renderer (PID 12)"')
+  expect(result).toContain('+1 MiB')
+  expect(result).toContain('-512 KiB')
+  expect(result).toContain('inspected renderer')
+  expect(result).toContain('7 rows omitted')
+  expect(result).toContain('Peak RSS: 4 MiB')
+})
+
+test('memory comparison chart renders an empty result', async () => {
+  const result = await createChart([], { type: 'memory-comparison-chart' })
+
+  expect(result).toContain('No comparable memory rows')
+})
+
 test('bar chart keeps two CPU performance counter rows inside the viewBox', async () => {
   const result = await createChart(
     [

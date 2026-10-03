@@ -72,6 +72,8 @@ export const updateState = async (newState: any): Promise<void> => {
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
       screencastQuality: state.screencastQuality,
       setupOnly: false,
+      shardCount: state.shardCount,
+      shardIndex: state.shardIndex,
       startupRuns: state.startupRuns,
       timeoutBetween: state.timeoutBetween,
       timeouts: state.timeouts,

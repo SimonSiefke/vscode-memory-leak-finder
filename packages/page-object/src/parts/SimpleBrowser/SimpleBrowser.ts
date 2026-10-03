@@ -619,6 +619,74 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
 })()`)
       await page.waitForIdle()
     },
+    async dragBrowserWebContents({ deltaX, deltaY, selector }: { deltaX: number; deltaY: number; selector: string }) {
+      if (!this.modernBrowserWebContentsId) {
+        throw new Error('No tracked browser web contents available')
+      }
+      const electron = this.getElectron()
+      const point = await electron.executeJavaScriptInWebContents({
+        expression: `(() => {
+  const element = document.querySelector(${JSON.stringify(selector)})
+  if (!(element instanceof HTMLElement)) {
+    throw new Error('Expected element matching selector ' + ${JSON.stringify(selector)})
+  }
+  element.scrollIntoView({ block: 'center', inline: 'center' })
+  const rect = element.getBoundingClientRect()
+  if (rect.width <= 0 || rect.height <= 0) {
+    throw new Error('Expected visible element matching selector ' + ${JSON.stringify(selector)})
+  }
+  return {
+    x: Math.round(rect.left + rect.width / 2 - ${deltaX} / 2),
+    y: Math.round(rect.top + rect.height / 2 - ${deltaY} / 2),
+  }
+})()`,
+        webContentsId: this.modernBrowserWebContentsId,
+      })
+      if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
+        throw new Error(`Failed to compute drag point for ${selector}`)
+      }
+      await electron.evaluate(`(async () => {
+  const { webContents } = globalThis._____electron
+  const targetWebContents = webContents.fromId(${this.modernBrowserWebContentsId})
+  if (!targetWebContents || targetWebContents.isDestroyed()) {
+    throw new Error('webcontents not found')
+  }
+  const point = ${JSON.stringify(point)}
+  const deltaX = ${deltaX}
+  const deltaY = ${deltaY}
+  const wasAttached = targetWebContents.debugger.isAttached()
+  if (!wasAttached) {
+    targetWebContents.debugger.attach('1.3')
+  }
+  try {
+    const dispatchMouseEvent = (params) => targetWebContents.debugger.sendCommand('Input.dispatchMouseEvent', params)
+    await dispatchMouseEvent({ type: 'mouseMoved', x: point.x, y: point.y })
+    await dispatchMouseEvent({ button: 'left', buttons: 1, clickCount: 1, type: 'mousePressed', x: point.x, y: point.y })
+    for (let index = 1; index <= 5; index++) {
+      await dispatchMouseEvent({
+        button: 'left',
+        buttons: 1,
+        type: 'mouseMoved',
+        x: point.x + deltaX * index / 5,
+        y: point.y + deltaY * index / 5,
+      })
+    }
+    await dispatchMouseEvent({
+      button: 'left',
+      buttons: 0,
+      clickCount: 1,
+      type: 'mouseReleased',
+      x: point.x + deltaX,
+      y: point.y + deltaY,
+    })
+  } finally {
+    if (!wasAttached && targetWebContents.debugger.isAttached()) {
+      targetWebContents.debugger.detach()
+    }
+  }
+})()`)
+      await page.waitForIdle()
+    },
     async createDeferredMockServer({ id, port }: { id: string; port: number }) {
       try {
         await page.waitForIdle()

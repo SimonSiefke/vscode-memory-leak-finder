@@ -49,6 +49,8 @@ export interface StdinDataState {
   readonly runSkippedTestsAnyway: boolean
   readonly showSkippedFailedTestDuration: boolean
   readonly screencastQuality: number
+  readonly shardCount?: number | undefined
+  readonly shardIndex?: number | undefined
   readonly startupRuns: number
   readonly stdout: string[]
   readonly timeoutBetween: number
@@ -160,6 +162,8 @@ export const setState = (newState: StdinDataState): void => {
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
     showSkippedFailedTestDuration: newState.showSkippedFailedTestDuration,
     screencastQuality: newState.screencastQuality,
+    shardCount: newState.shardCount,
+    shardIndex: newState.shardIndex,
     startupRuns: newState.startupRuns,
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
