@@ -36,6 +36,8 @@ export interface ChatEditorSendOptions {
 }
 
 export interface ChatEditorSendMessageOptions extends ChatEditorSendOptions {
+  readonly accessButton?: string
+  readonly waitForCompletion?: boolean
   readonly expectedResponse?: string
   readonly approveToolCalls?: boolean
   readonly validateRequest?: { readonly exists: readonly unknown[] }
