@@ -82,6 +82,7 @@ test('initialStart - watch mode - show details', async () => {
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
     allowCopilotAuthInCi: false,
     arch: '',
+    bailOnFailure: false,
     bisect: false,
     buildVscodeMinified: false,
     checkLeaks: false,
@@ -159,6 +160,7 @@ test('initialStart - watch mode - start running', async () => {
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
     allowCopilotAuthInCi: false,
     arch: '',
+    bailOnFailure: false,
     bisect: false,
     buildVscodeMinified: false,
     checkLeaks: false,
@@ -234,6 +236,7 @@ test('initialStart - start running', async () => {
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
     allowCopilotAuthInCi: false,
     arch: '',
+    bailOnFailure: false,
     bisect: false,
     buildVscodeMinified: false,
     checkLeaks: false,
@@ -309,6 +312,7 @@ test('initialStart - convert requests to mocks', async () => {
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
     allowCopilotAuthInCi: false,
     arch: '',
+    bailOnFailure: false,
     bisect: false,
     buildVscodeMinified: false,
     checkLeaks: false,
@@ -385,6 +389,7 @@ test('initialStart - enables environment flag for disabling vscode node modules 
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
     allowCopilotAuthInCi: false,
     arch: '',
+    bailOnFailure: false,
     bisect: false,
     buildVscodeMinified: false,
     checkLeaks: false,
@@ -466,6 +471,7 @@ test('initialStart - computes vscode node modules cache key from commit', async 
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
     allowCopilotAuthInCi: false,
     arch: '',
+    bailOnFailure: false,
     bisect: false,
     buildVscodeMinified: false,
     checkLeaks: false,
@@ -541,6 +547,7 @@ test('initialStart - resolve vscode commit hash', async () => {
   const options: ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv> & { isGithubActions: boolean } = {
     allowCopilotAuthInCi: false,
     arch: '',
+    bailOnFailure: false,
     bisect: false,
     buildVscodeMinified: false,
     checkLeaks: false,
