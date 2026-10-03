@@ -11,6 +11,7 @@ const mockDownloadAndBuildVscodeFromCommit =
       nodeModulesCacheDir: string,
       useNice: boolean,
       buildVscodeMinified: boolean,
+      repoFolderName: string,
     ) => Promise<string>
   >()
 
