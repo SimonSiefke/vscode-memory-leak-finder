@@ -8,6 +8,7 @@ import process from 'node:process'
 import { setTimeout as delay } from 'node:timers/promises'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as Root from '../Root/Root.ts'
+import { waitForUnixSocket } from '../WaitForUnixSocket/WaitForUnixSocket.ts'
 
 type RuntimeName = 'bun' | 'node'
 
@@ -62,6 +63,7 @@ interface StartExternalRuntimeOptions {
   readonly serverPort: number
   readonly setupCommands?: readonly SetupCommand[]
   readonly setupFiles?: readonly SetupFile[]
+  readonly socketPath?: string
 }
 
 interface SetupCommand {
@@ -321,7 +323,7 @@ const runSetupCommand = async ({
   await waitForExit(childProcess, 10 * 60_000)
 
   if (childProcess.exitCode !== 0) {
-    throw new Error(`Setup command failed: ${command} ${args.join(' ')}`)
+    throw new Error(`Setup command failed: ${command} ${args.join(' ')}\nstdout:\n${stdout.join('')}\nstderr:\n${stderr.join('')}`)
   }
 }
 
@@ -671,6 +673,7 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
       serverPort,
       setupCommands = [],
       setupFiles = [],
+      socketPath,
     }: StartExternalRuntimeOptions): Promise<void> {
       if (activeRuntime) {
         await activeRuntime.dispose()
@@ -727,11 +730,16 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
         return `stdout:\n${stdout.join('')}\nstderr:\n${stderr.join('')}`
       }
 
-      await waitForHttpServer(
-        `http://127.0.0.1:${serverPort}${healthPath}`,
-        getOutput,
-        () => childProcess.exitCode !== null || childProcess.signalCode !== null,
-      )
+      const hasExited = () => childProcess.exitCode !== null || childProcess.signalCode !== null
+      if (socketPath) {
+        await waitForUnixSocket({
+          getOutput,
+          hasExited,
+          socketPath,
+        })
+      } else {
+        await waitForHttpServer(`http://127.0.0.1:${serverPort}${healthPath}`, getOutput, hasExited)
+      }
       await waitForInspector(runtimeName, inspectPort)
 
       let rpc: RuntimeRpc | undefined
