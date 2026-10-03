@@ -16,6 +16,7 @@ jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => 
   isBuffering: () => false,
   isGithubActions: () => false,
   isWindows: () => false,
+  shouldShowSkippedFailedTestDuration: () => false,
   setBuffering: () => {},
   setTestStateChange: () => {},
 }))
@@ -63,7 +64,7 @@ test.skip('handleTestFailed', async () => {
     type: 'Error',
   }
 
-  await HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error, false)
+  await HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error, false, 100)
 
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(expect.stringContaining('test failed'))

@@ -51,9 +51,25 @@ const getAllocationPositions = (snapshot: Snapshot, scriptMap: MemoryCityScriptM
   if (functionInfoIndexOffset === -1 || traceIdOffset === -1 || traceRecordLength <= 0) {
     return []
   }
+  const nodeFields = snapshot.meta.node_fields
+  const nodeFieldCount = nodeFields.length
+  const traceNodeIdOffset = nodeFields.indexOf('trace_node_id')
+  if (traceNodeIdOffset === -1) {
+    return []
+  }
+  const liveTraceIds = new Set<number>()
+  for (let offset = traceNodeIdOffset; offset < snapshot.nodes.length; offset += nodeFieldCount) {
+    const traceId = snapshot.nodes[offset]
+    if (traceId !== 0) {
+      liveTraceIds.add(traceId)
+    }
+  }
   const positions: SourcePosition[] = []
   for (let index = 0; index < traceTree.length; index += traceRecordLength) {
     const traceId = traceTree[index + traceIdOffset]
+    if (!liveTraceIds.has(traceId)) {
+      continue
+    }
     const functionInfoIndex = traceTree[index + functionInfoIndexOffset]
     const offset = functionInfoIndex * functionFields.length
     const scriptId = traceFunctionInfos[offset + scriptIdOffset]
@@ -127,7 +143,7 @@ const resolveOriginalPositions = async (positions: readonly SourcePosition[]): P
   if (Object.keys(sourceMapPositions).length > 0) {
     try {
       await using rpc = await LaunchSourceMapWorker.launchSourceMapCoordinator()
-      const result = (await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapPositions, true)) as Record<
+      const result = (await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapPositions, false)) as Record<
         string,
         readonly OriginalPosition[]
       >
@@ -147,18 +163,29 @@ const resolveOriginalPositions = async (positions: readonly SourcePosition[]): P
   return resolved
 }
 
+const toSourceMap = (positions: readonly SourcePosition[], resolved: ReadonlyMap<SourcePosition, string>): ReadonlyMap<number, string> => {
+  const sources = new Map<number, string>()
+  for (const position of positions) {
+    sources.set(position.key, resolved.get(position) || 'runtime/unattributed/unknown')
+  }
+  return sources
+}
+
+export const resolveMemoryCityAllocationSources = async (
+  snapshot: Snapshot,
+  scriptMap: MemoryCityScriptMap,
+): Promise<ReadonlyMap<number, string>> => {
+  const positions = getAllocationPositions(snapshot, scriptMap)
+  const resolved = await resolveOriginalPositions(positions)
+  return toSourceMap(positions, resolved)
+}
+
 export const resolveMemoryCitySources = async (snapshot: Snapshot, scriptMap: MemoryCityScriptMap): Promise<ResolvedMemoryCitySources> => {
   const allocationPositions = getAllocationPositions(snapshot, scriptMap)
   const locationPositions = getLocationPositions(snapshot, scriptMap)
   const positions = [...allocationPositions, ...locationPositions]
   const resolved = await resolveOriginalPositions(positions)
-  const allocationSources = new Map<number, string>()
-  const locationSources = new Map<number, string>()
-  for (const position of allocationPositions) {
-    allocationSources.set(position.key, resolved.get(position) || 'runtime/unattributed/unknown')
-  }
-  for (const position of locationPositions) {
-    locationSources.set(position.key, resolved.get(position) || 'runtime/unattributed/unknown')
-  }
+  const allocationSources = toSourceMap(allocationPositions, resolved)
+  const locationSources = toSourceMap(locationPositions, resolved)
   return { allocationSources, locationSources }
 }

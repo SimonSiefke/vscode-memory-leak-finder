@@ -1,0 +1,13 @@
+{
+  "name": "type-hierarchy-provider-sample",
+  "displayName": "type-hierarchy-provider-sample",
+  "publisher": "vscode-memory-leak-finder",
+  "version": "0.0.0-dev",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "activationEvents": [
+    "onLanguage:plaintext"
+  ],
+  "main": "./extension.js"
+}
