@@ -23,6 +23,13 @@ export interface TrackedAllocationRun {
   readonly runIndex: number
 }
 
+export interface TrackedAllocationStackStatistic {
+  readonly createdCount: number
+  readonly location: string
+  readonly stack: string
+  readonly type: string
+}
+
 export const getTrackedAllocations = async (session: Session): Promise<TrackedAllocationStatistics> => {
   try {
     const result = await DevtoolsProtocolRuntime.evaluate(session, {
@@ -94,5 +101,46 @@ export const getTrackedAllocationRuns = async (session: Session): Promise<readon
     return result as readonly TrackedAllocationRun[]
   } catch (error) {
     throw new VError(error, `Failed to get tracked allocation runs`)
+  }
+}
+
+export const getTrackedAllocationStacks = async (session: Session): Promise<readonly TrackedAllocationStackStatistic[]> => {
+  try {
+    const result = await DevtoolsProtocolRuntime.evaluate(session, {
+      expression: `(() => {
+        if (typeof globalThis.getAllocationStackStatistics === 'function') {
+          return globalThis.getAllocationStackStatistics()
+        }
+        return []
+      })()`,
+      returnByValue: true,
+    })
+
+    if (!Array.isArray(result)) {
+      return []
+    }
+
+    return result as readonly TrackedAllocationStackStatistic[]
+  } catch (error) {
+    throw new VError(error, `Failed to get tracked allocation stack traces`)
+  }
+}
+
+export const setTrackedAllocationStackTrackingEnabled = async (
+  session: Session,
+  enabled: boolean,
+  locations?: readonly string[],
+): Promise<void> => {
+  try {
+    await DevtoolsProtocolRuntime.evaluate(session, {
+      expression: `(() => {
+        if (typeof globalThis.setAllocationStackTrackingEnabled === 'function') {
+          globalThis.setAllocationStackTrackingEnabled(${enabled}, ${JSON.stringify(locations)})
+        }
+      })()`,
+      returnByValue: true,
+    })
+  } catch (error) {
+    throw new VError(error, `Failed to ${enabled ? 'enable' : 'disable'} tracked allocation stack traces`)
   }
 }

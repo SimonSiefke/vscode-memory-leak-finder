@@ -1,14 +1,25 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }: CreateParams) => {
+export const create = ({ expect, page, VError, electronApp, ideVersion, platform }: CreateParams) => {
   return {
-    async shouldBeVisible({ useSingleIframe = false }: { useSingleIframe?: boolean } = {}) {
+    async show() {
+      const index = await page.locator('.webview').count()
+      const quickPick = QuickPick.create({ page, expect, VError, electronApp, ideVersion, platform })
+      await quickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
+      return this.shouldBeVisible(index)
+    },
+    async shouldBeVisible(indexOrOptions: number | { useSingleIframe?: boolean } = 0) {
+      const index = typeof indexOrOptions === 'number' ? indexOrOptions : 0
+      const useSingleIframe = typeof indexOrOptions === 'object' && indexOrOptions.useSingleIframe === true
       try {
         await page.waitForIdle()
-        const webView = page.locator('.webview')
+        const webView = page.locator('.webview').nth(index)
         await expect(webView).toBeVisible()
         await page.waitForIdle()
         const childPage = await page.waitForIframe({
+          index,
           injectUtilityScript: false,
           url: useSingleIframe
             ? /^vscode-webview:\/\/vscode\.markdown-language-features\//
@@ -22,6 +33,7 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await contentFrame.waitForIdle()
         const markDown = contentFrame.locator('.markdown-body')
         await expect(markDown).toBeVisible()
+        await contentFrame.waitForIdle()
         await page.waitForIdle()
         return contentFrame
       } catch (error) {
@@ -50,9 +62,11 @@ export const create = ({ expect, page, VError }: CreateParams) => {
     },
     async shouldHaveHeading(subFrame: any, id: string) {
       try {
+        await contentFrame.waitForIdle()
         await page.waitForIdle()
         const heading = subFrame.locator(`#${id}`)
         await expect(heading).toBeVisible()
+        await contentFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
