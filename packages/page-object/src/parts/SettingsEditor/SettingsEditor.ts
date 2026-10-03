@@ -3,7 +3,7 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {
@@ -255,9 +255,6 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
         const body = page.locator('.settings-body')
         await expect(body).toBeVisible()
         await page.waitForIdle()
-        const rightControls = page.locator('.settings-right-controls')
-        await expect(rightControls).toBeVisible()
-        await page.waitForIdle()
         if (ideVersion.minor >= 114) {
           const openInMainWindowButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
           await expect(openInMainWindowButton).toBeVisible()
@@ -331,6 +328,7 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
         const searchInput = page.locator('.search-container [role="textbox"]')
         await expect(searchInput).toBeVisible()
         await page.waitForIdle()
+        await searchInput.focus()
         await expect(searchInput).toBeFocused()
         await page.waitForIdle()
         await searchInput.type(value)

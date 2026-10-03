@@ -1,8 +1,8 @@
+import { afterEach, expect, test } from '@jest/globals'
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises'
 import * as os from 'node:os'
-import { afterEach, expect, test } from '@jest/globals'
-import * as Path from '../src/parts/Path/Path.ts'
 import { hasCompleteTopLevelNodeModules } from '../src/parts/HasCompleteTopLevelNodeModules/HasCompleteTopLevelNodeModules.ts'
+import * as Path from '../src/parts/Path/Path.ts'
 
 const temporaryDirectories: string[] = []
 

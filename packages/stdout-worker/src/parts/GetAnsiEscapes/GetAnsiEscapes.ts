@@ -17,5 +17,5 @@ export const getCursorBackward = (length: number): string => ansiEscapes.cursorB
 export const getEraseEndLine = (): string => ansiEscapes.eraseEndLine
 
 export const getClear = (isWindows: boolean): string => {
-  return isWindows ? '\u001B[2J\u001B[0f' : '\u001B[2J\u001B[3J\u001B[H'
+  return isWindows ? '\u{1B}[2J\u{1B}[0f' : '\u{1B}[2J\u{1B}[3J\u{1B}[H'
 }

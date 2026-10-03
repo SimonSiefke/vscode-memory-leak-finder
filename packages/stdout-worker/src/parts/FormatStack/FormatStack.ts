@@ -14,12 +14,12 @@ const formatStackLine = (line: string, relativeFilePath: string): string => {
     if (filePath === relativeFilePath) {
       filePath = chalk.reset.cyan(filePath)
     }
-    return '   ' + stackTraceColor(stackMatch1[1]) + filePath + stackTraceColor(stackMatch1[3])
+    return ' '.repeat(3) + stackTraceColor(stackMatch1[1]) + filePath + stackTraceColor(stackMatch1[3])
   }
   const stackMatch2: RegExpMatchArray | null = line.match(RE_STACK_PATH_2)
   if (stackMatch2) {
     const filePath: string = stackMatch2[2]
-    return '   ' + stackTraceColor(stackMatch2[1]) + filePath + stackTraceColor(stackMatch2[3])
+    return ' '.repeat(3) + stackTraceColor(stackMatch2[1]) + filePath + stackTraceColor(stackMatch2[3])
   }
   return line
 }

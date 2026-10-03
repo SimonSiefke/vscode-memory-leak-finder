@@ -18,8 +18,10 @@ export const getCompressionWorker = async (): Promise<Awaited<ReturnType<typeof 
 }
 
 export const disposeCompressionWorker = async (): Promise<void> => {
-  if (compressionWorkerRpc) {
-    await compressionWorkerRpc.dispose()
-    compressionWorkerRpc = null
+  if (!compressionWorkerRpc) {
+    return
   }
+
+  await compressionWorkerRpc.dispose()
+  compressionWorkerRpc = null
 }

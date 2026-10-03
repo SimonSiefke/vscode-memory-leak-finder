@@ -1,4 +1,5 @@
 import { addRowHighlights } from '../AddRowHighlights/AddRowHighlights.ts'
+import { addOmittedEntriesFooter } from '../AddOmittedEntriesFooter/AddOmittedEntriesFooter.ts'
 import { fixSvgHeight } from '../FixSvgHeight/FixSvgHeight.ts'
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import { getCommonBarChartOptions } from '../GetCommonBarChartOptions/GetCommonBarChartOptions.ts'
@@ -65,5 +66,6 @@ export const createDualBarChart = (data: any, options: any): string => {
 
   const finalHtml = fixHtmlNamespace(baseHtml)
   const resizedHtml = fixSvgHeight(finalHtml, dataCount)
-  return addRowHighlights(resizedHtml, orderedData, chartOptions, options)
+  const highlightedHtml = addRowHighlights(resizedHtml, orderedData, chartOptions, options)
+  return addOmittedEntriesFooter(highlightedHtml, options)
 }

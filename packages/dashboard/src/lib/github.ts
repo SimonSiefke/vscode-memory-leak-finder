@@ -7,59 +7,59 @@ export type ReviewState = 'APPROVED' | 'CHANGES_REQUESTED' | 'COMMENTED' | 'DISM
 export type DashboardStatus = 'draft' | 'changes-requested' | 'review-ready' | 'in-review' | 'merged' | 'closed'
 
 export interface GitHubLabel {
-  name: string
   color: string
+  name: string
 }
 
 interface SearchIssue {
-  number: number
-  title: string
-  html_url: string
-  state: 'open' | 'closed'
-  user: {
-    login: string
-    avatar_url: string
-  }
-  labels: GitHubLabel[]
+  body: string | null
+  closed_at: string | null
   comments: number
   created_at: string
-  updated_at: string
-  closed_at: string | null
-  body: string | null
+  html_url: string
+  labels: GitHubLabel[]
+  number: number
   pull_request: {
     html_url: string
     merged_at: string | null
   }
+  state: 'open' | 'closed'
+  title: string
+  updated_at: string
+  user: {
+    login: string
+    avatar_url: string
+  }
 }
 
 interface PullRequestDetails {
-  number: number
-  html_url: string
-  state: 'open' | 'closed'
-  title: string
-  body: string | null
-  draft: boolean
-  updated_at: string
-  merged_at: string | null
-  mergeable_state?: string | null
   additions?: number
-  deletions?: number
-  changed_files?: number
-  commits?: number
   base: {
     ref: string
     repo: {
       full_name: string
     }
   }
+  body: string | null
+  changed_files?: number
+  commits?: number
+  deletions?: number
+  draft: boolean
   head: {
     ref: string
     repo: {
       full_name: string
     } | null
   }
+  html_url: string
+  mergeable_state?: string | null
+  merged_at: string | null
+  number: number
   requested_reviewers: Array<{ login: string }>
   requested_teams: Array<{ name: string }>
+  state: 'open' | 'closed'
+  title: string
+  updated_at: string
   user: {
     login: string
     avatar_url: string
@@ -67,112 +67,112 @@ interface PullRequestDetails {
 }
 
 export interface Review {
+  body: string | null
   id: number
   state: ReviewState
+  submitted_at: string | null
   user: {
     login: string
     avatar_url: string
   } | null
-  submitted_at: string | null
-  body: string | null
 }
 
 export interface DashboardPullRequest {
+  additions: number | null
+  author: string
+  authorAvatarUrl: string
+  baseRef: string
+  body: string
+  changedFiles: number | null
+  closedAt: string | null
+  comments: number
+  commits: number | null
+  createdAt: string
+  deletions: number | null
+  draft: boolean
+  headRef: string
   id: string
-  repoKey: RepoKey
-  repoFullName: string
+  labels: GitHubLabel[]
+  mergeableState: string | null
+  mergedAt: string | null
   number: number
-  title: string
-  url: string
+  repoFullName: string
+  repoKey: RepoKey
+  requestedReviewers: string[]
+  reviews: Review[]
   state: 'open' | 'closed'
   status: DashboardStatus
   statusLabel: string
-  author: string
-  authorAvatarUrl: string
-  labels: GitHubLabel[]
-  createdAt: string
+  title: string
   updatedAt: string
-  closedAt: string | null
-  mergedAt: string | null
-  body: string
-  draft: boolean
-  mergeableState: string | null
-  additions: number | null
-  deletions: number | null
-  changedFiles: number | null
-  commits: number | null
-  comments: number
-  baseRef: string
-  headRef: string
-  requestedReviewers: string[]
-  reviews: Review[]
+  url: string
 }
 
 export interface DashboardData {
+  fetchedAt: string
   pullRequests: DashboardPullRequest[]
   rateLimitRemaining: string | null
-  fetchedAt: string
 }
 
 export const dashboardCacheKey = 'vscode-leak-dashboard.github-data'
 const pullRequestDetailCachePrefix = 'vscode-leak-dashboard.pr-detail:'
 
 export interface DiffLine {
-  kind: 'context' | 'add' | 'remove' | 'meta'
-  oldLineNumber: number | null
-  newLineNumber: number | null
   content: string
+  kind: 'context' | 'add' | 'remove' | 'meta'
+  newLineNumber: number | null
+  oldLineNumber: number | null
 }
 
 export interface DiffFile {
-  path: string
   additions: number
   deletions: number
   lines: DiffLine[]
+  path: string
 }
 
 export interface PullRequestImage {
   alt: string
-  url: string
-  source: string
   createdAt: string
+  source: string
+  url: string
 }
 
 export interface PullRequestComment {
-  id: number
   author: string
   authorAvatarUrl: string
   body: string
   createdAt: string
+  id: number
   updatedAt: string
   url: string
 }
 
 export interface PullRequestInspection {
+  afterImage: PullRequestImage | null
+  beforeImage: PullRequestImage | null
+  comments: PullRequestComment[]
+  description: string
+  diffFiles: DiffFile[]
+  fetchedAt: string
   prId: string
   updatedAt: string
-  description: string
-  comments: PullRequestComment[]
-  diffFiles: DiffFile[]
-  beforeImage: PullRequestImage | null
-  afterImage: PullRequestImage | null
-  fetchedAt: string
 }
 
 const endpoints = [
   {
-    repoKey: 'fork' as const,
-    repoFullName: 'SimonSiefke/vscode',
     owner: 'SimonSiefke',
-    repo: 'vscode',
     query: 'repo:SimonSiefke/vscode is:pr is:open',
+    repo: 'vscode',
+    repoFullName: 'SimonSiefke/vscode',
+    repoKey: 'fork' as const,
   },
   {
-    repoKey: 'upstream' as const,
-    repoFullName: 'microsoft/vscode',
     owner: 'microsoft',
-    repo: 'vscode',
     query: 'repo:microsoft/vscode is:pr author:SimonSiefke',
+    repo: 'vscode',
+    repoFullName: 'microsoft/vscode',
+    repoKey: 'upstream' as const,
   },
 ]
 
@@ -187,10 +187,10 @@ const fetchAllSearchItems = async (octokit: Octokit, query: string): Promise<{ d
   let remaining: string | null = null
 
   for await (const response of octokit.paginate.iterator(octokit.rest.search.issuesAndPullRequests, {
-    q: query,
-    sort: 'updated',
     order: 'desc',
     per_page: 100,
+    q: query,
+    sort: 'updated',
   })) {
     remaining = response.headers['x-ratelimit-remaining'] ?? remaining
     items.push(...(response.data as SearchIssue[]))
@@ -211,12 +211,12 @@ const fetchOpenPullRequestDetails = async (
   let remaining: string | null = null
 
   for await (const response of octokit.paginate.iterator(octokit.rest.pulls.list, {
-    owner,
-    repo,
-    state: 'open',
-    sort: 'updated',
     direction: 'desc',
+    owner,
     per_page: 100,
+    repo,
+    sort: 'updated',
+    state: 'open',
   })) {
     remaining = response.headers['x-ratelimit-remaining'] ?? remaining
     data.push(...(response.data as PullRequestDetails[]))
@@ -237,19 +237,19 @@ const getDashboardStatus = (
   pullRequest: PullRequestDetails | undefined,
 ): { status: DashboardStatus; label: string } => {
   if (issue.pull_request.merged_at) {
-    return { status: 'merged', label: 'Merged' }
+    return { label: 'Merged', status: 'merged' }
   }
   if (issue.state === 'closed') {
-    return { status: 'closed', label: 'Closed' }
+    return { label: 'Closed', status: 'closed' }
   }
   if (pullRequest?.draft) {
-    return { status: 'draft', label: 'Draft' }
+    return { label: 'Draft', status: 'draft' }
   }
   if ((pullRequest?.requested_reviewers.length ?? 0) > 0 || (pullRequest?.requested_teams.length ?? 0) > 0) {
-    return { status: 'in-review', label: 'In review' }
+    return { label: 'In review', status: 'in-review' }
   }
 
-  return { status: 'review-ready', label: 'Ready' }
+  return { label: 'Ready', status: 'review-ready' }
 }
 
 const toDashboardPullRequest = (
@@ -258,38 +258,38 @@ const toDashboardPullRequest = (
   repoKey: RepoKey,
   repoFullName: string,
 ): DashboardPullRequest => {
-  const { status, label } = getDashboardStatus(issue, pullRequest)
+  const { label, status } = getDashboardStatus(issue, pullRequest)
   return {
-    id: `${repoFullName}#${issue.number}`,
-    repoKey,
-    repoFullName,
-    number: issue.number,
-    title: pullRequest?.title ?? issue.title,
-    url: pullRequest?.html_url ?? issue.pull_request.html_url ?? issue.html_url,
-    state: issue.state,
-    status,
-    statusLabel: label,
+    additions: pullRequest?.additions ?? null,
     author: pullRequest?.user.login ?? issue.user.login,
     authorAvatarUrl: pullRequest?.user.avatar_url ?? issue.user.avatar_url,
-    labels: issue.labels,
-    createdAt: issue.created_at,
-    updatedAt: pullRequest?.updated_at ?? issue.updated_at,
-    closedAt: issue.closed_at,
-    mergedAt: issue.pull_request.merged_at ?? pullRequest?.merged_at ?? null,
-    body: pullRequest?.body ?? issue.body ?? '',
-    draft: pullRequest?.draft ?? false,
-    mergeableState: pullRequest?.mergeable_state ?? null,
-    additions: pullRequest?.additions ?? null,
-    deletions: pullRequest?.deletions ?? null,
-    changedFiles: pullRequest?.changed_files ?? null,
-    commits: pullRequest?.commits ?? null,
-    comments: issue.comments,
     baseRef: pullRequest ? `${pullRequest.base.repo.full_name}:${pullRequest.base.ref}` : repoFullName,
+    body: pullRequest?.body ?? issue.body ?? '',
+    changedFiles: pullRequest?.changed_files ?? null,
+    closedAt: issue.closed_at,
+    comments: issue.comments,
+    commits: pullRequest?.commits ?? null,
+    createdAt: issue.created_at,
+    deletions: pullRequest?.deletions ?? null,
+    draft: pullRequest?.draft ?? false,
     headRef: pullRequest ? `${pullRequest.head.repo?.full_name ?? 'unknown'}:${pullRequest.head.ref}` : 'Open on GitHub for branch details',
+    id: `${repoFullName}#${issue.number}`,
+    labels: issue.labels,
+    mergeableState: pullRequest?.mergeable_state ?? null,
+    mergedAt: issue.pull_request.merged_at ?? pullRequest?.merged_at ?? null,
+    number: issue.number,
+    repoFullName,
+    repoKey,
     requestedReviewers: pullRequest
       ? [...pullRequest.requested_reviewers.map((reviewer) => reviewer.login), ...pullRequest.requested_teams.map((team) => team.name)]
       : [],
     reviews: [],
+    state: issue.state,
+    status,
+    statusLabel: label,
+    title: pullRequest?.title ?? issue.title,
+    updatedAt: pullRequest?.updated_at ?? issue.updated_at,
+    url: pullRequest?.html_url ?? issue.pull_request.html_url ?? issue.html_url,
   }
 }
 
@@ -316,8 +316,8 @@ export const fetchDashboardData = async (token: string): Promise<DashboardData> 
         openIssues.map(async (issue) => {
           const result = await octokit.rest.pulls.get({
             owner: endpoint.owner,
-            repo: endpoint.repo,
             pull_number: issue.number,
+            repo: endpoint.repo,
           })
           rateLimitRemaining = result.headers['x-ratelimit-remaining'] ?? rateLimitRemaining
           return result.data as PullRequestDetails
@@ -338,9 +338,9 @@ export const fetchDashboardData = async (token: string): Promise<DashboardData> 
   pullRequests.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
 
   return {
+    fetchedAt: new Date().toISOString(),
     pullRequests,
     rateLimitRemaining,
-    fetchedAt: new Date().toISOString(),
   }
 }
 
@@ -379,57 +379,57 @@ export const fetchPullRequestInspection = async (token: string, pullRequest: Das
   const [owner, repo] = pullRequest.repoFullName.split('/')
   const [diffResponse, comments] = await Promise.all([
     octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
-      owner,
-      repo,
-      pull_number: pullRequest.number,
       mediaType: {
         format: 'diff',
       },
+      owner,
+      pull_number: pullRequest.number,
+      repo,
     }),
     octokit.paginate(octokit.rest.issues.listComments, {
-      owner,
-      repo,
       issue_number: pullRequest.number,
+      owner,
       per_page: 100,
+      repo,
     }),
   ])
 
   const imageSources = [
     {
-      source: 'PR description',
       body: pullRequest.body,
       createdAt: pullRequest.updatedAt,
+      source: 'PR description',
     },
     ...comments
       .filter((comment) => comment.user?.login.toLowerCase().includes('memory-leak-finder-bot'))
       .map((comment) => ({
-        source: comment.user?.login ?? 'memory-leak-finder-bot',
         body: comment.body ?? '',
         createdAt: comment.updated_at ?? comment.created_at,
+        source: comment.user?.login ?? 'memory-leak-finder-bot',
       })),
   ]
 
   const images = imageSources.flatMap((source) => extractImages(source.body, source.source, source.createdAt))
-  const { beforeImage, afterImage } = pickBeforeAfterImages(images)
+  const { afterImage, beforeImage } = pickBeforeAfterImages(images)
   const renderedComments = comments.map((comment) => ({
-    id: comment.id,
     author: comment.user?.login ?? 'unknown',
     authorAvatarUrl: comment.user?.avatar_url ?? '',
     body: comment.body ?? '',
     createdAt: comment.created_at,
+    id: comment.id,
     updatedAt: comment.updated_at ?? comment.created_at,
     url: comment.html_url,
   }))
 
   return {
+    afterImage,
+    beforeImage,
+    comments: renderedComments,
+    description: pullRequest.body,
+    diffFiles: parseUnifiedDiff(String(diffResponse.data)),
+    fetchedAt: new Date().toISOString(),
     prId: pullRequest.id,
     updatedAt: pullRequest.updatedAt,
-    description: pullRequest.body,
-    comments: renderedComments,
-    diffFiles: parseUnifiedDiff(String(diffResponse.data)),
-    beforeImage,
-    afterImage,
-    fetchedAt: new Date().toISOString(),
   }
 }
 
@@ -440,11 +440,11 @@ const getPullRequestDetailCacheKey = (pullRequest: DashboardPullRequest): string
 const normalizePullRequestInspection = (inspection: PullRequestInspection): PullRequestInspection => {
   return {
     ...inspection,
-    description: inspection.description ?? '',
-    comments: Array.isArray(inspection.comments) ? inspection.comments : [],
-    diffFiles: Array.isArray(inspection.diffFiles) ? inspection.diffFiles : [],
-    beforeImage: inspection.beforeImage ?? null,
     afterImage: inspection.afterImage ?? null,
+    beforeImage: inspection.beforeImage ?? null,
+    comments: Array.isArray(inspection.comments) ? inspection.comments : [],
+    description: inspection.description ?? '',
+    diffFiles: Array.isArray(inspection.diffFiles) ? inspection.diffFiles : [],
   }
 }
 
@@ -460,10 +460,10 @@ const parseUnifiedDiff = (diff: string): DiffFile[] => {
         files.push(currentFile)
       }
       currentFile = {
-        path: '',
         additions: 0,
         deletions: 0,
         lines: [],
+        path: '',
       }
       continue
     }
@@ -481,7 +481,7 @@ const parseUnifiedDiff = (diff: string): DiffFile[] => {
       const match = /@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(line)
       oldLine = match ? Number(match[1]) : oldLine
       newLine = match ? Number(match[2]) : newLine
-      currentFile.lines.push({ kind: 'meta', oldLineNumber: null, newLineNumber: null, content: line })
+      currentFile.lines.push({ content: line, kind: 'meta', newLineNumber: null, oldLineNumber: null })
       continue
     }
 
@@ -497,23 +497,23 @@ const parseUnifiedDiff = (diff: string): DiffFile[] => {
 
     if (line.startsWith('+')) {
       currentFile.additions++
-      currentFile.lines.push({ kind: 'add', oldLineNumber: null, newLineNumber: newLine, content: line.slice(1) })
+      currentFile.lines.push({ content: line.slice(1), kind: 'add', newLineNumber: newLine, oldLineNumber: null })
       newLine++
       continue
     }
 
     if (line.startsWith('-')) {
       currentFile.deletions++
-      currentFile.lines.push({ kind: 'remove', oldLineNumber: oldLine, newLineNumber: null, content: line.slice(1) })
+      currentFile.lines.push({ content: line.slice(1), kind: 'remove', newLineNumber: null, oldLineNumber: oldLine })
       oldLine++
       continue
     }
 
     currentFile.lines.push({
-      kind: 'context',
-      oldLineNumber: oldLine,
-      newLineNumber: newLine,
       content: line.startsWith(' ') ? line.slice(1) : line,
+      kind: 'context',
+      newLineNumber: newLine,
+      oldLineNumber: oldLine,
     })
     oldLine++
     newLine++
@@ -533,11 +533,11 @@ const extractImages = (body: string, source: string, createdAt: string): PullReq
   let match: RegExpExecArray | null
 
   while ((match = markdownImageRegex.exec(body))) {
-    images.push({ alt: `${match[1]} ${getNearbyText(body, match.index)}`.trim(), url: match[2], source, createdAt })
+    images.push({ alt: `${match[1]} ${getNearbyText(body, match.index)}`.trim(), createdAt, source, url: match[2] })
   }
 
   while ((match = htmlImageRegex.exec(body))) {
-    images.push({ alt: getNearbyText(body, match.index), url: match[1], source, createdAt })
+    images.push({ alt: getNearbyText(body, match.index), createdAt, source, url: match[1] })
   }
 
   return images
@@ -550,8 +550,9 @@ const getNearbyText = (body: string, index: number): string => {
 const pickBeforeAfterImages = (
   images: PullRequestImage[],
 ): { beforeImage: PullRequestImage | null; afterImage: PullRequestImage | null } => {
-  const sorted = [...images].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-  const beforeImage = [...sorted].reverse().find((image) => /before/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-2) ?? null
-  const afterImage = [...sorted].reverse().find((image) => /after/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-1) ?? null
-  return { beforeImage, afterImage }
+  const sorted = images.slice().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+  const newestFirst = sorted.slice().reverse()
+  const beforeImage = newestFirst.find((image) => /before/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-2) ?? null
+  const afterImage = newestFirst.find((image) => /after/i.test(`${image.alt} ${image.url}`)) ?? sorted.at(-1) ?? null
+  return { afterImage, beforeImage }
 }

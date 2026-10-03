@@ -112,28 +112,28 @@ export const handleIssueComment = async ({ env, octokit, payload }: HandleIssueC
 
   if (parsedCommand.type === 'error') {
     await octokit.rest.issues.createComment({
+      body: renderInvalidCommandComment(parsedCommand.message),
+      issue_number: issueNumber,
       owner,
       repo,
-      issue_number: issueNumber,
-      body: renderInvalidCommandComment(parsedCommand.message),
     })
     return
   }
 
   if (!payload.issue.pull_request) {
     await octokit.rest.issues.createComment({
+      body: 'Bot commands can only be started from pull request comments.',
+      issue_number: issueNumber,
       owner,
       repo,
-      issue_number: issueNumber,
-      body: 'Bot commands can only be started from pull request comments.',
     })
     return
   }
 
   const pullRequest = await octokit.rest.pulls.get({
     owner,
-    repo,
     pull_number: issueNumber,
+    repo,
   })
 
   await startMeasureRun({

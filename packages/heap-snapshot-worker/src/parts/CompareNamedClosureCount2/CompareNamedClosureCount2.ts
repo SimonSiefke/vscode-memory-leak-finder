@@ -1,7 +1,10 @@
-import { compareNamedClosureCountFromHeapSnapshotInternal2 } from '../CompareNamedClosureCountInternal2/CompareNamedClosureCountInternal2.ts'
+import {
+  compareNamedClosureCountFromHeapSnapshotInternal2,
+  type MatchingNodeMap,
+} from '../CompareNamedClosureCountInternal2/CompareNamedClosureCountInternal2.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
-export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, pathB: string): Promise<any[]> => {
+export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, pathB: string): Promise<MatchingNodeMap> => {
   const [snapshotA, snapshotB] = await Promise.all([
     prepareHeapSnapshot(pathA, {
       parseStrings: true,

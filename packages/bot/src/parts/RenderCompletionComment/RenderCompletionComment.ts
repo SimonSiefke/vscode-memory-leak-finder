@@ -53,6 +53,27 @@ const renderFailureVideos = (summary: MeasureWorkflowSummary, videoEmbeds: reado
   return `\n### Failure videos\n\n${renderedVideos}\n`
 }
 
+const formatWorkflowDuration = (durationMs: number): string => {
+  const totalSeconds = Math.max(0, Math.round(durationMs / 1000))
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`
+  }
+  if (minutes > 0) {
+    return `${minutes}m ${seconds}s`
+  }
+  return `${seconds}s`
+}
+
+const renderWorkflowDuration = (summary: MeasureWorkflowSummary): string => {
+  if (summary.workflowDurationMs === undefined) {
+    return ''
+  }
+  return `\n- Duration: ${formatWorkflowDuration(summary.workflowDurationMs)}`
+}
+
 const renderCharts = (summary: MeasureWorkflowSummary, chartEmbeds: readonly CommentChartEmbed[]): string => {
   if (summary.conclusion !== 'success') {
     return ''
@@ -89,13 +110,14 @@ export const renderCompletionComment = ({ chartEmbeds = [], summary, videoEmbeds
       : `\n<details>\n<summary>Error details</summary>\n\n\`\`\`json\n${JSON.stringify(summary.error, null, 2)}\n\`\`\`\n</details>\n`
   const chartsBlock = renderCharts(summary, chartEmbeds)
   const failureVideosBlock = renderFailureVideos(summary, videoEmbeds)
+  const workflowDurationLine = renderWorkflowDuration(summary)
 
   return `${heading}
 
 - Measure: ${summary.measure}
 - Base commit: ${summary.baseCommit}
 - Candidate ref: ${summary.candidateRef}
-- Workflow: ${summary.workflowRun.url}
+- Workflow: ${summary.workflowRun.url}${workflowDurationLine}
 ${compilerOutputBlock}
 ${chartsBlock}
 ${failureVideosBlock}

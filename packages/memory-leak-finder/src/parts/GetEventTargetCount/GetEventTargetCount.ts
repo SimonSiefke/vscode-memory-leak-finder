@@ -3,5 +3,5 @@ import * as GetObjectCount from '../GetObjectCount/GetObjectCount.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 export const getEventTargetCount = (session: Session, objectGroup: string): Promise<number> => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.EventTarget, objectGroup)
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.EventTarget)
 }

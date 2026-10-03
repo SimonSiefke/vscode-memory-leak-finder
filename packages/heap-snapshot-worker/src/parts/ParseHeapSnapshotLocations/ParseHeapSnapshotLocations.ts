@@ -1,4 +1,5 @@
 import * as Assert from '../Assert/Assert.ts'
+import type { NumberArray } from '../Snapshot/Snapshot.ts'
 
 export interface ParsedLocation {
   readonly columnIndex: number
@@ -8,7 +9,7 @@ export interface ParsedLocation {
 }
 
 export const parseHeapSnapshotLocations = (
-  locations: readonly number[],
+  locations: NumberArray,
   locationFields: readonly string[],
   nodeFieldCount: number,
 ): ParsedLocation[] => {

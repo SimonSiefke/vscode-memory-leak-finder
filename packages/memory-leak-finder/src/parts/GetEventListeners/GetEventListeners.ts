@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as CleanEventListeners from '../CleanEventListeners/CleanEventListeners.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
@@ -5,8 +6,7 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
 import * as GetEventListenersFromMap from '../GetEventListenersFromMap/GetEventListenersFromMap.ts'
 import * as GetEventListenersOfTargets from '../GetEventListenersOfTargets/GetEventListenersOfTargets.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
-
-export const getEventListeners = async (session: Session, objectGroup: string, scriptMap: any): Promise<readonly any[]> => {
+export const getEventListeners = async (session: Session, objectGroup: string, scriptMap: Dynamic): Promise<readonly Dynamic[]> => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.EventTarget,
     objectGroup,

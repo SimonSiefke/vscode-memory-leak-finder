@@ -1,6 +1,6 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.ts'
-
-export const deduplicateEventListeners = (eventListeners) => {
+export const deduplicateEventListeners = (eventListeners: Dynamic) => {
   const countMap = Object.create(null)
   const eventListenerMap = Object.create(null)
   for (const eventListener of eventListeners) {
@@ -9,12 +9,12 @@ export const deduplicateEventListeners = (eventListeners) => {
     countMap[key] ||= 0
     countMap[key]++
   }
-  const deduplicated: any[] = []
+  const deduplicated: Dynamic[] = []
   for (const [key, value] of Object.entries(eventListenerMap)) {
     const count = countMap[key]
     deduplicated.push({
       // @ts-ignore
-      ...(value as any),
+      ...(value as Dynamic),
       count,
     })
   }

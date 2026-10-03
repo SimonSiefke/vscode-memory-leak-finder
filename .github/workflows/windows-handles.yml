@@ -1,0 +1,77 @@
+name: Windows handles (optional)
+
+# Keep this measure separate so cancellation cannot affect the CI or PR result.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: windows-handles-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  windows-handles:
+    runs-on: windows-2022
+    continue-on-error: true
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v6
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-insiders-versions
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v6
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm ci --ignore-scripts && npm run postinstall
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm run build
+      - name: Run Windows handles measure
+        timeout-minutes: 350
+        continue-on-error: true
+        run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure windows-handles --runs 37 --restart-between --run-skipped-tests-anyway
+      - name: Generate Windows handles charts
+        if: always()
+        run: node packages/charts/src/main.ts
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-results-windows-handles
+          path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-charts-windows-handles
+          path: ./.vscode-charts
+          include-hidden-files: true

@@ -9,7 +9,7 @@ const isNoteBook = (file: string) => {
 }
 
 const normalizeText = (value: string) => {
-  return value.replaceAll('\u00a0', ' ').replaceAll('\n', ' ')
+  return value.replaceAll('\u{A0}', ' ').replaceAll('\n', ' ')
 }
 
 const wait = (milliseconds: number) => {
@@ -207,7 +207,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           const plusActions = page.locator('.monaco-diff-editor .gutterItem .action-label.codicon-plus')
           const plusActionCount = await plusActions.count()
           let topMostPlusAction = null
-          let topMostY = Number.POSITIVE_INFINITY
+          let topMostY = Infinity
           for (let i = 0; i < plusActionCount; i++) {
             const plusAction = plusActions.nth(i)
             if (!(await plusAction.isVisible())) {

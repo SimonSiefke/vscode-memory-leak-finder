@@ -1,10 +1,10 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
 import { cleanEventListenerDescription } from '../CleanEventListenerDescription/CleanEventListenerDescription.ts'
 import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
 import * as GetPrettyEventListenerUrl from '../GetPrettyEventListenerUrl/GetPrettyEventListenerUrl.ts'
 import * as GetSourceMapUrlFromScriptMap from '../GetSourceMapUrlFromScriptMap/GetSourceMapUrlFromScriptMap.ts'
-
-export const cleanEventListener = (eventListener, scriptMap) => {
+export const cleanEventListener = (eventListener: Dynamic, scriptMap: Dynamic) => {
   Assert.object(eventListener)
   Assert.object(scriptMap)
   const { sourceMapUrl, url } = GetSourceMapUrlFromScriptMap.getSourceMapUrlFromScriptMap(eventListener.scriptId, scriptMap)

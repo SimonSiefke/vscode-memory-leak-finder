@@ -5,12 +5,12 @@ test('getEnv returns defaults when optional values are omitted', () => {
   const result = getEnv({})
 
   expect(result).toEqual({
+    allMockDataR2ObjectKey: 'all-mock-data.zip',
     allowedLogins: ['SimonSiefke'],
     publicBaseUrl: '',
     userDataR2AccessKeyId: '',
     userDataR2AccountId: '',
     userDataR2Bucket: '',
-    allMockDataR2ObjectKey: 'all-mock-data.zip',
     userDataR2ObjectKey: '.vscode-user-data-dir.zip',
     userDataR2SecretAccessKey: '',
     userDataSnapshotToken: '',
@@ -34,12 +34,12 @@ test('getEnv falls back to WEBHOOK_PROXY_URL for the public base url', () => {
 
 test('getEnv parses comma separated allowed logins and workflow overrides', () => {
   const result = getEnv({
+    BOT_ALL_MOCK_DATA_R2_OBJECT_KEY: 'all-mock-data.zip',
     BOT_ALLOWED_LOGINS: 'SimonSiefke,octocat',
     BOT_PUBLIC_BASE_URL: 'https://bot.example.com',
     BOT_USER_DATA_R2_ACCESS_KEY_ID: 'access-key-id',
     BOT_USER_DATA_R2_ACCOUNT_ID: 'cloudflare-account-id',
     BOT_USER_DATA_R2_BUCKET: 'vscode-memory-leak-finder',
-    BOT_ALL_MOCK_DATA_R2_OBJECT_KEY: 'all-mock-data.zip',
     BOT_USER_DATA_R2_OBJECT_KEY: '.vscode-user-data-dir.zip',
     BOT_USER_DATA_R2_SECRET_ACCESS_KEY: 'secret-access-key',
     BOT_USER_DATA_SNAPSHOT_TOKEN: 'download-token',
@@ -53,12 +53,12 @@ test('getEnv parses comma separated allowed logins and workflow overrides', () =
   })
 
   expect(result).toEqual({
+    allMockDataR2ObjectKey: 'all-mock-data.zip',
     allowedLogins: ['SimonSiefke', 'octocat'],
     publicBaseUrl: 'https://bot.example.com',
     userDataR2AccessKeyId: 'access-key-id',
     userDataR2AccountId: 'cloudflare-account-id',
     userDataR2Bucket: 'vscode-memory-leak-finder',
-    allMockDataR2ObjectKey: 'all-mock-data.zip',
     userDataR2ObjectKey: '.vscode-user-data-dir.zip',
     userDataR2SecretAccessKey: 'secret-access-key',
     userDataSnapshotToken: 'download-token',

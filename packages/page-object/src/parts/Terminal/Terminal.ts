@@ -3,6 +3,10 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as Workspace from '../Workspace/Workspace.ts'
 
+const escapeRegExp = (value: string): string => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 const cleanup = async ({ page, row1 }: { page: any; row1: any }) => {
   for (let i = 0; i < 50; i++) {
     await page.waitForIdle()
@@ -282,6 +286,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to set terminal find input`)
       }
     },
+    async shouldContainText(text: string | RegExp, timeout = 30_000) {
+      try {
+        await page.waitForIdle()
+        const terminal = page.locator('.terminal.xterm')
+        await expect(terminal).toBeVisible()
+        const rows = terminal.locator('.xterm-rows')
+        await expect(rows).toBeVisible()
+        const pattern = typeof text === 'string' ? new RegExp(escapeRegExp(text)) : text
+        await expect(rows).toHaveText(pattern, { timeout })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify terminal contains text ${text}`)
+      }
+    },
     async shouldHaveIncompleteDecoration(enabled: boolean) {
       const terminal = page.locator('.terminal.xterm')
       await page.waitForIdle()
@@ -304,28 +322,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify terminal success decoration`)
-      }
-    },
-    async shouldContainText(text: string, timeout = 30_000) {
-      try {
-        await page.waitForIdle()
-        const terminal = page.locator('.terminal.xterm')
-        await expect(terminal).toBeVisible()
-        const rows = terminal.locator('.xterm-rows')
-        await expect(rows).toBeVisible()
-        const startTime = performance.now()
-        while (performance.now() - startTime < timeout) {
-          const content = await rows.textContent()
-          if (typeof content === 'string' && content.includes(text)) {
-            await page.waitForIdle()
-            return
-          }
-          await new Promise((resolve) => setTimeout(resolve, 200))
-          await page.waitForIdle()
-        }
-        throw new Error(`Timed out waiting for terminal text ${text}`)
-      } catch (error) {
-        throw new VError(error, `Failed to verify terminal contains text ${text}`)
       }
     },
     async show({ waitForReady = false } = {}) {

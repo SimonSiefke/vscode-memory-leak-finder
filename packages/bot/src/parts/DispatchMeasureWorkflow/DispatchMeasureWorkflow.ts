@@ -38,12 +38,12 @@ const getWorkflowPageUrl = (env: BotEnv): string => {
 const findTriggeredWorkflowRunUrl = async (octokit: WorkflowDispatchOctokit, env: BotEnv, request: MeasureRequest): Promise<string> => {
   try {
     const response = await octokit.rest.actions.listWorkflowRuns({
-      owner: env.workflowOwner,
-      repo: env.workflowRepo,
-      workflow_id: env.workflowFileName,
       branch: env.workflowRef,
       event: 'workflow_dispatch',
+      owner: env.workflowOwner,
       per_page: 10,
+      repo: env.workflowRepo,
+      workflow_id: env.workflowFileName,
     })
     const expectedRunNamePrefix = `measure-run:${request.requestId}:`
     const workflowRun = response.data.workflow_runs.find((item) => item.name?.startsWith(expectedRunNamePrefix))
@@ -59,19 +59,15 @@ export const dispatchMeasureWorkflow = async (
   request: MeasureRequest,
   statusCommentId: number,
 ): Promise<string> => {
-  const { downloadUserDataZipFileToken, downloadUserDataZipFileUrl, downloadAllMockDataZipFileUrl } = await getUserDataDownloadInfo(env)
+  const { downloadAllMockDataZipFileUrl, downloadUserDataZipFileToken, downloadUserDataZipFileUrl } = await getUserDataDownloadInfo(env)
   await octokit.rest.actions.createWorkflowDispatch({
-    owner: env.workflowOwner,
-    repo: env.workflowRepo,
-    workflow_id: env.workflowFileName,
-    ref: env.workflowRef,
     inputs: {
       base_commit: request.baseCommit,
       candidate_ref: request.candidateRef,
       cli_args: request.cliArgs.join(' '),
-      download_user_data_zip_file_url: downloadUserDataZipFileUrl,
-      download_user_data_zip_file_token: downloadUserDataZipFileToken,
       download_all_mock_data_zip_file_url: downloadAllMockDataZipFileUrl,
+      download_user_data_zip_file_token: downloadUserDataZipFileToken,
+      download_user_data_zip_file_url: downloadUserDataZipFileUrl,
       measure: request.measure,
       only: request.only,
       request_id: request.requestId,
@@ -84,6 +80,10 @@ export const dispatchMeasureWorkflow = async (
       status_comment_id: String(statusCommentId),
       target_base_ref: request.targetBaseRef,
     },
+    owner: env.workflowOwner,
+    ref: env.workflowRef,
+    repo: env.workflowRepo,
+    workflow_id: env.workflowFileName,
   })
   return findTriggeredWorkflowRunUrl(octokit, env, request)
 }

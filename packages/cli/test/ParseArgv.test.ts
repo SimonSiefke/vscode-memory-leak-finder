@@ -22,10 +22,66 @@ test('parseArgv - headless mode', () => {
   })
 })
 
+test('parseArgv - color defaults to true', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: true,
+  })
+})
+
+test('parseArgv - color enabled', () => {
+  const argv = ['--color', 'true']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: true,
+  })
+})
+
+test('parseArgv - color disabled', () => {
+  const argv = ['--color', 'false']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: false,
+  })
+})
+
 test('parseArgv - run skipped tests anyway', () => {
   const argv = ['--run-skipped-tests-anyway']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     runSkippedTestsAnyway: true,
+  })
+})
+
+test('parseArgv - hides skipped failed test duration locally by default', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, {})).toMatchObject({
+    showSkippedFailedTestDuration: false,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration when enabled', () => {
+  const argv = ['--show-skipped-failed-test-duration']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, {})).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration in ci', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, { CI: 'true' })).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration in GitHub Actions', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, { GITHUB_ACTIONS: 'true' })).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
+test('parseArgv - run network tests anyway', () => {
+  const argv = ['--run-network-tests-anyway']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    runNetworkTestsAnyway: true,
   })
 })
 
@@ -84,8 +140,8 @@ test('parseArgv - download user data zip file url from env', () => {
   }
 })
 
-test('parseArgv - runs', () => {
-  const argv = ['--runs', '4']
+test('parseArgv - runs uses last value', () => {
+  const argv = ['--runs', '1', '--runs', '4']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     runs: 4,
   })
@@ -96,6 +152,72 @@ test('parseArgv - runs', () => {
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     runs: 4,
   })
+})
+
+test('parseArgv - shard with equals syntax', () => {
+  const argv = ['--shard=1/2']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    shardCount: 2,
+    shardIndex: 1,
+  })
+})
+
+test('parseArgv - shard with separate value', () => {
+  const argv = ['--shard', '2/3']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    shardCount: 3,
+    shardIndex: 2,
+  })
+})
+
+test('parseArgv - shard uses last value', () => {
+  const argv = ['--shard=1/2', '--shard', '3/4']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    shardCount: 4,
+    shardIndex: 3,
+  })
+})
+
+test('parseArgv - shard is omitted by default', () => {
+  expect(ParseArgv.parseArgv('linux', 'x64', [])).not.toHaveProperty('shardIndex')
+})
+
+test.each(['', '1', '1/', '/2', 'a/2'])('parseArgv - rejects invalid shard format %s', (value) => {
+  expect(() => ParseArgv.parseArgv('linux', 'x64', [`--shard=${value}`])).toThrow(
+    '--shard must use the format <index>/<count>, for example --shard=1/2',
+  )
+})
+
+test.each(['0/2', '1/0', '3/2'])('parseArgv - rejects invalid shard range %s', (value) => {
+  expect(() => ParseArgv.parseArgv('linux', 'x64', [`--shard=${value}`])).toThrow(
+    '--shard index and count must be positive integers, and index must not exceed count',
+  )
+})
+
+test('parseArgv - startup runs', () => {
+  const argv = ['--measure', 'cpu-performance-counters-from-start', '--startup-runs', '30']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    startupRuns: 30,
+  })
+})
+
+test('parseArgv - startup runs with Linux process-tree resources from start', () => {
+  const argv = ['--measure', 'linux-process-tree-resources-from-start', '--startup-runs', '5']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    startupRuns: 5,
+  })
+})
+
+test('parseArgv - startup runs uses last value', () => {
+  const argv = ['--measure', 'cpu-performance-counters-from-start', '--startup-runs', '3', '--startup-runs', '7']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    startupRuns: 7,
+  })
+})
+
+test('parseArgv - startup runs requires startup counter measure', () => {
+  const argv = ['--measure', 'event-listener-count', '--startup-runs', '2']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow('--startup-runs can only be used with a from-start measure')
 })
 
 test('parseArgv - record video', () => {
@@ -109,6 +231,20 @@ test('parseArgv - disable vscode node modules cache', () => {
   const argv = ['--disable-vscode-node-modules-cache']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     disableVscodeNodeModulesCache: true,
+  })
+})
+
+test('parseArgv - build vscode minified', () => {
+  const argv = ['--build-vscode-minified']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    buildVscodeMinified: true,
+  })
+})
+
+test('parseArgv - build vscode minified not present', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    buildVscodeMinified: false,
   })
 })
 
@@ -172,6 +308,14 @@ test('parseArgv - create all mock data zip', () => {
   const argv = ['--create-all-mock-data-zip']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     createAllMockDataZip: true,
+  })
+})
+
+test('parseArgv - use proxy mock enables proxy', () => {
+  const argv = ['--use-proxy-mock']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    enableProxy: true,
+    useProxyMock: true,
   })
 })
 
@@ -242,6 +386,23 @@ test('parseArgv - measure-node flag', () => {
   expect(options.measureNode).toBe(true)
 })
 
+test('parseArgv - ipc-message-count requires measure-node', () => {
+  const argv = ['--measure', 'ipc-message-count']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow('--measure ipc-message-count requires --measure-node')
+})
+
+test('parseArgv - ipcMessageCount requires measure-node', () => {
+  const argv = ['--measure', 'ipcMessageCount']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow('--measure ipc-message-count requires --measure-node')
+})
+
+test('parseArgv - ipc-message-count allows measure-node', () => {
+  const argv = ['--measure', 'ipc-message-count', '--measure-node']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('ipc-message-count')
+  expect(options.measureNode).toBe(true)
+})
+
 test('parseArgv - process-root-strategy flag', () => {
   const argv = ['--process-root-strategy', 'ssh-remote-server']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
@@ -290,6 +451,70 @@ test('parseArgv - inspect-ptyhost flag not present', () => {
   expect(options.inspectPtyHost).toBe(false)
 })
 
+test('parseArgv - inspect-integrated-browser flag', () => {
+  const argv = ['--inspect-integrated-browser']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(true)
+})
+
+test('parseArgv - inspect-integrated-browser flag not present', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(false)
+})
+
+test('parseArgv - websites-e2e measure requires inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--measure', 'named-function-count-3']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    'websites-e2e test measures can only be run with --inspect-integrated-browser',
+  )
+})
+
+test('parseArgv - websites-e2e check-leaks requires inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--check-leaks']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    'websites-e2e test measures can only be run with --inspect-integrated-browser',
+  )
+})
+
+test('parseArgv - websites-e2e measure allows inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--measure', 'named-function-count-3', '--inspect-integrated-browser']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(true)
+})
+
+test('parseArgv - websites-e2e test without measure allows no inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(false)
+})
+
+test('parseArgv - inspect-process flag', () => {
+  const argv = ['--inspect-process', 'vite.js']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectProcess).toBe('vite.js')
+})
+
+test('parseArgv - inspect-process flag not present', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectProcess).toBe('')
+})
+
+test('parseArgv - inspect-integrated-browser rejects other measure targets', () => {
+  const argv = ['--inspect-integrated-browser', '--inspect-extensions']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
+  )
+})
+
+test('parseArgv - inspect-integrated-browser rejects inspect-process target', () => {
+  const argv = ['--inspect-integrated-browser', '--inspect-process', 'vite.js']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
+  )
+})
+
 test('parseArgv - enable-extensions flag', () => {
   const argv = ['--enable-extensions']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
@@ -300,6 +525,12 @@ test('parseArgv - enable-extensions flag not present', () => {
   const argv: readonly string[] = []
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.enableExtensions).toBe(false)
+})
+
+test('parseArgv - memory-city automatically enables and inspects extensions', () => {
+  const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', 'memory-city'])
+  expect(options.enableExtensions).toBe(true)
+  expect(options.inspectExtensions).toBe(true)
 })
 
 test('parseArgv - inspect-ptyhost-port flag', () => {
@@ -464,6 +695,56 @@ test('parseArgv - check-leaks automatically true when --measure is specified wit
   const argv = ['--measure', 'heap-usage']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.checkLeaks).toBe(true)
+})
+
+test('parseArgv - tracked allocations enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocations']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.trackFunctions).toBe(true)
+})
+
+test('parseArgv - tracked allocations from start enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocations-from-start']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-allocations-from-start')
+  expect(options.trackFunctions).toBe(true)
+})
+
+test('parseArgv - tracked allocations with stack traces enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocations-with-stack-traces']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-allocations-with-stack-traces')
+  expect(options.trackFunctions).toBe(true)
+})
+
+test('parseArgv - tracked allocation timeline enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocation-timeline']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-allocation-timeline')
+  expect(options.trackFunctions).toBe(true)
+})
+
+test('parseArgv - tracked allocation leaks enables tracking transform', () => {
+  for (const measure of ['tracked-allocation-leaks', 'trackedAllocationLeaks']) {
+    const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', measure])
+    expect(options.measure).toBe(measure)
+    expect(options.trackFunctions).toBe(true)
+  }
+})
+
+test('parseArgv - tracked allocation performance enables tracking transform', () => {
+  for (const measure of ['tracked-allocation-performance', 'trackedAllocationPerformance']) {
+    const options = ParseArgv.parseArgv('linux', 'x64', ['--measure', measure])
+    expect(options.measure).toBe(measure)
+    expect(options.trackFunctions).toBe(true)
+  }
+})
+
+test('parseArgv - tracked timeouts enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-timeouts']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-timeouts')
+  expect(options.trackFunctions).toBe(true)
 })
 
 test('parseArgv - explicit --check-leaks takes precedence', () => {

@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptors from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
-
-export const getEventTargets = async (session: Session, objectGroup: string, scriptMap: any): Promise<readonly any[]> => {
+export const getEventTargets = async (session: Session, objectGroup: string, scriptMap: Dynamic): Promise<readonly Dynamic[]> => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.EventTarget,
     objectGroup,

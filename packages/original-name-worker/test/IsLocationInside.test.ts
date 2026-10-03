@@ -10,7 +10,7 @@ const getFirstNodePath = (code: string): NodePath => {
     errorRecovery: true,
     plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
     sourceType: 'unambiguous',
-  }) as unknown as t.File
+  })
   let found: NodePath | null = null
   traverseAst(ast, {
     enter(path: NodePath) {

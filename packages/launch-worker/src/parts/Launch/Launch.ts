@@ -1,19 +1,26 @@
 import { join } from 'node:path'
 import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
+import * as CallgrindConfig from '../CallgrindConfig/CallgrindConfig.ts'
+import * as CpuPerformanceCountersFromStart from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
+import * as LinuxProcessTreeResourcesFromStart from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.ts'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
-import * as Root from '../Root/Root.ts'
+import * as PrepareTrackedVscode from '../PrepareTrackedVscode/PrepareTrackedVscode.ts'
 
 export interface LaunchOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly canUseIdleCallback: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly headlessMode: boolean
@@ -29,6 +36,7 @@ export interface LaunchOptions {
   readonly measureId: string
   readonly openDevtools: boolean
   readonly platform: string
+  readonly preparedVscodePath: string
   readonly proxyTestFolderName: string
   readonly trackFunctions: boolean
   readonly updateUrl: string
@@ -39,14 +47,45 @@ export interface LaunchOptions {
 
 let proxyWorkerRpc: any = null
 
+export const getTrackingMode = (measureId: string): string => {
+  if (measureId === 'tracked-timeouts' || measureId === 'trackedTimeouts') {
+    return 'timeouts'
+  }
+  if (
+    measureId === 'tracked-allocations' ||
+    measureId === 'trackedAllocations' ||
+    measureId === 'tracked-allocations-from-start' ||
+    measureId === 'trackedAllocationsFromStart' ||
+    measureId === 'tracked-allocations-with-stack-traces' ||
+    measureId === 'trackedAllocationsWithStackTraces' ||
+    measureId === 'tracked-allocation-leaks' ||
+    measureId === 'trackedAllocationLeaks' ||
+    measureId === 'tracked-allocation-performance' ||
+    measureId === 'trackedAllocationPerformance' ||
+    measureId === 'tracked-allocation-timeline' ||
+    measureId === 'trackedAllocationTimeline'
+  ) {
+    return 'allocations'
+  }
+  return 'functions'
+}
+
+export const getSecretsPath = (): string => {
+  const userDataDir = GetUserDataDir.getUserDataDir()
+  return join(userDataDir, 'secrets', 'secrets.json')
+}
+
 export const launch = async (options: LaunchOptions): Promise<any> => {
   const {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     connectionId,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -61,6 +100,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     measureId,
     openDevtools,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
     trackFunctions,
     updateUrl,
@@ -68,8 +108,10 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   } = options
+  const cpuPerformanceCountersFromStartConfig = CpuPerformanceCountersFromStart.getConfig(measureId, connectionId)
+  const linuxProcessTreeResourcesFromStartConfig = LinuxProcessTreeResourcesFromStart.getConfig(measureId, connectionId)
+  const trackingMode = getTrackingMode(measureId)
   const {
-    binaryPath,
     child,
     parsedVersion,
     pid,
@@ -77,9 +119,14 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     arch,
+    buildVscodeMinified,
+    callgrindConfig: CallgrindConfig.getCallgrindConfig(measureId, connectionId),
     clearExtensions,
     commit,
+    cpuPerformanceCountersFromStartConfig,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -91,8 +138,12 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    linuxProcessTreeResourcesFromStartConfig,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
+    trackFunctions,
+    trackingMode,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -102,18 +153,21 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   // TODO maybe can do the intialization also here, without needing a separate worker
   await using port = createPipeline(child.stderr)
 
-  let preGeneratedWorkbenchPath: string | null = null
-  if (trackFunctions) {
-    preGeneratedWorkbenchPath = join(Root.root, '.vscode-workbench-tracked', 'workbench.desktop.main.js')
-  }
+  const secretsPath = getSecretsPath()
 
   await using rpc = await launchInitializationWorker()
   if (pid === undefined) {
     throw new Error(`pid is undefined after launching IDE`)
   }
-  const userDataDir = GetUserDataDir.getUserDataDir(platform)
-  const secretsPath = join(userDataDir, 'secrets', 'secrets.json')
-  const { devtoolsWebSocketUrl, electronObjectId, sessionId, targetId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
+  const {
+    devtoolsWebSocketUrl,
+    electronObjectId,
+    pid: electronPid,
+    sessionId,
+    targetId,
+    utilityContext,
+    webSocketUrl,
+  } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
     secretsPath,
     headlessMode,
@@ -125,20 +179,125 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     connectionId,
     measureId,
     pid,
-    preGeneratedWorkbenchPath,
-    binaryPath,
   )
 
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
     parsedVersion,
-    pid,
+    pid: typeof electronPid === 'number' ? electronPid : pid,
     sessionId,
     targetId,
     utilityContext,
     webSocketUrl,
   }
+}
+
+export const prepareTrackedVscode = async ({
+  arch,
+  buildVscodeMinified,
+  commit,
+  insidersCommit,
+  measureId,
+  platform,
+  updateUrl,
+  vscodePath,
+  vscodeVersion,
+}: {
+  readonly arch: string
+  readonly buildVscodeMinified: boolean
+  readonly commit: string
+  readonly insidersCommit: string
+  readonly measureId: string
+  readonly platform: string
+  readonly updateUrl: string
+  readonly vscodePath: string
+  readonly vscodeVersion: string
+}): Promise<string> => {
+  const binaryPath = await GetBinaryPath.getBinaryPath(
+    platform,
+    arch,
+    vscodeVersion,
+    vscodePath,
+    commit,
+    insidersCommit,
+    updateUrl,
+    buildVscodeMinified,
+  )
+  return PrepareTrackedVscode.prepareTrackedVscode(binaryPath, getTrackingMode(measureId))
+}
+
+export const setup = async ({
+  arch,
+  buildVscodeMinified,
+  clearExtensions,
+  commit,
+  cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
+  enableExtensions,
+  enableProxy,
+  ide,
+  insidersCommit,
+  inspectExtensions,
+  inspectExtensionsPort,
+  inspectPtyHost,
+  inspectPtyHostPort,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
+  platform,
+  updateUrl,
+  useProxyMock,
+  vscodePath,
+  vscodeVersion,
+}: {
+  arch: string
+  buildVscodeMinified: boolean
+  clearExtensions: boolean
+  commit: string
+  cwd: string
+  downloadUserDataZipFileToken: string
+  downloadUserDataZipFileUrl: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  ide: string
+  insidersCommit: string
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  platform: string
+  updateUrl: string
+  useProxyMock: boolean
+  vscodePath: string
+  vscodeVersion: string
+}): Promise<void> => {
+  await LaunchIde.setupIde({
+    arch,
+    buildVscodeMinified,
+    clearExtensions,
+    commit,
+    cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
+    enableExtensions,
+    enableProxy,
+    ide,
+    insidersCommit,
+    inspectExtensions,
+    inspectExtensionsPort,
+    inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcess,
+    inspectSharedProcessPort,
+    platform,
+    updateUrl,
+    useProxyMock,
+    vscodePath,
+    vscodeVersion,
+  })
 }
 
 export const setProxyTestFolderName = async (proxyTestFolderName: string): Promise<void> => {

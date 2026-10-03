@@ -1,10 +1,10 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as ExtractDataUrlSourceMap from '../ExtractDataUrlSourceMap/ExtractDataUrlSourceMap.ts'
 import * as FindMatchingSourceMap from '../FindMatchingSourceMap/FindMatchingSourceMap.ts'
-
 export const create = (): IScriptHandler => {
   const scriptMap = Object.create(null)
-  const handleScriptParsed = (event) => {
+  const handleScriptParsed = (event: Dynamic) => {
     const { scriptId, sourceMapURL, url } = event.params
     if (!url) {
       return
@@ -32,11 +32,11 @@ export const create = (): IScriptHandler => {
   }
   return {
     scriptMap,
-    async start(session) {
+    async start(session: Dynamic) {
       session.on('Debugger.scriptParsed', handleScriptParsed)
       await session.invoke('Debugger.enable')
     },
-    async stop(session) {
+    async stop(session: Dynamic) {
       session.off('Debugger.scriptParsed', handleScriptParsed)
       await session.invoke('Debugger.disable')
     },

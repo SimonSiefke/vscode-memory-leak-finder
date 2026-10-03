@@ -4,6 +4,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
 import * as DownloadAndUnzipInsiders from '../DownloadAndUnzipInsiders/DownloadAndUnzipInsiders.ts'
 import * as Env from '../Env/Env.ts'
+import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
 import * as GetProductJsonPath from '../GetProductJsonPath/GetProductJsonPath.ts'
 import * as GetVscodeRuntimePath from '../GetVscodeRuntimePath/GetVscodeRuntimePath.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
@@ -12,6 +13,12 @@ import * as RemoveUnusedFiles from '../RemoveUnusedFiles/RemoveUnusedFiles.ts'
 import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.ts'
 
 const automaticallyDownloadSourceMaps = false
+const maxDownloadRetries = 3
+
+interface DownloadVSCodeOptions {
+  readonly cachePath: string
+  readonly version: string
+}
 
 export interface DownloadAndUnzipVscodeOptions {
   readonly arch: string
@@ -19,6 +26,30 @@ export interface DownloadAndUnzipVscodeOptions {
   readonly platform: string
   readonly updateUrl: string
   readonly vscodeVersion: string
+}
+
+const isObject = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null
+}
+
+const isEconnresetError = (error: unknown): boolean => {
+  if (!isObject(error)) {
+    return false
+  }
+  return error.code === ErrorCodes.ECONNRESET || (typeof error.message === 'string' && error.message.includes(ErrorCodes.ECONNRESET))
+}
+
+const downloadAndUnzipVSCodeWithRetries = async (options: DownloadVSCodeOptions): Promise<string> => {
+  const { downloadAndUnzipVSCode } = await import('@vscode/test-electron')
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await downloadAndUnzipVSCode(options)
+    } catch (error) {
+      if (!isEconnresetError(error) || attempt >= maxDownloadRetries) {
+        throw error
+      }
+    }
+  }
 }
 
 export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOptions): Promise<string> => {
@@ -47,8 +78,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     if (cachedPath) {
       return cachedPath
     }
-    const { downloadAndUnzipVSCode } = await import('@vscode/test-electron')
-    const path = await downloadAndUnzipVSCode({
+    const path = await downloadAndUnzipVSCodeWithRetries({
       cachePath: VscodeTestCachePath.vscodeTestCachePath,
       version: vscodeVersion,
     })

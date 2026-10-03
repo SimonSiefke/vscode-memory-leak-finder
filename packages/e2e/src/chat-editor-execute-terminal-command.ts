@@ -12,12 +12,14 @@ export const setup = async ({ ChatEditor, Editor, Electron, SideBar, Terminal }:
   await Editor.closeAll()
   await SideBar.hide()
   await ChatEditor.open()
+  await ChatEditor.clearAll()
 }
 
 export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
-    message: `Run echo hello world in terminal.`,
-    model: 'GPT-4.1',
+    message: `Use the terminal tool to run exactly: echo hello world`,
+    model: ChatEditor.Models.Auto,
+    approveToolCalls: true,
     verify: true,
     waitForCompletion: false,
   })
@@ -25,6 +27,8 @@ export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> 
   await Terminal.show()
   await Terminal.shouldContainText('hello world', 90_000)
   await Terminal.shouldHaveSuccessDecoration()
+  await Terminal.killAll()
+  await ChatEditor.clearAll()
 }
 
 export const teardown = async ({ Editor, Terminal }: TestContext): Promise<void> => {

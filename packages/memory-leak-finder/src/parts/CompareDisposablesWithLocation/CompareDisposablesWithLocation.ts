@@ -1,8 +1,8 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as ImproveDisposableOutput from '../ImproveDisposableOutput/ImproveDisposableOutput.ts'
-
-const addDeltas = (prettyBefore, prettyAfter) => {
-  const newItems: any[] = []
+const addDeltas = (prettyBefore: Dynamic, prettyAfter: Dynamic) => {
+  const newItems: Dynamic[] = []
   const countMap = Object.create(null)
   for (const item of prettyBefore) {
     countMap[item.name] = item.count
@@ -20,8 +20,7 @@ const addDeltas = (prettyBefore, prettyAfter) => {
   }
   return newItems
 }
-
-export const compareDisposablesWithLocation = async (before, after) => {
+export const compareDisposablesWithLocation = async (before: Dynamic, after: Dynamic) => {
   const beforeResult = before
   const afterResult = after.result
   const { scriptMap } = after

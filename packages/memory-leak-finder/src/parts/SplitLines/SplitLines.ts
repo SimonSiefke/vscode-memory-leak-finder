@@ -1,4 +1,5 @@
-export const splitLines = (string) => {
+import type { Dynamic } from '../Types/Types.ts'
+export const splitLines = (string: Dynamic) => {
   if (string === '') {
     return []
   }

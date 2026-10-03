@@ -2,13 +2,15 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Editor, ExtensionDetailView, Extensions }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, ExtensionDetailView, Extensions, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
   await Extensions.search('@builtin html')
   await Extensions.first.shouldBe('HTML Language Basics')
   await Extensions.first.click()
   await ExtensionDetailView.shouldHaveHeading('HTML Language Basics')
+  await ExtensionDetailView.shouldHaveTab('Details')
+  await SideBar.hide()
 }
 
 export const run = async ({ ExtensionDetailView }: TestContext): Promise<void> => {

@@ -6,6 +6,7 @@
     { "path": "./packages/bot" },
     { "path": "./packages/chart-worker" },
     { "path": "./packages/charts" },
+    { "path": "./packages/chromium-memory-dump-worker" },
     { "path": "./packages/cli" },
     { "path": "./packages/compression-worker" },
     { "path": "./packages/cryptography-worker" },
@@ -21,9 +22,11 @@
     { "path": "./packages/file-watcher-worker" },
     { "path": "./packages/function-tracker" },
     { "path": "./packages/heap-snapshot-worker" },
+    { "path": "./packages/heap-snapshot-parsing-worker" },
     { "path": "./packages/initialization-worker" },
     { "path": "./packages/injected-code" },
     { "path": "./packages/launch-worker" },
+    { "path": "./packages/linux-process-tree-worker" },
     { "path": "./packages/load-source-map-worker" },
     { "path": "./packages/memory-leak-finder" },
     { "path": "./packages/network-worker" },
@@ -38,6 +41,8 @@
     { "path": "./packages/storage-worker" },
     { "path": "./packages/test-coordinator" },
     { "path": "./packages/test-worker" },
-    { "path": "./packages/video-recording-worker" }
+    { "path": "./packages/video-recording-worker" },
+    { "path": "./packages/visualizations" },
+    { "path": "./packages/websites-e2e" }
   ]
 }

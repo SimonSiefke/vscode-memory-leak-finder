@@ -18,11 +18,11 @@ export const create = (session: Session) => {
 }
 
 export const start = (session: Session, objectGroup: string) => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.Object, objectGroup)
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.Object)
 }
 
 export const stop = async (session: Session, objectGroup: string) => {
-  const result = GetObjectCount.getObjectCount(session, PrototypeExpression.Object, objectGroup)
+  const result = GetObjectCount.getObjectCount(session, PrototypeExpression.Object)
   return result
 }
 

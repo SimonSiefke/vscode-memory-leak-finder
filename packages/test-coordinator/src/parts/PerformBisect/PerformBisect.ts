@@ -50,8 +50,8 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
         callback,
         clearDisposables: Disposables.disposeAll,
         commit: '',
-        insidersCommit: commitHash,
         getTimeStamp,
+        insidersCommit: commitHash,
       })
 
       if (result.type === 'error') {
@@ -95,9 +95,8 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
       commit: lastLeakingCommit,
       type: 'success',
     }
-  } else {
-    return {
-      type: 'not-found',
-    }
+  }
+  return {
+    type: 'not-found',
   }
 }

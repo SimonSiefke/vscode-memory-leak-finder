@@ -1,12 +1,12 @@
 export const getThingCountFromHeapSnapshotInternal = (
-  nodes,
-  strings,
-  itemsPerNode,
-  typeFieldIndex,
-  nameFieldIndex,
-  typeIndex,
-  objectName,
-) => {
+  nodes: Uint32Array,
+  strings: readonly string[],
+  itemsPerNode: number,
+  typeFieldIndex: number,
+  nameFieldIndex: number,
+  typeIndex: number,
+  objectName: string,
+): number => {
   const objectNameIndex = strings.indexOf(objectName)
   const objectNameIndexLast = strings.lastIndexOf(objectName)
   if (objectNameIndex !== objectNameIndexLast) {

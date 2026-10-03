@@ -1,10 +1,10 @@
 const mockTrackingId = '00000000-0000-4000-8000-000000000001'
 const mockTelemetryIds: Record<string, string> = {
   activityid: '00000000-0000-4000-8000-000000000010',
+  'request-context': 'appId=cid-v1:00000000-0000-4000-8000-000000000014',
+  'x-tfs-processid': '00000000-0000-4000-8000-000000000013',
   'x-tfs-session': '00000000-0000-4000-8000-000000000011',
   'x-vss-e2eid': '00000000-0000-4000-8000-000000000012',
-  'x-tfs-processid': '00000000-0000-4000-8000-000000000013',
-  'request-context': 'appId=cid-v1:00000000-0000-4000-8000-000000000014',
   'x-vss-senderdeploymentid': '00000000-0000-4000-8000-000000000015',
 }
 
@@ -18,7 +18,7 @@ const isSignedCopilotToken = (value: string): boolean => {
 }
 
 const replaceIpAddresses = (value: string): string => {
-  return value.replace(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, mockIpAddress)
+  return value.replaceAll(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, mockIpAddress)
 }
 
 const sanitizeSignedCopilotToken = (value: string): string => {

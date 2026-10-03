@@ -5,6 +5,7 @@ import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 export interface PrepareTestsOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
@@ -28,6 +29,7 @@ export interface PrepareTestsOptions {
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
+  readonly preparedVscodePath: string
   readonly proxyTestFolderName: string
   readonly recordVideo: boolean
   readonly runMode: number
@@ -43,6 +45,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
   const {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     connectionId,
@@ -63,6 +66,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     measureId,
     openDevtools,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
     trackFunctions,
     updateUrl,
@@ -77,6 +81,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     await prepareBoth({
       arch,
       attachedToPageTimeout,
+      buildVscodeMinified,
       canUseIdleCallback,
       clearExtensions,
       commit,
@@ -99,6 +104,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       measureId,
       openDevtools,
       platform,
+      preparedVscodePath,
       proxyTestFolderName,
       trackFunctions,
       updateUrl,
