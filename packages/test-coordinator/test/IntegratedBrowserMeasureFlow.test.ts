@@ -2,9 +2,15 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 import { join } from 'node:path'
 
 const events: string[] = []
+let hangNextWorkerDispose = false
 
 const rpc = {
-  async dispose() {},
+  async dispose() {
+    if (hangNextWorkerDispose) {
+      hangNextWorkerDispose = false
+      await new Promise(() => {})
+    }
+  },
   async invoke() {},
   send() {},
 }
@@ -105,6 +111,7 @@ const { runTestsWithCallback } = await import('../src/parts/RunTestsWithCallback
 
 beforeEach(() => {
   events.length = 0
+  hangNextWorkerDispose = false
   jest.clearAllMocks()
 })
 
@@ -364,4 +371,98 @@ test('runTestsWithCallback - inspect process starts memory worker after setup', 
     { runs: 1 },
     expect.stringContaining(join('process', 'vite.js', 'named-function-count3', 'react-vite-simple-browser.json')),
   )
+})
+
+test('runTestsWithCallback - restart between tests does not hang when a worker fails to dispose', async () => {
+  jest.useFakeTimers()
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+  mockGetTestsToRun.mockResolvedValueOnce([
+    {
+      absolutePath: '/test-root/src/first.ts',
+      dirent: 'first.ts',
+      relativeDirname: 'src',
+      relativePath: 'src/first.ts',
+    },
+    {
+      absolutePath: '/test-root/src/second.ts',
+      dirent: 'second.ts',
+      relativeDirname: 'src',
+      relativePath: 'src/second.ts',
+    },
+  ])
+  hangNextWorkerDispose = true
+
+  try {
+    const runPromise = runTestsWithCallback({
+      addDisposable: () => {},
+      allowCopilotAuthInCi: false,
+      arch: 'x64',
+      buildVscodeMinified: false,
+      callback: async () => {},
+      checkLeaks: false,
+      clearDisposables: async () => {},
+      clearExtensions: false,
+      color: false,
+      commit: 'abc123',
+      compressVideo: false,
+      continueValue: '',
+      cwd: '/test-cwd',
+      downloadUserDataZipFileToken: '',
+      downloadUserDataZipFileUrl: '',
+      enableExtensions: false,
+      enableProxy: false,
+      filterValue: '',
+      getTimeStamp: () => 0,
+      headlessMode: true,
+      ide: 'vscode',
+      ideVersion: 'stable',
+      insidersCommit: '',
+      inspectExtensions: false,
+      inspectExtensionsPort: 0,
+      inspectIntegratedBrowser: false,
+      inspectPtyHost: false,
+      inspectPtyHostPort: 0,
+      inspectSharedProcess: false,
+      inspectSharedProcessPort: 0,
+      isGithubActions: false,
+      login: false,
+      measure: '',
+      measureAfter: false,
+      measureNode: false,
+      openDevtools: false,
+      pageObjectPath: '',
+      platform: 'linux',
+      recordVideo: false,
+      restartBetween: true,
+      root: '/test-root',
+      runMode: 1,
+      runNetworkTestsAnyway: false,
+      runs: 1,
+      runSkippedTestsAnyway: false,
+      screencastQuality: 100,
+      setupOnly: false,
+      startupRuns: 1,
+      timeoutBetween: 0,
+      timeouts: false,
+      trackFunctions: false,
+      updateUrl: '',
+      useProxyMock: false,
+      vscodePath: '',
+      vscodeVersion: '1.0.0',
+    })
+    const completedBeforeWatchdog = Promise.race([
+      runPromise.then(() => true),
+      new Promise<false>((resolve) => setTimeout(() => resolve(false), 10_001)),
+    ])
+
+    await jest.advanceTimersByTimeAsync(10_001)
+
+    expect(await completedBeforeWatchdog).toBe(true)
+    expect((await runPromise).type).toBe('success')
+    expect(mockPrepareTestsAndAttach).toHaveBeenCalledTimes(2)
+    expect(warn).toHaveBeenCalledWith('Timed out disposing function tracker worker after 10000ms')
+  } finally {
+    warn.mockRestore()
+    jest.useRealTimers()
+  }
 })
