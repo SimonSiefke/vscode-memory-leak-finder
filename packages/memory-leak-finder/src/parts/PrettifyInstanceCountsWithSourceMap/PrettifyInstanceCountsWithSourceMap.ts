@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as CompareInstance from '../CompareInstance/CompareInstance.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
-
-const cleanInstance = (instance) => {
+const cleanInstance = (instance: Dynamic) => {
   const { beforeCount, count, name, originalName, originalStack, stack } = instance
   return {
     beforeCount,
@@ -12,8 +12,7 @@ const cleanInstance = (instance) => {
     url: originalStack?.[0] || stack?.[0] || '',
   }
 }
-
-export const prettifyInstanceCountsWithSourceMap = async (instances) => {
+export const prettifyInstanceCountsWithSourceMap = async (instances: Dynamic) => {
   Assert.array(instances)
   const classNames = true
   const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(instances, classNames)

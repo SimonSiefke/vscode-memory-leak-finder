@@ -46,5 +46,5 @@ export const run = async ({ DiffEditor, Editor }: TestContext): Promise<void> =>
     file2: 'd.txt',
     file2Content: 'd',
   })
-  await Editor.closeAll()
+  await Editor.closeAllEditorGroups()
 }

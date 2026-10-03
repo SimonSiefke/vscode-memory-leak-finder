@@ -50,7 +50,7 @@ export const run = async ({ ChatEditor, Editor, Workspace }: TestContext): Promi
 
   await ChatEditor.send({
     message: prompt,
-    model: 'GPT-4.1',
+    model: ChatEditor.Models.GPT41,
   })
 
   await waitForGeneratedFiles(ChatEditor)

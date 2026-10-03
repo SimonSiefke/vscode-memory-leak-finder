@@ -4,10 +4,10 @@ export const skip = 1
 
 // These types and functions are used in the generated TypeScript test file strings
 export interface MockTestContext {
+  page: unknown
   proxy: {
     write: (data: string) => Promise<void>
   }
-  page: unknown
 }
 
 export const getLinesAsArray = (_count: number): string[] => {
@@ -19,19 +19,20 @@ export const pollFor = async (_page: unknown, _getter: () => string[], _expected
 }
 
 const generateTypeScriptTestFile = (): string => {
-  const lines: string[] = []
+  const lines: string[] = [
+    "import { test, expect } from '@jest/globals'",
+    "import type { MockTestContext } from './types'",
+    '',
+    "test.describe('InputHandler Integration Tests', () => {",
+    "  test.describe('CSI', () => {",
+    "    test.describe('CSI ? Pm h - DECSET: Private Mode Set', () => {",
+    "      test('CSI Ps d - VPA: Line Position Absolute [row] (default = [1,column])', async () => {",
+    '        const ctx = {} as MockTestContext',
+    "        await ctx.proxy.write('\\x1b[2d')",
+    "        await pollFor(ctx.page, () => getLinesAsArray(4), ['', 'a', '', ''])",
+  ]
 
   // Add imports and setup
-  lines.push("import { test, expect } from '@jest/globals'")
-  lines.push("import type { MockTestContext } from './types'")
-  lines.push('')
-  lines.push("test.describe('InputHandler Integration Tests', () => {")
-  lines.push("  test.describe('CSI', () => {")
-  lines.push("    test.describe('CSI ? Pm h - DECSET: Private Mode Set', () => {")
-  lines.push("      test('CSI Ps d - VPA: Line Position Absolute [row] (default = [1,column])', async () => {")
-  lines.push('        const ctx = {} as MockTestContext')
-  lines.push("        await ctx.proxy.write('\\x1b[2d')")
-  lines.push("        await pollFor(ctx.page, () => getLinesAsArray(4), ['', 'a', '', ''])")
   lines.push('      })')
   lines.push('')
   lines.push("      test('CSI Ps e - VPR: Line Position Relative (default = 1)', async () => {")
@@ -86,7 +87,7 @@ const generateTypeScriptTestFile = (): string => {
   return lines.join('\n')
 }
 
-export const setup = async ({ DiffEditor, Editor, Explorer, Workspace, SideBar, QuickPick }: TestContext): Promise<void> => {
+export const setup = async ({ DiffEditor, Editor, Explorer, QuickPick, SideBar, Workspace }: TestContext): Promise<void> => {
   const originalContent = generateTypeScriptTestFile()
   const lines = originalContent.split('\n')
 

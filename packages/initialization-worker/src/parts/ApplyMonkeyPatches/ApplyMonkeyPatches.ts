@@ -3,20 +3,29 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally/MakeElectronAvailableGlobally.ts'
 import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
 import { monkeyPatchElectronHeadlessMode } from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.ts'
+import { getMonkeyPatchElectronSafeStorageScript } from '../MonkeyPatchElectronSafeStorageScript/MonkeyPatchElectronSafeStorageScript.ts'
 import * as MonkeyPatchElectronIpcMain from '../MonkeyPatchElectronScript/MonkeyPatchElectronIpcMain.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { openDevtoolsScript } from '../OpenDevtoolsScript/OpenDevtoolsScript.ts'
-import { protocolInterceptorScript } from '../ProtocolInterceptorScript/ProtocolInterceptorScript.ts'
+
+const isIpcMessagesMeasure = (measureId: string): boolean => {
+  return (
+    measureId === 'ipcMessageCount' ||
+    measureId === 'ipcmessagecount' ||
+    measureId === 'ipcMessagesFromStart' ||
+    measureId === 'ipcmessagesfromstart' ||
+    measureId === 'ipc-messages-from-start'
+  )
+}
 
 export const applyMonkeyPatches = async (
   electronRpc: RpcConnection,
   electronObjectId: string,
   requireObjectId: string,
+  secretsPath: string,
   headlessMode: boolean,
   trackFunctions: boolean,
   openDevtools: boolean,
-  port: number,
-  preGeneratedWorkbenchPath: string | null,
   measureId?: string,
 ): Promise<string> => {
   // TODO do this in parallel
@@ -26,7 +35,7 @@ export const applyMonkeyPatches = async (
     objectId: electronObjectId,
   })
 
-  if (measureId && (measureId === 'ipcMessageCount' || measureId === 'ipcmessagecount')) {
+  if (measureId && isIpcMessagesMeasure(measureId)) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
       functionDeclaration: MonkeyPatchElectronIpcMain.monkeyPatchElectronIpcMain,
       objectId: electronObjectId,
@@ -45,9 +54,9 @@ export const applyMonkeyPatches = async (
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
 
-  if (trackFunctions) {
+  if (secretsPath) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: protocolInterceptorScript(port, preGeneratedWorkbenchPath),
+      functionDeclaration: getMonkeyPatchElectronSafeStorageScript({ secretsPath }),
       objectId: electronObjectId,
     })
   }

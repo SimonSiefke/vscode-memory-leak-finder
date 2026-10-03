@@ -5,10 +5,13 @@ import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 export interface PrepareTestsOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly headlessMode: boolean
@@ -26,6 +29,7 @@ export interface PrepareTestsOptions {
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
+  readonly preparedVscodePath: string
   readonly proxyTestFolderName: string
   readonly recordVideo: boolean
   readonly runMode: number
@@ -41,10 +45,13 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
   const {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     connectionId,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -59,6 +66,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     measureId,
     openDevtools,
     platform,
+    preparedVscodePath,
     proxyTestFolderName,
     trackFunctions,
     updateUrl,
@@ -73,11 +81,14 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     await prepareBoth({
       arch,
       attachedToPageTimeout,
+      buildVscodeMinified,
       canUseIdleCallback,
       clearExtensions,
       commit,
       connectionId,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       headlessMode,
@@ -93,6 +104,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       measureId,
       openDevtools,
       platform,
+      preparedVscodePath,
       proxyTestFolderName,
       trackFunctions,
       updateUrl,

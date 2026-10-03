@@ -27,6 +27,7 @@ test('mouse events', () => {
   expect(GetEventClass.getEventClass(DomEventType.MouseEnter)).toBe(MouseEvent)
   expect(GetEventClass.getEventClass(DomEventType.MouseLeave)).toBe(MouseEvent)
   expect(GetEventClass.getEventClass(DomEventType.MouseDown)).toBe(MouseEvent)
+  expect(GetEventClass.getEventClass(DomEventType.MouseMove)).toBe(MouseEvent)
   expect(GetEventClass.getEventClass(DomEventType.MouseUp)).toBe(MouseEvent)
 })
 

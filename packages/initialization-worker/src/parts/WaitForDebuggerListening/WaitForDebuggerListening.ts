@@ -15,6 +15,9 @@ const isIgnoredError = (data: string): boolean => {
   if (data.includes('Failed to connect to the bus')) {
     return true
   }
+  if (data.includes(`For help, see: https://nodejs.org/learn/getting-started/debugging`)) {
+    return true
+  }
   return false
 }
 
@@ -33,7 +36,8 @@ const errorChecker = (data: string) => {
 
 interface ReadableStreamLike {
   emit(event: 'data', data: string): boolean
-  on(event: 'data', listener: (data: string) => void): unknown
+  on(event: string, listener: (...args: any[]) => void): unknown
+  removeListener(event: string, listener: (...args: any[]) => void): unknown
 }
 
 export const waitForDebuggerListening = async (stream: ReadableStreamLike): Promise<string> => {

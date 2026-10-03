@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import type { Session } from '../Session/Session.ts'
 import * as CompareDisposablesWithLocation from '../CompareDisposablesWithLocation/CompareDisposablesWithLocation.ts'
@@ -8,7 +9,6 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-
 // TODO
 // 1. query all objects
 // 2. check for each object if it has a dispose method to find all disposables
@@ -16,23 +16,18 @@ import * as TargetId from '../TargetId/TargetId.ts'
 //  location else location of disposable function
 // 4. group disposables by function location (constructor location / disposable function location)
 // 5. sort grouped disposables by count
-
 export const id = MeasureId.Disposables
-
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
-
 export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
-
-export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup: Dynamic, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   return GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
 }
-
-export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup: Dynamic, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
   return {
@@ -40,11 +35,8 @@ export const stop = async (session: Session, objectGroup, scriptHandler: IScript
     scriptMap: scriptHandler.scriptMap,
   }
 }
-
 export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
-
 export const compare = CompareDisposablesWithLocation.compareDisposablesWithLocation
-
 export const isLeak = IsLeakDisposables.isLeakDisposables

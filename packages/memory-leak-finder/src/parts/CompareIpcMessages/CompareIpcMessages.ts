@@ -1,6 +1,6 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Hash from '../Hash/Hash.ts'
-
-export const compare = (before: readonly any[], after: readonly any[]): readonly any[] => {
+export const compare = (before: readonly Dynamic[], after: readonly Dynamic[]): readonly Dynamic[] => {
   const counts = Object.create(null)
   for (const item of before) {
     const hash = Hash.hash(item)
@@ -17,9 +17,7 @@ export const compare = (before: readonly any[], after: readonly any[]): readonly
     }
     afterCounts[hash]++
   }
-
-  const added: any[] = []
-
+  const added: Dynamic[] = []
   for (const item of after) {
     const hash = Hash.hash(item)
     const beforeCount = counts[hash] ?? 0
@@ -30,6 +28,5 @@ export const compare = (before: readonly any[], after: readonly any[]): readonly
       afterCounts[hash]--
     }
   }
-
   return added
 }

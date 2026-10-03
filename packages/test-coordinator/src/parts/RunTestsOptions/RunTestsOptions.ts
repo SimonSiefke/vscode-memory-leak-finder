@@ -1,6 +1,8 @@
 export interface RunTestsOptions {
+  readonly allowCopilotAuthInCi: boolean
   readonly arch: string
   readonly bisect?: boolean
+  readonly buildVscodeMinified: boolean
   readonly checkLeaks: boolean
   readonly clearExtensions: boolean
   readonly color: boolean
@@ -8,6 +10,8 @@ export interface RunTestsOptions {
   readonly compressVideo: boolean
   readonly continueValue: string
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly filterValue: string
@@ -17,6 +21,8 @@ export interface RunTestsOptions {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess?: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
@@ -33,10 +39,14 @@ export interface RunTestsOptions {
   readonly restartBetween: boolean
   readonly root: string
   readonly runMode: number
+  readonly runNetworkTestsAnyway: boolean
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
   readonly setupOnly: boolean
+  readonly shardCount?: number | undefined
+  readonly shardIndex?: number | undefined
+  readonly startupRuns: number
   readonly timeoutBetween: number
   readonly timeouts: any
   readonly trackFunctions: boolean

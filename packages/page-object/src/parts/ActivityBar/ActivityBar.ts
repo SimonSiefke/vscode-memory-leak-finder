@@ -166,6 +166,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to reset view locations`)
       }
     },
+    async shouldBeHidden() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that activity bar is hidden`)
+      }
+    },
+    async shouldBeVisible() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that activity bar is visible`)
+      }
+    },
     async show() {
       try {
         const activityBar = page.locator('.part.activitybar')
@@ -208,22 +224,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         ariaLabel: 'Source Control',
       })
     },
-    async shouldBeHidden() {
-      try {
-        const activityBar = page.locator('.part.activitybar')
-        await expect(activityBar).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to verify that activity bar is hidden`)
-      }
-    },
-    async shouldBeVisible() {
-      try {
-        const activityBar = page.locator('.part.activitybar')
-        await expect(activityBar).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to verify that activity bar is visible`)
-      }
-    },
     async showTooltipExplorer() {
       try {
         const activityBar = page.locator('.part.activitybar')
@@ -247,11 +247,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="${ariaLabel}"])`)
         const expanded = await activityBarItem.getAttribute('aria-expanded')
-        if (expanded === 'false') {
+        const sideBar = page.locator('.sidebar')
+        const sideBarVisible = await sideBar.isVisible()
+        if (!sideBarVisible) {
+          await activityBarItem.clickExponential({
+            waitFor: sideBar,
+          })
+        } else if (expanded === 'false') {
           await activityBarItem.click()
         }
         await page.waitForIdle()
-        const sideBar = page.locator('.sidebar')
         const title = sideBar.locator('.composite.title')
         await expect(title).toHaveText(titleLabel)
         await page.waitForIdle()

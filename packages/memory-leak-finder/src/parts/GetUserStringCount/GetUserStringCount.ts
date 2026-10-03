@@ -1,7 +1,7 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as GetUserStrings from '../GetUserStrings/GetUserStrings.ts'
-
-export const getUserStringCount = async (session: Session, objectGroup: string, id: any): Promise<number> => {
+export const getUserStringCount = async (session: Session, objectGroup: string, id: Dynamic): Promise<number> => {
   const strings = await GetUserStrings.getUserStrings(session, objectGroup, id)
   const stringCount = strings.length
   return stringCount

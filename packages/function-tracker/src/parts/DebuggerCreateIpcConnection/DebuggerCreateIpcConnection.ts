@@ -1,6 +1,6 @@
+import { VError } from '@lvce-editor/verror'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as Json from '../Json/Json.ts'
-import { VError } from '@lvce-editor/verror'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
 
 /**

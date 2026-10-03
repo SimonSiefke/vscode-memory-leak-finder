@@ -6,6 +6,7 @@ interface IdeVersion {
 
 export type CreateParams = {
   readonly browserRpc?: any
+  readonly createPageObject?: (page: any) => Promise<any>
   readonly electronApp: any
   readonly externalInspectPort?: number
   readonly expect: any

@@ -5,7 +5,9 @@ import { URL } from 'node:url'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import * as IsExpiredTokenErrorResponse from '../IsExpiredTokenErrorResponse/IsExpiredTokenErrorResponse.ts'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import * as ReplaceJwtTokensInValue from '../ReplaceJwtTokensInValue/ReplaceJwtTokensInValue.ts'
+import * as SanitizeMockData from '../SanitizeMockData/SanitizeMockData.ts'
 
 interface SaveMockFileOptions {
   readonly method: string
@@ -37,7 +39,11 @@ export const saveMockFile = async (options: SaveMockFileOptions): Promise<string
     }
   }
 
-  const processedBody = await ReplaceJwtTokensInValue.replaceJwtTokensInValue(options.response.body)
+  const processedRequestBody = PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(options.requestBody)
+  const processedBody = PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(
+    SanitizeMockData.sanitizeMockBody(await ReplaceJwtTokensInValue.replaceJwtTokensInValue(options.response.body)),
+  )
+  const processedHeaders = SanitizeMockData.sanitizeMockHeaders(options.response.headers)
 
   const mockData = {
     metadata: {
@@ -45,13 +51,13 @@ export const saveMockFile = async (options: SaveMockFileOptions): Promise<string
       timestamp: options.timestamp,
     },
     request: {
-      body: options.requestBody,
+      body: processedRequestBody,
       method: options.method,
       url: options.url,
     },
     response: {
       body: processedBody,
-      headers: options.response.headers,
+      headers: processedHeaders,
       statusCode: options.response.statusCode,
       statusMessage: options.response.statusMessage,
       wasCompressed: options.response.wasCompressed,

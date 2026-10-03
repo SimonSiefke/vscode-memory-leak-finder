@@ -1,5 +1,9 @@
+import * as GetScenarioExtensionArgs from '../GetScenarioExtensionArgs/GetScenarioExtensionArgs.ts'
 import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
+import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
+import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as AssertLocalVsCodeBuildReady from '../AssertLocalVsCodeBuildReady/AssertLocalVsCodeBuildReady.ts'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
@@ -13,6 +17,7 @@ import * as GetVscodeRuntimeDir from '../GetVscodeRuntimeDir/GetVscodeRuntimeDir
 import * as IsCi from '../IsCi/IsCi.ts'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.ts'
 import { join } from '../Path/Path.ts'
+import * as PrepareTrackedVscode from '../PrepareTrackedVscode/PrepareTrackedVscode.ts'
 import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 import * as RemoveVscodeBackups from '../RemoveVscodeBackups/RemoveVscodeBackups.ts'
 import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveVscodeGlobalStorage.ts'
@@ -76,6 +81,7 @@ const restoreProxyArtifacts = async (downloadToken: string): Promise<void> => {
 
 const prepareVsCodeLaunch = async ({
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   downloadUserDataZipFileToken,
@@ -88,6 +94,7 @@ const prepareVsCodeLaunch = async ({
   vscodeVersion,
 }: {
   arch: string
+  buildVscodeMinified: boolean
   clearExtensions: boolean
   commit: string
   downloadUserDataZipFileToken: string
@@ -123,7 +130,16 @@ const prepareVsCodeLaunch = async ({
   await mkdir(sourceMapCacheDir, { recursive: true })
   const sourcesDir = join(Root.root, '.vscode-sources')
   await mkdir(sourcesDir, { recursive: true })
-  const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
+  const binaryPath = await GetBinaryPath.getBinaryPath(
+    platform,
+    arch,
+    vscodeVersion,
+    vscodePath,
+    commit,
+    insidersCommit,
+    updateUrl,
+    buildVscodeMinified,
+  )
   await AssertLocalVsCodeBuildReady.assertLocalVsCodeBuildReady(binaryPath, enableExtensions)
   const userDataDir = GetUserDataDir.getUserDataDir()
   const extensionsDir = GetExtensionsDir.getExtensionsDir()
@@ -159,6 +175,7 @@ const prepareVsCodeLaunch = async ({
 
 export const setupVsCode = async ({
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   downloadUserDataZipFileToken,
@@ -171,6 +188,7 @@ export const setupVsCode = async ({
   vscodeVersion,
 }: {
   arch: string
+  buildVscodeMinified: boolean
   clearExtensions: boolean
   commit: string
   downloadUserDataZipFileToken: string
@@ -185,6 +203,7 @@ export const setupVsCode = async ({
   try {
     await prepareVsCodeLaunch({
       arch,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       downloadUserDataZipFileToken,
@@ -204,8 +223,11 @@ export const setupVsCode = async ({
 export const launchVsCode = async ({
   addDisposable,
   arch,
+  buildVscodeMinified,
+  callgrindConfig,
   clearExtensions,
   commit,
+  cpuPerformanceCountersFromStartConfig,
   cwd,
   downloadUserDataZipFileToken,
   downloadUserDataZipFileUrl,
@@ -219,8 +241,12 @@ export const launchVsCode = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  linuxProcessTreeResourcesFromStartConfig,
   platform,
+  preparedVscodePath,
   proxyTestFolderName,
+  trackFunctions,
+  trackingMode,
   useProxyMock,
   updateUrl,
   vscodePath,
@@ -228,8 +254,11 @@ export const launchVsCode = async ({
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
   arch: string
+  buildVscodeMinified: boolean
+  callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   commit: string
+  cpuPerformanceCountersFromStartConfig: CpuPerformanceCountersFromStartConfig
   cwd: string
   downloadUserDataZipFileToken: string
   downloadUserDataZipFileUrl: string
@@ -243,8 +272,12 @@ export const launchVsCode = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  linuxProcessTreeResourcesFromStartConfig: LinuxProcessTreeResourcesFromStartConfig
   platform: string
+  preparedVscodePath: string
   proxyTestFolderName: string
+  trackFunctions: boolean
+  trackingMode: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -255,8 +288,9 @@ export const launchVsCode = async ({
     console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
   }
   try {
-    const { binaryPath, extensionsDir, runtimeDir, settingsPath, testWorkspacePath, userDataDir } = await prepareVsCodeLaunch({
+    let { binaryPath, extensionsDir, runtimeDir, settingsPath, testWorkspacePath, userDataDir } = await prepareVsCodeLaunch({
       arch,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       downloadUserDataZipFileToken,
@@ -265,9 +299,12 @@ export const launchVsCode = async ({
       insidersCommit,
       platform,
       updateUrl,
-      vscodePath,
+      vscodePath: preparedVscodePath || vscodePath,
       vscodeVersion,
     })
+    if (trackFunctions) {
+      binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
+    }
 
     // Start proxy server if enabled
     // Note: enableProxy might be undefined if RPC call doesn't pass it correctly
@@ -307,13 +344,21 @@ export const launchVsCode = async ({
       enableExtensions,
       enableProxy,
       extensionsDir,
-      extraLaunchArgs: [testWorkspacePath],
+      extraLaunchArgs: [
+        testWorkspacePath,
+        ...(await GetScenarioExtensionArgs.getScenarioExtensionArgs(
+          `${Root.root}/packages/e2e/fixtures`,
+          proxyTestFolderName,
+          enableExtensions,
+        )),
+      ],
       inspectExtensions,
       inspectExtensionsPort,
       inspectPtyHost,
       inspectPtyHostPort,
       inspectSharedProcess,
       inspectSharedProcessPort,
+      platform,
       userDataDir,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({
@@ -326,10 +371,14 @@ export const launchVsCode = async ({
     const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,
       args,
+      callgrindConfig,
       cliPath: binaryPath,
+      cpuPerformanceCountersFromStartConfig,
       cwd,
       env,
       headlessMode,
+      linuxProcessTreeResourcesFromStartConfig,
+      platform,
     })
     return {
       binaryPath,

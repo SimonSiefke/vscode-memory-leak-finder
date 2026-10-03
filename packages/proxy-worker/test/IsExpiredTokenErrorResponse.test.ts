@@ -19,6 +19,15 @@ test('isExpiredTokenErrorResponse - detects invalid token auth responses', () =>
   ).toBe(true)
 })
 
+test('isExpiredTokenErrorResponse - detects bad request invalid token auth responses', () => {
+  expect(
+    IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse({
+      body: 'IDE authentication failed: bad request: invalid token: cannot decode HMAC\n',
+      statusCode: 400,
+    }),
+  ).toBe(true)
+})
+
 test('isExpiredTokenErrorResponse - ignores unrelated 401 responses', () => {
   expect(
     IsExpiredTokenErrorResponse.isExpiredTokenErrorResponse({

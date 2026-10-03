@@ -2,6 +2,8 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
+export const requiresNetwork = true
+
 const testId = 'simple-browser-reload-html'
 const testUrl = 'http://localhost:3001/index.html'
 

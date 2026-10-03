@@ -1,4 +1,5 @@
-export const getPrettyEventListenerUrl = (url) => {
+import type { Dynamic } from '../Types/Types.ts'
+export const getPrettyEventListenerUrl = (url: Dynamic) => {
   if (url.startsWith('/')) {
     return url.slice(1)
   }

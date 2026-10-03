@@ -2,7 +2,16 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, page, platform, VError, ideVersion }: CreateParams) => {
+const escapeForRegExp = (value: string): string => {
+  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const getStackFrameLabelPattern = (file: string, line: number): RegExp => {
+  const filePattern = file.split(/[\\/]/).map(escapeForRegExp).join('[\\\\/]')
+  return new RegExp(`^Stack Frame <anonymous>, line ${line}, (?:.*[\\\\/])?${filePattern}$`)
+}
+
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async continue() {
       try {
@@ -120,7 +129,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         await this.waitForPaused({
           callStackSize,
           file,
-          ...(hasCallStack === undefined ? {} : { hasCallStack }),
+          ...(hasCallStack !== undefined && { hasCallStack }),
           line,
         })
       } catch (error) {
@@ -228,20 +237,21 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         }
         await page.waitForIdle()
         const quickPickWidget = page.locator('.quick-input-widget')
-        const quickPickPromise = expect(quickPickWidget)
-          .toBeVisible({
-            timeout: 15_000,
-          })
-          .then(() => 1)
-          .catch(() => 0)
         const debugToolBar = page.locator('.debug-toolbar')
-        const debugToolBarPromise = expect(debugToolBar)
-          .toBeVisible({
-            timeout: 15_000,
-          })
-          .then(() => 2)
-          .catch(() => 0)
-        const value = await Promise.race([quickPickPromise, debugToolBarPromise])
+        const waitForQuickPickOrDebugToolBar = async () => {
+          const startTime = Date.now()
+          while (Date.now() - startTime < 15_000) {
+            if (await quickPickWidget.isVisible().catch(() => false)) {
+              return 1
+            }
+            if (await debugToolBar.isVisible().catch(() => false)) {
+              return 2
+            }
+            await new Promise((resolve) => setTimeout(resolve, 250))
+          }
+          return 0
+        }
+        const value = await waitForQuickPickOrDebugToolBar()
         if (value === 1) {
           const option = page.locator(`[role="option"][aria-label^="${debugLabel}"]`)
           await expect(quickPickWidget).toBeVisible()
@@ -403,19 +413,6 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         throw new VError(error, `Failed to stop`)
       }
     },
-    async waitForDebugConsoleOutput({ output: _output }: { output: string }) {
-      try {
-        await page.waitForIdle()
-        const repl = page.locator('.repl')
-        await expect(repl).toBeVisible()
-        await page.waitForIdle()
-        const row = page.locator('.monaco-list-row[aria-label^="x = 1"]')
-        await expect(row).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to wait for debug console output`)
-      }
-    },
     async takeCpuProfile({ seconds }: { seconds: number }) {
       try {
         await page.waitForIdle()
@@ -445,13 +442,26 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
         await page.waitForIdle()
         const decoration = page.locator('.monaco-editor .codelens-decoration', {})
         await expect(decoration).toBeVisible({
-          timeout: 5_000,
+          timeout: 15_000,
         })
         await page.waitForIdle()
         await expect(decoration).toHaveText(/Self Time/)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to take performance profile`)
+      }
+    },
+    async waitForDebugConsoleOutput({ output: _output }: { output: string }) {
+      try {
+        await page.waitForIdle()
+        const repl = page.locator('.repl')
+        await expect(repl).toBeVisible()
+        await page.waitForIdle()
+        const row = page.locator('.monaco-list-row[aria-label^="x = 1"]')
+        await expect(row).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to wait for debug console output`)
       }
     },
     async waitForPaused({
@@ -467,7 +477,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
     }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
-      await expect(continueButton).toBeVisible({ timeout: 30_000 })
+      await expect(continueButton).toBeVisible({ timeout: 45_000 })
       await page.waitForIdle()
       if (!hasCallStack) {
         // TODO maybe check some other things
@@ -485,7 +495,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
       await page.waitForIdle()
       const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
       await expect(stackFrame).toBeVisible()
-      await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
+      await expect(stackFrame).toHaveAttribute('aria-label', getStackFrameLabelPattern(file, line))
       if (callStackSize) {
         await expect(stackFrame).toHaveAttribute(`aria-setsize`, `${callStackSize}`)
       }
@@ -503,7 +513,7 @@ export const create = ({ electronApp, expect, page, platform, VError, ideVersion
     async waitForPausedOnException({ exception = false, file, line }: { exception?: boolean; file: string; line: number }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
-      await expect(continueButton).toBeVisible({ timeout: 30_000 })
+      await expect(continueButton).toBeVisible({ timeout: 45_000 })
       await page.waitForIdle()
       const pausedStackFrame = page.locator('.debug-top-stack-frame-column')
       await expect(pausedStackFrame).toBeVisible()

@@ -1,17 +1,22 @@
-export const createSessionRpcConnection = (rpc: any, sessionId: string): any => {
+import type { Dynamic } from '../Types/Types.ts'
+export const createSessionRpcConnection = (rpc: Dynamic, sessionId: string, targetId = ''): Dynamic => {
   return {
     callbacks: rpc.callbacks,
     connectionClosed: rpc.connectionClosed,
     dispose() {
       rpc.dispose()
     },
-    invoke(method: string, params?: any): Promise<any> {
+    invoke(method: string, params?: Dynamic): Promise<Dynamic> {
       return rpc.invokeWithSession(sessionId, method, params)
+    },
+    invokeBrowser(method: string, params?: Dynamic): Promise<Dynamic> {
+      return rpc.invoke(method, params)
     },
     listeners: rpc.listeners,
     off: rpc.off,
     on: rpc.on,
     once: rpc.once,
     sessionId,
+    targetId,
   }
 }

@@ -13,7 +13,7 @@ type QuickPickApi = {
   executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
   getVisibleCommands: () => Promise<string[]>
   pressEnter: () => Promise<void>
-  select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<void>
+  select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<number>
   showCommands: (options?: { pressKeyOnce?: boolean }) => Promise<void>
   type: (value: string) => Promise<void>
 }
@@ -25,23 +25,25 @@ type WorkbenchDependencies = {
 
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
-  readonly sessionRpc?: any
+  readonly closeGracefully: () => Promise<void>
   readonly locator?: (selector: string) => any
-  readonly waitForIdle: () => Promise<void>
+  readonly sessionRpc?: any
   readonly shouldBeVisible: () => Promise<void>
+  readonly waitForIdle: () => Promise<void>
+  readonly Workbench?: any
 }
 
 const createLocatorProxy = (sessionRpc: any, selector: string, sessionId?: string) => {
   return {
-    objectType: 'locator',
-    rpc: sessionRpc,
-    sessionRpc,
-    sessionId,
-    selector,
     hasText: undefined,
     locator(subSelector: string) {
       return createLocatorProxy(sessionRpc, `${selector} ${subSelector}`, sessionId)
     },
+    objectType: 'locator',
+    rpc: sessionRpc,
+    selector,
+    sessionId,
+    sessionRpc,
   }
 }
 
@@ -72,12 +74,12 @@ const sleep = async (milliseconds: number): Promise<void> => {
 
 const getRemoteHostPlatformLabel = (platform: string): string => {
   switch (platform) {
+    case 'darwin':
+      return 'macOS'
     case 'linux':
       return 'Linux'
     case 'win32':
       return 'Windows'
-    case 'darwin':
-      return 'macOS'
     default:
       throw new Error(`Unsupported platform for Remote - SSH host selection: ${platform}`)
   }
@@ -91,7 +93,7 @@ const maybeSelectRemoteHostPlatform = async (
   const expectedPlatform = getRemoteHostPlatformLabel(platform)
   const platformOptions = ['Linux', 'Windows', 'macOS']
   const start = Date.now()
-  while (Date.now() - start < 5_000) {
+  while (Date.now() - start < 5000) {
     try {
       const visibleCommands = await quickPick.getVisibleCommands()
       if (visibleCommands.includes(expectedPlatform)) {
@@ -156,28 +158,44 @@ const waitForSshConnection = async (
   throw new Error(`Timed out waiting for Remote - SSH connection to settle`)
 }
 
-export const create = ({ browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams) => {
-  return createWithDependencies(
-    reconnectDevtools
-      ? { browserRpc, electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }
-      : { browserRpc, electronApp, expect, ideVersion, page, platform, VError },
-    {
-      createQuickPick: () =>
-        QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        }),
-      sleep,
-    },
-  )
+export const create = ({
+  browserRpc,
+  createPageObject,
+  electronApp,
+  expect,
+  ideVersion,
+  page,
+  platform,
+  reconnectDevtools,
+  VError,
+}: CreateParams) => {
+  const workbenchContext = {
+    browserRpc,
+    electronApp,
+    expect,
+    ideVersion,
+    page,
+    platform,
+    VError,
+    ...(createPageObject && { createPageObject }),
+    ...(reconnectDevtools && { reconnectDevtools }),
+  }
+  return createWithDependencies(workbenchContext, {
+    createQuickPick: () =>
+      QuickPick.create({
+        electronApp,
+        expect,
+        ideVersion,
+        page,
+        platform,
+        VError,
+      }),
+    sleep,
+  })
 }
 
 export const createWithDependencies = (
-  { browserRpc, electronApp, expect, page, platform, reconnectDevtools, VError, ideVersion }: CreateParams,
+  { browserRpc, createPageObject, electronApp, expect, ideVersion, page, platform, reconnectDevtools, VError }: CreateParams,
   dependencies: WorkbenchDependencies,
 ) => {
   return {
@@ -198,6 +216,140 @@ export const createWithDependencies = (
         const message =
           options.alias || options.port ? `Failed to connect to SSH server` : `Failed to connect to SSH server: missing target`
         throw new VError(error, message)
+      }
+    },
+    async focusLeftEditorGroup() {
+      await page.waitForIdle()
+      const quickPick = QuickPick.create({
+        electronApp,
+        expect,
+        ideVersion,
+        page,
+        platform,
+        VError,
+      })
+      await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
+      await page.waitForIdle()
+    },
+    async openNewWindow(): Promise<ISimplifedWindow> {
+      try {
+        const newWindowPromise = this.waitForNewWindow({ timeout: 5000 })
+        // Run the quickpick command to open new window
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.NewWindow)
+
+        const sessionId = await newWindowPromise
+        if (!sessionId) {
+          throw new Error(`Failed to wait for window`)
+        }
+
+        // Use electronApp.waitForPage to create the page with utility context
+        const newWindowPage = await electronApp.waitForPage({
+          injectUtilityScript: true,
+          sessionId,
+        })
+
+        await page.waitForIdle()
+
+        const newWindow = createPageObject ? await createPageObject(newWindowPage) : Object.create(null)
+        const getNewWindowPage = () => newWindow.__page || newWindowPage
+
+        return Object.assign(newWindow, {
+          async close() {
+            try {
+              // Wait for the window to be fully idle before attempting to close
+              const page = getNewWindowPage()
+              await page.waitForIdle()
+              await page.close()
+            } catch (error) {
+              throw new VError(error, `Failed to close new window`)
+            }
+          },
+          async closeGracefully() {
+            try {
+              // Wait for the window to be fully idle before attempting to close
+              await newWindowPage.waitForIdle()
+              const quickPick = QuickPick.create({
+                electronApp,
+                expect,
+                ideVersion,
+                page: newWindowPage,
+                platform,
+                VError,
+              })
+              await quickPick.executeCommand(WellKnownCommands.CloseWindow)
+            } catch (error) {
+              throw new VError(error, `Failed to close new window`)
+            }
+          },
+          locator: (selector: string) => getNewWindowPage().locator(selector),
+          evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
+            const page = getNewWindowPage()
+            return page.evaluateInMainWorld(options)
+          },
+          sessionRpc: newWindowPage.sessionRpc,
+          async shouldBeVisible() {
+            const page = getNewWindowPage()
+            await page.waitForIdle()
+            const workbench = page.locator('.monaco-workbench')
+            await expect(workbench).toBeVisible({ timeout: 20_000 })
+            await page.waitForIdle()
+          },
+          waitForIdle: () => getNewWindowPage().waitForIdle(),
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to open new window`)
+      }
+    },
+    async reload(): Promise<void> {
+      try {
+        await page.waitForIdle()
+
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+
+        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
+        const refreshedPage = await page.refresh()
+        await page.rebind(refreshedPage)
+        try {
+          await page.waitForIdle()
+        } catch {
+          // The renderer can be in flux immediately after reload. Visibility check below is the real readiness gate.
+        }
+        await this.shouldBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to reload window`)
+      }
+    },
+    evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
+      return page.evaluateInMainWorld(options)
+    },
+    async shouldBeVisible() {
+      const workbench = page.locator('.monaco-workbench')
+      await expect(workbench).toBeVisible()
+    },
+    async shouldHaveEditorBackground(color: string) {
+      try {
+        const workbench = page.locator('.monaco-workbench')
+        await expect(workbench).toHaveCss('--vscode-editor-background', color, {
+          timeout: 1000,
+        })
+      } catch (error) {
+        throw new VError(error, `workbench has not the expected background color`)
       }
     },
     async waitForNewWindow({ timeout }: { timeout: number }) {
@@ -234,119 +386,6 @@ export const createWithDependencies = (
       const sessionId = await promise
 
       return sessionId
-    },
-    async openNewWindow(): Promise<ISimplifedWindow> {
-      try {
-        const newWindowPromise = this.waitForNewWindow({ timeout: 5000 })
-        // Run the quickpick command to open new window
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.NewWindow)
-
-        const sessionId = await newWindowPromise
-        if (!sessionId) {
-          throw new Error(`Failed to wait for window`)
-        }
-
-        // Use electronApp.waitForPage to create the page with utility context
-        const newWindowPage = await electronApp.waitForPage({
-          injectUtilityScript: true,
-          sessionId,
-        })
-
-        await page.waitForIdle()
-
-        return {
-          async close() {
-            try {
-              // Wait for the window to be fully idle before attempting to close
-              await newWindowPage.waitForIdle()
-              const quickPick = QuickPick.create({
-                electronApp,
-                expect,
-                ideVersion,
-                page: newWindowPage,
-                platform,
-                VError,
-              })
-              await quickPick.executeCommand(WellKnownCommands.CloseWindow)
-            } catch (error) {
-              throw new VError(error, `Failed to close new window`)
-            }
-          },
-          locator: (selector: string) => newWindowPage.locator(selector),
-          sessionRpc: newWindowPage.sessionRpc,
-          waitForIdle: () => newWindowPage.waitForIdle(),
-          async shouldBeVisible() {
-            await newWindowPage.waitForIdle()
-            const workbench = newWindowPage.locator('.monaco-workbench')
-            await expect(workbench).toBeVisible({ timeout: 20_000 })
-            await newWindowPage.waitForIdle()
-          },
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to open new window`)
-      }
-    },
-    async reload(): Promise<void> {
-      try {
-        await page.waitForIdle()
-
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-
-        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
-        const refreshedPage = await page.refresh()
-        await page.rebind(refreshedPage)
-        try {
-          await page.waitForIdle()
-        } catch {
-          // The renderer can be in flux immediately after reload. Visibility check below is the real readiness gate.
-        }
-        await this.shouldBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to reload window`)
-      }
-    },
-    async focusLeftEditorGroup() {
-      await page.waitForIdle()
-      const quickPick = QuickPick.create({
-        electronApp,
-        expect,
-        ideVersion,
-        page,
-        platform,
-        VError,
-      })
-      await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
-      await page.waitForIdle()
-    },
-    async shouldBeVisible() {
-      const workbench = page.locator('.monaco-workbench')
-      await expect(workbench).toBeVisible()
-    },
-    async shouldHaveEditorBackground(color: string) {
-      try {
-        const workbench = page.locator('.monaco-workbench')
-        await expect(workbench).toHaveCss('--vscode-editor-background', color, {
-          timeout: 1000,
-        })
-      } catch (error) {
-        throw new VError(error, `workbench has not the expected background color`)
-      }
     },
   }
 }

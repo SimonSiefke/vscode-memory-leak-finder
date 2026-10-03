@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as GetProxyPaths from '../GetProxyPaths/GetProxyPaths.ts'
 import * as ParseRequestBody from '../ParseRequestBody/ParseRequestBody.ts'
+import * as PathPlaceholders from '../PathPlaceholders/PathPlaceholders.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveImageData from '../SaveImageData/SaveImageData.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
@@ -60,7 +61,7 @@ export const saveRequest = async (
           .map((k) => Number.parseInt(k, 10))
           .filter((k) => !isNaN(k))
           .sort((a, b) => a - b)
-        if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+        if (keys.length > 0 && keys[0] === 0 && keys.at(-1) === keys.length - 1) {
           const numbers = keys.map((k) => decompressedBody[k] as number)
           imageBuffer = Buffer.from(new Uint8Array(numbers))
         } else {
@@ -91,7 +92,7 @@ export const saveRequest = async (
           .map((k) => Number.parseInt(k, 10))
           .filter((k) => !isNaN(k))
           .sort((a, b) => a - b)
-        if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+        if (keys.length > 0 && keys[0] === 0 && keys.at(-1) === keys.length - 1) {
           // Looks like a serialized Buffer/Uint8Array
           const numbers = keys.map((k) => decompressedBody[k] as number)
           bodyString = new TextDecoder().decode(new Uint8Array(numbers))
@@ -125,13 +126,13 @@ export const saveRequest = async (
         timestamp,
       },
       request: {
-        body: ParseRequestBody.parseRequestBody(req.headers, requestBody),
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(ParseRequestBody.parseRequestBody(req.headers, requestBody)),
         headers: req.headers,
         method: req.method,
         url: req.url,
       },
       response: {
-        body: responseBodyData,
+        body: PathPlaceholders.replaceAbsolutePathsWithPlaceholdersInValue(responseBodyData),
         headers: responseHeaders,
         statusCode,
         statusMessage,

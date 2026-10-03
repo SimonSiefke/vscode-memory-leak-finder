@@ -11,7 +11,7 @@ const readRequestBody = async (request: IncomingMessage): Promise<Buffer> => {
 }
 
 const getBearerToken = (request: IncomingMessage): string => {
-  const authorization = request.headers.authorization
+  const { authorization } = request.headers
   if (!authorization?.startsWith('Bearer ')) {
     return ''
   }
@@ -39,7 +39,7 @@ export const createHandleUserDataUploadRequest = (env: BotEnv) => {
     if (request.method !== 'POST') {
       return false
     }
-    const path = request.url?.split('?')[0] ?? ''
+    const path = request.url?.split('?', 1)[0] ?? ''
     if (path !== '/api/user-data/upload') {
       return false
     }

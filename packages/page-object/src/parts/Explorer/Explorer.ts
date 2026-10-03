@@ -382,6 +382,21 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to rename explorer item from "${oldDirentName}" to "${newDirentName}"`)
       }
     },
+    async selectItem(direntName: string) {
+      try {
+        await page.waitForIdle()
+        const explorer = page.locator('.explorer-folders-view .monaco-list')
+        const dirent = explorer.locator('.monaco-list-row', {
+          hasText: direntName,
+        })
+        await expect(dirent).toBeVisible()
+        await dirent.click()
+        await page.waitForIdle()
+        await this.shouldHaveFocusedItem(direntName)
+      } catch (error) {
+        throw new VError(error, `Failed to select explorer item "${direntName}"`)
+      }
+    },
     async shouldHaveFocusedItem(direntName: string) {
       try {
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -397,21 +412,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to verify that explorer has focused dirent "${direntName}"`)
-      }
-    },
-    async selectItem(direntName: string) {
-      try {
-        await page.waitForIdle()
-        const explorer = page.locator('.explorer-folders-view .monaco-list')
-        const dirent = explorer.locator('.monaco-list-row', {
-          hasText: direntName,
-        })
-        await expect(dirent).toBeVisible()
-        await dirent.click()
-        await page.waitForIdle()
-        await this.shouldHaveFocusedItem(direntName)
-      } catch (error) {
-        throw new VError(error, `Failed to select explorer item "${direntName}"`)
       }
     },
     async shouldHaveItem(direntName: string) {

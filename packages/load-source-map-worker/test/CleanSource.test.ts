@@ -32,3 +32,18 @@ test('cleanSource - up a folder .src path', () => {
   const input = '../.src/vs/nls.ts'
   expect(cleanSource(input)).toBe('src/vs/nls.ts')
 })
+
+test('cleanSource - node modules path outside source root', () => {
+  const input = '../../node_modules/.pnpm/@sentry+utils@8.28.0/node_modules/@sentry/utils/build/esm/is.js'
+  expect(cleanSource(input)).toBe('node_modules/.pnpm/@sentry+utils@8.28.0/node_modules/@sentry/utils/build/esm/is.js')
+})
+
+test('cleanSource - absolute mixed relative path', () => {
+  const input = '/tmp/project/../../node_modules/pkg/index.js'
+  expect(cleanSource(input)).toBe('tmp/project/node_modules/pkg/index.js')
+})
+
+test('cleanSource - windows mixed relative path', () => {
+  const input = 'C:\\tmp\\project\\..\\node_modules\\pkg\\index.js'
+  expect(cleanSource(input)).toBe('tmp/project/node_modules/pkg/index.js')
+})

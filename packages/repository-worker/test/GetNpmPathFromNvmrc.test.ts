@@ -1,70 +1,28 @@
-import { homedir } from 'node:os'
-import { join } from 'node:path'
 import { expect, test } from '@jest/globals'
 import { createMockRpc } from '@lvce-editor/rpc'
+import { homedir } from 'node:os'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 import { getNpmPathFromNvmrc } from '../src/parts/GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
-
-const getNvmDir = (homeDir: string): string => {
-  if (process.platform === 'win32') {
-    return join(homeDir, 'AppData', 'Roaming', 'nvm')
-  }
-  return join(homeDir, '.nvm')
-}
-
-const getNodeAndNpmPaths = (nvmDir: string, nodeVersion: string): { nodePath: string; npmPath: string } => {
-  if (process.platform === 'win32') {
-    return {
-      nodePath: join(nvmDir, `v${nodeVersion}`, 'node.exe'),
-      npmPath: join(nvmDir, `v${nodeVersion}`, 'npm.cmd'),
-    }
-  }
-  return {
-    nodePath: join(nvmDir, 'versions', 'node', `v${nodeVersion}`, 'bin', 'node'),
-    npmPath: join(nvmDir, 'versions', 'node', `v${nodeVersion}`, 'bin', 'npm'),
-  }
-}
-
-const getAdditionalNodeProbePaths = (homeDir: string, nodeVersion: string): readonly string[] => {
-  if (process.platform === 'win32') {
-    return [join(homeDir, '.nvm', `v${nodeVersion}`, 'node.exe'), join(homeDir, '.config', 'nvm', `v${nodeVersion}`, 'node.exe')]
-  }
-  return [join(homeDir, '.config', 'nvm', 'versions', 'node', `v${nodeVersion}`, 'bin', 'node')]
-}
-
-const setStableExecPath = (): (() => void) => {
-  const descriptor = Object.getOwnPropertyDescriptor(process, 'execPath')
-  Object.defineProperty(process, 'execPath', {
-    configurable: true,
-    value: process.platform === 'win32' ? 'C:\\Program Files\\nodejs\\node.exe' : '/usr/bin/node',
-  })
-  return () => {
-    if (descriptor) {
-      Object.defineProperty(process, 'execPath', descriptor)
-    }
-  }
-}
+import * as Path from '../src/parts/Path/Path.ts'
 
 test('getNpmPathFromNvmrc - returns installed npm path from nvm', async () => {
   const repoPath = '/test/repo'
-  const nodeVersion = '22.22.1'
+  const nvmrcPath = `${repoPath}/.nvmrc`
   const homeDir = homedir()
   const oldNvmDir = process.env.NVM_DIR
-  const oldNvmHome = process.env.NVM_HOME
-  const nvmDir = getNvmDir(homeDir)
-  const { nodePath, npmPath } = getNodeAndNpmPaths(nvmDir, nodeVersion)
-  const restoreExecPath = setStableExecPath()
+  const nvmDir = Path.join(homeDir, '.nvm')
+  const npmPath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'npm')
+  const nodePath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'node')
 
   process.env.NVM_DIR = nvmDir
-  process.env.NVM_HOME = nvmDir
 
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.readFileContent': () => nodeVersion,
-      'FileSystem.exists': (path: string) => path === nodePath || path === npmPath,
       'FileSystem.exec': () => {
         throw new Error('unexpected exec')
       },
+      'FileSystem.exists': (path: string) => path === nvmrcPath || path === nodePath || path === npmPath,
+      'FileSystem.readFileContent': () => '22.22.1',
     },
   })
   try {
@@ -74,52 +32,47 @@ test('getNpmPathFromNvmrc - returns installed npm path from nvm', async () => {
 
     expect(result).toBe(npmPath)
     expect(mockRpc.invocations).toEqual([
-      ['FileSystem.readFileContent', join(repoPath, '.nvmrc')],
+      ['FileSystem.exists', nvmrcPath],
+      ['FileSystem.readFileContent', nvmrcPath],
       ['FileSystem.exists', nodePath],
       ['FileSystem.exists', npmPath],
     ])
   } finally {
     process.env.NVM_DIR = oldNvmDir
-    process.env.NVM_HOME = oldNvmHome
-    restoreExecPath()
   }
 })
 
 test('getNpmPathFromNvmrc - installs missing node version and resolves npm path', async () => {
   const repoPath = '/test/repo'
-  const nodeVersion = '22.22.1'
+  const nvmrcPath = `${repoPath}/.nvmrc`
   const homeDir = homedir()
   const oldNvmDir = process.env.NVM_DIR
-  const oldNvmHome = process.env.NVM_HOME
-  const nvmDir = getNvmDir(homeDir)
-  const { nodePath, npmPath } = getNodeAndNpmPaths(nvmDir, nodeVersion)
-  const additionalNodeProbePaths = getAdditionalNodeProbePaths(homeDir, nodeVersion)
-  const restoreExecPath = setStableExecPath()
+  const nvmDir = Path.join(homeDir, '.nvm')
+  const configNvmNodePath = Path.join(homeDir, '.config', 'nvm', 'versions', 'node', 'v22.22.1', 'bin', 'node')
+  const npmPath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'npm')
+  const nodePath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'node')
   let installed = false
 
   process.env.NVM_DIR = nvmDir
-  process.env.NVM_HOME = nvmDir
 
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.readFileContent': () => `v${nodeVersion}`,
+      'FileSystem.exec': (command: string, args: readonly string[]) => {
+        expect(command).toBe('bash')
+        expect(args).toEqual(['-c', expect.stringContaining('nvm install 22.22.1')])
+        installed = true
+        return { exitCode: 0, stderr: '', stdout: '' }
+      },
       'FileSystem.exists': (path: string) => {
+        if (path === nvmrcPath) {
+          return true
+        }
         if (path === nodePath || path === npmPath) {
           return installed
         }
         return false
       },
-      'FileSystem.exec': (command: string, args: readonly string[]) => {
-        if (process.platform === 'win32') {
-          expect(command).toBe(join(nvmDir, 'nvm.exe'))
-          expect(args).toEqual(['install', nodeVersion])
-        } else {
-          expect(command).toBe('bash')
-          expect(args).toEqual(['-c', expect.stringContaining(`nvm install ${nodeVersion}`)])
-        }
-        installed = true
-        return { exitCode: 0, stderr: '', stdout: '' }
-      },
+      'FileSystem.readFileContent': () => 'v22.22.1',
     },
   })
   try {
@@ -129,18 +82,64 @@ test('getNpmPathFromNvmrc - installs missing node version and resolves npm path'
 
     expect(result).toBe(npmPath)
     expect(mockRpc.invocations).toEqual([
-      ['FileSystem.readFileContent', join(repoPath, '.nvmrc')],
+      ['FileSystem.exists', nvmrcPath],
+      ['FileSystem.readFileContent', nvmrcPath],
       ['FileSystem.exists', nodePath],
-      ...additionalNodeProbePaths.map((path) => ['FileSystem.exists', path]),
-      process.platform === 'win32'
-        ? ['FileSystem.exec', join(nvmDir, 'nvm.exe'), ['install', nodeVersion], {}]
-        : ['FileSystem.exec', 'bash', ['-c', expect.stringContaining(`nvm install ${nodeVersion}`)], {}],
+      ['FileSystem.exists', configNvmNodePath],
+      ['FileSystem.exec', 'bash', ['-c', expect.stringContaining('nvm install 22.22.1')], {}],
       ['FileSystem.exists', nodePath],
       ['FileSystem.exists', npmPath],
     ])
   } finally {
     process.env.NVM_DIR = oldNvmDir
-    process.env.NVM_HOME = oldNvmHome
-    restoreExecPath()
+  }
+})
+
+test('getNpmPathFromNvmrc - falls back to parent .nvmrc for nested folders', async () => {
+  const repoPath = '/test/repo/build'
+  const parentRepoPath = '/test/repo'
+  const repoNvmrcPath = `${parentRepoPath}/.nvmrc`
+  const buildNvmrcPath = `${repoPath}/.nvmrc`
+  const homeDir = homedir()
+  const oldNvmDir = process.env.NVM_DIR
+  const nvmDir = Path.join(homeDir, '.nvm')
+  const npmPath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'npm')
+  const nodePath = Path.join(nvmDir, 'versions', 'node', 'v22.22.1', 'bin', 'node')
+
+  process.env.NVM_DIR = nvmDir
+
+  const mockRpc = createMockRpc({
+    commandMap: {
+      'FileSystem.exec': () => {
+        throw new Error('unexpected exec')
+      },
+      'FileSystem.exists': (path: string) => {
+        if (path === buildNvmrcPath) {
+          return false
+        }
+        return path === repoNvmrcPath || path === nodePath || path === npmPath
+      },
+      'FileSystem.readFileContent': (path: string) => {
+        expect(path).toBe(repoNvmrcPath)
+        return '22.22.1'
+      },
+    },
+  })
+
+  try {
+    FileSystemWorker.set(mockRpc)
+
+    const result = await getNpmPathFromNvmrc(repoPath)
+
+    expect(result).toBe(npmPath)
+    expect(mockRpc.invocations).toEqual([
+      ['FileSystem.exists', buildNvmrcPath],
+      ['FileSystem.exists', repoNvmrcPath],
+      ['FileSystem.readFileContent', repoNvmrcPath],
+      ['FileSystem.exists', nodePath],
+      ['FileSystem.exists', npmPath],
+    ])
+  } finally {
+    process.env.NVM_DIR = oldNvmDir
   }
 })

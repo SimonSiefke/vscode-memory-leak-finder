@@ -1,23 +1,9 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as Explorer from '../Explorer/Explorer.ts'
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 
-export const create = ({ page, VError, expect }: CreateParams) => {
+export const create = ({ expect, page, VError, ideVersion, electronApp, platform }: CreateParams) => {
   return {
-    async shouldHaveImage(src: string) {
-      try {
-        await page.waitForIdle()
-        const preview = page.locator('.image-carousel-editor')
-        await expect(preview).toBeVisible()
-        await page.waitForIdle()
-        const image = preview.locator('.main-image')
-        await expect(image).toBeVisible()
-        await page.waitForIdle()
-        // TODO
-        // await expect(image).toHaveAttribute('complete', true)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to verify that images preview has image with src "${src}"`)
-      }
-    },
     async close() {
       try {
         await page.waitForIdle()
@@ -31,6 +17,18 @@ export const create = ({ page, VError, expect }: CreateParams) => {
         await expect(focusElement).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to hide images preview`)
+      }
+    },
+    async open(folderName: string) {
+      try {
+        const explorer = Explorer.create({ page, expect, VError, ideVersion, electronApp, platform })
+        await explorer.openContextMenu(folderName)
+        const menu = ContextMenu.create({ expect, page, VError, electronApp, ideVersion, platform })
+        await menu.select('Open in Images Preview')
+
+        // TODO wait for images preview to be visible
+      } catch (error) {
+        throw new VError(error, `Failed show images preview`)
       }
     },
     async next() {
@@ -59,6 +57,22 @@ export const create = ({ page, VError, expect }: CreateParams) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to click previous`)
+      }
+    },
+    async shouldHaveImage(src: string) {
+      try {
+        await page.waitForIdle()
+        const preview = page.locator('.image-carousel-editor')
+        await expect(preview).toBeVisible()
+        await page.waitForIdle()
+        const image = preview.locator('.main-image')
+        await expect(image).toBeVisible()
+        await page.waitForIdle()
+        // TODO
+        // await expect(image).toHaveAttribute('complete', true)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that images preview has image with src "${src}"`)
       }
     },
   }

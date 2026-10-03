@@ -1,14 +1,15 @@
-export const getFirstEvent = async (eventEmitter, eventMap) => {
-  const { promise, resolve } = Promise.withResolvers<any>()
+import type { Dynamic } from '../Types/Types.ts'
+export const getFirstEvent = async (eventEmitter: Dynamic, eventMap: Dynamic) => {
+  const { promise, resolve } = Promise.withResolvers<Dynamic>()
   const listenerMap = Object.create(null)
-  const cleanup = (value) => {
+  const cleanup = (value: Dynamic) => {
     for (const event of Object.keys(eventMap)) {
       eventEmitter.off(event, listenerMap[event])
     }
     resolve(value)
   }
   for (const [event, type] of Object.entries(eventMap)) {
-    const listener = (event) => {
+    const listener = (event: Dynamic) => {
       cleanup({
         event,
         type,

@@ -9,7 +9,7 @@ export const enrichClosuresWithReferences = (
   for (const [locationKey, closures] of Object.entries(leakedClosures)) {
     enriched[locationKey] = closures.map((closure) => {
       const references = referencesMap.get(closure.nodeIndex) || []
-      const sortedReferences = [...references].sort((a, b) => {
+      const sortedReferences = references.toSorted((a, b) => {
         // Sort by sourceNodeName first
         const sourceNodeNameA = a.sourceNodeName ?? ''
         const sourceNodeNameB = b.sourceNodeName ?? ''

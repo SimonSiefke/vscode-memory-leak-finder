@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as CompareDetachedDomNodes from '../CompareDetachedDomNodes/CompareDetachedDomNodes.ts'
@@ -6,40 +7,30 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-
 export const id = MeasureId.DetachedDomNodeRoots
-
 export const targets = [TargetId.Browser]
-
 export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
-
 export const start = (session: Session, objectGroup: string) => {
   return GetDetachedDomNodes.getDetachedDomNodes(session, objectGroup)
 }
-
 export const stop = async (session: Session, objectGroup: string) => {
   const result = await GetDetachedDomNodes.getDetachedDomNodes(session, objectGroup)
   return result
 }
-
 export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
-
 export const compare = CompareDetachedDomNodes.compareDetachedDomNodes
-
-const getCount = (instance) => {
+const getCount = (instance: Dynamic) => {
   return instance.count
 }
-
-const getTotal = (instance) => {
+const getTotal = (instance: Dynamic) => {
   const counts = instance.map(getCount)
   return Arrays.sum(counts)
 }
-
-export const isLeak = ({ after, before }) => {
+export const isLeak = ({ after, before }: Dynamic) => {
   return getTotal(after) > getTotal(before)
 }

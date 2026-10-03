@@ -15,6 +15,7 @@ export const getBinaryPath = async (
   commit: string,
   insidersCommit: string,
   updateUrl: string,
+  buildVscodeMinified: boolean = false,
 ): Promise<string> => {
   if (vscodePath) {
     return vscodePath
@@ -43,6 +44,7 @@ export const getBinaryPath = async (
       reposDir,
       nodeModulesCacheDir,
       useNice,
+      buildVscodeMinified,
       repoFolderName,
     )
   }

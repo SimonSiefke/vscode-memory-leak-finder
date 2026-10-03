@@ -1,6 +1,6 @@
-import type { TestContext } from '../types.js'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import type { TestContext } from '../types.js'
 
 export const skip = false
 
@@ -11,7 +11,7 @@ const completedFilePath = join(workspacePath, 'completed.txt')
 
 const waitForCompletedFile = async (): Promise<void> => {
   const maxWaitTime = 90_000
-  const pollInterval = 1_000
+  const pollInterval = 1000
   const startTime = performance.now()
 
   while (performance.now() - startTime < maxWaitTime) {
@@ -57,17 +57,17 @@ export const setup = async ({ ChatEditor, Editor, Electron, SideBar, Terminal, W
 
   await Workspace.setFiles([
     {
-      name: 'package.json',
       content: `{
   "name": "interactive-node-script",
   "private": true,
   "type": "module"
 }
 `,
+      name: 'package.json',
     },
     {
-      name: 'confirm.js',
       content: scriptContent,
+      name: 'confirm.js',
     },
   ])
 
@@ -81,7 +81,7 @@ export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> 
   await ChatEditor.sendMessage({
     message:
       'Run node confirm.js in the terminal. The script will pause briefly before it asks for confirmation. If it needs input, answer y and wait until it finishes successfully.',
-    model: 'GPT-4.1',
+    model: ChatEditor.Models.GPT41,
     verify: true,
   })
 

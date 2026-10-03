@@ -1,22 +1,18 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
-
-const isPropertyPromiseState = (property) => {
+const isPropertyPromiseState = (property: Dynamic) => {
   return property.name === '[[PromiseState]]'
 }
-
-const isPropertyPromiseResult = (property) => {
+const isPropertyPromiseResult = (property: Dynamic) => {
   return property.name === '[[PromiseResult]]'
 }
-
-const getPropertyPromiseState = (properties) => {
+const getPropertyPromiseState = (properties: Dynamic) => {
   return properties.find(isPropertyPromiseState)
 }
-
-const getPropertyPromiseResult = (properties) => {
+const getPropertyPromiseResult = (properties: Dynamic) => {
   return properties.find(isPropertyPromiseResult)
 }
-
-const prettifyPromise = (promise) => {
+const prettifyPromise = (promise: Dynamic) => {
   const { preview } = promise
   const { properties } = preview
   const state = getPropertyPromiseState(properties)
@@ -26,8 +22,7 @@ const prettifyPromise = (promise) => {
     state,
   }
 }
-
-export const comparePromises = (before, after) => {
+export const comparePromises = (before: Dynamic, after: Dynamic) => {
   Assert.array(before)
   Assert.array(after)
   const prettyBefore = before.map(prettifyPromise)

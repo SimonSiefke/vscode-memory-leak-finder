@@ -1,5 +1,8 @@
 import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
+import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
+import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
@@ -103,8 +106,10 @@ export const setupCursor = async ({
 
 export const launchCursor = async ({
   addDisposable,
+  callgrindConfig,
   clearExtensions,
   cursorVersion,
+  cpuPerformanceCountersFromStartConfig,
   cwd,
   downloadUserDataZipFileToken,
   downloadUserDataZipFileUrl,
@@ -117,13 +122,16 @@ export const launchCursor = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  linuxProcessTreeResourcesFromStartConfig,
   proxyTestFolderName: _proxyTestFolderName,
   useProxyMock,
   vscodePath,
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
+  callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   cursorVersion: string
+  cpuPerformanceCountersFromStartConfig: CpuPerformanceCountersFromStartConfig
   cwd: string
   downloadUserDataZipFileToken: string
   downloadUserDataZipFileUrl: string
@@ -136,6 +144,7 @@ export const launchCursor = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  linuxProcessTreeResourcesFromStartConfig: LinuxProcessTreeResourcesFromStartConfig
   proxyTestFolderName?: string
   useProxyMock: boolean
   vscodePath?: string
@@ -170,10 +179,14 @@ export const launchCursor = async ({
     const { child, pid } = await LaunchElectron.launchElectron({
       addDisposable,
       args,
+      callgrindConfig,
       cliPath: binaryPath,
+      cpuPerformanceCountersFromStartConfig,
       cwd,
       env,
       headlessMode,
+      linuxProcessTreeResourcesFromStartConfig,
+      platform: process.platform,
     })
     return {
       child,

@@ -1,6 +1,6 @@
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
-import { AddressInfo } from 'node:net'
+import type { AddressInfo } from 'node:net'
 import { afterEach, expect, test } from '@jest/globals'
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { handleHomePageRequest } from '../src/parts/HomePage/HomePage.ts'
 
 type TestServer = {
@@ -64,4 +64,15 @@ test('homepage handler serves an html overview at root', async () => {
   expect(text).toContain('/api/github/webhooks')
   expect(text).toContain('/api/user-data/upload')
   expect(text).toContain('/upload-user-data-dir')
+})
+
+test('homepage handler responds to head requests at root', async () => {
+  const server = await createTestServer()
+
+  const response = await fetch(server.url, {
+    method: 'HEAD',
+  })
+
+  expect(response.status).toBe(200)
+  expect(response.headers.get('content-type')).toContain('text/html')
 })

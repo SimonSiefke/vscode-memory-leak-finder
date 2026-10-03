@@ -87,6 +87,7 @@ export const generateApiTypes = async (): Promise<void> => {
     // Generate context interface
     const contextInterface = `export interface PageObjectContext {
   readonly page: any
+  readonly createPageObject?: (page: any) => Promise<any>
   readonly expect: any
   readonly VError: any
   readonly ideVersion?: {

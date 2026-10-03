@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import type { Session } from '../Session/Session.ts'
 import * as AddStackTracesToEventListeners from '../AddStackTracesToEventListeners/AddStackTracesToEventListeners.ts'
@@ -10,43 +11,34 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackEventListenerStackTraces from '../StartTrackEventListenerStackTraces/StartTrackEventListenerStackTraces.ts'
 import * as StopTrackingEventListenerStackTraces from '../StopTrackingEventListenerStackTraces/StopTrackingEventListenerStackTraces.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-
 export const id = MeasureId.EventListenersWithStackTrace
-
 export const targets = [TargetId.Browser]
-
 /**
  *
- * @param {any} session
+ * @param {unknown} session
  */
-
 export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
-
-export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup: Dynamic, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackEventListenerStackTraces.startTrackingEventListenerStackTraces(session, objectGroup)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   return result
 }
-
-export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup: Dynamic, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   const resultWithStackTraces = await AddStackTracesToEventListeners.addStackTracesToEventListeners(session, result)
   await StopTrackingEventListenerStackTraces.stopTrackingEventListenerStackTraces(session, objectGroup)
   return resultWithStackTraces
 }
-
 export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
-
 export const compare = CompareEventListenersWithStackTraces.compareEventListenersWithStackTraces
-
-export const isLeak = (leakedEventListeners) => {
+export const isLeak = (leakedEventListeners: Dynamic) => {
   return leakedEventListeners.length > 0
 }

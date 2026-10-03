@@ -4,7 +4,6 @@ import { deriveMeasureRequest } from '../src/parts/DeriveMeasureRequest/DeriveMe
 test('deriveMeasureRequest uses pr base sha and head owner branch by default', () => {
   const result = deriveMeasureRequest({
     actorLogin: 'SimonSiefke',
-    commentId: 456,
     command: {
       cliArgs: ['--measure', 'named-function-count3', '--only', 'chat-editor-fix', '--inspect-extensions'],
       command: 'run',
@@ -16,10 +15,12 @@ test('deriveMeasureRequest uses pr base sha and head owner branch by default', (
         measureNode: false,
         only: 'chat-editor-fix',
         restartBetween: false,
+        runNetworkTestsAnyway: false,
         runSkippedTestsAnyway: false,
       },
       mention: '@vscode-memory-leak-finder',
     },
+    commentId: 456,
     issueNumber: 123,
     pullRequest: {
       baseRef: 'main',

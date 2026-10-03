@@ -128,16 +128,16 @@ const homePageHtml = `<!doctype html>
 `
 
 export const handleHomePageRequest = (request: IncomingMessage, response: ServerResponse): boolean => {
-  if (request.method !== 'GET') {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
     return false
   }
-  const path = request.url?.split('?')[0] ?? ''
+  const path = request.url?.split('?', 1)[0] ?? ''
   if (path !== '/') {
     return false
   }
   response.writeHead(200, {
     'content-type': 'text/html; charset=utf-8',
   })
-  response.end(homePageHtml)
+  response.end(request.method === 'HEAD' ? undefined : homePageHtml)
   return true
 }
