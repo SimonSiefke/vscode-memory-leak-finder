@@ -40,7 +40,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await this.selectCommand(httpOption, true)
 
         const quickPickLocator = page.locator('.quick-input-widget')
-        const quickPickInput = quickPickLocator.locator('[aria-autocomplete="list"]')
+        const quickPickInput = quickPickLocator.locator('.ibwrapper .input')
         await expect(quickPickInput).toHaveAttribute('aria-label', `URL of the MCP server (e.g., http://localhost:3000) - Enter Server URL`)
         await page.waitForIdle()
         await quickPickInput.type(`${serverUrl}/mcp`)
