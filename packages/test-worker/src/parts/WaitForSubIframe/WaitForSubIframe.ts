@@ -24,7 +24,7 @@ export const waitForSubIframe = async ({
 
   let utilityContext = undefined
   if (injectUtilityScript) {
-    const utilityExecutionContextName = 'utility-iframe'
+    const utilityExecutionContextName = `utility-iframe-${subFrame.id}`
     utilityContext = await addUtilityExecutionContext(sessionRpc, utilityExecutionContextName, subFrame.id)
   }
 

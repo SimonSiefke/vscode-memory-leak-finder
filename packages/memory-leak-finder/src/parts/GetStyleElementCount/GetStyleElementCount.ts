@@ -8,5 +8,5 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @returns {Promise<number>}
  */
 export const getCanvasCount = async (session: Session, objectGroup: string) => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.StyleElement, objectGroup)
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.StyleElement)
 }

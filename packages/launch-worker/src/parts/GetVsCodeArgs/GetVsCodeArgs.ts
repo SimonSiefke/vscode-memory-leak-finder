@@ -31,16 +31,15 @@ export const getVscodeArgs = ({
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
-    '--new-window',
     '--no-sandbox',
+    '--force-disable-user-env',
     '--disable-updates',
     '--skip-welcome',
     '--skip-release-notes',
     '--disable-workspace-trust',
-    '--extensions-dir',
-    extensionsDir,
-    '--user-data-dir',
-    userDataDir,
+    `--extensions-dir=${extensionsDir}`,
+    `--user-data-dir=${userDataDir}`,
+    '--enable-proposed-api=simon.speech-session-race-sample',
   ]
   if (platform === 'linux') {
     args.push('--ozone-platform=x11')
@@ -54,6 +53,8 @@ export const getVscodeArgs = ({
 
   if (!enableExtensions) {
     args.push('--disable-extensions')
+    args.push('--disable-extension=GitHub.copilot')
+    args.push('--disable-extension=GitHub.copilot-chat')
   }
 
   if (inspectPtyHost) {

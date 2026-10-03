@@ -39,10 +39,14 @@ export interface StartRunningOptions {
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
+  readonly runNetworkTestsAnyway: boolean
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
   readonly setupOnly: boolean
+  readonly shardCount?: number | undefined
+  readonly shardIndex?: number | undefined
+  readonly startupRuns: number
   readonly timeoutBetween: number
   readonly timeouts: boolean
   readonly trackFunctions: boolean

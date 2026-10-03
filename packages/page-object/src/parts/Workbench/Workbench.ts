@@ -13,7 +13,7 @@ type QuickPickApi = {
   executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
   getVisibleCommands: () => Promise<string[]>
   pressEnter: () => Promise<void>
-  select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<void>
+  select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<number>
   showCommands: (options?: { pressKeyOnce?: boolean }) => Promise<void>
   type: (value: string) => Promise<void>
 }
@@ -25,6 +25,7 @@ type WorkbenchDependencies = {
 
 export interface ISimplifedWindow {
   readonly close: () => Promise<void>
+  readonly closeGracefully: () => Promise<void>
   readonly locator?: (selector: string) => any
   readonly sessionRpc?: any
   readonly shouldBeVisible: () => Promise<void>
@@ -290,6 +291,10 @@ export const createWithDependencies = (
             }
           },
           locator: (selector: string) => getNewWindowPage().locator(selector),
+          evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
+            const page = getNewWindowPage()
+            return page.evaluateInMainWorld(options)
+          },
           sessionRpc: newWindowPage.sessionRpc,
           async shouldBeVisible() {
             const page = getNewWindowPage()
@@ -329,6 +334,9 @@ export const createWithDependencies = (
       } catch (error) {
         throw new VError(error, `Failed to reload window`)
       }
+    },
+    evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
+      return page.evaluateInMainWorld(options)
     },
     async shouldBeVisible() {
       const workbench = page.locator('.monaco-workbench')

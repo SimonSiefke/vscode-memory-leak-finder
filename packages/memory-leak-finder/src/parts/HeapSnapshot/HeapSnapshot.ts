@@ -16,3 +16,14 @@ export const takeHeapSnapshot = async (session: Session, outFile: Dynamic, optio
   await stream.start()
   await pipelinePromise
 }
+
+export const takeTrackingHeapSnapshot = async (session: Session, outFile: string, options: Dynamic = {}) => {
+  Assert.object(session)
+  Assert.string(outFile)
+  await mkdir(dirname(outFile), { recursive: true })
+  const stream = HeapSnapshotStream.createTrackingSnapshot(session, options)
+  const writeStream = createWriteStream(outFile)
+  const pipelinePromise = pipeline(stream, writeStream)
+  await stream.start()
+  await pipelinePromise
+}

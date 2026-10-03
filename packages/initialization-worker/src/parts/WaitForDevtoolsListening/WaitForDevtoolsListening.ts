@@ -6,12 +6,13 @@ const RE_LISTENING_ON = /DevTools listening on (ws:\/\/.*)/
 
 interface ReadableStreamLike {
   emit(event: 'data', data: string): boolean
-  on(event: 'data', listener: (data: string) => void): unknown
+  on(event: string, listener: (...args: any[]) => void): unknown
+  removeListener(event: string, listener: (...args: any[]) => void): unknown
 }
 
-const errorChecker = async (data: string, stream: ReadableStreamLike): Promise<void> => {
+const errorChecker = async (data: string, stream: ReadableStreamLike, signal: AbortSignal): Promise<void> => {
   if (IsImportantErrorMessage.isImportantErrorMessage(data)) {
-    const error = await GetElectronErrorMessage.getElectronErrorMessage(data, stream)
+    const error = await GetElectronErrorMessage.getElectronErrorMessage(data, stream, signal)
     throw error
   }
 }

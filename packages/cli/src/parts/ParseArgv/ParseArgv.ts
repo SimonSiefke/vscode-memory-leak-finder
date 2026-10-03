@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { join, normalize, resolve } from 'node:path'
 import * as Ide from '../Ide/Ide.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
 import { root } from '../Root/Root.ts'
@@ -81,6 +81,14 @@ const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-skipped-tests-anyway')
 }
 
+const parseShowSkippedFailedTestDuration = (argv: readonly string[], env: NodeJS.ProcessEnv): boolean => {
+  return argv.includes('--show-skipped-failed-test-duration') || Boolean(env.CI || env.GITHUB_ACTIONS)
+}
+
+const parseRunNetworkTestsAnyway = (argv: readonly string[]): boolean => {
+  return argv.includes('--run-network-tests-anyway')
+}
+
 const parseAllowCopilotAuthInCi = (argv: readonly string[]): boolean => {
   return argv.includes('--allow-copilot-auth-in-ci')
 }
@@ -138,11 +146,61 @@ const parseRuns = (argv: readonly string[]): number => {
   return 1
 }
 
+const parseShard = (argv: readonly string[]): { readonly shardCount: number; readonly shardIndex: number } | undefined => {
+  let found = false
+  let value: string | undefined
+  for (let index = 0; index < argv.length; index++) {
+    const argument = argv[index]
+    if (argument === '--shard') {
+      found = true
+      value = argv[index + 1]
+    } else if (argument.startsWith('--shard=')) {
+      found = true
+      value = argument.slice('--shard='.length)
+    }
+  }
+  if (!found) {
+    return undefined
+  }
+  value ||= ''
+  const match = /^(\d+)\/(\d+)$/.exec(value)
+  if (!match) {
+    throw new Error('--shard must use the format <index>/<count>, for example --shard=1/2')
+  }
+  const shardIndex = Number.parseInt(match[1])
+  const shardCount = Number.parseInt(match[2])
+  if (
+    !Number.isSafeInteger(shardIndex) ||
+    !Number.isSafeInteger(shardCount) ||
+    shardIndex < 1 ||
+    shardCount < 1 ||
+    shardIndex > shardCount
+  ) {
+    throw new Error('--shard index and count must be positive integers, and index must not exceed count')
+  }
+  return {
+    shardCount,
+    shardIndex,
+  }
+}
+
+const parseStartupRuns = (argv: readonly string[]): number => {
+  if (argv.includes('--startup-runs')) {
+    return parseArgvNumber(argv, '--startup-runs')
+  }
+  return 1
+}
+
 const parseCwd = (cwd: string, argv: readonly string[]): string => {
   if (argv.includes('--cwd')) {
     return parseArgvString(argv, '--cwd')
   }
   return join(root, 'packages/e2e')
+}
+
+const isWebsitesE2e = (cwd: string): boolean => {
+  const relativeWebsitesE2ePath = join('packages', 'websites-e2e')
+  return normalize(cwd) === relativeWebsitesE2ePath || resolve(cwd) === join(root, relativeWebsitesE2ePath)
 }
 
 const parseMeasure = (argv: readonly string[]): string => {
@@ -170,6 +228,19 @@ const parseMeasureAfter = (argv: readonly string[]): boolean => {
 
 const parseMeasureNode = (argv: readonly string[]): boolean => {
   return argv.includes('--measure-node')
+}
+
+const isIpcMessageCountMeasure = (measure: string): boolean => {
+  return measure === 'ipc-message-count' || measure === 'ipcMessageCount' || measure === 'ipcmessagecount'
+}
+
+const isFromStartMeasure = (measure: string): boolean => {
+  return (
+    measure === 'cpu-performance-counters-from-start' ||
+    measure === 'cpuPerformanceCountersFromStart' ||
+    measure === 'linux-process-tree-resources-from-start' ||
+    measure === 'linuxProcessTreeResourcesFromStart'
+  )
 }
 
 const parseProcessRootStrategy = (argv: readonly string[]): string => {
@@ -333,6 +404,13 @@ const parseClearExtensions = (argv: readonly string[]): boolean => {
   return argv.includes('--clear-extensions')
 }
 
+const parseColor = (argv: readonly string[]): boolean => {
+  if (argv.includes('--color')) {
+    return parseArgvString(argv, '--color') !== 'false'
+  }
+  return true
+}
+
 const parseUpdateUrl = (argv: readonly string[]): string => {
   if (argv.includes('--update-url')) {
     return parseArgvString(argv, '--update-url')
@@ -355,7 +433,25 @@ const parsePageObjectPath = (argv: readonly string[]): string => {
 }
 
 const parseTrackFunctions = (argv: readonly string[]): boolean => {
-  return argv.includes('--track-functions') || parseMeasure(argv) === 'tracked-functions'
+  const measure = parseMeasure(argv)
+  return (
+    argv.includes('--track-functions') ||
+    measure === 'tracked-functions' ||
+    measure === 'tracked-allocations' ||
+    measure === 'trackedAllocations' ||
+    measure === 'tracked-allocations-from-start' ||
+    measure === 'trackedAllocationsFromStart' ||
+    measure === 'tracked-allocations-with-stack-traces' ||
+    measure === 'trackedAllocationsWithStackTraces' ||
+    measure === 'tracked-allocation-leaks' ||
+    measure === 'trackedAllocationLeaks' ||
+    measure === 'tracked-allocation-performance' ||
+    measure === 'trackedAllocationPerformance' ||
+    measure === 'tracked-allocation-timeline' ||
+    measure === 'trackedAllocationTimeline' ||
+    measure === 'tracked-timeouts' ||
+    measure === 'trackedTimeouts'
+  )
 }
 
 const parseOpenDevtools = (argv: readonly string[]): boolean => {
@@ -366,7 +462,7 @@ const parseResolveExtensionSourceMaps = (argv: readonly string[]): boolean => {
   return argv.includes('--resolve-extension-source-maps')
 }
 
-export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
+export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv = process.env) => {
   const platform = parsePlatform(processPlatform, argv)
   const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
@@ -374,7 +470,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const buildVscodeMinified = parseBuildVscodeMinified(argv)
   const checkLeaks = parseCheckLeaks(argv)
   const clearExtensions = parseClearExtensions(argv)
-  const color = true
+  const color = parseColor(argv)
   const commit = parseCommit(argv)
   const convertRequestsToMocks = parseConvertRequestsToMocks(argv)
   const createAllMockDataZip = parseCreateAllMockDataZip(argv)
@@ -386,14 +482,16 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const useStableVscodeRepoPath = parseUseStableVscodeRepoPath(argv)
   const downloadUserDataZipFileToken = parseDownloadUserDataZipFileToken(argv)
   const downloadUserDataZipFileUrl = parseDownloadUserDataZipFileUrl(argv)
-  const enableExtensions = parseEnableExtensions(argv)
+  const measure = parseMeasure(argv)
+  const memoryCity = measure === 'memory-city' || measure === 'memoryCity'
+  const enableExtensions = parseEnableExtensions(argv) || memoryCity
   const enableProxy = parseEnableProxy(argv)
   const filter = parseFilter(argv)
   const headless = parseHeadless(argv)
   const ide = parseIde(argv)
   const ideVersion = ''
   const insidersCommit = parseInsidersCommit(parsedVersion, argv)
-  const inspectExtensions = parseInspectExtensions(argv)
+  const inspectExtensions = parseInspectExtensions(argv) || memoryCity
   const inspectExtensionsPort = parseInspectExtensionsPort(argv)
   const inspectIntegratedBrowser = parseInspectIntegratedBrowser(argv)
   const inspectProcess = parseInspectProcess(argv)
@@ -401,9 +499,14 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const inspectPtyHostPort = parseInspectPtyHostPort(argv)
   const inspectSharedProcess = parseInspectSharedProcess(argv)
   const inspectSharedProcessPort = parseInspectSharedProcessPort(argv)
-  const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  if (checkLeaks && isWebsitesE2e(cwd) && !inspectIntegratedBrowser) {
+    throw new Error('websites-e2e test measures can only be run with --inspect-integrated-browser')
+  }
+  if (isIpcMessageCountMeasure(measure) && !measureNode) {
+    throw new Error('--measure ipc-message-count requires --measure-node')
+  }
   if (inspectIntegratedBrowser && (measureNode || inspectSharedProcess || inspectExtensions || inspectPtyHost || inspectProcess)) {
     throw new Error(
       '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
@@ -415,7 +518,14 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const restartBetween = parseRestartBetween(argv)
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
+  const shard = parseShard(argv)
+  const startupRuns = parseStartupRuns(argv)
+  if (startupRuns > 1 && !isFromStartMeasure(measure)) {
+    throw new Error('--startup-runs can only be used with a from-start measure')
+  }
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
+  const showSkippedFailedTestDuration = parseShowSkippedFailedTestDuration(argv, env)
+  const runNetworkTestsAnyway = parseRunNetworkTestsAnyway(argv)
   const allowCopilotAuthInCi = parseAllowCopilotAuthInCi(argv)
   const screencastQuality = parseScreencastQuality(argv)
   const setupOnly = parseSetupOnly(argv)
@@ -480,10 +590,13 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     resolveVscodeCommitHash,
     restartBetween,
     runMode,
+    runNetworkTestsAnyway,
     runs,
     runSkippedTestsAnyway,
+    showSkippedFailedTestDuration,
     screencastQuality,
     setupOnly,
+    startupRuns,
     timeoutBetween,
     timeouts,
     trackFunctions,
@@ -495,5 +608,6 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     vscodeVersion,
     watch,
     workers,
+    ...(shard || {}),
   }
 }

@@ -37,10 +37,18 @@ export const combine = (...measures: Dynamic[]) => {
       await measure.releaseResources()
     }
   }
+  const runCompletion = async () => {
+    for (const measure of measures) {
+      if (measure.runCompletion) {
+        await measure.runCompletion()
+      }
+    }
+  }
   return {
     compare,
     id: MeasureId.Combined,
     releaseResources,
+    runCompletion,
     start,
     stop,
   }

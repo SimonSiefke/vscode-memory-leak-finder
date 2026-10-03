@@ -15,6 +15,7 @@ test('deriveMeasureRequest uses pr base sha and head owner branch by default', (
         measureNode: false,
         only: 'chat-editor-fix',
         restartBetween: false,
+        runNetworkTestsAnyway: false,
         runSkippedTestsAnyway: false,
       },
       mention: '@vscode-memory-leak-finder',

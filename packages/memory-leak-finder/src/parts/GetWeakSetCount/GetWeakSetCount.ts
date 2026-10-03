@@ -8,5 +8,5 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @returns {Promise<number>}
  */
 export const getWeakSetCount = (session: Session, objectGroup: string) => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.WeakSet, objectGroup)
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.WeakSet)
 }

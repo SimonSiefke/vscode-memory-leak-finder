@@ -2,6 +2,8 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
+export const requiresNetwork = true
+
 const testId = 'simple-browser-add-console-logs-to-chat'
 const testUrl = 'http://localhost:3001/console-errors.html'
 const consoleErrorText = 'Simple browser console error for chat context'

@@ -1,36 +1,42 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = 1
-
-export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Git, QuickPick, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      content: '<h1>hello world</h1>',
-      name: 'index.html',
+      content: '# Repository A',
+      name: 'a/README.md',
+    },
+    {
+      content: '# Repository B',
+      name: 'b/README.md',
     },
   ])
-  await Workspace.initializeGitRepository()
-  await Editor.closeAll()
-  await Explorer.focus()
+  await Git.initRepository('a')
+  await Git.initRepository('b')
+  await QuickPick.waitForCommand('Git: Open Repository')
+  await Git.openRepository('a')
+  await Git.openRepository('b')
   await ActivityBar.showSourceControl()
 }
 
-export const run = async ({ Git, SourceControl, Workspace }: TestContext): Promise<void> => {
-  const git = Git as typeof Git & {
-    openRepository(relativePath: string): Promise<void>
-  }
-
-  await SourceControl.shouldHaveRepositoryCount(1)
-
-  await Workspace.add({
-    content: '# nested repository',
-    name: 'nested-repo/README.md',
-  })
-  await Git.initRepository('nested-repo')
-  await git.openRepository('nested-repo')
+export const run = async ({ Git, SourceControl }: TestContext): Promise<void> => {
   await SourceControl.shouldHaveRepositoryCount(2)
+  await SourceControl.shouldHaveRepository('a')
+  await SourceControl.shouldHaveRepository('b')
 
-  await SourceControl.closeRepository('nested-repo')
-  await Workspace.remove('nested-repo')
+  await Git.closeRepository('a')
+  await SourceControl.shouldNotHaveRepository('a')
   await SourceControl.shouldHaveRepositoryCount(1)
+
+  await Git.reopenClosedRepository('a')
+  await SourceControl.shouldHaveRepositoryCount(2)
+  await SourceControl.shouldHaveRepository('a')
+  await SourceControl.shouldHaveRepository('b')
+}
+
+export const teardown = async ({ Git, SourceControl, Workspace }: TestContext): Promise<void> => {
+  await Git.closeRepository('a')
+  await Git.closeRepository()
+  await SourceControl.shouldHaveRepositoryCount(0)
+  await Workspace.setFiles([])
 }

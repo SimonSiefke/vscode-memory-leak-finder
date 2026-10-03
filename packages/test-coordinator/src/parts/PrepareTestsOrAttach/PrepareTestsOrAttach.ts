@@ -40,6 +40,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
+  readonly preparedVscodePath?: string
   readonly proxyTestFolderName: string
   readonly recordVideo: boolean
   readonly runMode: number
@@ -84,6 +85,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     openDevtools,
     pageObjectPath,
     platform,
+    preparedVscodePath = '',
     proxyTestFolderName,
     recordVideo,
     runMode,
@@ -124,6 +126,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       openDevtools,
       pageObjectPath,
       platform,
+      preparedVscodePath,
       proxyTestFolderName,
       recordVideo,
       runMode,

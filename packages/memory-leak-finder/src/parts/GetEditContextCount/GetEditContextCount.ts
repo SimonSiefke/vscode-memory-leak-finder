@@ -5,7 +5,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 export const getEditContextCount = async (session: Session, objectGroup: string): Promise<number> => {
   try {
-    return await GetObjectCount.getObjectCount(session, PrototypeExpression.EditContext, objectGroup)
+    return await GetObjectCount.getObjectCount(session, PrototypeExpression.EditContext)
   } catch (error) {
     throw new VError(error, `Failed to get edit context count`)
   }

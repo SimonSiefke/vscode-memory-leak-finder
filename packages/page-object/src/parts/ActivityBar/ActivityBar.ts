@@ -247,11 +247,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="${ariaLabel}"])`)
         const expanded = await activityBarItem.getAttribute('aria-expanded')
-        if (expanded === 'false') {
+        const sideBar = page.locator('.sidebar')
+        const sideBarVisible = await sideBar.isVisible()
+        if (!sideBarVisible) {
+          await activityBarItem.clickExponential({
+            waitFor: sideBar,
+          })
+        } else if (expanded === 'false') {
           await activityBarItem.click()
         }
         await page.waitForIdle()
-        const sideBar = page.locator('.sidebar')
         const title = sideBar.locator('.composite.title')
         await expect(title).toHaveText(titleLabel)
         await page.waitForIdle()
