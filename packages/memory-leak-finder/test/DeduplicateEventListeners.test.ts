@@ -44,3 +44,42 @@ test('deduplicateEventListeners', () => {
     },
   ])
 })
+
+test('deduplicateEventListeners keeps event types separate at the same location', () => {
+  const stack = ['listener (file:///framework.js:1:2)']
+  const eventListeners = [
+    {
+      description: 'listener',
+      objectId: '1',
+      sourceMaps: [''],
+      stack,
+      type: 'click',
+    },
+    {
+      description: 'listener',
+      objectId: '2',
+      sourceMaps: [''],
+      stack,
+      type: 'keydown',
+    },
+  ]
+
+  expect(DeduplicateEventListeners.deduplicateEventListeners(eventListeners)).toEqual([
+    {
+      count: 1,
+      description: 'listener',
+      objectId: '1',
+      sourceMaps: [''],
+      stack,
+      type: 'click',
+    },
+    {
+      count: 1,
+      description: 'listener',
+      objectId: '2',
+      sourceMaps: [''],
+      stack,
+      type: 'keydown',
+    },
+  ])
+})
