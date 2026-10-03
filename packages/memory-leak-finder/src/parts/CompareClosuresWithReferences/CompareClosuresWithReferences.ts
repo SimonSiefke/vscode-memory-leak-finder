@@ -1,12 +1,17 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { launchHeapSnapshotWorker } from '../LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts'
-
-const getThreshold = (context: any): number => {
+const getThreshold = (context: Dynamic): number => {
   const defaultRuns = 2
   const threshold = context && Number.isFinite(context.runs) ? context.runs : defaultRuns
   return threshold
 }
-
-export const compareClosuresWithReferences = async (beforePath: string, after: { heapSnapshotPath: string }, context: any) => {
+export const compareClosuresWithReferences = async (
+  beforePath: string,
+  after: {
+    heapSnapshotPath: string
+  },
+  context: Dynamic,
+) => {
   const afterPath = after.heapSnapshotPath
   const minCount = getThreshold(context)
   const options = {

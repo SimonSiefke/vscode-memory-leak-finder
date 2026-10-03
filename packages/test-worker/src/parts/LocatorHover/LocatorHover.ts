@@ -3,8 +3,9 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 
 // TODO duplicate code
 // TODO pass page session as parameter
-export const hover = async (locator) => {
+export const hover = async (locator, options) => {
   Assert.object(locator)
+  Assert.object(options)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
       arguments: [
@@ -17,6 +18,7 @@ export const hover = async (locator) => {
         {
           value: {
             bubbles: true,
+            ...options,
           },
         },
       ],

@@ -4,7 +4,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 /**
  *
- * @param {any} session
+ * @param {unknown} session
  * @returns {Promise<number[]>}
  */
 export const getSymbols = async (session: Session, objectGroup: string) => {

@@ -1,4 +1,5 @@
-const prettifyFlatScopeListItem = (flatScopeListItem) => {
+import type { Dynamic } from '../Types/Types.ts'
+const prettifyFlatScopeListItem = (flatScopeListItem: Dynamic) => {
   const { value } = flatScopeListItem
   const { description, objectId, subtype, type } = value
   return {
@@ -8,7 +9,6 @@ const prettifyFlatScopeListItem = (flatScopeListItem) => {
     type,
   }
 }
-
-export const prettifyFlatScopeList = (flatScopeList) => {
+export const prettifyFlatScopeList = (flatScopeList: Dynamic) => {
   return flatScopeList.map(prettifyFlatScopeListItem)
 }

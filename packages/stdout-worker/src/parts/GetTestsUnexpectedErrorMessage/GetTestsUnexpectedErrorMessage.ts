@@ -3,10 +3,10 @@ import * as Indent from '../Indent/Indent.ts'
 import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
 
 export const getTestsUnexpectedErrorMessage = ({
-  stack,
   codeFrame,
-  type,
   message,
+  stack,
+  type,
 }: {
   stack?: string
   type?: string

@@ -1,5 +1,6 @@
 import * as CommandMap from '../CommandMap/CommandMap.ts'
 import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
+import * as CreateAllMockDataZip from '../CreateAllMockDataZip/CreateAllMockDataZip.ts'
 import * as InitialStart from '../InitialStart/InitialStart.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
 import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
@@ -9,7 +10,11 @@ import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 export const run = async (platform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
   await StdoutWorker.initialize()
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
-  const options = ParseArgv.parseArgv(platform, arch, argv)
+  if (argv.includes('--create-all-mock-data-zip')) {
+    await CreateAllMockDataZip.createAllMockDataZip()
+    return
+  }
+  const options = ParseArgv.parseArgv(platform, arch, argv, env)
 
   // Parse isGithubActions once at startup
   const isGithubActions = Boolean(env.GITHUB_ACTIONS)
@@ -19,7 +24,9 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     ...StdinDataState.getState(),
     arch: options.arch,
     bisect: options.bisect,
+    buildVscodeMinified: options.buildVscodeMinified,
     checkLeaks: options.checkLeaks,
+    color: options.color,
     // @ts-ignore
     commit: options.commit,
     continueValue: options.continueValue,
@@ -31,6 +38,8 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     insidersCommit: options.insidersCommit,
     inspectExtensions: options.inspectExtensions,
     inspectExtensionsPort: options.inspectExtensionsPort,
+    inspectIntegratedBrowser: options.inspectIntegratedBrowser,
+    inspectProcess: options.inspectProcess,
     inspectPtyHost: options.inspectPtyHost,
     inspectPtyHostPort: options.inspectPtyHostPort,
     inspectSharedProcess: options.inspectSharedProcess,
@@ -42,11 +51,17 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     measureNode: options.measureNode,
     pageObjectPath: options.pageObjectPath,
     platform: options.platform,
+    processRootStrategy: options.processRootStrategy,
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
+    runNetworkTestsAnyway: options.runNetworkTestsAnyway,
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
+    showSkippedFailedTestDuration: options.showSkippedFailedTestDuration,
+    shardCount: options.shardCount,
+    shardIndex: options.shardIndex,
+    startupRuns: options.startupRuns,
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
@@ -57,5 +72,5 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     watch: options.watch,
     workers: options.workers,
   })
-  return InitialStart.initialStart({ ...options, isGithubActions } as ReturnType<typeof ParseArgv.parseArgv> & { isGithubActions: boolean })
+  return InitialStart.initialStart({ ...options, isGithubActions })
 }

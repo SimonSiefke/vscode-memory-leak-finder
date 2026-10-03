@@ -8,6 +8,7 @@ export const downloadAndBuildVscodeFromCommit = async (
   reposDir: string,
   nodeModulesCacheDir: string,
   useNice: boolean,
+  buildVscodeMinified: boolean,
 ): Promise<string> => {
   await using rpc = await RepositoryWorker.launch()
   const path = await rpc.invoke(
@@ -19,6 +20,7 @@ export const downloadAndBuildVscodeFromCommit = async (
     reposDir,
     nodeModulesCacheDir,
     useNice,
+    buildVscodeMinified,
   )
   return path
 }

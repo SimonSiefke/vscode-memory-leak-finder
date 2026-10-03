@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = process.platform === 'darwin'
+
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {

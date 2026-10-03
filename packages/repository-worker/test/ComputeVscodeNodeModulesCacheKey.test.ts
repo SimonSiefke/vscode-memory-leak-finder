@@ -1,48 +1,54 @@
-import { test, expect, jest } from '@jest/globals'
-import { MockRpc } from '@lvce-editor/rpc'
-import { pathToFileURL } from 'node:url'
+import { expect, test } from '@jest/globals'
+import { createMockRpc } from '@lvce-editor/rpc'
 import { computeVscodeNodeModulesCacheKey } from '../src/parts/ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.ts'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { getHash } from '../src/parts/GetHash/GetHash.ts'
 
-test('computeVscodeNodeModulesCacheKey - returns a string', async () => {
-  const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation((method) => {
-    if (method === 'FileSystem.findFiles') {
-      return ['package-lock.json']
-    }
-    if (method === 'FileSystem.readFileContent') {
-      return 'mock package-lock content'
-    }
-    throw new Error(`unexpected method ${method}`)
-  })
-
-  const mockRpc = MockRpc.create({
-    commandMap: {},
-    invoke: mockInvoke,
+test('computeVscodeNodeModulesCacheKey - hashes platform, arch, nvmrc, and sorted package-lock contents', async () => {
+  const folder = '/test/repo'
+  const mockRpc = createMockRpc({
+    commandMap: {
+      'FileSystem.findFiles': () => ['src/package-lock.json', 'package-lock.json'],
+      'FileSystem.readFileContent': (path: string) => {
+        switch (path) {
+          case `${folder}/.nvmrc`:
+            return 'v22.15.0'
+          case `${folder}/package-lock.json`:
+            return 'root-lock'
+          case `${folder}/src/package-lock.json`:
+            return 'nested-lock'
+          default:
+            throw new Error(`unexpected path ${path}`)
+        }
+      },
+    },
   })
   FileSystemWorker.set(mockRpc)
 
-  const result = await computeVscodeNodeModulesCacheKey(pathToFileURL('/nonexistent/path').href)
-  expect(typeof result).toBe('string')
-  expect(result.length).toBeGreaterThan(0)
-  expect(mockInvoke).toHaveBeenCalled()
+  const result = await computeVscodeNodeModulesCacheKey(folder)
+
+  expect(result).toBe(getHash([process.platform, process.arch, 'v22.15.0', 'root-lock', 'nested-lock']))
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.findFiles', ['**/package-lock.json', '.vscode/**/package-lock.json'], { cwd: folder, exclude: ['**/node_modules/**'] }],
+    ['FileSystem.readFileContent', `${folder}/.nvmrc`],
+    ['FileSystem.readFileContent', `${folder}/package-lock.json`],
+    ['FileSystem.readFileContent', `${folder}/src/package-lock.json`],
+  ])
 })
 
 test('computeVscodeNodeModulesCacheKey - handles errors gracefully', async () => {
-  const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation(() => {
-    throw new Error('File not found')
-  })
-
-  const mockRpc = MockRpc.create({
-    commandMap: {},
-    invoke: mockInvoke,
+  const folder = '/nonexistent/path'
+  const mockRpc = createMockRpc({
+    commandMap: {
+      'FileSystem.findFiles': () => {
+        throw new Error('File not found')
+      },
+    },
   })
   FileSystemWorker.set(mockRpc)
 
-  // Should throw a VError with proper error message
-  await expect(computeVscodeNodeModulesCacheKey(pathToFileURL('/nonexistent/path').href)).rejects.toThrow(
-    'Failed to compute VS Code node_modules cache key',
-  )
-  expect(mockInvoke).toHaveBeenCalled()
+  await expect(computeVscodeNodeModulesCacheKey(folder)).rejects.toThrow('Failed to compute VS Code node_modules cache key')
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.findFiles', ['**/package-lock.json', '.vscode/**/package-lock.json'], { cwd: folder, exclude: ['**/node_modules/**'] }],
+  ])
 })

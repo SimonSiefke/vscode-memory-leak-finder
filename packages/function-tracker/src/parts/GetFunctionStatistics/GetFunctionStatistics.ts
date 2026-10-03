@@ -1,5 +1,5 @@
-import { getSessionRpc } from '../SessionState/SessionState.ts'
 import type { FunctionStatistics } from '../Types/Types.ts'
+import { getSessionRpc } from '../SessionState/SessionState.ts'
 
 export const getFunctionStatistics = async (): Promise<FunctionStatistics> => {
   const currentSessionRpc = getSessionRpc()

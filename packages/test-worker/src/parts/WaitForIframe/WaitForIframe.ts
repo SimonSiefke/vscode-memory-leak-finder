@@ -2,13 +2,43 @@ import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUti
 import { createSessionRpcConnection } from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import { DevtoolsProtocolTarget, DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
-const findMatchingIframe = (targets, expectedUrl) => {
+interface TargetInfo {
+  readonly targetId: string
+  readonly title: string
+  readonly type: string
+  readonly url: string
+}
+
+const findMatchingIframe = (targets, expectedUrl, index) => {
+  let matchingIndex = 0
   for (const target of targets) {
-    if (expectedUrl.test(target.title)) {
-      return target
+    if (expectedUrl.test(target.url) || expectedUrl.test(target.title)) {
+      if (matchingIndex === index) {
+        return target
+      }
+      matchingIndex++
     }
   }
   return undefined
+}
+
+const waitForMatchingIframe = async (sessionRpc, url, index, timeout = 30_000) => {
+  const deadline = performance.now() + timeout
+  let targets: readonly TargetInfo[] = []
+  while (performance.now() < deadline) {
+    targets = (await DevtoolsProtocolTarget.getTargets(sessionRpc)) as readonly TargetInfo[]
+    const matchingIframe = findMatchingIframe(
+      targets.filter((target) => target.type === 'iframe'),
+      url,
+      index,
+    )
+    if (matchingIframe) {
+      return matchingIframe
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  }
+  const iframeTargets = targets.filter((target) => target.type === 'iframe').map((target) => `${target.title} (${target.url})`)
+  throw new Error(`no matching iframe found for ${url} within ${timeout}ms. Iframe targets: ${iframeTargets.join(', ') || 'none'}`)
 }
 
 export const waitForIframe = async ({
@@ -18,6 +48,7 @@ export const waitForIframe = async ({
   electronRpc,
   idleTimeout,
   injectUtilityScript,
+  index = 0,
   sessionRpc,
   url,
 }) => {
@@ -28,12 +59,7 @@ export const waitForIframe = async ({
   // 4. resolve promise with execution context id and frame Id, clean up listeners
 
   // TODO ask browser rpc for targets / add target change listener
-  const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
-  const iframes = targets.filter((target) => target.type === 'iframe')
-  const matchingIframe = findMatchingIframe(iframes, url)
-  if (!matchingIframe) {
-    throw new Error(`no matching iframe found for ${url}`)
-  }
+  const matchingIframe = await waitForMatchingIframe(sessionRpc, url, index)
 
   const iframeSessionId = await DevtoolsProtocolTarget.attachToTarget(sessionRpc, {
     flatten: true,
@@ -46,7 +72,8 @@ export const waitForIframe = async ({
   const utilityExecutionContextName = 'utility'
 
   if (injectUtilityScript) {
-    const frameId = '' // TODO
+    const { frameTree } = await DevtoolsProtocolPage.getFrameTree(iframeRpc)
+    const frameId = frameTree.frame.id
     iframeUtilityContext = await addUtilityExecutionContext(iframeRpc, utilityExecutionContextName, frameId)
   }
 

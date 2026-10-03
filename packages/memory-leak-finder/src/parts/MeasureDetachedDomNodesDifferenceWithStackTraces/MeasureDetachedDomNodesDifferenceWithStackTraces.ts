@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import type { Session } from '../Session/Session.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
@@ -12,46 +13,36 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackingDomNodeStackTraces from '../StartTrackingDomNodeStackTraces/StartTrackingDomNodeStackTraces.ts'
 import * as StopTrackingDomNodeStackTraces from '../StopTrackingDomNodeStackTraces/StopTrackingDomNodeStackTraces.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-
 export const id = MeasureId.DetachedDomNodesDifferenceWithStackTraces
-
 export const targets = [TargetId.Browser]
-
 export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
-
 export const start = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackingDomNodeStackTraces.startTrackingDomNodeStackTraces(session, objectGroup)
   return GetDetachedDomNodes.getDetachedDomNodes(session, objectGroup)
 }
-
 export const stop = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup, scriptHandler.scriptMap)
   await StopTrackingDomNodeStackTraces.stopTrackingDomNodeStackTraces(session, objectGroup)
   return result
 }
-
 export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
-
 export const compare = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces
-
-const getCount = (instance) => {
+const getCount = (instance: Dynamic) => {
   return instance.count
 }
-
-const getTotal = (instance) => {
+const getTotal = (instance: Dynamic) => {
   Assert.array(instance)
   const counts = instance.map(getCount)
   return Arrays.sum(counts)
 }
-
-export const isLeak = ({ after, before }) => {
+export const isLeak = ({ after, before }: Dynamic) => {
   return getTotal(after) > getTotal(before)
 }

@@ -38,9 +38,22 @@
   "workbench.secondarySideBar.defaultVisibility": "hidden",
   "terminal.integrated.gpuAcceleration": "off",
   "editor.accessibilitySupport": "off",
+  "terminal.integrated.defaultProfile.linux": "bash-clean",
+  "terminal.integrated.profiles.linux": {
+    "bash-clean": {
+      "path": "/bin/bash",
+      "args": ["--noprofile", "--norc"]
+    }
+  },
   "terminal.integrated.shellIntegration.enabled": false,
   "extensions.verifySignature": false,
   "telemetry.feedback.enabled": false,
   "telemetry.editStats.enabled": false,
-  "security.workspace.trust.enabled": false
+  "security.workspace.trust.enabled": false,
+  "remote.SSH.remotePlatform": {
+    "*": "linux"
+  },
+  "chat.allowAnonymousAccess": true,
+  "application.shellEnvironmentResolutionTimeout": 119,
+  "workbench.experimental.modernUI": false
 }

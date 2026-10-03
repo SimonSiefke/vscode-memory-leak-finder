@@ -1,6 +1,6 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
-
-export const compareNumbers = (before, after) => {
+export const compareNumbers = (before: Dynamic, after: Dynamic) => {
   const beforeMap = Object.create(null)
   for (const element of before) {
     beforeMap[element] ||= 0
@@ -11,8 +11,8 @@ export const compareNumbers = (before, after) => {
     afterMap[element] ||= 0
     afterMap[element]++
   }
-  const result: any[] = []
-  const seen: any[] = []
+  const result: Dynamic[] = []
+  const seen: Dynamic[] = []
   for (const element of after) {
     if (seen.includes(element)) {
       continue

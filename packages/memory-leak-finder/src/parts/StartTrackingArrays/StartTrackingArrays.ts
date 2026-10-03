@@ -1,26 +1,21 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PartitionArray from '../PartitionArray/PartitionArray.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
-
-const ArrayChunkSize = 100_000
-
-const isEnumerable = (property) => {
+const ArrayChunkSize = 100000
+const isEnumerable = (property: Dynamic) => {
   return property.enumerable
 }
-
-const getObjectId = (result) => {
+const getObjectId = (result: Dynamic) => {
   return result.objectId
 }
-
-const getValue = (result) => {
+const getValue = (result: Dynamic) => {
   return result.value
 }
-
-const getEnumerableValues = (result) => {
+const getEnumerableValues = (result: Dynamic) => {
   return result.filter(isEnumerable).map(getValue)
 }
-
 export const startTrackingArrays = async (session: Session, objectGroup: string) => {
   const arrayDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Array,

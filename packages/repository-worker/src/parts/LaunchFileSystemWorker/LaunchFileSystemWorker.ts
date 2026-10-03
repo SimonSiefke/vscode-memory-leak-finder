@@ -6,6 +6,8 @@ export const launchFileSystemWorker = async (): Promise<void> => {
   const rpc = await NodeWorkerRpcParent.create({
     commandMap: {},
     path: FileSystemWorkerPath.fileSystemWorkerPath,
+    // @ts-ignore
+    ref: false,
   })
   FileSystemWorker.set(rpc)
 }

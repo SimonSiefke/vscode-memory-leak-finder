@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import type { Session } from '../Session/Session.ts'
 import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
@@ -6,26 +7,21 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
-
 export const id = MeasureId.NamedFunctionCount2
-
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
-
 export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
-
-export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup: Dynamic, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   const id = 0
   const heapSnapshotPath = await getHeapSnapshot(session, id)
   await WriteScriptMap.writeScriptMap(scriptHandler.scriptMap, id)
   return heapSnapshotPath
 }
-
-export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup: Dynamic, scriptHandler: IScriptHandler) => {
   const id = 1
   const heapSnapshotPath = await getHeapSnapshot(session, id)
   await WriteScriptMap.writeScriptMap(scriptHandler.scriptMap, id)
@@ -35,9 +31,7 @@ export const stop = async (session: Session, objectGroup, scriptHandler: IScript
     scriptMap: scriptHandler.scriptMap,
   }
 }
-
-export const isLeak = (leaked) => {
+export const isLeak = (leaked: Dynamic) => {
   return leaked.length > 0
 }
-
 export { compareNamedFunctionCount2 as compare } from '../CompareNamedFunctionCount2/CompareNamedFunctionCount2.ts'

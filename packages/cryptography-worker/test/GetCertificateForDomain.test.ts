@@ -207,7 +207,7 @@ test.skip('getCertificateForDomain - deletes mismatched files even if unlink fai
     }
     throw new Error('Unexpected path')
   })
-  mockUnlink.mockRejectedValue(new Error('File not found') as never)
+  mockUnlink.mockRejectedValue(new Error('File not found'))
 
   const result = await GetCertificateForDomainModule.getCertificateForDomain('example.com')
 

@@ -1,1 +1,1 @@
-export type Session = any
+export type { Session } from '../Types/Types.ts'

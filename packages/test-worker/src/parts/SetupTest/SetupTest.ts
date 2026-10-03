@@ -2,12 +2,28 @@ import * as Assert from '../Assert/Assert.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import * as SetupTestWithCallback from '../SetupTestWithCallback/SetupTestWithCallback.ts'
 
-export const setupTest = async (connectionId, absolutePath, forceRun, timeouts, isGithubActions) => {
+export const setupTest = async (
+  connectionId,
+  absolutePath,
+  forceRun,
+  timeouts,
+  isGithubActions,
+  allowCopilotAuthInCi,
+  runNetworkTestsAnyway,
+) => {
   Assert.number(connectionId)
   Assert.string(absolutePath)
   Assert.boolean(forceRun)
   Assert.boolean(isGithubActions)
+  Assert.boolean(runNetworkTestsAnyway)
   const pageObject = PageObjectState.getPageObject(connectionId)
-  const result = await SetupTestWithCallback.setupTestWithCallback(pageObject, absolutePath, forceRun, isGithubActions)
+  const result = await SetupTestWithCallback.setupTestWithCallback(
+    pageObject,
+    absolutePath,
+    forceRun,
+    isGithubActions,
+    allowCopilotAuthInCi,
+    runNetworkTestsAnyway,
+  )
   return result
 }

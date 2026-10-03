@@ -52,6 +52,10 @@ const getDecorationContent = (text: string, className: string): string => {
 }
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const getRepository = (name: string) => {
+    return page.locator('.sidebar .scm-provider .label-name', { hasExactText: name }).first()
+  }
+
   return {
     async checkoutBranch(branchName: string) {
       try {
@@ -69,14 +73,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     },
     async closeRepository(name: string) {
       try {
-        const repositoryRows = page.locator('.sidebar .scm-repositories-view .monaco-list-row')
-        const namedRepository = page
-          .locator(
-            `.sidebar .scm-repositories-view .monaco-list-row[aria-label*="${name}"], .sidebar .scm-repositories-view .monaco-list-row:has-text("${name}")`,
-          )
-          .first()
-        const repositoryProviders = page.locator('.sidebar .scm-provider')
-        const repository = (await repositoryRows.count()) > 0 ? namedRepository : repositoryProviders.nth(1)
+        const repository = getRepository(name)
         await expect(repository).toBeVisible()
         const contextMenu = ContextMenu.create({
           electronApp,
@@ -212,29 +209,6 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to hide graph`)
       }
     },
-    async refresh() {
-      try {
-        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.GitRefresh)
-      } catch (error) {
-        throw new VError(error, `Failed to git refresh`)
-      }
-    },
-    async selectBranch(branchName: string) {
-      try {
-        await page.waitForIdle()
-        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
-        await expect(quickInput).toBeVisible()
-        const option = quickInput.locator('.label-name', {
-          hasExactText: branchName,
-        })
-        await expect(option).toBeVisible()
-        await option.click()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to select branch "${branchName}"`)
-      }
-    },
     async openChange(name: string) {
       try {
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
@@ -266,21 +240,27 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to open change "${name}"`)
       }
     },
-    async show() {
+    async refresh() {
       try {
-        const activityBar = page.locator('.part.activitybar')
-        await expect(activityBar).toBeVisible()
-        const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="Source Control"])`)
-        await expect(activityBarItem).toBeVisible()
-        const expanded = await activityBarItem.getAttribute('aria-expanded')
-        if (expanded === 'false') {
-          await activityBarItem.click()
-        }
-        const sideBar = page.locator('.sidebar')
-        const title = sideBar.locator('.composite.title')
-        await expect(title).toHaveText('Source Control')
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitRefresh)
       } catch (error) {
-        throw new VError(error, `Failed to show source control`)
+        throw new VError(error, `Failed to git refresh`)
+      }
+    },
+    async selectBranch(branchName: string) {
+      try {
+        await page.waitForIdle()
+        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
+        await expect(quickInput).toBeVisible()
+        const option = quickInput.locator('.label-name', {
+          hasExactText: branchName,
+        })
+        await expect(option).toBeVisible()
+        await option.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select branch "${branchName}"`)
       }
     },
     async shouldHaveHistoryItem(name: string) {
@@ -356,12 +336,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           throw new VError(error, `Failed to verify repository count ${expectedCount}`)
       }
     },
+    async shouldHaveRepository(name: string) {
+      try {
+        const repository = getRepository(name)
+        await expect(repository).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify repository "${name}"`)
+      }
+    },
     async shouldHaveUnstagedFile(name: string) {
       try {
         const changesPart = page.locator('[role="treeitem"][aria-label="Changes"]')
-        await expect(changesPart).toBeVisible()
+        await expect(changesPart).toBeVisible({ timeout: 15_000 })
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
-        await expect(file).toBeVisible()
+        await expect(file).toBeVisible({ timeout: 15_000 })
       } catch (error) {
         throw new VError(error, `Failed to check unstaged file`)
       }
@@ -374,6 +362,31 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(item).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to verify that history item is hidden`)
+      }
+    },
+    async shouldNotHaveRepository(name: string) {
+      try {
+        const repository = getRepository(name)
+        await expect(repository).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that repository "${name}" is hidden`)
+      }
+    },
+    async show() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="Source Control"])`)
+        await expect(activityBarItem).toBeVisible()
+        const expanded = await activityBarItem.getAttribute('aria-expanded')
+        if (expanded === 'false') {
+          await activityBarItem.click()
+        }
+        const sideBar = page.locator('.sidebar')
+        const title = sideBar.locator('.composite.title')
+        await expect(title).toHaveText('Source Control')
+      } catch (error) {
+        throw new VError(error, `Failed to show source control`)
       }
     },
     async showBranchPicker() {

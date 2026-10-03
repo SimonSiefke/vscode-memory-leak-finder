@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as CreateCountMap from '../CreateCountMap/CreateCountMap.ts'
 import * as SortNamedFunctions from '../SortNamedFunctions/SortNamedFunctions.ts'
-
-const mergeFunctions = (beforeFunctions, afterFunctions) => {
+const mergeFunctions = (beforeFunctions: Dynamic, afterFunctions: Dynamic) => {
   const beforeMap = CreateCountMap.createCountMap(beforeFunctions, 'url')
-  const leaked: any[] = []
+  const leaked: Dynamic[] = []
   for (const element of afterFunctions) {
     const beforeCount = beforeMap[element.url] || ''
     const afterCount = element.count
@@ -17,8 +17,7 @@ const mergeFunctions = (beforeFunctions, afterFunctions) => {
   }
   return leaked
 }
-
-export const compareNamedFunctionCount = (before, after) => {
+export const compareNamedFunctionCount = (before: Dynamic, after: Dynamic) => {
   const beforeFunctions = SortNamedFunctions.sortNamedFunctions(before)
   const afterFunctions = SortNamedFunctions.sortNamedFunctions(after)
   const leaked = mergeFunctions(beforeFunctions, afterFunctions)

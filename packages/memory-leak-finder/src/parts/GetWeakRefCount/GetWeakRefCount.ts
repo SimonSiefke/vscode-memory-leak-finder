@@ -4,9 +4,9 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 /**
  *
- * @param {any} session
+ * @param {unknown} session
  * @returns {Promise<number>}
  */
 export const getWeakRefCount = async (session: Session, objectGroup: string) => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.WeakRef, objectGroup)
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.WeakRef)
 }

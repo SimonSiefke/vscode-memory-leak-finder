@@ -6,7 +6,7 @@ import { launchHeapSnapshotWorker } from '../LaunchHeapSnapshotWorker/LaunchHeap
 import * as Root from '../Root/Root.ts'
 /**
  *
- * @param {any} session
+ * @param {unknown} session
  * @returns {Promise<string[]>}
  */
 export const getUserStrings = async (session: Session, objectGroup: string, id: string) => {

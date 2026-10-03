@@ -1,12 +1,11 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
-
-const compareEventListener = (a, b) => {
+const compareEventListener = (a: Dynamic, b: Dynamic) => {
   const sourceA = GetSourceMapUrl.getSourceMapUrl(a)
   const sourceB = GetSourceMapUrl.getSourceMapUrl(b)
   return sourceA.sourceMapUrl.localeCompare(sourceB.sourceMapUrl) || sourceB.line - sourceA.line || sourceB.column - sourceA.column
 }
-
-export const sortEventListenersBySourceMap = (eventListeners) => {
+export const sortEventListenersBySourceMap = (eventListeners: Dynamic) => {
   return Arrays.toSorted(eventListeners, compareEventListener)
 }

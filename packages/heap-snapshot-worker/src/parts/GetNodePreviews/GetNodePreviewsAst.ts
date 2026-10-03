@@ -1,4 +1,4 @@
-import type { ArrayNode, AstNode, ObjectNode, PropertyEntry } from '../AstNode/AstNode.ts'
+import type { ArrayNode, AstNode, CodeNode, ObjectNode, PropertyEntry } from '../AstNode/AstNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
@@ -50,7 +50,7 @@ export const buildAstForNode = (
   }
   if (nodeTypeName === 'number') {
     const n = typeof node.name === 'number' ? strings[node.name] : undefined
-    const parsed = n === undefined ? Number.NaN : Number(n)
+    const parsed = n === undefined ? NaN : Number(n)
     return { id, name, type: 'number', value: Number.isFinite(parsed) ? parsed : (n ?? '') }
   }
   if (nodeTypeName === 'bigint') {
@@ -166,7 +166,15 @@ export const buildAstForNode = (
         }
       }
     }
-    return { column: columnValue, id, line: lineValue, name, scriptId: scriptIdValue, type: nodeTypeName as any }
+    const codeNode: CodeNode = {
+      id,
+      name,
+      ...(columnValue === undefined ? {} : { column: columnValue }),
+      ...(lineValue === undefined ? {} : { line: lineValue }),
+      ...(scriptIdValue === undefined ? {} : { scriptId: scriptIdValue }),
+      type: nodeTypeName,
+    }
+    return codeNode
   }
 
   return createUnknown(id, name, `[${nodeTypeName} ${id}]`)

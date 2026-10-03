@@ -16,10 +16,12 @@ export const set = (rpc: RpcConnection): void => {
 }
 
 export const dispose = async (): Promise<void> => {
-  if (state.rpc) {
-    await state.rpc.dispose()
-    state.rpc = undefined
+  if (!state.rpc) {
+    return
   }
+
+  await state.rpc.dispose()
+  state.rpc = undefined
 }
 
 const invoke = (method: string, ...params: unknown[]): Promise<unknown> => {
@@ -34,7 +36,7 @@ interface FindFilesOptions {
   exclude?: string[]
 }
 
-export const findFiles = (pattern: string, options: FindFilesOptions): Promise<string[]> => {
+export const findFiles = (pattern: string | readonly string[], options: FindFilesOptions): Promise<string[]> => {
   return invoke('FileSystem.findFiles', pattern, options) as Promise<string[]>
 }
 

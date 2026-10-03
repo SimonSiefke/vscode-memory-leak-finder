@@ -29,10 +29,16 @@ export const isImportantErrorMessage = (data: string): boolean => {
   if (data.includes('Failed to adjust OOM score of renderer')) {
     return false
   }
+  if (data.includes('Invalid MIT-MAGIC-COOKIE-1 key')) {
+    return false
+  }
   if (data.includes('Failed to decrypt: Key not valid for use in specified state')) {
     return false
   }
   if (data.includes(`For help, see: https://nodejs.org/en/docs/inspector`)) {
+    return false
+  }
+  if (data.includes(`For help, see: https://nodejs.org/learn/getting-started/debugging`)) {
     return false
   }
   if (data.trim() === 'Debugger attached.') {

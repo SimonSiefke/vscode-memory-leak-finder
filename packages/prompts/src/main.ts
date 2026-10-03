@@ -14,17 +14,19 @@ const ourPath = `/home/simon/.cache/repos/vscode-memory-leak-finder`
 const only = 'source-control-multiple-repositories'
 const runs = 17
 const measure = 'named-function-count3'
+const extraArgs = ''
 
 const main = async () => {
   const absolutePath = isAbsolute(relativePath) ? relativePath : join(root, relativePath)
   const content = await readFile(absolutePath, 'utf8')
   const prompt = getPrompt({
     content,
+    extraArgs,
     localVscodePath,
-    only,
-    runs,
-    ourPath,
     measure,
+    only,
+    ourPath,
+    runs,
   })
   await clipboard.write(prompt)
   process.stdout.write(prompt)

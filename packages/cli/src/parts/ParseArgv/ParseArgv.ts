@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { join, normalize, resolve } from 'node:path'
 import * as Ide from '../Ide/Ide.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
 import { root } from '../Root/Root.ts'
@@ -6,7 +6,7 @@ import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
 const parseArgvNumber = (argv: readonly string[], name: string): number => {
-  const index = argv.indexOf(name)
+  const index = argv.lastIndexOf(name)
   const next = index + 1
   const value = argv[next]
   const parsed = Number.parseInt(value)
@@ -17,7 +17,7 @@ const parseArgvNumber = (argv: readonly string[], name: string): number => {
 }
 
 const parseArgvString = (argv: readonly string[], name: string): string => {
-  const index = argv.indexOf(name)
+  const index = argv.lastIndexOf(name)
   const next = index + 1
   const value = argv[next]
   if (typeof value === 'string') {
@@ -81,12 +81,62 @@ const parseRunSkippedTestsAnyway = (argv: readonly string[]): boolean => {
   return argv.includes('--run-skipped-tests-anyway')
 }
 
+const parseShowSkippedFailedTestDuration = (argv: readonly string[], env: NodeJS.ProcessEnv): boolean => {
+  return argv.includes('--show-skipped-failed-test-duration') || Boolean(env.CI || env.GITHUB_ACTIONS)
+}
+
+const parseRunNetworkTestsAnyway = (argv: readonly string[]): boolean => {
+  return argv.includes('--run-network-tests-anyway')
+}
+
+const parseAllowCopilotAuthInCi = (argv: readonly string[]): boolean => {
+  return argv.includes('--allow-copilot-auth-in-ci')
+}
+
+const parseDownloadUserDataZipFileUrl = (argv: readonly string[]): string => {
+  if (argv.includes('--download-user-data-zip-file-url')) {
+    return parseArgvString(argv, '--download-user-data-zip-file-url')
+  }
+  return process.env.DOWNLOAD_USER_DATA_ZIP_FILE_URL || ''
+}
+
+const parseDownloadUserDataZipFileToken = (argv: readonly string[]): string => {
+  if (argv.includes('--download-user-data-zip-file-token')) {
+    return parseArgvString(argv, '--download-user-data-zip-file-token')
+  }
+  return process.env.DOWNLOAD_USER_DATA_ZIP_FILE_TOKEN || ''
+}
+
 const parseRecordVideo = (argv: readonly string[]): boolean => {
   return argv.includes('--record-video')
 }
 
+const parseDisableVscodeNodeModulesCache = (argv: readonly string[]): boolean => {
+  return argv.includes('--disable-vscode-node-modules-cache')
+}
+
+const parseUseStableVscodeRepoPath = (argv: readonly string[]): boolean => {
+  return argv.includes('--use-stable-vscode-repo-path')
+}
+
+const parseComputeVscodeNodeModulesCacheKey = (argv: readonly string[]): boolean => {
+  return argv.includes('--compute-vscode-node-modules-cache-key')
+}
+
+const parseResolveVscodeCommitHash = (argv: readonly string[]): boolean => {
+  return argv.includes('--resolve-vscode-commit-hash')
+}
+
+const parseVerbose = (argv: readonly string[]): boolean => {
+  return argv.includes('--verbose')
+}
+
 const parseCompressVideo = (argv: readonly string[]): boolean => {
   return argv.includes('--compress-video')
+}
+
+const parseBuildVscodeMinified = (argv: readonly string[]): boolean => {
+  return argv.includes('--build-vscode-minified')
 }
 
 const parseRuns = (argv: readonly string[]): number => {
@@ -96,11 +146,61 @@ const parseRuns = (argv: readonly string[]): number => {
   return 1
 }
 
+const parseShard = (argv: readonly string[]): { readonly shardCount: number; readonly shardIndex: number } | undefined => {
+  let found = false
+  let value: string | undefined
+  for (let index = 0; index < argv.length; index++) {
+    const argument = argv[index]
+    if (argument === '--shard') {
+      found = true
+      value = argv[index + 1]
+    } else if (argument.startsWith('--shard=')) {
+      found = true
+      value = argument.slice('--shard='.length)
+    }
+  }
+  if (!found) {
+    return undefined
+  }
+  value ||= ''
+  const match = /^(\d+)\/(\d+)$/.exec(value)
+  if (!match) {
+    throw new Error('--shard must use the format <index>/<count>, for example --shard=1/2')
+  }
+  const shardIndex = Number.parseInt(match[1])
+  const shardCount = Number.parseInt(match[2])
+  if (
+    !Number.isSafeInteger(shardIndex) ||
+    !Number.isSafeInteger(shardCount) ||
+    shardIndex < 1 ||
+    shardCount < 1 ||
+    shardIndex > shardCount
+  ) {
+    throw new Error('--shard index and count must be positive integers, and index must not exceed count')
+  }
+  return {
+    shardCount,
+    shardIndex,
+  }
+}
+
+const parseStartupRuns = (argv: readonly string[]): number => {
+  if (argv.includes('--startup-runs')) {
+    return parseArgvNumber(argv, '--startup-runs')
+  }
+  return 1
+}
+
 const parseCwd = (cwd: string, argv: readonly string[]): string => {
   if (argv.includes('--cwd')) {
     return parseArgvString(argv, '--cwd')
   }
   return join(root, 'packages/e2e')
+}
+
+const isWebsitesE2e = (cwd: string): boolean => {
+  const relativeWebsitesE2ePath = join('packages', 'websites-e2e')
+  return normalize(cwd) === relativeWebsitesE2ePath || resolve(cwd) === join(root, relativeWebsitesE2ePath)
 }
 
 const parseMeasure = (argv: readonly string[]): string => {
@@ -128,6 +228,26 @@ const parseMeasureAfter = (argv: readonly string[]): boolean => {
 
 const parseMeasureNode = (argv: readonly string[]): boolean => {
   return argv.includes('--measure-node')
+}
+
+const isIpcMessageCountMeasure = (measure: string): boolean => {
+  return measure === 'ipc-message-count' || measure === 'ipcMessageCount' || measure === 'ipcmessagecount'
+}
+
+const isFromStartMeasure = (measure: string): boolean => {
+  return (
+    measure === 'cpu-performance-counters-from-start' ||
+    measure === 'cpuPerformanceCountersFromStart' ||
+    measure === 'linux-process-tree-resources-from-start' ||
+    measure === 'linuxProcessTreeResourcesFromStart'
+  )
+}
+
+const parseProcessRootStrategy = (argv: readonly string[]): string => {
+  if (argv.includes('--process-root-strategy')) {
+    return parseArgvString(argv, '--process-root-strategy')
+  }
+  return 'launch-pid'
 }
 
 const parseTimeouts = (argv: readonly string[]): boolean => {
@@ -217,6 +337,17 @@ const parseInspectPtyHost = (argv: readonly string[]): boolean => {
   return argv.includes('--inspect-ptyhost')
 }
 
+const parseInspectIntegratedBrowser = (argv: readonly string[]): boolean => {
+  return argv.includes('--inspect-integrated-browser')
+}
+
+const parseInspectProcess = (argv: readonly string[]): string => {
+  if (argv.includes('--inspect-process')) {
+    return parseArgvString(argv, '--inspect-process')
+  }
+  return ''
+}
+
 const parseEnableExtensions = (argv: readonly string[]): boolean => {
   return argv.includes('--enable-extensions')
 }
@@ -243,7 +374,7 @@ const parseInspectExtensionsPort = (argv: readonly string[]): number => {
 }
 
 const parseEnableProxy = (argv: readonly string[]): boolean => {
-  return argv.includes('--enable-proxy')
+  return argv.includes('--enable-proxy') || argv.includes('--use-proxy-mock')
 }
 
 const parseUseProxyMock = (argv: readonly string[]): boolean => {
@@ -252,6 +383,10 @@ const parseUseProxyMock = (argv: readonly string[]): boolean => {
 
 const parseConvertRequestsToMocks = (argv: readonly string[]): boolean => {
   return argv.includes('--convert-requests-to-mocks')
+}
+
+const parseCreateAllMockDataZip = (argv: readonly string[]): boolean => {
+  return argv.includes('--create-all-mock-data-zip')
 }
 
 const parseBisect = (argv: readonly string[]): boolean => {
@@ -267,6 +402,13 @@ const parseScreencastQuality = (argv: readonly string[]): number => {
 
 const parseClearExtensions = (argv: readonly string[]): boolean => {
   return argv.includes('--clear-extensions')
+}
+
+const parseColor = (argv: readonly string[]): boolean => {
+  if (argv.includes('--color')) {
+    return parseArgvString(argv, '--color') !== 'false'
+  }
+  return true
 }
 
 const parseUpdateUrl = (argv: readonly string[]): string => {
@@ -291,7 +433,25 @@ const parsePageObjectPath = (argv: readonly string[]): string => {
 }
 
 const parseTrackFunctions = (argv: readonly string[]): boolean => {
-  return argv.includes('--track-functions') || parseMeasure(argv) === 'tracked-functions'
+  const measure = parseMeasure(argv)
+  return (
+    argv.includes('--track-functions') ||
+    measure === 'tracked-functions' ||
+    measure === 'tracked-allocations' ||
+    measure === 'trackedAllocations' ||
+    measure === 'tracked-allocations-from-start' ||
+    measure === 'trackedAllocationsFromStart' ||
+    measure === 'tracked-allocations-with-stack-traces' ||
+    measure === 'trackedAllocationsWithStackTraces' ||
+    measure === 'tracked-allocation-leaks' ||
+    measure === 'trackedAllocationLeaks' ||
+    measure === 'tracked-allocation-performance' ||
+    measure === 'trackedAllocationPerformance' ||
+    measure === 'tracked-allocation-timeline' ||
+    measure === 'trackedAllocationTimeline' ||
+    measure === 'tracked-timeouts' ||
+    measure === 'trackedTimeouts'
+  )
 }
 
 const parseOpenDevtools = (argv: readonly string[]): boolean => {
@@ -302,40 +462,71 @@ const parseResolveExtensionSourceMaps = (argv: readonly string[]): boolean => {
   return argv.includes('--resolve-extension-source-maps')
 }
 
-export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[]) => {
+export const parseArgv = (processPlatform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv = process.env) => {
   const platform = parsePlatform(processPlatform, argv)
   const pageObjectPath = parsePageObjectPath(argv)
   const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const bisect = parseBisect(argv)
+  const buildVscodeMinified = parseBuildVscodeMinified(argv)
   const checkLeaks = parseCheckLeaks(argv)
   const clearExtensions = parseClearExtensions(argv)
-  const color = true
+  const color = parseColor(argv)
   const commit = parseCommit(argv)
   const convertRequestsToMocks = parseConvertRequestsToMocks(argv)
+  const createAllMockDataZip = parseCreateAllMockDataZip(argv)
   const continueValue = parseContinueValue(argv)
   const cwd = parseCwd(process.cwd(), argv)
-  const enableExtensions = parseEnableExtensions(argv)
+  const computeVscodeNodeModulesCacheKey = parseComputeVscodeNodeModulesCacheKey(argv)
+  const resolveVscodeCommitHash = parseResolveVscodeCommitHash(argv)
+  const disableVscodeNodeModulesCache = parseDisableVscodeNodeModulesCache(argv)
+  const useStableVscodeRepoPath = parseUseStableVscodeRepoPath(argv)
+  const downloadUserDataZipFileToken = parseDownloadUserDataZipFileToken(argv)
+  const downloadUserDataZipFileUrl = parseDownloadUserDataZipFileUrl(argv)
+  const measure = parseMeasure(argv)
+  const memoryCity = measure === 'memory-city' || measure === 'memoryCity'
+  const enableExtensions = parseEnableExtensions(argv) || memoryCity
   const enableProxy = parseEnableProxy(argv)
   const filter = parseFilter(argv)
   const headless = parseHeadless(argv)
   const ide = parseIde(argv)
   const ideVersion = ''
   const insidersCommit = parseInsidersCommit(parsedVersion, argv)
-  const inspectExtensions = parseInspectExtensions(argv)
+  const inspectExtensions = parseInspectExtensions(argv) || memoryCity
   const inspectExtensionsPort = parseInspectExtensionsPort(argv)
+  const inspectIntegratedBrowser = parseInspectIntegratedBrowser(argv)
+  const inspectProcess = parseInspectProcess(argv)
   const inspectPtyHost = parseInspectPtyHost(argv)
   const inspectPtyHostPort = parseInspectPtyHostPort(argv)
   const inspectSharedProcess = parseInspectSharedProcess(argv)
   const inspectSharedProcessPort = parseInspectSharedProcessPort(argv)
-  const measure = parseMeasure(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  if (checkLeaks && isWebsitesE2e(cwd) && !inspectIntegratedBrowser) {
+    throw new Error('websites-e2e test measures can only be run with --inspect-integrated-browser')
+  }
+  if (isIpcMessageCountMeasure(measure) && !measureNode) {
+    throw new Error('--measure ipc-message-count requires --measure-node')
+  }
+  if (inspectIntegratedBrowser && (measureNode || inspectSharedProcess || inspectExtensions || inspectPtyHost || inspectProcess)) {
+    throw new Error(
+      '--inspect-integrated-browser cannot be combined with --measure-node, --inspect-shared-process, --inspect-extensions, --inspect-ptyhost, or --inspect-process',
+    )
+  }
+  const processRootStrategy = parseProcessRootStrategy(argv)
   const recordVideo = parseRecordVideo(argv)
   const compressVideo = parseCompressVideo(argv)
   const restartBetween = parseRestartBetween(argv)
   const runMode = parseRunMode(argv)
   const runs = parseRuns(argv)
+  const shard = parseShard(argv)
+  const startupRuns = parseStartupRuns(argv)
+  if (startupRuns > 1 && !isFromStartMeasure(measure)) {
+    throw new Error('--startup-runs can only be used with a from-start measure')
+  }
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
+  const showSkippedFailedTestDuration = parseShowSkippedFailedTestDuration(argv, env)
+  const runNetworkTestsAnyway = parseRunNetworkTestsAnyway(argv)
+  const allowCopilotAuthInCi = parseAllowCopilotAuthInCi(argv)
   const screencastQuality = parseScreencastQuality(argv)
   const setupOnly = parseSetupOnly(argv)
   const login = parseLogin(argv)
@@ -346,22 +537,30 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const resolveExtensionSourceMaps = parseResolveExtensionSourceMaps(argv)
   const useProxyMock = parseUseProxyMock(argv)
   const updateUrl = parseUpdateUrl(argv)
+  const verbose = parseVerbose(argv)
   const vscodePath = parseVscodePath(argv)
   const { vscodeVersion } = parsedVersion
   const watch = parseWatch(argv)
   const workers = parseWorkers(argv)
   const isWindows = IsWindows.isWindows(processPlatform)
   return {
+    allowCopilotAuthInCi,
     arch,
     bisect,
+    buildVscodeMinified,
     checkLeaks,
     clearExtensions,
     color,
     commit,
     compressVideo,
-    convertRequestsToMocks,
+    computeVscodeNodeModulesCacheKey,
     continueValue,
+    convertRequestsToMocks,
+    createAllMockDataZip,
     cwd,
+    disableVscodeNodeModulesCache,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     filter,
@@ -371,6 +570,8 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     insidersCommit,
     inspectExtensions,
     inspectExtensionsPort,
+    inspectIntegratedBrowser,
+    inspectProcess,
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,
@@ -383,22 +584,30 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     openDevtools,
     pageObjectPath,
     platform,
+    processRootStrategy,
     recordVideo,
     resolveExtensionSourceMaps,
+    resolveVscodeCommitHash,
     restartBetween,
     runMode,
+    runNetworkTestsAnyway,
     runs,
     runSkippedTestsAnyway,
+    showSkippedFailedTestDuration,
     screencastQuality,
     setupOnly,
+    startupRuns,
     timeoutBetween,
     timeouts,
     trackFunctions,
     updateUrl,
     useProxyMock,
+    useStableVscodeRepoPath,
+    verbose,
     vscodePath,
     vscodeVersion,
     watch,
     workers,
+    ...(shard || {}),
   }
 }

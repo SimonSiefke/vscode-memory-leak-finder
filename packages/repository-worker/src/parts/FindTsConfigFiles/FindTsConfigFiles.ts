@@ -6,7 +6,7 @@ export const findTsConfigFiles = async (rootDir: string): Promise<readonly strin
   try {
     const relativePaths = await FileSystemWorker.findFiles('**/tsconfig.json', {
       cwd: rootDir,
-      exclude: ['**/node_modules/**', '**/out/**', '**/.git/**'],
+      exclude: ['**/node_modules/**', '**/out/**', '**/.git/**', '**/extensions/copilot/chat-lib/**'],
     })
     return relativePaths.map((p) => Path.join(rootDir, p))
   } catch (error) {

@@ -4,9 +4,9 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 /**
  *
- * @param {any} session
+ * @param {unknown} session
  * @returns {Promise<number>}
  */
 export const getTextDecoderCount = async (session: Session, objectGroup: string) => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.TextDecoder, objectGroup)
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.TextDecoder)
 }

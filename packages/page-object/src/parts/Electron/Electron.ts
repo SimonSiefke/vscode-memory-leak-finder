@@ -9,157 +9,63 @@ type WebContentsEntry = {
   readonly url: string
 }
 
+type ResizeWindowWidthOptions = {
+  readonly stepDelay?: number
+  readonly width: number
+}
+
+type WindowResizeState = {
+  readonly message?: string
+  readonly status: 'pending' | 'rejected' | 'resolved'
+  readonly width?: number
+}
+
+let windowResizeOperationId = 0
+
+const validateWindowWidth = (width: number): void => {
+  if (!Number.isInteger(width) || width <= 0) {
+    throw new TypeError(`Window width must be a positive integer`)
+  }
+}
+
+const validateStepDelay = (stepDelay: number): void => {
+  if (!Number.isInteger(stepDelay) || stepDelay < 0) {
+    throw new TypeError(`Window resize step delay must be a non-negative integer`)
+  }
+}
+
+const getWindowExpression = (body: string): string => {
+  return `(() => {
+  const { BrowserWindow } = globalThis._____electron
+  const window = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows().find((candidate) => candidate.isVisible())
+  if (!window || window.isDestroyed()) {
+    throw new Error('Expected visible Electron window')
+  }
+  ${body}
+})()`
+}
+
 const getWebContentsSummary = (entries: readonly WebContentsEntry[]): string => {
   return entries.map((entry) => `${entry.id}:${entry.type}:${entry.url || '<empty>'}`).join(', ')
 }
 
-export const create = ({ electronApp, VError }: CreateParams) => {
+export const create = ({ electronApp, page, VError }: CreateParams) => {
   return {
-    async evaluate(expression: string) {
-      return await electronApp.evaluate(expression)
-    },
-    async getWindowCount(): Promise<number> {
-      try {
-        await this.evaluate(`(() => {
-  const { BrowserWindow } = globalThis._____electron
-  globalThis._____windowCount = BrowserWindow.getAllWindows().length
-})()`)
-        // Return the count that was stored in the global
-        return await this.evaluate(`globalThis._____windowCount`)
-      } catch (error) {
-        throw new VError(error, `Failed to get window count`)
-      }
-    },
-    async getWindowIsVisible(windowId: number): Promise<boolean> {
+    async closeWindow(windowId: number) {
       try {
         await this.evaluate(`(() => {
           const { BrowserWindow } = globalThis._____electron
           const window = BrowserWindow.fromId(${windowId})
-          globalThis._____windowIsVisible = Boolean(window) && !window.isDestroyed() && window.isVisible()
+          if (window && !window.isDestroyed()) {
+            window.close()
+          }
         })()`)
-        return await this.evaluate(`globalThis._____windowIsVisible`)
       } catch (error) {
-        throw new VError(error, `Failed to get window visibility`)
+        throw new VError(error, `Failed to close window`)
       }
     },
-    async getWindowIds(): Promise<readonly number[]> {
-      try {
-        await this.evaluate(`(() => {
-          const { BrowserWindow } = globalThis._____electron
-          const allWindows = BrowserWindow.getAllWindows()
-          globalThis._____windowIds = allWindows.map(w => w.id)
-        })()`)
-        // Return the IDs that were stored in the global
-        return await this.evaluate(`globalThis._____windowIds`)
-      } catch (error) {
-        throw new VError(error, `Failed to get window IDs`)
-      }
-    },
-    async getAllWebContents(): Promise<readonly WebContentsEntry[]> {
-      try {
-        await this.evaluate(`(() => {
-  const { webContents } = globalThis._____electron
-  const allWebContents = typeof webContents.getAllWebContents === 'function' ? webContents.getAllWebContents() : []
-  globalThis._____allWebContents = allWebContents
-    .filter((contents) => contents && !contents.isDestroyed())
-    .map((contents) => {
-      const ownerWindow = typeof contents.getOwnerBrowserWindow === 'function' ? contents.getOwnerBrowserWindow() : null
-      return {
-        id: contents.id,
-        ownerWindowId: ownerWindow && !ownerWindow.isDestroyed() ? ownerWindow.id : null,
-        ownerWindowVisible: ownerWindow && !ownerWindow.isDestroyed() ? ownerWindow.isVisible() : null,
-        title: typeof contents.getTitle === 'function' ? contents.getTitle() : '',
-        type: typeof contents.getType === 'function' ? contents.getType() : '',
-        url: typeof contents.getURL === 'function' ? contents.getURL() : '',
-      }
-    })
-})()`)
-        return await this.evaluate(`globalThis._____allWebContents`)
-      } catch (error) {
-        throw new VError(error, `Failed to get all web contents`)
-      }
-    },
-    async getWebContents(webContentsId: number): Promise<WebContentsEntry | undefined> {
-      try {
-        const entries = await this.getAllWebContents()
-        return entries.find((entry) => entry.id === webContentsId)
-      } catch (error) {
-        throw new VError(error, `Failed to get web contents ${webContentsId}`)
-      }
-    },
-    async waitForNewWebContentsView({
-      existingIds,
-      timeout = 10_000,
-    }: {
-      existingIds: readonly number[]
-      timeout?: number
-    }): Promise<WebContentsEntry> {
-      try {
-        const existingIdSet = new Set(existingIds)
-        const startTime = performance.now()
-        while (true) {
-          const entries = await this.getAllWebContents()
-          const match = entries.find((entry) => {
-            return !existingIdSet.has(entry.id) && entry.ownerWindowVisible !== false && !entry.url.startsWith('devtools://')
-          })
-          if (match) {
-            return match
-          }
-          if (performance.now() - startTime > timeout) {
-            throw new Error(
-              `No new visible web contents found. Existing ids: ${existingIds.join(', ')}. Found: ${getWebContentsSummary(entries)}`,
-            )
-          }
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to wait for new web contents view`)
-      }
-    },
-    async waitForWebContentsView({ timeout = 10_000, urlPattern }: { timeout?: number; urlPattern: RegExp }): Promise<WebContentsEntry> {
-      try {
-        const startTime = performance.now()
-        while (true) {
-          const entries = await this.getAllWebContents()
-          const match = entries.find((entry) => {
-            return urlPattern.test(entry.url) && entry.ownerWindowVisible !== false
-          })
-          if (match) {
-            return match
-          }
-          if (performance.now() - startTime > timeout) {
-            throw new Error(`No visible web contents matched ${urlPattern}. Found: ${getWebContentsSummary(entries)}`)
-          }
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to wait for web contents view`)
-      }
-    },
-    async waitForWebContentsUrl({
-      timeout = 10_000,
-      urlPattern,
-      webContentsId,
-    }: {
-      timeout?: number
-      urlPattern: RegExp
-      webContentsId: number
-    }): Promise<WebContentsEntry> {
-      try {
-        const startTime = performance.now()
-        while (true) {
-          const entry = await this.getWebContents(webContentsId)
-          if (entry && urlPattern.test(entry.url) && entry.ownerWindowVisible !== false) {
-            return entry
-          }
-          if (performance.now() - startTime > timeout) {
-            throw new Error(`Web contents ${webContentsId} did not match ${urlPattern}`)
-          }
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to wait for web contents url ${webContentsId}`)
-      }
+    async evaluate(expression: string) {
+      return await electronApp.evaluate(expression)
     },
     async executeJavaScriptInWebContents({
       expression,
@@ -218,68 +124,28 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to execute JavaScript in web contents ${webContentsId}`)
       }
     },
-    async waitForWebContentsText({
-      selector,
-      text,
-      timeout = 10_000,
-      urlPattern,
-      webContentsId,
-    }: {
-      selector: string
-      text: string
-      timeout?: number
-      urlPattern: RegExp
-      webContentsId?: number
-    }) {
+    async getAllWebContents(): Promise<readonly WebContentsEntry[]> {
       try {
-        const startTime = performance.now()
-        while (true) {
-          const remainingTimeout = Math.max(100, timeout - (performance.now() - startTime))
-          const entry = webContentsId
-            ? await this.waitForWebContentsUrl({
-                timeout: remainingTimeout,
-                urlPattern,
-                webContentsId,
-              })
-            : await this.waitForWebContentsView({
-                timeout: remainingTimeout,
-                urlPattern,
-              })
-          const selectorText = await this.executeJavaScriptInWebContents({
-            expression: `(() => {
-  const element = document.querySelector(${JSON.stringify(selector)})
-  return element ? element.textContent || '' : ''
-})()`,
-            timeout: remainingTimeout,
-            webContentsId: entry.id,
-          })
-          if (typeof selectorText === 'string' && selectorText.includes(text)) {
-            return entry
-          }
-          if (performance.now() - startTime > timeout) {
-            throw new Error(`Selector ${selector} in ${entry.url} did not contain expected text ${text}`)
-          }
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to wait for web contents text ${text}`)
+        await this.evaluate(`(() => {
+  const { webContents } = globalThis._____electron
+  const allWebContents = typeof webContents.getAllWebContents === 'function' ? webContents.getAllWebContents() : []
+  globalThis._____allWebContents = allWebContents
+    .filter((contents) => contents && !contents.isDestroyed())
+    .map((contents) => {
+      const ownerWindow = typeof contents.getOwnerBrowserWindow === 'function' ? contents.getOwnerBrowserWindow() : null
+      return {
+        id: contents.id,
+        ownerWindowId: ownerWindow && !ownerWindow.isDestroyed() ? ownerWindow.id : null,
+        ownerWindowVisible: ownerWindow && !ownerWindow.isDestroyed() ? ownerWindow.isVisible() : null,
+        title: typeof contents.getTitle === 'function' ? contents.getTitle() : '',
+        type: typeof contents.getType === 'function' ? contents.getType() : '',
+        url: typeof contents.getURL === 'function' ? contents.getURL() : '',
       }
-    },
-    async waitForWindowCount(expectedCount: number, timeout = 5000): Promise<void> {
-      try {
-        const startTime = performance.now()
-        while (true) {
-          const actualCount = await this.getWindowCount()
-          if (actualCount === expectedCount) {
-            return
-          }
-          if (performance.now() - startTime > timeout) {
-            throw new Error(`Expected ${expectedCount} windows but got ${actualCount}`)
-          }
-          await new Promise((resolve) => setTimeout(resolve, 200))
-        }
+    })
+})()`)
+        return await this.evaluate(`globalThis._____allWebContents`)
       } catch (error) {
-        throw new VError(error, `Failed to wait for window count ${expectedCount}`)
+        throw new VError(error, `Failed to get all web contents`)
       }
     },
     async getNewWindowId(): Promise<number | null> {
@@ -300,35 +166,134 @@ export const create = ({ electronApp, VError }: CreateParams) => {
         throw new VError(error, `Failed to get new window ID`)
       }
     },
-    async waitForWindowVisible(windowId: number) {
+    async getWebContents(webContentsId: number): Promise<WebContentsEntry | undefined> {
       try {
-        const maxDelay = 5000
-        const startTime = performance.now()
-        while (true) {
-          const isVisible = await this.getWindowIsVisible(windowId)
-          if (isVisible) {
-            return
-          }
-          if (performance.now() - startTime > maxDelay) {
-            throw new Error(`Window ${windowId} did not become visible within ${maxDelay}ms`)
-          }
-          await new Promise((resolve) => setTimeout(resolve, 200))
-        }
+        const entries = await this.getAllWebContents()
+        return entries.find((entry) => entry.id === webContentsId)
       } catch (error) {
-        throw new VError(error, `Failed to wait for window visibility`)
+        throw new VError(error, `Failed to get web contents ${webContentsId}`)
       }
     },
-    async closeWindow(windowId: number) {
+    async getWindowCount(): Promise<number> {
+      try {
+        await this.evaluate(`(() => {
+  const { BrowserWindow } = globalThis._____electron
+  globalThis._____windowCount = BrowserWindow.getAllWindows().length
+})()`)
+        // Return the count that was stored in the global
+        return await this.evaluate(`globalThis._____windowCount`)
+      } catch (error) {
+        throw new VError(error, `Failed to get window count`)
+      }
+    },
+    async getWindowIds(): Promise<readonly number[]> {
+      try {
+        await this.evaluate(`(() => {
+          const { BrowserWindow } = globalThis._____electron
+          const allWindows = BrowserWindow.getAllWindows()
+          globalThis._____windowIds = allWindows.map(w => w.id)
+        })()`)
+        // Return the IDs that were stored in the global
+        return await this.evaluate(`globalThis._____windowIds`)
+      } catch (error) {
+        throw new VError(error, `Failed to get window IDs`)
+      }
+    },
+    async getWindowIsVisible(windowId: number): Promise<boolean> {
       try {
         await this.evaluate(`(() => {
           const { BrowserWindow } = globalThis._____electron
           const window = BrowserWindow.fromId(${windowId})
-          if (window && !window.isDestroyed()) {
-            window.close()
-          }
+          globalThis._____windowIsVisible = Boolean(window) && !window.isDestroyed() && window.isVisible()
         })()`)
+        return await this.evaluate(`globalThis._____windowIsVisible`)
       } catch (error) {
-        throw new VError(error, `Failed to close window`)
+        throw new VError(error, `Failed to get window visibility`)
+      }
+    },
+    async resizeWindowWidth({ stepDelay = 16, width }: ResizeWindowWidthOptions): Promise<void> {
+      try {
+        validateWindowWidth(width)
+        validateStepDelay(stepDelay)
+
+        const stateKey = `_____windowResizeState${++windowResizeOperationId}`
+        const stateKeyLiteral = JSON.stringify(stateKey)
+        await this.evaluate(
+          getWindowExpression(`const targetWidth = ${width}
+  const stepDelay = ${stepDelay}
+  const initialBounds = window.getBounds()
+  globalThis[${stateKeyLiteral}] = { status: 'pending' }
+  const resize = async () => {
+    const direction = Math.sign(targetWidth - initialBounds.width)
+    for (let width = initialBounds.width + direction; direction !== 0 && width !== targetWidth + direction; width += direction) {
+      window.setBounds({
+        ...initialBounds,
+        width,
+      })
+      await new Promise((resolve) => setTimeout(resolve, stepDelay))
+    }
+    return window.getBounds().width
+  }
+  resize().then(
+    (actualWidth) => {
+      globalThis[${stateKeyLiteral}] = { status: 'resolved', width: actualWidth }
+    },
+    (error) => {
+      globalThis[${stateKeyLiteral}] = {
+        message: String(error && error.message ? error.message : error),
+        status: 'rejected',
+      }
+    },
+  )`),
+        )
+
+        const timeout = Math.max(10_000, stepDelay * 10_000)
+        const startTime = performance.now()
+        try {
+          while (true) {
+            const state = (await this.evaluate(`globalThis[${stateKeyLiteral}]`)) as WindowResizeState
+            if (state?.status === 'resolved') {
+              if (state.width !== width) {
+                throw new Error(`Expected window width ${width}, got ${state.width}`)
+              }
+              await page.waitForIdle()
+              return
+            }
+            if (state?.status === 'rejected') {
+              throw new Error(state.message || `Window resize failed`)
+            }
+            if (performance.now() - startTime > timeout) {
+              throw new Error(`Window resize did not finish within ${timeout}ms`)
+            }
+            await new Promise((resolve) => setTimeout(resolve, 50))
+          }
+        } finally {
+          await this.evaluate(`delete globalThis[${stateKeyLiteral}]`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to resize window to width ${width}`)
+      }
+    },
+    async setWindowWidth(width: number): Promise<void> {
+      try {
+        validateWindowWidth(width)
+        const actualWidth = await this.evaluate(
+          getWindowExpression(`if (window.isMaximized()) {
+    window.unmaximize()
+  }
+  const bounds = window.getBounds()
+  window.setBounds({
+    ...bounds,
+    width: ${width},
+  })
+  return window.getBounds().width`),
+        )
+        if (actualWidth !== width) {
+          throw new Error(`Expected window width ${width}, got ${actualWidth}`)
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set window width to ${width}`)
       }
     },
     async mockDialog(response: any) {
@@ -392,6 +357,169 @@ export const create = ({ electronApp, VError }: CreateParams) => {
   }
   electron['${namespace}']['${key}'] = original
 })()`)
+    },
+    async waitForNewWebContentsView({
+      existingIds,
+      timeout = 10_000,
+      urlPattern,
+    }: {
+      existingIds: readonly number[]
+      timeout?: number
+      urlPattern?: RegExp
+    }): Promise<WebContentsEntry> {
+      try {
+        const existingIdSet = new Set(existingIds)
+        const startTime = performance.now()
+        while (true) {
+          const entries = await this.getAllWebContents()
+          const match = entries.find((entry) => {
+            return (
+              !existingIdSet.has(entry.id) &&
+              entry.ownerWindowVisible !== false &&
+              !entry.url.startsWith('devtools://') &&
+              (!urlPattern || urlPattern.test(entry.url))
+            )
+          })
+          if (match) {
+            return match
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error(
+              `No new visible web contents found${urlPattern ? ` matching ${urlPattern}` : ''}. Existing ids: ${existingIds.join(', ')}. Found: ${getWebContentsSummary(entries)}`,
+            )
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for new web contents view`)
+      }
+    },
+    async waitForWebContentsText({
+      selector,
+      text,
+      timeout = 10_000,
+      urlPattern,
+      webContentsId,
+    }: {
+      selector: string
+      text: string
+      timeout?: number
+      urlPattern: RegExp
+      webContentsId?: number
+    }) {
+      try {
+        const startTime = performance.now()
+        while (true) {
+          const remainingTimeout = Math.max(100, timeout - (performance.now() - startTime))
+          const entry = webContentsId
+            ? await this.waitForWebContentsUrl({
+                timeout: remainingTimeout,
+                urlPattern,
+                webContentsId,
+              })
+            : await this.waitForWebContentsView({
+                timeout: remainingTimeout,
+                urlPattern,
+              })
+          const selectorText = await this.executeJavaScriptInWebContents({
+            expression: `(() => {
+  const element = document.querySelector(${JSON.stringify(selector)})
+  return element ? element.textContent || '' : ''
+})()`,
+            timeout: remainingTimeout,
+            webContentsId: entry.id,
+          })
+          if (typeof selectorText === 'string' && selectorText.includes(text)) {
+            return entry
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error(`Selector ${selector} in ${entry.url} did not contain expected text ${text}`)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for web contents text ${text}`)
+      }
+    },
+    async waitForWebContentsUrl({
+      timeout = 10_000,
+      urlPattern,
+      webContentsId,
+    }: {
+      timeout?: number
+      urlPattern: RegExp
+      webContentsId: number
+    }): Promise<WebContentsEntry> {
+      try {
+        const startTime = performance.now()
+        while (true) {
+          const entry = await this.getWebContents(webContentsId)
+          if (entry && urlPattern.test(entry.url) && entry.ownerWindowVisible !== false) {
+            return entry
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error(`Web contents ${webContentsId} did not match ${urlPattern}`)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for web contents url ${webContentsId}`)
+      }
+    },
+    async waitForWebContentsView({ timeout = 10_000, urlPattern }: { timeout?: number; urlPattern: RegExp }): Promise<WebContentsEntry> {
+      try {
+        const startTime = performance.now()
+        while (true) {
+          const entries = await this.getAllWebContents()
+          const match = entries.find((entry) => {
+            return urlPattern.test(entry.url) && entry.ownerWindowVisible !== false
+          })
+          if (match) {
+            return match
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error(`No visible web contents matched ${urlPattern}. Found: ${getWebContentsSummary(entries)}`)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for web contents view`)
+      }
+    },
+    async waitForWindowCount(expectedCount: number, timeout = 5000): Promise<void> {
+      try {
+        const startTime = performance.now()
+        while (true) {
+          const actualCount = await this.getWindowCount()
+          if (actualCount === expectedCount) {
+            return
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error(`Expected ${expectedCount} windows but got ${actualCount}`)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 200))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for window count ${expectedCount}`)
+      }
+    },
+    async waitForWindowVisible(windowId: number) {
+      try {
+        const maxDelay = 5000
+        const startTime = performance.now()
+        while (true) {
+          const isVisible = await this.getWindowIsVisible(windowId)
+          if (isVisible) {
+            return
+          }
+          if (performance.now() - startTime > maxDelay) {
+            throw new Error(`Window ${windowId} did not become visible within ${maxDelay}ms`)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 200))
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to wait for window visibility`)
+      }
     },
   }
 }
