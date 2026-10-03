@@ -47,7 +47,7 @@ test('getCpuProfileSummary aggregates self and total time from samples', () => {
     timeDeltas: [1000, 2500, 500, 1000],
   })
 
-  expect(result.metrics).toEqual({
+  expect(result.metrics).toMatchObject({
     nodeCount: 4,
     sampleCount: 4,
     totalTimeMs: 5,
@@ -145,4 +145,42 @@ test('formatCpuProfileSummary returns compact text', () => {
   expect(summary).toContain('CPU profile:')
   expect(summary).toContain('totalTimeMs | 3')
   expect(summary).toContain('activate | 3 | 3 | 2 | file:///extension.js:12:5')
+})
+
+test('separates idle, GC, JavaScript and unattributed samples without claiming CPU utilization', () => {
+  const result = getCpuProfileSummary({
+    startTime: 0,
+    endTime: 10000,
+    nodes: [
+      { id: 1, callFrame: { functionName: '(idle)' } },
+      { id: 2, callFrame: { functionName: '(garbage collector)' } },
+      { id: 3, callFrame: { functionName: 'work', url: 'file:///work.js' } },
+    ],
+    samples: [1, 2, 3, 999],
+    timeDeltas: [1000, 2000, 3000, 500],
+  })
+  expect(result.metrics).toMatchObject({
+    totalTimeMs: 6.5,
+    elapsedTimeMs: 10,
+    idleTimeMs: 1,
+    gcTimeMs: 2,
+    javascriptTimeMs: 3,
+    otherTimeMs: 0.5,
+    estimatedTiming: false,
+  })
+})
+test('rounds only after accumulation and marks fallback timing', () => {
+  const result = getCpuProfileSummary({
+    startTime: 0,
+    endTime: 1000,
+    samples: [1, 1, 1],
+    nodes: [{ id: 1, callFrame: { url: 'file:///a.js' } }],
+  })
+  expect(result.metrics.totalTimeMs).toBe(1)
+  expect(result.metrics.estimatedTiming).toBe(true)
+  expect(result.topSelfTime[0].selfTimeMs).toBe(1)
+})
+test('malformed timing cannot produce negative or nonfinite totals', () => {
+  const result = getCpuProfileSummary({ startTime: 2, endTime: 1, samples: [1], timeDeltas: [-1] })
+  expect(result.metrics).toMatchObject({ totalTimeMs: 0, elapsedTimeMs: null, estimatedTiming: true })
 })

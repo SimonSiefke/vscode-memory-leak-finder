@@ -34,7 +34,7 @@ test('cpu profile measure lifecycle starts and stops the profiler', async () => 
   const args = MeasureCpuProfile.create(session) as [any]
   const before = await MeasureCpuProfile.start(...args)
   const after = await MeasureCpuProfile.stop(...args)
-  const result = MeasureCpuProfile.compare(before, after)
+  const result = await MeasureCpuProfile.compare(before, after)
   await MeasureCpuProfile.releaseResources(...args)
 
   expect(before.metrics.sampleCount).toBe(0)
@@ -54,8 +54,8 @@ test('cpu profile measure lifecycle starts and stops the profiler', async () => 
   ])
 })
 
-test('cpu profile measure compares as informational only', () => {
-  const result = MeasureCpuProfile.compare(
+test('cpu profile measure compares as informational only', async () => {
+  const result = await MeasureCpuProfile.compare(
     {
       metrics: {
         nodeCount: 0,

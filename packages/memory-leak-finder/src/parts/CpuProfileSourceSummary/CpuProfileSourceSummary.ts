@@ -1,3 +1,4 @@
+import { getSampleTiming } from '../CpuProfileSampleTimes/CpuProfileSampleTimes.ts'
 import type { ScriptMap } from '../ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts'
 import * as ResolveTrackedLocationSourceMaps from '../ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts'
 import type { Dynamic } from '../Types/Types.ts'
@@ -13,7 +14,6 @@ export interface CpuProfileSourceSummary {
   readonly sourceSelfTime: Readonly<Record<string, number>>
 }
 
-const MicrosecondToMillisecond = 1000
 const MillisecondPrecision = 1000
 
 const toArray = (value: Dynamic): readonly Dynamic[] => {
@@ -32,16 +32,6 @@ const roundMetricValue = (value: number): number => {
   return Math.round((value + Number.EPSILON) * MillisecondPrecision) / MillisecondPrecision
 }
 
-const getSampleTimes = (profile: Dynamic, samples: readonly Dynamic[]): readonly number[] => {
-  const timeDeltas = toArray(profile?.timeDeltas)
-  if (timeDeltas.length >= samples.length) {
-    return timeDeltas.slice(0, samples.length).map((value) => roundMetricValue(toNumber(value) / MicrosecondToMillisecond))
-  }
-  const totalTimeUs = toNumber(profile?.endTime) - toNumber(profile?.startTime)
-  const sampleTimeMs = samples.length === 0 ? 0 : roundMetricValue(totalTimeUs / MicrosecondToMillisecond / samples.length)
-  return samples.map(() => sampleTimeMs)
-}
-
 const getGeneratedLocation = (node: Dynamic): string => {
   const callFrame = node?.callFrame || {}
   const url = toString(callFrame.url)
@@ -56,7 +46,7 @@ const getGeneratedLocation = (node: Dynamic): string => {
 export const getCpuProfileSourceSummary = async (profile: Dynamic, scriptMap: ScriptMap | undefined): Promise<CpuProfileSourceSummary> => {
   const nodes = toArray(profile?.nodes)
   const samples = toArray(profile?.samples)
-  const sampleTimes = getSampleTimes(profile, samples)
+  const sampleTimes = getSampleTiming(profile).times
   const nodeMap = new Map<number, Dynamic>()
   const nodeLocations = new Map<number, string>()
 
@@ -80,7 +70,7 @@ export const getCpuProfileSourceSummary = async (profile: Dynamic, scriptMap: Sc
 
   for (let index = 0; index < samples.length; index++) {
     const sampleTimeMs = sampleTimes[index] || 0
-    profileTotalTimeMs = roundMetricValue(profileTotalTimeMs + sampleTimeMs)
+    profileTotalTimeMs += sampleTimeMs
     const nodeId = toNumber(samples[index])
     const node = nodeMap.get(nodeId)
     const location = nodeLocations.get(nodeId)
@@ -91,15 +81,16 @@ export const getCpuProfileSourceSummary = async (profile: Dynamic, scriptMap: Sc
     if (!url) {
       continue
     }
-    javascriptSelfTimeMs = roundMetricValue(javascriptSelfTimeMs + sampleTimeMs)
+    javascriptSelfTimeMs += sampleTimeMs
     const source = resolvedLocations[location]?.originalSource || url
-    sourceSelfTime[source] = roundMetricValue((sourceSelfTime[source] || 0) + sampleTimeMs)
+    sourceSelfTime[source] = (sourceSelfTime[source] || 0) + sampleTimeMs
   }
 
+  for (const source of Object.keys(sourceSelfTime)) sourceSelfTime[source] = roundMetricValue(sourceSelfTime[source])
   return {
     metrics: {
-      javascriptSelfTimeMs,
-      profileTotalTimeMs,
+      javascriptSelfTimeMs: roundMetricValue(javascriptSelfTimeMs),
+      profileTotalTimeMs: roundMetricValue(profileTotalTimeMs),
       sampleCount: samples.length,
     },
     sourceSelfTime,

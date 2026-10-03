@@ -194,6 +194,15 @@ Measures CPU instructions and cycles for the inspected process.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
 ```
 
+### Cpu profile summary
+
+See [the cpu-profile-summary measure](docs/measures/cpu-profile-summary.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure cpu-profile --only base
+npm run build-charts
+```
+
 ### Linux allocation stacks (BCC)
 
 ```sh
