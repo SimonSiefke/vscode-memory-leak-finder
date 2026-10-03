@@ -12,7 +12,7 @@ export interface ParsedNode {
 }
 
 export interface ParsedEdge {
-  readonly nameOrIndex: string
+  readonly nameOrIndex: string | number
   readonly toNode: number
   readonly type: string
 }
@@ -260,7 +260,7 @@ const analyzeNodePrototypeChain = (
         const prototypeEdges = edgeMap.get(prototypeNode.id) || []
         for (const edge of prototypeEdges) {
           // Only check property-type edges for suspicious properties
-          if (edge.type === 'property' && isUnusualPrototypeProperty(edge.nameOrIndex)) {
+          if (edge.type === 'property' && typeof edge.nameOrIndex === 'string' && isUnusualPrototypeProperty(edge.nameOrIndex)) {
             prototypeProperties.push({
               propertyName: edge.nameOrIndex,
               prototypeId: prototypeNode.id,
