@@ -19,7 +19,6 @@ cherry`,
 export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   // @ts-ignore
   await Editor.addCursorBelow()
-  // @ts-ignore
   await Editor.addCursorBelow()
   await Editor.type('prefix ')
   await Editor.shouldHaveText(`prefix apple
@@ -48,5 +47,6 @@ cherry`)
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.save({ viaKeyBoard: false })
   await Editor.closeAll()
 }

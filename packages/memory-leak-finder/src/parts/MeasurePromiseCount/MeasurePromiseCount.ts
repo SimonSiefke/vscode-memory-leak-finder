@@ -1,5 +1,6 @@
 import type { Session } from '../Session/Session.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as ForceGarbageCollection from '../ForceGarbageCollection/ForceGarbageCollection.ts'
 import * as GetPromiseCount from '../GetPromiseCount/GetPromiseCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
@@ -17,12 +18,14 @@ export const create = (session: Session) => {
 }
 
 export const start = async (session: Session, objectGroup: string) => {
+  await ForceGarbageCollection.forceGarbageCollection(session)
   const result = await GetPromiseCount.getPromiseCount(session, objectGroup)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 
 export const stop = async (session: Session, objectGroup: string) => {
+  await ForceGarbageCollection.forceGarbageCollection(session)
   const result = await GetPromiseCount.getPromiseCount(session, objectGroup)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
