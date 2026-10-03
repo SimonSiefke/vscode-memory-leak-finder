@@ -53,6 +53,7 @@ export * as StringCount from '../CreateStringCountChart/CreateStringCountChart.t
 export * as SymbolCount from '../CreateSymbolCountChart/CreateSymbolCountChart.ts'
 export * as SynchronousDomReadCount from '../CreateSynchronousDomReadCountChart/CreateSynchronousDomReadCountChart.ts'
 export * as SynchronousDomReadCountWithStackTraces from '../CreateSynchronousDomReadCountWithStackTracesChart/CreateSynchronousDomReadCountWithStackTracesChart.ts'
+export * as SynchronousFileSystem from '../CreateSynchronousFileSystemChart/CreateSynchronousFileSystemChart.ts'
 export * as TrackedAllocationLeaks from '../CreateTrackedAllocationLeaksChart/CreateTrackedAllocationLeaksChart.ts'
 export * as TrackedAllocationPerformance from '../CreateTrackedAllocationPerformanceChart/CreateTrackedAllocationPerformanceChart.ts'
 export * as TrackedAllocations from '../CreateTrackedAllocationsChart/CreateTrackedAllocationsChart.ts'
