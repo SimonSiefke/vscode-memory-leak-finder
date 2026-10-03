@@ -1,0 +1,26 @@
+{
+  "name": "native-context-menu-escape-dismissal",
+  "displayName": "Native Context Menu Escape Dismissal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "native-context-menu-escape-dismissal.setup",
+        "title": "Native Context Menu Escape Dismissal: Setup"
+      },
+      {
+        "command": "native-context-menu-escape-dismissal.run",
+        "title": "Native Context Menu Escape Dismissal: Run"
+      },
+      {
+        "command": "native-context-menu-escape-dismissal.cleanup",
+        "title": "Native Context Menu Escape Dismissal: Cleanup"
+      }
+    ]
+  }
+}
