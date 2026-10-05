@@ -466,6 +466,14 @@ Measures the total number of Timeouts.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-timeout --only base
 ```
 
+### Startup phase durations
+
+See [the startup-phase-durations measure](docs/measures/startup-phase-durations.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure startup-phase-durations --only base
+```
+
 ### Synchronous file system
 
 See [the synchronous-file-system measure](docs/measures/synchronous-file-system.md) for coverage, result fields, and limitations.
