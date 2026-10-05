@@ -399,6 +399,14 @@ See [the module-loading measure](docs/measures/module-loading.md) for coverage, 
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure module-loading --only base
+```
+
+### Module resolution
+
+See [the module-resolution measure](docs/measures/module-resolution.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure module-resolution --only base
 npm run build-charts
 ```
 
