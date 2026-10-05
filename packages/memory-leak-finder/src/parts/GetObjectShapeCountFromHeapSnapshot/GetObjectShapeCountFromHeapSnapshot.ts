@@ -1,8 +1,7 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
-
 const ITEMS_PER_NODE = 7
-
-export const getObjectShapeCountFromHeapSnapshot = (heapsnapshot) => {
+export const getObjectShapeCountFromHeapSnapshot = (heapsnapshot: Dynamic) => {
   Assert.object(heapsnapshot)
   const { nodes, snapshot } = heapsnapshot
   const { meta } = snapshot

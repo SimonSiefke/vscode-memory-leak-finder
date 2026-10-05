@@ -1,8 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { connectToDevtoolsWithJsonUrl } from '../ConnectToDevtoolsWithJsonUrl/ConnectToDevtoolsWithJsonUrl.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetIntegratedBrowserMeasureRpc from '../GetIntegratedBrowserMeasureRpc/GetIntegratedBrowserMeasureRpc.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
-
 export const getMeasureRpc = async (
   devtoolsWebSocketUrl: string,
   electronWebSocketUrl: string,
@@ -10,20 +11,24 @@ export const getMeasureRpc = async (
   measureNode: boolean,
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
+  inspectIntegratedBrowser: boolean,
   inspectPtyHost: boolean,
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
-  externalInspectPort?: number,
-  externalInspectRuntime: 'bun' | 'node' = 'node',
-): Promise<any> => {
-  if (externalInspectPort) {
-    return connectToDevtoolsWithJsonUrl(externalInspectPort, externalInspectRuntime)
+  excludedTargetIds: readonly string[],
+  inspectExternalRuntime = false,
+  externalRuntimeInspectPort = 0,
+  externalRuntimeName = '',
+): Promise<Dynamic> => {
+  if (inspectExternalRuntime) {
+    return connectToDevtoolsWithJsonUrl(externalRuntimeInspectPort, externalRuntimeName === 'bun' ? 'bun' : 'node')
   }
-
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
+  if (inspectIntegratedBrowser) {
+    return GetIntegratedBrowserMeasureRpc.getIntegratedBrowserMeasureRpc(browserRpc, excludedTargetIds)
+  }
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
-
   if (inspectSharedProcess) {
     await sessionRpc.dispose()
     const sharedProcessRpc = await connectToDevtoolsWithJsonUrl(inspectSharedProcessPort)
@@ -44,12 +49,10 @@ export const getMeasureRpc = async (
     const electronRpc = await DebuggerCreateIpcConnection.createConnection(electronWebSocketUrl)
     return electronRpc
   }
-
   await DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
     autoAttach: true,
     flatten: true,
     waitForDebuggerOnStart: false,
   })
-
   return sessionRpc
 }

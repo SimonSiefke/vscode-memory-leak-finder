@@ -9,10 +9,6 @@ const handleStdinError = () => {
   console.log('[video-recording-worker] ffmpeg error')
 }
 
-const handleStdinFinished = () => {
-  console.log('[video-recording-worker] ffmpeg finished')
-}
-
 const handleExit = () => {
   console.log('[video-recording-worker] ffmpeg exit')
 }
@@ -25,9 +21,7 @@ export const start = async (platform: string, outFile: string): Promise<void> =>
     throw new Error(`ffmpeg binary not found at ${ffmpegPath}`)
   }
   const fps = 25
-  const width = 1024
-  const height = 768
-  const options = GetFfmpegOptions.getFfmpegOptions(fps, width, height, outFile)
+  const options = GetFfmpegOptions.getFfmpegOptions(fps, outFile)
   const childProcess = spawn(ffmpegPath, options, {
     stdio: ['pipe', 'pipe', 'pipe'],
   })
@@ -38,7 +32,6 @@ export const start = async (platform: string, outFile: string): Promise<void> =>
   childProcess.stderr.on('data', (data) => {
     console.log({ stderr: data.toString() })
   })
-  childProcess.stdin.on('finish', handleStdinFinished)
   childProcess.stdin.on('error', handleStdinError)
   childProcess.on('exit', handleExit)
 }

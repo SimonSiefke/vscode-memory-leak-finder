@@ -1,15 +1,99 @@
 import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
+import type { CallgrindConfig } from '../CallgrindConfig/CallgrindConfig.ts'
+import type { CpuPerformanceCountersFromStartConfig } from '../CpuPerformanceCountersFromStart/CpuPerformanceCountersFromStart.ts'
+import type { LinuxProcessTreeResourcesFromStartConfig } from '../LinuxProcessTreeResourcesFromStart/LinuxProcessTreeResourcesFromStart.ts'
 import * as Ide from '../Ide/Ide.ts'
 import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
 import * as ParseVersion from '../ParseVersion/ParseVersion.ts'
 
-export const launchIde = async ({
-  addDisposable,
+export const setupIde = async ({
   arch,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
+  enableExtensions,
+  enableProxy,
+  ide,
+  insidersCommit,
+  inspectExtensions,
+  inspectExtensionsPort,
+  inspectPtyHost,
+  inspectPtyHostPort,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
+  platform,
+  proxyTestFolderName,
+  useProxyMock,
+  updateUrl,
+  vscodePath,
+  vscodeVersion,
+}: {
+  arch: string
+  buildVscodeMinified: boolean
+  clearExtensions: boolean
+  commit: string
+  cwd: string
+  downloadUserDataZipFileToken: string
+  downloadUserDataZipFileUrl: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  ide: string
+  insidersCommit: string
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  platform: string
+  proxyTestFolderName?: string
+  useProxyMock: boolean
+  updateUrl: string
+  vscodePath: string
+  vscodeVersion: string
+}) => {
+  if (ide === Ide.Cursor) {
+    const cursorVersion = '0.45.14' // TODO make it configurable
+    await LaunchCursor.setupCursor({
+      clearExtensions,
+      cursorVersion,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
+      vscodePath,
+    })
+    return
+  }
+  await LaunchVsCode.setupVsCode({
+    arch,
+    buildVscodeMinified,
+    clearExtensions,
+    commit,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
+    enableExtensions,
+    insidersCommit,
+    platform,
+    updateUrl,
+    vscodePath,
+    vscodeVersion,
+  })
+}
+
+export const launchIde = async ({
+  addDisposable,
+  arch,
+  buildVscodeMinified,
+  callgrindConfig,
+  clearExtensions,
+  commit,
+  cpuPerformanceCountersFromStartConfig,
+  cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
   headlessMode,
@@ -21,7 +105,12 @@ export const launchIde = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  linuxProcessTreeResourcesFromStartConfig,
   platform,
+  preparedVscodePath,
+  proxyTestFolderName,
+  trackFunctions,
+  trackingMode,
   updateUrl,
   useProxyMock,
   vscodePath,
@@ -29,9 +118,14 @@ export const launchIde = async ({
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
   arch: string
+  buildVscodeMinified: boolean
+  callgrindConfig: CallgrindConfig
   clearExtensions: boolean
   commit: string
+  cpuPerformanceCountersFromStartConfig: CpuPerformanceCountersFromStartConfig
   cwd: string
+  downloadUserDataZipFileToken: string
+  downloadUserDataZipFileUrl: string
   enableExtensions: boolean
   enableProxy: boolean
   headlessMode: boolean
@@ -43,7 +137,12 @@ export const launchIde = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  linuxProcessTreeResourcesFromStartConfig: LinuxProcessTreeResourcesFromStartConfig
   platform: string
+  preparedVscodePath: string
+  proxyTestFolderName: string
+  trackFunctions: boolean
+  trackingMode: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -53,9 +152,13 @@ export const launchIde = async ({
     const cursorVersion = '0.45.14' // TODO make it configurable
     const { child, pid } = await LaunchCursor.launchCursor({
       addDisposable,
+      callgrindConfig,
       clearExtensions,
       cursorVersion,
+      cpuPerformanceCountersFromStartConfig,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       headlessMode,
@@ -65,6 +168,8 @@ export const launchIde = async ({
       inspectPtyHostPort,
       inspectSharedProcess,
       inspectSharedProcessPort,
+      linuxProcessTreeResourcesFromStartConfig,
+      proxyTestFolderName,
       useProxyMock,
       vscodePath,
     })
@@ -72,6 +177,7 @@ export const launchIde = async ({
       child,
       parsedVersion: ParseVersion.parseVersion(cursorVersion),
       pid,
+      proxyWorkerRpc: null,
     }
   }
   let versionToParse: string
@@ -82,12 +188,17 @@ export const launchIde = async ({
   } else {
     versionToParse = vscodeVersion
   }
-  const { binaryPath, child, pid } = await LaunchVsCode.launchVsCode({
+  const { binaryPath, child, pid, proxyWorkerRpc } = await LaunchVsCode.launchVsCode({
     addDisposable,
     arch,
+    buildVscodeMinified,
+    callgrindConfig,
     clearExtensions,
     commit,
+    cpuPerformanceCountersFromStartConfig,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -98,7 +209,12 @@ export const launchIde = async ({
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    linuxProcessTreeResourcesFromStartConfig,
     platform,
+    preparedVscodePath,
+    proxyTestFolderName,
+    trackFunctions,
+    trackingMode,
     updateUrl,
     useProxyMock,
     vscodePath,
@@ -110,5 +226,6 @@ export const launchIde = async ({
     child,
     parsedVersion: ParseVersion.parseVersion(versionToParse),
     pid,
+    proxyWorkerRpc,
   }
 }

@@ -1,12 +1,11 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
-
-const getHash = (node) => {
+const getHash = (node: Dynamic) => {
   return `${node.type}:${node.disposed}:${node.handlerName}:${node.nodeDescription}`
 }
-
-const getUnique = (nodes) => {
+const getUnique = (nodes: Dynamic) => {
   const seen = Object.create(null)
-  const unique: any[] = []
+  const unique: Dynamic[] = []
   for (const node of nodes) {
     const hash = getHash(node)
     if (hash in seen) {
@@ -17,16 +16,13 @@ const getUnique = (nodes) => {
   }
   return unique
 }
-
-const compareCount = (a, b) => {
+const compareCount = (a: Dynamic, b: Dynamic) => {
   return b.count - a.count
 }
-
-const sortByCount = (items) => {
+const sortByCount = (items: Dynamic) => {
   return Arrays.toSorted(items, compareCount)
 }
-
-export const compareDomListeners = (before, after) => {
+export const compareDomListeners = (before: Dynamic, after: Dynamic) => {
   const oldCountMap = Object.create(null)
   for (const item of before) {
     const hash = getHash(item)
@@ -40,7 +36,7 @@ export const compareDomListeners = (before, after) => {
     newCountMap[hash]++
   }
   const unique = getUnique(after)
-  const leaked: any[] = []
+  const leaked: Dynamic[] = []
   for (const item of unique) {
     const hash = getHash(item)
     const oldCount = oldCountMap[hash] || 0

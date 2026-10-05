@@ -26,7 +26,8 @@ const mergeSelectors = (selector, subSelector = '', hasText = '', hasExactText =
     if (subSelector.startsWith('text=')) {
       const text = subSelector.slice('text='.length)
       return `${merged}:has-text("${text}")`
-    } else if (merged) {
+    }
+    if (merged) {
       merged += ` ${subSelector}`
     } else {
       merged = subSelector
@@ -91,8 +92,8 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     getValue() {
       return LocatorGetValue.getValue(this)
     },
-    hover() {
-      return LocatorHover.hover(this)
+    hover(options = {}) {
+      return LocatorHover.hover(this, options)
     },
     isVisible() {
       return LocatorIsVisible.isVisible(this)

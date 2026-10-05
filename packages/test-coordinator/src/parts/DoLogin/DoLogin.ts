@@ -1,14 +1,17 @@
-import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
+import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 
 export interface LoginOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly compressVideo: boolean
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly filterValue: string
@@ -19,20 +22,23 @@ export interface LoginOptions {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess?: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly measure: string
   readonly measureNode: boolean
-  readonly measureNodeSubprocess: boolean
+  readonly measureNodeSubprocess?: boolean
   readonly openDevtools: boolean
   readonly pageObjectPathResolved: string
   readonly platform: string
+  readonly proxyTestFolderName: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
-  readonly subprocessRuntime: 'bun' | 'node'
+  readonly subprocessRuntime?: 'bun' | 'node'
   readonly timeouts: any
   readonly trackFunctions: boolean
   readonly updateUrl: string
@@ -44,11 +50,14 @@ export interface LoginOptions {
 export const doLogin = async ({
   arch,
   attachedToPageTimeout,
+  buildVscodeMinified,
   clearExtensions,
   commit,
   compressVideo,
   connectionId,
   cwd,
+  downloadUserDataZipFileToken,
+  downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
   filterValue,
@@ -59,6 +68,8 @@ export const doLogin = async ({
   insidersCommit,
   inspectExtensions,
   inspectExtensionsPort,
+  inspectIntegratedBrowser,
+  inspectProcess = '',
   inspectPtyHost,
   inspectPtyHostPort,
   inspectSharedProcess,
@@ -69,6 +80,7 @@ export const doLogin = async ({
   openDevtools,
   pageObjectPathResolved,
   platform,
+  proxyTestFolderName,
   recordVideo,
   runMode,
   screencastQuality,
@@ -84,11 +96,14 @@ export const doLogin = async ({
     await PrepareTestsOrAttach.prepareTestsAndAttach({
       arch,
       attachedToPageTimeout,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       compressVideo,
       connectionId,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       headlessMode,
@@ -98,6 +113,8 @@ export const doLogin = async ({
       insidersCommit,
       inspectExtensions,
       inspectExtensionsPort,
+      inspectIntegratedBrowser,
+      inspectProcess,
       inspectPtyHost,
       inspectPtyHostPort,
       inspectSharedProcess,
@@ -108,6 +125,7 @@ export const doLogin = async ({
       openDevtools,
       pageObjectPath: pageObjectPathResolved,
       platform,
+      proxyTestFolderName,
       recordVideo,
       runMode,
       screencastQuality,

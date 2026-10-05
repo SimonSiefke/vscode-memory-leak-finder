@@ -1,7 +1,7 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-
-export const spyOnContructors = async (session: Session, objectGroup, constructorsObjectId) => {
+export const spyOnContructors = async (session: Session, objectGroup: Dynamic, constructorsObjectId: Dynamic) => {
   // TODO
   // 1. for each class, modify constructor to point to custom class
   //    that captures stack trace on creation

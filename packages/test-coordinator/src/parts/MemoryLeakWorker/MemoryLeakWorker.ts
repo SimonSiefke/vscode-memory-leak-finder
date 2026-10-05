@@ -2,6 +2,20 @@ import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import * as Assert from '../Assert/Assert.ts'
 import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
 import * as MemoryLeakWorkerUrl from '../MemoryLeakWorkerUrl/MemoryLeakWorkerUrl.ts'
+import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
+
+interface ExternalRuntimeInfo {
+  readonly args: readonly string[]
+  readonly command: string
+  readonly inspectPort: number
+  readonly pid: number
+  readonly runtimeName: string
+}
+
+const matchesProcess = (runtimeInfo: ExternalRuntimeInfo, inspectProcess: string): boolean => {
+  const values = [runtimeInfo.command, ...runtimeInfo.args]
+  return values.some((value) => value.includes(inspectProcess))
+}
 
 export const startWorker = async (
   devtoolsWebsocketUrl: string,
@@ -10,18 +24,34 @@ export const startWorker = async (
   measureId: string,
   attachedToPageTimeout: number,
   measureNode: boolean,
-  measureNodeSubprocess: boolean,
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
+  inspectIntegratedBrowser: boolean,
   inspectPtyHost: boolean,
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   pid: number,
-  externalInspectPort: number,
-  subprocessRuntime: 'bun' | 'node',
+  excludedTargetIds: readonly string[],
+  inspectProcess = '',
+  testWorkerRpc?: any,
+  measureNodeSubprocess = false,
+  externalInspectPort = 0,
+  subprocessRuntime: 'bun' | 'node' = 'node',
 ) => {
   Assert.string(devtoolsWebsocketUrl)
+  const externalRuntimeInfo =
+    inspectProcess && testWorkerRpc
+      ? ((await testWorkerRpc.invoke(TestWorkerCommandType.GetExternalRuntimeInfo, connectionId)) as ExternalRuntimeInfo)
+      : undefined
+  if (externalRuntimeInfo && !matchesProcess(externalRuntimeInfo, inspectProcess)) {
+    throw new Error(
+      `Expected external runtime command to include ${JSON.stringify(inspectProcess)} but got ${[
+        externalRuntimeInfo.command,
+        ...externalRuntimeInfo.args,
+      ].join(' ')}`,
+    )
+  }
   const rpc = await NodeWorkerRpcParent.create({
     commandMap: CommandMapRef.commandMapRef,
     path: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
@@ -37,13 +67,16 @@ export const startWorker = async (
     measureNode || measureNodeSubprocess,
     inspectSharedProcess,
     inspectExtensions,
+    inspectIntegratedBrowser,
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
     pid,
-    externalInspectPort || undefined,
-    subprocessRuntime,
+    excludedTargetIds,
+    Boolean(externalRuntimeInfo) || measureNodeSubprocess,
+    externalRuntimeInfo?.inspectPort ?? externalInspectPort,
+    externalRuntimeInfo?.runtimeName ?? subprocessRuntime,
     measureNodeSubprocess,
   )
   return rpc

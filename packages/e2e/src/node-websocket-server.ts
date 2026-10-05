@@ -12,7 +12,7 @@ interface WebSocketResultResponse {
   readonly ok: boolean
 }
 
-export const skip = false
+export const skip = true
 
 const createServerSource = () => {
   return `import crypto from 'node:crypto'

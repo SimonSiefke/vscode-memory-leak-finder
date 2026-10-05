@@ -53,10 +53,10 @@ test('waitForDevtoolsListening - error - main not found', async () => {
   setTimeout(() => {
     stream.emit(
       'data',
-      '\u001B[1m\u001B[47m\u001B[31mError launching app\n' +
-        '\u001B[30mUnable to find Electron app at /test/e2e/fixtures/sample.error-main-not-found\n' +
+      '\u{1B}[1m\u{1B}[47m\u{1B}[31mError launching app\n' +
+        '\u{1B}[30mUnable to find Electron app at /test/e2e/fixtures/sample.error-main-not-found\n' +
         '\n' +
-        `Cannot find module '/test/e2e/fixtures/sample.error-main-not-found/not-found.js'. Please verify that the package.json has a valid "main" entry\u001B[0m\n`,
+        `Cannot find module '/test/e2e/fixtures/sample.error-main-not-found/not-found.js'. Please verify that the package.json has a valid "main" entry\u{1B}[0m\n`,
     )
   }, 0)
   await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrow(
@@ -75,10 +75,10 @@ test('waitForDevtoolsListening - error - invalid package json', async () => {
   setTimeout(() => {
     stream.emit(
       'data',
-      '\u001B[1m\u001B[47m\u001B[31mError launching app\n' +
-        '\u001B[30mUnable to parse /test/e2e/fixtures/sample.error-invalid-package-json/package.json\n' +
+      '\u{1B}[1m\u{1B}[47m\u{1B}[31mError launching app\n' +
+        '\u{1B}[30mUnable to parse /test/e2e/fixtures/sample.error-invalid-package-json/package.json\n' +
         '\n' +
-        "/test/e2e/fixtures/sample.error-invalid-package-json/package.json: Expected ',' or '}' after property value in JSON at position 182\u001B[0m\n",
+        "/test/e2e/fixtures/sample.error-invalid-package-json/package.json: Expected ',' or '}' after property value in JSON at position 182\u{1B}[0m\n",
     )
   }, 0)
   await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrow(

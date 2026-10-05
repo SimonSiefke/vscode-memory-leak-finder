@@ -1,4 +1,5 @@
-export const getSummary = (result) => {
+import type { Dynamic } from '../Types/Types.ts'
+export const getSummary = (result: Dynamic) => {
   if (result && result.eventListeners) {
     return { eventListeners: result.eventListeners }
   }

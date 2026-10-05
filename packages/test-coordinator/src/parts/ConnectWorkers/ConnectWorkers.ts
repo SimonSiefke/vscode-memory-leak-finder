@@ -1,3 +1,4 @@
+import { emptyRpc } from '../EmptyRpc/EmptyRpc.ts'
 import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
@@ -22,17 +23,19 @@ export const connectWorkers = async (
   utilityContext: any,
   runMode: number,
   measureNode: boolean,
-  measureNodeSubprocess: boolean,
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
+  inspectIntegratedBrowser: boolean,
+  inspectProcess = '',
   inspectPtyHost: boolean,
   enableExtensions: boolean,
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   trackFunctions: boolean,
-  externalInspectPort: number,
-  subprocessRuntime: 'bun' | 'node',
+  measureNodeSubprocess = false,
+  externalInspectPort = 0,
+  subprocessRuntime: 'bun' | 'node' = 'node',
 ) => {
   const promises: Promise<any>[] = []
   if (recordVideo) {
@@ -70,24 +73,31 @@ export const connectWorkers = async (
   )
   const [videoRpc, testWorkerRpc] = await Promise.all(promises)
 
-  const memoryRpc = await MemoryLeakWorker.startWorker(
-    devtoolsWebSocketUrl,
-    webSocketUrl,
-    connectionId,
-    measureId,
-    attachedToPageTimeout,
-    measureNode,
-    measureNodeSubprocess,
-    inspectSharedProcess,
-    inspectExtensions,
-    inspectPtyHost,
-    inspectPtyHostPort,
-    inspectSharedProcessPort,
-    inspectExtensionsPort,
-    pid,
-    externalInspectPort,
-    subprocessRuntime,
-  )
+  const memoryRpc =
+    inspectIntegratedBrowser || inspectProcess
+      ? emptyRpc
+      : await MemoryLeakWorker.startWorker(
+          devtoolsWebSocketUrl,
+          webSocketUrl,
+          connectionId,
+          measureId,
+          attachedToPageTimeout,
+          measureNode,
+          inspectSharedProcess,
+          inspectExtensions,
+          inspectIntegratedBrowser,
+          inspectPtyHost,
+          inspectPtyHostPort,
+          inspectSharedProcessPort,
+          inspectExtensionsPort,
+          pid,
+          [],
+          '',
+          undefined,
+          measureNodeSubprocess,
+          externalInspectPort,
+          subprocessRuntime,
+        )
 
   return {
     memoryRpc,

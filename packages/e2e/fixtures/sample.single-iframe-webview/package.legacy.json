@@ -1,0 +1,20 @@
+{
+  "name": "single-iframe-webview",
+  "displayName": "Webview Loader Test",
+  "description": "E2E fixture for comparing the legacy and experimental Electron webview loaders",
+  "version": "0.0.0-dev",
+  "publisher": "vscode-memory-leak-finder",
+  "engines": {
+    "vscode": "^1.128.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": ["onCommand:test.showSingleIframeWebview"],
+  "contributes": {
+    "commands": [
+      {
+        "command": "test.showSingleIframeWebview",
+        "title": "Test: Show Single-Iframe WebView"
+      }
+    ]
+  }
+}

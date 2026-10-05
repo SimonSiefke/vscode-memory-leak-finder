@@ -39,6 +39,25 @@ const getMiddleHtml = (dirents: string[]) => {
   return html
 }
 
+const singleColumnFolders = new Set([
+  'compiled-code-size-by-file',
+  'compiled-code-size-by-function',
+  'cpu-profile',
+  'file-descriptor-count',
+  'named-function-count-3',
+  'paint-events',
+  'tracked-allocation-leaks',
+  'tracked-allocation-performance',
+  'tracked-allocations-by-file',
+])
+
+export const getFolderContentHtml = (folderName: string, dirents: string[]): string => {
+  if (singleColumnFolders.has(folderName)) {
+    return getSingleColumnHtml(dirents)
+  }
+  return getMiddleHtml(dirents)
+}
+
 const generateIndexHtmlForFolder = async (folderPath: string, folderName: string): Promise<void> => {
   const outPath = join(folderPath, 'index.html')
   const dirents = await readdir(folderPath)
@@ -46,16 +65,9 @@ const generateIndexHtmlForFolder = async (folderPath: string, folderName: string
   // Copy CSS and JS files to this folder
   await CopyAssetsToFolder.copyAssetsToFolder(folderPath)
 
-  // Use single column layout for named-function-count-3
-  if (folderName === 'named-function-count-3') {
-    const middleHtml = getSingleColumnHtml(dirents)
-    const html = baseStructure.replace('CONTENT', middleHtml)
-    await writeFile(outPath, html)
-  } else {
-    const middleHtml = getMiddleHtml(dirents)
-    const html = baseStructure.replace('CONTENT', middleHtml)
-    await writeFile(outPath, html)
-  }
+  const middleHtml = getFolderContentHtml(folderName, dirents)
+  const html = baseStructure.replace('CONTENT', middleHtml)
+  await writeFile(outPath, html)
 }
 
 const getSingleColumnHtml = (dirents: string[]): string => {

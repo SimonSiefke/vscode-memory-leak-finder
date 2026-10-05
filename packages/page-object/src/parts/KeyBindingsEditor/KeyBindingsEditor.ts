@@ -23,6 +23,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await input.focus()
         await expect(input).toBeFocused()
         await input.setValue(searchValue)
+        await expect(input).toHaveValue(searchValue)
+        const rows = keyBindingsEditor.locator('.keybindings-body .monaco-list-row')
+        await expect(rows.first()).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to search for ${searchValue}`)
       }
@@ -66,10 +70,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(keyBindingsEditor).toBeVisible({
           timeout: 3000,
         })
+        await page.waitForIdle()
+        const openInMainWindowButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
+        if (await openInMainWindowButton.isVisible()) {
+          await openInMainWindowButton.click()
+          await expect(openInMainWindowButton).toBeHidden()
+          await page.waitForIdle()
+        }
         const body = page.locator('.keybindings-body')
         await expect(body).toBeVisible()
+        await page.waitForIdle()
         const list = body.locator('.monaco-list')
         await expect(list).toBeVisible()
+        await page.waitForIdle()
+        const input = page.locator('.keybindings-header .ibwrapper .input')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        await expect(input).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show keybindings editor`)
       }

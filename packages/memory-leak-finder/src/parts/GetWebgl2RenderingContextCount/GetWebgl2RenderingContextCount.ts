@@ -5,7 +5,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 export const getWebgl2RenderingContextCount = async (session: Session, objectGroup: string): Promise<number> => {
   try {
-    return await GetObjectCount.getObjectCount(session, PrototypeExpression.Webgl2RenderingContext, objectGroup)
+    return await GetObjectCount.getObjectCount(session, PrototypeExpression.Webgl2RenderingContext)
   } catch (error) {
     throw new VError(error, `Failed to get webgl2 rendering context count`)
   }

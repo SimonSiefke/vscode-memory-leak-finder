@@ -280,9 +280,37 @@ export const getValue = (locator: any) => {
   return element.value
 }
 
+const insertTextWithRange = (element: HTMLElement, value: string): void => {
+  const selection = document.getSelection()
+  if (selection && selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0)
+    if (element.contains(range.commonAncestorContainer)) {
+      range.deleteContents()
+      const text = document.createTextNode(value)
+      range.insertNode(text)
+      range.setStartAfter(text)
+      range.collapse(true)
+      selection.removeAllRanges()
+      selection.addRange(range)
+      return
+    }
+  }
+  element.textContent = `${element.textContent || ''}${value}`
+}
+
 export const contentEditableInsert = ({ value }) => {
+  const element = document.activeElement
+  const before = element instanceof HTMLElement && element.isContentEditable ? element.textContent : undefined
   // TODO find non-deprecated alternative
-  document.execCommand('insertText', false, value)
+  const didInsert = document.execCommand('insertText', false, value)
+  if (didInsert && (before === undefined || value === '' || (element instanceof HTMLElement && element.textContent !== before))) {
+    return
+  }
+  if (!(element instanceof HTMLElement) || !element.isContentEditable) {
+    return
+  }
+  insertTextWithRange(element, value)
+  element.dispatchEvent(new InputEvent('input', { bubbles: true, data: value, inputType: 'insertText' }))
 }
 
 export const boundingBox = (locator) => {

@@ -1,10 +1,10 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.ts'
 import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.ts'
-
-export const getConstructorLocations = async (session: Session, objectGroup: string, map: any) => {
+export const getConstructorLocations = async (session: Session, objectGroup: string, map: Dynamic) => {
   const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const map = this

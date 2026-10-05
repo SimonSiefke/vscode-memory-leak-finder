@@ -1,10 +1,13 @@
 import { mkdir, readdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as Electron from '../Electron/Electron.ts'
 import * as Exec from '../Exec/Exec.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ page, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const workspace = join(Root.root, '.vscode-test-workspace')
 
   return {
@@ -37,6 +40,21 @@ export const create = ({ page, VError }: CreateParams) => {
       await Exec.exec('git', ['clone', repoUrl, '.'], { cwd: workspace, env: { ...process.env } })
       await page.waitForIdle()
     },
+    async closeRepository(relativePath?: string) {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitCloseRepository, {
+          pressKeyOnce: true,
+          stayVisible: Boolean(relativePath),
+        })
+        if (relativePath) {
+          await quickPick.select(relativePath)
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close repository${relativePath ? ` at ${relativePath}` : ''}`)
+      }
+    },
     async commit(message: string) {
       try {
         await page.waitForIdle()
@@ -64,6 +82,97 @@ export const create = ({ page, VError }: CreateParams) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to init`)
+      }
+    },
+    async initRepository(relativePath: string) {
+      try {
+        const repositoryPath = join(workspace, relativePath)
+        await mkdir(repositoryPath, { recursive: true })
+        await Exec.exec('git', ['init', '-b', 'main'], { cwd: repositoryPath, env: { ...process.env } })
+        await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: repositoryPath, env: { ...process.env } })
+        await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: repositoryPath, env: { ...process.env } })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to init repository at ${relativePath}`)
+      }
+    },
+    async openRepository(relativePath: string) {
+      try {
+        const repositoryPath = join(workspace, relativePath)
+        const electron = Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await electron.mockOpenDialog({
+          bookmarks: [],
+          canceled: false,
+          filePaths: [repositoryPath],
+        })
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitOpenRepository, { pressKeyOnce: true })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open repository at ${relativePath}`)
+      }
+    },
+    async reopenClosedRepository(relativePath: string) {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitReopenClosedRepositories, {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
+        await quickPick.select(` ${relativePath}`)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to reopen repository at ${relativePath}`)
+      }
+    },
+    async shouldHaveNoStagedDiff(fileName: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--cached', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (result.stdout !== '') {
+          throw new Error(`expected no staged diff for ${fileName} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check staged diff for ${fileName}`)
+      }
+    },
+    async shouldHaveStagedDiffContaining(fileName: string, text: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--cached', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (!result.stdout.includes(text)) {
+          throw new Error(`expected staged diff for ${fileName} to include ${text} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check staged diff contents for ${fileName}`)
+      }
+    },
+    async shouldHaveWorkingTreeDiffContaining(fileName: string, text: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (!result.stdout.includes(text)) {
+          throw new Error(`expected working tree diff for ${fileName} to include ${text} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check working tree diff contents for ${fileName}`)
+      }
+    },
+    async shouldNotHaveStagedDiffContaining(fileName: string, text: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--cached', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (result.stdout.includes(text)) {
+          throw new Error(`expected staged diff for ${fileName} not to include ${text} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check staged diff contents for ${fileName}`)
+      }
+    },
+    async shouldNotHaveWorkingTreeDiffContaining(fileName: string, text: string) {
+      try {
+        const result = await Exec.exec('git', ['diff', '--', fileName], { cwd: workspace, env: { ...process.env } })
+        if (result.stdout.includes(text)) {
+          throw new Error(`expected working tree diff for ${fileName} not to include ${text} but got ${result.stdout}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check working tree diff contents for ${fileName}`)
       }
     },
   }

@@ -1,20 +1,17 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
-
-const getKey = (element) => {
+const getKey = (element: Dynamic) => {
   return `${element.scriptId}:${element.lineNumber}:${element.columnNumber}`
 }
-
-const compareFunction = (a, b) => {
+const compareFunction = (a: Dynamic, b: Dynamic) => {
   return b.count - a.count
 }
-
-const sortValues = (values) => {
+const sortValues = (values: Dynamic) => {
   return Arrays.toSorted(values, compareFunction)
 }
-
-export const sortNamedFunctions = (array) => {
+export const sortNamedFunctions = (array: Dynamic) => {
   Assert.array(array)
   const map = Object.create(null)
   for (const element of array) {

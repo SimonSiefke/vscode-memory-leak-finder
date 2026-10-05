@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
+import * as RequestMockKey from '../RequestMockKey/RequestMockKey.ts'
 
 const __dirname = import.meta.dirname
 const MOCK_CONFIG_PATH = join(__dirname, 'mock-config.json')
@@ -50,13 +51,14 @@ const findConfigMatch = (config: MockConfigEntry[], hostname: string, pathname: 
   return null
 }
 
-export const getMockFileName = async (hostname: string, pathname: string, method: string): Promise<string> => {
+export const getMockFileName = async (hostname: string, pathname: string, method: string, requestBody?: unknown): Promise<string> => {
   // Try to load config first
   const config = await loadConfig()
   const configMatch = findConfigMatch(config, hostname, pathname, method)
+  const requestMockKey = RequestMockKey.getRequestMockKey(hostname, pathname, method, requestBody)
 
   if (configMatch) {
-    return configMatch
+    return RequestMockKey.appendRequestMockKey(configMatch, requestMockKey)
   }
 
   // Generic fallback: Convert URL to filename format: hostname_pathname_method.json
@@ -64,5 +66,5 @@ export const getMockFileName = async (hostname: string, pathname: string, method
   const pathnameSanitized = pathname.replaceAll(NON_ALPHANUMERIC_REGEX, '_').replace(LEADING_UNDERSCORES_REGEX, '')
   const methodLower = method.toLowerCase()
   const pathPart = pathnameSanitized || 'root'
-  return `${hostnameSanitized}_${pathPart}_${methodLower}.json`
+  return RequestMockKey.appendRequestMockKey(`${hostnameSanitized}_${pathPart}_${methodLower}.json`, requestMockKey)
 }

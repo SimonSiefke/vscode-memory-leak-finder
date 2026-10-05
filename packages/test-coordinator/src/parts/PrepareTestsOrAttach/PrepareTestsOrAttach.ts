@@ -13,11 +13,14 @@ export const state: State = {
 export interface PrepareTestsAndAttachOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly compressVideo: boolean
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly headlessMode: boolean
@@ -27,20 +30,24 @@ export interface PrepareTestsAndAttachOptions {
   readonly insidersCommit: string
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
+  readonly inspectIntegratedBrowser: boolean
+  readonly inspectProcess?: string
   readonly inspectPtyHost: boolean
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly measureId: string
+  readonly measureNodeSubprocess?: boolean
+  readonly subprocessRuntime?: 'bun' | 'node'
   readonly measureNode: boolean
-  readonly measureNodeSubprocess: boolean
   readonly openDevtools: boolean
   readonly pageObjectPath: string
   readonly platform: string
+  readonly preparedVscodePath?: string
+  readonly proxyTestFolderName: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number
-  readonly subprocessRuntime: 'bun' | 'node'
   readonly timeouts: any
   readonly trackFunctions: boolean
   readonly updateUrl: string
@@ -86,11 +93,14 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   const {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     clearExtensions,
     commit,
     compressVideo,
     connectionId,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -100,20 +110,24 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     insidersCommit,
     inspectExtensions,
     inspectExtensionsPort,
+    inspectIntegratedBrowser,
+    inspectProcess = '',
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
     measureId,
     measureNode,
-    measureNodeSubprocess,
+    measureNodeSubprocess = false,
+    subprocessRuntime = 'node',
     openDevtools,
     pageObjectPath,
     platform,
+    preparedVscodePath = '',
+    proxyTestFolderName,
     recordVideo,
     runMode,
     screencastQuality,
-    subprocessRuntime,
     timeouts,
     trackFunctions,
     updateUrl,
@@ -126,10 +140,13 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     state.promise = PrepareTests.prepareTests({
       arch,
       attachedToPageTimeout,
+      buildVscodeMinified,
       clearExtensions,
       commit,
       connectionId,
       cwd,
+      downloadUserDataZipFileToken,
+      downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
       headlessMode,
@@ -147,6 +164,8 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       openDevtools,
       pageObjectPath,
       platform,
+      preparedVscodePath,
+      proxyTestFolderName,
       recordVideo,
       runMode,
       timeouts,
@@ -191,23 +210,28 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     utilityContext,
     runMode,
     measureNode,
-    measureNodeSubprocess,
     inspectSharedProcess,
     inspectExtensions,
+    inspectIntegratedBrowser,
+    inspectProcess,
     inspectPtyHost,
     enableExtensions,
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
     trackFunctions,
+    measureNodeSubprocess,
     externalInspectPort,
     subprocessRuntime,
   )
   return {
+    devtoolsWebSocketUrl,
     functionTrackerRpc,
     initializationWorkerRpc,
     memoryRpc,
+    pid,
     testWorkerRpc,
     videoRpc,
+    webSocketUrl,
   }
 }

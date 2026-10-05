@@ -1,10 +1,11 @@
-import { fixSvgHeight } from '../FixSvgHeight/FixSvgHeight.ts'
+import { addRowHighlights } from '../AddRowHighlights/AddRowHighlights.ts'
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import { getCommonBarChartOptions } from '../GetCommonBarChartOptions/GetCommonBarChartOptions.ts'
 import * as Plot from '../Plot/Plot.ts'
 
 export const createBarChart = (data: any, options: any): string => {
-  const dataCount = data.length
+  const orderedData = [...data].sort((a: any, b: any) => (b.value || 0) - (a.value || 0))
+  const dataCount = orderedData.length
   const chartOptions = getCommonBarChartOptions(dataCount, options)
 
   const baseHtml = Plot.plot({
@@ -14,21 +15,19 @@ export const createBarChart = (data: any, options: any): string => {
     marginRight: chartOptions.marginRight,
     marginTop: chartOptions.marginTop,
     marks: [
-      Plot.rectX(data, {
+      Plot.rectX(orderedData, {
         fill: 'black',
         fillOpacity: 0.75,
         inset: 0,
         rx1: 2,
         rx2: 2,
-        sort: {
-          y: '-x',
-        },
         strokeWidth: 2,
+        title: 'title',
         x: 'value',
         y: 'name',
       }),
 
-      Plot.text(data, {
+      Plot.text(orderedData, {
         dx: 3,
         fontSize: chartOptions.fontSize,
         stroke: 'black',
@@ -41,10 +40,10 @@ export const createBarChart = (data: any, options: any): string => {
     ],
     style: 'overflow: visible; background:white',
     width: chartOptions.width,
-    x: { axis: null },
-    y: { label: null },
+    x: { axis: null, ...(orderedData.every((item: any) => item.value === 0) ? { domain: [0, 1] } : {}) },
+    y: { domain: orderedData.map((item: any) => item.name), label: null },
   }).outerHTML
 
   const finalHtml = fixHtmlNamespace(baseHtml)
-  return fixSvgHeight(finalHtml, dataCount)
+  return addRowHighlights(finalHtml, orderedData, chartOptions, options)
 }

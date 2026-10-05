@@ -14,17 +14,19 @@ const ourPath = `/home/simon/.cache/repos/vite`
 const only = 'node-vite-server-hot-reload'
 const runs = 197
 const measure = 'instance-count-differences'
+const extraArgs = ''
 
 const main = async () => {
   const absolutePath = isAbsolute(relativePath) ? relativePath : join(root, relativePath)
   const content = await readFile(absolutePath, 'utf8')
   const prompt = getPrompt({
     content,
+    extraArgs,
     localVscodePath,
-    only,
-    runs,
-    ourPath,
     measure,
+    only,
+    ourPath,
+    runs,
   })
   await clipboard.write(prompt)
   process.stdout.write(prompt)

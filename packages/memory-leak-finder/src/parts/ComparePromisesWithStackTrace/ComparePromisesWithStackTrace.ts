@@ -1,9 +1,9 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.ts'
 import * as Hash from '../Hash/Hash.ts'
-
-const hashPromise = (item) => {
+const hashPromise = (item: Dynamic) => {
   const { preview, stackTrace } = item
   const { properties } = preview
   return Hash.hash({
@@ -11,8 +11,7 @@ const hashPromise = (item) => {
     stackTrace,
   })
 }
-
-const getAdded = (before, after) => {
+const getAdded = (before: Dynamic, after: Dynamic) => {
   const beforeMap = Object.create(null)
   for (const item of before) {
     const hash = hashPromise(item)
@@ -24,7 +23,7 @@ const getAdded = (before, after) => {
     beforeCounts[hash] = beforeMap[hash]
   }
   const afterCounts: Record<string, number> = Object.create(null)
-  const leaked: any[] = []
+  const leaked: Dynamic[] = []
   for (const item of after) {
     const hash = hashPromise(item)
     afterCounts[hash] ||= 0
@@ -37,8 +36,7 @@ const getAdded = (before, after) => {
   }
   return { afterCounts, beforeCounts, leaked }
 }
-
-const deduplicate = (leaked, beforeCounts: Record<string, number>, afterCounts: Record<string, number>) => {
+const deduplicate = (leaked: Dynamic, beforeCounts: Record<string, number>, afterCounts: Record<string, number>) => {
   const map = Object.create(null)
   for (const item of leaked) {
     const hash = hashPromise(item)
@@ -46,21 +44,20 @@ const deduplicate = (leaked, beforeCounts: Record<string, number>, afterCounts: 
       map[hash] = item
     }
   }
-  const deduplicated: any[] = []
+  const deduplicated: Dynamic[] = []
   for (const [key, value] of Object.entries(map)) {
     const beforeCount = beforeCounts[key] || 0
     const afterCount = afterCounts[key] || 0
     const delta = afterCount - beforeCount
     deduplicated.push({
-      ...(value as any),
+      ...(value as Dynamic),
       count: afterCount,
       delta,
     })
   }
   return deduplicated
 }
-
-const cleanItem = (item) => {
+const cleanItem = (item: Dynamic) => {
   const { count, delta, preview, stackTrace } = item
   const { properties } = preview
   return {
@@ -70,21 +67,19 @@ const cleanItem = (item) => {
     stackTrace: typeof stackTrace === 'string' ? stackTrace.split('\n') : stackTrace,
   }
 }
-
-const clean = (items) => {
+const clean = (items: Dynamic) => {
   return items.map(cleanItem)
 }
-
-const mergeOriginal = (items, cleanInstances) => {
+const mergeOriginal = (items: Dynamic, cleanInstances: Dynamic) => {
   const reverseMap = Object.create(null)
   for (const instance of cleanInstances) {
     reverseMap[instance.originalIndex] = instance
   }
-  const merged: any[] = []
+  const merged: Dynamic[] = []
   let originalIndex = 0
   for (const item of items) {
     originalIndex++
-    const originalStack: any[] = []
+    const originalStack: Dynamic[] = []
     let sourcesHash: string | null | undefined = null
     for (let i = 0; i < item.stackTrace.length; i++) {
       originalIndex++
@@ -104,16 +99,13 @@ const mergeOriginal = (items, cleanInstances) => {
   }
   return merged
 }
-
-const compareItem = (a, b) => {
+const compareItem = (a: Dynamic, b: Dynamic) => {
   return b.count - a.count
 }
-
-const sortItems = (items) => {
+const sortItems = (items: Dynamic) => {
   return items.toSorted(compareItem)
 }
-
-export const comparePromisesWithStackTrace = async (before, after, context = {}) => {
+export const comparePromisesWithStackTrace = async (before: Dynamic, after: Dynamic, context: Dynamic = {}) => {
   Assert.array(before)
   let afterResult = after
   let scriptMap = null
@@ -129,10 +121,10 @@ export const comparePromisesWithStackTrace = async (before, after, context = {})
   let filtered = cleanLeaked
   if (context && typeof context === 'object' && 'runs' in context && typeof context.runs === 'number') {
     const { runs } = context
-    filtered = cleanLeaked.filter((item) => item.delta >= runs)
+    filtered = cleanLeaked.filter((item: Dynamic) => item.delta >= runs)
   }
   if (scriptMap) {
-    const stackTraces = filtered.map((item) => item.stackTrace)
+    const stackTraces = filtered.map((item: Dynamic) => item.stackTrace)
     const fullQuery = GetEventListenersQuery.getEventListenerQuery(stackTraces, scriptMap)
     const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
     const sortedWithOriginal = mergeOriginal(filtered, cleanInstances)

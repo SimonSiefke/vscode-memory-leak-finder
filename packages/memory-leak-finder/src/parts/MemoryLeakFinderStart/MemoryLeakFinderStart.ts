@@ -1,9 +1,14 @@
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
-import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import * as PendingDevtoolsConnectionState from '../PendingDevtoolsConnectionState/PendingDevtoolsConnectionState.ts'
+import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import * as WaitForCrash from '../WaitForCrash/WaitForCrash.ts'
+import type { UnknownRecord } from '../Types/Types.ts'
 
-const doStart = async (connectionId: number): Promise<any> => {
+const isRecord = (value: unknown): value is UnknownRecord => {
+  return typeof value === 'object' && value !== null
+}
+
+const doStart = async (connectionId: number): Promise<unknown> => {
   let state = MemoryLeakFinderState.get(connectionId)
   if (!state) {
     const pending = PendingDevtoolsConnectionState.get(connectionId)
@@ -17,13 +22,16 @@ const doStart = async (connectionId: number): Promise<any> => {
         pending.measureNode,
         pending.inspectSharedProcess,
         pending.inspectExtensions,
+        pending.inspectIntegratedBrowser,
         pending.inspectPtyHost,
         pending.inspectPtyHostPort,
         pending.inspectSharedProcessPort,
         pending.inspectExtensionsPort,
         pending.pid,
-        pending.externalInspectPort,
-        pending.externalInspectRuntime,
+        pending.excludedTargetIds,
+        pending.inspectExternalRuntime,
+        pending.externalRuntimeInspectPort,
+        pending.externalRuntimeName,
       )
       state = MemoryLeakFinderState.get(connectionId)
     }
@@ -39,15 +47,15 @@ const doStart = async (connectionId: number): Promise<any> => {
   return result
 }
 
-export const start = async (connectionId: number, electronTargetId: string): Promise<any> => {
+export const start = async (connectionId: number, electronTargetId: string): Promise<unknown> => {
   const crashInfo = WaitForCrash.waitForCrash(electronTargetId)
   const resultPromise = doStart(connectionId)
   const intermediateResult = await Promise.race([crashInfo.promise, resultPromise])
-  if (intermediateResult && intermediateResult.crashed) {
+  if (isRecord(intermediateResult) && intermediateResult.crashed) {
     throw new Error('target crashed')
   }
   crashInfo.dispose()
-  if (intermediateResult && intermediateResult.connectionClosed) {
+  if (isRecord(intermediateResult) && intermediateResult.connectionClosed) {
     return { connectionClosed: true }
   }
   MemoryLeakFinderState.update(connectionId, { before: intermediateResult })

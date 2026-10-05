@@ -15,11 +15,14 @@ export interface PrepareBothResult {
 export interface PrepareBothOptions {
   readonly arch: string
   readonly attachedToPageTimeout: number
+  readonly buildVscodeMinified: boolean
   readonly canUseIdleCallback: boolean
   readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
+  readonly downloadUserDataZipFileToken: string
+  readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
   readonly headlessMode: boolean
@@ -35,6 +38,8 @@ export interface PrepareBothOptions {
   readonly measureId: string
   readonly openDevtools: boolean
   readonly platform: string
+  readonly preparedVscodePath: string
+  readonly proxyTestFolderName: string
   readonly trackFunctions: boolean
   readonly updateUrl: string
   readonly useProxyMock: boolean
@@ -46,11 +51,14 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
   const {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     canUseIdleCallback,
     clearExtensions,
     commit,
     connectionId,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -66,6 +74,8 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     measureId,
     openDevtools,
     platform,
+    preparedVscodePath,
+    proxyTestFolderName,
     trackFunctions,
     updateUrl,
     useProxyMock,
@@ -76,11 +86,14 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
   const launchResult = await initializationWorkerRpc.invoke('Launch.launch', {
     arch,
     attachedToPageTimeout,
+    buildVscodeMinified,
     canUseIdleCallback,
     clearExtensions,
     commit,
     connectionId,
     cwd,
+    downloadUserDataZipFileToken,
+    downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
     headlessMode,
@@ -96,6 +109,8 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     measureId,
     openDevtools,
     platform,
+    preparedVscodePath,
+    proxyTestFolderName,
     trackFunctions,
     updateUrl,
     useProxyMock,

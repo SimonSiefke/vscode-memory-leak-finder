@@ -2,6 +2,30 @@ import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtoc
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
+const getEvaluateContextOptions = (utilityContext: { id?: number; uniqueId?: string }) => {
+  if (utilityContext.uniqueId) {
+    return {
+      uniqueContextId: utilityContext.uniqueId,
+    }
+  }
+  return {
+    contextId: utilityContext.id,
+  }
+}
+
+const waitForContextWithTimeout = async (promise: Promise<any>, timeout: number) => {
+  const { promise: timeoutPromise, resolve } = Promise.withResolvers<undefined>()
+  const timeoutRef = setTimeout(() => {
+    resolve(undefined)
+  }, timeout)
+  try {
+    const result = await Promise.race([promise, timeoutPromise])
+    return result
+  } finally {
+    clearTimeout(timeoutRef)
+  }
+}
+
 const getMatchingContext = (contexts: Record<string, any>, utilityExecutionContextName: string) => {
   for (const value of Object.values(contexts)) {
     if (value.name === utilityExecutionContextName) {
@@ -13,6 +37,7 @@ const getMatchingContext = (contexts: Record<string, any>, utilityExecutionConte
 
 export const addUtilityExecutionContext = async (rpc, utilityExecutionContextName, frameId) => {
   const contexts = Object.create(null)
+  const utilityScript = await UtilityScript.getUtilityScript()
 
   const executionContextPromise = waitForUtilityExecutionContext(rpc, utilityExecutionContextName, contexts)
 
@@ -25,18 +50,47 @@ export const addUtilityExecutionContext = async (rpc, utilityExecutionContextNam
     return matchingContext
   }
 
-  await DevtoolsProtocolPage.createIsolatedWorld(rpc, {
+  const createIsolatedWorldResult = await DevtoolsProtocolPage.createIsolatedWorld(rpc, {
     frameId: frameId,
     worldName: utilityExecutionContextName,
   })
 
-  const utilityContext = await executionContextPromise
+  await DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(rpc, {
+    source: utilityScript,
+    worldName: utilityExecutionContextName,
+  })
+
+  const createdExecutionContext = await waitForContextWithTimeout(executionContextPromise, 5000)
+  const utilityContext =
+    createdExecutionContext ||
+    (typeof createIsolatedWorldResult?.executionContextId === 'number'
+      ? {
+          id: createIsolatedWorldResult.executionContextId,
+          name: utilityExecutionContextName,
+        }
+      : await executionContextPromise)
   await DevtoolsProtocolRuntime.disable(rpc)
 
-  const utilityScript = await UtilityScript.getUtilityScript()
   await DevtoolsProtocolRuntime.evaluate(rpc, {
     expression: utilityScript,
-    uniqueContextId: utilityContext.uniqueId,
+    ...getEvaluateContextOptions(utilityContext),
   })
+
+  const testType = await DevtoolsProtocolRuntime.evaluate(rpc, {
+    expression: 'typeof test',
+    returnByValue: true,
+    ...getEvaluateContextOptions(utilityContext),
+  })
+
+  if (testType !== 'object' && !utilityContext.uniqueId) {
+    const contextFromEvent = await waitForContextWithTimeout(executionContextPromise, 5000)
+    if (contextFromEvent) {
+      await DevtoolsProtocolRuntime.evaluate(rpc, {
+        expression: utilityScript,
+        ...getEvaluateContextOptions(contextFromEvent),
+      })
+      return contextFromEvent
+    }
+  }
   return utilityContext
 }

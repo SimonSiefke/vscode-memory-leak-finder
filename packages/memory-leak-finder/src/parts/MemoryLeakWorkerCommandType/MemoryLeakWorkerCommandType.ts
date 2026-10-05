@@ -3,5 +3,6 @@ export const GetHeapSnapshotForConnection = 'GetHeapSnapshotForConnection.getHea
 export const GetNamedArrayCountForConnection = 'GetNamedArrayCountForConnection.getNamedArrayCountForConnection'
 export const MemoryLeakFinderSetup = 'MemoryLeakFinderSetup.setup'
 export const MemoryLeakFinderStart = 'MemoryLeakFinderStart.start'
+export const MemoryLeakFinderRunCompletion = 'MemoryLeakFinderRunCompletion.runCompletion'
 export const MemoryLeakFinderStop = 'MemoryLeakFinderStop.stop'
 export const MemoryLeakFinderCompare = 'MemoryLeakFinderStop.compare'

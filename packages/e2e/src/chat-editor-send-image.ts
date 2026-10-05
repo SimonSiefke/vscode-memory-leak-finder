@@ -18,13 +18,13 @@ export const setup = async ({ ChatEditor, Editor, SideBar, Workspace }: TestCont
       name: 'image.svg',
     },
   ])
-  // TODO create an svg file, attach it as image
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     image: 'image.svg',
     message: `what's displayed in this image`,
+    model: ChatEditor.Models.Auto,
     verify: true,
   })
   await ChatEditor.clearAll()

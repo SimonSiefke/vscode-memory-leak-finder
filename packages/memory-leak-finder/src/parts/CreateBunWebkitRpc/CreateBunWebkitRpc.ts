@@ -2,7 +2,7 @@ const getConstructorNameFunction = 'function(){ return this && this.constructor 
 
 interface SyntheticQueryObject {
   readonly expression: string
-  readonly objectGroup?: string
+  readonly objectGroup?: string | undefined
 }
 
 let nextSyntheticObjectId = 0

@@ -2,8 +2,11 @@ export interface PendingDevtoolsConnectionOptions {
   readonly attachedToPageTimeout: number
   readonly devtoolsWebSocketUrl: string
   readonly electronWebSocketUrl: string
-  readonly externalInspectPort?: number
-  readonly externalInspectRuntime?: 'bun' | 'node'
+  readonly excludedTargetIds: readonly string[]
+  readonly inspectExternalRuntime: boolean
+  readonly externalRuntimeInspectPort: number
+  readonly externalRuntimeName: string
+  readonly inspectIntegratedBrowser: boolean
   readonly inspectExtensions: boolean
   readonly inspectExtensionsPort: number
   readonly inspectPtyHost: boolean

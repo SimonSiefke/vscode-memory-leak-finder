@@ -1,8 +1,8 @@
+import * as PendingDevtoolsConnectionState from '../PendingDevtoolsConnectionState/PendingDevtoolsConnectionState.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetCombinedMeasure from '../GetCombinedMeasure/GetCombinedMeasure.ts'
 import * as GetMeasureRpc from '../GetMeasureRpc/GetMeasureRpc.ts'
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
-import * as PendingDevtoolsConnectionState from '../PendingDevtoolsConnectionState/PendingDevtoolsConnectionState.ts'
 
 export const connectDevtools = async (
   devtoolsWebSocketUrl: string,
@@ -13,13 +13,16 @@ export const connectDevtools = async (
   measureNode: boolean,
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
+  inspectIntegratedBrowser: boolean,
   inspectPtyHost: boolean,
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   pid: number,
-  externalInspectPort?: number,
-  externalInspectRuntime: 'bun' | 'node' = 'node',
+  excludedTargetIds: readonly string[] = [],
+  inspectExternalRuntime = false,
+  externalRuntimeInspectPort = 0,
+  externalRuntimeName = '',
   deferConnect = false,
 ): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
@@ -30,20 +33,23 @@ export const connectDevtools = async (
 
   if (deferConnect) {
     PendingDevtoolsConnectionState.set(connectionId, {
-      attachedToPageTimeout,
       devtoolsWebSocketUrl,
       electronWebSocketUrl,
-      externalInspectPort,
-      externalInspectRuntime,
+      measureId,
+      attachedToPageTimeout,
+      measureNode,
+      inspectSharedProcess,
       inspectExtensions,
-      inspectExtensionsPort,
+      inspectIntegratedBrowser,
       inspectPtyHost,
       inspectPtyHostPort,
-      inspectSharedProcess,
       inspectSharedProcessPort,
-      measureId,
-      measureNode,
+      inspectExtensionsPort,
       pid,
+      excludedTargetIds,
+      inspectExternalRuntime,
+      externalRuntimeInspectPort,
+      externalRuntimeName,
     })
     return
   }
@@ -55,15 +61,18 @@ export const connectDevtools = async (
     measureNode,
     inspectSharedProcess,
     inspectExtensions,
+    inspectIntegratedBrowser,
     inspectPtyHost,
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
-    externalInspectPort,
-    externalInspectRuntime,
+    excludedTargetIds,
+    inspectExternalRuntime,
+    externalRuntimeInspectPort,
+    externalRuntimeName,
   )
 
-  const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid)
+  const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId, connectionId, pid, electronWebSocketUrl)
   PendingDevtoolsConnectionState.remove(connectionId)
   MemoryLeakFinderState.set(connectionId, { measure, pid, rpc: measureRpc })
 }

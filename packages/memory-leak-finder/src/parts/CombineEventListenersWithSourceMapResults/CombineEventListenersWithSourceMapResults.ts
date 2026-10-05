@@ -1,12 +1,11 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
-
-const compareCount = (a, b) => {
+const compareCount = (a: Dynamic, b: Dynamic) => {
   return b.count - a.count
 }
-
-const getIndex = (values, line, column) => {
+const getIndex = (values: Dynamic, line: Dynamic, column: Dynamic) => {
   for (let i = 0; i < values.length; i += 2) {
     const valueLine = values[i]
     const valueColumn = values[i + 1]
@@ -16,12 +15,11 @@ const getIndex = (values, line, column) => {
   }
   return -1
 }
-
-export const combineEventListenersWithSourceMapResults = (eventListeners, map, cleanPositionMap) => {
+export const combineEventListenersWithSourceMapResults = (eventListeners: Dynamic, map: Dynamic, cleanPositionMap: Dynamic) => {
   Assert.array(eventListeners)
   Assert.object(map)
   Assert.object(cleanPositionMap)
-  const newEventListeners: any[] = []
+  const newEventListeners: Dynamic[] = []
   for (const eventListener of eventListeners) {
     const { column, line, sourceMapUrl } = GetSourceMapUrl.getSourceMapUrl(eventListener)
     const index = getIndex(map[sourceMapUrl], line, column)

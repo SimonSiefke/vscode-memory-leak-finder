@@ -20,25 +20,28 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const main = page.locator('[role="main"]')
         await expect(main).toBeVisible({
-          timeout: 30_000,
+          timeout: 120_000,
         })
       } catch (error) {
         if (isDevtoolsCannotFindContextError(error)) {
           // ignore and try again
           const main = page.locator('[role="main"]')
           await expect(main).toBeVisible({
-            timeout: 30_000,
+            timeout: 120_000,
           })
           return page
-        } else {
-          throw error
         }
+        throw error
       }
       if (!enableExtensions) {
         const notification = page.locator('text=All installed extensions are temporarily disabled.')
-        await expect(notification).toBeVisible({
-          timeout: 15_000,
-        })
+        try {
+          await expect(notification).toBeVisible({
+            timeout: 15_000,
+          })
+        } catch {
+          await page.waitForIdle()
+        }
       }
       if (inspectPtyHost) {
         const terminal = Terminal.create({

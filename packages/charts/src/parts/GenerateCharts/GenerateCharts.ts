@@ -1,5 +1,8 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { execFile } from 'node:child_process'
+import { access, mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
+import { promisify } from 'node:util'
+import escapeHtml from 'escape-html'
 import * as Charts from '../Charts/Charts.ts'
 import * as GetChartConfig from '../GetChartConfig/GetChartConfig.ts'
 import { launchChartWorker } from '../LaunchChartWorker/LaunchChartWorker.ts'
@@ -17,6 +20,46 @@ const visitors = Object.values(Charts).map((value) => {
   }
 })
 
+const execFileAsync = promisify(execFile)
+
+const getComparisonBasePath = (
+  highlightChangesPath: string | undefined,
+  basePathInfo: { readonly processType: string },
+): string | undefined => {
+  if (!highlightChangesPath) {
+    return undefined
+  }
+  if (basePathInfo.processType === 'main') {
+    return highlightChangesPath
+  }
+  return join(highlightChangesPath, basePathInfo.processType)
+}
+
+const getComparisonData = async (visitor: any, comparisonBasePath: string | undefined): Promise<any[]> => {
+  if (!comparisonBasePath) {
+    return []
+  }
+  return visitor.getData(comparisonBasePath)
+}
+
+const getComparisonDataByFilename = (comparisonData: readonly any[]): Map<string, readonly any[]> => {
+  const comparisonDataByFilename = new Map<string, readonly any[]>()
+  for (const item of comparisonData) {
+    if (item.filename && item.data) {
+      comparisonDataByFilename.set(item.filename, item.data)
+    }
+  }
+  return comparisonDataByFilename
+}
+
+const getHighlightLabels = (data: readonly any[], comparisonData: readonly any[], shouldHighlightChanges: boolean): string[] => {
+  if (!shouldHighlightChanges) {
+    return []
+  }
+  const comparisonNames = new Set(comparisonData.map((item) => item.name))
+  return data.filter((item) => !comparisonNames.has(item.name)).map((item) => item.name)
+}
+
 export const generateCharts = async () => {
   await using rpc = await launchChartWorker()
   const config = GetChartConfig.getChartConfig()
@@ -28,6 +71,7 @@ export const generateCharts = async () => {
     { isNode: false, path: join(Root.root, '.vscode-memory-leak-finder-results', 'shared-process'), processType: 'shared-process' },
     { isNode: false, path: join(Root.root, '.vscode-memory-leak-finder-results', 'extension-host'), processType: 'extension-host' },
     { isNode: false, path: join(Root.root, '.vscode-memory-leak-finder-results', 'pty-host'), processType: 'pty-host' },
+    { isNode: false, path: join(Root.root, '.vscode-memory-leak-finder-results', 'integrated-browser'), processType: 'integrated-browser' },
   ]
 
   for (const basePathInfo of basePaths) {
@@ -40,18 +84,31 @@ export const generateCharts = async () => {
       if (data.length === 0) {
         continue
       }
+      const comparisonBasePath = getComparisonBasePath(config.highlightChangesPath, basePathInfo)
+      const shouldHighlightChanges = Boolean(comparisonBasePath)
+      const comparisonData = await getComparisonData(visitor, comparisonBasePath)
 
       const chartMetaData = visitor.fn()
       // @ts-ignore
       if (visitor.multiple) {
+        const comparisonDataByFilename = getComparisonDataByFilename(comparisonData)
         for (let i = 0; i < data.length; i++) {
           const item = data[i]
           // Check if item has filename metadata (new structure) or is just data array (old structure)
           const chartData = item.data || item
           const filename = item.filename || i.toString()
+          const comparisonChartData = comparisonDataByFilename.get(filename) || []
 
-          if (chartData.length > 0) {
-            const svg = await rpc.invoke('Chart.create', chartData, { ...chartMetaData, compress: config.compress })
+          if (chartData.length > 0 || item.status) {
+            const svg =
+              chartData.length === 0
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="90"><rect width="1200" height="90" fill="white"/><text x="20" y="45" font-family="sans-serif" font-size="16">${escapeHtml(item.status)}</text></svg>`
+                : await rpc.invoke('Chart.create', chartData, {
+                    ...chartMetaData,
+                    compress: config.compress,
+                    highlightLabels: getHighlightLabels(chartData, comparisonChartData, shouldHighlightChanges),
+                    omittedEntryCount: item.omittedEntryCount || 0,
+                  })
             let outPath
             if (basePathInfo.isNode) {
               if (visitor.name === 'named-function-count-3') {
@@ -69,7 +126,11 @@ export const generateCharts = async () => {
           }
         }
       } else {
-        const svg = await rpc.invoke('Chart.create', data, { ...chartMetaData, compress: config.compress })
+        const svg = await rpc.invoke('Chart.create', data, {
+          ...chartMetaData,
+          compress: config.compress,
+          highlightLabels: getHighlightLabels(data, comparisonData, shouldHighlightChanges),
+        })
         let outPath
         if (basePathInfo.isNode) {
           outPath = join(Root.root, '.vscode-charts', 'node', `${visitor.name}.svg`)
@@ -81,6 +142,26 @@ export const generateCharts = async () => {
         await mkdir(dirname(outPath), { recursive: true })
         await writeFile(outPath, svg)
       }
+    }
+  }
+
+  const memoryCityResults = join(Root.root, '.vscode-memory-leak-finder-results', 'memory-city')
+  try {
+    await access(memoryCityResults)
+    await execFileAsync(process.execPath, [
+      join(Root.root, 'packages', 'visualizations', 'src', 'generate.ts'),
+      '--revision',
+      `${process.env.MEMORY_CITY_REVISION_LABEL || 'Current revision'}=${memoryCityResults}`,
+      '--scenario',
+      process.env.MEMORY_CITY_SCENARIO || 'VS Code memory scenario',
+      '--assets',
+      join(Root.root, 'packages', 'visualizations', 'dist'),
+      '--out',
+      join(Root.root, '.vscode-charts', 'memory-city'),
+    ])
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error
     }
   }
 }
