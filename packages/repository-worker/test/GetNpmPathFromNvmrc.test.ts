@@ -1,6 +1,6 @@
-import { homedir } from 'node:os'
 import { expect, test } from '@jest/globals'
 import { createMockRpc } from '@lvce-editor/rpc'
+import { homedir } from 'node:os'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 import { getNpmPathFromNvmrc } from '../src/parts/GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
 import * as Path from '../src/parts/Path/Path.ts'
@@ -18,11 +18,11 @@ test('getNpmPathFromNvmrc - returns installed npm path from nvm', async () => {
 
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.readFileContent': () => '22.22.1',
-      'FileSystem.exists': (path: string) => path === nvmrcPath || path === nodePath || path === npmPath,
       'FileSystem.exec': () => {
         throw new Error('unexpected exec')
       },
+      'FileSystem.exists': (path: string) => path === nvmrcPath || path === nodePath || path === npmPath,
+      'FileSystem.readFileContent': () => '22.22.1',
     },
   })
   try {
@@ -57,7 +57,12 @@ test('getNpmPathFromNvmrc - installs missing node version and resolves npm path'
 
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.readFileContent': () => 'v22.22.1',
+      'FileSystem.exec': (command: string, args: readonly string[]) => {
+        expect(command).toBe('bash')
+        expect(args).toEqual(['-c', expect.stringContaining('nvm install 22.22.1')])
+        installed = true
+        return { exitCode: 0, stderr: '', stdout: '' }
+      },
       'FileSystem.exists': (path: string) => {
         if (path === nvmrcPath) {
           return true
@@ -67,12 +72,7 @@ test('getNpmPathFromNvmrc - installs missing node version and resolves npm path'
         }
         return false
       },
-      'FileSystem.exec': (command: string, args: readonly string[]) => {
-        expect(command).toBe('bash')
-        expect(args).toEqual(['-c', expect.stringContaining('nvm install 22.22.1')])
-        installed = true
-        return { exitCode: 0, stderr: '', stdout: '' }
-      },
+      'FileSystem.readFileContent': () => 'v22.22.1',
     },
   })
   try {
@@ -110,9 +110,8 @@ test('getNpmPathFromNvmrc - falls back to parent .nvmrc for nested folders', asy
 
   const mockRpc = createMockRpc({
     commandMap: {
-      'FileSystem.readFileContent': (path: string) => {
-        expect(path).toBe(repoNvmrcPath)
-        return '22.22.1'
+      'FileSystem.exec': () => {
+        throw new Error('unexpected exec')
       },
       'FileSystem.exists': (path: string) => {
         if (path === buildNvmrcPath) {
@@ -120,8 +119,9 @@ test('getNpmPathFromNvmrc - falls back to parent .nvmrc for nested folders', asy
         }
         return path === repoNvmrcPath || path === nodePath || path === npmPath
       },
-      'FileSystem.exec': () => {
-        throw new Error('unexpected exec')
+      'FileSystem.readFileContent': (path: string) => {
+        expect(path).toBe(repoNvmrcPath)
+        return '22.22.1'
       },
     },
   })

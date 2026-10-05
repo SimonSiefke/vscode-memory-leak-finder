@@ -14,14 +14,14 @@
     "strict": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
-    "noUncheckedSideEffectImports": true,
-    "exactOptionalPropertyTypes": true,
     "composite": true,
     "allowImportingTsExtensions": true,
     "rootDir": ".",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true
   },
   "include": ["src", "test"]
 }

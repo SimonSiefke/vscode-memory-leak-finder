@@ -10,7 +10,7 @@ export const waitForSubIframe = async ({
   injectUtilityScript,
   sessionRpc,
   url,
-}) => {
+}: any) => {
   // TODO
   // 1. add listener to page frame attached, frameStartedNavigating, check if it matches the expected url, take note of the frame id
   // 2. add listener for runtime execution context created, check if it matches the frame id from above
@@ -24,7 +24,7 @@ export const waitForSubIframe = async ({
 
   let utilityContext = undefined
   if (injectUtilityScript) {
-    const utilityExecutionContextName = 'utility-iframe'
+    const utilityExecutionContextName = `utility-iframe-${subFrame.id}`
     utilityContext = await addUtilityExecutionContext(sessionRpc, utilityExecutionContextName, subFrame.id)
   }
 

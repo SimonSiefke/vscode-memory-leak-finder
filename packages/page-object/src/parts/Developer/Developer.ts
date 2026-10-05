@@ -2,17 +2,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-<<<<<<< HEAD
-interface CreateParams {
-  expect: any
-  page: any
-  platform: string
-  VError: any
-}
-
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
-=======
-export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const executeDeveloperCommand = async (command: string, errorMessage: string) => {
     try {
       await page.waitForIdle()
@@ -31,14 +21,7 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
     }
   }
 
->>>>>>> origin/main
   return {
-    async toggleScreenCastMode() {
-      await executeDeveloperCommand(WellKnownCommands.ToggleScreenCastMode, `Failed to toggle screencast mode`)
-    },
-    async toggleProcessExplorer() {
-      await executeDeveloperCommand(WellKnownCommands.ToggleProcessExplorer, `Failed to toggle process explorer`)
-    },
     async startTracing() {
       await executeDeveloperCommand(WellKnownCommands.StartTracing, `Failed to start tracing`)
       const statusBarItem = page.locator('[aria-label^="Recording performance trace."]')
@@ -47,6 +30,12 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
     },
     async stopTracing() {
       await executeDeveloperCommand(WellKnownCommands.StopTracing, `Failed to stop tracing`)
+    },
+    async toggleProcessExplorer() {
+      await executeDeveloperCommand(WellKnownCommands.ToggleProcessExplorer, `Failed to toggle process explorer`)
+    },
+    async toggleScreenCastMode() {
+      await executeDeveloperCommand(WellKnownCommands.ToggleScreenCastMode, `Failed to toggle screencast mode`)
     },
   }
 }

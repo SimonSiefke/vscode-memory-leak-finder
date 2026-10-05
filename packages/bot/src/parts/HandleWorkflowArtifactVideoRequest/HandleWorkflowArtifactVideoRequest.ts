@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import JSZip from 'jszip'
 import type { Probot } from 'probot'
-import { downloadArtifactArchive } from '../DownloadArtifactArchive/DownloadArtifactArchive.ts'
+import JSZip from 'jszip'
 import type { BotEnv } from '../Env/Env.ts'
+import { downloadArtifactArchive } from '../DownloadArtifactArchive/DownloadArtifactArchive.ts'
 
 type WorkflowArtifact = {
   readonly archive_download_url: string
@@ -12,7 +12,7 @@ type WorkflowArtifact = {
 }
 
 type WorkflowArtifactRequestOctokit = {
-  readonly auth: (options: { type: 'installation' }) => Promise<{ token: string } | unknown>
+  readonly auth: (options: { type: 'installation' }) => Promise<unknown | { token: string }>
   readonly request: (route: string, options: Record<string, unknown>) => Promise<{ data: WorkflowArtifact }>
 }
 
@@ -21,6 +21,13 @@ type AppOctokit = {
 }
 
 type WorkflowArtifactKind = 'chart' | 'video'
+
+type WorkflowArtifactRequestDetails = {
+  readonly artifactId: number | undefined
+  readonly chartPath: string | undefined
+  readonly owner: string
+  readonly repo: string
+}
 
 const writeJson = (response: ServerResponse, statusCode: number, body: unknown): void => {
   response.writeHead(statusCode, {
@@ -54,46 +61,82 @@ const getContentType = (fileName: string): string => {
 }
 
 const sanitizeFileName = (fileName: string): string => {
-  return fileName.replace(/[^A-Za-z0-9._-]/g, '-')
+  return fileName.replaceAll(/[^A-Za-z0-9._-]/g, '-')
 }
 
-const getRepositoryInstallationId = async (app: Probot, env: BotEnv): Promise<number> => {
+const getRepositoryInstallationId = async (app: Probot, owner: string, repo: string): Promise<number> => {
   const appOctokit = (await app.auth()) as AppOctokit
   const response = await appOctokit.request('GET /repos/{owner}/{repo}/installation', {
-    owner: env.workflowOwner,
-    repo: env.workflowRepo,
     headers: {
       accept: 'application/vnd.github+json',
     },
+    owner,
+    repo,
   })
   return response.data.id
 }
 
-const getChartRequestPath = (requestUrl: URL): string | undefined => {
-  const chartPrefix = '/api/workflow-artifacts/chart/'
-  if (!requestUrl.pathname.startsWith(chartPrefix)) {
-    return undefined
-  }
-  const pathParts = requestUrl.pathname.slice(chartPrefix.length).split('/').filter(Boolean)
-  if (pathParts.length < 3) {
+const getDecodedPath = (pathParts: readonly string[], startIndex: number): string | undefined => {
+  if (pathParts.length <= startIndex) {
     return undefined
   }
   return pathParts
-    .slice(2)
+    .slice(startIndex)
     .map((part) => decodeURIComponent(part))
     .join('/')
 }
 
-const getArtifactIdFromPath = (requestUrl: URL): number | undefined => {
+const getChartRequestDetails = (requestUrl: URL, env: BotEnv): WorkflowArtifactRequestDetails => {
   const chartPrefix = '/api/workflow-artifacts/chart/'
   if (!requestUrl.pathname.startsWith(chartPrefix)) {
-    return undefined
+    return {
+      artifactId: parsePositiveInteger(requestUrl.searchParams.get('artifact_id')),
+      chartPath: undefined,
+      owner: env.workflowOwner,
+      repo: env.workflowRepo,
+    }
   }
   const pathParts = requestUrl.pathname.slice(chartPrefix.length).split('/').filter(Boolean)
-  if (pathParts.length < 2) {
-    return undefined
+  const legacyRunId = parsePositiveInteger(pathParts[0] || null)
+  const legacyArtifactId = parsePositiveInteger(pathParts[1] || null)
+  if (legacyRunId && legacyArtifactId) {
+    return {
+      artifactId: legacyArtifactId,
+      chartPath: getDecodedPath(pathParts, 2),
+      owner: env.workflowOwner,
+      repo: env.workflowRepo,
+    }
   }
-  return parsePositiveInteger(pathParts[1] || null)
+  if (pathParts.length < 5) {
+    return {
+      artifactId: undefined,
+      chartPath: undefined,
+      owner: env.workflowOwner,
+      repo: env.workflowRepo,
+    }
+  }
+  return {
+    artifactId: parsePositiveInteger(pathParts[3] || null),
+    chartPath: getDecodedPath(pathParts, 4),
+    owner: decodeURIComponent(pathParts[0] || ''),
+    repo: decodeURIComponent(pathParts[1] || ''),
+  }
+}
+
+const getWorkflowArtifactRequestDetails = (
+  artifactKind: WorkflowArtifactKind,
+  requestUrl: URL,
+  env: BotEnv,
+): WorkflowArtifactRequestDetails => {
+  if (artifactKind === 'chart') {
+    return getChartRequestDetails(requestUrl, env)
+  }
+  return {
+    artifactId: parsePositiveInteger(requestUrl.searchParams.get('artifact_id')),
+    chartPath: undefined,
+    owner: env.workflowOwner,
+    repo: env.workflowRepo,
+  }
 }
 
 const getArtifactRequestConfig = (
@@ -144,11 +187,8 @@ const createHandleWorkflowArtifactRequest = (app: Probot, env: BotEnv, artifactK
     if (requestUrl.pathname !== config.pathname && !isChartPathRequest) {
       return false
     }
-    const artifactId =
-      artifactKind === 'chart'
-        ? getArtifactIdFromPath(requestUrl) || parsePositiveInteger(requestUrl.searchParams.get('artifact_id'))
-        : parsePositiveInteger(requestUrl.searchParams.get('artifact_id'))
-    const chartPath = artifactKind === 'chart' ? getChartRequestPath(requestUrl) : undefined
+    const requestDetails = getWorkflowArtifactRequestDetails(artifactKind, requestUrl, env)
+    const { artifactId, chartPath, owner, repo } = requestDetails
     if (!artifactId) {
       writeJson(response, 400, { error: 'artifact_id is required' })
       return true
@@ -156,15 +196,15 @@ const createHandleWorkflowArtifactRequest = (app: Probot, env: BotEnv, artifactK
 
     try {
       const installationId =
-        parsePositiveInteger(requestUrl.searchParams.get('installation_id')) || (await getRepositoryInstallationId(app, env))
+        parsePositiveInteger(requestUrl.searchParams.get('installation_id')) || (await getRepositoryInstallationId(app, owner, repo))
       const octokit = (await app.auth(installationId)) as WorkflowArtifactRequestOctokit
       const artifactResponse = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}', {
-        owner: env.workflowOwner,
-        repo: env.workflowRepo,
         artifact_id: artifactId,
         headers: {
           accept: 'application/vnd.github+json',
         },
+        owner,
+        repo,
       })
       const artifact = artifactResponse.data
       if (artifact.expired) {

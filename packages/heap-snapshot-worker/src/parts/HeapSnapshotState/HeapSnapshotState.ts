@@ -1,15 +1,17 @@
-const snapshots = Object.create(null)
+import type { HeapSnapshotInput, Snapshot } from '../Snapshot/Snapshot.ts'
 
-export const set = (id: any, value: any) => {
+const snapshots: Record<string, Snapshot | HeapSnapshotInput | unknown> = Object.create(null)
+
+export const set = (id: string | number, value: unknown): void => {
   snapshots[id] = value
 }
 
-export const get = (id: any) => {
+export const get = <T = Snapshot>(id: string | number): T => {
   const value = snapshots[id]
   delete snapshots[id]
-  return value
+  return value as T
 }
 
-export const dispose = (id: any) => {
+export const dispose = (id: string | number): void => {
   delete snapshots[id]
 }

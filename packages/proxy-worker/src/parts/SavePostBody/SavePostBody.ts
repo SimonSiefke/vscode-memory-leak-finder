@@ -47,7 +47,7 @@ export const savePostBody = async (
       try {
         const formData: Record<string, string> = {}
         const params = new URLSearchParams(requestBodyData)
-        for (const [key, value] of params.entries()) {
+        for (const [key, value] of params) {
           formData[key] = value
         }
         requestBodyData = formData
@@ -94,7 +94,7 @@ export const savePostBody = async (
             .map((k) => Number.parseInt(k, 10))
             .filter((k) => !isNaN(k))
             .sort((a, b) => a - b)
-          if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+          if (keys.length > 0 && keys[0] === 0 && keys.at(-1) === keys.length - 1) {
             const numbers = keys.map((k) => decompressedBody[k] as number)
             imageBuffer = Buffer.from(new Uint8Array(numbers))
           } else {
@@ -125,7 +125,7 @@ export const savePostBody = async (
             .map((k) => Number.parseInt(k, 10))
             .filter((k) => !isNaN(k))
             .sort((a, b) => a - b)
-          if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+          if (keys.length > 0 && keys[0] === 0 && keys.at(-1) === keys.length - 1) {
             // Looks like a serialized Buffer/Uint8Array
             const numbers = keys.map((k) => decompressedBody[k] as number)
             bodyString = new TextDecoder().decode(new Uint8Array(numbers))

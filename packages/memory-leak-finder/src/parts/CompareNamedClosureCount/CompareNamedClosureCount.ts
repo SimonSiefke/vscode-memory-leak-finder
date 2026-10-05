@@ -5,13 +5,18 @@ const compareItem = (a: { contextNodeCount: number }, b: { contextNodeCount: num
   return b.contextNodeCount - a.contextNodeCount
 }
 
-const sortByCounts = (items: readonly { contextNodeCount: number; delta: number; name: string }[]): readonly { contextNodeCount: number; delta: number; name: string }[] => {
+const sortByCounts = (
+  items: readonly { contextNodeCount: number; delta: number; name: string }[],
+): readonly { contextNodeCount: number; delta: number; name: string }[] => {
   Assert.array(items)
   const sorted = Arrays.toSorted(items, compareItem)
   return sorted
 }
 
-export const compareNamedClosureCount = (before: unknown, after: unknown): readonly { contextNodeCount: number; delta: number; name: string }[] => {
+export const compareNamedClosureCount = (
+  before: unknown,
+  after: unknown,
+): readonly { contextNodeCount: number; delta: number; name: string }[] => {
   const beforeMap: { [name: string]: number } = Object.create(null)
   for (const item of before as readonly { name: string; contextNodeCount: number }[]) {
     beforeMap[item.name] ||= 0

@@ -24,8 +24,8 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     image: 'image.svg',
     message: `what's displayed in this image`,
+    model: ChatEditor.Models.Auto,
     verify: true,
-    model: 'GPT-4.1',
   })
   await ChatEditor.clearAll()
 }

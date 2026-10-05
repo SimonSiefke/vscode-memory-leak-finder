@@ -25,8 +25,8 @@ export const findCommitForVersion = async (repoPath: string, version: string): P
     // If no tag found, try to find commit by checking git log
     const logResult = await exec('git', ['log', '--all', '--oneline', '--grep', version], { cwd: repoPath })
     if (logResult.stdout.trim()) {
-      const firstLine = logResult.stdout.split('\n')[0]
-      const commitHash = firstLine.split(' ')[0]
+      const firstLine = logResult.stdout.split('\n', 1)[0]
+      const commitHash = firstLine.split(' ', 1)[0]
       if (commitHash) {
         return commitHash
       }

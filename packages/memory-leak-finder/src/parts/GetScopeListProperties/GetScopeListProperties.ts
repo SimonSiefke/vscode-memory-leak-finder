@@ -1,7 +1,7 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-
-export const getScopeListProperties = async (session: Session, objectId) => {
+export const getScopeListProperties = async (session: Session, objectId: Dynamic) => {
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     generatePreview: false,
     objectId: objectId,

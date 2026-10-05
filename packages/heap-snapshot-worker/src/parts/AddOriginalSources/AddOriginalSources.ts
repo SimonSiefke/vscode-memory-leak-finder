@@ -1,5 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { dirname, isAbsolute, join, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareResult.ts'
 import * as FindMatchingSourceMap from '../FindMatchingSourceMap/FindMatchingSourceMap.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
@@ -10,7 +11,19 @@ export interface ScriptInfo {
   readonly url?: string
 }
 
-const isRelativeSourceMap = (sourceMapUrl: string) => {
+interface OriginalPosition {
+  readonly column?: number | null
+  readonly line?: number | null
+  readonly name?: string | null
+  readonly source?: string | null
+}
+
+type OriginalPositionMap = Record<string, readonly OriginalPosition[]>
+type MutableCompareResult = {
+  -readonly [Key in keyof CompareResult]: CompareResult[Key]
+}
+
+const isRelativeSourceMap = (sourceMapUrl: string): boolean => {
   if (sourceMapUrl.startsWith('file://')) {
     return false
   }
@@ -28,7 +41,13 @@ const isRelativeSourceMap = (sourceMapUrl: string) => {
 
 const getSourceMapUrl = (script: ScriptInfo): string => {
   if (script.url && script.sourceMapUrl && isRelativeSourceMap(script.sourceMapUrl)) {
-    return new URL(script.sourceMapUrl, script.url).toString()
+    try {
+      return new URL(script.sourceMapUrl, script.url).href
+    } catch {
+      if (isAbsolute(script.url)) {
+        return pathToFileURL(resolve(dirname(script.url), script.sourceMapUrl)).href
+      }
+    }
   }
   let sourceMapUrl = script.sourceMapUrl || ''
   // If no source map URL was found, try to find a matching .js.map file
@@ -41,41 +60,47 @@ const getSourceMapUrl = (script: ScriptInfo): string => {
   return sourceMapUrl
 }
 
-export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly any[]> => {
-  let scriptMap: Record<number, ScriptInfo> | undefined
-  // Always attempt to load script maps from disk
-  try {
-    const scriptMapsDir: string = join(root, '.vscode-script-maps')
-    const entries = await readdir(scriptMapsDir, { withFileTypes: true })
-    const mergedMap: Record<number, ScriptInfo> = Object.create(null)
-    for (const entry of entries) {
-      if (entry.isFile() && entry.name.endsWith('.json')) {
-        const fullPath = join(scriptMapsDir, entry.name)
-        try {
-          const content = await readFile(fullPath, 'utf8')
-          const parsed = JSON.parse(content) as Record<number, ScriptInfo>
-          for (const [key, value] of Object.entries(parsed)) {
-            const numericKey = Number(key)
-            const existing = mergedMap[numericKey]
-            if (existing) {
-              if (!existing.sourceMapUrl && value.sourceMapUrl) {
+export const addOriginalSources = async (
+  items: readonly CompareResult[],
+  providedScriptMap?: Readonly<Record<number, ScriptInfo>>,
+  extendedOriginalNames = true,
+): Promise<readonly CompareResult[]> => {
+  let scriptMap = providedScriptMap
+  if (!scriptMap) {
+    // Existing measures persist script maps before launching this worker.
+    try {
+      const scriptMapsDir: string = join(root, '.vscode-script-maps')
+      const entries = await readdir(scriptMapsDir, { withFileTypes: true })
+      const mergedMap: Record<number, ScriptInfo> = Object.create(null)
+      for (const entry of entries) {
+        if (entry.isFile() && entry.name.endsWith('.json')) {
+          const fullPath = join(scriptMapsDir, entry.name)
+          try {
+            const content = await readFile(fullPath, 'utf8')
+            const parsed = JSON.parse(content) as Record<number, ScriptInfo>
+            for (const [key, value] of Object.entries(parsed)) {
+              const numericKey = Number(key)
+              const existing = mergedMap[numericKey]
+              if (existing) {
+                if (!existing.sourceMapUrl && value.sourceMapUrl) {
+                  mergedMap[numericKey] = value
+                }
+              } else {
                 mergedMap[numericKey] = value
               }
-            } else {
-              mergedMap[numericKey] = value
             }
+          } catch {
+            // ignore invalid files
           }
-        } catch {
-          // ignore invalid files
         }
       }
+      scriptMap = mergedMap
+    } catch {
+      // ignore if directory not found
     }
-    scriptMap = mergedMap
-  } catch {
-    // ignore if directory not found
   }
 
-  const enriched: CompareResult[] = [...items]
+  const enriched: MutableCompareResult[] = items.map((item) => ({ ...item }))
   if (!scriptMap) {
     return enriched
   }
@@ -84,10 +109,12 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
   const positionPointers: { index: number; sourceMapUrl: string }[] = []
 
   for (let i = 0; i < enriched.length; i++) {
-    const item = enriched[i] as any
+    const item = enriched[i]
     const script = scriptMap[item.scriptId]
     if (script) {
-      item.url = script.url
+      if (script.url) {
+        item.url = script.url
+      }
       const sourceMapUrl = getSourceMapUrl(script)
       item.sourceMapUrl = sourceMapUrl
       if (item.url) {
@@ -110,8 +137,11 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
 
   try {
     await using rpc = await LaunchSourceMapWorker.launchSourceMapCoordinator()
-    const extendedOriginalNames = true
-    const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, extendedOriginalNames)
+    const cleanPositionMap = (await rpc.invoke(
+      'SourceMap.getCleanPositionsMap',
+      sourceMapUrlToPositions,
+      extendedOriginalNames,
+    )) as OriginalPositionMap
     const offsetMap: Record<string, number> = Object.create(null)
     for (const pointer of positionPointers) {
       const positions = cleanPositionMap[pointer.sourceMapUrl] || []
@@ -119,7 +149,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
       const original = positions[offset]
       offsetMap[pointer.sourceMapUrl] = offset + 1
       if (original) {
-        const target = enriched[pointer.index] as any
+        const target = enriched[pointer.index]
         target.originalSource = original.source ?? null
         target.originalUrl = original.source ?? null
         target.originalLine = original.line ?? null

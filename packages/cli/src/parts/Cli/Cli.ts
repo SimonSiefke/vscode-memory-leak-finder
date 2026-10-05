@@ -14,7 +14,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     await CreateAllMockDataZip.createAllMockDataZip()
     return
   }
-  const options = ParseArgv.parseArgv(platform, arch, argv)
+  const options = ParseArgv.parseArgv(platform, arch, argv, env)
 
   // Parse isGithubActions once at startup
   const isGithubActions = Boolean(env.GITHUB_ACTIONS)
@@ -24,7 +24,9 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     ...StdinDataState.getState(),
     arch: options.arch,
     bisect: options.bisect,
+    buildVscodeMinified: options.buildVscodeMinified,
     checkLeaks: options.checkLeaks,
+    color: options.color,
     // @ts-ignore
     commit: options.commit,
     continueValue: options.continueValue,
@@ -36,6 +38,8 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     insidersCommit: options.insidersCommit,
     inspectExtensions: options.inspectExtensions,
     inspectExtensionsPort: options.inspectExtensionsPort,
+    inspectIntegratedBrowser: options.inspectIntegratedBrowser,
+    inspectProcess: options.inspectProcess,
     inspectPtyHost: options.inspectPtyHost,
     inspectPtyHostPort: options.inspectPtyHostPort,
     inspectSharedProcess: options.inspectSharedProcess,
@@ -45,14 +49,19 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     measure: options.measure,
     measureAfter: options.measureAfter,
     measureNode: options.measureNode,
-    processRootStrategy: options.processRootStrategy,
     pageObjectPath: options.pageObjectPath,
     platform: options.platform,
+    processRootStrategy: options.processRootStrategy,
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
+    runNetworkTestsAnyway: options.runNetworkTestsAnyway,
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
+    showSkippedFailedTestDuration: options.showSkippedFailedTestDuration,
+    shardCount: options.shardCount,
+    shardIndex: options.shardIndex,
+    startupRuns: options.startupRuns,
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
@@ -63,5 +72,5 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     watch: options.watch,
     workers: options.workers,
   })
-  return InitialStart.initialStart({ ...options, isGithubActions } as ReturnType<typeof ParseArgv.parseArgv> & { isGithubActions: boolean })
+  return InitialStart.initialStart({ ...options, isGithubActions })
 }

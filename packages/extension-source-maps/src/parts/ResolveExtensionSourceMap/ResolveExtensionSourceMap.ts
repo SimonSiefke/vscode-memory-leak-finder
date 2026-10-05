@@ -1,19 +1,19 @@
 import * as Assert from '@lvce-editor/assert'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import * as GenerateExtensionSourceMaps from '../GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
 import { root } from '../Root/Root.ts'
-import { fileURLToPath, pathToFileURL } from 'node:url'
 
 interface ResolveExtensionSourceMapConfig {
-  readonly extensionName: string
-  readonly repoUrl: string
-  readonly cacheDir: string
-  readonly platform: string
-  readonly match: string
   readonly buildScript: readonly string[]
+  readonly cacheDir: string
+  readonly extensionName: string
+  readonly match: string
   readonly moditications: readonly any[]
   readonly pathReplacements: readonly any[]
+  readonly platform: string
+  readonly repoUrl: string
 }
 
 const resolveVersion = (extensionPath: string) => {
@@ -70,13 +70,13 @@ export const resolveExtensionSourceMap = async (
   const extensionsFolder = fileURLToPath(extensionFolderUri)
   const version = resolveVersion(extensionsFolder)
   await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
+    buildScript: config.buildScript,
     cacheDir: config.cacheDir,
     extensionName: config.extensionName,
+    modifications: config.moditications,
+    platform: config.platform,
     repoUrl: config.repoUrl,
     version: version,
-    buildScript: config.buildScript,
-    platform: config.platform,
-    modifications: config.moditications,
   })
   const relative = uri.slice(index + config.match.length)
   const finalPath = getFinalPath(relative, version, config)

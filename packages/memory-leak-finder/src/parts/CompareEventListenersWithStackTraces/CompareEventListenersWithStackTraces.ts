@@ -1,15 +1,19 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as DeduplicateEventListeners from '../DeduplicateEventListeners/DeduplicateEventListeners.ts'
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
-export const compareEventListenersWithStackTraces = async (before: unknown, after: unknown) => {
+export const compareEventListenersWithStackTraces = async (
+  before: readonly Record<string, any>[],
+  after: readonly Record<string, any>[],
+) => {
   const map = Object.create(null)
   for (const listener of before) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
     map[key] ||= 0
     map[key]++
   }
-  const leaked: any[] = []
+  const leaked: Dynamic[] = []
   for (const listener of after) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
     if (map[key]) {

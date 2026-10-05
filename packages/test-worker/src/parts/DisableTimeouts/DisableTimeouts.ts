@@ -1,6 +1,6 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
-export const disableTimeouts = async (firstWindow) => {
+export const disableTimeouts = async (firstWindow: any) => {
   await DevtoolsProtocolRuntime.evaluate(firstWindow.rpc, {
     expression: `(() => {
   if(globalThis.____timeoutMocked){

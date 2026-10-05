@@ -9,6 +9,7 @@ export type ParsedCommandFlags = {
   readonly only: string
   readonly processRootStrategy?: string
   readonly restartBetween: boolean
+  readonly runNetworkTestsAnyway: boolean
   readonly runSkippedTestsAnyway: boolean
   readonly runs?: number
 }
@@ -44,8 +45,8 @@ type MutableParsedCommandFlags = {
 
 const createSyntaxError = (reason: string): ParseBotCommentError => {
   return {
-    type: 'error',
     message: `Invalid command syntax. ${reason}. Supported flags: ${AllowedCommandFlags.supportedFlagsMessage}.`,
+    type: 'error',
   }
 }
 
@@ -79,6 +80,7 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
     measureNode: false,
     only: '',
     restartBetween: false,
+    runNetworkTestsAnyway: false,
     runSkippedTestsAnyway: false,
   }
 
@@ -94,17 +96,20 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
         case '--inspect-extensions':
           flags.inspectExtensions = true
           break
-        case '--inspect-shared-process':
-          flags.inspectSharedProcess = true
-          break
         case '--inspect-ptyhost':
           flags.inspectPtyHost = true
+          break
+        case '--inspect-shared-process':
+          flags.inspectSharedProcess = true
           break
         case '--measure-node':
           flags.measureNode = true
           break
         case '--restart-between':
           flags.restartBetween = true
+          break
+        case '--run-network-tests-anyway':
+          flags.runNetworkTestsAnyway = true
           break
         case '--run-skipped-tests-anyway':
           flags.runSkippedTestsAnyway = true
@@ -131,6 +136,12 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
       case '--only':
         flags.only = value
         break
+      case '--process-root-strategy':
+        if (value !== 'launch-pid' && value !== 'ssh-remote-server') {
+          return createSyntaxError('Expected "--process-root-strategy" to be one of: launch-pid, ssh-remote-server')
+        }
+        flags.processRootStrategy = value
+        break
       case '--runs': {
         const parsedRuns = Number.parseInt(value, 10)
         if (!Number.isInteger(parsedRuns) || parsedRuns < 1) {
@@ -139,12 +150,6 @@ export const parseBotComment = (body: string): ParseBotCommentResult => {
         flags.runs = parsedRuns
         break
       }
-      case '--process-root-strategy':
-        if (value !== 'launch-pid' && value !== 'ssh-remote-server') {
-          return createSyntaxError('Expected "--process-root-strategy" to be one of: launch-pid, ssh-remote-server')
-        }
-        flags.processRootStrategy = value
-        break
     }
   }
 

@@ -34,6 +34,7 @@ export type CreateMeasureWorkflowSummaryOptions = {
     readonly candidateMeasure: 'success' | 'failure' | 'skipped'
     readonly charts?: 'success' | 'failure' | 'skipped'
   }
+  readonly workflowDurationMs?: number
   readonly workflowRun: {
     readonly id: number
     readonly url: string
@@ -65,6 +66,7 @@ export const createMeasureWorkflowSummary = (options: CreateMeasureWorkflowSumma
     sourceRepository: options.sourceRepository,
     statusCommentId: options.statusCommentId,
     stepOutcomes: options.stepOutcomes,
+    ...(options.workflowDurationMs === undefined ? {} : { workflowDurationMs: options.workflowDurationMs }),
     workflowRun: options.workflowRun,
   }
 }
@@ -126,6 +128,17 @@ const parseCliArgs = (value: string | undefined): readonly string[] => {
     return []
   }
   return value.split(/\s+/).filter(Boolean)
+}
+
+const getWorkflowDurationMs = (startedAtEpochMs: string | undefined, now = Date.now()): number | undefined => {
+  if (!startedAtEpochMs) {
+    return undefined
+  }
+  const start = Number.parseInt(startedAtEpochMs, 10)
+  if (!Number.isFinite(start)) {
+    return undefined
+  }
+  return Math.max(0, now - start)
 }
 
 const getChartRelativeSegments = (chartPath: string): readonly string[] => {
@@ -260,6 +273,7 @@ if (isEntryPoint) {
     process.env.MEASURE_CANDIDATE_LOG_PATH || '',
   ])
   const error = mergeErrorWithTscErrorLines(rawError, tscErrorLines)
+  const workflowDurationMs = getWorkflowDurationMs(process.env.MEASURE_WORKFLOW_STARTED_AT_EPOCH_MS)
   const payload = createMeasureWorkflowSummary({
     actorLogin: process.env.MEASURE_ACTOR_LOGIN || '',
     artifactNames: parseJson(process.env.MEASURE_ARTIFACT_NAMES || '{}'),
@@ -279,6 +293,7 @@ if (isEntryPoint) {
     },
     statusCommentId: Number.parseInt(process.env.MEASURE_STATUS_COMMENT_ID || '0', 10),
     stepOutcomes: parseJson(process.env.MEASURE_STEP_OUTCOMES || '{}'),
+    ...(workflowDurationMs === undefined ? {} : { workflowDurationMs }),
     workflowRun: {
       id: Number.parseInt(process.env.MEASURE_WORKFLOW_RUN_ID || '0', 10),
       url: process.env.MEASURE_WORKFLOW_RUN_URL || '',

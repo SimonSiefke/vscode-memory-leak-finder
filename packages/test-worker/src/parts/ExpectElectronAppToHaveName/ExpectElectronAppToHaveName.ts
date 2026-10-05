@@ -2,7 +2,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 import { ExpectError } from '../ExpectError/ExpectError.ts'
 import * as FunctionGetElectronAppName from '../FunctionGetElectronAppName/FunctionGetElectronAppName.ts'
 
-export const toHaveName = async (electronApp, expectedName) => {
+export const toHaveName = async (electronApp: any, expectedName: any) => {
   const result = await DevtoolsProtocolRuntime.callFunctionOn(electronApp.rpc, {
     functionDeclaration: FunctionGetElectronAppName.code,
     objectId: electronApp.electronObjectId,

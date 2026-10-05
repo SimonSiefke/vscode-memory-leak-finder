@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 
-export const clickExponential = async (locator, options) => {
+export const clickExponential = async (locator: any, options: any) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
@@ -14,7 +14,7 @@ export const clickExponential = async (locator, options) => {
         },
       ],
       awaitPromise: true,
-      functionDeclaration: '(options) => test.clickExponential(options)',
+      functionDeclaration: 'async (options) => test.clickExponential(options)',
     },
     locator,
   )

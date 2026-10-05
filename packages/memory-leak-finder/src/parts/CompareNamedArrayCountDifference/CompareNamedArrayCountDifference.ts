@@ -5,13 +5,18 @@ const compareItem = (a: { count: number }, b: { count: number }): number => {
   return b.count - a.count
 }
 
-const sortByCounts = (items: readonly { count: number; name: string; delta: number; [key: string]: unknown }[]): readonly { count: number; name: string; delta: number; [key: string]: unknown }[] => {
+const sortByCounts = (
+  items: readonly { count: number; name: string; delta: number; [key: string]: unknown }[],
+): readonly { count: number; name: string; delta: number; [key: string]: unknown }[] => {
   Assert.array(items)
   const sorted = Arrays.toSorted(items, compareItem)
   return sorted
 }
 
-export const compareNamedArrayCountDifference = (before: unknown, after: unknown): readonly { count: number; name: string; delta: number; [key: string]: unknown }[] => {
+export const compareNamedArrayCountDifference = (
+  before: unknown,
+  after: unknown,
+): readonly { count: number; name: string; delta: number; [key: string]: unknown }[] => {
   Assert.array(before)
   Assert.array(after)
   const beforeMap: { [name: string]: number } = Object.create(null)
@@ -32,6 +37,5 @@ export const compareNamedArrayCountDifference = (before: unknown, after: unknown
     }
   }
   const sorted = sortByCounts(leaked)
-
   return sorted
 }

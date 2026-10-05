@@ -2,17 +2,6 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
-    async shouldBeVisible() {
-      try {
-        await page.waitForIdle()
-        const searchView = page.locator('.search-view')
-        await expect(searchView).toBeVisible()
-        const searchInput = searchView.locator('textarea[aria-label^="Search"]')
-        await expect(searchInput).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to verify that search view is visible`)
-      }
-    },
     async clear() {
       try {
         await page.waitForIdle()
@@ -146,6 +135,17 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set files to include`)
+      }
+    },
+    async shouldBeVisible() {
+      try {
+        await page.waitForIdle()
+        const searchView = page.locator('.search-view')
+        await expect(searchView).toBeVisible()
+        const searchInput = searchView.locator('textarea[aria-label^="Search"]')
+        await expect(searchInput).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that search view is visible`)
       }
     },
     async shouldHaveNoResults() {

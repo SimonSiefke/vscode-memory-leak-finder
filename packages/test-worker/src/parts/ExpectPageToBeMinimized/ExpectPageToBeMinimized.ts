@@ -1,7 +1,7 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as FunctionExpectElectronWindowToBeMinimized from '../FunctionExpectElectronWindowToBeMinimized/FunctionExpectElectronWindowToBeMinimized.ts'
 
-export const toBeMinimized = async (page) => {
+export const toBeMinimized = async (page: any) => {
   await DevtoolsProtocolRuntime.callFunctionOn(page.electronRpc, {
     arguments: [
       {

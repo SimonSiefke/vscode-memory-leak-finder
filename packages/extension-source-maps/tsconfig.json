@@ -13,19 +13,15 @@
     "assumeChangesOnlyAffectDirectDependencies": true,
     "strict": true,
     "noImplicitAny": true,
-    "noUncheckedSideEffectImports": true,
-    "exactOptionalPropertyTypes": true,
     "composite": true,
     "allowImportingTsExtensions": true,
     "rootDir": ".",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true
   },
-<<<<<<< HEAD
-  "include": ["src", "test", "rollup.config.js"]
-=======
   "include": ["src", "test", "playground"]
->>>>>>> origin/main
 }

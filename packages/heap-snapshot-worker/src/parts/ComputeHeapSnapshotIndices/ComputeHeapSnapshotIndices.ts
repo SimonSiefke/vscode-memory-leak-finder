@@ -1,7 +1,30 @@
-type NodeTypes = [readonly string[]]
-type EdgeTypes = [readonly string[]]
+export interface HeapSnapshotIndices {
+  readonly bigintTypeIndex: number
+  readonly detachednessFieldIndex: number
+  readonly edgeCountFieldIndex: number
+  readonly edgeNameFieldIndex: number
+  readonly edgeToNodeFieldIndex: number
+  readonly edgeTypeFieldIndex: number
+  readonly edgeTypes: readonly string[]
+  readonly idFieldIndex: number
+  readonly ITEMS_PER_EDGE: number
+  readonly ITEMS_PER_NODE: number
+  readonly nameFieldIndex: number
+  readonly nativeTypeIndex: number
+  readonly nodeTypes: readonly string[]
+  readonly objectTypeIndex: number
+  readonly regexpTypeIndex: number
+  readonly selfSizeFieldIndex: number
+  readonly traceNodeIdFieldIndex: number
+  readonly typeFieldIndex: number
+}
 
-export const computeHeapSnapshotIndices = (node_types: NodeTypes, node_fields: readonly string[], edge_types: EdgeTypes, edge_fields: readonly string[]) => {
+export const computeHeapSnapshotIndices = (
+  node_types: readonly (readonly string[])[],
+  node_fields: readonly string[],
+  edge_types: readonly (readonly string[])[],
+  edge_fields: readonly string[],
+): HeapSnapshotIndices => {
   // Type indices
   const objectTypeIndex = node_types[0].indexOf('object')
   const nativeTypeIndex = node_types[0].indexOf('native')

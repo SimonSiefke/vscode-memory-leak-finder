@@ -1,6 +1,6 @@
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 
-export const checkMultiElementCondition = async (fnName, locator, options = {}) => {
+export const checkMultiElementCondition = async (fnName: string, locator: any, options = {}) => {
   // TODO pass connection it to locator by which we can query page object
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {

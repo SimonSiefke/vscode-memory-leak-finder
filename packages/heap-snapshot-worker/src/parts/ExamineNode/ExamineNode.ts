@@ -58,12 +58,12 @@ export const examineNodeById = (nodeId: number, snapshot: Snapshot): NodeExamina
 }
 
 interface ProcessedEdge {
+  readonly edgeName: string
+  readonly nameIndex: number
+  readonly targetNodeInfo?: { name: string | null; type: string | null }
+  readonly toNode: number
   readonly type: number
   readonly typeName: string
-  readonly nameIndex: number
-  readonly edgeName: string
-  readonly toNode: number
-  readonly targetNodeInfo?: { name: string | null; type: string | null }
 }
 
 /**
@@ -121,16 +121,11 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
           type: getNodeTypeName(targetNode, node_types),
         }
       : undefined
-<<<<<<< HEAD
     const edgeData: any = { edgeName, nameIndex, toNode, type, typeName }
     if (targetNodeInfo !== undefined) {
       edgeData.targetNodeInfo = targetNodeInfo
     }
     processedEdges.push(edgeData)
-=======
-    // @ts-ignore
-    processedEdges.push({ edgeName, nameIndex, targetNodeInfo, toNode, type, typeName })
->>>>>>> origin/main
   }
 
   // Extract properties (property-type edges) with improved value detection

@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 
-export const getTextContent = async (locator, { allowHidden }) => {
+export const getTextContent = async (locator: any, { allowHidden }: any) => {
   Assert.object(locator)
   const text = await EvaluateInUtilityContext.evaluateInUtilityContext(
     {

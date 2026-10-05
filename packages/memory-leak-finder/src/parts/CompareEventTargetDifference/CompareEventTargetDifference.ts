@@ -15,11 +15,16 @@ const compareEventTarget = (a: { count: number; description?: string }, b: { cou
   return compareCount(a, b) || compareDescription(a, b)
 }
 
-const sort = (eventTargets: readonly { count: number; description?: string; delta: number }[]): readonly { count: number; description?: string; delta: number }[] => {
+const sort = (
+  eventTargets: readonly { count: number; description?: string; delta: number }[],
+): readonly { count: number; description?: string; delta: number }[] => {
   return Arrays.toSorted(eventTargets, compareEventTarget)
 }
 
-export const compareEventTargets = (before: unknown, after: unknown): readonly { count: number; description?: string; delta: number }[] => {
+export const compareEventTargets = (
+  before: readonly { description: string }[],
+  after: readonly { description: string }[],
+): readonly { count: number; description?: string; delta: number }[] => {
   Assert.array(before)
   Assert.array(after)
   const pretty = CompareEventTargets.compareEventTargets(before, after)

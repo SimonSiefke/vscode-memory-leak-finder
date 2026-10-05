@@ -85,7 +85,7 @@ export const checkSingleElementCondition = async (locator: Locator, fnName: stri
   const timeout = (options as { timeout?: number }).timeout || maxTimeout
   const endTime = startTime + timeout
   let currentTime = startTime
-  const fn = SingleElementConditionMap.getFunction(fnName)
+  const fn = SingleElementConditionMap.getFunction(fnName) as (element: HTMLElement, options: any) => boolean
   while (currentTime < endTime) {
     const element = QuerySelector.querySelector(locator.selector)
     if (element) {
@@ -109,7 +109,7 @@ export const checkHidden = async (locator: Locator, options: { timeout?: number 
   const timeout = options.timeout || maxTimeout
   const endTime = startTime + timeout
   let currentTime = startTime
-  const fn = SingleElementConditionMap.getFunction('toBeHidden')
+  const fn = SingleElementConditionMap.getFunction('toBeHidden') as (element: HTMLElement, options: any) => boolean
   while (currentTime < endTime) {
     const element = QuerySelector.querySelector(locator.selector)
     if (!element) {
@@ -147,12 +147,16 @@ export const checkTitle = async (expectedTitle: string): Promise<void> => {
   throw new AssertionError(message)
 }
 
-export const checkMultiElementCondition = async (locator: Locator, fnName: string, options: { timeout?: number; count?: number }): Promise<void> => {
+export const checkMultiElementCondition = async (
+  locator: Locator,
+  fnName: string,
+  options: { timeout?: number; count?: number },
+): Promise<void> => {
   const startTime = Time.getTimeStamp()
   const timeout = options.timeout || maxTimeout
   const endTime = startTime + timeout
   let currentTime = startTime
-  const fn = MultiElementConditionMap.getFunction(fnName)
+  const fn = MultiElementConditionMap.getFunction(fnName) as (elements: readonly Element[], options: any) => boolean
   while (currentTime < endTime) {
     const elements = QuerySelector.querySelectorAll(locator.selector)
     const successful = fn(elements, options as any)
@@ -167,7 +171,15 @@ export const checkMultiElementCondition = async (locator: Locator, fnName: strin
   throw new AssertionError(message)
 }
 
-export const pressKeyExponential = async ({ key, timeout = maxTimeout, waitFor }: { key: string; timeout?: number; waitFor: Locator }): Promise<void> => {
+export const pressKeyExponential = async ({
+  key,
+  timeout = maxTimeout,
+  waitFor,
+}: {
+  key: string
+  timeout?: number
+  waitFor: Locator
+}): Promise<void> => {
   Assert.string(key)
   Assert.object(waitFor)
   const locator = waitFor
@@ -192,7 +204,17 @@ export const pressKeyExponential = async ({ key, timeout = maxTimeout, waitFor }
   throw new AssertionError(message)
 }
 
-export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, waitFor }: { locator: Locator; text: string; timeout?: number; waitFor: Locator }): Promise<void> => {
+export const typeAndWaitFor = async ({
+  locator,
+  text,
+  timeout = maxTimeout,
+  waitFor,
+}: {
+  locator: Locator
+  text: string
+  timeout?: number
+  waitFor: Locator
+}): Promise<void> => {
   Assert.object(locator)
   Assert.string(text)
   Assert.object(waitFor)
@@ -208,17 +230,9 @@ export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, wait
     if (waitForElement && toBeVisible(waitForElement, {})) {
       return
     }
-<<<<<<< HEAD
-    const element = QuerySelector.querySelector(locator.selector)
-    if (element && (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) {
-      fn(element, { text: '' })
-      fn(element, { text })
-    }
-=======
     const element = QuerySelector.querySelector(locator.selector) as any
     fn(element, { text: '' })
     fn(element, { text })
->>>>>>> origin/main
     current *= exponentialFactor
     await Timeout.waitForMutation(document.body, current)
     currentTime = Time.getTimeStamp()
@@ -227,15 +241,27 @@ export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, wait
   throw new AssertionError(message)
 }
 
-export const clickExponential = async ({ button = '', locator, timeout = maxTimeout, waitFor, waitForHidden }: { button?: string; locator: Locator; timeout?: number; waitFor?: Locator; waitForHidden?: Locator }): Promise<void> => {
+export const clickExponential = async ({
+  button = '',
+  locator,
+  timeout = maxTimeout,
+  waitFor,
+  waitForHidden,
+}: {
+  button?: string
+  locator: Locator
+  timeout?: number
+  waitFor?: Locator
+  waitForHidden?: Locator
+}): Promise<void> => {
   const exponentialFactor = 2
   const startTime = Time.getTimeStamp()
   const endTime = startTime + timeout
   let currentTime = startTime
-  const toBeHidden = SingleElementConditionMap.getFunction('toBeHidden')
+  const toBeHidden = SingleElementConditionMap.getFunction('toBeHidden') as (element: HTMLElement, options: any) => boolean
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   let current = 1
-  const buttonValue: number = button === 'right' ? 2 : (button ? Number.parseInt(button, 10) : 0)
+  const buttonValue: number = button === 'right' ? 2 : button ? Number.parseInt(button, 10) : 0
   const clickOptions: MouseEventInit & { button?: number } = {
     bubbles: true,
     button: buttonValue,
@@ -291,13 +317,8 @@ export const type = (text: string): void => {
   }
 }
 
-<<<<<<< HEAD
-export const getValue = (locator: Locator): string => {
-  const element = QuerySelector.querySelector(locator.selector)
-=======
 export const getValue = (locator: any) => {
-  const element = QuerySelector.querySelector(locator.selector) as HTMLInputElement
->>>>>>> origin/main
+  const element = QuerySelector.querySelector(locator.selector) as HTMLInputElement | HTMLTextAreaElement
   if (!element) {
     throw new Error(`element not found`)
   }
@@ -307,9 +328,37 @@ export const getValue = (locator: any) => {
   throw new Error(`element is not an input or textarea`)
 }
 
-export const contentEditableInsert = ({ value }: { value: string }): void => {
+const insertTextWithRange = (element: HTMLElement, value: string): void => {
+  const selection = document.getSelection()
+  if (selection && selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0)
+    if (element.contains(range.commonAncestorContainer)) {
+      range.deleteContents()
+      const text = document.createTextNode(value)
+      range.insertNode(text)
+      range.setStartAfter(text)
+      range.collapse(true)
+      selection.removeAllRanges()
+      selection.addRange(range)
+      return
+    }
+  }
+  element.textContent = `${element.textContent || ''}${value}`
+}
+
+export const contentEditableInsert = ({ value }: { value: string }) => {
+  const element = document.activeElement
+  const before = element instanceof HTMLElement && element.isContentEditable ? element.textContent : undefined
   // TODO find non-deprecated alternative
-  document.execCommand('insertText', false, value)
+  const didInsert = document.execCommand('insertText', false, value)
+  if (didInsert && (before === undefined || value === '' || (element instanceof HTMLElement && element.textContent !== before))) {
+    return
+  }
+  if (!(element instanceof HTMLElement) || !element.isContentEditable) {
+    return
+  }
+  insertTextWithRange(element, value)
+  element.dispatchEvent(new InputEvent('input', { bubbles: true, data: value, inputType: 'insertText' }))
 }
 
 export const boundingBox = (locator: Locator): { height: number; width: number; x: number; y: number } => {

@@ -6,7 +6,7 @@ export const handleHealthRequest = (request: IncomingMessage, response: ServerRe
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return false
   }
-  const path = request.url?.split('?')[0] ?? ''
+  const path = request.url?.split('?', 1)[0] ?? ''
   if (path !== '/health') {
     return false
   }

@@ -1,12 +1,12 @@
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 
-const waitForEventInternal = (sessionRpc, utilityExecutionContextName, contexts): Promise<any> => {
+const waitForEventInternal = (sessionRpc: any, utilityExecutionContextName: string, contexts: any): Promise<any> => {
   const { promise, resolve } = Promise.withResolvers<any>()
-  const cleanup = (value) => {
+  const cleanup = (value: any) => {
     // TODO remove event listener
     resolve(value)
   }
-  const handleExecutionContextCreated = (event) => {
+  const handleExecutionContextCreated = (event: any) => {
     const { params } = event
     const { context } = params
     const { id, name, uniqueId } = context
@@ -27,7 +27,7 @@ const waitForEventInternal = (sessionRpc, utilityExecutionContextName, contexts)
   return promise
 }
 
-export const waitForUtilityExecutionContext = async (sessionRpc, utilityExecutionContextName, contexts) => {
+export const waitForUtilityExecutionContext = async (sessionRpc: any, utilityExecutionContextName: string, contexts: any) => {
   const eventPromise = waitForEventInternal(sessionRpc, utilityExecutionContextName, contexts)
   const { id, name, uniqueId } = await eventPromise
   return {

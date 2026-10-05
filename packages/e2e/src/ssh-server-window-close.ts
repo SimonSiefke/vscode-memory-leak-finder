@@ -4,7 +4,7 @@ export const skip = 1
 
 let connection: any
 
-export const setup = async ({ SshServer, Extensions, Electron }: TestContext): Promise<void> => {
+export const setup = async ({ Electron, Extensions, SshServer }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
   })

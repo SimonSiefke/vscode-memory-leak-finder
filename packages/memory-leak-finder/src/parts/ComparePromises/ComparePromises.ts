@@ -16,7 +16,9 @@ const getPropertyPromiseResult = (properties: readonly { name: string }[]): { na
   return properties.find(isPropertyPromiseResult)
 }
 
-const prettifyPromise = (promise: { preview: { properties: readonly { name: string }[] } }): { result: { name: string } | undefined; state: { name: string } | undefined } => {
+const prettifyPromise = (promise: {
+  preview: { properties: readonly { name: string }[] }
+}): { result: { name: string } | undefined; state: { name: string } | undefined } => {
   const { preview } = promise
   const { properties } = preview
   const state = getPropertyPromiseState(properties)
@@ -27,7 +29,13 @@ const prettifyPromise = (promise: { preview: { properties: readonly { name: stri
   }
 }
 
-export const comparePromises = (before: unknown, after: unknown): { after: readonly { result: { name: string } | undefined; state: { name: string } | undefined }[]; before: readonly { result: { name: string } | undefined; state: { name: string } | undefined }[] } => {
+export const comparePromises = (
+  before: readonly { preview: { properties: readonly { name: string }[] } }[],
+  after: readonly { preview: { properties: readonly { name: string }[] } }[],
+): {
+  after: readonly { result: { name: string } | undefined; state: { name: string } | undefined }[]
+  before: readonly { result: { name: string } | undefined; state: { name: string } | undefined }[]
+} => {
   Assert.array(before)
   Assert.array(after)
   const prettyBefore = before.map(prettifyPromise)

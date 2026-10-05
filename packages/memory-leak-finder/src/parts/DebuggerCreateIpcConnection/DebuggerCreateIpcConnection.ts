@@ -1,24 +1,21 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { createRpc } from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as Json from '../Json/Json.ts'
 import { VError } from '../VError/VError.ts'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
-
-export const createConnection = async (wsUrl: string): Promise<any> => {
+export const createConnection = async (wsUrl: string): Promise<Dynamic> => {
   try {
     const webSocket = new WebSocket(wsUrl)
     let connectionClosed = false
-
-    const errorHandler = (error: any) => {
+    const errorHandler = (error: Dynamic) => {
       connectionClosed = true
     }
     const closeHandler = () => {
       connectionClosed = true
     }
-
     webSocket.addEventListener('error', errorHandler)
     webSocket.addEventListener('close', closeHandler)
-    await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)
-
+    await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as Dynamic)
     const ipc = {
       get connectionClosed() {
         return connectionClosed
@@ -32,15 +29,15 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
       get onmessage() {
         return webSocket.onmessage
       },
-      set onmessage(listener) {
-        const handleMessage = (event: any) => {
+      set onmessage(listener: Dynamic) {
+        const handleMessage = (event: Dynamic) => {
           const parsed = JSON.parse(event.data)
           // @ts-ignore
           listener(parsed)
         }
         webSocket.onmessage = handleMessage
       },
-      send(message: any): void {
+      send(message: Dynamic): void {
         if (connectionClosed) {
           return
         }

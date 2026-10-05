@@ -1,6 +1,8 @@
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.ts'
 
-export const deduplicateEventListeners = <T extends { [key: string]: unknown }>(eventListeners: readonly T[]): readonly (T & { count: number })[] => {
+export const deduplicateEventListeners = <T extends { [key: string]: unknown }>(
+  eventListeners: readonly T[],
+): readonly (T & { count: number })[] => {
   const countMap: { [key: string]: number } = Object.create(null)
   const eventListenerMap: { [key: string]: T } = Object.create(null)
   for (const eventListener of eventListeners) {

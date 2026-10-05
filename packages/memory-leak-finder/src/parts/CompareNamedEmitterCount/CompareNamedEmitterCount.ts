@@ -5,7 +5,9 @@ const compareItem = (a: { count: number; name: string }, b: { count: number; nam
   return b.count - a.count || a.name.localeCompare(b.name)
 }
 
-const sortByCounts = (items: readonly { count: number; delta: number; name: string }[]): readonly { count: number; delta: number; name: string }[] => {
+const sortByCounts = (
+  items: readonly { count: number; delta: number; name: string }[],
+): readonly { count: number; delta: number; name: string }[] => {
   Assert.array(items)
   const sorted = Arrays.toSorted(items, compareItem)
   return sorted

@@ -15,13 +15,13 @@ const loadUrlScript = `function (url) {
   browserWindow.loadURL(url)
 }`
 
-export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow, idleTimeout, sessionRpc }) => {
+export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow, idleTimeout, sessionRpc }: any) => {
   let currentFirstWindow = firstWindow
   let currentSessionRpc = sessionRpc
 
   return {
     electronObjectId,
-    evaluate(expression) {
+    evaluate(expression: string) {
       return DevtoolsProtocolRuntime.evaluate(this.rpc, {
         expression,
         returnByValue: true,
@@ -30,7 +30,7 @@ export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow,
     firstWindow() {
       return currentFirstWindow
     },
-    loadUrl(url) {
+    loadUrl(url: string) {
       return DevtoolsProtocolRuntime.callFunctionOn(this.rpc, {
         arguments: [
           {
@@ -42,24 +42,25 @@ export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow,
       })
     },
     objectType: ObjectType.ElectronApp,
-    rebind({ firstWindow, sessionRpc }) {
+    rebind({ firstWindow, sessionRpc }: any) {
       currentFirstWindow = firstWindow
       currentSessionRpc = sessionRpc
     },
     rpc: electronRpc,
-    waitForIframe({ injectUtilityScript = true, url }) {
+    waitForIframe({ index = 0, injectUtilityScript = true, url }: any) {
       return WaitForIframe.waitForIframe({
         browserRpc,
         createPage: Page.create,
         electronObjectId,
         electronRpc,
         idleTimeout,
+        index,
         injectUtilityScript,
         sessionRpc: currentSessionRpc,
         url,
       })
     },
-    waitForPage({ injectUtilityScript = true, sessionId }) {
+    waitForPage({ injectUtilityScript = true, sessionId }: any) {
       return WaitForPage.waitForPage({
         browserRpc,
         createPage: Page.create,

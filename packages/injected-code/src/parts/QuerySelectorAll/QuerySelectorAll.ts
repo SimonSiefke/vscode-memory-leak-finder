@@ -6,21 +6,33 @@ import * as QuerySelectorAllInternalEnterFrame from '../QuerySelectorAllInternal
 import * as QuerySelectorAllNth from '../QuerySelectorAllNth/QuerySelectorAllNth.ts'
 import * as SelectorType from '../SelectorType/SelectorType.ts'
 
-export const getSelectorModule = (type: string | number): { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => Element[] } => {
+export const getSelectorModule = (
+  type: string | number,
+): { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => readonly Element[] } => {
   const typeNumber = typeof type === 'string' ? Number.parseInt(type, 10) : type
   switch (typeNumber) {
     case SelectorType.Css:
-      return QuerySelectorAllByCss as { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => Element[] }
+      return QuerySelectorAllByCss as {
+        querySelectorAll: (roots: readonly Element[], body: string, selector: string) => readonly Element[]
+      }
     case SelectorType.EnterShadow:
-      return QuerySelectorAllEnterShadow as { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => Element[] }
+      return QuerySelectorAllEnterShadow as {
+        querySelectorAll: (roots: readonly Element[], body: string, selector: string) => readonly Element[]
+      }
     case SelectorType.ExactText:
-      return QuerySelectorAllByExactText as { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => Element[] }
+      return QuerySelectorAllByExactText as {
+        querySelectorAll: (roots: readonly Element[], body: string, selector: string) => readonly Element[]
+      }
     case SelectorType.InternalEnterFrame:
-      return QuerySelectorAllInternalEnterFrame as { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => Element[] }
+      return QuerySelectorAllInternalEnterFrame as {
+        querySelectorAll: (roots: readonly Element[], body: string, selector: string) => readonly Element[]
+      }
     case SelectorType.Nth:
-      return QuerySelectorAllNth as { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => Element[] }
+      return QuerySelectorAllNth as { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => readonly Element[] }
     case SelectorType.Text:
-      return QuerySelectorAllByText as { querySelectorAll: (roots: readonly Element[], body: string, selector: string) => Element[] }
+      return QuerySelectorAllByText as {
+        querySelectorAll: (roots: readonly Element[], body: string, selector: string) => readonly Element[]
+      }
     default:
       throw new Error('not found')
   }

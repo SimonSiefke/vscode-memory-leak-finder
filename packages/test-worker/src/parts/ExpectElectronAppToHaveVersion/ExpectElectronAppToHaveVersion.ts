@@ -2,7 +2,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 import { ExpectError } from '../ExpectError/ExpectError.ts'
 import * as FunctionGetElectronAppVersion from '../FunctionGetElectronAppVersion/FunctionGetElectronAppVersion.ts'
 
-export const toHaveVersion = async (electronApp, expectedVersion) => {
+export const toHaveVersion = async (electronApp: any, expectedVersion: any) => {
   const result = await DevtoolsProtocolRuntime.callFunctionOn(electronApp.rpc, {
     functionDeclaration: FunctionGetElectronAppVersion.code,
     objectId: electronApp.electronObjectId,

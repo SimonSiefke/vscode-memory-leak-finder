@@ -9,41 +9,41 @@ interface IConfig {
   readonly enabled: boolean
   readonly extensionName: string
   readonly friendlyName: string
+  readonly match: string
   readonly modifications: readonly any[]
   readonly pathReplacements: readonly any[]
   readonly platform: string
   readonly repoUrl: string
-  readonly match: string
   readonly resolveVersion: string
 }
 
 export const getConfigs = (platform: string): readonly IConfig[] => {
   return [
     {
-      extensionName: 'vscode-js-debug',
-      repoUrl: 'git@github.com:microsoft/vscode-js-debug.git',
       buildScript: [`npm`, `run`, `package`],
-      enabled: true,
       cacheDir,
-      modifications: [],
-      platform,
+      enabled: true,
+      extensionName: 'vscode-js-debug',
       friendlyName: 'js-debug',
       match: 'extensions/ms-vscode.js-debug/',
-      resolveVersion: 'packageJson',
+      modifications: [],
       pathReplacements: [
         {
           occurrence: /^src/,
           replacement: 'dist/src',
         },
       ],
+      platform,
+      repoUrl: 'git@github.com:microsoft/vscode-js-debug.git',
+      resolveVersion: 'packageJson',
     },
     {
-      friendlyName: 'github-copilot-chat',
       buildScript: ['npm', 'run', 'build'],
       cacheDir,
-      extensionName: 'copilot-chat',
-      repoUrl: 'git@github.com:microsoft/vscode-copilot-chat.git',
       enabled: false,
+      extensionName: 'copilot-chat',
+      friendlyName: 'github-copilot-chat',
+      match: 'extensions/ms-vscode.js-debug/',
       modifications: [
         {
           name: '.esbuild.ts',
@@ -51,10 +51,10 @@ export const getConfigs = (platform: string): readonly IConfig[] => {
           replacement: "sourcemap: isDev ? 'linked' : 'linked'",
         },
       ],
-      platform,
-      match: 'extensions/ms-vscode.js-debug/',
-      resolveVersion: 'packageJson',
       pathReplacements: [],
+      platform,
+      repoUrl: 'git@github.com:microsoft/vscode-copilot-chat.git',
+      resolveVersion: 'packageJson',
     },
   ]
 }

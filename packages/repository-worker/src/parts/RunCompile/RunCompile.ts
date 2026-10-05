@@ -40,3 +40,20 @@ export const runCompile = async (cwd: string, useNice: boolean, mainJsPath: stri
     throw new Error('Build failed: out/main.js not found after compilation')
   }
 }
+
+export const runMinifiedBuild = async (cwd: string, platform: string, arch: string, useNice: boolean, executablePath: string) => {
+  const npmPath = await getNpmPathFromNvmrc(cwd)
+  const npxPath = Path.join(dirname(npmPath), 'npx')
+  const buildTask = `vscode-${platform}-${arch}-min`
+  const result = await runBuildCommand(cwd, useNice, npxPath, ['gulp', buildTask])
+
+  if (result.exitCode) {
+    console.log(`[repository] ${buildTask} exitCode: ${result.exitCode}`)
+    console.log(`[repository] ${buildTask} stdout: ${result.stdout}`)
+    console.log(`[repository] ${buildTask} stderr: ${result.stderr}`)
+  }
+
+  if (!(await FileSystemWorker.pathExists(executablePath))) {
+    throw new Error(`Build failed: minified VS Code executable not found at ${executablePath}`)
+  }
+}

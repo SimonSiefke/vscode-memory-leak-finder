@@ -12,13 +12,5 @@ import { createHeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSn
 export const parseFromStream = async (readStream: Readable, options: { parseStrings?: boolean } = { parseStrings: false }) => {
   const writeStream = createHeapSnapshotWriteStream(options)
   await pipeline(readStream, writeStream)
-  const result = writeStream.getResult()
-  const metaData = (writeStream as { metaData: unknown }).metaData
-  return {
-    edges: result.edges,
-    locations: result.locations,
-    metaData,
-    nodes: result.nodes,
-    strings: result.strings,
-  }
+  return writeStream.getResult()
 }

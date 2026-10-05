@@ -8,7 +8,10 @@ type DisposableItem = {
   readonly [key: string]: unknown
 }
 
-const addDeltas = (prettyBefore: readonly DisposableItem[], prettyAfter: readonly DisposableItem[]): readonly (DisposableItem & { delta: number })[] => {
+const addDeltas = (
+  prettyBefore: readonly DisposableItem[],
+  prettyAfter: readonly DisposableItem[],
+): readonly (DisposableItem & { delta: number })[] => {
   const newItems: (DisposableItem & { delta: number })[] = []
   const countMap = Object.create(null)
   for (const item of prettyBefore) {
@@ -29,7 +32,10 @@ const addDeltas = (prettyBefore: readonly DisposableItem[], prettyAfter: readonl
   return newItems
 }
 
-export const compareDisposablesWithLocation = async (before: readonly unknown[], after: { result: readonly unknown[]; scriptMap: unknown }): Promise<readonly (DisposableItem & { delta: number })[]> => {
+export const compareDisposablesWithLocation = async (
+  before: readonly unknown[],
+  after: { result: readonly unknown[]; scriptMap: unknown },
+): Promise<readonly (DisposableItem & { delta: number })[]> => {
   const beforeResult = before
   const afterResult = after.result
   const { scriptMap } = after

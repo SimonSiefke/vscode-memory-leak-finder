@@ -1,3 +1,4 @@
+import type { Dynamic } from '../Types/Types.ts'
 import { codeFrameColumns } from '@babel/code-frame'
 import { readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join } from 'node:path'
@@ -13,12 +14,10 @@ const getActualPath = (fileUri: string): string => {
   }
   return fileUri
 }
-
-const isSyntheticRuntimePath = (path) => {
+const isSyntheticRuntimePath = (path: Dynamic) => {
   return path.startsWith('node:') || path.startsWith('node:internal/')
 }
-
-const getReadablePath = (filePath, root) => {
+const getReadablePath = (filePath: Dynamic, root: Dynamic) => {
   const actualPath = getActualPath(filePath)
   if (!root || isAbsolute(actualPath)) {
     return actualPath
@@ -27,7 +26,6 @@ const getReadablePath = (filePath, root) => {
   if (FileSystem.existsSync(directCandidate)) {
     return directCandidate
   }
-
   let currentRoot = root
   for (let i = 0; i < 5; i++) {
     const workspaceCandidate = join(currentRoot, '.vscode-test-workspace', actualPath)
@@ -40,10 +38,8 @@ const getReadablePath = (filePath, root) => {
     }
     currentRoot = parent
   }
-
   return directCandidate
 }
-
 const RE_MODULE_NOT_FOUND_STACK = /Cannot find package '([^']+)' imported from (.+)$/
 
 const prepareModuleNotFoundError = (error: Error & { stack?: string }): { codeFrame: string; message: string; stack: string } => {
@@ -87,8 +83,7 @@ const prepareModuleNotFoundError = (error: Error & { stack?: string }): { codeFr
     stack: newStack,
   }
 }
-
-const getPathDetails = (lines) => {
+const getPathDetails = (lines: Dynamic) => {
   for (let i = 0; i < lines.length; i++) {
     const file = lines[i]
     if (file) {
@@ -112,8 +107,7 @@ const getPathDetails = (lines) => {
   }
   return undefined
 }
-
-const getCodeFrame = (cleanedStack, { color, root }) => {
+const getCodeFrame = (cleanedStack: Dynamic, { color, root }: Dynamic) => {
   try {
     const lines = SplitLines.splitLines(cleanedStack)
     const pathDetails = getPathDetails(lines)
@@ -137,7 +131,10 @@ const getCodeFrame = (cleanedStack, { color, root }) => {
   }
 }
 
-export const prepare = async (error: Error & { code?: string; codeFrame?: string; cause?: () => Error | undefined; message?: string; stack?: string }, { color = true, root = '' }: { color?: boolean; root?: string } = {}): Promise<{ codeFrame: string; message: string; stack: string }> => {
+export const prepare = async (
+  error: Error & { code?: string; codeFrame?: string; cause?: () => Error | undefined; message?: string; stack?: string },
+  { color = true, root = '' }: { color?: boolean; root?: string } = {},
+): Promise<{ codeFrame: string; message: string; stack: string }> => {
   if (error && error.code === ErrorCodes.ERR_MODULE_NOT_FOUND) {
     return prepareModuleNotFoundError(error)
   }

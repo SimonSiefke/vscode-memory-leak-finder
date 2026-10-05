@@ -1,6 +1,6 @@
 import * as SingleElementConditions from '../SingleElementCondition/SingleElementConditions.ts'
 
-export const getFunction = (fnName: string) => {
+export const getFunction = (fnName: string): ((element: any, options: any) => any) => {
   switch (fnName) {
     case 'notToHaveClass':
       return SingleElementConditions.notToHaveClass

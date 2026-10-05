@@ -1,6 +1,6 @@
 import * as ConditionErrors from '../ConditionErrors/ConditionErrors.ts'
 
-export const getFunction = (fnName: any) => {
+export const getFunction = (fnName: string): ((locator: any, options: any) => string) => {
   switch (fnName) {
     case 'toBeFocused':
       return ConditionErrors.toBeFocused

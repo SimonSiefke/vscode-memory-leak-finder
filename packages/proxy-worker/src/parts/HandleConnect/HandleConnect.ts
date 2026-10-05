@@ -18,6 +18,29 @@ import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
 
+const createMissingMockResponseBody = (targetUrl: string): string => {
+  return JSON.stringify({
+    error: 'Mock response not found',
+    message: 'Proxy mock mode is enabled, but no mock response exists for this request. Refusing to forward request to the network.',
+    target: targetUrl,
+  })
+}
+
+const writeMissingMockResponse = (tlsSocket: TLSSocket, httpVersion: string, targetUrl: string): void => {
+  const body = createMissingMockResponseBody(targetUrl)
+  const response =
+    `${httpVersion} 502 Mock response not found\r\n` +
+    'Access-Control-Allow-Credentials: true\r\n' +
+    'Access-Control-Allow-Headers: authorization, content-type, accept, x-requested-with\r\n' +
+    'Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS\r\n' +
+    'Access-Control-Allow-Origin: *\r\n' +
+    'Content-Type: application/json\r\n' +
+    `Content-Length: ${Buffer.byteLength(body)}\r\n` +
+    '\r\n' +
+    body
+  tlsSocket.write(response)
+}
+
 const saveInterceptedRequest = async (
   method: string,
   url: string,
@@ -69,7 +92,7 @@ const saveInterceptedRequest = async (
           .map((k) => Number.parseInt(k, 10))
           .filter((k) => !isNaN(k))
           .sort((a, b) => a - b)
-        if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+        if (keys.length > 0 && keys[0] === 0 && keys.at(-1) === keys.length - 1) {
           const numbers = keys.map((k) => decompressedBody[k] as number)
           imageBuffer = Buffer.from(new Uint8Array(numbers))
         } else {
@@ -100,7 +123,7 @@ const saveInterceptedRequest = async (
           .map((k) => Number.parseInt(k, 10))
           .filter((k) => !isNaN(k))
           .sort((a, b) => a - b)
-        if (keys.length > 0 && keys[0] === 0 && keys[keys.length - 1] === keys.length - 1) {
+        if (keys.length > 0 && keys[0] === 0 && keys.at(-1) === keys.length - 1) {
           // Looks like a serialized Buffer/Uint8Array
           const numbers = keys.map((k) => decompressedBody[k] as number)
           bodyString = new TextDecoder().decode(new Uint8Array(numbers))
@@ -334,7 +357,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
               // Skip Transfer-Encoding headers - we'll set Content-Length instead
               // Skip Content-Encoding headers - mock body is already decompressed
               if (lowerKey !== 'content-length' && lowerKey !== 'transfer-encoding' && lowerKey !== 'content-encoding') {
-                cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+                cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : v
                 lowerCaseHeaders.add(lowerKey)
               }
             }
@@ -378,6 +401,9 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             tlsSocket.write(bodyBuffer)
             return // Don't record mock requests
           }
+          console.error(`[Proxy] Missing mock response for ${method} ${fullUrl}; blocked live network request`)
+          writeMissingMockResponse(tlsSocket, httpVersion, fullUrl)
+          return // Don't record or forward unmatched mock-mode requests.
         }
 
         // Save POST body separately for inspection

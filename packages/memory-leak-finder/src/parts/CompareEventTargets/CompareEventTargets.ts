@@ -27,7 +27,10 @@ const prettifyEventTargets = (eventTargets: readonly { description: string }[]):
   return sorted
 }
 
-export const compareEventTargets = (before: unknown, after: unknown): { after: readonly { count: number; description: string }[]; before: readonly { count: number; description: string }[] } => {
+export const compareEventTargets = (
+  before: readonly { description: string }[],
+  after: readonly { description: string }[],
+): { after: readonly { count: number; description: string }[]; before: readonly { count: number; description: string }[] } => {
   Assert.array(before)
   Assert.array(after)
   const prettyBefore = prettifyEventTargets(before)

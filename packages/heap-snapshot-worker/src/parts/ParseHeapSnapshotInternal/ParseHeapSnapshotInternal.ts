@@ -4,18 +4,19 @@ import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdg
 import * as ParseHeapSnapshotInternalGraph from '../ParseHeapSnapshotInternalGraph/ParseHeapSnapshotInternalGraph.ts'
 import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.ts'
 import * as ParseHeapSnapshotLocations from '../ParseHeapSnapshotLocations/ParseHeapSnapshotLocations.ts'
+import type { NumberArray, ParsedHeapSnapshot } from '../Snapshot/Snapshot.ts'
 
 export const parseHeapSnapshotInternal = (
-  nodes: any,
-  nodeFields: any,
-  nodeTypes: any,
-  edges: any,
-  edgeFields: any,
-  edgeTypes: any,
-  strings: any,
-  locations: any,
-  locationFields: any,
-) => {
+  nodes: NumberArray,
+  nodeFields: readonly string[],
+  nodeTypes: readonly string[],
+  edges: NumberArray,
+  edgeFields: readonly string[],
+  edgeTypes: readonly string[],
+  strings: readonly string[],
+  locations: NumberArray,
+  locationFields: readonly string[],
+): ParsedHeapSnapshot => {
   // Assert.array(nodes)
   Assert.array(nodeFields)
   Assert.array(nodeTypes)

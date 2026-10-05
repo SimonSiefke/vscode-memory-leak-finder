@@ -1,19 +1,17 @@
-type HeapSnapshotNode = {
-  readonly [key: string]: number | string | undefined
-}
+import type { HeapSnapshotRecord, HeapSnapshotValue, NumberArray } from '../Snapshot/Snapshot.ts'
 
 export const createHeapSnapshotNode = (
-  array: readonly number[],
+  array: NumberArray,
   startIndex: number,
   nodeFields: readonly string[],
   valueTypes: readonly string[],
-  typeKey: string | number,
-  nameKey: string | number,
-  indexMultiplierKey: string | number,
+  typeKey: string,
+  nameKey: string,
+  indexMultiplierKey: string,
   indexMultiplier: number,
   strings: readonly string[],
-): HeapSnapshotNode => {
-  const node = Object.create(null)
+): HeapSnapshotRecord => {
+  const node: Record<string, HeapSnapshotValue> = Object.create(null)
   const nodeFieldCount = nodeFields.length
   for (let j = 0; j < nodeFieldCount; j++) {
     const key = nodeFields[j]
@@ -25,7 +23,9 @@ export const createHeapSnapshotNode = (
         break
       }
       case nameKey: {
-        node[key] = strings[value]
+        const type = nameKey === 'nameOrIndex' ? valueTypes[array[startIndex + nodeFields.indexOf(typeKey)]] : undefined
+        // V8 stores numeric indices for element and hidden edges, not string-table offsets.
+        node[key] = type === 'element' || type === 'hidden' ? value : strings[value]
 
         break
       }

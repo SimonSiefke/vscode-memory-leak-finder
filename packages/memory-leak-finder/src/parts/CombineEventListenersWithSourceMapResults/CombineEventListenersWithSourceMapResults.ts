@@ -3,12 +3,12 @@ import * as Assert from '../Assert/Assert.ts'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
 
 type EventListenerWithCount = {
-  readonly count: number
+  readonly count?: number
   readonly [key: string]: unknown
 }
 
 const compareCount = (a: EventListenerWithCount, b: EventListenerWithCount): number => {
-  return b.count - a.count
+  return b.count! - a.count!
 }
 
 const getIndex = (values: readonly number[], line: number, column: number): number => {
@@ -23,10 +23,10 @@ const getIndex = (values: readonly number[], line: number, column: number): numb
 }
 
 type EventListener = {
-  readonly column: number
-  readonly count: number
-  readonly line: number
-  readonly sourceMapUrl: string
+  readonly column?: number
+  readonly count?: number
+  readonly line?: number
+  readonly sourceMapUrl?: string
   readonly sourceMaps?: readonly string[]
   readonly [key: string]: unknown
 }
@@ -36,7 +36,11 @@ type CleanPositionMap = {
   readonly [sourceMapUrl: string]: readonly Position[] | undefined
 }
 
-export const combineEventListenersWithSourceMapResults = (eventListeners: readonly EventListener[], map: { readonly [sourceMapUrl: string]: readonly number[] }, cleanPositionMap: CleanPositionMap): readonly EventListener[] => {
+export const combineEventListenersWithSourceMapResults = (
+  eventListeners: readonly EventListener[],
+  map: { readonly [sourceMapUrl: string]: readonly number[] },
+  cleanPositionMap: CleanPositionMap,
+): readonly EventListener[] => {
   Assert.array(eventListeners)
   Assert.object(map)
   Assert.object(cleanPositionMap)

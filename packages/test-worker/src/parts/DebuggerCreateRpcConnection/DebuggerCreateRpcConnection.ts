@@ -12,7 +12,7 @@ type Ipc = {
 
 export const createRpc = (ipc: Ipc, canUseIdleCallback: boolean) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message) => {
+  const handleMessage = (message: any) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -40,7 +40,7 @@ export const createRpc = (ipc: Ipc, canUseIdleCallback: boolean) => {
   return {
     callbacks,
     canUseIdleCallback,
-    invoke(method, params) {
+    invoke(method: string, params: any) {
       const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
       callbacks[id] = { reject, resolve }
@@ -51,7 +51,7 @@ export const createRpc = (ipc: Ipc, canUseIdleCallback: boolean) => {
       })
       return promise
     },
-    invokeWithSession(sessionId, method, params) {
+    invokeWithSession(sessionId: string, method: string, params: any) {
       const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
       callbacks[id] = { reject, resolve }
@@ -78,13 +78,13 @@ export const createRpc = (ipc: Ipc, canUseIdleCallback: boolean) => {
     },
     listeners,
     objectType: ObjectType.Rpc,
-    off(event, listener) {
+    off(event: any, listener: any) {
       delete listener[event]
     },
-    on(event, listener) {
+    on(event: any, listener: any) {
       listeners[event] = listener
     },
-    once(event) {
+    once(event: any) {
       const { promise, resolve } = Promise.withResolvers()
       onceListeners[event] = resolve
       return promise

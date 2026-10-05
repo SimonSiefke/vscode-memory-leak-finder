@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 
-export const press = async (rpc, utilityContext, key) => {
+export const press = async (rpc: any, utilityContext: any, key: string) => {
   Assert.object(rpc)
   Assert.string(key)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
@@ -21,7 +21,7 @@ export const press = async (rpc, utilityContext, key) => {
   )
 }
 
-export const type = async (rpc, utilityContext, text) => {
+export const type = async (rpc: any, utilityContext: any, text: string) => {
   Assert.object(rpc)
   Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
@@ -41,7 +41,7 @@ export const type = async (rpc, utilityContext, text) => {
   )
 }
 
-export const pressKeyExponential = async (rpc, utilityContext, options) => {
+export const pressKeyExponential = async (rpc: any, utilityContext: any, options: any) => {
   Assert.object(options)
   Assert.string(options.key)
   Assert.object(options.waitFor)
@@ -64,7 +64,7 @@ export const pressKeyExponential = async (rpc, utilityContext, options) => {
   // TODO
 }
 
-export const contentEditableInsert = async (utilityContext, rpc, options) => {
+export const contentEditableInsert = async (rpc: any, utilityContext: any, options: any) => {
   Assert.object(options)
   Assert.string(options.value)
   await EvaluateInUtilityContext.evaluateInUtilityContext(

@@ -15,7 +15,7 @@ export const findPackageLockFiles = async (folder: string): Promise<readonly str
       cwd: folder,
       exclude: ['**/node_modules/**'],
     })
-    const absolutePaths = [...new Set(packageLockPaths)].map((path) => Path.join(folder, path))
+    const absolutePaths = Array.from(new Set(packageLockPaths), (path) => Path.join(folder, path))
     return absolutePaths
   } catch (error) {
     throw new VError(error, `Failed to find package-lock.json files in directory '${folder}'`)

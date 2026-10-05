@@ -1,6 +1,9 @@
 import { expect, test } from '@jest/globals'
-import { mkdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
+import { SourceMapGenerator } from 'source-map'
 import { addOriginalSources } from '../src/parts/AddOriginalSources/AddOriginalSources.ts'
 import { root } from '../src/parts/Root/Root.ts'
 
@@ -10,14 +13,14 @@ test('addOriginalSources attaches urls from script maps folder without sourcemap
   await mkdir(mapsDir, { recursive: true })
   const mapPath: string = join(mapsDir, 'tmp-test.json')
   const scriptMap = {
-    1: { sourceMapUrl: '', url: 'file:///bundle1.js' },
-    2: { sourceMapUrl: '', url: 'file:///bundle2.js' },
+    91001: { sourceMapUrl: '', url: 'file:///bundle1.js' },
+    91002: { sourceMapUrl: '', url: 'file:///bundle2.js' },
   }
   await writeFile(mapPath, JSON.stringify(scriptMap), 'utf8')
 
   const items: readonly any[] = [
-    { column: 10, count: 5, delta: 2, line: 20, name: 'fnA', scriptId: 1 },
-    { column: 15, count: 8, delta: 3, line: 25, name: 'fnB', scriptId: 2 },
+    { column: 10, count: 5, delta: 2, line: 20, name: 'fnA', scriptId: 91001 },
+    { column: 15, count: 8, delta: 3, line: 25, name: 'fnB', scriptId: 91002 },
   ]
 
   const result = await addOriginalSources(items)
@@ -39,4 +42,94 @@ test('addOriginalSources attaches urls from script maps folder without sourcemap
   expect(result[1].originalUrl).toBeUndefined()
   // Cleanup: remove temp file
   await rm(mapPath)
+})
+
+test('addOriginalSources attaches original locations from relative source maps', async () => {
+  const mapsDir: string = join(root, '.vscode-script-maps')
+  await mkdir(mapsDir, { recursive: true })
+  const mapPath: string = join(mapsDir, 'tmp-relative-source-map-test.json')
+  const tempDir = await mkdtemp(join(tmpdir(), 'source-map-test-'))
+  const generatedPath = join(tempDir, 'bundle.js')
+  const sourcePath = '../../node_modules/.pnpm/pkg/source.ts'
+  const generatedMap = new SourceMapGenerator({
+    file: 'bundle.js',
+  })
+  generatedMap.addMapping({
+    generated: {
+      column: 11,
+      line: 2,
+    },
+    name: 'makeLeak',
+    original: {
+      column: 3,
+      line: 7,
+    },
+    source: sourcePath,
+  })
+  generatedMap.setSourceContent(sourcePath, 'export function makeLeak() {}')
+  await writeFile(join(tempDir, 'bundle.js.map'), generatedMap.toString(), 'utf8')
+  const scriptMap = {
+    91003: {
+      sourceMapUrl: 'bundle.js.map',
+      url: generatedPath,
+    },
+  }
+  await writeFile(mapPath, JSON.stringify(scriptMap), 'utf8')
+
+  const result = await addOriginalSources([{ column: 10, count: 5, delta: 2, line: 1, name: 'm', scriptId: 91003 }])
+
+  expect(result[0]).toMatchObject({
+    originalLocation: 'node_modules/.pnpm/pkg/source.ts:7:3',
+    originalName: 'makeLeak',
+    sourceLocation: `${generatedPath}:1:10`,
+    sourceMapUrl: pathToFileURL(join(tempDir, 'bundle.js.map')).toString(),
+  })
+
+  await rm(mapPath)
+  await rm(tempDir, { recursive: true })
+})
+
+test('addOriginalSources resolves injected code using file url and relative source map', async () => {
+  const mapsDir: string = join(root, '.vscode-script-maps')
+  await mkdir(mapsDir, { recursive: true })
+  const mapPath: string = join(mapsDir, 'tmp-injected-code-source-map-test.json')
+  const tempDir = await mkdtemp(join(tmpdir(), 'injected-code-source-map-test-'))
+  const generatedPath = join(tempDir, 'injectedCode.js')
+  const sourcePath = '../../packages/injected-code/src/parts/Injected/Injected.ts'
+  const generatedMap = new SourceMapGenerator({
+    file: 'injectedCode.js',
+  })
+  generatedMap.addMapping({
+    generated: {
+      column: 7,
+      line: 3,
+    },
+    name: 'runInjectedCode',
+    original: {
+      column: 2,
+      line: 11,
+    },
+    source: sourcePath,
+  })
+  generatedMap.setSourceContent(sourcePath, 'export const runInjectedCode = () => {}')
+  await writeFile(join(tempDir, 'injectedCode.js.map'), generatedMap.toString(), 'utf8')
+  const scriptMap = {
+    91004: {
+      sourceMapUrl: 'injectedCode.js.map',
+      url: pathToFileURL(generatedPath).toString(),
+    },
+  }
+  await writeFile(mapPath, JSON.stringify(scriptMap), 'utf8')
+
+  const result = await addOriginalSources([{ column: 6, count: 291, delta: 291, line: 2, name: 'dispose', scriptId: 91004 }])
+
+  expect(result[0]).toMatchObject({
+    originalLocation: 'packages/injected-code/src/parts/Injected/Injected.ts:11:2',
+    originalName: 'runInjectedCode',
+    sourceLocation: `${pathToFileURL(generatedPath).toString()}:2:6`,
+    sourceMapUrl: pathToFileURL(join(tempDir, 'injectedCode.js.map')).toString(),
+  })
+
+  await rm(mapPath)
+  await rm(tempDir, { recursive: true })
 })

@@ -177,40 +177,40 @@ export function GET() {
 const getFilesForPhase = (phase: number): ReadonlyArray<{ name: string; content: string }> => {
   return [
     {
-      name: 'next-app/lib/report-data.js',
       content: getReportDataContent(phase),
+      name: 'next-app/lib/report-data.js',
     },
     {
-      name: 'next-app/app/layout.js',
       content: getRootLayoutContent(phase),
+      name: 'next-app/app/layout.js',
     },
     {
-      name: 'next-app/app/page.js',
       content: getHomePageContent(phase),
+      name: 'next-app/app/page.js',
     },
     {
-      name: 'next-app/app/reports/layout.js',
       content: getReportsLayoutContent(phase),
+      name: 'next-app/app/reports/layout.js',
     },
     {
-      name: 'next-app/app/reports/template.js',
       content: getReportsTemplateContent(phase),
+      name: 'next-app/app/reports/template.js',
     },
     {
-      name: 'next-app/app/reports/page.js',
       content: getReportsPageContent(phase),
+      name: 'next-app/app/reports/page.js',
     },
     {
-      name: 'next-app/app/api/report/route.js',
       content: getApiRouteContent(phase),
+      name: 'next-app/app/api/report/route.js',
     },
     {
-      name: 'next-app/app/components/index.js',
       content: getComponentsIndexContent(),
+      name: 'next-app/app/components/index.js',
     },
     ...Array.from({ length: cardCount }, (_, index) => ({
-      name: getCardPath(index),
       content: getCardContent(phase, index),
+      name: getCardPath(index),
     })),
   ]
 }
@@ -257,12 +257,14 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
 
   const { inspectPort, serverPort } = await ExternalRuntime.createPorts()
   await ExternalRuntime.startExternalRuntime({
-    command: 'node',
     args: [`--inspect=127.0.0.1:${inspectPort}`, 'start-next.cjs', 'dev'],
+    command: 'node',
     cwd: 'next-app',
+    inspectPort,
+    runtimeName: 'node',
+    serverPort,
     setupCommands: [
       {
-        command: 'npx',
         args: [
           '--yes',
           'create-next-app@latest',
@@ -275,40 +277,38 @@ export const setup = async ({ Editor, Explorer, ExternalRuntime, Workspace }: Te
           '--no-tailwind',
           '--skip-install',
         ],
+        command: 'npx',
       },
       {
-        command: 'npm',
         args: ['install', '--package-lock-only'],
+        command: 'npm',
         cwd: 'next-app',
       },
       {
-        command: 'npm',
         args: ['ci'],
+        command: 'npm',
         cwd: 'next-app',
       },
     ],
     setupFiles: [
       ...getFilesForPhase(phases[0]),
       {
-        name: 'next-app/app/health/route.js',
         content: `export function GET() {
   return Response.json({ ok: true })
 }
 `,
+        name: 'next-app/app/health/route.js',
       },
       {
-        name: 'next-app/start-next.cjs',
         content: `process.env.HOSTNAME = '127.0.0.1'
 process.env.NEXT_TELEMETRY_DISABLED = '1'
 process.env.PORT = process.env.MEMORY_LEAK_FINDER_SERVER_PORT
 
 require('next/dist/bin/next')
 `,
+        name: 'next-app/start-next.cjs',
       },
     ],
-    inspectPort,
-    runtimeName: 'node',
-    serverPort,
   })
 }
 

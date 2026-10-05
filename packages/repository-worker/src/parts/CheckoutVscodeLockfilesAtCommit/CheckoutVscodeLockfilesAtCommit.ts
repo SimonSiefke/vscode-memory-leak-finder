@@ -1,7 +1,7 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import * as os from 'node:os'
-import * as Path from '../Path/Path.ts'
 import { exec } from '../Exec/Exec.ts'
+import * as Path from '../Path/Path.ts'
 import * as VerboseLog from '../VerboseLog/VerboseLog.ts'
 
 const sparseCheckoutPatterns = '.nvmrc\n**/package-lock.json\n'

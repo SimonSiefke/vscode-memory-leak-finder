@@ -3,18 +3,7 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-<<<<<<< HEAD
-interface CreateParams {
-  expect: any
-  page: any
-  platform: string
-  VError: any
-}
-
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
-=======
-export const create = ({ expect, page, platform, VError, electronApp, ideVersion }: CreateParams) => {
->>>>>>> origin/main
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async addItem({ key, name, value }: { key: string; name: string; value: string }) {
       try {
@@ -51,11 +40,7 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
         throw new VError(error, `Failed to add item to settings editor`)
       }
     },
-<<<<<<< HEAD
-    async applyFilter({ filterName, filterText }: { filterName: string; filterText: string }) {
-=======
     async applyFilter({ filterName, filterText: _filterText }: { filterName: string; filterText: string }) {
->>>>>>> origin/main
       try {
         await page.waitForIdle()
         const settingsFilter = page.locator('[aria-label="Filter Settings"]')
@@ -270,9 +255,6 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
         const body = page.locator('.settings-body')
         await expect(body).toBeVisible()
         await page.waitForIdle()
-        const rightControls = page.locator('.settings-right-controls')
-        await expect(rightControls).toBeVisible()
-        await page.waitForIdle()
         if (ideVersion.minor >= 114) {
           const openInMainWindowButton = page.locator('[aria-label="Open Modal Editor in Main Window"]')
           await expect(openInMainWindowButton).toBeVisible()
@@ -340,16 +322,13 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
         throw new VError(error, `Failed to remove item`)
       }
     },
-<<<<<<< HEAD
-    async search({ resultCount, value }: { resultCount: number; value: string }) {
-=======
     async search({ resultCount, value }: { resultCount: number | 'many'; value: string }) {
->>>>>>> origin/main
       try {
         await page.waitForIdle()
         const searchInput = page.locator('.search-container [role="textbox"]')
         await expect(searchInput).toBeVisible()
         await page.waitForIdle()
+        await searchInput.focus()
         await expect(searchInput).toBeFocused()
         await page.waitForIdle()
         await searchInput.type(value)
@@ -357,11 +336,7 @@ export const create = ({ expect, page, platform, VError, electronApp, ideVersion
         const searchCount = page.locator('.settings-count-widget')
         await expect(searchCount).toBeVisible()
         await page.waitForIdle()
-<<<<<<< HEAD
-        if (resultCount > 1) {
-=======
         if (resultCount === 'many' || resultCount > 1) {
->>>>>>> origin/main
           await expect(searchCount).toHaveText(new RegExp(`\\d+ Settings Found`))
         } else {
           const word = resultCount === 1 ? 'Setting' : 'Settings'

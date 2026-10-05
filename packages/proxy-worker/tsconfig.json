@@ -9,8 +9,6 @@
     "isolatedModules": true,
     "strict": true,
     "noImplicitAny": true,
-    "noUncheckedSideEffectImports": true,
-    "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
@@ -22,7 +20,9 @@
     "noUnusedLocals": true,
     "composite": true,
     "allowImportingTsExtensions": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true
   },
   "include": ["src", "test"]
 }

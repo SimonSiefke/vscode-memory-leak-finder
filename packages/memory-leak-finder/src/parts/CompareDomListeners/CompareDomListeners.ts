@@ -43,7 +43,10 @@ const sortByCount = (items: readonly LeakedDomListener[]): readonly LeakedDomLis
   return Arrays.toSorted(items, compareCount)
 }
 
-export const compareDomListeners = (before: readonly DomListenerNode[], after: readonly DomListenerNode[]): readonly LeakedDomListener[] => {
+export const compareDomListeners = (
+  before: readonly DomListenerNode[],
+  after: readonly DomListenerNode[],
+): readonly LeakedDomListener[] => {
   const oldCountMap = Object.create(null)
   for (const item of before) {
     const hash = getHash(item)

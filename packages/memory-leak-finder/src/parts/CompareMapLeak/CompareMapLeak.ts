@@ -1,4 +1,8 @@
-export const compareMapLeak = <T extends { objectId?: unknown; [key: string]: unknown }>(before: readonly T[], after: readonly T[], getKey: (element: T) => string): Omit<T, 'objectId'>[] => {
+export const compareMapLeak = <T extends { objectId?: unknown; [key: string]: unknown }>(
+  before: readonly T[],
+  after: readonly T[],
+  getKey: (element: T) => string,
+): Omit<T, 'objectId'>[] => {
   const map: { [key: string]: number } = Object.create(null)
   for (const element of before) {
     const key = getKey(element)

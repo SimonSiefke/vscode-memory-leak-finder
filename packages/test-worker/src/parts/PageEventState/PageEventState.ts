@@ -13,7 +13,7 @@ const state = {
   events: [] as any[],
 }
 
-const addEvent = (event) => {
+const addEvent = (event: any) => {
   state.events.push(event)
   for (const callback of state.callbacks) {
     for (const event of state.events) {
@@ -25,7 +25,7 @@ const addEvent = (event) => {
   }
 }
 
-export const waitForEvent = async ({ frameId, name, timeout = TimeoutConstants.PageEvent }) => {
+export const waitForEvent = async ({ frameId, name, timeout = TimeoutConstants.PageEvent }: any) => {
   try {
     for (const event of state.events) {
       if (event.frameId === frameId && event.name === name) {

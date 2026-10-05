@@ -13,7 +13,7 @@ const script = `(async function () {
   browserWindow.focus()
 })()`
 
-export const focus = async ({ electronRpc }) => {
+export const focus = async ({ electronRpc }: any) => {
   try {
     await DevtoolsProtocolRuntime.evaluate(electronRpc, {
       awaitPromise: true,

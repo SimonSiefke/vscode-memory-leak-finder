@@ -7,13 +7,13 @@ const signedHeaders = 'host;x-amz-content-sha256;x-amz-date'
 const unsignedPayload = 'UNSIGNED-PAYLOAD'
 
 const encodeRfc3986 = (value: string): string => {
-  return encodeURIComponent(value).replace(/[!'()*]/g, (character) => {
+  return encodeURIComponent(value).replaceAll(/[!'()*]/g, (character) => {
     return `%${character.charCodeAt(0).toString(16).toUpperCase()}`
   })
 }
 
 const toAmzDate = (value: Date): string => {
-  return value.toISOString().replace(/[:-]|\.\d{3}/g, '')
+  return value.toISOString().replaceAll(/[:-]|\.\d{3}/g, '')
 }
 
 const toDateStamp = (value: string): string => {

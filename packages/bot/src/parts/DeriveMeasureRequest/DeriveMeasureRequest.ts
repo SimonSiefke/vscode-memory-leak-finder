@@ -1,5 +1,5 @@
-import { createRequestId } from '../CreateRequestId/CreateRequestId.ts'
 import type { ParsedBotComment } from '../ParseBotComment/ParseBotComment.ts'
+import { createRequestId } from '../CreateRequestId/CreateRequestId.ts'
 
 export type DeriveMeasureRequestOptions = {
   readonly actorLogin: string
@@ -39,7 +39,7 @@ export type MeasureRequest = {
 }
 
 export const deriveMeasureRequest = (options: DeriveMeasureRequestOptions): MeasureRequest => {
-  const { actorLogin, commentId, command, issueNumber, pullRequest, requestId, sourceRepository } = options
+  const { actorLogin, command, commentId, issueNumber, pullRequest, requestId, sourceRepository } = options
   return {
     actorLogin,
     baseCommit: pullRequest.baseSha,

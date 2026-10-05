@@ -1,19 +1,5 @@
+import type { Dynamic } from '../Types/Types.ts'
 import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.ts'
-
-<<<<<<< HEAD
-type DetachedDomNode = {
-  readonly description: string
-  readonly count: number
-  readonly [key: string]: unknown
-}
-
-export const compareDetachedDomNodesWithStackTraces = (before: readonly unknown[], after: readonly unknown[]): { after: readonly DetachedDomNode[]; before: readonly DetachedDomNode[] } => {
-  const result = CompareDetachedDomNodes.compareDetachedDomNodes(before, after)
-  return {
-    after: result.after,
-    before: result.before,
-  }
-=======
 export interface DomNode {
   readonly type: string
   readonly subtype: string
@@ -27,16 +13,14 @@ export interface DomNode {
   readonly delta?: number
   readonly beforeCount?: number
   readonly afterCount?: number
-  readonly [key: string]: any
+  readonly [key: string]: Dynamic
 }
-
 export interface NodeWithDelta extends DomNode {
   readonly count: number
   readonly delta: number
   readonly beforeCount: number
   readonly afterCount: number
 }
-
 export interface FormattedNodeWithDelta {
   readonly className: string
   readonly description: string
@@ -44,17 +28,14 @@ export interface FormattedNodeWithDelta {
   readonly originalStack: string[]
   readonly count: number
   readonly delta: number
-  readonly [key: string]: any
+  readonly [key: string]: Dynamic
 }
-
 export interface Context {
   readonly runs?: number
 }
-
 const compareNode = (a: NodeWithDelta, b: NodeWithDelta): number => {
   return b.delta - a.delta
 }
-
 const getBeforeCountMap = (before: DomNode[]): Record<string, number> => {
   const beforeCountMap: Record<string, number> = Object.create(null)
   for (const node of before) {
@@ -63,7 +44,6 @@ const getBeforeCountMap = (before: DomNode[]): Record<string, number> => {
   }
   return beforeCountMap
 }
-
 const getAfterCountMap = (after: DomNode[]): Record<string, number> => {
   const afterCountMap: Record<string, number> = Object.create(null)
   for (const node of after) {
@@ -72,7 +52,6 @@ const getAfterCountMap = (after: DomNode[]): Record<string, number> => {
   }
   return afterCountMap
 }
-
 const getBeforeNodeMap = (before: DomNode[]): Record<string, DomNode> => {
   const beforeNodeMap: Record<string, DomNode> = Object.create(null)
   for (const node of before) {
@@ -83,19 +62,17 @@ const getBeforeNodeMap = (before: DomNode[]): Record<string, DomNode> => {
   }
   return beforeNodeMap
 }
-
 const findNode = (hash: string, after: DomNode[], beforeNodeMap: Record<string, DomNode>): DomNode | undefined => {
-  // Prefer a node from after with a stack trace, otherwise use any after node, otherwise use before node
-  let node = Array.from(after).find((n) => GetDomNodeHash.getDomNodeHash(n) === hash && n.stackTrace && n.stackTrace.length > 0)
+  // Prefer a node from after with a stack trace, otherwise use unknown after node, otherwise use before node
+  let node = Array.from(after).find((n: Dynamic) => GetDomNodeHash.getDomNodeHash(n) === hash && n.stackTrace && n.stackTrace.length > 0)
   if (!node) {
-    node = Array.from(after).find((n) => GetDomNodeHash.getDomNodeHash(n) === hash)
+    node = Array.from(after).find((n: Dynamic) => GetDomNodeHash.getDomNodeHash(n) === hash)
   }
   if (!node) {
     node = beforeNodeMap[hash]
   }
   return node
 }
-
 const getNodesWithDeltas = (
   afterCountMap: Record<string, number>,
   beforeCountMap: Record<string, number>,
@@ -108,9 +85,7 @@ const getNodesWithDeltas = (
     const afterCount = afterCountMap[hash]
     const beforeCount = beforeCountMap[hash] || 0
     const delta = afterCount - beforeCount
-
     const node = findNode(hash, after, beforeNodeMap)
-
     // Only include nodes with delta >= runs
     if (delta >= runs && node) {
       afterWithDeltas.push({
@@ -124,11 +99,9 @@ const getNodesWithDeltas = (
   }
   return afterWithDeltas
 }
-
 const formatOutput = (nodes: NodeWithDelta[]): FormattedNodeWithDelta[] => {
-  return nodes.map(({ type, subtype, objectId, beforeCount, afterCount, sourcesHash, ...rest }) => rest as FormattedNodeWithDelta)
+  return nodes.map(({ type, subtype, objectId, beforeCount, afterCount, sourcesHash, ...rest }: Dynamic) => rest as FormattedNodeWithDelta)
 }
-
 export const compareDetachedDomNodesWithStackTraces = (
   before: DomNode[],
   after: DomNode[],
@@ -142,5 +115,4 @@ export const compareDetachedDomNodesWithStackTraces = (
   const sorted = afterWithDeltas.toSorted(compareNode)
   const formatted = formatOutput(sorted)
   return formatted
->>>>>>> origin/main
 }

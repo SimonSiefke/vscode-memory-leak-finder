@@ -26,15 +26,6 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         throw new VError(error, `Failed to hide hover`)
       }
     },
-    async shouldHaveText(text: string) {
-      try {
-        const tooltip = page.locator('.monaco-hover')
-        await expect(tooltip).toBeVisible()
-        await expect(tooltip).toContainText(text)
-      } catch (error) {
-        throw new VError(error, `Failed to check that hover has text "${text}"`)
-      }
-    },
     async shouldHaveActions() {
       try {
         const tooltip = page.locator('.monaco-hover')
@@ -43,6 +34,15 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         await expect(actions.first()).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to check that hover has actions`)
+      }
+    },
+    async shouldHaveText(text: string) {
+      try {
+        const tooltip = page.locator('.monaco-hover')
+        await expect(tooltip).toBeVisible()
+        await expect(tooltip).toContainText(text)
+      } catch (error) {
+        throw new VError(error, `Failed to check that hover has text "${text}"`)
       }
     },
   }

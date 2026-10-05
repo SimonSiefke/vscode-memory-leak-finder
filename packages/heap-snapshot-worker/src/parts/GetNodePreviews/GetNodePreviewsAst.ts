@@ -1,4 +1,4 @@
-import type { ArrayNode, AstNode, CodeNode, ObjectNode, PropertyEntry, UnknownNode } from '../AstNode/AstNode.ts'
+import type { ArrayNode, AstNode, CodeNode, ObjectNode, PropertyEntry } from '../AstNode/AstNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
@@ -7,30 +7,12 @@ import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
-<<<<<<< HEAD
-const createUnknown = (id: number, name: string | null, value?: string): UnknownNode => {
-  if (value !== undefined) {
-    return {
-      id,
-      name,
-      type: 'unknown',
-      value,
-    }
-  }
-  return {
-    id,
-    name,
-    type: 'unknown',
-  }
-}
-=======
 const createUnknown = (id: number, name: string | null, value?: string): AstNode => ({
   id,
   name,
   type: 'unknown',
   value: undefined,
 })
->>>>>>> origin/main
 
 export const buildAstForNode = (
   nodeIndex: number,
@@ -68,7 +50,7 @@ export const buildAstForNode = (
   }
   if (nodeTypeName === 'number') {
     const n = typeof node.name === 'number' ? strings[node.name] : undefined
-    const parsed = n === undefined ? Number.NaN : Number(n)
+    const parsed = n === undefined ? NaN : Number(n)
     return { id, name, type: 'number', value: Number.isFinite(parsed) ? parsed : (n ?? '') }
   }
   if (nodeTypeName === 'bigint') {
@@ -184,26 +166,15 @@ export const buildAstForNode = (
         }
       }
     }
-    if (nodeTypeName === 'code') {
-      const codeNode: CodeNode = {
-        id,
-        name,
-        type: 'code',
-        ...(columnValue !== undefined && { column: columnValue }),
-        ...(lineValue !== undefined && { line: lineValue }),
-        ...(scriptIdValue !== undefined && { scriptId: scriptIdValue }),
-      }
-      return codeNode
-    }
-    const closureNode: CodeNode = {
+    const codeNode: CodeNode = {
       id,
       name,
-      type: 'closure',
-      ...(columnValue !== undefined && { column: columnValue }),
-      ...(lineValue !== undefined && { line: lineValue }),
-      ...(scriptIdValue !== undefined && { scriptId: scriptIdValue }),
+      ...(columnValue === undefined ? {} : { column: columnValue }),
+      ...(lineValue === undefined ? {} : { line: lineValue }),
+      ...(scriptIdValue === undefined ? {} : { scriptId: scriptIdValue }),
+      type: nodeTypeName,
     }
-    return closureNode
+    return codeNode
   }
 
   return createUnknown(id, name, `[${nodeTypeName} ${id}]`)

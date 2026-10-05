@@ -1,23 +1,9 @@
-export interface RpcConnection {
-  readonly connectionClosed?: () => boolean
-  dispose(): void
-  invoke(method: string, params?: any): Promise<any>
-  invokeWithSession?(sessionId: string, method: string, params?: any): Promise<any>
-  readonly [key: string]: any
-}
-
-export interface Measure {
-  compare(before: any, after: any, context: any): Promise<any>
-  readonly id: string
-  releaseResources(): Promise<void>
-  start(): Promise<any>
-  stop(): Promise<any>
-}
+import type { MeasureInstance, RpcConnection } from '../Types/Types.ts'
 
 export interface MemoryLeakFinderState {
-  after?: any
-  before?: any
-  readonly measure: Measure
+  after?: unknown
+  before?: unknown
+  readonly measure: MeasureInstance
   readonly pid: number
   readonly rpc: RpcConnection
 }

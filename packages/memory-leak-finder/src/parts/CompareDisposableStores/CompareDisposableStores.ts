@@ -1,28 +1,19 @@
-type DisposableStore = {
-  readonly length: number
-  readonly [index: number]: { readonly stackTrace: string }
-  readonly some: (predicate: (item: { readonly stackTrace: string }) => boolean) => boolean
+import type { Dynamic } from '../Types/Types.ts'
+const hasStackTrace = (stackTrace: Dynamic) => {
+  return stackTrace !== ''
 }
-
-const hasStackTrace = (item: { readonly stackTrace: string }): boolean => {
-  return item.stackTrace !== ''
+const hasItems = (disposableStore: Dynamic) => {
+  return disposableStore.length && disposableStore.some(hasStackTrace)
 }
-
-const hasItems = (disposableStore: DisposableStore): boolean => {
-  return disposableStore.length > 0 && disposableStore.some(hasStackTrace)
-}
-
-const compareSize = (a: DisposableStore, b: DisposableStore): number => {
+const compareSize = (a: Dynamic, b: Dynamic) => {
   return b.length - a.length
 }
-
-const prettifyDisposableStores = (disposableStores: readonly DisposableStore[]): readonly DisposableStore[] => {
+const prettifyDisposableStores = (disposableStores: Dynamic) => {
   const viableStores = disposableStores.filter(hasItems)
   const sortedStores = viableStores.sort(compareSize)
   return sortedStores
 }
-
-export const compareDisposableStores = (before: readonly DisposableStore[], after: readonly DisposableStore[]): { after: readonly DisposableStore[]; before: readonly DisposableStore[] } => {
+export const compareDisposableStores = (before: Dynamic, after: Dynamic) => {
   const prettyBefore = prettifyDisposableStores(before)
   const prettyAfter = prettifyDisposableStores(after)
   return {

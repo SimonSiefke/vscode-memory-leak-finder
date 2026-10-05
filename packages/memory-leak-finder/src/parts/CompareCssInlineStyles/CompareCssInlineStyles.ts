@@ -16,7 +16,10 @@ const prettifyMap = (map: { readonly [key: string]: number }): { readonly [key: 
   return sortedMap
 }
 
-export const compareCssInlineStyles = (before: { readonly [key: string]: number }, after: { readonly [key: string]: number }): { after: { readonly [key: string]: number }; before: { readonly [key: string]: number } } => {
+export const compareCssInlineStyles = (
+  before: { readonly [key: string]: number },
+  after: { readonly [key: string]: number },
+): { after: { readonly [key: string]: number }; before: { readonly [key: string]: number } } => {
   Assert.object(before)
   Assert.object(after)
   const prettyBefore = prettifyMap(before)

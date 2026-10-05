@@ -9,8 +9,6 @@
     "strict": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
-    "noUncheckedSideEffectImports": true,
-    "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
@@ -23,7 +21,9 @@
     "composite": true,
     "esModuleInterop": true,
     "allowImportingTsExtensions": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true
   },
-  "include": ["src", "test", "types.d.ts"]
+  "include": ["helpers", "src", "test", "types.d.ts"]
 }

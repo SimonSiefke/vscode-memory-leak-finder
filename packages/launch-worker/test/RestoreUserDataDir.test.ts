@@ -1,10 +1,10 @@
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
-import { AddressInfo } from 'node:net'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import type { AddressInfo } from 'node:net'
 import { afterEach, expect, jest, test } from '@jest/globals'
 import JSZip from 'jszip'
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { restoreUserDataDir } from '../src/parts/RestoreUserDataDir/RestoreUserDataDir.ts'
 
 type TestHttpServer = {
@@ -162,7 +162,7 @@ test('restoreUserDataDir throws contextual error when fetch throws', async () =>
   const originalFetch = globalThis.fetch
   globalThis.fetch = jest.fn(async () => {
     throw new Error('network down')
-  }) as typeof fetch
+  })
   const userDataDir = await mkdtemp(join(tmpdir(), 'restored-user-data-'))
 
   try {

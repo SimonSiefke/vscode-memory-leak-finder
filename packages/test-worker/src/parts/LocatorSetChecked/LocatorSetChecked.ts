@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 
-export const setChecked = async (locator, value: boolean): Promise<void> => {
+export const setChecked = async (locator: any, value: boolean): Promise<void> => {
   Assert.object(locator)
   if (typeof value !== 'boolean') {
     throw new TypeError(`setChecked expects a boolean value, got ${typeof value}`)

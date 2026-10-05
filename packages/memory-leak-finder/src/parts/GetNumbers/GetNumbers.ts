@@ -1,16 +1,14 @@
+import type { Dynamic } from '../Types/Types.ts'
 import type { Session } from '../Session/Session.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
-
-const compareNumber = (a, b) => {
+const compareNumber = (a: Dynamic, b: Dynamic) => {
   return b - a
 }
-
-const sortNumbers = (numbers) => {
+const sortNumbers = (numbers: Dynamic) => {
   return Arrays.toSorted(numbers, compareNumber)
 }
-
 export const getNumbers = async (session: Session, objectGroup: string): Promise<readonly number[]> => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
@@ -51,7 +49,6 @@ export const getNumbers = async (session: Session, objectGroup: string): Promise
     objectId: objects.objects.objectId,
     returnByValue: true,
   })
-
   const sortedNumbers = sortNumbers(result)
   return sortedNumbers
 }

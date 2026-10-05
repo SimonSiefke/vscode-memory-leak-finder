@@ -1,8 +1,14 @@
 import * as DispatchEvent from '../DispatchEvent/DispatchEvent.ts'
 
-export const click = (element: Element, options: MouseEventInit & { button?: number | 'right' }): void => {
+export const click = (element: Element, options: Omit<MouseEventInit, 'button'> & { button?: number | 'right' }): void => {
   const rect = element.getBoundingClientRect()
-  const mutableOptions = options as MouseEventInit & { button?: number | 'right'; clientX?: number; clientY?: number; cancelable?: boolean; bubbles?: boolean }
+  const mutableOptions = options as Omit<MouseEventInit, 'button'> & {
+    button?: number | 'right'
+    clientX?: number
+    clientY?: number
+    cancelable?: boolean
+    bubbles?: boolean
+  }
   mutableOptions.clientX = (rect.left + rect.right) / 2
   mutableOptions.clientY = (rect.top + rect.bottom) / 2
   mutableOptions.cancelable = true
@@ -12,14 +18,15 @@ export const click = (element: Element, options: MouseEventInit & { button?: num
     buttonValue = 2
     mutableOptions.button = 2
   }
-  DispatchEvent.pointerDown(element, mutableOptions)
-  DispatchEvent.mouseDown(element, mutableOptions)
+  const dispatchOptions = mutableOptions as MouseEventInit
+  DispatchEvent.pointerDown(element, dispatchOptions)
+  DispatchEvent.mouseDown(element, dispatchOptions)
   if (buttonValue !== 2 /* right */) {
-    DispatchEvent.click(element, mutableOptions)
+    DispatchEvent.click(element, dispatchOptions)
   }
-  DispatchEvent.mouseUp(element, mutableOptions)
-  DispatchEvent.pointerUp(element, mutableOptions)
+  DispatchEvent.mouseUp(element, dispatchOptions)
+  DispatchEvent.pointerUp(element, dispatchOptions)
   if (buttonValue === 2 /* right */) {
-    DispatchEvent.contextMenu(element, mutableOptions)
+    DispatchEvent.contextMenu(element, dispatchOptions)
   }
 }

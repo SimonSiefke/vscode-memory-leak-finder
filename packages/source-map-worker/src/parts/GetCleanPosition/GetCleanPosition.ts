@@ -13,7 +13,7 @@ export const getCleanPosition = (position: Position | null | undefined): Positio
     return undefined
   }
   const { source, sourcesHash, column, line, name } = position
-  const result: Position = {
+  const result: { -readonly [Key in keyof Position]: Position[Key] } = {
     source: CleanSource.cleanSource(source),
   }
   if (sourcesHash !== undefined && sourcesHash !== null) {

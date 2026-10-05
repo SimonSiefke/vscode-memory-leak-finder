@@ -1,4 +1,5 @@
 import * as UnwrapDevtoolsEvaluateResult from '../src/parts/UnwrapDevtoolsEvaluateResult/UnwrapDevtoolsEvaluateResult.js'
+import * as ErrorCodes from '../src/parts/ErrorCodes/ErrorCodes.js'
 import { test, expect } from '@jest/globals'
 
 test('unwrapResult - undefined', () => {
@@ -69,6 +70,28 @@ test('unwrapResult - result with empty object', () => {
   ).toEqual({})
 })
 
+test('unwrapResult - performance metrics', () => {
+  expect(
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      result: {
+        metrics: [
+          {
+            name: 'LayoutCount',
+            value: 2,
+          },
+        ],
+      },
+    }),
+  ).toEqual({
+    metrics: [
+      {
+        name: 'LayoutCount',
+        value: 2,
+      },
+    ],
+  })
+})
+
 test('unwrapResult - wrapped null', () => {
   expect(UnwrapDevtoolsEvaluateResult.unwrapResult({ result: { result: { type: 'object', subtype: 'null', value: null } } })).toBe(null)
 })
@@ -112,6 +135,17 @@ test('unwrapResult - heap usage', () => {
   })
 })
 
+test('unwrapResult - heap snapshot object id', () => {
+  const rawResult = {
+    id: 9,
+    result: { heapSnapshotObjectId: '123' },
+    sessionId: '1E8CFE6179C022F428E3CCF6C2E0E7D4',
+  }
+  expect(UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)).toEqual({
+    heapSnapshotObjectId: '123',
+  })
+})
+
 test('unwrapResult - global lexical scope names', () => {
   const rawResult = {
     id: 9,
@@ -121,4 +155,39 @@ test('unwrapResult - global lexical scope names', () => {
   expect(UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)).toEqual({
     names: [],
   })
+})
+
+test('unwrapResult - preserves method not found errors', () => {
+  expect.assertions(2)
+  try {
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      error: {
+        code: -32601,
+        message: "'Memory.startSampling' wasn't found",
+      },
+    })
+  } catch (error) {
+    expect(error).toMatchObject({
+      code: ErrorCodes.E_DEVTOOLS_METHOD_NOT_FOUND,
+      message: "'Memory.startSampling' wasn't found",
+    })
+    expect(error).toBeInstanceOf(Error)
+  }
+})
+
+test('unwrapResult - does not classify unrelated protocol failures as method not found', () => {
+  expect.assertions(2)
+  try {
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      error: {
+        code: -32602,
+        message: 'Invalid parameters',
+      },
+    })
+  } catch (error) {
+    expect(error).toMatchObject({
+      message: 'Invalid parameters',
+    })
+    expect(error).not.toHaveProperty('code')
+  }
 })

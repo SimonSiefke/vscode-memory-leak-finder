@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { BotEnv } from '../Env/Env.ts'
+import { getR2GetObjectRequest } from '../GetR2GetObjectRequest/GetR2GetObjectRequest.ts'
 import {
   allMockDataDownloadPath,
   allMockDataSnapshotUnavailableMessage,
@@ -10,7 +11,6 @@ import {
   userDataSnapshotUnavailableMessage,
   userDataDownloadPath,
 } from '../UserDataSnapshot/UserDataSnapshot.ts'
-import { getR2GetObjectRequest } from '../GetR2GetObjectRequest/GetR2GetObjectRequest.ts'
 
 type SnapshotRouteConfig = {
   readonly getR2ObjectKey: (env: BotEnv) => string
@@ -35,7 +35,7 @@ const snapshotRouteConfigs: readonly SnapshotRouteConfig[] = [
 ]
 
 const getBearerToken = (request: IncomingMessage): string => {
-  const authorization = request.headers.authorization
+  const { authorization } = request.headers
   if (!authorization?.startsWith('Bearer ')) {
     return ''
   }
@@ -79,7 +79,7 @@ export const createHandleUserDataDownloadRequest = (env: BotEnv) => {
     if (request.method !== 'GET') {
       return false
     }
-    const path = request.url?.split('?')[0] ?? ''
+    const path = request.url?.split('?', 1)[0] ?? ''
     const routeConfig = getSnapshotRouteConfig(path)
     if (!routeConfig) {
       return false

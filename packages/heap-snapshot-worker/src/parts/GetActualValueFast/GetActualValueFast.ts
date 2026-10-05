@@ -208,9 +208,11 @@ export const getActualValueFast = (
       }
       if (allIncomingValues.length > 0) {
         return `"${allIncomingValues[0]}"`
-      } else if (allInternalValues.length > 0) {
+      }
+      if (allInternalValues.length > 0) {
         return `"${allInternalValues[0]}"`
-      } else if (numberValues.length > 0) {
+      }
+      if (numberValues.length > 0) {
         return numberValues[0]
       }
     }
@@ -218,9 +220,9 @@ export const getActualValueFast = (
 
   if (nodeType === NODE_TYPE_OBJECT) {
     return `[Object ${targetNode.id}]`
-  } else if (nodeType === NODE_TYPE_ARRAY) {
-    return `[Array ${targetNode.id}]`
-  } else {
-    return `[${nodeTypeName || 'Unknown'} ${targetNode.id}]`
   }
+  if (nodeType === NODE_TYPE_ARRAY) {
+    return `[Array ${targetNode.id}]`
+  }
+  return `[${nodeTypeName || 'Unknown'} ${targetNode.id}]`
 }

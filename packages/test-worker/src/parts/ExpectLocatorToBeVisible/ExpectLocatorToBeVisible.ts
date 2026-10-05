@@ -1,5 +1,5 @@
 import * as ExpectLocatorSingleElementCondition from '../ExpectLocatorSingleElementCondition/ExpectLocatorSingleElementCondition.ts'
 
-export const toBeVisible = (locator, options = {}) => {
+export const toBeVisible = (locator: any, options = {}) => {
   return ExpectLocatorSingleElementCondition.checkSingleElementCondition('toBeVisible', locator, options)
 }
