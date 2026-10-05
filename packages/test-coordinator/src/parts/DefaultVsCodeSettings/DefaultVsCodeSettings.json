@@ -54,5 +54,6 @@
     "*": "linux"
   },
   "chat.allowAnonymousAccess": true,
-  "application.shellEnvironmentResolutionTimeout": 119
+  "application.shellEnvironmentResolutionTimeout": 119,
+  "workbench.experimental.modernUI": false
 }

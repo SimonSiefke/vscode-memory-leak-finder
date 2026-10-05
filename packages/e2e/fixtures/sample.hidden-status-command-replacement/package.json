@@ -1,0 +1,22 @@
+{
+  "name": "hidden-status-command-replacement-sample",
+  "displayName": "hidden-status-command-replacement-sample",
+  "publisher": "vscode-memory-leak-finder",
+  "version": "0.0.0",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "hidden_status_command_replacement.run",
+        "title": "Hidden Status Command: Run"
+      },
+      {
+        "command": "hidden_status_command_replacement.cleanup",
+        "title": "Hidden Status Command: Cleanup"
+      }
+    ]
+  }
+}

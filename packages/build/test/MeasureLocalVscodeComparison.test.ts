@@ -59,7 +59,10 @@ test('parseArgv uses defaults', () => {
     runs: 1,
     startupRuns: 1,
     skipBuild: false,
+    skipCleanCheck: false,
     skipCharts: false,
+    proxyCaptureRuns: 3,
+    extraTestArgs: [],
   })
 })
 
@@ -102,7 +105,10 @@ test('parseArgv uses overrides', () => {
     runs: 3,
     startupRuns: 30,
     skipBuild: true,
+    skipCleanCheck: false,
     skipCharts: true,
+    proxyCaptureRuns: 3,
+    extraTestArgs: [],
   })
 })
 
@@ -136,7 +142,10 @@ test('getMeasureCommandArgs forwards measure-after to cli', () => {
         runs: 97,
         startupRuns: 30,
         skipBuild: true,
+        skipCleanCheck: false,
         skipCharts: true,
+        extraTestArgs: [],
+        proxyCaptureRuns: 0,
       },
       '/tmp/code-oss',
     ),
@@ -149,11 +158,12 @@ test('getMeasureCommandArgs forwards measure-after to cli', () => {
     '97',
     '--startup-runs',
     '30',
+    '--vscode-path',
+    '/tmp/code-oss',
     '--measure',
     'gc-statistics',
     '--measure-node',
-    '--vscode-path',
-    '/tmp/code-oss',
+
     '--measure-after',
   ])
 })
@@ -312,4 +322,24 @@ test('ensureLocalVscodeBuild aborts on unstaged changes', async () => {
       runCommand: async () => {},
     }),
   ).rejects.toThrow(`VS Code repository has unstaged changes: ${repoPath}`)
+})
+
+test('parseArgv consumes skip-clean-check instead of forwarding it to the test runner', () => {
+  const options = parseArgv(['--skip-clean-check', '--enable-proxy'])
+  expect(options.skipCleanCheck).toBe(true)
+  expect(options.extraTestArgs).toEqual(['--enable-proxy'])
+})
+
+test('renameResult finds the scenario result when the filter filename differs', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'comparison-result-fallback-'))
+  try {
+    const expectedPath = join(directory, 'missing.json')
+    const actualPath = join(directory, 'chat-editor-add-numbers.json')
+    const labeledPath = join(directory, 'chat-editor-add-numbers.old.json')
+    await writeFile(actualPath, 'result')
+    await expect(renameResult(expectedPath, '^chat-editor-add-numbers.ts$', 'old')).resolves.toBe(labeledPath)
+    await expect(readFile(labeledPath, 'utf8')).resolves.toBe('result')
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
 })

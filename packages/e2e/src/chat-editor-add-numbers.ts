@@ -15,7 +15,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     expectedResponse: '2',
     message: `what's 1 + 1? Respond with just the number. Don't use any todo list. Don't create a todo. Under no circumstances use any tool.`,
-    model: ChatEditor.Models.Auto
+    model: ChatEditor.Models.Auto,
   })
 
   await ChatEditor.clearAll()

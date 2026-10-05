@@ -31,21 +31,24 @@ export interface MeasureLocalVscodeComparisonOptions {
   readonly skipCharts: boolean
 }
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 const isKnownFlagWithValue = (arg: string): boolean => {
-  return ['--display', '--measure', '--new-label', '--new-vscode-path', '--old-label', '--old-vscode-path', '--only', '--runs', '--startup-runs', '--vscode-path', '--proxy-capture-runs'].includes(arg)
+  return [
+    '--display',
+    '--measure',
+    '--new-label',
+    '--new-vscode-path',
+    '--old-label',
+    '--old-vscode-path',
+    '--only',
+    '--runs',
+    '--startup-runs',
+    '--vscode-path',
+    '--proxy-capture-runs',
+  ].includes(arg)
 }
 
 const isKnownFlagWithoutValue = (arg: string): boolean => {
-<<<<<<< Updated upstream
-  return ['--measure-after', '--measure-node', '--skip-build', '--skip-charts'].includes(arg)
-=======
   return ['--measure-after', '--measure-node', '--skip-build', '--skip-clean-check', '--skip-charts'].includes(arg)
->>>>>>> Stashed changes
 }
 
 const isProxyPreparationEnabled = (extraTestArgs: readonly string[]): boolean => {
@@ -76,10 +79,6 @@ const getExtraTestArgs = (argv: readonly string[]): readonly string[] => {
   return extraTestArgs
 }
 
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 interface RunCommandOptions {
   readonly cwd: string
   readonly env?: NodeJS.ProcessEnv
@@ -389,9 +388,7 @@ const cleanupResultFiles = async (resultPath: string, filter: string): Promise<v
   const filterBase = getResultTestName(filter)
   const resultFiles = await readdir(resultDirectory, { withFileTypes: true })
   const matchingFiles = resultFiles.filter((entry) => entry.isFile() && entry.name.includes(filterBase) && entry.name.endsWith('.json'))
-  await Promise.all(
-    matchingFiles.map((entry) => rm(join(resultDirectory, entry.name), { force: true })),
-  )
+  await Promise.all(matchingFiles.map((entry) => rm(join(resultDirectory, entry.name), { force: true })))
 }
 
 const writeStamp = async (path: string, content: string): Promise<void> => {
@@ -510,13 +507,13 @@ const hasValidNodeModulesCache = async (
 export const ensureLocalVscodeBuild = async (
   vscodePath: string,
   skipBuild: boolean,
-  skipCleanCheck: boolean,
   dependencies: EnsureLocalVscodeBuildDependencies = {
     hasCompleteNodeModulesCache,
     pathExists,
     readCommand,
     runCommand,
   },
+  skipCleanCheck = false,
 ): Promise<string> => {
   if (!skipCleanCheck) {
     await assertNoUnstagedChanges(vscodePath, dependencies.readCommand)
@@ -597,7 +594,6 @@ const runMeasure = async (options: MeasureLocalVscodeComparisonOptions, vscodeEx
   })
 }
 
-<<<<<<< Updated upstream
 const prepareProxyMocksIfNeeded = async (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): Promise<void> => {
   if (!isProxyPreparationEnabled(options.extraTestArgs)) {
     return
@@ -618,36 +614,9 @@ const prepareProxyMocksIfNeeded = async (options: MeasureLocalVscodeComparisonOp
   })
 }
 
-=======
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-export const renameResult = async (resultPath: string, label: string): Promise<string> => {
-  const labeledResultPath = getLabeledResultPath(resultPath, label)
-=======
-const prepareProxyMocksIfNeeded = async (options: MeasureLocalVscodeComparisonOptions, vscodeExecutablePath: string): Promise<void> => {
-  if (!isProxyPreparationEnabled(options.extraTestArgs)) {
-    return
-  }
-  await runCommand(process.execPath, getProxyCaptureCommandArgs(options, vscodeExecutablePath), {
-    cwd: repositoryRoot,
-    env: {
-      ...process.env,
-      DISPLAY: options.display,
-    },
-  })
-  await runCommand(process.execPath, ['packages/cli/bin/test.js', '--convert-requests-to-mocks', '--vscode-path', vscodeExecutablePath], {
-    cwd: repositoryRoot,
-    env: {
-      ...process.env,
-      DISPLAY: options.display,
-    },
-  })
-}
-
-export const renameResult = async (resultPath: string, filter: string, label: string): Promise<string> => {
-  const resolvedResultPath = await getResultPathWithFallback(resultPath, filter)
-  const labeledResultPath = getLabeledResultPath(resolvedResultPath, label)
->>>>>>> Stashed changes
+export const renameResult = async (resultPath: string, filterOrLabel: string, label?: string): Promise<string> => {
+  const resolvedResultPath = label === undefined ? resultPath : await getResultPathWithFallback(resultPath, filterOrLabel)
+  const labeledResultPath = getLabeledResultPath(resolvedResultPath, label ?? filterOrLabel)
   await mkdir(dirname(labeledResultPath), { recursive: true })
   await rm(labeledResultPath, { force: true })
   await rename(resolvedResultPath, labeledResultPath)
@@ -655,31 +624,16 @@ export const renameResult = async (resultPath: string, filter: string, label: st
 }
 
 export const measureLocalVscodeComparison = async (options: MeasureLocalVscodeComparisonOptions): Promise<void> => {
-  const oldExecutablePath = await ensureLocalVscodeBuild(options.oldVscodePath, options.skipBuild, options.skipCleanCheck)
+  const oldExecutablePath = await ensureLocalVscodeBuild(options.oldVscodePath, options.skipBuild, undefined, options.skipCleanCheck)
   const resultPath = getResultPath(options.measure, options.only)
-<<<<<<< Updated upstream
-  await prepareProxyMocksIfNeeded(options, oldExecutablePath)
-=======
-<<<<<<< Updated upstream
-=======
   await prepareProxyMocksIfNeeded(options, oldExecutablePath)
   await cleanupResultFiles(resultPath, options.only)
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   await runMeasure(options, oldExecutablePath)
   await renameResult(resultPath, options.only, options.oldLabel)
 
-<<<<<<< Updated upstream
-  const newExecutablePath = await ensureLocalVscodeBuild(options.newVscodePath, options.skipBuild)
-<<<<<<< Updated upstream
-  await prepareProxyMocksIfNeeded(options, newExecutablePath)
-=======
-=======
-  const newExecutablePath = await ensureLocalVscodeBuild(options.newVscodePath, options.skipBuild, options.skipCleanCheck)
+  const newExecutablePath = await ensureLocalVscodeBuild(options.newVscodePath, options.skipBuild, undefined, options.skipCleanCheck)
   await prepareProxyMocksIfNeeded(options, newExecutablePath)
   await cleanupResultFiles(resultPath, options.only)
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   await runMeasure(options, newExecutablePath)
   await renameResult(resultPath, options.only, options.newLabel)
 

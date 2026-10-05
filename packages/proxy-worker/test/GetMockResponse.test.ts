@@ -84,7 +84,7 @@ test('getMockResponse - uses static copilot mock for github copilot user endpoin
   expect(result).not.toBeNull()
   expect(result?.statusCode).toBe(200)
   expect(result?.headers).toEqual({ 'content-type': 'application/json' })
-  expect(result?.body).toContain('mock-user')
+  expect(JSON.parse(result?.body as string)).toMatchObject({ copilot_plan: 'individual', access_type_sku: 'no_auth_limited_copilot' })
 })
 
 test('getMockResponse - uses static mock for github user endpoint when no file is needed', async () => {

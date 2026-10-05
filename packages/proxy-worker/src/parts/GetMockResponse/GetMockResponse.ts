@@ -340,12 +340,7 @@ const getStaticMockResponse = (parsedUrl: URL, method: string): MockResponse | n
     }
   }
 
-  if (
-    normalizedMethod === 'GET' &&
-    hostname === 'api.github.com' &&
-    pathname.startsWith('/users/') &&
-    pathname.endsWith('/events')
-  ) {
+  if (normalizedMethod === 'GET' && hostname === 'api.github.com' && pathname.startsWith('/users/') && pathname.endsWith('/events')) {
     return {
       body: JSON.stringify([]),
       headers: { 'content-type': 'application/json' },
@@ -632,11 +627,7 @@ const findCompatibleCopilotMockFile = async (
           pathname === '/chat/completions'
             ? compareChatCompletionsRequestShape(requestBody, candidateRequestBody)
             : compareResponsesRequestShape(requestBody, candidateRequestBody)
-        if (
-          candidateUserRequestMockKey === requestedUserRequestMockKey ||
-          pathname === '/responses' ||
-          pathname === '/chat/completions'
-        ) {
+        if (candidateUserRequestMockKey === requestedUserRequestMockKey || pathname === '/responses' || pathname === '/chat/completions') {
           if (isBetterResponsesRequestShapeMatch(candidateDistance, bestCandidateDistance)) {
             bestCandidateDistance = candidateDistance
             bestCandidateFile = candidateFile
@@ -749,10 +740,7 @@ export const getMockResponse = async (method: string, url: string, requestBody?:
       }
     }
 
-    if (
-      requestBody !== undefined &&
-      isCopilotMockKeyedRequest(hostname, pathname, method)
-    ) {
+    if (requestBody !== undefined && isCopilotMockKeyedRequest(hostname, pathname, method)) {
       console.log(`[Proxy] No compatible keyed mock file found for ${method} ${pathname}; no fallback mock available`)
     }
 

@@ -22,10 +22,59 @@ test('parseArgv - headless mode', () => {
   })
 })
 
+test('parseArgv - color defaults to true', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: true,
+  })
+})
+
+test('parseArgv - color enabled', () => {
+  const argv = ['--color', 'true']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: true,
+  })
+})
+
+test('parseArgv - color disabled', () => {
+  const argv = ['--color', 'false']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    color: false,
+  })
+})
+
 test('parseArgv - run skipped tests anyway', () => {
   const argv = ['--run-skipped-tests-anyway']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     runSkippedTestsAnyway: true,
+  })
+})
+
+test('parseArgv - hides skipped failed test duration locally by default', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, {})).toMatchObject({
+    showSkippedFailedTestDuration: false,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration when enabled', () => {
+  const argv = ['--show-skipped-failed-test-duration']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, {})).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration in ci', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, { CI: 'true' })).toMatchObject({
+    showSkippedFailedTestDuration: true,
+  })
+})
+
+test('parseArgv - shows skipped failed test duration in GitHub Actions', () => {
+  const argv: readonly string[] = []
+  expect(ParseArgv.parseArgv('linux', 'x64', argv, { GITHUB_ACTIONS: 'true' })).toMatchObject({
+    showSkippedFailedTestDuration: true,
   })
 })
 
@@ -105,10 +154,57 @@ test('parseArgv - runs', () => {
   })
 })
 
+test('parseArgv - shard with equals syntax', () => {
+  const argv = ['--shard=1/2']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    shardCount: 2,
+    shardIndex: 1,
+  })
+})
+
+test('parseArgv - shard with separate value', () => {
+  const argv = ['--shard', '2/3']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    shardCount: 3,
+    shardIndex: 2,
+  })
+})
+
+test('parseArgv - shard uses last value', () => {
+  const argv = ['--shard=1/2', '--shard', '3/4']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    shardCount: 4,
+    shardIndex: 3,
+  })
+})
+
+test('parseArgv - shard is omitted by default', () => {
+  expect(ParseArgv.parseArgv('linux', 'x64', [])).not.toHaveProperty('shardIndex')
+})
+
+test.each(['', '1', '1/', '/2', 'a/2'])('parseArgv - rejects invalid shard format %s', (value) => {
+  expect(() => ParseArgv.parseArgv('linux', 'x64', [`--shard=${value}`])).toThrow(
+    '--shard must use the format <index>/<count>, for example --shard=1/2',
+  )
+})
+
+test.each(['0/2', '1/0', '3/2'])('parseArgv - rejects invalid shard range %s', (value) => {
+  expect(() => ParseArgv.parseArgv('linux', 'x64', [`--shard=${value}`])).toThrow(
+    '--shard index and count must be positive integers, and index must not exceed count',
+  )
+})
+
 test('parseArgv - startup runs', () => {
   const argv = ['--measure', 'cpu-performance-counters-from-start', '--startup-runs', '30']
   expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
     startupRuns: 30,
+  })
+})
+
+test('parseArgv - startup runs with Linux process-tree resources from start', () => {
+  const argv = ['--measure', 'linux-process-tree-resources-from-start', '--startup-runs', '5']
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({
+    startupRuns: 5,
   })
 })
 
@@ -121,9 +217,7 @@ test('parseArgv - startup runs uses last value', () => {
 
 test('parseArgv - startup runs requires startup counter measure', () => {
   const argv = ['--measure', 'event-listener-count', '--startup-runs', '2']
-  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
-    '--startup-runs can only be used with --measure cpu-performance-counters-from-start',
-  )
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow('--startup-runs can only be used with a from-start measure')
 })
 
 test('parseArgv - record video', () => {
@@ -369,6 +463,32 @@ test('parseArgv - inspect-integrated-browser flag not present', () => {
   expect(options.inspectIntegratedBrowser).toBe(false)
 })
 
+test('parseArgv - websites-e2e measure requires inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--measure', 'named-function-count-3']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    'websites-e2e test measures can only be run with --inspect-integrated-browser',
+  )
+})
+
+test('parseArgv - websites-e2e check-leaks requires inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--check-leaks']
+  expect(() => ParseArgv.parseArgv('linux', 'x64', argv)).toThrow(
+    'websites-e2e test measures can only be run with --inspect-integrated-browser',
+  )
+})
+
+test('parseArgv - websites-e2e measure allows inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e', '--measure', 'named-function-count-3', '--inspect-integrated-browser']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(true)
+})
+
+test('parseArgv - websites-e2e test without measure allows no inspect-integrated-browser', () => {
+  const argv = ['--cwd', 'packages/websites-e2e']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.inspectIntegratedBrowser).toBe(false)
+})
+
 test('parseArgv - inspect-process flag', () => {
   const argv = ['--inspect-process', 'vite.js']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
@@ -587,6 +707,13 @@ test('parseArgv - tracked allocations from start enables tracking transform', ()
   const argv = ['--measure', 'tracked-allocations-from-start']
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.measure).toBe('tracked-allocations-from-start')
+  expect(options.trackFunctions).toBe(true)
+})
+
+test('parseArgv - tracked allocations with stack traces enables tracking transform', () => {
+  const argv = ['--measure', 'tracked-allocations-with-stack-traces']
+  const options = ParseArgv.parseArgv('linux', 'x64', argv)
+  expect(options.measure).toBe('tracked-allocations-with-stack-traces')
   expect(options.trackFunctions).toBe(true)
 })
 
