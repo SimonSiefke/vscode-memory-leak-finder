@@ -450,6 +450,15 @@ Measures the total number of ResizeObservers.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure resize-observer-count --only base
 ```
 
+### Script compilation evaluation
+
+See [the script-compilation-evaluation measure](docs/measures/script-compilation-evaluation.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure script-compilation-evaluation --only base
+npm run build-charts
+```
+
 ### SetSize
 
 Measures the total number of elements in all Sets.
