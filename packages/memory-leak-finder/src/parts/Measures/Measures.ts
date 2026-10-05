@@ -154,6 +154,7 @@ export * as MeasureSymbolCount from '../MeasureSymbolCount/MeasureSymbolCount.ts
 export * as MeasureSymbols from '../MeasureSymbols/MeasureSymbols.ts'
 export * as MeasureSymbolsWithStackTraces from '../MeasureSymbolsWithStackTraces/MeasureSymbolsWithStackTraces.ts'
 export * as MeasureSynchronousDomReadCount from '../MeasureSynchronousDomReadCount/MeasureSynchronousDomReadCount.ts'
+export * as MeasureSynchronousDomReadCountWithStackTraces from '../MeasureSynchronousDomReadCountWithStackTraces/MeasureSynchronousDomReadCountWithStackTraces.ts'
 export * as MeasureSynchronousFileSystem from '../MeasureSynchronousFileSystem/MeasureSynchronousFileSystem.ts'
 export * as MeasureTextDecoderCount from '../MeasureTextDecoderCount/MeasureTextDecoderCount.ts'
 export * as MeasureTextEncoderCount from '../MeasureTextEncoderCount/MeasureTextEncoderCount.ts'
