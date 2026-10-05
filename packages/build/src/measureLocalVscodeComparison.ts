@@ -383,11 +383,17 @@ const getResultPathWithFallback = async (baseResultPath: string, filter: string)
   return stats[0].filePath
 }
 
-const cleanupResultFiles = async (resultPath: string, filter: string): Promise<void> => {
+export const cleanupResultFiles = async (resultPath: string, filter: string, labels: readonly string[]): Promise<void> => {
   const resultDirectory = dirname(resultPath)
   const filterBase = getResultTestName(filter)
   const resultFiles = await readdir(resultDirectory, { withFileTypes: true })
-  const matchingFiles = resultFiles.filter((entry) => entry.isFile() && entry.name.includes(filterBase) && entry.name.endsWith('.json'))
+  const matchingFiles = resultFiles.filter(
+    (entry) =>
+      entry.isFile() &&
+      entry.name.includes(filterBase) &&
+      entry.name.endsWith('.json') &&
+      !labels.some((label) => entry.name.endsWith(`.${label}.json`)),
+  )
   await Promise.all(matchingFiles.map((entry) => rm(join(resultDirectory, entry.name), { force: true })))
 }
 
@@ -627,13 +633,13 @@ export const measureLocalVscodeComparison = async (options: MeasureLocalVscodeCo
   const oldExecutablePath = await ensureLocalVscodeBuild(options.oldVscodePath, options.skipBuild, undefined, options.skipCleanCheck)
   const resultPath = getResultPath(options.measure, options.only)
   await prepareProxyMocksIfNeeded(options, oldExecutablePath)
-  await cleanupResultFiles(resultPath, options.only)
+  await cleanupResultFiles(resultPath, options.only, [options.oldLabel, options.newLabel])
   await runMeasure(options, oldExecutablePath)
   await renameResult(resultPath, options.only, options.oldLabel)
 
   const newExecutablePath = await ensureLocalVscodeBuild(options.newVscodePath, options.skipBuild, undefined, options.skipCleanCheck)
   await prepareProxyMocksIfNeeded(options, newExecutablePath)
-  await cleanupResultFiles(resultPath, options.only)
+  await cleanupResultFiles(resultPath, options.only, [options.oldLabel, options.newLabel])
   await runMeasure(options, newExecutablePath)
   await renameResult(resultPath, options.only, options.newLabel)
 

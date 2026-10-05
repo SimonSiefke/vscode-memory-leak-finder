@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path'
 import { afterEach, expect, test } from '@jest/globals'
 import {
   computeVscodeNodeModulesCacheKey,
+  cleanupResultFiles,
   ensureLocalVscodeBuild,
   getEnsureLocalVscodeBuildActions,
   getLabeledResultPath,
@@ -339,6 +340,21 @@ test('renameResult finds the scenario result when the filter filename differs', 
     await writeFile(actualPath, 'result')
     await expect(renameResult(expectedPath, '^chat-editor-add-numbers.ts$', 'old')).resolves.toBe(labeledPath)
     await expect(readFile(labeledPath, 'utf8')).resolves.toBe('result')
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
+})
+
+test('cleanupResultFiles preserves labeled comparison results before measuring the next checkout', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'comparison-result-cleanup-'))
+  try {
+    const resultPath = join(directory, 'chat-editor-add-numbers.json')
+    const oldResultPath = join(directory, 'chat-editor-add-numbers.old.json')
+    await writeFile(resultPath, 'stale')
+    await writeFile(oldResultPath, 'baseline')
+    await cleanupResultFiles(resultPath, '^chat-editor-add-numbers.ts$', ['old', 'new'])
+    await expect(readFile(resultPath, 'utf8')).rejects.toThrow()
+    await expect(readFile(oldResultPath, 'utf8')).resolves.toBe('baseline')
   } finally {
     await rm(directory, { recursive: true, force: true })
   }
