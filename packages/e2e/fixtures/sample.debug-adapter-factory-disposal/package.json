@@ -1,0 +1,35 @@
+{
+  "name": "debug-adapter-factory-disposal",
+  "displayName": "Debug Adapter Factory Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "debuggers": [
+      {
+        "type": "disposal-test",
+        "label": "Disposal test",
+        "languages": [
+          "plaintext"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "debug-adapter-factory-disposal.setup",
+        "title": "Debug Adapter Factory Disposal: Setup"
+      },
+      {
+        "command": "debug-adapter-factory-disposal.run",
+        "title": "Debug Adapter Factory Disposal: Run"
+      },
+      {
+        "command": "debug-adapter-factory-disposal.cleanup",
+        "title": "Debug Adapter Factory Disposal: Cleanup"
+      }
+    ]
+  }
+}
