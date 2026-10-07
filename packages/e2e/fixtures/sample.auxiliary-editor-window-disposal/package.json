@@ -1,0 +1,26 @@
+{
+  "name": "auxiliary-editor-window-disposal",
+  "displayName": "Auxiliary Editor Window Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "auxiliary-editor-window-disposal.setup",
+        "title": "Auxiliary Editor Window Disposal: Setup"
+      },
+      {
+        "command": "auxiliary-editor-window-disposal.run",
+        "title": "Auxiliary Editor Window Disposal: Run"
+      },
+      {
+        "command": "auxiliary-editor-window-disposal.cleanup",
+        "title": "Auxiliary Editor Window Disposal: Cleanup"
+      }
+    ]
+  }
+}
