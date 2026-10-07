@@ -1,0 +1,47 @@
+{
+  "name": "notebook-linkifier-repeat-and-close",
+  "displayName": "Notebook Linkifier Repeat And Close",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "notebooks": [
+      {
+        "type": "linkifier-lifecycle",
+        "displayName": "Linkifier lifecycle",
+        "selector": [
+          {
+            "filenamePattern": "*.linkifier-lifecycle"
+          }
+        ]
+      }
+    ],
+    "languageModelChatProviders": [
+      {
+        "vendor": "lifecycle-local",
+        "displayName": "Lifecycle Local"
+      }
+    ],
+    "commands": [
+      {
+        "command": "notebook-linkifier-repeat-and-close.setup",
+        "title": "Notebook Linkifier Repeat And Close: Setup"
+      },
+      {
+        "command": "notebook-linkifier-repeat-and-close.run",
+        "title": "Notebook Linkifier Repeat And Close: Run"
+      },
+      {
+        "command": "notebook-linkifier-repeat-and-close.cleanup",
+        "title": "Notebook Linkifier Repeat And Close: Cleanup"
+      },
+      {
+        "command": "notebook-linkifier-repeat-and-close.close",
+        "title": "Close Linkifier Notebook"
+      }
+    ]
+  }
+}
