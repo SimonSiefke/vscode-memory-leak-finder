@@ -3,14 +3,20 @@ import type { TransformOptions } from '../Types/Types.ts'
 import { generate2, parser2, traverse2 } from '../BabelHelpers/BabelHelpers.ts'
 import { createAllocationWrapperPlugin } from '../CreateAllocationWrapperPlugin/CreateAllocationWrapperPlugin.ts'
 
-const collectAllocationLocations = (ast: any): Map<any, { line: number; column: number }> => {
+const collectAllocationLocations = (
+  ast: any,
+  includeGeneratedLocation?: (line: number, column: number) => boolean,
+): Map<any, { line: number; column: number }> => {
   const allocationLocations = new Map<any, { line: number; column: number }>()
   const addLocation = (path: any) => {
     if (path.node.loc?.start) {
-      allocationLocations.set(path.node, {
-        column: path.node.loc.start.column,
-        line: path.node.loc.start.line,
-      })
+      const { column, line } = path.node.loc.start
+      if (!includeGeneratedLocation || includeGeneratedLocation(line, column)) {
+        allocationLocations.set(path.node, {
+          column,
+          line,
+        })
+      }
     }
   }
   traverse2(ast, {
@@ -40,7 +46,7 @@ export const transformCodeWithAllocationTracking = (code: string, options: Trans
       tokens: false,
     })
 
-    const allocationLocations = collectAllocationLocations(originalAst)
+    const allocationLocations = collectAllocationLocations(originalAst, options.includeGeneratedLocation)
     const plugin = createAllocationWrapperPlugin({ allocationLocations, scriptId })
     traverse2(originalAst, plugin)
     allocationLocations.clear()

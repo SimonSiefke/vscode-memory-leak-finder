@@ -1,9 +1,9 @@
 import { rm } from 'node:fs/promises'
 import { join } from 'node:path'
-import * as Root from '../Root/Root.ts'
+import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.ts'
 
 export const removeVsCodeWorkspaceStorage = async () => {
-  const workspaceStoragePath = join(Root.root, '.vscode-user-data-dir', 'User', 'workspaceStorage')
+  const workspaceStoragePath = join(GetUserDataDir.getUserDataDir(), 'User', 'workspaceStorage')
   await rm(workspaceStoragePath, {
     force: true,
     recursive: true,

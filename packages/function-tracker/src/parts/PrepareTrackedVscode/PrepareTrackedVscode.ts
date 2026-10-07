@@ -1,10 +1,12 @@
 import { createHash } from 'node:crypto'
 import { copyFile, mkdir, readFile, readdir, readlink, rm, stat, symlink, writeFile, chmod, lstat } from 'node:fs/promises'
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path'
+import { SourceMapConsumer, type RawSourceMap } from 'source-map'
 import { transformCode } from '../Transform/Transform.ts'
 
 interface FileMetadata {
   readonly destinationPath: string
+  readonly includePatterns: readonly string[]
   readonly sourceHash: string
   readonly sourceMtimeMs: number
   readonly sourcePath: string
@@ -20,6 +22,7 @@ interface SourceKind {
 
 interface CopyRoot {
   readonly excludeNodeModules: boolean
+  readonly sourceMapRoot?: string
   readonly sourceRoot: string
   readonly targetRoot: string
   readonly transformRelativeRoots: readonly string[]
@@ -85,10 +88,12 @@ const getExpectedMetadata = async (
   destinationPath: string,
   trackingMode: string,
   transformerVersion: string,
+  includePatterns: readonly string[],
 ): Promise<FileMetadata> => {
   const sourceStat = await stat(sourcePath)
   return {
     destinationPath,
+    includePatterns,
     sourceHash: await getFileHash(sourcePath),
     sourceMtimeMs: sourceStat.mtimeMs,
     sourcePath,
@@ -101,6 +106,7 @@ const getExpectedMetadata = async (
 const isMetadataEqual = (actual: FileMetadata | undefined, expected: FileMetadata): boolean => {
   return (
     actual?.destinationPath === expected.destinationPath &&
+    JSON.stringify(actual?.includePatterns || []) === JSON.stringify(expected.includePatterns) &&
     actual?.sourceHash === expected.sourceHash &&
     actual?.sourceMtimeMs === expected.sourceMtimeMs &&
     actual?.sourcePath === expected.sourcePath &&
@@ -110,20 +116,79 @@ const isMetadataEqual = (actual: FileMetadata | undefined, expected: FileMetadat
   )
 }
 
+const getTrackingIncludePatterns = (): readonly string[] => {
+  const value = process.env.VSCODE_PERFORMANCE_TRACK_INCLUDE || '[]'
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(value)
+  } catch {
+    throw new Error(`VSCODE_PERFORMANCE_TRACK_INCLUDE must be a JSON string array`)
+  }
+  if (!Array.isArray(parsed) || parsed.some((item) => typeof item !== 'string' || item.length === 0)) {
+    throw new Error(`VSCODE_PERFORMANCE_TRACK_INCLUDE must be a JSON string array`)
+  }
+  return [...new Set(parsed)]
+}
+
+const getIncludeGeneratedLocation = async (
+  sourcePath: string,
+  sourceMapPath: string,
+  includePatterns: readonly string[],
+): Promise<((line: number, column: number) => boolean) | undefined> => {
+  if (includePatterns.length === 0) {
+    return undefined
+  }
+  let sourceMapContent: string
+  try {
+    sourceMapContent = await readFile(sourceMapPath, 'utf8')
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return () => false
+    }
+    throw error
+  }
+  let rawMap: RawSourceMap
+  try {
+    rawMap = JSON.parse(sourceMapContent) as RawSourceMap
+  } catch {
+    throw new Error(`Targeted tracking found an invalid source map for ${sourcePath} at ${sourceMapPath}`)
+  }
+  const consumer = new SourceMapConsumer(rawMap)
+  const cache = new Map<string, boolean>()
+  return (line, column) => {
+    const key = `${line}:${column}`
+    const cached = cache.get(key)
+    if (cached !== undefined) {
+      return cached
+    }
+    const original = consumer.originalPositionFor({
+      column,
+      line,
+    })
+    const included = Boolean(original.source && includePatterns.some((pattern) => original.source?.includes(pattern)))
+    cache.set(key, included)
+    return included
+  }
+}
+
 const transformFileCached = async (
   sourcePath: string,
   destinationPath: string,
   trackingMode: string,
   transformerVersion: string,
+  includePatterns: readonly string[],
+  sourceMapPath: string,
 ): Promise<void> => {
   const metadataPath = getMetadataPath(destinationPath)
-  const expectedMetadata = await getExpectedMetadata(sourcePath, destinationPath, trackingMode, transformerVersion)
+  const expectedMetadata = await getExpectedMetadata(sourcePath, destinationPath, trackingMode, transformerVersion, includePatterns)
   if ((await pathExists(destinationPath)) && isMetadataEqual(await readJson<FileMetadata>(metadataPath), expectedMetadata)) {
     return
   }
   const code = await readFile(sourcePath, 'utf8')
+  const includeGeneratedLocation = await getIncludeGeneratedLocation(sourcePath, sourceMapPath, includePatterns)
   const transformed = await transformCode(code, {
     filename: sourcePath,
+    ...(includeGeneratedLocation ? { includeGeneratedLocation } : {}),
     minify: true,
     trackingMode,
   })
@@ -152,6 +217,16 @@ const shouldTransform = (relativePath: string, transformRelativeRoots: readonly 
     return normalized.endsWith('/vs/workbench/workbench.desktop.main.js')
   }
   return transformRelativeRoots.some((root) => isPathInsideRelativeRoot(normalized, root))
+}
+
+const getSourceMapPath = (sourcePath: string, relativePath: string, copyRoot: CopyRoot): string => {
+  if (!copyRoot.sourceMapRoot) {
+    return `${sourcePath}.map`
+  }
+  const normalized = relativePath.replaceAll('\\', '/')
+  const marker = 'resources/app/out/'
+  const bundleRelativePath = normalized.startsWith(marker) ? normalized.slice(marker.length) : normalized
+  return join(copyRoot.sourceMapRoot, `${bundleRelativePath}.map`)
 }
 
 const isPathInside = (root: string, path: string): boolean => {
@@ -185,6 +260,7 @@ const syncCopyRoot = async (
   copyRoot: CopyRoot,
   trackingMode: string,
   transformerVersion: string,
+  includePatterns: readonly string[],
   currentPath = copyRoot.sourceRoot,
 ): Promise<void> => {
   const entries = await readdir(currentPath, { withFileTypes: true })
@@ -197,7 +273,7 @@ const syncCopyRoot = async (
     const destinationPath = join(copyRoot.targetRoot, relativePath)
     if (entry.isDirectory()) {
       await mkdir(destinationPath, { recursive: true })
-      await syncCopyRoot(copyRoot, trackingMode, transformerVersion, sourcePath)
+      await syncCopyRoot(copyRoot, trackingMode, transformerVersion, includePatterns, sourcePath)
       continue
     }
     if (entry.isSymbolicLink()) {
@@ -208,7 +284,14 @@ const syncCopyRoot = async (
       continue
     }
     if (shouldTransform(relativePath, copyRoot.transformRelativeRoots, trackingMode)) {
-      await transformFileCached(sourcePath, destinationPath, trackingMode, transformerVersion)
+      await transformFileCached(
+        sourcePath,
+        destinationPath,
+        trackingMode,
+        transformerVersion,
+        includePatterns,
+        getSourceMapPath(sourcePath, relativePath, copyRoot),
+      )
       continue
     }
     await copyFileIfChanged(sourcePath, destinationPath)
@@ -232,7 +315,15 @@ const getSourceRootFromScript = (binaryPath: string): string | undefined => {
 }
 
 const getSourceRootFromLocalBuild = async (binaryPath: string): Promise<string | undefined> => {
+  const explicitSourceRoot = process.env.VSCODE_PERFORMANCE_SOURCE_PATH
+  if (explicitSourceRoot && (await pathExists(join(explicitSourceRoot, 'out-vscode-min')))) {
+    return explicitSourceRoot
+  }
   const runtimeRoot = dirname(binaryPath)
+  const siblingSourceRoot = join(dirname(runtimeRoot), 'source')
+  if (await pathExists(join(siblingSourceRoot, 'out-vscode-min'))) {
+    return siblingSourceRoot
+  }
   const match = /^VSCode-[^-]+-[^-]+-(.+)$/.exec(basename(runtimeRoot))
   if (!match) {
     return undefined
@@ -241,27 +332,29 @@ const getSourceRootFromLocalBuild = async (binaryPath: string): Promise<string |
   return (await pathExists(sourceRoot)) ? sourceRoot : undefined
 }
 
-const getLocalSourceKind = async (binaryPath: string, trackingMode: string): Promise<SourceKind | undefined> => {
+const getLocalSourceKind = async (binaryPath: string, trackingMode: string, includeHash: string): Promise<SourceKind | undefined> => {
   const sourceRoot = getSourceRootFromScript(binaryPath) || (await getSourceRootFromLocalBuild(binaryPath))
   if (!sourceRoot) {
     return undefined
   }
-  const targetContainer = join(trackedVscodeRoot, `${basename(sourceRoot)}-${getPathHash(sourceRoot)}-${trackingMode}`)
+  const targetContainer = join(trackedVscodeRoot, `${basename(sourceRoot)}-${getPathHash(sourceRoot)}-${trackingMode}${includeHash}`)
   const targetSourceRoot = join(targetContainer, basename(sourceRoot))
+  const binaryIsInsideSource = isPathInside(sourceRoot, binaryPath)
   const copyRoots: CopyRoot[] = [
     {
       excludeNodeModules: true,
       sourceRoot,
       targetRoot: targetSourceRoot,
-      transformRelativeRoots: ['out', 'out-min'],
+      transformRelativeRoots: binaryIsInsideSource ? ['out', 'out-min', 'out-vscode-min'] : [],
     },
   ]
   let targetBinaryPath = join(targetSourceRoot, relative(sourceRoot, binaryPath))
   const runtimeRoot = dirname(binaryPath)
-  if (!isPathInside(sourceRoot, binaryPath) && (await pathExists(runtimeRoot))) {
+  if (!binaryIsInsideSource && (await pathExists(runtimeRoot))) {
     const targetRuntimeRoot = join(targetContainer, basename(runtimeRoot))
     copyRoots.push({
       excludeNodeModules: false,
+      sourceMapRoot: join(sourceRoot, 'out-vscode-min'),
       sourceRoot: runtimeRoot,
       targetRoot: targetRuntimeRoot,
       transformRelativeRoots: ['resources/app/out'],
@@ -274,9 +367,9 @@ const getLocalSourceKind = async (binaryPath: string, trackingMode: string): Pro
   }
 }
 
-const getDownloadedSourceKind = (binaryPath: string, trackingMode: string): SourceKind => {
+const getDownloadedSourceKind = (binaryPath: string, trackingMode: string, includeHash: string): SourceKind => {
   const sourceRoot = getRuntimeRoot(binaryPath)
-  const targetRoot = getDownloadedTargetRoot(binaryPath, trackingMode)
+  const targetRoot = getDownloadedTargetRoot(binaryPath, `${trackingMode}${includeHash}`)
   return {
     copyRoots: [
       {
@@ -291,11 +384,14 @@ const getDownloadedSourceKind = (binaryPath: string, trackingMode: string): Sour
 }
 
 export const getPreparedVscodePath = async (binaryPath: string, trackingMode = 'functions'): Promise<string> => {
-  const sourceKind = (await getLocalSourceKind(binaryPath, trackingMode)) || getDownloadedSourceKind(binaryPath, trackingMode)
+  const includePatterns = getTrackingIncludePatterns()
+  const includeHash = includePatterns.length === 0 ? '' : `-${getHash(JSON.stringify(includePatterns)).slice(0, 12)}`
+  const sourceKind =
+    (await getLocalSourceKind(binaryPath, trackingMode, includeHash)) || getDownloadedSourceKind(binaryPath, trackingMode, includeHash)
   const transformerVersion = await readTransformerVersion()
   for (const copyRoot of sourceKind.copyRoots) {
     await mkdir(copyRoot.targetRoot, { recursive: true })
-    await syncCopyRoot(copyRoot, trackingMode, transformerVersion)
+    await syncCopyRoot(copyRoot, trackingMode, transformerVersion, includePatterns)
   }
   const targetStat = await lstat(sourceKind.targetBinaryPath)
   if (targetStat.isFile()) {

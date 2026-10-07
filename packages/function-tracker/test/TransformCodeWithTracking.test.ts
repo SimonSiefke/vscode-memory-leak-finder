@@ -17,6 +17,17 @@ test('TransformCodeWithTracking - should transform function declarations', () =>
   expect(transformed).toBe(expected)
 })
 
+test('TransformCodeWithTracking - only instruments included generated locations', () => {
+  const code = `function included() {}\nfunction excluded() {}`
+  const transformed = transformCodeWithTracking(code, {
+    includeGeneratedLocation: (line) => line === 1,
+    scriptId: 123,
+  })
+
+  expect(transformed).toContain('trackFunctionCall(123, 1, 0)')
+  expect(transformed).not.toContain('trackFunctionCall(123, 2, 0)')
+})
+
 test('TransformCodeWithTracking - should transform arrow functions', () => {
   const code = `
     const arrowFunction = () => {
