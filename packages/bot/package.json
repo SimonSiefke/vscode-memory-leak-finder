@@ -14,14 +14,14 @@
     "tunnel": "cloudflared tunnel --url http://localhost:3000"
   },
   "devDependencies": {
-    "nock": "^14.0.17",
+    "nock": "^15.0.1",
     "smee-client": "^5.0.0"
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.9.0",
-    "@lvce-editor/rpc": "^6.21.0",
+    "@lvce-editor/rpc": "^6.22.0",
     "@lvce-editor/verror": "^1.7.0",
-    "dotenv": "^17.4.2",
+    "dotenv": "^18.0.6",
     "jszip": "^3.10.2",
     "probot": "^14.3.2"
   }
