@@ -1,0 +1,26 @@
+{
+  "name": "codelens-renderer-model-disposal",
+  "displayName": "Codelens Renderer Model Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codelens-renderer-model-disposal.setup",
+        "title": "Codelens Renderer Model Disposal: Setup"
+      },
+      {
+        "command": "codelens-renderer-model-disposal.run",
+        "title": "Codelens Renderer Model Disposal: Run"
+      },
+      {
+        "command": "codelens-renderer-model-disposal.cleanup",
+        "title": "Codelens Renderer Model Disposal: Cleanup"
+      }
+    ]
+  }
+}
