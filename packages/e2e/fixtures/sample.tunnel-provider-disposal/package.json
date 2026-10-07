@@ -1,0 +1,30 @@
+{
+  "name": "tunnel-provider-disposal",
+  "displayName": "Tunnel Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tunnel-provider-disposal.setup",
+        "title": "Tunnel Provider Disposal: Setup"
+      },
+      {
+        "command": "tunnel-provider-disposal.run",
+        "title": "Tunnel Provider Disposal: Run"
+      },
+      {
+        "command": "tunnel-provider-disposal.cleanup",
+        "title": "Tunnel Provider Disposal: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "tunnels",
+    "tunnelFactory"
+  ]
+}
