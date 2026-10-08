@@ -74,7 +74,12 @@ export const connectDevtools = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
   trackFunctions: boolean,
+  externalInspectPort = 0,
+  subprocessRuntime: 'bun' | 'node' = 'node',
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
@@ -106,6 +111,8 @@ export const connectDevtools = async (
 
   const pageObjectContext: any = {
     browserRpc,
+    externalInspectPort,
+    subprocessRuntime,
     defaultContext: createDefaultContext(sessionRpc, utilityContext),
     electronApp: undefined,
     evaluateInDefaultContext(item) {

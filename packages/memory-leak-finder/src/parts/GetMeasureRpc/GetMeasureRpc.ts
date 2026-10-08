@@ -19,10 +19,10 @@ export const getMeasureRpc = async (
   excludedTargetIds: readonly string[],
   inspectExternalRuntime = false,
   externalRuntimeInspectPort = 0,
-  _externalRuntimeName = '',
+  externalRuntimeName = '',
 ): Promise<Dynamic> => {
   if (inspectExternalRuntime) {
-    return connectToDevtoolsWithJsonUrl(externalRuntimeInspectPort)
+    return connectToDevtoolsWithJsonUrl(externalRuntimeInspectPort, externalRuntimeName === 'bun' ? 'bun' : 'node')
   }
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   if (inspectIntegratedBrowser) {

@@ -20,7 +20,6 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
       await Stdout.write(`\nBisect didn't find a matching commit introducing the regression.\n`)
       process.exit(1)
     }
-    return
   }
   const {
     allowCopilotAuthInCi,
@@ -57,6 +56,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     measure,
     measureAfter,
     measureNode,
+    measureNodeSubprocess = false,
     openDevtools,
     platform,
     processRootStrategy,
@@ -68,6 +68,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     runSkippedTestsAnyway,
     screencastQuality,
     setupOnly,
+    subprocessRuntime = 'node',
     shardCount = 1,
     shardIndex = 1,
     startupRuns,
@@ -117,6 +118,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     measure,
     measureAfter,
     measureNode,
+    measureNodeSubprocess,
     openDevtools,
     platform,
     processRootStrategy,
@@ -129,6 +131,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     runSkippedTestsAnyway,
     screencastQuality,
     setupOnly,
+    subprocessRuntime,
     shardCount,
     shardIndex,
     startupRuns,

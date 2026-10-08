@@ -33,6 +33,7 @@ export interface StartRunningOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly measureNodeSubprocess?: boolean
   readonly openDevtools: boolean
   readonly platform: string
   readonly processRootStrategy: string
@@ -44,6 +45,7 @@ export interface StartRunningOptions {
   readonly runSkippedTestsAnyway: boolean
   readonly screencastQuality: number
   readonly setupOnly: boolean
+  readonly subprocessRuntime?: 'bun' | 'node'
   readonly shardCount?: number | undefined
   readonly shardIndex?: number | undefined
   readonly startupRuns: number

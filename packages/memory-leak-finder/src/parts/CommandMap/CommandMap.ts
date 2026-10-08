@@ -1,5 +1,7 @@
 import type { Dynamic } from '../Types/Types.ts'
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
+import * as GetHeapSnapshotForConnection from '../GetHeapSnapshotForConnection/GetHeapSnapshotForConnection.ts'
+import * as GetNamedArrayCountForConnection from '../GetNamedArrayCountForConnection/GetNamedArrayCountForConnection.ts'
 import * as MemoryLeakFinderCompare from '../MemoryLeakFinderCompare/MemoryLeakFinderCompare.ts'
 import * as MemoryLeakFinderRunCompletion from '../MemoryLeakFinderRunCompletion/MemoryLeakFinderRunCompletion.ts'
 import * as MemoryLeakFinderStart from '../MemoryLeakFinderStart/MemoryLeakFinderStart.ts'
@@ -7,6 +9,8 @@ import * as MemoryLeakFinderStop from '../MemoryLeakFinderStop/MemoryLeakFinderS
 import * as MemoryLeakWorkerCommandType from '../MemoryLeakWorkerCommandType/MemoryLeakWorkerCommandType.ts'
 export const commandMap: Record<string, Dynamic> = {
   [MemoryLeakWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
+  [MemoryLeakWorkerCommandType.GetHeapSnapshotForConnection]: GetHeapSnapshotForConnection.getHeapSnapshotForConnection,
+  [MemoryLeakWorkerCommandType.GetNamedArrayCountForConnection]: GetNamedArrayCountForConnection.getNamedArrayCountForConnection,
   [MemoryLeakWorkerCommandType.MemoryLeakFinderCompare]: MemoryLeakFinderCompare.compare,
   [MemoryLeakWorkerCommandType.MemoryLeakFinderRunCompletion]: MemoryLeakFinderRunCompletion.runCompletion,
   [MemoryLeakWorkerCommandType.MemoryLeakFinderStart]: MemoryLeakFinderStart.start,

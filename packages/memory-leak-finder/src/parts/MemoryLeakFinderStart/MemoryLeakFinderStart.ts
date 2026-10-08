@@ -1,3 +1,5 @@
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
+import * as PendingDevtoolsConnectionState from '../PendingDevtoolsConnectionState/PendingDevtoolsConnectionState.ts'
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import * as WaitForCrash from '../WaitForCrash/WaitForCrash.ts'
 import type { UnknownRecord } from '../Types/Types.ts'
@@ -7,7 +9,33 @@ const isRecord = (value: unknown): value is UnknownRecord => {
 }
 
 const doStart = async (connectionId: number): Promise<unknown> => {
-  const state = MemoryLeakFinderState.get(connectionId)
+  let state = MemoryLeakFinderState.get(connectionId)
+  if (!state) {
+    const pending = PendingDevtoolsConnectionState.get(connectionId)
+    if (pending) {
+      await ConnectDevtools.connectDevtools(
+        pending.devtoolsWebSocketUrl,
+        pending.electronWebSocketUrl,
+        connectionId,
+        pending.measureId,
+        pending.attachedToPageTimeout,
+        pending.measureNode,
+        pending.inspectSharedProcess,
+        pending.inspectExtensions,
+        pending.inspectIntegratedBrowser,
+        pending.inspectPtyHost,
+        pending.inspectPtyHostPort,
+        pending.inspectSharedProcessPort,
+        pending.inspectExtensionsPort,
+        pending.pid,
+        pending.excludedTargetIds,
+        pending.inspectExternalRuntime,
+        pending.externalRuntimeInspectPort,
+        pending.externalRuntimeName,
+      )
+      state = MemoryLeakFinderState.get(connectionId)
+    }
+  }
   if (!state) {
     throw new Error(`no measure found`)
   }

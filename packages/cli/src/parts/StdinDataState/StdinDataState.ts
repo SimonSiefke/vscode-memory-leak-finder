@@ -34,6 +34,7 @@ export interface StdinDataState {
   readonly isWindows: boolean
   readonly measure: string
   readonly measureAfter: boolean
+  readonly measureNodeSubprocess?: boolean | undefined
   readonly measureNode: boolean
   readonly mode: number
   readonly openDevtools: boolean
@@ -49,6 +50,7 @@ export interface StdinDataState {
   readonly runSkippedTestsAnyway: boolean
   readonly showSkippedFailedTestDuration: boolean
   readonly screencastQuality: number
+  readonly subprocessRuntime: 'bun' | 'node'
   readonly shardCount?: number | undefined
   readonly shardIndex?: number | undefined
   readonly startupRuns: number
@@ -93,6 +95,7 @@ let state: StdinDataState = {
   isWindows: false,
   measure: Character.EmptyString,
   measureAfter: false,
+  measureNodeSubprocess: false,
   measureNode: false,
   mode: ModeType.Waiting,
   openDevtools: false,
@@ -108,6 +111,7 @@ let state: StdinDataState = {
   runSkippedTestsAnyway: false,
   showSkippedFailedTestDuration: false,
   screencastQuality: 90,
+  subprocessRuntime: 'node',
   startupRuns: 1,
   stdout: [],
   timeoutBetween: 0,
@@ -148,6 +152,7 @@ export const setState = (newState: StdinDataState): void => {
     isWindows: newState.isWindows,
     measure: newState.measure,
     measureAfter: newState.measureAfter,
+    measureNodeSubprocess: newState.measureNodeSubprocess,
     measureNode: newState.measureNode,
     mode: newState.mode,
     pageObjectPath: newState.pageObjectPath,
@@ -162,6 +167,7 @@ export const setState = (newState: StdinDataState): void => {
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
     showSkippedFailedTestDuration: newState.showSkippedFailedTestDuration,
     screencastQuality: newState.screencastQuality,
+    subprocessRuntime: newState.subprocessRuntime,
     shardCount: newState.shardCount,
     shardIndex: newState.shardIndex,
     startupRuns: newState.startupRuns,

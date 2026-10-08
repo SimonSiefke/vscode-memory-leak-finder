@@ -61,6 +61,8 @@ export const updateState = async (newState: any): Promise<void> => {
       measure: state.measure,
       measureAfter: state.measureAfter,
       measureNode: state.measureNode || false,
+      measureNodeSubprocess: state.measureNodeSubprocess || false,
+      subprocessRuntime: state.subprocessRuntime,
       openDevtools: state.openDevtools,
       platform: state.platform,
       processRootStrategy: state.processRootStrategy,

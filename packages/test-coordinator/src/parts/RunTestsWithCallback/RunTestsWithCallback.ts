@@ -1,3 +1,4 @@
+import * as AssertSupportedSubprocessMeasure from '../AssertSupportedSubprocessMeasure/AssertSupportedSubprocessMeasure.ts'
 import type { Rpc } from '@lvce-editor/rpc'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -113,6 +114,7 @@ const getResultPath = ({
   inspectSharedProcess,
   measure,
   measureNode,
+  measureNodeSubprocess = false,
 }: {
   readonly dirent: string
   readonly inspectExtensions: boolean
@@ -121,6 +123,7 @@ const getResultPath = ({
   readonly inspectPtyHost: boolean
   readonly inspectSharedProcess: boolean
   readonly measure: string
+  readonly measureNodeSubprocess?: boolean
   readonly measureNode: boolean
 }): string => {
   const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
@@ -128,6 +131,9 @@ const getResultPath = ({
   const resultRelativePath = getResultRelativePath(fileName, testName)
   if (isMemoryCityMeasure(measure)) {
     return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'memory-city', resultRelativePath)
+  }
+  if (measureNodeSubprocess) {
+    return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node-subprocess', measure, resultRelativePath)
   }
   if (measureNode) {
     return join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, resultRelativePath)
@@ -185,6 +191,8 @@ export const runTestsWithCallback = async ({
   measure,
   measureAfter,
   measureNode,
+  measureNodeSubprocess = false,
+  subprocessRuntime = 'node',
   openDevtools,
   pageObjectPath,
   platform,
@@ -220,6 +228,7 @@ export const runTestsWithCallback = async ({
     Assert.number(runs)
     Assert.string(measure)
     Assert.boolean(measureAfter)
+    AssertSupportedSubprocessMeasure.assertSupportedSubprocessMeasure(checkLeaks, measure, measureNodeSubprocess, subprocessRuntime)
     Assert.boolean(measureNode)
     Assert.boolean(inspectIntegratedBrowser)
     Assert.string(inspectProcess)
@@ -448,6 +457,8 @@ export const runTestsWithCallback = async ({
               inspectSharedProcessPort,
               measureId: measure,
               measureNode,
+              measureNodeSubprocess,
+              subprocessRuntime,
               openDevtools,
               pageObjectPath: pageObjectPathResolved,
               platform,
@@ -518,6 +529,7 @@ export const runTestsWithCallback = async ({
               inspectSharedProcess,
               measure,
               measureNode,
+              measureNodeSubprocess,
             })
             const sampleResultPath = resultPath.replace(/\.json$/, `.startup-${startupRun + 1}.json`)
             await MemoryLeakFinder.compare(
@@ -543,6 +555,7 @@ export const runTestsWithCallback = async ({
             inspectSharedProcess,
             measure,
             measureNode,
+            measureNodeSubprocess,
           })
           const aggregateResult = StartupMeasure.getStartupMeasureAggregate(samples, startupMeasureInfo)
           await writeJson(resultPath, aggregateResult)
@@ -628,6 +641,8 @@ export const runTestsWithCallback = async ({
             inspectSharedProcessPort,
             measureId: measure,
             measureNode,
+            measureNodeSubprocess,
+            subprocessRuntime,
             openDevtools,
             pageObjectPath: pageObjectPathResolved,
             platform,
@@ -757,6 +772,7 @@ export const runTestsWithCallback = async ({
               inspectSharedProcess,
               measure,
               measureNode,
+              measureNodeSubprocess,
             })
             let result
             if (isMemoryCityMeasure(measure)) {

@@ -35,6 +35,9 @@ export const startWorker = async (
   excludedTargetIds: readonly string[],
   inspectProcess = '',
   testWorkerRpc?: any,
+  measureNodeSubprocess = false,
+  externalInspectPort = 0,
+  subprocessRuntime: 'bun' | 'node' = 'node',
 ) => {
   Assert.string(devtoolsWebsocketUrl)
   const externalRuntimeInfo =
@@ -61,7 +64,7 @@ export const startWorker = async (
     connectionId,
     measureId,
     attachedToPageTimeout,
-    measureNode,
+    measureNode || measureNodeSubprocess,
     inspectSharedProcess,
     inspectExtensions,
     inspectIntegratedBrowser,
@@ -71,9 +74,10 @@ export const startWorker = async (
     inspectExtensionsPort,
     pid,
     excludedTargetIds,
-    Boolean(externalRuntimeInfo),
-    externalRuntimeInfo?.inspectPort ?? 0,
-    externalRuntimeInfo?.runtimeName ?? '',
+    Boolean(externalRuntimeInfo) || measureNodeSubprocess,
+    externalRuntimeInfo?.inspectPort ?? externalInspectPort,
+    externalRuntimeInfo?.runtimeName ?? subprocessRuntime,
+    measureNodeSubprocess,
   )
   return rpc
 }

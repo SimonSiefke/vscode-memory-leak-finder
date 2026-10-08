@@ -31,6 +31,8 @@ interface ParsedVscodeVersion {
   readonly vscodeVersion: string
 }
 
+type SubprocessRuntime = 'bun' | 'node'
+
 const parseVscodeVersion = (defaultVersionValue: string, argv: readonly string[]): ParsedVscodeVersion => {
   if (argv.includes('--vscode-version')) {
     const vscodeVersionValue = parseArgvString(argv, '--vscode-version')
@@ -228,6 +230,21 @@ const parseMeasureAfter = (argv: readonly string[]): boolean => {
 
 const parseMeasureNode = (argv: readonly string[]): boolean => {
   return argv.includes('--measure-node')
+}
+
+const parseMeasureNodeSubprocess = (argv: readonly string[]): boolean => {
+  return argv.includes('--measure-node-subprocess')
+}
+
+const parseSubprocessRuntime = (argv: readonly string[]): SubprocessRuntime => {
+  if (!argv.includes('--subprocess-runtime')) {
+    return 'node'
+  }
+  const value = parseArgvString(argv, '--subprocess-runtime')
+  if (value === 'bun' || value === 'node') {
+    return value
+  }
+  throw new Error(`Expected --subprocess-runtime to be one of bun or node but received ${value || '<empty>'}`)
 }
 
 const isIpcMessageCountMeasure = (measure: string): boolean => {
@@ -501,6 +518,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const inspectSharedProcessPort = parseInspectSharedProcessPort(argv)
   const measureAfter = parseMeasureAfter(argv)
   const measureNode = parseMeasureNode(argv)
+  const measureNodeSubprocess = parseMeasureNodeSubprocess(argv)
   if (checkLeaks && isWebsitesE2e(cwd) && !inspectIntegratedBrowser) {
     throw new Error('websites-e2e test measures can only be run with --inspect-integrated-browser')
   }
@@ -524,6 +542,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     throw new Error('--startup-runs can only be used with a from-start measure')
   }
   const runSkippedTestsAnyway = parseRunSkippedTestsAnyway(argv)
+  const subprocessRuntime = parseSubprocessRuntime(argv)
   const showSkippedFailedTestDuration = parseShowSkippedFailedTestDuration(argv, env)
   const runNetworkTestsAnyway = parseRunNetworkTestsAnyway(argv)
   const allowCopilotAuthInCi = parseAllowCopilotAuthInCi(argv)
@@ -581,6 +600,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     measure,
     measureAfter,
     measureNode,
+    measureNodeSubprocess,
     openDevtools,
     pageObjectPath,
     platform,
@@ -596,6 +616,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     showSkippedFailedTestDuration,
     screencastQuality,
     setupOnly,
+    subprocessRuntime,
     startupRuns,
     timeoutBetween,
     timeouts,

@@ -752,3 +752,15 @@ test('parseArgv - explicit --check-leaks takes precedence', () => {
   const options = ParseArgv.parseArgv('linux', 'x64', argv)
   expect(options.checkLeaks).toBe(true)
 })
+
+test('parseArgv - supports Bun subprocess measurements alongside current launch options', () => {
+  expect(ParseArgv.parseArgv('linux', 'x64', ['--measure-node-subprocess', '--subprocess-runtime', 'bun', '--runs', '2'])).toMatchObject({
+    measureNodeSubprocess: true,
+    subprocessRuntime: 'bun',
+    runs: 2,
+  })
+})
+
+test('parseArgv - rejects an unsupported subprocess runtime', () => {
+  expect(() => ParseArgv.parseArgv('linux', 'x64', ['--subprocess-runtime', 'other'])).toThrow('Expected --subprocess-runtime')
+})
