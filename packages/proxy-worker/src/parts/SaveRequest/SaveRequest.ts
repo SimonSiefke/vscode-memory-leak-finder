@@ -1,4 +1,5 @@
 import type { IncomingMessage } from 'node:http'
+import { existsSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
@@ -23,8 +24,13 @@ export const saveRequest = async (
     await mkdir(requestsDir, { recursive: true })
     const timestamp = Date.now()
     const url = req.url || ''
-    const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}.json`
-    const filepath = join(requestsDir, filename)
+    const filename = `${timestamp}_${process.hrtime.bigint()}_${SanitizeFilename.sanitizeFilename(url)}`
+    let filepath = join(requestsDir, `${filename}.json`)
+    let collisionCounter = 1
+    while (existsSync(filepath)) {
+      filepath = join(requestsDir, `${filename}_${collisionCounter}.json`)
+      collisionCounter += 1
+    }
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
     const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
