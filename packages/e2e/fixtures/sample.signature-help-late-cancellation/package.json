@@ -1,0 +1,26 @@
+{
+  "name": "signature-help-late-cancellation",
+  "displayName": "Signature Help Late Cancellation",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "signature-help-late-cancellation.setup",
+        "title": "Signature Help Late Cancellation: Setup"
+      },
+      {
+        "command": "signature-help-late-cancellation.run",
+        "title": "Signature Help Late Cancellation: Run"
+      },
+      {
+        "command": "signature-help-late-cancellation.cleanup",
+        "title": "Signature Help Late Cancellation: Cleanup"
+      }
+    ]
+  }
+}
