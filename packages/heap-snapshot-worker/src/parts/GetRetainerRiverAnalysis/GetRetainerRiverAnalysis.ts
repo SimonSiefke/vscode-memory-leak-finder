@@ -1,6 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 const MissingNode = 0xffffffff
+const MaximumEvidencePerFlow = 16
 const ignoredNodeTypes = new Set(['bigint', 'code', 'hidden', 'number', 'string', 'synthetic'])
 const collectionPattern = /array|context|emitter|listener|map|set/i
 const servicePattern = /service/i
@@ -47,6 +48,7 @@ interface RiverNode {
 
 interface RiverLink {
   readonly evidence: readonly Evidence[]
+  readonly evidenceTruncated?: boolean
   readonly flowId: string
   readonly id: string
   readonly objectCount: number
@@ -669,7 +671,11 @@ export const getRetainerRiverAnalysis = (
     const retainedBytes = Math.max(1, Math.round(group.reduce((total, node) => total + graph.retainedSizes[node], 0)))
     const stages = getStageNodes(after, nodeAccess, path, traceStacks)
     const flowId = `flow-${flowIndex++}`
-    const evidence: Evidence[] = group.map((candidate) => {
+    const evidenceTruncated = group.length > MaximumEvidencePerFlow
+    const evidenceCandidates = evidenceTruncated
+      ? [representative, ...group.filter((candidate) => candidate !== representative).slice(0, MaximumEvidencePerFlow - 1)]
+      : group
+    const evidence: Evidence[] = evidenceCandidates.map((candidate) => {
       const candidatePath = getPath(candidate, graph.parent)
       const pathSegments: PathSegment[] = []
       for (let index = 1; index < candidatePath.length; index++) {
@@ -722,6 +728,7 @@ export const getRetainerRiverAnalysis = (
     for (let index = 0; index < flowNodes.length - 1; index++) {
       links.push({
         evidence,
+        ...(evidenceTruncated ? { evidenceTruncated: true } : {}),
         flowId,
         id: `${flowId}:${index}`,
         objectCount: group.length,

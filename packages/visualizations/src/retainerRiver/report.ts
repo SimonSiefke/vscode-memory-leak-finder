@@ -45,6 +45,7 @@ export interface RetainerRiverNode {
 
 export interface RetainerRiverLink {
   readonly evidence: readonly RetainerRiverEvidence[]
+  readonly evidenceTruncated?: boolean
   readonly flowId: string
   readonly id: string
   readonly objectCount: number
@@ -131,6 +132,13 @@ export const formatBytes = (bytes: number): string => {
   }
   const digits = value >= 100 ? 0 : value >= 10 ? 1 : 2
   return `${value.toFixed(digits)} ${units[unitIndex]}`
+}
+
+export const getEvidenceSummary = (link: RetainerRiverLink): string | undefined => {
+  if (!link.evidenceTruncated) {
+    return undefined
+  }
+  return `Showing ${link.evidence.length} sampled paths for ${link.objectCount.toLocaleString('en-US')} objects. Counts include every object.`
 }
 
 export const getFilteredReport = (report: RetainerRiverReport, query: string, minimumBytes: number): RetainerRiverReport => {
