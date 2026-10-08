@@ -1,0 +1,29 @@
+{
+  "name": "integrated-browser-close-during-creation",
+  "displayName": "Integrated Browser Close During Creation",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "integrated-browser-close-during-creation.setup",
+        "title": "Integrated Browser Close During Creation: Setup"
+      },
+      {
+        "command": "integrated-browser-close-during-creation.run",
+        "title": "Integrated Browser Close During Creation: Run"
+      },
+      {
+        "command": "integrated-browser-close-during-creation.cleanup",
+        "title": "Integrated Browser Close During Creation: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "browser"
+  ]
+}
