@@ -191,7 +191,7 @@ class HeapSnapshotWriteStream extends Writable {
       }
     }
     const fragment = endIndex === -1 ? chunk : chunk.subarray(0, endIndex)
-    this.traceTreeChunks.push(fragment)
+    this.traceTreeChunks.push(new Uint8Array(fragment))
     this.traceTreeSize += fragment.length
     if (endIndex === -1) {
       return

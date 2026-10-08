@@ -87,6 +87,26 @@ test('accepts an empty allocation trace and still reads following sections', () 
   })
 })
 
+test('preserves trace bytes when the producer reuses a buffer after its write callback', async () => {
+  const json = JSON.stringify(createSnapshot([1, 0, 1, 16, []]))
+  const start = json.indexOf('"trace_tree":[') + '"trace_tree":['.length
+  const fragment = Buffer.from('1,0,1,16,[')
+  const stream = createHeapSnapshotWriteStream({ parseStrings: true })
+  stream.write(Buffer.from(json.slice(0, start)))
+  await new Promise<void>((resolve, reject) => {
+    stream.write(fragment, (error) => (error ? reject(error) : resolve()))
+  })
+  fragment[0] = 57 // A producer may reuse its buffer after the write completes.
+  stream.end(Buffer.from(json.slice(start + fragment.length)))
+  await finished(stream)
+  const result = stream.getResult()
+  expect({ trace: [...result.traceTree], parents: [...result.traceTreeParents], strings: result.strings }).toEqual({
+    trace: [1, 0, 1, 16],
+    parents: [0],
+    strings: ['root', 'allocate', 'fixture.js'],
+  })
+})
+
 test('rejects an unfinished allocation trace', async () => {
   const json = JSON.stringify(createSnapshot([1, 0, 1, 16, []]))
   const end = json.indexOf(',"locations":') - 1
