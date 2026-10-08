@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { expect, jest, test } from '@jest/globals'
+import { afterEach, expect, jest, test } from '@jest/globals'
 import * as GetMeasure from '../src/parts/GetMeasure/GetMeasure.ts'
 import * as MeasureChromiumMemoryDump from '../src/parts/MeasureChromiumMemoryDump/MeasureChromiumMemoryDump.ts'
 import * as TargetId from '../src/parts/TargetId/TargetId.ts'
@@ -66,18 +66,33 @@ const traceEvents = [
   },
 ]
 
-const createSession = ({ dataLossOccurred = false, dumpSuccess = true } = {}) => {
+const createSession = ({
+  dataLossOccurred = false,
+  dumpSuccess = true,
+  readError = '',
+  emptyChunk = false,
+  noStream = false,
+  omitComplete = false,
+  closeError = '',
+  streamForever = false,
+} = {}) => {
   const calls: unknown[] = []
   const listeners: Record<string, (message: unknown) => void> = {}
+  const traceData = streamForever ? 'x'.repeat(256 * 1024) : JSON.stringify({ traceEvents })
   const invokeBrowser = jest.fn(async (method: string, params: unknown) => {
     calls.push([method, params])
     if (method === 'Tracing.requestMemoryDump') {
       return { result: { dumpGuid: '0x2', success: dumpSuccess } }
     }
     if (method === 'Tracing.end') {
-      listeners['Tracing.dataCollected']?.({ params: { value: traceEvents } })
-      listeners['Tracing.tracingComplete']?.({ params: { dataLossOccurred } })
+      if (!omitComplete)
+        listeners['Tracing.tracingComplete']?.({ params: { dataLossOccurred, ...(noStream ? {} : { stream: 'owned-trace' }) } })
     }
+    if (method === 'IO.read') {
+      if (readError) return { error: { message: readError } }
+      return { result: { data: emptyChunk ? '' : traceData, eof: !emptyChunk && !streamForever } }
+    }
+    if (method === 'IO.close' && closeError) return { error: { message: closeError } }
     return { result: {} }
   })
   return {
@@ -128,12 +143,14 @@ test('measure captures two deterministic detailed dumps through the root browser
           includedCategories: ['disabled-by-default-memory-infra'],
           recordMode: 'recordAsMuchAsPossible',
         },
-        transferMode: 'ReportEvents',
+        transferMode: 'ReturnAsStream',
       },
     ],
     ['Tracing.requestMemoryDump', { deterministic: true, levelOfDetail: 'detailed' }],
     ['Tracing.requestMemoryDump', { deterministic: true, levelOfDetail: 'detailed' }],
     ['Tracing.end', {}],
+    ['IO.read', { handle: 'owned-trace', size: 256 * 1024 }],
+    ['IO.close', { handle: 'owned-trace' }],
   ])
 })
 
@@ -225,8 +242,73 @@ test('release ends an active trace and removes listeners', async () => {
   await MeasureChromiumMemoryDump.releaseResources(...args)
   await MeasureChromiumMemoryDump.releaseResources(...args)
 
-  expect(calls.map((call: any) => call[0])).toEqual(['Tracing.start', 'Tracing.requestMemoryDump', 'Tracing.end'])
+  expect(calls.map((call: any) => call[0])).toEqual(['Tracing.start', 'Tracing.requestMemoryDump', 'Tracing.end', 'IO.close'])
   expect(session.listeners).toEqual({})
+})
+
+afterEach(() => {
+  jest.useRealTimers()
+})
+
+test.each([
+  [{ readError: 'stream disconnected', emptyChunk: false, noStream: false }, 'stream disconnected'],
+  [{ readError: '', emptyChunk: true, noStream: false }, 'made no progress'],
+  [{ readError: '', emptyChunk: false, noStream: true }, 'without a stream handle'],
+] as const)('failed stream capture remains incomplete and releases its handle', async (options, message) => {
+  const { calls, session } = createSession(options)
+  const args = MeasureChromiumMemoryDump.create(session)
+  await MeasureChromiumMemoryDump.start(...args)
+  await expect(MeasureChromiumMemoryDump.stop(...args)).rejects.toThrow(message)
+  await MeasureChromiumMemoryDump.releaseResources(...args)
+  expect({
+    captured: args[1].captured,
+    fileExists: existsSync(args[1].capturePath),
+    closeCount: calls.filter((call: any) => call[0] === 'IO.close').length,
+  }).toEqual({ captured: false, fileExists: false, closeCount: options.noStream ? 0 : 1 })
+})
+
+test('missing trace completion rejects within its bounded wait and removes listeners', async () => {
+  jest.useFakeTimers()
+  const { session } = createSession({ omitComplete: true })
+  const args = MeasureChromiumMemoryDump.create(session)
+  await MeasureChromiumMemoryDump.start(...args)
+  const stop = MeasureChromiumMemoryDump.stop(...args)
+  const rejected = expect(stop).rejects.toThrow('completion timed out after 10000ms')
+  await jest.advanceTimersByTimeAsync(10000)
+  await rejected
+  await MeasureChromiumMemoryDump.releaseResources(...args)
+  expect({ captured: args[1].captured, listeners: session.listeners, timers: jest.getTimerCount() }).toEqual({
+    captured: false,
+    listeners: {},
+    timers: 0,
+  })
+})
+
+test('a failed stream close is not accepted as a complete capture', async () => {
+  const { calls, session } = createSession({ closeError: 'close disconnected' })
+  const args = MeasureChromiumMemoryDump.create(session)
+  await MeasureChromiumMemoryDump.start(...args)
+  await expect(MeasureChromiumMemoryDump.stop(...args)).rejects.toThrow('close disconnected')
+  await MeasureChromiumMemoryDump.releaseResources(...args)
+  expect({
+    captured: args[1].captured,
+    fileExists: existsSync(args[1].capturePath),
+    closeCount: calls.filter((call: any) => call[0] === 'IO.close').length,
+  }).toEqual({ captured: false, fileExists: false, closeCount: 1 })
+})
+
+test('a non-terminating trace is bounded without retaining all its chunks', async () => {
+  const { calls, session } = createSession({ streamForever: true })
+  const args = MeasureChromiumMemoryDump.create(session)
+  await MeasureChromiumMemoryDump.start(...args)
+  await expect(MeasureChromiumMemoryDump.stop(...args)).rejects.toThrow('268435456 byte capture budget')
+  await MeasureChromiumMemoryDump.releaseResources(...args)
+  expect({
+    captured: args[1].captured,
+    fileExists: existsSync(args[1].capturePath),
+    reads: calls.filter((call: any) => call[0] === 'IO.read').length,
+    closes: calls.filter((call: any) => call[0] === 'IO.close').length,
+  }).toEqual({ captured: false, fileExists: false, reads: 1025, closes: 1 })
 })
 
 test('measure is informational, browser-only, and resolves by kebab-case id', () => {
