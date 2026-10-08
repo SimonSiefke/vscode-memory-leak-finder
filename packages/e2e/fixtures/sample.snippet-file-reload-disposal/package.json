@@ -1,0 +1,26 @@
+{
+  "name": "snippet-file-reload-disposal",
+  "displayName": "Snippet File Reload Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "snippet-file-reload-disposal.setup",
+        "title": "Snippet File Reload Disposal: Setup"
+      },
+      {
+        "command": "snippet-file-reload-disposal.run",
+        "title": "Snippet File Reload Disposal: Run"
+      },
+      {
+        "command": "snippet-file-reload-disposal.cleanup",
+        "title": "Snippet File Reload Disposal: Cleanup"
+      }
+    ]
+  }
+}
