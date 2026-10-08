@@ -9,7 +9,7 @@ interface TargetInfo {
   readonly url: string
 }
 
-const findMatchingIframe = (targets, expectedUrl, index) => {
+const findMatchingIframe = (targets: any, expectedUrl: RegExp, index: number) => {
   let matchingIndex = 0
   for (const target of targets) {
     if (expectedUrl.test(target.url) || expectedUrl.test(target.title)) {
@@ -22,7 +22,7 @@ const findMatchingIframe = (targets, expectedUrl, index) => {
   return undefined
 }
 
-const waitForMatchingIframe = async (sessionRpc, url, index, timeout = 30_000) => {
+const waitForMatchingIframe = async (sessionRpc: any, url: RegExp, index: number, timeout = 30_000) => {
   const deadline = performance.now() + timeout
   let targets: readonly TargetInfo[] = []
   while (performance.now() < deadline) {
@@ -51,7 +51,7 @@ export const waitForIframe = async ({
   index = 0,
   sessionRpc,
   url,
-}) => {
+}: any) => {
   // TODO
   // 1. enable page api
   // 2. add listener to page frame attached, frameStartedNavigating, check if it matches the expected url, take note of the frame id
@@ -99,7 +99,7 @@ export const waitForPage = async ({
   idleTimeout,
   injectUtilityScript,
   sessionId,
-}) => {
+}: any) => {
   // Wait for a newly created page/window
   // Similar to waitForIframe but for a new page instead of an iframe
 

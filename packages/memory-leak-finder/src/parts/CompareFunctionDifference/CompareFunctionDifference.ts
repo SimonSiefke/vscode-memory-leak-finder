@@ -1,8 +1,8 @@
-import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetNamedFunctionDifference from '../GetNamedFunctionDifference/GetNamedFunctionDifference.ts'
 import * as SortNamedFunctions from '../SortNamedFunctions/SortNamedFunctions.ts'
-export const compareFunctionDifference = (before: Dynamic, after: Dynamic) => {
+
+export const compareFunctionDifference = (before: unknown, after: unknown) => {
   Assert.array(before)
   Assert.array(after)
   const sortedBefore = SortNamedFunctions.sortNamedFunctions(before)

@@ -1,6 +1,6 @@
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 
-export const waitForSubFrameContextEvent = (rpc, urlRegex, timeout, signal: AbortSignal) => {
+export const waitForSubFrameContextEvent = (rpc: any, urlRegex: RegExp, timeout: number, signal: AbortSignal) => {
   const { promise, resolve } = Promise.withResolvers()
   const loaded = Object.create(null)
   let matchingFrameId = ''
@@ -11,17 +11,17 @@ export const waitForSubFrameContextEvent = (rpc, urlRegex, timeout, signal: Abor
       })
     }
   }
-  const handleFrameNavigation = (event) => {
+  const handleFrameNavigation = (event: any) => {
     if (urlRegex.test(event.params.url)) {
       matchingFrameId = event.params.frameId
     }
     cleanupMaybe()
   }
-  const handleFrameStoppedLoading = (event) => {
+  const handleFrameStoppedLoading = (event: any) => {
     loaded[event.params.frameId] = true
     cleanupMaybe()
   }
-  const handleDocumentOpened = (event) => {
+  const handleDocumentOpened = (event: any) => {
     if (urlRegex.test(event.params.frame.url)) {
       matchingFrameId = event.params.frame.id
       loaded[event.params.frame.id] = true
@@ -34,7 +34,7 @@ export const waitForSubFrameContextEvent = (rpc, urlRegex, timeout, signal: Abor
   const handleAbort = () => {
     cleanup(null)
   }
-  const cleanup = (result) => {
+  const cleanup = (result: any) => {
     rpc.off(DevtoolsEventType.PageFrameRequestedNavigation, handleFrameNavigation)
     rpc.off(DevtoolsEventType.PageFrameStoppedLoading, handleFrameStoppedLoading)
     rpc.off(DevtoolsEventType.PageDocumentOpened, handleDocumentOpened)

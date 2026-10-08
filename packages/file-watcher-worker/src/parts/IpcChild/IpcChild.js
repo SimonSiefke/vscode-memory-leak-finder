@@ -1,19 +1,25 @@
 import * as IpcChildType from '../IpcChildType/IpcChildType.js'
 
+/**
+ * @param {string | number} method
+ */
 const getModule = (method) => {
-  switch (method) {
-    case IpcChildType.NodeForkedProcess:
-      return import('../IpcChildWithNodeForkedProcess/IpcChildWithNodeForkedProcess.js')
-    case IpcChildType.NodeWorkerThread:
-      return import('../IpcChildWithNodeWorkerThread/IpcChildWithNodeWorkerThread.js')
-    default:
-      throw new Error('unexpected ipc type')
+  if (method === IpcChildType.NodeForkedProcess || method === String(IpcChildType.NodeForkedProcess)) {
+    return import('../IpcChildWithNodeForkedProcess/IpcChildWithNodeForkedProcess.js')
   }
+  if (method === IpcChildType.NodeWorkerThread || method === String(IpcChildType.NodeWorkerThread)) {
+    return import('../IpcChildWithNodeWorkerThread/IpcChildWithNodeWorkerThread.js')
+  }
+  throw new Error('unexpected ipc type')
 }
 
+/**
+ * @param {{ method: string | number }} options
+ */
 export const listen = async ({ method }) => {
   const module = await getModule(method)
   const rawIpc = module.create()
+  // @ts-ignore - rawIpc can be Process or MessagePort, wrap handles both
   const ipc = module.wrap(rawIpc)
   return ipc
 }

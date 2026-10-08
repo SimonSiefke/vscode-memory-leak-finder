@@ -12,9 +12,9 @@ import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import { VError } from '../VError/VError.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
-const createDefaultContext = (sessionRpc, utilityContext) => {
+const createDefaultContext = (sessionRpc: any, utilityContext: any) => {
   return {
-    callFunctionOn(options) {
+    callFunctionOn(options: any) {
       return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
         ...options,
         ...(utilityContext.uniqueId
@@ -29,9 +29,9 @@ const createDefaultContext = (sessionRpc, utilityContext) => {
   }
 }
 
-const createUtilityContext = (sessionRpc, utilityContext) => {
+const createUtilityContext = (sessionRpc: any, utilityContext: any) => {
   return {
-    callFunctionOn(options) {
+    callFunctionOn(options: any) {
       return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {
         ...options,
         ...(utilityContext.uniqueId
@@ -43,7 +43,7 @@ const createUtilityContext = (sessionRpc, utilityContext) => {
             }),
       })
     },
-    evaluate(options) {
+    evaluate(options: any) {
       return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
         ...options,
         ...(utilityContext.uniqueId
@@ -108,10 +108,10 @@ export const connectDevtools = async (
     browserRpc,
     defaultContext: createDefaultContext(sessionRpc, utilityContext),
     electronApp: undefined,
-    evaluateInDefaultContext(item) {
+    evaluateInDefaultContext(item: any) {
       throw new Error(`not implemented`)
     },
-    evaluateInUtilityContext(item) {},
+    evaluateInUtilityContext(item: any) {},
     expect: Expect.expect,
     ideVersion: parsedIdeVersion,
     page: undefined,
@@ -123,7 +123,7 @@ export const connectDevtools = async (
   }
 
   const livePage: any = LivePage.create({
-    onRebind: async (nextPage) => {
+    onRebind: async (nextPage: any) => {
       pageObjectContext.defaultContext = createDefaultContext(nextPage.sessionRpc, nextPage.utilityContext)
       pageObjectContext.page = livePage
       pageObjectContext.sessionRpc = nextPage.sessionRpc

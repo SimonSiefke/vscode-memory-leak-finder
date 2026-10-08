@@ -26,7 +26,7 @@ const getTargets = async (devtoolsWebSocketUrl: string): Promise<readonly Target
   const handleError = () => {
     opened.reject(new Error(`Failed to connect to browser devtools websocket`))
   }
-  const handleMessage = (event) => {
+  const handleMessage = (event: any) => {
     const message = JSON.parse(String(event.data)) as RpcResponse
     if (message.id === 0) {
       response.resolve(message)

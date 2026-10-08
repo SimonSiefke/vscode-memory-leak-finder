@@ -2,7 +2,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 import { ExpectError } from '../ExpectError/ExpectError.ts'
 import * as FunctionGetElectronAppIsPackaged from '../FunctionGetElectronAppIsPackaged/FunctionGetElectronAppIsPackaged.ts'
 
-export const toBePackaged = async (electronApp) => {
+export const toBePackaged = async (electronApp: any) => {
   const result = await DevtoolsProtocolRuntime.callFunctionOn(electronApp.rpc, {
     functionDeclaration: FunctionGetElectronAppIsPackaged.code,
     objectId: electronApp.electronObjectId,

@@ -1,6 +1,6 @@
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 
-export const toHaveTitle = async (page, expectedTitle) => {
+export const toHaveTitle = async (page: any, expectedTitle: any) => {
   const connectionId = 1
   const pageObject = PageObjectState.getPageObjectContext(connectionId)
   // @ts-ignore

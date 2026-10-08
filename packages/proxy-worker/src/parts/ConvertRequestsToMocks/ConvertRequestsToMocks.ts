@@ -33,10 +33,10 @@ interface RecordedRequestFile {
   }
   response?: {
     statusCode: number
-    statusMessage?: string
+    statusMessage?: string | undefined
     headers: Record<string, string | string[]>
     body: any
-    wasCompressed?: boolean
+    wasCompressed?: boolean | undefined
   }
 }
 
@@ -44,14 +44,16 @@ interface RecordedRequest {
   body?: unknown
   headers: Record<string, string | string[]>
   method: string
-  response?: {
-    statusCode: number
-    statusMessage?: string
-    headers: Record<string, string | string[]>
-    body: any
-    wasCompressed?: boolean
-  }
-  responseType?: string
+  response?:
+    | {
+        statusCode: number
+        statusMessage?: string | undefined
+        headers: Record<string, string | string[]>
+        body: any
+        wasCompressed?: boolean | undefined
+      }
+    | undefined
+  responseType?: string | undefined
   timestamp: number
   url: string
 }

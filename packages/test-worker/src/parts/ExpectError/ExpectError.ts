@@ -1,5 +1,5 @@
 export class ExpectError extends Error {
-  constructor(message) {
+  constructor(message: any) {
     super(message)
     this.name = 'ExpectError'
   }

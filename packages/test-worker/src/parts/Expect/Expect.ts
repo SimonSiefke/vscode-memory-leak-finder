@@ -4,7 +4,7 @@ import * as ExpectLocator from '../ExpectLocator/ExpectLocator.ts'
 import * as ExpectPage from '../ExpectPage/ExpectPage.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 
-export const expect = (args) => {
+export const expect = (args: any) => {
   const type = args ? args.objectType || args.type || '' : ''
   switch (type) {
     case ObjectType.ElectronApp:

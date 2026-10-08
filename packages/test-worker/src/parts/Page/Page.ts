@@ -14,26 +14,26 @@ import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
 import { waitForSubIframe } from '../WaitForSubIframe/WaitForSubIframe.ts'
 import * as WebWorker from '../WebWorker/WebWorker.ts'
 
-const createKeyboard = (rpc, utilityContext) => {
+const createKeyboard = (rpc: any, utilityContext: any) => {
   return {
-    contentEditableInsert(options) {
+    contentEditableInsert(options: any) {
       return PageKeyBoard.contentEditableInsert(this.rpc, this.utilityContext, options)
     },
-    press(key) {
+    press(key: string) {
       return PageKeyBoard.press(this.rpc, this.utilityContext, key)
     },
-    pressKeyExponential(options) {
+    pressKeyExponential(options: any) {
       return PageKeyBoard.pressKeyExponential(this.rpc, this.utilityContext, options)
     },
     rpc,
-    type(text) {
+    type(text: string) {
       return PageKeyBoard.type(this.rpc, this.utilityContext, text)
     },
     utilityContext,
   }
 }
 
-const createMouse = (rpc, utilityContext) => {
+const createMouse = (rpc: any, utilityContext: any) => {
   return {
     down() {
       return PageMouse.down(this.rpc, this.utilityContext)
@@ -41,7 +41,7 @@ const createMouse = (rpc, utilityContext) => {
     mockPointerEvents() {
       return PageMouse.mockPointerEvents(this.rpc, this.utilityContext)
     },
-    move(x, y) {
+    move(x: any, y: any) {
       return PageMouse.move(this.rpc, this.utilityContext, x, y)
     },
     rpc,
@@ -62,7 +62,7 @@ export const create = ({
   sessionRpc,
   targetId,
   utilityContext,
-}) => {
+}: any) => {
   return {
     blur() {
       return PageBlur.blur({
@@ -76,14 +76,14 @@ export const create = ({
     },
     electronObjectId,
     electronRpc,
-    async evaluate({ awaitPromise = false, expression, replMode = false }) {
+    async evaluate({ awaitPromise = false, expression, replMode = false }: any) {
       return PageEvaluate.evaluate(this.rpc, {
         awaitPromise,
         expression,
         replMode,
       })
     },
-    async evaluateInMainWorld({ awaitPromise = false, expression, replMode = false }) {
+    async evaluateInMainWorld({ awaitPromise = false, expression, replMode = false }: any) {
       return DevtoolsProtocolRuntime.evaluate(this.rpc, {
         awaitPromise,
         expression,
@@ -91,7 +91,7 @@ export const create = ({
         returnByValue: true,
       })
     },
-    async evaluateInUtilityWorld({ awaitPromise = false, expression, replMode = false }) {
+    async evaluateInUtilityWorld({ awaitPromise = false, expression, replMode = false }: any) {
       return DevtoolsProtocolRuntime.evaluate(this.rpc, {
         awaitPromise,
         expression,
@@ -105,16 +105,16 @@ export const create = ({
         electronRpc: this.electronRpc,
       })
     },
-    frameLocator(selector, options = {}) {
+    frameLocator(selector: string, options = {}) {
       return Locator.create(this.rpc, this.sessionId, `${selector}:internal-enter-frame()`, options)
     },
     keyboard: createKeyboard(sessionRpc, utilityContext),
-    locator(selector, options = {}) {
+    locator(selector: string, options = {}) {
       return Locator.create(this.rpc, this.sessionId, selector, options, this.utilityContext)
     },
     mouse: createMouse(sessionRpc, utilityContext),
     objectType: DevtoolsTargetType.Page,
-    pressKeyExponential(options) {
+    pressKeyExponential(options: any) {
       return PageKeyBoard.pressKeyExponential(this.sessionRpc, utilityContext, options)
     },
     async refresh() {
@@ -144,7 +144,7 @@ export const create = ({
     async waitForIdle() {
       return PageWaitForIdle.waitForIdle(this.rpc, this.electronRpc.canUseIdleCallback, idleTimeout)
     },
-    waitForIframe({ index = 0, injectUtilityScript = true, url }) {
+    waitForIframe({ index = 0, injectUtilityScript = true, url }: any) {
       return WaitForIframe.waitForIframe({
         browserRpc,
         createPage: create,
@@ -157,7 +157,7 @@ export const create = ({
         url,
       })
     },
-    waitForPage({ injectUtilityScript = true, sessionId }) {
+    waitForPage({ injectUtilityScript = true, sessionId }: any) {
       return WaitForIframe.waitForPage({
         browserRpc,
         createPage: create,
@@ -168,7 +168,7 @@ export const create = ({
         sessionId,
       })
     },
-    waitForSubIframe({ injectUtilityScript = true, url }) {
+    waitForSubIframe({ injectUtilityScript = true, url }: any) {
       return waitForSubIframe({
         browserRpc,
         createPage: create,

@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 
-export const click = async (locator, options) => {
+export const click = async (locator: any, options: any) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
@@ -26,7 +26,7 @@ export const click = async (locator, options) => {
   )
 }
 
-export const dblclick = async (locator) => {
+export const dblclick = async (locator: any) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {

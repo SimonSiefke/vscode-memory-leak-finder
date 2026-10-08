@@ -1,11 +1,17 @@
-import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
-const compareCount = (a: Dynamic, b: Dynamic) => {
-  return b.count - a.count
+
+type EventListenerWithCount = {
+  readonly count?: number
+  readonly [key: string]: unknown
 }
-const getIndex = (values: Dynamic, line: Dynamic, column: Dynamic) => {
+
+const compareCount = (a: EventListenerWithCount, b: EventListenerWithCount): number => {
+  return b.count! - a.count!
+}
+
+const getIndex = (values: readonly number[], line: number, column: number): number => {
   for (let i = 0; i < values.length; i += 2) {
     const valueLine = values[i]
     const valueColumn = values[i + 1]
@@ -15,11 +21,30 @@ const getIndex = (values: Dynamic, line: Dynamic, column: Dynamic) => {
   }
   return -1
 }
-export const combineEventListenersWithSourceMapResults = (eventListeners: Dynamic, map: Dynamic, cleanPositionMap: Dynamic) => {
+
+type EventListener = {
+  readonly column?: number
+  readonly count?: number
+  readonly line?: number
+  readonly sourceMapUrl?: string
+  readonly sourceMaps?: readonly string[]
+  readonly [key: string]: unknown
+}
+
+type Position = { column?: number; line?: number; name?: string; source?: string; sourcesHash?: string | null } | undefined
+type CleanPositionMap = {
+  readonly [sourceMapUrl: string]: readonly Position[] | undefined
+}
+
+export const combineEventListenersWithSourceMapResults = (
+  eventListeners: readonly EventListener[],
+  map: { readonly [sourceMapUrl: string]: readonly number[] },
+  cleanPositionMap: CleanPositionMap,
+): readonly EventListener[] => {
   Assert.array(eventListeners)
   Assert.object(map)
   Assert.object(cleanPositionMap)
-  const newEventListeners: Dynamic[] = []
+  const newEventListeners: EventListener[] = []
   for (const eventListener of eventListeners) {
     const { column, line, sourceMapUrl } = GetSourceMapUrl.getSourceMapUrl(eventListener)
     const index = getIndex(map[sourceMapUrl], line, column)

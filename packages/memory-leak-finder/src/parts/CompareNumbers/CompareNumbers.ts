@@ -1,19 +1,19 @@
-import type { Dynamic } from '../Types/Types.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
-export const compareNumbers = (before: Dynamic, after: Dynamic) => {
-  const beforeMap = Object.create(null)
-  for (const element of before) {
+
+export const compareNumbers = (before: unknown, after: unknown): readonly { count: number; delta: number; value: number }[] => {
+  const beforeMap: { [key: number]: number } = Object.create(null)
+  for (const element of before as readonly number[]) {
     beforeMap[element] ||= 0
     beforeMap[element]++
   }
-  const afterMap = Object.create(null)
-  for (const element of after) {
+  const afterMap: { [key: number]: number } = Object.create(null)
+  for (const element of after as readonly number[]) {
     afterMap[element] ||= 0
     afterMap[element]++
   }
-  const result: Dynamic[] = []
-  const seen: Dynamic[] = []
-  for (const element of after) {
+  const result: { count: number; delta: number; value: number }[] = []
+  const seen: number[] = []
+  for (const element of after as readonly number[]) {
     if (seen.includes(element)) {
       continue
     }

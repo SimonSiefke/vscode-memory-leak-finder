@@ -3,7 +3,7 @@ import { ExpectError } from '../ExpectError/ExpectError.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
 
-export const evaluate = async (rpc, { awaitPromise = false, expression, replMode = false }) => {
+export const evaluate = async (rpc: any, { awaitPromise = false, expression, replMode = false }: any) => {
   try {
     const connectionId = 1
     const pageObject = PageObjectState.getPageObjectContext(connectionId)

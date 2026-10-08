@@ -6,19 +6,19 @@ import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWe
 /**
  * @param {string} wsUrl
  */
-export const createConnection = async (wsUrl) => {
+export const createConnection = async (wsUrl: string) => {
   try {
     const webSocket = new WebSocket(wsUrl)
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
-    const ipc = {
+    const ipc: Parameters<typeof DebuggerCreateRpcConnection.createRpc>[0] = {
       get onmessage() {
-        return webSocket.onmessage
+        return webSocket.onmessage as unknown as ((message: unknown) => void) | null
       },
-      set onmessage(listener) {
-        const handleMessage = (event) => {
+      set onmessage(listener: ((message: unknown) => void) | null) {
+        const handleMessage = (event: any) => {
           const parsed = JSON.parse(event.data)
           // @ts-ignore
-          listener(parsed)
+          listener?.(parsed)
         }
         webSocket.onmessage = handleMessage
       },
@@ -26,7 +26,7 @@ export const createConnection = async (wsUrl) => {
        *
        * @param {any} message
        */
-      send(message) {
+      send(message: any) {
         webSocket.send(Json.stringify(message))
       },
     }

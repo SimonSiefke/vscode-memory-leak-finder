@@ -3,7 +3,7 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 
 // TODO duplicate code
 // TODO pass page session as parameter
-export const hover = async (locator, options) => {
+export const hover = async (locator: any, options: any) => {
   Assert.object(locator)
   Assert.object(options)
   await EvaluateInUtilityContext.evaluateInUtilityContext(

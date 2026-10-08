@@ -1,7 +1,7 @@
 import * as ImportTest from '../ImportTest/ImportTest.ts'
 import * as TestStage from '../TestStage/TestStage.ts'
 
-export const runTest = async (pageObject, file, forceRun) => {
+export const runTest = async (pageObject: any, file: string, forceRun: boolean) => {
   const module = await ImportTest.importTest(file)
   const wasOriginallySkipped = module.skip
   if (module.skip && !forceRun) {

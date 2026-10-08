@@ -20,7 +20,7 @@ import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.ts
 import * as LocatorType from '../LocatorType/LocatorType.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 
-const mergeSelectors = (selector, subSelector = '', hasText = '', hasExactText = '', nth = -1) => {
+const mergeSelectors = (selector: string, subSelector = '', hasText = '', hasExactText = '', nth = -1) => {
   let merged = selector
   if (subSelector) {
     if (subSelector.startsWith('text=')) {
@@ -45,7 +45,13 @@ const mergeSelectors = (selector, subSelector = '', hasText = '', hasExactText =
   return merged
 }
 
-export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = '', nth = -1 } = {}, utilityContext = {}) => {
+export const create = (
+  rpc: any,
+  sessionId: string,
+  selector: string,
+  { hasExactText = '', hasText = '', nth = -1 } = {},
+  utilityContext = {},
+) => {
   return {
     blur() {
       return LocatorBlur.blur(this)
@@ -59,7 +65,7 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     click(options = {}) {
       return LocatorClick.click(this, options)
     },
-    clickExponential(options) {
+    clickExponential(options: any) {
       return LocatorClickExponential.clickExponential(this, options)
     },
     count() {
@@ -86,7 +92,7 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     focus() {
       return LocatorFocus.focus(this)
     },
-    getAttribute(attributeName) {
+    getAttribute(attributeName: any) {
       return LocatorGetAttribute.getAttribute(this, attributeName)
     },
     getValue() {
@@ -98,20 +104,20 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     isVisible() {
       return LocatorIsVisible.isVisible(this)
     },
-    locator(selector, { hasExactText = '', hasText = '', nth = -1 } = {}) {
+    locator(selector: string, { hasExactText = '', hasText = '', nth = -1 } = {}) {
       return {
         ...this,
         selector: mergeSelectors(this.selector, selector, hasText, hasExactText, nth),
       }
     },
-    nth(value) {
+    nth(value: any) {
       return {
         ...this,
         selector: `${this.selector}:nth(${value})`,
       }
     },
     objectType: ObjectType.Locator,
-    press(key) {
+    press(key: string) {
       return LocatorPress.press(this, key)
     },
     rpc,
@@ -129,16 +135,16 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
     setChecked(value: boolean) {
       return LocatorSetChecked.setChecked(this, value)
     },
-    setValue(value) {
+    setValue(value: any) {
       return LocatorSetValue.setValue(this, value)
     },
     textContent({ allowHidden = false } = {}) {
       return LocatorTextContent.getTextContent(this, { allowHidden })
     },
-    type(text) {
+    type(text: string) {
       return LocatorType.type(this, text)
     },
-    typeAndWaitFor(text, locator, options) {
+    typeAndWaitFor(text: string, locator: any, options: any) {
       return LocatorType.typeAndWaitFor(
         this,
         text,

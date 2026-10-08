@@ -7,7 +7,8 @@ import * as CleanStack from '../CleanStack/CleanStack.ts'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
 import * as FileSystem from '../FileSystem/FileSystem.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
-const getActualPath = (fileUri: Dynamic) => {
+
+const getActualPath = (fileUri: string): string => {
   if (fileUri.startsWith('file://')) {
     return fileURLToPath(fileUri)
   }
@@ -40,14 +41,15 @@ const getReadablePath = (filePath: Dynamic, root: Dynamic) => {
   return directCandidate
 }
 const RE_MODULE_NOT_FOUND_STACK = /Cannot find package '([^']+)' imported from (.+)$/
-const prepareModuleNotFoundError = (error: Dynamic) => {
+
+const prepareModuleNotFoundError = (error: Error & { stack?: string }): { codeFrame: string; message: string; stack: string } => {
   const { message } = error
   const match = message.match(RE_MODULE_NOT_FOUND_STACK)
   if (!match) {
     return {
       codeFrame: '',
       message,
-      stack: error.stack,
+      stack: error.stack || '',
     }
   }
   const notFoundModule = match[1]
@@ -128,7 +130,11 @@ const getCodeFrame = (cleanedStack: Dynamic, { color, root }: Dynamic) => {
     return ''
   }
 }
-export const prepare = async (error: Dynamic, { color = true, root = '' }: Dynamic = {}) => {
+
+export const prepare = async (
+  error: Error & { code?: string; codeFrame?: string; cause?: () => Error | undefined; message?: string; stack?: string },
+  { color = true, root = '' }: { color?: boolean; root?: string } = {},
+): Promise<{ codeFrame: string; message: string; stack: string }> => {
   if (error && error.code === ErrorCodes.ERR_MODULE_NOT_FOUND) {
     return prepareModuleNotFoundError(error)
   }
@@ -142,14 +148,16 @@ export const prepare = async (error: Dynamic, { color = true, root = '' }: Dynam
       stack: relevantStack,
     }
   }
-  const { message } = error
-  if (error && error.cause) {
-    const cause = error.cause()
+  let { message } = error
+  let errorToUse: Error & { stack?: string } = error
+  if (error && 'cause' in error && typeof (error as { cause?: () => Error | undefined }).cause === 'function') {
+    const cause = (error as { cause: () => Error | undefined }).cause()
     if (cause) {
-      error = cause
+      errorToUse = cause
+      message = cause.message || message
     }
   }
-  const cleanedStack = CleanStack.cleanStack(error.stack, { root })
+  const cleanedStack = CleanStack.cleanStack(errorToUse.stack, { root })
   const lines = SplitLines.splitLines(cleanedStack)
   const codeFrame = getCodeFrame(error.stack, { color, root })
   const relevantStack = lines.join('\n')

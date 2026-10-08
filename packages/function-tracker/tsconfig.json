@@ -7,9 +7,9 @@
     "types": ["node", "jest"],
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
-    "strict": false,
+    "strict": true,
     "strictNullChecks": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "skipLibCheck": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
@@ -21,7 +21,9 @@
     "noUnusedLocals": true,
     "composite": true,
     "useUnknownInCatchVariables": false,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true
   },
   "include": ["src", "test", "playground"]
 }

@@ -21,7 +21,9 @@
     "composite": true,
     "esModuleInterop": true,
     "allowImportingTsExtensions": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true
   },
   "include": ["helpers", "src", "test", "types.d.ts"]
 }

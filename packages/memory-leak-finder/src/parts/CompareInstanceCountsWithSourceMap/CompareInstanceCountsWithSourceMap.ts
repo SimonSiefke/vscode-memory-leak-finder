@@ -1,7 +1,7 @@
-import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as PrettifyInstanceCountsWithSourceMap from '../PrettifyInstanceCountsWithSourceMap/PrettifyInstanceCountsWithSourceMap.ts'
-export const compareInstanceCountsWithSourceMap = async (before: Dynamic, after: Dynamic) => {
+
+export const compareInstanceCountsWithSourceMap = async (before: unknown, after: unknown) => {
   Assert.array(before)
   Assert.array(after)
   const prettyBefore = await PrettifyInstanceCountsWithSourceMap.prettifyInstanceCountsWithSourceMap(before)

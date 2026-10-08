@@ -35,7 +35,7 @@ const getMatchingContext = (contexts: Record<string, any>, utilityExecutionConte
   return undefined
 }
 
-export const addUtilityExecutionContext = async (rpc, utilityExecutionContextName, frameId) => {
+export const addUtilityExecutionContext = async (rpc: any, utilityExecutionContextName: string, frameId: any) => {
   const contexts = Object.create(null)
   const utilityScript = await UtilityScript.getUtilityScript()
 

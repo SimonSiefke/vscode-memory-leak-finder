@@ -1,5 +1,4 @@
-import type { Dynamic } from '../Types/Types.ts'
-export const compareCount = (before: Dynamic, after: Dynamic) => {
+export const compareCount = (before: number, after: number): { after: number; before: number } => {
   return {
     after,
     before,

@@ -6,16 +6,16 @@ import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWe
 /**
  * @param {string} wsUrl
  */
-export const createConnection = async (wsUrl) => {
+export const createConnection = async (wsUrl: string) => {
   try {
     const webSocket = new WebSocket(wsUrl)
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
     const ipc = {
-      get onmessage() {
-        return webSocket.onmessage
+      get onmessage(): ((data: any) => void) | null {
+        return webSocket.onmessage as ((data: any) => void) | null
       },
-      set onmessage(listener) {
-        const handleMessage = (event) => {
+      set onmessage(listener: (data: any) => void) {
+        const handleMessage = (event: MessageEvent) => {
           const parsed = JSON.parse(event.data)
           console.log(parsed)
           // @ts-ignore
@@ -27,7 +27,7 @@ export const createConnection = async (wsUrl) => {
        *
        * @param {any} message
        */
-      send(message) {
+      send(message: any) {
         webSocket.send(Json.stringify(message))
       },
     }

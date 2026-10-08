@@ -1,8 +1,18 @@
-import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as ImproveDisposableOutput from '../ImproveDisposableOutput/ImproveDisposableOutput.ts'
-const addDeltas = (prettyBefore: Dynamic, prettyAfter: Dynamic) => {
-  const newItems: Dynamic[] = []
+
+type DisposableItem = {
+  readonly count: number
+  readonly location?: string
+  readonly name: string
+  readonly [key: string]: unknown
+}
+
+const addDeltas = (
+  prettyBefore: readonly DisposableItem[],
+  prettyAfter: readonly DisposableItem[],
+): readonly (DisposableItem & { delta: number })[] => {
+  const newItems: (DisposableItem & { delta: number })[] = []
   const countMap = Object.create(null)
   for (const item of prettyBefore) {
     countMap[item.name] = item.count
@@ -11,16 +21,21 @@ const addDeltas = (prettyBefore: Dynamic, prettyAfter: Dynamic) => {
     const { count, location, name } = item
     const oldCount = countMap[item.name] || 0
     const delta = count - oldCount
-    newItems.push({
+    const newItem: DisposableItem & { delta: number } = {
       count,
       delta,
-      location,
       name,
-    })
+      ...(location !== undefined ? { location } : {}),
+    }
+    newItems.push(newItem)
   }
   return newItems
 }
-export const compareDisposablesWithLocation = async (before: Dynamic, after: Dynamic) => {
+
+export const compareDisposablesWithLocation = async (
+  before: readonly unknown[],
+  after: { result: readonly unknown[]; scriptMap: unknown },
+): Promise<readonly (DisposableItem & { delta: number })[]> => {
   const beforeResult = before
   const afterResult = after.result
   const { scriptMap } = after

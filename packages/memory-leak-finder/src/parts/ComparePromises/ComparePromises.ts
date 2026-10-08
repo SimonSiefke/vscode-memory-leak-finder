@@ -1,18 +1,24 @@
-import type { Dynamic } from '../Types/Types.ts'
 import * as Assert from '../Assert/Assert.ts'
-const isPropertyPromiseState = (property: Dynamic) => {
+
+const isPropertyPromiseState = (property: { name: string }): boolean => {
   return property.name === '[[PromiseState]]'
 }
-const isPropertyPromiseResult = (property: Dynamic) => {
+
+const isPropertyPromiseResult = (property: { name: string }): boolean => {
   return property.name === '[[PromiseResult]]'
 }
-const getPropertyPromiseState = (properties: Dynamic) => {
+
+const getPropertyPromiseState = (properties: readonly { name: string }[]): { name: string } | undefined => {
   return properties.find(isPropertyPromiseState)
 }
-const getPropertyPromiseResult = (properties: Dynamic) => {
+
+const getPropertyPromiseResult = (properties: readonly { name: string }[]): { name: string } | undefined => {
   return properties.find(isPropertyPromiseResult)
 }
-const prettifyPromise = (promise: Dynamic) => {
+
+const prettifyPromise = (promise: {
+  preview: { properties: readonly { name: string }[] }
+}): { result: { name: string } | undefined; state: { name: string } | undefined } => {
   const { preview } = promise
   const { properties } = preview
   const state = getPropertyPromiseState(properties)
@@ -22,7 +28,14 @@ const prettifyPromise = (promise: Dynamic) => {
     state,
   }
 }
-export const comparePromises = (before: Dynamic, after: Dynamic) => {
+
+export const comparePromises = (
+  before: readonly { preview: { properties: readonly { name: string }[] } }[],
+  after: readonly { preview: { properties: readonly { name: string }[] } }[],
+): {
+  after: readonly { result: { name: string } | undefined; state: { name: string } | undefined }[]
+  before: readonly { result: { name: string } | undefined; state: { name: string } | undefined }[]
+} => {
   Assert.array(before)
   Assert.array(after)
   const prettyBefore = before.map(prettifyPromise)

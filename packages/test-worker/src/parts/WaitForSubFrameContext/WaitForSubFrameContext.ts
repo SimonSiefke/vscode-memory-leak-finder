@@ -1,7 +1,7 @@
 import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForSubFrameContextEvent } from '../WaitForSubFrameContextEvent/WaitForSubFrameContextEvent.ts'
 
-const getMatchingSubFrame = (frames, url) => {
+const getMatchingSubFrame = (frames: any, url: RegExp) => {
   for (const frame of frames) {
     if (url.test(frame.url)) {
       return frame
@@ -10,13 +10,13 @@ const getMatchingSubFrame = (frames, url) => {
   return undefined
 }
 
-const getChildFrames = (frameResult) => {
+const getChildFrames = (frameResult: any) => {
   const { frameTree } = frameResult
   const childFrames = frameTree.childFrames || []
-  return childFrames.map((item) => item.frame)
+  return childFrames.map((item: any) => item.frame)
 }
 
-export const waitForSubFrame = async (rpc, urlRegex, timeout) => {
+export const waitForSubFrame = async (rpc: any, urlRegex: RegExp, timeout: number) => {
   const controller = new AbortController()
   const eventPromise = waitForSubFrameContextEvent(rpc, urlRegex, timeout, controller.signal)
   await DevtoolsProtocolPage.enable(rpc)

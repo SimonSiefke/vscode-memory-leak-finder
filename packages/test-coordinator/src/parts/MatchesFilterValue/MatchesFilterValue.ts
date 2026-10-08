@@ -1,4 +1,4 @@
-export const matchesFilterValue = (dirent, filterValue) => {
+export const matchesFilterValue = (dirent: string, filterValue: string): boolean => {
   if (filterValue.startsWith('^')) {
     return dirent.startsWith(filterValue.slice(1))
   }

@@ -1,7 +1,7 @@
 import { pathToFileURL } from 'node:url'
 import { VError } from '../VError/VError.ts'
 
-export const importScript = async (path) => {
+export const importScript = async (path: any) => {
   try {
     const url = pathToFileURL(path).toString()
     return await import(url)

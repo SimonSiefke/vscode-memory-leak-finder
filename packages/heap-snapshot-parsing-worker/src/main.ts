@@ -23,7 +23,7 @@ const getTransferList = (result: Record<string, any> | undefined) => {
       transferList.push(result.nodes.buffer)
     }
     if (result.edges && result.edges.buffer) {
-      transferList.push(result.edges.buffer)
+      transferList.push(result.edges.buffer as ArrayBuffer)
     }
     if (result.locations && result.locations.buffer) {
       transferList.push(result.locations.buffer as ArrayBuffer)

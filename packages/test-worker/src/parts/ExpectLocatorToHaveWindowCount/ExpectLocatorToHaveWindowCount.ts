@@ -1,7 +1,7 @@
 import { ExpectError } from '../ExpectError/ExpectError.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 
-const waitForWindowCount = (count) => {
+const waitForWindowCount = (count: number) => {
   const connectionId = 1
   const pageObject = PageObjectState.getPageObjectContext(connectionId)
   const windows = pageObject.getWindows()
@@ -10,6 +10,6 @@ const waitForWindowCount = (count) => {
   }
 }
 
-export const toHaveWindowCount = async (count) => {
+export const toHaveWindowCount = async (count: number) => {
   await waitForWindowCount(count)
 }

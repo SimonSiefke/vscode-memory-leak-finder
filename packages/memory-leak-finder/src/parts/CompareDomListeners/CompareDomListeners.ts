@@ -1,11 +1,29 @@
-import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
-const getHash = (node: Dynamic) => {
+
+type DomListenerNode = {
+  readonly type: string
+  readonly disposed: boolean
+  readonly handlerName: string
+  readonly nodeDescription: string
+  readonly [key: string]: unknown
+}
+
+const getHash = (node: DomListenerNode): string => {
   return `${node.type}:${node.disposed}:${node.handlerName}:${node.nodeDescription}`
 }
-const getUnique = (nodes: Dynamic) => {
-  const seen = Object.create(null)
-  const unique: Dynamic[] = []
+
+type LeakedDomListener = {
+  readonly count: number
+  readonly delta: number
+  readonly disposed: boolean
+  readonly handlerName: string
+  readonly nodeDescription: string
+  readonly type: string
+}
+
+const getUnique = (nodes: readonly DomListenerNode[]): readonly DomListenerNode[] => {
+  const seen: { [hash: string]: boolean } = Object.create(null)
+  const unique: DomListenerNode[] = []
   for (const node of nodes) {
     const hash = getHash(node)
     if (hash in seen) {
@@ -16,13 +34,19 @@ const getUnique = (nodes: Dynamic) => {
   }
   return unique
 }
-const compareCount = (a: Dynamic, b: Dynamic) => {
+
+const compareCount = (a: { readonly count: number }, b: { readonly count: number }): number => {
   return b.count - a.count
 }
-const sortByCount = (items: Dynamic) => {
+
+const sortByCount = (items: readonly LeakedDomListener[]): readonly LeakedDomListener[] => {
   return Arrays.toSorted(items, compareCount)
 }
-export const compareDomListeners = (before: Dynamic, after: Dynamic) => {
+
+export const compareDomListeners = (
+  before: readonly DomListenerNode[],
+  after: readonly DomListenerNode[],
+): readonly LeakedDomListener[] => {
   const oldCountMap = Object.create(null)
   for (const item of before) {
     const hash = getHash(item)
@@ -36,7 +60,7 @@ export const compareDomListeners = (before: Dynamic, after: Dynamic) => {
     newCountMap[hash]++
   }
   const unique = getUnique(after)
-  const leaked: Dynamic[] = []
+  const leaked: LeakedDomListener[] = []
   for (const item of unique) {
     const hash = getHash(item)
     const oldCount = oldCountMap[hash] || 0

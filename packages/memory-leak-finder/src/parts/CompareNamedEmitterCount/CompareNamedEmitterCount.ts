@@ -1,22 +1,26 @@
-import type { Dynamic } from '../Types/Types.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
-const compareItem = (a: Dynamic, b: Dynamic) => {
+
+const compareItem = (a: { count: number; name: string }, b: { count: number; name: string }): number => {
   return b.count - a.count || a.name.localeCompare(b.name)
 }
-const sortByCounts = (items: Dynamic) => {
+
+const sortByCounts = (
+  items: readonly { count: number; delta: number; name: string }[],
+): readonly { count: number; delta: number; name: string }[] => {
   Assert.array(items)
   const sorted = Arrays.toSorted(items, compareItem)
   return sorted
 }
-export const compareNamedEmitterCount = (before: Dynamic, after: Dynamic) => {
-  const beforeMap = Object.create(null)
-  for (const item of before) {
+
+export const compareNamedEmitterCount = (before: unknown, after: unknown): readonly { count: number; delta: number; name: string }[] => {
+  const beforeMap: { [name: string]: number } = Object.create(null)
+  for (const item of before as readonly { name: string; count: number }[]) {
     beforeMap[item.name] ||= 0
     beforeMap[item.name] += item.count
   }
-  const result: Dynamic[] = []
-  for (const item of after) {
+  const result: { count: number; delta: number; name: string }[] = []
+  for (const item of after as readonly { name: string; count: number }[]) {
     const beforeCount = beforeMap[item.name] || 0
     const afterCount = item.count
     const delta = afterCount - beforeCount

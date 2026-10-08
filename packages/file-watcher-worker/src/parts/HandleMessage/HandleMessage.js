@@ -2,6 +2,9 @@ import * as FileWatcherCommandType from '../FileWatcherCommandType/FileWatcherCo
 import * as WatchFile from '../WatchFile/WatchFile.js'
 import * as WatchFolder from '../WatchFolder/WatchFolder.js'
 
+/**
+ * @param {string} method
+ */
 export const getFn = (method) => {
   switch (method) {
     case FileWatcherCommandType.WatchFile:

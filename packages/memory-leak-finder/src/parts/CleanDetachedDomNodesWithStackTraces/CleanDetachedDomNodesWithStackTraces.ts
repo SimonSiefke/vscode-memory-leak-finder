@@ -1,7 +1,20 @@
 import type { Dynamic } from '../Types/Types.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.ts'
-const mergeOriginal = (nodes: Dynamic, cleanInstances: Dynamic) => {
+
+type DetachedDomNode = {
+  readonly stackTrace: readonly unknown[]
+  readonly [key: string]: unknown
+}
+
+type CleanInstance = {
+  readonly originalIndex: number
+  readonly originalStack?: readonly unknown[]
+  readonly sourcesHash?: string | null
+  readonly [key: string]: unknown
+}
+
+const mergeOriginal = (nodes: readonly DetachedDomNode[], cleanInstances: readonly CleanInstance[]): readonly DetachedDomNode[] => {
   const reverseMap = Object.create(null)
   for (const instance of cleanInstances) {
     reverseMap[instance.originalIndex] = instance
@@ -30,8 +43,12 @@ const mergeOriginal = (nodes: Dynamic, cleanInstances: Dynamic) => {
   }
   return merged
 }
-export const cleanDetachedDomNodesWithStackTraces = async (nodes: Dynamic, scriptMap: Dynamic) => {
-  const stackTraces = nodes.map((node: Dynamic) => node.stackTrace)
+
+export const cleanDetachedDomNodesWithStackTraces = async (
+  nodes: readonly DetachedDomNode[],
+  scriptMap: unknown,
+): Promise<readonly DetachedDomNode[]> => {
+  const stackTraces = nodes.map((node: DetachedDomNode) => node.stackTrace)
   const fullQuery = GetEventListenersQuery.getEventListenerQuery(stackTraces, scriptMap)
   const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
   const sorted = mergeOriginal(nodes, cleanInstances)

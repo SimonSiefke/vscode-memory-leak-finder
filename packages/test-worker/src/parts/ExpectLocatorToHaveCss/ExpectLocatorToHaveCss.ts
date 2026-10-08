@@ -1,6 +1,6 @@
 import * as ExpectLocatorSingleElementCondition from '../ExpectLocatorSingleElementCondition/ExpectLocatorSingleElementCondition.ts'
 
-export const toHaveCss = (locator, key, value, options = {}) => {
+export const toHaveCss = (locator: any, key: string, value: any, options = {}) => {
   if (typeof value === 'string') {
     value = value.trim()
   }

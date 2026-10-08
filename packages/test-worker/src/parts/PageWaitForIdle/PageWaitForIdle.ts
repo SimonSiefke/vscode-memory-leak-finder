@@ -11,7 +11,7 @@ const NativeIdleTimeout = 1000
 const TransportTimeout = 5000
 let hasWarnedAboutIdleTimeout = false
 
-const getExpression = (canUseIdleCallback) => {
+const getExpression = (canUseIdleCallback: boolean) => {
   Assert.boolean(canUseIdleCallback)
   if (canUseIdleCallback) {
     return `await new Promise(resolve => {
@@ -24,7 +24,7 @@ const getExpression = (canUseIdleCallback) => {
 })`
 }
 
-const waitRpcIdle = (pageObject, canUseIdleCallback) => {
+const waitRpcIdle = (pageObject: any, canUseIdleCallback: boolean) => {
   const expression = getExpression(canUseIdleCallback)
   return pageObject.utilityContext.evaluate({
     awaitPromise: true,
@@ -35,7 +35,7 @@ const waitRpcIdle = (pageObject, canUseIdleCallback) => {
   })
 }
 
-const waitWithTransportWatchdog = async (promise) => {
+const waitWithTransportWatchdog = async (promise: any) => {
   let timeout
   const timeoutPromise = new Promise((_, reject) => {
     timeout = globalThis.setTimeout(() => {
@@ -53,7 +53,7 @@ export const resetIdleTimeoutWarning = (): void => {
   hasWarnedAboutIdleTimeout = false
 }
 
-export const waitForIdle = async (rpc, canUseIdleCallback, _idleTimeout): Promise<IdleResult> => {
+export const waitForIdle = async (rpc: any, canUseIdleCallback: boolean, _idleTimeout: any): Promise<IdleResult> => {
   try {
     const connectionId = 1
     const pageObject = PageObjectState.getPageObjectContext(connectionId)

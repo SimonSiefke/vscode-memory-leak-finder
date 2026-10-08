@@ -16,7 +16,7 @@ interface SaveMockFileOptions {
     readonly body: unknown
     readonly headers: Record<string, string | string[]>
     readonly statusCode: number
-    readonly statusMessage?: string
+    readonly statusMessage?: string | undefined
     readonly wasCompressed?: boolean
   }
   readonly responseType: string

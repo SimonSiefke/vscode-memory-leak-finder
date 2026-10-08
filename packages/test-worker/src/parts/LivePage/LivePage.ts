@@ -1,4 +1,4 @@
-export const create = ({ onRebind, page }) => {
+export const create = ({ onRebind, page }: any) => {
   let currentPage = page
 
   return new Proxy(
@@ -6,7 +6,7 @@ export const create = ({ onRebind, page }) => {
     {
       get(_target, property) {
         if (property === 'rebind') {
-          return async (nextPage) => {
+          return async (nextPage: any) => {
             currentPage = nextPage
             await onRebind(nextPage)
           }

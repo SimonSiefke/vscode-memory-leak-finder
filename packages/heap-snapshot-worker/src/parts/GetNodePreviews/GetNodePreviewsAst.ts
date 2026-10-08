@@ -38,7 +38,7 @@ export const buildAstForNode = (
   if (!node) return null
   const nodeTypeName = getNodeTypeName(node, nodeTypes) || 'unknown'
   const name = getNodeName(node, strings)
-  const { id } = node
+  const id = node.id as number
 
   if (visited.has(id)) {
     return createUnknown(id, name, `[Circular ${id}]`)

@@ -5,9 +5,9 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
  * @param {any} ipc
  * @returns
  */
-export const createRpc = (ipc, canUseIdleCallback) => {
+export const createRpc = (ipc: any, canUseIdleCallback: boolean) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message) => {
+  const handleMessage = (message: any) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -35,7 +35,7 @@ export const createRpc = (ipc, canUseIdleCallback) => {
   return {
     callbacks,
     canUseIdleCallback,
-    invoke(method, params) {
+    invoke(method: string, params: any) {
       const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
       callbacks[id] = { reject, resolve }
@@ -46,7 +46,7 @@ export const createRpc = (ipc, canUseIdleCallback) => {
       })
       return promise
     },
-    invokeWithSession(sessionId, method, params) {
+    invokeWithSession(sessionId: any, method: string, params: any) {
       const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
       callbacks[id] = { reject, resolve }
@@ -58,7 +58,7 @@ export const createRpc = (ipc, canUseIdleCallback) => {
       })
       return promise
     },
-    invokeWithTarget(targetId, sessionId, method, params) {
+    invokeWithTarget(targetId: any, sessionId: any, method: string, params: any) {
       const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
       callbacks[id] = { reject, resolve }
@@ -73,13 +73,13 @@ export const createRpc = (ipc, canUseIdleCallback) => {
     },
     listeners,
     objectType: ObjectType.Rpc,
-    off(event, listener) {
+    off(event: string, listener: any) {
       delete listener[event]
     },
-    on(event, listener) {
+    on(event: string, listener: any) {
       listeners[event] = listener
     },
-    once(event) {
+    once(event: string) {
       const { promise, resolve } = Promise.withResolvers()
       onceListeners[event] = resolve
       return promise

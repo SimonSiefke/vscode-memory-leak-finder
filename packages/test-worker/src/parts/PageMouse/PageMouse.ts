@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 
-export const mockPointerEvents = async (rpc, utilityContext) => {
+export const mockPointerEvents = async (rpc: any, utilityContext: any) => {
   Assert.object(rpc)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
@@ -18,7 +18,7 @@ export const mockPointerEvents = async (rpc, utilityContext) => {
     },
   )
 }
-export const down = async (rpc, utilityContext) => {
+export const down = async (rpc: any, utilityContext: any) => {
   Assert.object(rpc)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
@@ -33,7 +33,7 @@ export const down = async (rpc, utilityContext) => {
   )
 }
 
-export const move = async (rpc, utilityContext, x, y) => {
+export const move = async (rpc: any, utilityContext: any, x: any, y: any) => {
   Assert.object(rpc)
   Assert.number(x)
   Assert.number(y)
@@ -57,7 +57,7 @@ export const move = async (rpc, utilityContext, x, y) => {
   )
 }
 
-export const up = async (rpc, utilityContext) => {
+export const up = async (rpc: any, utilityContext: any) => {
   Assert.object(rpc)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {

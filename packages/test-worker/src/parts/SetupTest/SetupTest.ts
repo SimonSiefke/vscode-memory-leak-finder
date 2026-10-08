@@ -3,13 +3,13 @@ import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import * as SetupTestWithCallback from '../SetupTestWithCallback/SetupTestWithCallback.ts'
 
 export const setupTest = async (
-  connectionId,
-  absolutePath,
-  forceRun,
-  timeouts,
-  isGithubActions,
-  allowCopilotAuthInCi,
-  runNetworkTestsAnyway,
+  connectionId: number,
+  absolutePath: string,
+  forceRun: boolean,
+  timeouts: any,
+  isGithubActions: boolean,
+  allowCopilotAuthInCi: boolean,
+  runNetworkTestsAnyway: boolean,
 ) => {
   Assert.number(connectionId)
   Assert.string(absolutePath)

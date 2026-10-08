@@ -1,7 +1,7 @@
 import * as ImportScript from '../ImportScript/ImportScript.ts'
 import { VError } from '../VError/VError.ts'
 
-export const importTest = async (file) => {
+export const importTest = async (file: string) => {
   try {
     const module = await ImportScript.importScript(file)
     return module

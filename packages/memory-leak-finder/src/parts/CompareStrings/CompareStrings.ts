@@ -1,8 +1,7 @@
-import type { Dynamic } from '../Types/Types.ts'
-export const compareStrings = (before: Dynamic, after: Dynamic) => {
-  const beforeSet = new Set(before)
-  const newStrings: Dynamic[] = []
-  for (const string of after) {
+export const compareStrings = (before: unknown, after: unknown): readonly string[] => {
+  const beforeSet = new Set(before as readonly string[])
+  const newStrings: string[] = []
+  for (const string of after as readonly string[]) {
     if (!beforeSet.has(string)) {
       newStrings.push(string)
     }

@@ -20,7 +20,9 @@
     "noUnusedLocals": true,
     "composite": true,
     "allowImportingTsExtensions": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": true
   },
   "include": ["src", "test"]
 }

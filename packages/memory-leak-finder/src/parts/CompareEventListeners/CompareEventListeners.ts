@@ -1,9 +1,9 @@
-import type { Dynamic } from '../Types/Types.ts'
 import * as CompareMapLeak from '../CompareMapLeak/CompareMapLeak.ts'
 import * as DeduplicateEventListeners from '../DeduplicateEventListeners/DeduplicateEventListeners.ts'
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
-export const compareEventListeners = async (before: Dynamic, after: Dynamic) => {
+
+export const compareEventListeners = async (before: readonly Record<string, any>[], after: readonly Record<string, any>[]) => {
   const leaked = CompareMapLeak.compareMapLeak(before, after, GetEventListenerKey.getEventListenerKey)
   if (leaked.length === 0) {
     return []

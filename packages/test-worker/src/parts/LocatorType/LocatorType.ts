@@ -4,7 +4,7 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 /**
  * @deprecated use Locator.fill instead
  */
-export const type = async (locator, text) => {
+export const type = async (locator: any, text: string) => {
   Assert.object(locator)
   Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
@@ -29,7 +29,7 @@ export const type = async (locator, text) => {
   )
 }
 
-export const typeAndWaitFor = async (locator, text, waitFor, options) => {
+export const typeAndWaitFor = async (locator: any, text: string, waitFor: any, options: any) => {
   Assert.object(locator)
   Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(

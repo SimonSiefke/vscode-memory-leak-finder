@@ -1,7 +1,7 @@
-export const createSessionRpcConnection = (rpc, sessionId) => {
+export const createSessionRpcConnection = (rpc: any, sessionId: string) => {
   return {
     callbacks: rpc.callbacks,
-    invoke(method, params) {
+    invoke(method: string, params: any) {
       return rpc.invokeWithSession(sessionId, method, params)
     },
     listeners: rpc.listeners,

@@ -1,5 +1,8 @@
 import { AssertionError } from '../AssertionError/AssertionError.js'
 
+/**
+ * @param {unknown} value
+ */
 const getType = (value) => {
   switch (typeof value) {
     case 'number':
@@ -23,6 +26,9 @@ const getType = (value) => {
   }
 }
 
+/**
+ * @param {unknown} value
+ */
 export const object = (value) => {
   const type = getType(value)
   if (type !== 'object') {
@@ -30,6 +36,9 @@ export const object = (value) => {
   }
 }
 
+/**
+ * @param {unknown} value
+ */
 export const number = (value) => {
   const type = getType(value)
   if (type !== 'number') {
@@ -37,6 +46,9 @@ export const number = (value) => {
   }
 }
 
+/**
+ * @param {unknown} value
+ */
 export const array = (value) => {
   const type = getType(value)
   if (type !== 'array') {
@@ -44,6 +56,9 @@ export const array = (value) => {
   }
 }
 
+/**
+ * @param {unknown} value
+ */
 export const string = (value) => {
   const type = getType(value)
   if (type !== 'string') {
@@ -51,6 +66,9 @@ export const string = (value) => {
   }
 }
 
+/**
+ * @param {unknown} value
+ */
 export const boolean = (value) => {
   const type = getType(value)
   if (type !== 'boolean') {
@@ -58,6 +76,9 @@ export const boolean = (value) => {
   }
 }
 
+/**
+ * @param {unknown} value
+ */
 export const fn = (value) => {
   const type = getType(value)
   if (type !== 'function') {
