@@ -1,0 +1,34 @@
+{
+  "name": "tree-view-registration-disposal",
+  "displayName": "Tree View Registration Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "disposalTreeView",
+          "name": "Disposal tree"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "tree-view-registration-disposal.setup",
+        "title": "Tree View Registration Disposal: Setup"
+      },
+      {
+        "command": "tree-view-registration-disposal.run",
+        "title": "Tree View Registration Disposal: Run"
+      },
+      {
+        "command": "tree-view-registration-disposal.cleanup",
+        "title": "Tree View Registration Disposal: Cleanup"
+      }
+    ]
+  }
+}
