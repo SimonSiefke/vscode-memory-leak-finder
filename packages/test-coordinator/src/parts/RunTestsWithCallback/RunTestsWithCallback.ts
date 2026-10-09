@@ -1,4 +1,5 @@
 import type { Rpc } from '@lvce-editor/rpc'
+import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
@@ -588,13 +589,17 @@ export const runTestsWithCallback = async ({
       }
     }
 
+    let previousHadScenarioSettings = false
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
       const proxyTestFolderName = GetProxyTestFolderName.getProxyTestFolderName(absolutePath)
       const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
 
-      const needsSetup = i === 0 || restartBetween
+      const hasScenarioSettings = existsSync(join(cwd, 'fixtures', proxyTestFolderName, 'settings.json'))
+      // Startup-only settings must not carry into the next scenario when the suite normally reuses a window.
+      const needsSetup = i === 0 || restartBetween || hasScenarioSettings || previousHadScenarioSettings
+      previousHadScenarioSettings = hasScenarioSettings
 
       if (needsSetup) {
         await disposeWorkers(workers)
