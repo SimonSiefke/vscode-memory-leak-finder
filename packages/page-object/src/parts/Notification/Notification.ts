@@ -31,13 +31,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async shouldHaveItem(expectedMessage: string) {
       try {
         await page.waitForIdle()
-        const toasts = page.locator('.notifications-toasts')
-        await expect(toasts).toBeVisible({ timeout: 10_000 })
         const notificationList = page.locator('.notifications-list-container')
-        await expect(notificationList).toBeVisible()
-        await page.waitForIdle()
         const item = notificationList.locator(`[aria-label^="Info: ${expectedMessage}"]`)
-        await expect(item).toBeVisible()
+        await expect(item).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to check notification ${expectedMessage}`)
