@@ -1,0 +1,29 @@
+{
+  "name": "scm-artifact-late-disposal",
+  "displayName": "Scm Artifact Late Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "scm-artifact-late-disposal.setup",
+        "title": "Scm Artifact Late Disposal: Setup"
+      },
+      {
+        "command": "scm-artifact-late-disposal.run",
+        "title": "Scm Artifact Late Disposal: Run"
+      },
+      {
+        "command": "scm-artifact-late-disposal.cleanup",
+        "title": "Scm Artifact Late Disposal: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "scmArtifactProvider"
+  ]
+}
