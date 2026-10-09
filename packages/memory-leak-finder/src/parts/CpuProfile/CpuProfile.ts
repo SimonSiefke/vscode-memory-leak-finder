@@ -1,6 +1,13 @@
+import { getSampleTiming } from '../CpuProfileSampleTimes/CpuProfileSampleTimes.ts'
 import type { Dynamic } from '../Types/Types.ts'
 
 export interface CpuProfileMetrics {
+  readonly elapsedTimeMs?: number | null
+  readonly javascriptTimeMs?: number
+  readonly gcTimeMs?: number
+  readonly idleTimeMs?: number
+  readonly otherTimeMs?: number
+  readonly estimatedTiming?: boolean
   readonly nodeCount: number
   readonly sampleCount: number
   readonly totalTimeMs: number
@@ -26,7 +33,6 @@ type MutableCpuProfileRow = {
   -readonly [Property in keyof CpuProfileRow]: CpuProfileRow[Property]
 }
 
-const MicrosecondToMillisecond = 1000
 const MillisecondPrecision = 1000
 const MaxTopFunctions = 20
 const AnonymousFunctionName = '(anonymous)'
@@ -50,16 +56,6 @@ const roundMetricValue = (value: number): number => {
 const getFunctionName = (node: Dynamic): string => {
   const functionName = toString(node?.callFrame?.functionName)
   return functionName || AnonymousFunctionName
-}
-
-const getSampleTimes = (profile: Dynamic, samples: readonly Dynamic[]): readonly number[] => {
-  const timeDeltas = toArray(profile?.timeDeltas)
-  if (timeDeltas.length >= samples.length) {
-    return timeDeltas.slice(0, samples.length).map((value) => roundMetricValue(toNumber(value) / MicrosecondToMillisecond))
-  }
-  const totalTimeUs = toNumber(profile?.endTime) - toNumber(profile?.startTime)
-  const sampleTimeMs = samples.length === 0 ? 0 : roundMetricValue(totalTimeUs / MicrosecondToMillisecond / samples.length)
-  return samples.map(() => sampleTimeMs)
 }
 
 const createRow = (node: Dynamic): MutableCpuProfileRow => {
@@ -93,7 +89,8 @@ const getSortedRows = (rows: Iterable<CpuProfileRow>, key: 'selfTimeMs' | 'total
 export const getCpuProfileSummary = (profile: Dynamic): CpuProfileSummary => {
   const nodes = toArray(profile?.nodes)
   const samples = toArray(profile?.samples)
-  const sampleTimes = getSampleTimes(profile, samples)
+  const timing = getSampleTiming(profile)
+  const sampleTimes = timing.times
   const parentMap = new Map<number, number>()
   const rowMap = new Map<number, MutableCpuProfileRow>()
 
@@ -112,15 +109,24 @@ export const getCpuProfileSummary = (profile: Dynamic): CpuProfileSummary => {
   }
 
   let totalTimeMs = 0
+  let javascriptTimeMs = 0,
+    gcTimeMs = 0,
+    idleTimeMs = 0,
+    otherTimeMs = 0
   for (let i = 0; i < samples.length; i++) {
     const sampleId = toNumber(samples[i])
     const sampleTimeMs = sampleTimes[i] || 0
-    totalTimeMs = roundMetricValue(totalTimeMs + sampleTimeMs)
+    totalTimeMs += sampleTimeMs
     const row = rowMap.get(sampleId)
     if (!row) {
+      otherTimeMs += sampleTimeMs
       continue
     }
-    row.selfTimeMs = roundMetricValue(row.selfTimeMs + sampleTimeMs)
+    if (row.functionName === '(idle)') idleTimeMs += sampleTimeMs
+    else if (row.functionName === '(garbage collector)') gcTimeMs += sampleTimeMs
+    else if (row.url) javascriptTimeMs += sampleTimeMs
+    else otherTimeMs += sampleTimeMs
+    row.selfTimeMs += sampleTimeMs
     row.hitCount++
 
     let currentId = sampleId
@@ -129,17 +135,27 @@ export const getCpuProfileSummary = (profile: Dynamic): CpuProfileSummary => {
       seen.add(currentId)
       const currentRow = rowMap.get(currentId)
       if (currentRow) {
-        currentRow.totalTimeMs = roundMetricValue(currentRow.totalTimeMs + sampleTimeMs)
+        currentRow.totalTimeMs += sampleTimeMs
       }
       currentId = parentMap.get(currentId) || 0
     }
   }
 
+  for (const row of rowMap.values()) {
+    row.selfTimeMs = roundMetricValue(row.selfTimeMs)
+    row.totalTimeMs = roundMetricValue(row.totalTimeMs)
+  }
   return {
     metrics: {
       nodeCount: nodes.length,
       sampleCount: samples.length,
-      totalTimeMs,
+      totalTimeMs: roundMetricValue(totalTimeMs),
+      elapsedTimeMs: timing.elapsedTimeMs === null ? null : roundMetricValue(timing.elapsedTimeMs),
+      javascriptTimeMs: roundMetricValue(javascriptTimeMs),
+      gcTimeMs: roundMetricValue(gcTimeMs),
+      idleTimeMs: roundMetricValue(idleTimeMs),
+      otherTimeMs: roundMetricValue(otherTimeMs),
+      estimatedTiming: timing.estimated,
     },
     topSelfTime: getSortedRows(rowMap.values(), 'selfTimeMs'),
     topTotalTime: getSortedRows(rowMap.values(), 'totalTimeMs'),
@@ -160,6 +176,9 @@ export const formatCpuProfileSummary = ({ metrics, topSelfTime, topTotalTime }: 
     `sampleCount | ${metrics.sampleCount}`,
     `nodeCount | ${metrics.nodeCount}`,
   ]
+  for (const key of ['elapsedTimeMs', 'javascriptTimeMs', 'gcTimeMs', 'idleTimeMs', 'otherTimeMs', 'estimatedTiming'] as const) {
+    if (metrics[key] !== undefined) lines.push(`${key} | ${metrics[key]}`)
+  }
   if (topSelfTime.length > 0) {
     lines.push('top self time:')
     lines.push('function | selfTimeMs | totalTimeMs | hitCount | location')

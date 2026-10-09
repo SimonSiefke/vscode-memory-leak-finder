@@ -14,6 +14,7 @@ export * as CompiledCodeSizeByFunction from '../CreateCompiledCodeSizeByFunction
 export * as ConcatenatedErrorStringCount from '../CreateConcatenatedErrorStringCountChart/CreateConcatenatedErrorStringCountChart.ts'
 export * as CpuPerformanceCounters from '../CreateCpuPerformanceCountersChart/CreateCpuPerformanceCountersChart.ts'
 export * as CpuProfile from '../CreateCpuProfileChart/CreateCpuProfileChart.ts'
+export * as CpuProfileSummary from '../CreateCpuProfileSummaryChart/CreateCpuProfileSummaryChart.ts'
 export * as CssRuleCount from '../CreateCssRuleCountChart/CreateCssRuleCountChart.ts'
 export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/CreateDetachedDomNodeCountChart.ts'
 export * as DomTimerCount from '../CreateDomTimerCountChart/CreateDomTimerCountChart.ts'
