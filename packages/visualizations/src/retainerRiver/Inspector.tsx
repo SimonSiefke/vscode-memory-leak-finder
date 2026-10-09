@@ -1,7 +1,7 @@
 import { ArrowRight, Braces, Code2, Layers3, MapPin, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { RetainerRiverLink, RetainerRiverNode, RetainerRiverStackFrame } from './report.ts'
-import { formatBytes } from './report.ts'
+import { formatBytes, getEvidenceSummary } from './report.ts'
 
 const formatLocation = (frame: RetainerRiverStackFrame): string => {
   const location = frame.original || frame.generated
@@ -97,6 +97,7 @@ export const Inspector = ({ link, nodeById, onClose }: InspectorProps) => {
 
       {item ? (
         <>
+          {link.evidenceTruncated && <p className="Muted">{getEvidenceSummary(link)}</p>}
           {link.evidence.length > 1 && (
             <label className="EvidencePicker">
               <span>Retaining path</span>
