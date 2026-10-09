@@ -75,12 +75,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
-        const moreActions = page.locator('.panel [aria-label="Views and More Actions..."]')
-        await expect(moreActions).toBeVisible()
-        await moreActions.click()
+        const outputTab = page.locator('.part.panel [role="tab"]', {
+          hasText: 'Output',
+        })
+        await expect(outputTab).toBeVisible()
         const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await contextMenu.open(outputTab)
         await contextMenu.openSubMenu('Move To', false)
-        await contextMenu.select('Sidebar', false)
+        const primarySideBar = page.locator('.monaco-submenu .action-menu-item:has(.action-label[aria-label="Primary Side Bar"])')
+        await expect(primarySideBar).toBeVisible()
+        await expect(primarySideBar).toBeFocused()
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+        const sideBarOutputView = page.locator('.part.sidebar .pane-body.output-view')
+        await expect(sideBarOutputView).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to move output to sidebar`)
       }
