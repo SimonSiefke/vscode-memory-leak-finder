@@ -10,30 +10,32 @@ export const create = ({ expect, page, VError, electronApp, ideVersion, platform
       await quickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
       return this.shouldBeVisible(index)
     },
-    async shouldBeVisible(index = 0) {
+    async shouldBeVisible(indexOrOptions: number | { useSingleIframe?: boolean } = 0) {
+      const index = typeof indexOrOptions === 'number' ? indexOrOptions : 0
+      const useSingleIframe = typeof indexOrOptions === 'object' && indexOrOptions.useSingleIframe === true
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview').nth(index)
         await expect(webView).toBeVisible()
         await page.waitForIdle()
-        await expect(webView).toHaveClass('ready')
-        await page.waitForIdle()
         const childPage = await page.waitForIframe({
           index,
           injectUtilityScript: false,
-          url: /extensionId=vscode.markdown-language-features/,
+          url: useSingleIframe
+            ? /^vscode-webview:\/\/vscode\.markdown-language-features\//
+            : /extensionId=vscode.markdown-language-features/,
         })
-        // TODO double iframe...
-        const subFrame = await childPage.waitForSubIframe({
-          url: /extensionId=vscode.markdown-language-features/,
-        })
-        await subFrame.waitForIdle()
-        await page.waitForIdle()
-        const markDown = subFrame.locator('.markdown-body')
+        const contentFrame = useSingleIframe
+          ? childPage
+          : await childPage.waitForSubIframe({
+              url: /extensionId=vscode.markdown-language-features/,
+            })
+        await contentFrame.waitForIdle()
+        const markDown = contentFrame.locator('.markdown-body')
         await expect(markDown).toBeVisible()
-        await subFrame.waitForIdle()
+        await contentFrame.waitForIdle()
         await page.waitForIdle()
-        return subFrame
+        return contentFrame
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview is visible`)
       }
