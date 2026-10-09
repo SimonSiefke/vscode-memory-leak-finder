@@ -36,6 +36,8 @@ export interface ChatEditorSendOptions {
 }
 
 export interface ChatEditorSendMessageOptions extends ChatEditorSendOptions {
+  readonly accessButton?: string
+  readonly waitForCompletion?: boolean
   readonly expectedResponse?: string
   readonly approveToolCalls?: boolean
   readonly validateRequest?: { readonly exists: readonly unknown[] }
@@ -118,7 +120,7 @@ export interface ChatEditor {
   shouldBeVisibleInSecondarySideBar(): Promise<void>
   shouldHaveNoActiveItems(): Promise<void>
   retryLastMessage(): Promise<void>
-  clickAccessButton(buttonText?: any): Promise<void>
+  clickAccessButton(buttonText?: any, timeout?: any): Promise<void>
   approveAllAccessRequests(options?: any): Promise<void>
   waitForLatestExchange(message: any): Promise<void>
   waitForNewWindow(options: any, electron: any): Promise<number>
