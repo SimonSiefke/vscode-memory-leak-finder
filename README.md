@@ -31,6 +31,19 @@ node packages/build/src/mergeArtifacts.ts
 
 ## Measures
 
+### TrackedEverything
+
+Records every source-observable value creation in the VS Code renderer from the
+first instrumented startup script through the end of the measured scenario.
+The result includes a lossless allocation-order stream and an interactive
+timeline city. This exhaustive instrumentation substantially changes runtime
+performance and memory use and does not include hidden V8 or Chromium
+allocations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure tracked-everything --only base
+```
+
 ### PendingPromisesWithRetainers
 
 Finds pending Promises added during a test and reports their shortest strong path from a GC root, together with per-path counts and retained bytes. Inspector query handles are released before the final heap snapshot.

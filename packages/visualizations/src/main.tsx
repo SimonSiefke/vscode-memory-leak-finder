@@ -1,16 +1,23 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App.tsx'
+import { TrackedEverythingApp } from './TrackedEverythingApp.tsx'
 import { isMemoryCityDataset } from './model.ts'
 import { sampleData } from './sampleData.ts'
+import { isTrackedEverythingDataset } from './trackedEverythingModel.ts'
+import type { TrackedEverythingDataset } from './trackedEverythingTypes.ts'
 import type { MemoryCityDataset } from './types.ts'
 import './styles.css'
 
 declare global {
   var __MEMORY_CITY_DATA__: unknown
+  var __TRACKED_EVERYTHING_DATA__: unknown
 }
 
-const loadDataset = async (): Promise<{ dataset: MemoryCityDataset; loadError?: string }> => {
+const loadDataset = async (): Promise<{ dataset: MemoryCityDataset | TrackedEverythingDataset; loadError?: string }> => {
+  if (isTrackedEverythingDataset(globalThis.__TRACKED_EVERYTHING_DATA__)) {
+    return { dataset: globalThis.__TRACKED_EVERYTHING_DATA__ }
+  }
   if (isMemoryCityDataset(globalThis.__MEMORY_CITY_DATA__)) {
     return { dataset: globalThis.__MEMORY_CITY_DATA__ }
   }
@@ -42,6 +49,6 @@ if (!root) {
 }
 createRoot(root).render(
   <StrictMode>
-    <App dataset={dataset} loadError={loadError} />
+    {isTrackedEverythingDataset(dataset) ? <TrackedEverythingApp dataset={dataset} /> : <App dataset={dataset} loadError={loadError} />}
   </StrictMode>,
 )

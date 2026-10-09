@@ -152,3 +152,16 @@ test('getMeasure resolves duplicated strings public measure id', () => {
     ),
   ).toBe(Measures.MeasureDuplicatedStrings)
 })
+
+test('getMeasure resolves tracked everything public measure id', () => {
+  const measure = {
+    id: 'trackedEverything',
+  }
+  const MemoryLeakFinder = {
+    Measures: {
+      MeasureTrackedEverything: measure,
+    },
+  }
+  expect(GetMeasure.getMeasure(MemoryLeakFinder, 'tracked-everything')).toBe(measure)
+  expect(GetMeasure.getMeasure(MemoryLeakFinder, 'trackedEverything')).toBe(measure)
+})

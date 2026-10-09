@@ -133,6 +133,7 @@ const createScene = (container: HTMLDivElement): SceneState => {
   mesh.castShadow = true
   mesh.receiveShadow = true
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
+  mesh.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 12, 0), 100)
   scene.add(mesh)
 
   const districts = new THREE.Group()
@@ -173,7 +174,9 @@ const createScene = (container: HTMLDivElement): SceneState => {
 
 export const MemoryCityScene = ({ buildings, districts, onFailure, onHover, onSelect, resetToken, selectedPath }: MemoryCitySceneProps) => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const callbacksRef = useRef({ onFailure, onHover, onSelect })
   const stateRef = useRef<(SceneState & { camera: THREE.PerspectiveCamera; dispose: () => void }) | null>(null)
+  callbacksRef.current = { onFailure, onHover, onSelect }
 
   useEffect(() => {
     const container = containerRef.current
@@ -184,7 +187,7 @@ export const MemoryCityScene = ({ buildings, districts, onFailure, onHover, onSe
       stateRef.current = createScene(container) as SceneState & { camera: THREE.PerspectiveCamera; dispose: () => void }
     } catch (error) {
       console.error('Failed to initialize Memory City WebGL renderer', error)
-      onFailure()
+      callbacksRef.current.onFailure()
       return
     }
     const state = stateRef.current
@@ -201,13 +204,13 @@ export const MemoryCityScene = ({ buildings, districts, onFailure, onHover, onSe
     const handleMove = (event: PointerEvent): void => {
       const building = getHit(event)
       state.renderer.domElement.style.cursor = building ? 'pointer' : 'grab'
-      onHover(building, event.clientX, event.clientY)
+      callbacksRef.current.onHover(building, event.clientX, event.clientY)
     }
-    const handleLeave = (): void => onHover(null, 0, 0)
+    const handleLeave = (): void => callbacksRef.current.onHover(null, 0, 0)
     const handleClick = (event: PointerEvent): void => {
       const building = getHit(event)
       if (building) {
-        onSelect(building)
+        callbacksRef.current.onSelect(building)
       }
     }
     state.renderer.domElement.addEventListener('pointermove', handleMove)
@@ -220,7 +223,7 @@ export const MemoryCityScene = ({ buildings, districts, onFailure, onHover, onSe
       state.dispose()
       stateRef.current = null
     }
-  }, [onFailure, onHover, onSelect])
+  }, [])
 
   useEffect(() => {
     const state = stateRef.current
