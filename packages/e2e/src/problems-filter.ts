@@ -32,15 +32,16 @@ export const setup = async ({ Editor, Problems, Workspace }: TestContext): Promi
   await Editor.open('beta.css')
   await Editor.shouldHaveSquigglyError()
   await Problems.show()
-  await Problems.shouldHaveCount(6)
   await Problems.switchToTableView()
-  await Problems.shouldHaveVisibleCount(6)
+  await Problems.shouldHaveVisibleTextCount('alpha.css', 2)
+  await Problems.shouldHaveVisibleTextCount('beta.css', 2)
+  await Problems.shouldHaveCount(4)
 }
 
 export const run = async ({ Problems }: TestContext): Promise<void> => {
   await Problems.filter('alpha.css')
-  await Problems.shouldHaveVisibleCount(4)
-  await Problems.shouldHaveVisibleTextCount('alpha.css', 4)
+  await Problems.shouldHaveVisibleCount(2)
+  await Problems.shouldHaveVisibleTextCount('alpha.css', 2)
   await Problems.shouldHaveVisibleTextCount('beta.css', 0)
 }
 
