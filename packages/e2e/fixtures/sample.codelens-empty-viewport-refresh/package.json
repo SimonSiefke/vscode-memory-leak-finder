@@ -1,0 +1,26 @@
+{
+  "name": "codelens-empty-viewport-refresh",
+  "displayName": "Codelens Empty Viewport Refresh",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codelens-empty-viewport-refresh.setup",
+        "title": "Codelens Empty Viewport Refresh: Setup"
+      },
+      {
+        "command": "codelens-empty-viewport-refresh.run",
+        "title": "Codelens Empty Viewport Refresh: Run"
+      },
+      {
+        "command": "codelens-empty-viewport-refresh.cleanup",
+        "title": "Codelens Empty Viewport Refresh: Cleanup"
+      }
+    ]
+  }
+}

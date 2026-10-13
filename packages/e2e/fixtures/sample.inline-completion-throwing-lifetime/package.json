@@ -1,0 +1,29 @@
+{
+  "name": "inline-completion-throwing-lifetime",
+  "displayName": "Inline Completion Throwing Lifetime",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "inline-completion-throwing-lifetime.setup",
+        "title": "Inline Completion Throwing Lifetime: Setup"
+      },
+      {
+        "command": "inline-completion-throwing-lifetime.run",
+        "title": "Inline Completion Throwing Lifetime: Run"
+      },
+      {
+        "command": "inline-completion-throwing-lifetime.cleanup",
+        "title": "Inline Completion Throwing Lifetime: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "inlineCompletionsAdditions"
+  ]
+}
