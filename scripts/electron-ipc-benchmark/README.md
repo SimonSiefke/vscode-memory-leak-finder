@@ -38,10 +38,13 @@ for raw measurements, commands, product logs, runner metadata, and build hashes.
 The x64 experiment is run `38431995751`. Its measurement steps use the original
 driver commit `70240d6d77cf3725f8f59bd91146509a63da5b9c`. That commit's summary
 parser includes timer provenance JSON in its sample glob. The report-only
-workflow on `ci/electron-ipc-report` corrects the glob, verifies that all three
-hosts completed their build, pilot, startup, and smoke steps successfully, and
-aggregates their original artifacts. It permits only the known summary-step
-failure and does not rerun measurements or change product code.
+workflow on `ci/electron-ipc-report` corrects the glob, verifies three successful
+build jobs, and audits the completed measurement logs for all three pilots,
+every startup index, and all 21 smoke passes on each host. It also rejects any
+errors other than the two known summary failures. This avoids stale in-progress
+step metadata returned by GitHub after a job has completed. The workflow then
+aggregates the original artifacts and includes `source-audit.json` in its report.
+It does not rerun measurements or change product code.
 
 ARM run `38436288594` provides hardware-counter measurements separately: three
 Ubuntu 24.04 ARM hosts, 15 launches per version per host, 45 launches per version
