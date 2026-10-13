@@ -194,6 +194,12 @@ Measures CPU instructions and cycles for the inspected process.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
 ```
 
+CI also runs this measure on `ubuntu-24.04-arm`, once per scenario with a fresh VS Code instance for each test. A `perf stat` probe first verifies that the runner exposes a positive hardware instruction count; ARM64 alone does not guarantee access to hardware counters. The job installs the kernel's perf tools and enables process-level perf access. If counters are unavailable, the job fails explicitly and preserves the reason in the results artifact and report.
+
+`npm run build-charts` generates a separate **instruction-count/index.html** report inside `.vscode-charts`, linked from the main charts page. Its chart ranks all measured tests by instructions, highest first, and its table links to each test's detailed instruction/cycle chart. Unavailable counters are excluded from the ranking and shown as unavailable instead of zero.
+
+The counts cover user-space CPU work in the inspected process during the scenario, excluding application startup. They are informational (`isLeak: false`): cumulative instruction counts naturally increase as work executes. Background activity, scenario duration, architecture, and `--runs` affect the totals, so compare results collected with the same settings.
+
 ### Linux allocation stacks (BCC)
 
 ```sh

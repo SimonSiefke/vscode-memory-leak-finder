@@ -329,9 +329,56 @@ jobs:
           path: ./.vscode-memory-leak-finder-results
           include-hidden-files: true
 
+  ci-linux-instruction-count:
+    runs-on: ubuntu-24.04-arm
+    needs: ci
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v6
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-insiders-versions
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-${{ runner.arch }}-instruction-count-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm run install:ci
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm run build
+      - name: Install perf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y linux-tools-common linux-tools-generic "linux-tools-$(uname -r)"
+          sudo sysctl -w kernel.perf_event_paranoid=1
+      - name: Verify hardware instruction counters
+        run: node packages/memory-leak-finder/src/verifyCpuPerformanceCounters.ts
+      - name: Measure instruction counts
+        timeout-minutes: 350
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure cpu-performance-counters --runs 1 --restart-between --run-skipped-tests-anyway
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
+          path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
+
   ci-linux-charts:
     runs-on: ubuntu-24.04
-    needs: ci-linux-measures
+    needs: [ci-linux-measures, ci-linux-instruction-count]
     if: always()
     timeout-minutes: 60
     steps:
@@ -366,6 +413,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-event-listeners
           path: ./vscode-memory-leak-finder-results-linux-event-listeners
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
+          path: ./vscode-memory-leak-finder-results-linux-instruction-count-arm64
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -845,6 +897,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
+      - name: Delete individual instruction count artifact
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Upload artifact
