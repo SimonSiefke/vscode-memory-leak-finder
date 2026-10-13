@@ -1,0 +1,42 @@
+name: Electron IPC hardware-counter probe
+
+on:
+  push:
+    branches: [ci/electron-ipc-pmu-probe]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ipc-pmu-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    if: github.repository == 'SimonSiefke/vscode-memory-leak-finder' && github.actor == 'SimonSiefke'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-22.04, ubuntu-24.04-arm, ubuntu-22.04-arm]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install perf and permit counters
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y linux-tools-common linux-tools-generic
+          perf_binary=$(ls /usr/lib/linux-tools/*/perf | sort -V | tail -1)
+          sudo ln -sf "$perf_binary" /usr/local/bin/perf
+          sudo sysctl kernel.perf_event_paranoid=-1
+      - name: Probe real hardware counters
+        env:
+          PROBE_RUNNER: ${{ matrix.runner }}
+        run: python3 scripts/electron-ipc-benchmark/pmu-probe.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: pmu-probe-${{ matrix.runner }}
+          path: pmu-probe
+          retention-days: 30
