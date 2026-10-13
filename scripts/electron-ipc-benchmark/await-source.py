@@ -10,7 +10,14 @@ run_id = int(os.environ["SOURCE_RUN_ID"])
 
 
 def api(path):
-    return json.loads(subprocess.check_output(["gh", "api", f"repos/{REPO}/actions/{path}"], text=True))
+    for attempt in range(1, 6):
+        try:
+            return json.loads(subprocess.check_output(["gh", "api", f"repos/{REPO}/actions/{path}"], text=True, timeout=45))
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            if attempt == 5:
+                raise
+            print(f"Temporary API failure; retry {attempt}/4 for {path}", flush=True)
+            time.sleep(min(5 * attempt, 20))
 
 
 deadline = time.monotonic() + 3 * 60 * 60
