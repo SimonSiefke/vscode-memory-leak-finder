@@ -45,6 +45,19 @@ class SummaryTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "revision mismatch"):
                 summary.load(root)
 
+    def test_startup_metadata_is_not_a_measurement(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / "startup"
+            evidence.mkdir()
+            (evidence / "after-timer-source.json").write_text(json.dumps({"sha": summary.COMMITS["after"]}))
+            sample = {"warmup": False, "sha": summary.COMMITS["after"], "index": 0, "mainToTimerReady": 123, "elapsed": 100}
+            (evidence / "after-0000.json").write_text(json.dumps(sample))
+            (evidence / "after-00-1.json").write_text(json.dumps(dict(sample, warmup=True, index=-1)))
+            run = summary.load(root)
+            self.assertEqual(run["values"]["mainToTimerReady"]["after"], [123])
+            self.assertEqual(run["blocks"]["elapsed"]["after"], {0: 100})
+
 
 if __name__ == "__main__":
     unittest.main()

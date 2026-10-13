@@ -34,3 +34,16 @@ and paired-block resampling. Do not compare raw startup times across hosts.
 
 Download `ipc-comparison-report` for the combined report and `ipc-results-*`
 for raw measurements, commands, product logs, runner metadata, and build hashes.
+
+The x64 experiment is run `38431995751`. Its measurement steps use the original
+driver commit `70240d6d77cf3725f8f59bd91146509a63da5b9c`. That commit's summary
+parser includes timer provenance JSON in its sample glob. The report-only
+workflow on `ci/electron-ipc-report` corrects the glob, verifies that all three
+hosts completed their build, pilot, startup, and smoke steps successfully, and
+aggregates their original artifacts. It permits only the known summary-step
+failure and does not rerun measurements or change product code.
+
+ARM run `38436288594` provides hardware-counter measurements separately: three
+Ubuntu 24.04 ARM hosts, 15 launches per version per host, 45 launches per version
+in total. Its artifact is `ipc-arm-cpu-comparison-report`. Keep architecture and
+measurement type separate when interpreting the results.

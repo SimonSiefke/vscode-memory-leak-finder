@@ -1,0 +1,49 @@
+name: Electron IPC benchmark report
+
+on:
+  push:
+    branches: [ci/electron-ipc-report]
+  workflow_dispatch:
+    inputs:
+      source_run:
+        description: Original pinned Electron IPC benchmark run
+        default: '38431995751'
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  report:
+    if: github.repository == 'SimonSiefke/vscode-memory-leak-finder' && github.actor == 'SimonSiefke'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 200
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN_ID: ${{ inputs.source_run || '38431995751' }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Test summary parser
+        run: python3 scripts/electron-ipc-benchmark/test-summary.py
+      - name: Wait for and verify original measurements
+        run: python3 scripts/electron-ipc-benchmark/await-source.py
+      - uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          pattern: ipc-results-*
+          path: results
+      - name: Verify complete samples and aggregate matched comparisons
+        run: |
+          python3 scripts/electron-ipc-benchmark/summarize.py results --aggregate --require-complete
+          cat results/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ipc-comparison-report
+          path: |
+            results/summary.json
+            results/samples.csv
+            results/report.md
+          retention-days: 30

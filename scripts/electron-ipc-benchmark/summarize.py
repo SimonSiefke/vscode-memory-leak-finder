@@ -36,7 +36,7 @@ def load(root):
                 sample = [s[metric] for s in row["samples"]]
                 values[metric][variant].extend(sample)
                 blocks[metric][variant][row["block"]] = statistics.mean(sample)
-        for filename in sorted(root.glob(f"startup/{variant}-*.json")):
+        for filename in sorted(root.glob(f"startup/{variant}-[0-9]*.json")):
             row = json.loads(filename.read_text())
             if row["warmup"]:
                 continue
