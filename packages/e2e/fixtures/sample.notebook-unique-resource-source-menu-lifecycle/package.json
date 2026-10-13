@@ -1,0 +1,49 @@
+{
+  "name": "notebook-unique-resource-source-menu-lifecycle",
+  "displayName": "Notebook Unique Resource Source Menu Lifecycle",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "notebooks": [
+      {
+        "type": "unique-lifecycle-notebook",
+        "displayName": "Unique lifecycle notebook",
+        "selector": [
+          {
+            "filenamePattern": "*.unique-lifecycle"
+          }
+        ]
+      }
+    ],
+    "menus": {
+      "notebook/kernelSource": [
+        {
+          "command": "notebook-unique-resource-source-menu-lifecycle.noop",
+          "when": "notebookType == unique-lifecycle-notebook"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "notebook-unique-resource-source-menu-lifecycle.setup",
+        "title": "Notebook Unique Resource Source Menu Lifecycle: Setup"
+      },
+      {
+        "command": "notebook-unique-resource-source-menu-lifecycle.run",
+        "title": "Notebook Unique Resource Source Menu Lifecycle: Run"
+      },
+      {
+        "command": "notebook-unique-resource-source-menu-lifecycle.cleanup",
+        "title": "Notebook Unique Resource Source Menu Lifecycle: Cleanup"
+      },
+      {
+        "command": "notebook-unique-resource-source-menu-lifecycle.noop",
+        "title": "Lifecycle notebook source"
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "debug-configuration-provider-disposal",
+  "displayName": "Debug Configuration Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "debuggers": [
+      {
+        "type": "disposal-test",
+        "label": "Disposal test",
+        "languages": [
+          "plaintext"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "debug-configuration-provider-disposal.setup",
+        "title": "Debug Configuration Provider Disposal: Setup"
+      },
+      {
+        "command": "debug-configuration-provider-disposal.run",
+        "title": "Debug Configuration Provider Disposal: Run"
+      },
+      {
+        "command": "debug-configuration-provider-disposal.cleanup",
+        "title": "Debug Configuration Provider Disposal: Cleanup"
+      }
+    ]
+  }
+}
