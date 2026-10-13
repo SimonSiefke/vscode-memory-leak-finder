@@ -51,7 +51,8 @@ def load(root):
                 raise RuntimeError("Invalid smoke sample")
             values["smokeSeconds"][variant].append(row["duration"])
             blocks["smokeSeconds"][variant][row["block"]] = row["duration"]
-    expected = {"instructions": 15 if perf["available"] else 0, "cycles": 15 if perf["available"] else 0, "mainToTimerReady": environment.get("startupSamples", 0), "elapsed": environment.get("startupSamples", 0), "smokeSeconds": 7}
+    cpu_only = environment.get("benchmarkMode") == "cpu"
+    expected = {"instructions": 15 if perf["available"] else 0, "cycles": 15 if perf["available"] else 0, "mainToTimerReady": environment.get("startupSamples", 0), "elapsed": environment.get("startupSamples", 0), "smokeSeconds": 0 if cpu_only else 7}
     complete = bool(environment) and all(len(values[m][v]) == expected[m] for m in METRICS for v in VARIANTS)
     complete = complete and all((root / f"evidence/pilot-00-{v}/accepted.json").exists() for v in VARIANTS)
     return {"root": str(root), "environment": environment, "perf": perf, "values": values, "blocks": blocks, "expected": expected, "complete": complete}
@@ -89,13 +90,17 @@ def compare(runs, metric, old, new):
 def summarize(root, aggregate=False, require_complete=False):
     directories = sorted(root.glob("ipc-results-*")) if aggregate else [root]
     runs = [load(p) for p in directories]
+    architectures = {r["environment"].get("architecture") for r in runs if r["environment"]}
+    if len(architectures) > 1:
+        raise RuntimeError("Cannot combine hardware-counter comparisons across architectures")
     root.mkdir(parents=True, exist_ok=True)
     complete = bool(runs) and all(r["complete"] for r in runs) and (len(runs) == 3 if aggregate else True)
     summary = {
         "complete": complete,
+        "architecture": next(iter(architectures), None),
         "variants": COMMITS,
         "runners": [{"environment": r["environment"], "perf": r["perf"], "complete": r["complete"], "expected": r["expected"]} for r in runs],
-        "methodology": "Development builds matching the corrected local comparison. All variants run sequentially on each runner with balanced startup order and randomized CPU/smoke blocks. Three excluded startup warmups per variant per runner. Aggregate effects average within-runner ratios. Confidence intervals resample runners and their matched blocks; three hosts provide limited evidence of host variation. No claim to reproduce the historical issue's different base/build/test selection.",
+        "methodology": "Development builds of the same source revisions as the corrected local comparison. CPU-only runs use ARM runners with verified hardware counters; do not compare their absolute counts or relative effects directly to x64 as proof of a historical x64 improvement. All variants run sequentially on each runner, in randomized CPU blocks of three launches. Aggregate effects average within-runner ratios. Confidence intervals resample runners and their matched blocks; three hosts provide limited evidence of host variation.",
         "metrics": {},
     }
     rows = []
@@ -115,7 +120,7 @@ def summarize(root, aggregate=False, require_complete=False):
         writer = csv.writer(stream)
         writer.writerow(["runner", "metric", "variant", "sample", "value"])
         writer.writerows(rows)
-    report = ["# Electron IPC benchmark", "", f"Complete: **{complete}**. Runners: {len(runs)}.", "", "Positive changes mean more instructions/cycles or longer duration.", "", "| Metric | Samples per variant | Fixed vs pre-fix, mean (95% CI) | Fixed vs buffer, mean (95% CI) | Pre-fix vs buffer, mean (95% CI) |", "| --- | ---: | ---: | ---: | ---: |"]
+    report = ["# Electron IPC benchmark", "", f"Complete: **{complete}**. Runners: {len(runs)}. Architecture: {summary['architecture']}.", "", "Positive changes mean more instructions/cycles or longer duration.", "", "| Metric | Samples per variant | Fixed vs pre-fix, mean (95% CI) | Fixed vs buffer, mean (95% CI) | Pre-fix vs buffer, mean (95% CI) |", "| --- | ---: | ---: | ---: | ---: |"]
     for metric, data in summary["metrics"].items():
         entries = []
         for name in ["after_vs_before", "after_vs_buffer", "before_vs_buffer"]:

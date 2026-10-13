@@ -1,0 +1,171 @@
+name: Electron IPC ARM CPU benchmark
+
+on:
+  push:
+    branches: [ci/electron-ipc-arm-cpu]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: electron-ipc-arm-cpu-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'SimonSiefke/vscode-memory-leak-finder' && github.actor == 'SimonSiefke'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: buffer
+            sha: 959031245ebb1fe077e0d512e1397c0ae82006e4
+          - variant: before
+            sha: d6352725adca1ebaebbabb24f65b63c88167fda3
+          - variant: after
+            sha: fb616229bd8383a07d0cdee17e5c844c9aa0a50c
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: SimonSiefke/vscode
+          ref: ${{ matrix.sha }}
+          path: product
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: product/.nvmrc
+      - name: Install build and desktop dependencies
+        run: bash scripts/electron-ipc-benchmark/install-linux.sh
+      - name: Install source dependencies
+        working-directory: product
+        run: npm ci
+      - name: Compile client
+        working-directory: product
+        run: npm run gulp compile-client
+      - name: Compile built-in extensions
+        working-directory: product
+        run: npm run build-fast-extensions
+      - name: Compile Copilot
+        working-directory: product
+        run: npm run compile-copilot
+      - name: Prepare Electron and smoke runner
+        working-directory: product
+        run: |
+          npm run electron
+          npm --prefix test/smoke run compile
+      - name: Verify product and archive build
+        env:
+          VARIANT: ${{ matrix.variant }}
+          EXPECTED_SHA: ${{ matrix.sha }}
+        run: |
+          python3 scripts/electron-ipc-benchmark/verify-build.py product "$EXPECTED_SHA"
+          tar --exclude=product/.git --exclude=product/.build/logs --exclude=product/.build/crashes -I 'zstd -T2 -3' -cf "$VARIANT.tar.zst" product
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ipc-build-${{ matrix.variant }}
+          path: ${{ matrix.variant }}.tar.zst
+          compression-level: 0
+          retention-days: 7
+
+  benchmark:
+    needs: build
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - replica: 1
+            startup_samples: 0
+          - replica: 2
+            startup_samples: 0
+          - replica: 3
+            startup_samples: 0
+    env:
+      IPC_BENCHMARK_ROOT: ${{ github.workspace }}/ipc-results
+      IPC_PRODUCT_ROOT: ${{ github.workspace }}/products
+      IPC_STARTUP_SAMPLES: ${{ matrix.startup_samples }}
+      IPC_REPLICA: ${{ matrix.replica }}
+      VSCODE_SKIP_PRELAUNCH: '1'
+      IPC_BENCHMARK_MODE: cpu
+    steps:
+      - uses: actions/checkout@v7
+      - name: Make space for isolated builds
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
+      - name: Install desktop and performance dependencies
+        run: bash scripts/electron-ipc-benchmark/install-linux.sh
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: ipc-build-*
+          path: archives
+          merge-multiple: true
+      - name: Extract isolated products
+        run: |
+          for variant in buffer before after; do
+            mkdir -p "products/$variant"
+            tar --zstd -xf "archives/$variant.tar.zst" --strip-components=1 -C "products/$variant"
+          done
+          rm -rf archives
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: products/after/.nvmrc
+      - name: Record product Node executable
+        run: echo "IPC_PRODUCT_NODE=$(command -v node)" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install benchmark driver
+        run: |
+          npm run install:ci
+          npm run build
+      - name: Record runner and verify performance counters
+        run: python3 scripts/electron-ipc-benchmark/run.py probe
+      - name: Validate builds and run editor-open pilots
+        run: python3 scripts/electron-ipc-benchmark/run.py pilot
+      - name: Measure CPU instructions and cycles
+        run: python3 scripts/electron-ipc-benchmark/run.py cpu
+      - name: Verify complete samples and summarize
+        run: python3 scripts/electron-ipc-benchmark/summarize.py "$IPC_BENCHMARK_ROOT" --require-complete
+      - name: Preserve summary and partial evidence
+        if: always()
+        run: |
+          python3 scripts/electron-ipc-benchmark/summarize.py "$IPC_BENCHMARK_ROOT"
+          if [[ -f "$IPC_BENCHMARK_ROOT/report.md" ]]; then
+            cat "$IPC_BENCHMARK_ROOT/report.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ipc-results-${{ matrix.replica }}
+          path: ipc-results
+          include-hidden-files: true
+          retention-days: 30
+
+  report:
+    needs: benchmark
+    if: always()
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: ipc-results-*
+          path: results
+      - name: Aggregate matched comparisons across runners
+        run: |
+          python3 scripts/electron-ipc-benchmark/summarize.py results --aggregate --require-complete
+          cat results/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ipc-arm-cpu-comparison-report
+          path: |
+            results/summary.json
+            results/samples.csv
+            results/report.md
+          retention-days: 30

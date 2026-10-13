@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import os
+import platform
 from pathlib import Path
 import random
 import re
@@ -51,6 +52,8 @@ def validate_logs(directory, destination):
 def probe():
     env = {
         "replica": int(os.environ.get("IPC_REPLICA", "1")),
+        "benchmarkMode": os.environ.get("IPC_BENCHMARK_MODE", "full"),
+        "architecture": platform.machine(),
         "startupSamples": int(os.environ.get("IPC_STARTUP_SAMPLES", "100")),
         "cpuSamples": 15,
         "smokeSamples": 7,
@@ -80,6 +83,8 @@ def probe():
     available = result.returncode == 0 and all(counters.get(k, 0) > 0 for k in ["instructions:u", "cycles:u"])
     save(ROOT / "perf-capability.json", {"available": available, "exitCode": result.returncode, "counters": counters, "reason": None if available else "Hosted runner does not expose usable instruction/cycle counters; see perf-probe.txt. CPU results are unavailable, never substituted."})
     print(f"Hardware performance counters available: {available}", flush=True)
+    if env["benchmarkMode"] == "cpu" and not available:
+        raise RuntimeError("This CPU-only job requires real hardware counters")
 
 
 def run(mode):
