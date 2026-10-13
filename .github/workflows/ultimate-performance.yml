@@ -1,0 +1,213 @@
+name: Ultimate Performance Measure
+
+on:
+  workflow_dispatch:
+    inputs:
+      before_commit:
+        description: Before VS Code commit (full 40-character SHA)
+        required: true
+        type: string
+      after_commit:
+        description: After VS Code commit (full 40-character SHA)
+        required: true
+        type: string
+      samples:
+        description: Samples per commit (profiling and snapshots use at most five)
+        type: string
+        default: '37'
+      benchmark_filter:
+        description: Optional comma-separated benchmark IDs; empty runs the entire suite
+        type: string
+        default: ''
+
+run-name: Ultimate Performance ${{ inputs.before_commit }} → ${{ inputs.after_commit }}
+
+permissions:
+  contents: read
+
+env:
+  BEFORE_COMMIT: ${{ inputs.before_commit }}
+  AFTER_COMMIT: ${{ inputs.after_commit }}
+  SAMPLES: ${{ inputs.samples }}
+  BENCHMARK_FILTER: ${{ inputs.benchmark_filter }}
+
+jobs:
+  initialize:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.manifest.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Validate inputs and generate benchmark manifest
+        id: manifest
+        run: |
+          node packages/ultimate-benchmark/src/main.ts matrix \
+            --before-commit "$BEFORE_COMMIT" --after-commit "$AFTER_COMMIT" \
+            --samples "$SAMPLES" --benchmark-filter "$BENCHMARK_FILTER" \
+            --output-dir .ultimate-manifest
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ultimate-manifest
+          path: .ultimate-manifest/manifest.json
+          retention-days: 30
+
+  build:
+    needs: initialize
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        revision: [before, after]
+    env:
+      REVISION: ${{ matrix.revision }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config xvfb x11-xserver-utils
+      - name: Install harness
+        run: npm run install:ci
+      - name: Build harness
+        run: npm run build
+      - name: Build and archive the minified VS Code package
+        run: |
+          if [[ "$REVISION" == before ]]; then
+            commit="$BEFORE_COMMIT"
+          else
+            commit="$AFTER_COMMIT"
+          fi
+          node packages/ultimate-benchmark/src/main.ts prepare \
+            --commit "$commit" --output-dir .ultimate-build
+      - name: Upload executable package
+        uses: actions/upload-artifact@v7
+        with:
+          name: ultimate-build-${{ matrix.revision }}
+          path: |
+            .ultimate-build/vscode.tar.gz
+            .ultimate-build/build.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+          overwrite: true
+      - name: Upload build status
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ultimate-build-status-${{ matrix.revision }}
+          path: .ultimate-build/status.json
+          retention-days: 30
+          overwrite: true
+
+  measure:
+    needs: [initialize, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.initialize.outputs.matrix) }}
+    env:
+      BENCHMARK_ID: ${{ matrix.id }}
+      JOB_SAMPLES: ${{ matrix.samples }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - name: Install runner dependencies
+        run: npm ci --ignore-scripts
+      - name: Install desktop and performance tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libasound2t64 libnss3 libgbm1 linux-tools-common linux-tools-generic
+          sudo apt-get install -y "linux-tools-$(uname -r)" || true
+          sudo sysctl -w kernel.perf_event_paranoid=-1 || true
+      - uses: actions/download-artifact@v8
+        with:
+          name: ultimate-build-before
+          path: .ultimate-builds/before
+      - uses: actions/download-artifact@v8
+        with:
+          name: ultimate-build-after
+          path: .ultimate-builds/after
+      - name: Verify and extract before build
+        id: before
+        run: node packages/ultimate-benchmark/src/main.ts extract --input-dir .ultimate-builds/before --commit "$BEFORE_COMMIT" --output-name executable
+      - name: Verify and extract after build
+        id: after
+        run: node packages/ultimate-benchmark/src/main.ts extract --input-dir .ultimate-builds/after --commit "$AFTER_COMMIT" --output-name executable
+      - name: Measure paired revisions
+        timeout-minutes: 310
+        env:
+          BEFORE_PATH: ${{ steps.before.outputs.executable }}
+          AFTER_PATH: ${{ steps.after.outputs.executable }}
+        run: |
+          xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
+            node packages/ultimate-benchmark/src/main.ts measure \
+            --benchmark-id "$BENCHMARK_ID" --samples "$JOB_SAMPLES" \
+            --before-path "$BEFORE_PATH" --after-path "$AFTER_PATH" \
+            --before-commit "$BEFORE_COMMIT" --after-commit "$AFTER_COMMIT" \
+            --output-dir .ultimate-results
+      - name: Upload all available samples and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ultimate-result-${{ matrix.id }}
+          path: .ultimate-results
+          include-hidden-files: true
+          retention-days: 30
+          overwrite: true
+
+  report:
+    needs: [initialize, build, measure]
+    if: ${{ always() && needs.initialize.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v8
+        with:
+          name: ultimate-manifest
+          path: .ultimate-manifest
+      - name: Download raw result artifacts
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: ultimate-result-*
+          path: .ultimate-downloads
+      - name: Download build status artifacts
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: ultimate-build-status-*
+          path: .ultimate-downloads
+      - name: Generate comparison charts and offline report
+        env:
+          BUILD_OUTCOMES: ${{ needs.build.result == 'success' && 'success,success' || 'failure,failure' }}
+        run: |
+          mkdir -p .ultimate-downloads
+          node packages/ultimate-benchmark/src/main.ts report \
+            --manifest .ultimate-manifest/manifest.json --input-dir .ultimate-downloads \
+            --output-dir .ultimate-report --build-outcomes "$BUILD_OUTCOMES"
+      - name: Upload comparison report and raw evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ultimate-performance-report
+          path: .ultimate-report
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: true

@@ -2,6 +2,97 @@
 
 Find memory leaks in vscode to improve robustness and performance.
 
+### Ultimate Performance Measure
+
+Run **Ultimate Performance Measure** from GitHub Actions with `before_commit` and
+`after_commit` set to full VS Code commit SHAs. The manual workflow builds both
+minified Linux x64 packages once, then runs 104 runtime benchmark jobs and a
+JavaScript bundle-size comparison. It leaves the existing CI and bot workflows
+unchanged.
+
+The defaults are 37 samples per commit, all extensions disabled, and the entire
+suite. CPU profiles and heap snapshots use at most five samples per commit.
+Each job measures both revisions on the same runner and alternates their order.
+Failures and unavailable facilities are recorded independently; regressions do
+not fail the workflow. The final job always gathers the available evidence and
+uploads **ultimate-performance-report**. Download and extract it, then open
+`index.html`. The report works offline and includes SVG charts, distributions,
+coverage, JSON/CSV summaries, CPU flame charts, and links to raw evidence.
+
+Startup covers an empty window and a workspace opening a fixed text file, in
+both cold and warm conditions. Cold launches use fresh profiles and clear Linux
+page, dentry, and inode caches immediately before spawning VS Code. Warm launches
+prime a separate profile with one unmeasured launch before each measured launch,
+preserving that profile and OS caches. Shared application storage is isolated
+inside each profile. Interactions cover opening small/large text files, typing,
+scrolling, find, workspace search, Quick Open, Explorer expansion, diff, terminal
+creation/commands, and Settings.
+
+Collectors run separately: timings, hardware instruction/cycle counters,
+software CPU counters and sampled process-tree PSS, renderer performance
+counters, Chromium timeline traces, CPU profiles, and renderer heap/code bytes.
+Startup traces use VS Code's early tracing hook before the Chromium workbench
+renderer launches, and are clipped at readiness; action
+traces exclude setup and cleanup. Timings measure input dispatch through visible
+completion, including automation polling. PSS samples are taken every 250 ms and
+can miss brief peaks. Heap/code values describe renderer snapshot self-size;
+V8 code nodes include bytecode and code metadata. Missing hardware counters and
+trace categories are never reported as zero.
+
+The report compares complete sample pairs only. Counts and byte sizes use means;
+timings use medians. It also shows p95, standard deviation, min/max, and
+deterministic paired-bootstrap 95% confidence intervals. Small samples and
+intervals crossing zero are marked inconclusive. These intervals are exploratory
+across many metrics, without a multiple-comparison significance claim. No
+outliers are removed or samples silently retried.
+
+Use the optional `samples` and `benchmark_filter` dispatch inputs for smaller
+runs. Filters accept comma-separated exact IDs from the shared manifest, for
+example:
+
+```text
+startup-empty-cold-timing,startup-empty-warm-timing,open-small-timing,bundles
+```
+
+The implementation lives in the separate
+[`ultimate-benchmark` package](packages/ultimate-benchmark/README.md), which owns
+the manifest, collectors, runner, and report generation. The commands are also
+available locally through the root npm shortcuts:
+
+```sh
+# Build/archive each revision; uses the existing commit build pipeline.
+npm run ultimate-performance:prepare -- --commit BEFORE_SHA --output-dir .tmp/ultimate-before
+npm run ultimate-performance:prepare -- --commit AFTER_SHA --output-dir .tmp/ultimate-after
+
+# Validate the checksums and extract the packaged executables.
+npm run ultimate-performance -- extract --commit BEFORE_SHA --input-dir .tmp/ultimate-before
+npm run ultimate-performance -- extract --commit AFTER_SHA --input-dir .tmp/ultimate-after
+
+# Create the expected-run manifest (also prints the complete matrix without a filter).
+npm run ultimate-performance -- matrix --before-commit BEFORE_SHA --after-commit AFTER_SHA \
+  --samples 5 --benchmark-filter open-small-timing --output-dir .tmp/ultimate-manifest
+
+# Each measure command runs both revisions and checkpoints each sample.
+xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
+  npm run ultimate-performance:measure -- --benchmark-id open-small-timing --samples 5 \
+  --before-commit BEFORE_SHA --after-commit AFTER_SHA \
+  --before-path .tmp/ultimate-before/VSCode-linux-x64/code-oss \
+  --after-path .tmp/ultimate-after/VSCode-linux-x64/code-oss \
+  --output-dir .tmp/ultimate-results/open-small-timing
+
+npm run ultimate-performance:report -- --manifest .tmp/ultimate-manifest/manifest.json \
+  --input-dir .tmp/ultimate-results --output-dir .tmp/ultimate-report
+```
+
+Replace `BEFORE_SHA` and `AFTER_SHA` with full 40-character hashes. Measurement
+commands require Node from `.nvmrc`, Linux x64, Xvfb or a display, and desktop
+libraries. Instruction/resource counters additionally need a working `perf`
+installation and event permissions. Cold startup needs noninteractive permission
+to write `/proc/sys/vm/drop_caches`. Unsupported collectors remain visible in the
+report while other measurements continue. Raw traces and snapshots are gzip
+compressed; decompress them before opening them in developer tools. Artifacts
+are retained for 30 days.
+
 ## Quickstart
 
 ```sh

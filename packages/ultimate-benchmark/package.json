@@ -1,0 +1,23 @@
+{
+  "name": "@vscode-memory-leak-finder/ultimate-benchmark",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/main.ts",
+  "scripts": {
+    "benchmark": "node src/main.ts",
+    "matrix": "node src/main.ts matrix",
+    "prepare-build": "node src/main.ts prepare",
+    "measure": "node src/main.ts measure",
+    "report": "node src/main.ts report",
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "type-check": "tsc -p ."
+  },
+  "dependencies": {
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.2",
+    "typescript": "^6.0.3"
+  }
+}
