@@ -264,7 +264,7 @@ export interface Editor {
   replaceText(options: any): Promise<void>
   save(options: any): Promise<void>
   saveAll(): Promise<void>
-  scrollDown(): Promise<void>
+  scrollDown(options?: { viaKeyBoard?: boolean }): Promise<void>
   scrollUp(): Promise<void>
   select(text: any): Promise<void>
   selectAll(options?: any): Promise<void>
