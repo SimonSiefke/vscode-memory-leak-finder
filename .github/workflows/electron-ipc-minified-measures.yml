@@ -5,7 +5,6 @@ on:
     branches: [ci/electron-ipc-minified-x64]
     paths:
       - .github/workflows/electron-ipc-minified-measures.yml
-      - scripts/electron-ipc-minified-x64/measure/**
   workflow_dispatch:
 
 permissions:
@@ -13,7 +12,7 @@ permissions:
   actions: read
 
 env:
-  IPC_BUILD_RUN: '38537816617'
+  IPC_BUILD_RUN: '38539729906'
 
 jobs:
   benchmark:

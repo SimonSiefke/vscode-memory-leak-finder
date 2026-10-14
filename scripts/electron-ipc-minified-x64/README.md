@@ -6,8 +6,9 @@ quality settings, complete built-in extensions, a working packaged SQLite
 module, and the correct native Electron architecture. Build hashes and source
 revisions accompany the artifacts. No pull requests or comments are created.
 
-The separate measurement workflow consumes one explicitly pinned successful
-build run. Three x64 hosts each compare all versions sequentially: 333/332/332
+The separate architecture measurement workflows consume one explicitly pinned
+build run and require all three jobs and artifacts for their architecture to
+complete successfully. Three x64 hosts each compare all versions sequentially: 333/332/332
 startup launches per version, plus seven smoke runs per version per host.
 Three native ARM64 hosts each compare fifteen CPU launches per version.
 Hardware counters must be real and positive; unsupported counters cannot be
@@ -17,7 +18,7 @@ Startup uses the original issue's internal recorder and direct packaged
 executable, with no CDP debugger or profiler. It waits for
 `ITimerService.whenReady()`, reports `mainToTimerReady` and `startupMetrics.ellapsed`,
 and quits normally. The recorder is bundled/minified separately and temporarily
-swapped into each package only for startup. Three warmups are excluded, launch
+swapped into each package, with its matching product metadata, only for startup. Three warmups are excluded, launch
 order cycles through all permutations, and launches have a one-second quiet
 interval. Every launch must emit exactly one valid record for its pinned commit.
 The pristine bundle is restored and hashes revalidated afterward.
