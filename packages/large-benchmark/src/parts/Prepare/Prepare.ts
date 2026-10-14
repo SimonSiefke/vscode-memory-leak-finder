@@ -3,10 +3,10 @@ import { createReadStream } from 'node:fs'
 import { access, mkdir, readFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { command, writeJson } from './io.ts'
-import type { BuildMetadata } from './types.ts'
+import { command, writeJson } from '../Io/Io.ts'
+import type { BuildMetadata } from '../Types/Types.ts'
 
-export const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..')
+export const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../..')
 
 export const sha256 = async (path: string): Promise<string> => {
   const hash = createHash('sha256')

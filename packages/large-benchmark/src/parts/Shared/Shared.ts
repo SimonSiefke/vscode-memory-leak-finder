@@ -1,10 +1,10 @@
 import type { ChildProcess } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import type { Metric } from './types.ts'
+import type { Metric } from '../Types/Types.ts'
 
 // The monorepo runs TypeScript sources directly. Use the same URL-based package
 // loading as the existing workers rather than compile another package's sources.
-const load = (packageName: string, path: string) => import(new URL(`../../../${packageName}/src/${path}`, import.meta.url).href)
+const load = (packageName: string, path: string) => import(new URL(`../../../../${packageName}/src/${path}`, import.meta.url).href)
 const [endpoint, capture, perf, pss, profile, browser, context, stages, fixtures, imports] = await Promise.all([
   load('memory-leak-finder', 'parts/ConnectDevtoolsEndpoint/ConnectDevtoolsEndpoint.ts'),
   load('memory-leak-finder', 'parts/PerformanceCapture/PerformanceCapture.ts'),
@@ -14,7 +14,7 @@ const [endpoint, capture, perf, pss, profile, browser, context, stages, fixtures
   load('memory-leak-finder', 'parts/MeasureBrowserPerformanceCounters/MeasureBrowserPerformanceCounters.ts'),
   load('test-worker', 'parts/CreateTestContext/CreateTestContext.ts'),
   load('test-worker', 'parts/TestStage/TestStage.ts'),
-  import(new URL('../../../e2e/helpers/performanceFixtures.ts', import.meta.url).href),
+  import(new URL('../../../../e2e/helpers/performanceFixtures.ts', import.meta.url).href),
   load('test-worker', 'parts/ImportTest/ImportTest.ts'),
 ])
 
@@ -73,7 +73,7 @@ export const createScenario = async (
   scenario: string,
   ideVersion: any,
 ): Promise<Scenario> => {
-  const file = new URL(`../../../e2e/src/performance-${scenario}.ts`, import.meta.url)
+  const file = new URL(`../../../../e2e/src/performance-${scenario}.ts`, import.meta.url)
   const module = await imports.importTest(fileURLToPath(file))
   const test = await context.createTestContext({ renderer, main, workspacePath, ideVersion })
   const api = test.api

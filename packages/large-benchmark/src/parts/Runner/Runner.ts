@@ -25,11 +25,11 @@ import {
   ResourceSampler,
   MeasureCpuProfile,
   MeasureBrowserPerformanceCounters,
-} from './shared.ts'
-import { compressEvidence } from './compression.ts'
-import { command, errorMessage, writeJson } from './io.ts'
-import { sampleCount, sampleOrder } from './manifest.ts'
-import { UnavailableError, type Benchmark, type Metric, type Result, type Revision, type Sample } from './types.ts'
+} from '../Shared/Shared.ts'
+import { compressEvidence } from '../Compression/Compression.ts'
+import { command, errorMessage, writeJson } from '../Io/Io.ts'
+import { sampleCount, sampleOrder } from '../Manifest/Manifest.ts'
+import { UnavailableError, type Benchmark, type Metric, type Result, type Revision, type Sample } from '../Types/Types.ts'
 
 export interface RunOptions {
   benchmark: Benchmark

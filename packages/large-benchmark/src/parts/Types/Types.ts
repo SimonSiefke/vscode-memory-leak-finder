@@ -52,5 +52,5 @@ export interface BuildMetadata {
   generatedAt: string
 }
 
-const metricUrl = new URL('../../../memory-leak-finder/src/parts/PerformanceMetric/PerformanceMetric.ts', import.meta.url).href
+const metricUrl = new URL('../../../../memory-leak-finder/src/parts/PerformanceMetric/PerformanceMetric.ts', import.meta.url).href
 export const { UnavailableError } = await import(metricUrl)

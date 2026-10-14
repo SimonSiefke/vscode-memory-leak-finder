@@ -2,7 +2,7 @@ import { afterEach, expect, jest, test } from '@jest/globals'
 import { mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { interactionScenarios } from '../src/largePerformance/manifest.ts'
+import { interactionScenarios } from '../src/parts/Manifest/Manifest.ts'
 
 const fixtureUrl = new URL('../../e2e/helpers/performanceFixtures.ts', import.meta.url).href
 const { files, prepareFixture, setup } = await import(fixtureUrl)

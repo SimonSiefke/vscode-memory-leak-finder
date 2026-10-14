@@ -1,9 +1,9 @@
 import { copyFile, link, mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
-import { errorMessage, readJson, writeJson } from './io.ts'
-import { selectBenchmarks } from './manifest.ts'
-import { comparePairs } from './statistics.ts'
-import type { Benchmark, Metric, Result, Sample, Status } from './types.ts'
+import { errorMessage, readJson, writeJson } from '../Io/Io.ts'
+import { selectBenchmarks } from '../Manifest/Manifest.ts'
+import { comparePairs } from '../Statistics/Statistics.ts'
+import type { Benchmark, Metric, Result, Sample, Status } from '../Types/Types.ts'
 
 export const escapeHtml = (value: unknown): string =>
   String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]!)

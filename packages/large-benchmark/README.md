@@ -6,6 +6,10 @@ the benchmark manifest, paired orchestration, result format, and offline report.
 It uses the existing DevTools connection and page-object harness, E2E scenarios
 in `packages/e2e/src/performance-*.ts`, and measures in `packages/memory-leak-finder`.
 
+Source modules follow `src/parts/ModuleName/ModuleName.ts`. The `src/main.ts`
+entry point delegates to `parts/Main/Main.ts`; the other parts handle options,
+the manifest, build preparation, measurements, bundle sizes, statistics, and reports.
+
 ## Large Performance Measure
 
 Run the [Large Performance Measure workflow](../../.github/workflows/large-performance.yml) from GitHub Actions

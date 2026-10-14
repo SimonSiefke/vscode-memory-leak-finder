@@ -1,4 +1,4 @@
-import type { Benchmark, Collector, Revision } from './types.ts'
+import type { Benchmark, Collector, Revision } from '../Types/Types.ts'
 
 export const interactionScenarios = [
   'open-small',

@@ -2,9 +2,9 @@ import { readFile, readdir } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { dirname, join, relative } from 'node:path'
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
-import { writeJson } from './io.ts'
-import type { Metric, Result, Revision } from './types.ts'
-import type { RunOptions } from './runner.ts'
+import { writeJson } from '../Io/Io.ts'
+import type { Metric, Result, Revision } from '../Types/Types.ts'
+import type { RunOptions } from '../Runner/Runner.ts'
 
 export interface Asset {
   path: string
