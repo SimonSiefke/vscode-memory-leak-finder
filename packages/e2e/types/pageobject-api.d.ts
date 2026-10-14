@@ -189,6 +189,8 @@ export interface DropDownContextMenu {
   shouldHaveItem(option: any): Promise<void>
 }
 export interface Editor {
+  shouldContainText(text: string): Promise<void>
+  typeCharacters(text: string): Promise<void>
   warmUpTextEditor(fileName?: any): Promise<void>
   acceptInlineCompletion(): Promise<void>
   acceptRename(): Promise<void>
@@ -262,7 +264,7 @@ export interface Editor {
   replaceText(options: any): Promise<void>
   save(options: any): Promise<void>
   saveAll(): Promise<void>
-  scrollDown(): Promise<void>
+  scrollDown(options?: { viaKeyBoard?: boolean }): Promise<void>
   scrollUp(): Promise<void>
   select(text: any): Promise<void>
   selectAll(options?: any): Promise<void>
@@ -339,6 +341,7 @@ export interface Editor {
   waitForNewWindow(options: any, electron: any): Promise<number>
 }
 export interface EditorFind {
+  shouldHaveMatchesCount(text: string): Promise<void>
   openReplace(): Promise<void>
   replace(): Promise<void>
   setReplaceValue(value: any): Promise<void>
@@ -626,6 +629,7 @@ export interface Profile {
   removeOtherProfiles(): Promise<void>
 }
 export interface QuickPick {
+  shouldHaveItem(text: string): Promise<void>
   close(): Promise<void>
   executeCommand(command: any, options?: any): Promise<void>
   focusNext(): Promise<void>
@@ -680,6 +684,8 @@ export interface RunningExtensions {
   stopProfilingExtensionHost(): Promise<void>
 }
 export interface Search {
+  submit(): Promise<void>
+  shouldHaveSummary(text: string | RegExp): Promise<void>
   shouldBeVisible(): Promise<void>
   clear(): Promise<void>
   collapseFiles(): Promise<void>
@@ -857,6 +863,8 @@ export interface Task {
   unpin(name: any): Promise<void>
 }
 export interface Terminal {
+  waitForShellPrompt(): Promise<void>
+  shouldHaveOutputLine(text: string): Promise<void>
   add(): Promise<void>
   clear(): Promise<void>
   clearFindInput(): Promise<void>
@@ -960,6 +968,7 @@ export interface Workbench {
   shouldHaveEditorBackground(color: any): Promise<void>
 }
 export interface Workspace {
+  getWorkspacePath(): string
   add(options: any): Promise<void>
   addExtension(name: any): Promise<void>
   initializeGitRepository(): Promise<void>

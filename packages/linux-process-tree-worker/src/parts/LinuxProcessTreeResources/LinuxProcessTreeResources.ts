@@ -1,4 +1,5 @@
 import { readdir, readFile } from 'node:fs/promises'
+import { setTimeout as delay } from 'node:timers/promises'
 
 export const PssSampleIntervalMs = 250
 
@@ -31,6 +32,7 @@ export interface ProcessTreeSample {
 
 export interface ProcessTreeSamplerResult {
   readonly droppedSampleCount: number
+  readonly finalSample?: ProcessTreeSample
   readonly samples: readonly ProcessTreeSample[]
 }
 
@@ -242,7 +244,11 @@ const isTransientProcError = (error: unknown): boolean => {
 export const createProcessTreeSampler = (
   rootPid: number,
   { getProcessTable: getTable = getProcessTable, now = Date.now, readPssKiB = readProcessPssKiB }: SamplerDependencies = {},
-  { excludeRoot = false, intervalMs = PssSampleIntervalMs }: { excludeRoot?: boolean; intervalMs?: number } = {},
+  {
+    excludeRoot = false,
+    intervalMs = PssSampleIntervalMs,
+    initialSampleAttempts = 1,
+  }: { excludeRoot?: boolean; intervalMs?: number; initialSampleAttempts?: number } = {},
 ): ProcessTreeSampler => {
   let droppedSampleCount = 0
   let fatalError: unknown
@@ -308,7 +314,11 @@ export const createProcessTreeSampler = (
 
   return {
     async start() {
-      const first = await takeSample()
+      let first = await takeSample()
+      for (let attempt = 1; !first && attempt < initialSampleAttempts; attempt++) {
+        await delay(20)
+        first = await takeSample()
+      }
       if (!first) {
         throw new Error(`Unable to take an initial process-tree PSS sample for ${rootPid}`)
       }
@@ -333,6 +343,7 @@ export const createProcessTreeSampler = (
         }
         return {
           droppedSampleCount,
+          ...(finalSample ? { finalSample } : {}),
           samples,
         }
       })()

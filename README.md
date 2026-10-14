@@ -2,6 +2,11 @@
 
 Find memory leaks in vscode to improve robustness and performance.
 
+### Large Performance Measure
+
+See the [`large-benchmark` package documentation](packages/large-benchmark/README.md)
+for workflow usage, benchmark coverage, requirements, and local examples.
+
 ## Quickstart
 
 ```sh
