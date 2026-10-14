@@ -1,5 +1,5 @@
 import { afterEach, expect, jest, test } from '@jest/globals'
-import { chmod, mkdtemp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
+import { chmod, mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { benchmarks, sampleCount, sampleOrder, selectBenchmarks } from '../src/parts/Manifest/Manifest.ts'
@@ -148,13 +148,15 @@ test('bundles exclude source maps and capture added and removed assets', async (
   ).toEqual(['added', 'removed'])
 })
 
-test('report survives missing and malformed artifacts, preserves evidence, and escapes diagnostics', async () => {
+test('report survives missing and malformed artifacts, leaves raw evidence in the input, and escapes diagnostics', async () => {
   const directory = await temporary()
   const input = join(directory, 'input')
   const output = join(directory, 'report')
   const data = result()
   data.diagnostics.push('<script>unsafe</script>')
+  data.samples[0]!.raw = ['trace.json.gz']
   await writeJson(join(input, 'valid', 'result.json'), data)
+  await writeFile(join(input, 'valid', 'trace.json.gz'), 'raw trace')
   await mkdir(join(input, 'invalid'))
   await writeFile(join(input, 'invalid', 'result.json'), '{broken')
   const summary = await generateReport({
@@ -169,8 +171,41 @@ test('report survives missing and malformed artifacts, preserves evidence, and e
   const html = await readFile(join(output, 'index.html'), 'utf8')
   expect(html).toContain('&lt;script&gt;unsafe&lt;/script&gt;')
   expect(html).not.toContain('<script>unsafe</script>')
-  expect(await readFile(join(output, 'data', benchmark.id, 'result.json'), 'utf8')).toContain('schemaVersion')
+  expect((await readdir(output)).sort()).toEqual(['charts', 'index.html'])
+  expect(html).toContain(`large-result-${benchmark.id}`)
+  expect(html).not.toMatch(/(?:href|src)="(?:data\/|summary\.)/)
   expect(await readFile(join(input, 'valid', 'result.json'), 'utf8')).toContain('schemaVersion')
+  expect(await readFile(join(input, 'valid', 'trace.json.gz'), 'utf8')).toBe('raw trace')
+})
+
+test('report generates flame charts and bundle details from input evidence without copying it', async () => {
+  const directory = await temporary()
+  const input = join(directory, 'input')
+  const output = join(directory, 'report')
+  const profileBenchmark = selectBenchmarks('open-small-profile')[0]!
+  const bundleBenchmark = selectBenchmarks('bundles')[0]!
+  const profile = { ...result(), benchmark: profileBenchmark }
+  profile.samples[0]!.raw = ['profiles/renderer.cpuprofile']
+  await writeJson(join(input, 'large-result-open-small-profile', 'result.json'), profile)
+  await writeJson(join(input, 'large-result-open-small-profile', 'profiles', 'renderer.cpuprofile'), {
+    nodes: [{ id: 1, callFrame: { functionName: 'renderEditor' } }],
+    samples: [1],
+    timeDeltas: [1000],
+  })
+  await writeJson(join(input, 'large-result-bundles', 'result.json'), { ...result(), benchmark: bundleBenchmark })
+  await writeJson(join(input, 'large-result-bundles', 'bundle-changes.json'), [
+    { path: 'workbench.js', status: 'changed', before: 100, after: 80, delta: -20 },
+  ])
+  const summary = await generateReport({ input, output, benchmarks: [profileBenchmark, bundleBenchmark], commits })
+  expect(summary.diagnostics).toEqual([])
+  expect((await readdir(output)).sort()).toEqual(['charts', 'index.html'])
+  const charts = await readdir(join(output, 'charts'))
+  expect(charts).toContain('open-small-profile-before-0.svg')
+  expect(charts.every((path) => path.endsWith('.svg'))).toBe(true)
+  expect(await readFile(join(output, 'charts', 'open-small-profile-before-0.svg'), 'utf8')).toContain('renderEditor')
+  const html = await readFile(join(output, 'index.html'), 'utf8')
+  expect(html).toContain('workbench.js')
+  for (const [, path] of html.matchAll(/src="([^"]+)"/g)) await expect(stat(join(output, path!))).resolves.toBeDefined()
 })
 
 test('report is still written when no valid runtime comparison or build is available', async () => {

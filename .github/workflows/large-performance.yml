@@ -203,13 +203,14 @@ jobs:
           node packages/large-benchmark/src/main.ts report \
             --manifest .large-manifest/manifest.json --input-dir .large-downloads \
             --output-dir .large-report --build-outcomes "$BUILD_OUTCOMES"
-      - name: Upload comparison report and raw evidence
+      - name: Upload HTML report and charts
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: large-performance-report
-          path: .large-report
-          include-hidden-files: true
+          path: |
+            .large-report/index.html
+            .large-report/charts/*.svg
           if-no-files-found: error
           retention-days: 30
           overwrite: true

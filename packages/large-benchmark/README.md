@@ -25,7 +25,15 @@ Failures and unavailable facilities are recorded independently; regressions do
 not fail the workflow. The final job always gathers the available evidence and
 uploads **large-performance-report**. Download and extract it, then open
 `index.html`. The report works offline and includes SVG charts, distributions,
-coverage, JSON/CSV summaries, CPU flame charts, and links to raw evidence.
+coverage, and CPU flame charts. This artifact contains only the HTML report and
+SVG charts. Raw JSON data, traces, profiles, snapshots, and diagnostics remain in
+the separate **large-result-&lt;benchmark-id&gt;** artifacts; the report identifies
+the corresponding artifact for each benchmark without copying its evidence.
+
+The Actions job summary shows Markdown tables for every available metric,
+grouped by collector, with before/after values, absolute and percentage changes,
+complete pair counts, and paired confidence intervals. Benchmark coverage remains
+available in an expandable table, including failed and unavailable collectors.
 
 Startup covers an empty window and a workspace opening a fixed text file, in
 both cold and warm conditions. Cold launches use fresh profiles and clear Linux
