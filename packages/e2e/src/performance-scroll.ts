@@ -8,6 +8,6 @@ export const setup = async (context: TestContext): Promise<void> => {
   await context.Editor.focus()
 }
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.scrollDown()
+  await Editor.scrollDown({ viaKeyBoard: true })
   await Editor.shouldContainText('line 19999 large needle')
 }

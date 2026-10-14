@@ -1060,8 +1060,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to save all files`)
       }
     },
-    async scrollDown() {
+    async scrollDown({ viaKeyBoard = false } = {}) {
       try {
+        if (viaKeyBoard) {
+          await page.keyboard.press(IsMacos.isMacos(platform) ? 'Meta+ArrowDown' : 'Control+End')
+          return
+        }
         await page.waitForIdle()
         await this.selectAll({ viaKeyBoard: false })
         await page.waitForIdle()
