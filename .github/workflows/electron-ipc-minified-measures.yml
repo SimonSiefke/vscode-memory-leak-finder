@@ -13,7 +13,7 @@ permissions:
   actions: read
 
 env:
-  IPC_BUILD_RUN: '38535429028'
+  IPC_BUILD_RUN: '38536042411'
 
 jobs:
   benchmark:
@@ -43,7 +43,7 @@ jobs:
         run: |
           gh run watch "$IPC_BUILD_RUN" --repo "$GITHUB_REPOSITORY" --exit-status --interval 30
           gh run view "$IPC_BUILD_RUN" --repo "$GITHUB_REPOSITORY" --json headSha,conclusion > build-provenance.json
-          python3 -c "import json; d=json.load(open('build-provenance.json')); assert d['conclusion']=='success' and d['headSha']=='88771974a7c8b984a7e2b44dfb46eb9178359107'"
+          python3 -c "import json; d=json.load(open('build-provenance.json')); assert d['conclusion']=='success' and d['headSha']=='94bb48e5b48343fa62a7f160e0320d559f49998f'"
       - name: Make space for isolated builds
         run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
       - name: Install desktop and performance dependencies
