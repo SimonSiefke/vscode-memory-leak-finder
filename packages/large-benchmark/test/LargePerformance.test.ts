@@ -234,6 +234,9 @@ test('reports reject unknown benchmark identities and overlapping input/output d
   await expect(generateReport({ input: directory, output: join(directory, 'report'), benchmarks: [benchmark], commits })).rejects.toThrow(
     'separate',
   )
+  await expect(generateReport({ input: join(directory, 'input'), output: directory, benchmarks: [benchmark], commits })).rejects.toThrow(
+    'separate',
+  )
   await expect(
     generateReport({ input: directory, output: directory + '-report', benchmarks: [{ ...benchmark, id: '../../escape' }], commits }),
   ).rejects.toThrow('Unknown benchmark')

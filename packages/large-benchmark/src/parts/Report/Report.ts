@@ -1,5 +1,5 @@
 import { copyFile, link, mkdir, readdir, rm, writeFile } from 'node:fs/promises'
-import { dirname, join, relative, resolve } from 'node:path'
+import { dirname, join, relative, resolve, sep } from 'node:path'
 import { errorMessage, readJson, writeJson } from '../Io/Io.ts'
 import { selectBenchmarks } from '../Manifest/Manifest.ts'
 import { comparePairs } from '../Statistics/Statistics.ts'
@@ -238,7 +238,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
   }
   const input = resolve(options.input)
   const output = resolve(options.output)
-  if (input === output || input.startsWith(output + '/') || output.startsWith(input + '/'))
+  if (input === output || input.startsWith(output + sep) || output.startsWith(input + sep))
     throw new Error('Report input and output must be separate directories')
   await mkdir(join(options.output, 'charts'), { recursive: true })
   const paths = await findResults(options.input)
