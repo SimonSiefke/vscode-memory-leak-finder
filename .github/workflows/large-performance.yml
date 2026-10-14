@@ -87,7 +87,7 @@ jobs:
           else
             commit="$AFTER_COMMIT"
           fi
-          node packages/large-benchmark/src/main.ts extract --input-dir .large-build --commit "$commit"
+          node packages/large-benchmark/src/main.ts extract --input-dir .large-build --commit "$commit" --output-name executable
           node --input-type=module -e "import {readFileSync,writeFileSync} from 'node:fs'; const metadata=JSON.parse(readFileSync('.large-build/build.json','utf8')); writeFileSync('.large-build/status.json',JSON.stringify({...metadata,status:'success',sourceRun:process.env.SOURCE_RUN},null,2))"
       - name: Upload executable package
         uses: actions/upload-artifact@v7
