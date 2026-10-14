@@ -1,4 +1,4 @@
-name: Electron IPC minified measurements
+name: Electron IPC minified x64 measurements
 
 on:
   push:
@@ -27,8 +27,6 @@ jobs:
         platform:
           - arch: x64
             runner: ubuntu-24.04
-          - arch: arm64
-            runner: ubuntu-24.04-arm
     env:
       IPC_BENCHMARK_ROOT: ${{ github.workspace }}/ipc-results
       IPC_PRODUCT_ROOT: ${{ github.workspace }}/products
@@ -41,9 +39,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh run watch "$IPC_BUILD_RUN" --repo "$GITHUB_REPOSITORY" --exit-status --interval 30
-          gh run view "$IPC_BUILD_RUN" --repo "$GITHUB_REPOSITORY" --json headSha,conclusion > build-provenance.json
-          python3 -c "import json; d=json.load(open('build-provenance.json')); assert d['conclusion']=='success' and d['headSha']=='d0243cb5f36fe789f78fc0607a81c16573176d92'"
+          python3 scripts/electron-ipc-minified-x64/measure/await-build.py
       - name: Make space for isolated builds
         run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
       - name: Install desktop and performance dependencies
@@ -116,7 +112,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64, arm64]
+        arch: [x64]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8

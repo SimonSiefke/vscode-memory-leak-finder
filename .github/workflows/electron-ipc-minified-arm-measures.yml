@@ -1,0 +1,133 @@
+name: Electron IPC minified ARM CPU measurements
+
+on:
+  push:
+    branches: [ci/electron-ipc-minified-x64]
+    paths:
+      - .github/workflows/electron-ipc-minified-arm-measures.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  IPC_BUILD_RUN: '38537816617'
+
+jobs:
+  benchmark:
+    if: github.repository == 'SimonSiefke/vscode-memory-leak-finder' && github.actor == 'SimonSiefke'
+    runs-on: ${{ matrix.platform.runner }}
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        replica: [1, 2, 3]
+        platform:
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    env:
+      IPC_BENCHMARK_ROOT: ${{ github.workspace }}/ipc-results
+      IPC_PRODUCT_ROOT: ${{ github.workspace }}/products
+      IPC_ARCH: ${{ matrix.platform.arch }}
+      IPC_REPLICA: ${{ matrix.replica }}
+      IPC_STARTUP_SAMPLES: ${{ matrix.replica == 1 && '333' || '332' }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Require pinned build run success
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/electron-ipc-minified-x64/measure/await-build.py
+      - name: Make space for isolated builds
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
+      - name: Install desktop and performance dependencies
+        run: bash scripts/electron-ipc-benchmark/install-linux.sh
+      - uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.IPC_BUILD_RUN }}
+          pattern: ipc-minified-${{ matrix.platform.arch }}-*
+          path: archives
+      - name: Extract isolated products
+        run: |
+          for variant in buffer before after; do
+            mkdir -p "products/$variant"
+            tar --zstd -xf "archives/ipc-minified-$IPC_ARCH-$variant/package.tar.zst" -C "products/$variant"
+          done
+          rm -rf archives
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: products/after/package/.nvmrc
+      - name: Record source smoke Node executable
+        run: echo "IPC_PRODUCT_NODE=$(command -v node)" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - name: Install pinned benchmark driver
+        if: matrix.platform.arch == 'arm64'
+        run: |
+          npm run install:ci
+          npm run build
+      - name: Prepare pinned smoke fixture
+        if: matrix.platform.arch == 'x64'
+        run: |
+          git clone https://github.com/microsoft/vscode-smoketest-express.git smoke-fixture
+          git -C smoke-fixture checkout --detach ecb012634f104f7a8188d9e3610a4d2d65bef6f6
+      - name: Verify pristine minified packages and runner
+        run: python3 scripts/electron-ipc-minified-x64/measure/run.py verify
+      - name: Validate editor-open scenario
+        if: matrix.platform.arch == 'arm64'
+        run: python3 scripts/electron-ipc-minified-x64/measure/run.py pilot
+      - name: Measure real hardware instructions and cycles
+        if: matrix.platform.arch == 'arm64'
+        run: python3 scripts/electron-ipc-minified-x64/measure/run.py cpu
+      - name: Measure internal startup readiness without debugger
+        if: matrix.platform.arch == 'x64'
+        run: xvfb-run -a python3 scripts/electron-ipc-minified-x64/measure/run.py startup
+      - name: Measure original smoke selection on pristine packages
+        if: matrix.platform.arch == 'x64'
+        run: python3 scripts/electron-ipc-minified-x64/measure/run.py smoke
+      - name: Require complete samples
+        run: python3 scripts/electron-ipc-minified-x64/measure/report.py "$IPC_BENCHMARK_ROOT" "$IPC_ARCH"
+      - name: Preserve provenance
+        if: always()
+        run: |
+          mkdir -p ipc-results
+          cp build-provenance.json ipc-results/ || true
+          if [[ -f ipc-results/report.md ]]; then cat ipc-results/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ipc-minified-results-${{ matrix.platform.arch }}-${{ matrix.replica }}
+          path: ipc-results
+          include-hidden-files: true
+          retention-days: 30
+
+  report:
+    needs: benchmark
+    if: always()
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [arm64]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: ipc-minified-results-${{ matrix.arch }}-*
+          path: results
+      - name: Aggregate matched comparisons on three hosts
+        run: |
+          python3 scripts/electron-ipc-minified-x64/measure/report.py results ${{ matrix.arch }} --aggregate
+          cat results/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ipc-minified-comparison-${{ matrix.arch }}
+          path: |
+            results/report.md
+            results/summary.json
+            results/samples.csv
+          retention-days: 30
