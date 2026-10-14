@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import struct
 import subprocess
@@ -23,9 +24,15 @@ def verify(root, sha, arch, source=None):
     product = json.loads((app / "product.json").read_text())
     if product.get("commit") != sha:
         raise RuntimeError(f"Packaged commit mismatch: {product.get('commit')}")
-    for name in ["out/main.js", "out/vs/workbench/workbench.desktop.main.js", "out/vs/base/browser/ui/codicons/codicon/codicon.ttf", "node_modules.asar"]:
+    for name in ["out/main.js", "out/vs/workbench/workbench.desktop.main.js", "out/media/codicon.ttf", "node_modules.asar"]:
         if not (app / name).is_file() or not (app / name).stat().st_size:
             raise RuntimeError(f"Missing packaged output: {name}")
+    css_path = app / "out/vs/workbench/workbench.desktop.main.css"
+    font_urls = [u.strip("\"' ") for u in re.findall(r"url\(([^)]+)\)", css_path.read_text()) if "codicon.ttf" in u]
+    if not font_urls or any((css_path.parent / u).resolve() != (app / "out/media/codicon.ttf").resolve() for u in font_urls):
+        raise RuntimeError("Packaged CSS does not resolve the codicon font")
+    if (app / "out/media/codicon.ttf").read_bytes()[:4] not in [b"\x00\x01\x00\x00", b"OTTO"]:
+        raise RuntimeError("Invalid packaged font data")
     if (app / "out/vs/base/common/uri.js").exists():
         raise RuntimeError("An unbundled development output was supplied")
     extensions = {}
@@ -49,7 +56,9 @@ db.get('SELECT 42 AS answer', (error, row) => {
   console.log(JSON.stringify({ sqlite: row.answer, arch: process.arch, electron: process.versions.electron, node: process.versions.node }));
  });
 });"""
-    result = subprocess.run([str(executable), "-e", script], cwd=app, env=dict(os.environ, ELECTRON_RUN_AS_NODE="1"), capture_output=True, text=True, check=True, timeout=45)
+    result = subprocess.run([str(executable), "-e", script], cwd=app, env=dict(os.environ, ELECTRON_RUN_AS_NODE="1"), capture_output=True, text=True, timeout=45)
+    if result.returncode:
+        raise RuntimeError(f"Packaged SQLite verification failed: {result.stdout}\n{result.stderr}")
     runtime = json.loads(result.stdout.splitlines()[-1])
     if runtime["sqlite"] != 42 or runtime["arch"] != arch:
         raise RuntimeError("Packaged native-module verification failed")
