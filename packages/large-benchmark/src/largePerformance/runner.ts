@@ -4,14 +4,31 @@ import { access, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promise
 import { hostname, release, cpus } from 'node:os'
 import { join, resolve } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
-import { Cdp, connectTarget } from './cdp.ts'
-import { electronExpression, heapSnapshot, profileMetrics, rendererMetrics, stopTrace, traceCategories } from './collectors.ts'
+import {
+  connectTarget,
+  evaluate,
+  waitReady,
+  createScenario,
+  prepareFixture,
+  type Session,
+  type Scenario,
+  electronExpression,
+  heapSnapshot,
+  profileMetrics,
+  rendererMetrics,
+  stopTrace,
+  traceCategories,
+  hardwareEvents,
+  PerfSession,
+  softwareEvents,
+  processTree,
+  ResourceSampler,
+  MeasureCpuProfile,
+  MeasureBrowserPerformanceCounters,
+} from './shared.ts'
 import { compressEvidence } from './compression.ts'
 import { command, errorMessage, writeJson } from './io.ts'
 import { sampleCount, sampleOrder } from './manifest.ts'
-import { hardwareEvents, PerfSession, softwareEvents } from './perf.ts'
-import { processTree, ResourceSampler } from './resources.ts'
-import { prepareFixture, runAction, setupAction, waitReady } from './scenarios.ts'
 import { UnavailableError, type Benchmark, type Metric, type Result, type Revision, type Sample } from './types.ts'
 
 export interface RunOptions {
@@ -72,17 +89,20 @@ export const prepareProfile = async (profile: string): Promise<void> => {
     'terminal.integrated.accessibleViewFocusOnCommandExecution': false,
     'editor.accessibilitySupport': 'on',
     'terminal.integrated.defaultProfile.linux': 'bash',
-    'terminal.integrated.profiles.linux': { bash: { path: '/bin/bash', args: ['--noprofile', '--norc'], env: { PS1: '$ ' } } },
+    'terminal.integrated.profiles.linux': {
+      bash: { path: '/bin/bash', args: ['--noprofile', '--norc'], env: { PS1: '$ ', PROMPT_COMMAND: '', BASH_ENV: null } },
+    },
     'terminal.integrated.shellIntegration.enabled': false,
     'security.workspace.trust.enabled': false,
     'files.hotExit': 'off',
+    'git.openRepositoryInParentFolders': 'never',
   })
 }
 
 interface Application {
   child: ChildProcess
-  renderer: Cdp
-  main: () => Promise<Cdp>
+  renderer: Session
+  main: () => Promise<Session>
   started: number
   ready: number
   dispose: () => Promise<void>
@@ -95,7 +115,7 @@ const launch = async (
   benchmark: Benchmark,
   directory: string,
   perf?: PerfSession,
-  hooks: { onSpawn?: (child: ChildProcess) => Promise<void>; onReady?: (renderer: Cdp) => Promise<void> } = {},
+  hooks: { onSpawn?: (child: ChildProcess) => Promise<void>; onReady?: (renderer: Session) => Promise<void> } = {},
 ): Promise<Application> => {
   const [rendererPort, mainPort] = await Promise.all([freePort(), freePort()])
   const args = [
@@ -145,19 +165,19 @@ const launch = async (
   }
   child.stdout?.on('data', append)
   child.stderr?.on('data', append)
-  let renderer: Cdp | undefined
-  let mainConnection: Cdp | undefined
-  const main = async (): Promise<Cdp> => (mainConnection ??= await connectTarget(mainPort, true))
+  let renderer: Session | undefined
+  let mainConnection: Session | undefined
+  const main = async (): Promise<Session> => (mainConnection ??= await connectTarget(mainPort, true))
   let disposePromise: Promise<void> | undefined
   const finish = async (): Promise<void> => {
     const pids = child.pid ? await processTree(child.pid).catch(() => []) : []
     if (child.exitCode === null && child.signalCode === null) {
       try {
-        await (await main()).evaluate(electronExpression('electron.app.quit()'))
+        await evaluate(await main(), electronExpression('electron.app.quit()'))
       } catch {}
     }
     // Node's inspector otherwise keeps shutdown waiting for the debugger to disconnect.
-    mainConnection?.close()
+    await mainConnection?.dispose()
     if (child.exitCode === null && child.signalCode === null)
       await Promise.race([new Promise<void>((resolve) => child.once('close', () => resolve())), delay(3000)])
     for (const entry of pids.reverse()) {
@@ -176,8 +196,7 @@ const launch = async (
         process.kill(-child.pid, 'SIGKILL')
       } catch {}
     }
-    renderer?.close()
-    mainConnection?.close()
+    await renderer?.dispose()
     await writeFile(join(directory, 'application.log'), log)
   }
   const dispose = (): Promise<void> => (disposePromise ??= finish())
@@ -204,6 +223,8 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
   const sample: Sample = { pair, revision, order, status: 'success', metrics: [], diagnostics: [], raw: [], elapsedMs: 0 }
   const started = performance.now()
   let app: Application | undefined
+  let scenario: Scenario | undefined
+  let activeRendererMeasure: typeof MeasureCpuProfile | undefined
   let perf: PerfSession | undefined
   let resources: ResourceSampler | undefined
   let resourceMetrics: Metric[] = []
@@ -250,7 +271,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
               }
             },
             onReady: async (renderer) => {
-              if (benchmark.collector === 'timeline') await renderer.evaluate(`console.timeStamp('large-end')`)
+              if (benchmark.collector === 'timeline') await evaluate(renderer, `console.timeStamp('large-end')`)
               await perf?.freeze()
               if (resources) resourceMetrics = await resources.stop()
             },
@@ -266,7 +287,12 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
         value: app.ready - app.started,
         coverage: 'spawn to visible workbench (and rendered text for workspace startup); includes automation polling',
       })
-    if (!benchmark.startup) await setupAction(renderer, benchmark)
+    if (!benchmark.startup) {
+      const version = JSON.parse(await readFile(join(resolve(options.paths[revision], '..'), 'resources/app/package.json'), 'utf8')).version
+      const [major, minor, patch] = version.split('.').map(Number)
+      scenario = await createScenario(renderer, await app.main(), workspace, benchmark.scenario, { major, minor, patch })
+      await scenario.setup()
+    }
     let before: Metric[] = []
     let browserBefore: { name: string; value: number }[] = []
     if (benchmark.collector === 'resources' && !benchmark.startup) {
@@ -275,24 +301,23 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     }
     if (!benchmark.startup && perf) await perf.attach((await processTree(app.child.pid!)).map((entry) => entry.pid))
     if (benchmark.collector === 'renderer') {
-      await renderer.send('Performance.enable')
-      browserBefore = (await renderer.send('Performance.getMetrics')).metrics
+      activeRendererMeasure = MeasureBrowserPerformanceCounters
+      browserBefore = (await activeRendererMeasure.start(renderer)).metrics
     }
     if (benchmark.collector === 'timeline') {
       if (!benchmark.startup) {
-        await (
-          await app.main()
-        ).evaluate(
+        await evaluate(
+          await app.main(),
           electronExpression(
             `await electron.contentTracing.startRecording({categoryFilter: ${JSON.stringify(traceCategories)}, traceOptions: 'record-until-full'})`,
           ),
         )
-        await renderer.evaluate(`console.timeStamp('large-start')`)
+        await evaluate(renderer, `console.timeStamp('large-start')`)
       }
     }
     if (benchmark.collector === 'profile') {
-      await renderer.send('Profiler.enable')
-      await renderer.send('Profiler.start')
+      activeRendererMeasure = MeasureCpuProfile
+      await activeRendererMeasure.start(renderer)
     }
     if (benchmark.collector === 'memory' && !benchmark.startup) {
       before = await heapSnapshot(renderer, join(directory, 'before.heapsnapshot'))
@@ -301,7 +326,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     }
     if (!benchmark.startup) {
       const actionStart = performance.now()
-      await runAction(renderer, benchmark, workspace)
+      await scenario!.run()
       if (benchmark.collector === 'timing')
         sample.metrics.push({
           name: 'actionTime',
@@ -339,20 +364,20 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
       sample.raw.push(`raw/${pair}-${revision}/resources.json`)
     }
     if (benchmark.collector === 'renderer') {
-      const browserAfter = (await renderer.send('Performance.getMetrics')).metrics
+      const browserAfter = (await MeasureBrowserPerformanceCounters.stop(renderer)).metrics
       sample.metrics.push(...rendererMetrics(browserBefore, browserAfter))
       await writeJson(join(directory, 'renderer.json'), { before: browserBefore, after: browserAfter })
       sample.raw.push(`raw/${pair}-${revision}/renderer.json`)
     }
     if (benchmark.collector === 'timeline') {
-      if (!benchmark.startup) await renderer.evaluate(`console.timeStamp('large-end')`)
+      if (!benchmark.startup) await evaluate(renderer, `console.timeStamp('large-end')`)
       // VS Code's --trace hook starts recording before it creates the workbench renderer.
       sample.metrics.push(...(await stopTrace(await app.main(), join(directory, 'trace.json'), benchmark.startup)))
       await compressEvidence(join(directory, 'trace.json'))
       sample.raw.push(`raw/${pair}-${revision}/trace.json.gz`)
     }
     if (benchmark.collector === 'profile') {
-      const { profile: cpuProfile } = await renderer.send('Profiler.stop')
+      const cpuProfile = await MeasureCpuProfile.stop(renderer)
       sample.metrics.push(...(await profileMetrics(cpuProfile, join(directory, 'renderer.cpuprofile'))))
       sample.raw.push(`raw/${pair}-${revision}/renderer.cpuprofile`, `raw/${pair}-${revision}/renderer-functions.json`)
     }
@@ -373,11 +398,35 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
   } catch (error) {
     sample.status = error instanceof UnavailableError ? 'unavailable' : 'failed'
     sample.diagnostics.push(errorMessage(error))
+    if (app) {
+      try {
+        await writeJson(
+          join(directory, 'failure-state.json'),
+          await evaluate(
+            app.renderer,
+            `({ text: document.body.innerText.slice(0, 30000), activeElement: document.activeElement?.outerHTML, tabs: [...document.querySelectorAll('.tab')].map(e => e.outerHTML) })`,
+          ),
+        )
+      } catch {}
+    }
   } finally {
     try {
+      if (perf && app) await perf.freeze()
       await resources?.stop()
     } catch (error) {
-      sample.diagnostics.push(errorMessage(error))
+      sample.diagnostics.push(`Collector boundary cleanup: ${errorMessage(error)}`)
+    }
+    try {
+      if (activeRendererMeasure && app) await activeRendererMeasure.releaseResources(app.renderer)
+    } catch (error) {
+      sample.diagnostics.push(`Renderer collector cleanup: ${errorMessage(error)}`)
+      sample.status = 'failed'
+    }
+    try {
+      await scenario?.dispose()
+    } catch (error) {
+      sample.diagnostics.push(`Scenario cleanup: ${errorMessage(error)}`)
+      sample.status = 'failed'
     }
     try {
       await app?.dispose()

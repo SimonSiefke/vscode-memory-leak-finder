@@ -1,9 +1,13 @@
-import { createWriteStream } from 'node:fs'
-import { readFile } from 'node:fs/promises'
-import { finished } from 'node:stream/promises'
-import { Cdp } from './cdp.ts'
-import { writeJson } from './io.ts'
-import { UnavailableError, type Metric } from './types.ts'
+import { readFile, writeFile } from 'node:fs/promises'
+import type { Session } from '../Session/Session.ts'
+import { evaluate } from '../ConnectDevtoolsEndpoint/ConnectDevtoolsEndpoint.ts'
+import * as HeapSnapshot from '../HeapSnapshot/HeapSnapshot.ts'
+import * as CpuProfile from '../CpuProfile/CpuProfile.ts'
+import { normalizeBrowserPerformanceMetrics } from '../BrowserPerformanceMetrics/BrowserPerformanceMetrics.ts'
+import { unionDuration } from '../PerformanceTraceEvents/PerformanceTraceEvents.ts'
+import { UnavailableError, type Metric } from '../PerformanceMetric/PerformanceMetric.ts'
+
+const writeJson = (path: string, value: unknown): Promise<void> => writeFile(path, JSON.stringify(value, null, 2) + '\n')
 
 export const traceCategories =
   'devtools.timeline,disabled-by-default-devtools.timeline,disabled-by-default-devtools.timeline.stack,v8,v8.execute,disabled-by-default-v8.compile,blink.console'
@@ -11,28 +15,18 @@ export const traceCategories =
 export const electronExpression = (expression: string): string =>
   `(async () => { const electron = typeof require === 'function' ? require('electron') : typeof process.getBuiltinModule === 'function' ? process.getBuiltinModule('module').createRequire(process.cwd() + '/package.json')('electron') : process.mainModule.require('electron'); return ${expression}; })()`
 
-const browserSpecs = [
-  ['LayoutCount', 'layoutCount', 'count'],
-  ['RecalcStyleCount', 'styleCount', 'count'],
-  ['LayoutDuration', 'layoutDuration', 'ms'],
-  ['RecalcStyleDuration', 'styleDuration', 'ms'],
-  ['ScriptDuration', 'scriptDuration', 'ms'],
-  ['TaskDuration', 'taskDuration', 'ms'],
-] as const
-
 export const rendererMetrics = (before: { name: string; value: number }[], after: { name: string; value: number }[]): Metric[] => {
-  const start = new Map(before.map((entry) => [entry.name, entry.value]))
-  const end = new Map(after.map((entry) => [entry.name, entry.value]))
-  return browserSpecs.flatMap(([cdpName, name, unit]) =>
-    start.has(cdpName) && end.has(cdpName)
-      ? [
-          {
-            name,
-            unit,
-            value: (end.get(cdpName)! - start.get(cdpName)!) * (unit === 'ms' ? 1000 : 1),
-            coverage: 'workbench renderer',
-          },
-        ]
+  const names: Record<string, string> = {
+    recalcStyleCount: 'styleCount',
+    layoutDurationMs: 'layoutDuration',
+    recalcStyleDurationMs: 'styleDuration',
+    scriptDurationMs: 'scriptDuration',
+    taskDurationMs: 'taskDuration',
+    gcDurationMs: 'gcDuration',
+  }
+  return normalizeBrowserPerformanceMetrics({ metrics: before }, { metrics: after }).flatMap((row) =>
+    row.available && row.delta !== null
+      ? [{ name: names[row.name] ?? row.name, unit: row.unit, value: row.delta, coverage: 'workbench renderer' }]
       : [],
   )
 }
@@ -48,22 +42,17 @@ interface TraceEvent {
 }
 
 const traceDuration = (events: TraceEvent[], end: number): number => {
-  const threads = new Map<number, [number, number][]>()
+  const threads = new Map<number, TraceEvent[]>()
   for (const event of events) {
     const spans = threads.get(event.tid) ?? []
-    spans.push([event.ts, Math.min(end, event.ts + event.dur!)])
+    spans.push({ ...event, dur: Math.min(event.dur!, end - event.ts) })
     threads.set(event.tid, spans)
   }
   let total = 0
   for (const spans of threads.values()) {
-    spans.sort((a, b) => a[0] - b[0])
-    let high = -Infinity
-    for (const [start, stop] of spans) {
-      total += Math.max(0, stop - Math.max(start, high))
-      high = Math.max(high, stop)
-    }
+    total += unionDuration(spans.map((event) => ({ ...event, dur: event.dur! })))
   }
-  return total / 1000
+  return total
 }
 
 export const analyzeTrace = (events: TraceEvent[], startup: boolean): Metric[] => {
@@ -124,9 +113,9 @@ export const analyzeTrace = (events: TraceEvent[], startup: boolean): Metric[] =
   return metrics
 }
 
-export const stopTrace = async (main: Cdp, path: string, startup: boolean): Promise<Metric[]> => {
-  const usage = await main.evaluate<{ percentage: number }>(electronExpression('await electron.contentTracing.getTraceBufferUsage()'))
-  await main.evaluate(electronExpression(`await electron.contentTracing.stopRecording(${JSON.stringify(path)})`))
+export const stopTrace = async (main: Session, path: string, startup: boolean): Promise<Metric[]> => {
+  const usage = await evaluate<{ percentage: number }>(main, electronExpression('await electron.contentTracing.getTraceBufferUsage()'))
+  await evaluate(main, electronExpression(`await electron.contentTracing.stopRecording(${JSON.stringify(path)})`))
   if (usage.percentage >= 1) throw new UnavailableError('Trace buffer filled; the trace is incomplete')
   return loadTrace(path, startup)
 }
@@ -169,49 +158,21 @@ export const summarizeHeap = (snapshot: any): Metric[] => {
   ]
 }
 
-export const heapSnapshot = async (cdp: Cdp, path: string): Promise<Metric[]> => {
-  const output = createWriteStream(path)
-  let streamError: Error | undefined
-  output.on('error', (error) => {
-    streamError = error
-  })
-  output.on('drain', () => cdp.resume())
-  const unsubscribe = cdp.on('HeapProfiler.addHeapSnapshotChunk', ({ chunk }: { chunk: string }) => {
-    if (!output.write(chunk)) cdp.pause()
-  })
-  try {
-    await cdp.send('HeapProfiler.takeHeapSnapshot', { reportProgress: false }, 120000)
-    output.end()
-    await finished(output)
-    if (streamError) throw streamError
-    return summarizeHeap(JSON.parse(await readFile(path, 'utf8')))
-  } finally {
-    unsubscribe()
-    cdp.resume()
-    output.destroy()
-  }
+export const heapSnapshot = async (session: Session, path: string): Promise<Metric[]> => {
+  await HeapSnapshot.takeHeapSnapshot(session, path, { reportProgress: false })
+  return summarizeHeap(JSON.parse(await readFile(path, 'utf8')))
 }
 
 export const profileMetrics = async (profile: any, path: string): Promise<Metric[]> => {
   await writeJson(path, profile)
   if (!Array.isArray(profile.samples) || !Array.isArray(profile.timeDeltas)) throw new UnavailableError('CPU profile contains no samples')
-  const nodes = new Map<number, any>(profile.nodes.map((node: any) => [node.id, node]))
-  const functions = new Map<string, number>()
-  for (let i = 0; i < profile.samples.length; i++) {
-    const frame = nodes.get(profile.samples[i])?.callFrame
-    if (!frame || !Number.isFinite(profile.timeDeltas[i])) continue
-    const name = `${frame.functionName || '(anonymous)'} @ ${frame.url || '(native)'}:${frame.lineNumber + 1}`
-    functions.set(name, (functions.get(name) ?? 0) + profile.timeDeltas[i] / 1000)
-  }
-  await writeJson(
-    path.replace('.cpuprofile', '-functions.json'),
-    [...functions].sort((a, b) => b[1] - a[1]),
-  )
+  const summary = CpuProfile.getCpuProfileSummary(profile)
+  await writeJson(path.replace('.cpuprofile', '-functions.json'), summary.topSelfTime)
   return [
     {
       name: 'profileSampledTime',
       unit: 'ms',
-      value: profile.timeDeltas.reduce((sum: number, value: number) => sum + value, 0) / 1000,
+      value: summary.metrics.totalTimeMs,
       coverage: 'workbench renderer CPU profile; diagnostic timing with profiler overhead',
     },
   ]

@@ -17,6 +17,10 @@ class CustomStream extends Readable {
     rpc.on(DevtoolsEventType.HeapProfilerAddHeapSnapshotChunk, this.handleChunk)
   }
   _read() {}
+  _destroy(error: Error | null, callback: (error?: Error | null) => void) {
+    this.rpc.off(DevtoolsEventType.HeapProfilerAddHeapSnapshotChunk, this.handleChunk)
+    callback(error)
+  }
   handleChunk(event: Dynamic) {
     const { params } = event
     const { chunk } = params
@@ -27,16 +31,19 @@ class CustomStream extends Readable {
       const options = {
         captureNumericValue: this.options.captureNumericValues,
         exposeInternals: false,
-        reportProgress: true,
+        reportProgress: this.options.reportProgress ?? true,
       }
       if (this.stopTracking) {
         await DevtoolsProtocolHeapProfiler.stopTrackingHeapObjects(this.rpc, options)
       } else {
         await DevtoolsProtocolHeapProfiler.takeHeapSnapshot(this.rpc, options)
       }
+    } catch (error) {
+      this.destroy(error instanceof Error ? error : new Error(String(error)))
+      throw error
     } finally {
       this.rpc.off(DevtoolsEventType.HeapProfilerAddHeapSnapshotChunk, this.handleChunk)
-      this.push(null)
+      if (!this.destroyed) this.push(null)
     }
   }
 }

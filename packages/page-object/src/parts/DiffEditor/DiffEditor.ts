@@ -68,8 +68,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await explorer.openContextMenu(file2)
         await contextMenu.select('Compare with Selected')
         await sideBar.hide()
-        const arrow = '↔'
-        const tab = page.locator('.tab', { hasText: `${file1} ${arrow} ${file2}` })
+        const tab = page.locator(`.tab[aria-label*=${JSON.stringify(file1)}][aria-label*=${JSON.stringify(file2)}]`)
         await expect(tab).toBeVisible()
         await page.waitForIdle()
         if (isNoteBook(file1)) {
@@ -92,11 +91,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           await expect(modified).toBeVisible()
           if (file1Content) {
             const lines = original.locator('.view-lines')
-            await expect(lines).toHaveText(file1Content)
+            await expect(lines).toHaveText(
+              file1Content.replaceAll(Character.NewLine, '').replaceAll(Character.Space, Character.NonBreakingSpace),
+            )
           }
           if (file2Content) {
             const lines = modified.locator('.view-lines')
-            await expect(lines).toHaveText(file2Content)
+            await expect(lines).toHaveText(
+              file2Content.replaceAll(Character.NewLine, '').replaceAll(Character.Space, Character.NonBreakingSpace),
+            )
           }
         }
       } catch (error) {

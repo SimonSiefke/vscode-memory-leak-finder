@@ -1,10 +1,12 @@
-import { spawn, type ChildProcess } from 'node:child_process'
+import { execFile, spawn, type ChildProcess } from 'node:child_process'
 import { constants } from 'node:fs'
 import { open, readFile, rm, type FileHandle } from 'node:fs/promises'
 import { join } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
-import { command } from './io.ts'
-import { UnavailableError, type Metric } from './types.ts'
+import { promisify } from 'node:util'
+import { UnavailableError, type Metric } from '../PerformanceMetric/PerformanceMetric.ts'
+
+const exec = promisify(execFile)
 
 export const hardwareEvents = ['instructions:u', 'cycles:u']
 export const softwareEvents = ['task-clock', 'context-switches', 'page-faults', 'minor-faults', 'major-faults']
@@ -43,7 +45,7 @@ export const probePerf = async (events: string[]): Promise<void> => {
   let raw: string
   try {
     // Put output in a temporary file because perf writes its statistics to stderr.
-    raw = await command(
+    const { stdout } = await exec(
       'sh',
       [
         '-c',
@@ -54,6 +56,7 @@ export const probePerf = async (events: string[]): Promise<void> => {
       ],
       { timeout: 15000 },
     )
+    raw = stdout
   } catch (error) {
     throw new UnavailableError(`perf counters unavailable: ${String(error)}`)
   }
@@ -81,7 +84,7 @@ export class PerfSession {
     await probePerf(events)
     const session = new PerfSession(directory, events)
     try {
-      await command('mkfifo', [join(directory, 'control'), join(directory, 'ack')])
+      await exec('mkfifo', [join(directory, 'control'), join(directory, 'ack')])
       session.control = await open(join(directory, 'control'), constants.O_RDWR | constants.O_NONBLOCK)
       session.acknowledgement = await open(join(directory, 'ack'), constants.O_RDWR | constants.O_NONBLOCK)
     } catch (error) {

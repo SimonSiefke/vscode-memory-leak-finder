@@ -4,6 +4,9 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, platform, VError }: CreateParams) => {
   return {
+    async shouldHaveItem(text: string) {
+      await expect(page.locator('.quick-input-list .label-name', { hasExactText: text })).toBeVisible()
+    },
     async close() {
       try {
         await this.hide()

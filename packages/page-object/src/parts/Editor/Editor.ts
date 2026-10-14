@@ -798,7 +798,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.openFile(fileName)
-        const tab = page.locator('.tab', { hasText: fileName })
+        const tab = page.locator(`.tab[data-resource-name=${JSON.stringify(basename(fileName))}]`)
         await expect(tab).toBeVisible()
         await page.waitForIdle()
         if (isNotebook(fileName)) {
@@ -1582,6 +1582,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
     },
+    async shouldContainText(text: string) {
+      const lines = page.locator('.monaco-editor .view-lines')
+      await expect(lines).toBeVisible()
+      const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replaceAll(' ', Character.NonBreakingSpace)
+      await expect(lines).toHaveText(new RegExp(escaped))
+    },
     async shouldHaveToken(text: string, color: string) {
       await page.waitForIdle()
       const token = page.locator(`[class^="mtk"]`, {
@@ -1923,6 +1929,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       } catch (error) {
         throw new VError(error, `Failed to type ${text}`)
       }
+    },
+    async typeCharacters(text: string) {
+      await page.keyboard.typeCharacters(text)
     },
     async undo({ viaKeyBoard = false } = {}) {
       try {

@@ -31,6 +31,7 @@ export interface ProcessTreeSample {
 
 export interface ProcessTreeSamplerResult {
   readonly droppedSampleCount: number
+  readonly finalSample?: ProcessTreeSample
   readonly samples: readonly ProcessTreeSample[]
 }
 
@@ -333,6 +334,7 @@ export const createProcessTreeSampler = (
         }
         return {
           droppedSampleCount,
+          ...(finalSample ? { finalSample } : {}),
           samples,
         }
       })()

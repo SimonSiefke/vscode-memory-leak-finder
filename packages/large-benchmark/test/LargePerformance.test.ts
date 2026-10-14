@@ -2,12 +2,8 @@ import { afterEach, expect, jest, test } from '@jest/globals'
 import { chmod, mkdtemp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { spawn, spawnSync } from 'node:child_process'
-import { setTimeout as delay } from 'node:timers/promises'
 import { benchmarks, sampleCount, sampleOrder, selectBenchmarks } from '../src/largePerformance/manifest.ts'
 import { comparePairs, summarize } from '../src/largePerformance/statistics.ts'
-import { analyzeTrace, rendererMetrics, summarizeHeap } from '../src/largePerformance/collectors.ts'
-import { parsePerf, PerfSession } from '../src/largePerformance/perf.ts'
 import { prepareProfile, runBenchmark, type RunOptions } from '../src/largePerformance/runner.ts'
 import { collectBundles, bundleChanges } from '../src/largePerformance/bundles.ts'
 import { comparisonsFor, generateReport, validateResult } from '../src/largePerformance/report.ts'
@@ -100,45 +96,6 @@ test('result validation rejects nonfinite metrics, duplicate samples, wrong comm
   data.samples[0]!.metrics[0]!.value = 10
   data.samples[0]!.raw = ['../../escape']
   expect(() => validateResult(data, benchmark, commits)).toThrow('reference')
-})
-
-test('perf unsupported values remain absent; multiplexed counters are rejected', () => {
-  expect(
-    parsePerf('100,,instructions:u,20,100.00,,\n50,,cycles:u,20,100.00,,', ['instructions:u', 'cycles:u']).map((metric) => metric.value),
-  ).toEqual([100, 50])
-  expect(parsePerf('<not supported>,,instructions:u,0,100.00,,', ['instructions:u'])).toEqual([])
-  expect(() => parsePerf('100,,instructions:u,20,50.00,,', ['instructions:u'])).toThrow('50%')
-})
-
-test('renderer durations convert seconds to milliseconds without inventing missing counters', () => {
-  expect(rendererMetrics([{ name: 'ScriptDuration', value: 1 }], [{ name: 'ScriptDuration', value: 1.25 }])).toEqual([
-    { name: 'scriptDuration', unit: 'ms', value: 250, coverage: 'workbench renderer' },
-  ])
-})
-
-test('traces clip to measurement boundaries and exclude other renderers and post-completion work', () => {
-  const marker = (message: string, ts: number) => ({ name: 'TimeStamp', ph: 'I', pid: 2, tid: 3, ts, args: { data: { message } } })
-  const events = [
-    marker('large-start', 10),
-    { name: 'Layout', ph: 'X', pid: 2, tid: 3, ts: 20, dur: 20 },
-    { name: 'Layout', ph: 'X', pid: 9, tid: 3, ts: 20, dur: 20 },
-    marker('large-end', 30),
-    { name: 'Layout', ph: 'X', pid: 2, tid: 3, ts: 35, dur: 20 },
-  ]
-  expect(analyzeTrace(events, false).find((metric) => metric.name === 'layouts')?.value).toBe(1)
-  expect(analyzeTrace(events, false).find((metric) => metric.name === 'layoutDuration')?.value).toBe(0.01)
-  expect(() => analyzeTrace(events, true)).toThrow('initialization')
-  expect(() => analyzeTrace([], false)).toThrow('markers')
-  expect(analyzeTrace([{ name: 'EvaluateScript', ph: 'X', pid: 2, tid: 3, ts: 1, dur: 2 }, ...events], true).length).toBeGreaterThan(0)
-})
-
-test('heap code bytes use the schema type index rather than assuming V8 field positions', () => {
-  expect(
-    summarizeHeap({
-      snapshot: { meta: { node_fields: ['self_size', 'type'], node_types: ['number', ['object', 'code']] } },
-      nodes: [100, 0, 50, 1],
-    }).map((metric) => metric.value),
-  ).toEqual([150, 50])
 })
 
 test('profile preparation resets only its owned directory and writes deterministic settings', async () => {
@@ -281,31 +238,3 @@ test('reports reject unknown benchmark identities and overlapping input/output d
     generateReport({ input: directory, output: directory + '-report', benchmarks: [{ ...benchmark, id: '../../escape' }], commits }),
   ).rejects.toThrow('Unknown benchmark')
 })
-
-const canUsePerf =
-  process.platform === 'linux' && spawnSync('perf', ['stat', '-e', 'task-clock', '--', process.execPath, '-e', '']).status === 0
-const perfTest = canUsePerf ? test : test.skip
-
-perfTest(
-  'perf controls delimit real collection and leave only uploadable files after disposal',
-  async () => {
-    const directory = await temporary()
-    const session = await PerfSession.create(directory, ['task-clock'])
-    const child = spawn(process.execPath, ['-e', 'setInterval(() => { let n=0; for(let i=0;i<100000;i++) n+=i }, 1)'], { stdio: 'ignore' })
-    try {
-      await session.attach([child.pid!])
-      await delay(100)
-      await session.freeze()
-      const metrics = await session.stop()
-      expect(metrics[0]!.name).toBe('task-clock')
-      expect(metrics[0]!.value).toBeGreaterThan(0)
-    } finally {
-      child.kill('SIGKILL')
-      await session.dispose()
-    }
-    await expect(stat(join(directory, 'control'))).rejects.toThrow()
-    await expect(stat(join(directory, 'ack'))).rejects.toThrow()
-    expect((await readFile(join(directory, 'perf.csv'), 'utf8')).length).toBeGreaterThan(0)
-  },
-  15000,
-)

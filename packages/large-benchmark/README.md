@@ -2,8 +2,9 @@
 
 Compare two minified Linux x64 VS Code builds with paired startup, interaction,
 resource, trace, profiling, memory, and bundle-size measurements. The package owns
-the benchmark manifest, deterministic fixtures, collectors, result format, and
-offline comparison report.
+the benchmark manifest, paired orchestration, result format, and offline report.
+It uses the existing DevTools connection and page-object harness, E2E scenarios
+in `packages/e2e/src/performance-*.ts`, and measures in `packages/memory-leak-finder`.
 
 ## Large Performance Measure
 
@@ -41,6 +42,18 @@ completion, including automation polling. PSS samples are taken every 250 ms and
 can miss brief peaks. Heap/code values describe renderer snapshot self-size;
 V8 code nodes include bytecode and code metadata. Missing hardware counters and
 trace categories are never reported as zero.
+
+The interaction scenarios use the same page APIs and setup/run/teardown stages
+as other E2E scenarios. Their `run` function ends at visible completion, with
+cleanup in `teardown` after collection stops. The existing leak scenarios often
+open and close a view in a single run; these dedicated workloads separate those
+actions to measure opening alone. They are opt-in (`skip = true`) for ordinary
+E2E runs and can also be executed with the harness's `--run-skipped-tests-anyway`.
+New reusable measures are `performanceTimeline`, `heapSnapshotBytes`,
+`processTreeCpuCounters`, and `processTreePss`. Profiling, renderer counter
+normalization, heap snapshot streaming, and PID-validated PSS sampling reuse
+the existing implementations. Cold/warm launch preparation and startup tracing
+remain orchestration hooks so collection begins before workbench initialization.
 
 The report compares complete sample pairs only. Counts and byte sizes use means;
 timings use medians. It also shows p95, standard deviation, min/max, and
@@ -108,3 +121,6 @@ inside the package, so use absolute paths when referencing files elsewhere.
 `prepare-build` is an explicit build command; installing the package does not
 build VS Code. Tests run with `npm --prefix packages/large-benchmark test` and
 type checks with `npm --prefix packages/large-benchmark run type-check`.
+Install the monorepo with `npm ci` before measuring; the shared workers and page
+objects use their package dependencies. `npm run build` builds the injected
+scenario utilities, which the workflow prepares before running measurements.
