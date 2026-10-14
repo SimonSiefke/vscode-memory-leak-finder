@@ -1,6 +1,6 @@
 import { readFile, readdir } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
-import { dirname, join, relative } from 'node:path'
+import { dirname, join, relative, sep } from 'node:path'
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 import { writeJson } from '../Io/Io.ts'
 import type { Metric, Result, Revision } from '../Types/Types.ts'
@@ -34,7 +34,7 @@ export const collectBundles = async (
           compressionCache.set(hash, compressed)
         }
         assets.push({
-          path: relative(directory, child),
+          path: relative(directory, child).split(sep).join('/'),
           bytes: bytes.length,
           ...compressed,
         })
