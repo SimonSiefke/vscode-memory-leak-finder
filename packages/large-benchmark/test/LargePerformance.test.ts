@@ -206,7 +206,7 @@ test('build extraction checks commit and archive integrity and preserves executa
   })
   await expect(extractBuild(directory, commits.after)).rejects.toThrow('metadata')
   const extracted = await extractBuild(directory, commits.before)
-  expect((await stat(extracted)).mode & 0o111).toBe(0o111)
+  if (process.platform !== 'win32') expect((await stat(extracted)).mode & 0o111).toBe(0o111)
   expect(await readFile(extracted, 'utf8')).toBe('#!/bin/sh\nexit 0\n')
   await writeFile(archive, 'corrupted archive')
   await expect(extractBuild(directory, commits.before)).rejects.toThrow('checksum mismatch')
