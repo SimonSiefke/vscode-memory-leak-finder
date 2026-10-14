@@ -1,0 +1,116 @@
+--- a/src/vs/platform/environment/common/argv.ts
++++ b/src/vs/platform/environment/common/argv.ts
+@@ -64,6 +64,7 @@
+ 	'prof-duration-markers'?: string[];
+ 	'prof-duration-markers-file'?: string;
+ 	'prof-v8-extensions'?: boolean;
++	'memory-leak-finder-benchmark-startup'?: boolean;
+ 	'no-cached-data'?: boolean;
+ 	verbose?: boolean;
+ 	trace?: boolean;
+--- a/src/vs/platform/environment/node/argv.ts
++++ b/src/vs/platform/environment/node/argv.ts
+@@ -146,6 +146,7 @@
+ 	'no-cached-data': { type: 'boolean' },
+ 	'prof-startup-prefix': { type: 'string' },
+ 	'prof-v8-extensions': { type: 'boolean' },
++	'memory-leak-finder-benchmark-startup': { type: 'boolean' },
+ 	'disable-extensions': { type: 'boolean', deprecates: ['disableExtensions'], cat: 't', description: localize('disableExtensions', "Disable all installed extensions. This option is not persisted and is effective only when the command opens a new window.") },
+ 	'disable-extension': { type: 'string[]', cat: 't', args: 'ext-id', description: localize('disableExtension', "Disable the provided extension. This option is not persisted and is effective only when the command opens a new window.") },
+ 	'sync': { type: 'string', cat: 't', description: localize('turn sync', "Turn sync on or off."), args: ['on | off'] },
+--- a/src/vs/code/electron-main/app.ts
++++ b/src/vs/code/electron-main/app.ts
+@@ -548,6 +548,14 @@
+ 		// Dispose on shutdown
+ 		Event.once(this.lifecycleMainService.onWillShutdown)(() => this.dispose());
+ 
++		if (this.environmentMainService.args['memory-leak-finder-benchmark-startup']) {
++			validatedIpcMain.once('vscode:memoryLeakFinderBenchmarkStartup', (_event, result: unknown) => {
++				process.stdout.write(`VSCODE_STARTUP_BENCHMARK\t${JSON.stringify(result)}\n`, () => {
++					void this.lifecycleMainService.quit();
++				});
++			});
++		}
++
+ 		// Contextmenu via IPC support
+ 		registerContextMenuListener();
+ 
+--- a/src/vs/workbench/contrib/performance/electron-browser/startupTimings.ts
++++ b/src/vs/workbench/contrib/performance/electron-browser/startupTimings.ts
+@@ -22,6 +22,49 @@
+ import { StartupTimings } from '../browser/startupTimings.js';
+ import { coalesce } from '../../../../base/common/arrays.js';
+ import { IStorageService, WillSaveStateReason } from '../../../../platform/storage/common/storage.js';
++import { ipcRenderer } from '../../../../base/parts/sandbox/electron-browser/globals.js';
++
++
++export class NativeStartupBenchmark implements IWorkbenchContribution {
++
++	constructor(
++		@ITimerService private readonly _timerService: ITimerService,
++		@INativeWorkbenchEnvironmentService environmentService: INativeWorkbenchEnvironmentService,
++		@IProductService private readonly _productService: IProductService
++	) {
++		if (environmentService.args['memory-leak-finder-benchmark-startup']) {
++			this._run().catch(error => ipcRenderer.send('vscode:memoryLeakFinderBenchmarkStartup', { error: String(error) }));
++		}
++	}
++
++	private async _run(): Promise<void> {
++		await this._timerService.whenReady();
++
++		const rendererReadyTime = performance.now();
++		const rendererReadyAbsoluteTime = performance.timeOrigin + rendererReadyTime;
++		const mainStartTime = this._timerService.getStartTime('code/didStartMain');
++		const rendererMarks = performance.getEntriesByType('mark').map(entry => ({
++			name: entry.name,
++			startTime: entry.startTime,
++			absoluteStartTime: performance.timeOrigin + entry.startTime
++		}));
++
++		ipcRenderer.send('vscode:memoryLeakFinderBenchmarkStartup', {
++			type: 'vscode-startup-benchmark',
++			schemaVersion: 1,
++			commit: this._productService.commit,
++			milestone: 'timerService.whenReady',
++			performanceTimeOrigin: performance.timeOrigin,
++			rendererReadyTime,
++			rendererReadyAbsoluteTime,
++			mainStartTime,
++			mainToTimerReady: mainStartTime >= 0 ? rendererReadyAbsoluteTime - mainStartTime : undefined,
++			startupMetrics: this._timerService.startupMetrics,
++			performanceMarks: this._timerService.getPerformanceMarks().map(([source, marks]) => ({ source, marks })),
++			rendererMarks
++		});
++	}
++}
+ 
+ interface ITracingData {
+ 	readonly args?: {
+--- a/src/vs/workbench/contrib/performance/electron-browser/performance.contribution.ts
++++ b/src/vs/workbench/contrib/performance/electron-browser/performance.contribution.ts
+@@ -5,9 +5,9 @@
+ 
+ import { LifecyclePhase } from '../../../services/lifecycle/common/lifecycle.js';
+ import { Registry } from '../../../../platform/registry/common/platform.js';
+-import { Extensions, IWorkbenchContributionsRegistry } from '../../../common/contributions.js';
++import { Extensions, IWorkbenchContributionsRegistry, registerWorkbenchContribution2, WorkbenchPhase } from '../../../common/contributions.js';
+ import { StartupProfiler } from './startupProfiler.js';
+-import { NativeStartupTimings } from './startupTimings.js';
++import { NativeStartupBenchmark, NativeStartupTimings } from './startupTimings.js';
+ import { RendererProfiling } from './rendererAutoProfiler.js';
+ import { IConfigurationRegistry, Extensions as ConfigExt } from '../../../../platform/configuration/common/configurationRegistry.js';
+ import { localize } from '../../../../nls.js';
+@@ -29,6 +29,12 @@
+ 
+ // -- startup timings
+ 
++registerWorkbenchContribution2(
++	'benchmark.nativeStartup',
++	NativeStartupBenchmark,
++	WorkbenchPhase.BlockStartup
++);
++
+ Registry.as<IWorkbenchContributionsRegistry>(Extensions.Workbench).registerWorkbenchContribution(
+ 	NativeStartupTimings,
+ 	LifecyclePhase.Eventually

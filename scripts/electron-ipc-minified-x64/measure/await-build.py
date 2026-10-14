@@ -7,7 +7,7 @@ import time
 repo = os.environ['GITHUB_REPOSITORY']
 run = os.environ['IPC_BUILD_RUN']
 arch = os.environ['IPC_ARCH']
-expected_sha = '827f9416479807f0d92e9ffde85a09c7ca145c19'
+expected_sha = os.environ.get('IPC_BUILD_REVISION', '827f9416479807f0d92e9ffde85a09c7ca145c19')
 
 
 def api(path):

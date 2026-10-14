@@ -1,0 +1,90 @@
+name: Electron IPC minified startup recorder refresh
+
+on:
+  push:
+    branches: [ci/electron-ipc-minified-x64]
+    paths:
+      - .github/workflows/electron-ipc-minified-recorder.yml
+      - scripts/electron-ipc-minified-x64/recorder/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  IPC_BUILD_RUN: '38539729906'
+  IPC_BUILD_REVISION: '827f9416479807f0d92e9ffde85a09c7ca145c19'
+  IPC_ARCH: x64
+  VSCODE_QUALITY: oss
+  VSCODE_PUBLISH_COUNTER: 0
+  NODE_OPTIONS: --max-old-space-size=6144
+
+jobs:
+  build:
+    if: github.repository == 'SimonSiefke/vscode-memory-leak-finder' && github.actor == 'SimonSiefke'
+    runs-on: ${{ matrix.platform.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [buffer, before, after]
+        include:
+          - variant: buffer
+            sha: 959031245ebb1fe077e0d512e1397c0ae82006e4
+          - variant: before
+            sha: d6352725adca1ebaebbabb24f65b63c88167fda3
+          - variant: after
+            sha: fb616229bd8383a07d0cdee17e5c844c9aa0a50c
+        platform:
+          - arch: x64
+            runner: ubuntu-24.04
+    env:
+      BUILD_SOURCEVERSION: ${{ matrix.sha }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Require the original verified packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/electron-ipc-minified-x64/measure/await-build.py
+      - name: Make space for package and preserved source
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
+      - name: Install packaging and desktop dependencies
+        run: bash scripts/electron-ipc-benchmark/install-linux.sh
+      - uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.IPC_BUILD_RUN }}
+          name: ipc-minified-x64-${{ matrix.variant }}
+          path: archive
+      - name: Extract and verify pristine original package
+        run: |
+          tar --zstd -xf archive/package.tar.zst
+          rm -rf archive
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: product/.nvmrc
+      - name: Verify original artifact integrity
+        run: python3 scripts/electron-ipc-minified-x64/build/verify.py package ${{ matrix.sha }} x64
+      - name: Adapt original recorder to current startup registration
+        run: git apply --directory=product scripts/electron-ipc-minified-x64/recorder/startup.patch
+      - name: Rebundle and package recorder using preserved source outputs
+        working-directory: product
+        run: |
+          node build/next/index.ts bundle --out out-vscode-min --target desktop --minify --mangle-privates --nls --source-map-base-url "https://main.vscode-cdn.net/sourcemaps/$BUILD_SOURCEVERSION/core"
+          npm run gulp vscode-linux-x64-min-ci
+      - name: Refresh recorder while preserving pristine product and smoke harness
+        run: |
+          rm -rf package/startup-out
+          cp -a VSCode-linux-x64/resources/app/out package/startup-out
+          cp VSCode-linux-x64/resources/app/product.json package/startup-product.json
+          git apply -R --directory=product scripts/electron-ipc-minified-x64/recorder/startup.patch
+          python3 scripts/electron-ipc-minified-x64/recorder/refresh.py
+          cp build-provenance.json package/pristine-build-provenance.json
+          tar --exclude=product/.git --exclude=product/.build/logs --exclude=product/.build/crashes -I 'zstd -T2 -3' -cf package.tar.zst package product
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ipc-minified-x64-${{ matrix.variant }}
+          path: package.tar.zst
+          compression-level: 0
+          retention-days: 7
