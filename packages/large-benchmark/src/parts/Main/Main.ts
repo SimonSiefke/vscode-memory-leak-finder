@@ -88,8 +88,7 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
         ...(get('--build-outcomes') ? { buildOutcomes: get('--build-outcomes') } : {}),
       })
       console.log(`Report: ${join(output, 'index.html')}; ${summary.comparisons.length} metric comparisons`)
-      if (process.env.GITHUB_STEP_SUMMARY)
-        await appendFile(process.env.GITHUB_STEP_SUMMARY, createWorkflowSummary(summary))
+      if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, createWorkflowSummary(summary))
       if (!summary.usable) throw new Error('Report preserved, but builds are unusable or no valid runtime comparisons exist')
       break
     }
