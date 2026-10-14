@@ -37,6 +37,14 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
+    async waitForShellPrompt() {
+      await expect(page.locator('.terminal .xterm-screen')).toBeVisible()
+      await expect(page.locator('.terminal .xterm-accessibility-tree')).toHaveText(/\$\s/)
+    },
+    async shouldHaveOutputLine(text: string) {
+      const line = page.locator('.terminal .xterm-accessibility-tree > div', { hasExactText: text })
+      await expect(line).toHaveCount(1)
+    },
     async add() {
       try {
         await page.waitForIdle()
@@ -87,10 +95,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to close terminal find`)
       }
     },
-    async execute(command: string, { waitForFile = '' } = {}) {
+    async execute(command: string, { waitForFile = '', viaNativeKeyboard = false } = {}) {
       try {
         await page.waitForIdle()
-        await this.type(command)
+        if (viaNativeKeyboard) await page.keyboard.typeCharacters(command)
+        else await this.type(command)
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         if (waitForFile) {
