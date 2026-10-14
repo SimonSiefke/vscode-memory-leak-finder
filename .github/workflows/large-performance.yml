@@ -1,6 +1,8 @@
 name: Large Performance Measure
 
 on:
+  push:
+    branches: [validation/large-performance-pr-3391-fixes]
   workflow_dispatch:
     inputs:
       before_commit:
@@ -20,16 +22,18 @@ on:
         type: string
         default: ''
 
-run-name: Large Performance ${{ inputs.before_commit }} → ${{ inputs.after_commit }}
+run-name: Large Performance ${{ inputs.before_commit || '07f806f999227108933c2e30515b26eecc1fda74' }} → ${{ inputs.after_commit || '07f806f999227108933c2e30515b26eecc1fda74' }}
 
 permissions:
   contents: read
+  actions: read
 
 env:
-  BEFORE_COMMIT: ${{ inputs.before_commit }}
-  AFTER_COMMIT: ${{ inputs.after_commit }}
-  SAMPLES: ${{ inputs.samples }}
-  BENCHMARK_FILTER: ${{ inputs.benchmark_filter }}
+  SOURCE_RUN: 38534632178
+  BEFORE_COMMIT: ${{ inputs.before_commit || '07f806f999227108933c2e30515b26eecc1fda74' }}
+  AFTER_COMMIT: ${{ inputs.after_commit || '07f806f999227108933c2e30515b26eecc1fda74' }}
+  SAMPLES: ${{ inputs.samples || '37' }}
+  BENCHMARK_FILTER: ${{ inputs.benchmark_filter || 'startup-empty-cold-resources,startup-empty-warm-resources,startup-workspace-cold-resources,startup-workspace-warm-resources,open-small-resources,open-large-resources,type-resources,scroll-timing,scroll-instructions,scroll-resources,scroll-timeline,scroll-memory,scroll-renderer,scroll-profile,find-resources,search-resources,quick-open-resources,explorer-resources,diff-resources,terminal-create-resources,terminal-command-resources,settings-resources' }}
 
 jobs:
   initialize:
@@ -69,21 +73,22 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
-      - name: Install native build dependencies
-        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config xvfb x11-xserver-utils
-      - name: Install harness
-        run: npm run install:ci
-      - name: Build harness
-        run: npm run build
-      - name: Build and archive the minified VS Code package
+      - name: Reuse the packaged revision from the full validation run
+        uses: actions/download-artifact@v8
+        with:
+          name: large-build-${{ matrix.revision }}
+          run-id: ${{ env.SOURCE_RUN }}
+          github-token: ${{ github.token }}
+          path: .large-build
+      - name: Verify the reused build and retain its metadata
         run: |
           if [[ "$REVISION" == before ]]; then
             commit="$BEFORE_COMMIT"
           else
             commit="$AFTER_COMMIT"
           fi
-          node packages/large-benchmark/src/main.ts prepare \
-            --commit "$commit" --output-dir .large-build
+          node packages/large-benchmark/src/main.ts extract --input-dir .large-build --commit "$commit"
+          node --input-type=module -e "import {readFileSync,writeFileSync} from 'node:fs'; const metadata=JSON.parse(readFileSync('.large-build/build.json','utf8')); writeFileSync('.large-build/status.json',JSON.stringify({...metadata,status:'success',sourceRun:process.env.SOURCE_RUN},null,2))"
       - name: Upload executable package
         uses: actions/upload-artifact@v7
         with:
@@ -182,7 +187,29 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           name: large-manifest
+          run-id: ${{ env.SOURCE_RUN }}
+          github-token: ${{ github.token }}
           path: .large-manifest
+      - name: Download the original full-suite results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: large-result-*
+          run-id: ${{ env.SOURCE_RUN }}
+          github-token: ${{ github.token }}
+          path: .large-downloads
+      - name: Preserve superseded results separately from the new comparison
+        run: |
+          python3 - <<'PYTHON'
+          import json, shutil
+          from pathlib import Path
+          manifest=json.loads(Path('.large-manifest/manifest.json').read_text())
+          changed=[b['id'] for b in manifest['benchmarks'] if b['collector']=='resources' or b['scenario']=='scroll']
+          destination=Path('.large-original-affected')
+          destination.mkdir()
+          for benchmark in changed:
+              source=Path('.large-downloads')/('large-result-'+benchmark)
+              if source.exists(): shutil.move(str(source),destination/source.name)
+          PYTHON
       - name: Download raw result artifacts
         continue-on-error: true
         uses: actions/download-artifact@v8
@@ -203,6 +230,18 @@ jobs:
           node packages/large-benchmark/src/main.ts report \
             --manifest .large-manifest/manifest.json --input-dir .large-downloads \
             --output-dir .large-report --build-outcomes "$BUILD_OUTCOMES"
+      - name: Include the initial results and explain the validation sources
+        if: always()
+        run: |
+          mkdir -p .large-report/validation
+          mv .large-original-affected .large-report/validation/original-affected
+          cat > .large-report/validation/README.txt <<'VALIDATION'
+          The original full suite ran in https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/38534632178.
+          This follow-up reuses those same two packaged VS Code builds.
+          All resource benchmarks and scroll workloads were measured again after fixes to CPU time units, independent PSS collection, and native keyboard scrolling.
+          The comparison report uses those new results and the unchanged benchmarks from the original full suite.
+          Superseded raw results are retained under validation/original-affected; they do not contribute to the new comparison statistics.
+          VALIDATION
       - name: Upload comparison report and raw evidence
         if: always()
         uses: actions/upload-artifact@v7
