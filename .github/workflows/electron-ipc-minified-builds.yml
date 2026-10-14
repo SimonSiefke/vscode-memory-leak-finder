@@ -34,6 +34,8 @@ jobs:
             runner: ubuntu-24.04-arm
     env:
       NODE_OPTIONS: --max-old-space-size=6144
+      VSCODE_QUALITY: oss
+      VSCODE_PUBLISH_COUNTER: 0
       BUILD_SOURCEVERSION: ${{ matrix.sha }}
     steps:
       - uses: actions/checkout@v7
