@@ -38,3 +38,10 @@ intervals that resample hosts and paired blocks. Only three hosts limit the
 evidence for host variation. These runs improve the match to the historical
 issue's build and timing methodology, but October revisions and hosted hardware
 differ from the original August benchmark.
+
+The pinned local packaging task incorrectly applies the app-level standalone
+Copilot CLI exclusion to the built-in extension, then requires that extension
+SDK in its ripgrep materialization step. `build/prepare.py` preserves only the
+extension-owned SDK and its package metadata in that dependency stream. The
+app-level filters and product source remain unchanged. All variants use this
+same packaging repair.
