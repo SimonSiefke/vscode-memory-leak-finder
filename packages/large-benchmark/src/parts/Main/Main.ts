@@ -8,6 +8,7 @@ import { generateReport } from '../Report/Report.ts'
 import type { RunOptions } from '../Runner/Runner.ts'
 import type { Benchmark } from '../Types/Types.ts'
 import { parseOptions } from '../ParseOptions/ParseOptions.ts'
+import { createWorkflowSummary } from '../WorkflowSummary/WorkflowSummary.ts'
 
 export interface Manifest {
   schemaVersion: 1
@@ -87,11 +88,7 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
         ...(get('--build-outcomes') ? { buildOutcomes: get('--build-outcomes') } : {}),
       })
       console.log(`Report: ${join(output, 'index.html')}; ${summary.comparisons.length} metric comparisons`)
-      if (process.env.GITHUB_STEP_SUMMARY)
-        await appendFile(
-          process.env.GITHUB_STEP_SUMMARY,
-          `## Large Performance\n\nBefore: \`${manifest.commits.before}\`\n\nAfter: \`${manifest.commits.after}\`\n\n${summary.comparisons.length} metric comparisons. Download **large-performance-report** and open \`index.html\`.\n\n${summary.coverage.map((entry) => `- ${entry.benchmark}: ${entry.status} (${entry.pairs} complete pairs)`).join('\n')}\n`,
-        )
+      if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, createWorkflowSummary(summary))
       if (!summary.usable) throw new Error('Report preserved, but builds are unusable or no valid runtime comparisons exist')
       break
     }

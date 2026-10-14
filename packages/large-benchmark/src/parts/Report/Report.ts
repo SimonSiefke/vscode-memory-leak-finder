@@ -1,6 +1,6 @@
-import { copyFile, link, mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve, sep } from 'node:path'
-import { errorMessage, readJson, writeJson } from '../Io/Io.ts'
+import { errorMessage, readJson } from '../Io/Io.ts'
 import { selectBenchmarks } from '../Manifest/Manifest.ts'
 import { comparePairs } from '../Statistics/Statistics.ts'
 import type { Benchmark, Metric, Result, Sample, Status } from '../Types/Types.ts'
@@ -203,24 +203,6 @@ const findResults = async (directory: string): Promise<string[]> => {
   return paths.sort()
 }
 
-const copyEvidence = async (source: string, destination: string): Promise<void> => {
-  await mkdir(destination, { recursive: true })
-  for (const entry of await readdir(source, { withFileTypes: true })) {
-    const from = join(source, entry.name)
-    const to = join(destination, entry.name)
-    if (entry.isDirectory()) await copyEvidence(from, to)
-    else if (entry.isFile()) {
-      // Raw evidence is immutable. Hard links preserve the inputs without duplicating their disk use.
-      try {
-        await link(from, to)
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== 'EXDEV') throw error
-        await copyFile(from, to)
-      }
-    }
-  }
-}
-
 export interface ReportOptions {
   input: string
   output: string
@@ -244,6 +226,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
   const paths = await findResults(options.input)
   const diagnostics: string[] = []
   const results = new Map<string, Result>()
+  const resultDirectories = new Map<string, string>()
   for (const path of paths) {
     try {
       const raw = await readJson<Result>(path)
@@ -258,11 +241,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
         continue
       }
       results.set(expected.id, result)
-      const destination = join(options.output, 'data', expected.id)
-      await mkdir(dirname(destination), { recursive: true })
-      // Avoid duplicating downloaded heap snapshots on the report runner's filesystem.
-      await rm(destination, { recursive: true, force: true })
-      await copyEvidence(dirname(path), destination)
+      resultDirectories.set(expected.id, dirname(path))
     } catch (error) {
       diagnostics.push(`${relative(options.input, path)}: ${errorMessage(error)}`)
     }
@@ -311,7 +290,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       for (const sample of result.samples)
         for (const path of sample.raw.filter((path) => path.endsWith('.cpuprofile'))) {
           try {
-            const profile = await readJson(join(options.output, 'data', benchmark.id, path))
+            const profile = await readJson(join(resultDirectories.get(benchmark.id)!, path))
             const filename = `${benchmark.id}-${sample.revision}-${sample.pair}.svg`
             await writeFile(join(options.output, 'charts', filename), flameSvg(profile))
             chartHtml.push(
@@ -325,7 +304,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     if (result && benchmark.collector === 'bundles') {
       try {
         const changes = await readJson<{ path: string; status: string; before: number; after: number; delta: number }[]>(
-          join(options.output, 'data', benchmark.id, 'bundle-changes.json'),
+          join(resultDirectories.get(benchmark.id)!, 'bundle-changes.json'),
         )
         chartHtml.push(
           `<h3>Largest asset changes</h3><table><thead><tr><th>Asset</th><th>Status</th><th>Before bytes</th><th>After bytes</th><th>Change</th></tr></thead><tbody>${changes
@@ -340,18 +319,13 @@ export const generateReport = async (inputOptions: ReportOptions) => {
         diagnostics.push(`Bundle details: ${errorMessage(error)}`)
       }
     }
-    const rawLinks =
+    const rawFiles =
       result?.samples
-        .flatMap((sample) =>
-          sample.raw.map(
-            (path) =>
-              `<li><a href="data/${href(benchmark.id)}/${href(path)}">${escapeHtml(`${sample.revision} #${sample.pair + 1}: ${path}`)}</a></li>`,
-          ),
-        )
+        .flatMap((sample) => sample.raw.map((path) => `<li>${escapeHtml(`${sample.revision} #${sample.pair + 1}: ${path}`)}</li>`))
         .join('') ?? ''
     sections.push(`<section class="benchmark" data-startup="${benchmark.startup}" data-collector="${benchmark.collector}" data-id="${benchmark.id}" data-search="${escapeHtml(entries.map((entry) => entry.metric).join(' '))}"><h2>${escapeHtml(benchmark.id)} <span class="badge ${status}">${status}</span></h2>
       <p>${pairs}/${result?.requestedSamples ?? '?'} complete pairs. ${benchmark.diagnostic ? 'Diagnostic collector; instrumentation changes execution.' : ''}</p>${chartHtml.join('')}
-      <details><summary>Diagnostics, runner metadata, and raw results</summary><pre>${escapeHtml(JSON.stringify({ runner: result?.runner, diagnostics: messages }, null, 2))}</pre><ul>${rawLinks}</ul></details></section>`)
+      <details><summary>Diagnostics, runner metadata, and raw results</summary><pre>${escapeHtml(JSON.stringify({ runner: result?.runner, diagnostics: messages }, null, 2))}</pre>${result ? `<p>Raw evidence is stored separately in the <code>large-result-${escapeHtml(benchmark.id)}</code> workflow artifact (or the original input directory for local runs).</p>` : ''}<ul>${rawFiles}</ul></details></section>`)
   }
   const validRuntime = comparisons.filter((entry) => entry.collector !== 'bundles').length
   const buildsFailed = options.buildOutcomes !== undefined && options.buildOutcomes !== 'success,success'
@@ -376,52 +350,6 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     comparisons,
     diagnostics,
   }
-  await writeJson(join(options.output, 'summary.json'), summary)
-  const csv = [
-    [
-      'benchmark',
-      'metric',
-      'unit',
-      'pairs',
-      'before_mean',
-      'after_mean',
-      'before_median',
-      'after_median',
-      'before_p95',
-      'after_p95',
-      'before_sd',
-      'after_sd',
-      'absolute_change',
-      'percent_change',
-      'ci_low',
-      'ci_high',
-      'inconclusive',
-    ],
-    ...comparisons.map((entry) => {
-      const s = entry.statistics
-      return [
-        entry.benchmark,
-        entry.metric,
-        entry.unit,
-        s.before.count,
-        s.before.mean,
-        s.after.mean,
-        s.before.median,
-        s.after.median,
-        s.before.p95,
-        s.after.p95,
-        s.before.standardDeviation,
-        s.after.standardDeviation,
-        s.absoluteChange,
-        s.percentChange ?? '',
-        ...s.interval,
-        s.inconclusive,
-      ]
-    }),
-  ]
-    .map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(','))
-    .join('\n')
-  await writeFile(join(options.output, 'summary.csv'), csv + '\n')
   const heatmap = comparisons
     .map((entry) => {
       const s = entry.statistics
@@ -477,7 +405,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     <p>${usable ? 'Comparison complete. Regressions and individual measurement failures are informational.' : 'Comparison incomplete: unusable builds or no valid runtime comparison. Available evidence is preserved below.'}</p>
     <div class="stats">${Object.entries(counts)
       .map(([name, value]) => `<span><strong>${value}</strong> ${name}</span>`)
-      .join('')}</div><p><a href="summary.json">Summary JSON</a> · <a href="summary.csv">Summary CSV</a></p>
+      .join('')}</div>
     <details><summary>How to read the measurements</summary><p>Counts and byte sizes use means; timings use medians. Only complete pairs are compared. No outliers were removed. Runtime confidence intervals use 10,000 deterministic paired bootstrap resamples. These are exploratory intervals across many metrics, without a multiple-comparison significance claim. Small samples and intervals crossing zero are inconclusive. Hardware counters may be unavailable on the runner; missing values are never zeros.</p></details>
     <nav><label>View <select id="view"><option value="all">All measurements</option><option value="startup">Startup</option><option value="editor">Editor and interactions</option><option value="timing">Timings</option><option value="instructions">Instruction counts</option><option value="resources">OS resources</option><option value="timeline">Rendering traces</option><option value="renderer">Renderer counters</option><option value="bundles">Bundle sizes</option><option value="profile">CPU profiles</option><option value="memory">Memory</option></select></label><label>Filter <input id="filter" type="search" placeholder="Benchmark or metric"/></label></nav></header>
     <div class="overview"><h2>Performance overview</h2><p>Green indicates improvement, red indicates regression, and gray indicates an inconclusive or unchanged result. Hover for confidence intervals; select a view to focus on a collector family. Click a value to open its charts.</p>${matrix}<details><summary>Detailed comparison table</summary><div class="table-wrap"><table><thead><tr><th>Benchmark</th><th>Metric</th><th>Before</th><th>After</th><th>Change</th><th>Pairs</th><th>Confidence</th></tr></thead><tbody>${heatmap}</tbody></table></div></details></div>
