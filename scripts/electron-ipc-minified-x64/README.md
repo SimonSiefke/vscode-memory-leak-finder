@@ -46,3 +46,11 @@ SDK in its ripgrep materialization step. `build/prepare.py` preserves only the
 extension-owned SDK and its package metadata in that dependency stream. The
 app-level filters and product source remain unchanged. All variants use this
 same packaging repair.
+
+The October contribution registry requires `registerWorkbenchContribution2`
+with `WorkbenchPhase.BlockStartup` for the recorder. The legacy API accepts only
+later phases and silently failed to start the original recorder. The recorder
+refresh workflow adapts this registration and rebuilds only its bundled output
+and matching metadata from preserved source artifacts. It verifies that every
+pristine core file, product manifest and native module retains its original hash.
+The successful ARM CPU experiment is preserved.

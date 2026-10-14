@@ -12,7 +12,8 @@ permissions:
   actions: read
 
 env:
-  IPC_BUILD_RUN: '38539729906'
+  IPC_BUILD_RUN: '38543648848'
+  IPC_BUILD_REVISION: 'cc5eaecca0670965d7d96fbbff81e47beb7f0b8d'
 
 jobs:
   benchmark:
