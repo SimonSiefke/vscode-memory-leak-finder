@@ -52,6 +52,8 @@ jobs:
       - name: Install source dependencies
         working-directory: product
         run: npm ci
+      - name: Repair pinned local Copilot packaging rules
+        run: python3 scripts/electron-ipc-minified-x64/build/prepare.py product
       - name: Build bundled minified package
         working-directory: product
         run: npm run gulp vscode-linux-${{ matrix.platform.arch }}-min
