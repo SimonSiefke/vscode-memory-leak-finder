@@ -149,8 +149,11 @@ def startup():
             out = package / 'resources/app/out'
             backup = package / 'pristine-out'
             out.rename(backup)
-            builds[v] = (out, backup)
+            product_json = package / 'resources/app/product.json'
+            saved_product = product_json.read_bytes()
+            builds[v] = (out, backup, product_json, saved_product)
             shutil.copytree(package / 'startup-out', out)
+            product_json.write_bytes((package / 'startup-product.json').read_bytes())
         permutations = list(itertools.permutations(VARIANTS))
         for index in range(-3, int(os.environ['IPC_STARTUP_SAMPLES'])):
             order = permutations[(index + 3 + REPLICA) % len(permutations)]
@@ -184,10 +187,11 @@ def startup():
             if index < 0 or index % 25 == 0:
                 print(f'ACCEPT startup round {index}', flush=True)
     finally:
-        for out, backup in builds.values():
+        for out, backup, product_json, saved_product in builds.values():
             if out.exists():
                 shutil.rmtree(out)
             backup.rename(out)
+            product_json.write_bytes(saved_product)
     for v in VARIANTS:
         verifier().verify(PRODUCTS / v / 'package', COMMITS[v], ARCH)
     save(ROOT / 'startup-restored.json', {'variants': COMMITS, 'verified': True})

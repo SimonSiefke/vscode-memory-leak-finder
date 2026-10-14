@@ -82,6 +82,8 @@ db.get('SELECT 42 AS answer', (error, row) => {
         "builtinExtensions": extensions,
         "nativeModules": {str(p.relative_to(app)): digest(p) for p in app.rglob("*.node")},
         "pristineOut": pristine,
+        "productJson": digest(app / "product.json"),
+        "startupProductJson": digest(root / "startup-product.json") if arch == "x64" else None,
         "startupOut": {str(p.relative_to(startup)): digest(p) for p in startup.rglob("*") if p.is_file()} if startup.exists() else {},
     }
     if source:
@@ -97,7 +99,7 @@ db.get('SELECT 42 AS answer', (error, row) => {
         (root / "ipc-minified-build.json").write_text(json.dumps(metadata, indent=2))
     else:
         recorded = json.loads((root / "ipc-minified-build.json").read_text())
-        for key in ["sha", "architecture", "buildType", "runtime", "builtinExtensions", "nativeModules", "pristineOut", "startupOut"]:
+        for key in ["sha", "architecture", "buildType", "runtime", "builtinExtensions", "nativeModules", "pristineOut", "startupOut", "productJson", "startupProductJson"]:
             if metadata[key] != recorded[key]:
                 raise RuntimeError(f"Packaged artifact changed: {key}")
     print(f"Verified minified Linux {arch}: {sha}; {len(extensions)} built-ins; SQLite query passed", flush=True)

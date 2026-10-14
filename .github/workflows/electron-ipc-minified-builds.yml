@@ -71,8 +71,9 @@ jobs:
         run: |
           git apply ../scripts/electron-ipc-minified-x64/build/startup.patch
           node build/next/index.ts bundle --out out-vscode-min --target desktop --minify --mangle-privates --nls --source-map-base-url "https://main.vscode-cdn.net/sourcemaps/$BUILD_SOURCEVERSION/core"
-          cp -a ../package/resources/app/out ../package/startup-out
-          cp -a out-vscode-min/. ../package/startup-out/
+          npm run gulp vscode-linux-x64-min-ci
+          cp -a ../VSCode-linux-x64/resources/app/out ../package/startup-out
+          cp ../VSCode-linux-x64/resources/app/product.json ../package/startup-product.json
           git apply -R ../scripts/electron-ipc-minified-x64/build/startup.patch
       - name: Verify native package, architecture and complete outputs
         run: python3 scripts/electron-ipc-minified-x64/build/verify.py package ${{ matrix.sha }} ${{ matrix.platform.arch }} product
