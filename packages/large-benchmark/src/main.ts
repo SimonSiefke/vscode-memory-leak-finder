@@ -1,13 +1,13 @@
 import { appendFile, mkdir } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { measureBundles } from './ultimatePerformance/bundles.ts'
-import { errorMessage, readJson, writeJson } from './ultimatePerformance/io.ts'
-import { sampleCount, selectBenchmarks } from './ultimatePerformance/manifest.ts'
-import { extractBuild, prepareBuild } from './ultimatePerformance/prepare.ts'
-import { generateReport } from './ultimatePerformance/report.ts'
-import type { RunOptions } from './ultimatePerformance/runner.ts'
-import type { Benchmark } from './ultimatePerformance/types.ts'
+import { measureBundles } from './largePerformance/bundles.ts'
+import { errorMessage, readJson, writeJson } from './largePerformance/io.ts'
+import { sampleCount, selectBenchmarks } from './largePerformance/manifest.ts'
+import { extractBuild, prepareBuild } from './largePerformance/prepare.ts'
+import { generateReport } from './largePerformance/report.ts'
+import type { RunOptions } from './largePerformance/runner.ts'
+import type { Benchmark } from './largePerformance/types.ts'
 
 export interface Manifest {
   schemaVersion: 1
@@ -31,10 +31,10 @@ export const parseOptions = (argv: string[]) => {
   }
   const samples = Number(get('--samples', '37'))
   if (!Number.isSafeInteger(samples) || samples < 1 || samples > 1000) throw new Error('--samples must be an integer between 1 and 1000')
-  return { get, required, samples, output: resolve(get('--output-dir', '.ultimate-performance')) }
+  return { get, required, samples, output: resolve(get('--output-dir', '.large-performance')) }
 }
 
-export const ultimatePerformance = async (argv: string[]): Promise<void> => {
+export const largePerformance = async (argv: string[]): Promise<void> => {
   const { get, required, samples, output } = parseOptions(argv.slice(1))
   const commits = (): { before: string; after: string } => {
     const before = required('--before-commit').toLowerCase()
@@ -89,7 +89,7 @@ export const ultimatePerformance = async (argv: string[]): Promise<void> => {
       await mkdir(output, { recursive: true })
       if (benchmark.collector === 'bundles') await measureBundles(options)
       else {
-        const { runBenchmark } = await import('./ultimatePerformance/runner.ts')
+        const { runBenchmark } = await import('./largePerformance/runner.ts')
         await runBenchmark(options)
       }
       break
@@ -108,18 +108,18 @@ export const ultimatePerformance = async (argv: string[]): Promise<void> => {
       if (process.env.GITHUB_STEP_SUMMARY)
         await appendFile(
           process.env.GITHUB_STEP_SUMMARY,
-          `## Ultimate Performance\n\nBefore: \`${manifest.commits.before}\`\n\nAfter: \`${manifest.commits.after}\`\n\n${summary.comparisons.length} metric comparisons. Download **ultimate-performance-report** and open \`index.html\`.\n\n${summary.coverage.map((entry) => `- ${entry.benchmark}: ${entry.status} (${entry.pairs} complete pairs)`).join('\n')}\n`,
+          `## Large Performance\n\nBefore: \`${manifest.commits.before}\`\n\nAfter: \`${manifest.commits.after}\`\n\n${summary.comparisons.length} metric comparisons. Download **large-performance-report** and open \`index.html\`.\n\n${summary.coverage.map((entry) => `- ${entry.benchmark}: ${entry.status} (${entry.pairs} complete pairs)`).join('\n')}\n`,
         )
       if (!summary.usable) throw new Error('Report preserved, but builds are unusable or no valid runtime comparisons exist')
       break
     }
     default:
-      throw new Error('Usage: ultimate-performance <matrix|prepare|extract|measure|report> [options]')
+      throw new Error('Usage: large-performance <matrix|prepare|extract|measure|report> [options]')
   }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  ultimatePerformance(process.argv.slice(2)).catch((error) => {
+  largePerformance(process.argv.slice(2)).catch((error) => {
     console.error(errorMessage(error))
     process.exitCode = 1
   })

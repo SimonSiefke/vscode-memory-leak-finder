@@ -358,7 +358,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
   const usable = validRuntime > 0 && !buildsFailed
   const buildStatuses: unknown[] = []
   for (const entry of await readdir(options.input, { withFileTypes: true }).catch(() => [])) {
-    if (!entry.isDirectory() || !entry.name.startsWith('ultimate-build-status-')) continue
+    if (!entry.isDirectory() || !entry.name.startsWith('large-build-status-')) continue
     try {
       buildStatuses.push(await readJson(join(options.input, entry.name, 'status.json')))
     } catch (error) {
@@ -471,9 +471,9 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       coverage.filter((entry) => entry.status === status).length,
     ]),
   )
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ultimate Performance · VS Code comparison</title><style>
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Large Performance · VS Code comparison</title><style>
     :root{color-scheme:light;font-family:system-ui,sans-serif;color:#1b2538;background:#f4f6fb}body{max-width:1350px;margin:auto;padding:36px}header,section,.overview{background:white;border:1px solid #dde3ef;border-radius:12px;padding:24px;margin-bottom:24px}h1{margin:0 0 12px;font-size:34px}h2{font-size:22px}p,figcaption{line-height:1.6}code{overflow-wrap:anywhere}.stats{display:flex;gap:12px;flex-wrap:wrap}.stats span{background:#eef1f8;border-radius:8px;padding:14px}.table-wrap{overflow:auto}.heatmap th,.heatmap td{min-width:95px;text-align:center}.heatmap tbody th{position:sticky;left:0;top:auto;background:#f7f9fd;text-align:left;min-width:170px;z-index:1}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #e3e8f2;padding:10px;overflow-wrap:anywhere}th{position:sticky;top:0;background:#edf1fa}.better{background:#e0f3e8}.worse{background:#fae3e3}.uncertain{background:#eef0f4}.badge{font-size:12px;border-radius:20px;padding:5px 9px;background:#eef0f4}.success{background:#e0f3e8}.failed{background:#fae3e3}figure{margin:16px 0;border:1px solid #e3e8f2;border-radius:8px;padding:14px}img{max-width:100%;height:auto}figcaption{font-size:12px;color:#566078}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}select,input{font:inherit;padding:8px;border:1px solid #ccd4e3;border-radius:6px}nav{display:flex;gap:12px;margin:20px 0;flex-wrap:wrap}a{color:#315abd}details{margin:12px 0}summary{cursor:pointer}.benchmark[hidden],tr[hidden]{display:none}@media(max-width:700px){body{padding:12px}header,section,.overview{padding:14px}.table-wrap{overflow:auto}h1{font-size:27px}}
-    </style></head><body><header><h1>Ultimate Performance</h1><p>VS Code · Linux x64 · all extensions disabled · before/after on the same runner</p><p><strong>Before:</strong> <code>${escapeHtml(options.commits.before)}</code><br/><strong>After:</strong> <code>${escapeHtml(options.commits.after)}</code></p>
+    </style></head><body><header><h1>Large Performance</h1><p>VS Code · Linux x64 · all extensions disabled · before/after on the same runner</p><p><strong>Before:</strong> <code>${escapeHtml(options.commits.before)}</code><br/><strong>After:</strong> <code>${escapeHtml(options.commits.after)}</code></p>
     <p>${usable ? 'Comparison complete. Regressions and individual measurement failures are informational.' : 'Comparison incomplete: unusable builds or no valid runtime comparison. Available evidence is preserved below.'}</p>
     <div class="stats">${Object.entries(counts)
       .map(([name, value]) => `<span><strong>${value}</strong> ${name}</span>`)

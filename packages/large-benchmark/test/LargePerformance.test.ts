@@ -4,21 +4,21 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { spawn, spawnSync } from 'node:child_process'
 import { setTimeout as delay } from 'node:timers/promises'
-import { benchmarks, sampleCount, sampleOrder, selectBenchmarks } from '../src/ultimatePerformance/manifest.ts'
-import { comparePairs, summarize } from '../src/ultimatePerformance/statistics.ts'
-import { analyzeTrace, rendererMetrics, summarizeHeap } from '../src/ultimatePerformance/collectors.ts'
-import { parsePerf, PerfSession } from '../src/ultimatePerformance/perf.ts'
-import { prepareProfile, runBenchmark, type RunOptions } from '../src/ultimatePerformance/runner.ts'
-import { collectBundles, bundleChanges } from '../src/ultimatePerformance/bundles.ts'
-import { comparisonsFor, generateReport, validateResult } from '../src/ultimatePerformance/report.ts'
-import { command, writeJson } from '../src/ultimatePerformance/io.ts'
-import { extractBuild, sha256 } from '../src/ultimatePerformance/prepare.ts'
+import { benchmarks, sampleCount, sampleOrder, selectBenchmarks } from '../src/largePerformance/manifest.ts'
+import { comparePairs, summarize } from '../src/largePerformance/statistics.ts'
+import { analyzeTrace, rendererMetrics, summarizeHeap } from '../src/largePerformance/collectors.ts'
+import { parsePerf, PerfSession } from '../src/largePerformance/perf.ts'
+import { prepareProfile, runBenchmark, type RunOptions } from '../src/largePerformance/runner.ts'
+import { collectBundles, bundleChanges } from '../src/largePerformance/bundles.ts'
+import { comparisonsFor, generateReport, validateResult } from '../src/largePerformance/report.ts'
+import { command, writeJson } from '../src/largePerformance/io.ts'
+import { extractBuild, sha256 } from '../src/largePerformance/prepare.ts'
 import { parseOptions } from '../src/main.ts'
-import type { Result, Sample } from '../src/ultimatePerformance/types.ts'
+import type { Result, Sample } from '../src/largePerformance/types.ts'
 
 const directories: string[] = []
 const temporary = async (): Promise<string> => {
-  const directory = await mkdtemp(join(tmpdir(), 'ultimate-performance-test-'))
+  const directory = await mkdtemp(join(tmpdir(), 'large-performance-test-'))
   directories.push(directory)
   return directory
 }
@@ -119,10 +119,10 @@ test('renderer durations convert seconds to milliseconds without inventing missi
 test('traces clip to measurement boundaries and exclude other renderers and post-completion work', () => {
   const marker = (message: string, ts: number) => ({ name: 'TimeStamp', ph: 'I', pid: 2, tid: 3, ts, args: { data: { message } } })
   const events = [
-    marker('ultimate-start', 10),
+    marker('large-start', 10),
     { name: 'Layout', ph: 'X', pid: 2, tid: 3, ts: 20, dur: 20 },
     { name: 'Layout', ph: 'X', pid: 9, tid: 3, ts: 20, dur: 20 },
-    marker('ultimate-end', 30),
+    marker('large-end', 30),
     { name: 'Layout', ph: 'X', pid: 2, tid: 3, ts: 35, dur: 20 },
   ]
   expect(analyzeTrace(events, false).find((metric) => metric.name === 'layouts')?.value).toBe(1)

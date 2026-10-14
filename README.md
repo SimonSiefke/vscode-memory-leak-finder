@@ -2,9 +2,9 @@
 
 Find memory leaks in vscode to improve robustness and performance.
 
-### Ultimate Performance Measure
+### Large Performance Measure
 
-Run **Ultimate Performance Measure** from GitHub Actions with `before_commit` and
+Run **Large Performance Measure** from GitHub Actions with `before_commit` and
 `after_commit` set to full VS Code commit SHAs. The manual workflow builds both
 minified Linux x64 packages once, then runs 104 runtime benchmark jobs and a
 JavaScript bundle-size comparison. It leaves the existing CI and bot workflows
@@ -15,7 +15,7 @@ suite. CPU profiles and heap snapshots use at most five samples per commit.
 Each job measures both revisions on the same runner and alternates their order.
 Failures and unavailable facilities are recorded independently; regressions do
 not fail the workflow. The final job always gathers the available evidence and
-uploads **ultimate-performance-report**. Download and extract it, then open
+uploads **large-performance-report**. Download and extract it, then open
 `index.html`. The report works offline and includes SVG charts, distributions,
 coverage, JSON/CSV summaries, CPU flame charts, and links to raw evidence.
 
@@ -55,33 +55,33 @@ startup-empty-cold-timing,startup-empty-warm-timing,open-small-timing,bundles
 ```
 
 The implementation lives in the separate
-[`ultimate-benchmark` package](packages/ultimate-benchmark/README.md), which owns
+[`large-benchmark` package](packages/large-benchmark/README.md), which owns
 the manifest, collectors, runner, and report generation. The commands are also
 available locally through the root npm shortcuts:
 
 ```sh
 # Build/archive each revision; uses the existing commit build pipeline.
-npm run ultimate-performance:prepare -- --commit BEFORE_SHA --output-dir .tmp/ultimate-before
-npm run ultimate-performance:prepare -- --commit AFTER_SHA --output-dir .tmp/ultimate-after
+npm run large-performance:prepare -- --commit BEFORE_SHA --output-dir .tmp/large-before
+npm run large-performance:prepare -- --commit AFTER_SHA --output-dir .tmp/large-after
 
 # Validate the checksums and extract the packaged executables.
-npm run ultimate-performance -- extract --commit BEFORE_SHA --input-dir .tmp/ultimate-before
-npm run ultimate-performance -- extract --commit AFTER_SHA --input-dir .tmp/ultimate-after
+npm run large-performance -- extract --commit BEFORE_SHA --input-dir .tmp/large-before
+npm run large-performance -- extract --commit AFTER_SHA --input-dir .tmp/large-after
 
 # Create the expected-run manifest (also prints the complete matrix without a filter).
-npm run ultimate-performance -- matrix --before-commit BEFORE_SHA --after-commit AFTER_SHA \
-  --samples 5 --benchmark-filter open-small-timing --output-dir .tmp/ultimate-manifest
+npm run large-performance -- matrix --before-commit BEFORE_SHA --after-commit AFTER_SHA \
+  --samples 5 --benchmark-filter open-small-timing --output-dir .tmp/large-manifest
 
 # Each measure command runs both revisions and checkpoints each sample.
 xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
-  npm run ultimate-performance:measure -- --benchmark-id open-small-timing --samples 5 \
+  npm run large-performance:measure -- --benchmark-id open-small-timing --samples 5 \
   --before-commit BEFORE_SHA --after-commit AFTER_SHA \
-  --before-path .tmp/ultimate-before/VSCode-linux-x64/code-oss \
-  --after-path .tmp/ultimate-after/VSCode-linux-x64/code-oss \
-  --output-dir .tmp/ultimate-results/open-small-timing
+  --before-path .tmp/large-before/VSCode-linux-x64/code-oss \
+  --after-path .tmp/large-after/VSCode-linux-x64/code-oss \
+  --output-dir .tmp/large-results/open-small-timing
 
-npm run ultimate-performance:report -- --manifest .tmp/ultimate-manifest/manifest.json \
-  --input-dir .tmp/ultimate-results --output-dir .tmp/ultimate-report
+npm run large-performance:report -- --manifest .tmp/large-manifest/manifest.json \
+  --input-dir .tmp/large-results --output-dir .tmp/large-report
 ```
 
 Replace `BEFORE_SHA` and `AFTER_SHA` with full 40-character hashes. Measurement

@@ -1,4 +1,4 @@
-name: Ultimate Performance Measure
+name: Large Performance Measure
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ on:
         type: string
         default: ''
 
-run-name: Ultimate Performance ${{ inputs.before_commit }} → ${{ inputs.after_commit }}
+run-name: Large Performance ${{ inputs.before_commit }} → ${{ inputs.after_commit }}
 
 permissions:
   contents: read
@@ -44,14 +44,14 @@ jobs:
       - name: Validate inputs and generate benchmark manifest
         id: manifest
         run: |
-          node packages/ultimate-benchmark/src/main.ts matrix \
+          node packages/large-benchmark/src/main.ts matrix \
             --before-commit "$BEFORE_COMMIT" --after-commit "$AFTER_COMMIT" \
             --samples "$SAMPLES" --benchmark-filter "$BENCHMARK_FILTER" \
-            --output-dir .ultimate-manifest
+            --output-dir .large-manifest
       - uses: actions/upload-artifact@v7
         with:
-          name: ultimate-manifest
-          path: .ultimate-manifest/manifest.json
+          name: large-manifest
+          path: .large-manifest/manifest.json
           retention-days: 30
 
   build:
@@ -82,15 +82,15 @@ jobs:
           else
             commit="$AFTER_COMMIT"
           fi
-          node packages/ultimate-benchmark/src/main.ts prepare \
-            --commit "$commit" --output-dir .ultimate-build
+          node packages/large-benchmark/src/main.ts prepare \
+            --commit "$commit" --output-dir .large-build
       - name: Upload executable package
         uses: actions/upload-artifact@v7
         with:
-          name: ultimate-build-${{ matrix.revision }}
+          name: large-build-${{ matrix.revision }}
           path: |
-            .ultimate-build/vscode.tar.gz
-            .ultimate-build/build.json
+            .large-build/vscode.tar.gz
+            .large-build/build.json
           if-no-files-found: error
           compression-level: 0
           retention-days: 30
@@ -99,8 +99,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: ultimate-build-status-${{ matrix.revision }}
-          path: .ultimate-build/status.json
+          name: large-build-status-${{ matrix.revision }}
+          path: .large-build/status.json
           retention-days: 30
           overwrite: true
 
@@ -131,18 +131,18 @@ jobs:
           sudo sysctl -w kernel.perf_event_paranoid=-1 || true
       - uses: actions/download-artifact@v8
         with:
-          name: ultimate-build-before
-          path: .ultimate-builds/before
+          name: large-build-before
+          path: .large-builds/before
       - uses: actions/download-artifact@v8
         with:
-          name: ultimate-build-after
-          path: .ultimate-builds/after
+          name: large-build-after
+          path: .large-builds/after
       - name: Verify and extract before build
         id: before
-        run: node packages/ultimate-benchmark/src/main.ts extract --input-dir .ultimate-builds/before --commit "$BEFORE_COMMIT" --output-name executable
+        run: node packages/large-benchmark/src/main.ts extract --input-dir .large-builds/before --commit "$BEFORE_COMMIT" --output-name executable
       - name: Verify and extract after build
         id: after
-        run: node packages/ultimate-benchmark/src/main.ts extract --input-dir .ultimate-builds/after --commit "$AFTER_COMMIT" --output-name executable
+        run: node packages/large-benchmark/src/main.ts extract --input-dir .large-builds/after --commit "$AFTER_COMMIT" --output-name executable
       - name: Measure paired revisions
         timeout-minutes: 310
         env:
@@ -150,17 +150,17 @@ jobs:
           AFTER_PATH: ${{ steps.after.outputs.executable }}
         run: |
           xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
-            node packages/ultimate-benchmark/src/main.ts measure \
+            node packages/large-benchmark/src/main.ts measure \
             --benchmark-id "$BENCHMARK_ID" --samples "$JOB_SAMPLES" \
             --before-path "$BEFORE_PATH" --after-path "$AFTER_PATH" \
             --before-commit "$BEFORE_COMMIT" --after-commit "$AFTER_COMMIT" \
-            --output-dir .ultimate-results
+            --output-dir .large-results
       - name: Upload all available samples and diagnostics
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: ultimate-result-${{ matrix.id }}
-          path: .ultimate-results
+          name: large-result-${{ matrix.id }}
+          path: .large-results
           include-hidden-files: true
           retention-days: 30
           overwrite: true
@@ -179,34 +179,34 @@ jobs:
       - run: npm ci --ignore-scripts
       - uses: actions/download-artifact@v8
         with:
-          name: ultimate-manifest
-          path: .ultimate-manifest
+          name: large-manifest
+          path: .large-manifest
       - name: Download raw result artifacts
         continue-on-error: true
         uses: actions/download-artifact@v8
         with:
-          pattern: ultimate-result-*
-          path: .ultimate-downloads
+          pattern: large-result-*
+          path: .large-downloads
       - name: Download build status artifacts
         continue-on-error: true
         uses: actions/download-artifact@v8
         with:
-          pattern: ultimate-build-status-*
-          path: .ultimate-downloads
+          pattern: large-build-status-*
+          path: .large-downloads
       - name: Generate comparison charts and offline report
         env:
           BUILD_OUTCOMES: ${{ needs.build.result == 'success' && 'success,success' || 'failure,failure' }}
         run: |
-          mkdir -p .ultimate-downloads
-          node packages/ultimate-benchmark/src/main.ts report \
-            --manifest .ultimate-manifest/manifest.json --input-dir .ultimate-downloads \
-            --output-dir .ultimate-report --build-outcomes "$BUILD_OUTCOMES"
+          mkdir -p .large-downloads
+          node packages/large-benchmark/src/main.ts report \
+            --manifest .large-manifest/manifest.json --input-dir .large-downloads \
+            --output-dir .large-report --build-outcomes "$BUILD_OUTCOMES"
       - name: Upload comparison report and raw evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: ultimate-performance-report
-          path: .ultimate-report
+          name: large-performance-report
+          path: .large-report
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30

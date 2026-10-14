@@ -67,8 +67,8 @@ const traceDuration = (events: TraceEvent[], end: number): number => {
 }
 
 export const analyzeTrace = (events: TraceEvent[], startup: boolean): Metric[] => {
-  const end = events.find((event) => event.name === 'TimeStamp' && event.args?.data?.message === 'ultimate-end')
-  const start = events.find((event) => event.name === 'TimeStamp' && event.args?.data?.message === 'ultimate-start')
+  const end = events.find((event) => event.name === 'TimeStamp' && event.args?.data?.message === 'large-end')
+  const start = events.find((event) => event.name === 'TimeStamp' && event.args?.data?.message === 'large-start')
   if (!end || (!startup && !start)) throw new UnavailableError('Trace is missing its measurement boundary markers')
   const lower = startup ? -Infinity : start!.ts
   const window = events.filter((event) => event.pid === end.pid && event.ts >= lower && event.ts < end.ts)

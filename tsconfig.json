@@ -41,7 +41,7 @@
     { "path": "./packages/storage-worker" },
     { "path": "./packages/test-coordinator" },
     { "path": "./packages/test-worker" },
-    { "path": "./packages/ultimate-benchmark" },
+    { "path": "./packages/large-benchmark" },
     { "path": "./packages/video-recording-worker" },
     { "path": "./packages/visualizations" },
     { "path": "./packages/websites-e2e" }

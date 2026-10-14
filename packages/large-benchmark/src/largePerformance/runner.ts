@@ -250,7 +250,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
               }
             },
             onReady: async (renderer) => {
-              if (benchmark.collector === 'timeline') await renderer.evaluate(`console.timeStamp('ultimate-end')`)
+              if (benchmark.collector === 'timeline') await renderer.evaluate(`console.timeStamp('large-end')`)
               await perf?.freeze()
               if (resources) resourceMetrics = await resources.stop()
             },
@@ -287,7 +287,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
             `await electron.contentTracing.startRecording({categoryFilter: ${JSON.stringify(traceCategories)}, traceOptions: 'record-until-full'})`,
           ),
         )
-        await renderer.evaluate(`console.timeStamp('ultimate-start')`)
+        await renderer.evaluate(`console.timeStamp('large-start')`)
       }
     }
     if (benchmark.collector === 'profile') {
@@ -345,7 +345,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
       sample.raw.push(`raw/${pair}-${revision}/renderer.json`)
     }
     if (benchmark.collector === 'timeline') {
-      if (!benchmark.startup) await renderer.evaluate(`console.timeStamp('ultimate-end')`)
+      if (!benchmark.startup) await renderer.evaluate(`console.timeStamp('large-end')`)
       // VS Code's --trace hook starts recording before it creates the workbench renderer.
       sample.metrics.push(...(await stopTrace(await app.main(), join(directory, 'trace.json'), benchmark.startup)))
       await compressEvidence(join(directory, 'trace.json'))

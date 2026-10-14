@@ -15,7 +15,7 @@ export const sha256 = async (path: string): Promise<string> => {
 }
 
 export const prepareBuild = async (commit: string, output: string): Promise<BuildMetadata> => {
-  if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('Ultimate performance builds require Linux x64')
+  if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('Large performance builds require Linux x64')
   if (!/^[0-9a-f]{40}$/i.test(commit)) throw new Error('A full 40-character commit SHA is required')
   output = resolve(output)
   await mkdir(output, { recursive: true })

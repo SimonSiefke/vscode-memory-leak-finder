@@ -1,5 +1,5 @@
 {
-  "name": "@vscode-memory-leak-finder/ultimate-benchmark",
+  "name": "@vscode-memory-leak-finder/large-benchmark",
   "version": "0.0.0-dev",
   "license": "MIT",
   "type": "module",

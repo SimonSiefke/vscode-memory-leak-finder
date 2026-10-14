@@ -5,14 +5,14 @@ import type { Benchmark } from './types.ts'
 
 export const prepareFixture = async (workspace: string): Promise<void> => {
   await mkdir(join(workspace, 'folder'), { recursive: true })
-  await writeFile(join(workspace, 'small.txt'), 'ultimate needle\nsmall deterministic file\n')
+  await writeFile(join(workspace, 'small.txt'), 'large needle\nsmall deterministic file\n')
   await writeFile(
     join(workspace, 'large.txt'),
-    Array.from({ length: 20000 }, (_, i) => `line ${i} ultimate needle ${'x'.repeat(60)}\n`).join(''),
+    Array.from({ length: 20000 }, (_, i) => `line ${i} large needle ${'x'.repeat(60)}\n`).join(''),
   )
-  await writeFile(join(workspace, 'before.txt'), 'ultimate needle\nunchanged\nbefore\n')
-  await writeFile(join(workspace, 'after.txt'), 'ultimate needle\nunchanged\nafter\n')
-  for (let i = 0; i < 20; i++) await writeFile(join(workspace, 'folder', `item-${i}.txt`), `fixture ${i} ultimate needle\n`)
+  await writeFile(join(workspace, 'before.txt'), 'large needle\nunchanged\nbefore\n')
+  await writeFile(join(workspace, 'after.txt'), 'large needle\nunchanged\nafter\n')
+  for (let i = 0; i < 20; i++) await writeFile(join(workspace, 'folder', `item-${i}.txt`), `fixture ${i} large needle\n`)
 }
 
 export const waitReady = async (cdp: Cdp, workspace: boolean): Promise<void> => {
@@ -21,7 +21,7 @@ export const waitReady = async (cdp: Cdp, workspace: boolean): Promise<void> => 
     `!!document.querySelector('.monaco-workbench .part.editor')?.getBoundingClientRect().width`,
     'visible workbench',
   )
-  if (workspace) await waitExpression(cdp, `(${editorText}).includes('ultimate needle')`, 'startup text editor')
+  if (workspace) await waitExpression(cdp, `(${editorText}).includes('large needle')`, 'startup text editor')
 }
 
 const editorText = `(document.querySelector('.monaco-editor .view-lines')?.textContent || '').replace(/\\u00a0/g, ' ')`
@@ -41,7 +41,7 @@ const openFile = async (cdp: Cdp, file: string): Promise<void> => {
     `!!document.querySelector('.tabs-container .tab.active')?.textContent?.includes(${JSON.stringify(file)})`,
     'active editor',
   )
-  await waitExpression(cdp, `(${editorText}).includes('ultimate needle')`, 'rendered file content')
+  await waitExpression(cdp, `(${editorText}).includes('large needle')`, 'rendered file content')
 }
 
 export const setupAction = async (cdp: Cdp, benchmark: Benchmark): Promise<void> => {
@@ -94,7 +94,7 @@ export const runAction = async (cdp: Cdp, benchmark: Benchmark, workspace: strin
       break
     case 'find':
       await key(cdp, 'f', 'KeyF', 70, 2)
-      await cdp.send('Input.insertText', { text: 'ultimate needle' })
+      await cdp.send('Input.insertText', { text: 'large needle' })
       await waitExpression(cdp, `!!document.querySelector('.find-widget .matchesCount')?.textContent?.match(/1 of 1/)`, 'find match')
       break
     case 'search':
@@ -144,11 +144,11 @@ export const runAction = async (cdp: Cdp, benchmark: Benchmark, workspace: strin
       await createTerminal(cdp)
       break
     case 'terminal-command':
-      await typeKeys(cdp, 'echo ULTIMATE_COMMAND_DONE')
+      await typeKeys(cdp, 'echo LARGE_COMMAND_DONE')
       await key(cdp, 'Enter', 'Enter', 13)
       await waitExpression(
         cdp,
-        `Array.from(document.querySelector('.terminal .xterm-accessibility-tree')?.children || []).some(e => e.textContent?.trim() === 'ULTIMATE_COMMAND_DONE')`,
+        `Array.from(document.querySelector('.terminal .xterm-accessibility-tree')?.children || []).some(e => e.textContent?.trim() === 'LARGE_COMMAND_DONE')`,
         'terminal command result',
       )
       break
