@@ -68,7 +68,7 @@ jobs:
         working-directory: product
         run: |
           git apply ../scripts/electron-ipc-minified-x64/build/startup.patch
-          npm run gulp esbuild-vscode-min
+          node build/next/index.ts bundle --out out-vscode-min --target desktop --minify --mangle-privates --nls --source-map-base-url "https://main.vscode-cdn.net/sourcemaps/$BUILD_SOURCEVERSION/core"
           cp -a ../package/resources/app/out ../package/startup-out
           cp -a out-vscode-min/. ../package/startup-out/
           git apply -R ../scripts/electron-ipc-minified-x64/build/startup.patch
