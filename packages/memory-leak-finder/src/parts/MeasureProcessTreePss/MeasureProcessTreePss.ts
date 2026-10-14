@@ -29,7 +29,7 @@ export class ResourceSampler {
   constructor(root: number, excludeRoot = false) {
     this.root = root
     this.excludeRoot = excludeRoot
-    this.sampler = createProcessTreeSampler(root, {}, { excludeRoot })
+    this.sampler = createProcessTreeSampler(root, {}, { excludeRoot, initialSampleAttempts: 20 })
   }
   async start(): Promise<void> {
     // A launch-wrapping perf process can appear before it forks Electron. Sampling

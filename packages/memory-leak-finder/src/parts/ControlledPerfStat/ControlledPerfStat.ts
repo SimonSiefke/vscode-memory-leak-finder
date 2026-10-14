@@ -17,8 +17,15 @@ export const parsePerf = (raw: string, events: string[]): Metric[] => {
     const fields = line.trim().split(',')
     const event = fields[2]?.trim()
     if (!event || !events.includes(event)) continue
-    const value = Number(fields[0]?.trim())
+    let value = Number(fields[0]?.trim())
     if (!fields[0]?.trim() || !Number.isFinite(value)) continue
+    if (event === 'task-clock') {
+      const unit = fields[1]?.trim()
+      // Some perf versions emit the kernel's nanosecond count without a unit.
+      if (!unit || unit === 'ns' || unit === 'nsec') value /= 1_000_000
+      else if (unit === 'sec' || unit === 's') value *= 1000
+      else if (unit !== 'msec' && unit !== 'ms') throw new UnavailableError(`Unknown perf task-clock unit: ${unit}`)
+    }
     // perf reports the percentage of time an event ran when counters are multiplexed.
     const running = Number(fields[4])
     if (fields[4]?.trim() && Number.isFinite(running) && running < 95)
@@ -74,6 +81,7 @@ export class PerfSession {
   private acknowledgement: FileHandle | undefined
   private closed: Promise<void> = Promise.resolve()
   private frozen = false
+  private stderr = ''
   readonly directory: string
   readonly events: string[]
   private constructor(directory: string, events: string[]) {
@@ -109,13 +117,17 @@ export class PerfSession {
   }
   bind(child: ChildProcess): void {
     this.child = child
+    child.stderr?.setEncoding('utf8')
+    child.stderr?.on('data', (chunk) => {
+      this.stderr = (this.stderr + chunk).slice(-4 * 1024 * 1024)
+    })
     this.closed = new Promise((resolve) => {
       child.once('close', () => resolve())
       child.once('error', () => resolve())
     })
   }
   async attach(pids: number[]): Promise<void> {
-    const child = spawn('perf', [...this.args(true), '-p', pids.join(',')], { stdio: 'ignore' })
+    const child = spawn('perf', [...this.args(true), '-p', pids.join(',')], { stdio: ['ignore', 'ignore', 'pipe'] })
     this.bind(child)
     await this.toggle('enable')
   }
@@ -125,6 +137,8 @@ export class PerfSession {
     const buffer = Buffer.alloc(128)
     const deadline = Date.now() + 5000
     while (Date.now() < deadline) {
+      if (this.child && (this.child.exitCode !== null || this.child.signalCode !== null))
+        throw new UnavailableError(`perf exited before ${value}: ${this.stderr.trim() || this.child.exitCode || this.child.signalCode}`)
       try {
         const { bytesRead } = await this.acknowledgement.read(buffer, 0, buffer.length, null)
         if (bytesRead && buffer.subarray(0, bytesRead).toString().includes('ack')) return
@@ -133,7 +147,7 @@ export class PerfSession {
       }
       await delay(5)
     }
-    throw new UnavailableError(`perf did not acknowledge ${value}`)
+    throw new UnavailableError(`perf did not acknowledge ${value}${this.stderr.trim() ? `: ${this.stderr.trim()}` : ''}`)
   }
   async freeze(): Promise<void> {
     if (!this.frozen) {

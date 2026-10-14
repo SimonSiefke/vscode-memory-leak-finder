@@ -228,6 +228,35 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
   let perf: PerfSession | undefined
   let resources: ResourceSampler | undefined
   let resourceMetrics: Metric[] = []
+  const resourceFailure = (collector: string, error: unknown): void => {
+    if (benchmark.collector !== 'resources') throw error
+    sample.status = 'partial'
+    sample.diagnostics.push(`${collector}: ${errorMessage(error)}`)
+  }
+  const startResources = async (pid: number, excludeRoot: boolean): Promise<void> => {
+    resources = new ResourceSampler(pid, excludeRoot)
+    try {
+      await resources.start()
+    } catch (error) {
+      resourceFailure('Process-tree PSS', error)
+      resources = undefined
+    }
+  }
+  const freezeCollectors = async (): Promise<void> => {
+    try {
+      await perf?.freeze()
+    } catch (error) {
+      resourceFailure('CPU counters', error)
+      await perf?.dispose()
+      perf = undefined
+    }
+    try {
+      if (resources) resourceMetrics = await resources.stop()
+    } catch (error) {
+      resourceFailure('Process-tree PSS', error)
+      resources = undefined
+    }
+  }
   try {
     if (options.injectFailure === `${benchmark.id}:${revision}:${pair}`) throw new Error('Injected collector failure')
     await prepareFixture(workspace)
@@ -266,14 +295,12 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
         ? {
             onSpawn: async (child) => {
               if (benchmark.collector === 'resources') {
-                resources = new ResourceSampler(child.pid!, !!perf)
-                await resources.start()
+                await startResources(child.pid!, !!perf)
               }
             },
             onReady: async (renderer) => {
               if (benchmark.collector === 'timeline') await evaluate(renderer, `console.timeStamp('large-end')`)
-              await perf?.freeze()
-              if (resources) resourceMetrics = await resources.stop()
+              await freezeCollectors()
             },
           }
         : {},
@@ -296,10 +323,17 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     let before: Metric[] = []
     let browserBefore: { name: string; value: number }[] = []
     if (benchmark.collector === 'resources' && !benchmark.startup) {
-      resources = new ResourceSampler(app.child.pid!, benchmark.startup && !!perf)
-      await resources.start()
+      await startResources(app.child.pid!, false)
     }
-    if (!benchmark.startup && perf) await perf.attach((await processTree(app.child.pid!)).map((entry) => entry.pid))
+    if (!benchmark.startup && perf) {
+      try {
+        await perf.attach((await processTree(app.child.pid!)).map((entry) => entry.pid))
+      } catch (error) {
+        resourceFailure('CPU counters', error)
+        await perf.dispose()
+        perf = undefined
+      }
+    }
     if (benchmark.collector === 'renderer') {
       activeRendererMeasure = MeasureBrowserPerformanceCounters
       browserBefore = (await activeRendererMeasure.start(renderer)).metrics
@@ -336,8 +370,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
         })
     }
     if (!benchmark.startup) {
-      await perf?.freeze()
-      if (resources) resourceMetrics = await resources.stop()
+      await freezeCollectors()
     }
     if (perf) {
       // A launch-wrapping perf process waits for Electron to exit before writing its final totals.

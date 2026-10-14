@@ -30,6 +30,17 @@ test('renderer durations convert seconds to milliseconds without inventing missi
   ])
 })
 
+test('perf task-clock normalizes explicit milliseconds and raw nanoseconds from hosted runners', () => {
+  for (const raw of [
+    '3316036078,,task-clock,3316036078,100.00',
+    '3316036078,nsec,task-clock,3316036078,100.00',
+    '3316.036078,msec,task-clock,3316036078,100.00',
+  ]) {
+    expect(parsePerf(raw, ['task-clock'])[0]).toMatchObject({ value: 3316.036078, unit: 'ms' })
+  }
+  expect(() => parsePerf('1,unknown,task-clock,10,100.00', ['task-clock'])).toThrow('Unknown perf task-clock unit')
+})
+
 test('traces clip to measurement boundaries and exclude other renderers and post-completion work', () => {
   const marker = (message: string, ts: number) => ({ name: 'TimeStamp', ph: 'I', pid: 2, tid: 3, ts, args: { data: { message } } })
   const events = [
