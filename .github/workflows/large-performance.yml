@@ -1,6 +1,8 @@
 name: Large Performance Measure
 
 on:
+  push:
+    branches: [validation/large-performance-pr-3391]
   workflow_dispatch:
     inputs:
       before_commit:
@@ -20,15 +22,15 @@ on:
         type: string
         default: ''
 
-run-name: Large Performance ${{ inputs.before_commit }} → ${{ inputs.after_commit }}
+run-name: Large Performance ${{ inputs.before_commit || '07f806f999227108933c2e30515b26eecc1fda74' }} → ${{ inputs.after_commit || '07f806f999227108933c2e30515b26eecc1fda74' }}
 
 permissions:
   contents: read
 
 env:
-  BEFORE_COMMIT: ${{ inputs.before_commit }}
-  AFTER_COMMIT: ${{ inputs.after_commit }}
-  SAMPLES: ${{ inputs.samples }}
+  BEFORE_COMMIT: ${{ inputs.before_commit || '07f806f999227108933c2e30515b26eecc1fda74' }}
+  AFTER_COMMIT: ${{ inputs.after_commit || '07f806f999227108933c2e30515b26eecc1fda74' }}
+  SAMPLES: ${{ inputs.samples || '37' }}
   BENCHMARK_FILTER: ${{ inputs.benchmark_filter }}
 
 jobs:
