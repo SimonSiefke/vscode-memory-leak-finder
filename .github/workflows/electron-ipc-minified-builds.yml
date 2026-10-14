@@ -1,0 +1,87 @@
+name: Electron IPC minified builds
+
+on:
+  push:
+    branches: [ci/electron-ipc-minified-x64]
+    paths:
+      - .github/workflows/electron-ipc-minified-builds.yml
+      - scripts/electron-ipc-minified-x64/build/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.repository == 'SimonSiefke/vscode-memory-leak-finder' && github.actor == 'SimonSiefke'
+    runs-on: ${{ matrix.platform.runner }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [buffer, before, after]
+        include:
+          - variant: buffer
+            sha: 959031245ebb1fe077e0d512e1397c0ae82006e4
+          - variant: before
+            sha: d6352725adca1ebaebbabb24f65b63c88167fda3
+          - variant: after
+            sha: fb616229bd8383a07d0cdee17e5c844c9aa0a50c
+        platform:
+          - arch: x64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
+      BUILD_SOURCEVERSION: ${{ matrix.sha }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: SimonSiefke/vscode
+          ref: ${{ matrix.sha }}
+          path: product
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: product/.nvmrc
+      - name: Install build and desktop dependencies
+        run: bash scripts/electron-ipc-benchmark/install-linux.sh
+      - name: Install source dependencies
+        working-directory: product
+        run: npm ci
+      - name: Build bundled minified package
+        working-directory: product
+        run: npm run gulp vscode-linux-${{ matrix.platform.arch }}-min
+      - name: Preserve pristine package
+        run: |
+          mv VSCode-linux-${{ matrix.platform.arch }} package
+          cp product/.nvmrc package/.nvmrc
+      - name: Compile smoke runner
+        if: matrix.platform.arch == 'x64'
+        working-directory: product
+        run: npm --prefix test/smoke run compile
+      - name: Bundle original internal startup recorder separately
+        if: matrix.platform.arch == 'x64'
+        working-directory: product
+        run: |
+          git apply ../scripts/electron-ipc-minified-x64/build/startup.patch
+          npm run gulp esbuild-vscode-min
+          cp -a ../package/resources/app/out ../package/startup-out
+          cp -a out-vscode-min/. ../package/startup-out/
+          git apply -R ../scripts/electron-ipc-minified-x64/build/startup.patch
+      - name: Verify native package, architecture and complete outputs
+        run: python3 scripts/electron-ipc-minified-x64/build/verify.py package ${{ matrix.sha }} ${{ matrix.platform.arch }} product
+      - name: Archive packaged application and smoke harness
+        run: |
+          if [[ '${{ matrix.platform.arch }}' == 'x64' ]]; then
+            tar --exclude=product/.git --exclude=product/.build/logs --exclude=product/.build/crashes -I 'zstd -T2 -3' -cf package.tar.zst package product
+          else
+            tar -I 'zstd -T2 -3' -cf package.tar.zst package
+          fi
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ipc-minified-${{ matrix.platform.arch }}-${{ matrix.variant }}
+          path: package.tar.zst
+          compression-level: 0
+          retention-days: 7
