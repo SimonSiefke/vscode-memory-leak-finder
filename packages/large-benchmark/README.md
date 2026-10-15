@@ -1,6 +1,6 @@
 # Large Benchmark
 
-Compare two minified Linux x64 VS Code builds with paired startup, interaction,
+Compare two or more minified Linux x64 VS Code builds with paired startup, interaction,
 resource, trace, profiling, memory, and bundle-size measurements. The package owns
 the benchmark manifest, paired orchestration, result format, and offline report.
 It uses the existing DevTools connection and page-object harness, E2E scenarios
@@ -13,13 +13,35 @@ the manifest, build preparation, measurements, bundle sizes, statistics, and rep
 ## Large Performance Measure
 
 Run the [Large Performance Measure workflow](../../.github/workflows/large-performance.yml) from GitHub Actions
-with `before_commit` and `after_commit` set to full VS Code commit SHAs. The manual workflow builds both
-minified Linux x64 packages once, then runs 104 runtime benchmark jobs and a
-JavaScript bundle-size comparison. It leaves the existing CI and bot workflows
-unchanged.
+with one of these revision inputs:
 
-The defaults are 37 samples per commit, all extensions disabled, and the entire
-suite. CPU profiles and heap snapshots use at most five samples per commit.
+- `version_range`: an inclusive stable version range such as `1.120.0...1.130.0`.
+  The workflow discovers published stable releases using Microsoft's
+  [stable release API](https://update.code.visualstudio.com/api/releases/stable?released=true),
+  includes patch releases within the bounds, sorts by numeric version, and resolves
+  each Linux x64 release to its full commit SHA. Both endpoints must be published
+  stable releases, and the range must select 2–256 versions. Insiders and prereleases
+  are excluded. Resolution happens once during initialization; the manifest preserves
+  each version and its commit, and the trend report displays version labels.
+- `commits`: a JSON array of 2–256 unique full VS Code commit SHAs in version order
+  (oldest to newest), for example `["<40-character SHA>", "<40-character SHA>", "<40-character SHA>"]`.
+  The workflow preserves the supplied order rather than sorting hashes.
+- `before_commit` and `after_commit`: the original two-build comparison.
+
+These input modes cannot be combined. For example, set `version_range` to
+`1.120.0...1.130.0`, set `measures` to `startup-times`, and leave all commit inputs empty.
+An unavailable release API, unknown endpoint, missing Linux build, or invalid
+commit metadata fails initialization before any builds start.
+
+The workflow builds each minified Linux x64 package once and compares each adjacent
+pair of commits. The full suite has 104 runtime benchmarks and one JavaScript
+bundle-size benchmark per pair. Each matrix stays within 256 jobs by grouping
+benchmarks into a job when necessary; each job downloads only its two required
+builds. If a build fails, comparisons using other builds can still run. It leaves
+the existing CI and bot workflows unchanged.
+
+The defaults are 37 samples per commit **per adjacent comparison**, all extensions disabled, and the entire
+suite. Interior commits are measured again against their next neighbor. CPU profiles and heap snapshots use at most five samples per commit.
 Each job measures both revisions on the same runner and alternates their order.
 Failures and unavailable facilities are recorded independently; regressions do
 not fail the workflow. The final job always gathers the available evidence and
@@ -27,13 +49,28 @@ uploads **large-performance-report**. Download and extract it, then open
 `index.html`. The report works offline and includes SVG charts, distributions,
 coverage, and CPU flame charts. This artifact contains only the HTML report and
 SVG charts. Raw JSON data, traces, profiles, snapshots, and diagnostics remain in
-the separate **large-result-&lt;benchmark-id&gt;** artifacts; the report identifies
+the separate **large-result-pair-&lt;pair-number&gt;-&lt;group-number&gt;** artifacts; the report identifies
 the corresponding artifact for each benchmark without copying its evidence.
 
-The Actions job summary shows Markdown tables for every available metric,
-grouped by collector, with before/after values, absolute and percentage changes,
-complete pair counts, and paired confidence intervals. Benchmark coverage remains
-available in an expandable table, including failed and unavailable collectors.
+For commit arrays, the report opens with a trend chart per metric and a table of
+changes between adjacent commits, including improvements, regressions, complete
+pair counts, and confidence intervals. Links open the full paired report for each
+step. The Actions summary shows overall chained changes and available links.
+
+Trend charts start at an index of 100 and multiply adjacent after/before ratios.
+This uses comparisons measured on the same runner rather than comparing absolute
+timings across runners. The overall percentage describes cumulative relative
+change; it is not an absolute startup time or a direct first-to-last measurement.
+Uncertainty can accumulate across links, and there is no aggregate confidence
+interval. Missing metrics and zero baselines stop the cumulative index; later
+valid pair results remain visible. Input order defines chart spacing, not elapsed
+calendar time.
+
+The original before/after inputs retain the paired report and Actions summary:
+tables for every available metric, grouped by collector, with before/after values,
+absolute and percentage changes, complete pair counts, and paired confidence
+intervals. Benchmark coverage remains available in each pair report, including
+failed and unavailable collectors.
 
 Startup covers an empty window and a workspace opening a fixed text file, in
 both cold and warm conditions. Cold launches use fresh profiles and clear Linux
@@ -74,13 +111,33 @@ intervals crossing zero are marked inconclusive. These intervals are exploratory
 across many metrics, without a multiple-comparison significance claim. No
 outliers are removed or samples silently retried.
 
-Use the optional `samples` and `benchmark_filter` dispatch inputs for smaller
-runs. Filters accept comma-separated exact IDs from the shared manifest, for
-example:
+Use the optional `measures` dispatch input to select comma-separated groups:
+
+| Group                                                                                         | Benchmarks                                                                    |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `startup-times`                                                                               | Only empty-window and workspace startup timings, cold and warm (4 benchmarks) |
+| `startup`                                                                                     | All startup collectors (20 benchmarks)                                        |
+| `timing`, `instructions`, `resources`, `renderer`, `timeline`, `profile`, `memory`, `bundles` | Benchmarks using the selected collectors                                      |
+
+Multiple groups are combined. Empty `measures` selects all measures. The existing
+`benchmark_filter` further restricts the selection to comma-separated exact IDs;
+unknown groups/IDs and an empty intersection are rejected. For example:
 
 ```text
 startup-empty-cold-timing,startup-empty-warm-timing,open-small-timing,bundles
 ```
+
+To compare startup performance across the last 100 stable VS Code versions,
+pass the oldest and newest desired stable version as `version_range`, or supply
+the 100 corresponding commit SHAs in release order, and set `measures` to `startup-times`. This builds 100 versions and measures 99 adjacent
+comparisons across the four startup workloads (396 benchmark comparisons, grouped
+into 198 measurement jobs). Use `samples` to control repetition. The workflow
+automatically resolves version ranges; raw commit arrays remain available for
+custom histories. Historical commits must build with
+the existing build pipeline and run with the current harness. Unsupported or failed
+builds/measurements remain visible as gaps instead of fabricated trend values.
+Large runs that select all collectors group more benchmarks into each job and may
+reach the job time limit; prefer focused measures for long histories.
 
 ## Local usage
 
@@ -98,11 +155,21 @@ npm run prepare-build -- --commit AFTER_SHA --output-dir .tmp/large-after
 npm run benchmark -- extract --commit BEFORE_SHA --input-dir .tmp/large-before
 npm run benchmark -- extract --commit AFTER_SHA --input-dir .tmp/large-after
 
-# Create the expected-run manifest (also prints the complete matrix without a filter).
+# Resolve all published stable releases in an inclusive range (including patches).
+npm run matrix -- --version-range 1.120.0...1.130.0 \
+  --measures startup-times --samples 5 --output-dir .tmp/large-series-manifest
+
+# Or create a version-series manifest from explicit hashes.
+npm run matrix -- --commits '["FIRST_SHA", "SECOND_SHA", "THIRD_SHA"]' \
+  --measures startup-times --samples 5 --output-dir .tmp/large-series-manifest
+
+# Or create the original two-build manifest.
 npm run matrix -- --before-commit BEFORE_SHA --after-commit AFTER_SHA \
   --samples 5 --benchmark-filter open-small-timing --output-dir .tmp/large-manifest
 
-# Each measure command runs both revisions and checkpoints each sample.
+# Each measure command runs one adjacent pair and checkpoints each sample.
+# For a series, repeat with the commits/paths for each adjacent pair, saving
+# results in separate subdirectories of .tmp/large-results.
 xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
   npm run measure -- --benchmark-id open-small-timing --samples 5 \
   --before-commit BEFORE_SHA --after-commit AFTER_SHA \
@@ -112,9 +179,16 @@ xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
 
 npm run report -- --manifest .tmp/large-manifest/manifest.json \
   --input-dir .tmp/large-results --output-dir .tmp/large-report
+
+# For a series report, use the series manifest and all adjacent-pair results.
+npm run report -- --manifest .tmp/large-series-manifest/manifest.json \
+  --input-dir .tmp/large-results --output-dir .tmp/large-series-report
 ```
 
-Replace `BEFORE_SHA` and `AFTER_SHA` with full 40-character hashes. Measurement
+The `measure` command also accepts comma-separated benchmark IDs in
+`--benchmark-id`; grouped results are written in benchmark subdirectories.
+
+Replace all example SHAs with full 40-character hashes. Measurement
 commands require Node from the repository's `.nvmrc`, Linux x64, Xvfb or a display,
 and desktop libraries. Instruction/resource counters additionally need a working `perf`
 installation and event permissions. Cold startup needs noninteractive permission

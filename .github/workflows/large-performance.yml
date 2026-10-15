@@ -3,16 +3,28 @@ name: Large Performance Measure
 on:
   workflow_dispatch:
     inputs:
+      version_range:
+        description: Inclusive stable version range, e.g. 1.120.0...1.130.0 (includes patch releases); alternative to commit inputs
+        type: string
+        default: ''
+      commits:
+        description: JSON array of full VS Code SHAs in version order (2–256); or use before/after below
+        type: string
+        default: ''
+      measures:
+        description: Optional comma-separated groups (startup-times, startup, timing, instructions, resources, renderer, timeline, profile, memory, bundles)
+        type: string
+        default: ''
       before_commit:
         description: Before VS Code commit (full 40-character SHA)
-        required: true
+        required: false
         type: string
       after_commit:
         description: After VS Code commit (full 40-character SHA)
-        required: true
+        required: false
         type: string
       samples:
-        description: Samples per commit (profiling and snapshots use at most five)
+        description: Samples per commit per adjacent comparison (profiling and snapshots use at most five)
         type: string
         default: '37'
       benchmark_filter:
@@ -20,12 +32,15 @@ on:
         type: string
         default: ''
 
-run-name: Large Performance ${{ inputs.before_commit }} → ${{ inputs.after_commit }}
+run-name: Large Performance ${{ inputs.version_range || (inputs.commits && 'version trend comparison') || format('{0} → {1}', inputs.before_commit, inputs.after_commit) }}
 
 permissions:
   contents: read
 
 env:
+  VERSION_RANGE: ${{ inputs.version_range }}
+  COMMITS: ${{ inputs.commits }}
+  MEASURES: ${{ inputs.measures }}
   BEFORE_COMMIT: ${{ inputs.before_commit }}
   AFTER_COMMIT: ${{ inputs.after_commit }}
   SAMPLES: ${{ inputs.samples }}
@@ -36,6 +51,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.manifest.outputs.matrix }}
+      build_matrix: ${{ steps.manifest.outputs.build_matrix }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -44,9 +60,13 @@ jobs:
       - name: Validate inputs and generate benchmark manifest
         id: manifest
         run: |
-          node packages/large-benchmark/src/main.ts matrix \
-            --before-commit "$BEFORE_COMMIT" --after-commit "$AFTER_COMMIT" \
-            --samples "$SAMPLES" --benchmark-filter "$BENCHMARK_FILTER" \
+          revisions=()
+          [[ -z "$VERSION_RANGE" ]] || revisions+=(--version-range "$VERSION_RANGE")
+          [[ -z "$COMMITS" ]] || revisions+=(--commits "$COMMITS")
+          [[ -z "$BEFORE_COMMIT" ]] || revisions+=(--before-commit "$BEFORE_COMMIT")
+          [[ -z "$AFTER_COMMIT" ]] || revisions+=(--after-commit "$AFTER_COMMIT")
+          node packages/large-benchmark/src/main.ts matrix "${revisions[@]}" \
+            --samples "$SAMPLES" --benchmark-filter "$BENCHMARK_FILTER" --measures "$MEASURES" \
             --output-dir .large-manifest
       - uses: actions/upload-artifact@v7
         with:
@@ -60,10 +80,9 @@ jobs:
     timeout-minutes: 350
     strategy:
       fail-fast: false
-      matrix:
-        revision: [before, after]
+      matrix: ${{ fromJSON(needs.initialize.outputs.build_matrix) }}
     env:
-      REVISION: ${{ matrix.revision }}
+      COMMIT: ${{ matrix.commit }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -77,17 +96,12 @@ jobs:
         run: npm run build
       - name: Build and archive the minified VS Code package
         run: |
-          if [[ "$REVISION" == before ]]; then
-            commit="$BEFORE_COMMIT"
-          else
-            commit="$AFTER_COMMIT"
-          fi
           node packages/large-benchmark/src/main.ts prepare \
-            --commit "$commit" --output-dir .large-build
+            --commit "$COMMIT" --output-dir .large-build
       - name: Upload executable package
         uses: actions/upload-artifact@v7
         with:
-          name: large-build-${{ matrix.revision }}
+          name: large-build-${{ matrix.commit }}
           path: |
             .large-build/vscode.tar.gz
             .large-build/build.json
@@ -99,13 +113,14 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: large-build-status-${{ matrix.revision }}
+          name: large-build-status-${{ matrix.commit }}
           path: .large-build/status.json
           retention-days: 30
           overwrite: true
 
   measure:
     needs: [initialize, build]
+    if: ${{ always() && needs.initialize.result == 'success' && !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     continue-on-error: true
@@ -113,8 +128,9 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.initialize.outputs.matrix) }}
     env:
-      BENCHMARK_ID: ${{ matrix.id }}
-      JOB_SAMPLES: ${{ matrix.samples }}
+      BENCHMARK_IDS: ${{ matrix.benchmarks }}
+      BEFORE_COMMIT: ${{ matrix.before }}
+      AFTER_COMMIT: ${{ matrix.after }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -133,11 +149,11 @@ jobs:
           sudo sysctl -w kernel.perf_event_paranoid=-1 || true
       - uses: actions/download-artifact@v8
         with:
-          name: large-build-before
+          name: large-build-${{ matrix.before }}
           path: .large-builds/before
       - uses: actions/download-artifact@v8
         with:
-          name: large-build-after
+          name: large-build-${{ matrix.after }}
           path: .large-builds/after
       - name: Verify and extract before build
         id: before
@@ -153,7 +169,7 @@ jobs:
         run: |
           xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
             node packages/large-benchmark/src/main.ts measure \
-            --benchmark-id "$BENCHMARK_ID" --samples "$JOB_SAMPLES" \
+            --benchmark-id "$BENCHMARK_IDS" --samples "$SAMPLES" \
             --before-path "$BEFORE_PATH" --after-path "$AFTER_PATH" \
             --before-commit "$BEFORE_COMMIT" --after-commit "$AFTER_COMMIT" \
             --output-dir .large-results
@@ -161,7 +177,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: large-result-${{ matrix.id }}
+          name: large-result-${{ matrix.id }}-${{ matrix.group }}
           path: .large-results
           include-hidden-files: true
           retention-days: 30
@@ -196,21 +212,19 @@ jobs:
           pattern: large-build-status-*
           path: .large-downloads
       - name: Generate comparison charts and offline report
-        env:
-          BUILD_OUTCOMES: ${{ needs.build.result == 'success' && 'success,success' || 'failure,failure' }}
         run: |
           mkdir -p .large-downloads
           node packages/large-benchmark/src/main.ts report \
             --manifest .large-manifest/manifest.json --input-dir .large-downloads \
-            --output-dir .large-report --build-outcomes "$BUILD_OUTCOMES"
+            --output-dir .large-report
       - name: Upload HTML report and charts
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: large-performance-report
           path: |
-            .large-report/index.html
-            .large-report/charts/*.svg
+            .large-report/**/*.html
+            .large-report/**/*.svg
           if-no-files-found: error
           retention-days: 30
           overwrite: true
