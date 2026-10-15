@@ -3,6 +3,10 @@ name: Large Performance Measure
 on:
   workflow_dispatch:
     inputs:
+      version_range:
+        description: Inclusive stable version range, e.g. 1.120.0...1.130.0 (includes patch releases); alternative to commit inputs
+        type: string
+        default: ''
       commits:
         description: JSON array of full VS Code SHAs in version order (2–256); or use before/after below
         type: string
@@ -28,12 +32,13 @@ on:
         type: string
         default: ''
 
-run-name: Large Performance ${{ inputs.commits && 'version trend comparison' || format('{0} → {1}', inputs.before_commit, inputs.after_commit) }}
+run-name: Large Performance ${{ inputs.version_range || (inputs.commits && 'version trend comparison') || format('{0} → {1}', inputs.before_commit, inputs.after_commit) }}
 
 permissions:
   contents: read
 
 env:
+  VERSION_RANGE: ${{ inputs.version_range }}
   COMMITS: ${{ inputs.commits }}
   MEASURES: ${{ inputs.measures }}
   BEFORE_COMMIT: ${{ inputs.before_commit }}
@@ -55,15 +60,11 @@ jobs:
       - name: Validate inputs and generate benchmark manifest
         id: manifest
         run: |
-          if [[ -n "$COMMITS" ]]; then
-            if [[ -n "$BEFORE_COMMIT" || -n "$AFTER_COMMIT" ]]; then
-              echo 'Use commits or before_commit/after_commit, not both' >&2
-              exit 1
-            fi
-            revisions=(--commits "$COMMITS")
-          else
-            revisions=(--before-commit "$BEFORE_COMMIT" --after-commit "$AFTER_COMMIT")
-          fi
+          revisions=()
+          [[ -z "$VERSION_RANGE" ]] || revisions+=(--version-range "$VERSION_RANGE")
+          [[ -z "$COMMITS" ]] || revisions+=(--commits "$COMMITS")
+          [[ -z "$BEFORE_COMMIT" ]] || revisions+=(--before-commit "$BEFORE_COMMIT")
+          [[ -z "$AFTER_COMMIT" ]] || revisions+=(--after-commit "$AFTER_COMMIT")
           node packages/large-benchmark/src/main.ts matrix "${revisions[@]}" \
             --samples "$SAMPLES" --benchmark-filter "$BENCHMARK_FILTER" --measures "$MEASURES" \
             --output-dir .large-manifest

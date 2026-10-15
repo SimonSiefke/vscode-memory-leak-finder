@@ -13,11 +13,25 @@ the manifest, build preparation, measurements, bundle sizes, statistics, and rep
 ## Large Performance Measure
 
 Run the [Large Performance Measure workflow](../../.github/workflows/large-performance.yml) from GitHub Actions
-with `commits` set to a JSON array of full VS Code commit SHAs in version order
-(oldest to newest), for example `["<40-character SHA>", "<40-character SHA>", "<40-character SHA>"]`.
-Alternatively, keep using `before_commit` and `after_commit` for the original two-build report.
-Supply either the array or the before/after inputs, not both. Arrays accept 2–256 unique commits;
-the workflow preserves the supplied order rather than sorting hashes.
+with one of these revision inputs:
+
+- `version_range`: an inclusive stable version range such as `1.120.0...1.130.0`.
+  The workflow discovers published stable releases using Microsoft's
+  [stable release API](https://update.code.visualstudio.com/api/releases/stable?released=true),
+  includes patch releases within the bounds, sorts by numeric version, and resolves
+  each Linux x64 release to its full commit SHA. Both endpoints must be published
+  stable releases, and the range must select 2–256 versions. Insiders and prereleases
+  are excluded. Resolution happens once during initialization; the manifest preserves
+  each version and its commit, and the trend report displays version labels.
+- `commits`: a JSON array of 2–256 unique full VS Code commit SHAs in version order
+  (oldest to newest), for example `["<40-character SHA>", "<40-character SHA>", "<40-character SHA>"]`.
+  The workflow preserves the supplied order rather than sorting hashes.
+- `before_commit` and `after_commit`: the original two-build comparison.
+
+These input modes cannot be combined. For example, set `version_range` to
+`1.120.0...1.130.0`, set `measures` to `startup-times`, and leave all commit inputs empty.
+An unavailable release API, unknown endpoint, missing Linux build, or invalid
+commit metadata fails initialization before any builds start.
 
 The workflow builds each minified Linux x64 package once and compares each adjacent
 pair of commits. The full suite has 104 runtime benchmarks and one JavaScript
@@ -114,12 +128,12 @@ startup-empty-cold-timing,startup-empty-warm-timing,open-small-timing,bundles
 ```
 
 To compare startup performance across the last 100 stable VS Code versions,
-supply the 100 corresponding commit SHAs in release order and set
-`measures` to `startup-times`. This builds 100 versions and measures 99 adjacent
+pass the oldest and newest desired stable version as `version_range`, or supply
+the 100 corresponding commit SHAs in release order, and set `measures` to `startup-times`. This builds 100 versions and measures 99 adjacent
 comparisons across the four startup workloads (396 benchmark comparisons, grouped
 into 198 measurement jobs). Use `samples` to control repetition. The workflow
-accepts commit hashes, so resolve release versions to their commits before dispatch;
-it does not discover releases automatically. Historical commits must build with
+automatically resolves version ranges; raw commit arrays remain available for
+custom histories. Historical commits must build with
 the existing build pipeline and run with the current harness. Unsupported or failed
 builds/measurements remain visible as gaps instead of fabricated trend values.
 Large runs that select all collectors group more benchmarks into each job and may
@@ -141,7 +155,11 @@ npm run prepare-build -- --commit AFTER_SHA --output-dir .tmp/large-after
 npm run benchmark -- extract --commit BEFORE_SHA --input-dir .tmp/large-before
 npm run benchmark -- extract --commit AFTER_SHA --input-dir .tmp/large-after
 
-# Create a version-series manifest and matrix (replace SHAs with full hashes).
+# Resolve all published stable releases in an inclusive range (including patches).
+npm run matrix -- --version-range 1.120.0...1.130.0 \
+  --measures startup-times --samples 5 --output-dir .tmp/large-series-manifest
+
+# Or create a version-series manifest from explicit hashes.
 npm run matrix -- --commits '["FIRST_SHA", "SECOND_SHA", "THIRD_SHA"]' \
   --measures startup-times --samples 5 --output-dir .tmp/large-series-manifest
 

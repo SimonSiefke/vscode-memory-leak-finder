@@ -132,7 +132,7 @@ test('matrix command emits build and measurement matrices and supports legacy be
       commits: { before: commits[0], after: commits[1] },
     })
     await expect(largePerformance(['matrix', '--commits', JSON.stringify(commits), '--before-commit', commits[0]!])).rejects.toThrow(
-      'not both',
+      'cannot be combined',
     )
   } finally {
     if (previous === undefined) delete process.env.GITHUB_OUTPUT

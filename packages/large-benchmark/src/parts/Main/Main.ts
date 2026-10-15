@@ -11,6 +11,7 @@ import { parseOptions } from '../ParseOptions/ParseOptions.ts'
 import { createWorkflowSummary } from '../WorkflowSummary/WorkflowSummary.ts'
 import { parseCommits, seriesMatrix, validateCommits, type SeriesManifest } from '../Series/Series.ts'
 import { generateTrendReport, createTrendWorkflowSummary } from '../TrendReport/TrendReport.ts'
+import { resolveVersionRange } from '../VersionRange/VersionRange.ts'
 
 export interface Manifest {
   schemaVersion: 1
@@ -30,12 +31,19 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
   switch (argv[0]) {
     case 'matrix': {
       const selected = selectBenchmarks(get('--benchmark-filter'), get('--measures'))
-      if (get('--commits') && (get('--before-commit') || get('--after-commit')))
-        throw new Error('Use --commits or --before-commit/--after-commit, not both')
-      const revisions = get('--commits') ? parseCommits(get('--commits')) : validateCommits(Object.values(commits()))
-      const manifest: Manifest | SeriesManifest = get('--commits')
-        ? { schemaVersion: 2, commits: revisions, samples, benchmarks: selected }
-        : { schemaVersion: 1, commits: commits(), samples, benchmarks: selected }
+      const inputModes = [get('--version-range'), get('--commits'), get('--before-commit') || get('--after-commit')].filter(Boolean)
+      if (inputModes.length > 1)
+        throw new Error('Use --version-range, --commits, or --before-commit/--after-commit; these inputs cannot be combined')
+      const releases = get('--version-range') ? await resolveVersionRange(get('--version-range')) : undefined
+      const revisions = releases
+        ? releases.map((release) => release.commit)
+        : get('--commits')
+          ? parseCommits(get('--commits'))
+          : validateCommits(Object.values(commits()))
+      const manifest: Manifest | SeriesManifest =
+        get('--commits') || releases
+          ? { schemaVersion: 2, commits: revisions, samples, benchmarks: selected, ...(releases ? { releases } : {}) }
+          : { schemaVersion: 1, commits: commits(), samples, benchmarks: selected }
       await writeJson(join(output, 'manifest.json'), manifest)
       const matrix = JSON.stringify(seriesMatrix(revisions, selected))
       const buildMatrix = JSON.stringify({ commit: revisions })

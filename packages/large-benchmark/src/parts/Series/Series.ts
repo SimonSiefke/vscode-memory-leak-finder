@@ -1,4 +1,5 @@
 import type { Benchmark } from '../Types/Types.ts'
+import type { StableRelease } from '../VersionRange/VersionRange.ts'
 
 export interface CommitPair {
   id: string
@@ -11,6 +12,7 @@ export interface SeriesManifest {
   commits: string[]
   samples: number
   benchmarks: Benchmark[]
+  releases?: StableRelease[]
 }
 
 export const validateCommits = (value: unknown): string[] => {
