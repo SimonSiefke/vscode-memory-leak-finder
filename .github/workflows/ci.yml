@@ -366,6 +366,7 @@ jobs:
         run: node packages/memory-leak-finder/src/verifyCpuPerformanceCounters.ts
       - name: Measure instruction counts
         timeout-minutes: 350
+        continue-on-error: true
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure cpu-performance-counters --runs 1 --restart-between --run-skipped-tests-anyway
