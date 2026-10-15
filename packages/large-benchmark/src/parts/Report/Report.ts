@@ -191,7 +191,7 @@ export const flameSvg = (profile: any): string => {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="${70 + depth * 22}" font-family="system-ui,sans-serif" font-size="12"><rect width="100%" height="100%" fill="white"/><text x="10" y="25" font-size="18">Renderer CPU flame chart · inclusive sampled time</text>${rectangles.join('')}</svg>`
 }
 
-const findResults = async (directory: string): Promise<string[]> => {
+export const findResults = async (directory: string): Promise<string[]> => {
   const paths: string[] = []
   const visit = async (path: string): Promise<void> => {
     for (const entry of await readdir(path, { withFileTypes: true }).catch(() => [])) {
@@ -209,6 +209,14 @@ export interface ReportOptions {
   benchmarks: Benchmark[]
   commits: { before: string; after: string }
   buildOutcomes?: string
+  resultPaths?: string[]
+}
+
+export const validateReportDirectories = (inputPath: string, outputPath: string): void => {
+  const input = resolve(inputPath)
+  const output = resolve(outputPath)
+  if (input === output || input.startsWith(output + sep) || output.startsWith(input + sep))
+    throw new Error('Report input and output must be separate directories')
 }
 
 export const generateReport = async (inputOptions: ReportOptions) => {
@@ -218,12 +226,9 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     ...inputOptions,
     benchmarks: inputOptions.benchmarks.map((benchmark) => canonical.find((entry) => entry.id === benchmark.id)!),
   }
-  const input = resolve(options.input)
-  const output = resolve(options.output)
-  if (input === output || input.startsWith(output + sep) || output.startsWith(input + sep))
-    throw new Error('Report input and output must be separate directories')
+  validateReportDirectories(options.input, options.output)
   await mkdir(join(options.output, 'charts'), { recursive: true })
-  const paths = await findResults(options.input)
+  const paths = options.resultPaths ?? (await findResults(options.input))
   const diagnostics: string[] = []
   const results = new Map<string, Result>()
   const resultDirectories = new Map<string, string>()
@@ -323,13 +328,16 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       result?.samples
         .flatMap((sample) => sample.raw.map((path) => `<li>${escapeHtml(`${sample.revision} #${sample.pair + 1}: ${path}`)}</li>`))
         .join('') ?? ''
+    const artifact = relative(options.input, resultDirectories.get(benchmark.id) ?? options.input).split(sep)[0]
+    const artifactName = artifact?.startsWith('large-result-') ? artifact : `large-result-${benchmark.id}`
     sections.push(`<section class="benchmark" data-startup="${benchmark.startup}" data-collector="${benchmark.collector}" data-id="${benchmark.id}" data-search="${escapeHtml(entries.map((entry) => entry.metric).join(' '))}"><h2>${escapeHtml(benchmark.id)} <span class="badge ${status}">${status}</span></h2>
       <p>${pairs}/${result?.requestedSamples ?? '?'} complete pairs. ${benchmark.diagnostic ? 'Diagnostic collector; instrumentation changes execution.' : ''}</p>${chartHtml.join('')}
-      <details><summary>Diagnostics, runner metadata, and raw results</summary><pre>${escapeHtml(JSON.stringify({ runner: result?.runner, diagnostics: messages }, null, 2))}</pre>${result ? `<p>Raw evidence is stored separately in the <code>large-result-${escapeHtml(benchmark.id)}</code> workflow artifact (or the original input directory for local runs).</p>` : ''}<ul>${rawFiles}</ul></details></section>`)
+      <details><summary>Diagnostics, runner metadata, and raw results</summary><pre>${escapeHtml(JSON.stringify({ runner: result?.runner, diagnostics: messages }, null, 2))}</pre>${result ? `<p>Raw evidence is stored separately in the <code>${escapeHtml(artifactName)}</code> workflow artifact (or the original input directory for local runs).</p>` : ''}<ul>${rawFiles}</ul></details></section>`)
   }
   const validRuntime = comparisons.filter((entry) => entry.collector !== 'bundles').length
   const buildsFailed = options.buildOutcomes !== undefined && options.buildOutcomes !== 'success,success'
-  const usable = validRuntime > 0 && !buildsFailed
+  const expectsRuntime = options.benchmarks.some((benchmark) => benchmark.collector !== 'bundles')
+  const usable = (expectsRuntime ? validRuntime > 0 : comparisons.length > 0) && !buildsFailed
   const buildStatuses: unknown[] = []
   for (const entry of await readdir(options.input, { withFileTypes: true }).catch(() => [])) {
     if (!entry.isDirectory() || !entry.name.startsWith('large-build-status-')) continue

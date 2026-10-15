@@ -44,15 +44,46 @@ export const benchmarks: Benchmark[] = [
   { id: 'bundles', scenario: 'bundles', collector: 'bundles', startup: false, cache: 'static', diagnostic: false },
 ]
 
-export const selectBenchmarks = (filter = ''): Benchmark[] => {
+export const measureGroups = [
+  'startup-times',
+  'startup',
+  'timing',
+  'instructions',
+  'resources',
+  'renderer',
+  'timeline',
+  'profile',
+  'memory',
+  'bundles',
+] as const
+
+export const selectBenchmarks = (filter = '', measures = ''): Benchmark[] => {
   const ids = filter
     .split(',')
     .map((id) => id.trim())
     .filter(Boolean)
-  if (!ids.length) return benchmarks
   const unknown = ids.filter((id) => !benchmarks.some((benchmark) => benchmark.id === id))
   if (unknown.length) throw new Error(`Unknown benchmark IDs: ${unknown.join(', ')}`)
-  return benchmarks.filter((benchmark) => ids.includes(benchmark.id))
+  const groups = measures
+    .split(',')
+    .map((group) => group.trim())
+    .filter(Boolean)
+  const unknownGroups = groups.filter((group) => !measureGroups.some((known) => known === group))
+  if (unknownGroups.length) throw new Error(`Unknown measures: ${unknownGroups.join(', ')}. Choose from: ${measureGroups.join(', ')}`)
+  const selected = benchmarks.filter(
+    (benchmark) =>
+      (!ids.length || ids.includes(benchmark.id)) &&
+      (!groups.length ||
+        groups.some((group) =>
+          group === 'startup-times'
+            ? benchmark.startup && benchmark.collector === 'timing'
+            : group === 'startup'
+              ? benchmark.startup
+              : benchmark.collector === group,
+        )),
+  )
+  if (!selected.length) throw new Error('No benchmarks match the selected measures and benchmark filter')
+  return selected
 }
 
 export const sampleOrder = (pair: number): Revision[] => (pair % 2 === 0 ? ['before', 'after'] : ['after', 'before'])
