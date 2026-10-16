@@ -12,7 +12,7 @@ test('installDependencies - runs npm ci without nice', async () => {
   const mockInvoke = jest.fn()
   mockInvoke.mockImplementation((method) => {
     if (method === 'FileSystem.readFileContent') {
-      return '20'
+      return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
       return true
@@ -41,7 +41,7 @@ test('installDependencies - runs npm ci with nice', async () => {
   const mockInvoke = jest.fn()
   mockInvoke.mockImplementation((method) => {
     if (method === 'FileSystem.readFileContent') {
-      return '20'
+      return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
       return true
@@ -70,7 +70,7 @@ test('installDependencies - throws VError when exec fails without nice', async (
   const mockInvoke = jest.fn()
   mockInvoke.mockImplementation((method) => {
     if (method === 'FileSystem.readFileContent') {
-      return '20'
+      return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
       return true
@@ -109,7 +109,7 @@ test('installDependencies - throws VError when exec fails with nice', async () =
   const mockInvoke = jest.fn()
   mockInvoke.mockImplementation((method) => {
     if (method === 'FileSystem.readFileContent') {
-      return '20'
+      return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
       return true
@@ -147,7 +147,7 @@ test('installDependencies - retries npm ci and succeeds', async () => {
   const mockInvoke = jest.fn()
   mockInvoke.mockImplementation((method) => {
     if (method === 'FileSystem.readFileContent') {
-      return '20'
+      return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
       return true
@@ -189,7 +189,7 @@ test('installDependencies - includes npm stderr after retry failures', async () 
   const mockInvoke = jest.fn()
   mockInvoke.mockImplementation((method) => {
     if (method === 'FileSystem.readFileContent') {
-      return '20'
+      return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
       return true
@@ -247,7 +247,7 @@ test('installDependencies - installs missing node version from .nvmrc before npm
         options: { cwd?: string; env?: Record<string, string | undefined> },
       ) => {
         if (command === 'bash') {
-          expect(args).toEqual(['-c', expect.stringContaining('nvm install 22.22.1')])
+          expect(args).toEqual(['-c', expect.stringContaining('nvm install "$1"'), 'nvm', '22.22.1'])
           installed = true
           return { exitCode: 0, stderr: '', stdout: '' }
         }
@@ -283,7 +283,7 @@ test('installDependencies - installs missing node version from .nvmrc before npm
       ['FileSystem.readFileContent', nvmrcPath],
       ['FileSystem.exists', nodePath],
       ['FileSystem.exists', configNvmNodePath],
-      ['FileSystem.exec', 'bash', ['-c', expect.stringContaining('nvm install 22.22.1')], {}],
+      ['FileSystem.exec', 'bash', ['-c', expect.stringContaining('nvm install "$1"'), 'nvm', '22.22.1'], { reject: false }],
       ['FileSystem.exists', nodePath],
       ['FileSystem.exists', npmPath],
       [
