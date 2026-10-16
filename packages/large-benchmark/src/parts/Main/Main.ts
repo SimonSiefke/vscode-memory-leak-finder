@@ -98,7 +98,7 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
         const summary = await generateTrendReport({ input: resolve(required('--input-dir')), output, manifest })
         console.log(`Report: ${join(output, 'index.html')}; ${summary.reports.length} adjacent revision comparisons`)
         if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, createTrendWorkflowSummary(summary))
-        if (!summary.usable) throw new Error('Report preserved, but one or more revision comparisons have no valid runtime results')
+        if (!summary.reports.some((report) => report.usable)) throw new Error('Report preserved, but no usable revision comparisons exist')
         break
       }
       const summary = await generateReport({

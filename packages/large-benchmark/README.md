@@ -37,8 +37,12 @@ The workflow builds each minified Linux x64 package once and compares each adjac
 pair of commits. The full suite has 104 runtime benchmarks and one JavaScript
 bundle-size benchmark per pair. Each matrix stays within 256 jobs by grouping
 benchmarks into a job when necessary; each job downloads only its two required
-builds. If a build fails, comparisons using other builds can still run. It leaves
-the existing CI and bot workflows unchanged.
+builds. If a build fails, comparisons using other builds can still run. Build and
+measurement failures for individual versions are informational: the workflow
+succeeds when at least one adjacent comparison has usable results. Missing
+comparisons remain visible in the report and Actions summary. A run with no
+usable comparisons still fails after preserving the report. It leaves the
+existing CI and bot workflows unchanged.
 
 The defaults are 37 samples per commit **per adjacent comparison**, all extensions disabled, and the entire
 suite. Interior commits are measured again against their next neighbor. CPU profiles and heap snapshots use at most five samples per commit.

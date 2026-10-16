@@ -78,6 +78,7 @@ jobs:
     needs: initialize
     runs-on: ubuntu-24.04
     timeout-minutes: 350
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.initialize.outputs.build_matrix) }}
