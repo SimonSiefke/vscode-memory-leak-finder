@@ -5,6 +5,56 @@ import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorke
 import { getNpmPathFromNvmrc } from '../src/parts/GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
 import * as Path from '../src/parts/Path/Path.ts'
 
+test.each([
+  ['16.14', false],
+  ['16', false],
+  ['v16.14', false],
+  ['lts/*', false],
+  ['16.14', true],
+  ['node', true],
+])('getNpmPathFromNvmrc - resolves %s to a patch version (already installed: %s)', async (nodeVersion, alreadyInstalled) => {
+  const repoPath = '/test/repo'
+  const nvmDir = Path.join(homedir(), '.nvm')
+  const oldNvmDir = process.env.NVM_DIR
+  const binDirectory = Path.join(nvmDir, 'versions', 'node', 'v16.14.2', 'bin')
+  const npmPath = Path.join(binDirectory, 'npm')
+  let installed = alreadyInstalled
+  let installCalls = 0
+  process.env.NVM_DIR = nvmDir
+
+  const mockRpc = createMockRpc({
+    commandMap: {
+      'FileSystem.exec': (command: string, args: readonly string[], options: { reject?: boolean }) => {
+        expect(command).toBe('bash')
+        expect(args).toEqual(['-c', expect.stringContaining('"$1"'), 'nvm', nodeVersion.replace(/^v/, '')])
+        expect(options.reject).toBe(false)
+        if (args[1].includes('nvm install')) {
+          installCalls++
+          installed = true
+          return { exitCode: 0, stderr: '', stdout: '' }
+        }
+        expect(args[1]).toContain('nvm version')
+        return { exitCode: installed ? 0 : 3, stderr: '', stdout: installed ? 'v16.14.2\n' : 'N/A\n' }
+      },
+      'FileSystem.exists': (path: string) =>
+        path === `${repoPath}/.nvmrc` || (installed && (path === Path.join(binDirectory, 'node') || path === npmPath)),
+      'FileSystem.readFileContent': () => `${nodeVersion}\n`,
+    },
+  })
+  try {
+    FileSystemWorker.set(mockRpc)
+    await expect(getNpmPathFromNvmrc(repoPath)).resolves.toBe(npmPath)
+    expect(installed).toBe(true)
+    expect(installCalls).toBe(alreadyInstalled ? 0 : 1)
+  } finally {
+    if (oldNvmDir === undefined) {
+      delete process.env.NVM_DIR
+    } else {
+      process.env.NVM_DIR = oldNvmDir
+    }
+  }
+})
+
 test('getNpmPathFromNvmrc - returns installed npm path from nvm', async () => {
   const repoPath = '/test/repo'
   const nvmrcPath = `${repoPath}/.nvmrc`
@@ -59,7 +109,7 @@ test('getNpmPathFromNvmrc - installs missing node version and resolves npm path'
     commandMap: {
       'FileSystem.exec': (command: string, args: readonly string[]) => {
         expect(command).toBe('bash')
-        expect(args).toEqual(['-c', expect.stringContaining('nvm install 22.22.1')])
+        expect(args).toEqual(['-c', expect.stringContaining('nvm install "$1"'), 'nvm', '22.22.1'])
         installed = true
         return { exitCode: 0, stderr: '', stdout: '' }
       },
@@ -86,7 +136,7 @@ test('getNpmPathFromNvmrc - installs missing node version and resolves npm path'
       ['FileSystem.readFileContent', nvmrcPath],
       ['FileSystem.exists', nodePath],
       ['FileSystem.exists', configNvmNodePath],
-      ['FileSystem.exec', 'bash', ['-c', expect.stringContaining('nvm install 22.22.1')], {}],
+      ['FileSystem.exec', 'bash', ['-c', expect.stringContaining('nvm install "$1"'), 'nvm', '22.22.1'], { reject: false }],
       ['FileSystem.exists', nodePath],
       ['FileSystem.exists', npmPath],
     ])
