@@ -223,6 +223,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: large-performance-report
+          include-hidden-files: true
           path: |
             .large-report/**/*.html
             .large-report/**/*.svg
