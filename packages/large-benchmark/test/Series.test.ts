@@ -192,21 +192,27 @@ test('missing or zero-baseline links stop the cumulative trend without hiding la
   expect(await readFile(join(directory, 'zero-report', 'charts', 'trend-1.svg'), 'utf8')).not.toMatch(/NaN|Infinity/)
 })
 
-test('series CLI preserves report and workflow summary when a revision comparison is missing', async () => {
+test.each([0, 1])('series CLI succeeds with a partial report when only comparison %s is available', async (pairIndex) => {
   const directory = await temporary()
   const input = join(directory, 'input')
   const manifestPath = join(directory, 'manifest.json')
   const output = join(directory, 'report')
   const summaryPath = join(directory, 'summary.md')
   await writeJson(manifestPath, manifest())
-  await writeJson(join(input, 'first', 'result.json'), result(0, 100, 120))
+  await writeJson(join(input, 'available', 'result.json'), result(pairIndex, 100, 120))
+  const failedCommit = commits[pairIndex === 0 ? 2 : 0]
+  await writeJson(join(input, `large-build-status-${failedCommit}`, 'status.json'), {
+    status: 'failed',
+    commit: failedCommit,
+    error: 'Build failed',
+  })
   const previous = process.env.GITHUB_STEP_SUMMARY
   process.env.GITHUB_STEP_SUMMARY = summaryPath
   jest.spyOn(console, 'log').mockImplementation(() => {})
   try {
-    await expect(largePerformance(['report', '--manifest', manifestPath, '--input-dir', input, '--output-dir', output])).rejects.toThrow(
-      'Report preserved',
-    )
+    await expect(
+      largePerformance(['report', '--manifest', manifestPath, '--input-dir', input, '--output-dir', output]),
+    ).resolves.toBeUndefined()
   } finally {
     if (previous === undefined) delete process.env.GITHUB_STEP_SUMMARY
     else process.env.GITHUB_STEP_SUMMARY = previous
@@ -215,6 +221,31 @@ test('series CLI preserves report and workflow summary when a revision compariso
   const markdown = await readFile(summaryPath, 'utf8')
   expect(markdown).toContain('3 commits; 2 adjacent comparisons')
   expect(markdown).toContain('| Unavailable | 1/2 |')
+  expect(markdown).toContain('**Comparison incomplete:**')
+  const pairHtml = await readFile(join(output, `pair-${pairIndex + 1}`, 'index.html'), 'utf8')
+  expect(pairHtml).toContain('startupTime')
+  expect(pairHtml).toContain('Build failed')
+})
+
+test('series CLI fails when no comparisons are usable while preserving the report and workflow summary', async () => {
+  const directory = await temporary()
+  const manifestPath = join(directory, 'manifest.json')
+  const output = join(directory, 'report')
+  const summaryPath = join(directory, 'summary.md')
+  await writeJson(manifestPath, manifest())
+  const previous = process.env.GITHUB_STEP_SUMMARY
+  process.env.GITHUB_STEP_SUMMARY = summaryPath
+  jest.spyOn(console, 'log').mockImplementation(() => {})
+  try {
+    await expect(
+      largePerformance(['report', '--manifest', manifestPath, '--input-dir', join(directory, 'absent'), '--output-dir', output]),
+    ).rejects.toThrow('no usable revision comparisons')
+  } finally {
+    if (previous === undefined) delete process.env.GITHUB_STEP_SUMMARY
+    else process.env.GITHUB_STEP_SUMMARY = previous
+  }
+  expect(await readFile(join(output, 'index.html'), 'utf8')).toContain('No paired metric results are available.')
+  expect(await readFile(summaryPath, 'utf8')).toContain('**Comparison incomplete:**')
 })
 
 test('bundle-only selections are usable while bundles do not mask missing requested runtime measurements', async () => {
