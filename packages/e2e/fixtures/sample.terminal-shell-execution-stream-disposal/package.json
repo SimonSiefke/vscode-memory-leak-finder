@@ -1,0 +1,26 @@
+{
+  "name": "terminal-shell-execution-stream-disposal",
+  "displayName": "Terminal Shell Execution Stream Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "terminal-shell-execution-stream-disposal.setup",
+        "title": "Terminal Shell Execution Stream Disposal: Setup"
+      },
+      {
+        "command": "terminal-shell-execution-stream-disposal.run",
+        "title": "Terminal Shell Execution Stream Disposal: Run"
+      },
+      {
+        "command": "terminal-shell-execution-stream-disposal.cleanup",
+        "title": "Terminal Shell Execution Stream Disposal: Cleanup"
+      }
+    ]
+  }
+}
