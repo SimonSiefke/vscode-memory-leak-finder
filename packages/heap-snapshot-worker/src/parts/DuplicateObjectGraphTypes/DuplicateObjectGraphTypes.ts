@@ -23,6 +23,9 @@ export const defaultLimits: DuplicateObjectGraphLimits = {
   maxComparisonWork: 20_000_000,
 }
 
+export type DuplicateObjectGraphPreview =
+  string | number | boolean | null | readonly DuplicateObjectGraphPreview[] | { readonly [key: string]: DuplicateObjectGraphPreview }
+
 export interface DuplicateObjectGraphGroup {
   readonly fingerprint: string
   readonly count: number
@@ -30,7 +33,7 @@ export interface DuplicateObjectGraphGroup {
   readonly duplicateBytes: number
   readonly representativeNodeId: number
   readonly exampleNodeIds: readonly number[]
-  readonly preview: Readonly<Record<string, string>>
+  readonly preview: DuplicateObjectGraphPreview
 }
 
 export interface DuplicateObjectGraphReport {

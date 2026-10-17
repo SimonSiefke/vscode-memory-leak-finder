@@ -65,6 +65,9 @@ export const getDuplicateObjectGraphs = (
   }
   const buckets = new Map<string, MutableGroup[]>()
   for (let index = 0; index < objects.length; index++) {
+    // Keep empty objects in the graph for nested equality and alias checks,
+    // but do not count them as duplicate roots.
+    if (objects[index].properties.length === 0) continue
     if (comparisonWork >= limits.maxComparisonWork) {
       unverifiedObjects += objects.length - index
       break
@@ -112,15 +115,13 @@ export const getDuplicateObjectGraphs = (
             duplicateBytes: group.totalBytes - size(object.ordinal),
             representativeNodeId: id(object.ordinal),
             exampleNodeIds: group.examples,
-            preview: Object.fromEntries(
-              object.properties.slice(0, 8).map((property) => [property.key.slice(0, 160), graph.preview(property.target)]),
-            ),
+            preview: graph.preview(object.ordinal),
           }
         }),
     )
     .sort(
       (a, b) =>
-        b.duplicateBytes - a.duplicateBytes || b.duplicateCount - a.duplicateCount || a.representativeNodeId - b.representativeNodeId,
+        b.duplicateCount - a.duplicateCount || b.duplicateBytes - a.duplicateBytes || a.representativeNodeId - b.representativeNodeId,
     )
   return {
     complete: unverifiedObjects === 0,

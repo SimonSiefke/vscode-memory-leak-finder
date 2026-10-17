@@ -1,4 +1,9 @@
-import type { DuplicateObjectGraphLimits, GraphObject, GraphProperty } from '../DuplicateObjectGraphTypes/DuplicateObjectGraphTypes.ts'
+import type {
+  DuplicateObjectGraphLimits,
+  DuplicateObjectGraphPreview,
+  GraphObject,
+  GraphProperty,
+} from '../DuplicateObjectGraphTypes/DuplicateObjectGraphTypes.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 export const getDuplicateObjectGraphNodes = (snapshot: Snapshot, limits: DuplicateObjectGraphLimits) => {
@@ -125,12 +130,66 @@ export const getDuplicateObjectGraphNodes = (snapshot: Snapshot, limits: Duplica
     leafTokens.set(ordinal, token)
     return token
   }
-  const preview = (ordinal: number): string => {
-    if (objectIndex[ordinal] >= 0) return `<object-${id(ordinal)}>`
-    if (type(ordinal) === 'string' && name(ordinal).length < 1024) return JSON.stringify(name(ordinal)).slice(0, 160)
-    if (['symbol', 'object', 'closure', 'bigint'].includes(type(ordinal)))
-      return `<${type(ordinal) === 'object' ? name(ordinal) : type(ordinal)}-${id(ordinal)}>`
-    return leaf(ordinal).slice(0, 160)
+  const preview = (root: number): DuplicateObjectGraphPreview => {
+    let remaining = 64
+    const ancestors = new Set<number>()
+    const visit = (ordinal: number, depth: number): DuplicateObjectGraphPreview => {
+      if (remaining-- <= 0) return '<preview limit>'
+      const nodeType = type(ordinal)
+      const nodeName = name(ordinal)
+      if (nodeType === 'string') return nodeName.length > 160 ? `${nodeName.slice(0, 160)}…` : nodeName
+      if (nodeType === 'number') {
+        const value = internal(ordinal, 'value')
+        if (value !== undefined) {
+          const text = name(value)
+          const number = Number(text)
+          return Number.isFinite(number) ? number : text
+        }
+      }
+      const literal = nodeType === 'hidden' ? internal(ordinal, 'to_string') : undefined
+      const literalName = literal === undefined ? nodeName : name(literal)
+      if (nodeType === 'hidden') {
+        if (literalName === 'true') return true
+        if (literalName === 'false') return false
+        if (literalName === 'null') return null
+        if (literalName === 'undefined') return '<undefined>'
+      }
+      if (ancestors.has(ordinal)) return '<circular>'
+      const object = objects[objectIndex[ordinal]]
+      const array = nodeType === 'object' && nodeName === 'Array'
+      if (object || array) {
+        if (depth >= 4) return array ? '<array>' : '<object>'
+        ancestors.add(ordinal)
+        let value: DuplicateObjectGraphPreview
+        if (object) {
+          value = Object.fromEntries(object.properties.slice(0, 8).map((property) => [property.key, visit(property.target, depth + 1)]))
+        } else {
+          const items: DuplicateObjectGraphPreview[] = []
+          let truncated = false
+          let scanned = 0
+          for (let edge = firstEdges[ordinal]; edge < firstEdges[ordinal + 1]; edge += edgeStride) {
+            if (++scanned > 128) {
+              truncated = true
+              break
+            }
+            if (edgeTypes[edges[edge + edgeTypeOffset]] !== 'element') continue
+            const index = edges[edge + edgeNameOffset]
+            if (index >= 8) {
+              truncated = true
+              continue
+            }
+            while (items.length <= index) items.push(null)
+            items[index] = visit(edges[edge + targetOffset] / stride, depth + 1)
+          }
+          if (truncated) items.push('<more items>')
+          value = items
+        }
+        ancestors.delete(ordinal)
+        return value
+      }
+      return `<${nodeType === 'object' ? nodeName : nodeType}-${id(ordinal)}>`
+    }
+    return visit(root, 0)
   }
   return { objects, objectIndex, opaqueObjects, unverifiedObjects, leaf, id, size, preview }
 }

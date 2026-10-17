@@ -72,7 +72,13 @@ const fixture = () => {
         entries.flatMap((entry, index) => [nodeTypes.indexOf(entry.type), str(entry.name), id(index), entry.size, entry.edges.length]),
       ),
       edges: Uint32Array.from(
-        entries.flatMap((entry) => entry.edges.flatMap((edge) => [edgeTypes.indexOf(edge.type), str(edge.key), edge.target * 5])),
+        entries.flatMap((entry) =>
+          entry.edges.flatMap((edge) => [
+            edgeTypes.indexOf(edge.type),
+            edge.type === 'element' ? Number(edge.key) : str(edge.key),
+            edge.target * 5,
+          ]),
+        ),
       ),
       strings,
     }
@@ -167,7 +173,57 @@ test.each([
   const report = getDuplicateObjectGraphs(f.build())
   expect(containsGroup(report, [f.id(a), f.id(c)])).toBe(true)
   expect(containsGroup(report, [f.id(a), f.id(b)])).toBe(false)
-  expect(report.groups[0].preview.value).toContain(String(f.id(first)))
+  expect(report.groups[0].preview).toMatchObject({
+    value: name === 'Array' ? [] : expect.stringContaining(String(f.id(first))),
+  })
+})
+
+test('excludes empty duplicate roots but compares nested empty objects structurally', () => {
+  const f = fixture()
+  for (let index = 0; index < 10; index++) f.object()
+  f.object({ nested: f.object() })
+  f.object({ nested: f.object() })
+  const report = getDuplicateObjectGraphs(f.build())
+  expect(report.duplicateObjects).toBe(1)
+  expect(report.duplicateBytes).toBe(32)
+  expect(report.groups).toHaveLength(1)
+  expect(report.groups[0].preview).toEqual({ nested: {} })
+})
+
+test('ranks duplicate count before byte size', () => {
+  const f = fixture()
+  for (let index = 0; index < 4; index++) f.object({ small: f.number(1) }, 16)
+  for (let index = 0; index < 2; index++) f.object({ large: f.number(2) }, 1024)
+  const report = getDuplicateObjectGraphs(f.build())
+  expect(report.groups.map((group) => group.duplicateCount)).toEqual([3, 1])
+  expect(report.groups.map((group) => group.duplicateBytes)).toEqual([48, 1024])
+})
+
+test('previews strings, nested objects, arrays and literals as JSON values', () => {
+  const f = fixture()
+  const array = f.node('Array', 'object')
+  f.edge(array, '0', f.text('hello "world"\n'), 'element')
+  f.edge(array, '1', f.object({ n: f.number(7) }), 'element')
+  const oddball = f.node('system / Oddball')
+  f.edge(oddball, 'to_string', f.text('true'))
+  const value = f.object({ items: array, text: f.text('plain'), enabled: oddball })
+  f.object({ items: array, text: f.text('plain'), enabled: oddball })
+  const group = getDuplicateObjectGraphs(f.build()).groups.find((group) => group.exampleNodeIds.includes(f.id(value)))!
+  expect(group.preview).toEqual({ enabled: true, items: ['hello "world"\n', { n: 7 }], text: 'plain' })
+  expect(JSON.parse(JSON.stringify(group.preview))).toEqual(group.preview)
+})
+
+test('bounds previews for cycles and large arrays without changing matching', () => {
+  const f = fixture()
+  const array = f.node('Array', 'object')
+  for (let index = 0; index < 100; index++) f.edge(array, String(index), f.number(index), 'element')
+  const a = f.object({ items: array })
+  const b = f.object({ items: array })
+  f.edge(a, 'self', a, 'property')
+  f.edge(b, 'self', b, 'property')
+  const report = getDuplicateObjectGraphs(f.build())
+  expect(containsGroup(report, [f.id(a), f.id(b)])).toBe(true)
+  expect(report.groups[0].preview).toEqual({ items: [0, 1, 2, 3, 4, 5, 6, 7, '<more items>'], self: '<circular>' })
 })
 
 test('does not equate unknown numeric values, ambiguous zero, ropes or truncated strings by display names', () => {

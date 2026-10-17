@@ -11,15 +11,25 @@ test('analyzes sequentially with strings and compares duplicate byte totals', as
   const before = {} as Snapshot
   const after = {} as Snapshot
   prepare.mockResolvedValueOnce(before).mockResolvedValueOnce(after)
-  const beforeReport = { complete: true, duplicateBytes: 32 }
-  const afterReport = { complete: true, duplicateBytes: 96 }
+  const group = {
+    fingerprint: 'internal hash',
+    representativeNodeId: 7,
+    exampleNodeIds: [7, 9],
+    count: 2,
+    duplicateCount: 1,
+    duplicateBytes: 32,
+    preview: { x: 1 },
+  }
+  const publicGroup = { count: 2, duplicateCount: 1, duplicateBytes: 32, preview: { x: 1 } }
+  const beforeReport = { complete: true, duplicateBytes: 32, groups: [group] }
+  const afterReport = { complete: true, duplicateBytes: 96, groups: [group] }
   analyze.mockReturnValueOnce(beforeReport).mockReturnValueOnce(afterReport)
   expect(await compareDuplicateObjectGraphs('before', 'after')).toEqual({
     before: 32,
     after: 96,
     delta: 64,
-    beforeDetails: beforeReport,
-    afterDetails: afterReport,
+    beforeDetails: { ...beforeReport, groups: [publicGroup] },
+    afterDetails: { ...afterReport, groups: [publicGroup] },
   })
   expect(prepare).toHaveBeenCalledWith('before', { parseStrings: true })
   expect(prepare).toHaveBeenCalledWith('after', { parseStrings: true })
