@@ -6,7 +6,7 @@ import { writeJson } from '../src/parts/Io/Io.ts'
 import { largePerformance } from '../src/parts/Main/Main.ts'
 import { benchmarks, selectBenchmarks } from '../src/parts/Manifest/Manifest.ts'
 import { commitPairs, parseCommits, seriesMatrix, type SeriesManifest } from '../src/parts/Series/Series.ts'
-import { generateTrendReport, trendsFor } from '../src/parts/TrendReport/TrendReport.ts'
+import { generateTrendReport, trendsFor, trendSvg } from '../src/parts/TrendReport/TrendReport.ts'
 import type { Result } from '../src/parts/Types/Types.ts'
 
 const commits = ['a'.repeat(40), 'b'.repeat(40), 'c'.repeat(40)]
@@ -174,7 +174,7 @@ test('series report keeps pair identities separate and chains relative changes a
   expect(trendsFor(reports).every((trend) => trend.overallPercent === null)).toBe(true)
 })
 
-test('missing or zero-baseline links stop the cumulative trend without hiding later pair results', async () => {
+test('missing or zero-baseline links restart the plotted range without claiming an overall change', async () => {
   const directory = await temporary()
   const input = join(directory, 'input')
   await writeJson(join(input, 'second', 'result.json'), result(1, 200, 100))
@@ -182,14 +182,39 @@ test('missing or zero-baseline links stop the cumulative trend without hiding la
   const summary = await generateTrendReport({ input, output: join(directory, 'report'), manifest: manifest() })
   expect(summary.usable).toBe(false)
   expect(summary.diagnostics).toHaveLength(1)
-  expect(summary.trends[0]!.points).toEqual([100, null, null])
+  expect(summary.trends[0]!.points).toEqual([null, 100, 50])
   expect(summary.trends[0]!.changes[1]!.statistics.percentChange).toBe(-50)
   expect(summary.trends[0]!.overallPercent).toBeNull()
+  const chart = await readFile(join(directory, 'report', 'charts', 'trend-1.svg'), 'utf8')
+  expect(chart.match(/<circle /g)).toHaveLength(2)
+  expect(chart.match(/stroke="#5479e8"/g)).toHaveLength(1)
+  expect(chart).toContain('each measured range starts at 100')
   const zero = result(0, 0, 10)
   await writeJson(join(input, 'first', 'result.json'), zero)
   const zeroSummary = await generateTrendReport({ input, output: join(directory, 'zero-report'), manifest: manifest() })
-  expect(zeroSummary.trends[0]!.points).toEqual([100, null, null])
+  expect(zeroSummary.trends[0]!.points).toEqual([null, 100, 50])
+  expect(zeroSummary.trends[0]!.overallPercent).toBeNull()
   expect(await readFile(join(directory, 'zero-report', 'charts', 'trend-1.svg'), 'utf8')).not.toMatch(/NaN|Infinity/)
+})
+
+test('separate measured ranges remain visible without drawing lines across missing links', async () => {
+  const directory = await temporary()
+  const input = join(directory, 'input')
+  await writeJson(join(input, 'first', 'result.json'), result(0, 100, 120))
+  await writeJson(join(input, 'second', 'result.json'), result(1, 200, 100))
+  const summary = await generateTrendReport({ input, output: join(directory, 'report'), manifest: manifest() })
+  const first = summary.reports[0]!
+  const second = summary.reports[1]!
+  const missing = { ...first, comparisons: [] }
+  const [trend] = trendsFor([first, missing, second])
+  expect(trend!.points).toEqual([100, 120, 100, 50])
+  expect(trend!.overallPercent).toBeNull()
+  const chart = trendSvg(trend!, [...commits, 'd'.repeat(40)])
+  expect(chart.match(/<circle /g)).toHaveLength(4)
+  expect(chart.match(/stroke="#5479e8"/g)).toHaveLength(2)
+  expect(chart).toContain('Missing links separate ranges')
+  expect(trendsFor([missing, missing, second, missing])[0]!.points).toEqual([null, null, 100, 50, null])
+  expect(trendsFor([missing, missing, second, missing])[0]!.overallPercent).toBeNull()
 })
 
 test.each([0, 1])('series CLI succeeds with a partial report when only comparison %s is available', async (pairIndex) => {

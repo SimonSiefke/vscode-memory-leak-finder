@@ -66,8 +66,10 @@ This uses comparisons measured on the same runner rather than comparing absolute
 timings across runners. The overall percentage describes cumulative relative
 change; it is not an absolute startup time or a direct first-to-last measurement.
 Uncertainty can accumulate across links, and there is no aggregate confidence
-interval. Missing metrics and zero baselines stop the cumulative index; later
-valid pair results remain visible. Input order defines chart spacing, not elapsed
+interval. Missing metrics and zero baselines separate the plotted ranges. Each
+uninterrupted measured range restarts at 100, with no line across a gap; index
+levels from different ranges cannot be compared. The overall change is unavailable
+unless all adjacent links are valid. Input order defines chart spacing, not elapsed
 calendar time.
 
 The original before/after inputs retain the paired report and Actions summary:
