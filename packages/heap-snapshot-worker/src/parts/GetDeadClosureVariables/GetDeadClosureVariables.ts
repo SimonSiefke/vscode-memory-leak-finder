@@ -1,0 +1,107 @@
+import { analyzeContexts } from '../AnalyzeClosureContexts/AnalyzeClosureContexts.ts'
+import { HeapSnapshot, type ClosureSnapshotProfile } from '../ClosureContextSnapshot/ClosureContextSnapshot.ts'
+
+// Dominator subtrees can overlap. Index them once so each byte is counted at
+// most once, even when multiple variables or closures retain the same object.
+const createByteCounter = (snapshot: HeapSnapshot) => {
+  const count = snapshot.dominators.length
+  const firstChild = new Int32Array(count).fill(-1)
+  const nextSibling = new Int32Array(count).fill(-1)
+  for (let i = 1; i < count; i++) {
+    const parent = snapshot.dominators[i]
+    nextSibling[i] = firstChild[parent]
+    firstChild[parent] = i
+  }
+  const start = new Uint32Array(count)
+  const end = new Uint32Array(count)
+  const stack = count ? [0] : []
+  let clock = 0
+  while (stack.length) {
+    const entry = stack.pop()!
+    if (entry < 0) {
+      end[~entry] = clock
+      continue
+    }
+    start[entry] = clock++
+    stack.push(~entry)
+    for (let child = firstChild[entry]; child !== -1; child = nextSibling[child]) stack.push(child)
+  }
+  return (indexes: number[]) => {
+    const ordinals = [...new Set(indexes.map((index) => index / snapshot.nodeFieldCount))].sort((a, b) => start[a] - start[b])
+    let until = -1
+    let bytes = 0
+    for (const ordinal of ordinals) {
+      if (start[ordinal] < until) continue
+      bytes += snapshot.retainedSizes[ordinal]
+      until = end[ordinal]
+    }
+    return bytes
+  }
+}
+
+export const getDeadClosureVariables = (profile: ClosureSnapshotProfile) => {
+  const meta = profile.snapshot.meta
+  const required = [
+    [meta.scope_fields, ['script_node_index', 'scope_id', 'depth', 'scope_context_vars_count', 'scope_uses_count']],
+    [meta.scope_context_var_fields, ['name']],
+    [meta.scope_use_fields, ['declaring_scope_id', 'slot_index']],
+  ] as const
+  if (
+    !profile.scopes ||
+    !profile.scope_context_vars ||
+    !profile.scope_uses ||
+    required.some(([fields, names]) => names.some((name) => !fields?.includes(name)))
+  ) {
+    throw new Error(
+      'dead-closure-variables requires V8 heap snapshots with embedded scope metadata. Update the inspected Chromium/Electron or Node.js runtime.',
+    )
+  }
+  const snapshot = new HeapSnapshot(profile)
+  const analysis = analyzeContexts(snapshot)
+  const countBytes = createByteCounter(snapshot)
+  const contexts = analysis.scopes
+    .flatMap((scope) =>
+      scope.contexts.map((context) => ({
+        contextNodeId: context.contextNodeId,
+        scriptName: scope.scriptName,
+        scopeName: scope.scopeName,
+        scopeStart: scope.scopeStart,
+        scopeEnd: scope.scopeEnd,
+        deadBytes: countBytes(context.deadFields.map((field) => field.valueNodeIndex)),
+        variables: context.deadFields,
+      })),
+    )
+    .sort((a, b) => b.deadBytes - a.deadBytes || a.contextNodeId - b.contextNodeId)
+  // Attribute dead fields to closures through their full context chain, including
+  // outer scopes. A shared context appears under every closure retaining it.
+  const contextsById = new Map(contexts.map((context) => [context.contextNodeId, context]))
+  const closures = []
+  for (let index = 0; index < snapshot.nodes.length; index += snapshot.nodeFieldCount) {
+    const node = snapshot.createNode()
+    node.nodeIndex = index
+    if (node.rawType() !== snapshot.nodeClosureType) continue
+    let context = node.findInternalEdgeTarget('context')
+    const seen = new Set<number>()
+    const deadContexts: typeof contexts = []
+    while (context && snapshot.isContextObject(context) && !seen.has(context.nodeIndex)) {
+      seen.add(context.nodeIndex)
+      const deadContext = contextsById.get(context.id())
+      if (deadContext) deadContexts.push(deadContext)
+      context = context.findInternalEdgeTarget('previous')
+    }
+    if (deadContexts.length)
+      closures.push({
+        closureNodeId: node.id(),
+        name: node.name(),
+        deadBytes: countBytes(deadContexts.flatMap((context) => context.variables.map((variable) => variable.valueNodeIndex))),
+        contexts: deadContexts,
+      })
+  }
+  closures.sort((a, b) => b.deadBytes - a.deadBytes || a.closureNodeId - b.closureNodeId)
+  return {
+    deadBytes: countBytes(contexts.flatMap((context) => context.variables.map((variable) => variable.valueNodeIndex))),
+    closures,
+    contexts,
+    scriptsWithoutScopes: analysis.scriptsWithoutScopes,
+  }
+}

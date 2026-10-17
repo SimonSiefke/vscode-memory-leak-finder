@@ -30,7 +30,7 @@ class CustomStream extends Readable {
     try {
       const options = {
         captureNumericValue: this.options.captureNumericValues,
-        exposeInternals: false,
+        exposeInternals: this.options.exposeInternals ?? false,
         reportProgress: this.options.reportProgress ?? true,
       }
       if (this.stopTracking) {
