@@ -140,7 +140,7 @@ npm run build-charts
 
 ### DeadClosureVariables
 
-Finds variables retained in closure contexts that no surviving closure can access, using the embedded V8 scope metadata analyzed by Chrome DevTools. Reports closures sorted by dead retained bytes, with context and variable details. A leak is an increase in the overall dead-byte total between snapshots.
+Finds variables retained in closure contexts that no surviving closure can access, using the embedded V8 scope metadata analyzed by Chrome DevTools. Reports only function locations whose dead retained bytes increased, sorted by byte growth. Each row includes the closure name, before/after closure counts, `beforeDeadBytes`, `deadBytes`, `delta`, generated `sourceLocation`, and source-mapped `originalLocation` / `originalName` when a source map is available. `beforeDetails` and `afterDetails` contain only `{deadBytes}`. A leak is an increase in the overall dead-byte total between snapshots.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure dead-closure-variables --only base
@@ -148,7 +148,7 @@ node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after -
 
 Requires a Chromium/Electron or Node.js runtime that emits `scopes`, `scope_context_vars`, and `scope_uses` in heap snapshots. Older runtimes fail with an unsupported-metadata error. Scripts that could not be analyzed are listed in `scriptsWithoutScopes`; empty scope tables can therefore produce partial results. VS Code 1.142.0 ships Electron 43 / Chromium 150, which lacks this metadata. End-to-end validation uses the VS Code application with Electron 46 nightly / Chromium 158.
 
-Bytes are the union of the retained sizes of dead variable values, with overlapping dominator subtrees counted once per closure and once in the overall total. Closure rows reference the shared context table through `contextNodeIds`, so variable details are stored once. Shared contexts can appear under several closures, so closure rows must not be added together. These sizes indicate memory impact, not guaranteed reclaimable memory: values may also have other live references. Suspended generators and async functions are treated as live, including variables used by functions they can instantiate.
+Bytes are the union of the retained sizes of dead variable values, with overlapping dominator subtrees counted once per closure and once in the overall total. Closures are grouped by generated URL, line, column and name, independently of heap object IDs. Shared retained values are counted once within each function group; different functions can retain the same context, so row totals must not be added together. Functions without snapshot locations use scope identity, or object identity when no scope metadata is available, rather than merging unrelated anonymous functions. These sizes indicate memory impact, not guaranteed reclaimable memory: values may also have other live references. Suspended generators and async functions are treated as live, including variables used by functions they can instantiate.
 
 The context classification is adapted from [Chrome DevTools ContextAnalyzer](https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/entrypoints/heap_snapshot_worker/ContextAnalyzer.ts), under its BSD license.
 

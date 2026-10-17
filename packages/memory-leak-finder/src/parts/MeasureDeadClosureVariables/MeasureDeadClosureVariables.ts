@@ -1,3 +1,5 @@
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import type { Session } from '../Session/Session.ts'
 import * as HeapSnapshot from '../HeapSnapshot/HeapSnapshot.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
@@ -12,6 +14,8 @@ import * as Root from '../Root/Root.ts'
 export const id = MeasureId.DeadClosureVariables
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 export interface DeadClosureVariablesState {
+  readonly scriptHandler: IScriptHandler
+  trackingScripts: boolean
   captured: boolean
   readonly beforePath: string
   readonly afterPath: string
@@ -23,6 +27,8 @@ export const create = (session: Session) => {
     session,
     {
       captured: false,
+      scriptHandler: ScriptHandler.create(),
+      trackingScripts: false,
       beforePath: join(Root.root, '.vscode-heapsnapshots', `${id}-${captureId}-before.json`),
       afterPath: join(Root.root, '.vscode-heapsnapshots', `${id}-${captureId}-after.json`),
     } satisfies DeadClosureVariablesState,
@@ -30,20 +36,30 @@ export const create = (session: Session) => {
 }
 
 export const start = async (session: Session, state: DeadClosureVariablesState): Promise<string> => {
+  state.trackingScripts = true
+  await state.scriptHandler.start(session)
   await HeapSnapshot.takeHeapSnapshot(session, state.beforePath, { exposeInternals: true, captureNumericValues: true })
   return state.beforePath
 }
 
 export const stop = async (session: Session, state: DeadClosureVariablesState): Promise<string> => {
   await HeapSnapshot.takeHeapSnapshot(session, state.afterPath, { exposeInternals: true, captureNumericValues: true })
+  await state.scriptHandler.stop(session)
+  state.trackingScripts = false
   state.captured = true
   return state.afterPath
 }
 
-export const compare = async (beforePath: string, afterPath: string) => {
+export const compare = async (
+  beforePath: string,
+  afterPath: string,
+  _context?: unknown,
+  _session?: Session,
+  state?: DeadClosureVariablesState,
+) => {
   try {
     await using rpc = await launchHeapSnapshotWorker()
-    return await rpc.invoke('HeapSnapshot.compareDeadClosureVariables', beforePath, afterPath)
+    return await rpc.invoke('HeapSnapshot.compareDeadClosureVariables', beforePath, afterPath, state?.scriptHandler.scriptMap ?? {})
   } finally {
     await Promise.all([rm(beforePath, { force: true }), rm(afterPath, { force: true })])
   }
@@ -51,6 +67,15 @@ export const compare = async (beforePath: string, afterPath: string) => {
 
 export const isLeak = IsLeakCount.isLeakCount
 export const releaseResources = async (_session: Session, state: DeadClosureVariablesState): Promise<void> => {
+  if (state.trackingScripts) {
+    try {
+      await state.scriptHandler.stop(_session)
+    } catch {
+      // The inspected process may already be disconnected.
+    } finally {
+      state.trackingScripts = false
+    }
+  }
   // stop() releases protocol resources before compare() consumes the snapshots.
   if (!state.captured) {
     await Promise.all([rm(state.beforePath, { force: true }), rm(state.afterPath, { force: true })])

@@ -1,3 +1,4 @@
+import { getDeadClosureLocations } from '../GetDeadClosureLocations/GetDeadClosureLocations.ts'
 import { analyzeContexts } from '../AnalyzeClosureContexts/AnalyzeClosureContexts.ts'
 import { HeapSnapshot, type ClosureSnapshotProfile } from '../ClosureContextSnapshot/ClosureContextSnapshot.ts'
 
@@ -39,7 +40,7 @@ const createByteCounter = (snapshot: HeapSnapshot) => {
   }
 }
 
-export const getDeadClosureVariables = (profile: ClosureSnapshotProfile) => {
+export const getDeadClosureVariables = (profile: ClosureSnapshotProfile, options: { groupClosures?: boolean } = {}) => {
   const meta = profile.snapshot.meta
   const required = [
     [meta.scope_fields, ['script_node_index', 'scope_id', 'depth', 'scope_context_vars_count', 'scope_uses_count']],
@@ -77,6 +78,8 @@ export const getDeadClosureVariables = (profile: ClosureSnapshotProfile) => {
   // variable details again for each closure retaining the same context.
   const contextsById = new Map(contexts.map((context) => [context.contextNodeId, context]))
   const closures = []
+  const locate = getDeadClosureLocations(snapshot)
+  const grouped = new Map<string, { source: ReturnType<typeof locate>; name: string; count: number; contextIds: Set<number> }>()
   const closureContexts = new Map<number, { deadBytes: number; contextNodeIds: number[] } | undefined>()
   for (let index = 0; index < snapshot.nodes.length; index += snapshot.nodeFieldCount) {
     const node = snapshot.createNode()
@@ -103,12 +106,28 @@ export const getDeadClosureVariables = (profile: ClosureSnapshotProfile) => {
         : undefined
       closureContexts.set(firstContext.nodeIndex, attribution)
     }
-    if (attribution) closures.push({ closureNodeId: node.id(), name: node.name(), ...attribution })
+    if (attribution) {
+      closures.push({ closureNodeId: node.id(), name: node.name(), ...attribution })
+      if (!options.groupClosures) continue
+      const source = locate(node)
+      const group = grouped.get(source.functionKey) ?? { source, name: node.name(), count: 0, contextIds: new Set<number>() }
+      group.count++
+      for (const id of attribution.contextNodeIds) group.contextIds.add(id)
+      grouped.set(source.functionKey, group)
+    }
   }
   closures.sort((a, b) => b.deadBytes - a.deadBytes || a.closureNodeId - b.closureNodeId)
   return {
     deadBytes: countBytes(contexts.flatMap((context) => context.variables.map((variable) => variable.valueNodeIndex))),
     closures,
+    closureGroups: [...grouped.values()].map((group) => ({
+      ...group.source,
+      name: group.name,
+      count: group.count,
+      deadBytes: countBytes(
+        [...group.contextIds].flatMap((id) => contextsById.get(id)!.variables.map((variable) => variable.valueNodeIndex)),
+      ),
+    })),
     contexts,
     scriptsWithoutScopes: analysis.scriptsWithoutScopes,
   }

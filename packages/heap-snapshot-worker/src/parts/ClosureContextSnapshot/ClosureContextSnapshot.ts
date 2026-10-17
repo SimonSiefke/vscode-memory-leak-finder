@@ -11,6 +11,7 @@ export interface ClosureSnapshotProfile {
     node_count: number
     edge_count: number
   }
+  locations?: number[]
   nodes: number[]
   edges: number[]
   strings: string[]

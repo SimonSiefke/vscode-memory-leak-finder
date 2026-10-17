@@ -252,3 +252,67 @@ test('keeps reports compact when many closures retain the same context', () => {
   ).toBe(true)
   expect(JSON.stringify(report).length).toBeLessThan(200_000)
 })
+
+test('reports only growing function locations, deduplicates shared contexts and maps original sources', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'dead-closure-locations-'))
+  try {
+    const { SourceMapGenerator } = await import('source-map')
+    const generatedMap = new SourceMapGenerator({ file: 'bundle.js' })
+    generatedMap.addMapping({
+      generated: { line: 2, column: 11 },
+      original: { line: 7, column: 3 },
+      source: 'original.ts',
+      name: 'growingKeeper',
+    })
+    generatedMap.setSourceContent('original.ts', 'export function growingKeeper() {}')
+    await writeFile(join(directory, 'bundle.js.map'), generatedMap.toString())
+    const paths = [join(directory, 'before.json'), join(directory, 'after.json')]
+    for (const [index, path] of paths.entries()) {
+      const f = fixture()
+      if (index) f.node('shift heap node indexes')
+      const locations: number[] = []
+      const add = (name: string, size: number, line: number, copies = 1) => {
+        const context = f.context()
+        f.edge(context, 'payload', f.node('value', 'object', size), 'context')
+        for (let copy = 0; copy < copies; copy++) {
+          const closure = f.closure(name, context)
+          locations.push(closure, 77 + index, f.script, line, 10)
+        }
+      }
+      add('minified', index ? 150 : 100, 1, index ? 3 : 2)
+      add('minified', 500, 2)
+      add('shrinking', index ? 100 : 200, 3)
+      if (index) add('newClosure', 90, 4)
+      const profile = f.build()
+      profile.snapshot.meta = {
+        ...profile.snapshot.meta,
+        location_fields: ['object_index', 'script_id', 'script_object_index', 'line', 'column'],
+      }
+      profile.locations = locations
+      await writeFile(path, JSON.stringify(profile))
+    }
+    const scriptMap = { 78: { url: join(directory, 'bundle.js'), sourceMapUrl: 'bundle.js.map' } }
+    const result = await compareDeadClosureVariables(paths[0], paths[1], scriptMap)
+    expect(result.beforeDetails).toEqual({ deadBytes: 800 })
+    expect(result.afterDetails).toEqual({ deadBytes: 840 })
+    expect(result.closures).toHaveLength(2)
+    expect(result.closures.map((row) => [row.name, row.delta])).toEqual([
+      ['newClosure', 90],
+      ['minified', 50],
+    ])
+    expect(result.closures[1]).toMatchObject({
+      beforeCount: 2,
+      count: 3,
+      beforeDeadBytes: 100,
+      deadBytes: 150,
+      sourceLocation: `${join(directory, 'bundle.js')}:1:10`,
+      originalLocation: 'original.ts:7:3',
+      originalName: 'growingKeeper',
+    })
+    expect(JSON.stringify(result).length).toBeLessThan(3000)
+    const identical = await compareDeadClosureVariables(paths[1], paths[1], scriptMap)
+    expect(identical.closures).toEqual([])
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
+})

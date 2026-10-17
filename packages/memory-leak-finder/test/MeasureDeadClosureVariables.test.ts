@@ -5,6 +5,12 @@ import { dirname } from 'node:path'
 const takeHeapSnapshot = jest.fn<(...args: unknown[]) => Promise<void>>()
 const invoke = jest.fn<(...args: unknown[]) => Promise<unknown>>()
 const dispose = jest.fn()
+const startScripts = jest.fn<(...args: unknown[]) => Promise<void>>()
+const stopScripts = jest.fn<(...args: unknown[]) => Promise<void>>()
+const scriptMap = { 77: { url: 'file:///bundle.js', sourceMapUrl: 'bundle.js.map' } }
+jest.unstable_mockModule('../src/parts/ScriptHandler/ScriptHandler.ts', () => ({
+  create: () => ({ scriptMap, start: startScripts, stop: stopScripts }),
+}))
 jest.unstable_mockModule('../src/parts/HeapSnapshot/HeapSnapshot.ts', () => ({ takeHeapSnapshot }))
 jest.unstable_mockModule('../src/parts/LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts', () => ({
   launchHeapSnapshotWorker: async () => ({ [Symbol.asyncDispose]: dispose, invoke }),
@@ -24,8 +30,10 @@ test('registers the public measure and captures numeric values and internal meta
   expect(takeHeapSnapshot).toHaveBeenCalledWith(args[0], after, { exposeInternals: true, captureNumericValues: true })
   const report = { before: 100, after: 200, delta: 100, afterDetails: { closures: [] } }
   invoke.mockResolvedValueOnce(report)
-  await expect(measure.compare(before, after)).resolves.toEqual(report)
-  expect(invoke).toHaveBeenCalledWith('HeapSnapshot.compareDeadClosureVariables', before, after)
+  await expect(measure.compare(before, after, {}, ...args)).resolves.toEqual(report)
+  expect(invoke).toHaveBeenCalledWith('HeapSnapshot.compareDeadClosureVariables', before, after, scriptMap)
+  expect(startScripts).toHaveBeenCalledWith(args[0])
+  expect(stopScripts).toHaveBeenCalledWith(args[0])
   expect(dispose).toHaveBeenCalled()
 })
 
@@ -66,4 +74,14 @@ test('preserves completed captures across stop resource release until comparison
   invoke.mockResolvedValueOnce({ before: 0, after: 0 })
   await measure.compare(args[1].beforePath, args[1].afterPath)
   await expect(access(args[1].afterPath)).rejects.toThrow()
+})
+
+test('stops script tracking if the initial heap capture fails', async () => {
+  const args = measure.create({} as any)
+  takeHeapSnapshot.mockRejectedValueOnce(new Error('capture failed'))
+  await expect(measure.start(...args)).rejects.toThrow('capture failed')
+  expect(args[1].trackingScripts).toBe(true)
+  await measure.releaseResources(...args)
+  expect(args[1].trackingScripts).toBe(false)
+  expect(stopScripts).toHaveBeenLastCalledWith(args[0])
 })
