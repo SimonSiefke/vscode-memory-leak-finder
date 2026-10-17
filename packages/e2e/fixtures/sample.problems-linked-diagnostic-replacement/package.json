@@ -1,0 +1,30 @@
+{
+  "name": "problems-linked-diagnostic-replacement",
+  "displayName": "Problems Linked Diagnostic Replacement",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "problems-linked-diagnostic-replacement.setup",
+        "title": "Problems Linked Diagnostic Replacement: Setup"
+      },
+      {
+        "command": "problems-linked-diagnostic-replacement.run",
+        "title": "Problems Linked Diagnostic Replacement: Run"
+      },
+      {
+        "command": "problems-linked-diagnostic-replacement.cleanup",
+        "title": "Problems Linked Diagnostic Replacement: Cleanup"
+      },
+      {
+        "command": "problems-linked-diagnostic-replacement.clear",
+        "title": "Linked Diagnostic: Clear"
+      }
+    ]
+  }
+}
