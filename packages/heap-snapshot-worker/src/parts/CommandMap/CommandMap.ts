@@ -1,3 +1,4 @@
+import { compareDeadClosureVariables } from '../CompareDeadClosureVariables/CompareDeadClosureVariables.ts'
 import { compareDomTimerCount } from '../CompareDomTimerCount/CompareDomTimerCount.ts'
 import * as CompareArrayBufferBytes from '../CompareArrayBufferBytes/CompareArrayBufferBytes.ts'
 import * as CompareNativeContextCount from '../CompareNativeContextCount/CompareNativeContextCount.ts'
@@ -39,6 +40,7 @@ import * as ParseHeapSnapshotStringsCount from '../ParseHeapSnapshotStringsCount
 import * as ParseUserStrings from '../ParseUserStrings/ParseUserStrings.ts'
 
 export const commandMap = {
+  'HeapSnapshot.compareDeadClosureVariables': compareDeadClosureVariables,
   'HeapSnapshot.compareArrayBufferBytes': CompareArrayBufferBytes.compareArrayBufferBytes,
   'HeapSnapshot.compareNativeContextCount': CompareNativeContextCount.compareNativeContextCount,
   'HeapSnapshot.compareCompiledCodeSize': CompareCompiledCodeSize.compareCompiledCodeSize,
