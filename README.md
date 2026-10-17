@@ -146,9 +146,9 @@ Finds variables retained in closure contexts that no surviving closure can acces
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure dead-closure-variables --only base
 ```
 
-Requires a Chromium/Electron or Node.js runtime that emits `scopes`, `scope_context_vars`, and `scope_uses` in heap snapshots. Older runtimes fail with an unsupported-metadata error. Scripts that could not be analyzed are listed in `scriptsWithoutScopes`; empty scope tables can therefore produce partial results.
+Requires a Chromium/Electron or Node.js runtime that emits `scopes`, `scope_context_vars`, and `scope_uses` in heap snapshots. Older runtimes fail with an unsupported-metadata error. Scripts that could not be analyzed are listed in `scriptsWithoutScopes`; empty scope tables can therefore produce partial results. VS Code 1.142.0 ships Electron 43 / Chromium 150, which lacks this metadata. End-to-end validation uses the VS Code application with Electron 46 nightly / Chromium 158.
 
-Bytes are the union of the retained sizes of dead variable values, with overlapping dominator subtrees counted once per closure and once in the overall total. Shared contexts can appear under several closures, so closure rows must not be added together. These sizes indicate memory impact, not guaranteed reclaimable memory: values may also have other live references. Suspended generators and async functions are treated as live, including variables used by functions they can instantiate.
+Bytes are the union of the retained sizes of dead variable values, with overlapping dominator subtrees counted once per closure and once in the overall total. Closure rows reference the shared context table through `contextNodeIds`, so variable details are stored once. Shared contexts can appear under several closures, so closure rows must not be added together. These sizes indicate memory impact, not guaranteed reclaimable memory: values may also have other live references. Suspended generators and async functions are treated as live, including variables used by functions they can instantiate.
 
 The context classification is adapted from [Chrome DevTools ContextAnalyzer](https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/entrypoints/heap_snapshot_worker/ContextAnalyzer.ts), under its BSD license.
 

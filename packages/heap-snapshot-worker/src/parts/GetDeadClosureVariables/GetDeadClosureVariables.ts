@@ -73,29 +73,37 @@ export const getDeadClosureVariables = (profile: ClosureSnapshotProfile) => {
     )
     .sort((a, b) => b.deadBytes - a.deadBytes || a.contextNodeId - b.contextNodeId)
   // Attribute dead fields to closures through their full context chain, including
-  // outer scopes. A shared context appears under every closure retaining it.
+  // outer scopes. Reference the shared context table instead of serializing all
+  // variable details again for each closure retaining the same context.
   const contextsById = new Map(contexts.map((context) => [context.contextNodeId, context]))
   const closures = []
+  const closureContexts = new Map<number, { deadBytes: number; contextNodeIds: number[] } | undefined>()
   for (let index = 0; index < snapshot.nodes.length; index += snapshot.nodeFieldCount) {
     const node = snapshot.createNode()
     node.nodeIndex = index
     if (node.rawType() !== snapshot.nodeClosureType) continue
-    let context = node.findInternalEdgeTarget('context')
-    const seen = new Set<number>()
-    const deadContexts: typeof contexts = []
-    while (context && snapshot.isContextObject(context) && !seen.has(context.nodeIndex)) {
-      seen.add(context.nodeIndex)
-      const deadContext = contextsById.get(context.id())
-      if (deadContext) deadContexts.push(deadContext)
-      context = context.findInternalEdgeTarget('previous')
+    const firstContext = node.findInternalEdgeTarget('context')
+    if (!firstContext) continue
+    let attribution = closureContexts.get(firstContext.nodeIndex)
+    if (!closureContexts.has(firstContext.nodeIndex)) {
+      let context: typeof firstContext | undefined = firstContext
+      const seen = new Set<number>()
+      const deadContexts: typeof contexts = []
+      while (context && snapshot.isContextObject(context) && !seen.has(context.nodeIndex)) {
+        seen.add(context.nodeIndex)
+        const deadContext = contextsById.get(context.id())
+        if (deadContext) deadContexts.push(deadContext)
+        context = context.findInternalEdgeTarget('previous')
+      }
+      attribution = deadContexts.length
+        ? {
+            deadBytes: countBytes(deadContexts.flatMap((context) => context.variables.map((variable) => variable.valueNodeIndex))),
+            contextNodeIds: deadContexts.map((context) => context.contextNodeId),
+          }
+        : undefined
+      closureContexts.set(firstContext.nodeIndex, attribution)
     }
-    if (deadContexts.length)
-      closures.push({
-        closureNodeId: node.id(),
-        name: node.name(),
-        deadBytes: countBytes(deadContexts.flatMap((context) => context.variables.map((variable) => variable.valueNodeIndex))),
-        contexts: deadContexts,
-      })
+    if (attribution) closures.push({ closureNodeId: node.id(), name: node.name(), ...attribution })
   }
   closures.sort((a, b) => b.deadBytes - a.deadBytes || a.closureNodeId - b.closureNodeId)
   return {

@@ -2,6 +2,7 @@ import { expect, test } from '@jest/globals'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { HeapSnapshot } from '../src/parts/ClosureContextSnapshot/ClosureContextSnapshot.ts'
 import { getDeadClosureVariables } from '../src/parts/GetDeadClosureVariables/GetDeadClosureVariables.ts'
 import { compareDeadClosureVariables } from '../src/parts/CompareDeadClosureVariables/CompareDeadClosureVariables.ts'
 import type { ClosureSnapshotProfile } from '../src/parts/ClosureContextSnapshot/ClosureContextSnapshot.ts'
@@ -205,4 +206,49 @@ test('compares overall bytes for growth, equality and shrinkage', async () => {
   } finally {
     await rm(directory, { recursive: true, force: true })
   }
+})
+
+test('reuses shared context-chain lookups, including absent previous contexts', () => {
+  const f = fixture()
+  const outer = f.context()
+  const inner = f.context()
+  f.edge(inner, 'previous', outer)
+  const profile = f.build()
+  const snapshot = new HeapSnapshot(profile)
+  let edgeReads = 0
+  profile.edges = new Proxy(profile.edges, {
+    get(target, key, receiver) {
+      if (typeof key === 'string' && /^\d+$/.test(key)) edgeReads++
+      return Reflect.get(target, key, receiver)
+    },
+  })
+  const node = snapshot.createNode()
+  node.nodeIndex = inner
+  expect(node.findInternalEdgeTarget('previous')?.nodeIndex).toBe(outer)
+  node.nodeIndex = outer
+  expect(node.findInternalEdgeTarget('previous')).toBeUndefined()
+  expect(edgeReads).toBeGreaterThan(0)
+  edgeReads = 0
+  node.nodeIndex = inner
+  expect(node.findInternalEdgeTarget('previous')?.nodeIndex).toBe(outer)
+  node.nodeIndex = outer
+  expect(node.findInternalEdgeTarget('previous')).toBeUndefined()
+  expect(edgeReads).toBe(0)
+})
+
+test('keeps reports compact when many closures retain the same context', () => {
+  const f = fixture()
+  const context = f.context()
+  f.edge(context, 'payload', f.node('large-value-name-'.repeat(150), 'object', 512), 'context')
+  for (let index = 0; index < 1000; index++) f.closure(`keeper${index}`, context)
+  const report = getDeadClosureVariables(f.build())
+  expect(report.deadBytes).toBe(512)
+  expect(report.closures).toHaveLength(1000)
+  expect(report.contexts).toHaveLength(1)
+  expect(
+    report.closures.every(
+      (closure) => closure.contextNodeIds.length === 1 && closure.contextNodeIds[0] === report.contexts[0].contextNodeId,
+    ),
+  ).toBe(true)
+  expect(JSON.stringify(report).length).toBeLessThan(200_000)
 })

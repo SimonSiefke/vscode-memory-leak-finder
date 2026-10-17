@@ -31,12 +31,23 @@ export class HeapSnapshot {
   readonly dominators: Uint32Array
   readonly edgeFieldCount: number
   readonly profile: ClosureSnapshotProfile
+  readonly edgeTypeOffset: number
+  readonly edgeNameOffset: number
+  readonly edgeTargetOffset: number
+  readonly internalEdgeType: number
+  // Many closures share the same context chain. Cache even missing links so
+  // walking each closure does not repeatedly scan a large module context.
+  readonly previousContexts = new Map<number, number | undefined>()
   constructor(profile: ClosureSnapshotProfile) {
     this.profile = profile
     this.nodes = Uint32Array.from(profile.nodes)
     this.strings = profile.strings
     this.nodeFieldCount = profile.snapshot.meta.node_fields.length
     this.edgeFieldCount = profile.snapshot.meta.edge_fields.length
+    this.edgeTypeOffset = profile.snapshot.meta.edge_fields.indexOf('type')
+    this.edgeNameOffset = profile.snapshot.meta.edge_fields.indexOf('name_or_index')
+    this.edgeTargetOffset = profile.snapshot.meta.edge_fields.indexOf('to_node')
+    this.internalEdgeType = profile.snapshot.meta.edge_types[0].indexOf('internal')
     const types = profile.snapshot.meta.node_types[0]
     this.nodeClosureType = types.indexOf('closure')
     this.nodeObjectType = types.indexOf('object')
@@ -100,10 +111,25 @@ export class HeapSnapshotNode {
     return new EdgeIterator(this)
   }
   findInternalEdgeTarget(name: string): HeapSnapshotNode | undefined {
-    for (const iter = this.edges(); iter.hasNext(); iter.next()) {
-      if (iter.edge.type() === 'internal' && iter.edge.name() === name) return iter.edge.node()
+    const snapshot = this.snapshot
+    if (name === 'previous' && snapshot.previousContexts.has(this.nodeIndex)) {
+      const index = snapshot.previousContexts.get(this.nodeIndex)
+      return index === undefined ? undefined : new HeapSnapshotNode(snapshot, index)
     }
-    return undefined
+    const ordinal = this.nodeIndex / snapshot.nodeFieldCount
+    const edges = snapshot.profile.edges
+    let target: number | undefined
+    for (let index = snapshot.firstEdges[ordinal]; index < snapshot.firstEdges[ordinal + 1]; index += snapshot.edgeFieldCount) {
+      if (
+        edges[index + snapshot.edgeTypeOffset] === snapshot.internalEdgeType &&
+        snapshot.strings[edges[index + snapshot.edgeNameOffset]] === name
+      ) {
+        target = edges[index + snapshot.edgeTargetOffset]
+        break
+      }
+    }
+    if (name === 'previous') snapshot.previousContexts.set(this.nodeIndex, target)
+    return target === undefined ? undefined : new HeapSnapshotNode(snapshot, target)
   }
   nodeValueAsInt(): number | undefined {
     if (this.type() !== 'number' || this.rawName() !== 'int') return undefined
