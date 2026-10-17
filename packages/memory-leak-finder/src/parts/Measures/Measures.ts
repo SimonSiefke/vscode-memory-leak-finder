@@ -182,3 +182,4 @@ export * as MeasureWebGl2RenderingContextCount from '../MeasureWebGl2RenderingCo
 export * as MeasureWidgetCount from '../MeasureWidgetCount/MeasureWidgetCount.ts'
 export * as MeasureWindowsHandles from '../MeasureWindowsHandles/MeasureWindowsHandles.ts'
 export * as MeasureWorkerCount from '../MeasureWorkerCount/MeasureWorkerCount.ts'
+export * as MeasureDuplicateObjectGraphs from '../MeasureDuplicateObjectGraphs/MeasureDuplicateObjectGraphs.ts'
