@@ -6,10 +6,11 @@ import * as Path from '../Path/Path.ts'
 import { withCopilotPackagingWorkaround } from '../WithCopilotPackagingWorkaround/WithCopilotPackagingWorkaround.ts'
 
 const runBuildCommand = async (cwd: string, useNice: boolean, npmPath: string, args: readonly string[]) => {
+  const env = { ...process.env, PATH: `${dirname(npmPath)}:${process.env.PATH ?? ''}` }
   if (useNice) {
-    return exec('nice', ['-n', '10', npmPath, ...args], { cwd, reject: false })
+    return exec('nice', ['-n', '10', npmPath, ...args], { cwd, reject: false, env })
   }
-  return exec(npmPath, [...args], { cwd, reject: false })
+  return exec(npmPath, [...args], { cwd, reject: false, env })
 }
 
 /**

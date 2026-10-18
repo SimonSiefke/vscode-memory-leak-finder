@@ -1,5 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
+import { dirname } from 'node:path'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 import { runCompile, runMinifiedBuild } from '../src/parts/RunCompile/RunCompile.ts'
 
@@ -31,9 +32,17 @@ test('runCompile runs the transpile step after compile', async () => {
 
   expect(execCalls).toHaveLength(2)
   expect(execCalls[0]?.[1]).toEqual(['run', 'compile'])
-  expect(execCalls[0]?.[2]).toEqual({ cwd, reject: false })
+  expect(execCalls[0]?.[2]).toEqual({
+    cwd,
+    reject: false,
+    env: expect.objectContaining({ PATH: `${dirname(String(execCalls[0]?.[0]))}:${process.env.PATH ?? ''}` }),
+  })
   expect(execCalls[1]?.[1]).toEqual(['gulp', 'transpile-client-esbuild'])
-  expect(execCalls[1]?.[2]).toEqual({ cwd, reject: false })
+  expect(execCalls[1]?.[2]).toEqual({
+    cwd,
+    reject: false,
+    env: expect.objectContaining({ PATH: `${dirname(String(execCalls[1]?.[0]))}:${process.env.PATH ?? ''}` }),
+  })
 })
 
 test('runCompile throws error when main.js not found after compilation', async () => {
@@ -92,7 +101,11 @@ test('runMinifiedBuild runs the platform minified vscode gulp task', async () =>
 
   expect(execCalls).toHaveLength(1)
   expect(execCalls[0]?.[1]).toEqual(['gulp', 'vscode-linux-x64-min'])
-  expect(execCalls[0]?.[2]).toEqual({ cwd, reject: false })
+  expect(execCalls[0]?.[2]).toEqual({
+    cwd,
+    reject: false,
+    env: expect.objectContaining({ PATH: `${dirname(String(execCalls[0]?.[0]))}:${process.env.PATH ?? ''}` }),
+  })
 })
 
 test('runMinifiedBuild rejects a failed gulp even when an executable exists', async () => {
