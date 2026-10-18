@@ -2,6 +2,7 @@ import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { errorMessage, readJson } from '../Io/Io.ts'
 import { selectBenchmarks } from '../Manifest/Manifest.ts'
+import { selectorDetailsSvg } from '../CssSelectorReport/CssSelectorReport.ts'
 import { comparePairs } from '../Statistics/Statistics.ts'
 import type { Benchmark, Metric, Result, Sample, Status } from '../Types/Types.ts'
 
@@ -104,6 +105,19 @@ export const validateResult = (raw: unknown, expected: Benchmark, commits: { bef
         !Number.isFinite(metric.value)
       )
         throw new Error('Invalid metric')
+    if (
+      sample.selectorStats !== undefined &&
+      (!Array.isArray(sample.selectorStats) ||
+        sample.selectorStats.some(
+          (row) =>
+            !row ||
+            typeof row.selector !== 'string' ||
+            ['elapsedMs', 'matchAttempts', 'matchCount', 'invalidationCount'].some(
+              (field) => !Number.isFinite(row[field as keyof typeof row]) || (row[field as keyof typeof row] as number) < 0,
+            ),
+        ))
+    )
+      throw new Error('Invalid CSS selector statistics')
     if (sample.raw.some((path) => typeof path !== 'string' || path.startsWith('/') || path.split(/[\\/]/).includes('..')))
       throw new Error('Invalid raw result reference')
   }
@@ -279,7 +293,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       : ['No result artifact was uploaded']
     coverage.push({ benchmark: benchmark.id, status, pairs, requested: result?.requestedSamples ?? 0, diagnostics: messages })
     const chartHtml: string[] = []
-    for (const entry of entries) {
+    for (const entry of benchmark.collector === 'css-selectors' ? [] : entries) {
       const filename = `${benchmark.id}-${entry.metric.replace(/[^a-zA-Z0-9_-]/g, '_')}.svg`
       try {
         await writeFile(join(options.output, 'charts', filename), comparisonSvg(entry))
@@ -289,6 +303,26 @@ export const generateReport = async (inputOptions: ReportOptions) => {
         )
       } catch (error) {
         diagnostics.push(`Chart ${filename}: ${errorMessage(error)}`)
+      }
+    }
+    if (result && benchmark.collector === 'css-selectors' && entries.length) {
+      const totalsFilename = `${benchmark.id}-totals.svg`
+      const totals = entries.map((entry, index) => comparisonSvg(entry).replace('<svg ', `<svg y="${index * 320}" `)).join('')
+      await writeFile(
+        join(options.output, 'charts', totalsFilename),
+        `<svg xmlns="http://www.w3.org/2000/svg" width="850" height="${entries.length * 320}" viewBox="0 0 850 ${entries.length * 320}" role="img" aria-label="CSS selector totals">${totals}</svg>`,
+      )
+      chartHtml.push(
+        `<h3>CSS selector totals</h3><figure><img loading="lazy" src="charts/${totalsFilename}" alt="CSS selector totals before and after"/><figcaption>All selectors; elapsed matching time uses medians, counts use means. Each panel has its own scale. Selector instrumentation adds overhead.</figcaption></figure>`,
+      )
+      const filename = `${benchmark.id}-details.svg`
+      try {
+        await writeFile(join(options.output, 'charts', filename), selectorDetailsSvg(result))
+        chartHtml.push(
+          `<h3>Selector details</h3><p>Up to 3,000 selectors, sorted by the larger before/after median. Totals above include every selector. <a href="charts/${filename}">Open full chart</a>.</p><iframe loading="lazy" style="width:100%;height:900px;border:1px solid #e3e8f2" src="charts/${filename}" title="CSS selector before and after details"></iframe>`,
+        )
+      } catch (error) {
+        diagnostics.push(`CSS selector details: ${errorMessage(error)}`)
       }
     }
     if (result && benchmark.collector === 'profile') {
@@ -415,7 +449,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       .map(([name, value]) => `<span><strong>${value}</strong> ${name}</span>`)
       .join('')}</div>
     <details><summary>How to read the measurements</summary><p>Counts and byte sizes use means; timings use medians. Only complete pairs are compared. No outliers were removed. Runtime confidence intervals use 10,000 deterministic paired bootstrap resamples. These are exploratory intervals across many metrics, without a multiple-comparison significance claim. Small samples and intervals crossing zero are inconclusive. Hardware counters may be unavailable on the runner; missing values are never zeros.</p></details>
-    <nav><label>View <select id="view"><option value="all">All measurements</option><option value="startup">Startup</option><option value="editor">Editor and interactions</option><option value="timing">Timings</option><option value="instructions">Instruction counts</option><option value="resources">OS resources</option><option value="timeline">Rendering traces</option><option value="renderer">Renderer counters</option><option value="bundles">Bundle sizes</option><option value="profile">CPU profiles</option><option value="memory">Memory</option></select></label><label>Filter <input id="filter" type="search" placeholder="Benchmark or metric"/></label></nav></header>
+    <nav><label>View <select id="view"><option value="all">All measurements</option><option value="startup">Startup</option><option value="editor">Editor and interactions</option><option value="timing">Timings</option><option value="instructions">Instruction counts</option><option value="resources">OS resources</option><option value="timeline">Rendering traces</option><option value="css-selectors">CSS selectors</option><option value="renderer">Renderer counters</option><option value="bundles">Bundle sizes</option><option value="profile">CPU profiles</option><option value="memory">Memory</option></select></label><label>Filter <input id="filter" type="search" placeholder="Benchmark or metric"/></label></nav></header>
     <div class="overview"><h2>Performance overview</h2><p>Green indicates improvement, red indicates regression, and gray indicates an inconclusive or unchanged result. Hover for confidence intervals; select a view to focus on a collector family. Click a value to open its charts.</p>${matrix}<details><summary>Detailed comparison table</summary><div class="table-wrap"><table><thead><tr><th>Benchmark</th><th>Metric</th><th>Before</th><th>After</th><th>Change</th><th>Pairs</th><th>Confidence</th></tr></thead><tbody>${heatmap}</tbody></table></div></details></div>
     <section><h2>Coverage</h2><details><summary>All benchmark outcomes</summary><table><thead><tr><th>Benchmark</th><th>Status</th><th>Complete pairs</th></tr></thead><tbody>${coverage.map((entry) => `<tr><td>${escapeHtml(entry.benchmark)}</td><td>${entry.status}</td><td>${entry.pairs}/${entry.requested || '?'}</td></tr>`).join('')}</tbody></table></details><details><summary>Report diagnostics and build outcomes</summary><pre>${escapeHtml(JSON.stringify({ buildOutcomes: summary.buildOutcomes, buildStatuses, diagnostics }, null, 2))}</pre></details></section>
     ${sections.map((section, index) => section.replace('<section ', `<section id="${options.benchmarks[index]!.id}" `)).join('')}

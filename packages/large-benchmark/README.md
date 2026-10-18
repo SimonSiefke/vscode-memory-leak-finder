@@ -44,7 +44,7 @@ An unavailable release API, unknown endpoint, missing Linux build, or invalid
 commit metadata fails initialization before any builds start.
 
 The workflow builds each minified Linux x64 package once and compares each adjacent
-pair of commits. The full suite has 104 runtime benchmarks and one JavaScript
+pair of commits. The full suite has 108 runtime benchmarks and one JavaScript
 bundle-size benchmark per pair. Each matrix stays within 256 jobs by grouping
 benchmarks into a job when necessary; each job downloads only its two required
 builds. If a build fails, comparisons using other builds can still run. Build and
@@ -55,7 +55,7 @@ usable comparisons still fails after preserving the report. It leaves the
 existing CI and bot workflows unchanged.
 
 The defaults are 37 samples per commit **per adjacent comparison**, all extensions disabled, and the entire
-suite. Interior commits are measured again against their next neighbor. CPU profiles and heap snapshots use at most five samples per commit.
+suite. Interior commits are measured again against their next neighbor. CPU profiles, heap snapshots, and CSS selector traces use at most five samples per commit.
 Each job measures both revisions on the same runner and alternates their order.
 Failures and unavailable facilities are recorded independently; regressions do
 not fail the workflow. The final job always gathers the available evidence and
@@ -132,8 +132,10 @@ Use the optional `measures` dispatch input to select comma-separated groups:
 | Group                                                                                         | Benchmarks                                                                    |
 | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | `startup-times`                                                                               | Only empty-window and workspace startup timings, cold and warm (4 benchmarks) |
-| `startup`                                                                                     | All startup collectors (20 benchmarks)                                        |
+| `startup`                                                                                     | All startup collectors (24 benchmarks)                                        |
 | `timing`, `instructions`, `resources`, `renderer`, `timeline`, `profile`, `memory`, `bundles` | Benchmarks using the selected collectors                                      |
+
+`css-selectors` selects CSS selector startup statistics (4 diagnostic benchmarks).
 
 Multiple groups are combined. Empty `measures` selects all measures. The existing
 `benchmark_filter` further restricts the selection to comma-separated exact IDs;
@@ -154,6 +156,47 @@ the existing build pipeline and run with the current harness. Unsupported or fai
 builds/measurements remain visible as gaps instead of fabricated trend values.
 Large runs that select all collectors group more benchmarks into each job and may
 reach the job time limit; prefer focused measures for long histories.
+
+## CSS selector comparisons
+
+Set `measures` to `css-selectors` to build and compare CSS selector matching costs
+at startup. This selects four separate diagnostic workloads: empty-window and
+workspace startup, each cold and warm. It works with the same before/after commit
+inputs, qualified fork references, ordered commit arrays, and inclusive stable
+`version_range` inputs (for example `1.120.0...1.142.0`, once both endpoints are
+published). Each build is reused across adjacent comparisons.
+
+Each pair report includes two SVG charts per workload:
+
+- **Totals:** elapsed selector matching time, match attempts, matches,
+  fast rejects, invalidations (where supported), and recorded style recalculations. Each metric has its own scale;
+  totals include all selectors, regardless of the detail limit.
+- **Details:** at most 3,000 selectors, with two horizontal bars per selector
+  (before and after elapsed matching time). Rows are ordered by the larger median
+  on either revision, slowest first. The chart scrolls and can be opened separately;
+  hover for the full selector text and exact values.
+
+Collection starts through VS Code's early trace hook, before the workbench renderer
+initializes, and ends at visible workbench readiness (including rendered text for
+workspace startup). Only the workbench renderer's events before that boundary are
+included. The instrumentation runs separately from ordinary timing collectors and
+adds overhead; these numbers describe instrumented selector matching cost.
+
+Identical selector text is combined across stylesheets because stylesheet IDs are
+process-local. Every selector is retained in the raw results before ranking; the
+3,000-row limit applies only to the rendered detail chart. Detail bars use the
+median elapsed time from complete sample pairs. A selector absent from an otherwise
+complete trace contributes zero; an unavailable or failed trace contributes no
+pair. Added and removed selectors are included. Missing instrumentation, unsupported
+trace formats, missing startup boundaries, and full/lost trace buffers are reported
+as unavailable rather than zero. Raw traces and selector JSON remain in the result
+artifacts. Version-range reports show total-metric trends and link to the two-chart
+details for every adjacent version pair.
+
+For a focused range comparison, use `version_range: 1.120.0...1.142.0` and
+`measures: css-selectors`; use `benchmark_filter: startup-workspace-warm-css-selectors`
+to restrict it to warm workspace startup. Historical versions must still build and
+support selector tracing; unavailable releases remain visible as gaps.
 
 ## Local usage
 

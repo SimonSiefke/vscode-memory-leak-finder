@@ -31,7 +31,7 @@ export const rendererMetrics = (before: { name: string; value: number }[], after
   )
 }
 
-interface TraceEvent {
+export interface TraceEvent {
   name: string
   ph: string
   pid: number
@@ -55,7 +55,7 @@ const traceDuration = (events: TraceEvent[], end: number): number => {
   return total
 }
 
-export const analyzeTrace = (events: TraceEvent[], startup: boolean): Metric[] => {
+export const traceWindow = (events: TraceEvent[], startup: boolean): TraceEvent[] => {
   const end = events.find((event) => event.name === 'TimeStamp' && event.args?.data?.message === 'large-end')
   const start = events.find((event) => event.name === 'TimeStamp' && event.args?.data?.message === 'large-start')
   if (!end || (!startup && !start)) throw new UnavailableError('Trace is missing its measurement boundary markers')
@@ -64,6 +64,12 @@ export const analyzeTrace = (events: TraceEvent[], startup: boolean): Metric[] =
   if (startup && !window.some((event) => event.ts < end.ts && /navigationStart|ParseHTML|CommitLoad|EvaluateScript/.test(event.name))) {
     throw new UnavailableError('Startup trace does not contain renderer initialization')
   }
+  return window
+}
+
+export const analyzeTrace = (events: TraceEvent[], startup: boolean): Metric[] => {
+  const window = traceWindow(events, startup)
+  const end = events.find((event) => event.name === 'TimeStamp' && event.args?.data?.message === 'large-end')!
   // Keep only complete duration events. Incomplete B/E spans are not converted into zero-duration events.
   const complete = window.filter((event) => event.ph === 'X' && typeof event.dur === 'number')
   const specs: [string, string, RegExp][] = [
@@ -113,14 +119,19 @@ export const analyzeTrace = (events: TraceEvent[], startup: boolean): Metric[] =
   return metrics
 }
 
-export const stopTrace = async (main: Session, path: string, startup: boolean): Promise<Metric[]> => {
+export const stopRecording = async (main: Session, path: string): Promise<TraceEvent[]> => {
   const usage = await evaluate<{ percentage: number }>(main, electronExpression('await electron.contentTracing.getTraceBufferUsage()'))
   await evaluate(main, electronExpression(`await electron.contentTracing.stopRecording(${JSON.stringify(path)})`))
   if (usage.percentage >= 1) throw new UnavailableError('Trace buffer filled; the trace is incomplete')
-  return loadTrace(path, startup)
+  return readTrace(path)
 }
 
-export const loadTrace = async (path: string, startup: boolean): Promise<Metric[]> => {
+export const stopTrace = async (main: Session, path: string, startup: boolean): Promise<Metric[]> =>
+  analyzeTrace(await stopRecording(main, path), startup)
+
+export const loadTrace = async (path: string, startup: boolean): Promise<Metric[]> => analyzeTrace(await readTrace(path), startup)
+
+const readTrace = async (path: string): Promise<TraceEvent[]> => {
   const trace = JSON.parse(await readFile(path, 'utf8')) as {
     traceEvents: TraceEvent[]
     metadata?: { trace_processor_stats?: Record<string, number> }
@@ -129,7 +140,7 @@ export const loadTrace = async (path: string, startup: boolean): Promise<Metric[
     if (/packet_loss|chunks_overwritten|chunks_discarded|data_loss/.test(name) && value > 0)
       throw new UnavailableError(`Incomplete trace: ${name}=${value}`)
   }
-  return analyzeTrace(trace.traceEvents, startup)
+  return trace.traceEvents
 }
 
 export const summarizeHeap = (snapshot: any): Metric[] => {

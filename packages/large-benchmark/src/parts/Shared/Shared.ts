@@ -5,7 +5,7 @@ import type { Metric } from '../Types/Types.ts'
 // The monorepo runs TypeScript sources directly. Use the same URL-based package
 // loading as the existing workers rather than compile another package's sources.
 const load = (packageName: string, path: string) => import(new URL(`../../../../${packageName}/src/${path}`, import.meta.url).href)
-const [endpoint, capture, perf, pss, profile, browser, context, stages, fixtures, imports] = await Promise.all([
+const [endpoint, capture, perf, pss, profile, browser, context, stages, fixtures, imports, css] = await Promise.all([
   load('memory-leak-finder', 'parts/ConnectDevtoolsEndpoint/ConnectDevtoolsEndpoint.ts'),
   load('memory-leak-finder', 'parts/PerformanceCapture/PerformanceCapture.ts'),
   load('memory-leak-finder', 'parts/ControlledPerfStat/ControlledPerfStat.ts'),
@@ -16,6 +16,7 @@ const [endpoint, capture, perf, pss, profile, browser, context, stages, fixtures
   load('test-worker', 'parts/TestStage/TestStage.ts'),
   import(new URL('../../../../e2e/helpers/performanceFixtures.ts', import.meta.url).href),
   load('test-worker', 'parts/ImportTest/ImportTest.ts'),
+  load('memory-leak-finder', 'parts/CssSelectorStats/CssSelectorStats.ts'),
 ])
 
 export interface Session {
@@ -92,3 +93,6 @@ export const createScenario = async (
     },
   }
 }
+
+export const { stopRecording, traceWindow } = capture
+export const { getCssSelectorStats } = css

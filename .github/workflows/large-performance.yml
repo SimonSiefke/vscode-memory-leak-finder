@@ -12,7 +12,7 @@ on:
         type: string
         default: ''
       measures:
-        description: Optional comma-separated groups (startup-times, startup, timing, instructions, resources, renderer, timeline, profile, memory, bundles)
+        description: Optional comma-separated groups (startup-times, startup, timing, instructions, resources, renderer, timeline, profile, memory, bundles, css-selectors)
         type: string
         default: ''
       before_commit:
