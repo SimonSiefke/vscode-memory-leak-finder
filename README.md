@@ -174,6 +174,12 @@ Finds variables retained in closure contexts that no surviving closure can acces
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure dead-closure-variables --only base
 ```
 
+To report the overall dead closure variables in the final snapshot, including unchanged and shrinking function groups, select `dead-closure-variables-total`. Its `closures` rows are sorted by `deadBytes` descending, while before/after totals and deltas remain available. The leak flag still indicates growth, independently of which rows are reported. This mode also includes `scriptsWithoutScopes` in each snapshot's details so incomplete script coverage is visible.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure dead-closure-variables-total --only '^editor-open.ts' --runs 1
+```
+
 Requires a Chromium/Electron or Node.js runtime that emits `scopes`, `scope_context_vars`, and `scope_uses` in heap snapshots. Older runtimes fail with an unsupported-metadata error. Scripts that could not be analyzed are listed in `scriptsWithoutScopes`; empty scope tables can therefore produce partial results. VS Code 1.142.0 ships Electron 43 / Chromium 150, which lacks this metadata. End-to-end validation uses the VS Code application with Electron 46 nightly / Chromium 158.
 
 Bytes are the union of the retained sizes of dead variable values, with overlapping dominator subtrees counted once per closure and once in the overall total. Closures are grouped by generated URL, line, column and name, independently of heap object IDs. Shared retained values are counted once within each function group; different functions can retain the same context, so row totals must not be added together. Functions without snapshot locations use scope identity, or object identity when no scope metadata is available, rather than merging unrelated anonymous functions. These sizes indicate memory impact, not guaranteed reclaimable memory: values may also have other live references. Suspended generators and async functions are treated as live, including variables used by functions they can instantiate.

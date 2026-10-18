@@ -16,6 +16,7 @@ jest.unstable_mockModule('../src/parts/LaunchHeapSnapshotWorker/LaunchHeapSnapsh
   launchHeapSnapshotWorker: async () => ({ [Symbol.asyncDispose]: dispose, invoke }),
 }))
 const measure = await import('../src/parts/MeasureDeadClosureVariables/MeasureDeadClosureVariables.ts')
+const totalMeasure = await import('../src/parts/MeasureDeadClosureVariablesTotal/MeasureDeadClosureVariablesTotal.ts')
 const { getMeasure } = await import('../src/parts/GetMeasure/GetMeasure.ts')
 const { loadMemoryLeakFinder } = await import('../src/parts/LoadMemoryLeakFinder/LoadMemoryLeakFinder.ts')
 
@@ -43,6 +44,17 @@ test.each([
   [200, 100, false],
 ])('only byte growth is a leak: %s -> %s', (before, after, leak) => {
   expect(measure.isLeak({ before, after })).toBe(leak)
+})
+
+test('registers a total measure and requests all final-snapshot groups without changing leak detection', async () => {
+  expect(getMeasure(loadMemoryLeakFinder(), 'dead-closure-variables-total').id).toBe(totalMeasure.id)
+  const args = totalMeasure.create({} as any)
+  invoke.mockResolvedValueOnce({ before: 200, after: 100, closures: [{ deadBytes: 100, delta: -100 }] })
+  const result = await totalMeasure.compare('before.json', 'after.json', {}, ...args)
+  expect(invoke).toHaveBeenLastCalledWith('HeapSnapshot.compareDeadClosureVariables', 'before.json', 'after.json', scriptMap, {
+    mode: 'total',
+  })
+  expect(totalMeasure.isLeak(result)).toBe(false)
 })
 
 test('cleans up both snapshots when analysis fails', async () => {
