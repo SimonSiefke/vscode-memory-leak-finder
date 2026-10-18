@@ -152,3 +152,7 @@ test('getMeasure resolves duplicated strings public measure id', () => {
     ),
   ).toBe(Measures.MeasureDuplicatedStrings)
 })
+
+test('getMeasure resolves retained substrings public measure id', () => {
+  expect(GetMeasure.getMeasure({ Measures }, 'retained-substrings')).toBe(Measures.MeasureRetainedSubstrings)
+})

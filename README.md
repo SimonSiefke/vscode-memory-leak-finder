@@ -36,6 +36,18 @@ node packages/build/src/mergeArtifacts.ts
 
 ## Measures
 
+### RetainedSubstrings
+
+Finds large flat string parents (at least 64 KiB of snapshot shallow size) retained through V8 sliced strings. Reports each parent once, its bytes, slice count, and up to eight example slices with shortest strong paths from the snapshot root. Parents with independent strong references are identified separately. Removing all slice-to-parent edges and checking reachability establishes whether the slices collectively provide the only strong paths to a parent.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure retained-substrings --only base
+```
+
+Positive growth in parent bytes reachable exclusively through slices signals a suspected leak. This measures parent footprint, not guaranteed savings from copying substrings: slice lengths and offsets are not available reliably, and keeping a slice may be intentional. Shared parents are counted once; weak edges and non-root shortcut edges do not establish retention. Only flat parents exposed as `string` nodes are counted; rope strings and external backing storage not included in shallow size are outside coverage.
+
+Reports show the 50 largest parents, with complete totals even when details are truncated. Paths include at most 32 segments nearest the slice, with an explicit truncation flag, and snapshot names are limited to 80 characters. V8 may label slices simply `(sliced string)`; actual substring contents, lengths, and offsets are not reconstructed. Before/after snapshots are parsed sequentially and removed after comparison, including failed comparisons.
+
 ### PendingPromisesWithRetainers
 
 Finds pending Promises added during a test and reports their shortest strong path from a GC root, together with per-path counts and retained bytes. Inspector query handles are released before the final heap snapshot.
