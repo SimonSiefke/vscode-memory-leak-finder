@@ -111,6 +111,7 @@ test('matrix command emits build and measurement matrices and supports legacy be
       (await readFile(githubOutput, 'utf8'))
         .trim()
         .split('\n')
+        .filter((line) => line.startsWith('matrix=') || line.startsWith('build_matrix='))
         .map((line) => [line.slice(0, line.indexOf('=')), JSON.parse(line.slice(line.indexOf('=') + 1))]),
     )
     expect(outputs.build_matrix).toEqual({ include: commits.map((commit) => ({ commit, artifact: commit })) })
@@ -333,6 +334,7 @@ test.each(['pair', 'series'])('qualified fork references survive the %s workflow
     (await readFile(githubOutput, 'utf8'))
       .trim()
       .split('\n')
+      .filter((line) => line.startsWith('matrix=') || line.startsWith('build_matrix='))
       .map((line) => [line.slice(0, line.indexOf('=')), JSON.parse(line.slice(line.indexOf('=') + 1))]),
   )
   expect(outputs.build_matrix).toEqual({

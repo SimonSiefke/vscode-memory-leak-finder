@@ -12,7 +12,7 @@ on:
         type: string
         default: ''
       measures:
-        description: Optional comma-separated groups (startup-times, startup, timing, instructions, resources, renderer, timeline, profile, memory, bundles, css-selectors)
+        description: Optional comma-separated groups (smoke, startup-times, startup, timing, instructions, resources, renderer, timeline, profile, memory, bundles, css-selectors)
         type: string
         default: ''
       before_commit:
@@ -52,6 +52,10 @@ jobs:
     outputs:
       matrix: ${{ steps.manifest.outputs.matrix }}
       build_matrix: ${{ steps.manifest.outputs.build_matrix }}
+      smoke_matrix: ${{ steps.manifest.outputs.smoke_matrix }}
+      has_runtime: ${{ steps.manifest.outputs.has_runtime }}
+      has_smoke: ${{ steps.manifest.outputs.has_smoke }}
+      smoke_harness: ${{ steps.manifest.outputs.smoke_harness }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -119,9 +123,75 @@ jobs:
           retention-days: 30
           overwrite: true
 
+      - name: Compile and archive the shared smoke harness and fixture
+        if: ${{ needs.initialize.outputs.has_smoke == 'true' && matrix.artifact == needs.initialize.outputs.smoke_harness }}
+        run: node packages/large-benchmark/src/main.ts prepare-smoke --commit "$COMMIT" --output-dir "$PWD/.large-smoke"
+      - name: Upload shared smoke harness
+        if: ${{ needs.initialize.outputs.has_smoke == 'true' && matrix.artifact == needs.initialize.outputs.smoke_harness }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: large-smoke-harness
+          path: |
+            .large-smoke/smoke.tar.gz
+            .large-smoke/smoke-build.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+  smoke:
+    needs: [initialize, build]
+    if: ${{ always() && needs.initialize.result == 'success' && needs.initialize.outputs.has_smoke == 'true' && !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.initialize.outputs.smoke_matrix) }}
+    env:
+      COMMIT: ${{ matrix.commit }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install desktop dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libasound2t64 libnss3 libgbm1 libgtk-3-0 libxkbfile1 bubblewrap socat
+      - uses: actions/download-artifact@v8
+        with:
+          name: large-build-${{ matrix.artifact }}
+          path: .large-build
+      - uses: actions/download-artifact@v8
+        with:
+          name: large-smoke-harness
+          path: .large-smoke
+      - name: Verify and extract packaged build
+        id: build
+        run: node packages/large-benchmark/src/main.ts extract --input-dir .large-build --commit "$COMMIT" --output-name executable
+      - name: Verify and extract shared smoke harness
+        run: node packages/large-benchmark/src/main.ts extract-smoke --input-dir .large-smoke
+      - name: Measure smoke suite repeatedly
+        env:
+          BUILD_PATH: ${{ steps.build.outputs.executable }}
+        run: |
+          xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
+            node packages/large-benchmark/src/main.ts smoke \
+            --commit "$COMMIT" --build-path "$BUILD_PATH" \
+            --harness-path "$PWD/.large-smoke" --samples "$SAMPLES" \
+            --output-dir .large-results
+      - name: Upload all smoke attempts and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: large-result-smoke-${{ matrix.artifact }}
+          path: .large-results
+          include-hidden-files: true
+          retention-days: 30
+
   measure:
     needs: [initialize, build]
-    if: ${{ always() && needs.initialize.result == 'success' && !cancelled() }}
+    if: ${{ always() && needs.initialize.result == 'success' && needs.initialize.outputs.has_runtime == 'true' && !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     continue-on-error: true
@@ -185,7 +255,7 @@ jobs:
           overwrite: true
 
   report:
-    needs: [initialize, build, measure]
+    needs: [initialize, build, measure, smoke]
     if: ${{ always() && needs.initialize.result == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -223,6 +293,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: large-performance-report
+          include-hidden-files: true
           path: |
             .large-report/**/*.html
             .large-report/**/*.svg

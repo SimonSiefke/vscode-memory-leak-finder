@@ -1,6 +1,6 @@
 export type Revision = 'before' | 'after'
 export type Collector =
-  'timing' | 'instructions' | 'resources' | 'renderer' | 'timeline' | 'profile' | 'memory' | 'bundles' | 'css-selectors'
+  'smoke' | 'timing' | 'instructions' | 'resources' | 'renderer' | 'timeline' | 'profile' | 'memory' | 'bundles' | 'css-selectors'
 export type Status = 'success' | 'partial' | 'failed' | 'unavailable' | 'missing'
 
 export interface Benchmark {

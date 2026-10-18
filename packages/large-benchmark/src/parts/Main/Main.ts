@@ -1,3 +1,4 @@
+import { prepareSmoke, extractSmoke, runSmoke } from '../Smoke/Smoke.ts'
 import { appendFile, mkdir } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { measureBundles } from '../Bundles/Bundles.ts'
@@ -46,7 +47,13 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
           : { schemaVersion: 1, commits: commits(), samples, benchmarks: selected }
       await writeJson(join(output, 'manifest.json'), manifest)
       const matrix = JSON.stringify({
-        include: seriesMatrix(revisions, selected).include.map((pair) => ({
+        include: (selected.some((b) => b.collector !== 'smoke')
+          ? seriesMatrix(
+              revisions,
+              selected.filter((b) => b.collector !== 'smoke'),
+            ).include
+          : []
+        ).map((pair) => ({
           ...pair,
           beforeArtifact: parseCommitReference(pair.before).artifact,
           afterArtifact: parseCommitReference(pair.after).artifact,
@@ -55,8 +62,35 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
       const buildMatrix = JSON.stringify({
         include: revisions.map((commit) => ({ commit, artifact: parseCommitReference(commit).artifact })),
       })
-      if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, `matrix=${matrix}\nbuild_matrix=${buildMatrix}\n`)
+      const smokeMatrix = JSON.stringify({
+        include: selected.some((b) => b.collector === 'smoke')
+          ? revisions.map((commit) => ({ commit, artifact: parseCommitReference(commit).artifact }))
+          : [],
+      })
+      if (process.env.GITHUB_OUTPUT)
+        await appendFile(
+          process.env.GITHUB_OUTPUT,
+          `matrix=${matrix}\nbuild_matrix=${buildMatrix}\nsmoke_matrix=${smokeMatrix}\nhas_runtime=${selected.some((b) => b.collector !== 'smoke')}\nhas_smoke=${selected.some((b) => b.collector === 'smoke')}\nsmoke_harness=${parseCommitReference(revisions[0]!).artifact}\n`,
+        )
       else console.log(matrix)
+      break
+    }
+    case 'prepare-smoke': {
+      await prepareSmoke(required('--commit'), output)
+      break
+    }
+    case 'extract-smoke': {
+      await extractSmoke(resolve(required('--input-dir')))
+      break
+    }
+    case 'smoke': {
+      await runSmoke({
+        commit: required('--commit'),
+        build: resolve(required('--build-path')),
+        harness: resolve(required('--harness-path')),
+        samples,
+        output,
+      })
       break
     }
     case 'prepare': {
@@ -80,6 +114,8 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
     case 'measure': {
       if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('Measurements require Linux x64')
       const selected = selectBenchmarks(required('--benchmark-id'))
+      if (selected.some((benchmark) => benchmark.collector === 'smoke'))
+        throw new Error('Use the smoke command for independent smoke-test measurements')
       for (const benchmark of selected) {
         const options: RunOptions = {
           benchmark,
@@ -117,12 +153,13 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
         ...(get('--build-outcomes') ? { buildOutcomes: get('--build-outcomes') } : {}),
       })
       console.log(`Report: ${join(output, 'index.html')}; ${summary.comparisons.length} metric comparisons`)
+      if (summary.smoke) console.log(summary.smoke.summary)
       if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, createWorkflowSummary(summary))
       if (!summary.usable) throw new Error('Report preserved, but builds are unusable or no valid runtime comparisons exist')
       break
     }
     default:
-      throw new Error('Usage: large-performance <matrix|prepare|extract|measure|report> [options]')
+      throw new Error('Usage: large-performance <matrix|prepare|extract|prepare-smoke|extract-smoke|smoke|measure|report> [options]')
   }
 }
 
