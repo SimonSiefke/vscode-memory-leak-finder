@@ -1,3 +1,4 @@
+import { reportSmoke } from '../Smoke/Smoke.ts'
 import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { errorMessage, readJson } from '../Io/Io.ts'
@@ -254,7 +255,10 @@ export const generateReport = async (inputOptions: ReportOptions) => {
   const comparisons: Comparison[] = []
   const coverage: { benchmark: string; status: Status; pairs: number; requested: number; diagnostics: string[] }[] = []
   const sections: string[] = []
-  for (const benchmark of options.benchmarks) {
+  const smoke = options.benchmarks.some((b) => b.collector === 'smoke')
+    ? await reportSmoke(options.input, options.output, options.commits)
+    : undefined
+  for (const benchmark of options.benchmarks.filter((b) => b.collector !== 'smoke')) {
     const result = results.get(benchmark.id)
     let entries: Comparison[] = []
     try {
@@ -334,10 +338,11 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       <p>${pairs}/${result?.requestedSamples ?? '?'} complete pairs. ${benchmark.diagnostic ? 'Diagnostic collector; instrumentation changes execution.' : ''}</p>${chartHtml.join('')}
       <details><summary>Diagnostics, runner metadata, and raw results</summary><pre>${escapeHtml(JSON.stringify({ runner: result?.runner, diagnostics: messages }, null, 2))}</pre>${result ? `<p>Raw evidence is stored separately in the <code>${escapeHtml(artifactName)}</code> workflow artifact (or the original input directory for local runs).</p>` : ''}<ul>${rawFiles}</ul></details></section>`)
   }
+  if (smoke) coverage.push({ benchmark: 'smoke-tests', status: smoke.status, pairs: 0, requested: 0, diagnostics: smoke.diagnostics })
   const validRuntime = comparisons.filter((entry) => entry.collector !== 'bundles').length
   const buildsFailed = options.buildOutcomes !== undefined && options.buildOutcomes !== 'success,success'
   const expectsRuntime = options.benchmarks.some((benchmark) => benchmark.collector !== 'bundles')
-  const usable = (expectsRuntime ? validRuntime > 0 : comparisons.length > 0) && !buildsFailed
+  const usable = (expectsRuntime ? validRuntime > 0 || !!smoke?.usable : comparisons.length > 0) && !buildsFailed
   const buildStatuses: unknown[] = []
   for (const entry of await readdir(options.input, { withFileTypes: true }).catch(() => [])) {
     if (!entry.isDirectory() || !entry.name.startsWith('large-build-status-')) continue
@@ -356,6 +361,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     buildStatuses,
     coverage,
     comparisons,
+    smoke,
     diagnostics,
   }
   const heatmap = comparisons
@@ -409,7 +415,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
   )
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Large Performance · VS Code comparison</title><style>
     :root{color-scheme:light;font-family:system-ui,sans-serif;color:#1b2538;background:#f4f6fb}body{max-width:1350px;margin:auto;padding:36px}header,section,.overview{background:white;border:1px solid #dde3ef;border-radius:12px;padding:24px;margin-bottom:24px}h1{margin:0 0 12px;font-size:34px}h2{font-size:22px}p,figcaption{line-height:1.6}code{overflow-wrap:anywhere}.stats{display:flex;gap:12px;flex-wrap:wrap}.stats span{background:#eef1f8;border-radius:8px;padding:14px}.table-wrap{overflow:auto}.heatmap th,.heatmap td{min-width:95px;text-align:center}.heatmap tbody th{position:sticky;left:0;top:auto;background:#f7f9fd;text-align:left;min-width:170px;z-index:1}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #e3e8f2;padding:10px;overflow-wrap:anywhere}th{position:sticky;top:0;background:#edf1fa}.better{background:#e0f3e8}.worse{background:#fae3e3}.uncertain{background:#eef0f4}.badge{font-size:12px;border-radius:20px;padding:5px 9px;background:#eef0f4}.success{background:#e0f3e8}.failed{background:#fae3e3}figure{margin:16px 0;border:1px solid #e3e8f2;border-radius:8px;padding:14px}img{max-width:100%;height:auto}figcaption{font-size:12px;color:#566078}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}select,input{font:inherit;padding:8px;border:1px solid #ccd4e3;border-radius:6px}nav{display:flex;gap:12px;margin:20px 0;flex-wrap:wrap}a{color:#315abd}details{margin:12px 0}summary{cursor:pointer}.benchmark[hidden],tr[hidden]{display:none}@media(max-width:700px){body{padding:12px}header,section,.overview{padding:14px}.table-wrap{overflow:auto}h1{font-size:27px}}
-    </style></head><body><header><h1>Large Performance</h1><p>VS Code · Linux x64 · all extensions disabled · before/after on the same runner</p><p><strong>Before:</strong> <code>${escapeHtml(options.commits.before)}</code><br/><strong>After:</strong> <code>${escapeHtml(options.commits.after)}</code></p>
+    </style></head><body><header><h1>Large Performance</h1><p>VS Code · Linux x64 · runtime collectors disable extensions and compare on the same runner; smoke tests use independent runners and their test extensions</p><p><strong>Before:</strong> <code>${escapeHtml(options.commits.before)}</code><br/><strong>After:</strong> <code>${escapeHtml(options.commits.after)}</code></p>
     <p>${usable ? 'Comparison complete. Regressions and individual measurement failures are informational.' : 'Comparison incomplete: unusable builds or no valid runtime comparison. Available evidence is preserved below.'}</p>
     <div class="stats">${Object.entries(counts)
       .map(([name, value]) => `<span><strong>${value}</strong> ${name}</span>`)
@@ -417,8 +423,9 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     <details><summary>How to read the measurements</summary><p>Counts and byte sizes use means; timings use medians. Only complete pairs are compared. No outliers were removed. Runtime confidence intervals use 10,000 deterministic paired bootstrap resamples. These are exploratory intervals across many metrics, without a multiple-comparison significance claim. Small samples and intervals crossing zero are inconclusive. Hardware counters may be unavailable on the runner; missing values are never zeros.</p></details>
     <nav><label>View <select id="view"><option value="all">All measurements</option><option value="startup">Startup</option><option value="editor">Editor and interactions</option><option value="timing">Timings</option><option value="instructions">Instruction counts</option><option value="resources">OS resources</option><option value="timeline">Rendering traces</option><option value="renderer">Renderer counters</option><option value="bundles">Bundle sizes</option><option value="profile">CPU profiles</option><option value="memory">Memory</option></select></label><label>Filter <input id="filter" type="search" placeholder="Benchmark or metric"/></label></nav></header>
     <div class="overview"><h2>Performance overview</h2><p>Green indicates improvement, red indicates regression, and gray indicates an inconclusive or unchanged result. Hover for confidence intervals; select a view to focus on a collector family. Click a value to open its charts.</p>${matrix}<details><summary>Detailed comparison table</summary><div class="table-wrap"><table><thead><tr><th>Benchmark</th><th>Metric</th><th>Before</th><th>After</th><th>Change</th><th>Pairs</th><th>Confidence</th></tr></thead><tbody>${heatmap}</tbody></table></div></details></div>
-    <section><h2>Coverage</h2><details><summary>All benchmark outcomes</summary><table><thead><tr><th>Benchmark</th><th>Status</th><th>Complete pairs</th></tr></thead><tbody>${coverage.map((entry) => `<tr><td>${escapeHtml(entry.benchmark)}</td><td>${entry.status}</td><td>${entry.pairs}/${entry.requested || '?'}</td></tr>`).join('')}</tbody></table></details><details><summary>Report diagnostics and build outcomes</summary><pre>${escapeHtml(JSON.stringify({ buildOutcomes: summary.buildOutcomes, buildStatuses, diagnostics }, null, 2))}</pre></details></section>
-    ${sections.map((section, index) => section.replace('<section ', `<section id="${options.benchmarks[index]!.id}" `)).join('')}
+    <section><h2>Coverage</h2><details><summary>All benchmark outcomes</summary><table><thead><tr><th>Benchmark</th><th>Status</th><th>Complete pairs</th></tr></thead><tbody>${coverage.map((entry) => `<tr><td>${escapeHtml(entry.benchmark)}</td><td>${entry.status}</td><td>${entry.benchmark === 'smoke-tests' ? 'Independent attempts; see smoke results' : `${entry.pairs}/${entry.requested || '?'}`} </td></tr>`).join('')}</tbody></table></details><details><summary>Report diagnostics and build outcomes</summary><pre>${escapeHtml(JSON.stringify({ buildOutcomes: summary.buildOutcomes, buildStatuses, diagnostics }, null, 2))}</pre></details></section>
+    ${smoke ? `<section id="smoke-tests"><h2>Smoke test timings</h2>${smoke.html}${smoke.usable ? '<img src="charts/smoke-tests.svg" alt="Mean and median smoke test timing comparison"/>' : ''}</section>` : ''}
+    ${sections.map((section, index) => section.replace('<section ', `<section id="${options.benchmarks.filter((b) => b.collector !== 'smoke')[index]!.id}" `)).join('')}
     <script>const view=document.getElementById('view'), filter=document.getElementById('filter'); function update(){const mode=view.value,q=filter.value.toLowerCase();for(const el of document.querySelectorAll('[data-id]')){const matches=mode==='all'||mode==='startup'&&el.dataset.startup==='true'||mode==='editor'&&el.dataset.startup==='false'&&!['bundles','resources','profile','memory'].includes(el.dataset.collector)||mode===el.dataset.collector;el.hidden=!matches||!(el.textContent+' '+el.dataset.id+' '+(el.dataset.search||'')).toLowerCase().includes(q)}for(const row of document.querySelectorAll('[data-matrix-row]'))row.hidden=Array.from(row.querySelectorAll('td')).every(cell=>cell.hidden||cell.dataset.comparable==='false');for(const column of document.querySelectorAll('[data-matrix-collector]'))column.hidden=!['all','startup','editor'].includes(mode)&&mode!==column.dataset.matrixCollector}view.addEventListener('change',update);filter.addEventListener('input',update)</script></body></html>`
   await writeFile(join(options.output, 'index.html'), html)
   return summary

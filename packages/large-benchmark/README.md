@@ -44,7 +44,7 @@ An unavailable release API, unknown endpoint, missing Linux build, or invalid
 commit metadata fails initialization before any builds start.
 
 The workflow builds each minified Linux x64 package once and compares each adjacent
-pair of commits. The full suite has 104 runtime benchmarks and one JavaScript
+pair of commits. The full suite has 104 paired runtime benchmarks, one smoke-test timing benchmark, and one JavaScript
 bundle-size benchmark per pair. Each matrix stays within 256 jobs by grouping
 benchmarks into a job when necessary; each job downloads only its two required
 builds. If a build fails, comparisons using other builds can still run. Build and
@@ -56,7 +56,7 @@ existing CI and bot workflows unchanged.
 
 The defaults are 37 samples per commit **per adjacent comparison**, all extensions disabled, and the entire
 suite. Interior commits are measured again against their next neighbor. CPU profiles and heap snapshots use at most five samples per commit.
-Each job measures both revisions on the same runner and alternates their order.
+Each paired runtime job measures both revisions on the same runner and alternates their order. Smoke tests use separate per-commit jobs as described below.
 Failures and unavailable facilities are recorded independently; regressions do
 not fail the workflow. The final job always gathers the available evidence and
 uploads **large-performance-report**. Download and extract it, then open
@@ -131,6 +131,7 @@ Use the optional `measures` dispatch input to select comma-separated groups:
 
 | Group                                                                                         | Benchmarks                                                                    |
 | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `smoke`                                                                                       | Electron smoke suite wall time; independent job per commit                    |
 | `startup-times`                                                                               | Only empty-window and workspace startup timings, cold and warm (4 benchmarks) |
 | `startup`                                                                                     | All startup collectors (20 benchmarks)                                        |
 | `timing`, `instructions`, `resources`, `renderer`, `timeline`, `profile`, `memory`, `bundles` | Benchmarks using the selected collectors                                      |
@@ -154,6 +155,71 @@ the existing build pipeline and run with the current harness. Unsupported or fai
 builds/measurements remain visible as gaps instead of fabricated trend values.
 Large runs that select all collectors group more benchmarks into each job and may
 reach the job time limit; prefer focused measures for long histories.
+
+## Smoke test timing comparisons
+
+Set `measures` to `smoke` in **Large Performance Measure**, with `before_commit`
+and `after_commit` set to full commit references. The exact benchmark ID is
+`smoke-tests`. Smoke timing is also included when the entire suite is selected.
+The default is 37 attempts per commit; `samples` overrides it.
+
+For a two-commit comparison the workflow creates two build jobs, followed by two
+smoke jobs (one per commit), and a final report job. Each smoke job downloads only
+its packaged build and a shared compiled smoke harness. The first commit's build
+job compiles the upstream Electron smoke suite and archives its installed
+Node dependencies plus one pinned checkout of `microsoft/vscode-smoketest-express`.
+Both revisions use this identical harness and fixture, whose commits are recorded
+with every result. Series inputs run one smoke job per commit and reuse that
+commit's results in the adjacent comparison reports; smoke results are separate
+from the paired trend index. Historical builds must support the first commit's suite.
+
+Each attempt launches a fresh Mocha process against the packaged Code OSS build,
+using upstream smoke setup/cleanup to reset profiles, extensions, and the fixture
+workspace. Compilation, installation, artifact extraction, and copying diagnostic
+files are outside the timing window. The measured wall time includes process
+startup, suite setup, tests, and cleanup. The OSS suite's usual product gates apply;
+stable-version migration tests are skipped to avoid repeated stable-build downloads.
+Automatic tracing is disabled for these timings. No outliers are removed, and
+failed attempts are retained without retries. A run with no tests, failed tests, or retried tests is
+rejected. Successful samples must have identical passed-test inventories and
+pending-test counts before they can be compared.
+
+The offline report and Actions summary show **both mean and median**, before/after
+values in milliseconds, absolute/percentage changes, and successful/requested
+counts for each commit. `charts/smoke-tests.svg` compares both statistics and labels
+the commit identities. Raw `smoke-result.json`, per-attempt Mocha JSON, console
+output (bounded to the last 4 MiB), logs, and crash evidence are retained in
+`large-result-smoke-<commit-artifact>` artifacts. Interrupted jobs preserve their
+last checkpoint; missing jobs or mismatched suites remain visible as unavailable
+comparisons. Failed/missing attempts do not enter the successful-run statistics;
+a comparison with failures is marked partial. This conditional subset can be
+biased when failure rates differ, so inspect counts and diagnostics with timings.
+
+These jobs run on independent GitHub-hosted runners. Their results are descriptive:
+runner differences and external service variability can affect the observed change,
+and 37 repetitions do not remove that bias. Smoke results have no paired confidence
+interval or statistical significance label. An attempt times out after 20 minutes;
+the overall job limit is 350 minutes, so slow suites may leave a partial checkpoint.
+
+Local example (run from the repository root, after preparing both packaged builds):
+
+```sh
+node packages/large-benchmark/src/main.ts prepare-smoke \
+  --commit BEFORE_SHA --output-dir "$PWD/.large-smoke"
+# When moving the harness archive to another machine, verify and extract it:
+node packages/large-benchmark/src/main.ts extract-smoke --input-dir .large-smoke
+
+# Repeat this command for AFTER_SHA with its executable and another output directory.
+xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
+  npm run large-performance:smoke -- \
+  --commit BEFORE_SHA --build-path "$PWD/.large-before/VSCode-linux-x64/code-oss" \
+  --harness-path "$PWD/.large-smoke" --samples 37 \
+  --output-dir .large-results/smoke-before
+```
+
+Create a manifest with `--measures smoke` and generate the report using the normal
+`matrix` and `report` commands. Local jobs require Linux x64, desktop libraries,
+and Xvfb or a display. Extracting the archive is required even on the build machine.
 
 ## Local usage
 

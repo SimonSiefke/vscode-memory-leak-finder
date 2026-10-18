@@ -45,9 +45,9 @@ const result = (): Result => ({
   samples: Array.from({ length: 5 }, (_, pair) => [sample(pair, 'before', pair + 10), sample(pair, 'after', pair + 5)]).flat(),
 })
 
-test('manifest contains the full 104 runtime jobs and bundles with bounded diagnostic sample counts', () => {
-  expect(benchmarks).toHaveLength(105)
-  expect(new Set(benchmarks.map((entry) => entry.id)).size).toBe(105)
+test('manifest contains the full 104 runtime jobs, smoke tests, and bundles with bounded diagnostic sample counts', () => {
+  expect(benchmarks).toHaveLength(106)
+  expect(new Set(benchmarks.map((entry) => entry.id)).size).toBe(106)
   expect(benchmarks.filter((entry) => entry.startup)).toHaveLength(20)
   expect(benchmarks.filter((entry) => entry.collector === 'profile')).toHaveLength(12)
   expect(sampleCount(selectBenchmarks('open-small-profile')[0]!, 37)).toBe(5)

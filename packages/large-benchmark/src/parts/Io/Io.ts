@@ -13,13 +13,14 @@ export const readJson = async <T>(path: string): Promise<T> => JSON.parse(await 
 export const command = (
   executable: string,
   args: string[],
-  options: { cwd?: string; timeout?: number; inherit?: boolean } = {},
+  options: { cwd?: string; timeout?: number; inherit?: boolean; env?: NodeJS.ProcessEnv } = {},
 ): Promise<string> =>
   new Promise((resolve, reject) => {
     const child = spawn(executable, args, {
       ...(options.cwd ? { cwd: options.cwd } : {}),
       stdio: options.inherit ? 'inherit' : ['ignore', 'pipe', 'pipe'],
       detached: true,
+      env: { ...process.env, ...options.env },
     })
     let stdout = ''
     let stderr = ''
@@ -42,7 +43,7 @@ export const command = (
     })
     child.once('close', (code, signal) => {
       clearTimeout(timer)
-      if (code !== 0) reject(new Error(`${executable} exited ${code ?? signal}: ${stderr}`))
+      if (code !== 0) reject(new Error(`${executable} exited ${code ?? signal}: ${stderr}\n${stdout}`))
       else resolve(stdout.trim())
     })
   })

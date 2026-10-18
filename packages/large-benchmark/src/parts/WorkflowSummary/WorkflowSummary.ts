@@ -1,6 +1,8 @@
 import type { Comparison, generateReport } from '../Report/Report.ts'
 
-type ReportSummary = Pick<Awaited<ReturnType<typeof generateReport>>, 'commits' | 'comparisons' | 'coverage' | 'usable'>
+type ReportSummary = Pick<Awaited<ReturnType<typeof generateReport>>, 'commits' | 'comparisons' | 'coverage' | 'usable'> & {
+  smoke?: { summary: string } | undefined
+}
 
 const cell = (value: string): string =>
   value.replace(/[&<>|`*_\[\]\\]/g, (character) => `&#${character.charCodeAt(0)};`).replace(/\r?\n/g, ' ')
@@ -42,8 +44,9 @@ export const createWorkflowSummary = (summary: ReportSummary): string => {
         ? []
         : ['**Comparison incomplete:** unusable builds or no valid runtime comparisons. Available results are shown below.']),
       'Timings use medians; counts and byte sizes use means. Only complete sample pairs are compared. Change is after minus before; percentages are N/A when before is zero. Runtime confidence intervals are exploratory; small samples and intervals including zero are inconclusive. Bundle sizes are static comparisons.',
+      ...(summary.smoke ? [summary.smoke.summary] : []),
       ...(tables.length ? tables : ['No paired metric results are available.']),
-      `<details>\n<summary>Benchmark coverage (${summary.coverage.length} jobs)</summary>\n\n| Benchmark | Status | Complete pairs |\n| --- | --- | ---: |\n${summary.coverage.map((entry) => `| ${cell(entry.benchmark)} | ${cell(entry.status)} | ${entry.pairs}/${entry.requested || '?'} |`).join('\n')}\n\n</details>`,
+      `<details>\n<summary>Benchmark coverage (${summary.coverage.length} jobs)</summary>\n\n| Benchmark | Status | Complete pairs |\n| --- | --- | ---: |\n${summary.coverage.map((entry) => `| ${cell(entry.benchmark)} | ${cell(entry.status)} | ${entry.benchmark === 'smoke-tests' ? 'Independent attempts; see smoke results' : `${entry.pairs}/${entry.requested || '?'}`} |`).join('\n')}\n\n</details>`,
     ].join('\n\n') + '\n'
   )
 }
