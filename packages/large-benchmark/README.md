@@ -54,7 +54,7 @@ comparisons remain visible in the report and Actions summary. A run with no
 usable comparisons still fails after preserving the report. It leaves the
 existing CI and bot workflows unchanged.
 
-The defaults are 37 samples per commit **per adjacent comparison**, all extensions disabled, and the entire
+The defaults are 37 samples per commit **per adjacent comparison**, user-installed extensions disabled; built-in extensions remain available, and the entire
 suite. Interior commits are measured again against their next neighbor. CPU profiles and heap snapshots use at most five samples per commit.
 Each job measures both revisions on the same runner and alternates their order.
 Minified builds reject nonzero gulp exits even if an executable was already
