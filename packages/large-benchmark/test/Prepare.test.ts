@@ -52,3 +52,14 @@ test('fork preparation refuses a checkout with the wrong SHA before archiving', 
   await expect(prepareBuild(reference, output)).rejects.toThrow(`expected ${sha}`)
   expect(command.mock.calls.some(([executable]) => executable === 'tar')).toBe(false)
 })
+
+test('preparation refuses tracked source changes before archiving', async () => {
+  const output = await fs.mkdtemp(join(tmpdir(), 'large-prepare-test-'))
+  directories.push(output)
+  command.mockImplementation(async (executable, args) => {
+    if (executable === 'git' && args[0] === 'diff') throw new Error('Tracked build source was changed')
+    return executable === 'git' ? sha : ''
+  })
+  await expect(prepareBuild(reference, output)).rejects.toThrow('Tracked build source was changed')
+  expect(command.mock.calls.some(([executable]) => executable === 'tar')).toBe(false)
+})

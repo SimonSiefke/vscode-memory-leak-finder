@@ -57,6 +57,19 @@ existing CI and bot workflows unchanged.
 The defaults are 37 samples per commit **per adjacent comparison**, all extensions disabled, and the entire
 suite. Interior commits are measured again against their next neighbor. CPU profiles and heap snapshots use at most five samples per commit.
 Each job measures both revisions on the same runner and alternates their order.
+Minified builds reject nonzero gulp exits even if an executable was already
+written, and preparation rejects tracked source changes. Native minified builds
+do not insert TypeScript suppression comments before compiling.
+
+The optional `copilot_packaging_workaround` input is disabled by default. For
+revisions whose application-level `.moduleignore` rules also strip the built-in
+Copilot SDK, it gives that extension a separate ignore file retaining Copilot
+dependencies. Application exclusions stay intact, and the original build source
+is restored after gulp, including on failure. Unknown source layouts are rejected.
+Both revisions must use the same setting; `build.json` records this build-only
+adjustment. Results with this adjustment describe those completed packages and
+must disclose the workaround.
+
 Failures and unavailable facilities are recorded independently; regressions do
 not fail the workflow. The final job always gathers the available evidence and
 uploads **large-performance-report**. Download and extract it, then open

@@ -50,6 +50,7 @@ export interface BuildMetadata {
   archiveSha256: string
   nodeVersion: string
   generatedAt: string
+  buildAdjustments?: string[]
 }
 
 const metricUrl = new URL('../../../../memory-leak-finder/src/parts/PerformanceMetric/PerformanceMetric.ts', import.meta.url).href

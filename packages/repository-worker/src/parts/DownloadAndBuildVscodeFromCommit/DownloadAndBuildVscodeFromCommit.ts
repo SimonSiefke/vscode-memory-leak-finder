@@ -131,11 +131,11 @@ export const downloadAndBuildVscodeFromCommit = async (
   // Compile if needed
   if (needsCompile) {
     await InstallDependencies.ensureNestedDependencies(repoPathWithCommitHash, useNice)
-    await fixTypescriptErrors(repoPathWithCommitHash)
     if (buildVscodeMinified) {
       Logger.log(`[repository] Building minified VS Code for commit ${commitHash}...`)
       await RunCompile.runMinifiedBuild(repoPathWithCommitHash, platform, arch, useNice, minifiedExecutablePath)
     } else {
+      await fixTypescriptErrors(repoPathWithCommitHash)
       Logger.log(`[repository] Compiling VS Code for commit ${commitHash}...`)
       await RunCompile.runCompile(repoPathWithCommitHash, useNice, mainJsPath)
     }

@@ -94,3 +94,19 @@ test('runMinifiedBuild runs the platform minified vscode gulp task', async () =>
   expect(execCalls[0]?.[1]).toEqual(['gulp', 'vscode-linux-x64-min'])
   expect(execCalls[0]?.[2]).toEqual({ cwd, reject: false })
 })
+
+test('runMinifiedBuild rejects a failed gulp even when an executable exists', async () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke(method: string) {
+      if (method === 'FileSystem.readFileContent') return '20.0.0'
+      if (method === 'FileSystem.exists') return true
+      if (method === 'FileSystem.exec') return { exitCode: 1, stderr: 'SDK packaging failed', stdout: '' }
+      throw new Error(`not implemented: ${method}`)
+    },
+  })
+  FileSystemWorker.set(mockRpc)
+  await expect(runMinifiedBuild('/test/repo', 'linux', 'x64', false, '/test/VSCode-linux-x64/code-oss')).rejects.toThrow(
+    'vscode-linux-x64-min exited with code 1',
+  )
+})

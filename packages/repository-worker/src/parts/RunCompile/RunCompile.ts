@@ -3,6 +3,7 @@ import { exec } from '../Exec/Exec.ts'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import { getNpmPathFromNvmrc } from '../GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
 import * as Path from '../Path/Path.ts'
+import { withCopilotPackagingWorkaround } from '../WithCopilotPackagingWorkaround/WithCopilotPackagingWorkaround.ts'
 
 const runBuildCommand = async (cwd: string, useNice: boolean, npmPath: string, args: readonly string[]) => {
   if (useNice) {
@@ -45,12 +46,15 @@ export const runMinifiedBuild = async (cwd: string, platform: string, arch: stri
   const npmPath = await getNpmPathFromNvmrc(cwd)
   const npxPath = Path.join(dirname(npmPath), 'npx')
   const buildTask = `vscode-${platform}-${arch}-min`
-  const result = await runBuildCommand(cwd, useNice, npxPath, ['gulp', buildTask])
+  const build = () => runBuildCommand(cwd, useNice, npxPath, ['gulp', buildTask])
+  const result =
+    process.env.VSCODE_BENCHMARK_COPILOT_PACKAGING_WORKAROUND === 'true' ? await withCopilotPackagingWorkaround(cwd, build) : await build()
 
   if (result.exitCode) {
     console.log(`[repository] ${buildTask} exitCode: ${result.exitCode}`)
     console.log(`[repository] ${buildTask} stdout: ${result.stdout}`)
     console.log(`[repository] ${buildTask} stderr: ${result.stderr}`)
+    throw new Error(`Build failed: ${buildTask} exited with code ${result.exitCode}`)
   }
 
   if (!(await FileSystemWorker.pathExists(executablePath))) {

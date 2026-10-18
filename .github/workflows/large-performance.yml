@@ -31,6 +31,10 @@ on:
         description: Optional comma-separated benchmark IDs; empty runs the entire suite
         type: string
         default: ''
+      copilot_packaging_workaround:
+        description: Explicit build-only workaround for revisions that strip the built-in Copilot SDK
+        type: boolean
+        default: false
 
 run-name: Large Performance ${{ inputs.version_range || (inputs.commits && 'version trend comparison') || format('{0} → {1}', inputs.before_commit, inputs.after_commit) }}
 
@@ -84,6 +88,7 @@ jobs:
       matrix: ${{ fromJSON(needs.initialize.outputs.build_matrix) }}
     env:
       COMMIT: ${{ matrix.commit }}
+      VSCODE_BENCHMARK_COPILOT_PACKAGING_WORKAROUND: ${{ inputs.copilot_packaging_workaround }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

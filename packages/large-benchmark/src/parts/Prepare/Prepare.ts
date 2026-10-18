@@ -40,6 +40,7 @@ export const prepareBuild = async (commit: string, output: string): Promise<Buil
   // Verify the checkout rather than relying on a pre-existing executable alone.
   const actualCommit = await command('git', ['rev-parse', 'HEAD'], { cwd: join(dirname(buildPath), 'source') })
   if (actualCommit !== sha) throw new Error(`Build checkout is ${actualCommit}, expected ${sha}`)
+  await command('git', ['diff', '--quiet', 'HEAD', '--'], { cwd: join(dirname(buildPath), 'source') })
   const archive = join(output, 'vscode.tar.gz')
   await command('tar', ['-czf', archive, '-C', dirname(buildPath), 'VSCode-linux-x64'], { timeout: 300000 })
   const metadata: BuildMetadata = {
@@ -51,6 +52,13 @@ export const prepareBuild = async (commit: string, output: string): Promise<Buil
     archiveSha256: await sha256(archive),
     nodeVersion: process.version,
     generatedAt: new Date().toISOString(),
+    ...(process.env.VSCODE_BENCHMARK_COPILOT_PACKAGING_WORKAROUND === 'true'
+      ? {
+          buildAdjustments: [
+            'Built-in Copilot packaging uses a separate moduleignore without application-level Copilot exclusions; build source restored after gulp.',
+          ],
+        }
+      : {}),
   }
   await writeJson(join(output, 'build.json'), metadata)
   await writeJson(join(output, 'status.json'), { status: 'success', ...metadata })
