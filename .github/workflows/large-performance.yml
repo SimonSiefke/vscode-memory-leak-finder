@@ -3,6 +3,10 @@ name: Large Performance Measure
 on:
   workflow_dispatch:
     inputs:
+      report_run_id:
+        description: Render artifacts from an existing run without building or measuring
+        type: string
+        default: ''
       version_range:
         description: Inclusive stable version range, e.g. 1.120.0...1.130.0 (includes patch releases); alternative to commit inputs
         type: string
@@ -36,10 +40,11 @@ on:
         type: boolean
         default: false
 
-run-name: Large Performance ${{ inputs.version_range || (inputs.commits && 'version trend comparison') || format('{0} → {1}', inputs.before_commit, inputs.after_commit) }}
+run-name: Large Performance ${{ (inputs.report_run_id && format('report for run {0}', inputs.report_run_id)) || inputs.version_range || (inputs.commits && 'version trend comparison') || format('{0} → {1}', inputs.before_commit, inputs.after_commit) }}
 
 permissions:
   contents: read
+  actions: read
 
 env:
   VERSION_RANGE: ${{ inputs.version_range }}
@@ -52,6 +57,7 @@ env:
 
 jobs:
   initialize:
+    if: ${{ inputs.report_run_id == '' }}
     runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.manifest.outputs.matrix }}
@@ -79,6 +85,7 @@ jobs:
           retention-days: 30
 
   build:
+    if: ${{ inputs.report_run_id == '' }}
     needs: initialize
     runs-on: ubuntu-24.04
     timeout-minutes: 350
@@ -126,7 +133,7 @@ jobs:
 
   measure:
     needs: [initialize, build]
-    if: ${{ always() && needs.initialize.result == 'success' && !cancelled() }}
+    if: ${{ always() && inputs.report_run_id == '' && needs.initialize.result == 'success' && !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     continue-on-error: true
@@ -191,10 +198,18 @@ jobs:
 
   report:
     needs: [initialize, build, measure]
-    if: ${{ always() && needs.initialize.result == 'success' }}
+    if: ${{ always() && (needs.initialize.result == 'success' || inputs.report_run_id != '') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    env:
+      REPORT_RUN_ID: ${{ inputs.report_run_id || github.run_id }}
     steps:
+      - name: Validate source run ID
+        run: |
+          if [[ ! "$REPORT_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo 'report_run_id must be numeric' >&2
+            exit 1
+          fi
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
@@ -205,18 +220,24 @@ jobs:
         with:
           name: large-manifest
           path: .large-manifest
+          run-id: ${{ inputs.report_run_id || github.run_id }}
+          github-token: ${{ github.token }}
       - name: Download raw result artifacts
         continue-on-error: true
         uses: actions/download-artifact@v8
         with:
           pattern: large-result-*
           path: .large-downloads
+          run-id: ${{ inputs.report_run_id || github.run_id }}
+          github-token: ${{ github.token }}
       - name: Download build status artifacts
         continue-on-error: true
         uses: actions/download-artifact@v8
         with:
           pattern: large-build-status-*
           path: .large-downloads
+          run-id: ${{ inputs.report_run_id || github.run_id }}
+          github-token: ${{ github.token }}
       - name: Generate comparison charts and offline report
         run: |
           mkdir -p .large-downloads
@@ -228,6 +249,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: large-performance-report
+          include-hidden-files: true
           path: |
             .large-report/**/*.html
             .large-report/**/*.svg
