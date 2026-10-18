@@ -1,5 +1,5 @@
 export type Revision = 'before' | 'after'
-export type Collector = 'timing' | 'instructions' | 'resources' | 'renderer' | 'timeline' | 'profile' | 'memory' | 'bundles'
+export type Collector = 'smoke' | 'timing' | 'instructions' | 'resources' | 'renderer' | 'timeline' | 'profile' | 'memory' | 'bundles'
 export type Status = 'success' | 'partial' | 'failed' | 'unavailable' | 'missing'
 
 export interface Benchmark {

@@ -41,10 +41,12 @@ export const benchmarks: Benchmark[] = [
       diagnostic: collector === 'memory' || collector === 'profile',
     })),
   ),
+  { id: 'smoke-tests', scenario: 'smoke-tests', collector: 'smoke', startup: false, cache: 'action', diagnostic: false },
   { id: 'bundles', scenario: 'bundles', collector: 'bundles', startup: false, cache: 'static', diagnostic: false },
 ]
 
 export const measureGroups = [
+  'smoke',
   'startup-times',
   'startup',
   'timing',

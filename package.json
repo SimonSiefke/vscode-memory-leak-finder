@@ -18,6 +18,7 @@
     "large-performance": "node packages/large-benchmark/src/main.ts",
     "large-performance:prepare": "node packages/large-benchmark/src/main.ts prepare",
     "large-performance:measure": "node packages/large-benchmark/src/main.ts measure",
+    "large-performance:smoke": "node packages/large-benchmark/src/main.ts smoke",
     "large-performance:report": "node packages/large-benchmark/src/main.ts report",
     "measure-local-vscode-comparison": "npm --prefix packages/build run measure-local-vscode-comparison --",
     "measure-codex-webview-load-time": "npm --prefix packages/build run measure-codex-webview-load-time --",
