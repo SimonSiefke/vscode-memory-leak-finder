@@ -1,3 +1,4 @@
+import { compareDuplicateObjectGraphs } from '../CompareDuplicateObjectGraphs/CompareDuplicateObjectGraphs.ts'
 import { compareDeadClosureVariables } from '../CompareDeadClosureVariables/CompareDeadClosureVariables.ts'
 import { compareDomTimerCount } from '../CompareDomTimerCount/CompareDomTimerCount.ts'
 import * as CompareArrayBufferBytes from '../CompareArrayBufferBytes/CompareArrayBufferBytes.ts'
@@ -41,6 +42,7 @@ import * as ParseHeapSnapshotStringsCount from '../ParseHeapSnapshotStringsCount
 import * as ParseUserStrings from '../ParseUserStrings/ParseUserStrings.ts'
 
 export const commandMap = {
+  'HeapSnapshot.compareDuplicateObjectGraphs': compareDuplicateObjectGraphs,
   'HeapSnapshot.compareDeadClosureVariables': compareDeadClosureVariables,
   'HeapSnapshot.compareArrayBufferBytes': CompareArrayBufferBytes.compareArrayBufferBytes,
   'HeapSnapshot.compareNativeContextCount': CompareNativeContextCount.compareNativeContextCount,

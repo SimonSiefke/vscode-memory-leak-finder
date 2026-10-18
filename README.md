@@ -150,6 +150,22 @@ node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after -
 npm run build-charts
 ```
 
+### DuplicateObjectGraphs
+
+Finds structurally identical plain-object graphs, such as `{x: 1}` and a separate `{x: 1}`. Property order is ignored; prototypes, cycles and shared-reference topology are preserved. A shared child differs from two separate equal children. SHA-256 fingerprints select candidate groups, then iterative graph verification checks every match, including hash collisions.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure duplicate-object-graphs --only '^editor-open.ts' --runs 1
+```
+
+The snapshots capture numeric property values. Objects with omitted indexed storage, accessor pairs or ambiguous symbol keys are treated as opaque, as are arrays, functions, symbols, BigInts, weak collections, Maps, Sets, class instances and native objects. Opaque values match by snapshot identity rather than description: two wrappers referencing the same symbol or WeakMap can match; wrappers referencing different ones cannot. Short complete strings and available numeric values compare by value. Long, truncated and rope strings, missing numeric values and ambiguous floating-point zero stay opaque. Property descriptor flags and insertion order are outside this data-equivalence measure.
+
+Reports exclude empty-object groups and rank groups by `duplicateCount`, with duplicate bytes breaking ties. Each group includes its count, duplicate count, duplicate bytes and a bounded JSON preview with plain strings, nested objects and arrays. Cycles, depth limits and opaque values use string placeholders. Fingerprints and heap node IDs are kept internally. Arrays remain opaque for matching even though their contents can be previewed. Empty objects still participate in nested graph comparisons and shared-reference checks.
+
+The measure compares overall redundant object bytes before and after. A leak is an increase in that total. Bytes count the shallow sizes of duplicate nonempty plain-object nodes, keeping the smallest instance in each group. Referenced strings, backing stores and opaque values are excluded, and nested object nodes are counted once rather than summing overlapping retained graphs. This estimates duplicate footprint, not bytes guaranteed reclaimable by merging objects; equivalent roots can share or overlap the same physical graph.
+
+Acyclic hashes are computed bottom-up once; cyclic dependencies use eight bounded refinement rounds followed by exact verification. Hash lookup is expected constant time, while hashing and checking a graph still depend on its size. Work limits bound object count and verification visits; exceeding them produces an explicit error instead of comparing partial totals. The internal analyzer exposes `complete`, statistics and limits for offline diagnostics. Default limits are 500,000 analyzable objects, 4,096 properties per object, 50,000 nodes per verification and 20 million verification steps. Snapshots are streamed and analyzed sequentially to bound memory, and shared graph details are not repeated in the report.
+
 ### DeadClosureVariables
 
 Finds variables retained in closure contexts that no surviving closure can access, using the embedded V8 scope metadata analyzed by Chrome DevTools. Reports only function locations whose dead retained bytes increased, sorted by byte growth. Each row includes the closure name, before/after closure counts, `beforeDeadBytes`, `deadBytes`, `delta`, generated `sourceLocation`, and source-mapped `originalLocation` / `originalName` when a source map is available. `beforeDetails` and `afterDetails` contain only `{deadBytes}`. A leak is an increase in the overall dead-byte total between snapshots.
