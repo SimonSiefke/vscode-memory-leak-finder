@@ -163,6 +163,7 @@ export * as MeasureSynchronousDomReadCount from '../MeasureSynchronousDomReadCou
 export * as MeasureSynchronousFileSystem from '../MeasureSynchronousFileSystem/MeasureSynchronousFileSystem.ts'
 export * as MeasureTextDecoderCount from '../MeasureTextDecoderCount/MeasureTextDecoderCount.ts'
 export * as MeasureTextEncoderCount from '../MeasureTextEncoderCount/MeasureTextEncoderCount.ts'
+export * as MeasureTrackedAllocationBytes from '../MeasureTrackedAllocationBytes/MeasureTrackedAllocationBytes.ts'
 export * as MeasureTrackedAllocationLeaks from '../MeasureTrackedAllocationLeaks/MeasureTrackedAllocationLeaks.ts'
 export * as MeasureTrackedAllocationPerformance from '../MeasureTrackedAllocationPerformance/MeasureTrackedAllocationPerformance.ts'
 export * as MeasureTrackedAllocations from '../MeasureTrackedAllocations/MeasureTrackedAllocations.ts'
