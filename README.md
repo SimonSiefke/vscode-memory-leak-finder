@@ -36,6 +36,18 @@ node packages/build/src/mergeArtifacts.ts
 
 ## Measures
 
+### RetainedSubstrings
+
+Finds large flat string parents (at least 64 KiB of snapshot shallow size) retained through V8 sliced strings. Reports each parent once, its bytes, slice count, and up to eight example slices with shortest strong paths from the snapshot root. Parents with independent strong references are identified separately. Removing all slice-to-parent edges and checking reachability establishes whether the slices collectively provide the only strong paths to a parent.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure retained-substrings --only base
+```
+
+Positive growth in parent bytes reachable exclusively through slices signals a suspected leak. This measures parent footprint, not guaranteed savings from copying substrings: slice lengths and offsets are not available reliably, and keeping a slice may be intentional. Shared parents are counted once; weak edges and non-root shortcut edges do not establish retention. Only flat parents exposed as `string` nodes are counted; rope strings and external backing storage not included in shallow size are outside coverage.
+
+Reports show the 50 largest parents, with complete totals even when details are truncated. Paths include at most 32 segments nearest the slice, with an explicit truncation flag, and snapshot names are limited to 80 characters. V8 may label slices simply `(sliced string)`; actual substring contents, lengths, and offsets are not reconstructed. Before/after snapshots are parsed sequentially and removed after comparison, including failed comparisons.
+
 ### PendingPromisesWithRetainers
 
 Finds pending Promises added during a test and reports their shortest strong path from a GC root, together with per-path counts and retained bytes. Inspector query handles are released before the final heap snapshot.
@@ -153,6 +165,20 @@ Reports exclude empty-object groups and rank groups by `duplicateCount`, with du
 The measure compares overall redundant object bytes before and after. A leak is an increase in that total. Bytes count the shallow sizes of duplicate nonempty plain-object nodes, keeping the smallest instance in each group. Referenced strings, backing stores and opaque values are excluded, and nested object nodes are counted once rather than summing overlapping retained graphs. This estimates duplicate footprint, not bytes guaranteed reclaimable by merging objects; equivalent roots can share or overlap the same physical graph.
 
 Acyclic hashes are computed bottom-up once; cyclic dependencies use eight bounded refinement rounds followed by exact verification. Hash lookup is expected constant time, while hashing and checking a graph still depend on its size. Work limits bound object count and verification visits; exceeding them produces an explicit error instead of comparing partial totals. The internal analyzer exposes `complete`, statistics and limits for offline diagnostics. Default limits are 500,000 analyzable objects, 4,096 properties per object, 50,000 nodes per verification and 20 million verification steps. Snapshots are streamed and analyzed sequentially to bound memory, and shared graph details are not repeated in the report.
+
+### DeadClosureVariables
+
+Finds variables retained in closure contexts that no surviving closure can access, using the embedded V8 scope metadata analyzed by Chrome DevTools. Reports only function locations whose dead retained bytes increased, sorted by byte growth. Each row includes the closure name, before/after closure counts, `beforeDeadBytes`, `deadBytes`, `delta`, generated `sourceLocation`, and source-mapped `originalLocation` / `originalName` when a source map is available. `beforeDetails` and `afterDetails` contain only `{deadBytes}`. A leak is an increase in the overall dead-byte total between snapshots.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure dead-closure-variables --only base
+```
+
+Requires a Chromium/Electron or Node.js runtime that emits `scopes`, `scope_context_vars`, and `scope_uses` in heap snapshots. Older runtimes fail with an unsupported-metadata error. Scripts that could not be analyzed are listed in `scriptsWithoutScopes`; empty scope tables can therefore produce partial results. VS Code 1.142.0 ships Electron 43 / Chromium 150, which lacks this metadata. End-to-end validation uses the VS Code application with Electron 46 nightly / Chromium 158.
+
+Bytes are the union of the retained sizes of dead variable values, with overlapping dominator subtrees counted once per closure and once in the overall total. Closures are grouped by generated URL, line, column and name, independently of heap object IDs. Shared retained values are counted once within each function group; different functions can retain the same context, so row totals must not be added together. Functions without snapshot locations use scope identity, or object identity when no scope metadata is available, rather than merging unrelated anonymous functions. These sizes indicate memory impact, not guaranteed reclaimable memory: values may also have other live references. Suspended generators and async functions are treated as live, including variables used by functions they can instantiate.
+
+The context classification is adapted from [Chrome DevTools ContextAnalyzer](https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/entrypoints/heap_snapshot_worker/ContextAnalyzer.ts), under its BSD license.
 
 ### ArrayCount
 

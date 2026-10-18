@@ -1,4 +1,5 @@
 import { compareDuplicateObjectGraphs } from '../CompareDuplicateObjectGraphs/CompareDuplicateObjectGraphs.ts'
+import { compareDeadClosureVariables } from '../CompareDeadClosureVariables/CompareDeadClosureVariables.ts'
 import { compareDomTimerCount } from '../CompareDomTimerCount/CompareDomTimerCount.ts'
 import * as CompareArrayBufferBytes from '../CompareArrayBufferBytes/CompareArrayBufferBytes.ts'
 import * as CompareNativeContextCount from '../CompareNativeContextCount/CompareNativeContextCount.ts'
@@ -15,6 +16,7 @@ import * as CompareObjectShapeDifference from '../CompareObjectShapeDifference/C
 import * as ComparePerformanceMarks from '../ComparePerformanceMarks/ComparePerformanceMarks.ts'
 import * as CompareNamedClosureCountWithReferences2 from '../CompareNamedClosureCountWithReferences2/CompareNamedClosureCountWithReferences2.ts'
 import * as CompareStringCount from '../CompareStringCount/CompareStringCount.ts'
+import * as CompareRetainedSubstrings from '../CompareRetainedSubstrings/CompareRetainedSubstrings.ts'
 import * as CreateMemoryCitySnapshot from '../CreateMemoryCitySnapshot/CreateMemoryCitySnapshot.ts'
 import * as CreatePendingPromiseRetainers from '../CreatePendingPromiseRetainers/CreatePendingPromiseRetainers.ts'
 import * as CreateRetainedBytesBySource from '../CreateRetainedBytesBySource/CreateRetainedBytesBySource.ts'
@@ -41,6 +43,7 @@ import * as ParseUserStrings from '../ParseUserStrings/ParseUserStrings.ts'
 
 export const commandMap = {
   'HeapSnapshot.compareDuplicateObjectGraphs': compareDuplicateObjectGraphs,
+  'HeapSnapshot.compareDeadClosureVariables': compareDeadClosureVariables,
   'HeapSnapshot.compareArrayBufferBytes': CompareArrayBufferBytes.compareArrayBufferBytes,
   'HeapSnapshot.compareNativeContextCount': CompareNativeContextCount.compareNativeContextCount,
   'HeapSnapshot.compareCompiledCodeSize': CompareCompiledCodeSize.compareCompiledCodeSize,
@@ -57,6 +60,7 @@ export const commandMap = {
   'HeapSnapshot.comparePerformanceMarks': ComparePerformanceMarks.comparePerformanceMarks,
   'HeapSnapshot.compareNamedClosureCountWithReferences2':
     CompareNamedClosureCountWithReferences2.compareNamedClosureCountWithReferencesFromHeapSnapshot2,
+  'HeapSnapshot.compareRetainedSubstrings': CompareRetainedSubstrings.compareRetainedSubstrings,
   'HeapSnapshot.compareStringCount': CompareStringCount.compareStringCount,
   'HeapSnapshot.compareStrings2': compareStrings2,
   'HeapSnapshot.createMemoryCitySnapshot': CreateMemoryCitySnapshot.createMemoryCitySnapshot,
