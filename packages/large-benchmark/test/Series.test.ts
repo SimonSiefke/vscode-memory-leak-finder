@@ -113,7 +113,7 @@ test('matrix command emits build and measurement matrices and supports legacy be
         .split('\n')
         .map((line) => [line.slice(0, line.indexOf('=')), JSON.parse(line.slice(line.indexOf('=') + 1))]),
     )
-    expect(outputs.build_matrix).toEqual({ commit: commits })
+    expect(outputs.build_matrix).toEqual({ include: commits.map((commit) => ({ commit, artifact: commit })) })
     expect(outputs.matrix.include).toHaveLength(8)
     expect(JSON.parse(await readFile(join(directory, 'series', 'manifest.json'), 'utf8'))).toMatchObject({ schemaVersion: 2, commits })
     await largePerformance([
@@ -307,4 +307,60 @@ test('series reports reject overlapping directories before writing', async () =>
     [join(directory, 'input'), directory],
   ])
     await expect(generateTrendReport({ input: input!, output: output!, manifest: manifest() })).rejects.toThrow('separate directories')
+})
+
+test.each(['pair', 'series'])('qualified fork references survive the %s workflow matrices and offline report', async (mode) => {
+  const directory = await temporary()
+  const before = `microsoft/vscode@${commits[0]}`
+  const after = `simonsiefke/vscode@${commits[1]}`
+  const previous = process.env.GITHUB_OUTPUT
+  const githubOutput = join(directory, 'github-output')
+  process.env.GITHUB_OUTPUT = githubOutput
+  try {
+    await largePerformance([
+      'matrix',
+      ...(mode === 'series' ? ['--commits', JSON.stringify([before, after])] : ['--before-commit', before, '--after-commit', after]),
+      '--benchmark-filter',
+      benchmark.id,
+      '--output-dir',
+      join(directory, 'manifest'),
+    ])
+  } finally {
+    if (previous === undefined) delete process.env.GITHUB_OUTPUT
+    else process.env.GITHUB_OUTPUT = previous
+  }
+  const outputs = Object.fromEntries(
+    (await readFile(githubOutput, 'utf8'))
+      .trim()
+      .split('\n')
+      .map((line) => [line.slice(0, line.indexOf('=')), JSON.parse(line.slice(line.indexOf('=') + 1))]),
+  )
+  expect(outputs.build_matrix).toEqual({
+    include: [
+      { commit: before, artifact: commits[0] },
+      { commit: after, artifact: `simonsiefke-vscode-${commits[1]}` },
+    ],
+  })
+  expect(outputs.matrix.include[0]).toMatchObject({
+    before,
+    after,
+    beforeArtifact: commits[0],
+    afterArtifact: `simonsiefke-vscode-${commits[1]}`,
+  })
+  const data = { ...result(0, 100, 90), commits: { before, after } }
+  await writeJson(join(directory, 'input', 'large-result-pair-1-1', 'result.json'), data)
+  jest.spyOn(console, 'log').mockImplementation(() => {})
+  await largePerformance([
+    'report',
+    '--manifest',
+    join(directory, 'manifest', 'manifest.json'),
+    '--input-dir',
+    join(directory, 'input'),
+    '--output-dir',
+    join(directory, 'report'),
+  ])
+  const html = await readFile(join(directory, 'report', 'index.html'), 'utf8')
+  expect(html).toContain(before)
+  expect(html).toContain(after)
+  expect(html).toContain('startupTime')
 })

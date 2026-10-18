@@ -1,3 +1,4 @@
+import { parseCommitReference } from '../CommitReference/CommitReference.ts'
 import type { Benchmark } from '../Types/Types.ts'
 import type { StableRelease } from '../VersionRange/VersionRange.ts'
 
@@ -17,11 +18,11 @@ export interface SeriesManifest {
 
 export const validateCommits = (value: unknown): string[] => {
   if (!Array.isArray(value) || value.length < 2 || value.length > 256)
-    throw new Error('commits must be a JSON array of 2 to 256 full 40-character SHAs, ordered oldest to newest')
-  if (!value.every((sha) => typeof sha === 'string' && /^[0-9a-f]{40}$/i.test(sha)))
-    throw new Error('commits must contain only full 40-character SHAs')
-  const commits = value.map((sha: string) => sha.toLowerCase())
-  if (new Set(commits).size !== commits.length) throw new Error('commits must be unique')
+    throw new Error('commits must be a JSON array of 2 to 256 full SHAs or owner/vscode@SHA references, ordered oldest to newest')
+  if (!value.every((reference) => typeof reference === 'string')) throw new Error('commits must contain only commit references')
+  const parsed = value.map((reference: string) => parseCommitReference(reference))
+  const commits = parsed.map((commit) => commit.reference)
+  if (new Set(parsed.map((commit) => commit.artifact)).size !== commits.length) throw new Error('commits must be unique')
   return commits
 }
 
@@ -30,7 +31,7 @@ export const parseCommits = (json: string): string[] => {
   try {
     value = JSON.parse(json)
   } catch {
-    throw new Error('commits must be a JSON array of full 40-character SHAs')
+    throw new Error('commits must be a JSON array of full SHAs or owner/vscode@SHA references')
   }
   return validateCommits(value)
 }

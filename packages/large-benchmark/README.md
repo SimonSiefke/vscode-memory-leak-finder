@@ -28,6 +28,16 @@ with one of these revision inputs:
   The workflow preserves the supplied order rather than sorting hashes.
 - `before_commit` and `after_commit`: the original two-build comparison.
 
+All explicit commit inputs accept either a full 40-character SHA (from
+`microsoft/vscode`) or `owner/vscode@<full 40-character SHA>`. For a fork PR,
+set `before_commit` to `microsoft/vscode@<base SHA>` and `after_commit` to
+`SimonSiefke/vscode@<PR head SHA>`. Qualified references also work in the
+`commits` array and in local `--commit`, `--before-commit`, and `--after-commit`
+options. Repository names and hashes are case insensitive. Use the same reference
+when preparing, extracting, and measuring a build; metadata and reports preserve
+the repository identity. Branch names, PR numbers, and abbreviated hashes are not
+accepted.
+
 These input modes cannot be combined. For example, set `version_range` to
 `1.120.0...1.130.0`, set `measures` to `startup-times`, and leave all commit inputs empty.
 An unavailable release API, unknown endpoint, missing Linux build, or invalid
@@ -156,6 +166,11 @@ cd packages/large-benchmark
 # Build/archive each revision; uses the existing commit build pipeline.
 npm run prepare-build -- --commit BEFORE_SHA --output-dir .tmp/large-before
 npm run prepare-build -- --commit AFTER_SHA --output-dir .tmp/large-after
+
+# A fork comparison uses qualified references throughout, for example:
+# npm run prepare-build -- --commit SimonSiefke/vscode@FULL_SHA --output-dir .tmp/large-fork
+# npm run matrix -- --before-commit microsoft/vscode@BASE_SHA \
+#   --after-commit SimonSiefke/vscode@HEAD_SHA --measures startup-times
 
 # Validate the checksums and extract the packaged executables.
 npm run benchmark -- extract --commit BEFORE_SHA --input-dir .tmp/large-before

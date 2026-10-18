@@ -3,6 +3,7 @@ import { createReadStream } from 'node:fs'
 import { access, mkdir, readFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { parseCommitReference } from '../CommitReference/CommitReference.ts'
 import { command, writeJson } from '../Io/Io.ts'
 import type { BuildMetadata } from '../Types/Types.ts'
 
@@ -16,16 +17,15 @@ export const sha256 = async (path: string): Promise<string> => {
 
 export const prepareBuild = async (commit: string, output: string): Promise<BuildMetadata> => {
   if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('Large performance builds require Linux x64')
-  if (!/^[0-9a-f]{40}$/i.test(commit)) throw new Error('A full 40-character commit SHA is required')
+  const { reference, sha, buildReference } = parseCommitReference(commit)
   output = resolve(output)
   await mkdir(output, { recursive: true })
-  const sha = commit.toLowerCase()
   await command(
     process.execPath,
     [
       join(repositoryRoot, 'packages/cli/bin/test.js'),
       '--commit',
-      sha,
+      buildReference,
       '--build-vscode-minified',
       '--setup-only',
       '--only',
@@ -44,7 +44,7 @@ export const prepareBuild = async (commit: string, output: string): Promise<Buil
   await command('tar', ['-czf', archive, '-C', dirname(buildPath), 'VSCode-linux-x64'], { timeout: 300000 })
   const metadata: BuildMetadata = {
     schemaVersion: 1,
-    commit: sha,
+    commit: reference,
     platform: 'linux',
     arch: 'x64',
     executable: 'VSCode-linux-x64/code-oss',
@@ -61,7 +61,7 @@ export const extractBuild = async (directory: string, expectedCommit: string): P
   const metadata = JSON.parse(await readFile(join(directory, 'build.json'), 'utf8')) as BuildMetadata
   if (
     metadata.schemaVersion !== 1 ||
-    metadata.commit !== expectedCommit.toLowerCase() ||
+    metadata.commit !== parseCommitReference(expectedCommit).reference ||
     metadata.platform !== 'linux' ||
     metadata.arch !== 'x64' ||
     metadata.executable !== 'VSCode-linux-x64/code-oss'

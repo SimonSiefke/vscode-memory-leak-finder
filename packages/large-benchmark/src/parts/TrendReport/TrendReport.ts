@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { commitLabel } from '../CommitReference/CommitReference.ts'
 import { errorMessage, readJson } from '../Io/Io.ts'
 import { escapeHtml, findResults, generateReport, validateReportDirectories, type Comparison } from '../Report/Report.ts'
 import { commitPairs, validateCommits, type SeriesManifest } from '../Series/Series.ts'
@@ -57,7 +58,7 @@ export const trendsFor = (reports: PairReport[]): Trend[] => {
   })
 }
 
-export const trendSvg = (trend: Trend, commits: string[], labels = commits.map((commit) => commit.slice(0, 10))): string => {
+export const trendSvg = (trend: Trend, commits: string[], labels = commits.map(commitLabel)): string => {
   const values = [100, ...trend.points.filter((point): point is number => point !== null)]
   const min = Math.min(...values) * 0.95
   const max = Math.max(...values) * 1.05
@@ -93,7 +94,7 @@ export const generateTrendReport = async (options: { input: string; output: stri
       releases.some((release, index) => release?.commit !== commits[index] || typeof release?.version !== 'string'))
   )
     throw new Error('Invalid release labels in benchmark manifest')
-  const labels = commits.map((commit, index) => releases?.[index]?.version ?? commit.slice(0, 10))
+  const labels = commits.map((commit, index) => releases?.[index]?.version ?? commitLabel(commit))
   const pairs = commitPairs(commits)
   const paths = new Map(pairs.map((pair) => [`${pair.before}:${pair.after}`, [] as string[]]))
   const diagnostics: string[] = []
