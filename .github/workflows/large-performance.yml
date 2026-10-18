@@ -8,7 +8,7 @@ on:
         type: string
         default: ''
       commits:
-        description: JSON array of full VS Code SHAs in version order (2–256); or use before/after below
+        description: JSON array of full SHAs or owner/vscode@SHA references in version order (2–256)
         type: string
         default: ''
       measures:
@@ -16,11 +16,11 @@ on:
         type: string
         default: ''
       before_commit:
-        description: Before VS Code commit (full 40-character SHA)
+        description: Before VS Code commit (full SHA or owner/vscode@SHA)
         required: false
         type: string
       after_commit:
-        description: After VS Code commit (full 40-character SHA)
+        description: After VS Code commit (full SHA or owner/vscode@SHA)
         required: false
         type: string
       samples:
@@ -102,7 +102,7 @@ jobs:
       - name: Upload executable package
         uses: actions/upload-artifact@v7
         with:
-          name: large-build-${{ matrix.commit }}
+          name: large-build-${{ matrix.artifact }}
           path: |
             .large-build/vscode.tar.gz
             .large-build/build.json
@@ -114,7 +114,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: large-build-status-${{ matrix.commit }}
+          name: large-build-status-${{ matrix.artifact }}
           path: .large-build/status.json
           retention-days: 30
           overwrite: true
@@ -150,11 +150,11 @@ jobs:
           sudo sysctl -w kernel.perf_event_paranoid=-1 || true
       - uses: actions/download-artifact@v8
         with:
-          name: large-build-${{ matrix.before }}
+          name: large-build-${{ matrix.beforeArtifact }}
           path: .large-builds/before
       - uses: actions/download-artifact@v8
         with:
-          name: large-build-${{ matrix.after }}
+          name: large-build-${{ matrix.afterArtifact }}
           path: .large-builds/after
       - name: Verify and extract before build
         id: before

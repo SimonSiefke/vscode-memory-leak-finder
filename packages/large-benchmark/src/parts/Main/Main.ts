@@ -1,6 +1,7 @@
 import { appendFile, mkdir } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { measureBundles } from '../Bundles/Bundles.ts'
+import { parseCommitReference } from '../CommitReference/CommitReference.ts'
 import { errorMessage, readJson, writeJson } from '../Io/Io.ts'
 import { selectBenchmarks } from '../Manifest/Manifest.ts'
 import { extractBuild, prepareBuild } from '../Prepare/Prepare.ts'
@@ -23,9 +24,8 @@ export interface Manifest {
 export const largePerformance = async (argv: string[]): Promise<void> => {
   const { get, required, samples, output } = parseOptions(argv.slice(1))
   const commits = (): { before: string; after: string } => {
-    const before = required('--before-commit').toLowerCase()
-    const after = required('--after-commit').toLowerCase()
-    if (![before, after].every((sha) => /^[0-9a-f]{40}$/.test(sha))) throw new Error('before/after commits must be full 40-character SHAs')
+    const before = parseCommitReference(required('--before-commit')).reference
+    const after = parseCommitReference(required('--after-commit')).reference
     return { before, after }
   }
   switch (argv[0]) {
@@ -45,8 +45,16 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
           ? { schemaVersion: 2, commits: revisions, samples, benchmarks: selected, ...(releases ? { releases } : {}) }
           : { schemaVersion: 1, commits: commits(), samples, benchmarks: selected }
       await writeJson(join(output, 'manifest.json'), manifest)
-      const matrix = JSON.stringify(seriesMatrix(revisions, selected))
-      const buildMatrix = JSON.stringify({ commit: revisions })
+      const matrix = JSON.stringify({
+        include: seriesMatrix(revisions, selected).include.map((pair) => ({
+          ...pair,
+          beforeArtifact: parseCommitReference(pair.before).artifact,
+          afterArtifact: parseCommitReference(pair.after).artifact,
+        })),
+      })
+      const buildMatrix = JSON.stringify({
+        include: revisions.map((commit) => ({ commit, artifact: parseCommitReference(commit).artifact })),
+      })
       if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, `matrix=${matrix}\nbuild_matrix=${buildMatrix}\n`)
       else console.log(matrix)
       break
