@@ -56,10 +56,13 @@ export const compare = async (
   _context?: unknown,
   _session?: Session,
   state?: DeadClosureVariablesState,
+  options?: { mode?: 'growth' | 'total' },
 ) => {
   try {
     await using rpc = await launchHeapSnapshotWorker()
-    return await rpc.invoke('HeapSnapshot.compareDeadClosureVariables', beforePath, afterPath, state?.scriptHandler.scriptMap ?? {})
+    const args: unknown[] = [beforePath, afterPath, state?.scriptHandler.scriptMap ?? {}]
+    if (options) args.push(options)
+    return await rpc.invoke('HeapSnapshot.compareDeadClosureVariables', ...args)
   } finally {
     await Promise.all([rm(beforePath, { force: true }), rm(afterPath, { force: true })])
   }

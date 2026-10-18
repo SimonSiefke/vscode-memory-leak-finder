@@ -312,6 +312,18 @@ test('reports only growing function locations, deduplicates shared contexts and 
     expect(JSON.stringify(result).length).toBeLessThan(3000)
     const identical = await compareDeadClosureVariables(paths[1], paths[1], scriptMap)
     expect(identical.closures).toEqual([])
+    const total = await compareDeadClosureVariables(paths[0], paths[1], scriptMap, { mode: 'total' })
+    expect(total.closures.map((row) => [row.name, row.deadBytes, row.delta])).toEqual([
+      ['minified', 500, 0],
+      ['minified', 150, 50],
+      ['shrinking', 100, -100],
+      ['newClosure', 90, 90],
+    ])
+    expect(total.closures[1]).toMatchObject({ originalLocation: 'original.ts:7:3', originalName: 'growingKeeper' })
+    expect(total.afterDetails).toMatchObject({ deadBytes: 840, scriptsWithoutScopes: [] })
+    const unchangedTotal = await compareDeadClosureVariables(paths[1], paths[1], scriptMap, { mode: 'total' })
+    expect(unchangedTotal.closures).toHaveLength(4)
+    expect(unchangedTotal.closures.every((row) => row.delta === 0)).toBe(true)
   } finally {
     await rm(directory, { recursive: true, force: true })
   }

@@ -185,3 +185,4 @@ export * as MeasureWindowsHandles from '../MeasureWindowsHandles/MeasureWindowsH
 export * as MeasureWorkerCount from '../MeasureWorkerCount/MeasureWorkerCount.ts'
 export * as MeasureDuplicateObjectGraphs from '../MeasureDuplicateObjectGraphs/MeasureDuplicateObjectGraphs.ts'
 export * as MeasureDeadClosureVariables from '../MeasureDeadClosureVariables/MeasureDeadClosureVariables.ts'
+export * as MeasureDeadClosureVariablesTotal from '../MeasureDeadClosureVariablesTotal/MeasureDeadClosureVariablesTotal.ts'
