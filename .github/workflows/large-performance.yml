@@ -3,6 +3,10 @@ name: Large Performance Measure
 on:
   workflow_dispatch:
     inputs:
+      build_run_id:
+        description: Optional source run whose verified executable packages should be reused
+        type: string
+        default: ''
       report_run_id:
         description: Render artifacts from an existing run without building or measuring
         type: string
@@ -85,7 +89,7 @@ jobs:
           retention-days: 30
 
   build:
-    if: ${{ inputs.report_run_id == '' }}
+    if: ${{ inputs.report_run_id == '' && inputs.build_run_id == '' }}
     needs: initialize
     runs-on: ubuntu-24.04
     timeout-minutes: 350
@@ -164,10 +168,14 @@ jobs:
         with:
           name: large-build-${{ matrix.beforeArtifact }}
           path: .large-builds/before
+          run-id: ${{ inputs.build_run_id || github.run_id }}
+          github-token: ${{ github.token }}
       - uses: actions/download-artifact@v8
         with:
           name: large-build-${{ matrix.afterArtifact }}
           path: .large-builds/after
+          run-id: ${{ inputs.build_run_id || github.run_id }}
+          github-token: ${{ github.token }}
       - name: Verify and extract before build
         id: before
         run: node packages/large-benchmark/src/main.ts extract --input-dir .large-builds/before --commit "$BEFORE_COMMIT" --output-name executable
@@ -236,7 +244,7 @@ jobs:
         with:
           pattern: large-build-status-*
           path: .large-downloads
-          run-id: ${{ inputs.report_run_id || github.run_id }}
+          run-id: ${{ inputs.report_run_id || inputs.build_run_id || github.run_id }}
           github-token: ${{ github.token }}
       - name: Generate comparison charts and offline report
         run: |

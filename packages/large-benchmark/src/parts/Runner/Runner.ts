@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { createServer } from 'node:net'
-import { access, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { access, cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { hostname, release, cpus } from 'node:os'
 import { join, resolve } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
@@ -437,9 +437,13 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
           join(directory, 'failure-state.json'),
           await evaluate(
             app.renderer,
-            `({ text: document.body.innerText.slice(0, 30000), activeElement: document.activeElement?.outerHTML, tabs: [...document.querySelectorAll('.tab')].map(e => e.outerHTML) })`,
+            `({ text: document.body.innerText.slice(0, 30000), activeElement: document.activeElement?.outerHTML, inputs: [...document.querySelectorAll('.search-view textarea, .quick-input-widget input')].map(e => ({ html: e.outerHTML, value: e.value })), tabs: [...document.querySelectorAll('.tab')].map(e => e.outerHTML) })`,
           ),
         )
+      } catch {}
+      try {
+        await cp(join(profile, 'logs'), join(directory, 'vscode-logs'), { recursive: true })
+        sample.raw.push(`raw/${pair}-${revision}/vscode-logs/`)
       } catch {}
     }
   } finally {
