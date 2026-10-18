@@ -72,7 +72,7 @@ test('measure selection supports startup times, unions of groups, and intersecti
     'startup-workspace-cold-timing',
     'startup-workspace-warm-timing',
   ])
-  expect(selectBenchmarks('', 'startup')).toHaveLength(20)
+  expect(selectBenchmarks('', 'startup')).toHaveLength(24)
   expect(selectBenchmarks('', 'timing, memory')).toHaveLength(32)
   expect(selectBenchmarks(benchmark.id + ',open-small-timing', 'startup-times')).toEqual([benchmark])
   expect(() => selectBenchmarks('', 'startp')).toThrow('Unknown measures')

@@ -26,6 +26,7 @@ import {
   MeasureCpuProfile,
   MeasureBrowserPerformanceCounters,
 } from '../Shared/Shared.ts'
+import { cssTraceCategories, collectSelectorStats } from '../CssSelectors/CssSelectors.ts'
 import { compressEvidence } from '../Compression/Compression.ts'
 import { command, errorMessage, writeJson } from '../Io/Io.ts'
 import { sampleCount, sampleOrder } from '../Manifest/Manifest.ts'
@@ -139,8 +140,12 @@ const launch = async (
     `--extensions-dir=${join(directory, 'extensions')}`,
     `--remote-debugging-port=${rendererPort}`,
     `--inspect=${mainPort}`,
-    ...(benchmark.startup && benchmark.collector === 'timeline'
-      ? ['--trace', `--trace-category-filter=${traceCategories}`, '--trace-options=record-until-full']
+    ...(benchmark.startup && ['timeline', 'css-selectors'].includes(benchmark.collector)
+      ? [
+          '--trace',
+          `--trace-category-filter=${benchmark.collector === 'css-selectors' ? cssTraceCategories : traceCategories}`,
+          '--trace-options=record-until-full',
+        ]
       : []),
     ...(benchmark.startup && benchmark.scenario === 'empty' ? [] : [workspace]),
     ...(benchmark.startup && benchmark.scenario === 'workspace' ? [join(workspace, 'small.txt')] : []),
@@ -299,7 +304,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
               }
             },
             onReady: async (renderer) => {
-              if (benchmark.collector === 'timeline') await evaluate(renderer, `console.timeStamp('large-end')`)
+              if (['timeline', 'css-selectors'].includes(benchmark.collector)) await evaluate(renderer, `console.timeStamp('large-end')`)
               await freezeCollectors()
             },
           }
@@ -408,6 +413,14 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
       sample.metrics.push(...(await stopTrace(await app.main(), join(directory, 'trace.json'), benchmark.startup)))
       await compressEvidence(join(directory, 'trace.json'))
       sample.raw.push(`raw/${pair}-${revision}/trace.json.gz`)
+    }
+    if (benchmark.collector === 'css-selectors') {
+      const stats = await collectSelectorStats(await app.main(), join(directory, 'trace.json'))
+      sample.metrics.push(...stats.metrics)
+      sample.selectorStats = stats.selectors
+      await writeJson(join(directory, 'css-selectors.json'), stats)
+      await compressEvidence(join(directory, 'trace.json'))
+      sample.raw.push(`raw/${pair}-${revision}/trace.json.gz`, `raw/${pair}-${revision}/css-selectors.json`)
     }
     if (benchmark.collector === 'profile') {
       const cpuProfile = await MeasureCpuProfile.stop(renderer)

@@ -1,5 +1,6 @@
 export type Revision = 'before' | 'after'
-export type Collector = 'smoke' | 'timing' | 'instructions' | 'resources' | 'renderer' | 'timeline' | 'profile' | 'memory' | 'bundles'
+export type Collector =
+  'smoke' | 'timing' | 'instructions' | 'resources' | 'renderer' | 'timeline' | 'profile' | 'memory' | 'bundles' | 'css-selectors'
 export type Status = 'success' | 'partial' | 'failed' | 'unavailable' | 'missing'
 
 export interface Benchmark {
@@ -19,6 +20,14 @@ export interface Metric {
   higherIsBetter?: boolean
 }
 
+export interface SelectorStatsRow {
+  selector: string
+  elapsedMs: number
+  matchAttempts: number
+  matchCount: number
+  invalidationCount: number
+}
+
 export interface Sample {
   pair: number
   revision: Revision
@@ -28,6 +37,7 @@ export interface Sample {
   diagnostics: string[]
   raw: string[]
   elapsedMs: number
+  selectorStats?: SelectorStatsRow[]
 }
 
 export interface Result {

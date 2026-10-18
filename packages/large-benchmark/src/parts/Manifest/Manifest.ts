@@ -15,8 +15,12 @@ export const interactionScenarios = [
   'settings',
 ] as const
 
-const startupCollectors: Collector[] = ['timing', 'instructions', 'resources', 'timeline', 'memory']
-const interactionCollectors: Collector[] = [...startupCollectors, 'renderer', 'profile']
+const startupCollectors: Collector[] = ['timing', 'instructions', 'resources', 'timeline', 'memory', 'css-selectors']
+const interactionCollectors: Collector[] = [
+  ...startupCollectors.filter((collector) => collector !== 'css-selectors'),
+  'renderer',
+  'profile',
+]
 
 export const benchmarks: Benchmark[] = [
   ...['empty', 'workspace'].flatMap((scenario) =>
@@ -27,7 +31,7 @@ export const benchmarks: Benchmark[] = [
         collector,
         startup: true,
         cache,
-        diagnostic: collector === 'memory',
+        diagnostic: collector === 'memory' || collector === 'css-selectors',
       })),
     ),
   ),
@@ -57,6 +61,7 @@ export const measureGroups = [
   'profile',
   'memory',
   'bundles',
+  'css-selectors',
 ] as const
 
 export const selectBenchmarks = (filter = '', measures = ''): Benchmark[] => {
