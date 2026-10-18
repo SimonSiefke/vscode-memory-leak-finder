@@ -42,6 +42,17 @@ const getBaseName = (item: NamedFunctionCount): string => {
   return fileName ? `${ANONYMOUS_NAME} (${fileName})` : ANONYMOUS_NAME
 }
 
+const getComparisonKey = (item: NamedFunctionCount, fallback: string): string => {
+  const location = item.originalLocation || item.sourceLocation
+  if (!location) {
+    return fallback
+  }
+  const normalizedLocation = location.replaceAll('\\', '/')
+  // Worktree roots differ between measurements; preserve the project path and function position.
+  const projectLocation = normalizedLocation.match(/(?:^|\/)((?:src|out|node_modules|extensions)\/.+)$/)?.[1]
+  return `location:${projectLocation || normalizedLocation}`
+}
+
 export const getNamedFunctionCountData3 = async (name: string, basePath: string) => {
   const resultsPath = join(basePath, 'named-function-count3')
   if (!existsSync(resultsPath)) {
@@ -62,6 +73,7 @@ export const getNamedFunctionCountData3 = async (name: string, basePath: string)
         count: item.count,
         delta: item.delta,
         name: uniqueName,
+        comparisonKey: getComparisonKey(item, uniqueName),
       }
     })
     data.sort((a: { count: number }, b: { count: number }) => b.count - a.count)
