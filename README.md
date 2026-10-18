@@ -855,3 +855,7 @@ See [the synchronous-dom-read-count measure](docs/measures/synchronous-dom-read-
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure synchronous-dom-read-count --only base
 npm run build-charts
 ```
+
+### Estimated allocation bytes
+
+Use [`--measure trackedAllocationBytes`](docs/measures/tracked-allocation-bytes.md) to compare estimated bytes allocated at instrumented sites, including computed strings/numbers. Results include per-site counts, estimated bytes and unknown-size counts; see the documented size model and coverage limits.

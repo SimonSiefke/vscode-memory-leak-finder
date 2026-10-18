@@ -24,3 +24,8 @@ test('getTrackingMode - other measures use function tracking', () => {
   expect(getTrackingMode('tracked-functions')).toBe('functions')
   expect(getTrackingMode('event-listener-count')).toBe('functions')
 })
+
+test('byte measure selects its dedicated tracking mode for both public spellings', () => {
+  expect(getTrackingMode('trackedAllocationBytes')).toBe('allocation-bytes')
+  expect(getTrackingMode('tracked-allocation-bytes')).toBe('allocation-bytes')
+})

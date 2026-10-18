@@ -437,6 +437,8 @@ const parseTrackFunctions = (argv: readonly string[]): boolean => {
   return (
     argv.includes('--track-functions') ||
     measure === 'tracked-functions' ||
+    measure === 'trackedAllocationBytes' ||
+    measure === 'tracked-allocation-bytes' ||
     measure === 'tracked-allocations' ||
     measure === 'trackedAllocations' ||
     measure === 'tracked-allocations-from-start' ||
