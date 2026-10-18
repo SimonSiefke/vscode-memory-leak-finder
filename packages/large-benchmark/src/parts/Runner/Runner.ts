@@ -41,6 +41,50 @@ export interface RunOptions {
   injectFailure?: string
 }
 
+// [DEBUG-ipc-search-submit-20261018] Temporary passive boundary capture.
+const searchInputTrace = `(() => {
+  const state = { tag: '[DEBUG-ipc-search-submit-20261018]', events: [] };
+  globalThis.__ipcSearchInputTrace = state;
+  const element = node => node instanceof Element ? {
+    tag: node.tagName,
+    label: node.getAttribute('aria-label'),
+    classes: node.className,
+    value: node.matches('.search-view textarea') ? node.value : undefined
+  } : { tag: String(node) };
+  const snapshot = () => ({
+    focus: document.hasFocus(),
+    visibility: document.visibilityState,
+    active: element(document.activeElement),
+    inputs: [...document.querySelectorAll('.search-view textarea')].map(element),
+    summary: document.querySelector('.search-view .messages')?.textContent,
+    progress: [...document.querySelectorAll('.monaco-progress-container')].map(e => ({ classes: e.className, style: e.getAttribute('style') }))
+  });
+  const push = data => {
+    const record = { time: performance.now(), ...data };
+    state.events.push(record);
+    if (state.events.length > 64) state.events.shift();
+    return record;
+  };
+  push({ kind: 'installed', ...snapshot() });
+  addEventListener('keydown', event => {
+    if (event.key !== 'Enter') return;
+    const record = push({ kind: 'keydown', key: event.key, code: event.code,
+      keyCode: event.keyCode, trusted: event.isTrusted, composing: event.isComposing,
+      modifiers: { ctrl: event.ctrlKey, alt: event.altKey, shift: event.shiftKey, meta: event.metaKey },
+      target: element(event.target), before: snapshot() });
+    queueMicrotask(() => { record.prevented = event.defaultPrevented; record.afterDispatch = snapshot(); });
+    setTimeout(() => push({ kind: 'after-enter', ...snapshot() }), 100);
+  }, true);
+  addEventListener('input', event => {
+    if (event.target instanceof Element && event.target.matches('.search-view textarea'))
+      push({ kind: 'input', target: element(event.target), ...snapshot() });
+  }, true);
+  for (const name of ['focus', 'blur', 'focusin', 'focusout'])
+    addEventListener(name, event => push({ kind: name, target: element(event.target), ...snapshot() }), true);
+  addEventListener('error', event => push({ kind: 'error', message: event.message, stack: event.error?.stack }));
+  addEventListener('unhandledrejection', event => push({ kind: 'rejection', message: String(event.reason) }));
+})()`
+
 const freePort = async (): Promise<number> => {
   const server = createServer()
   await new Promise<void>((resolve, reject) => {
@@ -306,6 +350,8 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
         : {},
     )
     const { renderer } = app
+    // [DEBUG-ipc-search-submit-20261018] Excluded from primary performance measurements.
+    if (process.env.VSCODE_BENCHMARK_INPUT_TRACE === '1' && benchmark.scenario === 'search') await evaluate(renderer, searchInputTrace)
     // Readiness is the startup boundary. Subsequent collector finalization is outside timing results.
     if (benchmark.startup && benchmark.collector === 'timing')
       sample.metrics.push({
@@ -458,6 +504,12 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     } catch (error) {
       sample.diagnostics.push(`Renderer collector cleanup: ${errorMessage(error)}`)
       sample.status = 'failed'
+    }
+    // [DEBUG-ipc-search-submit-20261018] Preserve success and failure controls.
+    if (process.env.VSCODE_BENCHMARK_INPUT_TRACE === '1' && app && benchmark.scenario === 'search') {
+      try {
+        await writeJson(join(directory, 'input-trace.json'), await evaluate(app.renderer, 'globalThis.__ipcSearchInputTrace'))
+      } catch {}
     }
     try {
       await scenario?.dispose()

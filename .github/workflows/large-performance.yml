@@ -185,6 +185,7 @@ jobs:
       - name: Measure paired revisions
         timeout-minutes: 310
         env:
+          VSCODE_BENCHMARK_INPUT_TRACE: '1'
           BEFORE_PATH: ${{ steps.before.outputs.executable }}
           AFTER_PATH: ${{ steps.after.outputs.executable }}
         run: |
