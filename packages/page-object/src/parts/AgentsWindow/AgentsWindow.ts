@@ -57,12 +57,12 @@ export const create = (params: CreateParams) => {
       const send = page.locator(`${composer} .sessions-chat-send-button .monaco-button:not(.disabled)`)
       await expect(send).toBeVisible({ timeout: 60_000 })
       for (let attempt = 0; attempt < 3; attempt++) {
-        await page.waitForIdle()
-        await send.focus()
-        await expect(send).toBeFocused()
-        await page.waitForIdle()
-        await send.click()
         try {
+          await page.waitForIdle()
+          await send.focus()
+          await expect(send).toBeFocused()
+          await page.waitForIdle()
+          await send.click()
           await expect(page.locator(composer)).toBeHidden({ timeout: 15_000 })
           break
         } catch (error) {
