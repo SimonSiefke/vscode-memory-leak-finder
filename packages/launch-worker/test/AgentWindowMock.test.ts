@@ -19,11 +19,12 @@ const start = async () => {
   return mock
 }
 
-test('advertises the model used by the real agent host', async () => {
+test('advertises the agent-host chat model and an empty inline-edit catalog', async () => {
   const { env } = await start()
   const response = await fetch(`${env.COPILOT_API_URL}/models`)
   expect(response.status).toBe(200)
-  const { data } = (await response.json()) as { data: unknown[] }
+  const { data, models } = (await response.json()) as { data: unknown[]; models: unknown[] }
+  expect(models).toEqual([])
   expect(data).toHaveLength(1)
   expect(data[0]).toMatchObject({ id: AgentWindowMock.modelId, supported_endpoints: ['/responses'] })
 })
