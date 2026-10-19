@@ -23,6 +23,7 @@ export interface LaunchOptions {
   readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
+  readonly launchAgentWindow?: boolean | undefined
   readonly headlessMode: boolean
   readonly ide: string
   readonly insidersCommit: string
@@ -91,6 +92,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
+    launchAgentWindow,
     headlessMode,
     ide,
     insidersCommit,
@@ -132,6 +134,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
+    launchAgentWindow,
     headlessMode,
     ide,
     insidersCommit,
@@ -240,6 +243,7 @@ export const setup = async ({
   downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
+  launchAgentWindow,
   ide,
   insidersCommit,
   inspectExtensions,
@@ -263,6 +267,7 @@ export const setup = async ({
   downloadUserDataZipFileUrl: string
   enableExtensions: boolean
   enableProxy: boolean
+  launchAgentWindow?: boolean | undefined
   ide: string
   insidersCommit: string
   inspectExtensions: boolean
@@ -287,6 +292,7 @@ export const setup = async ({
     downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
+    launchAgentWindow,
     ide,
     insidersCommit,
     inspectExtensions,

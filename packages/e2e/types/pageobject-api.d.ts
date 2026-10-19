@@ -54,6 +54,22 @@ export interface PageObjectWindowHandle extends NewWindowHandle {
   shouldBeVisible(): Promise<void>
 }
 
+export interface AgentsWindow {
+  shouldBeVisible(): Promise<void>
+  newChat(): Promise<void>
+  shouldHaveNewChat(): Promise<void>
+  typeDraft(message: string): Promise<void>
+  clearDraft(): Promise<void>
+  shouldHaveSendDisabled(): Promise<void>
+  sendNewChat(message: string): Promise<void>
+  sendMessage(message: string): Promise<void>
+  shouldHaveRequest(message: string): Promise<void>
+  shouldHaveReply(text: string, count?: number): Promise<void>
+  shouldHaveSession(title: string): Promise<void>
+  openChat(title: string): Promise<void>
+  deleteChat(title: string): Promise<void>
+}
+
 export interface ActivityBar {
   hide(): Promise<void>
   hideTooltip(): Promise<void>
@@ -985,6 +1001,7 @@ export interface Workspace {
 }
 
 export interface PageObjectApi {
+  readonly AgentsWindow: AgentsWindow
   readonly ActivityBar: ActivityBar
   readonly AccessibilityHelp: AccessibilityHelp
   readonly CallHierarchy: CallHierarchy

@@ -758,3 +758,21 @@ test.each(['trackedAllocationBytes', 'tracked-allocation-bytes'])('byte measure 
   expect(options.measure).toBe(measure)
   expect(options.trackFunctions).toBe(true)
 })
+
+test('parseArgv - launches the normal workbench by default', () => {
+  expect(ParseArgv.parseArgv('linux', 'x64', []).launchAgentWindow).toBe(false)
+})
+
+test.each(['linux', 'darwin', 'win32'])('parseArgv - launch agent window on %s', (platform) => {
+  expect(ParseArgv.parseArgv(platform, 'x64', ['--launch-agent-window', '--use-proxy-mock'])).toMatchObject({
+    launchAgentWindow: true,
+    enableProxy: true,
+    useProxyMock: true,
+  })
+})
+
+test('parseArgv - rejects the Agents window with Cursor', () => {
+  expect(() => ParseArgv.parseArgv('linux', 'x64', ['--ide=cursor', '--launch-agent-window'])).toThrow(
+    '--launch-agent-window is only supported for VS Code',
+  )
+})

@@ -1,3 +1,6 @@
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+import * as AgentWindowMock from '../AgentWindowMock/AgentWindowMock.ts'
 import * as GetScenarioExtensionArgs from '../GetScenarioExtensionArgs/GetScenarioExtensionArgs.ts'
 import { copyFile, mkdir, rm, stat } from 'node:fs/promises'
 import { dirname } from 'node:path'
@@ -231,6 +234,7 @@ export const launchVsCode = async ({
   downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
+  launchAgentWindow,
   headlessMode,
   insidersCommit,
   inspectExtensions,
@@ -262,6 +266,7 @@ export const launchVsCode = async ({
   downloadUserDataZipFileUrl: string
   enableExtensions: boolean
   enableProxy: boolean
+  launchAgentWindow?: boolean | undefined
   headlessMode: boolean
   insidersCommit: string
   inspectExtensions: boolean
@@ -300,9 +305,32 @@ export const launchVsCode = async ({
       vscodePath: preparedVscodePath || vscodePath,
       vscodeVersion,
     })
+    if (launchAgentWindow) {
+      // Keep agent Git operations inside the disposable fixture workspace.
+      const runGit = promisify(execFile)
+      await runGit('git', ['init', '--initial-branch=main', testWorkspacePath])
+      await runGit('git', [
+        '-C',
+        testWorkspacePath,
+        '-c',
+        'user.name=Agents Test',
+        '-c',
+        'user.email=agents-test@example.invalid',
+        '-c',
+        `core.hooksPath=${testWorkspacePath}/.git/no-hooks`,
+        'commit',
+        '--allow-empty',
+        '--no-gpg-sign',
+        '-m',
+        'Initialize Agents test workspace',
+      ])
+    }
     if (trackFunctions) {
       binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
     }
+
+    const agentMock = launchAgentWindow && useProxyMock ? await AgentWindowMock.start(userDataDir) : undefined
+    if (agentMock) addDisposable(agentMock.dispose)
 
     // Start proxy server if enabled
     // Note: enableProxy might be undefined if RPC call doesn't pass it correctly
@@ -341,6 +369,8 @@ export const launchVsCode = async ({
     const args = GetVsCodeArgs.getVscodeArgs({
       enableExtensions,
       enableProxy,
+      launchAgentWindow,
+      useProxyMock,
       extensionsDir,
       extraLaunchArgs: [
         testWorkspacePath,
@@ -361,7 +391,7 @@ export const launchVsCode = async ({
     })
     const env = GetVsCodeEnv.getVsCodeEnv({
       processEnv: process.env,
-      proxyEnvVars,
+      proxyEnvVars: { ...proxyEnvVars, ...agentMock?.env },
       runtimeDir,
       userDataDir,
     })

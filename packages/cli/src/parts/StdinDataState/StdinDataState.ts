@@ -16,6 +16,7 @@ export interface StdinDataState {
   readonly cwd: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
+  readonly launchAgentWindow?: boolean | undefined
   readonly exitCode: number
   readonly filter: string
   readonly headless: boolean
@@ -75,6 +76,7 @@ let state: StdinDataState = {
   cwd: Character.EmptyString,
   enableExtensions: false,
   enableProxy: false,
+  launchAgentWindow: false,
   exitCode: 0,
   filter: Character.EmptyString,
   headless: false,
@@ -132,6 +134,7 @@ export const setState = (newState: StdinDataState): void => {
     cwd: newState.cwd,
     enableExtensions: newState.enableExtensions,
     enableProxy: newState.enableProxy,
+    launchAgentWindow: newState.launchAgentWindow,
     headless: newState.headless,
     ide: newState.ide,
     ideVersion: newState.ideVersion,
