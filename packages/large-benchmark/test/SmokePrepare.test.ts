@@ -21,13 +21,20 @@ test('shared smoke archive preserves runtime chat simulation scripts alongside c
   const source = join(root, '.vscode-repos', `${sha}-minified`, 'source')
   const output = join(root, 'harness')
   const mockServer = 'scripts/chat-simulation/common/mock-llm-server.ts'
-  for (const directory of ['test/smoke/out', 'node_modules', 'scripts/chat-simulation/common'])
+  const protocolRegistry = 'src/vs/platform/agentHost/common/state/protocol/version/registry.ts'
+  for (const directory of [
+    'test/smoke/out',
+    'node_modules',
+    'scripts/chat-simulation/common',
+    'src/vs/platform/agentHost/common/state/protocol/version',
+  ])
     await mkdir(join(source, directory), { recursive: true })
   for (const file of ['package.json', 'product.json']) await writeFile(join(source, file), '{}')
   await writeFile(join(source, 'package.json'), JSON.stringify({ type: 'module' }))
   await writeFile(join(source, 'scripts/package.json'), JSON.stringify({ type: 'commonjs' }))
   await writeFile(join(source, mockServer), 'const startServer: () => void = () => {}; module.exports = { startServer };\n')
   await writeFile(join(source, 'test/smoke/out/main.js'), '// compiled smoke suite\n')
+  await writeFile(join(source, protocolRegistry), "export const PROTOCOL_VERSION = '1.0.0';\n")
   command.mockImplementation(async (executable, args, options) => {
     if (executable === 'git') {
       if (args[0] === 'clone') {
@@ -48,4 +55,6 @@ test('shared smoke archive preserves runtime chat simulation scripts alongside c
   )
   expect(await readFile(join(output, 'test/smoke/out/main.js'), 'utf8')).toContain('compiled smoke suite')
   expect(await readFile(join(output, 'fixture/app.js'), 'utf8')).toContain('smoke fixture')
+  // The SSH Dev Container fixture reads this source registry when negotiating its handshake.
+  expect(await readFile(join(output, protocolRegistry), 'utf8')).toMatch(/PROTOCOL_VERSION\s*=\s*'1\.0\.0'/)
 })
