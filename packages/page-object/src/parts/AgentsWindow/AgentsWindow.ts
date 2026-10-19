@@ -11,9 +11,12 @@ export const create = (params: CreateParams) => {
   const typeMessage = async (editor: any, message: string) => {
     await expect(editor).toBeVisible({ timeout: 60_000 })
     const input = editor.locator('.native-edit-context')
+    await page.waitForIdle()
     await input.focus()
+    await page.waitForIdle()
     await expect(input).toBeFocused()
     await input.type(message)
+    await page.waitForIdle()
     await expect(editor.locator('.view-lines')).toHaveText(message.replaceAll(' ', '\u00a0'))
   }
   return {
@@ -23,7 +26,9 @@ export const create = (params: CreateParams) => {
     async newChat() {
       const button = page.locator(`${workbench} [aria-label^="New Session"]`).first()
       await expect(button).toBeVisible({ timeout: 60_000 })
+      await page.waitForIdle()
       await button.click()
+      await page.waitForIdle()
       await this.shouldHaveNewChat()
     },
     async shouldHaveNewChat() {
@@ -36,8 +41,12 @@ export const create = (params: CreateParams) => {
     async clearDraft() {
       const input = page.locator(`${composer} .native-edit-context`)
       await input.focus()
+      await page.waitForIdle()
+      await expect(input).toBeFocused()
       await page.keyboard.press(platform === 'darwin' ? 'Meta+A' : 'Control+A')
+      await page.waitForIdle()
       await page.keyboard.press('Backspace')
+      await page.waitForIdle()
       await expect(page.locator(`${composer} .sessions-chat-editor .view-lines`)).toHaveText('')
     },
     async shouldHaveSendDisabled() {
@@ -106,7 +115,18 @@ export const create = (params: CreateParams) => {
       await page.keyboard.press('Enter')
       await expect(menu).toBeHidden()
       // VS Code's smoke-test driver automatically confirms dialogs.
-      await expect(row).toHaveCount(0, { timeout: 30_000 })
+      const deadline = Date.now() + 30_000
+      for (let attempt = 0; ; attempt++) {
+        try {
+          await expect(row).toHaveCount(0, { timeout: Math.max(1, deadline - Date.now()) })
+          break
+        } catch (error) {
+          // CDP can lose the promise for this read-only assertion during GC.
+          // Retry the assertion within its original deadline, never the deletion.
+          if (attempt >= 2 || Date.now() >= deadline || !String(error).includes('Promise was collected')) throw error
+          console.warn('AgentsWindow.deleteChat: retrying a collected DevTools assertion promise')
+        }
+      }
     },
   }
 }
