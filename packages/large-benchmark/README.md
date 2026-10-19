@@ -273,6 +273,12 @@ with every result. Series inputs run one smoke job per commit and reuse that
 commit's results in the adjacent comparison reports; smoke results are separate
 from the paired trend index. Historical builds must support the first commit's suite.
 
+The shared harness includes checkout sources used at runtime by container fixtures,
+including the Agent Host protocol registry. Build preparation preserves the built-in
+Copilot extension's installed CLI SDK when that revision declares it as a production
+dependency, and verifies it can be imported before archiving the executable. This
+uses the same revision's postinstall-materialized dependency, with no version upgrade.
+
 Each attempt launches a fresh Mocha process against the packaged Code OSS build,
 using upstream smoke setup/cleanup to reset profiles, extensions, and the fixture
 workspace. Compilation, installation, artifact extraction, and copying diagnostic

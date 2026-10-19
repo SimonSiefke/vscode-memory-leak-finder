@@ -3,6 +3,7 @@ import { createReadStream } from 'node:fs'
 import { access, mkdir, readFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { preserveCopilotRuntime } from '../CopilotRuntime/CopilotRuntime.ts'
 import { parseCommitReference } from '../CommitReference/CommitReference.ts'
 import { command, writeJson } from '../Io/Io.ts'
 import type { BuildMetadata } from '../Types/Types.ts'
@@ -40,6 +41,7 @@ export const prepareBuild = async (commit: string, output: string): Promise<Buil
   // Verify the checkout rather than relying on a pre-existing executable alone.
   const actualCommit = await command('git', ['rev-parse', 'HEAD'], { cwd: join(dirname(buildPath), 'source') })
   if (actualCommit !== sha) throw new Error(`Build checkout is ${actualCommit}, expected ${sha}`)
+  await preserveCopilotRuntime(join(dirname(buildPath), 'source'), buildPath)
   const archive = join(output, 'vscode.tar.gz')
   await command('tar', ['-czf', archive, '-C', dirname(buildPath), 'VSCode-linux-x64'], { timeout: 300000 })
   const metadata: BuildMetadata = {

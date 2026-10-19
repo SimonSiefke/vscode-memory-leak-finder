@@ -47,7 +47,21 @@ export const prepareSmoke = async (commit: string, output: string): Promise<void
   // Measurement jobs never rebuild or install the suite.
   await command(
     'tar',
-    ['-czf', archive, '-C', source, 'test', 'scripts', 'node_modules', 'package.json', 'product.json', '-C', resolve(output), 'fixture'],
+    [
+      '-czf',
+      archive,
+      '-C',
+      source,
+      'test',
+      'scripts',
+      'src',
+      'node_modules',
+      'package.json',
+      'product.json',
+      '-C',
+      resolve(output),
+      'fixture',
+    ],
     { timeout: 600000 },
   )
   await writeJson(join(output, 'smoke-build.json'), {
