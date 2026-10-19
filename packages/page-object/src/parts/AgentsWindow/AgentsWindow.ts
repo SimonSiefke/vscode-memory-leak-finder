@@ -11,10 +11,17 @@ export const create = (params: CreateParams) => {
   const typeMessage = async (editor: any, message: string) => {
     await expect(editor).toBeVisible({ timeout: 60_000 })
     const input = editor.locator('.native-edit-context')
-    await page.waitForIdle()
-    await input.focus()
-    await page.waitForIdle()
-    await expect(input).toBeFocused()
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await page.waitForIdle()
+        await input.focus()
+        await page.waitForIdle()
+        await expect(input).toBeFocused()
+        break
+      } catch (error) {
+        if (attempt === 2) throw error
+      }
+    }
     await input.type(message)
     await page.waitForIdle()
     await expect(editor.locator('.view-lines')).toHaveText(message.replaceAll(' ', '\u00a0'))
