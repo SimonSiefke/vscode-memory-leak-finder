@@ -6,4 +6,5 @@ test('getProxyEnvVars - includes IPv4 and IPv6 loopback hosts in no-proxy variab
 
   expect(envVars.NO_PROXY).toBe('localhost,127.0.0.1,0.0.0.0,::1,chatgpt.com,ab.chatgpt.com')
   expect(envVars.no_proxy).toBe('localhost,127.0.0.1,0.0.0.0,::1,chatgpt.com,ab.chatgpt.com')
+  expect(envVars.NODE_EXTRA_CA_CERTS).toBeDefined()
 })

@@ -163,6 +163,7 @@ const prepareVsCodeLaunch = async ({
   }
   return {
     binaryPath,
+    sourceVscodePathForElectron: vscodePath,
     extensionsDir,
     runtimeDir,
     settingsPath,
@@ -286,20 +287,32 @@ export const launchVsCode = async ({
     console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
   }
   try {
-    let { binaryPath, extensionsDir, runtimeDir, settingsPath, testWorkspacePath, userDataDir } = await prepareVsCodeLaunch({
-      arch,
-      buildVscodeMinified,
-      clearExtensions,
-      commit,
-      downloadUserDataZipFileToken,
-      downloadUserDataZipFileUrl,
-      enableExtensions,
-      insidersCommit,
-      platform,
-      updateUrl,
-      vscodePath: preparedVscodePath || vscodePath,
-      vscodeVersion,
-    })
+    let { binaryPath, extensionsDir, runtimeDir, settingsPath, sourceVscodePathForElectron, testWorkspacePath, userDataDir } =
+      await prepareVsCodeLaunch({
+        arch,
+        buildVscodeMinified,
+        clearExtensions,
+        commit,
+        downloadUserDataZipFileToken,
+        downloadUserDataZipFileUrl,
+        enableExtensions,
+        insidersCommit,
+        platform,
+        updateUrl,
+        vscodePath: preparedVscodePath || vscodePath,
+        vscodeVersion,
+      })
+    let explicitVscodeAppPath = ''
+    if (sourceVscodePathForElectron) {
+      try {
+        const sourceVscodePathStats = await stat(sourceVscodePathForElectron)
+        if (sourceVscodePathStats.isDirectory()) {
+          explicitVscodeAppPath = sourceVscodePathForElectron
+        }
+      } catch {
+        // ignore and continue without an explicit app path
+      }
+    }
     if (trackFunctions) {
       binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
     }
@@ -350,6 +363,7 @@ export const launchVsCode = async ({
           enableExtensions,
         )),
       ],
+      vscodeAppPath: explicitVscodeAppPath,
       inspectExtensions,
       inspectExtensionsPort,
       inspectPtyHost,
