@@ -55,6 +55,7 @@ export interface PageObjectWindowHandle extends NewWindowHandle {
 }
 
 export interface AgentsWindow {
+  selectNoWorkspace(): Promise<void>
   shouldBeVisible(): Promise<void>
   newChat(): Promise<void>
   shouldHaveNewChat(): Promise<void>

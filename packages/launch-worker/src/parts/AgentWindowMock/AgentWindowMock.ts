@@ -100,7 +100,9 @@ export const start = async (userDataDir: string) => {
       } else if (path === '/copilot/mcp_registry') {
         json(200, { mcp_registries: [] })
       } else if (req.method === 'GET' && path === '/models') {
-        json(200, { data: [model] })
+        // The shared endpoint serves both the SDK chat catalog and the
+        // extension proxy catalog. Inline-edit models are outside this fixture.
+        json(200, { data: [model], models: [] })
       } else if (req.method === 'GET' && path === `/models/${modelId}`) {
         json(200, model)
       } else if (path === '/models/session') {
@@ -161,6 +163,7 @@ export const start = async (userDataDir: string) => {
       'github.copilot.chat.githubMcpServer.enabled': false,
       'github.copilot.advanced.debug.overrideProxyUrl': url,
       'sessions.useWorktree': false,
+      'sessions.chat.unifiedWorkspacePicker.enabled': true,
     }
     for (const relativePath of ['User/settings.json', 'User/profiles/builtin/agents/settings.json']) {
       const path = join(userDataDir, relativePath)
