@@ -2,7 +2,7 @@ import { afterEach, expect, jest, test } from '@jest/globals'
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { writeJson } from '../src/parts/Io/Io.ts'
+import { command, writeJson } from '../src/parts/Io/Io.ts'
 import { largePerformance } from '../src/parts/Main/Main.ts'
 import { selectBenchmarks } from '../src/parts/Manifest/Manifest.ts'
 import { compareSmoke, runSmoke, smokeComparison, reportSmoke, type SmokeResult } from '../src/parts/Smoke/Smoke.ts'
@@ -88,6 +88,35 @@ test('37 attempts are checkpointed with failures retained, no retries, and proce
   expect(measured.samples[1]!.error).toBe('test failed')
   expect(execute.mock.calls[0]![1]).toEqual(expect.arrayContaining(['--build', '/build', '--skip-stable-build']))
   expect(JSON.parse(await readFile(join(output, 'smoke-result.json'), 'utf8'))).toEqual(measured)
+})
+
+test('packaged smoke launches clear development mode even when inherited from the parent', async () => {
+  const harness = await temporary(),
+    output = await temporary()
+  await writeJson(join(harness, 'smoke-build.json'), { schemaVersion: 1, harnessCommit: commits.before, fixtureCommit: 'c'.repeat(40) })
+  const previous = process.env.VSCODE_DEV
+  process.env.VSCODE_DEV = '1'
+  try {
+    const execute: typeof command = async (executable, args, options) => {
+      // Exercise the real subprocess environment merge, rather than just inspecting the overrides.
+      const stdout = await command(
+        executable,
+        ['-e', 'process.stdout.write(JSON.stringify({ dev: process.env.VSCODE_DEV, quality: process.env.VSCODE_QUALITY }))'],
+        { ...options, cwd: harness },
+      )
+      expect(JSON.parse(stdout)).toEqual({ quality: 'oss' })
+      await writeJson(args[2]!, { tests: ['suite test'], pending: 0, failures: 0, retried: false })
+      return stdout
+    }
+    jest.spyOn(console, 'log').mockImplementation(() => {})
+    const measured = await runSmoke({ commit: commits.before, build: '/build/code-oss', harness, output, samples: 1 }, execute)
+    expect(measured.samples[0]!.error).toBeUndefined()
+    expect(measured.samples[0]!.status).toBe('success')
+    expect(process.env.VSCODE_DEV).toBe('1')
+  } finally {
+    if (previous === undefined) delete process.env.VSCODE_DEV
+    else process.env.VSCODE_DEV = previous
+  }
 })
 
 test('independent means and medians use successful attempts without inventing pairs', () => {

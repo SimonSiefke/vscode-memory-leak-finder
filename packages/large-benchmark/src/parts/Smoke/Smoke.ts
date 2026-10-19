@@ -43,10 +43,11 @@ export const prepareSmoke = async (commit: string, output: string): Promise<void
   await command('git', ['clone', '--depth', '1', 'https://github.com/microsoft/vscode-smoketest-express', fixture], { timeout: 120000 })
   const fixtureCommit = await command('git', ['rev-parse', 'HEAD'], { cwd: fixture })
   const archive = join(output, 'smoke.tar.gz')
-  // Keep installed dependencies and compiled tests together; measurement jobs never rebuild or install the suite.
+  // Keep runtime helpers with the compiled tests (chat suites load scripts/chat-simulation directly).
+  // Measurement jobs never rebuild or install the suite.
   await command(
     'tar',
-    ['-czf', archive, '-C', source, 'test', 'node_modules', 'package.json', 'product.json', '-C', resolve(output), 'fixture'],
+    ['-czf', archive, '-C', source, 'test', 'scripts', 'node_modules', 'package.json', 'product.json', '-C', resolve(output), 'fixture'],
     { timeout: 600000 },
   )
   await writeJson(join(output, 'smoke-build.json'), {
@@ -134,7 +135,8 @@ export const runSmoke = async (options: SmokeOptions, execute = command): Promis
         {
           cwd: join(options.harness, 'test/smoke'),
           timeout: 20 * 60 * 1000,
-          env: { VSCODE_QUALITY: 'oss', VSCODE_DEV: '0', GITHUB_WORKSPACE: '', BUILD_ARTIFACTSTAGINGDIRECTORY: '' },
+          // Packaged VS Code treats any nonempty VSCODE_DEV value (including '0') as development mode.
+          env: { VSCODE_QUALITY: 'oss', VSCODE_DEV: undefined, GITHUB_WORKSPACE: '', BUILD_ARTIFACTSTAGINGDIRECTORY: '' },
         },
       )
       sample.elapsedMs = performance.now() - started
