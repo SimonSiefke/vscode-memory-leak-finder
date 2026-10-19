@@ -161,6 +161,7 @@ export const start = async (userDataDir: string) => {
       'github.copilot.chat.githubMcpServer.enabled': false,
       'github.copilot.advanced.debug.overrideProxyUrl': url,
       'sessions.useWorktree': false,
+      'sessions.chat.unifiedWorkspacePicker.enabled': true,
     }
     for (const relativePath of ['User/settings.json', 'User/profiles/builtin/agents/settings.json']) {
       const path = join(userDataDir, relativePath)

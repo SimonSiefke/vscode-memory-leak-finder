@@ -31,6 +31,28 @@ export const create = (params: CreateParams) => {
       await page.waitForIdle()
       await this.shouldHaveNewChat()
     },
+    async selectNoWorkspace() {
+      const picker = page
+        .locator(
+          `${composer} .sessions-chat-workspace-picker > a[role="button"], ${composer} .sessions-workspace-picker-trigger > a[role="button"]`,
+        )
+        .first()
+      await expect(picker).toBeVisible({ timeout: 60_000 })
+      if (/^(Chat|No workspace)$/i.test((await picker.textContent()).trim())) {
+        await expect(picker).toHaveText(/^(Chat|No workspace)$/i)
+        return
+      }
+      await picker.click()
+      const option = page
+        .locator(
+          '.context-view .monaco-list-row[role="option"][aria-label^="No workspace" i], .context-view .monaco-list-row[role="option"][aria-label="Chat"], .context-view .monaco-list-row[role="option"][aria-label^="Chat,"]',
+        )
+        .first()
+      await expect(option).toBeVisible({ timeout: 15_000 })
+      await option.click()
+      await expect(page.locator('.context-view .monaco-list-row[role="option"]')).toBeHidden()
+      await expect(picker).toHaveText(/^(Chat|No workspace)$/i)
+    },
     async shouldHaveNewChat() {
       await expect(page.locator(composer)).toBeVisible({ timeout: 60_000 })
       await expect(page.locator(`${composer} .sessions-chat-editor .view-lines`)).toHaveText('')
