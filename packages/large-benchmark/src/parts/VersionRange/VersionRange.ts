@@ -76,3 +76,13 @@ export const resolveVersionRange = async (range: string): Promise<StableRelease[
   validateCommits(releases.map((release) => release.commit))
   return releases
 }
+
+export const resolveLastVersions = async (count: number): Promise<StableRelease[]> => {
+  if (!Number.isSafeInteger(count) || count < 2 || count > 256) throw new Error('--last-versions must be between 2 and 256')
+  const available = await requestJson('https://update.code.visualstudio.com/api/releases/stable?released=true')
+  if (!Array.isArray(available) || !available.every((version) => typeof version === 'string'))
+    throw new Error('Invalid stable VS Code release list')
+  const versions = [...new Set(available as string[])].filter(isStableVersion).sort(compareVersions).slice(-count)
+  if (versions.length !== count) throw new Error(`Only ${versions.length} stable releases available`)
+  return resolveVersionRange(`${versions[0]}...${versions.at(-1)}`)
+}

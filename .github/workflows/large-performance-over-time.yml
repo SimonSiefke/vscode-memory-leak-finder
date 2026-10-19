@@ -1,0 +1,172 @@
+name: Large Performance Over Time
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_range:
+        description: Inclusive stable version range; empty selects the last N releases
+        type: string
+        default: ''
+      last_versions:
+        description: Number of latest stable releases (including patches), used when range is empty
+        type: string
+        default: '20'
+      frame_duration_ms:
+        description: Milliseconds per video frame
+        type: string
+        default: '400'
+
+permissions:
+  contents: read
+
+jobs:
+  initialize:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.manifest.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Freeze release list
+        id: manifest
+        env:
+          VERSION_RANGE: ${{ inputs.version_range }}
+          LAST_VERSIONS: ${{ inputs.last_versions }}
+          FRAME_DURATION: ${{ inputs.frame_duration_ms }}
+        run: |
+          revisions=(--last-versions "$LAST_VERSIONS")
+          [[ -z "$VERSION_RANGE" ]] || revisions=(--version-range "$VERSION_RANGE")
+          node packages/large-benchmark/src/main.ts history-matrix "${revisions[@]}" \
+            --frame-duration-ms "$FRAME_DURATION" --output-dir .large-manifest
+      - uses: actions/upload-artifact@v7
+        with:
+          name: large-history-manifest
+          path: .large-manifest/manifest.json
+          retention-days: 30
+
+  build:
+    needs: initialize
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.initialize.outputs.matrix) }}
+    env:
+      COMMIT: ${{ matrix.commit }}
+      VSCODE_VERSION: ${{ matrix.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config xvfb x11-xserver-utils
+      - name: Install harness
+        run: npm run install:ci
+      - name: Build harness
+        run: npm run build
+      - name: Build and archive the minified VS Code package
+        run: |
+          node packages/large-benchmark/src/main.ts prepare \
+            --commit "$COMMIT" --output-dir .large-build
+      - name: Upload executable package
+        uses: actions/upload-artifact@v7
+        with:
+          name: large-build-${{ matrix.artifact }}
+          path: |
+            .large-build/vscode.tar.gz
+            .large-build/build.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+          overwrite: true
+      - name: Upload build status
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: large-build-status-${{ matrix.artifact }}
+          path: .large-build/status.json
+          retention-days: 30
+          overwrite: true
+
+  measure:
+    needs: [initialize, build]
+    if: ${{ always() && needs.initialize.result == 'success' && !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.initialize.outputs.matrix) }}
+    env:
+      COMMIT: ${{ matrix.commit }}
+      VSCODE_VERSION: ${{ matrix.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - run: npm run install:ci
+      - run: npm run build
+      - name: Install desktop dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libasound2t64 libnss3 libgbm1 libgtk-3-0 libxkbfile1 bubblewrap socat
+      - uses: actions/download-artifact@v8
+        with:
+          name: large-build-${{ matrix.artifact }}
+          path: .large-build
+      - name: Verify and extract build
+        id: build
+        run: node packages/large-benchmark/src/main.ts extract --input-dir .large-build --commit "$COMMIT" --output-name executable
+      - name: Run the same function-count E2E suite on this version
+        env:
+          BUILD_PATH: ${{ steps.build.outputs.executable }}
+        run: |
+          xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
+            node packages/large-benchmark/src/main.ts history-measure \
+            --commit "$COMMIT" --vscode-version "$VSCODE_VERSION" --build-path "$BUILD_PATH" --output-dir .large-history-results
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: large-history-result-${{ matrix.artifact }}
+          path: .large-history-results
+          include-hidden-files: true
+          retention-days: 30
+
+  report:
+    needs: [initialize, build, measure]
+    if: ${{ always() && needs.initialize.result == 'success' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install video tools
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - uses: actions/download-artifact@v8
+        with:
+          name: large-history-manifest
+          path: .large-manifest
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: large-history-result-*
+          path: .large-history-results
+      - name: Render labeled charts and video
+        run: |
+          mkdir -p .large-history-results
+          node packages/large-benchmark/src/main.ts history-report \
+            --manifest .large-manifest/manifest.json --input-dir .large-history-results \
+            --output-dir .large-history-report
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: large-performance-over-time
+          path: .large-history-report
+          retention-days: 30
+          if-no-files-found: error

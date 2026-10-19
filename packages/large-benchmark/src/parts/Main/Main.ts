@@ -13,7 +13,8 @@ import { parseOptions } from '../ParseOptions/ParseOptions.ts'
 import { createWorkflowSummary } from '../WorkflowSummary/WorkflowSummary.ts'
 import { parseCommits, seriesMatrix, validateCommits, type SeriesManifest } from '../Series/Series.ts'
 import { generateTrendReport, createTrendWorkflowSummary } from '../TrendReport/TrendReport.ts'
-import { resolveVersionRange } from '../VersionRange/VersionRange.ts'
+import { measureFunctionCounts, reportFunctionCountHistory, type HistoryManifest } from '../FunctionCountHistory/FunctionCountHistory.ts'
+import { resolveLastVersions, resolveVersionRange } from '../VersionRange/VersionRange.ts'
 
 export interface Manifest {
   schemaVersion: 1
@@ -30,6 +31,35 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
     return { before, after }
   }
   switch (argv[0]) {
+    case 'history-matrix': {
+      if (get('--version-range') && get('--last-versions')) throw new Error('Use --version-range or --last-versions')
+      const frameDurationMs = Number(get('--frame-duration-ms', '400'))
+      if (!Number.isSafeInteger(frameDurationMs) || frameDurationMs < 40 || frameDurationMs > 60_000)
+        throw new Error('--frame-duration-ms must be an integer between 40 and 60000')
+      const releases = get('--version-range')
+        ? await resolveVersionRange(get('--version-range'))
+        : await resolveLastVersions(Number(get('--last-versions', '20')))
+      const manifest: HistoryManifest = { schemaVersion: 1, measure: 'function-count-history', releases, frameDurationMs }
+      await writeJson(join(output, 'manifest.json'), manifest)
+      const matrix = JSON.stringify({
+        include: releases.map((release) => ({ ...release, artifact: parseCommitReference(release.commit).artifact })),
+      })
+      if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, `matrix=${matrix}\n`)
+      else console.log(matrix)
+      break
+    }
+    case 'history-measure': {
+      await measureFunctionCounts(required('--commit'), required('--vscode-version'), resolve(required('--build-path')), output)
+      break
+    }
+    case 'history-report': {
+      await reportFunctionCountHistory(
+        await readJson<HistoryManifest>(resolve(required('--manifest'))),
+        resolve(required('--input-dir')),
+        output,
+      )
+      break
+    }
     case 'matrix': {
       const selected = selectBenchmarks(get('--benchmark-filter'), get('--measures'))
       const inputModes = [get('--version-range'), get('--commits'), get('--before-commit') || get('--after-commit')].filter(Boolean)
@@ -159,7 +189,9 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
       break
     }
     default:
-      throw new Error('Usage: large-performance <matrix|prepare|extract|prepare-smoke|extract-smoke|smoke|measure|report> [options]')
+      throw new Error(
+        'Usage: large-performance <matrix|prepare|extract|prepare-smoke|extract-smoke|smoke|measure|report|history-matrix|history-measure|history-report> [options]',
+      )
   }
 }
 

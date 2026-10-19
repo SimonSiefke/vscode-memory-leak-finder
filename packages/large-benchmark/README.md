@@ -158,6 +158,63 @@ builds/measurements remain visible as gaps instead of fabricated trend values.
 Large runs that select all collectors group more benchmarks into each job and may
 reach the job time limit; prefer focused measures for long histories.
 
+## Function counts over time video
+
+Run the [Large Performance Over Time workflow](../../.github/workflows/large-performance-over-time.yml)
+for a video of the existing renderer **function-count** chart across VS Code releases.
+The defaults are the latest **20 published stable releases** (including patches), in
+oldest-to-newest order, and **400 ms per frame**. Alternatively supply an inclusive
+`version_range`; it takes precedence over `last_versions`. `frame_duration_ms`
+controls playback speed (40–60000 ms).
+
+This runs the same default E2E suite and `--check-leaks --measure-after --measure function-count`
+arguments as the ordinary function-count CI job, using the same current harness
+checkout for every version. Each version is built and measured once, independently
+of adjacent versions. It does not run the paired performance collectors or repeat
+the suite 37 times. The suite uses one running application, without restarting
+between tests, so counts describe the retained functions after each scenario.
+
+Download **large-performance-over-time** and open `index.html` or play
+`function-count-history.mp4`. The 1280×720 H.264 video has the VS Code version at
+the top right of every frame. All frames use the same zero-based count scale and
+alphabetical test order. SVG and PNG frames are retained in `frames/`, and
+`test-order.json` maps chart indexes to test names. Twenty usable frames make an
+eight-second video at the default speed; the HTML player supports looping.
+
+Build failures and versions without matching test inventories are omitted from
+playback and listed in `coverage.json` and the HTML report. The largest collected
+inventory defines the shared test order; only exact matches enter the video.
+A nonzero harness exit excludes that version; partial counts and the failure
+diagnostic are retained. Missing/invalid counts are never replaced with zero. A run with no usable frames fails after saving coverage. A single usable
+version still produces a video. Raw per-test data is available in each
+**large-history-result-&lt;commit-artifact&gt;** artifact. Historical builds must
+support the current harness, and comparisons may reflect application changes as
+well as changes in scenario behavior. This workflow does not change the existing
+Large Performance Measure workflow.
+
+Local commands (from the repository root, after installing/building the harness):
+
+```sh
+npm run large-performance -- history-matrix --last-versions 20 --output-dir .tmp/history
+# Or: history-matrix --version-range 1.100.0...1.110.0 --frame-duration-ms 400
+
+# For each release in manifest.json, prepare/extract its build using the existing
+# prepare/extract commands, then run serially in this checkout:
+xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
+  npm run large-performance -- history-measure \
+  --commit FULL_SHA --vscode-version 1.100.0 --build-path /absolute/path/to/code-oss \
+  --output-dir .tmp/history-results/1.100.0
+
+npm run large-performance -- history-report --manifest .tmp/history/manifest.json \
+  --input-dir .tmp/history-results --output-dir .tmp/history-report
+```
+
+Measurement jobs require the usual Linux x64 desktop dependencies. Report generation
+requires FFmpeg with the `librsvg` decoder and `libx264` encoder, plus DejaVu fonts
+(`sudo apt-get install ffmpeg fonts-dejavu-core` on Ubuntu). The workflow installs
+them automatically. The report command also accepts result artifacts downloaded
+into separate subdirectories. Each manifest commit must have at most one result.
+
 ## CSS selector comparisons
 
 Set `measures` to `css-selectors` to build and compare CSS selector matching costs
