@@ -15,6 +15,7 @@
     { "path": "./packages/download-worker" },
     { "path": "./packages/dashboard" },
     { "path": "./packages/e2e" },
+    { "path": "./packages/agents-e2e" },
     { "path": "./packages/error-worker" },
     { "path": "./packages/exec-worker" },
     { "path": "./packages/extension-source-maps" },

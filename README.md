@@ -859,3 +859,34 @@ npm run build-charts
 ### Estimated allocation bytes
 
 Use [`--measure trackedAllocationBytes`](docs/measures/tracked-allocation-bytes.md) to compare estimated bytes allocated at instrumented sites, including computed strings/numbers. Results include per-site counts, estimated bytes and unknown-size counts; see the documented size model and coverage limits.
+
+## Agents window e2e tests
+
+Run the native VS Code Agents window suite with a build that supports `--agents`:
+
+```sh
+npm run e2e:agents -- --vscode-path /path/to/vscode/scripts/code.sh
+```
+
+On Linux without a desktop display, prefix the command with `xvfb-run -a`.
+Use `--only agents-window-send-message` to select a scenario, or `--runs 5`
+to repeat it. The suite covers startup with only one Agents window, new chat
+and draft input, sending a message and a follow-up, reopening a saved chat,
+and deleting active and inactive chats. Each completed chat is deleted so
+repeated memory measurements do not accumulate conversation history.
+
+`--launch-agent-window` launches the Agents window directly, using VS Code's
+native `--agents` argument and the harness's test profile and extensions.
+Without this flag, the normal workbench launches as before. It is VS Code only.
+The Agents scenarios live in `packages/agents-e2e`, separately from the regular
+workbench suite.
+
+When combined with `--use-proxy-mock`, Agents launches use a loopback HTTP mock
+for model discovery and streaming replies through the real agent host and
+Copilot SDK. The mock advertises one test model and replies with
+`Hello from the mocked Agents window.` No sign-in, API key, or captured network
+data is required. VS Code's smoke-test driver is enabled for its fake-token
+authentication hook; this also automatically confirms deletion dialogs. SDK state stays inside the test profile, mock settings are
+restored at shutdown, and the existing replay proxy blocks unmatched external
+requests. Omitting `--use-proxy-mock` keeps the native Agents backend; the bundled
+suite expects mocked replies.
