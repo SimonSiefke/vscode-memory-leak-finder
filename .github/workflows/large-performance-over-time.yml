@@ -168,5 +168,6 @@ jobs:
         with:
           name: large-performance-over-time
           path: .large-history-report
+          include-hidden-files: true
           retention-days: 30
           if-no-files-found: error
