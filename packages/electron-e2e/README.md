@@ -1,4 +1,4 @@
-# Electron main-process e2e tests
+# Electron lifecycle e2e tests
 
 Run a standalone generated Electron app and measure its main process:
 
@@ -140,10 +140,10 @@ npm run e2e:electron -- --only webcontentsview-add-remove --measure named-functi
 npm run e2e:electron -- --only worker-thread-create-terminate --measure heap-usage --warmup 37 --runs 37
 ```
 
-All measurements still target the launched Electron **main process**. These tests
-look for parent-side retention of API wrappers and lifecycle bookkeeping; they do
-not measure live child-process or worker heaps, renderer heaps, GPU memory, or
-native allocations.
+Function-count and heap-usage measurements target the launched Electron **main
+process**, covering parent-side API wrappers and lifecycle bookkeeping. The
+`native-memory` measure below additionally covers application process footprints
+and Chromium allocation counters.
 
 API references: [WebContentsView](https://www.electronjs.org/docs/latest/api/web-contents-view),
 [utilityProcess](https://www.electronjs.org/docs/latest/api/utility-process), and
@@ -153,5 +153,61 @@ The IPC/debugger renderer loads only a local data URL; Node integration is enabl
 for that fixture so IPC calls exercise the real renderer-to-main path. Fetch tests
 use an in-memory session and local/custom-protocol responses. The web-request
 server and host windows are created in setup and closed in teardown. NativeImage
-checks cover JavaScript wrappers; pixel storage is native memory and needs a
-separate native-memory measure to assess its lifetime.
+function-count checks cover JavaScript wrappers; use `native-memory` to assess
+pixel storage as well.
+
+## Native and graphics memory
+
+On Linux, collect process footprints and Chromium allocator counters with:
+
+```sh
+npm run e2e:electron -- --only offscreen-render-close --measure native-memory --warmup 37 --runs 185
+```
+
+`native-memory` records PID/start-time-validated `/proc/<pid>/smaps_rollup` PSS,
+RSS, and private memory for the launched application's processes, classified as
+main, GPU, renderer, utility, or other. Root process-tree discovery at checkpoints
+also finds children absent from Electron's app metrics. Each cycle collects main-process garbage
+before sampling; renderer heaps are not explicitly collected. Node's external-memory counters are recorded alongside footprints.
+
+Detailed Chromium MemoryInfra traces are captured at baseline, every 37 cycles,
+at the end, and after a five-second idle period. The result includes live
+`malloc/allocated_objects` bytes and the reported GPU allocator root size, plus
+individual graphics allocator rows. Parent and child allocator sizes are not added
+together. Missing counters remain `null`; they are not treated as zero. Tracing is
+primed before baseline and is stopped between checkpoints. Raw traces remain in
+the run's artifact directory.
+
+Use process-tree PSS for totals; summed RSS double-counts shared mappings.
+Footprints include JavaScript, native allocations, code, mappings, and retained
+allocator capacity; footprint growth alone does not establish a native leak.
+Live malloc counters also do not cover every allocation path: native Buffer
+storage, for example, is additionally tracked by external-memory counters and OS
+footprints. Graphics counters describe Chromium-tracked allocations, and GPU-process
+PSS/RSS describes that process's host memory, not physical GPU VRAM.
+
+`--software-gpu` requests ANGLE/SwiftShader so graphics allocations can be exercised
+on machines without usable hardware acceleration. Results include the requested
+mode, GPU capabilities, and the actual WebGL renderer probe. Software-renderer
+results cannot validate physical GPU-driver/VRAM leaks.
+
+The NativeImage scenario uses 512×512 source bitmaps so accumulating native pixel
+storage would have a meaningful signal. Two additional positive controls are
+selected explicitly:
+
+```sh
+npm run e2e:electron -- --only retained-native-buffer --measure native-memory --runs 8
+npm run e2e:electron -- --only retained-gpu-texture --measure native-memory --software-gpu --runs 4
+```
+
+The first retains one touched MiB of Buffer storage per cycle; the second retains
+a renderer and a committed 4 MiB WebGL texture per cycle. `idle` is an overhead
+control. `--check-leaks` remains specific to the function-count measurement;
+native/graphics data is reported for trend and allocator analysis.
+
+For diagnostic controls, `--js-flags=--jitless` disables V8 JIT compilation and
+`--skip-native-traces` retains process-footprint sampling while omitting MemoryInfra
+captures. These controls help distinguish code/cache growth and tracing overhead
+from API retention; omitted allocator counters remain unavailable in the result.
+Native measurements default to `electron-app/native-memory` under the results
+root; function and heap measurements remain under `electron-main`.

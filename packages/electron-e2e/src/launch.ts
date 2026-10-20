@@ -27,15 +27,25 @@ export const stopChild = async (child: ChildProcess): Promise<void> => {
   kill('SIGKILL')
 }
 
-export const launch = async (workspace: string, userDataPath: string, noSandbox: boolean) => {
+export const launch = async (workspace: string, userDataPath: string, noSandbox: boolean, softwareGpu = false, jsFlags = '') => {
   const env: NodeJS.ProcessEnv = { ...process.env, ELECTRON_E2E_USER_DATA: userDataPath, ELECTRON_E2E_NODE_PATH: process.execPath }
   delete env.ELECTRON_RUN_AS_NODE
   delete env.NODE_OPTIONS
-  const child = spawn(getElectronBinary(workspace), ['--inspect=127.0.0.1:0', ...(noSandbox ? ['--no-sandbox'] : []), workspace], {
-    detached: process.platform !== 'win32',
-    env,
-    stdio: ['ignore', 'ignore', 'pipe'],
-  })
+  const child = spawn(
+    getElectronBinary(workspace),
+    [
+      '--inspect=127.0.0.1:0',
+      ...(noSandbox ? ['--no-sandbox'] : []),
+      ...(softwareGpu ? ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] : []),
+      ...(jsFlags ? [`--js-flags=${jsFlags}`] : []),
+      workspace,
+    ],
+    {
+      detached: process.platform !== 'win32',
+      env,
+      stdio: ['ignore', 'ignore', 'pipe'],
+    },
+  )
   let logs = ''
   try {
     const endpoint = await new Promise<string>((resolve, reject) => {

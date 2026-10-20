@@ -172,11 +172,11 @@ module.exports = ({ settle, waitForEvent, closeWindow, verifyWebContentsCount })
       await settle()
     },
     async nativeImageCreateTransformRelease() {
-      const image = nativeImage.createFromBitmap(Buffer.alloc(16 * 16 * 4, 255), { width: 16, height: 16 })
-      const resized = image.resize({ width: 8, height: 8 })
-      const cropped = resized.crop({ x: 0, y: 0, width: 4, height: 4 })
+      const image = nativeImage.createFromBitmap(Buffer.alloc(512 * 512 * 4, 255), { width: 512, height: 512 })
+      const resized = image.resize({ width: 256, height: 256 })
+      const cropped = resized.crop({ x: 0, y: 0, width: 128, height: 128 })
       const png = cropped.toPNG()
-      if (cropped.isEmpty() || cropped.getSize().width !== 4 || png.length === 0) throw new Error('Native image transformation failed')
+      if (cropped.isEmpty() || cropped.getSize().width !== 128 || png.length === 0) throw new Error('Native image transformation failed')
       // NativeImage has no explicit destroy API; these wrappers must be collectible.
       await settle()
     },
