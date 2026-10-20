@@ -164,7 +164,7 @@ test('HTML tables preserve full selector data without allowing selector text to 
   expect(html).toContain('data-key="matchAttempts"')
   expect(html).toContain('data-key="matchCount"')
   expect(html).not.toContain(selector)
-  const serialized = html.match(/<script id="selector-data" type="application\/json">(.*?)<\/script>/s)![1]!
+  const serialized = html.match(/<script data-selector-data type="application\/json">(.*?)<\/script>/s)![1]!
   expect(JSON.parse(serialized).find((entry: { selector: string }) => entry.selector === selector).after.elapsedMs).toBe(15)
 })
 
@@ -203,7 +203,7 @@ test('offline pair and version-series reports include totals, selector details a
   expect(series.trends[0]!.points).toEqual([100, 200, 400])
   const index = await readFile(join(seriesOutput, 'index.html'), 'utf8')
   expect(index).toContain('Slowest CSS selectors')
-  expect(index).toContain(`src="pair-2/charts/${benchmark.id}-slowest.html"`)
+  expect(index).toContain(`href="pair-2/charts/${benchmark.id}-slowest.html"`)
   expect(index).toContain(`href="pair-1/charts/${benchmark.id}-slowest.html"`)
   expect(await readFile(join(seriesOutput, 'pair-2', 'charts', `${benchmark.id}-details.svg`), 'utf8')).toContain('.removed')
 })

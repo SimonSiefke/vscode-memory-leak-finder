@@ -1,4 +1,4 @@
-import { access, mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { commitLabel } from '../CommitReference/CommitReference.ts'
 import { errorMessage, readJson } from '../Io/Io.ts'
@@ -126,20 +126,14 @@ export const generateTrendReport = async (options: { input: string; output: stri
     let latestPair = -1
     for (const [index, pair] of pairs.entries()) {
       const chart = `${pair.id}/charts/${benchmark.id}-slowest.html`
-      if (
-        !(await access(join(options.output, chart)).then(
-          () => true,
-          () => false,
-        ))
-      )
-        continue
+      if (!reports[index]!.selectorTables[benchmark.id]) continue
       latestChart = chart
       latestPair = index
       links.push(`<a href="${chart}">${escapeHtml(labels[index])} → ${escapeHtml(labels[index + 1])}</a>`)
     }
     if (latestPair >= 0)
       selectorSections.push(
-        `<section><h2>Slowest CSS selectors · ${escapeHtml(benchmark.id)}</h2><p>Latest measured comparison: ${escapeHtml(labels[latestPair])} → ${escapeHtml(labels[latestPair + 1])}. Sortable table of selector time, matchAttempts, and matchCount; top 1,000 after sorting all selectors; identical selector text combined across stylesheets. Nested fragments are shown as Chromium recorded them.</p><p><a href="${latestChart}">Open selector table</a></p><iframe loading="lazy" style="width:100%;height:900px;border:1px solid #dde3ef" src="${latestChart}" title="${escapeHtml(benchmark.id)} sortable selector statistics"></iframe><details><summary>Selector rankings for every measured comparison</summary>${links.join('<br/>')}</details></section>`,
+        `<section><h2>Slowest CSS selectors · ${escapeHtml(benchmark.id)}</h2><p>Latest measured comparison: ${escapeHtml(labels[latestPair])} → ${escapeHtml(labels[latestPair + 1])}. Sortable table of selector time, matchAttempts, and matchCount; top 1,000 after sorting all selectors; identical selector text combined across stylesheets. Nested fragments are shown as Chromium recorded them.</p><p><a href="${latestChart}">Open selector table</a></p>${reports[latestPair]!.selectorTables[benchmark.id]}<details><summary>Selector rankings for every measured comparison</summary>${links.join('<br/>')}</details></section>`,
       )
   }
   const trends = trendsFor(reports)
