@@ -45,6 +45,7 @@ const verifyWebContentsCount = (expected) => {
 
 globalThis.electronE2E = {
   ready: app.whenReady().then(() => true),
+  ...require('./api-lifecycles.cjs')({ settle, waitForEvent, closeWindow, verifyWebContentsCount }),
   async windowOpenClose() {
     const window = new BrowserWindow({ width: 400, height: 300, show: true })
     try {

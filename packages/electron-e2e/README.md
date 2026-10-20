@@ -114,13 +114,21 @@ warmup, for example `--warmup 37`, to assess whether later cycles keep growing.
 Use `--only <scenario>` to select an API lifecycle. Each cycle waits for the
 resource to become ready and for its destruction or exit before sampling.
 
-| Scenario                         | Measured cycle                                                                                                                                                                    |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `webcontentsview-add-remove`     | Attach a new WebContentsView to a persistent BrowserWindow, load it, remove it, and explicitly close its webContents. The host window is created in setup and closed in teardown. |
-| `utility-process-create-kill`    | Fork an Electron utility process, receive its ready message, kill it, and await exit.                                                                                             |
-| `node-process-create-kill`       | Spawn the runner's actual Node executable, receive readiness on stdout, kill it, and await process/stdio closure.                                                                 |
-| `worker-thread-create-terminate` | Create a Node worker thread in the main process, receive readiness, terminate it, and verify the thread ID becomes -1.                                                            |
-| `offscreen-render-close`         | Create an offscreen BrowserWindow, load a local page, await a nonempty painted bitmap, stop painting, close the window, and verify webContents destruction.                       |
+| Scenario                                | Measured cycle                                                                                                                                                                    |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `webcontentsview-add-remove`            | Attach a new WebContentsView to a persistent BrowserWindow, load it, remove it, and explicitly close its webContents. The host window is created in setup and closed in teardown. |
+| `utility-process-create-kill`           | Fork an Electron utility process, receive its ready message, kill it, and await exit.                                                                                             |
+| `node-process-create-kill`              | Spawn the runner's actual Node executable, receive readiness on stdout, kill it, and await process/stdio closure.                                                                 |
+| `worker-thread-create-terminate`        | Create a Node worker thread in the main process, receive readiness, terminate it, and verify the thread ID becomes -1.                                                            |
+| `offscreen-render-close`                | Create an offscreen BrowserWindow, load a local page, await a nonempty painted bitmap, stop painting, close the window, and verify webContents destruction.                       |
+| `message-channel-roundtrip-close`       | Send and verify a MessageChannelMain message, then close both ports and await peer disconnection.                                                                                 |
+| `ipc-handle-invoke-remove`              | Register and invoke a main-process IPC handler from a persistent local renderer, remove it, then register/invoke/remove a replacement to verify cleanup.                          |
+| `protocol-handle-fetch-unhandle`        | Register a handler in a reused in-memory session, fetch and consume its response, unhandle the scheme, and verify registration is gone.                                           |
+| `web-request-intercept-remove`          | Intercept a request to a local HTTP server, consume its response, remove the listener, and verify a second request does not invoke it.                                            |
+| `cookie-set-get-remove`                 | Set and read a cookie in a reused in-memory session, remove it, and verify absence.                                                                                               |
+| `debugger-attach-command-detach`        | Attach the webContents debugger to a persistent local renderer, evaluate a command, detach, and verify attachment is gone.                                                        |
+| `menu-install-restore`                  | Create/install a menu, exercise its action callback, and restore the previous application menu.                                                                                   |
+| `native-image-create-transform-release` | Create, resize, crop, and PNG-encode NativeImage objects; drop the local wrappers for collection.                                                                                 |
 
 The process and thread fixtures stay alive until explicitly terminated. The view
 scenario checks that only the host webContents remains; the offscreen scenario
@@ -140,3 +148,10 @@ native allocations.
 API references: [WebContentsView](https://www.electronjs.org/docs/latest/api/web-contents-view),
 [utilityProcess](https://www.electronjs.org/docs/latest/api/utility-process), and
 [offscreen rendering](https://www.electronjs.org/docs/latest/tutorial/offscreen-rendering).
+
+The IPC/debugger renderer loads only a local data URL; Node integration is enabled
+for that fixture so IPC calls exercise the real renderer-to-main path. Fetch tests
+use an in-memory session and local/custom-protocol responses. The web-request
+server and host windows are created in setup and closed in teardown. NativeImage
+checks cover JavaScript wrappers; pixel storage is native memory and needs a
+separate native-memory measure to assess its lifetime.
