@@ -34,6 +34,7 @@ const main = async (): Promise<void> => {
       'software-gpu': { type: 'boolean', default: false },
       'js-flags': { type: 'string' },
       'skip-native-traces': { type: 'boolean', default: false },
+      'native-trace-interval': { type: 'string', default: '37' },
       help: { type: 'boolean', default: false },
     },
   })
@@ -49,7 +50,8 @@ const main = async (): Promise<void> => {
   --no-sandbox           Pass --no-sandbox to Electron
   --software-gpu         Exercise ANGLE/SwiftShader graphics allocations
   --js-flags <flags>     Pass V8 flags to the test app for diagnostic controls
-  --skip-native-traces   Sample native process footprints without MemoryInfra tracing`)
+  --skip-native-traces   Sample native process footprints without MemoryInfra tracing
+  --native-trace-interval <n>  Cycles between allocator traces (default: 37)`)
     return
   }
   if (values.measure !== 'named-function-count3' && values.measure !== 'heap-usage' && values.measure !== 'native-memory') {
@@ -57,6 +59,7 @@ const main = async (): Promise<void> => {
   }
   const runs = positiveInteger(values.runs, '--runs')
   const warmup = positiveInteger(values.warmup, '--warmup')
+  const nativeTraceInterval = positiveInteger(values['native-trace-interval'], '--native-trace-interval')
   const scenarios = (await readdir(scenariosPath)).filter((name) => name.endsWith('.ts')).map((name) => name.slice(0, -3))
   if (!scenarios.includes(values.only)) throw new Error(`Unknown scenario: ${values.only}. Available: ${scenarios.join(', ')}`)
   const scenario: Scenario = await import(pathToFileURL(join(scenariosPath, `${values.only}.ts`)).href)
@@ -104,6 +107,7 @@ const main = async (): Promise<void> => {
           () => scenario.run(context),
           artifactsPath,
           !values['skip-native-traces'],
+          nativeTraceInterval,
         )
       } else if (values.measure === 'heap-usage') {
         const result = await measureHeapUsage(app.rpc, runs, () => scenario.run(context))
@@ -134,6 +138,7 @@ const main = async (): Promise<void> => {
         electronVersion: app.identity.electron,
         softwareGpuRequested: values['software-gpu'],
         jsFlags: values['js-flags'] || '',
+        ...(values.measure === 'native-memory' ? { nativeTraceInterval } : {}),
         runs,
         warmup,
         workspace,

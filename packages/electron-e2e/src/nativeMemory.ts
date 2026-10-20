@@ -58,6 +58,7 @@ export const measureNativeMemory = async (
   run: () => Promise<void>,
   artifactsPath: string,
   collectTraces = true,
+  traceInterval = 37,
 ) => {
   if (process.platform !== 'linux') throw new Error('native-memory currently requires Linux /proc/smaps_rollup')
   let complete = true
@@ -147,7 +148,7 @@ export const measureNativeMemory = async (
   const before = await sample(0)
   for (let cycle = 1; cycle <= runs; cycle++) {
     await run()
-    if (cycle % 37 === 0 || cycle === runs) await checkpoint(cycle)
+    if (cycle % traceInterval === 0 || cycle === runs) await checkpoint(cycle)
     await sample(cycle)
   }
   // Observe delayed resource retirement and allocator retention without further operations.

@@ -171,7 +171,9 @@ also finds children absent from Electron's app metrics. Each cycle collects main
 before sampling; renderer heaps are not explicitly collected. Node's external-memory counters are recorded alongside footprints.
 
 Detailed Chromium MemoryInfra traces are captured at baseline, every 37 cycles,
-at the end, and after a five-second idle period. The result includes live
+at the end, and after a five-second idle period. `--native-trace-interval <n>`
+changes the checkpoint interval; setting it to the run count keeps captures at
+baseline, the end, and after idle. The result includes live
 `malloc/allocated_objects` bytes and the reported GPU allocator root size, plus
 individual graphics allocator rows. Parent and child allocator sizes are not added
 together. Missing counters remain `null`; they are not treated as zero. Tracing is
