@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url'
 import { takeHeapSnapshot } from '../../memory-leak-finder/src/parts/HeapSnapshot/HeapSnapshot.ts'
 import { launchHeapSnapshotWorker } from '../../memory-leak-finder/src/parts/LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts'
 import { create as createScriptHandler } from '../../memory-leak-finder/src/parts/ScriptHandler/ScriptHandler.ts'
+import { measureHeapUsage } from './heapUsage.ts'
 import { launch, stopChild } from './launch.ts'
 import { prepare } from './prepare.ts'
 import type { Scenario } from './types.ts'
@@ -35,7 +36,7 @@ const main = async (): Promise<void> => {
   if (values.help) {
     console.log(`Usage: npm run e2e:electron -- [options]
   --only <scenario>       window-open-close (default), retained-function (positive control)
-  --measure <measure>     named-function-count3
+  --measure <measure>     named-function-count3 or heap-usage
   --runs <n>             Measured cycles (default: 5)
   --warmup <n>           Warmup cycles before baseline (default: 2)
   --cache-dir <path>     Override persistent Electron workspace cache
@@ -44,7 +45,9 @@ const main = async (): Promise<void> => {
   --no-sandbox           Pass --no-sandbox to Electron`)
     return
   }
-  if (values.measure !== 'named-function-count3') throw new Error(`Unsupported Electron measure: ${values.measure}`)
+  if (values.measure !== 'named-function-count3' && values.measure !== 'heap-usage') {
+    throw new Error(`Unsupported Electron measure: ${values.measure}`)
+  }
   const runs = positiveInteger(values.runs, '--runs')
   const warmup = positiveInteger(values.warmup, '--warmup')
   const scenarios = (await readdir(scenariosPath)).filter((name) => name.endsWith('.ts')).map((name) => name.slice(0, -3))
@@ -79,22 +82,33 @@ const main = async (): Promise<void> => {
   const scriptHandler = createScriptHandler()
   try {
     console.log(`Measuring Electron ${app.identity.electron} main process (pid ${context.pid})`)
-    await scriptHandler.start(app.rpc)
+    if (values.measure === 'named-function-count3') await scriptHandler.start(app.rpc)
     try {
       await scenario.setup?.(context)
       for (let i = 0; i < warmup; i++) await scenario.run(context)
-      const beforePath = join(artifactsPath, 'before.heapsnapshot')
-      const afterPath = join(artifactsPath, 'after.heapsnapshot')
-      await app.rpc.invoke('HeapProfiler.collectGarbage')
-      await takeHeapSnapshot(app.rpc, beforePath)
-      for (let i = 0; i < runs; i++) await scenario.run(context)
-      await app.rpc.invoke('HeapProfiler.collectGarbage')
-      await takeHeapSnapshot(app.rpc, afterPath)
-      const scriptMap = scriptHandler.scriptMap
-      await writeFile(join(artifactsPath, 'script-map.json'), JSON.stringify(scriptMap, null, 2) + '\n')
-      await using worker = await launchHeapSnapshotWorker()
-      // Same comparison as named-function-count3, scoped to this app's scripts.
-      const functions = await worker.invoke('HeapSnapshot.compareFunctions2', beforePath, afterPath, { minCount: runs, scriptMap })
+      let measurement: Record<string, unknown>
+      let suspectedLeak = false
+      if (values.measure === 'heap-usage') {
+        const result = await measureHeapUsage(app.rpc, runs, () => scenario.run(context))
+        measurement = result
+        console.log(`Post-GC heap usage delta: ${result.heapUsage.delta} bytes`)
+      } else {
+        const beforePath = join(artifactsPath, 'before.heapsnapshot')
+        const afterPath = join(artifactsPath, 'after.heapsnapshot')
+        await app.rpc.invoke('HeapProfiler.collectGarbage')
+        await takeHeapSnapshot(app.rpc, beforePath)
+        for (let i = 0; i < runs; i++) await scenario.run(context)
+        await app.rpc.invoke('HeapProfiler.collectGarbage')
+        await takeHeapSnapshot(app.rpc, afterPath)
+        const scriptMap = scriptHandler.scriptMap
+        await writeFile(join(artifactsPath, 'script-map.json'), JSON.stringify(scriptMap, null, 2) + '\n')
+        await using worker = await launchHeapSnapshotWorker()
+        // Same comparison as named-function-count3, scoped to this app's scripts.
+        const functions = await worker.invoke('HeapSnapshot.compareFunctions2', beforePath, afterPath, { minCount: runs, scriptMap })
+        console.log(`${functions.length} growing function locations`)
+        measurement = { namedFunctionCount3: functions }
+        suspectedLeak = functions.length > 0
+      }
       const result = {
         scenario: values.only,
         measure: values.measure,
@@ -105,14 +119,14 @@ const main = async (): Promise<void> => {
         warmup,
         workspace,
         artifactsPath,
-        namedFunctionCount3: functions,
+        ...measurement,
       }
       const json = JSON.stringify(result, null, 2) + '\n'
       await writeFile(join(artifactsPath, 'result.json'), json)
       const resultPath = join(resultsDir, `${values.only}.json`)
       await writeFile(resultPath, json)
-      console.log(`${functions.length} growing function locations. Results: ${resultPath}`)
-      if (values['check-leaks'] && functions.length) process.exitCode = 1
+      console.log(`Results: ${resultPath}`)
+      if (values['check-leaks'] && suspectedLeak) process.exitCode = 1
     } finally {
       await scenario.teardown?.(context)
     }

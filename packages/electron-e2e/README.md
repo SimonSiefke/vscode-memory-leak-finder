@@ -91,3 +91,20 @@ It is selected explicitly and does not run with the default window scenario.
 npm --prefix packages/electron-e2e test
 npm --prefix packages/electron-e2e run type-check
 ```
+
+## Heap usage
+
+Sample the main process's V8 heap usage after garbage collection, before the first
+measured cycle and after every cycle:
+
+```sh
+npm run e2e:electron -- --measure heap-usage --runs 37
+```
+
+Results under `electron-main/heap-usage` contain `heapUsage.samples` (cycle number,
+used bytes, and allocated heap bytes), baseline/final samples, and a signed byte
+delta. This run does not enable the debugger or take heap snapshots, so snapshot
+analysis does not affect the usage samples. `--check-leaks` applies only to the
+function measurement; heap usage is reported for trend analysis without an automatic
+leak verdict. Early growth can be initialization or caches. Repeat with a longer
+warmup, for example `--warmup 37`, to assess whether later cycles keep growing.
