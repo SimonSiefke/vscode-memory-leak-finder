@@ -125,7 +125,7 @@ export const generateTrendReport = async (options: { input: string; output: stri
     let latestChart = ''
     let latestPair = -1
     for (const [index, pair] of pairs.entries()) {
-      const chart = `${pair.id}/charts/${benchmark.id}-slowest.svg`
+      const chart = `${pair.id}/charts/${benchmark.id}-slowest.html`
       if (
         !(await access(join(options.output, chart)).then(
           () => true,
@@ -139,7 +139,7 @@ export const generateTrendReport = async (options: { input: string; output: stri
     }
     if (latestPair >= 0)
       selectorSections.push(
-        `<section><h2>Slowest CSS selectors · ${escapeHtml(benchmark.id)}</h2><p>Latest measured comparison: ${escapeHtml(labels[latestPair])} → ${escapeHtml(labels[latestPair + 1])}. Top 20 by the larger before/after median total matching time during startup; identical selector text combined across stylesheets. Nested fragments are shown as Chromium recorded them.</p><a href="${latestChart}"><img src="${latestChart}" alt="Top 20 slowest CSS selectors"/></a><details><summary>Selector rankings for every measured comparison</summary>${links.join('<br/>')}</details></section>`,
+        `<section><h2>Slowest CSS selectors · ${escapeHtml(benchmark.id)}</h2><p>Latest measured comparison: ${escapeHtml(labels[latestPair])} → ${escapeHtml(labels[latestPair + 1])}. Sortable table of selector time, matchAttempts, and matchCount; top 1,000 after sorting all selectors; identical selector text combined across stylesheets. Nested fragments are shown as Chromium recorded them.</p><p><a href="${latestChart}">Open selector table</a></p><iframe loading="lazy" style="width:100%;height:900px;border:1px solid #dde3ef" src="${latestChart}" title="${escapeHtml(benchmark.id)} sortable selector statistics"></iframe><details><summary>Selector rankings for every measured comparison</summary>${links.join('<br/>')}</details></section>`,
       )
   }
   const trends = trendsFor(reports)

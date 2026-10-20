@@ -3,6 +3,7 @@ import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { errorMessage, readJson } from '../Io/Io.ts'
 import { selectBenchmarks } from '../Manifest/Manifest.ts'
+import { selectorTableHtml } from '../CssSelectorReport/CssSelectorTable.ts'
 import { selectorDetailsSvg } from '../CssSelectorReport/CssSelectorReport.ts'
 import { comparePairs } from '../Statistics/Statistics.ts'
 import type { Benchmark, Metric, Result, Sample, Status } from '../Types/Types.ts'
@@ -310,10 +311,10 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       }
     }
     if (result && benchmark.collector === 'css-selectors' && entries.length) {
-      const slowestFilename = `${benchmark.id}-slowest.svg`
-      await writeFile(join(options.output, 'charts', slowestFilename), selectorDetailsSvg(result, 20))
+      const slowestFilename = `${benchmark.id}-slowest.html`
+      await writeFile(join(options.output, 'charts', slowestFilename), selectorTableHtml(result))
       chartHtml.push(
-        `<h3>Slowest CSS selectors</h3><figure><a href="charts/${slowestFilename}"><img loading="lazy" src="charts/${slowestFilename}" alt="Top 20 slowest CSS selectors by elapsed matching time"/></a><figcaption>Top 20 selectors, ranked by the larger before/after median of total matching time during startup, rather than time per match. Identical selector text is combined across stylesheets. Nested selector fragments such as &amp;:hover are shown as Chromium recorded them.</figcaption></figure>`,
+        `<h3>Slowest CSS selectors</h3><p>Sortable selector name, time, matchAttempts, and matchCount. Switch between before and after; sorting selects the top 1,000 from all selectors. <a href="charts/${slowestFilename}">Open selector table</a>.</p><iframe loading="lazy" style="width:100%;height:900px;border:1px solid #e3e8f2" src="charts/${slowestFilename}" title="Sortable CSS selector statistics"></iframe>`,
       )
       const totalsFilename = `${benchmark.id}-totals.svg`
       const totals = entries.map((entry, index) => comparisonSvg(entry).replace('<svg ', `<svg y="${index * 320}" `)).join('')

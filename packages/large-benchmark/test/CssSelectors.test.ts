@@ -3,7 +3,8 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { analyzeSelectorTrace } from '../src/parts/CssSelectors/CssSelectors.ts'
-import { selectorComparisons, selectorDetailsSvg } from '../src/parts/CssSelectorReport/CssSelectorReport.ts'
+import { selectorComparisons, selectorDetailsSvg, selectorStatistics } from '../src/parts/CssSelectorReport/CssSelectorReport.ts'
+import { selectorTableHtml } from '../src/parts/CssSelectorReport/CssSelectorTable.ts'
 import { sampleCount, selectBenchmarks } from '../src/parts/Manifest/Manifest.ts'
 import { generateReport, validateResult } from '../src/parts/Report/Report.ts'
 import { generateTrendReport } from '../src/parts/TrendReport/TrendReport.ts'
@@ -127,12 +128,44 @@ test('ranking happens after aggregation without per-sample truncation and charts
   expect(svg).not.toContain('<unsafe & selector>')
   expect(svg.match(/<rect x="670"/g)).toHaveLength(6000)
   expect(svg).toContain('Top 3000 of 3006')
-  const compact = selectorDetailsSvg(data, 20)
+  const compact = selectorDetailsSvg(data, 1000)
   expect(compact).toContain('Slowest CSS selectors')
-  expect(compact).toContain('Top 20 of 3006')
-  expect(compact.match(/<rect x="670"/g)).toHaveLength(40)
+  expect(compact).toContain('Top 1000 of 3006')
+  expect(compact.match(/<rect x="670"/g)).toHaveLength(2000)
   expect(compact).toContain('&lt;unsafe &amp; selector&gt;')
   expect(compact).not.toContain('.selector-0<')
+})
+
+test('table statistics retain all selectors and summarize counts over complete pairs only', () => {
+  const data = result()
+  data.requestedSamples = 3
+  data.samples[0]!.selectorStats = [{ ...row('.counts', 2), matchAttempts: 10, matchCount: 4 }]
+  data.samples[2]!.selectorStats = [{ ...row('.counts', 8), matchAttempts: 20, matchCount: 8 }]
+  data.samples.push({ ...data.samples[0]!, pair: 2, selectorStats: [row('.ignore', 999)] })
+  const stats = selectorStatistics(data)
+  expect(stats.pairs).toBe(2)
+  expect(stats.rows.find((entry) => entry.selector === '.counts')).toEqual({
+    selector: '.counts',
+    before: { elapsedMs: 5, matchAttempts: 15, matchCount: 6 },
+    after: { elapsedMs: 0, matchAttempts: 0, matchCount: 0 },
+  })
+  expect(stats.rows.some((entry) => entry.selector === '.ignore')).toBe(false)
+  data.samples[0]!.status = 'failed'
+  expect(selectorStatistics(data).rows.find((entry) => entry.selector === '.counts')!.before.matchCount).toBe(8)
+  for (const sample of data.samples) sample.selectorStats = Array.from({ length: 3005 }, (_, i) => row(`.s${i}`, i))
+  expect(selectorStatistics(data).rows).toHaveLength(3005)
+})
+
+test('HTML tables preserve full selector data without allowing selector text to escape its script', () => {
+  const data = result()
+  const selector = '</script><script>alert("selector")</script> & >'
+  data.samples[1]!.selectorStats!.push(row(selector, 30))
+  const html = selectorTableHtml(data)
+  expect(html).toContain('data-key="matchAttempts"')
+  expect(html).toContain('data-key="matchCount"')
+  expect(html).not.toContain(selector)
+  const serialized = html.match(/<script id="selector-data" type="application\/json">(.*?)<\/script>/s)![1]!
+  expect(JSON.parse(serialized).find((entry: { selector: string }) => entry.selector === selector).after.elapsedMs).toBe(15)
 })
 
 test('result validation rejects malformed selector values', () => {
@@ -157,7 +190,7 @@ test('offline pair and version-series reports include totals, selector details a
     resultPaths: [join(input, 'first', 'result.json')],
   })
   expect(pair.diagnostics).toEqual([])
-  expect(await readFile(join(output, 'charts', `${benchmark.id}-slowest.svg`), 'utf8')).toContain('.added')
+  expect(await readFile(join(output, 'charts', `${benchmark.id}-slowest.html`), 'utf8')).toContain('.added')
   expect(await readFile(join(output, 'charts', `${benchmark.id}-totals.svg`), 'utf8')).toContain('Before')
   expect(await readFile(join(output, 'charts', `${benchmark.id}-details.svg`), 'utf8')).toContain('.added')
   expect(await readFile(join(output, 'index.html'), 'utf8')).toContain('Selector details')
@@ -170,8 +203,8 @@ test('offline pair and version-series reports include totals, selector details a
   expect(series.trends[0]!.points).toEqual([100, 200, 400])
   const index = await readFile(join(seriesOutput, 'index.html'), 'utf8')
   expect(index).toContain('Slowest CSS selectors')
-  expect(index).toContain(`src="pair-2/charts/${benchmark.id}-slowest.svg"`)
-  expect(index).toContain(`href="pair-1/charts/${benchmark.id}-slowest.svg"`)
+  expect(index).toContain(`src="pair-2/charts/${benchmark.id}-slowest.html"`)
+  expect(index).toContain(`href="pair-1/charts/${benchmark.id}-slowest.html"`)
   expect(await readFile(join(seriesOutput, 'pair-2', 'charts', `${benchmark.id}-details.svg`), 'utf8')).toContain('.removed')
 })
 

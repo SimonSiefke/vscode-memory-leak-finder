@@ -224,13 +224,15 @@ inputs, qualified fork references, ordered commit arrays, and inclusive stable
 `version_range` inputs (for example `1.120.0...1.142.0`, once both endpoints are
 published). Each build is reused across adjacent comparisons.
 
-Each pair report includes three SVG charts per workload:
+Each pair report includes a sortable HTML table and two SVG charts per workload:
 
-- **Slowest CSS selectors:** a compact top 20 ranking by the larger before/after median
-  total matching time during startup, with the selector text beside each pair of bars.
-  This measures total cost, not time per match. Nested fragments such as `&:hover`
-  are displayed as Chromium recorded them.
-
+- **Slowest CSS selectors:** an interactive table with selector name, time (ms),
+  `matchAttempts`, and `matchCount`. Choose before or after and click any column
+  heading to sort; click again to reverse the order. The top 1,000 rows are selected
+  after sorting all selectors, so ranking by match attempts includes selectors
+  outside the slowest-by-time list. A text filter narrows the selectors. Times are
+  medians and counts are means per startup across complete sample pairs. Nested
+  fragments such as `&:hover` are displayed as Chromium recorded them.
 - **Totals:** elapsed selector matching time, match attempts, matches,
   fast rejects, invalidations (where supported), and recorded style recalculations. Each metric has its own scale;
   totals include all selectors, regardless of the detail limit.
@@ -253,7 +255,7 @@ complete trace contributes zero; an unavailable or failed trace contributes no
 pair. Added and removed selectors are included. Missing instrumentation, unsupported
 trace formats, missing startup boundaries, and full/lost trace buffers are reported
 as unavailable rather than zero. Raw traces and selector JSON remain in the result
-artifacts. Version-range reports show the latest measured top 20 chart for each workload,
+artifacts. Version-range reports show the latest measured sortable table for each workload,
 link to rankings for every measured adjacent version pair, and show total-metric trends.
 
 For a focused range comparison, use `version_range: 1.120.0...1.142.0` and
