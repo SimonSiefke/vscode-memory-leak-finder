@@ -64,9 +64,15 @@ export const measureFunctionCounts = async (commit: string, version: string, exe
 
 const escape = (value: string): string => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;')
 
-export const functionCountFrame = (version: string, counts: HistoryResult['counts'], maximum: number): string => {
+export const functionCountFrame = (
+  version: string,
+  counts: HistoryResult['counts'],
+  maximum: number,
+  original: { version: string; counts: HistoryResult['counts'] } = { version, counts },
+): string => {
   const x = (index: number) => 100 + (index / Math.max(1, counts.length - 1)) * 1080
   const y = (count: number) => 620 - (count / maximum) * 500
+  const points = (values: HistoryResult['counts']) => values.map((point, index) => `${x(index)},${y(point.count)}`).join(' ')
   const grid = Array.from({ length: 6 }, (_, i) => {
     const count = (maximum * i) / 5
     return `<path d="M100 ${y(count)}H1180" stroke="#ddd"/><text x="90" y="${y(count) + 5}" text-anchor="end">${Math.round(count).toLocaleString('en-US')}</text>`
@@ -79,7 +85,10 @@ export const functionCountFrame = (version: string, counts: HistoryResult['count
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
 <rect width="1280" height="720" fill="white"/><g font-family="DejaVu Sans" font-size="16" fill="#222">
 <text x="100" y="55" font-size="28">Function Count</text><text x="1180" y="55" text-anchor="end" font-size="28">VS Code ${escape(version)}</text>
-${grid}${ticks}<polyline points="${counts.map((point, index) => `${x(index)},${y(point.count)}`).join(' ')}" fill="none" stroke="black" stroke-width="2"/>
+<path d="M100 90H140" stroke="#64748b" stroke-opacity="0.4" stroke-width="3"/><text x="152" y="95">Original: VS Code ${escape(original.version)}</text>
+<path d="M650 90H690" stroke="black" stroke-width="2"/><text x="702" y="95">Current: VS Code ${escape(version)}</text>
+${grid}${ticks}<polyline data-series="original" points="${points(original.counts)}" fill="none" stroke="#64748b" stroke-opacity="0.4" stroke-width="3"/>
+<polyline data-series="current" points="${points(counts)}" fill="none" stroke="black" stroke-width="2"/>
 <text x="640" y="695" text-anchor="middle">E2E test index (same test order for every version)</text></g></svg>`
 }
 
@@ -126,7 +135,7 @@ export const reportFunctionCountHistory = async (manifest: HistoryManifest, inpu
   await mkdir(output, { recursive: true })
   const frameDir = join(output, 'frames')
   await rm(frameDir, { recursive: true, force: true })
-  await rm(join(output, 'function-count-history.mp4'), { force: true })
+  for (const name of ['function-count-history.mp4', 'comparison.svg', 'comparison.png']) await rm(join(output, name), { force: true })
   await mkdir(frameDir)
   await writeJson(
     join(output, 'coverage.json'),
@@ -139,18 +148,26 @@ export const reportFunctionCountHistory = async (manifest: HistoryManifest, inpu
     })),
   )
   await writeJson(join(output, 'test-order.json'), names)
+  const original = frames[0]
   await writeFile(
     join(output, 'index.html'),
     `<!doctype html><meta charset="utf-8"><title>Function counts over time</title>
 <h1>Function counts over time</h1><p>${frames.length}/${ordered.length} versions; ${manifest.frameDurationMs} ms per frame. Shared axes. <a href="coverage.json">Coverage and diagnostics</a> · <a href="test-order.json">Test order</a></p>
+${original ? `<p>The faded line preserves the first usable version, VS Code ${escape(original.version)}, throughout playback. <a href="comparison.png">View the final comparison image</a> · <a href="comparison.svg">SVG</a></p>` : ''}
 <video controls loop width="1280" src="function-count-history.mp4"></video><ul>${ordered.map((item) => `<li>VS Code ${escape(item.version)}: ${usable(item.result) ? 'included' : 'unavailable'}</li>`).join('')}</ul>`,
   )
-  if (!frames.length) throw new Error('Report preserved, but no usable function-count frames exist')
+  if (!original) throw new Error('Report preserved, but no usable function-count frames exist')
   for (const [index, item] of frames.entries()) {
     const path = join(frameDir, String(index).padStart(4, '0'))
-    await writeFile(`${path}.svg`, functionCountFrame(item.version, item.result!.counts, maximum))
+    await writeFile(
+      `${path}.svg`,
+      functionCountFrame(item.version, item.result!.counts, maximum, { version: original.version, counts: original.result!.counts }),
+    )
     await command('ffmpeg', ['-v', 'error', '-y', '-c:v', 'librsvg', '-i', `${path}.svg`, '-frames:v', '1', `${path}.png`])
   }
+  const finalFrame = join(frameDir, String(frames.length - 1).padStart(4, '0'))
+  await cp(`${finalFrame}.svg`, join(output, 'comparison.svg'))
+  await cp(`${finalFrame}.png`, join(output, 'comparison.png'))
   await command('ffmpeg', [
     '-y',
     '-framerate',
