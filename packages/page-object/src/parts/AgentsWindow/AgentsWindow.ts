@@ -8,9 +8,7 @@ const sessionRows = `${workbench} .sessions-list-control .monaco-list-row`
 export const create = (params: CreateParams) => {
   const { expect, page, platform } = params
   const rowFor = (title: string) => page.locator(sessionRows, { hasText: title })
-  const typeMessage = async (editor: any, message: string) => {
-    await expect(editor).toBeVisible({ timeout: 60_000 })
-    const input = editor.locator('.native-edit-context')
+  const focusInput = async (input: any) => {
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         await page.waitForIdle()
@@ -22,6 +20,11 @@ export const create = (params: CreateParams) => {
         if (attempt === 2) throw error
       }
     }
+  }
+  const typeMessage = async (editor: any, message: string) => {
+    await expect(editor).toBeVisible({ timeout: 60_000 })
+    const input = editor.locator('.native-edit-context')
+    await focusInput(input)
     await input.type(message)
     await page.waitForIdle()
     await expect(editor.locator('.view-lines')).toHaveText(message.replaceAll(' ', '\u00a0'))
@@ -69,9 +72,7 @@ export const create = (params: CreateParams) => {
     },
     async clearDraft() {
       const input = page.locator(`${composer} .native-edit-context`)
-      await input.focus()
-      await page.waitForIdle()
-      await expect(input).toBeFocused()
+      await focusInput(input)
       await page.keyboard.press(platform === 'darwin' ? 'Meta+A' : 'Control+A')
       await page.waitForIdle()
       await page.keyboard.press('Backspace')
