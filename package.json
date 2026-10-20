@@ -25,7 +25,8 @@
     "measure-codex-webview-load-time": "npm --prefix packages/build run measure-codex-webview-load-time --",
     "measure-warm-codex-webview-load-time": "npm --prefix packages/build run measure-warm-codex-webview-load-time --",
     "measure-webview-memory": "npm --prefix packages/build run measure-webview-memory --",
-    "backport-prs": "npm --prefix packages/build run backport-prs --"
+    "backport-prs": "npm --prefix packages/build run backport-prs --",
+    "e2e:electron": "node packages/electron-e2e/src/main.ts"
   },
   "repository": {
     "type": "git",

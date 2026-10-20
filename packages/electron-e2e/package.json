@@ -1,0 +1,11 @@
+{
+  "name": "@vscode-memory-leak-finder/electron-e2e",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "type-check": "tsc -p .",
+    "e2e:electron": "node src/main.ts"
+  }
+}

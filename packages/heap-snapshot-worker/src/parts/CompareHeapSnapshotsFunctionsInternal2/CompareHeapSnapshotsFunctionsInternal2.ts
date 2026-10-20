@@ -1,7 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { UniqueLocation, UniqueLocationMap } from '../UniqueLocationMap/UniqueLocationMap.ts'
 import type { CompareResult } from './CompareResult.ts'
-import { addOriginalSources } from '../AddOriginalSources/AddOriginalSources.ts'
+import { addOriginalSources, type ScriptInfo } from '../AddOriginalSources/AddOriginalSources.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
 
@@ -73,6 +73,7 @@ const formatUniqueLocations = (
 export interface CompareFunctionsOptions {
   readonly excludeOriginalPaths?: readonly string[]
   readonly minCount?: number
+  readonly scriptMap?: Readonly<Record<number, ScriptInfo>>
 }
 
 const filterOutExcluded = (items: readonly CompareResult[], excludes: readonly string[]): readonly CompareResult[] => {
@@ -137,7 +138,7 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
     nodeNameOffset,
     after.strings,
   )
-  const enriched = await addOriginalSources(formattedItems)
+  const enriched = await addOriginalSources(formattedItems, options.scriptMap)
   const excludes = options.excludeOriginalPaths || []
   const filtered = filterOutExcluded(enriched, excludes)
   const sorted = filtered.toSorted(compareCount)
