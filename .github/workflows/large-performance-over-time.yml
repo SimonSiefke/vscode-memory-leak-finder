@@ -69,6 +69,8 @@ jobs:
       - name: Build harness
         run: npm run build
       - name: Build and archive the minified VS Code package
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           node packages/large-benchmark/src/main.ts prepare \
             --commit "$COMMIT" --output-dir .large-build
