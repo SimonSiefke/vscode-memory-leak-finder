@@ -3,6 +3,7 @@ import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { errorMessage, readJson } from '../Io/Io.ts'
 import { selectBenchmarks } from '../Manifest/Manifest.ts'
+import { selectorTableContent, selectorTableHtml } from '../CssSelectorReport/CssSelectorTable.ts'
 import { selectorDetailsSvg } from '../CssSelectorReport/CssSelectorReport.ts'
 import { comparePairs } from '../Statistics/Statistics.ts'
 import type { Benchmark, Metric, Result, Sample, Status } from '../Types/Types.ts'
@@ -269,6 +270,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
   const comparisons: Comparison[] = []
   const coverage: { benchmark: string; status: Status; pairs: number; requested: number; diagnostics: string[] }[] = []
   const sections: string[] = []
+  const selectorTables: Record<string, string> = {}
   const smoke = options.benchmarks.some((b) => b.collector === 'smoke')
     ? await reportSmoke(options.input, options.output, options.commits)
     : undefined
@@ -310,6 +312,12 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       }
     }
     if (result && benchmark.collector === 'css-selectors' && entries.length) {
+      const slowestFilename = `${benchmark.id}-slowest.html`
+      selectorTables[benchmark.id] = selectorTableContent(result)
+      await writeFile(join(options.output, 'charts', slowestFilename), selectorTableHtml(result))
+      chartHtml.push(
+        `<h3>Slowest CSS selectors</h3><p>Sortable selector name, time, matchAttempts, and matchCount. Switch between before and after; sorting selects the top 1,000 from all selectors. <a href="charts/${slowestFilename}">Open selector table</a>.</p>${selectorTables[benchmark.id]}`,
+      )
       const totalsFilename = `${benchmark.id}-totals.svg`
       const totals = entries.map((entry, index) => comparisonSvg(entry).replace('<svg ', `<svg y="${index * 320}" `)).join('')
       await writeFile(
@@ -462,5 +470,5 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     ${sections.map((section, index) => section.replace('<section ', `<section id="${options.benchmarks.filter((b) => b.collector !== 'smoke')[index]!.id}" `)).join('')}
     <script>const view=document.getElementById('view'), filter=document.getElementById('filter'); function update(){const mode=view.value,q=filter.value.toLowerCase();for(const el of document.querySelectorAll('[data-id]')){const matches=mode==='all'||mode==='startup'&&el.dataset.startup==='true'||mode==='editor'&&el.dataset.startup==='false'&&!['bundles','resources','profile','memory'].includes(el.dataset.collector)||mode===el.dataset.collector;el.hidden=!matches||!(el.textContent+' '+el.dataset.id+' '+(el.dataset.search||'')).toLowerCase().includes(q)}for(const row of document.querySelectorAll('[data-matrix-row]'))row.hidden=Array.from(row.querySelectorAll('td')).every(cell=>cell.hidden||cell.dataset.comparable==='false');for(const column of document.querySelectorAll('[data-matrix-collector]'))column.hidden=!['all','startup','editor'].includes(mode)&&mode!==column.dataset.matrixCollector}view.addEventListener('change',update);filter.addEventListener('input',update)</script></body></html>`
   await writeFile(join(options.output, 'index.html'), html)
-  return summary
+  return { ...summary, selectorTables }
 }

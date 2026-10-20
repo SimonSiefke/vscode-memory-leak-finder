@@ -336,8 +336,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const searchCount = page.locator('.settings-count-widget')
         await expect(searchCount).toBeVisible()
         await page.waitForIdle()
-        if (resultCount === 'many' || resultCount > 1) {
-          await expect(searchCount).toHaveText(new RegExp(`\\d+ Settings Found`))
+        if (resultCount === 'many') {
+          await expect(searchCount).toHaveText(/^[1-9]\d* Settings? Found$/)
         } else {
           const word = resultCount === 1 ? 'Setting' : 'Settings'
           await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)

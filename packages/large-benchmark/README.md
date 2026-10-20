@@ -177,7 +177,12 @@ between tests, so counts describe the retained functions after each scenario.
 Download **large-performance-over-time** and open `index.html` or play
 `function-count-history.mp4`. The 1280×720 H.264 video has the VS Code version at
 the top right of every frame. All frames use the same zero-based count scale and
-alphabetical test order. SVG and PNG frames are retained in `frames/`, and
+alphabetical test order. Every frame overlays the first usable version as a faded
+reference line behind the current version, with a legend identifying both versions.
+Failed or unavailable initial versions are skipped when choosing this fixed reference.
+The final frame is also saved as `comparison.png` and `comparison.svg` and linked
+from the report, so one image shows the change from the first usable version to
+the last. SVG and PNG frames are retained in `frames/`, and
 `test-order.json` maps chart indexes to test names. Twenty usable frames make an
 eight-second video at the default speed; the HTML player supports looping.
 
@@ -224,8 +229,15 @@ inputs, qualified fork references, ordered commit arrays, and inclusive stable
 `version_range` inputs (for example `1.120.0...1.142.0`, once both endpoints are
 published). Each build is reused across adjacent comparisons.
 
-Each pair report includes two SVG charts per workload:
+Each pair report includes a sortable HTML table and two SVG charts per workload:
 
+- **Slowest CSS selectors:** an interactive table with selector name, time (ms),
+  `matchAttempts`, and `matchCount`. Choose before or after and click any column
+  heading to sort; click again to reverse the order. The top 1,000 rows are selected
+  after sorting all selectors, so ranking by match attempts includes selectors
+  outside the slowest-by-time list. A text filter narrows the selectors. Times are
+  medians and counts are means per startup across complete sample pairs. Nested
+  fragments such as `&:hover` are displayed as Chromium recorded them.
 - **Totals:** elapsed selector matching time, match attempts, matches,
   fast rejects, invalidations (where supported), and recorded style recalculations. Each metric has its own scale;
   totals include all selectors, regardless of the detail limit.
@@ -248,8 +260,8 @@ complete trace contributes zero; an unavailable or failed trace contributes no
 pair. Added and removed selectors are included. Missing instrumentation, unsupported
 trace formats, missing startup boundaries, and full/lost trace buffers are reported
 as unavailable rather than zero. Raw traces and selector JSON remain in the result
-artifacts. Version-range reports show total-metric trends and link to the two-chart
-details for every adjacent version pair.
+artifacts. Version-range reports show the latest measured sortable table for each workload,
+link to rankings for every measured adjacent version pair, and show total-metric trends.
 
 For a focused range comparison, use `version_range: 1.120.0...1.142.0` and
 `measures: css-selectors`; use `benchmark_filter: startup-workspace-warm-css-selectors`
@@ -288,7 +300,13 @@ stable-version migration tests are skipped to avoid repeated stable-build downlo
 Automatic tracing is disabled for these timings. No outliers are removed, and
 failed attempts are retained without retries. A run with no tests, failed tests, or retried tests is
 rejected. Successful samples must have identical passed-test inventories and
-pending-test counts before they can be compared.
+pending-test counts before they can be compared. The shared runner accepts the known
+`Thinking Effort` / `Effort Level` model-section header alias across revisions,
+logging each normalization. It retains the upstream assertions for every option,
+checked default, section order, and unrelated header. This compatibility rule is
+applied to both builds; no smoke tests are excluded. Subprocesses clear
+`VSCODE_DEV` and `ELECTRON_RUN_AS_NODE` so parent environments cannot switch the
+packaged application into development or Node mode.
 
 The offline report and Actions summary show **both mean and median**, before/after
 values in milliseconds, absolute/percentage changes, and successful/requested

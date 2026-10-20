@@ -33,6 +33,33 @@ test('frames preserve zero counts, fixed axes, and place escaped version labels 
   expect(frame).toContain('200')
 })
 
+test('frames retain the original version as a faded reference on the same scale as each current version', () => {
+  const original = {
+    version: '1.135.0<&',
+    counts: [
+      { name: 'a.json', count: 0 },
+      { name: 'b.json', count: 100 },
+    ],
+  }
+  for (const version of ['1.141.0', '1.142.0']) {
+    const frame = functionCountFrame(
+      version,
+      [
+        { name: 'a.json', count: 50 },
+        { name: 'b.json', count: 150 },
+      ],
+      200,
+      original,
+    )
+    expect(frame).toContain('data-series="original" points="100,620 1180,370"')
+    expect(frame).toContain('data-series="current" points="100,495 1180,245"')
+    expect(frame).toContain('stroke-opacity="0.4"')
+    expect(frame).toContain('Original: VS Code 1.135.0&lt;&amp;')
+    expect(frame).toContain(`Current: VS Code ${version}`)
+    expect(frame.indexOf('data-series="original"')).toBeLessThan(frame.indexOf('data-series="current"'))
+  }
+})
+
 test('latest releases use numeric ordering, include patches, and resolve oldest first', async () => {
   jest.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
     const path = new URL(String(url)).pathname
