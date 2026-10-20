@@ -108,3 +108,35 @@ analysis does not affect the usage samples. `--check-leaks` applies only to the
 function measurement; heap usage is reported for trend analysis without an automatic
 leak verdict. Early growth can be initialization or caches. Repeat with a longer
 warmup, for example `--warmup 37`, to assess whether later cycles keep growing.
+
+## Additional lifecycle scenarios
+
+Use `--only <scenario>` to select an API lifecycle. Each cycle waits for the
+resource to become ready and for its destruction or exit before sampling.
+
+| Scenario                         | Measured cycle                                                                                                                                                                    |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `webcontentsview-add-remove`     | Attach a new WebContentsView to a persistent BrowserWindow, load it, remove it, and explicitly close its webContents. The host window is created in setup and closed in teardown. |
+| `utility-process-create-kill`    | Fork an Electron utility process, receive its ready message, kill it, and await exit.                                                                                             |
+| `node-process-create-kill`       | Spawn the runner's actual Node executable, receive readiness on stdout, kill it, and await process/stdio closure.                                                                 |
+| `worker-thread-create-terminate` | Create a Node worker thread in the main process, receive readiness, terminate it, and verify the thread ID becomes -1.                                                            |
+| `offscreen-render-close`         | Create an offscreen BrowserWindow, load a local page, await a nonempty painted bitmap, stop painting, close the window, and verify webContents destruction.                       |
+
+The process and thread fixtures stay alive until explicitly terminated. The view
+scenario checks that only the host webContents remains; the offscreen scenario
+checks that no webContents remains. Event waits are bounded and remove their
+listeners on completion or failure.
+
+```sh
+npm run e2e:electron -- --only webcontentsview-add-remove --measure named-function-count3 --runs 37
+npm run e2e:electron -- --only worker-thread-create-terminate --measure heap-usage --warmup 37 --runs 37
+```
+
+All measurements still target the launched Electron **main process**. These tests
+look for parent-side retention of API wrappers and lifecycle bookkeeping; they do
+not measure live child-process or worker heaps, renderer heaps, GPU memory, or
+native allocations.
+
+API references: [WebContentsView](https://www.electronjs.org/docs/latest/api/web-contents-view),
+[utilityProcess](https://www.electronjs.org/docs/latest/api/utility-process), and
+[offscreen rendering](https://www.electronjs.org/docs/latest/tutorial/offscreen-rendering).

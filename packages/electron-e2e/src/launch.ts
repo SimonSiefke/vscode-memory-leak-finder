@@ -28,7 +28,7 @@ export const stopChild = async (child: ChildProcess): Promise<void> => {
 }
 
 export const launch = async (workspace: string, userDataPath: string, noSandbox: boolean) => {
-  const env: NodeJS.ProcessEnv = { ...process.env, ELECTRON_E2E_USER_DATA: userDataPath }
+  const env: NodeJS.ProcessEnv = { ...process.env, ELECTRON_E2E_USER_DATA: userDataPath, ELECTRON_E2E_NODE_PATH: process.execPath }
   delete env.ELECTRON_RUN_AS_NODE
   delete env.NODE_OPTIONS
   const child = spawn(getElectronBinary(workspace), ['--inspect=127.0.0.1:0', ...(noSandbox ? ['--no-sandbox'] : []), workspace], {

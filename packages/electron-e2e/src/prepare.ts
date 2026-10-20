@@ -23,7 +23,7 @@ const isInstalled = async (workspace: string): Promise<boolean> => {
 }
 
 export const prepare = async (cacheRoot = join(process.env.XDG_CACHE_HOME || join(homedir(), '.cache'), 'electron-memory-leak-finder')) => {
-  const files = ['package.json', 'package-lock.json', 'main.cjs']
+  const files = ['package.json', 'package-lock.json', 'main.cjs', 'lifecycle-child.cjs']
   const hash = createHash('sha256').update(`${process.platform}-${process.arch}`)
   for (const file of files) hash.update(await readFile(join(fixturePath, file)))
   const workspace = join(cacheRoot, hash.digest('hex'))

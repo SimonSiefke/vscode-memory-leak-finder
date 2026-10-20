@@ -35,7 +35,7 @@ const main = async (): Promise<void> => {
   })
   if (values.help) {
     console.log(`Usage: npm run e2e:electron -- [options]
-  --only <scenario>       window-open-close (default), retained-function (positive control)
+  --only <scenario>       Scenario filename from packages/electron-e2e/scenarios (default: window-open-close)
   --measure <measure>     named-function-count3 or heap-usage
   --runs <n>             Measured cycles (default: 5)
   --warmup <n>           Warmup cycles before baseline (default: 2)
