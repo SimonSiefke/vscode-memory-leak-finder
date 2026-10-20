@@ -95,13 +95,18 @@ test('packaged smoke launches clear development mode even when inherited from th
     output = await temporary()
   await writeJson(join(harness, 'smoke-build.json'), { schemaVersion: 1, harnessCommit: commits.before, fixtureCommit: 'c'.repeat(40) })
   const previous = process.env.VSCODE_DEV
+  const previousElectron = process.env.ELECTRON_RUN_AS_NODE
+  process.env.ELECTRON_RUN_AS_NODE = '1'
   process.env.VSCODE_DEV = '1'
   try {
     const execute: typeof command = async (executable, args, options) => {
       // Exercise the real subprocess environment merge, rather than just inspecting the overrides.
       const stdout = await command(
         executable,
-        ['-e', 'process.stdout.write(JSON.stringify({ dev: process.env.VSCODE_DEV, quality: process.env.VSCODE_QUALITY }))'],
+        [
+          '-e',
+          'process.stdout.write(JSON.stringify({ dev: process.env.VSCODE_DEV, electronNode: process.env.ELECTRON_RUN_AS_NODE, quality: process.env.VSCODE_QUALITY }))',
+        ],
         { ...options, cwd: harness },
       )
       expect(JSON.parse(stdout)).toEqual({ quality: 'oss' })
@@ -114,6 +119,8 @@ test('packaged smoke launches clear development mode even when inherited from th
     expect(measured.samples[0]!.status).toBe('success')
     expect(process.env.VSCODE_DEV).toBe('1')
   } finally {
+    if (previousElectron === undefined) delete process.env.ELECTRON_RUN_AS_NODE
+    else process.env.ELECTRON_RUN_AS_NODE = previousElectron
     if (previous === undefined) delete process.env.VSCODE_DEV
     else process.env.VSCODE_DEV = previous
   }

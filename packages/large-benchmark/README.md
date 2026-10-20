@@ -295,7 +295,13 @@ stable-version migration tests are skipped to avoid repeated stable-build downlo
 Automatic tracing is disabled for these timings. No outliers are removed, and
 failed attempts are retained without retries. A run with no tests, failed tests, or retried tests is
 rejected. Successful samples must have identical passed-test inventories and
-pending-test counts before they can be compared.
+pending-test counts before they can be compared. The shared runner accepts the known
+`Thinking Effort` / `Effort Level` model-section header alias across revisions,
+logging each normalization. It retains the upstream assertions for every option,
+checked default, section order, and unrelated header. This compatibility rule is
+applied to both builds; no smoke tests are excluded. Subprocesses clear
+`VSCODE_DEV` and `ELECTRON_RUN_AS_NODE` so parent environments cannot switch the
+packaged application into development or Node mode.
 
 The offline report and Actions summary show **both mean and median**, before/after
 values in milliseconds, absolute/percentage changes, and successful/requested

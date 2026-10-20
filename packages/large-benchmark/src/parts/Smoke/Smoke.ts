@@ -5,6 +5,7 @@ import { hostname } from 'node:os'
 import { parseCommitReference } from '../CommitReference/CommitReference.ts'
 import { command, errorMessage, readJson, writeJson } from '../Io/Io.ts'
 import { repositoryRoot, sha256 } from '../Prepare/Prepare.ts'
+import { smokeCompatibility } from '../SmokeCompatibility/SmokeCompatibility.ts'
 import { summarize } from '../Statistics/Statistics.ts'
 
 export interface SmokeSample {
@@ -91,6 +92,8 @@ const load = createRequire(join(root, 'test/index.js'));
 const Mocha = load('mocha');
 const mocha = new Mocha({ timeout: 120000, retries: 0, reporter: 'spec', failZero: true });
 mocha.addFile(join(root, 'out/main.js'));
+mocha.loadFiles();
+${smokeCompatibility}
 const tests = []; let pending = 0, retried = false;
 const runner = mocha.run(failures => {
   writeFileSync(report, JSON.stringify({ tests: tests.sort(), pending, failures, retried }));
@@ -150,7 +153,13 @@ export const runSmoke = async (options: SmokeOptions, execute = command): Promis
           cwd: join(options.harness, 'test/smoke'),
           timeout: 20 * 60 * 1000,
           // Packaged VS Code treats any nonempty VSCODE_DEV value (including '0') as development mode.
-          env: { VSCODE_QUALITY: 'oss', VSCODE_DEV: undefined, GITHUB_WORKSPACE: '', BUILD_ARTIFACTSTAGINGDIRECTORY: '' },
+          env: {
+            VSCODE_QUALITY: 'oss',
+            VSCODE_DEV: undefined,
+            ELECTRON_RUN_AS_NODE: undefined,
+            GITHUB_WORKSPACE: '',
+            BUILD_ARTIFACTSTAGINGDIRECTORY: '',
+          },
         },
       )
       sample.elapsedMs = performance.now() - started
@@ -210,7 +219,7 @@ export const smokeComparison = (before: SmokeResult, after: SmokeResult) => {
       percent: baseline === 0 ? null : (candidate / baseline - 1) * 100,
     }
   })
-  const summary = `### Smoke test timings\n\nIndependent runners; successful suite process wall time including setup/cleanup. Runner differences can affect results; no paired confidence interval or significance claim. Stable-version migration tests are skipped.\n\nBefore: ${before.commit}; after: ${after.commit}.\nHarness: ${before.harnessCommit}; fixture: ${before.fixtureCommit}.\n\nSuccessful attempts: ${statistics.before.count}/${before.requestedSamples} before, ${statistics.after.count}/${after.requestedSamples} after. Failed/missing attempts are excluded, never retried.\n\n| Statistic | Before (ms) | After (ms) | Change (ms) | Change (%) |\n| --- | ---: | ---: | ---: | ---: |\n${rows.map((row) => `| ${row.name} | ${format(row.before)} | ${format(row.after)} | ${format(row.change)} | ${row.percent === null ? 'N/A' : format(row.percent)} |`).join('\n')}\n`
+  const summary = `### Smoke test timings\n\nIndependent runners; successful suite process wall time including setup/cleanup. Runner differences can affect results; no paired confidence interval or significance claim. Stable-version migration tests are skipped. The historical Thinking Effort/Effort Level header alias is normalized in both suites; option/default assertions remain unchanged.\n\nBefore: ${before.commit}; after: ${after.commit}.\nHarness: ${before.harnessCommit}; fixture: ${before.fixtureCommit}.\n\nSuccessful attempts: ${statistics.before.count}/${before.requestedSamples} before, ${statistics.after.count}/${after.requestedSamples} after. Failed/missing attempts are excluded, never retried.\n\n| Statistic | Before (ms) | After (ms) | Change (ms) | Change (%) |\n| --- | ---: | ---: | ---: | ---: |\n${rows.map((row) => `| ${row.name} | ${format(row.before)} | ${format(row.after)} | ${format(row.change)} | ${row.percent === null ? 'N/A' : format(row.percent)} |`).join('\n')}\n`
   const max = Math.max(...rows.flatMap((row) => [row.before, row.after]), 1)
   const bars = rows
     .map((row, index) => {
@@ -229,7 +238,7 @@ export const smokeComparison = (before: SmokeResult, after: SmokeResult) => {
     })
     .join('')
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="850" height="370" role="img" aria-label="Smoke test mean and median comparison"><rect width="850" height="370" fill="white"/><g font-family="system-ui" font-size="14"><text x="20" y="25">Smoke tests: mean / median · lower is better</text><text x="20" y="48">Successful attempts: ${statistics.before.count}/${before.requestedSamples} before; ${statistics.after.count}/${after.requestedSamples} after</text>${bars}<text x="20" y="300">Before: ${escape(before.commit)}</text><text x="20" y="323">After: ${escape(after.commit)}</text><text x="20" y="350">Independent runners; descriptive comparison; failed attempts excluded.</text></g></svg>`
-  const html = `<p>Independent runners; successful suite process wall time including setup/cleanup. Runner differences can affect results. No paired confidence interval or significance claim. Stable-version migration tests are skipped.</p><p>Successful attempts: ${statistics.before.count}/${before.requestedSamples} before; ${statistics.after.count}/${after.requestedSamples} after. Failed and missing attempts are excluded, never retried.</p><table><thead><tr><th>Statistic</th><th>Before (ms)</th><th>After (ms)</th><th>Change (ms)</th><th>Change (%)</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${row.name}</td><td>${format(row.before)}</td><td>${format(row.after)}</td><td>${format(row.change)}</td><td>${row.percent === null ? 'N/A' : format(row.percent)}</td></tr>`).join('')}</tbody></table>`
+  const html = `<p>Independent runners; successful suite process wall time including setup/cleanup. Runner differences can affect results. No paired confidence interval or significance claim. Stable-version migration tests are skipped. The historical Thinking Effort/Effort Level header alias is normalized in both suites; option/default assertions remain unchanged.</p><p>Successful attempts: ${statistics.before.count}/${before.requestedSamples} before; ${statistics.after.count}/${after.requestedSamples} after. Failed and missing attempts are excluded, never retried.</p><table><thead><tr><th>Statistic</th><th>Before (ms)</th><th>After (ms)</th><th>Change (ms)</th><th>Change (%)</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${row.name}</td><td>${format(row.before)}</td><td>${format(row.after)}</td><td>${format(row.change)}</td><td>${row.percent === null ? 'N/A' : format(row.percent)}</td></tr>`).join('')}</tbody></table>`
   return { statistics, summary, svg, html }
 }
 
