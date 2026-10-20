@@ -310,6 +310,11 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       }
     }
     if (result && benchmark.collector === 'css-selectors' && entries.length) {
+      const slowestFilename = `${benchmark.id}-slowest.svg`
+      await writeFile(join(options.output, 'charts', slowestFilename), selectorDetailsSvg(result, 20))
+      chartHtml.push(
+        `<h3>Slowest CSS selectors</h3><figure><a href="charts/${slowestFilename}"><img loading="lazy" src="charts/${slowestFilename}" alt="Top 20 slowest CSS selectors by elapsed matching time"/></a><figcaption>Top 20 selectors, ranked by the larger before/after median of total matching time during startup, rather than time per match. Identical selector text is combined across stylesheets. Nested selector fragments such as &amp;:hover are shown as Chromium recorded them.</figcaption></figure>`,
+      )
       const totalsFilename = `${benchmark.id}-totals.svg`
       const totals = entries.map((entry, index) => comparisonSvg(entry).replace('<svg ', `<svg y="${index * 320}" `)).join('')
       await writeFile(

@@ -26,8 +26,10 @@ export const selectorComparisons = (result: Result) => {
   return { pairs: pairs.length, totalSelectors: selectors.size, rows }
 }
 
-export const selectorDetailsSvg = (result: Result): string => {
-  const { pairs, totalSelectors, rows } = selectorComparisons(result)
+export const selectorDetailsSvg = (result: Result, limit = 3000): string => {
+  const comparison = selectorComparisons(result)
+  const { pairs, totalSelectors } = comparison
+  const rows = comparison.rows.slice(0, limit)
   const height = 150 + rows.length * 48
   const max = Math.max(0, ...rows.flatMap((row) => [row.before, row.after])) || 1
   const bars = rows
@@ -36,5 +38,5 @@ export const selectorDetailsSvg = (result: Result): string => {
       return `<g><title>${escape(row.selector)}\nBefore: ${format(row.before)} ms\nAfter: ${format(row.after)} ms</title><text x="15" y="${y + 17}">${escape(row.selector.length > 90 ? row.selector.slice(0, 87) + '…' : row.selector)}</text>${(['before', 'after'] as const).map((revision, i) => `<rect x="670" y="${y + i * 19}" width="${(row[revision] / max) * 580}" height="15" fill="${i ? '#a253ca' : '#5479e8'}"/><text x="${680 + (row[revision] / max) * 580}" y="${y + i * 19 + 12}">${format(row[revision])}</text>`).join('')}</g>`
     })
     .join('')
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="${height}" viewBox="0 0 1400 ${height}" role="img" aria-label="CSS selector before and after comparison"><rect width="100%" height="100%" fill="white"/><g font-family="system-ui,sans-serif" font-size="12" fill="#1b2538"><text x="15" y="28" font-size="20">CSS selector details · elapsed matching time (ms)</text><text x="15" y="52">Top ${rows.length} of ${totalSelectors} selectors; slowest median on either revision first; ${pairs} complete pairs</text><text x="15" y="74">Median per selector; identical selector text combined across stylesheets; hover for full selector and values.</text><text x="15" y="98" fill="#5479e8">Before: ${escape(result.commits.before)}</text><text x="700" y="98" fill="#a253ca">After: ${escape(result.commits.after)}</text>${bars}</g></svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="${height}" viewBox="0 0 1400 ${height}" role="img" aria-label="CSS selector before and after comparison"><rect width="100%" height="100%" fill="white"/><g font-family="system-ui,sans-serif" font-size="12" fill="#1b2538"><text x="15" y="28" font-size="20">${limit === 20 ? 'Slowest CSS selectors' : 'CSS selector details'} · elapsed matching time (ms)</text><text x="15" y="52">Top ${rows.length} of ${totalSelectors} selectors; slowest median on either revision first; ${pairs} complete pairs</text><text x="15" y="74">Median per selector; identical selector text combined across stylesheets; hover for full selector and values.</text><text x="15" y="98" fill="#5479e8">Before: ${escape(result.commits.before)}</text><text x="700" y="98" fill="#a253ca">After: ${escape(result.commits.after)}</text>${bars}</g></svg>`
 }

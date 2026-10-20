@@ -224,7 +224,12 @@ inputs, qualified fork references, ordered commit arrays, and inclusive stable
 `version_range` inputs (for example `1.120.0...1.142.0`, once both endpoints are
 published). Each build is reused across adjacent comparisons.
 
-Each pair report includes two SVG charts per workload:
+Each pair report includes three SVG charts per workload:
+
+- **Slowest CSS selectors:** a compact top 20 ranking by the larger before/after median
+  total matching time during startup, with the selector text beside each pair of bars.
+  This measures total cost, not time per match. Nested fragments such as `&:hover`
+  are displayed as Chromium recorded them.
 
 - **Totals:** elapsed selector matching time, match attempts, matches,
   fast rejects, invalidations (where supported), and recorded style recalculations. Each metric has its own scale;
@@ -248,8 +253,8 @@ complete trace contributes zero; an unavailable or failed trace contributes no
 pair. Added and removed selectors are included. Missing instrumentation, unsupported
 trace formats, missing startup boundaries, and full/lost trace buffers are reported
 as unavailable rather than zero. Raw traces and selector JSON remain in the result
-artifacts. Version-range reports show total-metric trends and link to the two-chart
-details for every adjacent version pair.
+artifacts. Version-range reports show the latest measured top 20 chart for each workload,
+link to rankings for every measured adjacent version pair, and show total-metric trends.
 
 For a focused range comparison, use `version_range: 1.120.0...1.142.0` and
 `measures: css-selectors`; use `benchmark_filter: startup-workspace-warm-css-selectors`

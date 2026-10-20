@@ -127,6 +127,12 @@ test('ranking happens after aggregation without per-sample truncation and charts
   expect(svg).not.toContain('<unsafe & selector>')
   expect(svg.match(/<rect x="670"/g)).toHaveLength(6000)
   expect(svg).toContain('Top 3000 of 3006')
+  const compact = selectorDetailsSvg(data, 20)
+  expect(compact).toContain('Slowest CSS selectors')
+  expect(compact).toContain('Top 20 of 3006')
+  expect(compact.match(/<rect x="670"/g)).toHaveLength(40)
+  expect(compact).toContain('&lt;unsafe &amp; selector&gt;')
+  expect(compact).not.toContain('.selector-0<')
 })
 
 test('result validation rejects malformed selector values', () => {
@@ -151,6 +157,7 @@ test('offline pair and version-series reports include totals, selector details a
     resultPaths: [join(input, 'first', 'result.json')],
   })
   expect(pair.diagnostics).toEqual([])
+  expect(await readFile(join(output, 'charts', `${benchmark.id}-slowest.svg`), 'utf8')).toContain('.added')
   expect(await readFile(join(output, 'charts', `${benchmark.id}-totals.svg`), 'utf8')).toContain('Before')
   expect(await readFile(join(output, 'charts', `${benchmark.id}-details.svg`), 'utf8')).toContain('.added')
   expect(await readFile(join(output, 'index.html'), 'utf8')).toContain('Selector details')
@@ -161,6 +168,10 @@ test('offline pair and version-series reports include totals, selector details a
     manifest: { schemaVersion: 2, commits, samples: 2, benchmarks: [benchmark] },
   })
   expect(series.trends[0]!.points).toEqual([100, 200, 400])
+  const index = await readFile(join(seriesOutput, 'index.html'), 'utf8')
+  expect(index).toContain('Slowest CSS selectors')
+  expect(index).toContain(`src="pair-2/charts/${benchmark.id}-slowest.svg"`)
+  expect(index).toContain(`href="pair-1/charts/${benchmark.id}-slowest.svg"`)
   expect(await readFile(join(seriesOutput, 'pair-2', 'charts', `${benchmark.id}-details.svg`), 'utf8')).toContain('.removed')
 })
 
