@@ -174,6 +174,14 @@ of adjacent versions. It does not run the paired performance collectors or repea
 the suite 37 times. The suite uses one running application, without restarting
 between tests, so counts describe the retained functions after each scenario.
 
+The page objects support both textarea and native EditContext inputs and both
+historical source-control repository label layouts. The Modern UI checkbox
+scenario falls back to `workbench.layoutControl.enabled` on releases where
+`workbench.experimental.modernUI` is unavailable. Both paths enable and disable a
+layout setting, but their function counts measure different layout features;
+account for that when comparing this scenario across versions. Compatibility
+changes do not resolve missing or failed VS Code build artifacts.
+
 Download **large-performance-over-time** and open `index.html` or play
 `function-count-history.mp4`. The 1280×720 H.264 video has the VS Code version at
 the top right of every frame. All frames use the same zero-based count scale and

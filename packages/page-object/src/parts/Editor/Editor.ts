@@ -429,15 +429,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async focus() {
       const editor = page.locator('.editor-instance')
       await expect(editor).toBeVisible()
-      if (ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100) {
-        const editorInput = editor.locator('.inputarea')
-        await editorInput.focus()
-        await expect(editorInput).toBeFocused()
-      } else {
-        const editContext = editor.locator('.native-edit-context')
-        await editContext.focus()
-        await expect(editContext).toBeFocused()
-      }
+      // Input mode depends on build quality and settings and can change after focus.
+      const editorInput = editor.locator(':is(.native-edit-context, .inputarea)').first()
+      await editorInput.focus()
+      await expect(editor.locator(':is(.native-edit-context, .inputarea):focus')).toBeFocused()
     },
     async focusBottomEditorGroup() {
       try {
@@ -2064,15 +2059,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(editor).toBeVisible()
       await page.waitForIdle()
 
-      if (ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100) {
-        const editorInput = editor.locator('.inputarea')
-        await expect(editorInput).toBeFocused()
-        await page.waitForIdle()
-      } else {
-        const editContext = editor.locator('.native-edit-context')
-        await expect(editContext).toBeFocused()
-        await page.waitForIdle()
-      }
+      const focusedInput = editor.locator(':is(.native-edit-context, .inputarea):focus')
+      await expect(focusedInput).toBeFocused()
       await page.waitForIdle()
     },
     async waitForVideoReady(hasError: boolean) {

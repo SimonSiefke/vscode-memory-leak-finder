@@ -1,7 +1,7 @@
 import { expect, jest, test } from '@jest/globals'
 import * as SettingsEditor from '../src/parts/SettingsEditor/SettingsEditor.ts'
 
-const searchSettings = async (text: string, resultCount: number | 'many') => {
+const searchSettings = async (text: string, resultCount: number | 'many' | 'any') => {
   const searchInput = { focus: jest.fn(async () => {}), type: jest.fn(async (_value: string) => {}) }
   const searchCount = {}
   const page = {
@@ -53,4 +53,28 @@ test.each([
 
 test('search enforces an explicit numeric result count', async () => {
   await expect(searchSettings('3 Settings Found', 2)).rejects.toThrow()
+})
+
+test.each(['0 Settings Found', 'No Settings Found', '2 Settings Found'])(
+  'search allows feature detection with any result count: %s',
+  async (label) => {
+    await searchSettings(label, 'any')
+  },
+)
+
+test('disableCheckBox leaves an already disabled setting unchecked', async () => {
+  const checkbox = { getAttribute: jest.fn(async () => 'false') }
+  const settings = SettingsEditor.create({
+    electronApp: {},
+    ideVersion: { major: 1, minor: 100, patch: 0 },
+    platform: 'linux',
+    page: { waitForIdle: jest.fn(async () => {}), locator: jest.fn(() => checkbox) },
+    VError: Error,
+    expect: jest.fn(() => ({ toBeVisible: jest.fn(async () => {}) })),
+  })
+  const toggle = jest.spyOn(settings, 'toggleCheckBox').mockResolvedValue(undefined)
+
+  await settings.disableCheckBox({ name: 'workbench.layoutControl.enabled' })
+
+  expect(toggle).not.toHaveBeenCalled()
 })
