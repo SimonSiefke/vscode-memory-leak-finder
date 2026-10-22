@@ -729,6 +729,7 @@ export interface SettingsEditor {
   ensureIdle(): Promise<void>
   expand(groupName: any): Promise<void>
   focusOutline(name: any): Promise<void>
+  hasCheckBox(name: string): Promise<boolean>
   moveScrollBar(y: any, expectedScrollBarTop: any): Promise<void>
   open(): Promise<void>
   openSettingsContextMenu(name: any, options: any): Promise<void>

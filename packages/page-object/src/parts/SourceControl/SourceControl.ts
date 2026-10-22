@@ -53,7 +53,7 @@ const getDecorationContent = (text: string, className: string): string => {
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
   const getRepository = (name: string) => {
-    return page.locator('.sidebar .scm-provider .label-name', { hasExactText: name }).first()
+    return page.locator('.sidebar .scm-provider :is(.label-name, .label > .name)', { hasExactText: name }).first()
   }
 
   return {
