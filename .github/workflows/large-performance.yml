@@ -15,6 +15,18 @@ on:
         description: Successful build run containing the baseline package and shared smoke harness
         required: true
         type: string
+      baseline_artifact_name:
+        description: Optional baseline artifact override, for reusing a prior paired candidate build
+        type: string
+        default: ''
+      harness_run_id:
+        description: Optional separate run containing the unchanged shared smoke harness
+        type: string
+        default: ''
+      candidate_run_id:
+        description: Optional prior run containing paired-candidate-build; skips rebuilding
+        type: string
+        default: ''
       samples:
         description: Complete alternating pairs of full smoke suites (1–20)
         type: string
@@ -30,9 +42,11 @@ env:
   BEFORE_COMMIT: ${{ inputs.before_commit }}
   AFTER_COMMIT: ${{ inputs.after_commit }}
   SAMPLES: ${{ inputs.samples }}
+  BASELINE_ARTIFACT_NAME: ${{ inputs.baseline_artifact_name }}
 
 jobs:
   build:
+    if: ${{ inputs.candidate_run_id == '' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
@@ -63,6 +77,7 @@ jobs:
 
   measure:
     needs: build
+    if: ${{ !cancelled() && (needs.build.result == 'success' || needs.build.result == 'skipped') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     steps:
@@ -78,7 +93,9 @@ jobs:
           import { parseCommitReference } from './packages/large-benchmark/src/parts/CommitReference/CommitReference.ts';
           const baseline = parseCommitReference(process.env.BEFORE_COMMIT);
           parseCommitReference(process.env.AFTER_COMMIT);
-          appendFileSync(process.env.GITHUB_OUTPUT, `baseline_artifact=large-build-${baseline.artifact}\n`);
+          const artifact = process.env.BASELINE_ARTIFACT_NAME || `large-build-${baseline.artifact}`;
+          if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(artifact)) throw new Error('Invalid baseline artifact name');
+          appendFileSync(process.env.GITHUB_OUTPUT, `baseline_artifact=${artifact}\n`);
           JS
       - name: Install desktop dependencies
         run: |
@@ -96,13 +113,15 @@ jobs:
         with:
           name: large-smoke-harness
           path: .paired-harness
-          run-id: ${{ inputs.baseline_run_id }}
+          run-id: ${{ inputs.harness_run_id || inputs.baseline_run_id }}
           github-token: ${{ github.token }}
       - name: Download candidate package
         uses: actions/download-artifact@v8
         with:
           name: paired-candidate-build
           path: .paired-candidate
+          run-id: ${{ inputs.candidate_run_id || github.run_id }}
+          github-token: ${{ github.token }}
       - name: Verify and extract baseline package
         id: baseline
         run: node packages/large-benchmark/src/main.ts extract --input-dir .paired-baseline --commit "$BEFORE_COMMIT" --output-name executable
