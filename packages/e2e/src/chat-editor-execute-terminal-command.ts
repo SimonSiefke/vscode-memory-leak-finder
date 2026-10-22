@@ -1,10 +1,14 @@
 import type { TestContext } from '../types.js'
 
-export const skip = 1
+export const skip = false
 
 export const requiresNetwork = true
 
-export const setup = async ({ ChatEditor, SideBar, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, Electron, SideBar, Terminal }: TestContext): Promise<void> => {
+  await Electron.mockDialog({
+    response: 1,
+  })
+  await Terminal.killAll()
   await Editor.closeAll()
   await SideBar.hide()
   await ChatEditor.open()
@@ -17,12 +21,17 @@ export const run = async ({ ChatEditor, Terminal }: TestContext): Promise<void> 
     model: ChatEditor.Models.Auto,
     approveToolCalls: true,
     verify: true,
+    waitForCompletion: false,
   })
 
+  await Terminal.show()
+  await Terminal.shouldContainText('hello world', 90_000)
+  await Terminal.shouldHaveSuccessDecoration()
   await Terminal.killAll()
   await ChatEditor.clearAll()
 }
 
-export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, Terminal }: TestContext): Promise<void> => {
+  await Terminal.killAll()
   await Editor.closeAll()
 }
