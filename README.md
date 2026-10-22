@@ -16,6 +16,17 @@ npm ci &&
 npm run e2e
 ```
 
+## Electron e2e tests
+
+Measure a standalone Electron app's main process, with a cached runtime and workspace:
+
+```sh
+npm run e2e:electron -- --only window-open-close --measure named-function-count3 --runs 5 --check-leaks
+```
+
+See [Electron e2e documentation](packages/electron-e2e/README.md) for cache behavior,
+process verification, results, and adding scenarios.
+
 ## Sharding
 
 Split the selected test files across parallel jobs with the Jest-compatible, one-based `--shard=<index>/<count>` option:
