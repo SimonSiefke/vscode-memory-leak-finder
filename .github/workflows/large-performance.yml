@@ -27,6 +27,10 @@ on:
         description: Optional prior run containing paired-candidate-build; skips rebuilding
         type: string
         default: ''
+      candidate_artifact_name:
+        description: Optional candidate artifact override for order-balanced archived-package pairs
+        type: string
+        default: ''
       local_chat_readiness:
         description: Wait for explicit local chat command completion in both baseline and candidate
         type: boolean
@@ -122,7 +126,7 @@ jobs:
       - name: Download candidate package
         uses: actions/download-artifact@v8
         with:
-          name: paired-candidate-build
+          name: ${{ inputs.candidate_artifact_name || 'paired-candidate-build' }}
           path: .paired-candidate
           run-id: ${{ inputs.candidate_run_id || github.run_id }}
           github-token: ${{ github.token }}
