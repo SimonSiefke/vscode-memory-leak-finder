@@ -890,3 +890,17 @@ authentication hook; this also automatically confirms deletion dialogs. SDK stat
 restored at shutdown, and the existing replay proxy blocks unmatched external
 requests. Omitting `--use-proxy-mock` keeps the native Agents backend; the bundled
 suite expects mocked replies.
+
+### CSS selector stats in CI
+
+Main-branch CI measures CSS selector matching across the E2E scenarios on Linux,
+with one run and a fresh VS Code instance per scenario. The Pages report at
+[`/css-selector-stats/`](https://simonsiefke.github.io/vscode-memory-leak-finder/css-selector-stats/)
+provides a scenario picker, text filtering, and sortable selector time, match attempts,
+and match count columns. All selectors are retained; the table shows the top 1,000
+after filtering and sorting. Identical selector text is combined across stylesheets.
+These are total matching costs during each scenario, excluding application startup;
+selector tracing adds overhead. Empty traces are shown explicitly.
+
+Run locally with `node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure css-selector-stats --runs 1 --restart-between --run-skipped-tests-anyway`,
+then `npm run build-charts`. The page is written to `.vscode-charts/css-selector-stats/index.html`.
