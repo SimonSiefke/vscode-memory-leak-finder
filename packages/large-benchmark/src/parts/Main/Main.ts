@@ -1,3 +1,4 @@
+import { pairedSmokeSummary, runPairedSmoke } from '../PairedSmoke/PairedSmoke.ts'
 import { prepareSmoke, extractSmoke, runSmoke } from '../Smoke/Smoke.ts'
 import { appendFile, mkdir } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
@@ -111,6 +112,20 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
     }
     case 'extract-smoke': {
       await extractSmoke(resolve(required('--input-dir')))
+      break
+    }
+    case 'paired-smoke': {
+      const result = await runPairedSmoke({
+        commits: commits(),
+        builds: { before: resolve(required('--before-path')), after: resolve(required('--after-path')) },
+        harness: resolve(required('--harness-path')),
+        samples,
+        output,
+      })
+      const summary = pairedSmokeSummary(result)
+      console.log(summary)
+      if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary)
+      if (!result.comparison) throw new Error('No complete matching smoke pairs')
       break
     }
     case 'smoke': {
