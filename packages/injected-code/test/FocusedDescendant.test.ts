@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import { expect, test } from '@jest/globals'
-import * as Conditions from '../src/parts/SingleElementCondition/SingleElementConditions.ts'
+import * as Conditions from '../src/parts/FocusedCondition/FocusedCondition.ts'
 
 const document = (globalThis as any).document
 const focusedInputOptions = { descendantSelector: ':is(.native-edit-context, .inputarea)' }

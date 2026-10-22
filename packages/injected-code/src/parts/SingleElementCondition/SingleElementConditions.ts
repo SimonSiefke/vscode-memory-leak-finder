@@ -56,13 +56,7 @@ export const toHaveAttribute = (element, { isRegex, key, value }) => {
   return actualValue === value
 }
 
-export const toBeFocused = (element, { descendantSelector = '' } = {}) => {
-  const activeElement = document.activeElement
-  if (descendantSelector) {
-    return activeElement !== element && element.contains(activeElement) && Boolean(activeElement?.matches(descendantSelector))
-  }
-  return element === activeElement
-}
+export { toBeFocused } from '../FocusedCondition/FocusedCondition.ts'
 
 export const toHaveClass = (element, { className }) => {
   Assert.string(className)
