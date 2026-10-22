@@ -27,12 +27,16 @@ on:
         description: Optional prior run containing paired-candidate-build; skips rebuilding
         type: string
         default: ''
+      local_chat_readiness:
+        description: Wait for explicit local chat command completion in both baseline and candidate
+        type: boolean
+        default: false
       samples:
         description: Complete alternating pairs of full smoke suites (1–20)
         type: string
         default: '8'
 
-run-name: Paired IPC smoke ${{ inputs.before_commit }} → ${{ inputs.after_commit }}
+run-name: Paired IPC smoke ${{ inputs.before_commit }} → ${{ inputs.after_commit }}${{ inputs.local_chat_readiness && ' [local chat readiness]' || '' }}
 
 permissions:
   contents: read
@@ -130,6 +134,9 @@ jobs:
         run: node packages/large-benchmark/src/main.ts extract --input-dir .paired-candidate --commit "$AFTER_COMMIT" --output-name executable
       - name: Verify and extract shared smoke harness
         run: node packages/large-benchmark/src/main.ts extract-smoke --input-dir .paired-harness
+      - name: Apply identical local chat command readiness correction
+        if: ${{ inputs.local_chat_readiness }}
+        run: python3 scripts/patch-local-chat-readiness.py "$PWD/.paired-harness"
       - name: Run full smoke suites in alternating pairs on this runner
         env:
           BEFORE_PATH: ${{ steps.baseline.outputs.executable }}
@@ -141,6 +148,20 @@ jobs:
             --before-path "$BEFORE_PATH" --after-path "$AFTER_PATH" \
             --harness-path "$PWD/.paired-harness" --samples "$SAMPLES" \
             --output-dir .paired-results
+      - name: Record optional harness correction
+        if: ${{ always() && inputs.local_chat_readiness }}
+        run: |
+          mkdir -p .paired-results
+          cp .paired-harness/local-chat-readiness-patch.json .paired-results/
+          node --input-type=module <<'JS'
+          import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+          const reportPath = '.paired-results/paired-smoke-result.json';
+          if (existsSync(reportPath)) {
+            const report = JSON.parse(readFileSync(reportPath, 'utf8'));
+            report.harnessReadinessPatch = JSON.parse(readFileSync('.paired-harness/local-chat-readiness-patch.json', 'utf8'));
+            writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
+          }
+          JS
       - name: Upload every attempt, paired statistics and diagnostics
         if: always()
         uses: actions/upload-artifact@v7
