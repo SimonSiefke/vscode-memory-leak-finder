@@ -432,7 +432,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       // Input mode depends on build quality and settings and can change after focus.
       const editorInput = editor.locator(':is(.native-edit-context, .inputarea)').first()
       await editorInput.focus()
-      await expect(editor.locator(':is(.native-edit-context, .inputarea):focus')).toBeFocused()
+      await expect(editor).toBeFocused({ descendantSelector: ':is(.native-edit-context, .inputarea)' })
     },
     async focusBottomEditorGroup() {
       try {
@@ -2059,8 +2059,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(editor).toBeVisible()
       await page.waitForIdle()
 
-      const focusedInput = editor.locator(':is(.native-edit-context, .inputarea):focus')
-      await expect(focusedInput).toBeFocused()
+      await expect(editor).toBeFocused({ descendantSelector: ':is(.native-edit-context, .inputarea)' })
       await page.waitForIdle()
     },
     async waitForVideoReady(hasError: boolean) {

@@ -27,7 +27,16 @@ test.each(['textarea', 'native', 'switch-on-focus'])('editor focus and readiness
     electronApp: {},
     expect: (element: any) => ({
       toBeVisible: async () => expect(document.querySelector(element.selector)).not.toBeNull(),
-      toBeFocused: async () => expect(document.querySelector(element.selector)).toBe(document.activeElement),
+      toBeFocused: async ({ descendantSelector = '' } = {}) => {
+        expect(element.selector).not.toContain(':focus')
+        const target = document.querySelector(element.selector)
+        if (descendantSelector) {
+          expect(target.contains(document.activeElement)).toBe(true)
+          expect(document.activeElement.matches(descendantSelector)).toBe(true)
+        } else {
+          expect(target).toBe(document.activeElement)
+        }
+      },
     }),
     ideVersion: { major: 1, minor: 100, patch: 0 },
     page: { locator, waitForIdle: async () => {} },
