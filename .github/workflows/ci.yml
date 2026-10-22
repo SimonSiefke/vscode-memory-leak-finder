@@ -210,6 +210,8 @@ jobs:
             args: --measure array-count
           - name: array-element-count
             args: --measure array-element-count
+          - name: css-selector-stats
+            args: --measure css-selector-stats --runs 1 --restart-between --run-skipped-tests-anyway
           - name: css-rule-count
             args: --measure css-rule-count
           - name: regex-count
@@ -408,6 +410,11 @@ jobs:
       - run: npm run type-check
       - run: npm run lint
       - run: npm run build
+      - name: Download CSS selector stats
+        uses: actions/download-artifact@v8
+        with:
+          name: vscode-memory-leak-finder-results-linux-css-selector-stats
+          path: ./vscode-memory-leak-finder-results-linux-css-selector-stats
       - name: Download all measure results
         uses: actions/download-artifact@v8
         continue-on-error: true
@@ -905,6 +912,8 @@ jobs:
           name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
       - name: Generate charts
         run: node packages/charts/src/main.ts
+      - name: Verify CSS selector report
+        run: test -s .vscode-charts/css-selector-stats/index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:

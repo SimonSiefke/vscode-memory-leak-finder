@@ -29,6 +29,7 @@ const baseStructure = `
 
 const getMiddleHtml = (dirents: string[]) => {
   let html = dirents.includes('instruction-count') ? '<p><a href="./instruction-count/index.html">Instruction counts by test</a></p>\n' : ''
+  if (dirents.includes('css-selector-stats')) html += '<p><a href="./css-selector-stats/index.html">Slowest CSS selectors</a></p>\n'
   html += '<ul class="Charts">\n'
   for (const dirent of dirents) {
     if (!dirent.endsWith('.svg')) {
