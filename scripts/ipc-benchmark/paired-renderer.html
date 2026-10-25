@@ -1,0 +1,12 @@
+<!doctype html>
+<script type="module">
+  import { compare } from './paired-engine.mjs'
+  window.addEventListener('message', async (event) => {
+    if (event.data.event !== 'benchmark-start') return
+    try {
+      window.reportBenchmark(await compare({ ...event.data, ports: event.ports, kind: 'renderer' }))
+    } catch (error) {
+      window.reportBenchmark({ error: String(error.stack) })
+    }
+  })
+</script>
