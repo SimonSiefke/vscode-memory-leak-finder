@@ -1,0 +1,12 @@
+{
+  "name": "ipc-performance-fixture",
+  "publisher": "ipc-performance",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "main": "./extension.cjs",
+  "activationEvents": [
+    "onStartupFinished"
+  ]
+}

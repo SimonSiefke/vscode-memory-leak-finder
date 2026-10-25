@@ -40,7 +40,7 @@ if (!Object.hasOwn(fixtures, options.fixture)) throw new Error('Unknown allocati
 const fixture = fixtures[options.fixture]
 const samplingInterval = options.samplingInterval || 1024
 for (let i = 0; i < 1000; i++) await proxy.$echo(fixture)
-const constructors = {}
+const constructors = Object.create(null)
 lifecycle.setDisposableTracker({
   trackDisposable: (value) => {
     const name = value.constructor.name

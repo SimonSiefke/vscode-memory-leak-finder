@@ -58,3 +58,11 @@ Use the repository's large-performance workflow for complete-product startup. Co
 ## Reuse packaged builds in Actions
 
 The existing `Large Performance Measure` workflow accepts optional `build_run_id`, `before_artifact` and `after_artifact` inputs alongside exact before/after commit references, existing benchmark IDs and a sample count. It verifies each package against the requested commit before running the existing large-performance collectors. It uploads raw results even when a measurement fails and generates the standard offline report. This avoids rebuilding identical commits when collecting follow-up instruction counts or CPU profiles. Artifact expiry still applies. Workflow permissions are read-only for repository contents and Actions artifacts.
+
+## Packaged-product extension API workload
+
+`perf-product-pairs.py` launches isolated packaged applications with the included development extension. Supply `--products` JSON mapping each variant to an absolute ELF application `executable` and its exact `commit`; use the verified extracted package, not the `bin/` CLI wrapper. Each launch has its own profile, extension directory, shared-data directory and Xvfb server. It closes only its own window after writing the result.
+
+The fixture settles after activation, warms the real extension API, collects extension-host garbage and gates whole-application hardware counters around fixed completed calls. `context-unchanged` repeatedly sends an unchanged `setContext` value, `context-changing` alternates it, and `clipboard-64KiB` validates repeated reads of text written into that launch's own Xvfb clipboard. Every API result and the completed logical-call count are checked. These are whole-application API costs, including handlers and background work. Garbage collection is forced only in the extension host; this differs from the isolated two-peer benchmark.
+
+Calibrate with identical-package A/A labels before comparing changes. `--cpu-profile` separately captures the extension host; those results are marked diagnostic and include profiler overhead. Never compare them with unprofiled counters. First verify a small plumbing run and inspect `result.json`/`error.json` before selecting a long campaign.
