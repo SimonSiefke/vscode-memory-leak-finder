@@ -32,7 +32,7 @@ on:
         type: string
         default: ''
       build_run_id:
-        description: Optional existing build run containing both exact packages; skips rebuilding
+        description: Optional existing build run ID, or before/after run IDs separated by a slash; skips rebuilding
         type: string
         default: ''
       before_artifact:
@@ -69,6 +69,8 @@ jobs:
       has_runtime: ${{ steps.manifest.outputs.has_runtime }}
       has_smoke: ${{ steps.manifest.outputs.has_smoke }}
       smoke_harness: ${{ steps.manifest.outputs.smoke_harness }}
+      reused_before_run_id: ${{ steps.reuse.outputs.before_run_id }}
+      reused_after_run_id: ${{ steps.reuse.outputs.after_run_id }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -86,6 +88,7 @@ jobs:
             --samples "$SAMPLES" --benchmark-filter "$BENCHMARK_FILTER" --measures "$MEASURES" \
             --output-dir .large-manifest
       - name: Validate reused package inputs
+        id: reuse
         if: ${{ inputs.build_run_id != '' }}
         env:
           BUILD_RUN_ID: ${{ inputs.build_run_id }}
@@ -93,15 +96,17 @@ jobs:
           AFTER_ARTIFACT: ${{ inputs.after_artifact }}
         run: |
           node --input-type=module <<'JS'
-          import { readFileSync } from 'node:fs';
+          import { appendFileSync, readFileSync } from 'node:fs';
           const { BUILD_RUN_ID, BEFORE_ARTIFACT, AFTER_ARTIFACT, BEFORE_COMMIT, AFTER_COMMIT, VERSION_RANGE, COMMITS } = process.env;
-          if (!/^[1-9][0-9]*$/.test(BUILD_RUN_ID) || !BEFORE_ARTIFACT || !AFTER_ARTIFACT || !BEFORE_COMMIT || !AFTER_COMMIT || VERSION_RANGE || COMMITS) {
-            throw new Error('Reusing builds requires one exact before/after pair, a run ID and both full artifact names');
+          const runIds = BUILD_RUN_ID.split('/');
+          if (runIds.length > 2 || runIds.some(id => !/^[1-9][0-9]*$/.test(id)) || !BEFORE_ARTIFACT || !AFTER_ARTIFACT || !BEFORE_COMMIT || !AFTER_COMMIT || VERSION_RANGE || COMMITS) {
+            throw new Error('Reusing builds requires one exact before/after pair, one or two run IDs and both full artifact names');
           }
           const manifest = JSON.parse(readFileSync('.large-manifest/manifest.json', 'utf8'));
           if (manifest.benchmarks.some(item => item.collector === 'smoke' || item.collector === 'bundles')) {
             throw new Error('Reused builds support runtime measurements; use the dedicated paired smoke workflow for smoke');
           }
+          appendFileSync(process.env.GITHUB_OUTPUT, `before_run_id=${runIds[0]}\nafter_run_id=${runIds[1] ?? runIds[0]}\n`);
           JS
       - uses: actions/upload-artifact@v7
         with:
@@ -254,13 +259,13 @@ jobs:
         with:
           name: ${{ inputs.before_artifact || format('large-build-{0}', matrix.beforeArtifact) }}
           path: .large-builds/before
-          run-id: ${{ inputs.build_run_id || github.run_id }}
+          run-id: ${{ needs.initialize.outputs.reused_before_run_id || github.run_id }}
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.after_artifact || format('large-build-{0}', matrix.afterArtifact) }}
           path: .large-builds/after
-          run-id: ${{ inputs.build_run_id || github.run_id }}
+          run-id: ${{ needs.initialize.outputs.reused_after_run_id || github.run_id }}
           github-token: ${{ github.token }}
       - name: Verify and extract before build
         id: before
@@ -318,7 +323,16 @@ jobs:
         with:
           pattern: large-build-status-*
           path: .large-downloads
-          run-id: ${{ inputs.build_run_id || github.run_id }}
+          run-id: ${{ needs.initialize.outputs.reused_before_run_id || github.run_id }}
+          github-token: ${{ github.token }}
+      - name: Download candidate build status artifacts from a different reused run
+        if: ${{ inputs.build_run_id != '' && needs.initialize.outputs.reused_after_run_id != needs.initialize.outputs.reused_before_run_id }}
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: large-build-status-*
+          path: .large-downloads
+          run-id: ${{ needs.initialize.outputs.reused_after_run_id }}
           github-token: ${{ github.token }}
       - name: Generate comparison charts and offline report
         run: |

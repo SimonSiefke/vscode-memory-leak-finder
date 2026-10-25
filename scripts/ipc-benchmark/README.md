@@ -57,7 +57,7 @@ Use the repository's large-performance workflow for complete-product startup. Co
 
 ## Reuse packaged builds in Actions
 
-The existing `Large Performance Measure` workflow accepts optional `build_run_id`, `before_artifact` and `after_artifact` inputs alongside exact before/after commit references, existing benchmark IDs and a sample count. It verifies each package against the requested commit before running the existing large-performance collectors. It uploads raw results even when a measurement fails and generates the standard offline report. This avoids rebuilding identical commits when collecting follow-up instruction counts or CPU profiles. Artifact expiry still applies. Workflow permissions are read-only for repository contents and Actions artifacts.
+The existing `Large Performance Measure` workflow accepts optional `build_run_id`, `before_artifact` and `after_artifact` inputs alongside exact before/after commit references, existing benchmark IDs and a sample count. It verifies each package against the requested commit before running the existing large-performance collectors. It uploads raw results even when a measurement fails and generates the standard offline report. This avoids rebuilding identical commits when collecting follow-up instruction counts or CPU profiles. For packages from different runs, set `build_run_id` to `beforeRunId/afterRunId`; a single run ID still applies to both. Both full artifact names and exact commit references remain required, and each extracted package is verified independently. Artifact expiry still applies. Workflow permissions are read-only for repository contents and Actions artifacts.
 
 ## Packaged-product extension API workload
 
