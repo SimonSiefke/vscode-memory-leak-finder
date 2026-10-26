@@ -185,7 +185,9 @@ const launch = async (
     await mainConnection?.dispose()
     if (child.exitCode === null && child.signalCode === null)
       await Promise.race([new Promise<void>((resolve) => child.once('close', () => resolve())), delay(3000)])
+    const hasPerfWrapper = perf?.child === child
     for (const entry of pids.reverse()) {
+      if (hasPerfWrapper && entry.pid === child.pid) continue
       try {
         const stat = await readFile(`/proc/${entry.pid}/stat`, 'utf8')
         const fields = stat
@@ -196,6 +198,9 @@ const launch = async (
         process.kill(entry.pid, 'SIGKILL')
       } catch {}
     }
+    // Let the collector flush disabled counters after forced application shutdown.
+    if (hasPerfWrapper && child.exitCode === null && child.signalCode === null)
+      await Promise.race([new Promise<void>((resolve) => child.once('close', () => resolve())), delay(1000)])
     if (child.pid && child.exitCode === null && child.signalCode === null) {
       try {
         process.kill(-child.pid, 'SIGKILL')
