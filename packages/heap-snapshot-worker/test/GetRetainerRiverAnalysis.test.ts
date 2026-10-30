@@ -148,6 +148,34 @@ test('buildRetainerGraph excludes weak references and handles cycles', () => {
   expect(graph.retainedSizes[1]).toBe(10)
 })
 
+test('bounds large-group evidence without reducing leak counts or retained bytes', () => {
+  const count = 1000
+  const after = createSnapshot([
+    { edges: [{ name: 'service', target: 1 }], id: 1, name: '(GC roots)', type: 'synthetic' },
+    { edges: [{ name: '_listeners', target: 2 }], id: 3, name: 'EditorService' },
+    {
+      edges: Array.from({ length: count }, (_, index) => ({ name: index, target: index + 3, type: 'element' })),
+      id: 5,
+      name: 'Array',
+      type: 'array',
+    },
+    ...Array.from({ length: count }, (_, index) => ({ id: 7 + index * 2, name: 'Leaked', selfSize: index === count - 1 ? 200 : 100 })),
+  ])
+
+  const report = getRetainerRiverAnalysis(before, after, { minimumCount: 37 })
+
+  expect(report.isLeak).toBe(true)
+  expect(report.summary).toEqual({ leakedObjects: count, retainedBytes: 100100, retainingPaths: 1 })
+  for (const link of report.links) {
+    expect(link.objectCount).toBe(count)
+    expect(link.retainedBytes).toBe(100100)
+    expect(link.evidence).toHaveLength(16)
+    expect(link).toMatchObject({ evidenceTruncated: true })
+    expect(link.evidence[0].retainingProperty).toBe('[999]')
+  }
+  expect(JSON.stringify(report).length).toBeLessThan(100000)
+})
+
 test('getRetainerRiverAnalysis records a shortest GC-root path', () => {
   const after = createSnapshot([
     {

@@ -1,0 +1,40 @@
+{
+  "name": "notebook-status-provider-host-restart",
+  "displayName": "Notebook Status Provider Host Restart",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "notebooks": [
+      {
+        "type": "restart-status",
+        "displayName": "Restart status",
+        "selector": [
+          {
+            "filenamePattern": "*.restart-status"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "notebook-status-provider-host-restart.setup",
+        "title": "Notebook Status Provider Host Restart: Setup"
+      },
+      {
+        "command": "notebook-status-provider-host-restart.run",
+        "title": "Notebook Status Provider Host Restart: Run"
+      },
+      {
+        "command": "notebook-status-provider-host-restart.cleanup",
+        "title": "Notebook Status Provider Host Restart: Cleanup"
+      }
+    ]
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ]
+}

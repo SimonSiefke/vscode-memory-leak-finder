@@ -1,0 +1,26 @@
+{
+  "name": "file-system-watcher-unique-patterns",
+  "displayName": "File System Watcher Unique Patterns",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "file-system-watcher-unique-patterns.setup",
+        "title": "File System Watcher Unique Patterns: Setup"
+      },
+      {
+        "command": "file-system-watcher-unique-patterns.run",
+        "title": "File System Watcher Unique Patterns: Run"
+      },
+      {
+        "command": "file-system-watcher-unique-patterns.cleanup",
+        "title": "File System Watcher Unique Patterns: Cleanup"
+      }
+    ]
+  }
+}

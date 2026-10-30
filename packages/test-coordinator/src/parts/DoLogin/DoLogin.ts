@@ -14,6 +14,7 @@ export interface LoginOptions {
   readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
+  readonly launchAgentWindow?: boolean | undefined
   readonly filterValue: string
   readonly headlessMode: boolean
   readonly ide: any
@@ -58,6 +59,7 @@ export const doLogin = async ({
   downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
+  launchAgentWindow,
   filterValue,
   headlessMode,
   ide,
@@ -102,6 +104,7 @@ export const doLogin = async ({
       downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
+      launchAgentWindow,
       headlessMode,
       ide,
       ideVersion,

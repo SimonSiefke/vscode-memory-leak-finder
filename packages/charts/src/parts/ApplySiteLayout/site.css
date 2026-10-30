@@ -1,0 +1,240 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1f2328;
+  background: #fff;
+  scroll-padding-top: 24px;
+}
+body {
+  margin: 0;
+  font:
+    14px/1.5 -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  color: #1f2328;
+  background: #fff;
+}
+body * {
+  box-sizing: border-box;
+}
+a {
+  color: #0969da;
+}
+a:focus-visible,
+summary:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 3px;
+}
+.SiteHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding: 12px 24px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #d1d9e0;
+}
+.SiteBrand {
+  font-size: 14px;
+  font-weight: 650;
+  color: #1f2328;
+  text-decoration: none;
+}
+.SiteBrand:hover {
+  color: #0969da;
+}
+.SiteDivider {
+  color: #8c959f;
+}
+.SitePage {
+  color: #59636e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.SiteMenu {
+  position: relative;
+  flex-shrink: 0;
+}
+.SiteMenu summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #d1d9e0;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #59636e;
+  list-style: none;
+}
+.SiteMenu summary::-webkit-details-marker {
+  display: none;
+}
+.SiteMenu summary:hover,
+.SiteMenu[open] summary {
+  background: #eaeef2;
+  color: #1f2328;
+}
+.SiteMenu nav {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 1100;
+  width: min(340px, calc(100vw - 32px));
+  max-height: min(640px, calc(100dvh - 88px));
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid #d1d9e0;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 8px 24px #1f232820;
+}
+.MenuHeading {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #59636e;
+}
+.SiteMenu nav a {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: #1f2328;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.SiteMenu nav a:hover {
+  background: #f6f8fa;
+}
+.SiteMenu nav a[aria-current='page'] {
+  background: #ddf4ff;
+  color: #0550ae;
+  font-weight: 600;
+}
+.SkipLink {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 1200;
+  padding: 10px 16px;
+  background: white;
+}
+.SkipLink:focus {
+  top: 12px;
+}
+.SiteContent {
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 32px;
+}
+.SiteContent h1 {
+  font-size: 28px;
+  line-height: 1.3;
+  font-weight: 600;
+  margin: 0 0 24px;
+  letter-spacing: -0.5px;
+}
+.SiteContent p {
+  color: #59636e;
+}
+.SiteContent .Main {
+  display: block;
+  padding: 0;
+}
+.SiteContent .Charts {
+  gap: 24px;
+}
+.SiteContent .Chart {
+  padding: 16px;
+  background: white;
+  scroll-margin-top: 24px;
+}
+.SiteContent .ChartImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.SiteContent .Layout {
+  min-width: 0;
+  min-height: 0;
+  align-items: flex-start;
+}
+.SiteContent .Navigation {
+  top: 24px;
+  width: 240px;
+  height: auto;
+  max-height: calc(100dvh - 48px);
+  border: 1px solid #d1d9e0;
+  border-radius: 8px;
+}
+.SiteContent .ChartsContainer {
+  min-width: 0;
+  padding: 0;
+}
+.SiteContent .chart {
+  margin: 24px 0;
+  padding: 16px;
+}
+.SiteContent table {
+  width: 100%;
+}
+.SiteContent th {
+  top: 0;
+}
+@media (max-width: 700px) {
+  .SiteHeader {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  .SiteBrand {
+    font-size: 13px;
+  }
+  .SitePage,
+  .SiteDivider {
+    display: none;
+  }
+  .SiteContent {
+    padding: 24px 16px;
+  }
+  .SiteContent h1 {
+    font-size: 24px;
+  }
+  .SiteContent .Layout {
+    flex-direction: column;
+  }
+  .SiteContent .Navigation {
+    position: static;
+    width: 100%;
+    max-height: 220px;
+  }
+  .SiteContent .ChartsContainer {
+    width: 100%;
+  }
+  .SiteContent .Chart {
+    padding: 8px;
+  }
+  .SiteContent .controls {
+    gap: 12px;
+  }
+  .SiteContent th,
+  .SiteContent td {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+  .SiteContent .ArrowOverlay {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .TableScroll {
+    overflow-x: auto;
+  }
+  .SiteContent .TableScroll table {
+    min-width: 640px;
+  }
+}

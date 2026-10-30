@@ -8,6 +8,7 @@
     "build": "lerna run build",
     "e2e:check-flakyness": "lerna run e2e:check-flakyness",
     "e2e": "lerna run e2e",
+    "e2e:agents": "node packages/cli/bin/test.js --cwd packages/agents-e2e --launch-agent-window --enable-extensions --use-proxy-mock",
     "format": "prettier --write .",
     "install:ci": "node packages/build/src/parts/Install/Install.js",
     "lint": "prettier --check .",
@@ -15,11 +16,17 @@
     "test": "lerna run test",
     "type-check": "tsc -b",
     "build-charts": "node packages/charts/src/main.ts",
+    "large-performance": "node packages/large-benchmark/src/main.ts",
+    "large-performance:prepare": "node packages/large-benchmark/src/main.ts prepare",
+    "large-performance:measure": "node packages/large-benchmark/src/main.ts measure",
+    "large-performance:smoke": "node packages/large-benchmark/src/main.ts smoke",
+    "large-performance:report": "node packages/large-benchmark/src/main.ts report",
     "measure-local-vscode-comparison": "npm --prefix packages/build run measure-local-vscode-comparison --",
     "measure-codex-webview-load-time": "npm --prefix packages/build run measure-codex-webview-load-time --",
     "measure-warm-codex-webview-load-time": "npm --prefix packages/build run measure-warm-codex-webview-load-time --",
     "measure-webview-memory": "npm --prefix packages/build run measure-webview-memory --",
-    "backport-prs": "npm --prefix packages/build run backport-prs --"
+    "backport-prs": "npm --prefix packages/build run backport-prs --",
+    "e2e:electron": "node packages/electron-e2e/src/main.ts"
   },
   "repository": {
     "type": "git",
@@ -35,14 +42,16 @@
   "devDependencies": {
     "@jest/globals": "^30.5.2",
     "@lerna/legacy-package-management": "^8.2.4",
-    "@types/node": "^26.6.4",
-    "execa": "^10.1.0",
+    "@types/node": "^26.6.6",
+    "@types/ws": "^8.18.2",
+    "execa": "^10.2.1",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
     "lerna": "^8.2.4",
-    "prettier": "^3.9.9",
-    "ts-jest": "^29.4.14",
-    "typescript": "^6.0.3"
+    "prettier": "^3.9.10",
+    "ts-jest": "^29.4.15",
+    "typescript": "^6.0.3",
+    "ws": "^8.22.0"
   },
   "jest": {
     "modulePathIgnorePatterns": [

@@ -29,6 +29,9 @@ const createKeyboard = (rpc, utilityContext) => {
     type(text) {
       return PageKeyBoard.type(this.rpc, this.utilityContext, text)
     },
+    typeCharacters(text: string) {
+      return PageKeyBoard.typeCharacters(this.rpc, text)
+    },
     utilityContext,
   }
 }

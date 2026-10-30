@@ -13,7 +13,7 @@ test('runCompile runs the transpile step after compile', async () => {
     commandMap: {},
     invoke(method: string, ...params: unknown[]) {
       if (method === 'FileSystem.readFileContent') {
-        return '20'
+        return '20.0.0'
       }
       if (method === 'FileSystem.exists') {
         return true
@@ -45,7 +45,7 @@ test('runCompile throws error when main.js not found after compilation', async (
     commandMap: {},
     invoke(method: string, ...params: unknown[]) {
       if (method === 'FileSystem.readFileContent') {
-        return '20'
+        return '20.0.0'
       }
       if (method === 'FileSystem.exists') {
         const path = params[0]
@@ -74,7 +74,7 @@ test('runMinifiedBuild runs the platform minified vscode gulp task', async () =>
     commandMap: {},
     invoke(method: string, ...params: unknown[]) {
       if (method === 'FileSystem.readFileContent') {
-        return '20'
+        return '20.0.0'
       }
       if (method === 'FileSystem.exists') {
         return true

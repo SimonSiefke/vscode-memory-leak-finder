@@ -1,0 +1,9 @@
+{
+  "name": "@vscode-memory-leak-finder/agents-e2e",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e:agents": "node ../cli/bin/test.js --cwd . --launch-agent-window --enable-extensions --use-proxy-mock"
+  }
+}

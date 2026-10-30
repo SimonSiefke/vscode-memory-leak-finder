@@ -16,6 +16,7 @@ export const createDefaultState = (): StdinDataState => ({
   cwd: '',
   enableExtensions: false,
   enableProxy: false,
+  launchAgentWindow: false,
   exitCode: 0,
   filter: '',
   headless: false,

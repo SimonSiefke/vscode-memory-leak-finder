@@ -56,9 +56,7 @@ export const toHaveAttribute = (element, { isRegex, key, value }) => {
   return actualValue === value
 }
 
-export const toBeFocused = (element) => {
-  return element === document.activeElement
-}
+export { toBeFocused } from '../FocusedCondition/FocusedCondition.ts'
 
 export const toHaveClass = (element, { className }) => {
   Assert.string(className)

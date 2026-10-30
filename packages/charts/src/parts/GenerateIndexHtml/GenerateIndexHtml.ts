@@ -85,7 +85,7 @@ const getSingleColumnHtml = (dirents: string[]): string => {
 
   html += '          </ul>\n'
   html += '        </nav>\n'
-  html += '        <main class="ChartsContainer">\n'
+  html += '        <div class="ChartsContainer">\n'
   html += '          <ul class="Charts SingleColumn">\n'
 
   for (const svgFile of svgFiles) {
@@ -94,7 +94,7 @@ const getSingleColumnHtml = (dirents: string[]): string => {
   }
 
   html += '          </ul>\n'
-  html += '        </main>\n'
+  html += '        </div>\n'
   html += '        <svg class="ArrowOverlay" id="arrowOverlay">\n'
   html += '          <path id="arrowPath" stroke="black" stroke-width="2" fill="none" opacity="0" />\n'
   html += '          <polygon id="arrowHead" points="0,0 12,6 0,12" fill="black" opacity="0" />\n'

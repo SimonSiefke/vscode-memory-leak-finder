@@ -1,0 +1,29 @@
+{
+  "name": "editor-webview-inset-disposal",
+  "displayName": "Editor Webview Inset Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "editor-webview-inset-disposal.setup",
+        "title": "Editor Webview Inset Disposal: Setup"
+      },
+      {
+        "command": "editor-webview-inset-disposal.run",
+        "title": "Editor Webview Inset Disposal: Run"
+      },
+      {
+        "command": "editor-webview-inset-disposal.cleanup",
+        "title": "Editor Webview Inset Disposal: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "editorInsets"
+  ]
+}

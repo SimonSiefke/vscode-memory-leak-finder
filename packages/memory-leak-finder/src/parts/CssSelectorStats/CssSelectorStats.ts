@@ -47,7 +47,7 @@ const getSelectorKey = (selector: string, styleSheetId: string): string => {
   return `${styleSheetId}\0${selector}`
 }
 
-export const getCssSelectorStats = (events: readonly Dynamic[]): CssSelectorStatsSummary => {
+export const getCssSelectorStats = (events: readonly Dynamic[], limit = MaxTopSelectors): CssSelectorStatsSummary => {
   const selectorMap = new Map<string, CssSelectorStatsRow>()
   let invalidationCount = 0
   let matchAttempts = 0
@@ -88,7 +88,7 @@ export const getCssSelectorStats = (events: readonly Dynamic[]): CssSelectorStat
 
   const topSelectors = [...selectorMap.values()]
     .toSorted((a, b) => b.elapsedMs - a.elapsedMs || b.matchAttempts - a.matchAttempts || a.selector.localeCompare(b.selector))
-    .slice(0, MaxTopSelectors)
+    .slice(0, limit)
 
   return {
     metrics: {

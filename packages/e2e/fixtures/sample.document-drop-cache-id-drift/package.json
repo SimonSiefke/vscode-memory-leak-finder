@@ -1,0 +1,30 @@
+{
+  "name": "document-drop-cache-id-drift",
+  "displayName": "Document Drop Cache Id Drift",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "document-drop-cache-id-drift.setup",
+        "title": "Document Drop Cache Id Drift: Setup"
+      },
+      {
+        "command": "document-drop-cache-id-drift.run",
+        "title": "Document Drop Cache Id Drift: Run"
+      },
+      {
+        "command": "document-drop-cache-id-drift.cleanup",
+        "title": "Document Drop Cache Id Drift: Cleanup"
+      },
+      {
+        "command": "document-drop-cache-id-drift.verify",
+        "title": "Verify Accepted Lifecycle Drop"
+      }
+    ]
+  }
+}

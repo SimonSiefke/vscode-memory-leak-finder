@@ -152,3 +152,11 @@ test('getMeasure resolves duplicated strings public measure id', () => {
     ),
   ).toBe(Measures.MeasureDuplicatedStrings)
 })
+
+test('getMeasure resolves retained substrings public measure id', () => {
+  expect(GetMeasure.getMeasure({ Measures }, 'retained-substrings')).toBe(Measures.MeasureRetainedSubstrings)
+})
+
+test.each(['trackedAllocationBytes', 'tracked-allocation-bytes'])('getMeasure resolves %s', (id) => {
+  expect(GetMeasure.getMeasure({ Measures }, id)).toBe(Measures.MeasureTrackedAllocationBytes)
+})

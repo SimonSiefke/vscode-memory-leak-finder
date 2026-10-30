@@ -5,6 +5,7 @@ import { promisify } from 'node:util'
 import escapeHtml from 'escape-html'
 import * as Charts from '../Charts/Charts.ts'
 import * as GetChartConfig from '../GetChartConfig/GetChartConfig.ts'
+import { getHighlightLabels } from '../GetHighlightLabels/GetHighlightLabels.ts'
 import { launchChartWorker } from '../LaunchChartWorker/LaunchChartWorker.ts'
 import * as Root from '../Root/Root.ts'
 
@@ -50,14 +51,6 @@ const getComparisonDataByFilename = (comparisonData: readonly any[]): Map<string
     }
   }
   return comparisonDataByFilename
-}
-
-const getHighlightLabels = (data: readonly any[], comparisonData: readonly any[], shouldHighlightChanges: boolean): string[] => {
-  if (!shouldHighlightChanges) {
-    return []
-  }
-  const comparisonNames = new Set(comparisonData.map((item) => item.name))
-  return data.filter((item) => !comparisonNames.has(item.name)).map((item) => item.name)
 }
 
 export const generateCharts = async () => {

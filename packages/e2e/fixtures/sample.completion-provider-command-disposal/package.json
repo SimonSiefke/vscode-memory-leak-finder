@@ -1,0 +1,26 @@
+{
+  "name": "completion-provider-command-disposal",
+  "displayName": "Completion Provider Command Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "completion-provider-command-disposal.setup",
+        "title": "Completion Provider Command Disposal: Setup"
+      },
+      {
+        "command": "completion-provider-command-disposal.run",
+        "title": "Completion Provider Command Disposal: Run"
+      },
+      {
+        "command": "completion-provider-command-disposal.cleanup",
+        "title": "Completion Provider Command Disposal: Cleanup"
+      }
+    ]
+  }
+}

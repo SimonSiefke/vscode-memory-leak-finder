@@ -1,5 +1,9 @@
 const pageObjects = Object.create(null)
 
+export const deletePageObject = (pageObjectId: number): void => {
+  delete pageObjects[pageObjectId]
+}
+
 export const getPageObject = (pageObjectId) => {
   const value = pageObjects[pageObjectId]
   if (!value) {
