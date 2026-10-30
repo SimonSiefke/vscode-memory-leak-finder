@@ -56,7 +56,15 @@ export const renderCssSelectorStatsHtml = (scenarios: readonly Scenario[]): stri
 <title>Slowest CSS selectors</title>
 <style>
 body{font:15px system-ui,sans-serif;color:#1b2538;margin:24px}p{line-height:1.5}
-.controls{display:flex;flex-wrap:wrap;gap:20px;margin:20px 0}select,input{font:inherit;padding:6px;max-width:100%}
+.controls{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 20px;margin:24px 0}
+.controls label{display:flex;flex-direction:column;gap:6px;min-width:0;max-width:100%;font-weight:600}
+.controls select,.controls input{box-sizing:border-box;min-height:40px;max-width:100%;border:1px solid #d1d9e0;border-radius:6px;background-color:#fff;color:inherit;font:inherit;font-weight:400;line-height:1.5;padding:8px 12px}
+.controls select{width:360px;appearance:none;padding-right:40px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%2359636e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+.controls input{width:240px}.controls input::placeholder{color:#59636e;opacity:1}
+.controls select:hover,.controls input:hover{border-color:#8c959f}
+.controls select:focus-visible,.controls input:focus-visible{border-color:#0969da;outline:2px solid #0969da;outline-offset:3px}
+@media(max-width:600px){.controls label,.controls select,.controls input{width:100%}}
+@media(forced-colors:active){.controls select{appearance:auto;background-image:none;padding-right:12px}}
 table{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-numeric:tabular-nums}th,td{padding:10px;border-bottom:1px solid #dde3ef;overflow-wrap:anywhere;text-align:right}
 th{position:sticky;top:0;background:#edf1fa}th:first-child,td:first-child{text-align:left;width:60%}td:first-child{font:13px ui-monospace,monospace}
 th button{font:inherit;font-weight:600;border:0;background:transparent;color:inherit;cursor:pointer}th[aria-sort=descending] button::after{content:' ▼'}th[aria-sort=ascending] button::after{content:' ▲'}tbody tr:nth-child(even){background:#f7f9fd}
