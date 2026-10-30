@@ -1,0 +1,37 @@
+{
+  "name": "notebook-cell-status-command-refresh",
+  "displayName": "Notebook Cell Status Command Refresh",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "notebooks": [
+      {
+        "type": "lifecycle-cell-status",
+        "displayName": "Lifecycle cell status",
+        "selector": [
+          {
+            "filenamePattern": "*.lifecycle-status"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "notebook-cell-status-command-refresh.setup",
+        "title": "Notebook Cell Status Command Refresh: Setup"
+      },
+      {
+        "command": "notebook-cell-status-command-refresh.run",
+        "title": "Notebook Cell Status Command Refresh: Run"
+      },
+      {
+        "command": "notebook-cell-status-command-refresh.cleanup",
+        "title": "Notebook Cell Status Command Refresh: Cleanup"
+      }
+    ]
+  }
+}
