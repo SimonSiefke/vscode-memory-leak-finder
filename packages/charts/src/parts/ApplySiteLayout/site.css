@@ -151,8 +151,6 @@ select:focus-visible {
 }
 .SiteContent .Chart {
   padding: 16px;
-  border: 1px solid #d1d9e0;
-  border-radius: 8px;
   background: white;
   scroll-margin-top: 88px;
 }
@@ -180,8 +178,6 @@ select:focus-visible {
 }
 .SiteContent .chart {
   margin: 24px 0;
-  border: 1px solid #d1d9e0;
-  border-radius: 8px;
   padding: 16px;
 }
 .SiteContent table {
