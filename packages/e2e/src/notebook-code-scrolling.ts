@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace, Notebook }: TestContext): Promise<void> => {
   const notebook = {
     cells: [
       {
@@ -105,6 +105,9 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   await Explorer.focus()
   await Explorer.shouldHaveItem('test.ipynb')
   await Editor.open('test.ipynb')
+  // Initialize cell editors and their lazy contributions before the heap baseline.
+  await Notebook.scrollDown()
+  await Notebook.scrollUp()
 }
 
 export const run = async ({ Notebook }: TestContext): Promise<void> => {
