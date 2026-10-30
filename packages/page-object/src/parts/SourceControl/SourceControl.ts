@@ -274,6 +274,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       }
     },
     async shouldHaveRepositoryCount(count: number) {
+      const expectedCount = Number(count)
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
@@ -320,7 +321,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const startTime = Date.now()
         while (Date.now() - startTime < timeout) {
           const actualCount = await getRepositoryCount()
-          if (actualCount === count) {
+          if (Number(actualCount) === expectedCount) {
             return
           }
           await (() => {
@@ -330,9 +331,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           })()
         }
         const actualCount = await getRepositoryCount()
-        throw new Error(`expected repository count ${count} but got ${actualCount}`)
+        throw new Error(`expected repository count ${expectedCount} but got ${actualCount}`)
       } catch (error) {
-        throw new VError(error, `Failed to verify repository count ${count}`)
+        throw new VError(error, `Failed to verify repository count ${expectedCount}`)
       }
     },
     async shouldHaveRepository(name: string) {
