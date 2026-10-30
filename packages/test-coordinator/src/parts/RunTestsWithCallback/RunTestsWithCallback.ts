@@ -18,6 +18,7 @@ import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
+import * as ShouldShowInitializingMessage from '../ShouldShowInitializingMessage/ShouldShowInitializingMessage.ts'
 import * as PrepareTrackedVscode from '../PrepareTrackedVscode/PrepareTrackedVscode.ts'
 import * as SetupOnly from '../SetupOnly/SetupOnly.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
@@ -354,7 +355,15 @@ export const runTestsWithCallback = async ({
     }
     const initialStart = Time.now()
     const first = formattedPaths[0]
-    await callback(TestWorkerEventType.HandleInitializing)
+    const showInitializingMessage = await ShouldShowInitializingMessage.shouldShowInitializingMessage({
+      arch,
+      commit,
+      ide,
+      insidersCommit,
+      platform,
+      vscodePath,
+      vscodeVersion,
+    })
 
     const preparedVscodePath =
       trackFunctions && ide === Ide.VsCode
@@ -375,14 +384,12 @@ export const runTestsWithCallback = async ({
       runs,
     }
 
-    const intializeEnd = getTimeStamp()
-    const intializeTime = intializeEnd - initialStart
-
-    await callback(TestWorkerEventType.HandleInitialized, intializeTime)
-
-    const testStart = getTimeStamp()
-    await callback(TestWorkerEventType.TestsStarting, total)
-    await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
+    let testStart = 0
+    if (!showInitializingMessage) {
+      testStart = performance.now()
+      await callback(TestWorkerEventType.TestsStarting, total)
+      await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, true)
+    }
 
     let workers: WorkerMap = {
       devtoolsWebSocketUrl: '',
@@ -394,6 +401,7 @@ export const runTestsWithCallback = async ({
       videoRpc: emptyRpc,
       webSocketUrl: '',
     }
+    let hasHandledInitializing = false
 
     const startupMeasureInfo = StartupMeasure.getStartupMeasureInfo(measure)
     if (startupMeasureInfo && startupRuns > 1) {
@@ -601,6 +609,10 @@ export const runTestsWithCallback = async ({
       const needsSetup = i === 0 || restartBetween
 
       if (needsSetup) {
+        const initializeStart = Time.now()
+        if (showInitializingMessage && !hasHandledInitializing) {
+          await callback(TestWorkerEventType.HandleInitializing)
+        }
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
         const { devtoolsWebSocketUrl, functionTrackerRpc, initializationWorkerRpc, memoryRpc, pid, testWorkerRpc, videoRpc, webSocketUrl } =
@@ -648,6 +660,11 @@ export const runTestsWithCallback = async ({
             vscodePath,
             vscodeVersion,
           })
+        if (showInitializingMessage && !hasHandledInitializing) {
+          const intializeTime = performance.now() - initializeStart
+          await callback(TestWorkerEventType.HandleInitialized, intializeTime)
+          hasHandledInitializing = true
+        }
         workers = {
           devtoolsWebSocketUrl,
           functionTrackerRpc: functionTrackerRpc || emptyRpc,
@@ -666,10 +683,15 @@ export const runTestsWithCallback = async ({
 
       const { testWorkerRpc, videoRpc } = workers
 
-      let wasOriginallySkipped = false
-      if (i !== 0) {
-        await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
+      if (i === 0 && showInitializingMessage) {
+        testStart = performance.now()
+        await callback(TestWorkerEventType.TestsStarting, total)
+        await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, true)
+      } else if (i !== 0) {
+        await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, false)
       }
+
+      let wasOriginallySkipped = false
 
       const start = i === 0 ? initialStart : Time.now()
       try {
