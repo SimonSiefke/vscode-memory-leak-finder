@@ -480,7 +480,7 @@ export interface Extensions {
   shouldHaveTitle(expectedTtitle: any): Promise<void>
   shouldHaveValue(value: any): Promise<void>
   show(): Promise<void>
-  waitForProgressToBeHidden(): Promise<void>
+  waitForProgressToBeHidden(options?: { timeout?: number }): Promise<void>
   readonly first: any
   readonly second: any
 }
