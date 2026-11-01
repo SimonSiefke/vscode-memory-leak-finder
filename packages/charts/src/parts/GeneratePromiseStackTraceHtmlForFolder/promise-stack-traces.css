@@ -1,6 +1,8 @@
 .PromiseStackTraces {
   padding: 20px;
-  min-width: 70%;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -30,15 +32,59 @@
 .CodeBlock {
   margin-top: 15px;
 }
-.CodeBlock pre {
+.CodeBlock pre,
+.CodeFrame pre {
   margin: 0;
   padding: 15px;
   background: #f5f5f5;
   border-radius: 4px;
   overflow-x: auto;
 }
-.CodeBlock code {
+.CodeBlock code,
+.CodeFrame code {
   font-family: 'Courier New', monospace;
+  white-space: pre;
   font-size: 13px;
   line-height: 1.5;
+}
+
+.PromiseScenario {
+  margin-bottom: 48px;
+}
+.PromiseChartScroll {
+  overflow-x: auto;
+  margin: 16px 0 24px;
+}
+.PromiseChart {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 1000px;
+}
+.PromiseChartLegend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #444;
+  font-size: 14px;
+}
+.InitialSwatch,
+.GrowthSwatch {
+  display: inline-block;
+  width: 16px;
+  height: 12px;
+  background: #000;
+}
+.GrowthSwatch {
+  margin-left: 12px;
+  background: #b22222;
+}
+.CodeFrame h4,
+.CodeBlock h4 {
+  margin: 16px 0 8px;
+}
+.CodeFrameUnavailable {
+  color: #666;
+  font-size: 14px;
 }

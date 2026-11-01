@@ -22,9 +22,7 @@ export const findPromiseStackTraceFolders = async (basePath: string): Promise<st
         lowerName.includes('promiseswithstacktrace') ||
         lowerName === 'promiseswithstacktrace'
       ) {
-        // @ts-ignore - path property exists on Dirent when using recursive: true
-        const relativePath = dirent.path || ''
-        const fullPath = relativePath ? join(basePath, relativePath, dirent.name) : join(basePath, dirent.name)
+        const fullPath = join(dirent.parentPath, dirent.name)
         folders.push(fullPath)
       }
     }
