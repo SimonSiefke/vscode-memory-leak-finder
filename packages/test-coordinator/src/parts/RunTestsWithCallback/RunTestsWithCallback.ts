@@ -709,7 +709,9 @@ export const runTestsWithCallback = async ({
         } else {
           let isLeak = false
           if (checkLeaks) {
-            if (measureAfter) {
+            // These targets may be created by the scenario itself. Attach before
+            // preparing instrumentation, then warm up again if preparation needs it.
+            if (measureAfter && (inspectIntegratedBrowser || inspectProcess || isMemoryCityMeasure(measure))) {
               await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
             }
             if (inspectIntegratedBrowser || inspectProcess) {
@@ -840,21 +842,34 @@ export const runTestsWithCallback = async ({
               }
             } else {
               const memoryRpc = workers.memoryRpc
-              await MemoryLeakFinder.start(memoryRpc, connectionId)
-              await TestWorkerRunTests.testWorkerRunTests(
-                testWorkerRpc,
-                connectionId,
-                absolutePath,
-                forceRun,
-                runMode,
-                platform,
-                runs,
-                () => MemoryLeakFinder.runCompletion(memoryRpc, connectionId),
-              )
-              if (timeoutBetween) {
-                await Timeout.setTimeout(timeoutBetween)
+              let needsRelease = true
+              try {
+                const prepared = await MemoryLeakFinder.prepare(memoryRpc, connectionId)
+                if (measureAfter && (!(inspectIntegratedBrowser || inspectProcess) || prepared)) {
+                  await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
+                }
+                await MemoryLeakFinder.start(memoryRpc, connectionId)
+                await TestWorkerRunTests.testWorkerRunTests(
+                  testWorkerRpc,
+                  connectionId,
+                  absolutePath,
+                  forceRun,
+                  runMode,
+                  platform,
+                  runs,
+                  () => MemoryLeakFinder.runCompletion(memoryRpc, connectionId),
+                )
+                if (timeoutBetween) {
+                  await Timeout.setTimeout(timeoutBetween)
+                }
+                // stop releases resources even when capture fails.
+                needsRelease = false
+                await MemoryLeakFinder.stop(memoryRpc, connectionId)
+              } finally {
+                if (needsRelease) {
+                  await MemoryLeakFinder.releaseResources(memoryRpc, connectionId)
+                }
               }
-              await MemoryLeakFinder.stop(memoryRpc, connectionId)
 
               result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
             }
