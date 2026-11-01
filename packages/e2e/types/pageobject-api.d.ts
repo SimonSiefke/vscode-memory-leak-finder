@@ -695,7 +695,7 @@ export interface RunAndDebug {
 }
 export interface RunningExtensions {
   show(): Promise<void>
-  showAndWaitFor(name: any): Promise<void>
+  showAndWaitFor(name: string, ...extensionIds: string[]): Promise<void>
   startDebuggingExtensionHost(): Promise<void>
   startProfilingExtensionHost(): Promise<void>
   stopProfilingExtensionHost(): Promise<void>
