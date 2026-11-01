@@ -22,6 +22,9 @@ export const setupTestWithCallback = async (pageObject, file, forceRun, isGithub
   const module = await ImportTest.importTest(file)
   const wasOriginallySkipped = Boolean(module.skip)
   const isCi = isGithubActions
+  if (module.skipInCi && isCi) {
+    return { error: null, skipped: true, wasOriginallySkipped }
+  }
   const requiresCopilotAuth = Boolean(module.requiresCopilotAuth) || hasChatTestFileName(file)
   if (requiresCopilotAuth && isCi && !allowCopilotAuthInCi) {
     return { error: null, skipped: true, wasOriginallySkipped }
