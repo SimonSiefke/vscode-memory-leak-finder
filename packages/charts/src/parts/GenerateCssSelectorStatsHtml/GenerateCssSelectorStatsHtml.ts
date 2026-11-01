@@ -1,5 +1,6 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { escapeHtml } from '../EscapeHtml/EscapeHtml.ts'
 import * as Root from '../Root/Root.ts'
 
 interface SelectorRow {
@@ -50,7 +51,26 @@ export const getCssSelectorStatsData = async (basePath: string): Promise<Scenari
 }
 
 export const renderCssSelectorStatsHtml = (scenarios: readonly Scenario[]): string => {
-  const data = JSON.stringify(scenarios).replace(/</g, '\\u003c')
+  const selectedIndex = Math.max(
+    0,
+    scenarios.findIndex((scenario) => scenario.rows.length),
+  )
+  const rows = scenarios[selectedIndex]?.rows || []
+  const visible = rows.toSorted((a, b) => b.elapsedMs - a.elapsedMs || a.selector.localeCompare(b.selector)).slice(0, 1000)
+  const options = scenarios
+    .map((scenario, index) => `<option value="${index}"${index === selectedIndex ? ' selected' : ''}>${escapeHtml(scenario.name)}</option>`)
+    .join('')
+  const tableRows = visible
+    .map(
+      (row) =>
+        `<tr><td>${escapeHtml(row.selector)}</td>${[row.elapsedMs, row.matchAttempts, row.matchCount]
+          .map((value) => `<td>${value.toLocaleString('en-US', { maximumFractionDigits: 3 })}</td>`)
+          .join('')}</tr>`,
+    )
+    .join('')
+  const status = rows.length
+    ? `Showing ${visible.length} of ${rows.length} matching selectors (${rows.length} total)`
+    : 'No selector timing rows collected for this scenario. Selector instrumentation may be unavailable.'
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Slowest CSS selectors</title>
@@ -70,25 +90,35 @@ th{position:sticky;top:0;background:#edf1fa}th:first-child,td:first-child{text-a
 th button{font:inherit;font-weight:600;border:0;background:transparent;color:inherit;cursor:pointer}th[aria-sort=descending] button::after{content:' ▼'}th[aria-sort=ascending] button::after{content:' ▲'}tbody tr:nth-child(even){background:#f7f9fd}
 </style></head><body><h1>Slowest CSS selectors</h1>
 <p>CSS selector matching during each measured VS Code scenario, excluding application startup. Each scenario runs once in a fresh instance. Time is total matching time in milliseconds; identical selector text is combined across stylesheets. Instrumentation adds overhead, and scenario duration and background activity affect the totals.</p>
-<div class="controls"><label>Scenario <select id="scenario"></select></label><label>Filter selectors <input id="filter" type="search" placeholder="Selector text"></label></div>
-<p id="status" role="status"></p><p>Click a column heading to sort; click again to reverse. The top 1,000 rows are selected after filtering and sorting all selectors.</p>
-<table><thead><tr><th scope="col" aria-sort="none"><button data-key="selector">Selector name</button></th><th scope="col" aria-sort="descending"><button data-key="elapsedMs">Time (ms)</button></th><th scope="col" aria-sort="none"><button data-key="matchAttempts">matchAttempts</button></th><th scope="col" aria-sort="none"><button data-key="matchCount">matchCount</button></th></tr></thead><tbody></tbody></table>
-<noscript>Enable JavaScript to view and sort the selector table.</noscript>
+<div class="controls"><label>Scenario <select id="scenario">${options}</select></label><label>Filter selectors <input id="filter" type="search" placeholder="Selector text"></label></div>
+<p id="status" role="status">${status}</p><p>Click a column heading to sort; click again to reverse. The top 1,000 rows are selected after filtering and sorting all selectors.</p>
+<table><thead><tr><th scope="col" aria-sort="none"><button data-key="selector">Selector name</button></th><th scope="col" aria-sort="descending"><button data-key="elapsedMs">Time (ms)</button></th><th scope="col" aria-sort="none"><button data-key="matchAttempts">matchAttempts</button></th><th scope="col" aria-sort="none"><button data-key="matchCount">matchCount</button></th></tr></thead><tbody>${tableRows}</tbody></table>
+<noscript>Enable JavaScript to sort, filter, or switch scenarios.</noscript>
 <p><a href="../index.html">Memory leak charts</a></p>
-<script id="data" type="application/json">${data}</script>
 <script>
 (() => {
-const scenarios = JSON.parse(document.querySelector('#data').textContent);
 const scenario = document.querySelector('#scenario'), filter = document.querySelector('#filter');
 const body = document.querySelector('tbody'), buttons = [...document.querySelectorAll('th button')];
-let key = 'elapsedMs', direction = -1;
-for (const [index, entry] of scenarios.entries()) {
-  const option = document.createElement('option'); option.value = index; option.textContent = entry.name;
-  scenario.appendChild(option);
+const status = document.querySelector('#status'), cache = new Map();
+let key = 'elapsedMs', direction = -1, renderId = 0;
+function loadRows(index) {
+  if (!cache.has(index)) cache.set(index, fetch('data/' + index + '.json').then(response => {
+    if (!response.ok) throw new Error('Failed to load selector data');
+    return response.json();
+  }).catch(error => { cache.delete(index); throw error; }));
+  return cache.get(index);
 }
-scenario.selectedIndex = Math.max(0, scenarios.findIndex(entry => entry.rows.length));
-function render() {
-  const rows = scenarios[scenario.value]?.rows || [];
+async function render() {
+  const id = ++renderId;
+  status.textContent = 'Loading selector data…';
+  let rows;
+  try {
+    rows = await loadRows(scenario.value);
+  } catch {
+    if (id === renderId) status.textContent = 'Could not load selector data. Try sorting, filtering, or choosing a scenario again.';
+    return;
+  }
+  if (id !== renderId) return;
   const query = filter.value.toLowerCase();
   const sorted = rows.filter(row => row.selector.toLowerCase().includes(query)).sort((a,b) =>
     direction * (key === 'selector' ? a.selector.localeCompare(b.selector) : a[key] - b[key]) || a.selector.localeCompare(b.selector));
@@ -102,13 +132,13 @@ function render() {
   }
   body.replaceChildren(fragment);
   for (const button of buttons) button.parentElement.setAttribute('aria-sort',button.dataset.key === key ? (direction === -1 ? 'descending' : 'ascending') : 'none');
-  document.querySelector('#status').textContent = !rows.length ? 'No selector timing rows collected for this scenario. Selector instrumentation may be unavailable.' : 'Showing ' + visible.length + ' of ' + sorted.length + ' matching selectors (' + rows.length + ' total)';
+  status.textContent = !rows.length ? 'No selector timing rows collected for this scenario. Selector instrumentation may be unavailable.' : 'Showing ' + visible.length + ' of ' + sorted.length + ' matching selectors (' + rows.length + ' total)';
 }
 for (const button of buttons) button.addEventListener('click', () => {
   direction = key === button.dataset.key ? -direction : button.dataset.key === 'selector' ? 1 : -1;
   key = button.dataset.key; render();
 });
-scenario.addEventListener('change',render); filter.addEventListener('input',render); render();
+scenario.addEventListener('change',render); filter.addEventListener('input',render);
 })();
 </script></body></html>`
 }
@@ -119,6 +149,9 @@ export const generateCssSelectorStatsHtml = async (
 ): Promise<void> => {
   const scenarios = await getCssSelectorStatsData(basePath)
   if (!scenarios.length) return
-  await mkdir(outPath, { recursive: true })
+  await mkdir(join(outPath, 'data'), { recursive: true })
+  for (const [index, scenario] of scenarios.entries()) {
+    await writeFile(join(outPath, 'data', `${index}.json`), JSON.stringify(scenario.rows))
+  }
   await writeFile(join(outPath, 'index.html'), renderCssSelectorStatsHtml(scenarios))
 }
