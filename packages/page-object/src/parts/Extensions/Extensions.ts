@@ -491,11 +491,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to show extensions view`)
       }
     },
-    async waitForProgressToBeHidden() {
+    async waitForProgressToBeHidden({ timeout = 30_000 }: { timeout?: number } = {}) {
       try {
         await page.waitForIdle()
         const progress = page.locator('.sidebar .monaco-progress-container')
-        await expect(progress).toBeHidden({ timeout: 30_000 })
+        await expect(progress).toBeHidden({ timeout })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide progress`)
