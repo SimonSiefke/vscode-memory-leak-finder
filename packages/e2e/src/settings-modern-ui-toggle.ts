@@ -3,7 +3,7 @@ import type { TestContext } from '../types.ts'
 const modernUiSetting = 'workbench.experimental.modernUI'
 let setting = modernUiSetting
 
-export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, RunningExtensions, SettingsEditor }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
@@ -18,9 +18,14 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
     await SettingsEditor.clear()
     await SettingsEditor.search({ resultCount: 'many', value: setting })
   }
-  await SettingsEditor.disableCheckBox({
-    name: setting,
-  })
+  // Writing settings activates the JSON and TypeScript extensions. Finish that
+  // activation before the first heap snapshot so module imports aren't leaks.
+  await SettingsEditor.enableCheckBox({ name: setting })
+  await SettingsEditor.disableCheckBox({ name: setting })
+  await RunningExtensions.showAndWaitFor('JSON Language Features', 'typescript-language-features')
+  await Editor.closeAll()
+  await SettingsEditor.open()
+  await SettingsEditor.search({ resultCount: 'many', value: setting })
 }
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
