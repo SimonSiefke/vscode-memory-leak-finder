@@ -2,6 +2,9 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
+// Hangs CI measure jobs that use --run-skipped-tests-anyway. Keep available for local runs.
+export const skipInCi = true
+
 export const setup = async ({ Editor, SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Terminal.killAll()
