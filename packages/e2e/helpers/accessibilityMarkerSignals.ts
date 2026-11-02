@@ -1,14 +1,18 @@
 import assert from 'node:assert/strict'
-import { readFile, rm } from 'node:fs/promises'
+import { readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { setTimeout } from 'node:timers/promises'
 import type { TestContext } from '../types.ts'
 
-export const command = async ({ QuickPick, Workspace }: TestContext, action: string): Promise<void> => {
+export const command = async ({ QuickPick, Workspace }: TestContext, action: string, onCleared?: () => Promise<void>): Promise<void> => {
   const resultPath = join(Workspace.getWorkspacePath(), 'marker-signals-result.json')
+  const acknowledgement = join(Workspace.getWorkspacePath(), 'marker-signals-continue.txt')
   await rm(resultPath, { force: true })
+  await rm(acknowledgement, { force: true })
   await QuickPick.executeCommand(`Marker Signals: ${action[0].toUpperCase()}${action.slice(1)}`)
-  const deadline = Date.now() + 10_000
+  await writeFile(acknowledgement, `${action}:start`)
+  let acknowledged = false
+  const deadline = Date.now() + 15_000
   while (Date.now() < deadline) {
     let text: string
     try {
@@ -18,14 +22,20 @@ export const command = async ({ QuickPick, Workspace }: TestContext, action: str
       await setTimeout(20)
       continue
     }
-    // A filesystem write may still be in progress.
-    if (!text.endsWith('}')) {
-      await setTimeout(20)
-      continue
-    }
     const result = JSON.parse(text)
     assert.equal(result.action, action)
     assert.equal(result.error, undefined)
+    if (result.phase === 'cleared') {
+      assert.ok(onCleared, 'Missing diagnostic-clear acknowledgement')
+      if (!acknowledged) {
+        await onCleared()
+        await writeFile(acknowledgement, `${action}:publish`)
+        acknowledged = true
+      }
+      await setTimeout(20)
+      continue
+    }
+    assert.equal(result.phase, 'done')
     return
   }
   throw new Error(`Marker Signals command did not complete: ${action}`)
@@ -37,7 +47,10 @@ export const waitFor = async ({ Workbench }: TestContext, expression: string): P
     if (await Workbench.evaluate({ expression })) return
     await setTimeout(20)
   }
-  throw new Error(`Marker Signals condition did not become true: ${expression}`)
+  const state = await Workbench.evaluate({
+    expression: `JSON.stringify({aria: Array.from(document.querySelectorAll('.monaco-aria-container')).map(node => node.textContent), markers: document.querySelectorAll('.squiggly-error, .squiggly-warning').length, editor: document.querySelector('.monaco-editor textarea')?.getAttribute('aria-label')})`,
+  })
+  throw new Error(`Marker Signals condition did not become true: ${expression}; state: ${state}`)
 }
 
 export const expectSignal = async (context: TestContext, severity: 'Error' | 'Warning'): Promise<void> => {
@@ -47,25 +60,20 @@ export const expectSignal = async (context: TestContext, severity: 'Error' | 'Wa
   )
 }
 
+export const moveToMarker = async (context: TestContext, line: 2 | 4): Promise<void> => {
+  await command(context, line === 2 ? 'error' : 'warning')
+}
+
 export const setup = async (context: TestContext): Promise<void> => {
   const { Editor, Workspace } = context
   await Editor.closeAll()
   await Workspace.setFiles(
     ['primary.txt', 'secondary.txt'].map((name) => ({ name, content: 'start\nerror here\nneutral\nwarning here\nend\n' })),
   )
-  await Workspace.writeWorkspaceSettings({
-    'accessibility.signalOptions.debouncePositionChanges': false,
-    'accessibility.signals.lineHasError': { sound: 'off', announcement: 'on' },
-    'accessibility.signals.lineHasWarning': { sound: 'off', announcement: 'on' },
-    'accessibility.signals.positionHasError': { sound: 'off', announcement: 'on' },
-    'accessibility.signals.positionHasWarning': { sound: 'off', announcement: 'on' },
-    'editor.stickyScroll.enabled': false,
-    'git.enabled': false,
-  })
   await command(context, 'setup')
-  await Editor.setCursor(4, 2)
+  await moveToMarker(context, 4)
   await expectSignal(context, 'Warning')
-  await Editor.setCursor(2, 2)
+  await moveToMarker(context, 2)
   await expectSignal(context, 'Error')
 }
 

@@ -17,16 +17,20 @@
         "title": "Marker Signals: Restore"
       },
       {
-        "command": "marker-signals.clear",
-        "title": "Marker Signals: Clear"
-      },
-      {
-        "command": "marker-signals.publish",
-        "title": "Marker Signals: Publish"
-      },
-      {
         "command": "marker-signals.cleanup",
         "title": "Marker Signals: Cleanup"
+      },
+      {
+        "command": "marker-signals.error",
+        "title": "Marker Signals: Error"
+      },
+      {
+        "command": "marker-signals.warning",
+        "title": "Marker Signals: Warning"
+      },
+      {
+        "command": "marker-signals.update",
+        "title": "Marker Signals: Update"
       }
     ]
   }
