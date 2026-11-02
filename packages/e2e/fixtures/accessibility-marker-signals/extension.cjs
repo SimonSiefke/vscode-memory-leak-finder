@@ -1,4 +1,4 @@
-const { readFile } = require('node:fs/promises')
+const { readFile, rename, writeFile } = require('node:fs/promises')
 
 exports.activate = (context, vscode) => {
   const diagnostics = vscode.languages.createDiagnosticCollection('marker-signals')
@@ -9,8 +9,8 @@ exports.activate = (context, vscode) => {
   const acknowledgement = vscode.Uri.joinPath(root, 'marker-signals-continue.txt')
   const writeResult = async (value) => {
     const temporary = vscode.Uri.joinPath(root, 'marker-signals-result.tmp')
-    await vscode.workspace.fs.writeFile(temporary, new TextEncoder().encode(JSON.stringify(value)))
-    await vscode.workspace.fs.rename(temporary, result, { overwrite: true })
+    await writeFile(temporary.fsPath, JSON.stringify(value))
+    await rename(temporary.fsPath, result.fsPath)
   }
   const waitForAcknowledgement = async (expected) => {
     const deadline = Date.now() + 10_000
