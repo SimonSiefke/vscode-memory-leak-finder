@@ -78,9 +78,25 @@ test('the preset freezes normal CI eligibility, focused opt-ins and source prove
   expect(result.benchmarks.find((b) => b.id === 'e2e-ordinary-timing')!.sourceSha256).toMatch(/^[a-f0-9]{64}$/)
 })
 
-test('focused workloads cannot override network/authentication/CI restrictions', async () => {
-  const { root, modules, load } = await fixture()
-  modules['quick-pick-toggle.ts'].requiresNetwork = true
+test.each(['requiresNetwork', 'requiresCopilotAuth', 'skipInCi'])(
+  'focused workloads retain %s exclusions without preventing preset discovery',
+  async (reason) => {
+    const { root, modules, load } = await fixture()
+    modules['settings-modern-ui-toggle.ts'][reason] = true
+    const result = await createCssPreset({ samples: 2, startupSamples: 2, cssSelectorSamples: 2 }, root, load)
+    expect(result.preset.inventory.find((entry) => entry.file.endsWith('/settings-modern-ui-toggle.ts'))).toMatchObject({
+      exclusion: reason,
+      focused: true,
+      selected: false,
+      explicitOptIn: false,
+    })
+    expect(result.benchmarks.some((benchmark) => benchmark.sourceFile?.endsWith('/settings-modern-ui-toggle.ts'))).toBe(false)
+  },
+)
+
+test('missing focused workloads still fail discovery', async () => {
+  const { root, load } = await fixture()
+  await rm(join(root, 'packages/e2e/src/quick-pick-toggle.ts'))
   await expect(createCssPreset({ samples: 2, startupSamples: 2, cssSelectorSamples: 2 }, root, load)).rejects.toThrow(
     'Focused workload is unavailable',
   )

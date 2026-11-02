@@ -158,8 +158,7 @@ export const createCssPreset = async (
     }
   }
   for (const file of focusedFiles) {
-    if (!inventory.some((entry) => entry.file.endsWith('/' + file) && entry.selected))
-      throw new Error(`Focused workload is unavailable: ${file}`)
+    if (!inventory.some((entry) => entry.file.endsWith('/' + file))) throw new Error(`Focused workload is unavailable: ${file}`)
   }
   for (const benchmark of registry) {
     if (benchmark.sourceFile) benchmark.sourceSha256 = sourceHash(await readFile(join(root, benchmark.sourceFile), 'utf8'))

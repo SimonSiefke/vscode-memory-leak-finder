@@ -238,7 +238,7 @@ change using separate timing, counter and tracing passes. Leave `measures` and
 timings, CPU profiles, heap snapshots and bundle sizes. Without the preset, the
 existing inventory, defaults and five-sample diagnostic cap remain unchanged.
 
-The preset includes the 12 dedicated performance interactions, plus picker
+The preset includes the 12 dedicated performance interactions. Additional focused candidates cover picker
 toggling, suggestion-widget churn, search-sidebar toggling and Modern UI settings
 toggling. These focused workloads collect timing, CPU instructions, CPU resources,
 renderer counters, timeline traces and selector statistics. It also discovers the
@@ -248,6 +248,8 @@ CI eligibility policy preserves network, authentication and CI exclusions. The 1
 dedicated workloads and three additional focused workloads explicitly opt into
 otherwise skipped tests; the manifest records these separately and never overrides
 network, authentication or CI restrictions.
+Ineligible focused candidates remain in the frozen inventory with their exclusion
+reason and do not prevent discovery of the remaining benchmarks.
 
 Sampling inputs are independent:
 
