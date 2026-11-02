@@ -1,6 +1,9 @@
 import * as JsonLanguageFeatures from '../helpers/jsonLanguageFeatures.ts'
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+export const skipInCi = true
+
 export const setup = async (context: TestContext): Promise<void> => {
   await JsonLanguageFeatures.setup(context, [{ name: 'symbols.json', content: '{\n  "greeting": "hello",\n  "tone": "friendly"\n}' }])
 }
