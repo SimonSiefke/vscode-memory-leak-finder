@@ -18,4 +18,5 @@ export const run = async (context: TestContext): Promise<void> => {
   await expectSignal(context, 'Warning')
   await moveToMarker(context, 2)
   await expectSignal(context, 'Error')
+  await command(context, 'reset')
 }

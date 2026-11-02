@@ -88,6 +88,12 @@ exports.activate = (context, vscode) => {
       if (JSON.stringify(cursor(editor)) !== JSON.stringify([1, 1])) throw new Error('Expected stationary cursor on error')
       publish()
     },
+    async reset() {
+      // Navigation history intentionally keeps selections in bounded stacks.
+      // Each measured iteration starts from the same history state.
+      await vscode.commands.executeCommand('workbench.action.clearEditorHistoryWithoutConfirm')
+      await open(files[0], new vscode.Range(1, 1, 1, 1))
+    },
     async cleanup() {
       diagnostics.clear()
       await vscode.commands.executeCommand('workbench.action.closeAllEditors')

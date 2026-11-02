@@ -15,4 +15,5 @@ export const run = async (context: TestContext): Promise<void> => {
   })
   await expectSignal(context, 'Error')
   await waitFor(context, "document.querySelectorAll('.monaco-editor .squiggly-error').length > 0")
+  await command(context, 'reset')
 }

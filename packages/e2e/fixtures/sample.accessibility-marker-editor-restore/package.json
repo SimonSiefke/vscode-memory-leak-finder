@@ -31,6 +31,10 @@
       {
         "command": "marker-signals.update",
         "title": "Marker Signals: Update"
+      },
+      {
+        "command": "marker-signals.reset",
+        "title": "Marker Signals: Reset"
       }
     ]
   }

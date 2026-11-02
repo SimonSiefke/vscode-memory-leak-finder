@@ -25,7 +25,9 @@ fixture publishes markers without moving the cursor. The diagnostic collection a
 are registered with the extension context. Teardown clears diagnostics, closes
 editors, and removes the workspace settings through the configuration API.
 Using that API also makes setup reliable when the test workspace is excluded
-from filesystem watching.
+from filesystem watching. Each iteration clears the bounded editor navigation
+history and restores the primary cursor, so history selections do not accumulate
+in the memory comparison. This does not disable the marker signal contribution.
 
 The scenarios are opt-in because they require the fixture extension. Run either
 with `--enable-extensions --run-skipped-tests-anyway`; for example:
