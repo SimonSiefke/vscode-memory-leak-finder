@@ -135,6 +135,21 @@ npm run build-charts
 
 The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
 
+### StringsWithLocations
+
+Reports positive growth in live string objects, grouped by string text and the closest available retaining source location. `count` is the added object count (`afterCount - beforeCount`); results sort by descending `count`, with stable tie ordering. Equal text at different locations remains separate, and multiple references to one string do not inflate the count.
+
+A shared breadth-first traversal finds the nearest located closure or container along strong retaining references through contexts, objects, arrays, and collections. It ignores weak links and prototype/compiler metadata paths when assigning a location. Equal-distance ties use generated source location order. Available source maps resolve locations before grouping and comparison; otherwise generated locations are used. Output locations use one-based lines and columns.
+
+These are inferred retaining locations, rather than string allocation sites or proof of a leak. A string need not belong to any surviving closure: top-level strings use a retaining container's location when available, and otherwise `location` is `null`. Flat string text comes from the snapshot; concatenated values are reconstructed up to 65,536 UTF-16 code units. Sliced strings, cyclic/incomplete ropes, and larger reconstructed ropes use `string: null`, `stringType`, and `heapObjectId`; they compare by object identity and are not merged as equal text. Snapshot text truncation and external data remain limits of the available evidence.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure strings-with-locations --only base
+npm run build-charts
+```
+
+Each entry includes `string`, `location`, `sourceLocation`, `count`, `beforeCount`, and `afterCount`, plus `originalLocation` when mapped. For example, `{ "string": "terminal output", "location": "src/terminal.ts:42:7", "sourceLocation": "bundle.js:1:120", "originalLocation": "src/terminal.ts:42:7", "count": 37, "beforeCount": 1, "afterCount": 38 }`. The chart shows added counts and abbreviated text with locations; full snapshot-provided text remains in the JSON results. Browser, Node, and worker targets are supported.
+
 ### StringObjectCount
 
 Counts live V8 string objects in before/after heap snapshots, including flat (`string`), concatenated (`concatenated string`), and sliced (`sliced string`) nodes. Separate objects with identical text count separately; multiple references to one object count once. Unlike `string-count`, which counts snapshot string-table entries (including metadata), this counts string heap nodes.

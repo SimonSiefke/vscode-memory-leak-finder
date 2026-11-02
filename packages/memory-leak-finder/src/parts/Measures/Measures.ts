@@ -156,6 +156,7 @@ export * as MeasureStoredPromiseCount from '../MeasureStoredPromiseCount/Measure
 export * as MeasureStringCount from '../MeasureStringCount/MeasureStringCount.ts'
 export * as MeasureStringObjectBytes from '../MeasureStringObjectBytes/MeasureStringObjectBytes.ts'
 export * as MeasureStringObjectCount from '../MeasureStringObjectCount/MeasureStringObjectCount.ts'
+export * as MeasureStringsWithLocations from '../MeasureStringsWithLocations/MeasureStringsWithLocations.ts'
 export * as MeasureStringDifference from '../MeasureStringDifference/MeasureStringDifference.ts'
 export * as MeasureStyleElementCount from '../MeasureStyleElementCount/MeasureStyleElementCount.ts'
 export * as MeasureSymbolCount from '../MeasureSymbolCount/MeasureSymbolCount.ts'
