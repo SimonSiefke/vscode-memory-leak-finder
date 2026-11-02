@@ -224,19 +224,20 @@ test('report is still written when no valid runtime comparison or build is avail
 
 test('build extraction checks commit and archive integrity and preserves executable permissions', async () => {
   const directory = await temporary()
+  const packageDirectory = `VSCode-linux-${process.arch}`
   const source = join(directory, 'source')
-  const executable = join(source, 'VSCode-linux-x64', 'code-oss')
-  await mkdir(join(source, 'VSCode-linux-x64'), { recursive: true })
+  const executable = join(source, packageDirectory, 'code-oss')
+  await mkdir(join(source, packageDirectory), { recursive: true })
   await writeFile(executable, '#!/bin/sh\nexit 0\n')
   await chmod(executable, 0o755)
   const archive = join(directory, 'vscode.tar.gz')
-  await command('tar', ['-czf', archive, '-C', source, 'VSCode-linux-x64'])
+  await command('tar', ['-czf', archive, '-C', source, packageDirectory])
   await writeJson(join(directory, 'build.json'), {
     schemaVersion: 1,
     commit: commits.before,
     platform: 'linux',
-    arch: 'x64',
-    executable: 'VSCode-linux-x64/code-oss',
+    arch: process.arch,
+    executable: `${packageDirectory}/code-oss`,
     archiveSha256: await sha256(archive),
   })
   await expect(extractBuild(directory, commits.after)).rejects.toThrow('metadata')
@@ -275,4 +276,25 @@ test('reports reject unknown benchmark identities and overlapping input/output d
   await expect(
     generateReport({ input: directory, output: directory + '-report', benchmarks: [{ ...benchmark, id: '../../escape' }], commits }),
   ).rejects.toThrow('Unknown benchmark')
+})
+
+test('architecture-aware reports reject mislabeled evidence while preserving legacy results', async () => {
+  const data = result()
+  const native = { ...benchmark, arch: 'arm64' as const }
+  expect(() => validateResult(data, native, commits)).toThrow('architecture')
+  data.benchmark = native
+  data.runner.arch = 'x64'
+  expect(() => validateResult(data, native, commits)).toThrow('architecture')
+  data.runner.arch = 'arm64'
+  expect(validateResult(data, native, commits).benchmark.arch).toBe('arm64')
+  expect(comparisonsFor(data)[0]!.arch).toBe('arm64')
+  const directory = await temporary()
+  await writeJson(join(directory, 'input/result.json'), data)
+  const report = await generateReport({ input: join(directory, 'input'), output: join(directory, 'report'), benchmarks: [native], commits })
+  expect(report.usable).toBe(true)
+  const html = await readFile(join(directory, 'report/index.html'), 'utf8')
+  expect(html).toContain('Linux · arm64 · native builds')
+  expect(html).toContain('arm64 · 5/5 complete pairs')
+  expect(html).not.toContain('Linux x64')
+  expect(validateResult(result(), benchmark, commits).benchmark).toBe(benchmark)
 })

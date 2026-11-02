@@ -1,6 +1,6 @@
 # Large Benchmark
 
-Compare two or more minified Linux x64 VS Code builds with paired startup, interaction,
+Compare two or more native minified Linux VS Code builds with paired startup, interaction,
 resource, trace, profiling, memory, and bundle-size measurements. The package owns
 the benchmark manifest, paired orchestration, result format, and offline report.
 It uses the existing DevTools connection and page-object harness, E2E scenarios
@@ -43,7 +43,7 @@ These input modes cannot be combined. For example, set `version_range` to
 An unavailable release API, unknown endpoint, missing Linux build, or invalid
 commit metadata fails initialization before any builds start.
 
-The workflow builds each minified Linux x64 package once and compares each adjacent
+The workflow builds each native minified Linux package once per required architecture and compares each adjacent
 pair of commits. The full suite has 108 paired runtime benchmarks, one smoke-test timing benchmark, and one JavaScript
 bundle-size benchmark per pair. Each matrix stays within 256 jobs by grouping
 benchmarks into a job when necessary; each job downloads only its two required
@@ -222,7 +222,7 @@ npm run large-performance -- history-report --manifest .tmp/history/manifest.jso
   --input-dir .tmp/history-results --output-dir .tmp/history-report
 ```
 
-Measurement jobs require the usual Linux x64 desktop dependencies. Report generation
+Measurement jobs require the usual native Linux desktop dependencies. Report generation
 requires FFmpeg with the `librsvg` decoder and `libx264` encoder, plus DejaVu fonts
 (`sudo apt-get install ffmpeg fonts-dejavu-core` on Ubuntu). The workflow installs
 them automatically. The report command also accepts result artifacts downloaded
@@ -278,9 +278,27 @@ unavailable; software-counter failures can still retain partial PSS evidence.
 The workflow groups benchmarks to stay within Actions' 256-job matrix limit and
 shares a 300-minute measurement budget across each job, reserving time for artifact
 upload. Attempts not reached before the budget expires remain missing. Runners
-need Linux x64, Xvfb, the normal Electron libraries, `perf` matching the kernel,
+need native Linux x64 or ARM64, Xvfb, the normal Electron libraries, `perf` matching the kernel,
 permission for hardware/software counters, and passwordless cache dropping for
-cold startup. Hosted runners may not expose a hardware PMU even after changing
+cold startup. Instruction collectors are queued on `ubuntu-24.04-arm`, using native
+ARM64 packages built on that runner architecture. Timing, CSS tracing, renderer
+counters and resource collectors stay on `ubuntu-24.04` with native x64 packages.
+Both sides of every pair always use the same architecture. Manifests freeze each
+benchmark's `arch`; build archives, result artifacts and reports retain that
+identity, and extraction refuses a package built for a different host architecture.
+Each architecture has separate build and measurement matrices so even 256-version
+histories stay within Actions' 256-job limit per matrix. Instruction-only dispatches
+skip x64 builds entirely. Older manifests without architecture metadata remain
+readable. Local measurements from new manifests must use the prescribed native host.
+
+To supplement a previous x64 comparison with hardware instructions, dispatch the
+same preset and revisions with `measures=instructions`, `samples=37` and
+`startup_samples=200`. This queues only ARM builds and instruction measurements;
+its report is separate from the original timing and CSS report. Instruction counts
+are architecture-specific: compare before/after within ARM, not absolute ARM counts
+against x64 timings or counts. No combined speedup score is computed.
+
+Hosted runners may not expose a hardware PMU even after changing
 `perf_event_paranoid`; use suitable runners for complete instruction coverage.
 The report prominently marks missing, failed, partial and unavailable coverage.
 

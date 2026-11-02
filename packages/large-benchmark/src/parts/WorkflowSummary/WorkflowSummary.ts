@@ -35,7 +35,7 @@ export const createWorkflowSummary = (summary: ReportSummary): string => {
   }
   const tables = [...groups].map(
     ([collector, entries]) =>
-      `### ${cell(collector)}\n\n| Benchmark | Metric (coverage) | Before | After | Change | Complete pairs | 95% paired CI of change | Result |\n| --- | --- | ---: | ---: | ---: | ---: | --- | --- |\n${entries.map(comparisonRow).join('\n')}\n`,
+      `### ${cell(collector)}${entries.some((entry) => entry.arch) ? ` (${[...new Set(entries.map((entry) => entry.arch ?? 'x64'))].join(' / ')})` : ''}\n\n| Benchmark | Metric (coverage) | Before | After | Change | Complete pairs | 95% paired CI of change | Result |\n| --- | --- | ---: | ---: | ---: | ---: | --- | --- |\n${entries.map(comparisonRow).join('\n')}\n`,
   )
   return (
     [

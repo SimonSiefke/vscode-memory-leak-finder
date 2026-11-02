@@ -6,7 +6,7 @@ import { selectBenchmarks, validateRegistry } from '../Manifest/Manifest.ts'
 import { selectorTableContent, selectorTableHtml } from '../CssSelectorReport/CssSelectorTable.ts'
 import { selectorDetailsSvg } from '../CssSelectorReport/CssSelectorReport.ts'
 import { comparePairs } from '../Statistics/Statistics.ts'
-import type { Benchmark, Metric, Result, Sample, Status } from '../Types/Types.ts'
+import type { Architecture, Benchmark, Metric, Result, Sample, Status } from '../Types/Types.ts'
 import type { CssPresetMetadata } from '../CssPreset/CssPreset.ts'
 import { overviewGroups, overviewSvg } from '../Overview/Overview.ts'
 
@@ -17,6 +17,7 @@ const href = (path: string): string => path.split('/').map(encodeURIComponent).j
 
 export interface Comparison {
   benchmark: string
+  arch?: Architecture
   scenario: string
   collector: string
   startup: boolean
@@ -58,6 +59,7 @@ export const comparisonsFor = (result: Result): Comparison[] => {
       {
         benchmark: result.benchmark.id,
         scenario: result.benchmark.scenario,
+        ...(result.benchmark.arch ? { arch: result.benchmark.arch } : {}),
         collector: result.benchmark.collector,
         startup: result.benchmark.startup,
         cache: result.benchmark.cache,
@@ -84,6 +86,7 @@ export const validateResult = (raw: unknown, expected: Benchmark, commits: { bef
     !result ||
     result.schemaVersion !== 1 ||
     result.benchmark?.id !== expected.id ||
+    (expected.arch !== undefined && (result.benchmark.arch !== expected.arch || result.runner?.arch !== expected.arch)) ||
     result.commits?.before !== commits.before ||
     result.commits?.after !== commits.after ||
     !Array.isArray(result.samples) ||
@@ -93,7 +96,7 @@ export const validateResult = (raw: unknown, expected: Benchmark, commits: { bef
     (expected.samples !== undefined && result.requestedSamples !== expected.samples) ||
     !['success', 'partial', 'failed', 'unavailable', 'missing'].includes(result.status)
   )
-    throw new Error('Result identity, commits, or sample count do not match this run')
+    throw new Error('Result identity, commits, architecture, or sample count do not match this run')
   const seen = new Set<string>()
   for (const sample of result.samples) {
     const key = `${sample.pair}:${sample.revision}`
@@ -257,6 +260,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     ...inputOptions,
     benchmarks: inputOptions.benchmarks.map((benchmark) => ({
       ...canonical.find((entry) => entry.id === benchmark.id)!,
+      ...(benchmark.arch === undefined ? {} : { arch: benchmark.arch }),
       ...(benchmark.samples === undefined ? {} : { samples: benchmark.samples }),
     })),
   }
@@ -401,7 +405,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     const artifact = relative(options.input, resultDirectories.get(benchmark.id) ?? options.input).split(sep)[0]
     const artifactName = artifact?.startsWith('large-result-') ? artifact : `large-result-${benchmark.id}`
     sections.push(`<section class="benchmark" data-startup="${benchmark.startup}" data-collector="${benchmark.collector}" data-id="${benchmark.id}" data-search="${escapeHtml(entries.map((entry) => entry.metric).join(' '))}"><h2>${escapeHtml(benchmark.id)} <span class="badge ${status}">${status}</span></h2>
-      <p>${pairs}/${result?.requestedSamples ?? '?'} complete pairs. ${benchmark.diagnostic ? 'Diagnostic collector; instrumentation changes execution.' : ''}</p>${chartHtml.join('')}
+      <p>${escapeHtml(benchmark.arch ?? 'legacy x64')} · ${pairs}/${result?.requestedSamples ?? '?'} complete pairs. ${benchmark.diagnostic ? 'Diagnostic collector; instrumentation changes execution.' : ''}</p>${chartHtml.join('')}
       <details><summary>Diagnostics, runner metadata, and raw results</summary><pre>${escapeHtml(JSON.stringify({ runner: result?.runner, diagnostics: messages }, null, 2))}</pre>${result ? `<p>Raw evidence is stored separately in the <code>${escapeHtml(artifactName)}</code> workflow artifact (or the original input directory for local runs).</p>` : ''}<ul>${rawFiles}</ul></details></section>`)
   }
   if (smoke) coverage.push({ benchmark: 'smoke-tests', status: smoke.status, pairs: 0, requested: 0, diagnostics: smoke.diagnostics })
@@ -496,7 +500,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     : ''
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Large Performance · VS Code comparison</title><style>
     :root{color-scheme:light;font-family:system-ui,sans-serif;color:#1b2538;background:#f4f6fb}body{max-width:1350px;margin:auto;padding:36px}header,section,.overview{background:white;border:1px solid #dde3ef;border-radius:12px;padding:24px;margin-bottom:24px}h1{margin:0 0 12px;font-size:34px}h2{font-size:22px}p,figcaption{line-height:1.6}code{overflow-wrap:anywhere}.stats{display:flex;gap:12px;flex-wrap:wrap}.stats span{background:#eef1f8;border-radius:8px;padding:14px}.table-wrap{overflow:auto}.heatmap th,.heatmap td{min-width:95px;text-align:center}.heatmap tbody th{position:sticky;left:0;top:auto;background:#f7f9fd;text-align:left;min-width:170px;z-index:1}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #e3e8f2;padding:10px;overflow-wrap:anywhere}th{position:sticky;top:0;background:#edf1fa}.better{background:#e0f3e8}.worse{background:#fae3e3}.uncertain{background:#eef0f4}.badge{font-size:12px;border-radius:20px;padding:5px 9px;background:#eef0f4}.success{background:#e0f3e8}.failed{background:#fae3e3}figure{margin:16px 0;border:1px solid #e3e8f2;border-radius:8px;padding:14px}img{max-width:100%;height:auto}figcaption{font-size:12px;color:#566078}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}select,input{font:inherit;padding:8px;border:1px solid #ccd4e3;border-radius:6px}nav{display:flex;gap:12px;margin:20px 0;flex-wrap:wrap}a{color:#315abd}details{margin:12px 0}summary{cursor:pointer}[hidden]{display:none}@media(max-width:700px){body{padding:12px}header,section,.overview{padding:14px}.table-wrap{overflow:auto}h1{font-size:27px}}
-    </style></head><body><header><h1>Large Performance</h1><p>VS Code · Linux x64 · runtime collectors disable extensions and compare on the same runner; smoke tests use independent runners and their test extensions</p><p><strong>Before:</strong> <code>${escapeHtml(options.commits.before)}</code><br/><strong>After:</strong> <code>${escapeHtml(options.commits.after)}</code></p>
+    </style></head><body><header><h1>Large Performance</h1><p>VS Code · Linux · ${escapeHtml([...new Set(options.benchmarks.map((b) => b.arch ?? 'x64'))].join(' / '))} · native builds; runtime collectors disable extensions and compare on the same runner; smoke tests use independent runners and their test extensions</p><p><strong>Before:</strong> <code>${escapeHtml(options.commits.before)}</code><br/><strong>After:</strong> <code>${escapeHtml(options.commits.after)}</code></p>
     <p>${summary.complete ? 'Comparison complete. Regressions are informational.' : 'Comparison incomplete: some requested samples or collectors are missing, failed or unavailable. Available evidence is preserved below.'}</p>
     <div class="stats">${Object.entries(counts)
       .map(([name, value]) => `<span><strong>${value}</strong> ${name}</span>`)

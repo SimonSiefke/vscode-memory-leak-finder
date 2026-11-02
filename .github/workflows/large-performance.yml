@@ -66,6 +66,10 @@ jobs:
   initialize:
     runs-on: ubuntu-24.04
     outputs:
+      arm_matrix: ${{ steps.manifest.outputs.arm_matrix }}
+      arm_build_matrix: ${{ steps.manifest.outputs.arm_build_matrix }}
+      has_arm: ${{ steps.manifest.outputs.has_arm }}
+      has_x64: ${{ steps.manifest.outputs.has_x64 }}
       matrix: ${{ steps.manifest.outputs.matrix }}
       build_matrix: ${{ steps.manifest.outputs.build_matrix }}
       smoke_matrix: ${{ steps.manifest.outputs.smoke_matrix }}
@@ -106,6 +110,7 @@ jobs:
           retention-days: 30
 
   build:
+    if: needs.initialize.outputs.has_x64 == 'true'
     needs: initialize
     runs-on: ubuntu-24.04
     timeout-minutes: 350
@@ -164,6 +169,52 @@ jobs:
           compression-level: 0
           if-no-files-found: error
           retention-days: 30
+
+  build-arm:
+    if: needs.initialize.outputs.has_arm == 'true'
+    needs: initialize
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 350
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.initialize.outputs.arm_build_matrix) }}
+    env:
+      COMMIT: ${{ matrix.commit }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config xvfb x11-xserver-utils
+      - name: Install harness
+        run: npm run install:ci
+      - name: Build harness
+        run: npm run build
+      - name: Build and archive the minified VS Code package
+        run: |
+          node packages/large-benchmark/src/main.ts prepare \
+            --commit "$COMMIT" --output-dir .large-build
+      - name: Upload executable package
+        uses: actions/upload-artifact@v7
+        with:
+          name: large-build-${{ matrix.artifact }}
+          path: |
+            .large-build/vscode.tar.gz
+            .large-build/build.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+          overwrite: true
+      - name: Upload build status
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: large-build-status-${{ matrix.artifact }}
+          path: .large-build/status.json
+          retention-days: 30
+          overwrite: true
 
   smoke:
     needs: [initialize, build]
@@ -287,8 +338,79 @@ jobs:
           retention-days: 30
           overwrite: true
 
+  measure-arm:
+    needs: [initialize, build-arm]
+    if: ${{ always() && needs.initialize.result == 'success' && needs.initialize.outputs.has_arm == 'true' && !cancelled() }}
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 350
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.initialize.outputs.arm_matrix) }}
+    env:
+      BENCHMARK_IDS: ${{ matrix.benchmarks }}
+      BEFORE_COMMIT: ${{ matrix.before }}
+      AFTER_COMMIT: ${{ matrix.after }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - name: Install runner dependencies
+        run: npm run install:ci
+      - name: Build shared scenario utilities
+        run: npm run build
+      - name: Download frozen benchmark manifest
+        uses: actions/download-artifact@v8
+        with:
+          name: large-manifest
+          path: .large-manifest
+      - name: Install desktop and performance tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libasound2t64 libnss3 libgbm1 linux-tools-common linux-tools-generic
+          sudo apt-get install -y "linux-tools-$(uname -r)" || true
+          sudo sysctl -w kernel.perf_event_paranoid=-1 || true
+      - uses: actions/download-artifact@v8
+        with:
+          name: large-build-${{ matrix.beforeArtifact }}
+          path: .large-builds/before
+      - uses: actions/download-artifact@v8
+        with:
+          name: large-build-${{ matrix.afterArtifact }}
+          path: .large-builds/after
+      - name: Verify and extract before build
+        id: before
+        run: node packages/large-benchmark/src/main.ts extract --input-dir .large-builds/before --commit "$BEFORE_COMMIT" --output-name executable
+      - name: Verify and extract after build
+        id: after
+        run: node packages/large-benchmark/src/main.ts extract --input-dir .large-builds/after --commit "$AFTER_COMMIT" --output-name executable
+      - name: Measure paired revisions
+        timeout-minutes: 310
+        env:
+          BEFORE_PATH: ${{ steps.before.outputs.executable }}
+          AFTER_PATH: ${{ steps.after.outputs.executable }}
+        run: |
+          xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24 -noreset' \
+            node packages/large-benchmark/src/main.ts measure \
+            --manifest .large-manifest/manifest.json \
+            --benchmark-id "$BENCHMARK_IDS" --samples "$SAMPLES" \
+            --before-path "$BEFORE_PATH" --after-path "$AFTER_PATH" \
+            --before-commit "$BEFORE_COMMIT" --after-commit "$AFTER_COMMIT" \
+            --output-dir .large-results
+      - name: Upload all available samples and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: large-result-arm64-${{ matrix.id }}-${{ matrix.group }}
+          path: .large-results
+          include-hidden-files: true
+          retention-days: 30
+          overwrite: true
+
   report:
-    needs: [initialize, build, measure, smoke]
+    needs: [initialize, build, build-arm, measure, measure-arm, smoke]
     if: ${{ always() && needs.initialize.result == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60

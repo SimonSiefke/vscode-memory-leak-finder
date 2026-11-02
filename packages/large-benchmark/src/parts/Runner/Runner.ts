@@ -1,6 +1,7 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { createServer } from 'node:net'
 import { access, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { assertNativeBenchmarks } from '../Architecture/Architecture.ts'
 import { hostname, release, cpus } from 'node:os'
 import { join, resolve } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
@@ -582,6 +583,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
 }
 
 export const runBenchmark = async (options: RunOptions, measure = measureSample): Promise<Result> => {
+  if (options.benchmark.arch) assertNativeBenchmarks([options.benchmark])
   if (measure === measureSample && !options.facilities) options = { ...options, facilities: await preflightCollectors([options.benchmark]) }
   const count = sampleCount(options.benchmark, options.samples)
   const result: Result = {
@@ -591,6 +593,7 @@ export const runBenchmark = async (options: RunOptions, measure = measureSample)
     requestedSamples: count,
     status: 'missing',
     runner: {
+      arch: process.arch,
       hostname: hostname(),
       kernel: release(),
       cpu: cpus()[0]?.model ?? 'unknown',

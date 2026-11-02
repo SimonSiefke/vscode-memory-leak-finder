@@ -373,7 +373,12 @@ test.each(['pair', 'series'])('qualified fork references survive the %s workflow
     beforeArtifact: commits[0],
     afterArtifact: `simonsiefke-vscode-${commits[1]}`,
   })
-  const data = { ...result(0, 100, 90), commits: { before, after } }
+  const data = {
+    ...result(0, 100, 90),
+    benchmark: { ...benchmark, arch: 'x64' as const },
+    runner: { arch: 'x64' },
+    commits: { before, after },
+  }
   await writeJson(join(directory, 'input', 'large-result-pair-1-1', 'result.json'), data)
   jest.spyOn(console, 'log').mockImplementation(() => {})
   await largePerformance([

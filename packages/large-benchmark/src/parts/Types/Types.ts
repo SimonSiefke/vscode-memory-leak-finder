@@ -1,3 +1,4 @@
+export type Architecture = 'x64' | 'arm64'
 export type Revision = 'before' | 'after'
 export type Collector =
   'smoke' | 'timing' | 'instructions' | 'resources' | 'renderer' | 'timeline' | 'profile' | 'memory' | 'bundles' | 'css-selectors'
@@ -10,6 +11,7 @@ export interface Benchmark {
   startup: boolean
   cache: 'cold' | 'warm' | 'action' | 'static'
   diagnostic: boolean
+  arch?: Architecture
   samples?: number
   sourceFile?: string
   sourceSha256?: string
@@ -60,7 +62,7 @@ export interface BuildMetadata {
   schemaVersion: 1
   commit: string
   platform: 'linux'
-  arch: 'x64'
+  arch: Architecture
   executable: string
   archiveSha256: string
   nodeVersion: string

@@ -11,12 +11,13 @@ import type { RunOptions } from '../Runner/Runner.ts'
 import type { Benchmark } from '../Types/Types.ts'
 import { parseOptions } from '../ParseOptions/ParseOptions.ts'
 import { createWorkflowSummary } from '../WorkflowSummary/WorkflowSummary.ts'
-import { parseCommits, seriesMatrix, validateCommits, type SeriesManifest } from '../Series/Series.ts'
+import { parseCommits, validateCommits, type SeriesManifest } from '../Series/Series.ts'
 import { generateTrendReport, createTrendWorkflowSummary } from '../TrendReport/TrendReport.ts'
 import { measureFunctionCounts, reportFunctionCountHistory, type HistoryManifest } from '../FunctionCountHistory/FunctionCountHistory.ts'
 import { resolveLastVersions, resolveVersionRange } from '../VersionRange/VersionRange.ts'
 import { createCssPreset, freezeSamples, samplingPolicy, harnessSourceHash, type CssPresetMetadata } from '../CssPreset/CssPreset.ts'
 import { benchmarks as legacyBenchmarks } from '../Manifest/Manifest.ts'
+import { assertNativeBenchmarks, collectorArchitecture, executionPlan } from '../Architecture/Architecture.ts'
 
 export interface Manifest {
   schemaVersion: 1
@@ -74,7 +75,10 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
             return freezeSamples(benchmark, policy)
           return benchmark
         })
-      const selected = selectBenchmarks(get('--benchmark-filter'), get('--measures'), registry)
+      const selected = selectBenchmarks(get('--benchmark-filter'), get('--measures'), registry).map((benchmark) => ({
+        ...benchmark,
+        arch: collectorArchitecture(benchmark),
+      }))
       const inputModes = [get('--version-range'), get('--commits'), get('--before-commit') || get('--after-commit')].filter(Boolean)
       if (inputModes.length > 1)
         throw new Error('Use --version-range, --commits, or --before-commit/--after-commit; these inputs cannot be combined')
@@ -90,22 +94,9 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
           : { schemaVersion: 1, commits: commits(), samples, benchmarks: selected }
       if (preset) manifest.preset = preset.preset
       await writeJson(join(output, 'manifest.json'), manifest)
-      const matrix = JSON.stringify({
-        include: (selected.some((b) => b.collector !== 'smoke')
-          ? seriesMatrix(
-              revisions,
-              selected.filter((b) => b.collector !== 'smoke'),
-            ).include
-          : []
-        ).map((pair) => ({
-          ...pair,
-          beforeArtifact: parseCommitReference(pair.before).artifact,
-          afterArtifact: parseCommitReference(pair.after).artifact,
-        })),
-      })
-      const buildMatrix = JSON.stringify({
-        include: revisions.map((commit) => ({ commit, artifact: parseCommitReference(commit).artifact })),
-      })
+      const plan = executionPlan(revisions, selected)
+      const matrix = JSON.stringify(plan.matrix)
+      const buildMatrix = JSON.stringify(plan.build_matrix)
       const smokeMatrix = JSON.stringify({
         include: selected.some((b) => b.collector === 'smoke')
           ? revisions.map((commit) => ({ commit, artifact: parseCommitReference(commit).artifact }))
@@ -114,9 +105,9 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
       if (process.env.GITHUB_OUTPUT)
         await appendFile(
           process.env.GITHUB_OUTPUT,
-          `matrix=${matrix}\nbuild_matrix=${buildMatrix}\nsmoke_matrix=${smokeMatrix}\nhas_runtime=${selected.some((b) => b.collector !== 'smoke')}\nhas_smoke=${selected.some((b) => b.collector === 'smoke')}\nsmoke_harness=${parseCommitReference(revisions[0]!).artifact}\n`,
+          `arm_matrix=${JSON.stringify(plan.arm_matrix)}\narm_build_matrix=${JSON.stringify(plan.arm_build_matrix)}\nhas_arm=${plan.has_arm}\nhas_x64=${plan.has_x64}\nmatrix=${matrix}\nbuild_matrix=${buildMatrix}\nsmoke_matrix=${smokeMatrix}\nhas_runtime=${plan.has_runtime}\nhas_smoke=${selected.some((b) => b.collector === 'smoke')}\nsmoke_harness=${parseCommitReference(revisions[0]!).artifact}\n`,
         )
-      else console.log(matrix)
+      else console.log(JSON.stringify(plan))
       break
     }
     case 'prepare-smoke': {
@@ -141,7 +132,12 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
       try {
         await prepareBuild(required('--commit'), output)
       } catch (error) {
-        await writeJson(join(output, 'status.json'), { status: 'failed', commit: get('--commit'), error: errorMessage(error) })
+        await writeJson(join(output, 'status.json'), {
+          status: 'failed',
+          commit: get('--commit'),
+          arch: process.arch,
+          error: errorMessage(error),
+        })
         throw error
       }
       break
@@ -156,7 +152,6 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
       break
     }
     case 'measure': {
-      if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('Measurements require Linux x64')
       const manifest = get('--manifest') ? await readJson<Manifest | SeriesManifest>(resolve(get('--manifest'))) : undefined
       if (get('--preset') === 'css-specific' && !manifest) throw new Error('Preset measurements require the frozen --manifest')
       if (manifest) {
@@ -177,6 +172,7 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
       const selected = selectBenchmarks(required('--benchmark-id'), '', manifest?.benchmarks ?? legacyBenchmarks)
       if (selected.some((benchmark) => benchmark.collector === 'smoke'))
         throw new Error('Use the smoke command for independent smoke-test measurements')
+      assertNativeBenchmarks(selected)
       const { preflightCollectors, runBenchmark } = await import('../Runner/Runner.ts')
       const facilities = await preflightCollectors(selected)
       const deadline = Date.now() + 300 * 60_000

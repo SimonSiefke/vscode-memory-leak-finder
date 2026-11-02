@@ -52,3 +52,22 @@ test('fork preparation refuses a checkout with the wrong SHA before archiving', 
   await expect(prepareBuild(reference, output)).rejects.toThrow(`expected ${sha}`)
   expect(command.mock.calls.some(([executable]) => executable === 'tar')).toBe(false)
 })
+
+test('ARM preparation packages a native ARM64 build and rejects it on an x64 runner before extraction', async () => {
+  Object.defineProperty(process, 'arch', { value: 'arm64' })
+  const output = await fs.mkdtemp(join(tmpdir(), 'large-prepare-arm-test-'))
+  directories.push(output)
+  command.mockImplementation(async (executable, args) => {
+    if (executable === 'git') return sha
+    if (executable === 'tar') await fs.writeFile(args[1]!, 'native ARM archive')
+    return ''
+  })
+  const metadata = await prepareBuild(reference, output)
+  expect(metadata).toMatchObject({ arch: 'arm64', executable: 'VSCode-linux-arm64/code-oss' })
+  expect(command.mock.calls.find(([executable]) => executable === 'tar')![1]).toContain('VSCode-linux-arm64')
+  await expect(extractBuild(output, reference)).resolves.toBe(join(output, 'VSCode-linux-arm64/code-oss'))
+  command.mockClear()
+  Object.defineProperty(process, 'arch', { value: 'x64' })
+  await expect(extractBuild(output, reference)).rejects.toThrow('metadata')
+  expect(command).not.toHaveBeenCalled()
+})

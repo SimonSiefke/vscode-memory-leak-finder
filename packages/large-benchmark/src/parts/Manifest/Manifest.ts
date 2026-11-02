@@ -113,7 +113,8 @@ export const validateRegistry = (registry: Benchmark[]): void => {
     if (
       !/^[a-z0-9-]+$/.test(benchmark.id) ||
       !measureGroups.includes(benchmark.collector as any) ||
-      !['cold', 'warm', 'action', 'static'].includes(benchmark.cache)
+      !['cold', 'warm', 'action', 'static'].includes(benchmark.cache) ||
+      (benchmark.arch !== undefined && !['x64', 'arm64'].includes(benchmark.arch))
     )
       throw new Error('Invalid benchmark identity')
     if (

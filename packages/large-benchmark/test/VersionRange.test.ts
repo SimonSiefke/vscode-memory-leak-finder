@@ -128,7 +128,7 @@ test('range CLI freezes version-to-commit resolution in the manifest and display
       commits: { before: manifest.commits[index], after: manifest.commits[index + 1] },
       requestedSamples: 1,
       status: 'success',
-      runner: {},
+      runner: { arch: 'x64' },
       diagnostics: [],
       samples: (['before', 'after'] as const).map((revision, order) => ({
         pair: 0,
