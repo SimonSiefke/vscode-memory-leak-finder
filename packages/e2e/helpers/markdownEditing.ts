@@ -26,7 +26,7 @@ const git = async ({ Workspace }: TestContext, args: string[]): Promise<string> 
 }
 
 export const setup = async (context: TestContext, { tracked, gitEnabled }: Options): Promise<void> => {
-  const { Editor, SideBar, SourceControl, Workspace } = context
+  const { Editor, Git, QuickPick, SideBar, SourceControl, Workspace } = context
   await Editor.closeAll()
   await Workspace.setFiles([
     { name: '.gitignore', content: '.vscode/\n' },
@@ -56,6 +56,11 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
   }
   await Workspace.writeFile(fileName, baselineText)
   assert.equal(await git(context, ['status', '--porcelain', '--', fileName]), tracked ? ` M ${fileName}\n` : `?? ${fileName}\n`)
+  if (gitEnabled) {
+    // A previous scenario may have disabled Git or explicitly closed this path.
+    await QuickPick.waitForCommand('Git: Open Repository')
+    await Git.openRepository('.')
+  }
   // Confirm the Git-enabled case actually has a repository in the workbench.
   await SourceControl.show()
   await SourceControl.shouldHaveRepositoryCount(gitEnabled ? 1 : 0)
@@ -68,6 +73,7 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
 export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promise<void> => {
   // Native key events exercise the typing path rather than replacing the model.
   // Keep this editor open across iterations, as in a sustained editing session.
+  await Editor.focus()
   await Editor.typeCharacters(typedText)
   await Editor.shouldContainText('typingcheckend')
   const isDirty = () =>
@@ -100,11 +106,19 @@ export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promis
   assert.fail(`Markdown changed after undo: expected ${baselineText.length} characters, got ${actual.length}`)
 }
 
-export const teardown = async ({ Editor, QuickPick, Workspace }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, Git, QuickPick, SourceControl, Workspace }: TestContext): Promise<void> => {
   try {
     await QuickPick.executeCommand('View: Revert and Close Editor')
   } finally {
     await Editor.closeAll()
+    const settings = await Workspace.readWorkspaceSettings()
+    if (settings['git.enabled'] !== false) {
+      await Git.closeRepository()
+      await SourceControl.shouldHaveRepositoryCount(0)
+    }
+    // Close Git's model before deleting its repository; otherwise later Git
+    // commands in this directory can discover the harness's parent repository.
+    await Workspace.remove('.git')
     await Workspace.remove('.vscode/settings.json')
   }
 }
