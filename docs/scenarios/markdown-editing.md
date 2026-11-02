@@ -14,8 +14,9 @@ modified throughout the test. No remote repository or network access is needed.
 Each iteration types 78 characters using native keyboard events, checks that
 the final marker appears, undoes until the editor reports a clean document,
 and saves. The saved document must exactly match the original working copy.
-The editor remains open across
-iterations; its contents do not grow with the run count. Teardown closes the
+The editor remains open across iterations; its contents do not grow with the
+run count. The check waits for the expected contents to reach disk, since the
+tab's dirty indicator can disappear before saving finishes. Teardown closes the
 document and removes the scenario's workspace settings.
 
 Run all three scenarios independently with:
@@ -24,8 +25,11 @@ Run all three scenarios independently with:
 node packages/cli/bin/test.js --only '^markdown-edit-' --runs 37 --restart-between
 ```
 
-Add `--check-leaks --measure-after --measure named-function-count3` to compare
-retained renderer functions after warmup. Other harness measurements can be
+Add `--check-leaks --measure-after --measure named-function-count3 --timeout-between 1000`
+to compare retained renderer functions after warmup and allow delayed editor work
+to finish before the final snapshot. Without the settling interval, continuous
+typing can leave callbacks queued on folding, quick-diff, and comment schedulers.
+Other harness measurements can be
 selected to compare CPU or process-tree memory across the same three workloads.
 
 These are bounded editing scenarios, not an hours-long crash reproducer. They

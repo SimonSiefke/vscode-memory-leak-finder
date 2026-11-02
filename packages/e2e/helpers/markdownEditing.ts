@@ -86,10 +86,18 @@ export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promis
     await Editor.press(`${modifier}+z`)
   }
   assert.equal(await isDirty(), false, 'Undo must restore the saved document')
-  await Editor.save({ viaKeyBoard: true })
-  const actual = await readFile(join(Workspace.getWorkspacePath(), fileName), 'utf8')
-  // Compare a bounded summary on failure rather than dumping a large document.
-  assert.ok(actual === baselineText, `Markdown changed after undo: expected ${baselineText.length} characters, got ${actual.length}`)
+  // Use the command for platform-independent saving. A tab can stop showing its
+  // dirty indicator while a save is still running, so also await persistence.
+  await Editor.save({ viaKeyBoard: false })
+  let actual = ''
+  const deadline = Date.now() + 3000
+  do {
+    actual = await readFile(join(Workspace.getWorkspacePath(), fileName), 'utf8')
+    if (actual === baselineText) return
+    await new Promise((resolve) => setTimeout(resolve, 20))
+  } while (Date.now() < deadline)
+  // Keep failure output bounded instead of dumping the entire document.
+  assert.fail(`Markdown changed after undo: expected ${baselineText.length} characters, got ${actual.length}`)
 }
 
 export const teardown = async ({ Editor, QuickPick, Workspace }: TestContext): Promise<void> => {
