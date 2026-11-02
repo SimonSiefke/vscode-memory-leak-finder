@@ -1,0 +1,33 @@
+{
+  "name": "accessibility-marker-editor-restore",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "marker-signals.setup",
+        "title": "Marker Signals: Setup"
+      },
+      {
+        "command": "marker-signals.restore",
+        "title": "Marker Signals: Restore"
+      },
+      {
+        "command": "marker-signals.clear",
+        "title": "Marker Signals: Clear"
+      },
+      {
+        "command": "marker-signals.publish",
+        "title": "Marker Signals: Publish"
+      },
+      {
+        "command": "marker-signals.cleanup",
+        "title": "Marker Signals: Cleanup"
+      }
+    ]
+  }
+}
