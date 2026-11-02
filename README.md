@@ -135,6 +135,25 @@ npm run build-charts
 
 The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
 
+### StringObjectCount
+
+Counts live V8 string objects in before/after heap snapshots, including flat (`string`), concatenated (`concatenated string`), and sliced (`sliced string`) nodes. Separate objects with identical text count separately; multiple references to one object count once. Unlike `string-count`, which counts snapshot string-table entries (including metadata), this counts string heap nodes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure string-object-count --only base
+```
+
+### StringObjectBytes
+
+Sums the snapshot `self_size` bytes of the same string nodes, including node overhead. This is the total shallow string footprint exposed by the snapshot, not text length or a sum of retained sizes. Shared parents and rope components count once as individual nodes; external backing storage omitted from `self_size` is outside coverage.
+
+Both string object measures support browser, Node, and worker targets, return numeric `before` and `after` values, and flag positive growth as a suspected leak. Measure the process holding the strings. Generated charts show the baseline in black and growth in red, with count or byte labels.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure string-object-bytes --only base
+npm run build-charts
+```
+
 ### ArrayBufferBytes
 
 Measures the native backing-store bytes retained by live `ArrayBuffer` objects. The result includes before, after, and delta byte and backing-store counts.

@@ -16,6 +16,7 @@ import * as CompareObjectShapeDifference from '../CompareObjectShapeDifference/C
 import * as ComparePerformanceMarks from '../ComparePerformanceMarks/ComparePerformanceMarks.ts'
 import * as CompareNamedClosureCountWithReferences2 from '../CompareNamedClosureCountWithReferences2/CompareNamedClosureCountWithReferences2.ts'
 import * as CompareStringCount from '../CompareStringCount/CompareStringCount.ts'
+import * as CompareStringObjects from '../CompareStringObjects/CompareStringObjects.ts'
 import * as CompareRetainedSubstrings from '../CompareRetainedSubstrings/CompareRetainedSubstrings.ts'
 import * as CreateMemoryCitySnapshot from '../CreateMemoryCitySnapshot/CreateMemoryCitySnapshot.ts'
 import * as CreatePendingPromiseRetainers from '../CreatePendingPromiseRetainers/CreatePendingPromiseRetainers.ts'
@@ -62,6 +63,7 @@ export const commandMap = {
     CompareNamedClosureCountWithReferences2.compareNamedClosureCountWithReferencesFromHeapSnapshot2,
   'HeapSnapshot.compareRetainedSubstrings': CompareRetainedSubstrings.compareRetainedSubstrings,
   'HeapSnapshot.compareStringCount': CompareStringCount.compareStringCount,
+  'HeapSnapshot.compareStringObjects': CompareStringObjects.compareStringObjects,
   'HeapSnapshot.compareStrings2': compareStrings2,
   'HeapSnapshot.createMemoryCitySnapshot': CreateMemoryCitySnapshot.createMemoryCitySnapshot,
   'HeapSnapshot.createPendingPromiseRetainers': CreatePendingPromiseRetainers.createPendingPromiseRetainers,
