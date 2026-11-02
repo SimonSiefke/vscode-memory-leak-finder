@@ -1,3 +1,4 @@
+import WebSocket from 'ws'
 import type { Dynamic } from '../Types/Types.ts'
 import { createRpc } from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as Json from '../Json/Json.ts'
@@ -30,7 +31,9 @@ export const createConnection = async (wsUrl: string, { connectionTimeoutMs = 0,
           ])
         : opened)
     } catch (error) {
-      webSocket.close()
+      // terminate can emit an error while the socket is still connecting.
+      webSocket.once('error', () => {})
+      webSocket.terminate()
       webSocket.removeEventListener('error', errorHandler)
       webSocket.removeEventListener('close', closeHandler)
       throw error
