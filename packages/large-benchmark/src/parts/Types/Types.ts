@@ -10,6 +10,10 @@ export interface Benchmark {
   startup: boolean
   cache: 'cold' | 'warm' | 'action' | 'static'
   diagnostic: boolean
+  samples?: number
+  sourceFile?: string
+  sourceSha256?: string
+  explicitOptIn?: boolean
 }
 
 export interface Metric {
@@ -18,6 +22,7 @@ export interface Metric {
   value: number
   coverage: string
   higherIsBetter?: boolean
+  direction?: 'lower' | 'higher' | 'neutral'
 }
 
 export interface SelectorStatsRow {

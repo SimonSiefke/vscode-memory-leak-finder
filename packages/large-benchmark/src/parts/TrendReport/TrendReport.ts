@@ -16,6 +16,7 @@ export interface Trend {
   unit: string
   coverage: string
   higherIsBetter: boolean
+  direction?: Comparison['direction']
   points: (number | null)[]
   segments: { start: number; end: number }[]
   changes: (Comparison | null)[]
@@ -50,6 +51,7 @@ export const trendsFor = (reports: PairReport[]): Trend[] => {
       unit: metric.unit,
       coverage: metric.coverage,
       higherIsBetter: metric.higherIsBetter,
+      direction: metric.direction,
       points,
       segments,
       changes,
@@ -80,7 +82,7 @@ export const trendSvg = (trend: Trend, commits: string[], labels = commits.map(c
         : `<circle cx="${x(index)}" cy="${y(point)}" r="4" fill="#5479e8"><title>#${index + 1} ${escapeHtml(labels[index])} (${commits[index]}): ${format(point)}</title></circle>`,
     )
     .join('')
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="330" viewBox="0 0 1140 330" role="img" aria-label="${escapeHtml(`${trend.benchmark}: ${trend.metric} trend`)}"><rect width="1140" height="330" fill="white"/><g font-family="system-ui,sans-serif" fill="#1b2538"><text x="20" y="25" font-size="18">${escapeHtml(trend.benchmark)} · ${escapeHtml(trend.metric)}</text><text x="20" y="48">Relative index; each measured range starts at 100; ${trend.higherIsBetter ? 'higher' : 'lower'} is better</text><text x="5" y="80">${format(max)}</text><text x="5" y="260">${format(min)}</text><line x1="70" x2="1070" y1="${y(100)}" y2="${y(100)}" stroke="#aaa" stroke-dasharray="4"/>${lines}${dots}<text x="70" y="295">#1 ${escapeHtml(labels[0])}</text><text x="1070" y="295" text-anchor="end">#${commits.length} ${escapeHtml(labels.at(-1))}</text><text x="20" y="320">Commit spacing follows input order. Hover for hashes and values. Missing links separate ranges; compare within each range.</text></g></svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="330" viewBox="0 0 1140 330" role="img" aria-label="${escapeHtml(`${trend.benchmark}: ${trend.metric} trend`)}"><rect width="1140" height="330" fill="white"/><g font-family="system-ui,sans-serif" fill="#1b2538"><text x="20" y="25" font-size="18">${escapeHtml(trend.benchmark)} · ${escapeHtml(trend.metric)}</text><text x="20" y="48">Relative index; each measured range starts at 100; ${trend.direction === 'neutral' ? 'contextual count; no improvement direction' : (trend.higherIsBetter ? 'higher' : 'lower') + ' is better'}</text><text x="5" y="80">${format(max)}</text><text x="5" y="260">${format(min)}</text><line x1="70" x2="1070" y1="${y(100)}" y2="${y(100)}" stroke="#aaa" stroke-dasharray="4"/>${lines}${dots}<text x="70" y="295">#1 ${escapeHtml(labels[0])}</text><text x="1070" y="295" text-anchor="end">#${commits.length} ${escapeHtml(labels.at(-1))}</text><text x="20" y="320">Commit spacing follows input order. Hover for hashes and values. Missing links separate ranges; compare within each range.</text></g></svg>`
 }
 
 export const generateTrendReport = async (options: { input: string; output: string; manifest: SeriesManifest }) => {
@@ -117,6 +119,7 @@ export const generateTrendReport = async (options: { input: string; output: stri
         benchmarks: options.manifest.benchmarks,
         commits: { before: pair.before, after: pair.after },
         resultPaths: paths.get(`${pair.before}:${pair.after}`)!,
+        ...(options.manifest.preset ? { preset: options.manifest.preset } : {}),
       }),
     )
   const selectorSections: string[] = []
@@ -148,13 +151,15 @@ export const generateTrendReport = async (options: { input: string; output: stri
         const assessment =
           !entry || !s
             ? 'Missing'
-            : s.absoluteChange === 0
-              ? 'Unchanged'
-              : s.inconclusive
-                ? 'Inconclusive'
-                : s.absoluteChange < 0 !== entry.higherIsBetter
-                  ? 'Improvement'
-                  : 'Regression'
+            : entry.direction === 'neutral'
+              ? 'Contextual count'
+              : s.absoluteChange === 0
+                ? 'Unchanged'
+                : s.inconclusive
+                  ? 'Inconclusive'
+                  : s.absoluteChange < 0 !== entry.higherIsBetter
+                    ? 'Improvement'
+                    : 'Regression'
         const confidence =
           entry?.collector === 'bundles' ? 'Static' : s ? `${s.interval.map(format).join(' to ')} ${escapeHtml(trend.unit)}` : '—'
         return `<tr><td><a href="${pairs[pairIndex]!.id}/index.html#${trend.benchmark}">${escapeHtml(labels[pairIndex])} → ${escapeHtml(labels[pairIndex + 1])}</a></td><td>${s ? format(s.before[s.primary]) : '—'}</td><td>${s ? format(s.after[s.primary]) : '—'}</td><td>${s?.percentChange === null || !s ? '—' : `${format(s.percentChange)}%`}</td><td>${confidence}</td><td>${s?.before.count ?? 0}</td><td>${assessment}</td></tr>`
@@ -165,12 +170,13 @@ export const generateTrendReport = async (options: { input: string; output: stri
     )
   }
   const usable = reports.every((report) => report.usable)
+  const complete = reports.every((report) => report.complete)
   await writeFile(
     join(options.output, 'index.html'),
-    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Large Performance · Version trends</title><style>body{font:15px system-ui;color:#1b2538;max-width:1200px;margin:32px auto;padding:0 20px}section{margin:32px 0}img{max-width:100%;height:auto}table{border-collapse:collapse;width:100%}th,td{padding:8px;border-bottom:1px solid #ddd;text-align:left}code{word-break:break-all}</style></head><body><h1>Large Performance · Version trends</h1><p>${commits.length} commits · ${pairs.length} adjacent comparisons · Linux x64 · extensions disabled</p>${usable ? '' : '<p><strong>Comparison incomplete: one or more adjacent comparisons have no valid runtime results.</strong></p>'}<p>Input order defines version order. Runtime collectors measure each adjacent pair on the same runner with alternating sample order. Smoke tests use independent runners and show separate mean/median comparisons below. Timings use medians; counts and byte sizes use means. The relative index starts at 100 for each uninterrupted measured range and multiplies adjacent after/before ratios. It describes cumulative relative change, not absolute startup time or a direct first-to-last measurement. Runner differences and uncertainty can accumulate. Overall changes are descriptive; only individual pairs have exploratory confidence intervals. Missing or zero-baseline links separate the plotted ranges. Later ranges restart at 100 and have independent baselines; their index levels cannot be compared across gaps. The overall change is unavailable unless every link is valid.</p><details><summary>Commits, pair reports, and coverage</summary><ol>${commits.map((commit, index) => `<li><strong>${escapeHtml(labels[index])}</strong> · <code>${commit}</code>${index ? ` · <a href="pair-${index}/index.html">Comparison with #${index}</a> (${reports[index - 1]!.coverage.filter((entry) => entry.status === 'success').length}/${options.manifest.benchmarks.length} successful benchmarks)` : ''}</li>`).join('')}</ol></details>${reports.map((report, index) => (report.smoke ? `<section><h2>Smoke tests · comparison ${index + 1}</h2>${report.smoke.html}${report.smoke.usable ? `<img src="pair-${index + 1}/charts/smoke-tests.svg" alt="Smoke test mean and median"/>` : ''}</section>` : '')).join('')}${selectorSections.join('')}${sections.join('') || '<p>No paired metric results are available.</p>'}<details><summary>Diagnostics</summary><pre>${escapeHtml(diagnostics.join('\n'))}</pre></details></body></html>`,
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Large Performance · Version trends</title><style>body{font:15px system-ui;color:#1b2538;max-width:1200px;margin:32px auto;padding:0 20px}section{margin:32px 0}img{max-width:100%;height:auto}table{border-collapse:collapse;width:100%}th,td{padding:8px;border-bottom:1px solid #ddd;text-align:left}code{word-break:break-all}</style></head><body><h1>Large Performance · Version trends</h1><p>${commits.length} commits · ${pairs.length} adjacent comparisons · Linux x64 · extensions disabled</p>${complete ? '' : '<p><strong>Comparison incomplete: one or more adjacent comparisons have missing, failed, partial or unavailable measurements.</strong></p>'}<p>Input order defines version order. Runtime collectors measure each adjacent pair on the same runner with alternating sample order. Smoke tests use independent runners and show separate mean/median comparisons below. Timings use medians; counts and byte sizes use means. The relative index starts at 100 for each uninterrupted measured range and multiplies adjacent after/before ratios. It describes cumulative relative change, not absolute startup time or a direct first-to-last measurement. Runner differences and uncertainty can accumulate. Overall changes are descriptive; only individual pairs have exploratory confidence intervals. Missing or zero-baseline links separate the plotted ranges. Later ranges restart at 100 and have independent baselines; their index levels cannot be compared across gaps. The overall change is unavailable unless every link is valid.</p><details><summary>Commits, pair reports, and coverage</summary><ol>${commits.map((commit, index) => `<li><strong>${escapeHtml(labels[index])}</strong> · <code>${commit}</code>${index ? ` · <a href="pair-${index}/index.html">Comparison with #${index}</a> (${reports[index - 1]!.coverage.filter((entry) => entry.status === 'success').length}/${options.manifest.benchmarks.length} successful benchmarks)` : ''}</li>`).join('')}</ol></details>${reports.map((report, index) => (report.smoke ? `<section><h2>Smoke tests · comparison ${index + 1}</h2>${report.smoke.html}${report.smoke.usable ? `<img src="pair-${index + 1}/charts/smoke-tests.svg" alt="Smoke test mean and median"/>` : ''}</section>` : '')).join('')}${selectorSections.join('')}${sections.join('') || '<p>No paired metric results are available.</p>'}<details><summary>Diagnostics</summary><pre>${escapeHtml(diagnostics.join('\n'))}</pre></details></body></html>`,
   )
-  return { commits, labels, reports, trends, usable, diagnostics }
+  return { commits, labels, reports, trends, usable, complete, diagnostics }
 }
 
 export const createTrendWorkflowSummary = (summary: Awaited<ReturnType<typeof generateTrendReport>>): string =>
-  `## Large Performance · Version trends\n\n${summary.commits.length} commits; ${summary.reports.length} adjacent comparisons. ${escapeHtml(summary.labels[0])} → ${escapeHtml(summary.labels.at(-1))}. Download **large-performance-report** and open \`index.html\` for trend charts, per-version changes, coverage, and distributions.\n\n${summary.usable ? '' : '**Comparison incomplete:** one or more adjacent comparisons have no valid runtime results.\n\n'}Overall change chains within-runner after/before ratios (first commit = 100); it is descriptive and has no aggregate confidence interval. Missing or zero-baseline links make the overall change unavailable; charts restart at 100 for each measured range without connecting across gaps.\n\n| Benchmark | Metric | Overall chained change | Available links |\n| --- | --- | ---: | ---: |\n${summary.trends.map((trend) => `| ${escapeHtml(trend.benchmark)} | ${escapeHtml(trend.metric).replaceAll('|', '&#124;').replace(/\r?\n/g, ' ')} | ${trend.overallPercent === null ? 'Unavailable' : `${format(trend.overallPercent)}%`} | ${trend.changes.filter(Boolean).length}/${summary.reports.length} |`).join('\n')}\n${summary.reports.map((report) => report.smoke?.summary ?? '').join('\n')}\n`
+  `## Large Performance · Version trends\n\n${summary.commits.length} commits; ${summary.reports.length} adjacent comparisons. ${escapeHtml(summary.labels[0])} → ${escapeHtml(summary.labels.at(-1))}. Download **large-performance-report** and open \`index.html\` for trend charts, per-version changes, coverage, and distributions.\n\n${summary.complete ? '' : '**Comparison incomplete:** one or more adjacent comparisons have missing, failed, partial or unavailable measurements.\n\n'}Overall change chains within-runner after/before ratios (first commit = 100); it is descriptive and has no aggregate confidence interval. Missing or zero-baseline links make the overall change unavailable; charts restart at 100 for each measured range without connecting across gaps.\n\n| Benchmark | Metric | Overall chained change | Available links |\n| --- | --- | ---: | ---: |\n${summary.trends.map((trend) => `| ${escapeHtml(trend.benchmark)} | ${escapeHtml(trend.metric).replaceAll('|', '&#124;').replace(/\r?\n/g, ' ')} | ${trend.overallPercent === null ? 'Unavailable' : `${format(trend.overallPercent)}%`} | ${trend.changes.filter(Boolean).length}/${summary.reports.length} |`).join('\n')}\n${summary.reports.map((report) => report.smoke?.summary ?? '').join('\n')}\n`

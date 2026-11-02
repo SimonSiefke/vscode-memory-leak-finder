@@ -230,6 +230,102 @@ into separate subdirectories. Each manifest commit must have at most one result.
 
 ## CSS selector comparisons
 
+### CSS-specific performance experiment
+
+Choose `preset: css-specific` in **Large Performance Measure** to compare a CSS
+change using separate timing, counter and tracing passes. Leave `measures` and
+`benchmark_filter` empty for the full experiment. This preset excludes smoke-suite
+timings, CPU profiles, heap snapshots and bundle sizes. Without the preset, the
+existing inventory, defaults and five-sample diagnostic cap remain unchanged.
+
+The preset includes the 12 dedicated performance interactions, plus picker
+toggling, suggestion-widget churn, search-sidebar toggling and Modern UI settings
+toggling. These focused workloads collect timing, CPU instructions, CPU resources,
+renderer counters, timeline traces and selector statistics. It also discovers the
+full E2E inventory at the harness revision and runs every normally eligible Linux
+CI scenario with timing, instructions, resources and renderer counters. The shared
+CI eligibility policy preserves network, authentication and CI exclusions. The 12
+dedicated workloads and three additional focused workloads explicitly opt into
+otherwise skipped tests; the manifest records these separately and never overrides
+network, authentication or CI restrictions.
+
+Sampling inputs are independent:
+
+| Workflow input / CLI option                       | CSS-specific default | Applies to                                                            |
+| ------------------------------------------------- | -------------------- | --------------------------------------------------------------------- |
+| `samples` / `--samples`                           | 37                   | Each interaction/collector and other startup collectors               |
+| `startup_samples` / `--startup-samples`           | 200                  | Empty-window/workspace startup timing and instructions, cold and warm |
+| `css_selector_samples` / `--css-selector-samples` | 37                   | Startup and interaction selector diagnostics, with no five-sample cap |
+
+Each sample has a fresh application, profile, workspace and extension directory.
+Warm startup uses one unmeasured priming launch in that sample's profile. Each
+before/after pair runs sequentially on one runner; pair order alternates AB/BA.
+Interaction boundaries enclose `run()` only, excluding launch, `beforeSetup`,
+`setup` and `teardown`. Ordinary E2E durations therefore include all actions,
+assertions and automation polling in that test's `run()`; they are not smoke-suite
+wall time or isolated user-action latency. Selector-instrumented results have
+additional overhead and remain separate from ordinary timing results.
+
+The frozen manifest records effective per-benchmark sample counts, all discovered
+test files and exclusion reasons, explicit opt-ins, workload hashes, harness commit
+and source hash, requested build identities, and measurement boundaries. Measurement
+jobs reject changed harness sources. Build archives retain their own identity and
+hash verification. Each attempt is checkpointed, including failures, without retries.
+Only sample-owned processes and directories are cleaned up. Hardware and software
+counter support is probed once per measurement job. Unsupported collectors stay
+unavailable; software-counter failures can still retain partial PSS evidence.
+
+The workflow groups benchmarks to stay within Actions' 256-job matrix limit and
+shares a 300-minute measurement budget across each job, reserving time for artifact
+upload. Attempts not reached before the budget expires remain missing. Runners
+need Linux x64, Xvfb, the normal Electron libraries, `perf` matching the kernel,
+permission for hardware/software counters, and passwordless cache dropping for
+cold startup. Hosted runners may not expose a hardware PMU even after changing
+`perf_event_paranoid`; use suitable runners for complete instruction coverage.
+The report prominently marks missing, failed, partial and unavailable coverage.
+
+Overview plots show per-scenario percentage changes and paired-bootstrap 95%
+intervals for duration, instructions, CPU time and renderer style-recalculation
+time. Use the search field and collector filters to inspect subsets. The
+percentage interval resamples complete pairs and computes the ratio in each
+resample; a zero baseline makes it unavailable. There is no combined speedup
+score. Successful matches and recalculation counts are contextual diagnostics,
+not automatically improvements when reduced. Individual samples, mean/median/p95,
+selector tables and raw traces remain available in reports/result artifacts.
+Selector rows are all retained; display limits affect charts and tables only.
+Selector-instrumented interactions allow a 30-second renderer transport watchdog
+instead of the usual five seconds; their scheduler yield remains unchanged, and
+timeouts still produce failed attempts without retries. Failed samples retain
+application logs alongside their page state before isolated profiles are removed.
+
+For a bounded local comparison, freeze a small selection first, then measure the
+same manifest (commands from the repository root after install/build):
+
+```sh
+npm run large-performance -- matrix --preset css-specific \
+  --before-commit microsoft/vscode@BASE_SHA --after-commit SimonSiefke/vscode@HEAD_SHA \
+  --samples 2 --startup-samples 2 --css-selector-samples 2 \
+  --benchmark-filter e2e-editor-open-timing,e2e-quick-pick-toggle-css-selectors,startup-empty-warm-timing \
+  --output-dir .tmp/css-manifest
+
+xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24 -noreset' \
+  npm run large-performance -- measure --preset css-specific \
+  --manifest .tmp/css-manifest/manifest.json \
+  --before-commit microsoft/vscode@BASE_SHA --after-commit SimonSiefke/vscode@HEAD_SHA \
+  --before-path /absolute/before/code-oss --after-path /absolute/after/code-oss \
+  --benchmark-id e2e-editor-open-timing,e2e-quick-pick-toggle-css-selectors,startup-empty-warm-timing \
+  --output-dir .tmp/css-results
+
+npm run large-performance -- report --manifest .tmp/css-manifest/manifest.json \
+  --input-dir .tmp/css-results --output-dir .tmp/css-report
+```
+
+Replace `BASE_SHA` and `HEAD_SHA` with full 40-character SHAs. Keep the harness
+unchanged between freezing and measuring. Omitting the three sample overrides
+selects the full 37/200 policy; a full run is intentionally expensive.
+
+### Startup selector diagnostics
+
 Set `measures` to `css-selectors` to build and compare CSS selector matching costs
 at startup. This selects four separate diagnostic workloads: empty-window and
 workspace startup, each cold and warm. It works with the same before/after commit

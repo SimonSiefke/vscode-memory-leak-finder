@@ -198,6 +198,30 @@ test('missing or zero-baseline links restart the plotted range without claiming 
   expect(await readFile(join(directory, 'zero-report', 'charts', 'trend-1.svg'), 'utf8')).not.toMatch(/NaN|Infinity/)
 })
 
+test('series reports keep decreasing recalculation counts contextual and warn about incomplete collector coverage', async () => {
+  const directory = await temporary()
+  const renderer = selectBenchmarks('open-small-renderer')[0]!
+  for (const index of [0, 1]) {
+    const data = result(index, 10, 5)
+    data.benchmark = renderer
+    for (const sample of data.samples) sample.metrics[0] = { ...sample.metrics[0]!, name: 'styleCount', unit: 'count' }
+    await writeJson(join(directory, 'input', String(index), 'result.json'), data)
+  }
+  const summary = await generateTrendReport({
+    input: join(directory, 'input'),
+    output: join(directory, 'output'),
+    manifest: { ...manifest(), benchmarks: [renderer, benchmark] },
+  })
+  expect(summary.usable).toBe(true)
+  expect(summary.complete).toBe(false)
+  const html = await readFile(join(directory, 'output/index.html'), 'utf8')
+  expect(html).toContain('Comparison incomplete')
+  expect(html).toContain('Contextual count')
+  expect(html).not.toContain('<td>Improvement</td>')
+  const svg = await readFile(join(directory, 'output/charts/trend-1.svg'), 'utf8')
+  expect(svg).toContain('contextual count; no improvement direction')
+})
+
 test('separate measured ranges remain visible without drawing lines across missing links', async () => {
   const directory = await temporary()
   const input = join(directory, 'input')

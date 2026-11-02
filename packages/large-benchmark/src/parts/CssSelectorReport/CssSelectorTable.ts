@@ -20,7 +20,7 @@ export const selectorTableContent = (result: Result): string => {
 </style>
 <h2>Slowest CSS selectors</h2><p>${escape(result.benchmark.id)} · ${statistics.pairs} complete sample pairs</p>
 <p>Before: <code>${escape(result.commits.before)}</code><br/>After: <code>${escape(result.commits.after)}</code></p>
-<p>Time is median total matching time during startup, in milliseconds. Match attempts and match count are means per startup across complete sample pairs. Identical selector text is combined across stylesheets; nested fragments are shown as Chromium recorded them.</p>
+<p>Time is median total matching time during ${result.benchmark.startup ? 'startup' : 'scenario.run()'}, in milliseconds. Match attempts and match count are means per ${result.benchmark.startup ? 'startup' : 'scenario.run()'} across complete sample pairs. Identical selector text is combined across stylesheets; nested fragments are shown as Chromium recorded them.</p>
 <div class="controls"><label>Revision <select data-revision><option value="after">After</option><option value="before">Before</option></select></label><label>Filter selectors <input data-filter type="search" placeholder="Selector text"/></label></div>
 <p data-status role="status"></p><p>Click a column heading to sort; click again to reverse. The top 1,000 rows are selected after sorting all selectors.</p>
 <div class="selector-table-wrap"><table><colgroup><col style="width:64%"/><col style="width:12%"/><col style="width:12%"/><col style="width:12%"/></colgroup><thead><tr>

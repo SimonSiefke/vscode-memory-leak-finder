@@ -17,4 +17,5 @@ export type CreateParams = {
   readonly subprocessRuntime?: 'bun' | 'node'
   readonly VError: any
   readonly workspacePath?: string
+  readonly extensionsPath?: string
 }

@@ -1,6 +1,7 @@
 import { parseCommitReference } from '../CommitReference/CommitReference.ts'
 import type { Benchmark } from '../Types/Types.ts'
 import type { StableRelease } from '../VersionRange/VersionRange.ts'
+import type { CssPresetMetadata } from '../CssPreset/CssPreset.ts'
 
 export interface CommitPair {
   id: string
@@ -14,6 +15,7 @@ export interface SeriesManifest {
   samples: number
   benchmarks: Benchmark[]
   releases?: StableRelease[]
+  preset?: CssPresetMetadata
 }
 
 export const validateCommits = (value: unknown): string[] => {

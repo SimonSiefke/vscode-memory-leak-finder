@@ -3,6 +3,19 @@ name: Large Performance Measure
 on:
   workflow_dispatch:
     inputs:
+      preset:
+        description: CSS-specific adds focused interactions and the frozen eligible E2E inventory
+        type: choice
+        options: [custom, css-specific]
+        default: custom
+      startup_samples:
+        description: Startup timing/instruction samples per revision; empty uses 200 for css-specific, otherwise samples
+        type: string
+        default: ''
+      css_selector_samples:
+        description: Selector samples per revision; empty uses 37 for css-specific, otherwise the existing cap of five
+        type: string
+        default: ''
       version_range:
         description: Inclusive stable version range, e.g. 1.120.0...1.130.0 (includes patch releases); alternative to commit inputs
         type: string
@@ -38,6 +51,9 @@ permissions:
   contents: read
 
 env:
+  PRESET: ${{ inputs.preset }}
+  STARTUP_SAMPLES: ${{ inputs.startup_samples }}
+  CSS_SELECTOR_SAMPLES: ${{ inputs.css_selector_samples }}
   VERSION_RANGE: ${{ inputs.version_range }}
   COMMITS: ${{ inputs.commits }}
   MEASURES: ${{ inputs.measures }}
@@ -61,6 +77,12 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
+      - name: Install harness for frozen E2E inventory discovery
+        if: inputs.preset == 'css-specific'
+        run: npm run install:ci
+      - name: Build scenario helpers for inventory discovery
+        if: inputs.preset == 'css-specific'
+        run: npm run build
       - name: Validate inputs and generate benchmark manifest
         id: manifest
         run: |
@@ -69,7 +91,12 @@ jobs:
           [[ -z "$COMMITS" ]] || revisions+=(--commits "$COMMITS")
           [[ -z "$BEFORE_COMMIT" ]] || revisions+=(--before-commit "$BEFORE_COMMIT")
           [[ -z "$AFTER_COMMIT" ]] || revisions+=(--after-commit "$AFTER_COMMIT")
+          sampling=()
+          [[ -z "$PRESET" ]] || sampling+=(--preset "$PRESET")
+          [[ -z "$STARTUP_SAMPLES" ]] || sampling+=(--startup-samples "$STARTUP_SAMPLES")
+          [[ -z "$CSS_SELECTOR_SAMPLES" ]] || sampling+=(--css-selector-samples "$CSS_SELECTOR_SAMPLES")
           node packages/large-benchmark/src/main.ts matrix "${revisions[@]}" \
+            "${sampling[@]}" \
             --samples "$SAMPLES" --benchmark-filter "$BENCHMARK_FILTER" --measures "$MEASURES" \
             --output-dir .large-manifest
       - uses: actions/upload-artifact@v7
@@ -212,6 +239,11 @@ jobs:
         run: npm run install:ci
       - name: Build shared scenario utilities
         run: npm run build
+      - name: Download frozen benchmark manifest
+        uses: actions/download-artifact@v8
+        with:
+          name: large-manifest
+          path: .large-manifest
       - name: Install desktop and performance tools
         run: |
           sudo apt-get update
@@ -238,8 +270,9 @@ jobs:
           BEFORE_PATH: ${{ steps.before.outputs.executable }}
           AFTER_PATH: ${{ steps.after.outputs.executable }}
         run: |
-          xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
+          xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24 -noreset' \
             node packages/large-benchmark/src/main.ts measure \
+            --manifest .large-manifest/manifest.json \
             --benchmark-id "$BENCHMARK_IDS" --samples "$SAMPLES" \
             --before-path "$BEFORE_PATH" --after-path "$AFTER_PATH" \
             --before-commit "$BEFORE_COMMIT" --after-commit "$AFTER_COMMIT" \

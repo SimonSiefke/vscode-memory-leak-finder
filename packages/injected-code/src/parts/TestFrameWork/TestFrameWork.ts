@@ -196,14 +196,20 @@ export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, wait
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   let current = 1
   const fn = ElementAction['setValue']
+  let typedElement: Element | undefined
   while (currentTime < endTime) {
     const waitForElement = QuerySelector.querySelector(waitFor.selector)
     if (waitForElement && toBeVisible(waitForElement, {} as any)) {
       return
     }
     const element = QuerySelector.querySelector(locator.selector) as any
-    fn(element, { text: '' })
-    fn(element, { text })
+    // DOM mutations can wake this loop before a debounced search completes.
+    // Rewriting an unchanged query on every mutation continually cancels it.
+    if (typedElement !== element || element.value !== text) {
+      fn(element, { text: '' })
+      fn(element, { text })
+      typedElement = element
+    }
     current *= exponentialFactor
     await Timeout.waitForMutation(document.body, current)
     currentTime = Time.getTimeStamp()

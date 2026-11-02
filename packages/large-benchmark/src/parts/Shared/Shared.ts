@@ -1,6 +1,11 @@
 import type { ChildProcess } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import type { Metric } from '../Types/Types.ts'
+import type { Benchmark } from '../Types/Types.ts'
+import { readFile } from 'node:fs/promises'
+import { resolve, relative, sep } from 'node:path'
+import { sourceHash } from '../CssPreset/CssPreset.ts'
+import { repositoryRoot } from '../Prepare/Prepare.ts'
 
 // The monorepo runs TypeScript sources directly. Use the same URL-based package
 // loading as the existing workers rather than compile another package's sources.
@@ -36,6 +41,7 @@ export const rendererMetrics: (before: { name: string; value: number }[], after:
 export const processTree: (root: number) => Promise<{ pid: number; identity: string }[]> = pss.processTree
 export const hardwareEvents: string[] = perf.hardwareEvents
 export const softwareEvents: string[] = perf.softwareEvents
+export const probePerf: (events: string[]) => Promise<void> = perf.probePerf
 
 export interface PerfSession {
   args(): string[]
@@ -45,7 +51,7 @@ export interface PerfSession {
   stop(): Promise<Metric[]>
   dispose(): Promise<void>
 }
-export const PerfSession: { create(directory: string, events: string[]): Promise<PerfSession> } = perf.PerfSession
+export const PerfSession: { create(directory: string, events: string[], probe?: boolean): Promise<PerfSession> } = perf.PerfSession
 export interface ResourceSampler {
   samples: unknown[]
   diagnostics: string[]
@@ -73,10 +79,27 @@ export const createScenario = async (
   workspacePath: string,
   scenario: string,
   ideVersion: any,
+  benchmark?: Benchmark,
+  extensionsPath?: string,
 ): Promise<Scenario> => {
-  const file = new URL(`../../../../e2e/src/performance-${scenario}.ts`, import.meta.url)
-  const module = await imports.importTest(fileURLToPath(file))
-  const test = await context.createTestContext({ renderer, main, workspacePath, ideVersion })
+  const file = benchmark?.sourceFile
+    ? resolve(repositoryRoot, benchmark.sourceFile)
+    : fileURLToPath(new URL(`../../../../e2e/src/performance-${scenario}.ts`, import.meta.url))
+  const local = relative(resolve(repositoryRoot, 'packages/e2e/src'), file)
+  if (local.startsWith('..') || local.includes(sep) || !/\.(ts|js)$/.test(local)) throw new Error('Invalid frozen scenario path')
+  if (benchmark?.sourceFile && (!benchmark.sourceSha256 || sourceHash(await readFile(file, 'utf8')) !== benchmark.sourceSha256))
+    throw new Error(`Frozen scenario source changed: ${benchmark.sourceFile}`)
+  const module = await imports.importTest(file)
+  const test = await context.createTestContext({
+    renderer,
+    main,
+    workspacePath,
+    ideVersion,
+    extensionsPath,
+    // Per-selector instrumentation can block the renderer beyond the ordinary
+    // five-second transport watchdog. Keep the native scheduler yield unchanged.
+    ...(benchmark?.collector === 'css-selectors' ? { idleTransportTimeout: 30_000 } : {}),
+  })
   const api = test.api
   return {
     setup: async () => {

@@ -95,6 +95,28 @@ test('absent instrumentation, malformed stats and missing initialization/boundar
   expect(() => analyzeSelectorTrace([boundaries[1], trace('.x', 1)])).toThrow('initialization')
 })
 
+test('interaction selector traces exclude setup, teardown and other renderers without requiring startup events', () => {
+  const events = [
+    trace('.setup', 1000, 5),
+    { name: 'TimeStamp', ts: 10, pid: 1, tid: 1, args: { data: { message: 'large-start' } } },
+    trace('.action', 2000, 20),
+    trace('.other-renderer', 9000, 20, 2),
+    { name: 'TimeStamp', ts: 30, pid: 1, tid: 1, args: { data: { message: 'large-end' } } },
+    trace('.teardown', 8000, 40),
+  ]
+  const stats = analyzeSelectorTrace(events, false)
+  expect(stats.selectors.map((row) => row.selector)).toEqual(['.action'])
+  expect(stats.metrics.find((metric) => metric.name === 'totalElapsedMs')!.value).toBe(2)
+  expect(stats.metrics.find((metric) => metric.name === 'matchCount')!.direction).toBe('neutral')
+  expect(stats.metrics[0]!.coverage).toContain('scenario.run()')
+  expect(() =>
+    analyzeSelectorTrace(
+      events.filter((event) => event.ts !== 10),
+      false,
+    ),
+  ).toThrow('boundary')
+})
+
 test('details align the union, rank the slower revision first, include additions/removals and exclude incomplete pairs', () => {
   const data = result()
   data.samples.push({ ...data.samples[0]!, pair: 2, selectorStats: [row('.ignore', 99999)] })
