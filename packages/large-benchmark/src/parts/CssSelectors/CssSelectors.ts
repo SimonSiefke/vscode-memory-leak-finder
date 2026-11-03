@@ -5,10 +5,10 @@ import { UnavailableError, type Metric, type SelectorStatsRow } from '../Types/T
 export const cssTraceCategories =
   '-*,devtools.timeline,disabled-by-default-devtools.timeline,disabled-by-default-blink.debug,disabled-by-default-devtools.timeline.invalidationTracking,blink.console'
 
-export const analyzeSelectorTrace = (events: any[]): { metrics: Metric[]; selectors: SelectorStatsRow[] } => {
-  const window = traceWindow(events, true)
+export const analyzeSelectorTrace = (events: any[], startup = true): { metrics: Metric[]; selectors: SelectorStatsRow[] } => {
+  const window = traceWindow(events, startup)
   const stats = window.filter((event: any) => event.name === 'SelectorStats')
-  if (!stats.length) throw new UnavailableError('Startup trace has no CSS selector statistics; instrumentation may be unsupported')
+  if (!stats.length) throw new UnavailableError('Trace has no CSS selector statistics; instrumentation may be unsupported')
   // Chromium emits empty SelectorStats spans when no selectors were attempted.
   // They are valid, but cannot alone prove that the instrumentation is supported.
   const timings = stats.flatMap((event: any) => {
@@ -17,7 +17,7 @@ export const analyzeSelectorTrace = (events: any[]): { metrics: Metric[]; select
     if (!Array.isArray(payload.selector_timings)) throw new UnavailableError('Unsupported CSS selector statistics format')
     return payload.selector_timings
   })
-  if (!timings.length) throw new UnavailableError('Startup trace has no CSS selector timing rows')
+  if (!timings.length) throw new UnavailableError('Trace has no CSS selector timing rows')
   if (
     timings.some(
       (row: any) =>
@@ -45,7 +45,8 @@ export const analyzeSelectorTrace = (events: any[]): { metrics: Metric[]; select
       name,
       value: value as number,
       unit: name === 'totalElapsedMs' ? 'ms' : 'count',
-      coverage: 'workbench renderer startup to readiness; CSS selector instrumentation enabled; all selectors',
+      coverage: `workbench renderer ${startup ? 'startup to readiness' : 'scenario.run()'}; CSS selector instrumentation enabled; all selectors`,
+      direction: name === 'matchCount' || name === 'styleRecalculationCount' ? 'neutral' : 'lower',
     }))
   if (timings.every((row: any) => Number.isFinite(row.fast_reject_count) && row.fast_reject_count >= 0))
     metrics.push({
@@ -57,4 +58,5 @@ export const analyzeSelectorTrace = (events: any[]): { metrics: Metric[]; select
   return { metrics, selectors: summary.topSelectors }
 }
 
-export const collectSelectorStats = async (main: Session, path: string) => analyzeSelectorTrace(await stopRecording(main, path))
+export const collectSelectorStats = async (main: Session, path: string, startup = true) =>
+  analyzeSelectorTrace(await stopRecording(main, path), startup)

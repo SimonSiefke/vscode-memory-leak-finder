@@ -133,3 +133,8 @@ test.each([true, false])(
     }
   },
 )
+
+test('workflow summary labels native instruction architecture', () => {
+  const markdown = createWorkflowSummary(summary([comparison({ collector: 'instructions', arch: 'arm64' })]))
+  expect(markdown).toContain('### instructions (arm64)')
+})

@@ -2,6 +2,7 @@ import type { Comparison, generateReport } from '../Report/Report.ts'
 
 type ReportSummary = Pick<Awaited<ReturnType<typeof generateReport>>, 'commits' | 'comparisons' | 'coverage' | 'usable'> & {
   smoke?: { summary: string } | undefined
+  complete?: boolean
 }
 
 const cell = (value: string): string =>
@@ -13,13 +14,15 @@ const comparisonRow = (entry: Comparison): string => {
   const s = entry.statistics
   const percent = s.percentChange === null ? 'N/A' : `${signed(s.percentChange)}%`
   const assessment =
-    s.absoluteChange === 0
-      ? 'Unchanged'
-      : s.inconclusive
-        ? 'Inconclusive'
-        : s.absoluteChange < 0 !== entry.higherIsBetter
-          ? 'Improvement'
-          : 'Regression'
+    entry.direction === 'neutral'
+      ? 'Contextual count'
+      : s.absoluteChange === 0
+        ? 'Unchanged'
+        : s.inconclusive
+          ? 'Inconclusive'
+          : s.absoluteChange < 0 !== entry.higherIsBetter
+            ? 'Improvement'
+            : 'Regression'
   return `| ${cell(entry.benchmark)} | ${cell(entry.metric)} (${cell(entry.coverage)}) | ${format(s.before[s.primary])} ${cell(entry.unit)} | ${format(s.after[s.primary])} ${cell(entry.unit)} | ${signed(s.absoluteChange)} ${cell(entry.unit)} (${percent}) | ${s.before.count} | ${entry.collector === 'bundles' ? 'Static' : `${s.interval.map(format).join(' to ')} ${cell(entry.unit)}`} | ${assessment} |`
 }
 
@@ -32,7 +35,7 @@ export const createWorkflowSummary = (summary: ReportSummary): string => {
   }
   const tables = [...groups].map(
     ([collector, entries]) =>
-      `### ${cell(collector)}\n\n| Benchmark | Metric (coverage) | Before | After | Change | Complete pairs | 95% paired CI of change | Result |\n| --- | --- | ---: | ---: | ---: | ---: | --- | --- |\n${entries.map(comparisonRow).join('\n')}\n`,
+      `### ${cell(collector)}${entries.some((entry) => entry.arch) ? ` (${[...new Set(entries.map((entry) => entry.arch ?? 'x64'))].join(' / ')})` : ''}\n\n| Benchmark | Metric (coverage) | Before | After | Change | Complete pairs | 95% paired CI of change | Result |\n| --- | --- | ---: | ---: | ---: | ---: | --- | --- |\n${entries.map(comparisonRow).join('\n')}\n`,
   )
   return (
     [
@@ -43,6 +46,9 @@ export const createWorkflowSummary = (summary: ReportSummary): string => {
       ...(summary.usable
         ? []
         : ['**Comparison incomplete:** unusable builds or no valid runtime comparisons. Available results are shown below.']),
+      ...(summary.usable && summary.complete === false
+        ? ['**Incomplete coverage:** some requested samples or collectors failed, are missing, or are unavailable.']
+        : []),
       'Timings use medians; counts and byte sizes use means. Only complete sample pairs are compared. Change is after minus before; percentages are N/A when before is zero. Runtime confidence intervals are exploratory; small samples and intervals including zero are inconclusive. Bundle sizes are static comparisons.',
       ...(summary.smoke ? [summary.smoke.summary] : []),
       ...(tables.length ? tables : ['No paired metric results are available.']),

@@ -43,6 +43,8 @@ export const createPageObjectContext = ({
   ideVersion,
   platform,
   workspacePath,
+  extensionsPath,
+  idleTransportTimeout,
 }: any): any => ({
   browserRpc,
   defaultContext: createDefaultContext(sessionRpc, utilityContext),
@@ -59,6 +61,8 @@ export const createPageObjectContext = ({
   sessionRpc,
   utilityContext: createUtilityContext(sessionRpc, utilityContext),
   ...(workspacePath ? { workspacePath } : {}),
+  ...(extensionsPath ? { extensionsPath } : {}),
+  ...(idleTransportTimeout ? { idleTransportTimeout } : {}),
   VError,
 })
 
@@ -69,11 +73,15 @@ export const createTestContext = async ({
   main,
   workspacePath,
   ideVersion,
+  extensionsPath,
+  idleTransportTimeout,
 }: {
   renderer: any
   main: any
   workspacePath: string
   ideVersion: { major: number; minor: number; patch: number }
+  extensionsPath?: string
+  idleTransportTimeout?: number
 }) => {
   const { frameTree } = await DevtoolsProtocolPage.getFrameTree(renderer)
   const utilityContext = await addUtilityExecutionContext(renderer, 'utility', frameTree.frame.id)
@@ -104,6 +112,8 @@ export const createTestContext = async ({
     sessionRpc: renderer,
     utilityContext,
     workspacePath,
+    extensionsPath,
+    idleTransportTimeout,
   })
   const { create } = await import(pageObjectUrl)
   const api = await create(context)

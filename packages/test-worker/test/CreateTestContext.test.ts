@@ -23,6 +23,8 @@ test('normal and direct-launch scenarios share Electron and isolated-world conte
     ideVersion: { major: 1, minor: 140, patch: 0 },
     platform: 'linux',
     workspacePath: '/isolated/workspace',
+    extensionsPath: '/isolated/extensions',
+    idleTransportTimeout: 30_000,
   })
   await context.utilityContext.evaluate({ expression: 'true' })
   expect(calls[0]).toMatchObject({ method: 'Runtime.evaluate', options: { uniqueContextId: 'world', expression: 'true' } })
@@ -30,6 +32,8 @@ test('normal and direct-launch scenarios share Electron and isolated-world conte
   expect(context.electronApp.rpc).toBe(main)
   expect(context.electronApp.firstWindow()).toBe(page)
   expect(context.workspacePath).toBe('/isolated/workspace')
+  expect(context.extensionsPath).toBe('/isolated/extensions')
+  expect(context.idleTransportTimeout).toBe(30_000)
   const next = { sessionRpc: renderer }
   context.electronApp.rebind({ firstWindow: next, sessionRpc: renderer })
   expect(context.electronApp.firstWindow()).toBe(next)

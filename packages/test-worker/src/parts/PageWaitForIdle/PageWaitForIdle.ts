@@ -35,12 +35,12 @@ const waitRpcIdle = (pageObject, canUseIdleCallback) => {
   })
 }
 
-const waitWithTransportWatchdog = async (promise) => {
+const waitWithTransportWatchdog = async (promise, transportTimeout = TransportTimeout) => {
   let timeout
   const timeoutPromise = new Promise((_, reject) => {
     timeout = globalThis.setTimeout(() => {
-      reject(new Error(`renderer/CDP idle call timed out after ${TransportTimeout}ms`))
-    }, TransportTimeout)
+      reject(new Error(`renderer/CDP idle call timed out after ${transportTimeout}ms`))
+    }, transportTimeout)
   })
   try {
     return await Promise.race([promise, timeoutPromise])
@@ -58,7 +58,7 @@ export const waitForIdle = async (rpc, canUseIdleCallback, _idleTimeout): Promis
     const connectionId = 1
     const pageObject = PageObjectState.getPageObjectContext(connectionId)
 
-    const didTimeout = await waitWithTransportWatchdog(waitRpcIdle(pageObject, canUseIdleCallback))
+    const didTimeout = await waitWithTransportWatchdog(waitRpcIdle(pageObject, canUseIdleCallback), pageObject.idleTransportTimeout)
     if (didTimeout && !hasWarnedAboutIdleTimeout) {
       hasWarnedAboutIdleTimeout = true
       console.warn(`requestIdleCallback used its ${NativeIdleTimeout}ms timeout; continuing with a degraded scheduler yield`)

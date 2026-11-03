@@ -2,11 +2,13 @@ import { reportSmoke } from '../Smoke/Smoke.ts'
 import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { errorMessage, readJson } from '../Io/Io.ts'
-import { selectBenchmarks } from '../Manifest/Manifest.ts'
+import { selectBenchmarks, validateRegistry } from '../Manifest/Manifest.ts'
 import { selectorTableContent, selectorTableHtml } from '../CssSelectorReport/CssSelectorTable.ts'
 import { selectorDetailsSvg } from '../CssSelectorReport/CssSelectorReport.ts'
 import { comparePairs } from '../Statistics/Statistics.ts'
-import type { Benchmark, Metric, Result, Sample, Status } from '../Types/Types.ts'
+import type { Architecture, Benchmark, Metric, Result, Sample, Status } from '../Types/Types.ts'
+import type { CssPresetMetadata } from '../CssPreset/CssPreset.ts'
+import { overviewGroups, overviewSvg } from '../Overview/Overview.ts'
 
 export const escapeHtml = (value: unknown): string =>
   String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]!)
@@ -15,6 +17,7 @@ const href = (path: string): string => path.split('/').map(encodeURIComponent).j
 
 export interface Comparison {
   benchmark: string
+  arch?: Architecture
   scenario: string
   collector: string
   startup: boolean
@@ -23,6 +26,7 @@ export interface Comparison {
   unit: string
   coverage: string
   higherIsBetter: boolean
+  direction?: 'lower' | 'higher' | 'neutral'
   statistics: ReturnType<typeof comparePairs>
 }
 
@@ -55,6 +59,7 @@ export const comparisonsFor = (result: Result): Comparison[] => {
       {
         benchmark: result.benchmark.id,
         scenario: result.benchmark.scenario,
+        ...(result.benchmark.arch ? { arch: result.benchmark.arch } : {}),
         collector: result.benchmark.collector,
         startup: result.benchmark.startup,
         cache: result.benchmark.cache,
@@ -62,6 +67,13 @@ export const comparisonsFor = (result: Result): Comparison[] => {
         unit: metric.unit,
         coverage: metric.coverage,
         higherIsBetter: metric.higherIsBetter ?? false,
+        direction:
+          metric.direction ??
+          (['matchCount', 'styleRecalculationCount', 'styleCount', 'layouts', 'paints', 'styles'].includes(metric.name)
+            ? 'neutral'
+            : metric.higherIsBetter
+              ? 'higher'
+              : 'lower'),
         statistics,
       },
     ]
@@ -74,15 +86,17 @@ export const validateResult = (raw: unknown, expected: Benchmark, commits: { bef
     !result ||
     result.schemaVersion !== 1 ||
     result.benchmark?.id !== expected.id ||
+    (expected.arch !== undefined && (result.benchmark.arch !== expected.arch || result.runner?.arch !== expected.arch)) ||
     result.commits?.before !== commits.before ||
     result.commits?.after !== commits.after ||
     !Array.isArray(result.samples) ||
     !Number.isSafeInteger(result.requestedSamples) ||
     result.requestedSamples < 1 ||
     result.requestedSamples > 1000 ||
+    (expected.samples !== undefined && result.requestedSamples !== expected.samples) ||
     !['success', 'partial', 'failed', 'unavailable', 'missing'].includes(result.status)
   )
-    throw new Error('Result identity, commits, or sample count do not match this run')
+    throw new Error('Result identity, commits, architecture, or sample count do not match this run')
   const seen = new Set<string>()
   for (const sample of result.samples) {
     const key = `${sample.pair}:${sample.revision}`
@@ -226,6 +240,7 @@ export interface ReportOptions {
   commits: { before: string; after: string }
   buildOutcomes?: string
   resultPaths?: string[]
+  preset?: CssPresetMetadata
 }
 
 export const validateReportDirectories = (inputPath: string, outputPath: string): void => {
@@ -236,11 +251,18 @@ export const validateReportDirectories = (inputPath: string, outputPath: string)
 }
 
 export const generateReport = async (inputOptions: ReportOptions) => {
-  const canonical = selectBenchmarks(inputOptions.benchmarks.map((benchmark) => benchmark.id).join(','))
+  const canonical = inputOptions.preset
+    ? inputOptions.benchmarks
+    : selectBenchmarks(inputOptions.benchmarks.map((benchmark) => benchmark.id).join(','))
+  validateRegistry(inputOptions.benchmarks)
   if (canonical.length !== inputOptions.benchmarks.length) throw new Error('Expected benchmarks must be nonempty and unique')
   const options = {
     ...inputOptions,
-    benchmarks: inputOptions.benchmarks.map((benchmark) => canonical.find((entry) => entry.id === benchmark.id)!),
+    benchmarks: inputOptions.benchmarks.map((benchmark) => ({
+      ...canonical.find((entry) => entry.id === benchmark.id)!,
+      ...(benchmark.arch === undefined ? {} : { arch: benchmark.arch }),
+      ...(benchmark.samples === undefined ? {} : { samples: benchmark.samples }),
+    })),
   }
   validateReportDirectories(options.input, options.output)
   await mkdir(join(options.output, 'charts'), { recursive: true })
@@ -297,7 +319,13 @@ export const generateReport = async (inputOptions: ReportOptions) => {
           ...result.samples.flatMap((sample) => sample.diagnostics.map((message) => `${sample.revision} #${sample.pair + 1}: ${message}`)),
         ]
       : ['No result artifact was uploaded']
-    coverage.push({ benchmark: benchmark.id, status, pairs, requested: result?.requestedSamples ?? 0, diagnostics: messages })
+    coverage.push({
+      benchmark: benchmark.id,
+      status,
+      pairs,
+      requested: result?.requestedSamples ?? benchmark.samples ?? 0,
+      diagnostics: messages,
+    })
     const chartHtml: string[] = []
     for (const entry of benchmark.collector === 'css-selectors' ? [] : entries) {
       const filename = `${benchmark.id}-${entry.metric.replace(/[^a-zA-Z0-9_-]/g, '_')}.svg`
@@ -377,7 +405,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     const artifact = relative(options.input, resultDirectories.get(benchmark.id) ?? options.input).split(sep)[0]
     const artifactName = artifact?.startsWith('large-result-') ? artifact : `large-result-${benchmark.id}`
     sections.push(`<section class="benchmark" data-startup="${benchmark.startup}" data-collector="${benchmark.collector}" data-id="${benchmark.id}" data-search="${escapeHtml(entries.map((entry) => entry.metric).join(' '))}"><h2>${escapeHtml(benchmark.id)} <span class="badge ${status}">${status}</span></h2>
-      <p>${pairs}/${result?.requestedSamples ?? '?'} complete pairs. ${benchmark.diagnostic ? 'Diagnostic collector; instrumentation changes execution.' : ''}</p>${chartHtml.join('')}
+      <p>${escapeHtml(benchmark.arch ?? 'legacy x64')} · ${pairs}/${result?.requestedSamples ?? '?'} complete pairs. ${benchmark.diagnostic ? 'Diagnostic collector; instrumentation changes execution.' : ''}</p>${chartHtml.join('')}
       <details><summary>Diagnostics, runner metadata, and raw results</summary><pre>${escapeHtml(JSON.stringify({ runner: result?.runner, diagnostics: messages }, null, 2))}</pre>${result ? `<p>Raw evidence is stored separately in the <code>${escapeHtml(artifactName)}</code> workflow artifact (or the original input directory for local runs).</p>` : ''}<ul>${rawFiles}</ul></details></section>`)
   }
   if (smoke) coverage.push({ benchmark: 'smoke-tests', status: smoke.status, pairs: 0, requested: 0, diagnostics: smoke.diagnostics })
@@ -399,6 +427,8 @@ export const generateReport = async (inputOptions: ReportOptions) => {
     commits: options.commits,
     generatedAt: new Date().toISOString(),
     usable,
+    complete: usable && coverage.every((entry) => entry.status === 'success'),
+    ...(options.preset ? { preset: options.preset } : {}),
     buildOutcomes: options.buildOutcomes ?? 'local executables',
     buildStatuses,
     coverage,
@@ -411,7 +441,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       const s = entry.statistics
       const change = s.percentChange === null ? `${format(s.absoluteChange)} ${entry.unit}` : `${format(s.percentChange)}%`
       const better = s.absoluteChange < 0 !== entry.higherIsBetter
-      return `<tr data-startup="${entry.startup}" data-collector="${entry.collector}" data-id="${entry.benchmark}"><td><a href="#${entry.benchmark}">${escapeHtml(entry.benchmark)}</a></td><td>${escapeHtml(entry.metric)}</td><td>${format(s.before[s.primary])}</td><td>${format(s.after[s.primary])}</td><td class="${s.inconclusive || s.absoluteChange === 0 ? 'uncertain' : better ? 'better' : 'worse'}" title="95% paired CI: ${s.interval.join(' to ')} ${escapeHtml(entry.unit)}">${change}</td><td>${s.before.count}</td><td>${entry.collector === 'bundles' ? 'Static' : s.inconclusive ? 'Inconclusive' : 'CI excludes zero'}</td></tr>`
+      return `<tr data-startup="${entry.startup}" data-collector="${entry.collector}" data-id="${entry.benchmark}"><td><a href="#${entry.benchmark}">${escapeHtml(entry.benchmark)}</a></td><td>${escapeHtml(entry.metric)}</td><td>${format(s.before[s.primary])}</td><td>${format(s.after[s.primary])}</td><td class="${entry.direction === 'neutral' || s.inconclusive || s.absoluteChange === 0 ? 'uncertain' : better ? 'better' : 'worse'}" title="95% paired CI: ${s.interval.join(' to ')} ${escapeHtml(entry.unit)}">${change}</td><td>${s.before.count}</td><td>${entry.direction === 'neutral' ? 'Contextual count' : entry.collector === 'bundles' ? 'Static' : s.inconclusive ? 'Inconclusive' : 'CI excludes zero'}</td></tr>`
     })
     .join('')
   const columns = new Map<string, Comparison>()
@@ -436,7 +466,7 @@ export const generateReport = async (inputOptions: ReportOptions) => {
             const s = entry?.statistics
             const value = !s ? '—' : s.percentChange === null ? `${format(s.absoluteChange)} ${column.unit}` : `${format(s.percentChange)}%`
             const color =
-              !s || s.inconclusive || s.absoluteChange === 0
+              !s || entry?.direction === 'neutral' || s.inconclusive || s.absoluteChange === 0
                 ? 'uncertain'
                 : s.absoluteChange < 0 !== entry!.higherIsBetter
                   ? 'better'
@@ -455,20 +485,33 @@ export const generateReport = async (inputOptions: ReportOptions) => {
       coverage.filter((entry) => entry.status === status).length,
     ]),
   )
+  const overviews: string[] = []
+  for (const group of overviewGroups) {
+    const entries = comparisons.filter(group.metric)
+    if (!entries.length) continue
+    const svg = overviewSvg(entries, group.title)
+    await writeFile(join(options.output, 'charts', `overview-${group.id}.svg`), svg)
+    overviews.push(
+      `<details open><summary>${escapeHtml(group.title)} · ${entries.length} comparisons</summary><div class="table-wrap">${svg}</div><a href="charts/overview-${group.id}.svg">Open standalone SVG</a></details>`,
+    )
+  }
+  const inventoryHtml = options.preset
+    ? `<section><h2>Frozen E2E inventory</h2><p>Harness: <code>${escapeHtml(options.preset.harnessCommit)}</code>; inventory SHA-256: <code>${escapeHtml(options.preset.inventorySha256)}</code>.</p><p>${escapeHtml(options.preset.boundary)}</p><details><summary>Eligibility and explicit focused opt-ins (${options.preset.inventory.length} tests)</summary><table><thead><tr><th>Test</th><th>Default CI exclusion</th><th>Preset selection</th></tr></thead><tbody>${options.preset.inventory.map((entry) => `<tr><td>${escapeHtml(entry.file)}</td><td>${escapeHtml(entry.exclusion ?? 'eligible')}</td><td>${entry.explicitOptIn ? 'explicit focused opt-in' : entry.selected ? 'eligible E2E' : 'excluded'}</td></tr>`).join('')}</tbody></table></details></section>`
+    : ''
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Large Performance · VS Code comparison</title><style>
-    :root{color-scheme:light;font-family:system-ui,sans-serif;color:#1b2538;background:#f4f6fb}body{max-width:1350px;margin:auto;padding:36px}header,section,.overview{background:white;border:1px solid #dde3ef;border-radius:12px;padding:24px;margin-bottom:24px}h1{margin:0 0 12px;font-size:34px}h2{font-size:22px}p,figcaption{line-height:1.6}code{overflow-wrap:anywhere}.stats{display:flex;gap:12px;flex-wrap:wrap}.stats span{background:#eef1f8;border-radius:8px;padding:14px}.table-wrap{overflow:auto}.heatmap th,.heatmap td{min-width:95px;text-align:center}.heatmap tbody th{position:sticky;left:0;top:auto;background:#f7f9fd;text-align:left;min-width:170px;z-index:1}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #e3e8f2;padding:10px;overflow-wrap:anywhere}th{position:sticky;top:0;background:#edf1fa}.better{background:#e0f3e8}.worse{background:#fae3e3}.uncertain{background:#eef0f4}.badge{font-size:12px;border-radius:20px;padding:5px 9px;background:#eef0f4}.success{background:#e0f3e8}.failed{background:#fae3e3}figure{margin:16px 0;border:1px solid #e3e8f2;border-radius:8px;padding:14px}img{max-width:100%;height:auto}figcaption{font-size:12px;color:#566078}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}select,input{font:inherit;padding:8px;border:1px solid #ccd4e3;border-radius:6px}nav{display:flex;gap:12px;margin:20px 0;flex-wrap:wrap}a{color:#315abd}details{margin:12px 0}summary{cursor:pointer}.benchmark[hidden],tr[hidden]{display:none}@media(max-width:700px){body{padding:12px}header,section,.overview{padding:14px}.table-wrap{overflow:auto}h1{font-size:27px}}
-    </style></head><body><header><h1>Large Performance</h1><p>VS Code · Linux x64 · runtime collectors disable extensions and compare on the same runner; smoke tests use independent runners and their test extensions</p><p><strong>Before:</strong> <code>${escapeHtml(options.commits.before)}</code><br/><strong>After:</strong> <code>${escapeHtml(options.commits.after)}</code></p>
-    <p>${usable ? 'Comparison complete. Regressions and individual measurement failures are informational.' : 'Comparison incomplete: unusable builds or no valid runtime comparison. Available evidence is preserved below.'}</p>
+    :root{color-scheme:light;font-family:system-ui,sans-serif;color:#1b2538;background:#f4f6fb}body{max-width:1350px;margin:auto;padding:36px}header,section,.overview{background:white;border:1px solid #dde3ef;border-radius:12px;padding:24px;margin-bottom:24px}h1{margin:0 0 12px;font-size:34px}h2{font-size:22px}p,figcaption{line-height:1.6}code{overflow-wrap:anywhere}.stats{display:flex;gap:12px;flex-wrap:wrap}.stats span{background:#eef1f8;border-radius:8px;padding:14px}.table-wrap{overflow:auto}.heatmap th,.heatmap td{min-width:95px;text-align:center}.heatmap tbody th{position:sticky;left:0;top:auto;background:#f7f9fd;text-align:left;min-width:170px;z-index:1}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #e3e8f2;padding:10px;overflow-wrap:anywhere}th{position:sticky;top:0;background:#edf1fa}.better{background:#e0f3e8}.worse{background:#fae3e3}.uncertain{background:#eef0f4}.badge{font-size:12px;border-radius:20px;padding:5px 9px;background:#eef0f4}.success{background:#e0f3e8}.failed{background:#fae3e3}figure{margin:16px 0;border:1px solid #e3e8f2;border-radius:8px;padding:14px}img{max-width:100%;height:auto}figcaption{font-size:12px;color:#566078}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}select,input{font:inherit;padding:8px;border:1px solid #ccd4e3;border-radius:6px}nav{display:flex;gap:12px;margin:20px 0;flex-wrap:wrap}a{color:#315abd}details{margin:12px 0}summary{cursor:pointer}[hidden]{display:none}@media(max-width:700px){body{padding:12px}header,section,.overview{padding:14px}.table-wrap{overflow:auto}h1{font-size:27px}}
+    </style></head><body><header><h1>Large Performance</h1><p>VS Code · Linux · ${escapeHtml([...new Set(options.benchmarks.map((b) => b.arch ?? 'x64'))].join(' / '))} · native builds; runtime collectors disable extensions and compare on the same runner; smoke tests use independent runners and their test extensions</p><p><strong>Before:</strong> <code>${escapeHtml(options.commits.before)}</code><br/><strong>After:</strong> <code>${escapeHtml(options.commits.after)}</code></p>
+    <p>${summary.complete ? 'Comparison complete. Regressions are informational.' : 'Comparison incomplete: some requested samples or collectors are missing, failed or unavailable. Available evidence is preserved below.'}</p>
     <div class="stats">${Object.entries(counts)
       .map(([name, value]) => `<span><strong>${value}</strong> ${name}</span>`)
       .join('')}</div>
     <details><summary>How to read the measurements</summary><p>Counts and byte sizes use means; timings use medians. Only complete pairs are compared. No outliers were removed. Runtime confidence intervals use 10,000 deterministic paired bootstrap resamples. These are exploratory intervals across many metrics, without a multiple-comparison significance claim. Small samples and intervals crossing zero are inconclusive. Hardware counters may be unavailable on the runner; missing values are never zeros.</p></details>
     <nav><label>View <select id="view"><option value="all">All measurements</option><option value="startup">Startup</option><option value="editor">Editor and interactions</option><option value="timing">Timings</option><option value="instructions">Instruction counts</option><option value="resources">OS resources</option><option value="timeline">Rendering traces</option><option value="css-selectors">CSS selectors</option><option value="renderer">Renderer counters</option><option value="bundles">Bundle sizes</option><option value="profile">CPU profiles</option><option value="memory">Memory</option></select></label><label>Filter <input id="filter" type="search" placeholder="Benchmark or metric"/></label></nav></header>
-    <div class="overview"><h2>Performance overview</h2><p>Green indicates improvement, red indicates regression, and gray indicates an inconclusive or unchanged result. Hover for confidence intervals; select a view to focus on a collector family. Click a value to open its charts.</p>${matrix}<details><summary>Detailed comparison table</summary><div class="table-wrap"><table><thead><tr><th>Benchmark</th><th>Metric</th><th>Before</th><th>After</th><th>Change</th><th>Pairs</th><th>Confidence</th></tr></thead><tbody>${heatmap}</tbody></table></div></details></div>
+    ${inventoryHtml}<div class="overview"><h2>Paired percentage changes</h2><p>Negative values mean less time or work. Intervals crossing zero and small samples are inconclusive; zero baselines are N/A. Each workload remains separate.</p>${overviews.join('')}</div><div class="overview"><h2>Performance overview</h2><p>Green indicates improvement, red indicates regression, and gray indicates an inconclusive or unchanged result. Hover for confidence intervals; select a view to focus on a collector family. Click a value to open its charts.</p>${matrix}<details><summary>Detailed comparison table</summary><div class="table-wrap"><table><thead><tr><th>Benchmark</th><th>Metric</th><th>Before</th><th>After</th><th>Change</th><th>Pairs</th><th>Confidence</th></tr></thead><tbody>${heatmap}</tbody></table></div></details></div>
     <section><h2>Coverage</h2><details><summary>All benchmark outcomes</summary><table><thead><tr><th>Benchmark</th><th>Status</th><th>Complete pairs</th></tr></thead><tbody>${coverage.map((entry) => `<tr><td>${escapeHtml(entry.benchmark)}</td><td>${entry.status}</td><td>${entry.benchmark === 'smoke-tests' ? 'Independent attempts; see smoke results' : `${entry.pairs}/${entry.requested || '?'}`} </td></tr>`).join('')}</tbody></table></details><details><summary>Report diagnostics and build outcomes</summary><pre>${escapeHtml(JSON.stringify({ buildOutcomes: summary.buildOutcomes, buildStatuses, diagnostics }, null, 2))}</pre></details></section>
     ${smoke ? `<section id="smoke-tests"><h2>Smoke test timings</h2>${smoke.html}${smoke.usable ? '<img src="charts/smoke-tests.svg" alt="Mean and median smoke test timing comparison"/>' : ''}</section>` : ''}
     ${sections.map((section, index) => section.replace('<section ', `<section id="${options.benchmarks.filter((b) => b.collector !== 'smoke')[index]!.id}" `)).join('')}
-    <script>const view=document.getElementById('view'), filter=document.getElementById('filter'); function update(){const mode=view.value,q=filter.value.toLowerCase();for(const el of document.querySelectorAll('[data-id]')){const matches=mode==='all'||mode==='startup'&&el.dataset.startup==='true'||mode==='editor'&&el.dataset.startup==='false'&&!['bundles','resources','profile','memory'].includes(el.dataset.collector)||mode===el.dataset.collector;el.hidden=!matches||!(el.textContent+' '+el.dataset.id+' '+(el.dataset.search||'')).toLowerCase().includes(q)}for(const row of document.querySelectorAll('[data-matrix-row]'))row.hidden=Array.from(row.querySelectorAll('td')).every(cell=>cell.hidden||cell.dataset.comparable==='false');for(const column of document.querySelectorAll('[data-matrix-collector]'))column.hidden=!['all','startup','editor'].includes(mode)&&mode!==column.dataset.matrixCollector}view.addEventListener('change',update);filter.addEventListener('input',update)</script></body></html>`
+    <script>const view=document.getElementById('view'), filter=document.getElementById('filter'); function update(){const mode=view.value,q=filter.value.toLowerCase();for(const el of document.querySelectorAll('[data-id]')){const matches=mode==='all'||mode==='startup'&&el.dataset.startup==='true'||mode==='editor'&&el.dataset.startup==='false'&&!['bundles','resources','profile','memory'].includes(el.dataset.collector)||mode===el.dataset.collector;el.toggleAttribute('hidden',!matches||!(el.textContent+' '+el.dataset.id+' '+(el.dataset.search||'')).toLowerCase().includes(q))}for(const svg of document.querySelectorAll('svg[data-overview]')){let visible=0;Array.from(svg.querySelectorAll('g[data-id]')).forEach((row,index)=>{row.setAttribute('transform','translate(0,'+((visible-index)*35)+')');if(!row.hasAttribute('hidden'))visible++});const height=105+35*visible;svg.setAttribute('height',height);svg.setAttribute('viewBox','0 0 1220 '+height)}for(const row of document.querySelectorAll('[data-matrix-row]'))row.hidden=Array.from(row.querySelectorAll('td')).every(cell=>cell.hidden||cell.dataset.comparable==='false');for(const column of document.querySelectorAll('[data-matrix-collector]'))column.hidden=!['all','startup','editor'].includes(mode)&&mode!==column.dataset.matrixCollector}view.addEventListener('change',update);filter.addEventListener('input',update)</script></body></html>`
   await writeFile(join(options.output, 'index.html'), html)
   return { ...summary, selectorTables }
 }

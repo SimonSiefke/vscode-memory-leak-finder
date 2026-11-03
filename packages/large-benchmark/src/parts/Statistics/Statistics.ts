@@ -35,10 +35,17 @@ export const comparePairs = (before: number[], after: number[], primary: 'mean' 
     state ^= state << 5
     return (state >>> 0) / 4294967296
   }
+  const percentages: number[] = []
+  let percentageUnavailable = baseline === 0
   const differences = Array.from({ length: 10000 }, () => {
     const indices = before.map(() => Math.floor(random() * before.length))
-    return statistic(indices.map((index) => after[index]!)) - statistic(indices.map((index) => before[index]!))
+    const resampledBefore = statistic(indices.map((index) => before[index]!))
+    const resampledAfter = statistic(indices.map((index) => after[index]!))
+    if (resampledBefore === 0) percentageUnavailable = true
+    else percentages.push(((resampledAfter - resampledBefore) / Math.abs(resampledBefore)) * 100)
+    return resampledAfter - resampledBefore
   }).sort((a, b) => a - b)
+  percentages.sort((a, b) => a - b)
   const interval: [number, number] = [differences[249]!, differences[9749]!]
   return {
     before: summarize(before),
@@ -47,6 +54,7 @@ export const comparePairs = (before: number[], after: number[], primary: 'mean' 
     absoluteChange: candidate - baseline,
     percentChange: baseline === 0 ? null : ((candidate - baseline) / Math.abs(baseline)) * 100,
     interval,
+    percentInterval: percentageUnavailable ? null : ([percentages[249]!, percentages[9749]!] as [number, number]),
     inconclusive: before.length < 5 || (interval[0] <= 0 && interval[1] >= 0),
     beforeSamples: before,
     afterSamples: after,

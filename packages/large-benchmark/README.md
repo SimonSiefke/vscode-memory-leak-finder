@@ -1,6 +1,6 @@
 # Large Benchmark
 
-Compare two or more minified Linux x64 VS Code builds with paired startup, interaction,
+Compare two or more native minified Linux VS Code builds with paired startup, interaction,
 resource, trace, profiling, memory, and bundle-size measurements. The package owns
 the benchmark manifest, paired orchestration, result format, and offline report.
 It uses the existing DevTools connection and page-object harness, E2E scenarios
@@ -43,7 +43,7 @@ These input modes cannot be combined. For example, set `version_range` to
 An unavailable release API, unknown endpoint, missing Linux build, or invalid
 commit metadata fails initialization before any builds start.
 
-The workflow builds each minified Linux x64 package once and compares each adjacent
+The workflow builds each native minified Linux package once per required architecture and compares each adjacent
 pair of commits. The full suite has 108 paired runtime benchmarks, one smoke-test timing benchmark, and one JavaScript
 bundle-size benchmark per pair. Each matrix stays within 256 jobs by grouping
 benchmarks into a job when necessary; each job downloads only its two required
@@ -222,13 +222,129 @@ npm run large-performance -- history-report --manifest .tmp/history/manifest.jso
   --input-dir .tmp/history-results --output-dir .tmp/history-report
 ```
 
-Measurement jobs require the usual Linux x64 desktop dependencies. Report generation
+Measurement jobs require the usual native Linux desktop dependencies. Report generation
 requires FFmpeg with the `librsvg` decoder and `libx264` encoder, plus DejaVu fonts
 (`sudo apt-get install ffmpeg fonts-dejavu-core` on Ubuntu). The workflow installs
 them automatically. The report command also accepts result artifacts downloaded
 into separate subdirectories. Each manifest commit must have at most one result.
 
 ## CSS selector comparisons
+
+### CSS-specific performance experiment
+
+Choose `preset: css-specific` in **Large Performance Measure** to compare a CSS
+change using separate timing, counter and tracing passes. Leave `measures` and
+`benchmark_filter` empty for the full experiment. This preset excludes smoke-suite
+timings, CPU profiles, heap snapshots and bundle sizes. Without the preset, the
+existing inventory, defaults and five-sample diagnostic cap remain unchanged.
+
+The preset includes the 12 dedicated performance interactions. Additional focused candidates cover picker
+toggling, suggestion-widget churn, search-sidebar toggling and Modern UI settings
+toggling. These focused workloads collect timing, CPU instructions, CPU resources,
+renderer counters, timeline traces and selector statistics. It also discovers the
+full E2E inventory at the harness revision and runs every normally eligible Linux
+CI scenario with timing, instructions, resources and renderer counters. The shared
+CI eligibility policy preserves network, authentication and CI exclusions. The 12
+dedicated workloads and three additional focused workloads explicitly opt into
+otherwise skipped tests; the manifest records these separately and never overrides
+network, authentication or CI restrictions.
+Ineligible focused candidates remain in the frozen inventory with their exclusion
+reason and do not prevent discovery of the remaining benchmarks.
+
+Sampling inputs are independent:
+
+| Workflow input / CLI option                       | CSS-specific default | Applies to                                                            |
+| ------------------------------------------------- | -------------------- | --------------------------------------------------------------------- |
+| `samples` / `--samples`                           | 37                   | Each interaction/collector and other startup collectors               |
+| `startup_samples` / `--startup-samples`           | 200                  | Empty-window/workspace startup timing and instructions, cold and warm |
+| `css_selector_samples` / `--css-selector-samples` | 37                   | Startup and interaction selector diagnostics, with no five-sample cap |
+
+Each sample has a fresh application, profile, workspace and extension directory.
+Warm startup uses one unmeasured priming launch in that sample's profile. Each
+before/after pair runs sequentially on one runner; pair order alternates AB/BA.
+Interaction boundaries enclose `run()` only, excluding launch, `beforeSetup`,
+`setup` and `teardown`. Ordinary E2E durations therefore include all actions,
+assertions and automation polling in that test's `run()`; they are not smoke-suite
+wall time or isolated user-action latency. Selector-instrumented results have
+additional overhead and remain separate from ordinary timing results.
+
+The frozen manifest records effective per-benchmark sample counts, all discovered
+test files and exclusion reasons, explicit opt-ins, workload hashes, harness commit
+and source hash, requested build identities, and measurement boundaries. Measurement
+jobs reject changed harness sources. Build archives retain their own identity and
+hash verification. Each attempt is checkpointed, including failures, without retries.
+Only sample-owned processes and directories are cleaned up. Hardware and software
+counter support is probed once per measurement job. Unsupported collectors stay
+unavailable; software-counter failures can still retain partial PSS evidence.
+
+The workflow groups benchmarks to stay within Actions' 256-job matrix limit and
+shares a 300-minute measurement budget across each job, reserving time for artifact
+upload. Attempts not reached before the budget expires remain missing. Runners
+need native Linux x64 or ARM64, Xvfb, the normal Electron libraries, `perf` matching the kernel,
+permission for hardware/software counters, and passwordless cache dropping for
+cold startup. Instruction collectors are queued on `ubuntu-24.04-arm`, using native
+ARM64 packages built on that runner architecture. Timing, CSS tracing, renderer
+counters and resource collectors stay on `ubuntu-24.04` with native x64 packages.
+Both sides of every pair always use the same architecture. Manifests freeze each
+benchmark's `arch`; build archives, result artifacts and reports retain that
+identity, and extraction refuses a package built for a different host architecture.
+Each architecture has separate build and measurement matrices so even 256-version
+histories stay within Actions' 256-job limit per matrix. Instruction-only dispatches
+skip x64 builds entirely. Older manifests without architecture metadata remain
+readable. Local measurements from new manifests must use the prescribed native host.
+
+To supplement a previous x64 comparison with hardware instructions, dispatch the
+same preset and revisions with `measures=instructions`, `samples=37` and
+`startup_samples=200`. This queues only ARM builds and instruction measurements;
+its report is separate from the original timing and CSS report. Instruction counts
+are architecture-specific: compare before/after within ARM, not absolute ARM counts
+against x64 timings or counts. No combined speedup score is computed.
+
+Hosted runners may not expose a hardware PMU even after changing
+`perf_event_paranoid`; use suitable runners for complete instruction coverage.
+The report prominently marks missing, failed, partial and unavailable coverage.
+
+Overview plots show per-scenario percentage changes and paired-bootstrap 95%
+intervals for duration, instructions, CPU time and renderer style-recalculation
+time. Use the search field and collector filters to inspect subsets. The
+percentage interval resamples complete pairs and computes the ratio in each
+resample; a zero baseline makes it unavailable. There is no combined speedup
+score. Successful matches and recalculation counts are contextual diagnostics,
+not automatically improvements when reduced. Individual samples, mean/median/p95,
+selector tables and raw traces remain available in reports/result artifacts.
+Selector rows are all retained; display limits affect charts and tables only.
+Selector-instrumented interactions allow a 30-second renderer transport watchdog
+instead of the usual five seconds; their scheduler yield remains unchanged, and
+timeouts still produce failed attempts without retries. Failed samples retain
+application logs alongside their page state before isolated profiles are removed.
+
+For a bounded local comparison, freeze a small selection first, then measure the
+same manifest (commands from the repository root after install/build):
+
+```sh
+npm run large-performance -- matrix --preset css-specific \
+  --before-commit microsoft/vscode@BASE_SHA --after-commit SimonSiefke/vscode@HEAD_SHA \
+  --samples 2 --startup-samples 2 --css-selector-samples 2 \
+  --benchmark-filter e2e-editor-open-timing,e2e-quick-pick-toggle-css-selectors,startup-empty-warm-timing \
+  --output-dir .tmp/css-manifest
+
+xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24 -noreset' \
+  npm run large-performance -- measure --preset css-specific \
+  --manifest .tmp/css-manifest/manifest.json \
+  --before-commit microsoft/vscode@BASE_SHA --after-commit SimonSiefke/vscode@HEAD_SHA \
+  --before-path /absolute/before/code-oss --after-path /absolute/after/code-oss \
+  --benchmark-id e2e-editor-open-timing,e2e-quick-pick-toggle-css-selectors,startup-empty-warm-timing \
+  --output-dir .tmp/css-results
+
+npm run large-performance -- report --manifest .tmp/css-manifest/manifest.json \
+  --input-dir .tmp/css-results --output-dir .tmp/css-report
+```
+
+Replace `BASE_SHA` and `HEAD_SHA` with full 40-character SHAs. Keep the harness
+unchanged between freezing and measuring. Omitting the three sample overrides
+selects the full 37/200 policy; a full run is intentionally expensive.
+
+### Startup selector diagnostics
 
 Set `measures` to `css-selectors` to build and compare CSS selector matching costs
 at startup. This selects four separate diagnostic workloads: empty-window and

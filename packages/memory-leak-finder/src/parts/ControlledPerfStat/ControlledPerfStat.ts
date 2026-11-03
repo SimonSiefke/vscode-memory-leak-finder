@@ -88,8 +88,8 @@ export class PerfSession {
     this.directory = directory
     this.events = events
   }
-  static async create(directory: string, events: string[]): Promise<PerfSession> {
-    await probePerf(events)
+  static async create(directory: string, events: string[], probe = true): Promise<PerfSession> {
+    if (probe) await probePerf(events)
     const session = new PerfSession(directory, events)
     try {
       await exec('mkfifo', [join(directory, 'control'), join(directory, 'ack')])

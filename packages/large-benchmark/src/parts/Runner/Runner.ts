@@ -1,6 +1,7 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { createServer } from 'node:net'
 import { access, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { assertNativeBenchmarks } from '../Architecture/Architecture.ts'
 import { hostname, release, cpus } from 'node:os'
 import { join, resolve } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
@@ -21,6 +22,7 @@ import {
   hardwareEvents,
   PerfSession,
   softwareEvents,
+  probePerf,
   processTree,
   ResourceSampler,
   MeasureCpuProfile,
@@ -40,6 +42,43 @@ export interface RunOptions {
   output: string
   budgetMs?: number
   injectFailure?: string
+  facilities?: CollectorFacilities
+}
+
+export interface CollectorFacilities {
+  hardware?: { available: boolean; diagnostic?: string }
+  software?: { available: boolean; diagnostic?: string }
+}
+
+export const preflightCollectors = async (benchmarks: Benchmark[], probe = probePerf): Promise<CollectorFacilities> => {
+  const facilities: CollectorFacilities = {}
+  for (const [kind, collector, events] of [
+    ['hardware', 'instructions', hardwareEvents],
+    ['software', 'resources', softwareEvents],
+  ] as const) {
+    if (!benchmarks.some((benchmark) => benchmark.collector === collector)) continue
+    try {
+      await probe([...events])
+      facilities[kind] = { available: true }
+    } catch (error) {
+      facilities[kind] = { available: false, diagnostic: errorMessage(error) }
+    }
+  }
+  return facilities
+}
+
+const boundedStage = async <T>(stage: string, operation: () => Promise<T>, milliseconds = 180_000): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await Promise.race([
+      operation(),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${stage} timed out after ${milliseconds}ms`)), milliseconds)
+      }),
+    ])
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 const freePort = async (): Promise<number> => {
@@ -161,9 +200,9 @@ const launch = async (
   })
   if (perf) perf.bind(child)
   let log = ''
-  let spawnError: Error | undefined
-  child.on('error', (error) => {
-    spawnError = error
+  const spawned = new Promise<void>((resolve, reject) => {
+    child.once('spawn', resolve)
+    child.once('error', reject)
   })
   const append = (data: Buffer): void => {
     log = (log + data.toString()).slice(-4 * 1024 * 1024)
@@ -176,7 +215,7 @@ const launch = async (
   let disposePromise: Promise<void> | undefined
   const finish = async (): Promise<void> => {
     const pids = child.pid ? await processTree(child.pid).catch(() => []) : []
-    if (child.exitCode === null && child.signalCode === null) {
+    if (child.pid && child.exitCode === null && child.signalCode === null) {
       try {
         await evaluate(await main(), electronExpression('electron.app.quit()'))
       } catch {}
@@ -206,10 +245,10 @@ const launch = async (
   }
   const dispose = (): Promise<void> => (disposePromise ??= finish())
   try {
+    await spawned
     await hooks.onSpawn?.(child)
     renderer = await connectTarget(rendererPort)
     await waitReady(renderer, benchmark.startup && benchmark.scenario === 'workspace')
-    if (spawnError) throw spawnError
     const ready = performance.now()
     await hooks.onReady?.(renderer)
     return { child, renderer, main, started, ready, dispose }
@@ -264,7 +303,10 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
   }
   try {
     if (options.injectFailure === `${benchmark.id}:${revision}:${pair}`) throw new Error('Injected collector failure')
-    await prepareFixture(workspace)
+    if (benchmark.collector === 'instructions' && options.facilities?.hardware?.available === false)
+      throw new UnavailableError(options.facilities.hardware.diagnostic ?? 'Hardware counters unavailable')
+    if (benchmark.sourceFile && !benchmark.sourceFile.includes('/performance-')) await mkdir(workspace, { recursive: true })
+    else await prepareFixture(workspace)
     await prepareProfile(profile)
     if (benchmark.cache === 'warm') {
       const primeDirectory = join(directory, 'prime')
@@ -282,7 +324,10 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     })
     if (benchmark.collector === 'instructions' || benchmark.collector === 'resources') {
       try {
-        perf = await PerfSession.create(directory, benchmark.collector === 'instructions' ? hardwareEvents : softwareEvents)
+        const kind = benchmark.collector === 'instructions' ? 'hardware' : 'software'
+        const facility = options.facilities?.[kind]
+        if (facility && !facility.available) throw new UnavailableError(facility.diagnostic ?? `${kind} counters unavailable`)
+        perf = await PerfSession.create(directory, benchmark.collector === 'instructions' ? hardwareEvents : softwareEvents, !facility)
       } catch (error) {
         if (benchmark.collector === 'instructions') throw error
         sample.diagnostics.push(errorMessage(error))
@@ -322,8 +367,16 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     if (!benchmark.startup) {
       const version = JSON.parse(await readFile(join(resolve(options.paths[revision], '..'), 'resources/app/package.json'), 'utf8')).version
       const [major, minor, patch] = version.split('.').map(Number)
-      scenario = await createScenario(renderer, await app.main(), workspace, benchmark.scenario, { major, minor, patch })
-      await scenario.setup()
+      scenario = await createScenario(
+        renderer,
+        await app.main(),
+        workspace,
+        benchmark.scenario,
+        { major, minor, patch },
+        benchmark,
+        join(directory, 'extensions'),
+      )
+      await boundedStage('Scenario setup', () => scenario!.setup())
     }
     let before: Metric[] = []
     let browserBefore: { name: string; value: number }[] = []
@@ -343,12 +396,12 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
       activeRendererMeasure = MeasureBrowserPerformanceCounters
       browserBefore = (await activeRendererMeasure.start(renderer)).metrics
     }
-    if (benchmark.collector === 'timeline') {
+    if (benchmark.collector === 'timeline' || benchmark.collector === 'css-selectors') {
       if (!benchmark.startup) {
         await evaluate(
           await app.main(),
           electronExpression(
-            `await electron.contentTracing.startRecording({categoryFilter: ${JSON.stringify(traceCategories)}, traceOptions: 'record-until-full'})`,
+            `await electron.contentTracing.startRecording({categoryFilter: ${JSON.stringify(benchmark.collector === 'css-selectors' ? cssTraceCategories : traceCategories)}, traceOptions: 'record-until-full'})`,
           ),
         )
         await evaluate(renderer, `console.timeStamp('large-start')`)
@@ -365,13 +418,16 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     }
     if (!benchmark.startup) {
       const actionStart = performance.now()
-      await scenario!.run()
+      await boundedStage('Scenario run', () => scenario!.run())
       if (benchmark.collector === 'timing')
         sample.metrics.push({
           name: 'actionTime',
           unit: 'ms',
           value: performance.now() - actionStart,
-          coverage: 'input dispatch to asserted visible completion; includes automation polling',
+          coverage:
+            benchmark.sourceFile?.includes('/performance-') || !benchmark.sourceFile
+              ? 'input dispatch to asserted visible completion; includes automation polling'
+              : 'scenario.run(); excludes launch/setup/teardown; includes automation polling',
         })
     }
     if (!benchmark.startup) {
@@ -415,7 +471,8 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
       sample.raw.push(`raw/${pair}-${revision}/trace.json.gz`)
     }
     if (benchmark.collector === 'css-selectors') {
-      const stats = await collectSelectorStats(await app.main(), join(directory, 'trace.json'))
+      if (!benchmark.startup) await evaluate(renderer, `console.timeStamp('large-end')`)
+      const stats = await collectSelectorStats(await app.main(), join(directory, 'trace.json'), benchmark.startup)
       sample.metrics.push(...stats.metrics)
       sample.selectorStats = stats.selectors
       await writeJson(join(directory, 'css-selectors.json'), stats)
@@ -450,7 +507,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
           join(directory, 'failure-state.json'),
           await evaluate(
             app.renderer,
-            `({ text: document.body.innerText.slice(0, 30000), activeElement: document.activeElement?.outerHTML, tabs: [...document.querySelectorAll('.tab')].map(e => e.outerHTML) })`,
+            `({ text: document.body.innerText.slice(0, 30000), activeElement: document.activeElement?.outerHTML, inputValue: document.activeElement?.value, tabs: [...document.querySelectorAll('.tab')].map(e => e.outerHTML) })`,
           ),
         )
       } catch {}
@@ -469,7 +526,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
       sample.status = 'failed'
     }
     try {
-      await scenario?.dispose()
+      if (scenario) await boundedStage('Scenario teardown', () => scenario!.dispose(), 30_000)
     } catch (error) {
       sample.diagnostics.push(`Scenario cleanup: ${errorMessage(error)}`)
       sample.status = 'failed'
@@ -491,6 +548,14 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     } catch {
       await writeFile(join(directory, 'application.log'), 'Application was not launched; see sample diagnostics.\n')
     }
+    if (sample.status === 'failed') {
+      try {
+        await access(join(profile, 'logs'))
+        await command('tar', ['-czf', join(directory, 'failure-logs.tar.gz'), '-C', profile, 'logs'], { timeout: 30_000 })
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') sample.diagnostics.push(`Failure logs: ${errorMessage(error)}`)
+      }
+    }
     for (const entry of await readdir(directory, { withFileTypes: true })) {
       if (!entry.isFile()) continue
       let name = entry.name
@@ -508,6 +573,9 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     // Keep measurement evidence, not large profiles/workspaces that contain no measurement results.
     await rm(profile, { recursive: true, force: true })
     await rm(workspace, { recursive: true, force: true })
+    await rm(join(directory, 'extensions'), { recursive: true, force: true })
+    await rm(join(directory, 'prime', 'extensions'), { recursive: true, force: true })
+    await rm(join(directory, 'project-cache'), { recursive: true, force: true })
     sample.raw.push(`raw/${pair}-${revision}/application.log`)
     sample.elapsedMs = performance.now() - started
   }
@@ -515,6 +583,8 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
 }
 
 export const runBenchmark = async (options: RunOptions, measure = measureSample): Promise<Result> => {
+  if (options.benchmark.arch) assertNativeBenchmarks([options.benchmark])
+  if (measure === measureSample && !options.facilities) options = { ...options, facilities: await preflightCollectors([options.benchmark]) }
   const count = sampleCount(options.benchmark, options.samples)
   const result: Result = {
     schemaVersion: 1,
@@ -523,6 +593,7 @@ export const runBenchmark = async (options: RunOptions, measure = measureSample)
     requestedSamples: count,
     status: 'missing',
     runner: {
+      arch: process.arch,
       hostname: hostname(),
       kernel: release(),
       cpu: cpus()[0]?.model ?? 'unknown',
@@ -534,6 +605,7 @@ export const runBenchmark = async (options: RunOptions, measure = measureSample)
     diagnostics: [],
   }
   const outputPath = join(options.output, 'result.json')
+  if (options.facilities) await writeJson(join(options.output, 'preflight.json'), options.facilities)
   await writeJson(outputPath, result)
   const deadline = Date.now() + (options.budgetMs ?? 5 * 60 * 60 * 1000)
   for (let pair = 0; pair < count; pair++) {

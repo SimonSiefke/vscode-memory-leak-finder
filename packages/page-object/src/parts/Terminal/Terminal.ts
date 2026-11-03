@@ -35,7 +35,7 @@ const waitForTerminalReady = async ({ page, row1 }: { page: any; row1: any }): P
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError, workspacePath }: CreateParams) => {
   return {
     async waitForShellPrompt() {
       await expect(page.locator('.terminal .xterm-screen')).toBeVisible()
@@ -103,7 +103,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         if (waitForFile) {
-          const workspace = Workspace.create({ electronApp, expect, ideVersion, page, platform, VError })
+          const workspace = Workspace.create({
+            electronApp,
+            expect,
+            ideVersion,
+            page,
+            platform,
+            VError,
+            ...(workspacePath ? { workspacePath } : {}),
+          })
           const exists = await workspace.waitForFile(waitForFile)
           if (!exists) {
             throw new Error(`expected file to be created`)

@@ -17,7 +17,10 @@ export const sha256 = async (path: string): Promise<string> => {
 }
 
 export const prepareBuild = async (commit: string, output: string): Promise<BuildMetadata> => {
-  if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('Large performance builds require Linux x64')
+  if (process.platform !== 'linux' || !['x64', 'arm64'].includes(process.arch))
+    throw new Error('Large performance builds require native Linux x64 or arm64')
+  const arch = process.arch as BuildMetadata['arch']
+  const packageDirectory = `VSCode-linux-${arch}`
   const { reference, sha, buildReference } = parseCommitReference(commit)
   output = resolve(output)
   await mkdir(output, { recursive: true })
@@ -36,20 +39,20 @@ export const prepareBuild = async (commit: string, output: string): Promise<Buil
     ],
     { cwd: repositoryRoot, timeout: 5 * 60 * 60 * 1000, inherit: true },
   )
-  const buildPath = join(repositoryRoot, '.vscode-repos', `${sha}-minified`, 'VSCode-linux-x64')
+  const buildPath = join(repositoryRoot, '.vscode-repos', `${sha}-minified`, packageDirectory)
   await access(join(buildPath, 'code-oss'))
   // Verify the checkout rather than relying on a pre-existing executable alone.
   const actualCommit = await command('git', ['rev-parse', 'HEAD'], { cwd: join(dirname(buildPath), 'source') })
   if (actualCommit !== sha) throw new Error(`Build checkout is ${actualCommit}, expected ${sha}`)
   await preserveCopilotRuntime(join(dirname(buildPath), 'source'), buildPath)
   const archive = join(output, 'vscode.tar.gz')
-  await command('tar', ['-czf', archive, '-C', dirname(buildPath), 'VSCode-linux-x64'], { timeout: 300000 })
+  await command('tar', ['-czf', archive, '-C', dirname(buildPath), packageDirectory], { timeout: 300000 })
   const metadata: BuildMetadata = {
     schemaVersion: 1,
     commit: reference,
     platform: 'linux',
-    arch: 'x64',
-    executable: 'VSCode-linux-x64/code-oss',
+    arch,
+    executable: `${packageDirectory}/code-oss`,
     archiveSha256: await sha256(archive),
     nodeVersion: process.version,
     generatedAt: new Date().toISOString(),
@@ -65,8 +68,9 @@ export const extractBuild = async (directory: string, expectedCommit: string): P
     metadata.schemaVersion !== 1 ||
     metadata.commit !== parseCommitReference(expectedCommit).reference ||
     metadata.platform !== 'linux' ||
-    metadata.arch !== 'x64' ||
-    metadata.executable !== 'VSCode-linux-x64/code-oss'
+    metadata.arch !== process.arch ||
+    !['x64', 'arm64'].includes(metadata.arch) ||
+    metadata.executable !== `VSCode-linux-${metadata.arch}/code-oss`
   )
     throw new Error('Build metadata does not match the requested commit/platform')
   const archive = join(directory, 'vscode.tar.gz')

@@ -7,7 +7,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const workspacePath = join(Root.root, '.vscode-test-workspace')
+const defaultWorkspacePath = join(Root.root, '.vscode-test-workspace')
 const defaultPortWaitHost = '127.0.0.1'
 const defaultPortWaitTimeout = 120_000
 
@@ -108,6 +108,7 @@ const waitForWorkspaceFileChanges = async (
   relativePaths: readonly string[],
   initialContents: readonly (string | null)[],
   maxWaitDelay: number = 10_000,
+  workspacePath = defaultWorkspacePath,
 ) => {
   const absolutePaths = relativePaths.map((relativePath) => join(workspacePath, relativePath))
   const startTime = performance.now()
@@ -154,7 +155,7 @@ export const Models = {
 export type ChatModel = (typeof Models)[keyof typeof Models]
 export type ChatEditorText = string | RegExp
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError, workspacePath = defaultWorkspacePath }: CreateParams) => {
   const chatScrollSelector = '.interactive-session .monaco-list .monaco-scrollable-element'
 
   const getLastRenderedLocator = async (locator: any, timeout: number, allowToolApproval: boolean = false) => {
@@ -1011,7 +1012,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
 
         if (shouldWaitForFileChanges) {
-          await waitForWorkspaceFileChanges(fileChangesToWaitFor, initialFileContents, 10_000)
+          await waitForWorkspaceFileChanges(fileChangesToWaitFor, initialFileContents, 10_000, workspacePath)
         }
 
         if (portsToWaitFor.length > 0) {
