@@ -75,7 +75,10 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
   if (process.platform === 'darwin') {
     await context.Electron.evaluate(`(() => {
       const { app, BrowserWindow } = globalThis._____electron;
-      const window = BrowserWindow.getAllWindows().find(window => /\/workbench(?:-dev)?\\.html(?:[?#]|$)/.test(window.webContents.getURL()));
+      const window = BrowserWindow.getAllWindows().find(window => {
+        const url = window.webContents.getURL();
+        return url.includes('/workbench.html') || url.includes('/workbench-dev.html');
+      });
       if (!window) throw new Error('The Markdown workbench window is missing');
       app.focus({ steal: true });
       window.show();
