@@ -98,11 +98,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const repl = page.locator('.repl')
         await expect(repl).toBeVisible()
-        // Reconcile native text focus while visible before hiding the input.
-        // Otherwise macOS can route later typing into the hidden console.
-        const input = repl.locator('.repl-input-wrapper :is(.native-edit-context, .inputarea)').first()
-        await input.focus()
-        await input.blur()
+        if (platform === 'darwin') {
+          const { traceDebugFocus } = await import(new URL('../../../../../scripts/pr3443-trace-debug-focus.js', import.meta.url).href)
+          await traceDebugFocus(page)
+        }
         const panel = Panel.create({ electronApp, expect, ideVersion, page, platform, VError })
         await panel.hide()
         await expect(repl).toBeHidden()
