@@ -39,7 +39,6 @@ jobs:
             **/node_modules
             **/.vscode-test
             **/.vscode-insiders-versions
-            **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
@@ -112,7 +111,6 @@ jobs:
             **/node_modules
             **/.vscode-test
             **/.vscode-insiders-versions
-            **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
@@ -299,7 +297,6 @@ jobs:
             **/node_modules
             **/.vscode-test
             **/.vscode-insiders-versions
-            **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
@@ -351,7 +348,6 @@ jobs:
             **/node_modules
             **/.vscode-test
             **/.vscode-insiders-versions
-            **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-${{ runner.arch }}-instruction-count-${{ steps.nodeModulesCacheKey.outputs.value }}
@@ -400,7 +396,6 @@ jobs:
             **/node_modules
             **/.vscode-test
             **/.vscode-insiders-versions
-            **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
