@@ -27,6 +27,20 @@ npm run e2e:electron -- --only window-open-close --measure named-function-count3
 See [Electron e2e documentation](packages/electron-e2e/README.md) for cache behavior,
 process verification, results, and adding scenarios.
 
+## Language-server processes
+
+On Linux, `--inspect-process` can measure a Node child of the VS Code instance under test, including its JSON language server:
+
+```sh
+node packages/cli/bin/test.js --only json-hover --run-skipped-tests-anyway --inspect-process jsonServerMain --measure named-function-count3 --check-leaks --measure-after --runs 37
+```
+
+Activate the language server during scenario setup or warm-up before measurement. The harness checks process ancestry, rejects ambiguous matches, and verifies the inspector's PID before capturing its heap. It uses an existing inspector or enables the selected Node process's inspector with `SIGUSR1`. Results are written under `.vscode-memory-leak-finder-results/process/jsonServerMain/`.
+
+Use `--inspect-extensions` in a separate run to measure the extension host. That heap does not include a language server running in a separate process. The JSON scenarios also include `json-document-schema-churn`, which uses distinct document and schema URIs, checks hover and diagnostic updates, and removes the generated files after closing the editor.
+
+The JSON scenarios share a provider-dependent setup that is excluded in CI. Run them locally with `--run-skipped-tests-anyway`; this flag preserves CI exclusions. Diagnostic assertions filter to the document under test so unrelated workspace problems do not affect the result.
+
 ## Sharding
 
 Split the selected test files across parallel jobs with the Jest-compatible, one-based `--shard=<index>/<count>` option:
@@ -134,6 +148,40 @@ npm run build-charts
 ```
 
 The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
+
+### StringsWithLocations
+
+Reports positive growth in live string objects, grouped by string text and the closest available retaining source location. `count` is the added object count (`afterCount - beforeCount`); results sort by descending `count`, with stable tie ordering. Equal text at different locations remains separate, and multiple references to one string do not inflate the count.
+
+A shared breadth-first traversal finds the nearest located closure or container along strong retaining references through contexts, objects, arrays, and collections. It ignores weak links and prototype/compiler metadata paths when assigning a location. Equal-distance ties use generated source location order. Available source maps resolve locations before grouping and comparison; otherwise generated locations are used. Output locations use one-based lines and columns.
+
+These are inferred retaining locations, rather than string allocation sites or proof of a leak. A string need not belong to any surviving closure: top-level strings use a retaining container's location when available, and otherwise `location` is `null`. Flat string text comes from the snapshot; concatenated values are reconstructed up to 65,536 UTF-16 code units. Sliced strings, cyclic/incomplete ropes, and larger reconstructed ropes use `string: null`, `stringType`, and `heapObjectId`; they compare by object identity and are not merged as equal text. Snapshot text truncation and external data remain limits of the available evidence.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure strings-with-locations --only base
+npm run build-charts
+```
+
+Each entry includes `string`, `location`, `sourceLocation`, `count`, `beforeCount`, and `afterCount`, plus `originalLocation` when mapped. For example, `{ "string": "terminal output", "location": "src/terminal.ts:42:7", "sourceLocation": "bundle.js:1:120", "originalLocation": "src/terminal.ts:42:7", "count": 37, "beforeCount": 1, "afterCount": 38 }`. The chart shows added counts and abbreviated text with locations; full snapshot-provided text remains in the JSON results. Browser, Node, and worker targets are supported.
+
+### StringObjectCount
+
+Counts live V8 string objects in before/after heap snapshots, including flat (`string`), concatenated (`concatenated string`), and sliced (`sliced string`) nodes. Separate objects with identical text count separately; multiple references to one object count once. Unlike `string-count`, which counts snapshot string-table entries (including metadata), this counts string heap nodes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure string-object-count --only base
+```
+
+### StringObjectBytes
+
+Sums the snapshot `self_size` bytes of the same string nodes, including node overhead. This is the total shallow string footprint exposed by the snapshot, not text length or a sum of retained sizes. Shared parents and rope components count once as individual nodes; external backing storage omitted from `self_size` is outside coverage.
+
+Both string object measures support browser, Node, and worker targets, return numeric `before` and `after` values, and flag positive growth as a suspected leak. Measure the process holding the strings. Generated charts show the baseline in black and growth in red, with count or byte labels.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure string-object-bytes --only base
+npm run build-charts
+```
 
 ### ArrayBufferBytes
 
