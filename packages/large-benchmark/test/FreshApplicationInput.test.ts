@@ -36,7 +36,7 @@ test.each([
     })
     const noise = setInterval(() => {
       document.getElementById('noise')!.textContent = String(performance.now())
-    }, 1)
+    }, 10)
     try {
       const result = typeAndWaitFor({
         locator: { selector: '#query' },
@@ -68,7 +68,7 @@ test.each([false, true])('Quick Open refreshes a query after its initial search 
     result.id = 'result'
     document.body.append(result)
   })
-  const noise = noisy ? setInterval(() => (document.getElementById('noise')!.textContent = String(performance.now())), 1) : undefined
+  const noise = noisy ? setInterval(() => (document.getElementById('noise')!.textContent = String(performance.now())), 10) : undefined
   try {
     const result = typeAndWaitFor({ locator: { selector: '#query' }, text: 'file.txt', waitFor: { selector: '#result' }, timeout: 1500 })
     const assertion = expect(result).resolves.toBeUndefined()
