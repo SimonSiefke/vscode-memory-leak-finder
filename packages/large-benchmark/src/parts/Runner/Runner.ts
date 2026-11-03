@@ -117,7 +117,14 @@ export const clearColdCaches = async (): Promise<void> => {
 export const prepareProfile = async (profile: string): Promise<void> => {
   await rm(profile, { recursive: true, force: true })
   await mkdir(join(profile, 'User'), { recursive: true })
+  const defaults = JSON.parse(
+    await readFile(
+      new URL('../../../../test-coordinator/src/parts/DefaultVsCodeSettings/DefaultVsCodeSettings.json', import.meta.url),
+      'utf8',
+    ),
+  )
   await writeJson(join(profile, 'User', 'settings.json'), {
+    ...defaults,
     'telemetry.telemetryLevel': 'off',
     'update.mode': 'none',
     'extensions.autoUpdate': false,
@@ -127,7 +134,6 @@ export const prepareProfile = async (profile: string): Promise<void> => {
     'editor.minimap.enabled': false,
     'editor.smoothScrolling': false,
     'terminal.integrated.accessibleViewFocusOnCommandExecution': false,
-    'editor.accessibilitySupport': 'on',
     'terminal.integrated.defaultProfile.linux': 'bash',
     'terminal.integrated.profiles.linux': {
       bash: { path: '/bin/bash', args: ['--noprofile', '--norc'], env: { PS1: '$ ', PROMPT_COMMAND: '', BASH_ENV: null } },
@@ -192,7 +198,7 @@ const launch = async (
   // No filesystem access to the application occurs between dropping caches and spawning it.
   if (benchmark.cache === 'cold') await clearColdCaches()
   const started = performance.now()
-  const child = spawn(perf ? 'perf' : executable, perf ? [...perf.args(), '--', executable, ...args] : args, {
+  const child = spawn(perf ? 'perf' : executable, perf ? [...perf.args(!benchmark.startup), '--', executable, ...args] : args, {
     detached: true,
     stdio: ['ignore', 'pipe', 'pipe'],
     env: { ...process.env, ELECTRON_RUN_AS_NODE: undefined, NODE_OPTIONS: undefined, NODE_DISABLE_COMPILE_CACHE: undefined },
@@ -215,7 +221,7 @@ const launch = async (
   let disposePromise: Promise<void> | undefined
   const finish = async (): Promise<void> => {
     const pids = child.pid ? await processTree(child.pid).catch(() => []) : []
-    if (child.pid && child.exitCode === null && child.signalCode === null) {
+    if (child.pid && ((child.exitCode === null && child.signalCode === null) || renderer || mainConnection)) {
       try {
         await evaluate(await main(), electronExpression('electron.app.quit()'))
       } catch {}
@@ -235,7 +241,8 @@ const launch = async (
         process.kill(entry.pid, 'SIGKILL')
       } catch {}
     }
-    if (child.pid && child.exitCode === null && child.signalCode === null) {
+    // The perf supervisor may have exited while its Electron descendants still own this process group.
+    if (child.pid) {
       try {
         process.kill(-child.pid, 'SIGKILL')
       } catch {}
@@ -284,6 +291,17 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     } catch (error) {
       resourceFailure('Process-tree PSS', error)
       resources = undefined
+    }
+  }
+  const disposeScenario = async (): Promise<void> => {
+    const current = scenario
+    scenario = undefined
+    if (!current) return
+    try {
+      await boundedStage('Scenario teardown', () => current.dispose(), 30_000)
+    } catch (error) {
+      sample.diagnostics.push(`Scenario cleanup: ${errorMessage(error)}`)
+      sample.status = 'failed'
     }
   }
   const freezeCollectors = async (): Promise<void> => {
@@ -340,7 +358,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
       workspace,
       benchmark,
       directory,
-      benchmark.startup ? perf : undefined,
+      perf,
       benchmark.startup
         ? {
             onSpawn: async (child) => {
@@ -381,11 +399,12 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     let before: Metric[] = []
     let browserBefore: { name: string; value: number }[] = []
     if (benchmark.collector === 'resources' && !benchmark.startup) {
-      await startResources(app.child.pid!, false)
+      await startResources(app.child.pid!, !!perf)
     }
     if (!benchmark.startup && perf) {
       try {
-        await perf.attach((await processTree(app.child.pid!)).map((entry) => entry.pid))
+        // Counters inherit from launch, so process churn during setup cannot invalidate a PID snapshot.
+        await perf.toggle('enable')
       } catch (error) {
         resourceFailure('CPU counters', error)
         await perf.dispose()
@@ -435,8 +454,9 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
     }
     if (perf) {
       // A launch-wrapping perf process waits for Electron to exit before writing its final totals.
-      // Counters were already disabled at readiness, so graceful shutdown is outside their window.
-      if (benchmark.startup) await app.dispose()
+      // Counters were already disabled at the boundary, so graceful shutdown is outside their window.
+      await disposeScenario()
+      await app.dispose()
       try {
         sample.metrics.push(...(await perf.stop()))
       } catch (error) {
@@ -525,12 +545,7 @@ export const measureSample = async (options: RunOptions, pair: number, revision:
       sample.diagnostics.push(`Renderer collector cleanup: ${errorMessage(error)}`)
       sample.status = 'failed'
     }
-    try {
-      if (scenario) await boundedStage('Scenario teardown', () => scenario!.dispose(), 30_000)
-    } catch (error) {
-      sample.diagnostics.push(`Scenario cleanup: ${errorMessage(error)}`)
-      sample.status = 'failed'
-    }
+    await disposeScenario()
     try {
       await app?.dispose()
     } catch (error) {

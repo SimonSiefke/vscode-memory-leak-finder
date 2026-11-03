@@ -56,6 +56,7 @@ export const harnessSourceHash = async (root = repositoryRoot): Promise<string> 
         'packages/injected-code',
         'packages/memory-leak-finder',
         'packages/e2e',
+        'packages/test-coordinator/src/parts/DefaultVsCodeSettings/DefaultVsCodeSettings.json',
         '.github/workflows/large-performance.yml',
         '.nvmrc',
         'package.json',

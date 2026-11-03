@@ -44,14 +44,23 @@ An unavailable release API, unknown endpoint, missing Linux build, or invalid
 commit metadata fails initialization before any builds start.
 
 The workflow builds each native minified Linux package once per required architecture and compares each adjacent
-pair of commits. The full suite has 108 paired runtime benchmarks, one smoke-test timing benchmark, and one JavaScript
+pair of commits. One-off builds disable the reusable VS Code `node_modules` cache,
+avoiding a second multi-GB copy of the dependency tree on the same runner.
+Build status records compilation and artifact-upload outcomes separately. Before
+expanding measurement matrices, a readiness job checks both required native build
+artifacts. Comparisons missing either build are retained as missing in the manifest
+and report but do not allocate measurement runners; other valid version pairs can
+still run. Build failures fail the workflow instead of causing a cascade of failed
+artifact downloads.
+
+The full suite has 108 paired runtime benchmarks, one smoke-test timing benchmark, and one JavaScript
 bundle-size benchmark per pair. Each matrix stays within 256 jobs by grouping
 benchmarks into a job when necessary; each job downloads only its two required
 builds. If a build fails, comparisons using other builds can still run. Build and
-measurement failures for individual versions are informational: the workflow
-succeeds when at least one adjacent comparison has usable results. Missing
-comparisons remain visible in the report and Actions summary. A run with no
-usable comparisons still fails after preserving the report. It leaves the
+measurement failures remain visible in the report and Actions summary. Local
+reports can succeed with usable partial evidence. Actions requires complete
+requested coverage and fails after preserving the partial report when coverage
+is incomplete. It leaves the
 existing CI and bot workflows unchanged.
 
 The defaults are 37 samples per commit **per adjacent comparison**, all extensions disabled, and the entire
@@ -273,7 +282,13 @@ test files and exclusion reasons, explicit opt-ins, workload hashes, harness com
 and source hash, requested build identities, and measurement boundaries. Measurement
 jobs reject changed harness sources. Build archives retain their own identity and
 hash verification. Each attempt is checkpointed, including failures, without retries.
-Only sample-owned processes and directories are cleaned up. Hardware and software
+Only sample-owned processes and directories are cleaned up. Interaction hardware
+and software counters inherit from a perf-wrapped application launch with counters
+initially disabled. They enable after scenario setup and freeze when `run()` ends,
+so short-lived setup processes cannot invalidate a later PID attachment. Scenario
+teardown and application shutdown remain outside collection. The benchmark profile
+inherits the ordinary E2E UI defaults (including custom title bars and editor preview
+behavior), with the documented deterministic benchmark settings layered over them. Hardware and software
 counter support is probed once per measurement job. Unsupported collectors stay
 unavailable; software-counter failures can still retain partial PSS evidence.
 
@@ -303,6 +318,9 @@ against x64 timings or counts. No combined speedup score is computed.
 Hosted runners may not expose a hardware PMU even after changing
 `perf_event_paranoid`; use suitable runners for complete instruction coverage.
 The report prominently marks missing, failed, partial and unavailable coverage.
+Actions report generation uses `--require-complete true`: partial evidence is still
+written and uploaded, but incomplete requested coverage fails the workflow. Local
+report generation keeps the previous behavior unless this option is supplied.
 
 Overview plots show per-scenario percentage changes and paired-bootstrap 95%
 intervals for duration, instructions, CPU time and renderer style-recalculation

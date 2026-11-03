@@ -44,9 +44,10 @@ export const softwareEvents: string[] = perf.softwareEvents
 export const probePerf: (events: string[]) => Promise<void> = perf.probePerf
 
 export interface PerfSession {
-  args(): string[]
+  args(startDisabled?: boolean): string[]
   bind(child: ChildProcess): void
   attach(pids: number[]): Promise<void>
+  toggle(value: 'enable' | 'disable'): Promise<void>
   freeze(): Promise<void>
   stop(): Promise<Metric[]>
   dispose(): Promise<void>

@@ -64,12 +64,12 @@ test('native measurement guard rejects wrong-architecture and mixed jobs while a
 test('workflow keeps native instruction builds and measurements on ARM and waits for their reports', async () => {
   const { readFile } = await import('node:fs/promises')
   const workflow = await readFile(new URL('../../../.github/workflows/large-performance.yml', import.meta.url), 'utf8')
-  const job = (name: string) => workflow.split(`\n  ${name}:\n`)[1]!.split(/\n  [a-z-]+:\n/)[0]!
+  const job = (name: string) => workflow.split(`\n  ${name}:\n`)[1]!.split(/\n  [a-z0-9-]+:\n/)[0]!
   expect(job('build-arm')).toContain('runs-on: ubuntu-24.04-arm')
   expect(job('build-arm')).toContain('outputs.arm_build_matrix')
   expect(job('measure-arm')).toContain('runs-on: ubuntu-24.04-arm')
-  expect(job('measure-arm')).toContain('needs: [initialize, build-arm]')
-  expect(job('measure-arm')).toContain('outputs.arm_matrix')
+  expect(job('measure-arm')).toContain('needs: [initialize, ready-arm]')
+  expect(job('measure-arm')).toContain('needs.ready-arm.outputs.matrix')
   expect(job('measure-arm')).toContain('name: large-result-arm64-')
   expect(job('measure')).toContain('runs-on: ubuntu-24.04\n')
   expect(job('report')).toContain('needs: [initialize, build, build-arm, measure, measure-arm, smoke]')

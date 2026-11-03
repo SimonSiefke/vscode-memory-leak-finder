@@ -115,8 +115,13 @@ test.each([true, false])(
     jest.spyOn(console, 'log').mockImplementation(() => {})
     try {
       const report = largePerformance(['report', '--manifest', manifest, '--input-dir', input, '--output-dir', output])
-      if (available) await report
-      else await expect(report).rejects.toThrow('no valid runtime comparisons')
+      if (available) {
+        await report
+        await expect(
+          largePerformance(['report', '--manifest', manifest, '--input-dir', input, '--output-dir', output, '--require-complete', 'true']),
+        ).rejects.toThrow('coverage is incomplete')
+        expect(await readFile(join(output, 'index.html'), 'utf8')).toContain('Comparison incomplete')
+      } else await expect(report).rejects.toThrow('no valid runtime comparisons')
     } finally {
       if (previous === undefined) delete process.env.GITHUB_STEP_SUMMARY
       else process.env.GITHUB_STEP_SUMMARY = previous

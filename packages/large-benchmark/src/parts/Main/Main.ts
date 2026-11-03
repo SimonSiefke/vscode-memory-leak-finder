@@ -19,6 +19,8 @@ import { createCssPreset, freezeSamples, samplingPolicy, harnessSourceHash, type
 import { benchmarks as legacyBenchmarks } from '../Manifest/Manifest.ts'
 import { assertNativeBenchmarks, collectorArchitecture, executionPlan } from '../Architecture/Architecture.ts'
 
+import { readyBuildMatrix, recordBuildUpload } from '../BuildReadiness/BuildReadiness.ts'
+
 export interface Manifest {
   schemaVersion: 1
   commits: { before: string; after: string }
@@ -108,6 +110,35 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
           `arm_matrix=${JSON.stringify(plan.arm_matrix)}\narm_build_matrix=${JSON.stringify(plan.arm_build_matrix)}\nhas_arm=${plan.has_arm}\nhas_x64=${plan.has_x64}\nmatrix=${matrix}\nbuild_matrix=${buildMatrix}\nsmoke_matrix=${smokeMatrix}\nhas_runtime=${plan.has_runtime}\nhas_smoke=${selected.some((b) => b.collector === 'smoke')}\nsmoke_harness=${parseCommitReference(revisions[0]!).artifact}\n`,
         )
       else console.log(JSON.stringify(plan))
+      break
+    }
+    case 'build-status': {
+      await recordBuildUpload(output, required('--commit'), get('--upload-outcome') === 'success')
+      break
+    }
+    case 'ready-matrix': {
+      const arch = required('--arch')
+      if (arch !== 'x64' && arch !== 'arm64') throw new Error('Expected x64 or arm64')
+      const manifest = await readJson<Manifest | SeriesManifest>(resolve(required('--manifest')))
+      validateRegistry(manifest.benchmarks)
+      const revisions = validateCommits(manifest.schemaVersion === 1 ? Object.values(manifest.commits) : manifest.commits)
+      const plan = executionPlan(revisions, manifest.benchmarks)
+      const ready = await readyBuildMatrix(arch === 'x64' ? plan.matrix : plan.arm_matrix, resolve(required('--input-dir')), arch)
+      const smoke =
+        arch === 'x64' && manifest.benchmarks.some((b) => b.collector === 'smoke') && ready.successful.includes(revisions[0]!)
+          ? ready.successful
+              .filter((commit) => revisions.includes(commit))
+              .map((commit) => ({ commit, artifact: parseCommitReference(commit).artifact }))
+          : []
+      await writeJson(join(output, 'build-readiness.json'), { ...ready, arch, smoke })
+      const outputs = `matrix=${JSON.stringify(ready.matrix)}\nhas_runtime=${ready.matrix.include.length > 0}\nsmoke_matrix=${JSON.stringify({ include: smoke })}\nhas_smoke=${smoke.length > 0}\n`
+      if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, outputs)
+      else console.log(outputs)
+      if (process.env.GITHUB_STEP_SUMMARY)
+        await appendFile(
+          process.env.GITHUB_STEP_SUMMARY,
+          `### ${arch} build readiness\n\n${ready.matrix.include.length} measurement jobs ready; ${ready.skipped.length} skipped because required builds are unavailable.\n\n${ready.diagnostics.map((d) => '- ' + d).join('\n')}\n`,
+        )
       break
     }
     case 'prepare-smoke': {
@@ -204,6 +235,8 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
         console.log(`Report: ${join(output, 'index.html')}; ${summary.reports.length} adjacent revision comparisons`)
         if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, createTrendWorkflowSummary(summary))
         if (!summary.reports.some((report) => report.usable)) throw new Error('Report preserved, but no usable revision comparisons exist')
+        if (get('--require-complete') === 'true' && !summary.complete)
+          throw new Error('Report preserved, but requested benchmark coverage is incomplete')
         break
       }
       const summary = await generateReport({
@@ -218,11 +251,13 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
       if (summary.smoke) console.log(summary.smoke.summary)
       if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, createWorkflowSummary(summary))
       if (!summary.usable) throw new Error('Report preserved, but builds are unusable or no valid runtime comparisons exist')
+      if (get('--require-complete') === 'true' && !summary.complete)
+        throw new Error('Report preserved, but requested benchmark coverage is incomplete')
       break
     }
     default:
       throw new Error(
-        'Usage: large-performance <matrix|prepare|extract|prepare-smoke|extract-smoke|smoke|measure|report|history-matrix|history-measure|history-report> [options]',
+        'Usage: large-performance <matrix|ready-matrix|build-status|prepare|extract|prepare-smoke|extract-smoke|smoke|measure|report|history-matrix|history-measure|history-report> [options]',
       )
   }
 }
