@@ -11,7 +11,7 @@ export const traceDebugFocus = async (page) => {
     expression: `document.querySelector('.repl-input-wrapper .native-edit-context')`,
   })
   const { listeners } = await invoke('DOMDebugger.getEventListeners', { objectId: node.result.objectId })
-  const listener = listeners.find((item) => item.type === 'blur')
+  const listener = listeners.find((item) => item.type === 'blur' && item.handler?.description.includes('NativeEditContext.blur'))
   const { breakpointId } = await invoke('Debugger.setBreakpointOnFunctionCall', { objectId: listener.handler.objectId })
   const captured = Promise.withResolvers()
   rpc.on('Debugger.paused', async (message) => {
@@ -26,9 +26,10 @@ export const traceDebugFocus = async (page) => {
       await invoke('Debugger.removeBreakpoint', { breakpointId })
       captured.resolve()
     } catch (error) {
+      console.log('DEBUG FOCUS TRACE ERROR', String(error))
       captured.reject(error)
     } finally {
-      await invoke('Debugger.resume')
+      await invoke('Debugger.resume').catch((error) => console.log('DEBUG FOCUS RESUME ERROR', String(error)))
     }
   })
   try {
