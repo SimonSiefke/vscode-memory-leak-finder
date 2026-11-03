@@ -98,6 +98,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const repl = page.locator('.repl')
         await expect(repl).toBeVisible()
+        // Blur while the input is visible: hiding it can leave native editor
+        // text focus stale on macOS and route later typing into this console.
+        const input = repl.locator('.repl-input-wrapper :is(.native-edit-context, .inputarea)').first()
+        await input.blur()
         const panel = Panel.create({ electronApp, expect, ideVersion, page, platform, VError })
         await panel.hide()
         await expect(repl).toBeHidden()

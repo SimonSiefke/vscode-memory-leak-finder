@@ -98,12 +98,7 @@ export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promis
   // Native key events exercise the typing path rather than replacing the model.
   // Keep this editor open across iterations, as in a sustained editing session.
   await Editor.focus()
-  if (process.platform === 'darwin') {
-    const { diagnoseTyping } = await import(new URL('../../../scripts/pr3443-diagnose-input.js', import.meta.url).href)
-    await diagnoseTyping({ Editor }, typedText)
-  } else {
-    await Editor.typeCharacters(typedText)
-  }
+  await Editor.typeCharacters(typedText)
   await Editor.shouldContainText('typingcheckend')
   assert.equal(await isDirty(Workbench), true, 'Typing must make the document dirty')
   // Undo grouping can vary between iterations. Wait for the saved version,
