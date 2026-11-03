@@ -51,7 +51,7 @@ export const parsePerf = (raw: string, events: string[]): Metric[] => {
 export const probePerf = async (events: string[]): Promise<void> => {
   let raw: string
   try {
-    // Put output in a temporary file because perf writes its statistics to stderr.
+    // Redirect statistics into captured stdout, including when perf exits unsuccessfully.
     const { stdout } = await exec(
       'sh',
       [
@@ -65,7 +65,8 @@ export const probePerf = async (events: string[]): Promise<void> => {
     )
     raw = stdout
   } catch (error) {
-    throw new UnavailableError(`perf counters unavailable: ${String(error)}`)
+    const failure = error as Error & { stdout?: string; stderr?: string }
+    throw new UnavailableError(`perf counters unavailable: ${String(error)}\n${failure.stdout ?? ''}${failure.stderr ?? ''}`)
   }
   const metrics = parsePerf(raw, events)
   if (

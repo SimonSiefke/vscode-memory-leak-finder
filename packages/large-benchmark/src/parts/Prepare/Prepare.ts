@@ -31,6 +31,8 @@ export const prepareBuild = async (commit: string, output: string): Promise<Buil
       '--commit',
       buildReference,
       '--build-vscode-minified',
+      // Each Actions job builds one revision; caching duplicates a multi-GB tree on the same disk.
+      '--disable-vscode-node-modules-cache',
       '--setup-only',
       '--only',
       'base',

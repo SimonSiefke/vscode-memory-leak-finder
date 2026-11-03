@@ -114,7 +114,6 @@ jobs:
     needs: initialize
     runs-on: ubuntu-24.04
     timeout-minutes: 350
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.initialize.outputs.build_matrix) }}
@@ -136,6 +135,7 @@ jobs:
           node packages/large-benchmark/src/main.ts prepare \
             --commit "$COMMIT" --output-dir .large-build
       - name: Upload executable package
+        id: archive
         uses: actions/upload-artifact@v7
         with:
           name: large-build-${{ matrix.artifact }}
@@ -146,6 +146,11 @@ jobs:
           compression-level: 0
           retention-days: 30
           overwrite: true
+      - name: Record whether the executable artifact was uploaded
+        if: always()
+        env:
+          UPLOAD_OUTCOME: ${{ steps.archive.outcome }}
+        run: node packages/large-benchmark/src/main.ts build-status --commit "$COMMIT" --upload-outcome "$UPLOAD_OUTCOME" --output-dir .large-build
       - name: Upload build status
         if: always()
         uses: actions/upload-artifact@v7
@@ -175,7 +180,6 @@ jobs:
     needs: initialize
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 350
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.initialize.outputs.arm_build_matrix) }}
@@ -197,6 +201,7 @@ jobs:
           node packages/large-benchmark/src/main.ts prepare \
             --commit "$COMMIT" --output-dir .large-build
       - name: Upload executable package
+        id: archive
         uses: actions/upload-artifact@v7
         with:
           name: large-build-${{ matrix.artifact }}
@@ -207,6 +212,11 @@ jobs:
           compression-level: 0
           retention-days: 30
           overwrite: true
+      - name: Record whether the executable artifact was uploaded
+        if: always()
+        env:
+          UPLOAD_OUTCOME: ${{ steps.archive.outcome }}
+        run: node packages/large-benchmark/src/main.ts build-status --commit "$COMMIT" --upload-outcome "$UPLOAD_OUTCOME" --output-dir .large-build
       - name: Upload build status
         if: always()
         uses: actions/upload-artifact@v7
@@ -216,15 +226,81 @@ jobs:
           retention-days: 30
           overwrite: true
 
-  smoke:
+  ready-x64:
     needs: [initialize, build]
-    if: ${{ always() && needs.initialize.result == 'success' && needs.initialize.outputs.has_smoke == 'true' && !cancelled() }}
+    if: ${{ always() && needs.initialize.result == 'success' && needs.initialize.outputs.has_x64 == 'true' && !cancelled() }}
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.ready.outputs.matrix }}
+      has_runtime: ${{ steps.ready.outputs.has_runtime }}
+      smoke_matrix: ${{ steps.ready.outputs.smoke_matrix }}
+      has_smoke: ${{ steps.ready.outputs.has_smoke }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - uses: actions/download-artifact@v8
+        with:
+          name: large-manifest
+          path: .large-manifest
+      - name: Download completed build statuses
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: large-build-status-*
+          path: .large-build-statuses
+      - name: Queue only comparisons with both native build artifacts
+        id: ready
+        run: node packages/large-benchmark/src/main.ts ready-matrix --manifest .large-manifest/manifest.json --input-dir .large-build-statuses --arch x64 --output-dir .large-ready
+      - uses: actions/upload-artifact@v7
+        with:
+          name: large-build-readiness-x64
+          path: .large-ready/build-readiness.json
+          retention-days: 30
+
+  ready-arm:
+    needs: [initialize, build-arm]
+    if: ${{ always() && needs.initialize.result == 'success' && needs.initialize.outputs.has_arm == 'true' && !cancelled() }}
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.ready.outputs.matrix }}
+      has_runtime: ${{ steps.ready.outputs.has_runtime }}
+      smoke_matrix: ${{ steps.ready.outputs.smoke_matrix }}
+      has_smoke: ${{ steps.ready.outputs.has_smoke }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - uses: actions/download-artifact@v8
+        with:
+          name: large-manifest
+          path: .large-manifest
+      - name: Download completed build statuses
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: large-build-status-*
+          path: .large-build-statuses
+      - name: Queue only comparisons with both native build artifacts
+        id: ready
+        run: node packages/large-benchmark/src/main.ts ready-matrix --manifest .large-manifest/manifest.json --input-dir .large-build-statuses --arch arm64 --output-dir .large-ready
+      - uses: actions/upload-artifact@v7
+        with:
+          name: large-build-readiness-arm64
+          path: .large-ready/build-readiness.json
+          retention-days: 30
+
+  smoke:
+    needs: [initialize, ready-x64]
+    if: ${{ always() && needs.initialize.result == 'success' && needs.ready-x64.outputs.has_smoke == 'true' && !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     continue-on-error: true
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.initialize.outputs.smoke_matrix) }}
+      matrix: ${{ fromJSON(needs.ready-x64.outputs.smoke_matrix) }}
     env:
       COMMIT: ${{ matrix.commit }}
     steps:
@@ -268,14 +344,14 @@ jobs:
           retention-days: 30
 
   measure:
-    needs: [initialize, build]
-    if: ${{ always() && needs.initialize.result == 'success' && needs.initialize.outputs.has_runtime == 'true' && !cancelled() }}
+    needs: [initialize, ready-x64]
+    if: ${{ always() && needs.initialize.result == 'success' && needs.ready-x64.outputs.has_runtime == 'true' && !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     continue-on-error: true
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.initialize.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.ready-x64.outputs.matrix) }}
     env:
       BENCHMARK_IDS: ${{ matrix.benchmarks }}
       BEFORE_COMMIT: ${{ matrix.before }}
@@ -339,14 +415,14 @@ jobs:
           overwrite: true
 
   measure-arm:
-    needs: [initialize, build-arm]
-    if: ${{ always() && needs.initialize.result == 'success' && needs.initialize.outputs.has_arm == 'true' && !cancelled() }}
+    needs: [initialize, ready-arm]
+    if: ${{ always() && needs.initialize.result == 'success' && needs.ready-arm.outputs.has_runtime == 'true' && !cancelled() }}
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 350
     continue-on-error: true
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.initialize.outputs.arm_matrix) }}
+      matrix: ${{ fromJSON(needs.ready-arm.outputs.matrix) }}
     env:
       BENCHMARK_IDS: ${{ matrix.benchmarks }}
       BEFORE_COMMIT: ${{ matrix.before }}
@@ -442,7 +518,7 @@ jobs:
           mkdir -p .large-downloads
           node packages/large-benchmark/src/main.ts report \
             --manifest .large-manifest/manifest.json --input-dir .large-downloads \
-            --output-dir .large-report
+            --output-dir .large-report --require-complete true
       - name: Upload HTML report and charts
         if: always()
         uses: actions/upload-artifact@v7

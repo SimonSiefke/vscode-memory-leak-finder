@@ -71,3 +71,16 @@ test('ARM preparation packages a native ARM64 build and rejects it on an x64 run
   await expect(extractBuild(output, reference)).rejects.toThrow('metadata')
   expect(command).not.toHaveBeenCalled()
 })
+
+test('one-off build does not duplicate its dependency tree into the reusable node_modules cache', async () => {
+  const output = await fs.mkdtemp(join(tmpdir(), 'large-prepare-cache-test-'))
+  directories.push(output)
+  command.mockImplementation(async (executable, args) => {
+    if (executable === process.execPath && !args.includes('--disable-vscode-node-modules-cache'))
+      throw new Error('ENOSPC: cache copy exhausted disk space')
+    if (executable === 'git') return sha
+    if (executable === 'tar') await fs.writeFile(args[1]!, 'build archive')
+    return ''
+  })
+  await expect(prepareBuild(reference, output)).resolves.toMatchObject({ commit: reference })
+})

@@ -5,6 +5,7 @@ import type { Benchmark } from '../Types/Types.ts'
 import { readFile } from 'node:fs/promises'
 import { resolve, relative, sep } from 'node:path'
 import { sourceHash } from '../CssPreset/CssPreset.ts'
+import { prepareWorkspaceWatcher } from '../WorkspaceReadiness/WorkspaceReadiness.ts'
 import { repositoryRoot } from '../Prepare/Prepare.ts'
 
 // The monorepo runs TypeScript sources directly. Use the same URL-based package
@@ -44,9 +45,10 @@ export const softwareEvents: string[] = perf.softwareEvents
 export const probePerf: (events: string[]) => Promise<void> = perf.probePerf
 
 export interface PerfSession {
-  args(): string[]
+  args(startDisabled?: boolean): string[]
   bind(child: ChildProcess): void
   attach(pids: number[]): Promise<void>
+  toggle(value: 'enable' | 'disable'): Promise<void>
   freeze(): Promise<void>
   stop(): Promise<Metric[]>
   dispose(): Promise<void>
@@ -103,6 +105,7 @@ export const createScenario = async (
   const api = test.api
   return {
     setup: async () => {
+      await prepareWorkspaceWatcher(api)
       await stages.beforeSetup(module, api)
       await stages.setup(module, api)
     },

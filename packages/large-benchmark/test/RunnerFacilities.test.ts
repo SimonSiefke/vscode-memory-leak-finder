@@ -71,3 +71,21 @@ test('a failed process spawn returns promptly with evidence and removes its isol
   expect(sample.raw).toContain('raw/0-before/application.log')
   await expect(stat(join(output, 'raw/0-before/profile'))).rejects.toThrow()
 }, 10_000)
+
+test('benchmark profiles retain the ordinary E2E UI defaults needed by menu and editor scenarios', async () => {
+  const { prepareProfile } = await import('../src/parts/Runner/Runner.ts')
+  const directory = await temporary()
+  await prepareProfile(directory)
+  const settings = JSON.parse(await readFile(join(directory, 'User/settings.json'), 'utf8'))
+  const defaults = JSON.parse(
+    await readFile(new URL('../../test-coordinator/src/parts/DefaultVsCodeSettings/DefaultVsCodeSettings.json', import.meta.url), 'utf8'),
+  )
+  for (const key of [
+    'window.titleBarStyle',
+    'window.commandCenter',
+    'workbench.editor.enablePreview',
+    'workbench.experimental.modernUI',
+    'editor.accessibilitySupport',
+  ])
+    expect(settings[key]).toEqual(defaults[key])
+})
