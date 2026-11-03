@@ -15,6 +15,15 @@ const committedText =
 const baselineText = committedText.replace('## Section 1\n', '## Section 1 (working copy)\n')
 export const typedText = 'jkl '.repeat(16) + 'typingcheckend'
 
+export const typeCharacters = async (Editor: TestContext['Editor']): Promise<void> => {
+  if (process.platform === 'darwin') {
+    // CDP's native input updates the macOS input buffer without updating Monaco.
+    for (const character of typedText) await Editor.type(character)
+  } else {
+    await Editor.typeCharacters(typedText)
+  }
+}
+
 interface Options {
   readonly tracked: boolean
   readonly gitEnabled: boolean
@@ -96,10 +105,10 @@ export const shouldBeClean = async (Workbench: TestContext['Workbench']): Promis
 }
 
 export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promise<void> => {
-  // Native key events exercise the typing path rather than replacing the model.
+  // Per-character input exercises the typing path rather than replacing the model.
   // Keep this editor open across iterations, as in a sustained editing session.
   await Editor.focus()
-  await Editor.typeCharacters(typedText)
+  await typeCharacters(Editor)
   await Editor.shouldContainText('typingcheckend')
   assert.equal(await isDirty(Workbench), true, 'Typing must make the document dirty')
   // Undo grouping can vary between iterations. Wait for the saved version,

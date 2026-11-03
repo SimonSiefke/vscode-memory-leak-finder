@@ -19,7 +19,7 @@ refresh synchronizes Source Control after the fixture's commits and file writes.
 The tracked document already differs from its committed version, so it remains
 modified throughout the test. No remote repository or network access is needed.
 
-Each `markdown-edit-*` iteration types 78 characters using native keyboard events, checks that
+Each `markdown-edit-*` iteration types 78 characters through editor input, checks that
 the final marker appears, undoes until the editor reports a clean document,
 and saves. The saved document must exactly match the original working copy.
 The editor remains open across iterations; its contents do not grow with the
@@ -30,9 +30,10 @@ exists. It then opens and closes the fixture's Git model before removing its
 `.git` directory. This prevents later scenarios from
 retaining the deleted repository or discovering the harness's parent repository.
 Each iteration focuses the editor before dispatching native typing events.
-On macOS, each character is committed through native CDP text input because
-keyboard events can update the input buffer without updating the editor model.
-Linux and Windows retain native keydown and keyup events.
+On macOS, each character uses the harness's editor input events because native
+CDP input can update the input buffer without updating the editor model.
+Linux and Windows use native keydown and keyup events. Both paths exercise the
+editor's typing and undo machinery; neither replaces the document model.
 
 The three typing variants for the different Git configurations append 78
 characters, save, and check the entire document against the cumulative expected

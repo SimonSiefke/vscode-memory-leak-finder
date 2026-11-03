@@ -15,7 +15,7 @@ export const setup = async (context: TestContext): Promise<void> => {
 
 export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promise<void> => {
   await Editor.focus()
-  await Editor.typeCharacters(MarkdownEditing.typedText)
+  await MarkdownEditing.typeCharacters(Editor)
   await Editor.save({ viaKeyBoard: false })
   await MarkdownEditing.shouldBeClean(Workbench)
   await MarkdownEditing.shouldHaveSavedText(Workspace, baselineText + MarkdownEditing.typedText)

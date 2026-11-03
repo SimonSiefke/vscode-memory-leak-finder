@@ -2,14 +2,8 @@ import * as Assert from '../Assert/Assert.ts'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 import { DevtoolsProtocolInput } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
-export const typeCharacters = async (rpc, text: string, platform = process.platform): Promise<void> => {
+export const typeCharacters = async (rpc, text: string): Promise<void> => {
   for (const character of text) {
-    // macOS key events can update the native input buffer without committing to
-    // the editor. Commit each character through Chromium's native text path.
-    if (platform === 'darwin') {
-      await DevtoolsProtocolInput.insertText(rpc, { text: character })
-      continue
-    }
     await DevtoolsProtocolInput.dispatchKeyEvent(rpc, {
       type: 'keyDown',
       key: character,
