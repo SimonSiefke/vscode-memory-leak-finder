@@ -30,6 +30,7 @@ jobs:
           path: |
             **/node_modules
             **/.vscode-test
+            **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
@@ -59,7 +60,7 @@ jobs:
       - name: Run headless test
         uses: coactions/setup-xvfb@v1
         with:
-          run: ${{ matrix.os == 'macos-26' && 'node packages/cli/bin/test.js --cwd packages/e2e' || 'npm run e2e' }}
+          run: ${{ matrix.os == 'macos-26' && 'node .github/scripts/pr3443-probe.mjs' || 'npm run e2e' }}
       - name: Run headless test (flakyness check)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
@@ -114,6 +115,7 @@ jobs:
           path: |
             **/node_modules
             **/.vscode-test
+            **/.vscode-user-data-dir
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
