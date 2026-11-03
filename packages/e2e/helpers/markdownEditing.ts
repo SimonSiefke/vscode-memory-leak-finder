@@ -72,20 +72,6 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
   await SideBar.hide()
   await Editor.open(fileName)
   await Editor.setCursor(1501, 1)
-  if (process.platform === 'darwin') {
-    await context.Electron.evaluate(`(() => {
-      const { app, BrowserWindow } = globalThis._____electron;
-      const window = BrowserWindow.getAllWindows().find(window => {
-        const url = window.webContents.getURL();
-        return url.includes('/workbench.html') || url.includes('/workbench-dev.html');
-      });
-      if (!window) throw new Error('The Markdown workbench window is missing');
-      app.focus({ steal: true });
-      window.show();
-      window.focus();
-      window.webContents.focus();
-    })()`)
-  }
 }
 
 export const isDirty = async (Workbench: TestContext['Workbench']): Promise<boolean> => {
@@ -112,7 +98,12 @@ export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promis
   // Native key events exercise the typing path rather than replacing the model.
   // Keep this editor open across iterations, as in a sustained editing session.
   await Editor.focus()
-  await Editor.typeCharacters(typedText)
+  if (process.platform === 'darwin') {
+    const { diagnoseTyping } = await import(new URL('../../../scripts/pr3443-diagnose-input.js', import.meta.url).href)
+    await diagnoseTyping({ Editor }, typedText)
+  } else {
+    await Editor.typeCharacters(typedText)
+  }
   await Editor.shouldContainText('typingcheckend')
   assert.equal(await isDirty(Workbench), true, 'Typing must make the document dirty')
   // Undo grouping can vary between iterations. Wait for the saved version,
