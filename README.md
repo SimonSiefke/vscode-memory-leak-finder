@@ -27,6 +27,20 @@ npm run e2e:electron -- --only window-open-close --measure named-function-count3
 See [Electron e2e documentation](packages/electron-e2e/README.md) for cache behavior,
 process verification, results, and adding scenarios.
 
+## Language-server processes
+
+On Linux, `--inspect-process` can measure a Node child of the VS Code instance under test, including its JSON language server:
+
+```sh
+node packages/cli/bin/test.js --only json-hover --run-skipped-tests-anyway --inspect-process jsonServerMain --measure named-function-count3 --check-leaks --measure-after --runs 37
+```
+
+Activate the language server during scenario setup or warm-up before measurement. The harness checks process ancestry, rejects ambiguous matches, and verifies the inspector's PID before capturing its heap. It uses an existing inspector or enables the selected Node process's inspector with `SIGUSR1`. Results are written under `.vscode-memory-leak-finder-results/process/jsonServerMain/`.
+
+Use `--inspect-extensions` in a separate run to measure the extension host. That heap does not include a language server running in a separate process. The JSON scenarios also include `json-document-schema-churn`, which uses distinct document and schema URIs, checks hover and diagnostic updates, and removes the generated files after closing the editor.
+
+The JSON scenarios share a provider-dependent setup that is excluded in CI. Run them locally with `--run-skipped-tests-anyway`; this flag preserves CI exclusions. Diagnostic assertions filter to the document under test so unrelated workspace problems do not affect the result.
+
 ## Sharding
 
 Split the selected test files across parallel jobs with the Jest-compatible, one-based `--shard=<index>/<count>` option:
