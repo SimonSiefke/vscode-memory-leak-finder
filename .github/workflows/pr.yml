@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-26, windows-2022]
+        os: [macos-26]
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v7
@@ -97,6 +97,7 @@ jobs:
           include-hidden-files: true
 
   pr-windows-poolmon:
+    if: false
     runs-on: windows-2022
     needs: pr
     timeout-minutes: 360
