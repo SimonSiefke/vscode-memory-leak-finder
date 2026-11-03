@@ -14,7 +14,8 @@ Eight scenarios exercise editing in a 1,500-line Markdown document:
 Setup creates a local repository and verifies the document's Git status. It
 also checks the repository count in Source Control before opening the editor.
 Git-enabled scenarios wait for Git activation and explicitly open the fixture
-repository, including after a preceding scenario disabled Git.
+repository, including after a preceding scenario disabled Git. An explicit Git
+refresh synchronizes Source Control after the fixture's commits and file writes.
 The tracked document already differs from its committed version, so it remains
 modified throughout the test. No remote repository or network access is needed.
 
@@ -24,10 +25,14 @@ and saves. The saved document must exactly match the original working copy.
 The editor remains open across iterations; its contents do not grow with the
 run count. The check waits for the expected contents to reach disk, since the
 tab's dirty indicator can disappear before saving finishes. Teardown closes the
-document, closes the fixture's Git model, removes its `.git` directory, and then
-removes the scenario's workspace settings. This prevents later scenarios from
+document and restores the workspace settings while the fixture repository still
+exists. It then opens and closes the fixture's Git model before removing its
+`.git` directory. This prevents later scenarios from
 retaining the deleted repository or discovering the harness's parent repository.
 Each iteration focuses the editor before dispatching native typing events.
+On macOS, the fixture uses textarea input because native CDP typing updates the
+EditContext buffer without updating the editor model. Linux and Windows retain
+their default input mode.
 
 The three typing variants for the different Git configurations append 78
 characters, save, and check the entire document against the cumulative expected

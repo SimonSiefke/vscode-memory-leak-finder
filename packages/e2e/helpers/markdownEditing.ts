@@ -43,6 +43,8 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
         'editor.inlineSuggest.enabled': false,
         'editor.formatOnType': false,
         'editor.wordWrap': 'off',
+        // Native CDP typing updates EditContext's buffer without updating Monaco on macOS.
+        ...(process.platform === 'darwin' ? { 'editor.editContext': false } : {}),
       }),
     },
   ])
@@ -60,18 +62,12 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
     // A previous scenario may have disabled Git or explicitly closed this path.
     await QuickPick.waitForCommand('Git: Open Repository')
     await Git.openRepository('.')
+    // Wait for an explicit status request after the fixture's commits and writes.
+    await QuickPick.executeCommand('Git: Refresh')
   }
   // Confirm the Git-enabled case actually has a repository in the workbench.
   await SourceControl.show()
   await SourceControl.shouldHaveRepositoryCount(gitEnabled ? 1 : 0)
-  if (process.platform === 'darwin') {
-    console.log(
-      '[DEBUG-pr3443] scm',
-      await context.Workbench.evaluate({
-        expression: `JSON.stringify(Array.from(document.querySelectorAll('.sidebar [role="treeitem"], .sidebar .scm-provider')).map(node => ({ label: node.getAttribute('aria-label'), expanded: node.getAttribute('aria-expanded'), text: node.textContent?.slice(0, 200) })).slice(0, 20))`,
-      }),
-    )
-  }
   if (gitEnabled) await SourceControl.shouldHaveUnstagedFile(fileName)
   await SideBar.hide()
   await Editor.open(fileName)
@@ -103,14 +99,6 @@ export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promis
   // Keep this editor open across iterations, as in a sustained editing session.
   await Editor.focus()
   await Editor.typeCharacters(typedText)
-  if (process.platform === 'darwin') {
-    console.log(
-      '[DEBUG-pr3443] typing',
-      await Workbench.evaluate({
-        expression: `JSON.stringify({ focused: document.hasFocus(), active: document.activeElement?.outerHTML.slice(0, 300), text: (document.activeElement?.editContext?.text ?? document.activeElement?.value)?.slice(-120), views: Array.from(document.querySelectorAll('.monaco-editor')).map(node => node.className) })`,
-      }),
-    )
-  }
   await Editor.shouldContainText('typingcheckend')
   assert.equal(await isDirty(Workbench), true, 'Typing must make the document dirty')
   // Undo grouping can vary between iterations. Wait for the saved version,
@@ -143,14 +131,14 @@ export const teardown = async ({ Editor, Git, QuickPick, SourceControl, Workspac
     await QuickPick.executeCommand('View: Revert and Close Editor')
   } finally {
     await Editor.closeAll()
-    const settings = await Workspace.readWorkspaceSettings()
-    if (settings['git.enabled'] !== false) {
-      await Git.closeRepository()
-      await SourceControl.shouldHaveRepositoryCount(0)
-    }
-    // Close Git's model before deleting its repository; otherwise later Git
-    // commands in this directory can discover the harness's parent repository.
-    await Workspace.remove('.git')
+    // Restore Git while this is still a valid repository, so reactivation cannot
+    // discover the harness's parent repository. Close its model before deletion.
     await Workspace.remove('.vscode/settings.json')
+    await QuickPick.waitForCommand('Git: Open Repository')
+    await Git.openRepository('.')
+    await SourceControl.shouldHaveRepositoryCount(1)
+    await Git.closeRepository()
+    await SourceControl.shouldHaveRepositoryCount(0)
+    await Workspace.remove('.git')
   }
 }
