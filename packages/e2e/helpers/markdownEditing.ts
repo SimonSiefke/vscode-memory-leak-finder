@@ -43,8 +43,6 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
         'editor.inlineSuggest.enabled': false,
         'editor.formatOnType': false,
         'editor.wordWrap': 'off',
-        // Native CDP typing updates EditContext's buffer without updating Monaco on macOS.
-        ...(process.platform === 'darwin' ? { 'editor.editContext': false } : {}),
       }),
     },
   ])

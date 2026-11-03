@@ -30,9 +30,9 @@ exists. It then opens and closes the fixture's Git model before removing its
 `.git` directory. This prevents later scenarios from
 retaining the deleted repository or discovering the harness's parent repository.
 Each iteration focuses the editor before dispatching native typing events.
-On macOS, the fixture uses textarea input because native CDP typing updates the
-EditContext buffer without updating the editor model. Linux and Windows retain
-their default input mode.
+On macOS, each character is committed through native CDP text input because
+keyboard events can update the input buffer without updating the editor model.
+Linux and Windows retain native keydown and keyup events.
 
 The three typing variants for the different Git configurations append 78
 characters, save, and check the entire document against the cumulative expected
