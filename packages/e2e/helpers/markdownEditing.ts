@@ -27,7 +27,7 @@ const git = async ({ Workspace }: TestContext, args: string[]): Promise<string> 
 
 export const setup = async (context: TestContext, { tracked, gitEnabled }: Options): Promise<void> => {
   const { Editor, Git, QuickPick, SideBar, SourceControl, Workspace } = context
-  await Editor.closeAll()
+  await Editor.closeAllEditorGroups()
   await Workspace.setFiles([
     { name: '.gitignore', content: '.vscode/\n' },
     {

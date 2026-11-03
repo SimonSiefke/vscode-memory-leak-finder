@@ -11,7 +11,7 @@ Eight scenarios exercise editing in a 1,500-line Markdown document:
 - `markdown-undo-redo-git-tracked`: undo and redo an existing insertion repeatedly.
 - `markdown-typing-delete-git-tracked`: type, save, delete, and save without undo.
 
-Setup creates a local repository and verifies the document's Git status. It
+Setup clears the editor groups, creates a local repository, and verifies the document's Git status. It
 also checks the repository count in Source Control before opening the editor.
 Git-enabled scenarios wait for Git activation and explicitly open the fixture
 repository, including after a preceding scenario disabled Git. An explicit Git
