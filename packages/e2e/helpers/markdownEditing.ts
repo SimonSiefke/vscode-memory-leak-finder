@@ -15,10 +15,39 @@ const committedText =
 const baselineText = committedText.replace('## Section 1\n', '## Section 1 (working copy)\n')
 export const typedText = 'jkl '.repeat(16) + 'typingcheckend'
 
-export const typeCharacters = async (Editor: TestContext['Editor']): Promise<void> => {
-  if (process.platform === 'darwin') {
-    // CDP's native input updates the macOS input buffer without updating Monaco.
-    for (const character of typedText) await Editor.type(character)
+export const typeCharacters = async (
+  Editor: TestContext['Editor'],
+  Workbench: TestContext['Workbench'],
+  platform = process.platform,
+): Promise<void> => {
+  if (platform === 'darwin') {
+    // Send input at the actual selection; the generic input helper inserts at
+    // the beginning of an EditContext buffer instead of advancing its selection.
+    for (const character of typedText) {
+      await Workbench.evaluate({
+        expression: `(() => {
+          const input = document.activeElement;
+          const text = ${JSON.stringify(character)};
+          if (input?.editContext) {
+            const context = input.editContext;
+            const start = context.selectionStart;
+            const end = context.selectionEnd;
+            const position = start + text.length;
+            context.updateText(start, end, text);
+            context.updateSelection(position, position);
+            context.dispatchEvent(new TextUpdateEvent('textupdate', {
+              updateRangeStart: start, updateRangeEnd: end, text,
+              selectionStart: position, selectionEnd: position
+            }));
+          } else if (input instanceof HTMLTextAreaElement) {
+            input.setRangeText(text, input.selectionStart, input.selectionEnd, 'end');
+            input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
+          } else {
+            throw new Error('Markdown editor input is not focused');
+          }
+        })()`,
+      })
+    }
   } else {
     await Editor.typeCharacters(typedText)
   }
@@ -108,7 +137,7 @@ export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promis
   // Per-character input exercises the typing path rather than replacing the model.
   // Keep this editor open across iterations, as in a sustained editing session.
   await Editor.focus()
-  await typeCharacters(Editor)
+  await typeCharacters(Editor, Workbench)
   await Editor.shouldContainText('typingcheckend')
   assert.equal(await isDirty(Workbench), true, 'Typing must make the document dirty')
   // Undo grouping can vary between iterations. Wait for the saved version,
