@@ -8,6 +8,7 @@ import * as childProcess from 'node:child_process'
 
 const events: string[] = []
 let child: any
+let holdSupervisor = false
 const spawn = jest.fn<typeof childProcess.spawn>(() => {
   events.push('spawn')
   child = Object.assign(new EventEmitter(), {
@@ -36,6 +37,10 @@ const perf = {
   }),
   stop: jest.fn(async () => {
     events.push('stop')
+    if (holdSupervisor) {
+      child.exitCode = 0
+      child.emit('close', 0)
+    }
     return [{ name: 'instructions', value: 100, unit: 'count', coverage: 'Electron process tree' }]
   }),
   dispose: jest.fn(async () => {}),
@@ -48,8 +53,10 @@ jest.unstable_mockModule('../src/parts/Shared/Shared.ts', () => ({
   evaluate: async (_session: unknown, expression: string) => {
     if (expression.includes('electron.app.quit()')) {
       events.push('quit')
-      child.exitCode = 0
-      child.emit('close', 0)
+      if (!holdSupervisor) {
+        child.exitCode = 0
+        child.emit('close', 0)
+      }
     }
   },
   electronExpression: (value: string) => value,
@@ -99,6 +106,7 @@ afterEach(async () => {
   jest.clearAllMocks()
   events.length = 0
   resourceRoots.length = 0
+  holdSupervisor = false
   await Promise.all(directories.splice(0).map((p) => rm(p, { recursive: true, force: true })))
 })
 
@@ -170,6 +178,41 @@ test('a perf supervisor exiting early cannot leave its sample-owned process grou
       0,
     )
     expect(kill).toHaveBeenCalledWith(-1_000_000_000, 'SIGKILL')
+  } finally {
+    kill.mockRestore()
+  }
+})
+
+test('application cleanup preserves a running perf supervisor until counters have been written', async () => {
+  holdSupervisor = true
+  const kill = jest.spyOn(process, 'kill').mockImplementation(() => true)
+  const directory = await mkdtemp(join(tmpdir(), 'interaction-flush-'))
+  directories.push(directory)
+  await mkdir(join(directory, 'resources/app'), { recursive: true })
+  await writeFile(join(directory, 'resources/app/package.json'), JSON.stringify({ version: '1.145.0' }))
+  try {
+    const sample = await measureSample(
+      {
+        benchmark: {
+          id: 'open-small-instructions',
+          scenario: 'open-small',
+          collector: 'instructions',
+          startup: false,
+          cache: 'action',
+          diagnostic: false,
+        },
+        samples: 1,
+        output: join(directory, 'output'),
+        commits: { before: 'a'.repeat(40), after: 'b'.repeat(40) },
+        paths: { before: join(directory, 'code-oss'), after: join(directory, 'code-oss') },
+        facilities: { hardware: { available: true } },
+      },
+      0,
+      'before',
+      0,
+    )
+    expect(sample.status).toBe('success')
+    expect(kill).not.toHaveBeenCalledWith(-1_000_000_000, 'SIGKILL')
   } finally {
     kill.mockRestore()
   }

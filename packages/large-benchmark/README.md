@@ -288,7 +288,10 @@ initially disabled. They enable after scenario setup and freeze when `run()` end
 so short-lived setup processes cannot invalidate a later PID attachment. Scenario
 teardown and application shutdown remain outside collection. The benchmark profile
 inherits the ordinary E2E UI defaults (including custom title bars and editor preview
-behavior), with the documented deterministic benchmark settings layered over them. Hardware and software
+behavior), with the documented deterministic benchmark settings layered over them.
+Interaction setup waits for the Explorer to observe a filesystem update after an
+initial snapshot, then removes both readiness files before the scenario starts.
+This prevents fresh-window watcher startup from losing early fixture changes. Hardware and software
 counter support is probed once per measurement job. Unsupported collectors stay
 unavailable; software-counter failures can still retain partial PSS evidence.
 

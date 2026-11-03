@@ -231,6 +231,7 @@ const launch = async (
     if (child.exitCode === null && child.signalCode === null)
       await Promise.race([new Promise<void>((resolve) => child.once('close', () => resolve())), delay(3000)])
     for (const entry of pids.reverse()) {
+      if (perf && entry.pid === child.pid) continue
       try {
         const stat = await readFile(`/proc/${entry.pid}/stat`, 'utf8')
         const fields = stat
@@ -242,7 +243,7 @@ const launch = async (
       } catch {}
     }
     // The perf supervisor may have exited while its Electron descendants still own this process group.
-    if (child.pid) {
+    if (child.pid && (!perf || child.exitCode !== null || child.signalCode !== null || child.killed)) {
       try {
         process.kill(-child.pid, 'SIGKILL')
       } catch {}
