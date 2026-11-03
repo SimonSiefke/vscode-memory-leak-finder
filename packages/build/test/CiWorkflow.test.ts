@@ -73,6 +73,30 @@ test('ci measures total array length and downloads the results for Pages charts'
           name: vscode-memory-leak-finder-results-linux-array-element-count`)
 })
 
+test.each(['string-object-count', 'string-object-bytes'])(
+  'ci collects %s for 37 runs and includes its artifact in Pages charts',
+  async (measure) => {
+    const workflow = await readFile(getWorkflowPath(), 'utf8')
+    expect(workflow).toContain(`          - name: ${measure}
+            args: --measure ${measure} --runs 37 --run-skipped-tests-anyway`)
+    expect(workflow).not.toContain(`--measure ${measure} --runs 37 --restart-between`)
+    const download = `      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-${measure}
+          path: ./vscode-memory-leak-finder-results-linux-${measure}`
+    const cleanup = `      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-${measure}`
+    expect(workflow).toContain(download)
+    expect(workflow).toContain(cleanup)
+    expect(workflow.indexOf(download)).toBeLessThan(workflow.indexOf('      - name: Merge all measure results'))
+    expect(workflow.indexOf(cleanup)).toBeGreaterThan(workflow.indexOf('      - name: Upload merged artifact'))
+  },
+)
+
 test('Windows handles runs separately from ci and pr so cancellation cannot affect their results', async () => {
   for (const workflowName of ['ci.yml', 'pr.yml']) {
     const workflow = await readFile(getWorkflowPath(workflowName), 'utf8')

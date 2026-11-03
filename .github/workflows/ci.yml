@@ -270,6 +270,10 @@ jobs:
             args: --measure symbol-count
           - name: object-count
             args: --measure object-count
+          - name: string-object-count
+            args: --measure string-object-count --runs 37 --run-skipped-tests-anyway
+          - name: string-object-bytes
+            args: --measure string-object-bytes --runs 37 --run-skipped-tests-anyway
           - name: disposable-count
             args: --measure disposable-count
           - name: worker-count
@@ -644,6 +648,16 @@ jobs:
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-string-object-count
+          path: ./vscode-memory-leak-finder-results-linux-string-object-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-string-object-bytes
+          path: ./vscode-memory-leak-finder-results-linux-string-object-bytes
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
           path: ./vscode-memory-leak-finder-results-linux-disposable-count
       - uses: actions/download-artifact@v8
@@ -910,6 +924,16 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-object-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-string-object-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-string-object-bytes
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true

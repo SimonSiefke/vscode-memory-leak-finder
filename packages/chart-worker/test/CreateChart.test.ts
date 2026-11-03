@@ -44,6 +44,19 @@ test('bar chart highlights missing rows with full-width non-overlapping row boxe
   expect(result).toContain('height="45"')
 })
 
+test('default line charts allow enough left margin for large byte totals', async () => {
+  const result = await createChart(
+    [
+      { index: 0, count: 24_000_000 },
+      { index: 1, count: 36_000_000 },
+    ],
+    { marginLeft: 90, x: 'index', xLabel: 'Test Case Index', y: 'count', yLabel: 'String Object Size (bytes)' },
+  )
+  expect(result).toContain('aria-label="line"')
+  expect(result).toContain('30,000,000')
+  expect(result).toContain('translate(90,')
+})
+
 test('memory comparison chart renders growth, shrinkage, byte formatting, inspected rows, and omissions', async () => {
   const result = await createChart(
     [
