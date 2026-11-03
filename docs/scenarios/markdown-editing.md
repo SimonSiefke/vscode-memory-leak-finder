@@ -30,6 +30,8 @@ exists. It then opens and closes the fixture's Git model before removing its
 `.git` directory. This prevents later scenarios from
 retaining the deleted repository or discovering the harness's parent repository.
 Each iteration focuses the editor before dispatching native typing events.
+CI starts with a fresh VS Code user-data profile; mutable editor and workspace
+state is excluded from the dependency cache.
 
 The three typing variants for the different Git configurations append 78
 characters, save, and check the entire document against the cumulative expected
