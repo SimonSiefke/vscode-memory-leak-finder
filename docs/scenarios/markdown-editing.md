@@ -30,9 +30,9 @@ exists. It then opens and closes the fixture's Git model before removing its
 `.git` directory. This prevents later scenarios from
 retaining the deleted repository or discovering the harness's parent repository.
 Each iteration focuses the editor before dispatching native typing events.
-The Debug Console page object releases input focus before hiding its panel;
-otherwise a hidden console can retain native editor focus on macOS and receive
-these typing commands instead of the document.
+On macOS the Debug Console page object sends a native input blur notification
+before hiding its panel. Otherwise a detached console input can retain editor
+focus and receive these typing commands instead of the document.
 
 The three typing variants for the different Git configurations append 78
 characters, save, and check the entire document against the cumulative expected
