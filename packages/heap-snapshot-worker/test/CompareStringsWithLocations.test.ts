@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { execFileSync } from 'node:child_process'
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -8,7 +8,8 @@ import { commandMap } from '../src/parts/CommandMap/CommandMap.ts'
 import { compareStringsWithLocations } from '../src/parts/CompareStringsWithLocations/CompareStringsWithLocations.ts'
 
 test('attributes actual V8 output strings to a retaining closure and observes release', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'strings-with-locations-'))
+  // The inspector reports canonical script URLs, including macOS /private/var paths.
+  const directory = await realpath(await mkdtemp(join(tmpdir(), 'strings-with-locations-')))
   const fixture = join(directory, 'fixture.mjs')
   const paths = ['before', 'after', 'released'].map((name) => join(directory, `${name}.heapsnapshot`))
   try {
