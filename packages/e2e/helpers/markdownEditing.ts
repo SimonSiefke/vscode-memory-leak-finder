@@ -62,13 +62,16 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
     // A previous scenario may have disabled Git or explicitly closed this path.
     await QuickPick.waitForCommand('Git: Open Repository')
     await Git.openRepository('.')
-    // Wait for an explicit status request after the fixture's commits and writes.
-    await QuickPick.executeCommand('Git: Refresh')
   }
   // Confirm the Git-enabled case actually has a repository in the workbench.
   await SourceControl.show()
   await SourceControl.shouldHaveRepositoryCount(gitEnabled ? 1 : 0)
-  if (gitEnabled) await SourceControl.shouldHaveUnstagedFile(fileName)
+  if (gitEnabled) {
+    // Opening the repository returns before Git updates its command contexts.
+    await QuickPick.waitForCommand('Git: Refresh')
+    await QuickPick.executeCommand('Git: Refresh')
+    await SourceControl.shouldHaveUnstagedFile(fileName)
+  }
   await SideBar.hide()
   await Editor.open(fileName)
   await Editor.setCursor(1501, 1)
