@@ -178,6 +178,10 @@ Sums the snapshot `self_size` bytes of the same string nodes, including node ove
 
 Both string object measures support browser, Node, and worker targets, return numeric `before` and `after` values, and flag positive growth as a suspected leak. Measure the process holding the strings. Generated charts show the baseline in black and growth in red, with count or byte labels.
 
+The main `index.html` also includes line charts of the absolute after-test totals versus test case index, matching the object-count overview. These are `.vscode-charts/string-object-count.svg` and `.vscode-charts/string-object-bytes.svg`; per-test bars remain in the corresponding subfolders.
+
+Linux CI runs each measure with `--runs 37 --run-skipped-tests-anyway`, keeps the application running between test cases, and merges both artifacts into the published chart site.
+
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure string-object-bytes --only base
 npm run build-charts
