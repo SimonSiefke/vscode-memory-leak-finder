@@ -1,0 +1,7 @@
+import * as MarkdownEditing from '../helpers/markdownEditing.ts'
+import type { TestContext } from '../types.ts'
+
+export const setup = (context: TestContext): Promise<void> => MarkdownEditing.setup(context, { tracked: true, gitEnabled: false })
+
+export const run = MarkdownEditing.run
+export const teardown = MarkdownEditing.teardown

@@ -98,6 +98,13 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       try {
         const repl = page.locator('.repl')
         await expect(repl).toBeVisible()
+        if (platform === 'darwin') {
+          // A native input can miss blur when the panel detaches it. Its cached
+          // focus would then receive later typing intended for the document.
+          await page.evaluateInMainWorld({
+            expression: `document.querySelector('.repl-input-wrapper .native-edit-context')?.dispatchEvent(new FocusEvent('blur'))`,
+          })
+        }
         const panel = Panel.create({ electronApp, expect, ideVersion, page, platform, VError })
         await panel.hide()
         await expect(repl).toBeHidden()
