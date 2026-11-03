@@ -15,44 +15,6 @@ const committedText =
 const baselineText = committedText.replace('## Section 1\n', '## Section 1 (working copy)\n')
 export const typedText = 'jkl '.repeat(16) + 'typingcheckend'
 
-export const typeCharacters = async (
-  Editor: TestContext['Editor'],
-  Workbench: TestContext['Workbench'],
-  platform = process.platform,
-): Promise<void> => {
-  if (platform === 'darwin') {
-    // Send input at the actual selection; the generic input helper inserts at
-    // the beginning of an EditContext buffer instead of advancing its selection.
-    for (const character of typedText) {
-      await Workbench.evaluate({
-        expression: `(() => {
-          const input = document.activeElement;
-          const text = ${JSON.stringify(character)};
-          if (input?.editContext) {
-            const context = input.editContext;
-            const start = context.selectionStart;
-            const end = context.selectionEnd;
-            const position = start + text.length;
-            context.updateText(start, end, text);
-            context.updateSelection(position, position);
-            context.dispatchEvent(new TextUpdateEvent('textupdate', {
-              updateRangeStart: start, updateRangeEnd: end, text,
-              selectionStart: position, selectionEnd: position
-            }));
-          } else if (input instanceof HTMLTextAreaElement) {
-            input.setRangeText(text, input.selectionStart, input.selectionEnd, 'end');
-            input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
-          } else {
-            throw new Error('Markdown editor input is not focused');
-          }
-        })()`,
-      })
-    }
-  } else {
-    await Editor.typeCharacters(typedText)
-  }
-}
-
 interface Options {
   readonly tracked: boolean
   readonly gitEnabled: boolean
@@ -103,7 +65,6 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
   await SourceControl.show()
   await SourceControl.shouldHaveRepositoryCount(gitEnabled ? 1 : 0)
   if (gitEnabled) {
-    // Opening the repository returns before Git updates its command contexts.
     await QuickPick.waitForCommand('Git: Refresh')
     await QuickPick.executeCommand('Git: Refresh')
     await SourceControl.shouldHaveUnstagedFile(fileName)
@@ -134,10 +95,10 @@ export const shouldBeClean = async (Workbench: TestContext['Workbench']): Promis
 }
 
 export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promise<void> => {
-  // Per-character input exercises the typing path rather than replacing the model.
+  // Native key events exercise the typing path rather than replacing the model.
   // Keep this editor open across iterations, as in a sustained editing session.
   await Editor.focus()
-  await typeCharacters(Editor, Workbench)
+  await Editor.typeCharacters(typedText)
   await Editor.shouldContainText('typingcheckend')
   assert.equal(await isDirty(Workbench), true, 'Typing must make the document dirty')
   // Undo grouping can vary between iterations. Wait for the saved version,
@@ -170,8 +131,8 @@ export const teardown = async ({ Editor, Git, QuickPick, SourceControl, Workspac
     await QuickPick.executeCommand('View: Revert and Close Editor')
   } finally {
     await Editor.closeAll()
-    // Restore Git while this is still a valid repository, so reactivation cannot
-    // discover the harness's parent repository. Close its model before deletion.
+    // Restore Git while the fixture is still a valid repository, then close its
+    // model before deletion so it cannot discover the harness's parent checkout.
     await Workspace.remove('.vscode/settings.json')
     await QuickPick.waitForCommand('Git: Open Repository')
     await Git.openRepository('.')

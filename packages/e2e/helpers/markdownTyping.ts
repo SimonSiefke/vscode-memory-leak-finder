@@ -10,10 +10,10 @@ export const setup = async (context: TestContext, options: Parameters<typeof Mar
   expectedText = await readFile(join(context.Workspace.getWorkspacePath(), 'editing.md'), 'utf8')
 }
 
-export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   // Preserve all previous edits, including the undo history, across iterations.
   await Editor.focus()
-  await MarkdownEditing.typeCharacters(Editor, Workbench)
+  await Editor.typeCharacters(MarkdownEditing.typedText)
   expectedText += MarkdownEditing.typedText
   await Editor.save({ viaKeyBoard: false })
   await MarkdownEditing.shouldHaveSavedText(Workspace, expectedText)
