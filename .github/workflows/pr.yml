@@ -60,7 +60,7 @@ jobs:
       - name: Run headless test
         uses: coactions/setup-xvfb@v1
         with:
-          run: ${{ matrix.os == 'macos-26' && 'node .github/scripts/pr3443-probe.mjs' || 'npm run e2e' }}
+          run: npm run e2e
       - name: Run headless test (flakyness check)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1

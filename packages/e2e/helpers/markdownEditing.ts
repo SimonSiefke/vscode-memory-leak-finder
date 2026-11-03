@@ -72,6 +72,17 @@ export const setup = async (context: TestContext, { tracked, gitEnabled }: Optio
   await SideBar.hide()
   await Editor.open(fileName)
   await Editor.setCursor(1501, 1)
+  if (process.platform === 'darwin') {
+    await context.Electron.evaluate(`(() => {
+      const { app, BrowserWindow } = globalThis._____electron;
+      const window = BrowserWindow.getAllWindows().find(window => /\/workbench(?:-dev)?\\.html(?:[?#]|$)/.test(window.webContents.getURL()));
+      if (!window) throw new Error('The Markdown workbench window is missing');
+      app.focus({ steal: true });
+      window.show();
+      window.focus();
+      window.webContents.focus();
+    })()`)
+  }
 }
 
 export const isDirty = async (Workbench: TestContext['Workbench']): Promise<boolean> => {
