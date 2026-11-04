@@ -6,7 +6,11 @@ import { getGroupKey, getStringPattern, type LocatedString } from '../GetStringG
 import { getStackLabels } from '../GetStackLabels/GetStackLabels.ts'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
-const excludedStringValues = new Set(['NaN', '0', '4294967040', 'Infinity', '-Infinity'])
+const excludedStringValues = new Set(['NaN', '0', '4294967040', 'Infinity', '-Infinity', 'BigInt', 'Circular', '[Circular]'])
+const excludedStringFragments = ['Renderer reported VERY LONG TASK', 'perf] SLOW task detected']
+
+const isExcludedString = (value: string): boolean =>
+  excludedStringValues.has(value) || value.startsWith('[BigInt ') || excludedStringFragments.some((fragment) => value.includes(fragment))
 
 export const getStringsWithLocationsData = async (basePath: string) => {
   const directory = join(basePath, 'strings-with-locations')
@@ -18,7 +22,7 @@ export const getStringsWithLocationsData = async (basePath: string) => {
     let omittedEntryCount = 0
     const grouped = new Map<string, { group: LocatedString; count: number; strings: Set<string>; stackStringCount: number }>()
     for (const group of groups.flatMap(expandStringStackGroups)) {
-      if (!group.stack && group.string !== null && excludedStringValues.has(group.string)) {
+      if (!group.stack && group.string !== null && isExcludedString(group.string)) {
         omittedEntryCount++
         continue
       }
@@ -74,7 +78,7 @@ export const getStringsWithLocationsData = async (basePath: string) => {
       data,
       filename: filename.replace(/\.json$/, ''),
       omittedEntryCount,
-      ...(!data.length && omittedEntryCount ? { status: 'Only excluded numeric strings grew; omitted from chart.' } : {}),
+      ...(!data.length && omittedEntryCount ? { status: 'Only excluded strings grew; omitted from chart.' } : {}),
     })
   }
   return result

@@ -224,7 +224,47 @@ test('omits exact numeric noise while preserving other numeric strings and stack
   }
 })
 
-test('explains a capture containing only omitted numeric noise', async () => {
+test('omits serialization markers and variable diagnostic messages while preserving stack components', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'strings-with-locations-diagnostics-'))
+  const excluded = [
+    'BigInt',
+    '[BigInt ',
+    '[BigInt 42]',
+    'Circular',
+    '[Circular]',
+    'Renderer reported VERY LONG TASK',
+    '[perf] Renderer reported VERY LONG TASK (123ms)',
+    'perf] SLOW task detected',
+    '[perf] SLOW task detected (42ms)',
+  ]
+  const retained = ['BigInteger', 'Circular reference', 'Renderer reported LONG TASK', '[perf] SLOW operation']
+  const stack = 'Error\n    at owner (file:///owner.js:1:1)'
+  try {
+    await mkdir(join(directory, 'strings-with-locations'))
+    await writeFile(
+      join(directory, 'strings-with-locations', 'output.json'),
+      JSON.stringify({
+        stringsWithLocations: [
+          ...excluded.map((string) => ({ string, location: 'src/owner.ts:1:1', count: 2 })),
+          ...retained.map((string) => ({ string, location: null, count: 1 })),
+          { string: '[Circular]', location: null, count: 3, stackCounts: [{ stack, count: 2 }] },
+        ],
+      }),
+    )
+    const [{ data, omittedEntryCount }] = await Chart.getData(directory)
+    expect(omittedEntryCount).toBe(10)
+    expect(data).toHaveLength(5)
+    expect(data.reduce((sum, item) => sum + item.count, 0)).toBe(6)
+    for (const value of retained) expect(data.some((item) => item.label.startsWith(`${JSON.stringify(value)} at `))).toBe(true)
+    expect(data.find((item) => item.name.startsWith('Stack: '))?.title).toContain(
+      '0 complete stack string objects; 2 component string objects',
+    )
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
+})
+
+test('explains a capture containing only omitted strings', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'strings-with-locations-only-noise-'))
   try {
     await mkdir(join(directory, 'strings-with-locations'))
@@ -237,13 +277,17 @@ test('explains a capture containing only omitted numeric noise', async () => {
           { string: '4294967040', location: null, count: 1 },
           { string: 'Infinity', location: null, count: 1 },
           { string: '-Infinity', location: null, count: 1 },
+          { string: '[BigInt ', location: null, count: 1 },
+          { string: '[Circular]', location: null, count: 1 },
+          { string: '[perf] Renderer reported VERY LONG TASK (', location: null, count: 1 },
+          { string: '[perf] SLOW task detected (', location: null, count: 1 },
         ],
       }),
     )
     const [result] = await Chart.getData(directory)
     expect(result.data).toEqual([])
-    expect(result.omittedEntryCount).toBe(5)
-    expect(result.status).toBe('Only excluded numeric strings grew; omitted from chart.')
+    expect(result.omittedEntryCount).toBe(9)
+    expect(result.status).toBe('Only excluded strings grew; omitted from chart.')
   } finally {
     await rm(directory, { recursive: true, force: true })
   }
