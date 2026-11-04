@@ -58,14 +58,14 @@ test('maps before grouping so different generated positions at one original loca
     beforeCount: 3,
     afterCount: 9,
   })
-  expect(resolveTrackedLocationSourceMaps).toHaveBeenLastCalledWith(['file:///bundle.js:3:8', 'file:///bundle.js:4:2'], scripts)
+  expect(resolveTrackedLocationSourceMaps).toHaveBeenLastCalledWith(['file:///bundle.js:3:8', 'file:///bundle.js:4:2'], scripts, false)
 })
 
 test('resolves each capture using its own script map', async () => {
   const afterScripts = { '8': { url: 'file:///bundle.js', sourceMapUrl: 'different.map' } }
   await resolveStringsWithLocations([row('same', 1)], [row('same', 2)], scripts, afterScripts)
-  expect(resolveTrackedLocationSourceMaps).toHaveBeenNthCalledWith(1, ['file:///bundle.js:2:5'], scripts)
-  expect(resolveTrackedLocationSourceMaps).toHaveBeenNthCalledWith(2, ['file:///bundle.js:2:5'], afterScripts)
+  expect(resolveTrackedLocationSourceMaps).toHaveBeenNthCalledWith(1, ['file:///bundle.js:2:5'], scripts, false)
+  expect(resolveTrackedLocationSourceMaps).toHaveBeenNthCalledWith(2, ['file:///bundle.js:2:5'], afterScripts, false)
 })
 
 test('retains generated locations when source maps fail or have incomplete positions', async () => {

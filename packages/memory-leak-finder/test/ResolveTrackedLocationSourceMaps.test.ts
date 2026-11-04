@@ -49,3 +49,22 @@ test('resolves tracked runtime locations against vscode-file script urls', async
     originalSource: 'src/vs/workbench/services/editor/common/editorService.ts',
   })
 })
+
+test('can resolve source locations without constructor name analysis', async () => {
+  const sourceMapUrl = 'file:///bundle.js.map'
+  mockGetCleanPositionsMap.mockResolvedValue({
+    [sourceMapUrl]: [{ column: 6, line: 42, name: '', source: 'src/owner.ts' }],
+  })
+  const { resolveTrackedLocationSourceMaps } =
+    await import('../src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts')
+  const result = await resolveTrackedLocationSourceMaps(['7:2:5'], { '7': { url: 'file:///bundle.js', sourceMapUrl } }, false)
+
+  expect(mockGetCleanPositionsMap).toHaveBeenCalledWith({ [sourceMapUrl]: [1, 4] }, false, false)
+  expect(result['7:2:5']).toEqual({
+    originalColumn: 6,
+    originalLine: 42,
+    originalLocation: 'src/owner.ts:42:6',
+    originalName: '',
+    originalSource: 'src/owner.ts',
+  })
+})
