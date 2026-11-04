@@ -108,3 +108,15 @@ test('returns no leaks for unchanged or shrinking groups, with deterministic tie
   const b = row('b', 1)
   expect(await resolveStringsWithLocations([], [a, b], {}, {})).toEqual(await resolveStringsWithLocations([], [b, a], {}, {}))
 })
+
+test('preserves stack-frame provenance through source mapping and keeps it separate from retaining locations', async () => {
+  resolveTrackedLocationSourceMaps.mockResolvedValue({
+    'file:///bundle.js:2:5': { originalSource: 'src/owner.ts', originalLine: 42, originalColumn: 6 },
+  })
+  const stack = { ...row('Error stack', 3), locationKind: 'stack-frame' as const }
+  const result = await resolveStringsWithLocations([], [stack, row('Error stack', 2)], scripts, scripts)
+  expect(result).toHaveLength(2)
+  expect(result[0]).toMatchObject({ location: 'src/owner.ts:42:7', locationKind: 'stack-frame', count: 3 })
+  expect(result[1]).toMatchObject({ location: 'src/owner.ts:42:7', count: 2 })
+  expect(result[1].locationKind).toBeUndefined()
+})

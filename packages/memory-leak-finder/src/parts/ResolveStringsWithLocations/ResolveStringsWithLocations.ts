@@ -5,6 +5,7 @@ interface StringLocationGroup {
   readonly string: string | null
   readonly sourceLocation: string | null
   readonly count: number
+  readonly locationKind?: 'stack-frame'
   readonly heapObjectId?: string
   readonly stringType?: string
 }
@@ -49,7 +50,8 @@ const resolveGroups = async (groups: readonly StringLocationGroup[], scriptMap: 
   })
 }
 
-const groupKey = (group: LocatedString) => JSON.stringify([group.string, group.location, group.heapObjectId ?? null])
+const groupKey = (group: LocatedString) =>
+  JSON.stringify([group.string, group.location, group.heapObjectId ?? null, group.locationKind ?? null])
 
 const aggregate = (groups: readonly LocatedString[]) => {
   const result = new Map<string, LocatedString>()

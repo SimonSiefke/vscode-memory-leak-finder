@@ -217,3 +217,65 @@ test('keeps an over-limit reconstructed rope explicit instead of grouping a trun
     stringType: 'concatenated string',
   })
 })
+
+test('attributes console-retained stack strings and rope fragments to an explicitly marked stack frame', () => {
+  const snapshot = createSnapshot([
+    { type: 'synthetic', edges: [{ target: 1 }] },
+    {
+      type: 'concatenated string',
+      edges: [
+        { target: 2, type: 'internal', name: 'first' },
+        { target: 3, type: 'internal', name: 'second' },
+      ],
+    },
+    { type: 'string', value: 'Error: leaked disposable\n    at trackDisposable (file:///owner.js:20:5)' },
+    { type: 'string', value: '\n    at handler (file:///other.js:30:7)' },
+  ])
+  const groups = getStringsWithLocations(snapshot, scripts)
+  expect(groups).toHaveLength(3)
+  expect(
+    groups.every(
+      (group) => group.sourceLocation === 'file:///owner.js:20:5' && 'locationKind' in group && group.locationKind === 'stack-frame',
+    ),
+  ).toBe(true)
+})
+
+test('prefers actual retaining locations over locations embedded in stack text', () => {
+  const snapshot = createSnapshot([
+    { type: 'synthetic', edges: [{ target: 1 }] },
+    { type: 'closure', location: [7, 0, 0], edges: [{ target: 2 }] },
+    { type: 'string', value: 'Error\n    at handler (file:///other.js:30:7)' },
+  ])
+  expect(getStringsWithLocations(snapshot, scripts)).toEqual([
+    { string: 'Error\n    at handler (file:///other.js:30:7)', sourceLocation: 'file:///owner.js:1:1', count: 1 },
+  ])
+})
+
+test.each([
+  ['[LEAKED DISPOSABLE] Error: CREATED via:', '\n', 'vscode-file://vscode-app/out/owner.js:16:19'],
+  ['TypeError: failed', '\\n', 'https://example.com/owner.js:42:3'],
+  ['Error', '\n', 'node:internal/example:12:4'],
+  ['Error', '\n', 'C:\\project\\owner.js:12:4'],
+])('extracts a fallback from %s with separator %j and source %s', (header, separator, location) => {
+  const string = `${header}${separator}    at trackDisposable (${location})`
+  const groups = getStringsWithLocations(
+    createSnapshot([
+      { type: 'synthetic', edges: [{ target: 1 }] },
+      { type: 'string', value: string },
+    ]),
+    {},
+  )
+  expect(groups).toEqual([{ string, sourceLocation: location, locationKind: 'stack-frame', count: 1 }])
+})
+
+test('does not infer locations from detached frames or ordinary URL text', () => {
+  const groups = getStringsWithLocations(
+    createSnapshot([
+      { type: 'synthetic', edges: [{ target: 1 }, { target: 2 }] },
+      { type: 'string', value: '\n    at trackDisposable (file:///owner.js:20:5)' },
+      { type: 'string', value: 'A link: file:///owner.js:20:5' },
+    ]),
+    {},
+  )
+  expect(groups.every((group) => group.sourceLocation === null)).toBe(true)
+})

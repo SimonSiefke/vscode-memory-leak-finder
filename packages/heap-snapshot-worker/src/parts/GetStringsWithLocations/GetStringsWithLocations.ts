@@ -5,6 +5,7 @@ export interface StringLocationGroup {
   readonly string: string | null
   readonly sourceLocation: string | null
   readonly count: number
+  readonly locationKind?: 'stack-frame'
   readonly heapObjectId?: string
   readonly stringType?: string
 }
@@ -22,6 +23,17 @@ const metadataEdges = new Set([
   'prototype_or_initial_map',
 ])
 const prototypeEdges = new Set(['__proto__', 'prototype', 'constructor'])
+const stringTypes = new Set(['string', 'concatenated string', 'sliced string'])
+const stringEdges = new Set(['first', 'second', 'parent'])
+
+const getStackFrameLocation = (value: string | null): string | undefined => {
+  // Only complete error stacks establish a frame. A detached stack fragment or
+  // arbitrary text containing a URL does not establish an allocation location.
+  if (!value || !/^(?:\[[^\]\r\n]{1,80}\]\s*)?[A-Za-z]*Error(?::|\r?\n|\\n|$)/.test(value)) return undefined
+  return /(?:\r?\n|\\n)\s*at (?:[^\r\n]*? \()?((?:[a-zA-Z][a-zA-Z\d+.-]*:(?:\/\/)?|\/)[^()\r\n]*?:\d+:\d+)\)?(?=\r?\n|\\n|$)/.exec(
+    value,
+  )?.[1]
+}
 
 export const getStringsWithLocations = (snapshot: Snapshot, scripts: StringLocationScriptMap): readonly StringLocationGroup[] => {
   const { nodes, edges, strings, meta } = snapshot
@@ -101,37 +113,61 @@ export const getStringsWithLocations = (snapshot: Snapshot, scripts: StringLocat
   }
   // Multi-source BFS is equivalent to a reverse search from each string, without
   // rescanning the heap for every string. Sorted anchors break equal-distance ties.
-  while (read < write) {
-    const source = queue[read++]
-    for (let edge = offsets[source]; edge < offsets[source + 1]; edge += edgeStride) {
-      const target = targetOf(edge)
-      if (!isStrong(source, edge) || !validTarget(target) || !reachable[target] || owners[target] !== -1) continue
-      const targetType = nodeType(target)
-      if (targetType === 'synthetic' || targetType === 'code') continue
-      const edgeType = edgeTypes[edges[edge + edgeTypeOffset]]
-      const name = strings[edges[edge + edgeNameOffset]]
-      if ((edgeType === 'internal' && metadataEdges.has(name)) || (edgeType === 'property' && prototypeEdges.has(name))) continue
-      owners[target] = owners[source]
-      queue[write++] = target
+  const assignOwners = (stackFramesOnly: boolean) => {
+    while (read < write) {
+      const source = queue[read++]
+      for (let edge = offsets[source]; edge < offsets[source + 1]; edge += edgeStride) {
+        const target = targetOf(edge)
+        if (!isStrong(source, edge) || !validTarget(target) || !reachable[target] || owners[target] !== -1) continue
+        const targetType = nodeType(target)
+        if (targetType === 'synthetic' || targetType === 'code') continue
+        const edgeType = edgeTypes[edges[edge + edgeTypeOffset]]
+        const name = strings[edges[edge + edgeNameOffset]]
+        if ((edgeType === 'internal' && metadataEdges.has(name)) || (edgeType === 'property' && prototypeEdges.has(name))) continue
+        if (stackFramesOnly && (edgeType !== 'internal' || !stringEdges.has(name) || !stringTypes.has(targetType))) continue
+        owners[target] = owners[source]
+        queue[write++] = target
+      }
     }
   }
+  assignOwners(false)
 
   const resolveValue = createStringValueResolver(snapshot, 64 * 1024)
-  const stringTypes = new Set(['string', 'concatenated string', 'sliced string'])
+  const retainingAnchorCount = anchors.length
+  const stackAnchors: typeof anchors = []
+  for (let ordinal = 0; ordinal < nodeCount; ordinal++) {
+    if (!reachable[ordinal] || owners[ordinal] !== -1 || !stringTypes.has(nodeType(ordinal))) continue
+    const location = getStackFrameLocation(resolveValue(ordinal))
+    if (location) stackAnchors.push({ ordinal, location })
+  }
+  stackAnchors.sort((a, b) => a.location.localeCompare(b.location) || a.ordinal - b.ordinal)
+  read = 0
+  write = 0
+  for (const anchor of stackAnchors) {
+    owners[anchor.ordinal] = anchors.length
+    anchors.push(anchor)
+    queue[write++] = anchor.ordinal
+  }
+  // Console/native roots have no JS location. Attribute only the stack's own
+  // rope/slice components to its first frame, explicitly separate from retainers.
+  assignOwners(true)
+
   const groups = new Map<string, StringLocationGroup>()
   for (let ordinal = 0; ordinal < nodeCount; ordinal++) {
     const type = nodeType(ordinal)
     if (!reachable[ordinal] || !stringTypes.has(type)) continue
     const value = resolveValue(ordinal)
     const sourceLocation = owners[ordinal] < 0 ? null : anchors[owners[ordinal]].location
+    const locationKind = owners[ordinal] >= retainingAnchorCount ? 'stack-frame' : undefined
     const heapObjectId = String(nodes[ordinal * stride + idOffset])
     // Snapshot placeholders do not establish equal text: preserve identity when
     // slices or unreconstructable ropes have no available value.
-    const key = JSON.stringify([value, sourceLocation, value === null ? heapObjectId : null])
+    const key = JSON.stringify([value, sourceLocation, value === null ? heapObjectId : null, locationKind ?? null])
     const previous = groups.get(key)
     groups.set(key, {
       string: value,
       sourceLocation,
+      ...(locationKind ? { locationKind } : {}),
       count: (previous?.count ?? 0) + 1,
       ...(value === null ? { heapObjectId, stringType: type } : {}),
     })
