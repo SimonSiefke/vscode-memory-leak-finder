@@ -31,6 +31,14 @@ export interface FunctionOccurrence {
   originalLocation?: OriginalLocation
 }
 
+export interface ReportedFunctionOccurrence {
+  readonly file: string
+  readonly originalName: string | null
+  readonly name: string
+  readonly bytes: number
+  readonly originalFile: string | null
+}
+
 export interface FunctionFingerprint {
   readonly hash: string
   readonly occurrence: FunctionOccurrence

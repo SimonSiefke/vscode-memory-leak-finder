@@ -104,11 +104,11 @@ test('rejects overwriting an input file, including aliases', async () => {
 const duplicateSource = 'function add(a,b){return a+b}; const addition=(x,y)=>x+y'
 const makeMap = (): string => {
   const map = new SourceMapGenerator({ file: 'bundle.js' })
-  map.addMapping({ generated: { line: 1, column: 0 }, original: { line: 10, column: 2 }, source: 'src/first.ts', name: 'add' })
+  map.addMapping({ generated: { line: 1, column: 0 }, original: { line: 10, column: 2 }, source: '../../../src/first.ts', name: 'add' })
   map.addMapping({
     generated: { line: 1, column: duplicateSource.indexOf('(x,y)') },
     original: { line: 20, column: 4 },
-    source: 'src/second.ts',
+    source: './src/second.ts',
     name: 'addition',
   })
   return map.toString()
@@ -132,9 +132,16 @@ test.each(['relative', 'sibling', 'inline-base64', 'inline-url'])(
     await execFileAsync(process.execPath, [cli, '--measure', 'duplicate-code', '--source-file', source, '--duplicate-code-output', output])
     const report = JSON.parse(await readFile(output, 'utf8'))
     expect(report.files[0].sourceMap).toMatchObject({ status: 'mapped', occurrences: 2, mapped: 2 })
-    expect(report.groups[0].occurrences[0].originalLocation).toEqual({ source: 'src/first.ts', line: 10, column: 3, name: 'add' })
-    expect(report.groups[0].occurrences[1].originalLocation).toEqual({ source: 'src/second.ts', line: 20, column: 5, name: 'addition' })
-    expect(report.groups[0].occurrences[0]).toMatchObject({ line: 1, column: 1 })
+    expect(report.groups[0].occurrences).toEqual([
+      { file: `${source}:1:1`, originalName: 'add', name: 'add', bytes: 29, originalFile: 'src/first.ts:10:3' },
+      {
+        file: `${source}:1:${duplicateSource.indexOf('(x,y)') + 1}`,
+        originalName: 'addition',
+        name: 'addition',
+        bytes: 10,
+        originalFile: 'src/second.ts:20:5',
+      },
+    ])
   },
 )
 
@@ -164,8 +171,13 @@ test.each(['missing', 'malformed', 'oversized', 'disabled'])('CLI retains genera
   ])
   const report = JSON.parse(await readFile(output, 'utf8'))
   expect(report.files[0].sourceMap).toMatchObject({ status: kind === 'disabled' ? 'skipped' : 'unavailable', occurrences: 2, mapped: 0 })
-  expect(report.groups[0].occurrences[0]).toMatchObject({ line: 1, column: 1 })
-  expect(report.groups[0].occurrences[0].originalLocation).toBeUndefined()
+  expect(report.groups[0].occurrences[0]).toEqual({
+    file: `${source}:1:1`,
+    originalName: null,
+    name: 'add',
+    bytes: 29,
+    originalFile: null,
+  })
 })
 
 test('does not load a source map for unique functions', async () => {

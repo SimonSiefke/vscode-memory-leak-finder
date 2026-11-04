@@ -5,6 +5,7 @@ import type {
   DuplicateGroup,
   FileAnalysis,
   FunctionOccurrence,
+  ReportedFunctionOccurrence,
   SourceMapReference,
   SourceMapResult,
   SourceMapSummary,
@@ -107,6 +108,18 @@ const addOriginalLocations = async (
   }
 }
 
+const formatOccurrence = (occurrence: FunctionOccurrence): ReportedFunctionOccurrence => {
+  const original = occurrence.originalLocation
+  const source = original?.source.replaceAll('\\', '/').replace(/^(?:\.{1,2}\/)+/, '')
+  return {
+    file: `${occurrence.file}:${occurrence.line}:${occurrence.column}`,
+    originalName: original?.name ?? null,
+    name: occurrence.name,
+    bytes: occurrence.bytes,
+    originalFile: original ? `${source}:${original.line}:${original.column}` : null,
+  }
+}
+
 export const measureDuplicateCode = async (argv: readonly string[]): Promise<void> => {
   const options = await parseOptions(argv)
   const byHash = new Map<string, FunctionOccurrence[]>()
@@ -173,7 +186,7 @@ export const measureDuplicateCode = async (argv: readonly string[]): Promise<voi
       duplicateGroups: groups.length,
       duplicateFunctions,
     },
-    groups,
+    groups: groups.map((group) => ({ ...group, occurrences: group.occurrences.map(formatOccurrence) })),
   }
   await mkdir(dirname(options.output), { recursive: true })
   await writeFile(options.output, JSON.stringify(report, null, 2) + '\n')
