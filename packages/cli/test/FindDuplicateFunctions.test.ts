@@ -18,6 +18,9 @@ test.each([
   ['same property with shorthand', 'function f(a){return {a}} function g(x){return {a:x}}'],
   ['literal spelling', 'function f(){return 0x10} const g=()=>16'],
   ['Unicode identifier names', 'function f(ä){return ä+1} const g=λ=>λ+1'],
+  ['same lexical receiver', 'const f=()=>this.x; const g=()=>this.x'],
+  ['same object home', 'const obj={f(){return super.x},g(){return super.x}}'],
+  ['same class home', 'class A extends Base {f(){return super.x} g(){return super.x}}'],
 ])('matches %s', (_name, source) => {
   const result = hashes(source)
   expect(result).toHaveLength(2)
@@ -43,6 +46,11 @@ test.each([
   ['getter and method', 'class A { get f(){return 1} g(){return 1} }'],
   ['private fields from different classes', 'class A { #x; f(){return this.#x} } class B { #x; g(){return this.#x} }'],
   ['super from different classes', 'class A extends Base { f(){return super.x} } class B extends Other { g(){return super.x} }'],
+  ['super from different objects', 'const a={__proto__:first,f(){return super.x}}; const b={__proto__:second,g(){return super.x}}'],
+  ['static and instance super', 'class A extends Base {static f(){return super.x} g(){return super.x}}'],
+  ['lexical receivers in different class fields', 'class A {f=()=>this.x} class B {g=()=>this.x}'],
+  ['static and instance lexical receivers', 'class A {static f=()=>this.x;g=()=>this.x}'],
+  ['lexical receivers in different static blocks', 'class A {static {this.f=()=>this.x}} class B {static {this.g=()=>this.x}}'],
 ])('distinguishes %s', (_name, source) => {
   const result = hashes(source)
   expect(result).toHaveLength(2)

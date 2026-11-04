@@ -180,17 +180,38 @@ export const findDuplicateFunctions = (source: string, file: string, sourceType:
   const fingerprints: FunctionFingerprint[] = []
   let functions = 0
   let skippedDynamicFunctions = 0
-  const pending: { node: Node; parent?: Node; classStart: number; receiverStart: number; dynamic: boolean }[] = [
-    { node: ast, classStart: -1, receiverStart: -1, dynamic: false },
+  const pending: { node: Node; parent?: Node; classStart: number; homeObject: string; receiverStart: number; dynamic: boolean }[] = [
+    { node: ast, classStart: -1, homeObject: 'global', receiverStart: -1, dynamic: false },
   ]
   while (pending.length) {
-    const { node, parent, classStart, receiverStart, dynamic } = pending.pop()!
+    const { node, parent, classStart, homeObject, receiverStart, dynamic } = pending.pop()!
     const inClass = node.type === 'ClassDeclaration' || node.type === 'ClassExpression' ? node.start : classStart
     // A surrounding with statement or direct eval can change lexical name lookup.
     const inDynamicScope = dynamic || node.type === 'WithStatement' || Boolean(modes.get(node)?.dynamic)
-    const nextReceiver = isFunction(node) && node.type !== 'ArrowFunctionExpression' ? node.start : receiverStart
-    for (const child of children(node))
-      pending.push({ node: child, parent: node, classStart: inClass, receiverStart: nextReceiver, dynamic: inDynamicScope })
+    const nextReceiver =
+      (isFunction(node) && node.type !== 'ArrowFunctionExpression') || node.type === 'StaticBlock' ? node.start : receiverStart
+    for (const child of children(node)) {
+      let childHome = homeObject
+      let childReceiver = nextReceiver
+      // Computed keys run in the enclosing context; only member values gain a
+      // new home object. Static and instance members have different prototypes.
+      if (child === node.value) {
+        if (node.type === 'MethodDefinition' || node.type === 'PropertyDefinition') {
+          childHome = `class:${inClass}:${Boolean(node.static)}`
+          if (node.type === 'PropertyDefinition') childReceiver = node.start
+        } else if (node.type === 'Property' && (node.method || node.kind === 'get' || node.kind === 'set')) {
+          childHome = `object:${parent!.start}`
+        }
+      } else if (node.type === 'StaticBlock') childHome = `class:${inClass}:true`
+      pending.push({
+        node: child,
+        parent: node,
+        classStart: inClass,
+        homeObject: childHome,
+        receiverStart: childReceiver,
+        dynamic: inDynamicScope,
+      })
+    }
     if (!isFunction(node)) continue
     functions++
 
@@ -244,7 +265,7 @@ export const findDuplicateFunctions = (source: string, file: string, sourceType:
           continue
         }
         if (current.type === 'PrivateIdentifier') add(['privateContext', file, classStart])
-        if (current.type === 'Super') add(['superContext', file, classStart])
+        if (current.type === 'Super') add(['superContext', file, homeObject])
         if (current.type === 'ThisExpression' || current.type === 'Super' || current.type === 'MetaProperty') sensitive = true
         if (
           current.type === 'WithStatement' ||
