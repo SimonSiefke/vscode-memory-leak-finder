@@ -117,6 +117,7 @@ const formatOccurrence = (occurrence: FunctionOccurrence): ReportedFunctionOccur
     name: occurrence.name,
     bytes: occurrence.bytes,
     originalFile: original ? `${source}:${original.line}:${original.column}` : null,
+    preview: original?.preview ?? null,
   }
 }
 

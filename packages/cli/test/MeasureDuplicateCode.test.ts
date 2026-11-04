@@ -111,6 +111,8 @@ const makeMap = (): string => {
     source: './src/second.ts',
     name: 'addition',
   })
+  map.setSourceContent('../../../src/first.ts', '\n'.repeat(9) + '  function add(a: number, b: number) { return a + b }')
+  map.setSourceContent('./src/second.ts', '\n'.repeat(19) + '    const addition = (x: number, y: number) => x + y;')
   return map.toString()
 }
 
@@ -133,13 +135,21 @@ test.each(['relative', 'sibling', 'inline-base64', 'inline-url'])(
     const report = JSON.parse(await readFile(output, 'utf8'))
     expect(report.files[0].sourceMap).toMatchObject({ status: 'mapped', occurrences: 2, mapped: 2 })
     expect(report.groups[0].occurrences).toEqual([
-      { file: `${source}:1:1`, originalName: 'add', name: 'add', bytes: 29, originalFile: 'src/first.ts:10:3' },
+      {
+        file: `${source}:1:1`,
+        originalName: 'add',
+        name: 'add',
+        bytes: 29,
+        originalFile: 'src/first.ts:10:3',
+        preview: 'function add(a: number, b: number) { return a + b }',
+      },
       {
         file: `${source}:1:${duplicateSource.indexOf('(x,y)') + 1}`,
         originalName: 'addition',
         name: 'addition',
         bytes: 10,
         originalFile: 'src/second.ts:20:5',
+        preview: 'const addition = (x: number, y: number) => x + y;',
       },
     ])
   },
@@ -177,6 +187,7 @@ test.each(['missing', 'malformed', 'oversized', 'disabled'])('CLI retains genera
     name: 'add',
     bytes: 29,
     originalFile: null,
+    preview: null,
   })
 })
 

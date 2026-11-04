@@ -3,6 +3,7 @@ export interface OriginalLocation {
   readonly line: number
   readonly column: number
   readonly name: string | null
+  preview: string | null
 }
 
 export type SourceMapReference = { readonly url: string } | { readonly start: number; readonly end: number }
@@ -37,6 +38,7 @@ export interface ReportedFunctionOccurrence {
   readonly name: string
   readonly bytes: number
   readonly originalFile: string | null
+  readonly preview: string | null
 }
 
 export interface FunctionFingerprint {
