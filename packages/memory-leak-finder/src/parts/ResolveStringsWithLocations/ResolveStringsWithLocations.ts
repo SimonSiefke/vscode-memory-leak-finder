@@ -36,7 +36,7 @@ const resolveGroups = async (groups: readonly StringLocationGroup[], scriptMap: 
   let resolved: Awaited<ReturnType<typeof resolveTrackedLocationSourceMaps>> = {}
   if (keys.length) {
     try {
-      resolved = await resolveTrackedLocationSourceMaps(keys, scriptMap)
+      resolved = await resolveTrackedLocationSourceMaps(keys, scriptMap, false)
     } catch {
       // Generated retaining locations remain useful if source maps cannot load.
     }
