@@ -61,6 +61,24 @@ node packages/build/src/mergeArtifacts.ts
 
 ## Measures
 
+### DuplicateCode
+
+Find structurally identical functions and methods in existing JavaScript bundles without launching VS Code or running an e2e test:
+
+```sh
+node packages/cli/bin/test.js --measure duplicate-code --source-file /path/to/workbench.desktop.main.js
+# Or locate the workbench bundle inside an existing installation:
+node packages/cli/bin/test.js --measure duplicate-code --vscode-path /path/to/VSCode-linux-x64
+```
+
+Repeat `--source-file` to compare multiple bundles, including duplicates across files. Inputs are deduplicated by real path and scanned sequentially in separate workers with a 1.5 GiB heap limit. Acorn parses without tokens, comments or per-node locations; scope analysis processes one function body at a time. Each file still needs to fit in memory. A parse or worker failure fails the command without writing a partial report. Use `--source-type script` for classic scripts; the default is `module`, suitable for the workbench bundle.
+
+Function names, parameter names and local binding names are normalized, including shadowed variables and destructuring. For example, `function add(a,b){return a+b}` matches `const addition=(x,y)=>x+y`. Concise arrow bodies are treated as return statements. Operators, literal values, parameter order, property names, async/generator behavior, strict mode and captured binding identity are preserved. Functions affected by direct `eval` or `with` are skipped and counted.
+
+The JSON report defaults to `.vscode-duplicate-code/results.json`; override it with `--duplicate-code-output /path/to/report.json`. It includes total functions scanned, skipped functions, duplicate counts and groups sorted by duplicate source bytes. Each occurrence includes its inferred name, file, one-based line/column, UTF-16 start/end offsets and UTF-8 source size. `duplicateBytes` sums the group sizes excluding its largest occurrence; nested groups can overlap, so these values are ranking estimates rather than additive savings.
+
+Results identify refactoring candidates, not proven interchangeable runtime values. Function identity, reflection (`name`, `length`, `toString`), construction behavior and call sites still need review. Captures from distinct bindings are kept separate even if their names or values happen to match; lexical receivers, private fields and `super` are compared conservatively. Locations refer to the supplied bundle, without source-map resolution.
+
 ### RetainedSubstrings
 
 Finds large flat string parents (at least 64 KiB of snapshot shallow size) retained through V8 sliced strings. Reports each parent once, its bytes, slice count, and up to eight example slices with shortest strong paths from the snapshot root. Parents with independent strong references are identified separately. Removing all slice-to-parent edges and checking reachability establishes whether the slices collectively provide the only strong paths to a parent.
