@@ -83,8 +83,21 @@ body{font:15px system-ui,sans-serif;color:#1b2538;margin:24px}p{line-height:1.5}
 .controls input{width:240px}.controls input::placeholder{color:#59636e;opacity:1}
 .controls select:hover,.controls input:hover{border-color:#8c959f}
 .controls select:focus-visible,.controls input:focus-visible{border-color:#0969da;outline:2px solid #0969da;outline-offset:3px}
+@supports (appearance:base-select) and selector(select::picker(select)){
+  .controls select,.controls select::picker(select){appearance:base-select}
+  .controls select{background-image:none;padding-right:12px;gap:12px}
+  .controls select:open{border-color:#0969da}
+  .controls select::picker-icon{color:#59636e}
+  .controls select::picker(select){max-height:min(360px,60dvh);max-width:calc(100vw - 24px);box-sizing:border-box;margin-block:4px;padding:4px;border:1px solid #d1d9e0;border-radius:8px;background:#fff;color:#1b2538;box-shadow:0 8px 24px rgb(27 37 56 / 14%);scrollbar-width:thin;scrollbar-color:#8c959f #fff}
+  .controls option{min-height:40px;padding:8px 10px;border-radius:4px;gap:10px;font:inherit;white-space:normal;overflow-wrap:anywhere;cursor:pointer}
+  .controls option:checked{background:#edf1fa;font-weight:600}
+  .controls option:hover{background:#f1f5fb}
+  .controls option:focus-visible{background:#edf1fa;outline:2px solid #0969da;outline-offset:-2px}
+  .controls option::checkmark{color:#0969da}
+}
 @media(max-width:600px){.controls label,.controls select,.controls input{width:100%}}
 @media(forced-colors:active){.controls select{appearance:auto;background-image:none;padding-right:12px}}
+@media(forced-colors:active){.controls select::picker(select){appearance:auto}}
 table{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-numeric:tabular-nums}th,td{padding:10px;border-bottom:1px solid #dde3ef;overflow-wrap:anywhere;text-align:right}
 th{position:sticky;top:0;background:#edf1fa}th:first-child,td:first-child{text-align:left;width:60%}td:first-child{font:13px ui-monospace,monospace}
 th button{font:inherit;font-weight:600;border:0;background:transparent;color:inherit;cursor:pointer}th[aria-sort=descending] button::after{content:' ▼'}th[aria-sort=ascending] button::after{content:' ▲'}tbody tr:nth-child(even){background:#f7f9fd}
