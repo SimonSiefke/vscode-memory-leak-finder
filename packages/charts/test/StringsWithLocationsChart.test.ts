@@ -67,3 +67,69 @@ test('groups numeric path IDs at the same location and preserves total growth an
     await rm(directory, { recursive: true, force: true })
   }
 })
+
+test('collapses stack components using measured partitions and preserves every added object', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'strings-with-locations-stacks-'))
+  const first = 'Error\n    at first (file:///owner.js:20:5)'
+  const second = 'Error\n    at second (file:///owner.js:20:5)'
+  const location = 'src/owner.ts:20:5'
+  try {
+    await mkdir(join(directory, 'strings-with-locations'))
+    await writeFile(
+      join(directory, 'strings-with-locations', 'output.json'),
+      JSON.stringify({
+        stringsWithLocations: [
+          { string: first, location, count: 2, stackCounts: [{ stack: first, count: 2 }] },
+          { string: second, location, count: 3, stackCounts: [{ stack: second, count: 3 }] },
+          {
+            string: 'common fragment',
+            location,
+            count: 6,
+            stackCounts: [
+              { stack: first, count: 2 },
+              { stack: second, count: 3 },
+            ],
+          },
+          { string: null, stringType: 'sliced string', heapObjectId: '11', location, count: 1, stackCounts: [{ stack: first, count: 1 }] },
+          { string: 'unrelated', location, count: 1 },
+        ],
+      }),
+    )
+    const [{ data }] = await Chart.getData(directory)
+    expect(data).toHaveLength(4)
+    expect(data.map((item) => item.count)).toEqual([6, 5, 1, 1])
+    expect(data.reduce((total, item) => total + item.count, 0)).toBe(13)
+    const firstRow = data.find((item) => item.title.includes(first))!
+    expect(firstRow.name.startsWith('Stack: ')).toBe(true)
+    expect(firstRow.title).toContain('2 complete stack string objects; 3 component string objects')
+    expect(data.filter((item) => item.name.startsWith('Stack: '))).toHaveLength(2)
+    expect(new Set(data.filter((item) => item.name.startsWith('Stack: ')).map((item) => item.label)).size).toBe(2)
+    expect(data.some((item) => item.name.startsWith('"common fragment"'))).toBe(true)
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
+})
+
+test('does not trust invalid stack partitions or collapse old files by substring matching', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'strings-with-locations-old-stacks-'))
+  const stack = 'Error\n    at owner (file:///owner.js:1:1)'
+  try {
+    await mkdir(join(directory, 'strings-with-locations'))
+    await writeFile(
+      join(directory, 'strings-with-locations', 'output.json'),
+      JSON.stringify({
+        stringsWithLocations: [
+          { string: stack, location: null, count: 1 },
+          { string: 'fragment', location: null, count: 1, stackCounts: [{ stack, count: 2 }] },
+          { string: 'another', location: null, count: 1, stackCounts: [{ stack, count: -1 }] },
+        ],
+      }),
+    )
+    const [{ data }] = await Chart.getData(directory)
+    expect(data).toHaveLength(3)
+    expect(data.reduce((total, item) => total + item.count, 0)).toBe(3)
+    expect(data.every((item) => !item.name.startsWith('Stack: '))).toBe(true)
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
+})

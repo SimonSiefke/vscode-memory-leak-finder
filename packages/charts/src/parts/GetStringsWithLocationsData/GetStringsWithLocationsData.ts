@@ -1,7 +1,9 @@
 import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
+import { expandStringStackGroups } from '../ExpandStringStackGroups/ExpandStringStackGroups.ts'
 import { getGroupKey, getStringPattern, type LocatedString } from '../GetStringGroupKey/GetStringGroupKey.ts'
+import { getStackLabels } from '../GetStackLabels/GetStackLabels.ts'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
 export const getStringsWithLocationsData = async (basePath: string) => {
@@ -11,21 +13,24 @@ export const getStringsWithLocationsData = async (basePath: string) => {
   for (const filename of await readdir(directory)) {
     const raw = await readJson(join(directory, filename))
     const groups: readonly LocatedString[] = raw.stringsWithLocations ?? []
-    const grouped = new Map<string, { group: LocatedString; count: number; strings: Set<string> }>()
-    for (const group of groups) {
+    const grouped = new Map<string, { group: LocatedString; count: number; strings: Set<string>; stackStringCount: number }>()
+    for (const group of groups.flatMap(expandStringStackGroups)) {
       const key = getGroupKey(group)
       let entry = grouped.get(key)
       if (!entry) {
-        entry = { group, count: 0, strings: new Set() }
+        entry = { group, count: 0, strings: new Set(), stackStringCount: 0 }
         grouped.set(key, entry)
       }
       entry.count += group.count
+      if (group.stack && group.string === group.stack) entry.stackStringCount += group.count
       if (group.string !== null) entry.strings.add(group.string)
     }
+    const stackLabels = getStackLabels([...grouped.values()].map((entry) => entry.group))
     const data = [...grouped]
-      .map(([comparisonKey, { group, count, strings }]) => {
-        const text =
-          group.string === null
+      .map(([comparisonKey, { group, count, strings, stackStringCount }]) => {
+        const text = group.stack
+          ? `Stack: ${JSON.stringify(group.stack)}`
+          : group.string === null
             ? `[${group.stringType ?? 'unavailable string'} #${group.heapObjectId}]`
             : JSON.stringify(getStringPattern(group.string))
         const location = group.location
@@ -35,14 +40,24 @@ export const getStringsWithLocationsData = async (basePath: string) => {
         const title = [
           `${count} added string objects`,
           location,
-          ...(group.string !== null && getStringPattern(group.string) !== group.string
+          ...(group.stack
+            ? [`${stackStringCount} complete stack string objects; ${count - stackStringCount} component string objects`, group.stack]
+            : []),
+          ...(!group.stack && group.string !== null && getStringPattern(group.string) !== group.string
             ? [`Numeric path segments grouped; ${samples.length} distinct string value${samples.length === 1 ? '' : 's'}`]
             : []),
           ...(group.string === null ? [text] : []),
           ...samples.slice(0, 5).map((value) => JSON.stringify(value)),
           ...(samples.length > 5 ? [`${samples.length - 5} more values in the measurement JSON`] : []),
         ].join('\n')
-        return { count, delta: count, name: `${text} (${location})`, label: `${text}\n${location}`, title, comparisonKey }
+        return {
+          count,
+          delta: count,
+          name: `${text} (${location})`,
+          label: `${stackLabels.get(comparisonKey) ?? text}\n${location}`,
+          title,
+          comparisonKey,
+        }
       })
       .sort((a, b) => b.count - a.count || a.comparisonKey.localeCompare(b.comparisonKey))
     result.push({ data, filename: filename.replace(/\.json$/, '') })

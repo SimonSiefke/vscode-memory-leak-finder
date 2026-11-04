@@ -5,6 +5,7 @@ export interface StringLocationGroup {
   readonly string: string | null
   readonly sourceLocation: string | null
   readonly count: number
+  readonly stackCounts?: readonly { readonly stack: string; readonly count: number }[]
   readonly locationKind?: 'stack-frame'
   readonly heapObjectId?: string
   readonly stringType?: string
@@ -152,7 +153,59 @@ export const getStringsWithLocations = (snapshot: Snapshot, scripts: StringLocat
   // rope/slice components to its first frame, explicitly separate from retainers.
   assignOwners(true)
 
+  // Record complete stack ownership independently from retaining locations.
+  // Only graph roots seed this pass: nested prefixes belong to the outer stack.
+  const hasStringParent = new Uint8Array(nodeCount)
+  const isComponentEdge = (edge: number) => {
+    const target = targetOf(edge)
+    return (
+      validTarget(target) &&
+      stringTypes.has(nodeType(target)) &&
+      edgeTypes[edges[edge + edgeTypeOffset]] === 'internal' &&
+      stringEdges.has(strings[edges[edge + edgeNameOffset]])
+    )
+  }
+  for (let source = 0; source < nodeCount; source++) {
+    if (!reachable[source] || !stringTypes.has(nodeType(source))) continue
+    for (let edge = offsets[source]; edge < offsets[source + 1]; edge += edgeStride) {
+      if (isComponentEdge(edge)) hasStringParent[targetOf(edge)] = 1
+    }
+  }
+  const stackOwners = new Int32Array(nodeCount).fill(-1)
+  const stackValues: string[] = []
+  const stackIds = new Map<string, number>()
+  const stackQueue: number[] = []
+  for (let ordinal = 0; ordinal < nodeCount; ordinal++) {
+    if (!reachable[ordinal] || hasStringParent[ordinal] || !stringTypes.has(nodeType(ordinal))) continue
+    const value = resolveValue(ordinal)
+    if (!value || !getStackFrameLocation(value)) continue
+    const stack = value
+    let id = stackIds.get(stack)
+    if (id === undefined) {
+      id = stackValues.length
+      stackIds.set(stack, id)
+      stackValues.push(stack)
+    }
+    stackOwners[ordinal] = id
+    stackQueue.push(ordinal)
+  }
+  for (let index = 0; index < stackQueue.length; index++) {
+    const source = stackQueue[index]
+    const owner = stackOwners[source]
+    for (let edge = offsets[source]; edge < offsets[source + 1]; edge += edgeStride) {
+      if (!isComponentEdge(edge)) continue
+      const target = targetOf(edge)
+      const previous = stackOwners[target]
+      if (previous === -2 || previous === owner) continue
+      // A shared component belongs to neither stack exclusively. Propagate that
+      // ambiguity to descendants too; each node changes state at most twice.
+      stackOwners[target] = previous === -1 ? owner : -2
+      stackQueue.push(target)
+    }
+  }
+
   const groups = new Map<string, StringLocationGroup>()
+  const groupStackCounts = new Map<string, Map<number, number>>()
   for (let ordinal = 0; ordinal < nodeCount; ordinal++) {
     const type = nodeType(ordinal)
     if (!reachable[ordinal] || !stringTypes.has(type)) continue
@@ -163,6 +216,15 @@ export const getStringsWithLocations = (snapshot: Snapshot, scripts: StringLocat
     // Snapshot placeholders do not establish equal text: preserve identity when
     // slices or unreconstructable ropes have no available value.
     const key = JSON.stringify([value, sourceLocation, value === null ? heapObjectId : null, locationKind ?? null])
+    const stackOwner = stackOwners[ordinal]
+    if (stackOwner >= 0) {
+      let counts = groupStackCounts.get(key)
+      if (!counts) {
+        counts = new Map()
+        groupStackCounts.set(key, counts)
+      }
+      counts.set(stackOwner, (counts.get(stackOwner) ?? 0) + 1)
+    }
     const previous = groups.get(key)
     groups.set(key, {
       string: value,
@@ -172,5 +234,10 @@ export const getStringsWithLocations = (snapshot: Snapshot, scripts: StringLocat
       ...(value === null ? { heapObjectId, stringType: type } : {}),
     })
   }
-  return [...groups.values()]
+  return [...groups].map(([key, group]) => {
+    const counts = groupStackCounts.get(key)
+    if (!counts) return group
+    const stackCounts = [...counts].map(([id, count]) => ({ stack: stackValues[id], count })).sort((a, b) => a.stack.localeCompare(b.stack))
+    return { ...group, stackCounts }
+  })
 }
