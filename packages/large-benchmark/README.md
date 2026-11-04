@@ -167,17 +167,34 @@ builds/measurements remain visible as gaps instead of fabricated trend values.
 Large runs that select all collectors group more benchmarks into each job and may
 reach the job time limit; prefer focused measures for long histories.
 
-## Function counts over time video
+## Renderer counts over time video
 
 Run the [Large Performance Over Time workflow](../../.github/workflows/large-performance-over-time.yml)
-for a video of the existing renderer **function-count** chart across VS Code releases.
+for a video of the renderer **function-count** or **event-listener-count** chart across VS Code releases.
+The `measure` input selects the collector; it defaults to `function-count`.
+For an event-listener history from VS Code 1.50.0 onward, select
+`measure: event-listener-count`, `build_source: release`, `suite: historical-core`,
+and set `version_range` to `1.50.0...<latest published stable version>`.
+The release API freezes every stable release in that inclusive range, including patches.
+
+`build_source: release` downloads the official stable packages through the existing
+version-specific harness downloader, bypassing source-build jobs. `source` retains
+the existing minified Code OSS build pipeline. Use the same package source for the
+whole comparison. Official packages and Code OSS builds can have different behavior.
+The optional `historical-core` suite runs 18 fixed existing editor, Explorer,
+Settings, keyboard shortcuts, debug console, Activity Bar, and source control
+scenarios. It avoids tests for recently introduced features and keeps the same
+inventory and ordering across every release. `default` retains the ordinary suite.
+Counts describe renderer DOM event listeners on EventTarget objects, document, and
+window; they do not count all internal VS Code event-emitter subscriptions.
+
 The defaults are the latest **20 published stable releases** (including patches), in
 oldest-to-newest order, and **400 ms per frame**. Alternatively supply an inclusive
 `version_range`; it takes precedence over `last_versions`. `frame_duration_ms`
 controls playback speed (40–60000 ms).
 
 This runs the same default E2E suite and `--check-leaks --measure-after --measure function-count`
-arguments as the ordinary function-count CI job, using the same current harness
+arguments (substituting the selected collector) as the ordinary function-count CI job, using the same current harness
 checkout for every version. Each version is built and measured once, independently
 of adjacent versions. It does not run the paired performance collectors or repeat
 the suite 37 times. The suite uses one running application, without restarting
@@ -192,7 +209,7 @@ account for that when comparing this scenario across versions. Compatibility
 changes do not resolve missing or failed VS Code build artifacts.
 
 Download **large-performance-over-time** and open `index.html` or play
-`function-count-history.mp4`. The 1280×720 H.264 video has the VS Code version at
+`function-count-history.mp4` or `event-listener-count-history.mp4`. The 1280×720 H.264 video has the VS Code version at
 the top right of every frame. All frames use the same zero-based count scale and
 alphabetical test order. Every frame overlays the first usable version as a faded
 reference line behind the current version, with a legend identifying both versions.
@@ -219,6 +236,8 @@ Local commands (from the repository root, after installing/building the harness)
 ```sh
 npm run large-performance -- history-matrix --last-versions 20 --output-dir .tmp/history
 # Or: history-matrix --version-range 1.100.0...1.110.0 --frame-duration-ms 400
+# Add --measure event-listener-count --suite historical-core to matrix and measure commands
+# for historical listener comparisons. Omit --build-path to download the official release.
 
 # For each release in manifest.json, prepare/extract its build using the existing
 # prepare/extract commands, then run serially in this checkout:

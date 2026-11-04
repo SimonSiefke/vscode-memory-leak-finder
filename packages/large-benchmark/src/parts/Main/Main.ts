@@ -13,7 +13,13 @@ import { parseOptions } from '../ParseOptions/ParseOptions.ts'
 import { createWorkflowSummary } from '../WorkflowSummary/WorkflowSummary.ts'
 import { parseCommits, validateCommits, type SeriesManifest } from '../Series/Series.ts'
 import { generateTrendReport, createTrendWorkflowSummary } from '../TrendReport/TrendReport.ts'
-import { measureFunctionCounts, reportFunctionCountHistory, type HistoryManifest } from '../FunctionCountHistory/FunctionCountHistory.ts'
+import {
+  historyMeasure,
+  historySuite,
+  measureFunctionCounts,
+  reportFunctionCountHistory,
+  type HistoryManifest,
+} from '../FunctionCountHistory/FunctionCountHistory.ts'
 import { resolveLastVersions, resolveVersionRange } from '../VersionRange/VersionRange.ts'
 import { createCssPreset, freezeSamples, samplingPolicy, harnessSourceHash, type CssPresetMetadata } from '../CssPreset/CssPreset.ts'
 import { benchmarks as legacyBenchmarks } from '../Manifest/Manifest.ts'
@@ -39,6 +45,8 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
   }
   switch (argv[0]) {
     case 'history-matrix': {
+      const measure = historyMeasure(get('--measure', 'function-count'))
+      const suite = historySuite(get('--suite', 'default'))
       if (get('--version-range') && get('--last-versions')) throw new Error('Use --version-range or --last-versions')
       const frameDurationMs = Number(get('--frame-duration-ms', '400'))
       if (!Number.isSafeInteger(frameDurationMs) || frameDurationMs < 40 || frameDurationMs > 60_000)
@@ -46,7 +54,7 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
       const releases = get('--version-range')
         ? await resolveVersionRange(get('--version-range'))
         : await resolveLastVersions(Number(get('--last-versions', '20')))
-      const manifest: HistoryManifest = { schemaVersion: 1, measure: 'function-count-history', releases, frameDurationMs }
+      const manifest: HistoryManifest = { schemaVersion: 1, measure: `${measure}-history`, releases, frameDurationMs, suite }
       await writeJson(join(output, 'manifest.json'), manifest)
       const matrix = JSON.stringify({
         include: releases.map((release) => ({ ...release, artifact: parseCommitReference(release.commit).artifact })),
@@ -56,7 +64,14 @@ export const largePerformance = async (argv: string[]): Promise<void> => {
       break
     }
     case 'history-measure': {
-      await measureFunctionCounts(required('--commit'), required('--vscode-version'), resolve(required('--build-path')), output)
+      await measureFunctionCounts(
+        required('--commit'),
+        required('--vscode-version'),
+        get('--build-path') ? resolve(get('--build-path')) : '',
+        output,
+        historyMeasure(get('--measure', 'function-count')),
+        historySuite(get('--suite', 'default')),
+      )
       break
     }
     case 'history-report': {
