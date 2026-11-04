@@ -253,6 +253,7 @@ test('keeps reports compact when many closures retain the same context', () => {
   expect(JSON.stringify(report).length).toBeLessThan(200_000)
 })
 
+// Three comparisons launch source-map workers; allow for startup on slower CI runners.
 test('reports only growing function locations, deduplicates shared contexts and maps original sources', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'dead-closure-locations-'))
   try {
@@ -327,4 +328,4 @@ test('reports only growing function locations, deduplicates shared contexts and 
   } finally {
     await rm(directory, { recursive: true, force: true })
   }
-})
+}, 30000)
