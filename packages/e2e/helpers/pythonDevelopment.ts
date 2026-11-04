@@ -86,6 +86,7 @@ export const setup = async (
                   python: interpreter(context),
                   program: '${workspaceFolder}/server.py',
                   console: 'internalConsole',
+                  internalConsoleOptions: 'neverOpen',
                   justMyCode: true,
                 },
               ],

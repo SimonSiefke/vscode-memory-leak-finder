@@ -23,6 +23,6 @@ for scenario in terminal-python-run-file terminal-python-pip-install editor-pyth
 done
 ```
 
-Add `--check-leaks --measure-after --measure named-function-count3 --runs 17` to inspect the renderer. Add `--inspect-extensions` for a separate extension-host run. Run these checks sequentially. Pylance's separate language-server process requires its own process inspection; it is not included in the extension-host heap.
+For renderer measurements, replace `--runs 3` with `--runs 17` and add `--check-leaks --measure-after --measure named-function-count3`. Add `--inspect-extensions` for a separate extension-host run. Run these checks sequentially. Pylance's separate language-server process requires its own process inspection; it is not included in the extension-host heap.
 
 The scenarios are skipped by default and marked `requiresNetwork` because they install marketplace extensions and the Flask cases download packages during setup. A repeated run retains the environment and installed extensions but closes the resources created by each measured iteration.

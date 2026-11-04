@@ -13,7 +13,7 @@ export const setup = async (context: TestContext): Promise<void> => {
 }
 
 export const run = async (context: TestContext): Promise<void> => {
-  const { ActivityBar, DebugConsole, Editor, Panel, QuickPick, RunAndDebug, Terminal, Workspace } = context
+  const { ActivityBar, DebugConsole, Editor, Panel, QuickPick, RunAndDebug, SideBar, Terminal, Workspace } = context
   await Workspace.remove('.flask-port')
   await Workspace.remove('.flask-response.json')
   await Editor.open('app.py')
@@ -42,6 +42,7 @@ export const run = async (context: TestContext): Promise<void> => {
     await Terminal.killAll()
     await Editor.closeAll()
     await Panel.hide()
+    await SideBar.hide()
     await Workspace.remove('.flask-port')
     await Workspace.remove('.flask-response.json')
   }
