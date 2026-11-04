@@ -5,6 +5,8 @@ interface StringLocationGroup {
   readonly string: string | null
   readonly sourceLocation: string | null
   readonly count: number
+  readonly stackCounts?: readonly { readonly stack: string; readonly count: number }[]
+  readonly locationKind?: 'stack-frame'
   readonly heapObjectId?: string
   readonly stringType?: string
 }
@@ -49,15 +51,32 @@ const resolveGroups = async (groups: readonly StringLocationGroup[], scriptMap: 
   })
 }
 
-const groupKey = (group: LocatedString) => JSON.stringify([group.string, group.location, group.heapObjectId ?? null])
+const groupKey = (group: LocatedString) =>
+  JSON.stringify([group.string, group.location, group.heapObjectId ?? null, group.locationKind ?? null])
 
 const aggregate = (groups: readonly LocatedString[]) => {
   const result = new Map<string, LocatedString>()
+  const partitions = new Map<string, Map<string, number>>()
   for (const group of groups) {
     const key = groupKey(group)
     const previous = result.get(key)
     const representative = previous && (previous.sourceLocation ?? '') < (group.sourceLocation ?? '') ? previous : group
+    for (const entry of group.stackCounts ?? []) {
+      let counts = partitions.get(key)
+      if (!counts) {
+        counts = new Map()
+        partitions.set(key, counts)
+      }
+      counts.set(entry.stack, (counts.get(entry.stack) ?? 0) + entry.count)
+    }
     result.set(key, { ...representative, count: (previous?.count ?? 0) + group.count })
+  }
+  for (const [key, counts] of partitions) {
+    const group = result.get(key)!
+    result.set(key, {
+      ...group,
+      stackCounts: [...counts].map(([stack, count]) => ({ stack, count })).sort((a, b) => a.stack.localeCompare(b.stack)),
+    })
   }
   return result
 }
@@ -74,7 +93,22 @@ export const resolveStringsWithLocations = async (
   for (const [key, group] of afterGroups) {
     const beforeCount = beforeGroups.get(key)?.count ?? 0
     const count = group.count - beforeCount
-    if (count > 0) result.push({ ...group, count, beforeCount, afterCount: group.count })
+    if (count <= 0) continue
+    const previousStacks = new Map(beforeGroups.get(key)?.stackCounts?.map(({ stack, count }) => [stack, count]))
+    const growingStacks = (group.stackCounts ?? [])
+      .map(({ stack, count }) => ({ stack, count: count - (previousStacks.get(stack) ?? 0) }))
+      .filter(({ count }) => count > 0)
+    // If ownership moved between stacks while some variants shrank, the net
+    // count cannot be partitioned faithfully. Keep that row uncollapsed.
+    const attributedCount = growingStacks.reduce((sum, entry) => sum + entry.count, 0)
+    const { stackCounts: _stackCounts, ...metadata } = group
+    result.push({
+      ...metadata,
+      count,
+      beforeCount,
+      afterCount: group.count,
+      ...(growingStacks.length && attributedCount <= count ? { stackCounts: growingStacks } : {}),
+    })
   }
   return result.sort((a, b) => b.count - a.count || groupKey(a).localeCompare(groupKey(b)))
 }

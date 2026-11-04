@@ -20,11 +20,13 @@ export const createDualBarChart = (data: any, options: any): string => {
     {
       row: item.row,
       type: 'initial',
+      title: item.title,
       value: item.count - item.delta, // initial count (total - leaked)
     },
     {
       row: item.row,
       type: 'leaked',
+      title: item.title,
       value: item.delta, // leaked count
     },
   ])
@@ -35,12 +37,23 @@ export const createDualBarChart = (data: any, options: any): string => {
     marginRight: chartOptions.marginRight,
     marginTop: 0,
     marks: [
+      ...(options.labelLineWidth
+        ? [
+            Plot.axisY({
+              fontSize: chartOptions.fontSize,
+              lineWidth: options.labelLineWidth,
+              textOverflow: 'ellipsis-middle',
+              tickFormat: (row: string) => orderedData[Number(row)].label ?? orderedData[Number(row)].name,
+            }),
+          ]
+        : []),
       Plot.rectX(transformedData, {
         fill: (d: any) => (d.type === 'initial' ? '#000000' : '#B22222'), // black for initial, firebrick red for leaked
         rx1: 2,
         rx2: 2,
         strokeWidth: 2,
         x: 'value',
+        ...(orderedData.some((item: any) => item.title) ? { title: 'title' } : {}),
         y: 'row',
       }),
 
@@ -61,11 +74,16 @@ export const createDualBarChart = (data: any, options: any): string => {
     x: { axis: null },
 
     // Process names are display labels, not unique row identifiers.
-    y: { domain: orderedData.map((item: any) => item.row), label: null, tickFormat: (row: string) => orderedData[Number(row)].name },
+    y: {
+      domain: orderedData.map((item: any) => item.row),
+      label: null,
+      tickFormat: (row: string) => orderedData[Number(row)].label ?? orderedData[Number(row)].name,
+      ...(options.labelLineWidth ? { axis: null } : {}),
+    },
   }).outerHTML
 
   const finalHtml = fixHtmlNamespace(baseHtml)
-  const resizedHtml = fixSvgHeight(finalHtml, dataCount)
+  const resizedHtml = options.rowHeight ? finalHtml : fixSvgHeight(finalHtml, dataCount)
   const highlightedHtml = addRowHighlights(resizedHtml, orderedData, chartOptions, options)
   return addOmittedEntriesFooter(highlightedHtml, options)
 }

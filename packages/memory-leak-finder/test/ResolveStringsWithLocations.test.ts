@@ -108,3 +108,66 @@ test('returns no leaks for unchanged or shrinking groups, with deterministic tie
   const b = row('b', 1)
   expect(await resolveStringsWithLocations([], [a, b], {}, {})).toEqual(await resolveStringsWithLocations([], [b, a], {}, {}))
 })
+
+test('preserves stack-frame provenance through source mapping and keeps it separate from retaining locations', async () => {
+  resolveTrackedLocationSourceMaps.mockResolvedValue({
+    'file:///bundle.js:2:5': { originalSource: 'src/owner.ts', originalLine: 42, originalColumn: 6 },
+  })
+  const stack = { ...row('Error stack', 3), locationKind: 'stack-frame' as const }
+  const result = await resolveStringsWithLocations([], [stack, row('Error stack', 2)], scripts, scripts)
+  expect(result).toHaveLength(2)
+  expect(result[0]).toMatchObject({ location: 'src/owner.ts:42:7', locationKind: 'stack-frame', count: 3 })
+  expect(result[1]).toMatchObject({ location: 'src/owner.ts:42:7', count: 2 })
+  expect(result[1].locationKind).toBeUndefined()
+})
+
+test('partitions positive exact-text growth by complete stack without changing the comparison identity', async () => {
+  const first = 'Error\n    at first (file:///owner.js:1:1)'
+  const second = 'Error\n    at second (file:///owner.js:2:1)'
+  const before = {
+    ...row('shared text', 4, null),
+    stackCounts: [
+      { stack: first, count: 2 },
+      { stack: second, count: 2 },
+    ],
+  }
+  const after = {
+    ...row('shared text', 10, null),
+    stackCounts: [
+      { stack: first, count: 4 },
+      { stack: second, count: 6 },
+    ],
+  }
+  expect(await resolveStringsWithLocations([before], [after], {}, {})).toEqual([
+    {
+      ...after,
+      location: null,
+      count: 6,
+      beforeCount: 4,
+      afterCount: 10,
+      stackCounts: [
+        { stack: first, count: 2 },
+        { stack: second, count: 4 },
+      ],
+    },
+  ])
+  expect(await resolveStringsWithLocations([before], [{ ...after, count: 4 }], {}, {})).toEqual([])
+})
+
+test('keeps net growth uncollapsed when movement between stacks prevents an exact partition', async () => {
+  const before = { ...row('fragment', 5, null), stackCounts: [{ stack: 'stack A', count: 5 }] }
+  const after = { ...row('fragment', 6, null), stackCounts: [{ stack: 'stack B', count: 6 }] }
+  const result = await resolveStringsWithLocations([before], [after], {}, {})
+  expect(result[0]).toMatchObject({ count: 1, beforeCount: 5, afterCount: 6 })
+  expect(result[0].stackCounts).toBeUndefined()
+})
+
+test('aggregates stack partitions across generated positions mapping to one source location', async () => {
+  const mapped = { originalSource: 'src/owner.ts', originalLine: 42, originalColumn: 6 }
+  resolveTrackedLocationSourceMaps.mockResolvedValue({ 'file:///bundle.js:2:5': mapped, 'file:///bundle.js:3:8': mapped })
+  const first = { ...row('fragment', 2), stackCounts: [{ stack: 'complete stack', count: 2 }] }
+  const second = { ...row('fragment', 3, 'file:///bundle.js:3:8'), stackCounts: [{ stack: 'complete stack', count: 3 }] }
+  const result = await resolveStringsWithLocations([first], [first, second], scripts, scripts)
+  expect(result).toHaveLength(1)
+  expect(result[0]).toMatchObject({ count: 3, stackCounts: [{ stack: 'complete stack', count: 3 }] })
+})

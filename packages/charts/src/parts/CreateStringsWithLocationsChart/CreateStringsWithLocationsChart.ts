@@ -6,10 +6,12 @@ export const getData = getStringsWithLocationsData
 
 export const createChart = () => ({
   fontSize: 12,
-  marginLeft: 500,
-  marginRight: 200,
+  marginLeft: 800,
+  marginRight: 100,
   type: 'dual-bar-chart',
-  width: 1400,
+  rowHeight: 40,
+  labelLineWidth: 64,
+  width: 1600,
   x: 'index',
   xLabel: 'Index',
   y: 'count',

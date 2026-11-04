@@ -217,3 +217,173 @@ test('keeps an over-limit reconstructed rope explicit instead of grouping a trun
     stringType: 'concatenated string',
   })
 })
+
+test('attributes console-retained stack strings and rope fragments to an explicitly marked stack frame', () => {
+  const snapshot = createSnapshot([
+    { type: 'synthetic', edges: [{ target: 1 }] },
+    {
+      type: 'concatenated string',
+      edges: [
+        { target: 2, type: 'internal', name: 'first' },
+        { target: 3, type: 'internal', name: 'second' },
+      ],
+    },
+    { type: 'string', value: 'Error: leaked disposable\n    at trackDisposable (file:///owner.js:20:5)' },
+    { type: 'string', value: '\n    at handler (file:///other.js:30:7)' },
+  ])
+  const groups = getStringsWithLocations(snapshot, scripts)
+  expect(groups).toHaveLength(3)
+  expect(
+    groups.every(
+      (group) => group.sourceLocation === 'file:///owner.js:20:5' && 'locationKind' in group && group.locationKind === 'stack-frame',
+    ),
+  ).toBe(true)
+})
+
+test('prefers actual retaining locations over locations embedded in stack text', () => {
+  const snapshot = createSnapshot([
+    { type: 'synthetic', edges: [{ target: 1 }] },
+    { type: 'closure', location: [7, 0, 0], edges: [{ target: 2 }] },
+    { type: 'string', value: 'Error\n    at handler (file:///other.js:30:7)' },
+  ])
+  expect(getStringsWithLocations(snapshot, scripts)).toEqual([
+    {
+      string: 'Error\n    at handler (file:///other.js:30:7)',
+      sourceLocation: 'file:///owner.js:1:1',
+      count: 1,
+      stackCounts: [{ stack: 'Error\n    at handler (file:///other.js:30:7)', count: 1 }],
+    },
+  ])
+})
+
+test.each([
+  ['[LEAKED DISPOSABLE] Error: CREATED via:', '\n', 'vscode-file://vscode-app/out/owner.js:16:19'],
+  ['TypeError: failed', '\\n', 'https://example.com/owner.js:42:3'],
+  ['Error', '\n', 'node:internal/example:12:4'],
+  ['Error', '\n', 'C:\\project\\owner.js:12:4'],
+])('extracts a fallback from %s with separator %j and source %s', (header, separator, location) => {
+  const string = `${header}${separator}    at trackDisposable (${location})`
+  const groups = getStringsWithLocations(
+    createSnapshot([
+      { type: 'synthetic', edges: [{ target: 1 }] },
+      { type: 'string', value: string },
+    ]),
+    {},
+  )
+  expect(groups).toEqual([
+    { string, sourceLocation: location, locationKind: 'stack-frame', count: 1, stackCounts: [{ stack: string, count: 1 }] },
+  ])
+})
+
+test('does not infer locations from detached frames or ordinary URL text', () => {
+  const groups = getStringsWithLocations(
+    createSnapshot([
+      { type: 'synthetic', edges: [{ target: 1 }, { target: 2 }] },
+      { type: 'string', value: '\n    at trackDisposable (file:///owner.js:20:5)' },
+      { type: 'string', value: 'A link: file:///owner.js:20:5' },
+    ]),
+    {},
+  )
+  expect(groups.every((group) => group.sourceLocation === null)).toBe(true)
+})
+
+test('associates a complete stack and its nested rope fragments without changing exact string groups', () => {
+  const header = 'Error: leaked disposable\n    at trackDisposable (file:///owner.js:20:5)'
+  const middle = '\n    at createWidget (file:///widget.js:30:7)'
+  const tail = '\n    at command (file:///commands.js:40:9)'
+  const snapshot = createSnapshot([
+    { type: 'synthetic', edges: [{ target: 1 }] },
+    {
+      type: 'concatenated string',
+      edges: [
+        { target: 2, type: 'internal', name: 'first' },
+        { target: 5, type: 'internal', name: 'second' },
+      ],
+    },
+    {
+      type: 'concatenated string',
+      edges: [
+        { target: 3, type: 'internal', name: 'first' },
+        { target: 4, type: 'internal', name: 'second' },
+      ],
+    },
+    { type: 'string', value: header },
+    { type: 'string', value: middle },
+    { type: 'string', value: tail },
+  ])
+  const groups = getStringsWithLocations(snapshot, scripts)
+  expect(groups).toHaveLength(5)
+  expect(groups.map((group) => group.stackCounts)).toEqual(Array.from({ length: 5 }, () => [{ stack: header + middle + tail, count: 1 }]))
+  expect(groups.reduce((total, group) => total + group.count, 0)).toBe(5)
+})
+
+test('keeps fragments shared by different stacks ambiguous, including their descendants', () => {
+  const header = 'Error\n    at owner (file:///owner.js:20:5)'
+  const snapshot = createSnapshot([
+    { type: 'synthetic', edges: [{ target: 1 }, { target: 2 }] },
+    {
+      type: 'concatenated string',
+      edges: [
+        { target: 3, type: 'internal', name: 'first' },
+        { target: 4, type: 'internal', name: 'second' },
+      ],
+    },
+    {
+      type: 'concatenated string',
+      edges: [
+        { target: 3, type: 'internal', name: 'first' },
+        { target: 5, type: 'internal', name: 'second' },
+      ],
+    },
+    {
+      type: 'concatenated string',
+      edges: [
+        { target: 6, type: 'internal', name: 'first' },
+        { target: 7, type: 'internal', name: 'second' },
+      ],
+    },
+    { type: 'string', value: '\n    at first (file:///first.js:1:1)' },
+    { type: 'string', value: '\n    at second (file:///second.js:1:1)' },
+    { type: 'string', value: header },
+    { type: 'string', value: '\n    at shared (file:///shared.js:1:1)' },
+  ])
+  const groups = getStringsWithLocations(snapshot, scripts)
+  const shared = groups.filter((group) =>
+    [header, header + '\n    at shared (file:///shared.js:1:1)', '\n    at shared (file:///shared.js:1:1)'].includes(group.string ?? ''),
+  )
+  expect(shared).toHaveLength(3)
+  expect(shared.every((group) => !group.stackCounts)).toBe(true)
+  expect(groups.filter((group) => group.stackCounts)).toHaveLength(4)
+})
+
+test('keeps separate stack counts for equal text stored in distinct component objects', () => {
+  const header = 'Error\n    at owner (file:///owner.js:20:5)'
+  const snapshot = createSnapshot([
+    { type: 'synthetic', edges: [{ target: 1 }, { target: 2 }] },
+    {
+      type: 'concatenated string',
+      edges: [
+        { target: 3, type: 'internal', name: 'first' },
+        { target: 5, type: 'internal', name: 'second' },
+      ],
+    },
+    {
+      type: 'concatenated string',
+      edges: [
+        { target: 4, type: 'internal', name: 'first' },
+        { target: 6, type: 'internal', name: 'second' },
+      ],
+    },
+    { type: 'string', value: header },
+    { type: 'string', value: header },
+    { type: 'string', value: '\n    at first (file:///first.js:1:1)' },
+    { type: 'string', value: '\n    at second (file:///second.js:1:1)' },
+  ])
+  const groups = getStringsWithLocations(snapshot, scripts)
+  const common = groups.find((group) => group.string === header)!
+  expect(common.count).toBe(2)
+  expect(common.stackCounts).toEqual([
+    { stack: header + '\n    at first (file:///first.js:1:1)', count: 1 },
+    { stack: header + '\n    at second (file:///second.js:1:1)', count: 1 },
+  ])
+})
