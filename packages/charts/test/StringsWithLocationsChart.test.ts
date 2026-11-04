@@ -136,7 +136,7 @@ test('does not trust invalid stack partitions or collapse old files by substring
   }
 })
 
-test('omits exact NaN and zero rows while preserving other numeric strings and stack components', async () => {
+test('omits exact numeric noise while preserving other numeric strings and stack components', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'strings-with-locations-noise-'))
   const stack = 'Error\n    at owner (file:///owner.js:1:1)'
   try {
@@ -148,6 +148,7 @@ test('omits exact NaN and zero rows while preserving other numeric strings and s
           { string: 'NaN', location: null, count: 54 },
           { string: '0', location: 'owner.ts:1:1', count: 14 },
           { string: '4294967040', location: null, count: 6 },
+          { string: '4294967041', location: null, count: 5 },
           { string: '0px', location: null, count: 2 },
           { string: 'NaN value', location: null, count: 1 },
           { string: '0', location: null, count: 3, stackCounts: [{ stack, count: 2 }] },
@@ -155,9 +156,10 @@ test('omits exact NaN and zero rows while preserving other numeric strings and s
       }),
     )
     const [{ data, omittedEntryCount }] = await Chart.getData(directory)
-    expect(omittedEntryCount).toBe(3)
-    expect(data.map((item) => item.count)).toEqual([6, 2, 2, 1])
-    expect(data.some((item) => item.label.startsWith('"4294967040" at '))).toBe(true)
+    expect(omittedEntryCount).toBe(4)
+    expect(data.map((item) => item.count)).toEqual([5, 2, 2, 1])
+    expect(data.some((item) => item.label.startsWith('"4294967040" at '))).toBe(false)
+    expect(data.some((item) => item.label.startsWith('"4294967041" at '))).toBe(true)
     expect(data.some((item) => item.label.startsWith('"0px" at '))).toBe(true)
     expect(data.some((item) => item.label.startsWith('"NaN value" at '))).toBe(true)
     expect(data.find((item) => item.name.startsWith('Stack: '))?.title).toContain(
@@ -178,13 +180,14 @@ test('explains a capture containing only omitted numeric noise', async () => {
         stringsWithLocations: [
           { string: '0', location: null, count: 1 },
           { string: 'NaN', location: null, count: 1 },
+          { string: '4294967040', location: null, count: 1 },
         ],
       }),
     )
     const [result] = await Chart.getData(directory)
     expect(result.data).toEqual([])
-    expect(result.omittedEntryCount).toBe(2)
-    expect(result.status).toBe('Only "NaN" and "0" strings grew; omitted from chart.')
+    expect(result.omittedEntryCount).toBe(3)
+    expect(result.status).toBe('Only excluded numeric strings grew; omitted from chart.')
   } finally {
     await rm(directory, { recursive: true, force: true })
   }

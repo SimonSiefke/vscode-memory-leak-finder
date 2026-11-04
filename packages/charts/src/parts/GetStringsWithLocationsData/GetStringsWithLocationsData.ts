@@ -6,6 +6,8 @@ import { getGroupKey, getStringPattern, type LocatedString } from '../GetStringG
 import { getStackLabels } from '../GetStackLabels/GetStackLabels.ts'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
+const excludedStringValues = new Set(['NaN', '0', '4294967040'])
+
 export const getStringsWithLocationsData = async (basePath: string) => {
   const directory = join(basePath, 'strings-with-locations')
   if (!existsSync(directory)) return []
@@ -16,7 +18,7 @@ export const getStringsWithLocationsData = async (basePath: string) => {
     let omittedEntryCount = 0
     const grouped = new Map<string, { group: LocatedString; count: number; strings: Set<string>; stackStringCount: number }>()
     for (const group of groups.flatMap(expandStringStackGroups)) {
-      if (!group.stack && (group.string === 'NaN' || group.string === '0')) {
+      if (!group.stack && group.string !== null && excludedStringValues.has(group.string)) {
         omittedEntryCount++
         continue
       }
@@ -69,7 +71,7 @@ export const getStringsWithLocationsData = async (basePath: string) => {
       data,
       filename: filename.replace(/\.json$/, ''),
       omittedEntryCount,
-      ...(!data.length && omittedEntryCount ? { status: 'Only "NaN" and "0" strings grew; omitted from chart.' } : {}),
+      ...(!data.length && omittedEntryCount ? { status: 'Only excluded numeric strings grew; omitted from chart.' } : {}),
     })
   }
   return result
