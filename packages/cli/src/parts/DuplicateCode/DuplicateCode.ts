@@ -1,3 +1,25 @@
+export interface OriginalLocation {
+  readonly source: string
+  readonly line: number
+  readonly column: number
+  readonly name: string | null
+}
+
+export type SourceMapReference = { readonly url: string } | { readonly start: number; readonly end: number }
+
+export interface SourceMapResult {
+  readonly locations: readonly (OriginalLocation | null)[]
+  readonly url: string
+}
+
+export interface SourceMapSummary {
+  readonly status: 'mapped' | 'unavailable' | 'skipped'
+  readonly occurrences: number
+  readonly mapped: number
+  readonly url?: string
+  readonly reason?: string
+}
+
 export interface FunctionOccurrence {
   readonly file: string
   readonly name: string
@@ -6,6 +28,7 @@ export interface FunctionOccurrence {
   readonly line: number
   readonly column: number
   readonly bytes: number
+  originalLocation?: OriginalLocation
 }
 
 export interface FunctionFingerprint {
@@ -18,6 +41,7 @@ export interface FileAnalysis {
   readonly functions: number
   readonly skippedDynamicFunctions: number
   readonly fingerprints: readonly FunctionFingerprint[]
+  readonly sourceMap?: SourceMapReference
 }
 
 export interface DuplicateGroup {

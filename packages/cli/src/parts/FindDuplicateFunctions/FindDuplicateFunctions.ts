@@ -1,7 +1,7 @@
 import { Parser, type Node as AcornNode, type Position } from 'acorn'
 import { createHash } from 'node:crypto'
 import { analyze, type Scope, type Variable } from 'eslint-scope'
-import type { FileAnalysis, FunctionFingerprint } from '../DuplicateCode/DuplicateCode.ts'
+import type { FileAnalysis, FunctionFingerprint, SourceMapReference } from '../DuplicateCode/DuplicateCode.ts'
 
 // Acorn's base type omits the fields specific to each ESTree node kind.
 type Node = AcornNode & Record<string, any>
@@ -161,7 +161,16 @@ const getPosition = (lineStarts: readonly number[], offset: number): { line: num
 }
 
 export const findDuplicateFunctions = (source: string, file: string, sourceType: 'script' | 'module' = 'module'): FileAnalysis => {
-  const ast = ScopeParser.parse(source, { ecmaVersion: 'latest', sourceType })
+  let sourceMap: SourceMapReference | undefined
+  const ast = ScopeParser.parse(source, {
+    ecmaVersion: 'latest',
+    sourceType,
+    onComment: (_block, text, start, end) => {
+      const match = /^[#@]\s*sourceMappingURL=(\S+)\s*$/.exec(text.trim())
+      // Inline maps can be enormous. Send only their offsets across the worker boundary.
+      if (match) sourceMap = match[1].startsWith('data:') ? { start, end } : { url: match[1] }
+    },
+  })
   const { bindings, modes } = resolveBindings(ast, sourceType)
 
   const lineStarts = [0]
@@ -289,5 +298,5 @@ export const findDuplicateFunctions = (source: string, file: string, sourceType:
       },
     })
   }
-  return { file, functions, skippedDynamicFunctions, fingerprints }
+  return { file, functions, skippedDynamicFunctions, fingerprints, ...(sourceMap ? { sourceMap } : {}) }
 }

@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
+import { SourceMapGenerator } from 'source-map'
 import { parseOptions } from '../src/parts/MeasureDuplicateCode/MeasureDuplicateCode.ts'
 
 const execFileAsync = promisify(execFile)
@@ -98,4 +99,80 @@ test('rejects overwriting an input file, including aliases', async () => {
   if (process.platform === 'win32') return
   await symlink(source, alias)
   await expect(parseOptions(['--source-file', source, '--duplicate-code-output', alias])).rejects.toThrow('must not overwrite')
+})
+
+const duplicateSource = 'function add(a,b){return a+b}; const addition=(x,y)=>x+y'
+const makeMap = (): string => {
+  const map = new SourceMapGenerator({ file: 'bundle.js' })
+  map.addMapping({ generated: { line: 1, column: 0 }, original: { line: 10, column: 2 }, source: 'src/first.ts', name: 'add' })
+  map.addMapping({
+    generated: { line: 1, column: duplicateSource.indexOf('(x,y)') },
+    original: { line: 20, column: 4 },
+    source: 'src/second.ts',
+    name: 'addition',
+  })
+  return map.toString()
+}
+
+test.each(['relative', 'sibling', 'inline-base64', 'inline-url'])(
+  'CLI resolves %s source maps only for duplicate occurrences',
+  async (kind) => {
+    const source = join(directory, 'bundle.js')
+    const output = join(directory, 'result.json')
+    let directive = ''
+    if (kind === 'relative') {
+      await mkdir(join(directory, 'maps'))
+      await writeFile(join(directory, 'maps', 'bundle.js.map'), makeMap())
+      directive = '\n//# sourceMappingURL=maps/bundle.js.map'
+    } else if (kind === 'sibling') await writeFile(source + '.map', makeMap())
+    else if (kind === 'inline-base64')
+      directive = '\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,' + Buffer.from(makeMap()).toString('base64')
+    else directive = '\n/*# sourceMappingURL=data:application/json,' + encodeURIComponent(makeMap()) + ' */'
+    await writeFile(source, duplicateSource + ';const unique=x=>x-1' + directive)
+    await execFileAsync(process.execPath, [cli, '--measure', 'duplicate-code', '--source-file', source, '--duplicate-code-output', output])
+    const report = JSON.parse(await readFile(output, 'utf8'))
+    expect(report.files[0].sourceMap).toMatchObject({ status: 'mapped', occurrences: 2, mapped: 2 })
+    expect(report.groups[0].occurrences[0].originalLocation).toEqual({ source: 'src/first.ts', line: 10, column: 3, name: 'add' })
+    expect(report.groups[0].occurrences[1].originalLocation).toEqual({ source: 'src/second.ts', line: 20, column: 5, name: 'addition' })
+    expect(report.groups[0].occurrences[0]).toMatchObject({ line: 1, column: 1 })
+  },
+)
+
+test.each(['missing', 'malformed', 'oversized', 'disabled'])('CLI retains generated positions when source maps are %s', async (kind) => {
+  const source = join(directory, 'bundle.js')
+  const output = join(directory, 'result.json')
+  await writeFile(source, duplicateSource)
+  if (kind === 'malformed' || kind === 'disabled') await writeFile(source + '.map', 'invalid JSON')
+  if (kind === 'oversized') {
+    const { open } = await import('node:fs/promises')
+    const file = await open(source + '.map', 'w')
+    try {
+      await file.truncate(129 * 1024 * 1024)
+    } finally {
+      await file.close()
+    }
+  }
+  await execFileAsync(process.execPath, [
+    cli,
+    '--measure',
+    'duplicate-code',
+    '--source-file',
+    source,
+    '--duplicate-code-output',
+    output,
+    ...(kind === 'disabled' ? ['--no-source-maps'] : []),
+  ])
+  const report = JSON.parse(await readFile(output, 'utf8'))
+  expect(report.files[0].sourceMap).toMatchObject({ status: kind === 'disabled' ? 'skipped' : 'unavailable', occurrences: 2, mapped: 0 })
+  expect(report.groups[0].occurrences[0]).toMatchObject({ line: 1, column: 1 })
+  expect(report.groups[0].occurrences[0].originalLocation).toBeUndefined()
+})
+
+test('does not load a source map for unique functions', async () => {
+  const source = join(directory, 'unique.js')
+  const output = join(directory, 'result.json')
+  await writeFile(source, 'const a=()=>1; const b=()=>2')
+  await writeFile(source + '.map', 'invalid JSON')
+  await execFileAsync(process.execPath, [cli, '--measure', 'duplicate-code', '--source-file', source, '--duplicate-code-output', output])
+  expect(JSON.parse(await readFile(output, 'utf8')).files[0].sourceMap).toMatchObject({ status: 'skipped', occurrences: 0, mapped: 0 })
 })

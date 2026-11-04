@@ -114,3 +114,10 @@ test('handles declaration hoisting, catch bindings and computed keys', () => {
 test('reports parse errors', () => {
   expect(() => hashes('function {')).toThrow()
 })
+
+test('reads only real source map comments, preferring the last directive', () => {
+  expect(findDuplicateFunctions('const text="//# sourceMappingURL=fake.map"', 'fixture.js').sourceMap).toBeUndefined()
+  expect(findDuplicateFunctions('//# sourceMappingURL=first.map\n/*# sourceMappingURL=last.map */', 'fixture.js').sourceMap).toEqual({
+    url: 'last.map',
+  })
+})
