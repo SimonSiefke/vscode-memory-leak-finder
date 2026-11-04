@@ -3,6 +3,15 @@ import { dirname, join, relative } from 'node:path'
 import { escapeHtml } from '../EscapeHtml/EscapeHtml.ts'
 import * as Root from '../Root/Root.ts'
 
+const siteUrl = 'https://simonsiefke.github.io/vscode-memory-leak-finder/'
+const pageUrl = (page: string): string =>
+  siteUrl +
+  page
+    .replace(/index\.html$/, '')
+    .split('/')
+    .map(encodeURIComponent)
+    .join('/')
+
 const pageLabel = (path: string): string => {
   if (path === 'index.html') return 'Memory leak charts'
   if (path === 'instruction-count/index.html') return 'Instruction counts by test'
@@ -51,6 +60,19 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
     let html = await readFile(filePath, 'utf8')
     // The generator owns these documents; keeping this pass idempotent is useful for local previews.
     if (html.includes('class="SiteHeader"')) continue
+    const description =
+      page === 'index.html'
+        ? 'Explore VS Code memory leak and performance reports, including retained objects, event listeners, instruction counts, and CSS selector statistics.'
+        : `${title}: explore memory leak and performance measurements from automated VS Code tests with VS Code Memory Leak Finder.`
+    const metadata = `<meta name="description" content="${escapeHtml(description)}">
+<link rel="canonical" href="${escapeHtml(pageUrl(page))}">
+<link rel="sitemap" type="application/xml" href="${escapeHtml(siteUrl)}sitemap.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="VS Code Memory Leak Finder">
+<meta property="og:title" content="${escapeHtml(title)} | VS Code Memory Leak Finder">
+<meta property="og:description" content="${escapeHtml(description)}">
+<meta property="og:url" content="${escapeHtml(pageUrl(page))}">`
+    html = html.replace('</head>', `${metadata}\n</head>`)
     if (page !== 'index.html') html = html.replaceAll('VSCode Memory Leak Finder Charts', escapeHtml(title))
     html = html.replaceAll('<table>', '<div class="TableScroll"><table>').replaceAll('</table>', '</table></div>')
     html = html.replace(/<html(?: lang="en")?>/, '<html lang="en">')
@@ -61,4 +83,9 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
     html = html.replace('</body>', `</div><script src="${escapeHtml(href('site.js'))}"></script></body>`)
     await writeFile(filePath, html)
   }
+  const urls = pages.map((page) => `  <url><loc>${escapeHtml(pageUrl(page))}</loc></url>`).join('\n')
+  await writeFile(
+    join(basePath, 'sitemap.xml'),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+  )
 }
