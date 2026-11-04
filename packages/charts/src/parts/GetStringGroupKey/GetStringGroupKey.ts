@@ -11,10 +11,13 @@ export interface LocatedString {
 
 // Numeric path segments are commonly instance IDs. Keep digits in names,
 // versions, stack line/column positions, and the retaining location intact.
-export const getStringPattern = (value: string): string => value.replace(/(?<=\/)\d+(?=\/|[?#]|$)/g, '\\d+')
+export const getStringPattern = (value: string, location: string | null = null): string => {
+  if (location && /^[a-zA-Z0-9]{4,6}$/.test(value) && /[a-zA-Z]/.test(value)) return '<short hash>'
+  return value.replace(/(?<=\/)\d+(?=\/|[?#]|$)/g, '\\d+')
+}
 
 export const getGroupKey = (group: LocatedString): string => {
   if (group.stack) return JSON.stringify(['stack', group.stack, group.location, group.locationKind ?? null])
-  const pattern = group.string === null ? null : getStringPattern(group.string)
+  const pattern = group.string === null ? null : getStringPattern(group.string, group.location)
   return JSON.stringify([pattern, pattern !== group.string, group.location, group.heapObjectId ?? null, group.locationKind ?? null])
 }
