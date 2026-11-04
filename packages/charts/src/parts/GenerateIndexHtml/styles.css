@@ -31,6 +31,13 @@
   max-width: 100%;
 }
 
+.ChartTitle {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
 @media screen and (min-width: 700px) {
   .Charts {
     grid-template-columns: repeat(2, minmax(0, 1fr));

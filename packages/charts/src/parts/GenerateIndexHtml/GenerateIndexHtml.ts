@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { escapeHtml } from '../EscapeHtml/EscapeHtml.ts'
 import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 import * as GeneratePromiseStackTraceHtml from '../GeneratePromiseStackTraceHtml/GeneratePromiseStackTraceHtml.ts'
 import * as Root from '../Root/Root.ts'
@@ -39,6 +40,20 @@ const getMiddleHtml = (dirents: string[]) => {
   return html
 }
 
+const getLabeledChartsHtml = (dirents: string[]): string => {
+  let html = '<ul class="Charts SingleColumn">\n'
+  for (const dirent of dirents) {
+    if (!dirent.endsWith('.svg')) {
+      continue
+    }
+    const chartName = escapeHtml(dirent.slice(0, -4))
+    const src = escapeHtml(encodeURIComponent(dirent))
+    html += `        <li class="Chart"><h2 class="ChartTitle">${chartName}</h2><img class="ChartImage" src="./${src}" alt="${chartName}"></li>\n`
+  }
+  html += '      </ul>'
+  return html
+}
+
 const singleColumnFolders = new Set([
   'compiled-code-size-by-file',
   'compiled-code-size-by-function',
@@ -52,6 +67,9 @@ const singleColumnFolders = new Set([
 ])
 
 export const getFolderContentHtml = (folderName: string, dirents: string[]): string => {
+  if (folderName === 'cpu-performance-counters') {
+    return getLabeledChartsHtml(dirents)
+  }
   if (singleColumnFolders.has(folderName)) {
     return getSingleColumnHtml(dirents)
   }
