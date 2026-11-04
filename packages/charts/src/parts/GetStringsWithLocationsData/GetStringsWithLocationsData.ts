@@ -54,7 +54,7 @@ export const getStringsWithLocationsData = async (basePath: string) => {
           count,
           delta: count,
           name: `${text} (${location})`,
-          label: `${stackLabels.get(comparisonKey) ?? text}\n${location}`,
+          label: `${stackLabels.get(comparisonKey) ?? text} at ${location}`,
           title,
           comparisonKey,
         }

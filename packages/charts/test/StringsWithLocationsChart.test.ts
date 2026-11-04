@@ -9,7 +9,7 @@ test('registers the strings-with-locations chart', () => {
   expect(Charts.StringsWithLocations).toBe(Chart)
   expect(Chart.name).toBe('strings-with-locations')
   expect(Chart.multiple).toBe(true)
-  expect(Chart.createChart()).toMatchObject({ type: 'dual-bar-chart', yLabel: 'Added String Objects by Retaining Location' })
+  expect(Chart.createChart()).toMatchObject({ type: 'dual-bar-chart', rowHeight: 20, yLabel: 'Added String Objects by Retaining Location' })
 })
 
 test('shows added counts in descending order with stable text/location identities', async () => {
@@ -32,7 +32,8 @@ test('shows added counts in descending order with stable text/location identitie
     const result = await Chart.getData(directory)
     expect(result[0].filename).toBe('output')
     expect(result[0].data.map((item) => item.count)).toEqual([10, 2, 1, 1])
-    expect(result[0].data[0]).toMatchObject({ name: '"output" (src/other.ts:5:1)', delta: 10 })
+    expect(result[0].data[0]).toMatchObject({ name: '"output" (src/other.ts:5:1)', label: '"output" at src/other.ts:5:1', delta: 10 })
+    expect(result[0].data.every((item) => !item.label.includes('\n'))).toBe(true)
     expect(new Set(result[0].data.map((item) => item.comparisonKey)).size).toBe(4)
     expect(result[0].data.some((item) => item.name.includes('[sliced string #11] (unknown location)'))).toBe(true)
     expect(result[0].data.some((item) => item.name.includes('x'.repeat(150)))).toBe(true)
@@ -103,6 +104,7 @@ test('collapses stack components using measured partitions and preserves every a
     expect(firstRow.name.startsWith('Stack: ')).toBe(true)
     expect(firstRow.title).toContain('2 complete stack string objects; 3 component string objects')
     expect(data.filter((item) => item.name.startsWith('Stack: '))).toHaveLength(2)
+    expect(data.every((item) => !item.label.includes('\n') && item.label.includes(' at '))).toBe(true)
     expect(new Set(data.filter((item) => item.name.startsWith('Stack: ')).map((item) => item.label)).size).toBe(2)
     expect(data.some((item) => item.name.startsWith('"common fragment"'))).toBe(true)
   } finally {

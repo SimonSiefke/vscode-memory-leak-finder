@@ -9,7 +9,7 @@ export const createChart = () => ({
   marginLeft: 800,
   marginRight: 100,
   type: 'dual-bar-chart',
-  rowHeight: 40,
+  rowHeight: 20,
   labelLineWidth: 64,
   width: 1600,
   x: 'index',
