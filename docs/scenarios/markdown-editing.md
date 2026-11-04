@@ -68,6 +68,20 @@ accumulate undo history. Their endpoints retain more history than their starting
 states; generic zero-growth checks cannot distinguish that state from a leak.
 The other four scenarios keep their history bounded and run by default.
 
+`markdown-typing-python-extensions` adds an opt-in, network-dependent variant.
+Setup installs and enables Python and Pylance, opens a Python file, and waits
+for its symbols and both running extensions before closing it. It then prepares
+the same untracked 1,500-line Markdown fixture with Git enabled. Each iteration
+appends text through native keyboard events, saves, and verifies the cumulative
+contents while keeping the editor and undo history open.
+
+```sh
+node packages/cli/bin/test.js --only markdown-typing-python-extensions --runs 37 --run-skipped-tests-anyway --enable-extensions
+```
+
+This variant requires marketplace access during setup and keeps the Python
+extensions active while typing Markdown.
+
 Add `--check-leaks --measure-after --measure named-function-count3 --timeout-between 1000`
 to compare retained renderer functions after warmup and allow delayed editor work
 to finish before the final snapshot. Without the settling interval, continuous
@@ -86,7 +100,7 @@ server runs in a separate child process and needs its own inspector capture.
 For rapid undo/save/redo/save measurements, allow at least two seconds of
 settling so the save participant's 1,750 ms timeout callbacks can finish.
 
-These are short editing scenarios, not an hours-long crash reproducer. They
+These are short editing scenarios, not an hours-long crash reproducer. The original eight
 use built-in editor and Git functionality without Markdown preview or marketplace
 extensions. All typing occurs with auto-save disabled. The `markdown-edit-*`
 workloads bound history and contents by undoing each insertion and saving before
