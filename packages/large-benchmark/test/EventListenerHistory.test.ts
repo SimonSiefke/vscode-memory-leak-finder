@@ -105,3 +105,27 @@ test('listener frames have an accurate title and unsupported count collectors ar
   )
   expect(() => historyMeasure('event-listeners')).toThrow('History measure')
 })
+
+test('the historical core report rejects incomplete fixed inventories instead of redefining completeness from a partial run', async () => {
+  const input = join(root, 'partial-core')
+  await io.writeJson(join(input, 'event-listener-count-history.json'), {
+    commit,
+    measure: 'event-listener-count',
+    suite: 'historical-core',
+    counts: [{ name: 'base.json', count: 10 }],
+  })
+  await expect(
+    reportFunctionCountHistory(
+      {
+        schemaVersion: 1,
+        measure: 'event-listener-count-history',
+        suite: 'historical-core',
+        frameDurationMs: 400,
+        releases: [{ version: '1.50.0', commit }],
+      },
+      input,
+      join(root, 'partial-core-report'),
+    ),
+  ).rejects.toThrow('no usable')
+  expect(command).not.toHaveBeenCalled()
+})

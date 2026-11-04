@@ -48,6 +48,8 @@ export const historyMeasure = (value: string): HistoryMeasure => {
 const measureTitle = (measure: HistoryMeasure): string => (measure === 'function-count' ? 'Function Count' : 'Event Listener Count')
 export interface HistoryResult {
   commit: string
+  measure?: HistoryMeasure
+  suite?: HistorySuite
   counts: { name: string; count: number }[]
   diagnostic?: string
 }
@@ -185,10 +187,13 @@ export const reportFunctionCountHistory = async (manifest: HistoryManifest, inpu
   // old version fails a scenario, or turn missing counts into zero.
   const inventory =
     ordered.map((item) => (item.result?.diagnostic ? [] : (item.result?.counts ?? []))).sort((a, b) => b.length - a.length)[0] ?? []
-  const names = inventory.map((point) => point.name)
+  const names =
+    manifest.suite === 'historical-core' ? historicalCoreTests.map((name) => `${name}.json`) : inventory.map((point) => point.name)
   const usable = (result: HistoryResult | undefined): result is HistoryResult =>
     !!result &&
     !result.diagnostic &&
+    (result.measure ?? measure) === measure &&
+    (result.suite ?? 'default') === (manifest.suite ?? 'default') &&
     names.length > 0 &&
     result.counts.length === names.length &&
     new Set(names).size === names.length &&
