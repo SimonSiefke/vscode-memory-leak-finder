@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test } from '@jest/globals'
 import { execFile } from 'node:child_process'
-import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises'
+import { mkdtemp, mkdir, readFile, realpath, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -13,7 +13,8 @@ const cli = fileURLToPath(new URL('../bin/test.js', import.meta.url))
 let directory: string
 
 beforeEach(async () => {
-  directory = await mkdtemp(join(tmpdir(), 'duplicate-code-'))
+  // Match the CLI's canonical paths when the temporary directory has an alias.
+  directory = await realpath(await mkdtemp(join(tmpdir(), 'duplicate-code-')))
 })
 
 afterEach(async () => {
