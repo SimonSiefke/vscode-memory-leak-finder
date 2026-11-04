@@ -13,8 +13,13 @@ export const getStringsWithLocationsData = async (basePath: string) => {
   for (const filename of await readdir(directory)) {
     const raw = await readJson(join(directory, filename))
     const groups: readonly LocatedString[] = raw.stringsWithLocations ?? []
+    let omittedEntryCount = 0
     const grouped = new Map<string, { group: LocatedString; count: number; strings: Set<string>; stackStringCount: number }>()
     for (const group of groups.flatMap(expandStringStackGroups)) {
+      if (!group.stack && (group.string === 'NaN' || group.string === '0')) {
+        omittedEntryCount++
+        continue
+      }
       const key = getGroupKey(group)
       let entry = grouped.get(key)
       if (!entry) {
@@ -60,7 +65,12 @@ export const getStringsWithLocationsData = async (basePath: string) => {
         }
       })
       .sort((a, b) => b.count - a.count || a.comparisonKey.localeCompare(b.comparisonKey))
-    result.push({ data, filename: filename.replace(/\.json$/, '') })
+    result.push({
+      data,
+      filename: filename.replace(/\.json$/, ''),
+      omittedEntryCount,
+      ...(!data.length && omittedEntryCount ? { status: 'Only "NaN" and "0" strings grew; omitted from chart.' } : {}),
+    })
   }
   return result
 }
