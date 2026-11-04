@@ -76,7 +76,7 @@ type IssueCommentOctokit = {
         repo: string
         issue_number: number
         body: string
-      }) => Promise<{ data: { id: number } }>
+      }) => Promise<{ data: { id: number | bigint } }>
       readonly updateComment: (options: { owner: string; repo: string; comment_id: number; body: string }) => Promise<unknown>
     }
     readonly pulls: {

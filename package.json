@@ -51,7 +51,7 @@
     "prettier": "^3.9.10",
     "ts-jest": "^29.4.15",
     "typescript": "^6.0.3",
-    "ws": "^8.22.0"
+    "ws": "^8.22.1"
   },
   "jest": {
     "modulePathIgnorePatterns": [
