@@ -22,8 +22,8 @@ test('shows added counts in descending order with stable text/location identitie
       join(results, 'output.json'),
       JSON.stringify({
         stringsWithLocations: [
-          { string: 'output', location: 'src/owner.ts:42:7', count: 2 },
-          { string: 'output', location: 'src/other.ts:5:1', count: 10 },
+          { string: 'terminal output', location: 'src/owner.ts:42:7', count: 2 },
+          { string: 'terminal output', location: 'src/other.ts:5:1', count: 10 },
           { string: null, location: null, count: 1, stringType: 'sliced string', heapObjectId: '11' },
           { string: 'x'.repeat(150), location: null, count: 1 },
         ],
@@ -32,7 +32,11 @@ test('shows added counts in descending order with stable text/location identitie
     const result = await Chart.getData(directory)
     expect(result[0].filename).toBe('output')
     expect(result[0].data.map((item) => item.count)).toEqual([10, 2, 1, 1])
-    expect(result[0].data[0]).toMatchObject({ name: '"output" (src/other.ts:5:1)', label: '"output" at src/other.ts:5:1', delta: 10 })
+    expect(result[0].data[0]).toMatchObject({
+      name: '"terminal output" (src/other.ts:5:1)',
+      label: '"terminal output" at src/other.ts:5:1',
+      delta: 10,
+    })
     expect(result[0].data.every((item) => !item.label.includes('\n'))).toBe(true)
     expect(new Set(result[0].data.map((item) => item.comparisonKey)).size).toBe(4)
     expect(result[0].data.some((item) => item.name.includes('[sliced string #11] (unknown location)'))).toBe(true)
@@ -107,6 +111,50 @@ test('collapses stack components using measured partitions and preserves every a
     expect(data.every((item) => !item.label.includes('\n') && item.label.includes(' at '))).toBe(true)
     expect(new Set(data.filter((item) => item.name.startsWith('Stack: ')).map((item) => item.label)).size).toBe(2)
     expect(data.some((item) => item.name.startsWith('"common fragment"'))).toBe(true)
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
+})
+
+test('combines short event hashes at one location while preserving counts, samples, and stack ownership', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'strings-with-locations-hashes-'))
+  const location = 'src/vs/base/common/event.ts:1208:14'
+  const stack = 'Error\n    at owner (file:///owner.js:1:1)'
+  try {
+    await mkdir(join(directory, 'strings-with-locations'))
+    await writeFile(
+      join(directory, 'strings-with-locations', 'output.json'),
+      JSON.stringify({
+        stringsWithLocations: [
+          { string: 'a2df', location, count: 2 },
+          { string: 'a2e0', location, count: 3 },
+          { string: 'Ab12Z9', location, count: 4 },
+          { string: 'event', location, count: 5 },
+          { string: 'a2df', location: 'src/vs/base/common/event.ts:1209:14', count: 1 },
+          { string: 'a2e0', location, locationKind: 'stack-frame', count: 1 },
+          { string: 'a2df', location: null, count: 1 },
+          { string: 'a2e0', location: null, count: 1 },
+          { string: '1234', location, count: 1 },
+          { string: 'a2f', location, count: 1 },
+          { string: 'a2e1234', location, count: 1 },
+          { string: 'a_2e', location, count: 1 },
+          { string: '<short hash>', location, count: 1 },
+          { string: 'a2df', location, count: 2, stackCounts: [{ stack, count: 2 }] },
+        ],
+      }),
+    )
+    const [{ data, omittedEntryCount }] = await Chart.getData(directory)
+    expect(data).toHaveLength(11)
+    expect(data.reduce((total, item) => total + item.count, 0)).toBe(25)
+    expect(omittedEntryCount).toBe(0)
+    expect(data[0]).toMatchObject({ count: 14, delta: 14, label: `"<short hash>" at ${location}` })
+    expect(data[0].title).toContain('Short hashes grouped; 4 distinct string values')
+    for (const value of ['a2df', 'a2e0', 'Ab12Z9', 'event']) expect(data[0].title).toContain(JSON.stringify(value))
+    expect(data.filter((item) => item.label.endsWith(' at unknown location'))).toHaveLength(2)
+    expect(data.find((item) => item.name.startsWith('Stack: '))?.title).toContain(
+      '0 complete stack string objects; 2 component string objects',
+    )
+    expect(new Set(data.map((item) => item.comparisonKey)).size).toBe(data.length)
   } finally {
     await rm(directory, { recursive: true, force: true })
   }

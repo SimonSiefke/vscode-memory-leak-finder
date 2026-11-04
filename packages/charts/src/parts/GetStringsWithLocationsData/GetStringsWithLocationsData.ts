@@ -35,11 +35,12 @@ export const getStringsWithLocationsData = async (basePath: string) => {
     const stackLabels = getStackLabels([...grouped.values()].map((entry) => entry.group))
     const data = [...grouped]
       .map(([comparisonKey, { group, count, strings, stackStringCount }]) => {
+        const pattern = group.string === null ? null : getStringPattern(group.string, group.location)
         const text = group.stack
           ? `Stack: ${JSON.stringify(group.stack)}`
           : group.string === null
             ? `[${group.stringType ?? 'unavailable string'} #${group.heapObjectId}]`
-            : JSON.stringify(getStringPattern(group.string))
+            : JSON.stringify(pattern)
         const location = group.location
           ? `${group.locationKind === 'stack-frame' ? 'stack frame: ' : ''}${group.location}`
           : 'unknown location'
@@ -50,8 +51,10 @@ export const getStringsWithLocationsData = async (basePath: string) => {
           ...(group.stack
             ? [`${stackStringCount} complete stack string objects; ${count - stackStringCount} component string objects`, group.stack]
             : []),
-          ...(!group.stack && group.string !== null && getStringPattern(group.string) !== group.string
-            ? [`Numeric path segments grouped; ${samples.length} distinct string value${samples.length === 1 ? '' : 's'}`]
+          ...(!group.stack && pattern !== group.string
+            ? [
+                `${pattern === '<short hash>' ? 'Short hashes' : 'Numeric path segments'} grouped; ${samples.length} distinct string value${samples.length === 1 ? '' : 's'}`,
+              ]
             : []),
           ...(group.string === null ? [text] : []),
           ...samples.slice(0, 5).map((value) => JSON.stringify(value)),
