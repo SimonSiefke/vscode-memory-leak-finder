@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       measure:
-        description: Renderer count to chart across releases
-        type: choice
-        options: [function-count, event-listener-count]
+        description: Comma-separated numeric collectors (e.g. function-count,object-count,string-object-bytes), or all
+        type: string
         default: function-count
       build_source:
         description: Build Code OSS from source or download official stable release packages
@@ -145,7 +144,7 @@ jobs:
         id: build
         if: ${{ inputs.build_source != 'release' }}
         run: node packages/large-benchmark/src/main.ts extract --input-dir .large-build --commit "$COMMIT" --output-name executable
-      - name: Run the same count E2E suite on this version
+      - name: Run the same E2E suite separately for each selected collector
         env:
           BUILD_PATH: ${{ steps.build.outputs.executable }}
           MEASURE: ${{ inputs.measure }}

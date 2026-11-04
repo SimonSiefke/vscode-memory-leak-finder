@@ -4,11 +4,18 @@ import { pathToFileURL } from 'node:url'
 import { parseCommitReference } from '../CommitReference/CommitReference.ts'
 import { command, errorMessage, readJson, writeJson } from '../Io/Io.ts'
 import { repositoryRoot } from '../Prepare/Prepare.ts'
+import {
+  countHistoryMeasures,
+  historyMeasure,
+  historyMeasureDefinition,
+  historyValue,
+  type HistoryMeasure,
+} from '../CountHistoryMeasures/CountHistoryMeasures.ts'
 import type { StableRelease } from '../VersionRange/VersionRange.ts'
 
 export interface HistoryManifest {
   schemaVersion: 1
-  measure: 'function-count-history' | 'event-listener-count-history'
+  measure: `${HistoryMeasure}-history`
   releases: StableRelease[]
   frameDurationMs: number
   suite?: HistorySuite
@@ -39,16 +46,10 @@ export const historicalCoreTests = [
   'settings-open',
   'source-control-toggle',
 ]
-export type HistoryMeasure = 'function-count' | 'event-listener-count'
-export const historyMeasure = (value: string): HistoryMeasure => {
-  if (value !== 'function-count' && value !== 'event-listener-count')
-    throw new Error('History measure must be function-count or event-listener-count')
-  return value
-}
-const measureTitle = (measure: HistoryMeasure): string => (measure === 'function-count' ? 'Function Count' : 'Event Listener Count')
 export interface HistoryResult {
   commit: string
   measure?: HistoryMeasure
+  unit?: 'count' | 'bytes' | 'elements' | 'entries'
   suite?: HistorySuite
   counts: { name: string; count: number }[]
   diagnostic?: string
@@ -56,7 +57,7 @@ export interface HistoryResult {
 
 // The CLI writes to a shared directory: run serially within a checkout and clear
 // only this collector before launching, so stale measurements cannot become frames.
-export const measureFunctionCounts = async (
+export const measureCounts = async (
   commit: string,
   version: string,
   executable: string,
@@ -64,7 +65,10 @@ export const measureFunctionCounts = async (
   measure: HistoryMeasure = 'function-count',
   suite: HistorySuite = 'default',
 ): Promise<void> => {
+  historyMeasure(measure)
   const reference = parseCommitReference(commit).reference
+  await rm(join(output, `${measure}-history.json`), { force: true })
+  await rm(join(output, 'raw'), { recursive: true, force: true })
   let cwd = 'packages/e2e'
   if (suite === 'historical-core') {
     const directory = join(output, 'suite')
@@ -103,12 +107,15 @@ export const measureFunctionCounts = async (
   }
   await mkdir(output, { recursive: true })
   const counts: HistoryResult['counts'] = []
-  for (const name of (await readdir(raw).catch(() => [] as string[])).sort()) {
-    if (!name.endsWith('.json')) continue
-    const data = await readJson<Record<string, { after?: unknown }>>(join(raw, name))
-    const count = data[measure === 'function-count' ? 'functionCount' : 'eventListenerCount']?.after
-    if (typeof count !== 'number' || !Number.isSafeInteger(count) || count < 0) throw new Error(`Invalid ${measure}: ${name}`)
-    counts.push({ name, count })
+  try {
+    for (const name of (await readdir(raw).catch(() => [] as string[])).sort()) {
+      if (!name.endsWith('.json')) continue
+      const data = await readJson<unknown>(join(raw, name))
+      const count = historyValue(measure, data)
+      counts.push({ name, count })
+    }
+  } catch (error) {
+    diagnostic = [diagnostic, errorMessage(error)].filter(Boolean).join('; ')
   }
   await cp(raw, join(output, 'raw'), { recursive: true }).catch((error: NodeJS.ErrnoException) => {
     if (error.code !== 'ENOENT') throw error
@@ -116,6 +123,7 @@ export const measureFunctionCounts = async (
   await writeJson(join(output, `${measure}-history.json`), {
     commit: reference,
     measure,
+    unit: historyMeasureDefinition(measure).unit,
     suite,
     counts,
     ...(diagnostic ? { diagnostic } : {}),
@@ -125,7 +133,7 @@ export const measureFunctionCounts = async (
 
 const escape = (value: string): string => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;')
 
-export const functionCountFrame = (
+export const countFrame = (
   version: string,
   counts: HistoryResult['counts'],
   maximum: number,
@@ -137,7 +145,7 @@ export const functionCountFrame = (
   const points = (values: HistoryResult['counts']) => values.map((point, index) => `${x(index)},${y(point.count)}`).join(' ')
   const grid = Array.from({ length: 6 }, (_, i) => {
     const count = (maximum * i) / 5
-    return `<path d="M100 ${y(count)}H1180" stroke="#ddd"/><text x="90" y="${y(count) + 5}" text-anchor="end">${Math.round(count).toLocaleString('en-US')}</text>`
+    return `<path d="M100 ${y(count)}H1180" stroke="#ddd"/><text x="90" y="${y(count) + 5}" text-anchor="end">${count >= 1_000_000 ? new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(count) : Math.round(count).toLocaleString('en-US')}</text>`
   }).join('')
   const ticks = counts
     .map((point, index) =>
@@ -146,9 +154,10 @@ export const functionCountFrame = (
     .join('')
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
 <rect width="1280" height="720" fill="white"/><g font-family="DejaVu Sans" font-size="16" fill="#222">
-<text x="100" y="55" font-size="28">${measureTitle(measure)}</text><text x="1180" y="55" text-anchor="end" font-size="28">VS Code ${escape(version)}</text>
+<text x="100" y="55" font-size="28">${historyMeasureDefinition(measure).title}</text><text x="1180" y="55" text-anchor="end" font-size="28">VS Code ${escape(version)}</text>
 <path d="M100 90H140" stroke="#64748b" stroke-opacity="0.4" stroke-width="3"/><text x="152" y="95">Original: VS Code ${escape(original.version)}</text>
 <path d="M650 90H690" stroke="black" stroke-width="2"/><text x="702" y="95">Current: VS Code ${escape(version)}</text>
+<text x="100" y="115" font-size="13">${historyMeasureDefinition(measure).unit}</text>
 ${grid}${ticks}<polyline data-series="original" points="${points(original.counts)}" fill="none" stroke="#64748b" stroke-opacity="0.4" stroke-width="3"/>
 <polyline data-series="current" points="${points(counts)}" fill="none" stroke="black" stroke-width="2"/>
 <text x="640" y="695" text-anchor="middle">E2E test index (same test order for every version)</text></g></svg>`
@@ -164,10 +173,10 @@ const findResults = async (directory: string, measure: HistoryMeasure): Promise<
   return results
 }
 
-export const reportFunctionCountHistory = async (manifest: HistoryManifest, input: string, output: string): Promise<void> => {
+export const reportCountHistory = async (manifest: HistoryManifest, input: string, output: string): Promise<void> => {
   if (
     manifest.schemaVersion !== 1 ||
-    !['function-count-history', 'event-listener-count-history'].includes(manifest.measure) ||
+    !Object.keys(countHistoryMeasures).some((name) => `${name}-history` === manifest.measure) ||
     !manifest.releases?.length ||
     !Number.isSafeInteger(manifest.frameDurationMs) ||
     manifest.frameDurationMs < 40 ||
@@ -175,7 +184,8 @@ export const reportFunctionCountHistory = async (manifest: HistoryManifest, inpu
   )
     throw new Error('Invalid count history manifest')
   const measure = historyMeasure(manifest.measure.replace(/-history$/, ''))
-  const title = `${measureTitle(measure)} over time`
+  const definition = historyMeasureDefinition(measure)
+  const title = `${definition.title} over time`
   const videoName = `${measure}-history.mp4`
   const results = await findResults(input, measure)
   const ordered = manifest.releases.map((release) => {
@@ -193,6 +203,7 @@ export const reportFunctionCountHistory = async (manifest: HistoryManifest, inpu
     !!result &&
     !result.diagnostic &&
     (result.measure ?? measure) === measure &&
+    (result.unit ?? definition.unit) === definition.unit &&
     (result.suite ?? 'default') === (manifest.suite ?? 'default') &&
     names.length > 0 &&
     result.counts.length === names.length &&
@@ -203,7 +214,7 @@ export const reportFunctionCountHistory = async (manifest: HistoryManifest, inpu
   await mkdir(output, { recursive: true })
   const frameDir = join(output, 'frames')
   await rm(frameDir, { recursive: true, force: true })
-  for (const name of ['function-count-history.mp4', 'event-listener-count-history.mp4', 'comparison.svg', 'comparison.png'])
+  for (const name of [...Object.keys(countHistoryMeasures).map((name) => `${name}-history.mp4`), 'comparison.svg', 'comparison.png'])
     await rm(join(output, name), { force: true })
   await mkdir(frameDir)
   await writeJson(
@@ -217,12 +228,13 @@ export const reportFunctionCountHistory = async (manifest: HistoryManifest, inpu
     })),
   )
   await writeJson(join(output, 'test-order.json'), names)
+  await writeJson(join(output, 'metric.json'), { measure, ...definition })
   const original = frames[0]
   await writeFile(
     join(output, 'index.html'),
     `<!doctype html><meta charset="utf-8"><title>${title}</title>
 <h1>${title}</h1><p>${frames.length}/${ordered.length} versions; ${manifest.frameDurationMs} ms per frame. Shared axes. <a href="coverage.json">Coverage and diagnostics</a> · <a href="test-order.json">Test order</a></p>
-<p>Suite: ${escape(manifest.suite ?? 'default')}. Counts are retained renderer event listeners or functions after each scenario in one running application; they are not a measurement of all internal VS Code event subscriptions.</p>
+<p>Suite: ${escape(manifest.suite ?? 'default')}. Absolute renderer totals after each scenario in one running application. Unit: ${definition.unit}. ${escape(definition.description)}</p>
 ${original ? `<p>The faded line preserves the first usable version, VS Code ${escape(original.version)}, throughout playback. <a href="comparison.png">View the final comparison image</a> · <a href="comparison.svg">SVG</a></p>` : ''}
 <video controls loop width="1280" src="${videoName}"></video><ul>${ordered.map((item) => `<li>VS Code ${escape(item.version)}: ${usable(item.result) ? 'included' : 'unavailable'}</li>`).join('')}</ul>`,
   )
@@ -231,13 +243,7 @@ ${original ? `<p>The faded line preserves the first usable version, VS Code ${es
     const path = join(frameDir, String(index).padStart(4, '0'))
     await writeFile(
       `${path}.svg`,
-      functionCountFrame(
-        item.version,
-        item.result!.counts,
-        maximum,
-        { version: original.version, counts: original.result!.counts },
-        measure,
-      ),
+      countFrame(item.version, item.result!.counts, maximum, { version: original.version, counts: original.result!.counts }, measure),
     )
     await command('ffmpeg', ['-v', 'error', '-y', '-c:v', 'librsvg', '-i', `${path}.svg`, '-frames:v', '1', `${path}.png`])
   }

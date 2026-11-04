@@ -170,8 +170,44 @@ reach the job time limit; prefer focused measures for long histories.
 ## Renderer counts over time video
 
 Run the [Large Performance Over Time workflow](../../.github/workflows/large-performance-over-time.yml)
-for a video of the renderer **function-count** or **event-listener-count** chart across VS Code releases.
-The `measure` input selects the collector; it defaults to `function-count`.
+for videos of numeric renderer metrics across VS Code releases.
+The `measure` input accepts a collector, a comma-separated list, or `all` for the
+32 supported collectors. It defaults to `function-count`. For example:
+
+```text
+function-count,object-count,string-object-count,string-object-bytes,array-count,array-element-count,weak-map-count
+```
+
+| Collector                                       | Meaning / unit                                                |
+| ----------------------------------------------- | ------------------------------------------------------------- |
+| `function-count`                                | Function objects / count                                      |
+| `object-count`                                  | Existing object collector total / count                       |
+| `string-object-count`                           | Live flat, concatenated, and sliced string heap nodes / count |
+| `string-object-bytes`                           | String heap-node shallow size, including overhead / bytes     |
+| `string-count`                                  | Snapshot string-table entries, including metadata / count     |
+| `array-count`                                   | Array objects / count                                         |
+| `array-element-count`                           | Sum of array lengths, including sparse slots / elements       |
+| `weak-map-count`, `weak-set-count`, `map-count` | Collection objects / count                                    |
+| `map-size`, `set-size`                          | Sum of collection sizes / entries                             |
+| `array-buffer-bytes`                            | Snapshot ArrayBuffer backing stores / bytes                   |
+
+Array element counts are not array allocation sizes. String object bytes describe
+snapshot shallow size, rather than character counts or retained sizes. Each report
+and frame labels its unit. See the [metric registry](src/parts/CountHistoryMeasures/CountHistoryMeasures.ts)
+for the complete list, also including closures, object shapes, native contexts,
+promises, errors, regular expressions, typed array occurrences, WeakRefs,
+FinalizationRegistries, DOM nodes, event targets, listeners, observers, abort
+controllers/signals, and canvases. Unsupported/non-numeric diagnostic collectors
+are rejected before release resolution or measurement.
+
+Multiple selections share one frozen release list and one build/download per
+version. Within each version job, collectors run serially in separate application
+launches with fresh profiles; the checkout's existing profile is restored afterwards.
+This keeps the release matrix within GitHub's 256-job limit without multiplying
+jobs by collector count. Snapshot-based string and byte collectors can take much
+longer than query-based counters. Broad selections over long histories may reach
+the 350-minute per-version job limit; select smaller groups or version ranges when needed.
+
 For an event-listener history from VS Code 1.50.0 onward, select
 `measure: event-listener-count`, `build_source: release`, `suite: historical-core`,
 and set `version_range` to `1.50.0...<latest published stable version>`.
@@ -185,7 +221,7 @@ The optional `historical-core` suite runs 18 fixed existing editor, Explorer,
 Settings, keyboard shortcuts, debug console, Activity Bar, and source control
 scenarios. It avoids tests for recently introduced features and keeps the same
 inventory and ordering across every release. `default` retains the ordinary suite.
-Counts describe renderer DOM event listeners on EventTarget objects, document, and
+For `event-listener-count`, values describe renderer DOM event listeners on EventTarget objects, document, and
 window; they do not count all internal VS Code event-emitter subscriptions.
 
 The defaults are the latest **20 published stable releases** (including patches), in
@@ -195,10 +231,10 @@ controls playback speed (40–60000 ms).
 
 This runs the same default E2E suite and `--check-leaks --measure-after --measure function-count`
 arguments (substituting the selected collector) as the ordinary function-count CI job, using the same current harness
-checkout for every version. Each version is built and measured once, independently
+checkout for every version. Each version is built/downloaded once and measured once per selected collector, independently
 of adjacent versions. It does not run the paired performance collectors or repeat
 the suite 37 times. The suite uses one running application, without restarting
-between tests, so counts describe the retained functions after each scenario.
+between tests, so values describe the absolute after-test totals for that collector.
 
 The page objects support both textarea and native EditContext inputs and both
 historical source-control repository label layouts. The Modern UI checkbox
@@ -209,8 +245,13 @@ account for that when comparing this scenario across versions. Compatibility
 changes do not resolve missing or failed VS Code build artifacts.
 
 Download **large-performance-over-time** and open `index.html` or play
-`function-count-history.mp4` or `event-listener-count-history.mp4`. The 1280×720 H.264 video has the VS Code version at
-the top right of every frame. All frames use the same zero-based count scale and
+`<measure>-history.mp4`. Single-measure runs retain the original flat artifact
+layout. Multi-measure runs have a top-level index and `videos.json`, with a separate
+`<measure>/` subdirectory for each metric's MP4, frames, comparison image, test order,
+metadata, and coverage. A collector with no usable frames fails independently;
+other collectors' videos are still rendered and preserved before the job reports
+incomplete coverage. The 1280×720 H.264 video has the VS Code version at
+the top right of every frame. All frames for one metric use the same zero-based scale and
 alphabetical test order. Every frame overlays the first usable version as a faded
 reference line behind the current version, with a legend identifying both versions.
 Failed or unavailable initial versions are skipped when choosing this fixed reference.
@@ -221,8 +262,8 @@ the last. SVG and PNG frames are retained in `frames/`, and
 eight-second video at the default speed; the HTML player supports looping.
 
 Build failures and versions without matching test inventories are omitted from
-playback and listed in `coverage.json` and the HTML report. The largest collected
-inventory defines the shared test order; only exact matches enter the video.
+playback and listed in `coverage.json` and the HTML report. The fixed historical core inventory, or the largest collected default-suite
+inventory, defines the shared test order for each metric; only exact matches enter its video.
 A nonzero harness exit excludes that version; partial counts and the failure
 diagnostic are retained. Missing/invalid counts are never replaced with zero. A run with no usable frames fails after saving coverage. A single usable
 version still produces a video. Raw per-test data is available in each
@@ -238,6 +279,7 @@ npm run large-performance -- history-matrix --last-versions 20 --output-dir .tmp
 # Or: history-matrix --version-range 1.100.0...1.110.0 --frame-duration-ms 400
 # Add --measure event-listener-count --suite historical-core to matrix and measure commands
 # for historical listener comparisons. Omit --build-path to download the official release.
+# To generate several videos, use the same comma-separated --measure list in both commands.
 
 # For each release in manifest.json, prepare/extract its build using the existing
 # prepare/extract commands, then run serially in this checkout:
@@ -254,7 +296,7 @@ Measurement jobs require the usual native Linux desktop dependencies. Report gen
 requires FFmpeg with the `librsvg` decoder and `libx264` encoder, plus DejaVu fonts
 (`sudo apt-get install ffmpeg fonts-dejavu-core` on Ubuntu). The workflow installs
 them automatically. The report command also accepts result artifacts downloaded
-into separate subdirectories. Each manifest commit must have at most one result.
+into separate subdirectories. Each manifest commit must have at most one result per selected collector.
 
 ## CSS selector comparisons
 

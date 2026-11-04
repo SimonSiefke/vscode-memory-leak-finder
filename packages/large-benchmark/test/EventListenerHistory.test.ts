@@ -9,8 +9,8 @@ const root = await mkdtemp(join(tmpdir(), 'listener-history-'))
 const command = jest.fn<typeof io.command>()
 jest.unstable_mockModule('../src/parts/Io/Io.ts', () => ({ ...io, command }))
 jest.unstable_mockModule('../src/parts/Prepare/Prepare.ts', () => ({ ...prepare, repositoryRoot: root }))
-const { functionCountFrame, historicalCoreTests, historyMeasure, measureFunctionCounts, reportFunctionCountHistory } =
-  await import('../src/parts/FunctionCountHistory/FunctionCountHistory.ts')
+const { countFrame, historicalCoreTests, measureCounts, reportCountHistory } = await import('../src/parts/CountHistory/CountHistory.ts')
+const { historyMeasure } = await import('../src/parts/CountHistoryMeasures/CountHistoryMeasures.ts')
 const commit = 'a'.repeat(40)
 const raw = join(root, '.vscode-memory-leak-finder-results/event-listener-count')
 
@@ -33,7 +33,7 @@ test('listener collection clears only its own stale data and uses the official v
     return ''
   })
   const output = join(root, 'measured')
-  await measureFunctionCounts(commit, '1.50.0', '', output, 'event-listener-count', 'historical-core')
+  await measureCounts(commit, '1.50.0', '', output, 'event-listener-count', 'historical-core')
   expect(JSON.parse(await readFile(join(output, 'event-listener-count-history.json'), 'utf8'))).toMatchObject({
     commit,
     measure: 'event-listener-count',
@@ -51,7 +51,7 @@ test('a failed listener suite retains raw evidence and its diagnostic but still 
     throw new Error('scenario failed')
   })
   const output = join(root, 'failed')
-  await expect(measureFunctionCounts(commit, '1.50.0', '/code', output, 'event-listener-count')).rejects.toThrow('scenario failed')
+  await expect(measureCounts(commit, '1.50.0', '/code', output, 'event-listener-count')).rejects.toThrow('scenario failed')
   expect(JSON.parse(await readFile(join(output, 'event-listener-count-history.json'), 'utf8'))).toMatchObject({
     diagnostic: 'scenario failed',
   })
@@ -75,7 +75,7 @@ test('listener reports use listener results, shared scales, the initial referenc
   })
   await io.writeJson(join(input, 'function-count-history.json'), { commit, counts: [{ name: 'different.json', count: 999 }] })
   const output = join(root, 'report')
-  await reportFunctionCountHistory(
+  await reportCountHistory(
     {
       schemaVersion: 1,
       measure: 'event-listener-count-history',
@@ -100,9 +100,7 @@ test('listener reports use listener results, shared scales, the initial referenc
 })
 
 test('listener frames have an accurate title and unsupported count collectors are rejected', () => {
-  expect(functionCountFrame('1.50.0', [{ name: 'base.json', count: 0 }], 10, undefined, 'event-listener-count')).toContain(
-    'Event Listener Count',
-  )
+  expect(countFrame('1.50.0', [{ name: 'base.json', count: 0 }], 10, undefined, 'event-listener-count')).toContain('Event Listener Count')
   expect(() => historyMeasure('event-listeners')).toThrow('History measure')
 })
 
@@ -115,7 +113,7 @@ test('the historical core report rejects incomplete fixed inventories instead of
     counts: [{ name: 'base.json', count: 10 }],
   })
   await expect(
-    reportFunctionCountHistory(
+    reportCountHistory(
       {
         schemaVersion: 1,
         measure: 'event-listener-count-history',
@@ -128,4 +126,43 @@ test('the historical core report rejects incomplete fixed inventories instead of
     ),
   ).rejects.toThrow('no usable')
   expect(command).not.toHaveBeenCalled()
+})
+
+test.each([
+  'function-count',
+  'object-count',
+  'string-object-count',
+  'string-object-bytes',
+  'array-count',
+  'array-element-count',
+  'weak-map-count',
+] as const)('%s collection reads its own absolute total and preserves its units', async (measure) => {
+  const key = measure.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase())
+  command.mockImplementation(async (_executable, args) => {
+    expect(args).toEqual(expect.arrayContaining(['--measure', measure]))
+    await io.writeJson(join(root, '.vscode-memory-leak-finder-results', measure, 'base.json'), { [key]: { before: 50, after: 100 } })
+    return ''
+  })
+  const output = join(root, 'scalar-collection', measure)
+  await measureCounts(commit, '1.50.0', '/code', output, measure)
+  expect(JSON.parse(await readFile(join(output, `${measure}-history.json`), 'utf8'))).toMatchObject({
+    measure,
+    unit: measure.endsWith('bytes') ? 'bytes' : measure === 'array-element-count' ? 'elements' : 'count',
+    counts: [{ name: 'base.json', count: 100 }],
+  })
+})
+
+test('invalid byte results preserve their raw data and diagnostic and cannot become valid zero totals', async () => {
+  command.mockImplementation(async () => {
+    await io.writeJson(join(root, '.vscode-memory-leak-finder-results/string-object-bytes/base.json'), {
+      stringObjectBytes: { after: null },
+    })
+    return ''
+  })
+  const output = join(root, 'invalid-bytes')
+  await expect(measureCounts(commit, '1.50.0', '/code', output, 'string-object-bytes')).rejects.toThrow('Invalid absolute')
+  const result = JSON.parse(await readFile(join(output, 'string-object-bytes-history.json'), 'utf8'))
+  expect(result.diagnostic).toContain('Invalid absolute')
+  expect(result.counts).toEqual([])
+  expect(JSON.parse(await readFile(join(output, 'raw/base.json'), 'utf8'))).toEqual({ stringObjectBytes: { after: null } })
 })

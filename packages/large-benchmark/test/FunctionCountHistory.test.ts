@@ -2,7 +2,7 @@ import { afterEach, expect, jest, test } from '@jest/globals'
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { functionCountFrame, reportFunctionCountHistory } from '../src/parts/FunctionCountHistory/FunctionCountHistory.ts'
+import { countFrame, reportCountHistory } from '../src/parts/CountHistory/CountHistory.ts'
 import { writeJson } from '../src/parts/Io/Io.ts'
 import { largePerformance } from '../src/parts/Main/Main.ts'
 import { resolveLastVersions } from '../src/parts/VersionRange/VersionRange.ts'
@@ -19,7 +19,7 @@ const temporary = async () => {
 }
 
 test('frames preserve zero counts, fixed axes, and place escaped version labels at the top right', () => {
-  const frame = functionCountFrame(
+  const frame = countFrame(
     '1.100.0<&',
     [
       { name: 'a.json', count: 0 },
@@ -42,7 +42,7 @@ test('frames retain the original version as a faded reference on the same scale 
     ],
   }
   for (const version of ['1.141.0', '1.142.0']) {
-    const frame = functionCountFrame(
+    const frame = countFrame(
       version,
       [
         { name: 'a.json', count: 50 },
@@ -78,7 +78,7 @@ test('missing and duplicate results preserve a coverage report and fail without 
   await writeJson(join(directory, 'input/duplicate/function-count-history.json'), result)
   const output = join(directory, 'output')
   await expect(
-    reportFunctionCountHistory(
+    reportCountHistory(
       {
         schemaVersion: 1,
         measure: 'function-count-history',
@@ -113,7 +113,7 @@ test('failed suites with partial counts cannot define an inventory or become fra
     diagnostic: 'test suite exited 1',
   })
   await expect(
-    reportFunctionCountHistory(
+    reportCountHistory(
       { schemaVersion: 1, measure: 'function-count-history', frameDurationMs: 400, releases: [{ version: '1.100.0', commit }] },
       join(directory, 'input'),
       join(directory, 'output'),
