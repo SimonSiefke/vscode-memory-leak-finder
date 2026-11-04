@@ -6,7 +6,7 @@ import { getGroupKey, getStringPattern, type LocatedString } from '../GetStringG
 import { getStackLabels } from '../GetStackLabels/GetStackLabels.ts'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
-const excludedStringValues = new Set(['NaN', '0', '4294967040'])
+const excludedStringValues = new Set(['NaN', '0', '4294967040', 'Infinity', '-Infinity'])
 
 export const getStringsWithLocationsData = async (basePath: string) => {
   const directory = join(basePath, 'strings-with-locations')
