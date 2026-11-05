@@ -714,7 +714,11 @@ export const runTestsWithCallback = async ({
             if (measureAfter && (inspectIntegratedBrowser || inspectProcess || isMemoryCityMeasure(measure))) {
               await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
             }
-            if (inspectIntegratedBrowser || inspectProcess) {
+            if (inspectIntegratedBrowser || inspectProcess || inspectExtensions) {
+              if (inspectExtensions) {
+                // Workspace setup can restart the extension host before measurement begins.
+                await disposeWorker('memory', workers.memoryRpc)
+              }
               if (inspectProcess) {
                 workers.memoryRpc = await MemoryLeakWorker.startWorker(
                   workers.devtoolsWebSocketUrl,

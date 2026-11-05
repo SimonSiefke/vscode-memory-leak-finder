@@ -111,7 +111,7 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     async openFile(fileName: string) {
       try {
         await page.waitForIdle()
-        await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform || '') })
+        await this.show({ key: KeyBindings.getOpenQuickPickFiles(platform || ''), pressKeyOnce: true })
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const quickPickInput = await this.waitForInputVisible()

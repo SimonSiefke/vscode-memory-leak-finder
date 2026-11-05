@@ -575,6 +575,7 @@ export interface MultiDiffEditor {
   shouldBeVisible(): Promise<void>
 }
 export interface Notebook {
+  focusReplInput(): Promise<void>
   addMarkdownCell(): Promise<void>
   clearAllOutputs(): Promise<void>
   createVenv(): Promise<void>
@@ -583,6 +584,7 @@ export interface Notebook {
   removeMarkdownCell(): Promise<void>
   scrollDown(): Promise<void>
   scrollUp(): Promise<void>
+  shouldHaveKernel(expectedKernel: string): Promise<void>
   shouldHaveOutput(expectedOutput: string): Promise<void>
   splitCell(cellIndex?: any): Promise<void>
 }
@@ -596,8 +598,9 @@ export interface Notification {
   shouldHaveItem(expectedMessage: any): Promise<void>
 }
 export interface Output {
+  shouldHaveText(text: RegExp, timeout?: number): Promise<void>
   clearFilter(): Promise<void>
-  filter(filterValue: any): Promise<void>
+  filter(filterValue: any, options?: { timeout?: number }): Promise<void>
   hide(): Promise<void>
   moveOutputToSidebar(): Promise<void>
   openEditor(): Promise<void>
@@ -914,6 +917,7 @@ export interface TerminalInlineChat {
   show(): Promise<void>
 }
 export interface Testing {
+  shouldHaveSummary(text: string | RegExp, timeout?: number): Promise<void>
   clearAllResults(): Promise<void>
   focusOnTestExplorerView(): Promise<void>
   runAllTests(options: any): Promise<void>
