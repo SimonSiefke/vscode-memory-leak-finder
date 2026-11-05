@@ -79,7 +79,8 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
     if (!html.includes('name="viewport"'))
       html = html.replace('</head>', '<meta name="viewport" content="width=device-width, initial-scale=1"></head>')
     html = html.replace('</head>', `<link rel="stylesheet" href="${escapeHtml(href('site.css'))}"></head>`)
-    html = html.replace(/<body>/, `<body>${header}<div class="SiteContent" id="page-content" tabindex="-1">`)
+    const contentClass = html.includes('class="Layout"') ? 'SiteContent SiteContentWithNavigation' : 'SiteContent'
+    html = html.replace(/<body>/, `<body>${header}<div class="${contentClass}" id="page-content" tabindex="-1">`)
     html = html.replace('</body>', `</div><script src="${escapeHtml(href('site.js'))}"></script></body>`)
     await writeFile(filePath, html)
   }

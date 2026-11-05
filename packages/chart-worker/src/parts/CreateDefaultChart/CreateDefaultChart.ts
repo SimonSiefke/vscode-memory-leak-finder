@@ -4,7 +4,7 @@ import * as Plot from '../Plot/Plot.ts'
 export const createDefaultChart = (
   data: any[],
   {
-    marginLeft = 60,
+    marginLeft = 70,
     x,
     xLabel,
     y,
@@ -14,7 +14,7 @@ export const createDefaultChart = (
   const baseHtml = Plot.plot({
     marginLeft,
     marks: [Plot.lineY(data, { stroke: 'black', x, y })],
-    style: 'overflow: visible;background:white',
+    style: { overflow: 'visible', background: 'white', fontSize: '13px' },
     x: {
       label: xLabel,
     },

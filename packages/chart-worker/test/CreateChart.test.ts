@@ -10,7 +10,7 @@ test('main', async () => {
     yLabel: 'Y',
   }
   expect(await createChart(data, options))
-    .toBe(`<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" class=\"plot-d6a7b5\" fill=\"currentColor\" font-family=\"system-ui, sans-serif\" font-size=\"10\" text-anchor=\"middle\" width=\"640\" height=\"400\" viewBox=\"0 0 640 400\" style=\"overflow: visible; background: white;\"><style>:where(.plot-d6a7b5) {
+    .toBe(`<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" class=\"plot-d6a7b5\" fill=\"currentColor\" font-family=\"system-ui, sans-serif\" font-size=\"10\" text-anchor=\"middle\" width=\"640\" height=\"400\" viewBox=\"0 0 640 400\" style=\"overflow: visible; background: white; font-size: 13px;\"><style>:where(.plot-d6a7b5) {
   --plot-background: white;
   display: block;
   height: auto;
@@ -20,7 +20,7 @@ test('main', async () => {
 :where(.plot-d6a7b5 text),
 :where(.plot-d6a7b5 tspan) {
   white-space: pre;
-}</style><g aria-label=\"y-axis label\" text-anchor=\"start\" transform=\"translate(-57,-17)\"><text y=\"0.71em\" transform=\"translate(60,20)\">Y</text></g><g aria-label=\"x-axis label\" text-anchor=\"end\" transform=\"translate(17,27)\"><text transform=\"translate(620,370)\">X</text></g></svg>`)
+}</style><g aria-label=\"y-axis label\" text-anchor=\"start\" transform=\"translate(-67,-17)\"><text y=\"0.71em\" transform=\"translate(70,20)\">Y</text></g><g aria-label=\"x-axis label\" text-anchor=\"end\" transform=\"translate(17,27)\"><text transform=\"translate(620,370)\">X</text></g></svg>`)
 })
 
 test('bar chart highlights missing rows with full-width non-overlapping row boxes', async () => {
