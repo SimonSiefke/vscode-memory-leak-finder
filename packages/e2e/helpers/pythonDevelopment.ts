@@ -69,6 +69,8 @@ export const setup = async (
         'editor.inlineSuggest.enabled': false,
         'editor.autoClosingBrackets': 'never',
         'python.analysis.completeFunctionParens': false,
+        'python.analysis.typeCheckingMode': 'basic',
+        'terminal.integrated.env.linux': { PROMPT_COMMAND: null, PS1: '$ ' },
         'files.autoSave': 'off',
       }),
     },

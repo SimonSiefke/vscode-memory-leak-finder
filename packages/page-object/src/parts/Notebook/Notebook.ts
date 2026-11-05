@@ -182,6 +182,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to scroll up in notebook`)
       }
     },
+    async focusReplInput() {
+      try {
+        const input = page.locator('.interactive-editor .input-cell-container :is(.native-edit-context, .inputarea)')
+        await expect(input).toBeVisible()
+        await input.focus()
+        await expect(input).toBeFocused()
+      } catch (error) {
+        throw new VError(error, 'Failed to focus REPL input')
+      }
+    },
+    async shouldHaveKernel(expectedKernel: string) {
+      try {
+        const kernelLabel = page.locator('.kernel-action-view-item .kernel-label')
+        await expect(kernelLabel).toHaveText(expectedKernel, { timeout: 30_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to verify notebook kernel ${expectedKernel}`)
+      }
+    },
     async shouldHaveOutput(expectedOutput: string) {
       try {
         const notebook = page.locator('.notebook-editor')
