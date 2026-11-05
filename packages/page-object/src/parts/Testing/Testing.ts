@@ -73,6 +73,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, 'Failed to run all tests')
       }
     },
+    async shouldHaveSummary(text: string | RegExp, timeout = 30_000): Promise<void> {
+      const summary = page.locator('.test-explorer .result-summary')
+      await expect(summary).toBeVisible()
+      await expect(page.locator('.test-explorer .result-summary > div:last-of-type')).toHaveText(text, { timeout })
+      await expect(summary.locator('.codicon-loading')).toHaveCount(0, { timeout })
+    },
     async runTask(taskName: string): Promise<void> {
       try {
         await page.waitForIdle()

@@ -171,7 +171,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           return
         }
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors)
+        await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors, { pressKeyOnce: true })
         await expect(tabs).toHaveCount(0, {
           timeout: 4000,
         })
