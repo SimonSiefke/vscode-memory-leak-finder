@@ -198,7 +198,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           platform,
           VError,
         })
-        await quickPick.executeCommand(WellKnownCommands.FocusActivityBar)
+        await quickPick.executeCommand(
+          ideVersion.major === 1 && ideVersion.minor < 85
+            ? WellKnownCommands.ToggleActivityBarVisibility
+            : WellKnownCommands.FocusActivityBar,
+        )
         await expect(activityBar).toBeVisible({ timeout: 10_000 })
       } catch (error) {
         throw new VError(error, `Failed to show activity bar`)
