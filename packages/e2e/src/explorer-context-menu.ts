@@ -2,6 +2,10 @@ import type { TestContext } from '../types.ts'
 
 export const skip = process.platform === 'darwin'
 
+// Flaky menu visibility on Linux CI, including repeated runs; keep runnable locally.
+// https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/41893151874/job/126798192348
+export const skipInCi = process.platform === 'linux'
+
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
