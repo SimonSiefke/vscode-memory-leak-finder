@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, writeFile } from 'node:fs/promises'
+import { cp, mkdir, readdir, stat, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import { hostname } from 'node:os'
@@ -32,12 +32,27 @@ interface HarnessMetadata {
   archiveSha256: string
 }
 
+export const compileSmoke = async (source: string): Promise<void> => {
+  const pnpmLock = await stat(join(source, 'pnpm-lock.yaml')).catch((error: NodeJS.ErrnoException) => {
+    if (error.code === 'ENOENT') return undefined
+    throw error
+  })
+  let args = ['run', 'compile', '--prefix', 'test/smoke']
+  if (pnpmLock) {
+    const { packageManager } = await readJson<{ packageManager?: string }>(join(source, 'package.json'))
+    if (!packageManager || !/^pnpm@\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+sha\d+\.[a-f\d]+)?$/.test(packageManager))
+      throw new Error(`Expected a pinned pnpm version in '${source}/package.json'`)
+    args = ['exec', '--yes', `--package=${packageManager.split('+')[0]}`, '--', 'pnpm', '--dir', 'test/smoke', 'run', 'compile']
+  }
+  await command('npm', args, { cwd: source, timeout: 600000, inherit: true })
+}
+
 // Reuse one compiled suite and fixture for every revision in the comparison.
 export const prepareSmoke = async (commit: string, output: string): Promise<void> => {
   const { sha, reference } = parseCommitReference(commit)
   const source = join(repositoryRoot, '.vscode-repos', `${sha}-minified`, 'source')
   if ((await command('git', ['rev-parse', 'HEAD'], { cwd: source })) !== sha) throw new Error('Smoke harness checkout mismatch')
-  await command('npm', ['run', 'compile', '--prefix', 'test/smoke'], { cwd: source, timeout: 600000, inherit: true })
+  await compileSmoke(source)
   output = resolve(output)
   const fixture = join(output, 'fixture')
   await mkdir(output, { recursive: true })

@@ -38,6 +38,14 @@ when preparing, extracting, and measuring a build; metadata and reports preserve
 the repository identity. Branch names, PR numbers, and abbreviated hashes are not
 accepted.
 
+Build preparation selects the dependency installer from the revision's root
+lockfile: `pnpm-lock.yaml` uses the pnpm version pinned in `package.json`, with
+frozen lockfiles; older revisions use `npm ci`. Pinned pnpm is launched through
+`npm exec`, including compilation and smoke-harness preparation, so no global
+pnpm or Corepack setup is required. pnpm revisions bypass the reusable npm
+`node_modules` cache; their workspace installation and nested roots stay under
+the revision's own install scripts.
+
 These input modes cannot be combined. For example, set `version_range` to
 `1.120.0...1.130.0`, set `measures` to `startup-times`, and leave all commit inputs empty.
 An unavailable release API, unknown endpoint, missing Linux build, or invalid

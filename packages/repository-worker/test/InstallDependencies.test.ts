@@ -10,12 +10,12 @@ import * as Path from '../src/parts/Path/Path.ts'
 
 test('installDependencies - runs npm ci without nice', async () => {
   const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation((method) => {
+  mockInvoke.mockImplementation((method, ...params) => {
     if (method === 'FileSystem.readFileContent') {
       return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
-      return true
+      return !String(params[0]).endsWith('/pnpm-lock.yaml')
     }
     if (method === 'FileSystem.findFiles') {
       return []
@@ -39,12 +39,12 @@ test('installDependencies - runs npm ci without nice', async () => {
 
 test('installDependencies - runs npm ci with nice', async () => {
   const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation((method) => {
+  mockInvoke.mockImplementation((method, ...params) => {
     if (method === 'FileSystem.readFileContent') {
       return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
-      return true
+      return !String(params[0]).endsWith('/pnpm-lock.yaml')
     }
     if (method === 'FileSystem.findFiles') {
       return []
@@ -68,12 +68,12 @@ test('installDependencies - runs npm ci with nice', async () => {
 
 test('installDependencies - throws VError when exec fails without nice', async () => {
   const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation((method) => {
+  mockInvoke.mockImplementation((method, ...params) => {
     if (method === 'FileSystem.readFileContent') {
       return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
-      return true
+      return !String(params[0]).endsWith('/pnpm-lock.yaml')
     }
     if (method === 'FileSystem.findFiles') {
       return []
@@ -107,12 +107,12 @@ test('installDependencies - throws VError when exec fails without nice', async (
 
 test('installDependencies - throws VError when exec fails with nice', async () => {
   const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation((method) => {
+  mockInvoke.mockImplementation((method, ...params) => {
     if (method === 'FileSystem.readFileContent') {
       return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
-      return true
+      return !String(params[0]).endsWith('/pnpm-lock.yaml')
     }
     if (method === 'FileSystem.findFiles') {
       return []
@@ -145,12 +145,12 @@ test('installDependencies - throws VError when exec fails with nice', async () =
 
 test('installDependencies - retries npm ci and succeeds', async () => {
   const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation((method) => {
+  mockInvoke.mockImplementation((method, ...params) => {
     if (method === 'FileSystem.readFileContent') {
       return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
-      return true
+      return !String(params[0]).endsWith('/pnpm-lock.yaml')
     }
     if (method === 'FileSystem.findFiles') {
       return []
@@ -187,12 +187,12 @@ test('installDependencies - retries npm ci and succeeds', async () => {
 
 test('installDependencies - includes npm stderr after retry failures', async () => {
   const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation((method) => {
+  mockInvoke.mockImplementation((method, ...params) => {
     if (method === 'FileSystem.readFileContent') {
       return '20.0.0'
     }
     if (method === 'FileSystem.exists') {
-      return true
+      return !String(params[0]).endsWith('/pnpm-lock.yaml')
     }
     if (method === 'FileSystem.findFiles') {
       return []
@@ -258,6 +258,7 @@ test('installDependencies - installs missing node version from .nvmrc before npm
         return { exitCode: 0, stderr: '', stdout: '' }
       },
       'FileSystem.exists': (path: string) => {
+        if (path.endsWith('/pnpm-lock.yaml')) return false
         if (path === nvmrcPath) {
           return true
         }
@@ -279,6 +280,7 @@ test('installDependencies - installs missing node version from .nvmrc before npm
     await installDependencies(repoPath, false)
 
     expect(mockRpc.invocations).toEqual([
+      ['FileSystem.exists', `${repoPath}/pnpm-lock.yaml`],
       ['FileSystem.exists', nvmrcPath],
       ['FileSystem.readFileContent', nvmrcPath],
       ['FileSystem.exists', nodePath],
@@ -298,6 +300,7 @@ test('installDependencies - installs missing node version from .nvmrc before npm
           reject: false,
         },
       ],
+      ['FileSystem.exists', `${repoPath}/pnpm-lock.yaml`],
       [
         'FileSystem.findFiles',
         ['**/package-lock.json', '.vscode/**/package-lock.json'],
@@ -330,6 +333,7 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
         return { exitCode: 0, stderr: '', stdout: '' }
       },
       'FileSystem.exists': (path: string) => {
+        if (path.endsWith('/pnpm-lock.yaml')) return false
         if (path === nodePath || path === npmPath) {
           return true
         }
@@ -372,6 +376,7 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
     await installDependencies(repoPath, false)
 
     expect(mockRpc.invocations).toEqual([
+      ['FileSystem.exists', `${repoPath}/pnpm-lock.yaml`],
       ['FileSystem.exists', repoNvmrcPath],
       ['FileSystem.readFileContent', repoNvmrcPath],
       ['FileSystem.exists', nodePath],
@@ -388,6 +393,7 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
           reject: false,
         },
       ],
+      ['FileSystem.exists', `${repoPath}/pnpm-lock.yaml`],
       [
         'FileSystem.findFiles',
         ['**/package-lock.json', '.vscode/**/package-lock.json'],
@@ -395,6 +401,7 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
       ],
       ['FileSystem.exists', `${buildPath}/package.json`],
       ['FileSystem.exists', `${buildPath}/node_modules`],
+      ['FileSystem.exists', `${buildPath}/pnpm-lock.yaml`],
       ['FileSystem.exists', buildNvmrcPath],
       ['FileSystem.exists', repoNvmrcPath],
       ['FileSystem.readFileContent', repoNvmrcPath],
@@ -414,6 +421,7 @@ test('installDependencies - runs npm ci in nested package folders when dependenc
       ],
       ['FileSystem.exists', `${extensionPath}/package.json`],
       ['FileSystem.exists', `${extensionPath}/node_modules`],
+      ['FileSystem.exists', `${extensionPath}/pnpm-lock.yaml`],
       ['FileSystem.exists', extensionNvmrcPath],
       ['FileSystem.exists', `${repoPath}/extensions/.nvmrc`],
       ['FileSystem.exists', repoNvmrcPath],
@@ -444,6 +452,7 @@ test('ensureNestedDependencies - skips nested folders without package.json', asy
   const mockRpc = createMockRpc({
     commandMap: {
       'FileSystem.exists': (path: string) => {
+        if (path.endsWith('/pnpm-lock.yaml')) return false
         if (path === `${nestedPath}/package.json`) {
           return false
         }
@@ -457,6 +466,7 @@ test('ensureNestedDependencies - skips nested folders without package.json', asy
 
   await expect(ensureNestedDependencies(repoPath, false)).resolves.toBe(0)
   expect(mockRpc.invocations).toEqual([
+    ['FileSystem.exists', `${repoPath}/pnpm-lock.yaml`],
     ['FileSystem.findFiles', ['**/package-lock.json', '.vscode/**/package-lock.json'], { cwd: repoPath, exclude: ['**/node_modules/**'] }],
     ['FileSystem.exists', `${nestedPath}/package.json`],
   ])
@@ -503,6 +513,7 @@ test('ensureNestedDependencies - reinstalls nested dependencies when existing no
         return { exitCode: 0, stderr: '', stdout: '' }
       },
       'FileSystem.exists': (path: string) => {
+        if (path.endsWith('/pnpm-lock.yaml')) return false
         if (path === `${nestedPath}/package.json`) {
           return true
         }
@@ -594,6 +605,7 @@ test('ensureNestedDependencies - installs copilot and chat-lib dependencies with
         return { exitCode: 0, stderr: '', stdout: '' }
       },
       'FileSystem.exists': (path: string) => {
+        if (path.endsWith('/pnpm-lock.yaml')) return false
         if (path === repoNvmrcPath) {
           return true
         }
@@ -632,6 +644,7 @@ test('ensureNestedDependencies - installs copilot and chat-lib dependencies with
 
     await expect(ensureNestedDependencies(repoPath, false)).resolves.toBe(2)
     expect(mockRpc.invocations).toEqual([
+      ['FileSystem.exists', `${repoPath}/pnpm-lock.yaml`],
       [
         'FileSystem.findFiles',
         ['**/package-lock.json', '.vscode/**/package-lock.json'],
@@ -639,6 +652,7 @@ test('ensureNestedDependencies - installs copilot and chat-lib dependencies with
       ],
       ['FileSystem.exists', `${copilotPath}/package.json`],
       ['FileSystem.exists', `${copilotPath}/node_modules`],
+      ['FileSystem.exists', `${copilotPath}/pnpm-lock.yaml`],
       ['FileSystem.exists', copilotNvmrcPath],
       ['FileSystem.exists', extensionsNvmrcPath],
       ['FileSystem.exists', repoNvmrcPath],
@@ -659,6 +673,7 @@ test('ensureNestedDependencies - installs copilot and chat-lib dependencies with
       ],
       ['FileSystem.exists', `${copilotNestedPath}/package.json`],
       ['FileSystem.exists', `${copilotNestedPath}/node_modules`],
+      ['FileSystem.exists', `${copilotNestedPath}/pnpm-lock.yaml`],
       ['FileSystem.exists', chatLibNvmrcPath],
       ['FileSystem.exists', copilotNvmrcPath],
       ['FileSystem.exists', extensionsNvmrcPath],
