@@ -2,7 +2,7 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, platform, VError }: CreateParams) => {
+export const create = ({ expect, ideVersion, page, platform, VError }: CreateParams) => {
   return {
     async shouldHaveItem(text: string) {
       await expect(page.locator('.quick-input-list .label-name', { hasExactText: text })).toBeVisible()
@@ -273,7 +273,9 @@ export const create = ({ expect, page, platform, VError }: CreateParams) => {
     },
     async waitForInputVisible() {
       const quickPick = page.locator('.quick-input-widget')
-      const quickPickInput = quickPick.locator('.ibwrapper .input')
+      // VS Code 1.53 renamed the input box wrapper class.
+      const inputSelector = ideVersion.major === 1 && ideVersion.minor < 53 ? '.wrapper .input' : '.ibwrapper .input'
+      const quickPickInput = quickPick.locator(inputSelector)
       await expect(quickPickInput).toBeVisible()
       await expect(quickPickInput).toBeFocused({ timeout: 3000 })
       return quickPickInput
