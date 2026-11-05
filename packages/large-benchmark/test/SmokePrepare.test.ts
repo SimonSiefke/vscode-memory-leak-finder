@@ -11,7 +11,7 @@ const fixtureCommit = 'b'.repeat(40)
 const command = jest.fn<typeof io.command>()
 jest.unstable_mockModule('../src/parts/Io/Io.ts', () => ({ ...io, command }))
 jest.unstable_mockModule('../src/parts/Prepare/Prepare.ts', () => ({ ...prepare, repositoryRoot: root }))
-const { prepareSmoke, extractSmoke } = await import('../src/parts/Smoke/Smoke.ts')
+const { compileSmoke, prepareSmoke, extractSmoke } = await import('../src/parts/Smoke/Smoke.ts')
 
 afterAll(async () => {
   await rm(root, { recursive: true, force: true })
@@ -57,4 +57,28 @@ test('shared smoke archive preserves runtime chat simulation scripts alongside c
   expect(await readFile(join(output, 'fixture/app.js'), 'utf8')).toContain('smoke fixture')
   // The SSH Dev Container fixture reads this source registry when negotiating its handshake.
   expect(await readFile(join(output, protocolRegistry), 'utf8')).toMatch(/PROTOCOL_VERSION\s*=\s*'1\.0\.0'/)
+})
+
+test('smoke compilation uses the pinned pnpm for revisions with a pnpm lockfile', async () => {
+  const source = join(root, 'pnpm-source')
+  await mkdir(source)
+  await writeFile(join(source, 'pnpm-lock.yaml'), 'lockfileVersion: 9.0\n')
+  await writeFile(join(source, 'package.json'), JSON.stringify({ packageManager: 'pnpm@12.16.0' }))
+  command.mockClear()
+  command.mockResolvedValue('')
+  await compileSmoke(source)
+  expect(command).toHaveBeenCalledWith(
+    'npm',
+    ['exec', '--yes', '--package=pnpm@12.16.0', '--', 'pnpm', '--dir', 'test/smoke', 'run', 'compile'],
+    { cwd: source, timeout: 600000, inherit: true },
+  )
+})
+
+test('smoke compilation keeps npm for older revisions', async () => {
+  const source = join(root, 'npm-source')
+  await mkdir(source)
+  command.mockClear()
+  command.mockResolvedValue('')
+  await compileSmoke(source)
+  expect(command).toHaveBeenCalledWith('npm', ['run', 'compile', '--prefix', 'test/smoke'], { cwd: source, timeout: 600000, inherit: true })
 })

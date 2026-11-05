@@ -16,7 +16,7 @@ test('runCompile runs the transpile step after compile', async () => {
         return '20.0.0'
       }
       if (method === 'FileSystem.exists') {
-        return true
+        return !String(params[0]).endsWith('/pnpm-lock.yaml')
       }
       if (method === 'FileSystem.exec') {
         execCalls.push(params)
@@ -52,7 +52,7 @@ test('runCompile throws error when main.js not found after compilation', async (
         if (path === mainJsPath) {
           return false
         }
-        return true
+        return !String(params[0]).endsWith('/pnpm-lock.yaml')
       }
       if (method === 'FileSystem.exec') {
         return { exitCode: 0, stderr: '', stdout: '' }
@@ -77,7 +77,7 @@ test('runMinifiedBuild runs the platform minified vscode gulp task', async () =>
         return '20.0.0'
       }
       if (method === 'FileSystem.exists') {
-        return true
+        return !String(params[0]).endsWith('/pnpm-lock.yaml')
       }
       if (method === 'FileSystem.exec') {
         execCalls.push(params)
