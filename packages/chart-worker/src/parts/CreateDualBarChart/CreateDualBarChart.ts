@@ -68,7 +68,7 @@ export const createDualBarChart = (data: any, options: any): string => {
         y: 'row',
       }),
     ],
-    style: 'overflow: visible;background:white',
+    style: { overflow: 'visible', background: 'white', fontSize: `${options.fontSize || 10}px` },
     width: chartOptions.width,
     // marginBottom: 'auto',
     x: { axis: null },

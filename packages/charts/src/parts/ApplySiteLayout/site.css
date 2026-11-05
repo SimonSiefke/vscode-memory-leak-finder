@@ -175,6 +175,29 @@ select:focus-visible {
   min-width: 0;
   padding: 0;
 }
+.SiteContentWithNavigation {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 1136px) minmax(0, 1fr);
+  column-gap: 24px;
+  justify-content: space-between;
+  max-width: none;
+  align-items: start;
+}
+.SiteContentWithNavigation > header {
+  grid-column: 2;
+}
+.SiteContentWithNavigation .Main,
+.SiteContentWithNavigation .Layout {
+  display: contents;
+}
+.SiteContentWithNavigation .Navigation {
+  grid-column: 1;
+  grid-row: 2;
+}
+.SiteContentWithNavigation .ChartsContainer {
+  grid-column: 2;
+  grid-row: 2;
+}
 .SiteContent .chart {
   margin: 24px 0;
   padding: 16px;
@@ -202,6 +225,13 @@ select:focus-visible {
   }
   .SiteContent h1 {
     font-size: 24px;
+  }
+  .SiteContentWithNavigation {
+    display: block;
+  }
+  .SiteContentWithNavigation .Layout {
+    display: flex;
+    gap: 24px;
   }
   .SiteContent .Layout {
     flex-direction: column;

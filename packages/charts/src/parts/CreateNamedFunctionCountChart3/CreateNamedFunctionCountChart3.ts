@@ -18,10 +18,10 @@ export const createChart = (): {
 } => {
   return {
     fontSize: 12,
-    marginLeft: 500,
-    marginRight: 500,
+    marginLeft: 250,
+    marginRight: 100,
     type: 'dual-bar-chart',
-    width: 1400,
+    width: 1200,
     x: 'index',
     xLabel: 'Index',
     y: 'count',
