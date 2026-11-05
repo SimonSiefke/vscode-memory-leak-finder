@@ -107,31 +107,52 @@ test('a batch report keeps successful videos when another metric has no usable f
   expect(await readFile(join(output, 'string-object-bytes/index.html'), 'utf8')).toContain('Unit: bytes')
 })
 
-test('multi-measure matrices freeze one release matrix and the requested collector list', async () => {
-  const fetch = jest.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
-    const path = new URL(String(url)).pathname
-    if (path === '/api/releases/stable') return Response.json(['1.50.0', '1.50.1'])
-    const version = path.split('/')[3]!
-    return Response.json({ productVersion: version, version: (version === '1.50.0' ? 'a' : 'b').repeat(40) })
-  })
-  const log = jest.spyOn(console, 'log').mockImplementation(() => {})
-  try {
-    const output = join(root, 'matrix')
-    await largePerformance([
-      'history-matrix',
-      '--version-range',
-      '1.50.0...1.50.1',
-      '--measure',
-      'object-count,string-object-bytes',
-      '--output-dir',
-      output,
-    ])
-    const manifest = JSON.parse(await readFile(join(output, 'manifest.json'), 'utf8'))
-    expect(manifest).toMatchObject({ schemaVersion: 2, measures: ['object-count', 'string-object-bytes'] })
-    expect(manifest.releases).toHaveLength(2)
-    expect(JSON.parse(log.mock.calls[0]![0] as string).include).toHaveLength(2)
-  } finally {
-    fetch.mockRestore()
-    log.mockRestore()
-  }
-})
+test.each(['console', 'github-output'])(
+  'multi-measure matrices freeze one release matrix and the requested collector list (%s)',
+  async (destination) => {
+    const fetch = jest.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+      const path = new URL(String(url)).pathname
+      if (path === '/api/releases/stable') return Response.json(['1.50.0', '1.50.1'])
+      const version = path.split('/')[3]!
+      return Response.json({ productVersion: version, version: (version === '1.50.0' ? 'a' : 'b').repeat(40) })
+    })
+    const log = jest.spyOn(console, 'log').mockImplementation(() => {})
+    const output = join(root, `matrix-${destination}`)
+    const githubOutput = join(output, 'github-output')
+    const previous = process.env.GITHUB_OUTPUT
+    if (destination === 'github-output') process.env.GITHUB_OUTPUT = githubOutput
+    else delete process.env.GITHUB_OUTPUT
+    try {
+      await largePerformance([
+        'history-matrix',
+        '--version-range',
+        '1.50.0...1.50.1',
+        '--measure',
+        'object-count,string-object-bytes',
+        '--output-dir',
+        output,
+      ])
+      const manifest = JSON.parse(await readFile(join(output, 'manifest.json'), 'utf8'))
+      expect(manifest).toMatchObject({ schemaVersion: 2, measures: ['object-count', 'string-object-bytes'] })
+      const releases = [
+        { version: '1.50.0', commit },
+        { version: '1.50.1', commit: 'b'.repeat(40) },
+      ]
+      expect(manifest.releases).toEqual(releases)
+      const matrix = JSON.stringify({ include: releases.map((release) => ({ ...release, artifact: release.commit })) })
+      if (destination === 'github-output') {
+        expect(await readFile(githubOutput, 'utf8')).toBe(`matrix=${matrix}\n`)
+        expect(log).not.toHaveBeenCalled()
+      } else {
+        expect(log).toHaveBeenCalledTimes(1)
+        expect(log).toHaveBeenCalledWith(matrix)
+      }
+      expect(fetch).toHaveBeenCalledTimes(3)
+    } finally {
+      if (previous === undefined) delete process.env.GITHUB_OUTPUT
+      else process.env.GITHUB_OUTPUT = previous
+      fetch.mockRestore()
+      log.mockRestore()
+    }
+  },
+)
