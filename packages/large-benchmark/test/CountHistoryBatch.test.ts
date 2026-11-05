@@ -52,6 +52,23 @@ test('a batch runs collectors serially, isolates profiles, restores the previous
   expect(bytes).toMatchObject({ measure: 'string-object-bytes', unit: 'bytes', counts: [{ name: 'base.json', count: 2048 }] })
 })
 
+test('a batch removes its temporary profile when no profile existed before measurement', async () => {
+  await rm(profile, { recursive: true, force: true })
+  command.mockImplementation(async (_executable, args) => {
+    const measure = args[args.indexOf('--measure') + 1]!
+    await expect(readFile(join(profile, 'dirty'))).rejects.toThrow()
+    await mkdir(profile)
+    await writeFile(join(profile, 'dirty'), measure)
+    throw new Error('collector failed after profile creation')
+  })
+  await expect(
+    measureHistories(commit, '1.50.0', '', join(root, 'no-original-profile'), ['function-count', 'object-count'], 'default'),
+  ).rejects.toThrow('Some history collectors failed')
+  expect(command).toHaveBeenCalledTimes(2)
+  await expect(readdir(profile)).rejects.toThrow()
+  expect((await readdir(root)).filter((name) => name.startsWith('.large-history-profile-'))).toEqual([])
+})
+
 test('a batch report keeps successful videos when another metric has no usable frames', async () => {
   command.mockImplementation(async (_executable, args) => {
     await writeFile(args.at(-1)!, 'rendered')

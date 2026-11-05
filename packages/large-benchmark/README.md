@@ -217,10 +217,11 @@ The release API freezes every stable release in that inclusive range, including 
 version-specific harness downloader, bypassing source-build jobs. `source` retains
 the existing minified Code OSS build pipeline. Use the same package source for the
 whole comparison. Official packages and Code OSS builds can have different behavior.
-The optional `historical-core` suite runs 18 fixed existing editor, Explorer,
+The optional `historical-core` suite runs 17 fixed existing editor, Explorer,
 Settings, keyboard shortcuts, debug console, Activity Bar, and source control
 scenarios. It avoids tests for recently introduced features and keeps the same
-inventory and ordering across every release. `default` retains the ordinary suite.
+inventory and ordering across every release. It excludes the Explorer expand/collapse
+scenario, which is always skipped on Linux CI. `default` retains the ordinary suite.
 For `event-listener-count`, values describe renderer DOM event listeners on EventTarget objects, document, and
 window; they do not count all internal VS Code event-emitter subscriptions.
 

@@ -30,6 +30,7 @@ export const measureHistories = async (
   const profile = join(repositoryRoot, '.vscode-user-data-dir')
   const backup = await mkdtemp(join(repositoryRoot, '.large-history-profile-'))
   let restore = false
+  let isolated = false
   const statuses: { measure: HistoryMeasure; diagnostic?: string }[] = []
   try {
     try {
@@ -38,6 +39,7 @@ export const measureHistories = async (
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
     }
+    isolated = true
     for (const measure of selected) {
       try {
         await rm(profile, { recursive: true, force: true })
@@ -49,8 +51,8 @@ export const measureHistories = async (
       await writeJson(join(output, 'measurement-status.json'), statuses)
     }
   } finally {
+    if (isolated) await rm(profile, { recursive: true, force: true })
     if (restore) {
-      await rm(profile, { recursive: true, force: true })
       await rename(join(backup, 'profile'), profile)
     }
     await rm(backup, { recursive: true, force: true })

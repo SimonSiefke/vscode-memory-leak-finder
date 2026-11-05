@@ -38,7 +38,6 @@ export const historicalCoreTests = [
   'editor-split-up',
   'editor-switch-between-tabs',
   'editor-toggle-pin',
-  'explorer-expand-and-collapse',
   'explorer-focus',
   'explorer-open',
   'explorer-refresh',
