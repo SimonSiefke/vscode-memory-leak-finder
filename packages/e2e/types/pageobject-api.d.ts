@@ -220,6 +220,8 @@ export interface Editor {
   closeAll(): Promise<void>
   closeOthers(): Promise<void>
   closeAllEditorGroups(): Promise<void>
+  closeActiveEditorGroup(): Promise<void>
+  shouldHaveEditorGroupCount(count: number): Promise<void>
   closeAutoFix(): Promise<void>
   closeFind(): Promise<void>
   closeInspectedTokens(): Promise<void>

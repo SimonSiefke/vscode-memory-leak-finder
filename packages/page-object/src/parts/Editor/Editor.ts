@@ -190,6 +190,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to close all editor groups`)
       }
     },
+    async closeActiveEditorGroup() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand('View: Close Editor Group')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close active editor group`)
+      }
+    },
+    async shouldHaveEditorGroupCount(count: number) {
+      try {
+        await expect(page.locator('.editor-group-container')).toHaveCount(count)
+      } catch (error) {
+        throw new VError(error, `Expected ${count} editor groups`)
+      }
+    },
     async closeAutoFix() {
       try {
         await page.waitForIdle()
