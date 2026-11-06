@@ -3,7 +3,7 @@ import { getStringObjectMetrics } from '../src/parts/GetStringObjectMetrics/GetS
 import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 const createSnapshot = (
-  records: readonly { type: string; bytes: number; name?: number }[],
+  records: readonly { type: string; bytes: number; name?: number; edgeCount?: number }[],
   fields = ['type', 'name', 'id', 'self_size', 'edge_count'],
   types = ['hidden', 'object', 'string', 'concatenated string', 'sliced string'],
 ): Snapshot => ({
@@ -26,7 +26,7 @@ const createSnapshot = (
         name: record.name ?? 1,
         id: index * 2 + 1,
         self_size: record.bytes,
-        edge_count: 0,
+        edge_count: record.edgeCount ?? 0,
       }
       return fields.map((field) => values[field])
     }),
@@ -77,6 +77,17 @@ test('resolves reordered fields and type IDs from metadata', () => {
 
 test('returns zero for an empty heap despite string-table entries', () => {
   expect(getStringObjectMetrics(createSnapshot([]))).toEqual({ bytes: 0, count: 0 })
+})
+
+test('excludes zero-size snapshot annotations without excluding allocated strings with the same text', () => {
+  const snapshot = createSnapshot([
+    { type: 'string', bytes: 0, name: 1 },
+    { type: 'string', bytes: 24, name: 1 },
+    { type: 'string', bytes: 0, edgeCount: 1 },
+    { type: 'concatenated string', bytes: 20 },
+    { type: 'sliced string', bytes: 20 },
+  ])
+  expect(getStringObjectMetrics(snapshot)).toEqual({ bytes: 64, count: 4 })
 })
 
 test('supports metadata without concatenated or sliced string types', () => {
