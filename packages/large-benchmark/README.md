@@ -266,9 +266,10 @@ reference line behind the current version, with a legend identifying both versio
 Failed or unavailable initial versions are skipped when choosing this fixed reference.
 The final frame is also saved as `comparison.png` and `comparison.svg` and linked
 from the report, so one image shows the change from the first usable version to
-the last. SVG and PNG frames are retained in `frames/`, and
-`test-order.json` maps chart indexes to test names. Twenty usable frames make an
-eight-second video at the default speed; the HTML player supports looping.
+the last. SVG and PNG frames are kept locally while rendering the video and are
+not included in the downloaded workflow artifact. `test-order.json` maps chart
+indexes to test names. Twenty usable frames make an eight-second video at the
+default speed; the HTML player supports looping.
 
 Build failures and versions without matching test inventories are omitted from
 playback and listed in `coverage.json` and the HTML report. The fixed historical core inventory, or the largest collected default-suite
