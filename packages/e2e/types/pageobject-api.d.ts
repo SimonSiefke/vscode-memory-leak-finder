@@ -235,6 +235,7 @@ export interface Editor {
   disableVersionLens(): Promise<void>
   duplicateSelection(): Promise<void>
   enable2x2GridView(): Promise<void>
+  enableSingleColumnLayout(): Promise<void>
   enableReadonly(): Promise<void>
   enableStickyScroll(): Promise<void>
   enableVersionLens(): Promise<void>

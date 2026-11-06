@@ -42,8 +42,9 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.focusLeftEditorGroup()
   await Editor.shouldHaveText('c', 'c.txt')
 
-  await Editor.closeAllEditorGroups()
+  await Editor.enableSingleColumnLayout()
   await Editor.shouldHaveEditorGroupCount(1)
+  await Editor.closeAllEditorGroups()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {

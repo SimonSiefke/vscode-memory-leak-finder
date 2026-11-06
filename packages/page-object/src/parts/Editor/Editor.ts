@@ -380,6 +380,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to enable editor grid layout`)
       }
     },
+    async enableSingleColumnLayout() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.EditorLayoutSingle)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable single-column editor layout`)
+      }
+    },
     async enableReadonly() {
       try {
         await page.waitForIdle()
