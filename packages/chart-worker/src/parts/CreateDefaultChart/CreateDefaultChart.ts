@@ -13,6 +13,7 @@ export const createDefaultChart = (
 ) => {
   const baseHtml = Plot.plot({
     marginLeft,
+    marginTop: 30,
     marks: [Plot.lineY(data, { stroke: 'black', x, y })],
     style: { overflow: 'visible', background: 'white', fontSize: '13px' },
     x: {
