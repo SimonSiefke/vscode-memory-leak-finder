@@ -1,5 +1,7 @@
 name: Large Performance Over Time
 
+run-name: Large Performance Over Time (${{ inputs.measure || 'function-count' }})
+
 on:
   workflow_dispatch:
     inputs:
