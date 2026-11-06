@@ -1,0 +1,7 @@
+{
+  "name": "@vscode-memory-leak-finder/docs",
+  "version": "0.0.0-dev",
+  "private": true,
+  "license": "MIT",
+  "type": "module"
+}
