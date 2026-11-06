@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { copyFile, readdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import { escapeHtml } from '../EscapeHtml/EscapeHtml.ts'
 import * as Root from '../Root/Root.ts'
@@ -37,6 +37,7 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
   })
   await writeFile(join(basePath, 'site.css'), await readFile(new URL('./site.css', import.meta.url), 'utf8'))
   await writeFile(join(basePath, 'site.js'), await readFile(new URL('./site.js', import.meta.url), 'utf8'))
+  await copyFile(new URL('./favicon.svg', import.meta.url), join(basePath, 'favicon.svg'))
 
   for (const page of pages) {
     const filePath = join(basePath, page)
@@ -78,6 +79,7 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
 <meta property="og:description" content="${escapeHtml(description)}">
 <meta property="og:url" content="${escapeHtml(pageUrl(page))}">`
     html = html.replace('</head>', `${metadata}\n</head>`)
+    html = html.replace('</head>', `<link rel="icon" type="image/svg+xml" href="${escapeHtml(href('favicon.svg'))}"></head>`)
     if (page !== 'index.html') html = html.replaceAll('VSCode Memory Leak Finder Charts', escapeHtml(title))
     html = html.replaceAll('<table>', '<div class="TableScroll"><table>').replaceAll('</table>', '</table></div>')
     html = html.replace(/<html(?: lang="en")?>/, '<html lang="en">')

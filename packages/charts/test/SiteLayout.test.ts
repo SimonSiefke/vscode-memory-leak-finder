@@ -1,6 +1,6 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { expect, test } from '@jest/globals'
 import { JSDOM } from 'jsdom'
 import { applySiteLayout } from '../src/parts/ApplySiteLayout/ApplySiteLayout.ts'
@@ -17,6 +17,7 @@ test('every report can reach every available page, including from nested paths a
       await writeFile(join(root, page), `<!doctype html><html><head><title>${title}</title></head><body><h1>Report</h1></body></html>`)
     }
     await applySiteLayout(root)
+    expect(await readFile(join(root, 'favicon.svg'), 'utf8')).toContain('<svg')
     for (const page of pages) {
       const html = await readFile(join(root, page), 'utf8')
       const document = new JSDOM(html, { url: `https://example.com/repository/${page}` }).window.document
@@ -32,6 +33,11 @@ test('every report can reach every available page, including from nested paths a
       }
       expect(document.querySelector('[aria-current="page"]')?.getAttribute('href')).toBe(links[pages.indexOf(page)].getAttribute('href'))
       expect(document.querySelector('meta[name="viewport"]')).not.toBeNull()
+      const favicon = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
+      expect(favicon?.getAttribute('type')).toBe('image/svg+xml')
+      const faviconBase = relative(dirname(join(root, page)), root).replaceAll('\\', '/') || '.'
+      expect(favicon?.getAttribute('href')).toBe(`${faviconBase}/favicon.svg`)
+      expect(resolve(dirname(join(root, page)), favicon?.getAttribute('href') ?? '')).toBe(join(root, 'favicon.svg'))
       expect(document.querySelector('.SiteBrand')?.getAttribute('href')).toBe(links[0].getAttribute('href'))
       const description = document.querySelector('meta[name="description"]')?.getAttribute('content')
       expect(description).toContain('VS Code')
@@ -49,6 +55,7 @@ test('every report can reach every available page, including from nested paths a
     await applySiteLayout(root)
     expect(await readFile(join(root, pages[2]), 'utf8')).toBe(before)
     expect(await readFile(join(root, 'sitemap.xml'), 'utf8')).toBe(sitemap)
+    expect(await readFile(join(root, 'favicon.svg'), 'utf8')).toContain('<svg')
   } finally {
     await rm(root, { recursive: true, force: true })
   }
