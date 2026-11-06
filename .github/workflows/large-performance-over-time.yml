@@ -199,3 +199,20 @@ jobs:
           include-hidden-files: true
           retention-days: 30
           if-no-files-found: error
+
+  cleanup:
+    needs: [initialize, build, measure, report]
+    if: ${{ always() && !cancelled() && needs.report.result == 'success' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Delete intermediate artifacts
+        uses: geekyeggo/delete-artifact@v6
+        with:
+          name: |
+            large-history-manifest
+            large-build-*
+            large-build-status-*
+            large-history-result-*
