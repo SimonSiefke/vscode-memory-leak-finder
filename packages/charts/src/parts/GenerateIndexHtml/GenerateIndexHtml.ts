@@ -67,6 +67,9 @@ const singleColumnFolders = new Set([
 ])
 
 export const getFolderContentHtml = (folderName: string, dirents: string[]): string => {
+  if (folderName === 'map-and-set-size') {
+    return getLabeledChartsHtml(dirents)
+  }
   if (folderName === 'cpu-performance-counters') {
     return getLabeledChartsHtml(dirents)
   }

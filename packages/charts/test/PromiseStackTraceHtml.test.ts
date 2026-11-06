@@ -109,3 +109,32 @@ test('writes black/red charts and source frames above complete stacks, retaining
     }
   })
 }, 30_000)
+
+test('generates source frames for files restored from source maps', async () => {
+  const hash = `promise-source-restore-test-${process.pid}-${Date.now()}`
+  const sourcesDir = join(Root.root, '.vscode-sources', hash)
+  const root = await mkdtemp(join(tmpdir(), 'promise-report-restored-source-'))
+  const results = join(root, 'results')
+  const target = join(root, 'charts')
+  await mkdir(join(sourcesDir, 'src'), { recursive: true })
+  await mkdir(results)
+  await mkdir(target)
+  try {
+    await writeFile(join(sourcesDir, 'src', 'quickDiffModel.ts'), 'const restoredSource = true')
+    await writeFile(
+      join(results, 'css-completion.json'),
+      JSON.stringify({
+        promisesWithStackTrace: [{ count: 1, delta: 1, originalStack: ['src/quickDiffModel.ts:1:0'], sourcesHash: hash }],
+      }),
+    )
+    await generatePromiseStackTraceHtmlForFolder(results, target, 'promisesWithStackTrace')
+
+    const html = await readFile(join(target, 'index.html'), 'utf8')
+    const document = new JSDOM(html).window.document
+    expect(document.querySelector('.CodeFrame code')?.textContent).toContain('const restoredSource = true')
+    expect(document.querySelector('.CodeFrameUnavailable')).toBeNull()
+  } finally {
+    await rm(sourcesDir, { recursive: true, force: true })
+    await rm(root, { recursive: true, force: true })
+  }
+})

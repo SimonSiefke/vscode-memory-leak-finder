@@ -1,9 +1,10 @@
-import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { copyFile, readdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import { escapeHtml } from '../EscapeHtml/EscapeHtml.ts'
 import * as Root from '../Root/Root.ts'
 
 const siteUrl = 'https://simonsiefke.github.io/vscode-memory-leak-finder/'
+const titleSuffix = ' | VScode Memory Leak Finder'
 const pageUrl = (page: string): string =>
   siteUrl +
   page
@@ -36,6 +37,7 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
   })
   await writeFile(join(basePath, 'site.css'), await readFile(new URL('./site.css', import.meta.url), 'utf8'))
   await writeFile(join(basePath, 'site.js'), await readFile(new URL('./site.js', import.meta.url), 'utf8'))
+  await copyFile(new URL('./favicon.svg', import.meta.url), join(basePath, 'favicon.svg'))
 
   for (const page of pages) {
     const filePath = join(basePath, page)
@@ -60,6 +62,10 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
     let html = await readFile(filePath, 'utf8')
     // The generator owns these documents; keeping this pass idempotent is useful for local previews.
     if (html.includes('class="SiteHeader"')) continue
+    html = html.replace(/<title>([\s\S]*?)<\/title>/, (_match, title: string) => {
+      const pageTitle = title.replace(/(?:\s*\|\s*VScode Memory Leak Finder)+$/, '')
+      return `<title>${pageTitle}${titleSuffix}</title>`
+    })
     const description =
       page === 'index.html'
         ? 'Explore VS Code memory leak and performance reports, including retained objects, event listeners, instruction counts, and CSS selector statistics.'
@@ -73,6 +79,7 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
 <meta property="og:description" content="${escapeHtml(description)}">
 <meta property="og:url" content="${escapeHtml(pageUrl(page))}">`
     html = html.replace('</head>', `${metadata}\n</head>`)
+    html = html.replace('</head>', `<link rel="icon" type="image/svg+xml" href="${escapeHtml(href('favicon.svg'))}"></head>`)
     if (page !== 'index.html') html = html.replaceAll('VSCode Memory Leak Finder Charts', escapeHtml(title))
     html = html.replaceAll('<table>', '<div class="TableScroll"><table>').replaceAll('</table>', '</table></div>')
     html = html.replace(/<html(?: lang="en")?>/, '<html lang="en">')
