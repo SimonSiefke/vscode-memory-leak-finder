@@ -4,6 +4,11 @@ import { join } from 'node:path'
 import { expect, test } from '@jest/globals'
 import { getNamedFunctionCountData3 } from '../src/parts/GetNamedFunctionCountData3/GetNamedFunctionCountData3.ts'
 import { getHighlightLabels } from '../src/parts/GetHighlightLabels/GetHighlightLabels.ts'
+import * as NamedFunctionCount3 from '../src/parts/CreateNamedFunctionCountChart3/CreateNamedFunctionCountChart3.ts'
+
+test('uses explicit row spacing so the SVG height correction does not compress three-row charts', () => {
+  expect(NamedFunctionCount3.createChart().rowHeight).toBe(24)
+})
 
 /**
  * @typedef {{
