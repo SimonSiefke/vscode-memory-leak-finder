@@ -276,11 +276,13 @@ playback and listed in `coverage.json` and the HTML report. The fixed historical
 inventory, defines the shared test order for each metric; only exact matches enter its video.
 A nonzero harness exit excludes that version; partial counts and the failure
 diagnostic are retained. Missing/invalid counts are never replaced with zero. A run with no usable frames fails after saving coverage. A single usable
-version still produces a video. Raw per-test data is available in each
-**large-history-result-&lt;commit-artifact&gt;** artifact. Historical builds must
-support the current harness, and comparisons may reflect application changes as
-well as changes in scenario behavior. This workflow does not change the existing
-Large Performance Measure workflow.
+version still produces a video. The manifest, build packages, build statuses, and
+per-version measurement artifacts are deleted after the final report ZIP uploads
+successfully; if report generation or upload fails, those intermediate artifacts
+remain available for diagnosis. Historical builds must support the current
+harness, and comparisons may reflect application changes as well as changes in
+scenario behavior. This workflow does not change the existing Large Performance
+Measure workflow.
 
 Local commands (from the repository root, after installing/building the harness):
 

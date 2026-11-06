@@ -51,7 +51,7 @@ jobs:
       - run: npm run type-check
       - run: npm run lint
       - run: npm run build
-      - run: npx lerna run test --since origin/main
+      - run: npm test
       - name: Run headless test (with videos)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
@@ -131,7 +131,7 @@ jobs:
             **/.vscode-sources
           key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
-        run: npm ci --ignore-scripts && npm run postinstall
+        run: npm run install:ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run build
       - name: Locate PoolMon

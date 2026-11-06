@@ -2,6 +2,9 @@
 
 Find memory leaks in vscode to improve robustness and performance.
 
+See the [`docs` package documentation](packages/docs/README.md) for the full
+documentation index.
+
 ### Large Performance Measure
 
 See the [`large-benchmark` package documentation](packages/large-benchmark/README.md)

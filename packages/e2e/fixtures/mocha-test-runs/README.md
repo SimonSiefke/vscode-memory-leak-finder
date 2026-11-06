@@ -27,8 +27,7 @@ Use a dedicated driver worktree and the repository's `.nvmrc` Node version.
 Install dependencies and Mocha for VS Code 1.4.0 before launching the harness:
 
 ```sh
-npm ci --ignore-scripts
-npm run postinstall
+npm ci
 npm ci --ignore-scripts --prefix packages/e2e/fixtures/mocha-test-runs
 mkdir -p .vscode-extensions
 cp -R packages/e2e/fixtures/mocha-test-runs .vscode-extensions/mocha-test-runs-fixture
