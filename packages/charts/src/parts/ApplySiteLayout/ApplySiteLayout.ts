@@ -4,6 +4,7 @@ import { escapeHtml } from '../EscapeHtml/EscapeHtml.ts'
 import * as Root from '../Root/Root.ts'
 
 const siteUrl = 'https://simonsiefke.github.io/vscode-memory-leak-finder/'
+const titleSuffix = ' | VScode Memory Leak Finder'
 const pageUrl = (page: string): string =>
   siteUrl +
   page
@@ -60,6 +61,10 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
     let html = await readFile(filePath, 'utf8')
     // The generator owns these documents; keeping this pass idempotent is useful for local previews.
     if (html.includes('class="SiteHeader"')) continue
+    html = html.replace(/<title>([\s\S]*?)<\/title>/, (_match, title: string) => {
+      const pageTitle = title.replace(/(?:\s*\|\s*VScode Memory Leak Finder)+$/, '')
+      return `<title>${pageTitle}${titleSuffix}</title>`
+    })
     const description =
       page === 'index.html'
         ? 'Explore VS Code memory leak and performance reports, including retained objects, event listeners, instruction counts, and CSS selector statistics.'
