@@ -15,7 +15,7 @@
     "format": "prettier --write .",
     "install:ci": "node packages/build/src/parts/Install/Install.js",
     "lint": "prettier --check .",
-    "test": "npm run test --workspaces --if-present",
+    "test": "node scripts/runWorkspaceTests.js",
     "type-check": "tsc -b",
     "build-charts": "node packages/charts/src/main.ts",
     "large-performance": "node packages/large-benchmark/src/main.ts",
