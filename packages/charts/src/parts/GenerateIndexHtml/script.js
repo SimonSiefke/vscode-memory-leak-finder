@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const arrowHead = document.getElementById('arrowHead')
 
   // Function to calculate and draw arrow
+  function getArrowTargetX(chartRect) {
+    return chartRect.left + Math.min(300, chartRect.width / 2)
+  }
+
   function drawArrow(activeLink, activeChart) {
     if (!activeLink || !activeChart || !arrowPath) return
 
@@ -19,8 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const startX = linkRect.right + 10
     const startY = linkRect.top + linkRect.height / 2
 
-    // Target point: 300px more to the right from left edge of chart, center vertically
-    const targetX = chartRect.left + 300
+    // Keep the target inside the chart, including when the page is resized.
+    const targetX = getArrowTargetX(chartRect)
     const targetY = chartRect.top + chartRect.height / 2
 
     // Control points for bezier curve
@@ -87,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       if (currentChart) {
         const chartRect = currentChart.getBoundingClientRect()
-        const arrowEndX = chartRect.left + 300
+        const arrowEndX = getArrowTargetX(chartRect)
         const viewportWidth = window.innerWidth
 
         // If arrow head would be hidden (beyond viewport), switch to next chart
