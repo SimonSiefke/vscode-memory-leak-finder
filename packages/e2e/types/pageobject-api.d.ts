@@ -220,6 +220,8 @@ export interface Editor {
   closeAll(): Promise<void>
   closeOthers(): Promise<void>
   closeAllEditorGroups(): Promise<void>
+  closeActiveEditorGroup(): Promise<void>
+  shouldHaveEditorGroupCount(count: number): Promise<void>
   closeAutoFix(): Promise<void>
   closeFind(): Promise<void>
   closeInspectedTokens(): Promise<void>
@@ -233,6 +235,7 @@ export interface Editor {
   disableVersionLens(): Promise<void>
   duplicateSelection(): Promise<void>
   enable2x2GridView(): Promise<void>
+  enableSingleColumnLayout(): Promise<void>
   enableReadonly(): Promise<void>
   enableStickyScroll(): Promise<void>
   enableVersionLens(): Promise<void>
