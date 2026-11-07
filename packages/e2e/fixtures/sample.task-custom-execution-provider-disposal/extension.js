@@ -20,7 +20,7 @@ const createTask = () => {
     vscode.TaskScope.Workspace,
     'Temporary',
     'Disposal',
-    new vscode.CustomExecution(async () => {
+    new vscode.CustomExecution(async function disposedProviderCallback() {
       throw new Error(`Must not execute: ${state.value}`)
     }),
   )
@@ -32,10 +32,12 @@ const run = async () => {
   })
   try {
     const tasks = await vscode.tasks.fetchTasks({ type: 'disposal-task' })
-    if (!tasks.some((task) => task.execution instanceof vscode.CustomExecution)) throw new Error('Custom execution was not fetched')
+    if (tasks.length !== 1 || !(tasks[0].execution instanceof vscode.CustomExecution)) throw new Error('Expected one custom execution')
   } finally {
     registration.dispose()
   }
+  const remaining = await vscode.tasks.fetchTasks({ type: 'disposal-task' })
+  if (remaining.length !== 0) throw new Error('Disposed provider still contributes tasks')
 }
 
 exports.activate = (context) => {
