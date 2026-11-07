@@ -1,6 +1,11 @@
 # Task Custom Execution Provider Disposal
 
-Register a task provider, fetch its custom execution, and unregister without running it.
+Register a task provider, require exactly one custom execution, and unregister
+without running it. Fetch again to verify the registration no longer contributes
+tasks. The callback is named `disposedProviderCallback` for heap attribution.
+
+For pending discovery and a surviving provider execution control, use the sibling
+`sample.task-custom-execution-late-provider-disposal` fixture.
 
 Source investigation: [#256](https://github.com/SimonSiefke/vscode/pull/256). Intended measurement process: extension-host.
 
