@@ -334,6 +334,14 @@ jobs:
           name: vscode-memory-leak-finder-results-linux-${{ matrix.measure.name }}
           path: ./.vscode-memory-leak-finder-results
           include-hidden-files: true
+      - name: Upload extracted source files
+        if: always() && matrix.measure.name == 'promises-with-stack-trace-shard-1'
+        uses: actions/upload-artifact@v7
+        with:
+          name: vscode-memory-leak-finder-sources-linux
+          path: ./.vscode-sources
+          include-hidden-files: true
+          if-no-files-found: error
 
   ci-linux-instruction-count:
     runs-on: ubuntu-24.04-arm
@@ -418,6 +426,11 @@ jobs:
             **/.vscode-source-maps
             **/.vscode-sources
           key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
+      - name: Download extracted source files
+        uses: actions/download-artifact@v8
+        with:
+          name: vscode-memory-leak-finder-sources-linux
+          path: ./.vscode-sources
       - name: npm ci
         run: npm run install:ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
