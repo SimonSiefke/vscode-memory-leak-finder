@@ -1,0 +1,26 @@
+{
+  "name": "call-hierarchy-late-cancellation",
+  "displayName": "Call Hierarchy Late Cancellation",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "call-hierarchy-late-cancellation.setup",
+        "title": "Call Hierarchy Late Cancellation: Setup"
+      },
+      {
+        "command": "call-hierarchy-late-cancellation.run",
+        "title": "Call Hierarchy Late Cancellation: Run"
+      },
+      {
+        "command": "call-hierarchy-late-cancellation.cleanup",
+        "title": "Call Hierarchy Late Cancellation: Cleanup"
+      }
+    ]
+  }
+}
