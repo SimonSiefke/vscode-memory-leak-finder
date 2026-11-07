@@ -9,9 +9,9 @@ const root = join(dirname, '..', '..', '..')
 
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
-const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/node/named-function-count3/window-open-new.json`
+const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/named-function-count3/source-control-multiple-repositories.json`
 const ourPath = `/home/simon/.cache/repos/vscode-memory-leak-finder`
-const only = 'window-open-new'
+const only = 'source-control-multiple-repositories'
 const runs = 17
 const measure = 'named-function-count3'
 const extraArgs = ''
