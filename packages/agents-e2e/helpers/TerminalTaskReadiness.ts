@@ -9,7 +9,10 @@ interface Message {
 }
 
 export const taskExecutions = (messages: readonly Message[]) => {
-  const executions = new Map<string, { key: string; channel: string; connectionId: string; finished: boolean; exitCode?: number }>()
+  const executions = new Map<
+    string,
+    { key: string; channel: string; connectionId: string; commandLine: string; finished: boolean; exitCode?: number }
+  >()
   for (const message of messages) {
     const meta = message._ahpLog
     const channel = message.params?.channel
@@ -17,7 +20,7 @@ export const taskExecutions = (messages: readonly Message[]) => {
     if (meta?.dir !== 's2c' || meta.transport !== 'local' || !channel || !action?.commandId) continue
     const key = JSON.stringify([meta.connectionId, channel, action.commandId])
     if (action.type === 'terminal/commandExecuted' && action.commandLine?.includes('.chat-window-task-pids')) {
-      executions.set(key, { key, channel, connectionId: meta.connectionId, finished: false })
+      executions.set(key, { key, channel, connectionId: meta.connectionId, commandLine: action.commandLine, finished: false })
     } else if (action.type === 'terminal/commandFinished') {
       const execution = executions.get(key)
       if (execution) {
@@ -50,7 +53,22 @@ export const connect = async (userData: string) => {
       assert.equal(executions.length, 1, 'One task invocation must execute exactly one fixture shell command')
       const execution = executions[0]
       assert.ok(execution.finished)
-      assert.equal(execution.exitCode, 0, 'The fixture task must complete successfully')
+      if (execution.exitCode !== 0) {
+        const messages = await readMessages(directory)
+        const output = messages
+          .filter(
+            (message) =>
+              message._ahpLog?.dir === 's2c' &&
+              message._ahpLog.connectionId === execution.connectionId &&
+              message.params?.channel === execution.channel &&
+              message.params?.action?.type === 'terminal/data',
+          )
+          .slice(-20)
+          .map((message) => message.params?.action?.data ?? '')
+          .join('')
+          .slice(-4096)
+        assert.fail(`The fixture task must complete successfully: ${JSON.stringify({ execution, output })}`)
+      }
       if (owner) {
         assert.equal(execution.channel, owner.channel, 'Hidden task must reuse the same terminal channel')
         assert.equal(execution.connectionId, owner.connectionId, 'Task reuse must stay on the same live connection')

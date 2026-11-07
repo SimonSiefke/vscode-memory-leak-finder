@@ -1,5 +1,8 @@
 import { expect, test } from '@jest/globals'
-import { taskExecutions } from '../helpers/TerminalTaskReadiness.ts'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { connect, taskExecutions } from '../helpers/TerminalTaskReadiness.ts'
 
 const event = (type: string, commandId: string, extra = {}, connectionId = 'local-connection', channel = 'agenthost-terminal:/task') => ({
   params: { channel, action: { type, commandId, ...extra } },
@@ -27,4 +30,35 @@ test('does not match completion from another channel or connection with the same
   expect(taskExecutions([...messages, event('terminal/commandFinished', 'cwd', { exitCode: 1 })])).toMatchObject([
     { finished: true, exitCode: 1 },
   ])
+})
+
+test('failed task completion reports the command and bounded output from its own connection and channel', async () => {
+  const userData = await mkdtemp(join(tmpdir(), 'terminal-task-readiness-'))
+  try {
+    const directory = join(userData, 'logs', 'current', 'ahp')
+    await mkdir(directory, { recursive: true })
+    const messages = [
+      executed(),
+      event('terminal/data', '', { data: 'unrelated output' }, 'other-connection'),
+      event('terminal/data', '', { data: 'other terminal output' }, 'local-connection', 'agenthost-terminal:/other'),
+      event('terminal/data', '', { data: 'x'.repeat(5000) + 'fixture: command not found' }),
+      event('terminal/commandFinished', 'cwd', { exitCode: 127 }),
+    ]
+    await writeFile(join(directory, 'terminal.jsonl'), messages.map((message) => JSON.stringify(message)).join('\n') + '\n')
+    const readiness = await connect(userData)
+    let failure = ''
+    try {
+      await readiness.waitAfter(new Set())
+    } catch (error) {
+      failure = String(error)
+    }
+    expect(failure).toContain('"exitCode":127')
+    expect(failure).toContain('.chat-window-task-pids')
+    expect(failure).toContain('fixture: command not found')
+    expect(failure).not.toContain('unrelated output')
+    expect(failure).not.toContain('other terminal output')
+    expect(failure.length).toBeLessThan(5000)
+  } finally {
+    await rm(userData, { recursive: true, force: true })
+  }
 })
