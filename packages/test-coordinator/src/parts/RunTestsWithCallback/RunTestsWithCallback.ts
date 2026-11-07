@@ -592,15 +592,19 @@ export const runTestsWithCallback = async ({
       }
     }
 
+    let restartAfterFailure = false
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
       const proxyTestFolderName = GetProxyTestFolderName.getProxyTestFolderName(absolutePath)
       const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
 
-      const needsSetup = i === 0 || restartBetween
+      const needsSetup = i === 0 || restartBetween || restartAfterFailure
 
       if (needsSetup) {
+        if (i > 0 && recordVideo) {
+          await VideoRecording.finalize(workers.videoRpc, `part-${i}`)
+        }
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
         const { devtoolsWebSocketUrl, functionTrackerRpc, initializationWorkerRpc, memoryRpc, pid, testWorkerRpc, videoRpc, webSocketUrl } =
@@ -658,6 +662,7 @@ export const runTestsWithCallback = async ({
           videoRpc: videoRpc || emptyRpc,
           webSocketUrl,
         }
+        restartAfterFailure = false
       }
 
       if (enableProxy) {
@@ -897,6 +902,9 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
+        // A failed setup or teardown can leave a debugger running, a dialog open,
+        // or a dead renderer. Keep its failure, but isolate the next scenario.
+        restartAfterFailure = true
         if (wasOriginallySkipped) {
           skippedFailed++
         } else {
