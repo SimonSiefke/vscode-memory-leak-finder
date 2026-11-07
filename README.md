@@ -30,6 +30,12 @@ npm run e2e:electron -- --only window-open-close --measure named-function-count3
 See [Electron e2e documentation](packages/electron-e2e/README.md) for cache behavior,
 process verification, results, and adding scenarios.
 
+## Edit telemetry snapshots
+
+See [edit telemetry snapshot coverage](docs/scenarios/edit-telemetry-document-snapshots.md)
+for a development-build scenario that verifies consumed document snapshots are
+collected while the edited document remains open.
+
 ## Language-server processes
 
 On Linux, `--inspect-process` can measure a Node child of the VS Code instance under test, including its JSON language server:
