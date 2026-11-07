@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import { afterEach, expect, jest, test } from '@jest/globals'
-import { openWorkspaceFolder } from '../src/parts/AgentsWindow/AgentsWindow.ts'
+import { openWorkspaceFolder, selectLocalEnvironment } from '../src/parts/AgentsWindow/AgentsWindow.ts'
 
 // Jest provides a browser realm; the package itself intentionally has Node-only types.
 const browser = globalThis as any
@@ -46,4 +46,27 @@ test('reopens a workspace menu replaced during discovery and activates only the 
   expect(opens).toBe(2)
   expect(staleClick).not.toHaveBeenCalled()
   expect(liveClick).toHaveBeenCalledTimes(1)
+})
+
+test('waits for the local provider and retries its stale row without retrying other actions', async () => {
+  jest.useFakeTimers()
+  const environment = { click: jest.fn(async () => {}) }
+  const local = {
+    count: jest.fn<() => Promise<number>>().mockResolvedValueOnce(0).mockResolvedValue(1),
+    click: jest
+      .fn<() => Promise<void>>()
+      .mockRejectedValueOnce(new Error('element not found .monaco-list-row:has-text("This Computer")'))
+      .mockResolvedValue(undefined),
+  }
+  const press = jest.fn(async (_key: string) => {})
+  const selected = jest.fn(async (_text: string) => {})
+  const page = { locator: (selector: string) => (selector.includes('data-session-picker-id') ? environment : local), keyboard: { press } }
+  const assertions = () => ({ toBeVisible: async (_options?: unknown) => {}, toHaveText: selected })
+  const pending = selectLocalEnvironment(page, assertions)
+  await jest.advanceTimersByTimeAsync(1_500)
+  await pending
+  expect(environment.click).toHaveBeenCalledTimes(3)
+  expect(local.click).toHaveBeenCalledTimes(2)
+  expect(press.mock.calls).toEqual([['Escape'], ['Escape']])
+  expect(selected).toHaveBeenCalledWith('This Computer')
 })

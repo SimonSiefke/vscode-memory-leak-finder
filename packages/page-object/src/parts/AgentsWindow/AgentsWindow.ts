@@ -35,6 +35,33 @@ export const openWorkspaceFolder = async (page: any): Promise<void> => {
   })
 }
 
+export const selectLocalEnvironment = async (page: any, expect: any): Promise<void> => {
+  const environment = page.locator(
+    `${composer} [data-session-picker-id="sessions.focusNewSessionEnvironmentPicker"] a[aria-haspopup="listbox"]`,
+  )
+  const local = page.locator('.context-view .monaco-list-row', { hasText: 'This Computer' })
+  const deadline = Date.now() + 60_000
+  await expect(environment).toBeVisible({ timeout: 60_000 })
+  while (Date.now() < deadline) {
+    try {
+      await environment.click()
+      await expect(page.locator('.context-view [aria-label="Environment"]')).toBeVisible()
+      if (await local.count()) {
+        await local.click()
+        await expect(environment).toHaveText('This Computer')
+        return
+      }
+    } catch (error) {
+      // Discovery may remove this row after count() but before native click().
+      // Retry only this setup race; unexpected errors still fail the scenario.
+      if (!String(error).includes('element not found') || !String(error).includes('This Computer')) throw error
+    }
+    await page.keyboard.press('Escape')
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  throw new Error('Local Agents environment did not become available')
+}
+
 export const create = (params: CreateParams) => {
   const { expect, page, platform } = params
   const canvasObserver = InboxCanvasObserver.create(page)
@@ -73,21 +100,7 @@ export const create = (params: CreateParams) => {
       await this.shouldHaveNewChat()
     },
     async selectWorkspace(path: string, readinessDirectory: string) {
-      const environment = page.locator(
-        `${composer} [data-session-picker-id="sessions.focusNewSessionEnvironmentPicker"] a[aria-haspopup="listbox"]`,
-      )
-      const local = page.locator('.context-view .monaco-list-row', { hasText: 'This Computer' })
-      const deadline = Date.now() + 60_000
-      while (true) {
-        await environment.click()
-        await expect(page.locator('.context-view [aria-label="Environment"]')).toBeVisible()
-        if (await local.count()) break
-        await page.keyboard.press('Escape')
-        if (Date.now() >= deadline) throw new Error('Local Agents environment did not become available')
-        await new Promise((resolve) => setTimeout(resolve, 500))
-      }
-      await local.click()
-      await expect(environment).toHaveText('This Computer')
+      await selectLocalEnvironment(page, expect)
       const picker = page.locator(`${composer} .sessions-workspace-picker-trigger a[aria-haspopup="listbox"]`).first()
       for (let attempt = 0; ; attempt++) {
         await openWorkspaceFolder(page)
