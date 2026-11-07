@@ -93,14 +93,29 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           platform,
           VError,
         })
-        await quickPick.executeCommand(WellKnownCommands.AutoFix)
         if (hasFixes) {
+          await quickPick.executeCommand(WellKnownCommands.AutoFix)
           // TODO
-        } else {
-          const overlayMessage = page.locator('.monaco-editor-overlaymessage')
-          await expect(overlayMessage).toBeVisible()
-          await expect(overlayMessage).toHaveText('No auto fixes available')
+          return
         }
+        const overlayMessage = page.locator('.monaco-editor-overlaymessage')
+        // Background diagnostics can cancel a manual code-action request before
+        // it produces a result. Reinvoke only this no-fixes operation, bounded by
+        // a total message wait, and keep transport/text failures visible.
+        const deadline = Date.now() + 6000
+        do {
+          await quickPick.executeCommand(WellKnownCommands.AutoFix)
+          const attemptDeadline = Math.min(deadline, Date.now() + 1500)
+          do {
+            if (await overlayMessage.isVisible()) {
+              await expect(overlayMessage).toHaveText('No auto fixes available')
+              return
+            }
+            await new Promise((resolve) => setTimeout(resolve, 50))
+          } while (Date.now() < attemptDeadline)
+        } while (Date.now() < deadline)
+        await expect(overlayMessage).toBeVisible({ timeout: 1 })
+        await expect(overlayMessage).toHaveText('No auto fixes available')
       } catch (error) {
         throw new VError(error, `Failed to execute auto fix`)
       }
