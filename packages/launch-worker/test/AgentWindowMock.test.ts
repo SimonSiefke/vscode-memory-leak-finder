@@ -13,9 +13,9 @@ afterEach(async () => {
   if (directory) await rm(directory, { recursive: true, force: true })
 })
 
-const start = async () => {
+const start = async (canvasFixture = false) => {
   directory = await mkdtemp(join(tmpdir(), 'agents-window-mock-'))
-  mock = await AgentWindowMock.start(directory)
+  mock = await AgentWindowMock.start(directory, canvasFixture)
   return mock
 }
 
@@ -89,4 +89,23 @@ test('restores existing settings and removes mock-only profile settings on dispo
   expect(await readFile(settingsPath, 'utf8')).toBe(original)
   await expect(readFile(join(directory, 'User/profiles/builtin/agents/settings.json'))).rejects.toMatchObject({ code: 'ENOENT' })
   await expect(fetch(`${address}/models`)).rejects.toThrow()
+})
+
+test('serves the bundled runtime model metadata batches', async () => {
+  const { env } = await start()
+  const response = await fetch(`${env.COPILOT_API_URL}/meta`)
+  expect(response.status).toBe(200)
+  expect(await response.json()).toEqual({ models: [[expect.objectContaining({ id: AgentWindowMock.modelId })]] })
+})
+
+test('isolates the opt-in canvas fixture and restores settings when disposed', async () => {
+  const { env } = await start(true)
+  const fixture = env.VMLF_INBOX_FIXTURE!
+  expect(await readFile(join(fixture, 'extension.mjs'), 'utf8')).toContain('joinSession')
+  const settings = JSON.parse(await readFile(join(directory, 'User', 'settings.json'), 'utf8'))
+  expect(settings['chat.canvases.enabled']).toBe(true)
+  expect(settings['chat.agentHost.ahpJsonlLoggingEnabled']).toBe(true)
+  await mock!.dispose()
+  await expect(readFile(join(fixture, 'extension.mjs'))).rejects.toMatchObject({ code: 'ENOENT' })
+  await expect(readFile(join(directory, 'User', 'settings.json'))).rejects.toMatchObject({ code: 'ENOENT' })
 })

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "e2e:agents": "node ../cli/bin/test.js --cwd . --launch-agent-window --enable-extensions --use-proxy-mock"
+    "e2e:agents": "node ../cli/bin/test.js --cwd . --launch-agent-window --enable-extensions --use-proxy-mock",
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js"
   }
 }

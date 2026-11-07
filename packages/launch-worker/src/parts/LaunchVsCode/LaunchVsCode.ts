@@ -329,7 +329,10 @@ export const launchVsCode = async ({
       binaryPath = await PrepareTrackedVscode.prepareTrackedVscode(binaryPath, trackingMode, preparedVscodePath)
     }
 
-    const agentMock = launchAgentWindow && useProxyMock ? await AgentWindowMock.start(userDataDir) : undefined
+    const agentMock =
+      launchAgentWindow && useProxyMock
+        ? await AgentWindowMock.start(userDataDir, proxyTestFolderName === 'agents-window-inbox-canvas-subscriptions')
+        : undefined
     if (agentMock) addDisposable(agentMock.dispose)
 
     // Start proxy server if enabled

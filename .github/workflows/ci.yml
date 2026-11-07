@@ -61,6 +61,18 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm test
+      - name: Prepare short Inbox runtime directory
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/inbox-runtime"
+          chmod 700 "$RUNNER_TEMP/inbox-runtime"
+          printf 'XDG_RUNTIME_DIR=%s/inbox-runtime\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Run Inbox canvas subscription regression
+        timeout-minutes: 10
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/agents-e2e --launch-agent-window --enable-extensions --use-proxy-mock --only agents-window-inbox-canvas-subscriptions.ts --vscode-version 1.145.0 --runs 1
       - name: Run headless test (with videos)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1

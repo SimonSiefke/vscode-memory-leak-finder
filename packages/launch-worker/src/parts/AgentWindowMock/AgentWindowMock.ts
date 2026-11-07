@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { createServer, type ServerResponse } from 'node:http'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
+import * as AgentWindowCanvasFixture from '../AgentWindowCanvasFixture/AgentWindowCanvasFixture.ts'
 
 export const modelId = 'gpt-5.3-codex'
 export const reply = 'Hello from the mocked Agents window.'
@@ -63,7 +64,8 @@ const streamResponse = (res: ServerResponse) => {
 
 // Use the real agent host and SDK, replacing only their HTTP backend. Bind to
 // loopback and never forward requests or require real credentials.
-export const start = async (userDataDir: string) => {
+export const start = async (userDataDir: string, canvasFixture = false) => {
+  let fixture: Awaited<ReturnType<typeof AgentWindowCanvasFixture.install>> | undefined
   const savedSettings = new Map<string, string | undefined>()
   const server = createServer(async (req, res) => {
     const path = new URL(req.url || '/', 'http://localhost').pathname
@@ -97,6 +99,8 @@ export const start = async (userDataDir: string) => {
         json(200, { token, expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_in: 1800, endpoints: { api: url, proxy: url } })
       } else if (path.startsWith('/copilot_internal/')) {
         json(200, {})
+      } else if (path === '/meta') {
+        json(200, { models: [[model]] })
       } else if (path === '/copilot/mcp_registry') {
         json(200, { mcp_registries: [] })
       } else if (req.method === 'GET' && path === '/models') {
@@ -147,6 +151,7 @@ export const start = async (userDataDir: string) => {
     disposed = true
     server.closeAllConnections()
     await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())))
+    await fixture?.dispose()
     for (const [path, original] of savedSettings) {
       if (original === undefined) await rm(path, { force: true })
       else await writeFile(path, original)
@@ -155,6 +160,9 @@ export const start = async (userDataDir: string) => {
   try {
     const settings = {
       'window.menuStyle': 'custom',
+      ...(canvasFixture
+        ? { 'chat.canvases.enabled': true, 'chat.agentSessions.inbox.enabled': true, 'chat.agentHost.ahpJsonlLoggingEnabled': true }
+        : {}),
       'chat.allowAnonymousAccess': true,
       'chat.agentHost.unsafeTestToken': token,
       'chat.defaultModel': modelId,
@@ -180,9 +188,12 @@ export const start = async (userDataDir: string) => {
     const copilotHome = join(stateHome, '.copilot')
     await mkdir(copilotHome, { recursive: true })
     await mkdir(join(stateHome, '.codex'), { recursive: true })
+    if (canvasFixture) fixture = await AgentWindowCanvasFixture.install(copilotHome)
+
     return {
       dispose,
       env: {
+        ...(fixture ? { VMLF_INBOX_FIXTURE: fixture.directory, VMLF_INBOX_USER_DATA: userDataDir } : {}),
         COPILOT_API_URL: url,
         COPILOT_DEBUG_GITHUB_API_URL: url,
         VSCODE_AGENT_HOST_CAPI_URL_OVERRIDE: url,
