@@ -981,6 +981,7 @@ export interface Window {
   focus(): Promise<void>
 }
 export interface Workbench {
+  collectGarbage(): Promise<void>
   connectToSsh(options: any): Promise<void>
   waitForNewWindow(options: any): Promise<void>
   openNewWindow(): Promise<PageObjectApi & PageObjectWindowHandle>

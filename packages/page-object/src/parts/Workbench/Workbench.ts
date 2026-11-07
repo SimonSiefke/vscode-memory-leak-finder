@@ -338,6 +338,9 @@ export const createWithDependencies = (
     evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
       return page.evaluateInMainWorld(options)
     },
+    async collectGarbage(): Promise<void> {
+      await page.rpc.invoke('HeapProfiler.collectGarbage')
+    },
     async shouldBeVisible() {
       const workbench = page.locator('.monaco-workbench')
       await expect(workbench).toBeVisible()
