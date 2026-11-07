@@ -126,18 +126,14 @@ export const shouldHaveSavedText = async (Workspace: TestContext['Workspace'], e
   assert.fail(`Saved Markdown differs: expected ${expected.length} characters, got ${actual.length}`)
 }
 
-export const teardown = async ({ Editor, Git, QuickPick, SourceControl, Workspace }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, QuickPick, SourceControl, Workspace }: TestContext): Promise<void> => {
   try {
     await QuickPick.executeCommand('View: Revert and Close Editor')
   } finally {
     await Editor.closeAll()
-    // Restore Git while the fixture is still a valid repository, then close its
-    // model before deletion so it cannot discover the harness's parent checkout.
-    await Workspace.remove('.vscode/settings.json')
-    await QuickPick.waitForCommand('Git: Open Repository')
-    await Git.openRepository('.')
-    await SourceControl.shouldHaveRepositoryCount(1)
-    await Git.closeRepository()
+    // Disable Git and await model disposal before deleting the repository.
+    // Reopening it during cleanup can resolve to the enclosing harness checkout.
+    await Workspace.updateWorkspaceSettings({ 'git.enabled': false })
     await SourceControl.shouldHaveRepositoryCount(0)
     await Workspace.remove('.git')
   }
