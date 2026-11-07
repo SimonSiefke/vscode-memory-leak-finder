@@ -22,13 +22,13 @@ const deferred = () => {
   })
   return { promise, resolve }
 }
-const bounded = async (promise, label) => {
+const bounded = async (promise, label, timeout = 10000) => {
   let timer
   try {
     return await Promise.race([
       promise,
       new Promise((_, reject) => {
-        timer = setTimeout(() => reject(new Error(`Timed out: ${label}`)), 10000)
+        timer = setTimeout(() => reject(new Error(`Timed out: ${label}`)), timeout)
       }),
     ])
   } finally {
@@ -49,6 +49,76 @@ const discardedTask = (id) => {
       throw new Error(`Must not execute: ${state.value}`)
     }),
   )
+}
+class LateCanceledProviderState {
+  value = 'canceled provider callback'
+}
+const runCanceledCallback = async (id) => {
+  const entered = deferred()
+  const release = deferred()
+  const ended = deferred()
+  const closed = deferred()
+  const write = new vscode.EventEmitter()
+  const close = new vscode.EventEmitter()
+  const state = new LateCanceledProviderState()
+  const name = `Canceled ${id}`
+  let calls = 0
+  let opens = 0
+  let closes = 0
+  let execution
+  const listener = vscode.tasks.onDidEndTask((event) => {
+    if (event.execution.task.name === name) ended.resolve()
+  })
+  const task = new vscode.Task(
+    { type: 'late-disposal-task', task: `canceled-${id}` },
+    vscode.TaskScope.Workspace,
+    name,
+    'Disposal',
+    new vscode.CustomExecution(async function lateCanceledProviderCallback() {
+      calls++
+      entered.resolve()
+      await release.promise
+      return {
+        onDidWrite: write.event,
+        onDidClose: close.event,
+        open: () => {
+          opens++
+          write.fire(state.value)
+          close.fire(0)
+        },
+        close: () => {
+          closes++
+          closed.resolve()
+        },
+      }
+    }),
+  )
+  task.presentationOptions = { reveal: vscode.TaskRevealKind.Never, close: true }
+  const provider = vscode.tasks.registerTaskProvider('late-disposal-task', {
+    provideTasks: () => [task],
+    resolveTask: () => undefined,
+  })
+  try {
+    const tasks = await bounded(vscode.tasks.fetchTasks({ type: 'late-disposal-task' }), 'cancelable task discovered')
+    const discovered = tasks.find((candidate) => candidate.name === name)
+    if (!(discovered?.execution instanceof vscode.CustomExecution)) throw new Error('Cancelable callback was not discovered')
+    execution = await bounded(vscode.tasks.executeTask(discovered), 'cancelable task accepted')
+    await bounded(entered.promise, 'cancelable callback entered')
+    provider.dispose()
+    execution.terminate()
+    await bounded(ended.promise, 'pending callback task canceled')
+    release.resolve()
+    // Report a missing close before the UI completion-notification deadline.
+    await bounded(closed.promise, 'late PTY closed', 5000)
+    if (calls !== 1 || opens !== 0 || closes !== 1) throw new Error(`Canceled callback/open/close counts: ${calls}/${opens}/${closes}`)
+  } finally {
+    release.resolve()
+    if (execution && vscode.tasks.taskExecutions.includes(execution)) execution.terminate()
+    provider.dispose()
+    listener.dispose()
+    write.dispose()
+    close.dispose()
+  }
 }
 const run = async () => {
   const id = ++iteration
@@ -107,6 +177,7 @@ const run = async () => {
     execution = await bounded(vscode.tasks.executeTask(survivor), 'live task accepted')
     await bounded(ended.promise, 'live task ended')
     if (calls !== 1 || opens !== 1) throw new Error(`Live callback/open counts: ${calls}/${opens}`)
+    await runCanceledCallback(id)
   } finally {
     disposed.dispose()
     release.resolve()
@@ -114,7 +185,7 @@ const run = async () => {
     try {
       if (fetch) await bounded(fetch, 'discovery cleanup')
     } finally {
-      execution?.terminate()
+      if (execution && vscode.tasks.taskExecutions.includes(execution)) execution.terminate()
       live.dispose()
       endListener.dispose()
       close.dispose()
@@ -134,6 +205,7 @@ exports.activate = (context) => {
           await action()
           void vscode.window.showInformationMessage(`${prefix}: ${name} complete`)
         } catch (error) {
+          console.error(`${prefix}: ${name} failed`, error)
           void vscode.window.showErrorMessage(`${prefix}: ${name} failed: ${error.message}`)
           throw error
         }
