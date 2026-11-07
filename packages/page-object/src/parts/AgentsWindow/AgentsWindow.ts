@@ -8,6 +8,33 @@ const composer = `${workbench} .sessions-chat-widget .new-chat-widget-container`
 const activeSession = `${workbench} .session-view.is-active`
 const sessionRows = `${workbench} .sessions-list-control .monaco-list-row:has(.session-item)`
 
+// Resolve and activate the live menu row in one renderer task. Workspace discovery
+// can replace the menu between separate locator readiness and click RPCs.
+export const openWorkspaceFolder = async (page: any): Promise<void> => {
+  await page.evaluateInMainWorld({
+    awaitPromise: true,
+    expression: `(async () => {
+      const selector = ${JSON.stringify(`${composer} .sessions-workspace-picker-trigger a[aria-haspopup="listbox"]`)}
+      const deadline = Date.now() + 15_000
+      let lastOpen = -Infinity
+      while (Date.now() < deadline) {
+        const option = Array.from(document.querySelectorAll('.context-view .monaco-list-row')).find(element =>
+          (element.querySelector('.label-name')?.textContent === 'Open Folder...' ||
+            /^Open Folder\\.\\.\\.(,|$)/.test(element.getAttribute('aria-label') || '')) && element.getClientRects().length)
+        if (option) { option.click(); return }
+        const trigger = document.querySelector(selector)
+        if (!trigger) throw new Error('No new-session workspace picker')
+        if (trigger.getAttribute('aria-expanded') !== 'true' && Date.now() - lastOpen >= 250) {
+          trigger.click()
+          lastOpen = Date.now()
+        }
+        await new Promise(resolve => requestAnimationFrame(resolve))
+      }
+      throw new Error('No live Open Folder workspace option')
+    })()`,
+  })
+}
+
 export const create = (params: CreateParams) => {
   const { expect, page, platform } = params
   const canvasObserver = InboxCanvasObserver.create(page)
@@ -63,10 +90,7 @@ export const create = (params: CreateParams) => {
       await expect(environment).toHaveText('This Computer')
       const picker = page.locator(`${composer} .sessions-workspace-picker-trigger a[aria-haspopup="listbox"]`).first()
       for (let attempt = 0; ; attempt++) {
-        await picker.click()
-        const browse = page.locator('.context-view .monaco-list-row', { hasText: 'Open Folder...' })
-        await expect(browse).toBeVisible({ timeout: 10_000 })
-        await browse.click()
+        await openWorkspaceFolder(page)
         const input = page.locator('.quick-input-widget input[placeholder="Folder path"]')
         await expect(input).toBeVisible()
         await expect(page.locator('.quick-input-widget .quick-input-list .monaco-list-row').first()).toBeVisible()
