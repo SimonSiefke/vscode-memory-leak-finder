@@ -64,7 +64,7 @@ const streamResponse = (res: ServerResponse) => {
 
 // Use the real agent host and SDK, replacing only their HTTP backend. Bind to
 // loopback and never forward requests or require real credentials.
-export const start = async (userDataDir: string, canvasFixture = false) => {
+export const start = async (userDataDir: string, canvasFixture = false, terminalFixture = false) => {
   let fixture: Awaited<ReturnType<typeof AgentWindowCanvasFixture.install>> | undefined
   const savedSettings = new Map<string, string | undefined>()
   const server = createServer(async (req, res) => {
@@ -119,6 +119,22 @@ export const start = async (userDataDir: string, canvasFixture = false) => {
         })
       } else if (path === '/models/session/intent') {
         json(200, { model: modelId })
+      } else if (req.method === 'POST' && path === '/chat/completions') {
+        JSON.parse(Buffer.concat(chunks).toString())
+        res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' })
+        const chunk = {
+          id: `chatcmpl_${randomUUID()}`,
+          object: 'chat.completion.chunk',
+          created: Math.floor(Date.now() / 1000),
+          model: modelId,
+        }
+        res.write(
+          `data: ${JSON.stringify({ ...chunk, choices: [{ index: 0, delta: { role: 'assistant', content: reply }, finish_reason: null }] })}\n\n`,
+        )
+        res.write(
+          `data: ${JSON.stringify({ ...chunk, choices: [{ index: 0, delta: {}, finish_reason: 'stop' }], usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 } })}\n\n`,
+        )
+        res.end('data: [DONE]\n\n')
       } else if (req.method === 'POST' && path === '/responses') {
         JSON.parse(Buffer.concat(chunks).toString())
         streamResponse(res)
@@ -171,6 +187,16 @@ export const start = async (userDataDir: string, canvasFixture = false) => {
       'github.copilot.chat.githubMcpServer.enabled': false,
       'github.copilot.advanced.debug.overrideProxyUrl': url,
       'sessions.useWorktree': false,
+      ...(terminalFixture
+        ? {
+            'sessions.chatWindows.enabled': true,
+            'chat.agentHost.ahpJsonlLoggingEnabled': true,
+            'sessions.list.showArchivedByDefault': true,
+            'chat.experimental.sessionArchiveActionWording': 'archive',
+            'terminal.integrated.enablePersistentSessions': true,
+            'terminal.integrated.defaultLocation': 'view',
+          }
+        : {}),
       'sessions.chat.unifiedWorkspacePicker.enabled': true,
     }
     for (const relativePath of ['User/settings.json', 'User/profiles/builtin/agents/settings.json']) {
@@ -193,6 +219,7 @@ export const start = async (userDataDir: string, canvasFixture = false) => {
     return {
       dispose,
       env: {
+        ...(terminalFixture ? { VMLF_CHAT_TERMINAL_USER_DATA: userDataDir } : {}),
         ...(fixture ? { VMLF_INBOX_FIXTURE: fixture.directory, VMLF_INBOX_USER_DATA: userDataDir } : {}),
         COPILOT_API_URL: url,
         COPILOT_DEBUG_GITHUB_API_URL: url,

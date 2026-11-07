@@ -10,7 +10,10 @@ type ConnectToSshOptions = {
 }
 
 type QuickPickApi = {
-  executeCommand: (command: string, options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care' }) => Promise<void>
+  executeCommand: (
+    command: string,
+    options?: { pressKeyOnce?: boolean; stayVisible?: boolean | 'dont-care'; stopsApplication?: boolean },
+  ) => Promise<void>
   getVisibleCommands: () => Promise<string[]>
   pressEnter: () => Promise<void>
   select: (text: string | RegExp, stayVisible?: boolean | 'dont-care') => Promise<number>
@@ -24,6 +27,7 @@ type WorkbenchDependencies = {
 }
 
 export interface ISimplifedWindow {
+  readonly evaluate: (options: { expression: string; awaitPromise?: boolean }) => Promise<any>
   readonly close: () => Promise<void>
   readonly closeGracefully: () => Promise<void>
   readonly locator?: (selector: string) => any
@@ -52,7 +56,8 @@ const isReloadTransitionError = (error: unknown): boolean => {
   return (
     message.includes('Execution context was destroyed') ||
     message.includes('uniqueContextId not found') ||
-    message.includes('Cannot find context with specified id')
+    message.includes('Cannot find context with specified id') ||
+    message.includes('Inspected target navigated or closed')
   )
 }
 
@@ -231,108 +236,110 @@ export const createWithDependencies = (
       await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
       await page.waitForIdle()
     },
-    async openNewWindow(): Promise<ISimplifedWindow> {
+    async openChatWindow(): Promise<ISimplifedWindow> {
+      return this.openNewWindow('Agents: Open Chat in New Window')
+    },
+    async openNewWindow(command: string = WellKnownCommands.NewWindow): Promise<ISimplifedWindow> {
       try {
-        const newWindowPromise = this.waitForNewWindow({ timeout: 5000 })
-        // Run the quickpick command to open new window
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.NewWindow)
-
-        const sessionId = await newWindowPromise
-        if (!sessionId) {
-          throw new Error(`Failed to wait for window`)
-        }
-
-        // Use electronApp.waitForPage to create the page with utility context
-        const newWindowPage = await electronApp.waitForPage({
-          injectUtilityScript: true,
-          sessionId,
-        })
-
-        await page.waitForIdle()
-
-        const newWindow = createPageObject ? await createPageObject(newWindowPage) : Object.create(null)
-        const getNewWindowPage = () => newWindow.__page || newWindowPage
-
-        return Object.assign(newWindow, {
-          async close() {
-            try {
-              // Wait for the window to be fully idle before attempting to close
-              const page = getNewWindowPage()
-              await page.waitForIdle()
-              await page.close()
-            } catch (error) {
-              throw new VError(error, `Failed to close new window`)
-            }
-          },
-          async closeGracefully() {
-            try {
-              // Wait for the window to be fully idle before attempting to close
-              await newWindowPage.waitForIdle()
-              const quickPick = QuickPick.create({
-                electronApp,
-                expect,
-                ideVersion,
-                page: newWindowPage,
-                platform,
-                VError,
-              })
-              await quickPick.executeCommand(WellKnownCommands.CloseWindow)
-            } catch (error) {
-              throw new VError(error, `Failed to close new window`)
-            }
-          },
-          locator: (selector: string) => getNewWindowPage().locator(selector),
-          evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
-            const page = getNewWindowPage()
-            return page.evaluateInMainWorld(options)
-          },
-          sessionRpc: newWindowPage.sessionRpc,
-          async shouldBeVisible() {
-            const page = getNewWindowPage()
-            await page.waitForIdle()
-            const workbench = page.locator('.monaco-workbench')
-            await expect(workbench).toBeVisible({ timeout: 20_000 })
-            await page.waitForIdle()
-          },
-          waitForIdle: () => getNewWindowPage().waitForIdle(),
-        })
+        // Resume and attach a new auxiliary target while its opener is still waiting.
+        const newWindowPromise = this.waitForNewWindowReady(30_000)
+        void newWindowPromise.catch(() => {})
+        await dependencies.createQuickPick().executeCommand(command)
+        return await newWindowPromise
       } catch (error) {
-        throw new VError(error, `Failed to open new window`)
+        throw new VError(error, 'Failed to open new window')
       }
     },
+    async waitForNewWindowReady(timeout = 30_000, url?: string): Promise<ISimplifedWindow> {
+      const sessionId = await this.waitForNewWindow({ timeout, ...(url ? { url } : {}) })
+      if (!sessionId) throw new Error('No new window target attached')
+      return this.connectWindow(sessionId)
+    },
+    async connectWindow(sessionId: string): Promise<ISimplifedWindow> {
+      const newWindowPage = await electronApp.waitForPage({ injectUtilityScript: true, sessionId })
+      const newWindow = createPageObject ? await createPageObject(newWindowPage) : Object.create(null)
+      const getNewWindowPage = () => newWindow.__page || newWindowPage
+
+      return Object.assign(newWindow, {
+        async close() {
+          try {
+            // Wait for the window to be fully idle before attempting to close
+            const page = getNewWindowPage()
+            await page.waitForIdle()
+            await page.close()
+          } catch (error) {
+            throw new VError(error, `Failed to close new window`)
+          }
+        },
+        async closeGracefully() {
+          try {
+            // Wait for the window to be fully idle before attempting to close
+            await newWindowPage.waitForIdle()
+            const quickPick = QuickPick.create({
+              electronApp,
+              expect,
+              ideVersion,
+              page: newWindowPage,
+              platform,
+              VError,
+            })
+            await quickPick.executeCommand(WellKnownCommands.CloseWindow, { stopsApplication: true })
+          } catch (error) {
+            throw new VError(error, `Failed to close new window`)
+          }
+        },
+        locator: (selector: string) => getNewWindowPage().locator(selector),
+        evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
+          const page = getNewWindowPage()
+          return page.evaluateInMainWorld(options)
+        },
+        sessionRpc: newWindowPage.sessionRpc,
+        async shouldBeVisible() {
+          const page = getNewWindowPage()
+          await page.waitForIdle()
+          const workbench = page.locator('.monaco-workbench')
+          await expect(workbench).toBeVisible({ timeout: 20_000 })
+          await page.waitForIdle()
+        },
+        waitForIdle: () => getNewWindowPage().waitForIdle(),
+      })
+    },
     async reload(): Promise<void> {
+      let timer: ReturnType<typeof setTimeout> | undefined
+      let onCleared: ((message: any) => void) | undefined
       try {
         await page.waitForIdle()
-
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
+        await page.sessionRpc.invoke('Runtime.enable', {})
+        const sessionId = page.sessionRpc.sessionId
+        const navigation = new Promise<void>((resolve, reject) => {
+          onCleared = (message) => {
+            if (!sessionId || message?.sessionId === sessionId) resolve()
+          }
+          page.sessionRpc.on('Runtime.executionContextsCleared', onCleared)
+          timer = setTimeout(() => reject(new Error('Reload did not clear the renderer context')), 15_000)
         })
-
-        await quickPick.executeCommand(WellKnownCommands.DeveloperReloadWindow)
-        const refreshedPage = await page.refresh()
-        await page.rebind(refreshedPage)
-        try {
-          await page.waitForIdle()
-        } catch {
-          // The renderer can be in flux immediately after reload. Visibility check below is the real readiness gate.
+        void navigation.catch(() => {})
+        await dependencies.createQuickPick().executeCommand(WellKnownCommands.DeveloperReloadWindow, {
+          stopsApplication: true,
+          stayVisible: 'dont-care',
+        })
+        await navigation
+        const deadline = Date.now() + 30_000
+        while (true) {
+          try {
+            await page.rebind(await page.refresh())
+            await this.shouldBeVisible()
+            return
+          } catch (error) {
+            if (!isReloadTransitionError(error) || Date.now() >= deadline) throw error
+            await dependencies.sleep(100)
+          }
         }
-        await this.shouldBeVisible()
       } catch (error) {
-        throw new VError(error, `Failed to reload window`)
+        throw new VError(error, 'Failed to reload window')
+      } finally {
+        clearTimeout(timer)
+        if (onCleared) page.sessionRpc.off('Runtime.executionContextsCleared', onCleared)
       }
     },
     evaluate(options: { readonly awaitPromise?: boolean; readonly expression: string; readonly replMode?: boolean }) {
@@ -355,7 +362,7 @@ export const createWithDependencies = (
         throw new VError(error, `workbench has not the expected background color`)
       }
     },
-    async waitForNewWindow({ timeout }: { timeout: number }) {
+    async waitForNewWindow({ timeout, url }: { timeout: number; url?: string }) {
       const { promise, resolve } = Promise.withResolvers<string>()
 
       if (!browserRpc) {
@@ -375,7 +382,11 @@ export const createWithDependencies = (
       }
 
       const handleNewTarget = (message: any): void => {
-        if (targetCaptured) {
+        // Electron auxiliary windows initially attach with an empty URL before about:blank.
+        if (
+          targetCaptured ||
+          (url && message.params.targetInfo.url !== url && !(url === 'about:blank' && !message.params.targetInfo.url))
+        ) {
           return
         }
         targetCaptured = true
