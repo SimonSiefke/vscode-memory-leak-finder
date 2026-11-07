@@ -2,6 +2,13 @@ const vscode = require('vscode')
 const fs = require('node:fs/promises')
 const path = require('node:path')
 
+// Readers poll these files while commands run. Publish only complete JSON.
+const publishJson = async (file, records) => {
+  const temporary = `${file}.tmp`
+  await fs.writeFile(temporary, JSON.stringify(records))
+  await fs.rename(temporary, file)
+}
+
 exports.activate = (context) => {
   const parent = path.resolve(context.extensionPath, '../../../../.vscode-test-workspace')
   let root
@@ -34,14 +41,14 @@ exports.activate = (context) => {
         if (!Number.isInteger(pid) || pid <= 0) throw new Error(`No real shell PID for ${terminal.name}`)
         records.push({ name: terminal.name, pid, transient })
       }
-      await fs.writeFile(path.join(root, '.chat-window-terminals.json'), JSON.stringify(records))
+      await publishJson(path.join(root, '.chat-window-terminals.json'), records)
     },
     async snapshot() {
       const records = []
       for (const terminal of vscode.window.terminals) {
         records.push({ name: terminal.name, pid: await terminal.processId })
       }
-      await fs.writeFile(path.join(root, '.chat-window-terminal-snapshot.json'), JSON.stringify(records))
+      await publishJson(path.join(root, '.chat-window-terminal-snapshot.json'), records)
     },
     async verifyReconnect() {
       const matches = vscode.window.terminals.filter((terminal) => terminal.name === `${prefix}persistent`)
