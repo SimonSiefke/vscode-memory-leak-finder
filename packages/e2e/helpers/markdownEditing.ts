@@ -89,23 +89,48 @@ export const isDirty = async (Workbench: TestContext['Workbench']): Promise<bool
 export const shouldBeClean = async (Workbench: TestContext['Workbench']): Promise<void> => {
   const deadline = Date.now() + 3000
   while (await isDirty(Workbench)) {
-    assert.ok(Date.now() < deadline, 'Markdown save did not finish')
+    assert.ok(Date.now() < deadline, 'Markdown editor did not become clean')
     await new Promise((resolve) => setTimeout(resolve, 20))
   }
+}
+
+const getRenderedText = async (Workbench: TestContext['Workbench']): Promise<string> => {
+  const result = await Workbench.evaluate({
+    expression: `(() => {
+      const lines = document.querySelector('.editor-instance .view-lines');
+      if (!lines) throw new Error('Markdown editor lines are missing');
+      return lines.textContent;
+    })()`,
+  })
+  assert.equal(typeof result, 'string')
+  return result as string
 }
 
 export const run = async ({ Editor, Workbench, Workspace }: TestContext): Promise<void> => {
   // Native key events exercise the typing path rather than replacing the model.
   // Keep this editor open across iterations, as in a sustained editing session.
   await Editor.focus()
+  const cleanText = await getRenderedText(Workbench)
   await Editor.typeCharacters(typedText)
   await Editor.shouldContainText('typingcheckend')
   assert.equal(await isDirty(Workbench), true, 'Typing must make the document dirty')
-  // Undo grouping can vary between iterations. Wait for the saved version,
-  // without opening the command palette between individual undo operations.
+  // Undo grouping can vary between iterations. Await each change before sending
+  // another key, and stop at the original text while its clean flag catches up.
   const modifier = process.platform === 'darwin' ? 'Meta' : 'Control'
   for (let index = 0; index < typedText.length && (await isDirty(Workbench)); index++) {
+    const before = await getRenderedText(Workbench)
     await Editor.press(`${modifier}+z`)
+    const deadline = Date.now() + 3000
+    let after = await getRenderedText(Workbench)
+    while (after === before && (await isDirty(Workbench))) {
+      assert.ok(Date.now() < deadline, 'Undo did not update the Markdown editor')
+      await new Promise((resolve) => setTimeout(resolve, 20))
+      after = await getRenderedText(Workbench)
+    }
+    if (after === cleanText) {
+      await shouldBeClean(Workbench)
+      break
+    }
   }
   assert.equal(await isDirty(Workbench), false, 'Undo must restore the saved document')
   // Use the command for platform-independent saving. A tab can stop showing its
@@ -126,18 +151,14 @@ export const shouldHaveSavedText = async (Workspace: TestContext['Workspace'], e
   assert.fail(`Saved Markdown differs: expected ${expected.length} characters, got ${actual.length}`)
 }
 
-export const teardown = async ({ Editor, Git, QuickPick, SourceControl, Workspace }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, QuickPick, SourceControl, Workspace }: TestContext): Promise<void> => {
   try {
     await QuickPick.executeCommand('View: Revert and Close Editor')
   } finally {
     await Editor.closeAll()
-    // Restore Git while the fixture is still a valid repository, then close its
-    // model before deletion so it cannot discover the harness's parent checkout.
-    await Workspace.remove('.vscode/settings.json')
-    await QuickPick.waitForCommand('Git: Open Repository')
-    await Git.openRepository('.')
-    await SourceControl.shouldHaveRepositoryCount(1)
-    await Git.closeRepository()
+    // Disable Git and await model disposal before deleting the repository.
+    // Reopening it during cleanup can resolve to the enclosing harness checkout.
+    await Workspace.updateWorkspaceSettings({ 'git.enabled': false })
     await SourceControl.shouldHaveRepositoryCount(0)
     await Workspace.remove('.git')
   }
