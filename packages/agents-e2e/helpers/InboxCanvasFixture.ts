@@ -3,7 +3,7 @@ import { join } from 'node:path'
 
 type Message = {
   method?: string
-  params?: { channel?: string; action?: { type?: string; canvases?: { resource: string }[] } }
+  params?: { channel?: string; action?: { type?: string; data?: string; canvases?: { resource: string }[] } }
   _ahpLog?: { dir: string; connectionId: string; transport: string; droppedEntries?: number; truncated?: boolean }
 }
 

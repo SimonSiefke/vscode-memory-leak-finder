@@ -1,0 +1,29 @@
+{
+  "name": "agents-window-chat-terminal-lifecycle",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.146.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "chatWindowTerminalProbe.create",
+        "title": "Chat Window Terminal Probe: Create"
+      },
+      {
+        "command": "chatWindowTerminalProbe.snapshot",
+        "title": "Chat Window Terminal Probe: Snapshot"
+      },
+      {
+        "command": "chatWindowTerminalProbe.cleanup",
+        "title": "Chat Window Terminal Probe: Cleanup"
+      },
+      {
+        "command": "chatWindowTerminalProbe.verifyReconnect",
+        "title": "Chat Window Terminal Probe: Verify Reconnect"
+      }
+    ]
+  }
+}

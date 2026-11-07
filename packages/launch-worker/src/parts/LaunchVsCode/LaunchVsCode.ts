@@ -331,7 +331,11 @@ export const launchVsCode = async ({
 
     const agentMock =
       launchAgentWindow && useProxyMock
-        ? await AgentWindowMock.start(userDataDir, proxyTestFolderName === 'agents-window-inbox-canvas-subscriptions')
+        ? await AgentWindowMock.start(
+            userDataDir,
+            proxyTestFolderName === 'agents-window-inbox-canvas-subscriptions',
+            proxyTestFolderName === 'agents-window-chat-terminal-lifecycle',
+          )
         : undefined
     if (agentMock) addDisposable(agentMock.dispose)
 

@@ -62,6 +62,8 @@ export interface AgentsWindow {
   presentInboxCanvas(): Promise<void>
   hideInboxCanvas(): Promise<void>
   closeInboxEvidence(): Promise<void>
+  selectWorkspace(path: string, readinessDirectory: string): Promise<void>
+  archiveChat(title: string): Promise<void>
   selectNoWorkspace(): Promise<void>
   shouldBeVisible(): Promise<void>
   newChat(): Promise<void>
@@ -991,7 +993,10 @@ export interface Workbench {
   collectGarbage(): Promise<void>
   connectToSsh(options: any): Promise<void>
   waitForNewWindow(options: any): Promise<void>
-  openNewWindow(): Promise<PageObjectApi & PageObjectWindowHandle>
+  openNewWindow(command?: string): Promise<PageObjectApi & PageObjectWindowHandle>
+  openChatWindow(): Promise<PageObjectApi & PageObjectWindowHandle>
+  waitForNewWindowReady(timeout?: number, url?: string): Promise<PageObjectApi & PageObjectWindowHandle>
+  connectWindow(sessionId: string): Promise<PageObjectApi & PageObjectWindowHandle>
   close(): Promise<void>
   evaluate(options: any): Promise<unknown>
   shouldBeVisible(): Promise<void>

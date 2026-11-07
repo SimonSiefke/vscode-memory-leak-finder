@@ -30,8 +30,8 @@ export const create = (page: any) => {
     breakpoint = undefined
     if (debugging) await cleanup('Debugger.disable')
     debugging = false
-    if (page.rpc.listeners['Debugger.scriptParsed'] === parsedListener) delete page.rpc.listeners['Debugger.scriptParsed']
-    if (page.rpc.listeners['Debugger.paused'] === pausedListener) delete page.rpc.listeners['Debugger.paused']
+    if (parsedListener) page.rpc.off('Debugger.scriptParsed', parsedListener)
+    if (pausedListener) page.rpc.off('Debugger.paused', pausedListener)
     parsedListener = undefined
     pausedListener = undefined
     adapters.length = 0
