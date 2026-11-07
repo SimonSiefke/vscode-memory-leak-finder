@@ -1,4 +1,6 @@
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as InboxCanvasObserver from '../InboxCanvasObserver/InboxCanvasObserver.ts'
 
 const workbench = '.agent-sessions-workbench'
 const composer = `${workbench} .sessions-chat-widget .new-chat-widget-container`
@@ -7,6 +9,7 @@ const sessionRows = `${workbench} .sessions-list-control .monaco-list-row`
 
 export const create = (params: CreateParams) => {
   const { expect, page, platform } = params
+  const canvasObserver = InboxCanvasObserver.create(page)
   const rowFor = (title: string) => page.locator(sessionRows, { hasText: title })
   const focusInput = async (input: any) => {
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -44,7 +47,7 @@ export const create = (params: CreateParams) => {
     async selectNoWorkspace() {
       const picker = page
         .locator(
-          `${composer} .sessions-chat-workspace-picker > a[role="button"], ${composer} .sessions-workspace-picker-trigger > a[role="button"]`,
+          `${composer} .sessions-chat-workspace-picker > a[role="button"], ${composer} .sessions-workspace-picker-trigger a[role="button"]`,
         )
         .first()
       await expect(picker).toBeVisible({ timeout: 60_000 })
@@ -52,23 +55,37 @@ export const create = (params: CreateParams) => {
         await expect(picker).toHaveText(/^(Chat|No workspace)$/i)
         return
       }
-      await picker.click()
-      const option = page
-        .locator(
-          '.context-view .monaco-list-row[role="option"][aria-label^="No workspace" i], .context-view .monaco-list-row[role="option"][aria-label="Chat"], .context-view .monaco-list-row[role="option"][aria-label^="Chat,"]',
-        )
-        .first()
-      await expect(option).toBeVisible({ timeout: 15_000 })
-      await option.click()
-      await expect(page.locator('.context-view .monaco-list-row[role="option"]')).toBeHidden()
+      // Workspace discovery can rerender the trigger and dismiss its menu.
+      // Reopen only a closed menu until the actual option becomes ready.
+      await page.evaluateInMainWorld({
+        awaitPromise: true,
+        expression: `(async () => {
+          const selector = ${JSON.stringify(`${composer} .sessions-workspace-picker-trigger a[aria-haspopup="listbox"], ${composer} .sessions-chat-workspace-picker > a[role="button"]`)}
+          const deadline = Date.now() + 15_000
+          let lastOpen = 0
+          while (Date.now() < deadline) {
+            const option = Array.from(document.querySelectorAll('.context-view [role="option"]')).find(element =>
+              /^(No workspace|Chat)(,|$)/i.test(element.getAttribute('aria-label') || '') && element.getClientRects().length)
+            if (option) { option.click(); return }
+            const trigger = document.querySelector(selector)
+            if (trigger?.getAttribute('aria-expanded') !== 'true' && Date.now() - lastOpen > 250) {
+              if (!trigger) throw new Error('No new-session workspace picker')
+              trigger.click()
+              lastOpen = Date.now()
+            }
+            await new Promise(resolve => requestAnimationFrame(resolve))
+          }
+          throw new Error('No visible Chat / No workspace option')
+        })()`,
+      })
       await expect(picker).toHaveText(/^(Chat|No workspace)$/i)
     },
     async shouldHaveNewChat() {
       await expect(page.locator(composer)).toBeVisible({ timeout: 60_000 })
-      await expect(page.locator(`${composer} .sessions-chat-editor .view-lines`)).toHaveText('')
+      await expect(page.locator(`${composer} .monaco-editor .view-lines`)).toHaveText('')
     },
     async typeDraft(message: string) {
-      await typeMessage(page.locator(`${composer} .sessions-chat-editor .monaco-editor`), message)
+      await typeMessage(page.locator(`${composer} .monaco-editor`), message)
     },
     async clearDraft() {
       const input = page.locator(`${composer} .native-edit-context`)
@@ -77,14 +94,16 @@ export const create = (params: CreateParams) => {
       await page.waitForIdle()
       await page.keyboard.press('Backspace')
       await page.waitForIdle()
-      await expect(page.locator(`${composer} .sessions-chat-editor .view-lines`)).toHaveText('')
+      await expect(page.locator(`${composer} .monaco-editor .view-lines`)).toHaveText('')
     },
     async shouldHaveSendDisabled() {
       await expect(page.locator(`${composer} .sessions-chat-send-button .monaco-button`)).toHaveClass('disabled')
     },
     async sendNewChat(message: string) {
       await this.typeDraft(message)
-      const send = page.locator(`${composer} .sessions-chat-send-button .monaco-button:not(.disabled)`)
+      const send = page.locator(
+        `${composer} .sessions-chat-send-button .monaco-button:not(.disabled), ${composer} .chat-execute-toolbar .action-item:not(.disabled) > .action-label.codicon-arrow-up-compact`,
+      )
       await expect(send).toBeVisible({ timeout: 60_000 })
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
@@ -129,6 +148,38 @@ export const create = (params: CreateParams) => {
     async openChat(title: string) {
       await rowFor(title).click()
       await this.shouldHaveRequest(title)
+    },
+    armCanvasObserver: () => canvasObserver.arm(),
+    keepCanvasObserver: (title: string) => canvasObserver.keep(title),
+    disposeCanvasObservers: () => canvasObserver.dispose(),
+    async showInboxEvidence(title: string) {
+      await QuickPick.create(params).executeCommand('Agents: Show Inbox', { pressKeyOnce: true })
+      const done = page.locator('[role="tab"][id$="-done"]')
+      await expect(done).toBeVisible({ timeout: 30_000 })
+      await done.click()
+      const item = page.locator('.inbox-notifications-item', { hasText: title })
+      await expect(item).toBeVisible()
+      await item.click()
+      await expect(page.locator('.inbox-evidence-canvas-controls [role="button"]', { hasText: 'Inbox contract canvas' })).toBeVisible()
+    },
+    async presentInboxCanvas() {
+      const button = page.locator('.inbox-evidence-canvas-controls [role="button"]', { hasText: 'Inbox contract canvas' })
+      await expect(button).toBeVisible()
+      await expect(button).toHaveAttribute('aria-disabled', 'false')
+      await button.click()
+      await expect(page.locator('.inbox-evidence-native-canvas')).toBeVisible()
+    },
+    async hideInboxCanvas() {
+      const hide = page.locator('.inbox-evidence-canvas-controls [role="button"]', { hasText: 'Hide canvas' })
+      await expect(hide).toBeVisible()
+      await hide.click()
+      await expect(page.locator('.inbox-evidence-native-canvas')).toHaveCount(0)
+    },
+    async closeInboxEvidence() {
+      const close = page.locator('[role="button"][aria-label="Close Evidence"]')
+      await expect(close).toBeVisible()
+      await close.click()
+      await expect(page.locator('.inbox-evidence-canvases')).toHaveCount(0)
     },
     async deleteChat(title: string) {
       const row = rowFor(title)

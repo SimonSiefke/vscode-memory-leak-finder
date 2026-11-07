@@ -55,6 +55,13 @@ export interface PageObjectWindowHandle extends NewWindowHandle {
 }
 
 export interface AgentsWindow {
+  armCanvasObserver(): Promise<void>
+  keepCanvasObserver(title: string): Promise<void>
+  disposeCanvasObservers(): Promise<void>
+  showInboxEvidence(title: string): Promise<void>
+  presentInboxCanvas(): Promise<void>
+  hideInboxCanvas(): Promise<void>
+  closeInboxEvidence(): Promise<void>
   selectNoWorkspace(): Promise<void>
   shouldBeVisible(): Promise<void>
   newChat(): Promise<void>
