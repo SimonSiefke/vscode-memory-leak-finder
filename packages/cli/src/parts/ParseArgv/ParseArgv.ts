@@ -437,6 +437,8 @@ const parseTrackFunctions = (argv: readonly string[]): boolean => {
   return (
     argv.includes('--track-functions') ||
     measure === 'tracked-functions' ||
+    measure === 'trackedAllocationBytes' ||
+    measure === 'tracked-allocation-bytes' ||
     measure === 'tracked-allocations' ||
     measure === 'trackedAllocations' ||
     measure === 'tracked-allocations-from-start' ||
@@ -485,10 +487,14 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
   const measure = parseMeasure(argv)
   const memoryCity = measure === 'memory-city' || measure === 'memoryCity'
   const enableExtensions = parseEnableExtensions(argv) || memoryCity
+  const launchAgentWindow = argv.includes('--launch-agent-window')
   const enableProxy = parseEnableProxy(argv)
   const filter = parseFilter(argv)
   const headless = parseHeadless(argv)
   const ide = parseIde(argv)
+  if (launchAgentWindow && ide !== Ide.VsCode) {
+    throw new Error('--launch-agent-window is only supported for VS Code')
+  }
   const ideVersion = ''
   const insidersCommit = parseInsidersCommit(parsedVersion, argv)
   const inspectExtensions = parseInspectExtensions(argv) || memoryCity
@@ -563,6 +569,7 @@ export const parseArgv = (processPlatform: string, arch: string, argv: readonly 
     downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
+    launchAgentWindow,
     filter,
     headless,
     ide,

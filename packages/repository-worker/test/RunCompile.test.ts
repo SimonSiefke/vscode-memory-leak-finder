@@ -13,10 +13,10 @@ test('runCompile runs the transpile step after compile', async () => {
     commandMap: {},
     invoke(method: string, ...params: unknown[]) {
       if (method === 'FileSystem.readFileContent') {
-        return '20'
+        return '20.0.0'
       }
       if (method === 'FileSystem.exists') {
-        return true
+        return !String(params[0]).endsWith('/pnpm-lock.yaml')
       }
       if (method === 'FileSystem.exec') {
         execCalls.push(params)
@@ -45,14 +45,14 @@ test('runCompile throws error when main.js not found after compilation', async (
     commandMap: {},
     invoke(method: string, ...params: unknown[]) {
       if (method === 'FileSystem.readFileContent') {
-        return '20'
+        return '20.0.0'
       }
       if (method === 'FileSystem.exists') {
         const path = params[0]
         if (path === mainJsPath) {
           return false
         }
-        return true
+        return !String(params[0]).endsWith('/pnpm-lock.yaml')
       }
       if (method === 'FileSystem.exec') {
         return { exitCode: 0, stderr: '', stdout: '' }
@@ -74,10 +74,10 @@ test('runMinifiedBuild runs the platform minified vscode gulp task', async () =>
     commandMap: {},
     invoke(method: string, ...params: unknown[]) {
       if (method === 'FileSystem.readFileContent') {
-        return '20'
+        return '20.0.0'
       }
       if (method === 'FileSystem.exists') {
-        return true
+        return !String(params[0]).endsWith('/pnpm-lock.yaml')
       }
       if (method === 'FileSystem.exec') {
         execCalls.push(params)

@@ -9,26 +9,31 @@ export const compareFileDescriptorCount = (
   count: number
   delta: number
 }> => {
-  // Create a map of before counts by name for easy lookup
+  // Process names are not unique (for example, multiple VS Code utility processes).
+  // Compare the total count for each name so one process cannot overwrite another's baseline.
   const beforeMap = new Map<string, number>()
   for (const item of before) {
-    beforeMap.set(item.name, item.fileDescriptorCount)
+    beforeMap.set(item.name, (beforeMap.get(item.name) || 0) + item.fileDescriptorCount)
   }
-  // Calculate deltas for each item in after
+  const afterMap = new Map<string, number>()
+  for (const item of after) {
+    afterMap.set(item.name, (afterMap.get(item.name) || 0) + item.fileDescriptorCount)
+  }
+  // Calculate deltas for each process name
   const deltas: Array<{
     name: string
     count: number
     delta: number
   }> = []
-  for (const item of after) {
-    const beforeCount = beforeMap.get(item.name) || 0
-    const delta = item.fileDescriptorCount - beforeCount
+  for (const [name, count] of afterMap) {
+    const beforeCount = beforeMap.get(name) || 0
+    const delta = count - beforeCount
     // Only include items with delta >= context.runs
     if (delta >= context.runs) {
       deltas.push({
-        count: item.fileDescriptorCount,
+        count,
         delta,
-        name: item.name,
+        name,
       })
     }
   }

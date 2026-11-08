@@ -1,5 +1,8 @@
 const waitForTimeout = (maxDelay: number) => {
-  const { promise, resolve } = Promise.withResolvers<void>()
+  let resolve!: () => void
+  const promise = new Promise<void>((done) => {
+    resolve = done
+  })
   let disposed = false
   const dispose = () => {
     if (disposed) {
@@ -10,11 +13,14 @@ const waitForTimeout = (maxDelay: number) => {
     resolve()
   }
   const timeout = setTimeout(dispose, maxDelay)
-  return { promise, [Symbol.dispose]: dispose }
+  return { promise, dispose }
 }
 
 const waitForMutationInternal = (element: Node) => {
-  const { promise, resolve } = Promise.withResolvers<void>()
+  let resolve!: () => void
+  const promise = new Promise<void>((done) => {
+    resolve = done
+  })
   let disposed = false
   const dispose = () => {
     if (disposed) {
@@ -36,7 +42,7 @@ const waitForMutationInternal = (element: Node) => {
     childList: true,
     subtree: true,
   })
-  return { promise, [Symbol.dispose]: dispose }
+  return { promise, dispose }
 }
 
 export const waitForMutation = async (element: Node | null, maxDelay: number) => {
@@ -51,7 +57,7 @@ export const waitForMutation = async (element: Node | null, maxDelay: number) =>
     mutation = waitForMutationInternal(element)
     await Promise.race([timeout.promise, mutation.promise])
   } finally {
-    timeout?.[Symbol.dispose]()
-    mutation?.[Symbol.dispose]()
+    timeout?.dispose()
+    mutation?.dispose()
   }
 }

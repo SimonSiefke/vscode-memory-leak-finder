@@ -28,6 +28,7 @@ interface CopyRoot {
 const repositoryRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
 const trackedVscodeRoot = join(repositoryRoot, '.vscode-test', 'tracked-vscode')
 const transformerFiles = [
+  join(import.meta.dirname, '..', 'AllocationBytesPreamble', 'AllocationBytesPreamble.ts'),
   join(import.meta.dirname, 'PrepareTrackedVscode.ts'),
   join(import.meta.dirname, '..', 'Transform', 'Transform.ts'),
   join(import.meta.dirname, '..', 'TransformCodeWithTracking', 'TransformCodeWithTracking.ts'),

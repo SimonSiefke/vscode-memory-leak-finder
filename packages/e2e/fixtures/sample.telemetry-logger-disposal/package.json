@@ -1,0 +1,26 @@
+{
+  "name": "telemetry-logger-disposal",
+  "displayName": "Telemetry Logger Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "telemetry-logger-disposal.setup",
+        "title": "Telemetry Logger Disposal: Setup"
+      },
+      {
+        "command": "telemetry-logger-disposal.run",
+        "title": "Telemetry Logger Disposal: Run"
+      },
+      {
+        "command": "telemetry-logger-disposal.cleanup",
+        "title": "Telemetry Logger Disposal: Cleanup"
+      }
+    ]
+  }
+}

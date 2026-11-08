@@ -1,0 +1,26 @@
+{
+  "name": "text-document-unique-resource-marks",
+  "displayName": "Text Document Unique Resource Marks",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "text-document-unique-resource-marks.setup",
+        "title": "Text Document Unique Resource Marks: Setup"
+      },
+      {
+        "command": "text-document-unique-resource-marks.run",
+        "title": "Text Document Unique Resource Marks: Run"
+      },
+      {
+        "command": "text-document-unique-resource-marks.cleanup",
+        "title": "Text Document Unique Resource Marks: Cleanup"
+      }
+    ]
+  }
+}

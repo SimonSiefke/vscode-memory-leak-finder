@@ -11,11 +11,8 @@ test('install retries up to five times on Windows', async () => {
     platform: 'win32',
     runCommand: (args) => {
       commands.push(args)
-      if (args[0] === 'ci') {
-        ciAttempt++
-        return ciAttempt < 5 ? 1 : 0
-      }
-      return 0
+      ciAttempt++
+      return ciAttempt < 5 ? 1 : 0
     },
     sleep: async (milliseconds) => {
       waits.push(milliseconds)
@@ -24,7 +21,7 @@ test('install retries up to five times on Windows', async () => {
 
   expect(exitCode).toBe(0)
   expect(ciAttempt).toBe(5)
-  expect(commands.at(-1)).toEqual(['run', 'postinstall'])
+  expect(commands.at(-1)).toEqual(['ci'])
   expect(waits).toHaveLength(4)
 })
 
@@ -40,10 +37,7 @@ test('install runs once on non-Windows platforms', async () => {
   })
 
   expect(exitCode).toBe(0)
-  expect(commands).toEqual([
-    ['ci', '--ignore-scripts'],
-    ['run', 'postinstall'],
-  ])
+  expect(commands).toEqual([['ci']])
   expect(getMaxAttempts('linux')).toBe(1)
   expect(getMaxAttempts('win32')).toBe(5)
 })

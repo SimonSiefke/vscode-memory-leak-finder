@@ -1,0 +1,26 @@
+{
+  "name": "comment-controller-disposal",
+  "displayName": "Comment Controller Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "comment-controller-disposal.setup",
+        "title": "Comment Controller Disposal: Setup"
+      },
+      {
+        "command": "comment-controller-disposal.run",
+        "title": "Comment Controller Disposal: Run"
+      },
+      {
+        "command": "comment-controller-disposal.cleanup",
+        "title": "Comment Controller Disposal: Cleanup"
+      }
+    ]
+  }
+}

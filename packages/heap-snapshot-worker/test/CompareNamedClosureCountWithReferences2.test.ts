@@ -3967,7 +3967,6 @@ test('should handle closure with empty property name', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  console.log(JSON.stringify(result, null, 2))
   const expectedResult = [
     {
       location: '1:10:5',

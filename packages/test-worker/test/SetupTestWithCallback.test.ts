@@ -19,6 +19,40 @@ beforeEach(() => {
   jest.clearAllMocks()
 })
 
+test.each([false, true])('setupTestWithCallback skips skipInCi tests on GitHub Actions with forceRun=%s', async (forceRun) => {
+  mockImportTest.mockResolvedValue({ skip: 1, skipInCi: true })
+
+  const result = await SetupTestWithCallback.setupTestWithCallback(
+    {},
+    '/test/terminal-editor-move-to-new-window.ts',
+    forceRun,
+    true,
+    false,
+    false,
+  )
+
+  expect(result).toEqual({ error: null, skipped: true, wasOriginallySkipped: true })
+  expect(mockBeforeSetup).not.toHaveBeenCalled()
+  expect(mockSetup).not.toHaveBeenCalled()
+})
+
+test.each([false, true])('setupTestWithCallback respects local forceRun=%s for skipInCi tests', async (forceRun) => {
+  mockImportTest.mockResolvedValue({ skip: 1, skipInCi: true })
+
+  const result = await SetupTestWithCallback.setupTestWithCallback(
+    {},
+    '/test/terminal-editor-move-to-new-window.ts',
+    forceRun,
+    false,
+    false,
+    false,
+  )
+
+  expect(result).toEqual({ error: null, skipped: !forceRun, wasOriginallySkipped: true })
+  expect(mockBeforeSetup).toHaveBeenCalledTimes(forceRun ? 1 : 0)
+  expect(mockSetup).toHaveBeenCalledTimes(forceRun ? 1 : 0)
+})
+
 test('setupTestWithCallback skips requiresNetwork tests on GitHub Actions even when skipped tests are forced', async () => {
   mockImportTest.mockResolvedValue({
     requiresNetwork: true,

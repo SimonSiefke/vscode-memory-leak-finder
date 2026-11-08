@@ -1,0 +1,38 @@
+{
+  "name": "custom-document-provider-disposal",
+  "displayName": "Custom Document Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "custom-document-provider-disposal.editor",
+        "displayName": "Lifecycle document",
+        "selector": [
+          {
+            "filenamePattern": "*.lifecycle"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      {
+        "command": "custom-document-provider-disposal.setup",
+        "title": "Custom Document Provider Disposal: Setup"
+      },
+      {
+        "command": "custom-document-provider-disposal.run",
+        "title": "Custom Document Provider Disposal: Run"
+      },
+      {
+        "command": "custom-document-provider-disposal.cleanup",
+        "title": "Custom Document Provider Disposal: Cleanup"
+      }
+    ]
+  }
+}

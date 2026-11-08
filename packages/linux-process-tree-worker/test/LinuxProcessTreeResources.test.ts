@@ -144,6 +144,25 @@ test('sampler fails instead of converting a smaps permission error to a dropped 
   await expect(sampler.start()).rejects.toThrow('permission denied')
 })
 
+test('initial PSS preparation tolerates process churn and records dropped subsamples', async () => {
+  const stable = processTable(processIdentity(1, 0), processIdentity(2, 1))
+  const changed = processTable(processIdentity(1, 0))
+  const tables = [stable, changed, stable, changed, stable, stable]
+  let index = 0
+  const sampler = createProcessTreeSampler(
+    1,
+    {
+      getProcessTable: async () => tables[index++] || stable,
+      readPssKiB: async (pid) => pid * 10,
+    },
+    { intervalMs: 10_000, initialSampleAttempts: 2 },
+  )
+  await expect(sampler.start()).resolves.toMatchObject({ processCount: 2, pssKiB: 30 })
+  const result = await sampler.stop()
+  expect(result.droppedSampleCount).toBe(1)
+  expect(result.samples).toHaveLength(2)
+})
+
 test('creates the normalized informational result', () => {
   const result = LinuxProcessTreeResourceResult.createResult({
     droppedSampleCount: 1,
