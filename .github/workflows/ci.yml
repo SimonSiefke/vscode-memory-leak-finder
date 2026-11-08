@@ -297,9 +297,9 @@ jobs:
           - name: object-count
             args: --measure object-count
           - name: string-object-count
-            args: --measure string-object-count --runs 37 --run-skipped-tests-anyway
+            args: --measure string-object-count
           - name: string-object-bytes
-            args: --measure string-object-bytes --runs 37 --run-skipped-tests-anyway
+            args: --measure string-object-bytes
           - name: disposable-count
             args: --measure disposable-count
           - name: worker-count
