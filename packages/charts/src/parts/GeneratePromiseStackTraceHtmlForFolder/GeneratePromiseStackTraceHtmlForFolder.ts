@@ -86,8 +86,7 @@ export const generatePromiseStackTraceHtmlForFolder = async (
 
   await using rpc = await launchChartWorker()
   const config = GetChartConfig.getChartConfig()
-  let content =
-    '<p class="PromiseChartLegend"><span class="InitialSwatch"></span> Initial count (black) <span class="GrowthSwatch"></span> Increase (red)</p>\n'
+  let content = ''
   let hasResults = false
 
   for (const jsonFile of jsonFiles) {
