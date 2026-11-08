@@ -79,6 +79,9 @@ test('ci collects Node-compatible measures for the extension host and verifies i
   for (const measure of ['array-count', 'function-count', 'pending-promise-count', 'object-count']) {
     expect(workflow).toContain(`          - name: ${measure}-extensions\n            args: --measure ${measure} --inspect-extensions`)
   }
+  for (const measure of ['string-object-count', 'string-object-bytes']) {
+    expect(workflow).toContain(`          - name: ${measure}-extensions\n            args: --measure ${measure} --inspect-extensions`)
+  }
   expect(workflow).not.toContain('name: detached-dom-node-count-extensions')
   expect(workflow).toContain('pattern: vscode-memory-leak-finder-results-linux-*-extensions')
   expect(workflow).toContain('path: ./vscode-memory-leak-finder-results-linux-extensions')
