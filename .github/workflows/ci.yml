@@ -768,6 +768,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-file-watcher-count
           path: ./vscode-memory-leak-finder-results-linux-file-watcher-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-pending-promise-count
+          path: ./vscode-memory-leak-finder-results-linux-pending-promise-count
       - name: Merge all measure results
         run: node packages/build/src/mergeArtifacts.ts
       - name: Upload merged artifact
@@ -1122,6 +1127,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-pending-promise-count
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Verify extension-host overview charts
