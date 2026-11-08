@@ -37,11 +37,9 @@ test.each([
   }
 })
 
-test('registers homepage overviews alongside the existing per-test bars', () => {
+test('registers the overview charts without dedicated per-test charts', () => {
   expect(Charts.StringObjectCountOverview).toBe(Count)
   expect(Charts.StringObjectBytesOverview).toBe(Bytes)
-  expect(Count.name).toBe(Charts.StringObjectCount.name)
-  expect(Bytes.name).toBe(Charts.StringObjectBytes.name)
-  expect(Charts.StringObjectCount.multiple).toBe(true)
-  expect(Charts.StringObjectBytes.multiple).toBe(true)
+  expect(Charts).not.toHaveProperty('StringObjectCount')
+  expect(Charts).not.toHaveProperty('StringObjectBytes')
 })

@@ -57,6 +57,11 @@ export const generateCharts = async () => {
   await Promise.all([
     rm(join(Root.root, '.vscode-charts', 'map-size'), { recursive: true, force: true }),
     rm(join(Root.root, '.vscode-charts', 'set-size'), { recursive: true, force: true }),
+    ...['', 'node', 'shared-process', 'extension-host', 'pty-host', 'integrated-browser'].flatMap((processType) =>
+      ['string-object-bytes', 'string-object-count'].map((chartName) =>
+        rm(join(Root.root, '.vscode-charts', processType, chartName), { recursive: true, force: true }),
+      ),
+    ),
   ])
   await using rpc = await launchChartWorker()
   const config = GetChartConfig.getChartConfig()

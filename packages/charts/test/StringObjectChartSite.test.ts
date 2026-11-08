@@ -23,7 +23,7 @@ afterAll(async () => {
   await rm(directory, { recursive: true, force: true })
 })
 
-test('merges CI artifacts and generates overview SVGs, index images, and per-test detail pages', async () => {
+test('merges CI artifacts and generates overview SVGs without string object detail pages', async () => {
   for (const processType of ['', 'node']) {
     for (const [name, key, values] of [
       ['string-object-count', 'stringObjectCount', [100, 160, 140]],
@@ -34,6 +34,14 @@ test('merges CI artifacts and generates overview SVGs, index images, and per-tes
       for (const [index, after] of values.entries()) {
         await writeFile(join(results, `case-${index + 1}.json`), JSON.stringify({ [key]: { before: after - 10, after } }))
       }
+    }
+  }
+  for (const processType of ['', 'node', 'shared-process', 'extension-host', 'pty-host', 'integrated-browser']) {
+    for (const name of ['string-object-count', 'string-object-bytes']) {
+      const staleDetails = join(directory, '.vscode-charts', processType, name)
+      await mkdir(staleDetails, { recursive: true })
+      await writeFile(join(staleDetails, 'old-case.svg'), '<svg></svg>')
+      await writeFile(join(staleDetails, 'index.html'), '<html>stale detail page</html>')
     }
   }
   const error = jest.fn()
@@ -57,9 +65,17 @@ test('merges CI artifacts and generates overview SVGs, index images, and per-tes
       expect(svg).toContain('Test Case Index')
       expect(svg).not.toMatch(/NaN|Infinity/)
       expect(index).toContain(`src="./${name}.svg"`)
-      const details = await readFile(join(charts, name, 'index.html'), 'utf8')
-      expect(details).toContain('case-1.svg')
-      expect(await readFile(join(charts, name, 'case-1.svg'), 'utf8')).toContain('String objects')
+      await expect(readFile(join(charts, name, 'index.html'), 'utf8')).rejects.toMatchObject({ code: 'ENOENT' })
+      expect(index).not.toContain(`${name}/`)
+    }
+  }
+  const sitemap = await readFile(join(directory, '.vscode-charts', 'sitemap.xml'), 'utf8')
+  expect(sitemap).not.toContain('string-object-count')
+  expect(sitemap).not.toContain('string-object-bytes')
+  for (const processType of ['node', 'shared-process', 'extension-host', 'pty-host', 'integrated-browser']) {
+    const charts = join(directory, '.vscode-charts', processType)
+    for (const name of ['string-object-count', 'string-object-bytes']) {
+      await expect(readFile(join(charts, name, 'index.html'), 'utf8')).rejects.toMatchObject({ code: 'ENOENT' })
     }
   }
 }, 30000)
