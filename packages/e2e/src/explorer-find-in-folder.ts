@@ -13,6 +13,9 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
       name: 'other-file.txt',
     },
   ])
+  await Workspace.updateWorkspaceSettings({
+    'search.mode': 'view',
+  })
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.shouldHaveItem('folder')
