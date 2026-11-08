@@ -312,6 +312,44 @@ jobs:
             args: --measure file-descriptors --runs 37 --restart-between --run-skipped-tests-anyway
           - name: file-watcher-count
             args: --measure file-watcher-count --runs 37 --restart-between --run-skipped-tests-anyway
+          - name: pending-promise-count-extensions
+            args: --measure pending-promise-count --inspect-extensions
+          - name: promise-count-extensions
+            args: --measure promise-count --inspect-extensions
+          - name: array-count-extensions
+            args: --measure array-count --inspect-extensions
+          - name: array-element-count-extensions
+            args: --measure array-element-count --inspect-extensions
+          - name: regex-count-extensions
+            args: --measure regex-count --inspect-extensions
+          - name: function-count-extensions
+            args: --measure function-count --inspect-extensions
+          - name: weak-map-count-extensions
+            args: --measure weak-map-count --inspect-extensions
+          - name: number-count-extensions
+            args: --measure number-count --inspect-extensions
+          - name: error-count-extensions
+            args: --measure error-count --inspect-extensions
+          - name: weak-set-count-extensions
+            args: --measure weak-set-count --inspect-extensions
+          - name: map-size-extensions
+            args: --measure map-size --inspect-extensions
+          - name: set-size-extensions
+            args: --measure set-size --inspect-extensions
+          - name: message-port-count-extensions
+            args: --measure message-port-count --inspect-extensions
+          - name: symbol-count-extensions
+            args: --measure symbol-count --inspect-extensions
+          - name: object-shape-count-extensions
+            args: --measure object-shape-count --inspect-extensions
+          - name: object-count-extensions
+            args: --measure object-count --inspect-extensions
+          - name: string-object-count-extensions
+            args: --measure string-object-count --runs 37 --run-skipped-tests-anyway --inspect-extensions
+          - name: string-object-bytes-extensions
+            args: --measure string-object-bytes --runs 37 --run-skipped-tests-anyway --inspect-extensions
+          - name: disposable-count-extensions
+            args: --measure disposable-count --inspect-extensions
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v7
@@ -468,6 +506,12 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-css-selector-stats
           path: ./vscode-memory-leak-finder-results-linux-css-selector-stats
+      - name: Download extension-host measure results
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: vscode-memory-leak-finder-results-linux-*-extensions
+          path: ./vscode-memory-leak-finder-results-linux-extensions
       - name: Download all measure results
         uses: actions/download-artifact@v8
         continue-on-error: true
@@ -978,6 +1022,101 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
+      - name: Delete extension-host artifact (pending-promise-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-pending-promise-count-extensions
+      - name: Delete extension-host artifact (promise-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-promise-count-extensions
+      - name: Delete extension-host artifact (array-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-count-extensions
+      - name: Delete extension-host artifact (array-element-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-element-count-extensions
+      - name: Delete extension-host artifact (regex-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-regex-count-extensions
+      - name: Delete extension-host artifact (function-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-function-count-extensions
+      - name: Delete extension-host artifact (weak-map-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-weak-map-count-extensions
+      - name: Delete extension-host artifact (number-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-number-count-extensions
+      - name: Delete extension-host artifact (error-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-error-count-extensions
+      - name: Delete extension-host artifact (weak-set-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-weak-set-count-extensions
+      - name: Delete extension-host artifact (map-size-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-map-size-extensions
+      - name: Delete extension-host artifact (set-size-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-set-size-extensions
+      - name: Delete extension-host artifact (message-port-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-message-port-count-extensions
+      - name: Delete extension-host artifact (symbol-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-symbol-count-extensions
+      - name: Delete extension-host artifact (object-shape-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-object-shape-count-extensions
+      - name: Delete extension-host artifact (object-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-object-count-extensions
+      - name: Delete extension-host artifact (string-object-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-string-object-count-extensions
+      - name: Delete extension-host artifact (string-object-bytes-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-string-object-bytes-extensions
+      - name: Delete extension-host artifact (disposable-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-disposable-count-extensions
       - name: Delete individual instruction count artifact
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
@@ -985,6 +1124,12 @@ jobs:
           name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
       - name: Generate charts
         run: node packages/charts/src/main.ts
+      - name: Verify extension-host overview charts
+        run: |
+          test -s .vscode-charts/extension-host/index.html
+          grep -q './array-count/index.html' .vscode-charts/extension-host/index.html
+          grep -q './function-count/index.html' .vscode-charts/extension-host/index.html
+          grep -q './extension-host/index.html' .vscode-charts/index.html
       - name: Verify CSS selector report
         run: test -s .vscode-charts/css-selector-stats/index.html
       - name: Upload artifact

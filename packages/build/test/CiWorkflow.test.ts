@@ -73,6 +73,21 @@ test('ci measures total array length and downloads the results for Pages charts'
           name: vscode-memory-leak-finder-results-linux-array-element-count`)
 })
 
+test('ci collects Node-compatible measures for the extension host and verifies its Pages overview', async () => {
+  const workflow = await readFile(getWorkflowPath(), 'utf8')
+
+  for (const measure of ['array-count', 'function-count', 'pending-promise-count', 'object-count']) {
+    expect(workflow).toContain(`          - name: ${measure}-extensions\n            args: --measure ${measure} --inspect-extensions`)
+  }
+  expect(workflow).not.toContain('name: detached-dom-node-count-extensions')
+  expect(workflow).toContain('pattern: vscode-memory-leak-finder-results-linux-*-extensions')
+  expect(workflow).toContain('path: ./vscode-memory-leak-finder-results-linux-extensions')
+  expect(workflow).toContain('name: Delete extension-host artifact (array-count-extensions)')
+  expect(workflow).toContain('name: Delete extension-host artifact (function-count-extensions)')
+  expect(workflow).toContain("grep -q './array-count/index.html' .vscode-charts/extension-host/index.html")
+  expect(workflow).toContain("grep -q './function-count/index.html' .vscode-charts/extension-host/index.html")
+})
+
 test.each(['string-object-count', 'string-object-bytes'])(
   'ci collects %s with the standard test selection and includes its artifact in Pages charts',
   async (measure) => {
