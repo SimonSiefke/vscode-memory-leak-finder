@@ -242,6 +242,8 @@ jobs:
             args: --measure edit-context-count
           - name: function-count
             args: --measure function-count
+          - name: gc-statistics
+            args: --measure gc-statistics --runs 1 --restart-between
           - name: named-function-count3
             args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway
           - name: named-function-count3-shared-process
