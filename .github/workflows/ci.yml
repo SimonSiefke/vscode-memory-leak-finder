@@ -212,6 +212,8 @@ jobs:
             args: --measure dom-counters
           - name: detached-dom-node-count
             args: --measure detached-dom-node-count --timeout-between 10000
+          - name: pending-promise-count
+            args: --measure pending-promise-count
           - name: promise-count
             args: --measure promise-count
           - name: promises-with-stack-trace-shard-1

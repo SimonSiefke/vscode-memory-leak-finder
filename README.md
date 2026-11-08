@@ -600,6 +600,15 @@ Measures the difference in counts of each function.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure named-function-difference --only base
 ```
 
+### PendingPromiseCount
+
+Measures live promises whose state is pending, excluding fulfilled and rejected promises. CI collects before/after counts for each scenario. `npm run build-charts` generates `pending-promise-count.svg` on the main charts page, showing the after count in scenario order.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure pending-promise-count --only base
+npm run build-charts
+```
+
 ### PromiseCount
 
 Measures the total number of Promises.
