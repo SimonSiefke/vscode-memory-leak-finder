@@ -1031,3 +1031,13 @@ selector tracing adds overhead. Empty traces are shown explicitly.
 
 Run locally with `node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure css-selector-stats --runs 1 --restart-between --run-skipped-tests-anyway`,
 then `npm run build-charts`. The page is written to `.vscode-charts/css-selector-stats/index.html`.
+
+### Active Interval Count
+
+Counts outstanding renderer intervals from the start of workbench instrumentation. Both timer clear APIs remove either kind of handle; fired timeouts are removed while intervals remain active until cleared. The measure automatically prepares an instrumented VS Code copy and does not modify the installed build. Timers created before the workbench starts and timers in other realms are outside this measure.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure active-interval-count
+```
+
+Linux CI collects this measure and publishes `active-interval-count.svg` on the main GitHub Pages charts page.

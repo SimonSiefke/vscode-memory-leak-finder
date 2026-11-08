@@ -776,3 +776,7 @@ test('parseArgv - rejects the Agents window with Cursor', () => {
     '--launch-agent-window is only supported for VS Code',
   )
 })
+
+test.each(['active-interval-count', 'activeIntervalCount'])('%s automatically enables startup instrumentation', (measure) => {
+  expect(ParseArgv.parseArgv('linux', 'x64', ['--measure', measure]).trackFunctions).toBe(true)
+})
