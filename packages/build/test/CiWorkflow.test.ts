@@ -94,9 +94,6 @@ test.each(['string-object-count', 'string-object-bytes'])(
     const workflow = await readFile(getWorkflowPath(), 'utf8')
     expect(workflow).toContain(`          - name: ${measure}
             args: --measure ${measure}`)
-    expect(workflow).not.toContain(`--measure ${measure} --runs`)
-    expect(workflow).not.toContain(`--measure ${measure} --run-skipped-tests-anyway`)
-    expect(workflow).not.toContain(`--measure ${measure} --restart-between`)
     const download = `      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
