@@ -286,6 +286,8 @@ jobs:
             args: --measure message-port-count
           - name: symbol-count
             args: --measure symbol-count
+          - name: object-shape-count
+            args: --measure object-shape-count
           - name: object-count
             args: --measure object-count
           - name: string-object-count

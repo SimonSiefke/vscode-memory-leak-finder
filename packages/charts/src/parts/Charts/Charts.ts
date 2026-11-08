@@ -43,6 +43,7 @@ export * as NamedArrayCountDifference from '../CreateNamedArrayCountDifferenceCh
 export * as NamedFunctionCount3 from '../CreateNamedFunctionCountChart3/CreateNamedFunctionCountChart3.ts'
 export * as NumberCount from '../CreateNumberCountChart/CreateNumberCountChart.ts'
 export * as ObjectCount from '../CreateObjectCountChart/CreateObjectCountChart.ts'
+export * as ObjectShapeCount from '../CreateObjectShapeCountChart/CreateObjectShapeCountChart.ts'
 export * as ObjectUrlCount from '../CreateObjectUrlCountChart/CreateObjectUrlCountChart.ts'
 export * as PaintEvents from '../CreatePaintEventsChart/CreatePaintEventsChart.ts'
 export * as PerformanceMarkBytes from '../CreatePerformanceMarkBytesChart/CreatePerformanceMarkBytesChart.ts'

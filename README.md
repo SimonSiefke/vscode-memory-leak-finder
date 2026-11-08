@@ -146,6 +146,15 @@ Compares V8 object shapes before and after a test. Results identify constructor,
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-difference --only base
 ```
 
+### ObjectShapeCount
+
+Measures live V8 object-shape nodes in heap snapshots. CI collects before/after counts for each scenario. `npm run build-charts` generates `object-shape-count.svg` on the main charts page, showing the after count in scenario order.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-count --only base
+npm run build-charts
+```
+
 ### ObjectUrlCount
 
 Spies on `URL.createObjectURL` and `URL.revokeObjectURL` from renderer startup and reports cumulative call counts plus the number of created object URLs that are still active after each test.
