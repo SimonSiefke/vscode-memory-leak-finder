@@ -28,6 +28,7 @@ interface CopyRoot {
 const repositoryRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
 const trackedVscodeRoot = join(repositoryRoot, '.vscode-test', 'tracked-vscode')
 const transformerFiles = [
+  join(import.meta.dirname, '..', 'ActiveTimerPreamble', 'ActiveTimerPreamble.ts'),
   join(import.meta.dirname, '..', 'AllocationBytesPreamble', 'AllocationBytesPreamble.ts'),
   join(import.meta.dirname, 'PrepareTrackedVscode.ts'),
   join(import.meta.dirname, '..', 'Transform', 'Transform.ts'),
@@ -149,7 +150,7 @@ const shouldTransform = (relativePath: string, transformRelativeRoots: readonly 
     return false
   }
   const normalized = relativePath.replaceAll('\\', '/')
-  if (trackingMode === 'timeouts') {
+  if (trackingMode === 'timeouts' || trackingMode === 'active-timers') {
     return normalized.endsWith('/vs/workbench/workbench.desktop.main.js')
   }
   return transformRelativeRoots.some((root) => isPathInsideRelativeRoot(normalized, root))
