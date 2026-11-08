@@ -485,6 +485,17 @@ Measures the total number of functions.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure function-count --only base
 ```
 
+### GC counts
+
+CI collects `gc-statistics` once per scenario with a fresh VS Code instance. `npm run build-charts` generates `minor-gc-count.svg` and `major-gc-count.svg` on the main charts page, showing captured collection events per scenario in filename order. Missing or invalid counts and traces reporting data loss are omitted; complete traces with no collection events contribute zero.
+
+Only collections captured during the scenario are counted. The final forced garbage collection runs after tracing stops and is excluded. Counts describe collection activity, rather than a leak verdict, and depend on the workload, heap state and runtime version.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure gc-statistics --runs 1 --restart-between --only base
+npm run build-charts
+```
+
 ### GlobalLexicalScopeNames
 
 Measures global variables / global lexical scope names.

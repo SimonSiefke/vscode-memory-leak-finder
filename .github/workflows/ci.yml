@@ -228,6 +228,8 @@ jobs:
             args: --measure array-count
           - name: array-element-count
             args: --measure array-element-count
+          - name: gc-statistics
+            args: --measure gc-statistics --runs 1 --restart-between
           - name: css-selector-stats
             args: --measure css-selector-stats --runs 1 --restart-between --run-skipped-tests-anyway
           - name: css-rule-count
