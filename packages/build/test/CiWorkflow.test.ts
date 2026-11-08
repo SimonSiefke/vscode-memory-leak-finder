@@ -74,12 +74,14 @@ test('ci measures total array length and downloads the results for Pages charts'
 })
 
 test.each(['string-object-count', 'string-object-bytes'])(
-  'ci collects %s for 37 runs and includes its artifact in Pages charts',
+  'ci collects %s with the standard test selection and includes its artifact in Pages charts',
   async (measure) => {
     const workflow = await readFile(getWorkflowPath(), 'utf8')
     expect(workflow).toContain(`          - name: ${measure}
-            args: --measure ${measure} --runs 37 --run-skipped-tests-anyway`)
-    expect(workflow).not.toContain(`--measure ${measure} --runs 37 --restart-between`)
+            args: --measure ${measure}`)
+    expect(workflow).not.toContain(`--measure ${measure} --runs`)
+    expect(workflow).not.toContain(`--measure ${measure} --run-skipped-tests-anyway`)
+    expect(workflow).not.toContain(`--measure ${measure} --restart-between`)
     const download = `      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:

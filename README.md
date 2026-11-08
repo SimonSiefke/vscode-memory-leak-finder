@@ -224,7 +224,7 @@ Both string object measures support browser, Node, and worker targets, return nu
 
 The main `index.html` also includes line charts of the absolute after-test totals versus test case index, matching the object-count overview. These are `.vscode-charts/string-object-count.svg` and `.vscode-charts/string-object-bytes.svg`; per-test bars remain in the corresponding subfolders.
 
-Linux CI runs each measure with `--runs 37 --run-skipped-tests-anyway`, keeps the application running between test cases, and merges both artifacts into the published chart site.
+Linux CI uses the standard eligible test selection for each measure, keeps the application running between test cases, and merges both artifacts into the published chart site.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure string-object-bytes --only base
