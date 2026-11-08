@@ -24,6 +24,7 @@ export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEven
 export * as EventLoopDelay from '../CreateEventLoopDelayChart/CreateEventLoopDelayChart.ts'
 export * as FileDescriptorCount from '../CreateFileDescriptorCountChart/CreateFileDescriptorCountChart.ts'
 export * as ForcedLayoutCount from '../CreateForcedLayoutCountChart/CreateForcedLayoutCountChart.ts'
+export * as ForcedLayoutCountOverview from '../CreateForcedLayoutCountOverviewChart/CreateForcedLayoutCountOverviewChart.ts'
 export * as FrontendStartupPerformance from '../CreateFrontendStartupPerformanceChart/CreateFrontendStartupPerformanceChart.ts'
 export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountChart.ts'
 export * as GpuCanvasContextCount from '../CreateGpuCanvasContextCountChart/CreateGpuCanvasContextCountChart.ts'
