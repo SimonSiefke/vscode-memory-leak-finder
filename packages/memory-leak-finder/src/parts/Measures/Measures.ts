@@ -8,6 +8,7 @@ export * as MeasureAttachedDomNodeCount from '../MeasureAttachedDomNodeCount/Mea
 export * as MeasureBlobCount from '../MeasureBlobCount/MeasureBlobCount.ts'
 export * as MeasureBooleanCount from '../MeasureBooleanCount/MeasureBooleanCount.ts'
 export * as MeasureBrowserPerformanceCounters from '../MeasureBrowserPerformanceCounters/MeasureBrowserPerformanceCounters.ts'
+export * as MeasureEmptySetCount from '../MeasureEmptySetCount/MeasureEmptySetCount.ts'
 export * as MeasurePerformanceTimeline from '../MeasurePerformanceTimeline/MeasurePerformanceTimeline.ts'
 export * as MeasureHeapSnapshotBytes from '../MeasureHeapSnapshotBytes/MeasureHeapSnapshotBytes.ts'
 export * as MeasureProcessTreePss from '../MeasureProcessTreePss/MeasureProcessTreePss.ts'
