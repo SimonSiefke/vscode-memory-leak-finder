@@ -345,9 +345,9 @@ jobs:
           - name: object-count-extensions
             args: --measure object-count --inspect-extensions
           - name: string-object-count-extensions
-            args: --measure string-object-count --runs 37 --run-skipped-tests-anyway --inspect-extensions
+            args: --measure string-object-count --inspect-extensions
           - name: string-object-bytes-extensions
-            args: --measure string-object-bytes --runs 37 --run-skipped-tests-anyway --inspect-extensions
+            args: --measure string-object-bytes --inspect-extensions
           - name: disposable-count-extensions
             args: --measure disposable-count --inspect-extensions
     timeout-minutes: 360
