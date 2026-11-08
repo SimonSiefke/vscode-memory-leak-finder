@@ -4,6 +4,7 @@ import { basename, join } from 'node:path'
 import { expect, test } from '@jest/globals'
 import { JSDOM } from 'jsdom'
 import { findPromiseStackTraceFolders } from '../src/parts/FindPromiseStackTraceFolders/FindPromiseStackTraceFolders.ts'
+import { formatStackTrace } from '../src/parts/FormatStackTrace/FormatStackTrace.ts'
 import { generatePromiseStackTraceHtmlForFolder } from '../src/parts/GeneratePromiseStackTraceHtmlForFolder/GeneratePromiseStackTraceHtmlForFolder.ts'
 import { getCodeFrame } from '../src/parts/GetCodeFrame/GetCodeFrame.ts'
 import * as Root from '../src/parts/Root/Root.ts'
@@ -64,6 +65,29 @@ test('discovers promise folders under the renderer and other process results', a
   }
 })
 
+test('shortens VS Code installation paths in string and array stack traces', async () => {
+  expect(
+    formatStackTrace([
+      'at t.expandWasmFrames (/home/runner/work/vscode-memory-leak-finder/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.145.0/resources/app/extensions/ms-vscode.js-debug/src/extension.js:79:30168)',
+      'at windows (C:\\runner\\vscode\\resources\\app\\extensions\\ms-vscode.js-debug\\src\\extension.js:80:4)',
+      'at relative (extensions/example.js:1:2)',
+      'at node:internal/process/task_queues:95:5',
+      'at unrelated (/tmp/example.js:1:2)',
+    ]),
+  ).toBe(
+    [
+      'at t.expandWasmFrames (extensions/ms-vscode.js-debug/src/extension.js:79:30168)',
+      'at windows (extensions\\ms-vscode.js-debug\\src\\extension.js:80:4)',
+      'at relative (extensions/example.js:1:2)',
+      'at node:internal/process/task_queues:95:5',
+      'at unrelated (/tmp/example.js:1:2)',
+    ].join('\n'),
+  )
+  expect(formatStackTrace('at first (/opt/vscode/resources/app/out.js:1:2)\nat second (relative.js:3:4)')).toBe(
+    'at first (out.js:1:2)\nat second (relative.js:3:4)',
+  )
+})
+
 test('writes black/red charts and source frames above complete stacks, retaining duplicate locations and escaping source text', async () => {
   await withSource(async (hash, location) => {
     const root = await mkdtemp(join(tmpdir(), 'promise-report-'))
@@ -78,7 +102,12 @@ test('writes black/red charts and source frames above complete stacks, retaining
           promisesWithStackTrace: [
             { count: 10, delta: 7, originalStack: [location, 'src/caller.ts:20:0'], sourcesHash: hash },
             { count: 8, delta: 5, originalStack: `${location}\nsrc/other.ts:30:0`, sourcesHash: hash },
-            { count: 6, delta: 3, originalStack: [], stackTrace: ['at fallback (missing.ts:1:0)'] },
+            {
+              count: 6,
+              delta: 3,
+              originalStack: [],
+              stackTrace: ['at fallback (/home/runner/vscode/resources/app/extensions/example/fallback.js:1:0)'],
+            },
             { count: 2, delta: 2, stackTrace: ['</code><img src=x onerror=alert(1)>'] },
           ],
         }),
@@ -94,9 +123,9 @@ test('writes black/red charts and source frames above complete stacks, retaining
       expect(cards[0].querySelector('.CodeBlock code')?.textContent).toBe(`at ${location}\nat src/caller.ts:20:0`)
       expect(cards[0].innerHTML.indexOf('class="CodeFrame"')).toBeLessThan(cards[0].innerHTML.indexOf('class="CodeBlock"'))
       expect(cards[1].querySelector('.CodeFrame')).not.toBeNull()
-      expect(cards[2].querySelector('h3')?.textContent).toBe('missing.ts:1:0')
+      expect(cards[2].querySelector('h3')?.textContent).toBe('fallback.js:1:0')
       expect(cards[2].querySelector('.CodeFrameUnavailable')).not.toBeNull()
-      expect(cards[2].querySelector('.CodeBlock code')?.textContent).toBe('at fallback (missing.ts:1:0)')
+      expect(cards[2].querySelector('.CodeBlock code')?.textContent).toBe('at fallback (extensions/example/fallback.js:1:0)')
       expect(cards[3].querySelector('img')).toBeNull()
       const svg = await readFile(join(target, 'scenario & growth.svg'), 'utf8')
       const chart = new JSDOM(svg, { contentType: 'image/svg+xml' }).window.document
