@@ -1132,6 +1132,8 @@ jobs:
           grep -q './extension-host/index.html' .vscode-charts/index.html
       - name: Verify CSS selector report
         run: test -s .vscode-charts/css-selector-stats/index.html
+      - name: Build documentation site
+        run: npm run docs:build --workspace packages/docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:

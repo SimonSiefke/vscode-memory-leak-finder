@@ -1,27 +1,25 @@
 # Documentation
 
-This package collects the project's documentation entry points. The source
-documents remain in their existing locations so current README links continue
-to work.
+The project documentation site lives in [`site`](./site). It uses VitePress to publish a searchable field guide alongside the existing generated measurement reports on GitHub Pages.
 
-## Project guides
+## Build and preview
+
+Install repository dependencies from the root and run:
+
+```sh
+npm run docs:build --workspace packages/docs
+npm run docs:preview --workspace packages/docs
+```
+
+The static site is written to `.vscode-charts/docs`, leaving chart and report paths at the artifact root unchanged. The published site uses `/vscode-memory-leak-finder/docs/` as its base path.
+
+## Documentation source
+
+The overview, quick start, execution flow, scenario guide, and report guide are maintained in `site`. The measure catalog is generated from the public collector registry in `packages/memory-leak-finder/src/parts/Measures/Measures.ts`; detailed notes remain in their original locations under `docs/measures` and `docs/scenarios`.
+
+## Existing project guides
 
 - [Large performance benchmarks](../large-benchmark/README.md)
 - [Electron end-to-end tests](../electron-e2e/README.md)
-
-## Measures
-
-- [Event loop delay](../../docs/measures/event-loop-delay.md)
-- [Forced layout count](../../docs/measures/forced-layout-count.md)
-- [Long renderer tasks](../../docs/measures/long-renderer-tasks.md)
-- [Module resolution](../../docs/measures/module-resolution.md)
-- [Module resolution lookups](../../docs/measures/module-resolution-lookups.md)
-- [Synchronous DOM read count](../../docs/measures/synchronous-dom-read-count.md)
-- [Synchronous file system](../../docs/measures/synchronous-file-system.md)
-- [Tracked allocation bytes](../../docs/measures/tracked-allocation-bytes.md)
-
-## Scenarios
-
-- [Accessibility marker signals](../../docs/scenarios/accessibility-marker-signals.md)
-- [Markdown editing](../../docs/scenarios/markdown-editing.md)
-- [Python development](../../docs/scenarios/python-development.md)
+- [Scenario notes](../../docs/scenarios)
+- [Measure notes](../../docs/measures)

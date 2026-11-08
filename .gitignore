@@ -12,6 +12,7 @@
 .vscode-user-data-dir.zip
 .vscode-sse-data
 .vscode-project-cache
+packages/docs/site/.vitepress/cache/
 .vscode-workbench-tracked
 .vscode-workbench-tracked-allocations
 .vscode-workbench-tracked-modules
