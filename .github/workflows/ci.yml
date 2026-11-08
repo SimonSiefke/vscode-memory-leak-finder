@@ -420,7 +420,7 @@ jobs:
   ci-linux-charts:
     runs-on: ubuntu-24.04
     needs: [ci-linux-measures, ci-linux-instruction-count]
-    if: always()
+    if: ${{ always() && needs.ci-linux-measures.result != 'cancelled' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
