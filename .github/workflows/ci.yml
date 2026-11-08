@@ -214,6 +214,8 @@ jobs:
             args: --measure detached-dom-node-count --timeout-between 10000
           - name: pending-promise-count
             args: --measure pending-promise-count
+          - name: empty-map-count
+            args: --measure empty-map-count
           - name: promise-count
             args: --measure promise-count
           - name: promises-with-stack-trace-shard-1
@@ -768,6 +770,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-file-watcher-count
           path: ./vscode-memory-leak-finder-results-linux-file-watcher-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-empty-map-count
+          path: ./vscode-memory-leak-finder-results-linux-empty-map-count
       - name: Merge all measure results
         run: node packages/build/src/mergeArtifacts.ts
       - name: Upload merged artifact
@@ -1122,6 +1129,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-empty-map-count
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Verify extension-host overview charts

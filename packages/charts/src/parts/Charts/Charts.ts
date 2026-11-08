@@ -19,6 +19,7 @@ export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/Create
 export * as DomTimerCount from '../CreateDomTimerCountChart/CreateDomTimerCountChart.ts'
 export * as EditContextCount from '../CreateEditContextCountChart/CreateEditContextCountChart.ts'
 export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChart.ts'
+export * as EmptyMapCount from '../CreateEmptyMapCountChart/CreateEmptyMapCountChart.ts'
 export * as ErrorCount from '../CreateErrorCountChart/CreateErrorCountChart.ts'
 export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEventListenerCountChart.ts'
 export * as EventLoopDelay from '../CreateEventLoopDelayChart/CreateEventLoopDelayChart.ts'
