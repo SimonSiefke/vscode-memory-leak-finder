@@ -116,6 +116,9 @@ test('writes black/red charts and source frames above complete stacks, retaining
       const html = await readFile(join(target, 'index.html'), 'utf8')
       const document = new JSDOM(html).window.document
       const cards = [...document.querySelectorAll('.PromiseItem')]
+      expect(html).not.toContain('Initial count (black)')
+      expect(html).not.toContain('Increase (red)')
+      expect(document.querySelector('.PromiseChartLegend, .InitialSwatch, .GrowthSwatch')).toBeNull()
       expect(cards).toHaveLength(4)
       expect(document.querySelector('h2')?.textContent).toBe('scenario & growth')
       expect(document.querySelector('.PromiseChart')?.getAttribute('src')).toBe('./scenario%20%26%20growth.svg')

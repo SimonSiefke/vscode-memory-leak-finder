@@ -61,25 +61,6 @@
   height: auto;
   min-width: 1000px;
 }
-.PromiseChartLegend {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  color: #444;
-  font-size: 14px;
-}
-.InitialSwatch,
-.GrowthSwatch {
-  display: inline-block;
-  width: 16px;
-  height: 12px;
-  background: #000;
-}
-.GrowthSwatch {
-  margin-left: 12px;
-  background: #b22222;
-}
 .CodeFrame h4,
 .CodeBlock h4 {
   margin: 16px 0 8px;
