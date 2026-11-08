@@ -1,0 +1,26 @@
+{
+  "name": "comment-range-provider-cancel-on-close",
+  "displayName": "Comment Range Provider Cancel On Close",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "comment-range-provider-cancel-on-close.setup",
+        "title": "Comment Range Provider Cancel On Close: Setup"
+      },
+      {
+        "command": "comment-range-provider-cancel-on-close.run",
+        "title": "Comment Range Provider Cancel On Close: Run"
+      },
+      {
+        "command": "comment-range-provider-cancel-on-close.cleanup",
+        "title": "Comment Range Provider Cancel On Close: Cleanup"
+      }
+    ]
+  }
+}

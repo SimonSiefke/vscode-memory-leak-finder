@@ -1,0 +1,29 @@
+{
+  "name": "mapped-edit-provider-disposal",
+  "displayName": "Mapped Edit Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mapped-edit-provider-disposal.setup",
+        "title": "Mapped Edit Provider Disposal: Setup"
+      },
+      {
+        "command": "mapped-edit-provider-disposal.run",
+        "title": "Mapped Edit Provider Disposal: Run"
+      },
+      {
+        "command": "mapped-edit-provider-disposal.cleanup",
+        "title": "Mapped Edit Provider Disposal: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "mappedEditsProvider"
+  ]
+}

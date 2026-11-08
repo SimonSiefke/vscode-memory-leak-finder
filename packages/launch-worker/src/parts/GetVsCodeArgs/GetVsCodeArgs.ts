@@ -3,6 +3,7 @@ import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.ts'
 export const getVscodeArgs = ({
   enableExtensions,
   enableProxy,
+  launchAgentWindow,
   extensionsDir,
   extraLaunchArgs,
   inspectExtensions,
@@ -13,9 +14,11 @@ export const getVscodeArgs = ({
   inspectSharedProcessPort,
   platform = process.platform,
   userDataDir,
+  useProxyMock = false,
 }: {
   enableExtensions: boolean
   enableProxy: boolean
+  launchAgentWindow?: boolean | undefined
   extensionsDir: string
   extraLaunchArgs: string[]
   inspectExtensions: boolean
@@ -25,6 +28,7 @@ export const getVscodeArgs = ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   platform?: string
+  useProxyMock?: boolean
   userDataDir: string
 }): string[] => {
   const proxyBypassList = '<-loopback>;localhost;127.0.0.1;0.0.0.0;::1'
@@ -41,6 +45,10 @@ export const getVscodeArgs = ({
     `--user-data-dir=${userDataDir}`,
     '--enable-proposed-api=simon.speech-session-race-sample',
   ]
+  if (launchAgentWindow) {
+    if (useProxyMock) args.push('--enable-smoke-test-driver')
+    args.push('--agents', '--skip-sessions-welcome', `--agents-user-data-dir=${userDataDir}`, `--agents-extensions-dir=${extensionsDir}`)
+  }
   if (platform === 'linux') {
     args.push('--ozone-platform=x11')
   }

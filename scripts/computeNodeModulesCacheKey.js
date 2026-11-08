@@ -3,27 +3,15 @@ import { readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = import.meta.dirname
 const root = join(__dirname, '..')
 
-const getPackageLocations = () => {
-  const packageLocations = []
-  const packagesFolder = join(root, 'packages')
-  const dirents = readdirSync(packagesFolder)
-  for (const dirent of dirents) {
-    packageLocations.push(`packages/${dirent}/package-lock.json`)
-  }
-  packageLocations.push('package-lock.json')
-  return packageLocations
-}
-
 const locations = [
   '.nvmrc',
-  'lerna.json',
-  ...getPackageLocations(),
+  'package.json',
+  'package-lock.json',
   '.github/workflows/pr.yml',
   '.github/workflows/ci.yml',
   '.github/workflows/release.yml',
@@ -35,7 +23,8 @@ const packagesFolder = join(root, 'packages')
 
 const dirents = readdirSync(packagesFolder)
 for (const dirent of dirents) {
-  locations.push(`packages/${dirent}/package-lock.json`)
+  const manifest = `packages/${dirent}/package.json`
+  locations.push(manifest)
 }
 
 const getAbsolutePath = (relativePath) => {

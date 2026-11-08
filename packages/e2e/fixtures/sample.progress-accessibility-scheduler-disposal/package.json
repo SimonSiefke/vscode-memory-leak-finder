@@ -1,0 +1,26 @@
+{
+  "name": "progress-accessibility-scheduler-disposal",
+  "displayName": "Progress Accessibility Scheduler Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "progress-accessibility-scheduler-disposal.setup",
+        "title": "Progress Accessibility Scheduler Disposal: Setup"
+      },
+      {
+        "command": "progress-accessibility-scheduler-disposal.run",
+        "title": "Progress Accessibility Scheduler Disposal: Run"
+      },
+      {
+        "command": "progress-accessibility-scheduler-disposal.cleanup",
+        "title": "Progress Accessibility Scheduler Disposal: Cleanup"
+      }
+    ]
+  }
+}

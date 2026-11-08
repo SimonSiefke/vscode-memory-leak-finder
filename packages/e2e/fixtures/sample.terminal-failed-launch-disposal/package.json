@@ -1,0 +1,26 @@
+{
+  "name": "terminal-failed-launch-disposal",
+  "displayName": "Terminal Failed Launch Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "terminal-failed-launch-disposal.setup",
+        "title": "Terminal Failed Launch Disposal: Setup"
+      },
+      {
+        "command": "terminal-failed-launch-disposal.run",
+        "title": "Terminal Failed Launch Disposal: Run"
+      },
+      {
+        "command": "terminal-failed-launch-disposal.cleanup",
+        "title": "Terminal Failed Launch Disposal: Cleanup"
+      }
+    ]
+  }
+}

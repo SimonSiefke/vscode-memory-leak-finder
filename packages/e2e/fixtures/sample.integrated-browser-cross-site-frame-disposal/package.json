@@ -1,0 +1,29 @@
+{
+  "name": "integrated-browser-cross-site-frame-disposal",
+  "displayName": "Integrated Browser Cross Site Frame Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "integrated-browser-cross-site-frame-disposal.setup",
+        "title": "Integrated Browser Cross Site Frame Disposal: Setup"
+      },
+      {
+        "command": "integrated-browser-cross-site-frame-disposal.run",
+        "title": "Integrated Browser Cross Site Frame Disposal: Run"
+      },
+      {
+        "command": "integrated-browser-cross-site-frame-disposal.cleanup",
+        "title": "Integrated Browser Cross Site Frame Disposal: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "browser"
+  ]
+}

@@ -7,14 +7,15 @@ export const formatStackTrace = (stackTrace: string | string[]): string => {
   }
 
   const formattedLines = lines.map((line) => {
-    const trimmedLine = line.trim()
+    const relativeLine = line.replace(/(?:[A-Za-z]:)?(?:[\\/][^\\/\s()]+)*[\\/]resources[\\/]+app[\\/]+/g, '')
+    const trimmedLine = relativeLine.trim()
     if (trimmedLine.startsWith('at ')) {
-      return line
+      return relativeLine
     }
     if (trimmedLine === '') {
-      return line
+      return relativeLine
     }
-    const leadingWhitespace = line.match(/^\s*/)?.[0] || ''
+    const leadingWhitespace = relativeLine.match(/^\s*/)?.[0] || ''
     return `${leadingWhitespace}at ${trimmedLine}`
   })
 

@@ -5,6 +5,8 @@ test('registers performance measures with kebab-case and camelCase names', () =>
   const module = loadMemoryLeakFinder()
   expect(getMeasure(module, 'forced-layout-count').id).toBe('forcedLayoutCount')
   expect(getMeasure(module, 'forcedLayoutCount').id).toBe('forcedLayoutCount')
+  expect(getMeasure(module, 'module-resolution-lookups').id).toBe('moduleResolutionLookups')
+  expect(getMeasure(module, 'moduleResolutionLookups').id).toBe('moduleResolutionLookups')
   expect(getMeasure(module, 'module-resolution').id).toBe('moduleResolution')
   expect(getMeasure(module, 'moduleResolution').id).toBe('moduleResolution')
   expect(getMeasure(module, 'synchronous-file-system').id).toBe('synchronousFileSystem')

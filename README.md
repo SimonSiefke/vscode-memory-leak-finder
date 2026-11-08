@@ -2,6 +2,14 @@
 
 Find memory leaks in vscode to improve robustness and performance.
 
+See the [`docs` package documentation](packages/docs/README.md) for the full
+documentation index.
+
+### Large Performance Measure
+
+See the [`large-benchmark` package documentation](packages/large-benchmark/README.md)
+for workflow usage, benchmark coverage, requirements, and local examples.
+
 ## Quickstart
 
 ```sh
@@ -10,6 +18,37 @@ cd vscode-memory-leak-finder &&
 npm ci &&
 npm run e2e
 ```
+
+## Electron e2e tests
+
+Measure a standalone Electron app's main process, with a cached runtime and workspace:
+
+```sh
+npm run e2e:electron -- --only window-open-close --measure named-function-count3 --runs 5 --check-leaks
+```
+
+See [Electron e2e documentation](packages/electron-e2e/README.md) for cache behavior,
+process verification, results, and adding scenarios.
+
+## Edit telemetry snapshots
+
+See [edit telemetry snapshot coverage](docs/scenarios/edit-telemetry-document-snapshots.md)
+for a development-build scenario that verifies consumed document snapshots are
+collected while the edited document remains open.
+
+## Language-server processes
+
+On Linux, `--inspect-process` can measure a Node child of the VS Code instance under test, including its JSON language server:
+
+```sh
+node packages/cli/bin/test.js --only json-hover --run-skipped-tests-anyway --inspect-process jsonServerMain --measure named-function-count3 --check-leaks --measure-after --runs 37
+```
+
+Activate the language server during scenario setup or warm-up before measurement. The harness checks process ancestry, rejects ambiguous matches, and verifies the inspector's PID before capturing its heap. It uses an existing inspector or enables the selected Node process's inspector with `SIGUSR1`. Results are written under `.vscode-memory-leak-finder-results/process/jsonServerMain/`.
+
+Use `--inspect-extensions` in a separate run to measure the extension host. That heap does not include a language server running in a separate process. The JSON scenarios also include `json-document-schema-churn`, which uses distinct document and schema URIs, checks hover and diagnostic updates, and removes the generated files after closing the editor.
+
+The JSON scenarios share a provider-dependent setup that is excluded in CI. Run them locally with `--run-skipped-tests-anyway`; this flag preserves CI exclusions. Diagnostic assertions filter to the document under test so unrelated workspace problems do not affect the result.
 
 ## Sharding
 
@@ -30,6 +69,42 @@ node packages/build/src/mergeArtifacts.ts
 <!--  -->
 
 ## Measures
+
+### DuplicateCode
+
+Find structurally identical functions and methods in existing JavaScript bundles without launching VS Code or running an e2e test:
+
+```sh
+node packages/cli/bin/test.js --measure duplicate-code --source-file /path/to/workbench.desktop.main.js
+# Or locate the workbench bundle inside an existing installation:
+node packages/cli/bin/test.js --measure duplicate-code --vscode-path /path/to/VSCode-linux-x64
+```
+
+Repeat `--source-file` to compare multiple bundles, including duplicates across files. Inputs are deduplicated by real path and scanned sequentially in separate workers with a 1.5 GiB heap limit. Acorn parses without tokens, comments or per-node locations; scope analysis processes one function body at a time. Each file still needs to fit in memory. A parse or worker failure fails the command without writing a partial report. Use `--source-type script` for classic scripts; the default is `module`, suitable for the workbench bundle.
+
+Function names, parameter names and local binding names are normalized, including shadowed variables and destructuring. For example, `function add(a,b){return a+b}` matches `const addition=(x,y)=>x+y`. Concise arrow bodies are treated as return statements. Operators, literal values, parameter order, property names, async/generator behavior, strict mode and captured binding identity are preserved. Functions affected by direct `eval` or `with` are skipped and counted.
+
+The JSON report defaults to `.vscode-duplicate-code/results.json`; override it with `--duplicate-code-output /path/to/report.json`. It includes total functions scanned, skipped functions, duplicate counts and groups sorted by duplicate source bytes, highest first. Each occurrence has `file`, `originalName`, `name`, `bytes`, `originalFile`, and `preview`. Both file fields include one-based line and column as `<file>:<line>:<column>`; `bytes` is the UTF-8 source size. `duplicateBytes` sums the group sizes excluding its largest occurrence; nested groups can overlap, so these values are ranking estimates rather than additive savings.
+
+Original locations are resolved automatically from `sourceMappingURL` comments (relative files, file URLs, HTTP(S), or inline maps), falling back to a sibling `.js.map` file when no directive exists. Leading `../` and `./` segments are removed from original paths, so workbench locations appear as `src/vs/<path>:<line>:<column>`. `originalFile` is `null` when no location is available; `originalName` is `null` when the map does not provide a name. Each file's `sourceMap` summary records its status, requested occurrences, and mapped count.
+
+`preview` shows a source excerpt starting at the mapped original position, limited to five lines and 300 characters. It stops at obvious short-function boundaries where possible; long functions are truncated. Previews use the map's embedded `sourcesContent` and are `null` when unavailable. Requested positions are grouped by source and processed in line order, scanning each requested source once without parsing original ASTs, splitting whole files into lines, or retaining line indexes. No additional files are read or downloaded for previews.
+
+Only occurrences in duplicate groups are looked up, using one consumer and one batch per bundle after the AST workers exit. Map workers run sequentially, release their consumers, and never build a JavaScript array of all mappings or write embedded sources to disk. HTTP(S) maps are streamed to `.vscode-source-maps/duplicate-code/` and cached by URL. Maps have a 128 MiB input limit, downloads have a 60-second timeout, and workers have a 1.5 GiB JavaScript heap limit; native source-map/WASM memory adds to process RSS. Missing, malformed, oversized maps or failed map workers leave the generated report usable and record the reason. Use `--no-source-maps` to disable resolution and downloads.
+
+Results identify refactoring candidates, not proven interchangeable runtime values. Function identity, reflection (`name`, `length`, `toString`), construction behavior and call sites still need review. Captures from distinct bindings are kept separate even if their names or values happen to match; lexical receivers, private fields and `super` are compared conservatively.
+
+### RetainedSubstrings
+
+Finds large flat string parents (at least 64 KiB of snapshot shallow size) retained through V8 sliced strings. Reports each parent once, its bytes, slice count, and up to eight example slices with shortest strong paths from the snapshot root. Parents with independent strong references are identified separately. Removing all slice-to-parent edges and checking reachability establishes whether the slices collectively provide the only strong paths to a parent.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure retained-substrings --only base
+```
+
+Positive growth in parent bytes reachable exclusively through slices signals a suspected leak. This measures parent footprint, not guaranteed savings from copying substrings: slice lengths and offsets are not available reliably, and keeping a slice may be intentional. Shared parents are counted once; weak edges and non-root shortcut edges do not establish retention. Only flat parents exposed as `string` nodes are counted; rope strings and external backing storage not included in shallow size are outside coverage.
+
+Reports show the 50 largest parents, with complete totals even when details are truncated. Paths include at most 32 segments nearest the slice, with an explicit truncation flag, and snapshot names are limited to 80 characters. V8 may label slices simply `(sliced string)`; actual substring contents, lengths, and offsets are not reconstructed. Before/after snapshots are parsed sequentially and removed after comparison, including failed comparisons.
 
 ### PendingPromisesWithRetainers
 
@@ -71,6 +146,15 @@ Compares V8 object shapes before and after a test. Results identify constructor,
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-difference --only base
 ```
 
+### ObjectShapeCount
+
+Measures live V8 object-shape nodes in heap snapshots. CI collects before/after counts for each scenario. `npm run build-charts` generates `object-shape-count.svg` on the main charts page, showing the after count in scenario order.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-shape-count --only base
+npm run build-charts
+```
+
 ### ObjectUrlCount
 
 Spies on `URL.createObjectURL` and `URL.revokeObjectURL` from renderer startup and reports cumulative call counts plus the number of created object URLs that are still active after each test.
@@ -107,6 +191,46 @@ npm run build-charts
 
 The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
 
+### StringsWithLocations
+
+Reports positive growth in live string objects, grouped by string text and the closest available retaining source location. `count` is the added object count (`afterCount - beforeCount`); results sort by descending `count`, with stable tie ordering. Equal text at different locations remains separate, and multiple references to one string do not inflate the count.
+
+A shared breadth-first traversal finds the nearest located closure or container along strong retaining references through contexts, objects, arrays, and collections. It ignores weak links and prototype/compiler metadata paths when assigning a location. Equal-distance ties use generated source location order. Available source maps resolve locations before grouping and comparison; otherwise generated locations are used. Output locations use one-based lines and columns.
+
+These are inferred retaining locations, rather than string allocation sites or proof of a leak. A string need not belong to any surviving closure: top-level strings use a retaining container's location when available. For otherwise unlocated error stacks (for example, console strings held by native DevTools handles), the first frame in the stack provides a fallback. It propagates only through that stack's rope/slice components, preserves actual retaining locations, and includes `locationKind: "stack-frame"` so it cannot be mistaken for a retaining location. If neither source is available, `location` remains `null`. Flat string text comes from the snapshot; concatenated values are reconstructed up to 65,536 UTF-16 code units. Sliced strings, cyclic/incomplete ropes, and larger reconstructed ropes use `string: null`, `stringType`, and `heapObjectId`; they compare by object identity and are not merged as equal text. Snapshot text truncation and external data remain limits of the available evidence.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure strings-with-locations --only base
+npm run build-charts
+```
+
+Each entry includes `string`, `location`, `sourceLocation`, `count`, `beforeCount`, and `afterCount`, plus `originalLocation` when mapped. For example, `{ "string": "terminal output", "location": "src/terminal.ts:42:7", "sourceLocation": "bundle.js:1:120", "originalLocation": "src/terminal.ts:42:7", "count": 37, "beforeCount": 1, "afterCount": 38 }`. The chart uses a wider label column, with single-line labels in the form `"<string>" at <location>`. Long lines are clamped with a middle ellipsis; hovering a bar reveals full text and location. Numeric path segments are grouped for display: `/<terminal-window>/25` and `/<terminal-window>/26` at the same location share the pattern `/<terminal-window>/\d+`. Digits in names, versions, and source line/column positions are preserved. Short hashes (4–6 ASCII letters or digits, with at least one letter) at the same known location share a `"<short hash>"` chart row. All-letter values also qualify; purely numeric strings and strings with unknown locations stay separate. `getGroupKey` also keeps location provenance and unavailable object identities separate. Chart bars sum the positive added counts of their member groups; normalization does not change the exact-text before/after comparison or the raw JSON results. Tooltips show up to five original values and the number of distinct values. Stack-derived locations are labeled “stack frame.” Standalone exact `"NaN"`, `"0"`, `"4294967040"`, `"Infinity"`, and `"-Infinity"` string values are omitted from the chart, with an omitted-entry count. The chart also omits exact `"BigInt"`, `"Circular"`, and `"[Circular]"` values, strings starting with `"[BigInt "`, and messages containing `"Renderer reported VERY LONG TASK"` or `"perf] SLOW task detected"`. They remain in the raw measurement and leak comparison; components belonging to a collapsed stack remain included in that stack’s count.
+
+New captures also include optional `stackCounts` partitions, derived from the heap's actual rope/slice references. The chart collapses a complete error stack and its components into one row per stack and location. Labels show the first frame where stacks at the same location differ. Each bar still counts added string objects; its tooltip separates complete stack strings from component strings and shows the full stack. Identical text in distinct component objects can contribute to different stacks. Objects physically shared by different stacks stay uncollapsed, as do partitions whose movement between stacks cannot explain the exact net growth. The exact-text measure comparison and raw string values remain unchanged. Historical result files without this metadata retain their existing rows. Browser, Node, and worker targets are supported.
+
+### StringObjectCount
+
+Counts live V8 string objects in before/after heap snapshots, including flat (`string`), concatenated (`concatenated string`), and sliced (`sliced string`) nodes. Separate objects with identical text count separately; multiple references to one object count once. Unlike `string-count`, which counts snapshot string-table entries (including metadata), this counts string heap nodes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure string-object-count --only base
+```
+
+### StringObjectBytes
+
+Sums the snapshot `self_size` bytes of the same string nodes, including node overhead. This is the total shallow string footprint exposed by the snapshot, not text length or a sum of retained sizes. Shared parents and rope components count once as individual nodes; external backing storage omitted from `self_size` is outside coverage.
+
+Both string object measures support browser, Node, and worker targets, return numeric `before` and `after` values, and flag positive growth as a suspected leak. Measure the process holding the strings. Generated charts show the baseline in black and growth in red, with count or byte labels.
+
+The main `index.html` also includes line charts of the absolute after-test totals versus test case index, matching the object-count overview. These are `.vscode-charts/string-object-count.svg` and `.vscode-charts/string-object-bytes.svg`; per-test bars remain in the corresponding subfolders.
+
+Linux CI uses the standard eligible test selection for each measure, keeps the application running between test cases, and merges both artifacts into the published chart site.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure string-object-bytes --only base
+npm run build-charts
+```
+
 ### ArrayBufferBytes
 
 Measures the native backing-store bytes retained by live `ArrayBuffer` objects. The result includes before, after, and delta byte and backing-store counts.
@@ -132,6 +256,42 @@ Measures the native self-size bytes retained by Chromium `PerformanceMark` objec
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure performance-mark-bytes --only base
 npm run build-charts
 ```
+
+### DuplicateObjectGraphs
+
+Finds structurally identical plain-object graphs, such as `{x: 1}` and a separate `{x: 1}`. Property order is ignored; prototypes, cycles and shared-reference topology are preserved. A shared child differs from two separate equal children. SHA-256 fingerprints select candidate groups, then iterative graph verification checks every match, including hash collisions.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure duplicate-object-graphs --only '^editor-open.ts' --runs 1
+```
+
+The snapshots capture numeric property values. Objects with omitted indexed storage, accessor pairs or ambiguous symbol keys are treated as opaque, as are arrays, functions, symbols, BigInts, weak collections, Maps, Sets, class instances and native objects. Opaque values match by snapshot identity rather than description: two wrappers referencing the same symbol or WeakMap can match; wrappers referencing different ones cannot. Short complete strings and available numeric values compare by value. Long, truncated and rope strings, missing numeric values and ambiguous floating-point zero stay opaque. Property descriptor flags and insertion order are outside this data-equivalence measure.
+
+Reports exclude empty-object groups and rank groups by `duplicateCount`, with duplicate bytes breaking ties. Each group includes its count, duplicate count, duplicate bytes and a bounded JSON preview with plain strings, nested objects and arrays. Cycles, depth limits and opaque values use string placeholders. Fingerprints and heap node IDs are kept internally. Arrays remain opaque for matching even though their contents can be previewed. Empty objects still participate in nested graph comparisons and shared-reference checks.
+
+The measure compares overall redundant object bytes before and after. A leak is an increase in that total. Bytes count the shallow sizes of duplicate nonempty plain-object nodes, keeping the smallest instance in each group. Referenced strings, backing stores and opaque values are excluded, and nested object nodes are counted once rather than summing overlapping retained graphs. This estimates duplicate footprint, not bytes guaranteed reclaimable by merging objects; equivalent roots can share or overlap the same physical graph.
+
+Acyclic hashes are computed bottom-up once; cyclic dependencies use eight bounded refinement rounds followed by exact verification. Hash lookup is expected constant time, while hashing and checking a graph still depend on its size. Work limits bound object count and verification visits; exceeding them produces an explicit error instead of comparing partial totals. The internal analyzer exposes `complete`, statistics and limits for offline diagnostics. Default limits are 500,000 analyzable objects, 4,096 properties per object, 50,000 nodes per verification and 20 million verification steps. Snapshots are streamed and analyzed sequentially to bound memory, and shared graph details are not repeated in the report.
+
+### DeadClosureVariables
+
+Finds variables retained in closure contexts that no surviving closure can access, using the embedded V8 scope metadata analyzed by Chrome DevTools. Reports only function locations whose dead retained bytes increased, sorted by byte growth. Each row includes the closure name, before/after closure counts, `beforeDeadBytes`, `deadBytes`, `delta`, generated `sourceLocation`, and source-mapped `originalLocation` / `originalName` when a source map is available. `beforeDetails` and `afterDetails` contain only `{deadBytes}`. A leak is an increase in the overall dead-byte total between snapshots.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure dead-closure-variables --only base
+```
+
+To report the overall dead closure variables in the final snapshot, including unchanged and shrinking function groups, select `dead-closure-variables-total`. Its `closures` rows are sorted by `deadBytes` descending, while before/after totals and deltas remain available. The leak flag still indicates growth, independently of which rows are reported. This mode also includes `scriptsWithoutScopes` in each snapshot's details so incomplete script coverage is visible.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure dead-closure-variables-total --only '^editor-open.ts' --runs 1
+```
+
+Requires a Chromium/Electron or Node.js runtime that emits `scopes`, `scope_context_vars`, and `scope_uses` in heap snapshots. Older runtimes fail with an unsupported-metadata error. Scripts that could not be analyzed are listed in `scriptsWithoutScopes`; empty scope tables can therefore produce partial results. VS Code 1.142.0 ships Electron 43 / Chromium 150, which lacks this metadata. End-to-end validation uses the VS Code application with Electron 46 nightly / Chromium 158.
+
+Bytes are the union of the retained sizes of dead variable values, with overlapping dominator subtrees counted once per closure and once in the overall total. Closures are grouped by generated URL, line, column and name, independently of heap object IDs. Shared retained values are counted once within each function group; different functions can retain the same context, so row totals must not be added together. Functions without snapshot locations use scope identity, or object identity when no scope metadata is available, rather than merging unrelated anonymous functions. These sizes indicate memory impact, not guaranteed reclaimable memory: values may also have other live references. Suspended generators and async functions are treated as live, including variables used by functions they can instantiate.
+
+The context classification is adapted from [Chrome DevTools ContextAnalyzer](https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/entrypoints/heap_snapshot_worker/ContextAnalyzer.ts), under its BSD license.
 
 ### ArrayCount
 
@@ -193,6 +353,12 @@ Measures CPU instructions and cycles for the inspected process.
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure cpu-performance-counters --only base
 ```
+
+CI also runs this measure on `ubuntu-24.04-arm`, once per scenario with a fresh VS Code instance for each test. A `perf stat` probe first verifies that the runner exposes a positive hardware instruction count; ARM64 alone does not guarantee access to hardware counters. The job installs the kernel's perf tools and enables process-level perf access. If counters are unavailable, the job fails explicitly and preserves the reason in the results artifact and report.
+
+`npm run build-charts` generates a separate **instruction-count/index.html** report inside `.vscode-charts`, linked from the main charts page. Its chart ranks all measured tests by instructions, highest first, and its table links to each test's detailed instruction/cycle chart. Unavailable counters are excluded from the ranking and shown as unavailable instead of zero.
+
+The counts cover user-space CPU work in the inspected process during the scenario, excluding application startup. They are informational (`isLeak: false`): cumulative instruction counts naturally increase as work executes. Background activity, scenario duration, architecture, and `--runs` affect the totals, so compare results collected with the same settings.
 
 ### Linux allocation stacks (BCC)
 
@@ -328,6 +494,17 @@ Measures the total number of functions.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure function-count --only base
 ```
 
+### GC counts
+
+CI collects `gc-statistics` once per scenario with a fresh VS Code instance. `npm run build-charts` generates `minor-gc-count.svg` and `major-gc-count.svg` on the main charts page, showing captured collection events per scenario in filename order. Missing or invalid counts and traces reporting data loss are omitted; complete traces with no collection events contribute zero.
+
+Only collections captured during the scenario are counted. The final forced garbage collection runs after tracing stops and is excluded. Counts describe collection activity, rather than a leak verdict, and depend on the workload, heap state and runtime version.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure gc-statistics --runs 1 --restart-between --only base
+npm run build-charts
+```
+
 ### GlobalLexicalScopeNames
 
 Measures global variables / global lexical scope names.
@@ -393,6 +570,14 @@ Measures the total number of MediaQueryLists.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure media-query-list-count --only base
 ```
 
+### Module resolution lookups
+
+See [the module-resolution-lookups measure](docs/measures/module-resolution-lookups.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure module-resolution-lookups --only base
+```
+
 ### Module resolution
 
 See [the module-resolution measure](docs/measures/module-resolution.md) for coverage, result fields, and limitations.
@@ -424,6 +609,15 @@ Measures the difference in counts of each function.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure named-function-difference --only base
+```
+
+### PendingPromiseCount
+
+Measures live promises whose state is pending, excluding fulfilled and rejected promises. CI collects before/after counts for each scenario. `npm run build-charts` generates `pending-promise-count.svg` on the main charts page, showing the after count in scenario order.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure pending-promise-count --only base
+npm run build-charts
 ```
 
 ### PromiseCount
@@ -788,3 +982,52 @@ See [the synchronous-dom-read-count measure](docs/measures/synchronous-dom-read-
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure synchronous-dom-read-count --only base
 npm run build-charts
 ```
+
+### Estimated allocation bytes
+
+Use [`--measure trackedAllocationBytes`](docs/measures/tracked-allocation-bytes.md) to compare estimated bytes allocated at instrumented sites, including computed strings/numbers. Results include per-site counts, estimated bytes and unknown-size counts; see the documented size model and coverage limits.
+
+## Agents window e2e tests
+
+Run the native VS Code Agents window suite with a build that supports `--agents`:
+
+```sh
+npm run e2e:agents -- --vscode-path /path/to/vscode/scripts/code.sh
+```
+
+On Linux without a desktop display, prefix the command with `xvfb-run -a`.
+Use `--only agents-window-send-message` to select a scenario, or `--runs 5`
+to repeat it. The suite covers startup with only one Agents window, new chat
+and draft input, sending a message and a follow-up, reopening a saved chat,
+and deleting active and inactive chats. Each completed chat is deleted so
+repeated memory measurements do not accumulate conversation history.
+
+`--launch-agent-window` launches the Agents window directly, using VS Code's
+native `--agents` argument and the harness's test profile and extensions.
+Without this flag, the normal workbench launches as before. It is VS Code only.
+The Agents scenarios live in `packages/agents-e2e`, separately from the regular
+workbench suite.
+
+When combined with `--use-proxy-mock`, Agents launches use a loopback HTTP mock
+for model discovery and streaming replies through the real agent host and
+Copilot SDK. The mock advertises one test model and replies with
+`Hello from the mocked Agents window.` No sign-in, API key, or captured network
+data is required. VS Code's smoke-test driver is enabled for its fake-token
+authentication hook; this also automatically confirms deletion dialogs. SDK state stays inside the test profile, mock settings are
+restored at shutdown, and the existing replay proxy blocks unmatched external
+requests. Omitting `--use-proxy-mock` keeps the native Agents backend; the bundled
+suite expects mocked replies.
+
+### CSS selector stats in CI
+
+Main-branch CI measures CSS selector matching across the E2E scenarios on Linux,
+with one run and a fresh VS Code instance per scenario. The Pages report at
+[`/css-selector-stats/`](https://simonsiefke.github.io/vscode-memory-leak-finder/css-selector-stats/)
+provides a scenario picker, text filtering, and sortable selector time, match attempts,
+and match count columns. All selectors are retained; the table shows the top 1,000
+after filtering and sorting. Identical selector text is combined across stylesheets.
+These are total matching costs during each scenario, excluding application startup;
+selector tracing adds overhead. Empty traces are shown explicitly.
+
+Run locally with `node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure css-selector-stats --runs 1 --restart-between --run-skipped-tests-anyway`,
+then `npm run build-charts`. The page is written to `.vscode-charts/css-selector-stats/index.html`.

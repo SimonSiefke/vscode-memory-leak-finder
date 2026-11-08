@@ -4,7 +4,9 @@ import { fileURLToPath } from 'url'
 import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 import * as EscapeHtml from '../EscapeHtml/EscapeHtml.ts'
 import * as FormatStackTrace from '../FormatStackTrace/FormatStackTrace.ts'
+import * as GetChartConfig from '../GetChartConfig/GetChartConfig.ts'
 import * as GetCodeFrame from '../GetCodeFrame/GetCodeFrame.ts'
+import { launchChartWorker } from '../LaunchChartWorker/LaunchChartWorker.ts'
 import * as ReadJson from '../ReadJson/ReadJson.ts'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -18,7 +20,6 @@ const promiseStackTraceStructure = `
     <title>Promise Stack Traces</title>
     <link rel="stylesheet" href="./styles.css">
     <link rel="stylesheet" href="./promise-stack-traces.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
   </head>
 
   <body>
@@ -30,8 +31,6 @@ const promiseStackTraceStructure = `
         CONTENT
       </div>
     </main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <script src="./script.js"></script>
   </body>
 
@@ -44,14 +43,19 @@ const copyPromiseStackTraceCss = async (folderPath: string): Promise<void> => {
   await writeFile(join(folderPath, 'promise-stack-traces.css'), cssContent)
 }
 
+const getStackLines = (stackTrace: string | string[]): string[] =>
+  (Array.isArray(stackTrace) ? stackTrace : stackTrace.split('\n')).filter((line) => line.trim())
+
+const getPromiseStack = (item: any): string[] => {
+  const originalStack = getStackLines(item.originalStack || '')
+  return originalStack.length > 0 ? originalStack : getStackLines(item.stackTrace || '')
+}
+
 const getPromiseTitle = (stackTrace: string | string[]): string => {
-  let firstLine: string | undefined
-  if (Array.isArray(stackTrace)) {
-    firstLine = stackTrace[0]
-  } else if (typeof stackTrace === 'string') {
-    const lines = stackTrace.split('\n')
-    firstLine = lines[0]
-  }
+  const firstLine = getStackLines(stackTrace)[0]
+    ?.trim()
+    .replace(/^at\s+/, '')
+    .replace(/^.*\((.*)\)$/, '$1')
 
   if (!firstLine) {
     return 'Promise'
@@ -80,7 +84,10 @@ export const generatePromiseStackTraceHtmlForFolder = async (
     return
   }
 
+  await using rpc = await launchChartWorker()
+  const config = GetChartConfig.getChartConfig()
   let content = ''
+  let hasResults = false
 
   for (const jsonFile of jsonFiles) {
     const filePath = join(sourceFolderPath, jsonFile)
@@ -115,12 +122,22 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       continue
     }
 
-    content += `<h2>${EscapeHtml.escapeHtml(jsonFile.replace('.json', ''))}</h2>\n`
+    hasResults = true
+    const scenario = jsonFile.replace(/\.json$/, '')
+    const chartFile = `${scenario}.svg`
+    const svg = await rpc.invoke(
+      'Chart.create',
+      items.map((item) => ({ count: item.count || 0, delta: item.delta || 0, name: getPromiseTitle(getPromiseStack(item)) })),
+      { type: 'dual-bar-chart', fontSize: 12, marginLeft: 400, marginRight: 100, width: 1400, compress: config.compress },
+    )
+    await writeFile(join(targetFolderPath, chartFile), svg)
+    content += `<section class="PromiseScenario">\n<h2>${EscapeHtml.escapeHtml(scenario)}</h2>\n`
+    content += `<div class="PromiseChartScroll"><img class="PromiseChart" src="./${EscapeHtml.escapeHtml(encodeURIComponent(chartFile))}" alt="Promise counts and increases for ${EscapeHtml.escapeHtml(scenario)}"></div>\n`
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i]
       // Prefer originalStack (original locations) over stackTrace (minified locations)
-      const stackTrace = item.originalStack || item.stackTrace || ''
+      const stackTrace = getPromiseStack(item)
       const count = item.count || 0
       const delta = item.delta || 0
       const properties = item.properties || {}
@@ -139,45 +156,30 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       content += '    </div>\n'
       content += '  </div>\n'
 
-      // Add code frame for first stack trace line only
-      if (item.originalStack && Array.isArray(item.originalStack) && item.originalStack.length > 0) {
-        const firstStackLine = item.originalStack[0]
-        const sourcesHash = item.sourcesHash || null
-        const codeFrame = await GetCodeFrame.getCodeFrame(firstStackLine, sourcesHash)
-        if (codeFrame) {
-          content += '  <div class="CodeFrame">\n'
-          content += '    <pre class="line-numbers"><code class="language-typescript">'
-          content += EscapeHtml.escapeHtml(codeFrame)
-          content += '</code></pre>\n'
-          content += '  </div>\n'
-        }
+      const codeFrame = stackTrace[0] ? await GetCodeFrame.getCodeFrame(stackTrace[0], item.sourcesHash) : null
+      if (codeFrame) {
+        content += '  <div class="CodeFrame"><h4>Source</h4>\n'
+        content += `    <pre><code>${EscapeHtml.escapeHtml(codeFrame)}</code></pre>\n`
+        content += '  </div>\n'
+      } else {
+        content += '  <p class="CodeFrameUnavailable">Source code unavailable for this location.</p>\n'
       }
 
-      // Format stack trace without the first line
-      let stackTraceWithoutFirstLine: string | string[] = stackTrace
-      if (Array.isArray(stackTrace)) {
-        stackTraceWithoutFirstLine = stackTrace.slice(1)
-      } else if (typeof stackTrace === 'string') {
-        const lines = stackTrace.split('\n')
-        stackTraceWithoutFirstLine = lines.slice(1).join('\n')
-      }
-
-      const formattedStackTraceWithoutFirstLine = FormatStackTrace.formatStackTrace(stackTraceWithoutFirstLine)
-      const escapedStackTraceWithoutFirstLine = formattedStackTraceWithoutFirstLine
-        ? EscapeHtml.escapeHtml(formattedStackTraceWithoutFirstLine)
-        : '(no stack trace)'
+      const formattedStackTrace = FormatStackTrace.formatStackTrace(stackTrace)
+      const escapedStackTrace = EscapeHtml.escapeHtml(formattedStackTrace || '(no stack trace)')
 
       content += '  <div class="CodeBlock">\n'
-      content += '    <pre><code class="language-javascript">'
-      content += escapedStackTraceWithoutFirstLine
+      content += '    <h4>Stack trace</h4><pre><code>'
+      content += escapedStackTrace
       content += '</code></pre>\n'
       content += '  </div>\n'
 
       content += '</div>\n'
     }
+    content += '</section>\n'
   }
 
-  if (content) {
+  if (hasResults) {
     const outPath = join(targetFolderPath, 'index.html')
     const html = promiseStackTraceStructure.replace('CONTENT', content)
     await CopyAssetsToFolder.copyAssetsToFolder(targetFolderPath)

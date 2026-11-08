@@ -128,10 +128,4 @@ test('examineNode - should show improved string property values', () => {
   expect(textProp).toBeDefined()
   expect(textProp!.value).toBe('"longText"')
   expect(textProp!.targetType).toBe('string')
-
-  console.log('\n=== IMPROVED STRING PROPERTY ANALYSIS ===')
-  console.log('String properties with proper values:')
-  result!.properties.forEach((prop) => {
-    console.log(`  ${prop.name}: ${prop.value} (${prop.targetType})`)
-  })
 })

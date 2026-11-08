@@ -79,6 +79,43 @@ test('querySelectorAll - class - no match', () => {
   expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([])
 })
 
+test('querySelectorAll - has selector fallback', () => {
+  const root = document.createElement('div')
+  const first = document.createElement('div')
+  first.className = 'action-item'
+  const label = document.createElement('span')
+  label.className = 'action-label'
+  label.setAttribute('aria-label', 'Source Control (3)')
+  first.append(label)
+  const second = document.createElement('div')
+  second.className = 'action-item'
+  second.append(document.createElement('span'))
+  root.append(first, second)
+  const nativeQuerySelectorAll = root.querySelectorAll.bind(root)
+  root.querySelectorAll = ((selector: string) => {
+    if (selector.includes(':has(')) throw new DOMException('unsupported selector', 'SyntaxError')
+    return nativeQuerySelectorAll(selector)
+  }) as typeof root.querySelectorAll
+  expect(QuerySelectorAllRoot.querySelectorAll(root, '.action-item:has(.action-label[aria-label^="Source Control"])')).toEqual([first])
+})
+
+test('querySelectorAll - has selector fallback preserves list order and root boundaries', () => {
+  const root = document.createElement('div')
+  const first = document.createElement('span')
+  first.className = 'first'
+  first.append(document.createElement('i'))
+  const second = document.createElement('span')
+  second.className = 'second'
+  second.append(document.createElement('i'))
+  root.append(first, second)
+  root.querySelectorAll = ((selector: string) => {
+    if (selector.includes(':has(')) throw new DOMException('unsupported selector', 'SyntaxError')
+    return Element.prototype.querySelectorAll.call(root, selector)
+  }) as typeof root.querySelectorAll
+  expect(QuerySelectorAllRoot.querySelectorAll(root, '.second:has(i), .first:has(i)')).toEqual([first, second])
+  expect(QuerySelectorAllRoot.querySelectorAll(first, ':has(i)')).toEqual([])
+})
+
 test('querySelectorAll - text - match', () => {
   const root = document.createElement('div')
   const element = document.createElement('div')

@@ -3,6 +3,7 @@ import { findSummaryArtifact } from '../FindSummaryArtifact/FindSummaryArtifact.
 import { getWorkflowArtifactChartUrl } from '../GetWorkflowArtifactChartUrl/GetWorkflowArtifactChartUrl.ts'
 import { getWorkflowArtifactVideoUrl } from '../GetWorkflowArtifactVideoUrl/GetWorkflowArtifactVideoUrl.ts'
 import { renderCompletionComment } from '../RenderCompletionComment/RenderCompletionComment.ts'
+import { toNumericGitHubId } from '../ToNumericGitHubId/ToNumericGitHubId.ts'
 
 type WorkflowRunArtifact = {
   readonly archive_download_url: string
@@ -36,13 +37,13 @@ type WorkflowRunOctokit = {
         owner: string
         repo: string
         run_id: number
-      }) => Promise<{ data: { artifacts: WorkflowRunArtifact[] } }>
+      }) => Promise<{ data: { artifacts: (Omit<WorkflowRunArtifact, 'id'> & { readonly id: number | bigint })[] } }>
     }
     readonly issues: {
       readonly updateComment: (options: { owner: string; repo: string; comment_id: number; body: string }) => Promise<unknown>
     }
     readonly repos: {
-      readonly get: (options: { owner: string; repo: string }) => Promise<{ data: { id: number } }>
+      readonly get: (options: { owner: string; repo: string }) => Promise<{ data: { id: number | bigint } }>
     }
   }
 }
@@ -179,14 +180,15 @@ export const handleWorkflowRunCompleted = async (
     repo,
     run_id: runId,
   })
-  const summaryArtifact = findSummaryArtifact(artifactsResponse.data.artifacts)
+  const artifacts = artifactsResponse.data.artifacts.map((artifact) => ({ ...artifact, id: toNumericGitHubId(artifact.id) }))
+  const summaryArtifact = findSummaryArtifact(artifacts)
   if (!summaryArtifact) {
     return
   }
 
   const summary = await downloadSummaryArtifactFn(octokit, summaryArtifact)
   const chartEmbeds = getChartEmbeds({
-    artifacts: artifactsResponse.data.artifacts,
+    artifacts,
     owner,
     publicBaseUrl,
     repo,
@@ -194,7 +196,7 @@ export const handleWorkflowRunCompleted = async (
     summary,
   })
   const videoEmbeds = await getVideoEmbeds({
-    artifacts: artifactsResponse.data.artifacts,
+    artifacts,
     installationId: payload.installation?.id,
     publicBaseUrl,
     summary,

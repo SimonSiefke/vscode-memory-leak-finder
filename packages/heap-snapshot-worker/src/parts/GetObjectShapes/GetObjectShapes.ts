@@ -59,7 +59,8 @@ export const getObjectShapes = (snapshot: Snapshot): readonly ObjectShape[] => {
     return undefined
   }
 
-  const shapeByMap = new Map<number, MutableShape>()
+  // Contexts can share a map while retaining different scope-specific node names.
+  const shapeByMap = new Map<number, Map<string, MutableShape>>()
   const shapeBySignature = new Map<string, MutableShape>()
   for (let ordinal = 0; ordinal < snapshot.node_count; ordinal++) {
     if (getNodeType(ordinal) !== objectType) {
@@ -69,7 +70,13 @@ export const getObjectShapes = (snapshot: Snapshot): readonly ObjectShape[] => {
     if (mapOrdinal === undefined || getNodeType(mapOrdinal) !== objectShapeType || getNodeName(mapOrdinal) !== 'system / Map') {
       continue
     }
-    let shape = shapeByMap.get(mapOrdinal)
+    const constructorName = getNodeName(ordinal)
+    let shapesForMap = shapeByMap.get(mapOrdinal)
+    if (!shapesForMap) {
+      shapesForMap = new Map()
+      shapeByMap.set(mapOrdinal, shapesForMap)
+    }
+    let shape = shapesForMap.get(constructorName)
     if (!shape) {
       const properties: string[] = []
       const descriptorsOrdinal = findInternalTarget(mapOrdinal, 'descriptors')
@@ -92,20 +99,18 @@ export const getObjectShapes = (snapshot: Snapshot): readonly ObjectShape[] => {
       }
       const prototypeOrdinal = findInternalTarget(mapOrdinal, 'prototype')
       const elementsKindOrdinal = findInternalTarget(mapOrdinal, 'elements_kind_name')
-      const constructorName = getNodeName(ordinal)
       const prototypeName = prototypeOrdinal === undefined ? '' : getNodeName(prototypeOrdinal)
       const elementsKind = elementsKindOrdinal === undefined ? '' : getNodeName(elementsKindOrdinal)
       const signature = JSON.stringify([constructorName, prototypeName, elementsKind, properties])
       shape = { constructorName, elementsKind, instanceCount: 0, properties, prototypeName, shapeCount: 1, signature }
-      shapeByMap.set(mapOrdinal, shape)
       const existing = shapeBySignature.get(signature)
       if (existing) {
         existing.shapeCount++
         shape = existing
-        shapeByMap.set(mapOrdinal, existing)
       } else {
         shapeBySignature.set(signature, shape)
       }
+      shapesForMap.set(constructorName, shape)
     }
     shape.instanceCount++
   }

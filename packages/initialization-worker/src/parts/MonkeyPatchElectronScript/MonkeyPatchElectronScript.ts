@@ -12,7 +12,8 @@ export const monkeyPatchElectronScript = `function () {
   let readyEventArgs
   let isReady = false
 
-  const { resolve, promise } = Promise.withResolvers();
+  let resolve
+  const promise = new Promise(done => { resolve = done });
 
   const patchedAppEmit = (event, ...args) => {
     if (event === 'ready') {

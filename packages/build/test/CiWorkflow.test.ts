@@ -73,6 +73,47 @@ test('ci measures total array length and downloads the results for Pages charts'
           name: vscode-memory-leak-finder-results-linux-array-element-count`)
 })
 
+test('ci collects Node-compatible measures for the extension host and verifies its Pages overview', async () => {
+  const workflow = await readFile(getWorkflowPath(), 'utf8')
+
+  for (const measure of ['array-count', 'function-count', 'pending-promise-count', 'object-count']) {
+    expect(workflow).toContain(`          - name: ${measure}-extensions\n            args: --measure ${measure} --inspect-extensions`)
+  }
+  for (const measure of ['string-object-count', 'string-object-bytes']) {
+    expect(workflow).toContain(`          - name: ${measure}-extensions\n            args: --measure ${measure} --inspect-extensions`)
+  }
+  expect(workflow).not.toContain('name: detached-dom-node-count-extensions')
+  expect(workflow).toContain('pattern: vscode-memory-leak-finder-results-linux-*-extensions')
+  expect(workflow).toContain('path: ./vscode-memory-leak-finder-results-linux-extensions')
+  expect(workflow).toContain('name: Delete extension-host artifact (array-count-extensions)')
+  expect(workflow).toContain('name: Delete extension-host artifact (function-count-extensions)')
+  expect(workflow).toContain("grep -q './array-count/index.html' .vscode-charts/extension-host/index.html")
+  expect(workflow).toContain("grep -q './function-count/index.html' .vscode-charts/extension-host/index.html")
+})
+
+test.each(['string-object-count', 'string-object-bytes'])(
+  'ci collects %s with the standard test selection and includes its artifact in Pages charts',
+  async (measure) => {
+    const workflow = await readFile(getWorkflowPath(), 'utf8')
+    expect(workflow).toContain(`          - name: ${measure}
+            args: --measure ${measure}`)
+    const download = `      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-${measure}
+          path: ./vscode-memory-leak-finder-results-linux-${measure}`
+    const cleanup = `      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-${measure}`
+    expect(workflow).toContain(download)
+    expect(workflow).toContain(cleanup)
+    expect(workflow.indexOf(download)).toBeLessThan(workflow.indexOf('      - name: Merge all measure results'))
+    expect(workflow.indexOf(cleanup)).toBeGreaterThan(workflow.indexOf('      - name: Upload merged artifact'))
+  },
+)
+
 test('Windows handles runs separately from ci and pr so cancellation cannot affect their results', async () => {
   for (const workflowName of ['ci.yml', 'pr.yml']) {
     const workflow = await readFile(getWorkflowPath(workflowName), 'utf8')

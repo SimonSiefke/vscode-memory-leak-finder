@@ -27,7 +27,6 @@ export const getPendingPromiseCount = async (session: Session, objectGroup: stri
     const state = innerProperties.find((item: Dynamic) => item.name === '[[PromiseState]]')
     return state.value
   })
-  const fulfilled = promiseStates.filter((value: Dynamic) => value === 'fulfilled')
-  const fulfilledCount = fulfilled.length
-  return fulfilledCount
+  const pending = promiseStates.filter((value: Dynamic) => value === 'pending')
+  return pending.length
 }

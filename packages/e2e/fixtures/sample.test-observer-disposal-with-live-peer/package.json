@@ -1,0 +1,29 @@
+{
+  "name": "test-observer-disposal-with-live-peer",
+  "displayName": "Test Observer Disposal With Live Peer",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "test-observer-disposal-with-live-peer.setup",
+        "title": "Test Observer Disposal With Live Peer: Setup"
+      },
+      {
+        "command": "test-observer-disposal-with-live-peer.run",
+        "title": "Test Observer Disposal With Live Peer: Run"
+      },
+      {
+        "command": "test-observer-disposal-with-live-peer.cleanup",
+        "title": "Test Observer Disposal With Live Peer: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "testObserver"
+  ]
+}
