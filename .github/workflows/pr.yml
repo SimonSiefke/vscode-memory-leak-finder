@@ -6,6 +6,56 @@ on:
       - main
 
 jobs:
+  diagnose-extension-detail-view-select-categories:
+    name: extension-detail-view-select-categories (attempt ${{ matrix.attempt }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        attempt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v6
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm ci --ignore-scripts && npm run postinstall
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm run build
+      - name: Run exact e2e test
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: >-
+            node packages/cli/bin/test.js
+            --cwd packages/e2e
+            --only ^extension-detail-view-select-categories.ts
+            --run-skipped-tests-anyway
+            --record-video
+            --workers 1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: extension-detail-view-select-categories-attempt-${{ matrix.attempt }}
+          path: ./.vscode-videos
+          include-hidden-files: true
+          if-no-files-found: ignore
+
   pr:
     runs-on: ${{ matrix.os }}
     strategy:
