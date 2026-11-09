@@ -368,6 +368,7 @@ test('cpu profile flame chart renders frames, ticks, labels, and tooltips', asyn
         hitCount: 1,
         location: 'file:///workbench.js:10:4',
         name: 'render<Workbench>',
+        originalLocation: 'src/workbench.ts:3:7',
         selfTimeMs: 2,
         startMs: 0,
         totalTimeMs: 5,
@@ -406,7 +407,8 @@ test('cpu profile flame chart renders frames, ticks, labels, and tooltips', asyn
   expect(result).toContain('CPU Profile Flame Chart')
   expect(result).toContain('5 ms')
   expect(result).toContain('render&lt;Workbench&gt;')
-  expect(result).toContain('Location: file:///workbench.js:10:4')
+  expect(result).toContain('Location: src/workbench.ts:3:7')
+  expect(result).toContain('Generated location: file:///workbench.js:10:4')
   expect(result).toContain('data-frame="0"')
   expect(result).toContain('data-frame="1"')
   expect(result).not.toContain('data-frame="2"')
