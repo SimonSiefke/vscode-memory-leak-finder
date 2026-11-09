@@ -1,3 +1,4 @@
+import { generateStartupPerformance } from '../StartupPerformance/StartupPerformance.ts'
 import * as ApplySiteLayout from '../ApplySiteLayout/ApplySiteLayout.ts'
 import * as GenerateCssSelectorStatsHtml from '../GenerateCssSelectorStatsHtml/GenerateCssSelectorStatsHtml.ts'
 import * as GenerateCharts from '../GenerateCharts/GenerateCharts.ts'
@@ -9,5 +10,6 @@ export const main = async () => {
   await GenerateCssSelectorStatsHtml.generateCssSelectorStatsHtml()
   await GenerateIndexHtml.generateIndexHtml()
   await GenerateInstructionCountHtml.generateInstructionCountHtml()
+  await generateStartupPerformance()
   await ApplySiteLayout.applySiteLayout()
 }
