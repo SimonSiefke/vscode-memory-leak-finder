@@ -19,7 +19,7 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
     await page.waitForIdle()
     const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
     await contextMenu.open(titleBar.locator('.titlebar-container'))
-    await contextMenu.select(text)
+    await contextMenu.selectAndClose(text)
     await page.waitForIdle()
   }
 
