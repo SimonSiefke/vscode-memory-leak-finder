@@ -319,6 +319,8 @@ jobs:
             args: --measure file-descriptors --runs 37 --restart-between --run-skipped-tests-anyway
           - name: file-watcher-count
             args: --measure file-watcher-count --runs 37 --restart-between --run-skipped-tests-anyway
+          - name: heap-snapshot-bytes
+            args: --measure heapSnapshotBytes --filter-value window-open-new --runs 5
           - name: pending-promise-count-extensions
             args: --measure pending-promise-count --inspect-extensions
           - name: promise-count-extensions
@@ -525,6 +527,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-event-listeners
           path: ./vscode-memory-leak-finder-results-linux-event-listeners
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-heap-snapshot-bytes
+          path: ./vscode-memory-leak-finder-results-linux-heap-snapshot-bytes
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
