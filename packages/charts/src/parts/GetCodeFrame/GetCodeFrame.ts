@@ -1,6 +1,5 @@
 import { codeFrameColumns } from '@babel/code-frame'
 import { existsSync, readFileSync } from 'node:fs'
-import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
@@ -40,20 +39,6 @@ const findSourceFile = async (relativePath: string, sourcesHash: string | null |
       return sourceFilePath
     }
     return null
-  }
-
-  try {
-    const hashDirs = await readdir(sourcesDir, { withFileTypes: true })
-    for (const hashDir of hashDirs) {
-      if (hashDir.isDirectory()) {
-        const sourceFilePath = join(sourcesDir, hashDir.name, relativePath)
-        if (existsSync(sourceFilePath)) {
-          return sourceFilePath
-        }
-      }
-    }
-  } catch {
-    // Ignore errors
   }
 
   return null
