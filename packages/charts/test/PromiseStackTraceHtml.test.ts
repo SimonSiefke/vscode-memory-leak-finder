@@ -54,6 +54,12 @@ test('renders Babel context and a caret at the zero-based source-map column, usi
   })
 })
 
+test('does not guess a source revision when a stack trace has no source hash', async () => {
+  await withSource(async (_hash, location) => {
+    expect(await getCodeFrame(location)).toBeNull()
+  })
+})
+
 test('discovers promise folders under the renderer and other process results', async () => {
   const root = await mkdtemp(join(tmpdir(), 'promise-folders-'))
   try {
