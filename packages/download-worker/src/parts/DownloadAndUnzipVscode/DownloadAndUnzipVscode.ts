@@ -14,9 +14,18 @@ import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath
 
 const automaticallyDownloadSourceMaps = false
 const maxDownloadRetries = 3
+const transientDownloadErrorCodes = new Set([
+  ErrorCodes.ECONNRESET,
+  'ETIMEDOUT',
+  'EAI_AGAIN',
+  'ECONNREFUSED',
+  'EPIPE',
+])
 
 interface DownloadVSCodeOptions {
+  readonly arch: string
   readonly cachePath: string
+  readonly platform: string
   readonly version: string
 }
 
@@ -32,11 +41,44 @@ const isObject = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null
 }
 
-const isEconnresetError = (error: unknown): boolean => {
-  if (!isObject(error)) {
-    return false
+const getNestedErrors = (error: unknown, seen = new Set<unknown>()): unknown[] => {
+  if (!isObject(error) || seen.has(error)) {
+    return []
   }
-  return error.code === ErrorCodes.ECONNRESET || (typeof error.message === 'string' && error.message.includes(ErrorCodes.ECONNRESET))
+  seen.add(error)
+  const nested: unknown[] = []
+  if (Array.isArray(error.errors)) {
+    nested.push(...error.errors)
+  }
+  if (error.cause !== undefined) {
+    nested.push(error.cause)
+  }
+  return [error, ...nested.flatMap((item) => getNestedErrors(item, seen))]
+}
+
+const isTransientDownloadError = (error: unknown): boolean => {
+  return getNestedErrors(error).some((item) => {
+    if (!isObject(item)) {
+      return false
+    }
+    if (typeof item.code === 'string' && transientDownloadErrorCodes.has(item.code)) {
+      return true
+    }
+    const message = item.message
+    return typeof message === 'string' && [...transientDownloadErrorCodes].some((code) => message.includes(code))
+  })
+}
+
+const getErrorDetails = (error: unknown): string => {
+  const details = getNestedErrors(error)
+    .map((item) => {
+      if (item instanceof Error) {
+        const code = isObject(item) && typeof item.code === 'string' ? ` (${item.code})` : ''
+        return `${item.name}: ${item.message}${code}`
+      }
+      return String(item)
+    })
+  return [...new Set(details)].join('; ') || String(error)
 }
 
 const downloadAndUnzipVSCodeWithRetries = async (options: DownloadVSCodeOptions): Promise<string> => {
@@ -45,9 +87,11 @@ const downloadAndUnzipVSCodeWithRetries = async (options: DownloadVSCodeOptions)
     try {
       return await downloadAndUnzipVSCode(options)
     } catch (error) {
-      if (!isEconnresetError(error) || attempt >= maxDownloadRetries) {
-        throw error
+      const attempts = attempt + 1
+      if (!isTransientDownloadError(error) || attempt >= maxDownloadRetries) {
+        throw new Error(`VS Code ${options.version} download for ${options.platform}/${options.arch} failed after ${attempts} attempt(s): ${getErrorDetails(error)}`, { cause: error })
       }
+      await new Promise((resolve) => setTimeout(resolve, 100 * 2 ** attempt))
     }
   }
 }
@@ -79,7 +123,9 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       return cachedPath
     }
     const path = await downloadAndUnzipVSCodeWithRetries({
+      arch,
       cachePath: VscodeTestCachePath.vscodeTestCachePath,
+      platform,
       version: vscodeVersion,
     })
     try {

@@ -48,13 +48,14 @@ afterEach(() => {
   process.env.VSCODE_PATH = originalVscodePath
 })
 
-test('downloadAndUnzipVscode - retries ECONNRESET up to three times', async () => {
+test('downloadAndUnzipVscode - retries nested transient errors up to three times', async () => {
   const resetError = Object.assign(new Error('read ECONNRESET'), {
     code: 'ECONNRESET',
   })
-  mockDownloadAndUnzipVSCode.mockRejectedValueOnce(resetError)
-  mockDownloadAndUnzipVSCode.mockRejectedValueOnce(resetError)
-  mockDownloadAndUnzipVSCode.mockRejectedValueOnce(resetError)
+  const aggregateError = new AggregateError([new Error('request failed'), resetError], 'all download hosts failed')
+  mockDownloadAndUnzipVSCode.mockRejectedValueOnce(aggregateError)
+  mockDownloadAndUnzipVSCode.mockRejectedValueOnce(aggregateError)
+  mockDownloadAndUnzipVSCode.mockRejectedValueOnce(aggregateError)
   mockDownloadAndUnzipVSCode.mockResolvedValue('/vscode/code')
 
   const { downloadAndUnzipVscode } = await import('../src/parts/DownloadAndUnzipVscode/DownloadAndUnzipVscode.ts')
@@ -71,11 +72,11 @@ test('downloadAndUnzipVscode - retries ECONNRESET up to three times', async () =
   expect(mockSetVscodeRuntimePath).toHaveBeenCalledWith('1.100.0', '/vscode/code', 'linux', 'x64')
 })
 
-test('downloadAndUnzipVscode - does not retry other download errors', async () => {
+test('downloadAndUnzipVscode - does not retry permanent nested download errors and reports details', async () => {
   const error = Object.assign(new Error('getaddrinfo ENOTFOUND'), {
     code: 'ENOTFOUND',
   })
-  mockDownloadAndUnzipVSCode.mockRejectedValue(error)
+  mockDownloadAndUnzipVSCode.mockRejectedValue(new AggregateError([error], 'all download hosts failed'))
 
   const { downloadAndUnzipVscode } = await import('../src/parts/DownloadAndUnzipVscode/DownloadAndUnzipVscode.ts')
   await expect(
@@ -86,7 +87,31 @@ test('downloadAndUnzipVscode - does not retry other download errors', async () =
       updateUrl: '',
       vscodeVersion: '1.100.0',
     }),
-  ).rejects.toThrow('Failed to download VSCode')
+  ).rejects.toThrow('VS Code 1.100.0 download for linux/x64 failed after 1 attempt(s): AggregateError: all download hosts failed; Error: getaddrinfo ENOTFOUND (ENOTFOUND)')
 
   expect(mockDownloadAndUnzipVSCode).toHaveBeenCalledTimes(1)
+})
+
+test('downloadAndUnzipVscode - reports nested causes after transient retries are exhausted', async () => {
+  const resetError = Object.assign(new Error('socket reset'), { code: 'ECONNRESET' })
+  const aggregateError = new AggregateError([resetError], 'all download hosts failed')
+  mockDownloadAndUnzipVSCode.mockRejectedValue(aggregateError)
+
+  const { downloadAndUnzipVscode } = await import('../src/parts/DownloadAndUnzipVscode/DownloadAndUnzipVscode.ts')
+  await expect(
+    downloadAndUnzipVscode({ arch: 'x64', insidersCommit: '', platform: 'linux', updateUrl: '', vscodeVersion: '1.100.0' }),
+  ).rejects.toThrow('VS Code 1.100.0 download for linux/x64 failed after 4 attempt(s): AggregateError: all download hosts failed; Error: socket reset (ECONNRESET)')
+
+  expect(mockDownloadAndUnzipVSCode).toHaveBeenCalledTimes(4)
+})
+
+test('downloadAndUnzipVscode - uses the cached download without retrying', async () => {
+  mockGetVscodeRuntimePath.mockResolvedValue('/cached/vscode')
+
+  const { downloadAndUnzipVscode } = await import('../src/parts/DownloadAndUnzipVscode/DownloadAndUnzipVscode.ts')
+  await expect(
+    downloadAndUnzipVscode({ arch: 'x64', insidersCommit: '', platform: 'linux', updateUrl: '', vscodeVersion: '1.100.0' }),
+  ).resolves.toBe('/cached/vscode')
+
+  expect(mockDownloadAndUnzipVSCode).not.toHaveBeenCalled()
 })
