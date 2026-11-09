@@ -111,29 +111,36 @@ test('maps generated CPU locations with one-based source-map coordinates and kee
     requestedLocation = String(locations[0])
     return { [requestedLocation]: { originalLocation: 'src/editor.ts:3:7' } }
   }
-  const frames = [{
-    colorKey: 'file:///bundle.js:2:4',
-    depth: 0,
-    durationMs: 5,
-    hitCount: 2,
-    location: 'file:///bundle.js:2:4',
-    name: 'render',
-    selfTimeMs: 5,
-    startMs: 0,
-    totalTimeMs: 5,
-  }, {
-    colorKey: 'node:internal/bootstrap_node:1:2',
-    depth: 1,
-    durationMs: 1,
-    hitCount: 1,
-    location: 'node:internal/bootstrap_node:1:2',
-    name: 'internalBinding',
-    selfTimeMs: 1,
-    startMs: 0,
-    totalTimeMs: 1,
-  }]
+  const frames = [
+    {
+      colorKey: 'file:///bundle.js:2:4',
+      depth: 0,
+      durationMs: 5,
+      hitCount: 2,
+      location: 'file:///bundle.js:2:4',
+      name: 'render',
+      selfTimeMs: 5,
+      startMs: 0,
+      totalTimeMs: 5,
+    },
+    {
+      colorKey: 'node:internal/bootstrap_node:1:2',
+      depth: 1,
+      durationMs: 1,
+      hitCount: 1,
+      location: 'node:internal/bootstrap_node:1:2',
+      name: 'internalBinding',
+      selfTimeMs: 1,
+      startMs: 0,
+      totalTimeMs: 1,
+    },
+  ]
 
-  const result = await withOriginalLocations(frames, { '1': { url: 'file:///bundle.js', sourceMapUrl: 'file:///bundle.js.map' } }, resolveLocations)
+  const result = await withOriginalLocations(
+    frames,
+    { 1: { url: 'file:///bundle.js', sourceMapUrl: 'file:///bundle.js.map' } },
+    resolveLocations,
+  )
 
   expect(requestedLocation).toBe('file:///bundle.js:3:5')
   expect(result[0]).toMatchObject({

@@ -269,7 +269,12 @@ export const getCpuProfileFrames = (profile: Dynamic): readonly CpuProfileFrame[
 }
 
 const getScriptMap = (rawData: Dynamic): ScriptMap | undefined => {
-  return rawData?.scriptMap || rawData?.cpuProfile?.scriptMap || rawData?.cpuProfile?.raw?.after?.scriptMap || rawData?.trackedAllocationPerformance?.scriptMap
+  return (
+    rawData?.scriptMap ||
+    rawData?.cpuProfile?.scriptMap ||
+    rawData?.cpuProfile?.raw?.after?.scriptMap ||
+    rawData?.trackedAllocationPerformance?.scriptMap
+  )
 }
 
 const isNodeInternal = (location: string): boolean => {
@@ -280,18 +285,28 @@ const isNodeInternal = (location: string): boolean => {
 export const withOriginalLocations = async (
   frames: readonly CpuProfileFrame[],
   scriptMap: ScriptMap | undefined,
-  resolveLocations?: (locations: readonly string[], scriptMap: ScriptMap) => Promise<Record<string, { readonly originalLocation: string | null }>>,
+  resolveLocations?: (
+    locations: readonly string[],
+    scriptMap: ScriptMap,
+  ) => Promise<Record<string, { readonly originalLocation: string | null }>>,
 ): Promise<readonly CpuProfileFrame[]> => {
   if (!scriptMap || Object.keys(scriptMap).length === 0) {
     return frames
   }
-  const locations = [...new Set(frames.flatMap((frame) => {
-    const match = frame.location.match(/^(.+):(\d+):(\d+)$/)
-    return match && !isNodeInternal(frame.location) ? [`${match[1]}:${Number(match[2]) + 1}:${Math.max(1, Number(match[3]) + 1)}`] : []
-  }))]
+  const locations = [
+    ...new Set(
+      frames.flatMap((frame) => {
+        const match = frame.location.match(/^(.+):(\d+):(\d+)$/)
+        return match && !isNodeInternal(frame.location) ? [`${match[1]}:${Number(match[2]) + 1}:${Math.max(1, Number(match[3]) + 1)}`] : []
+      }),
+    ),
+  ]
   let resolve: NonNullable<typeof resolveLocations> = resolveLocations || (async () => ({}))
   if (!resolveLocations) {
-    const resolverPath = new URL('../../../../memory-leak-finder/src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts', import.meta.url)
+    const resolverPath = new URL(
+      '../../../../memory-leak-finder/src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts',
+      import.meta.url,
+    )
     const resolver = await import(resolverPath.href)
     resolve = resolver.resolveTrackedLocationSourceMaps
   }

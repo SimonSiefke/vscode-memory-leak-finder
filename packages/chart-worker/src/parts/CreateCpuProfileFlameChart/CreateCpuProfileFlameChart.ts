@@ -146,7 +146,9 @@ const getLabel = (name: string, width: number): string => {
 const getTooltip = (frame: NormalizedCpuProfileFrame): string => {
   const locationLine = frame.originalLocation
     ? `\nLocation: ${frame.originalLocation}\nGenerated location: ${frame.location}`
-    : frame.location ? `\nLocation: ${frame.location}` : ''
+    : frame.location
+      ? `\nLocation: ${frame.location}`
+      : ''
   return `${frame.name}${locationLine}\nStart: ${roundMetricValue(frame.startMs)} ms\nDuration: ${roundMetricValue(frame.durationMs)} ms\nSelf: ${roundMetricValue(frame.selfTimeMs)} ms\nTotal: ${roundMetricValue(frame.totalTimeMs)} ms\nHits: ${frame.hitCount}`
 }
 
