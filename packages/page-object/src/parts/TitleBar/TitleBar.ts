@@ -46,6 +46,17 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
         throw new VError(error, `Failed to ensure title bar layout controls are visible`)
       }
     },
+    async ensureAccountsWidgetVisible() {
+      try {
+        const accountsWidget = page.locator('.part.titlebar .sessions-account-titlebar-widget')
+        if (!(await accountsWidget.isVisible())) {
+          await toggleTitleBarItem('Accounts')
+        }
+        await expect(accountsWidget).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to ensure title bar accounts widget is visible`)
+      }
+    },
     async hideCommandCenter() {
       try {
         const commandCenter = page.locator('.part.titlebar .command-center')
@@ -64,6 +75,16 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
         await expect(layoutControl).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide title bar layout controls`)
+      }
+    },
+    async hideAccountsWidget() {
+      try {
+        const accountsWidget = page.locator('.part.titlebar .sessions-account-titlebar-widget')
+        await expect(accountsWidget).toBeVisible()
+        await toggleTitleBarItem('Accounts')
+        await expect(accountsWidget).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide title bar accounts widget`)
       }
     },
     async toggleMenuBar() {
@@ -125,6 +146,16 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
         await expect(layoutControl).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to show title bar layout controls`)
+      }
+    },
+    async showAccountsWidget() {
+      try {
+        const accountsWidget = page.locator('.part.titlebar .sessions-account-titlebar-widget')
+        await expect(accountsWidget).toBeHidden()
+        await toggleTitleBarItem('Accounts')
+        await expect(accountsWidget).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show title bar accounts widget`)
       }
     },
     async hideMenu(text: string) {
