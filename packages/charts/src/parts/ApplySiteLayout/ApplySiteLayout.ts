@@ -15,6 +15,7 @@ const pageUrl = (page: string): string =>
 
 const pageLabel = (path: string): string => {
   if (path === 'index.html') return 'Memory leak charts'
+  if (path === 'startup-performance/index.html') return 'Startup performance'
   if (path === 'instruction-count/index.html') return 'Instruction counts by test'
   if (path === 'css-selector-stats/index.html') return 'Slowest CSS selectors'
   return path
@@ -30,7 +31,7 @@ export const applySiteLayout = async (basePath = join(Root.root, '.vscode-charts
   const pages = files
     .filter((file) => file === 'index.html' || file.endsWith('/index.html') || file.endsWith('\\index.html'))
     .map((file) => file.replaceAll('\\', '/'))
-  const primaryPages = ['index.html', 'instruction-count/index.html', 'css-selector-stats/index.html']
+  const primaryPages = ['index.html', 'startup-performance/index.html', 'instruction-count/index.html', 'css-selector-stats/index.html']
   pages.sort((a, b) => {
     const rank = (page: string) => (primaryPages.includes(page) ? primaryPages.indexOf(page) : primaryPages.length)
     return rank(a) - rank(b) || a.localeCompare(b)

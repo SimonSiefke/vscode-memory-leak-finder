@@ -5,7 +5,8 @@
   "type": "module",
   "main": "src/main.ts",
   "scripts": {
-    "dev": "node src/main.ts"
+    "dev": "node src/main.ts",
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --config jest.config.js --runInBand --coverage=false"
   },
   "jest": {
     "testMatch": [

@@ -99,6 +99,17 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
+      - name: Collect repeated startup CPU profiles
+        if: matrix.os == 'ubuntu-24.04'
+        timeout-minutes: 15
+        run: xvfb-run --auto-servernum node packages/build/src/measureStartupProfiles.ts --executable .vscode-test/vscode-linux-x64-1.145.0/code --output .vscode-memory-leak-finder-results/startup-performance --samples 7
+      - name: Upload startup CPU profiles
+        if: always() && matrix.os == 'ubuntu-24.04'
+        uses: actions/upload-artifact@v7
+        with:
+          name: vscode-startup-performance-linux
+          path: .vscode-memory-leak-finder-results/startup-performance
+          include-hidden-files: true
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -771,6 +782,11 @@ jobs:
           path: ./vscode-memory-leak-finder-results-linux-pending-promise-count
       - name: Merge all measure results
         run: node packages/build/src/mergeArtifacts.ts
+      - name: Download startup CPU profiles
+        uses: actions/download-artifact@v8
+        with:
+          name: vscode-startup-performance-linux
+          path: .vscode-memory-leak-finder-results/startup-performance
       - name: Upload merged artifact
         uses: actions/upload-artifact@v7
         if: always()
@@ -1136,6 +1152,13 @@ jobs:
           grep -q './array-count/index.html' .vscode-charts/extension-host/index.html
           grep -q './function-count/index.html' .vscode-charts/extension-host/index.html
           grep -q './extension-host/index.html' .vscode-charts/index.html
+      - name: Verify startup performance report
+        run: |
+          test -s .vscode-charts/startup-performance/index.html
+          test -s .vscode-charts/startup-performance/manifest.json
+          for process in renderer main shared-process extension-host; do
+            test -s ".vscode-charts/startup-performance/$process.svg"
+          done
       - name: Verify CSS selector report
         run: test -s .vscode-charts/css-selector-stats/index.html
       - name: Build documentation site
