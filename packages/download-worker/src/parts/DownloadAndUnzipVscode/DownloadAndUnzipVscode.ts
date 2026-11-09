@@ -20,6 +20,7 @@ const transientDownloadErrorMessages = ['Failed to get VS Code archive location'
 interface DownloadVSCodeOptions {
   readonly arch: string
   readonly cachePath: string
+  readonly downloadPlatform: string
   readonly platform: string
   readonly version: string
 }
@@ -88,6 +89,25 @@ const getErrorDetails = (error: unknown): string => {
   return [...new Set(details)].join('; ') || String(error)
 }
 
+const getDownloadPlatform = (platform: string, arch: string): string => {
+  if (platform === 'win32') {
+    return arch === 'arm64' ? 'win32-arm64-archive' : 'win32-x64-archive'
+  }
+  if (platform === 'darwin') {
+    return arch === 'arm64' ? 'darwin-arm64' : 'darwin'
+  }
+  if (platform === 'linux') {
+    if (arch === 'arm64') {
+      return 'linux-arm64'
+    }
+    if (arch === 'arm') {
+      return 'linux-armhf'
+    }
+    return 'linux-x64'
+  }
+  return platform
+}
+
 const downloadAndUnzipVSCodeWithRetries = async (options: DownloadVSCodeOptions): Promise<string> => {
   const { downloadAndUnzipVSCode, makeConsoleReporter } = await import('@vscode/test-electron')
   for (let attempt = 0; ; attempt++) {
@@ -95,7 +115,9 @@ const downloadAndUnzipVSCodeWithRetries = async (options: DownloadVSCodeOptions)
     const consoleReporter = await makeConsoleReporter()
     try {
       return await downloadAndUnzipVSCode({
-        ...options,
+        cachePath: options.cachePath,
+        platform: options.downloadPlatform,
+        version: options.version,
         reporter: {
           report(report) {
             if ('error' in report) {
@@ -152,6 +174,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     const path = await downloadAndUnzipVSCodeWithRetries({
       arch,
       cachePath: VscodeTestCachePath.vscodeTestCachePath,
+      downloadPlatform: getDownloadPlatform(platform, arch),
       platform,
       version: vscodeVersion,
     })

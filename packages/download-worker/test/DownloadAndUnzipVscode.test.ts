@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
 
-const mockDownloadAndUnzipVSCode = jest.fn<(options: { readonly cachePath: string; readonly version: string }) => Promise<string>>()
+const mockDownloadAndUnzipVSCode =
+  jest.fn<(options: { readonly cachePath: string; readonly platform: string; readonly version: string }) => Promise<string>>()
 const mockMakeConsoleReporter = jest.fn<() => Promise<{ report: (report: unknown) => void; error: (error: unknown) => void }>>()
 const mockGetVscodeRuntimePath = jest.fn<(vscodeVersion: string, platform: string, arch: string) => Promise<string>>()
 const mockSetVscodeRuntimePath = jest.fn<(vscodeVersion: string, path: string, platform: string, arch: string) => Promise<void>>()
@@ -72,6 +73,7 @@ test('downloadAndUnzipVscode - retries nested transient errors up to three times
 
   expect(result).toBe('/vscode/code')
   expect(mockDownloadAndUnzipVSCode).toHaveBeenCalledTimes(4)
+  expect(mockDownloadAndUnzipVSCode).toHaveBeenCalledWith(expect.objectContaining({ platform: 'linux-x64', version: '1.100.0' }))
   expect(mockSetVscodeRuntimePath).toHaveBeenCalledWith('1.100.0', '/vscode/code', 'linux', 'x64')
 })
 
