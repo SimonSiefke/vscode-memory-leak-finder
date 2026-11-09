@@ -1,5 +1,5 @@
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
 export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
@@ -44,6 +44,15 @@ export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
   }
   const { sessionId, targetInfo } = event.params
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+
+  // Chromium can hold a newly opened auxiliary window at its startup barrier.
+  // Such windows do not go through electronApp.waitForPage, unlike new workbenches.
+  browserRpc.on('Target.attachedToTarget', (message) => {
+    const childRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, message.params.sessionId)
+    void DevtoolsProtocolRuntime.runIfWaitingForDebugger(childRpc).catch(() => {
+      // A short-lived target may detach before the resume request arrives.
+    })
+  })
 
   // TODO can remove attachment now
   return {
