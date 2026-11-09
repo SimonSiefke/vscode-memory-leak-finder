@@ -3,6 +3,13 @@ import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
+interface ScriptMap {
+  readonly [scriptId: string]: {
+    readonly sourceMapUrl?: string
+    readonly url?: string
+  }
+}
+
 type Dynamic = any
 
 interface CpuProfileNodeInfo {
@@ -28,6 +35,7 @@ export interface CpuProfileFrame {
   readonly hitCount: number
   readonly location: string
   readonly name: string
+  readonly originalLocation?: string
   readonly selfTimeMs: number
   readonly startMs: number
   readonly totalTimeMs: number
@@ -75,11 +83,17 @@ const getProfile = (rawData: Dynamic): Dynamic => {
   if (rawData?.cpuProfile?.raw?.after?.nodes) {
     return rawData.cpuProfile.raw.after
   }
+  if (rawData?.cpuProfile?.raw?.after?.profile?.nodes) {
+    return rawData.cpuProfile.raw.after.profile
+  }
   if (rawData?.raw?.after?.nodes) {
     return rawData.raw.after
   }
   if (rawData?.profile?.nodes) {
     return rawData.profile
+  }
+  if (rawData?.profile?.profile?.nodes) {
+    return rawData.profile.profile
   }
   if (rawData?.cpuProfile?.profile?.nodes) {
     return rawData.cpuProfile.profile
@@ -254,6 +268,43 @@ export const getCpuProfileFrames = (profile: Dynamic): readonly CpuProfileFrame[
   return frames
 }
 
+const getScriptMap = (rawData: Dynamic): ScriptMap | undefined => {
+  return rawData?.scriptMap || rawData?.cpuProfile?.scriptMap || rawData?.cpuProfile?.raw?.after?.scriptMap || rawData?.trackedAllocationPerformance?.scriptMap
+}
+
+const isNodeInternal = (location: string): boolean => {
+  const url = location.match(/^(.+):\d+:\d+$/)?.[1] || ''
+  return url.startsWith('node:') || /(?:^|[/\\])(?:internal|bootstrap_node)(?:[/\\.]|$)/.test(url)
+}
+
+export const withOriginalLocations = async (
+  frames: readonly CpuProfileFrame[],
+  scriptMap: ScriptMap | undefined,
+  resolveLocations?: (locations: readonly string[], scriptMap: ScriptMap) => Promise<Record<string, { readonly originalLocation: string | null }>>,
+): Promise<readonly CpuProfileFrame[]> => {
+  if (!scriptMap || Object.keys(scriptMap).length === 0) {
+    return frames
+  }
+  const locations = [...new Set(frames.flatMap((frame) => {
+    const match = frame.location.match(/^(.+):(\d+):(\d+)$/)
+    return match && !isNodeInternal(frame.location) ? [`${match[1]}:${Number(match[2]) + 1}:${Math.max(1, Number(match[3]) + 1)}`] : []
+  }))]
+  let resolve: NonNullable<typeof resolveLocations> = resolveLocations || (async () => ({}))
+  if (!resolveLocations) {
+    const resolverPath = new URL('../../../../memory-leak-finder/src/parts/ResolveTrackedLocationSourceMaps/ResolveTrackedLocationSourceMaps.ts', import.meta.url)
+    const resolver = await import(resolverPath.href)
+    resolve = resolver.resolveTrackedLocationSourceMaps
+  }
+  const resolved = await resolve(locations, scriptMap)
+  return frames.map((frame) => {
+    const match = frame.location.match(/^(.+):(\d+):(\d+)$/)
+    if (!match || isNodeInternal(frame.location)) return frame
+    const location = `${match[1]}:${Number(match[2]) + 1}:${Math.max(1, Number(match[3]) + 1)}`
+    const originalLocation = resolved[location]?.originalLocation
+    return originalLocation ? { ...frame, originalLocation } : frame
+  })
+}
+
 export const getCpuProfileData = async (
   basePath: string,
 ): Promise<readonly { readonly data: readonly CpuProfileFrame[]; readonly filename: string }[]> => {
@@ -268,7 +319,7 @@ export const getCpuProfileData = async (
       const filePath = join(resultsPath, dirent)
       const rawData = await readJson(filePath)
       const profile = getProfile(rawData)
-      const data = getCpuProfileFrames(profile)
+      const data = await withOriginalLocations(getCpuProfileFrames(profile), getScriptMap(rawData))
       if (data.length === 0) {
         continue
       }

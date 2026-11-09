@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { expect, test } from '@jest/globals'
 import * as CreateCpuProfileChart from '../src/parts/CreateCpuProfileChart/CreateCpuProfileChart.ts'
-import { getCpuProfileData } from '../src/parts/GetCpuProfileData/GetCpuProfileData.ts'
+import { getCpuProfileData, withOriginalLocations } from '../src/parts/GetCpuProfileData/GetCpuProfileData.ts'
 
 test('getCpuProfileData returns merged flame chart frames per test file', async () => {
   const workspaceRoot = await mkdtemp(join(tmpdir(), 'cpu-profile-data-'))
@@ -102,6 +102,46 @@ test('createCpuProfileChart uses flame chart multi-chart configuration', () => {
       width: 1400,
     }),
   )
+})
+
+test('maps generated CPU locations with one-based source-map coordinates and keeps generated frame identity', async () => {
+  let requestedLocation = ''
+  /** @param {readonly string[]} locations */
+  const resolveLocations = async (locations) => {
+    requestedLocation = String(locations[0])
+    return { [requestedLocation]: { originalLocation: 'src/editor.ts:3:7' } }
+  }
+  const frames = [{
+    colorKey: 'file:///bundle.js:2:4',
+    depth: 0,
+    durationMs: 5,
+    hitCount: 2,
+    location: 'file:///bundle.js:2:4',
+    name: 'render',
+    selfTimeMs: 5,
+    startMs: 0,
+    totalTimeMs: 5,
+  }, {
+    colorKey: 'node:internal/bootstrap_node:1:2',
+    depth: 1,
+    durationMs: 1,
+    hitCount: 1,
+    location: 'node:internal/bootstrap_node:1:2',
+    name: 'internalBinding',
+    selfTimeMs: 1,
+    startMs: 0,
+    totalTimeMs: 1,
+  }]
+
+  const result = await withOriginalLocations(frames, { '1': { url: 'file:///bundle.js', sourceMapUrl: 'file:///bundle.js.map' } }, resolveLocations)
+
+  expect(requestedLocation).toBe('file:///bundle.js:3:5')
+  expect(result[0]).toMatchObject({
+    colorKey: 'file:///bundle.js:2:4',
+    location: 'file:///bundle.js:2:4',
+    originalLocation: 'src/editor.ts:3:7',
+  })
+  expect(result[1]).not.toHaveProperty('originalLocation')
 })
 
 test('getCpuProfileData includes raw profiles from tracked allocation performance results', async () => {
