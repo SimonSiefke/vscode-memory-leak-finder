@@ -14,13 +14,7 @@ import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath
 
 const automaticallyDownloadSourceMaps = false
 const maxDownloadRetries = 3
-const transientDownloadErrorCodes = new Set([
-  ErrorCodes.ECONNRESET,
-  'ETIMEDOUT',
-  'EAI_AGAIN',
-  'ECONNREFUSED',
-  'EPIPE',
-])
+const transientDownloadErrorCodes = new Set([ErrorCodes.ECONNRESET, 'ETIMEDOUT', 'EAI_AGAIN', 'ECONNREFUSED', 'EPIPE'])
 
 interface DownloadVSCodeOptions {
   readonly arch: string
@@ -70,14 +64,13 @@ const isTransientDownloadError = (error: unknown): boolean => {
 }
 
 const getErrorDetails = (error: unknown): string => {
-  const details = getNestedErrors(error)
-    .map((item) => {
-      if (item instanceof Error) {
-        const code = isObject(item) && typeof item.code === 'string' ? ` (${item.code})` : ''
-        return `${item.name}: ${item.message}${code}`
-      }
-      return String(item)
-    })
+  const details = getNestedErrors(error).map((item) => {
+    if (item instanceof Error) {
+      const code = isObject(item) && typeof item.code === 'string' ? ` (${item.code})` : ''
+      return `${item.name}: ${item.message}${code}`
+    }
+    return String(item)
+  })
   return [...new Set(details)].join('; ') || String(error)
 }
 
@@ -89,7 +82,10 @@ const downloadAndUnzipVSCodeWithRetries = async (options: DownloadVSCodeOptions)
     } catch (error) {
       const attempts = attempt + 1
       if (!isTransientDownloadError(error) || attempt >= maxDownloadRetries) {
-        throw new Error(`VS Code ${options.version} download for ${options.platform}/${options.arch} failed after ${attempts} attempt(s): ${getErrorDetails(error)}`, { cause: error })
+        throw new Error(
+          `VS Code ${options.version} download for ${options.platform}/${options.arch} failed after ${attempts} attempt(s): ${getErrorDetails(error)}`,
+          { cause: error },
+        )
       }
       await new Promise((resolve) => setTimeout(resolve, 100 * 2 ** attempt))
     }

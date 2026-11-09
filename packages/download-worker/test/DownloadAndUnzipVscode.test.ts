@@ -87,7 +87,9 @@ test('downloadAndUnzipVscode - does not retry permanent nested download errors a
       updateUrl: '',
       vscodeVersion: '1.100.0',
     }),
-  ).rejects.toThrow('VS Code 1.100.0 download for linux/x64 failed after 1 attempt(s): AggregateError: all download hosts failed; Error: getaddrinfo ENOTFOUND (ENOTFOUND)')
+  ).rejects.toThrow(
+    'VS Code 1.100.0 download for linux/x64 failed after 1 attempt(s): AggregateError: all download hosts failed; Error: getaddrinfo ENOTFOUND (ENOTFOUND)',
+  )
 
   expect(mockDownloadAndUnzipVSCode).toHaveBeenCalledTimes(1)
 })
@@ -100,7 +102,9 @@ test('downloadAndUnzipVscode - reports nested causes after transient retries are
   const { downloadAndUnzipVscode } = await import('../src/parts/DownloadAndUnzipVscode/DownloadAndUnzipVscode.ts')
   await expect(
     downloadAndUnzipVscode({ arch: 'x64', insidersCommit: '', platform: 'linux', updateUrl: '', vscodeVersion: '1.100.0' }),
-  ).rejects.toThrow('VS Code 1.100.0 download for linux/x64 failed after 4 attempt(s): AggregateError: all download hosts failed; Error: socket reset (ECONNRESET)')
+  ).rejects.toThrow(
+    'VS Code 1.100.0 download for linux/x64 failed after 4 attempt(s): AggregateError: all download hosts failed; Error: socket reset (ECONNRESET)',
+  )
 
   expect(mockDownloadAndUnzipVSCode).toHaveBeenCalledTimes(4)
 })
