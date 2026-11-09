@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
 
 const mockDownloadAndUnzipVSCode = jest.fn<(options: { readonly cachePath: string; readonly version: string }) => Promise<string>>()
+const mockMakeConsoleReporter = jest.fn<() => Promise<{ report: (report: unknown) => void; error: (error: unknown) => void }>>()
 const mockGetVscodeRuntimePath = jest.fn<(vscodeVersion: string, platform: string, arch: string) => Promise<string>>()
 const mockSetVscodeRuntimePath = jest.fn<(vscodeVersion: string, path: string, platform: string, arch: string) => Promise<void>>()
 const mockGetProductJsonPath = jest.fn<(platform: string, path: string) => string>()
@@ -12,6 +13,7 @@ const originalVscodePath = process.env.VSCODE_PATH
 
 jest.unstable_mockModule('@vscode/test-electron', () => ({
   downloadAndUnzipVSCode: mockDownloadAndUnzipVSCode,
+  makeConsoleReporter: mockMakeConsoleReporter,
 }))
 
 jest.unstable_mockModule('../src/parts/GetVscodeRuntimePath/GetVscodeRuntimePath.ts', () => ({
@@ -37,6 +39,7 @@ beforeEach(() => {
   jest.resetAllMocks()
   delete process.env.VSCODE_PATH
   mockGetVscodeRuntimePath.mockResolvedValue('')
+  mockMakeConsoleReporter.mockResolvedValue({ report: jest.fn(), error: jest.fn() })
   mockSetVscodeRuntimePath.mockResolvedValue()
   mockGetProductJsonPath.mockReturnValue('/vscode/product.json')
   mockReadJson.mockResolvedValue({})
@@ -70,6 +73,44 @@ test('downloadAndUnzipVscode - retries nested transient errors up to three times
   expect(result).toBe('/vscode/code')
   expect(mockDownloadAndUnzipVSCode).toHaveBeenCalledTimes(4)
   expect(mockSetVscodeRuntimePath).toHaveBeenCalledWith('1.100.0', '/vscode/code', 'linux', 'x64')
+})
+
+test('downloadAndUnzipVscode - retries and reports transient errors captured by the download reporter', async () => {
+  const resetError = Object.assign(new Error('socket reset'), { code: 'ECONNRESET' })
+  const aggregateError = new AggregateError([resetError], 'all download hosts failed')
+  mockDownloadAndUnzipVSCode.mockImplementationOnce(async (options) => {
+    const { reporter } = options as typeof options & {
+      readonly reporter: { report: (report: { readonly stage: string; readonly error: unknown }) => void }
+    }
+    reporter.report({ stage: 'retrying', error: aggregateError })
+    throw new Error('Failed to download and unzip VS Code 1.100.0')
+  })
+  mockDownloadAndUnzipVSCode.mockResolvedValue('/vscode/code')
+
+  const { downloadAndUnzipVscode } = await import('../src/parts/DownloadAndUnzipVscode/DownloadAndUnzipVscode.ts')
+  await expect(
+    downloadAndUnzipVscode({ arch: 'x64', insidersCommit: '', platform: 'linux', updateUrl: '', vscodeVersion: '1.100.0' }),
+  ).resolves.toBe('/vscode/code')
+
+  expect(mockDownloadAndUnzipVSCode).toHaveBeenCalledTimes(2)
+})
+
+test('downloadAndUnzipVscode - retries a transient missing CDN redirect reported by the downloader', async () => {
+  mockDownloadAndUnzipVSCode.mockImplementationOnce(async (options) => {
+    const { reporter } = options as typeof options & {
+      readonly reporter: { report: (report: { readonly stage: string; readonly error: unknown }) => void }
+    }
+    reporter.report({ stage: 'retrying', error: 'Failed to get VS Code archive location' })
+    throw new Error('Failed to download and unzip VS Code 1.100.0')
+  })
+  mockDownloadAndUnzipVSCode.mockResolvedValue('/vscode/code')
+
+  const { downloadAndUnzipVscode } = await import('../src/parts/DownloadAndUnzipVscode/DownloadAndUnzipVscode.ts')
+  await expect(
+    downloadAndUnzipVscode({ arch: 'x64', insidersCommit: '', platform: 'linux', updateUrl: '', vscodeVersion: '1.100.0' }),
+  ).resolves.toBe('/vscode/code')
+
+  expect(mockDownloadAndUnzipVSCode).toHaveBeenCalledTimes(2)
 })
 
 test('downloadAndUnzipVscode - does not retry permanent nested download errors and reports details', async () => {
