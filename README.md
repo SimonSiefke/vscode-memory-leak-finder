@@ -32,7 +32,7 @@ process verification, results, and adding scenarios.
 
 ## Edit telemetry snapshots
 
-See [edit telemetry snapshot coverage](docs/scenarios/edit-telemetry-document-snapshots.md)
+See [edit telemetry snapshot coverage](packages/docs/site/scenarios/edit-telemetry-document-snapshots.md)
 for a development-build scenario that verifies consumed document snapshots are
 collected while the edited document remains open.
 
@@ -471,7 +471,7 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 
 ### Event loop delay
 
-See [the event-loop-delay measure](docs/measures/event-loop-delay.md) for coverage, result fields, and limitations.
+See [the event-loop-delay measure](packages/docs/site/measures/event-loop-delay.md) for coverage, result fields, and limitations.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure event-loop-delay --only base
@@ -547,7 +547,7 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 
 ### Long renderer tasks
 
-See [the long-renderer-tasks measure](docs/measures/long-renderer-tasks.md) for coverage, result fields, and limitations.
+See [the long-renderer-tasks measure](packages/docs/site/measures/long-renderer-tasks.md) for coverage, result fields, and limitations.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure long-renderer-tasks --only base
@@ -572,7 +572,7 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 
 ### Module resolution lookups
 
-See [the module-resolution-lookups measure](docs/measures/module-resolution-lookups.md) for coverage, result fields, and limitations.
+See [the module-resolution-lookups measure](packages/docs/site/measures/module-resolution-lookups.md) for coverage, result fields, and limitations.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure module-resolution-lookups --only base
@@ -580,7 +580,7 @@ node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after -
 
 ### Module resolution
 
-See [the module-resolution measure](docs/measures/module-resolution.md) for coverage, result fields, and limitations.
+See [the module-resolution measure](packages/docs/site/measures/module-resolution.md) for coverage, result fields, and limitations.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure module-resolution --only base
@@ -662,7 +662,7 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 
 ### Synchronous dom read count with stack traces
 
-See [the synchronous-dom-read-count-with-stack-traces measure](docs/measures/synchronous-dom-read-count-with-stack-traces.md) for coverage, result fields, and limitations.
+See [the synchronous-dom-read-count-with-stack-traces measure](packages/docs/site/measures/synchronous-dom-read-count-with-stack-traces.md) for coverage, result fields, and limitations.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure synchronous-dom-read-count-with-stack-traces --only base
@@ -670,7 +670,7 @@ node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after -
 
 ### Synchronous file system
 
-See [the synchronous-file-system measure](docs/measures/synchronous-file-system.md) for coverage, result fields, and limitations.
+See [the synchronous-file-system measure](packages/docs/site/measures/synchronous-file-system.md) for coverage, result fields, and limitations.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure-node --measure synchronous-file-system --only base
@@ -975,7 +975,7 @@ Results retain before/after counters and their deltas. At least 64 KiB growth in
 
 ## Forced layout count
 
-See [the forced-layout-count measure](docs/measures/forced-layout-count.md) for coverage, result fields, and limitations.
+See [the forced-layout-count measure](packages/docs/site/measures/forced-layout-count.md) for coverage, result fields, and limitations.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure forced-layout-count --only base
@@ -984,7 +984,7 @@ npm run build-charts
 
 ## Synchronous dom read count
 
-See [the synchronous-dom-read-count measure](docs/measures/synchronous-dom-read-count.md) for coverage, result fields, and limitations.
+See [the synchronous-dom-read-count measure](packages/docs/site/measures/synchronous-dom-read-count.md) for coverage, result fields, and limitations.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure synchronous-dom-read-count --only base
@@ -993,7 +993,7 @@ npm run build-charts
 
 ### Estimated allocation bytes
 
-Use [`--measure trackedAllocationBytes`](docs/measures/tracked-allocation-bytes.md) to compare estimated bytes allocated at instrumented sites, including computed strings/numbers. Results include per-site counts, estimated bytes and unknown-size counts; see the documented size model and coverage limits.
+Use [`--measure trackedAllocationBytes`](packages/docs/site/measures/tracked-allocation-bytes.md) to compare estimated bytes allocated at instrumented sites, including computed strings/numbers. Results include per-site counts, estimated bytes and unknown-size counts; see the documented size model and coverage limits.
 
 ## Agents window e2e tests
 
