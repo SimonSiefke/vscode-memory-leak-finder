@@ -42,6 +42,7 @@ export const createDualBarChart = (data: any, options: any): string => {
             Plot.axisY({
               fontSize: chartOptions.fontSize,
               lineWidth: options.labelLineWidth,
+              ...(options.labelAlign === 'left' ? { dx: -chartOptions.marginLeft, textAnchor: 'start', tickPadding: 0, tickSize: 0 } : {}),
               textOverflow: 'ellipsis-middle',
               tickFormat: (row: string) => orderedData[Number(row)].label ?? orderedData[Number(row)].name,
             }),

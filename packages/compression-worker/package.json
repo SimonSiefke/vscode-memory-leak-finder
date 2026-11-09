@@ -18,7 +18,7 @@
     "@lvce-editor/assert": "^1.11.0",
     "@lvce-editor/rpc": "^6.23.0",
     "@lvce-editor/verror": "^1.7.0",
-    "@mongodb-js/zstd": "^7.0.0",
+    "@mongodb-js/zstd": "^2.0.1",
     "extract-zip": "^2.0.1"
   }
 }
